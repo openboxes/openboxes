@@ -18,7 +18,7 @@ class StocklistController {
     def stocklistService
     def documentService
 
-    def show = {
+    def show() {
         println "stocklist " + params
         def location = Location.get(params.id)
         def inventoryLevels = InventoryLevel.findAllByInventory(location.inventory)
@@ -26,15 +26,14 @@ class StocklistController {
         [location: location, inventoryLevels: inventoryLevels]
     }
 
-
-    def renderHtml = {
+    def renderHtml() {
         Stocklist stocklist = stocklistService.getStocklist(params.id)
         render(
                 template: "/stocklist/print",
                 model: [stocklist: stocklist])
     }
 
-    def renderPdf = {
+    def renderPdf() {
         Stocklist stocklist = stocklistService.getStocklist(params.id)
 
         renderPdf(
@@ -44,7 +43,7 @@ class StocklistController {
         )
     }
 
-    def generateCsv = {
+    def generateCsv() {
         Stocklist stocklist = stocklistService.getStocklist(params.id)
 
         render ""
@@ -58,7 +57,7 @@ class StocklistController {
         documentService.generateStocklistCsv(response.outputStream, stocklist)
     }
 
-    def sendMail = {
+    def sendMail() {
         Stocklist stocklist = stocklistService.getStocklist(params.id)
 
         if (!params.recipients || !params.id || !params.body || !params.subject) {

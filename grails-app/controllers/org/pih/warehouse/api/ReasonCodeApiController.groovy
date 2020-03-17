@@ -18,7 +18,7 @@ class ReasonCodeApiController {
     def locationService
     def messageSource
 
-    def list = {
+    def list() {
 
         List<ReasonCodeCommand> reasonCodes = []
         ActivityCode[] activityCodes = params.list("activityCode") as ActivityCode[]
@@ -35,13 +35,13 @@ class ReasonCodeApiController {
         render([data: reasonCodes.collect { it.toJson() }] as JSON)
     }
 
-    def read = {
+    def read() {
         ReasonCode reasonCodeEnum = params.id as ReasonCode
         ReasonCodeCommand reasonCode = getReasonCode(reasonCodeEnum)
         render([data: reasonCode?.toJson()] as JSON)
     }
 
-    List<ReasonCodeCommand> getReasonCodes(List<ReasonCode> reasonCodeEnums) {
+    private List<ReasonCodeCommand> getReasonCodes(List<ReasonCode> reasonCodeEnums) {
         List<ReasonCodeCommand> reasonCodes = []
         reasonCodeEnums.eachWithIndex { ReasonCode reasonCodeEnum, index ->
             reasonCodes << getReasonCode(reasonCodeEnum)
@@ -49,7 +49,7 @@ class ReasonCodeApiController {
         return reasonCodes
     }
 
-    ReasonCodeCommand getReasonCode(ReasonCode reasonCodeEnum) {
+    private ReasonCodeCommand getReasonCode(ReasonCode reasonCodeEnum) {
         Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale ?: "en")
         Locale locale = session?.user?.locale ?: defaultLocale
         ReasonCodeCommand reasonCode = new ReasonCodeCommand()

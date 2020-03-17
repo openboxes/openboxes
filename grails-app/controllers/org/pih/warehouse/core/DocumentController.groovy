@@ -37,11 +37,11 @@ class DocumentController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
 
         log.info "params: " + params
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
@@ -72,13 +72,13 @@ class DocumentController {
         [documentInstanceList: documentInstanceList, documentInstanceTotal: documentInstanceTotal]
     }
 
-    def create = {
+    def create() {
         def documentInstance = new Document()
         documentInstance.properties = params
         return [documentInstance: documentInstance]
     }
 
-    def save = {
+    def save() {
 
         log.info "Params " + params
         def documentInstance = new Document(params)
@@ -106,7 +106,7 @@ class DocumentController {
         }
     }
 
-    def show = {
+    def show() {
         def documentInstance = Document.get(params.id)
         if (!documentInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label', default: 'Document'), params.id])}"
@@ -116,7 +116,7 @@ class DocumentController {
         }
     }
 
-    def edit = {
+    def edit() {
         def documentInstance = Document.get(params.id)
         if (!documentInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label', default: 'Document'), params.id])}"
@@ -126,7 +126,7 @@ class DocumentController {
         }
     }
 
-    def update = {
+    def update() {
         log.info "Update " + params
 
 
@@ -155,7 +155,7 @@ class DocumentController {
         }
     }
 
-    def delete = {
+    def delete() {
         def documentInstance = Document.get(params.id)
         if (documentInstance) {
             try {
@@ -176,7 +176,7 @@ class DocumentController {
     /**
      * Upload a document to the server
      */
-    def uploadDocument = { DocumentCommand command ->
+    def uploadDocument(DocumentCommand command) {
         log.info "Uploading document: " + params
         def file = command.fileContents
 
@@ -297,7 +297,7 @@ class DocumentController {
     /**
      * @deprecated
      */
-    def upload = {
+    def upload() {
 
         log.info "Upload " + params
 
@@ -343,7 +343,7 @@ class DocumentController {
     /**
      * Allow user to download the file associated with the given id.
      */
-    def download = {
+    def download() {
         log.debug "Download file with id = ${params.id}"
         def documentInstance = Document.get(params.id)
         if (!documentInstance) {
@@ -359,13 +359,13 @@ class DocumentController {
         }
     }
 
-    def preview = {
+    def preview() {
         def documentInstance = Document.get(params.id)
         render(template: "preview", model: [documentInstance: documentInstance])
     }
 
 
-    def render = {
+    def render() {
         def documentInstance = Document.get(params.id)
         Shipment shipmentInstance = Shipment.get(params.shipmentId)
         if (!documentInstance) {
@@ -430,7 +430,7 @@ class DocumentController {
      * Saves changes to document metadata (or, more specifically, saves changes to metadata--type,name,documentNumber--associated with
      * a document without modifying the document itself--the upload method handles this)
      */
-    def saveDocument = { DocumentCommand command ->
+    def saveDocument(DocumentCommand command) {
         // fetch the existing document
         Document documentInstance = Document.get(params.documentId)
         if (!documentInstance) {
@@ -481,7 +481,7 @@ class DocumentController {
         }
     }
 
-    def printZebraTemplate = {
+    def printZebraTemplate() {
         Document document = Document.load(params.id)
         Location location = Location.load(session.warehouse.id)
         InventoryItem inventoryItem = InventoryItem.load(params?.inventoryItem?.id)
@@ -514,7 +514,7 @@ class DocumentController {
         redirect(controller: "inventoryItem", action: "showStockCard", id: inventoryItem?.product?.id)
     }
 
-    def buildZebraTemplate = {
+    def buildZebraTemplate() {
         Document document = Document.load(params.id)
         InventoryItem inventoryItem = InventoryItem.load(params.inventoryItem?.id)
         Location location = Location.load(session.warehouse.id)
@@ -524,7 +524,7 @@ class DocumentController {
         render(renderedContent)
     }
 
-    def renderZebraTemplate = {
+    def renderZebraTemplate() {
         Document document = Document.load(params.id)
         InventoryItem inventoryItem = InventoryItem.load(params.inventoryItem?.id)
         Location location = Location.load(session.warehouse.id)
@@ -542,7 +542,7 @@ class DocumentController {
     }
 
 
-    def exportZebraTemplate = {
+    def exportZebraTemplate() {
         Document document = Document.load(params.id)
         InventoryItem inventoryItem = InventoryItem.load(params.inventoryItem?.id)
         Location location = Location.load(session.warehouse.id)

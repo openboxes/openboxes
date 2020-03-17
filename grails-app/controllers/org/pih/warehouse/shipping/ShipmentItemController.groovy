@@ -19,22 +19,22 @@ class ShipmentItemController {
     def shipmentService
 
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [shipmentItemInstanceList: ShipmentItem.list(params), shipmentItemInstanceTotal: ShipmentItem.count()]
     }
 
-    def create = {
+    def create() {
         def shipmentItemInstance = new ShipmentItem()
         shipmentItemInstance.properties = params
         return [shipmentItemInstance: shipmentItemInstance]
     }
 
-    def save = {
+    def save() {
         def shipmentItemInstance = new ShipmentItem(params)
         if (shipmentItemInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'shipmentItem.label', default: 'ShipmentItem'), shipmentItemInstance.id])}"
@@ -44,7 +44,7 @@ class ShipmentItemController {
         }
     }
 
-    def show = {
+    def show() {
         def shipmentItemInstance = ShipmentItem.get(params.id)
         if (!shipmentItemInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipmentItem.label', default: 'ShipmentItem'), params.id])}"
@@ -54,7 +54,7 @@ class ShipmentItemController {
         }
     }
 
-    def edit = {
+    def edit() {
         def shipmentItemInstance = ShipmentItem.get(params.id)
         if (!shipmentItemInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipmentItem.label', default: 'ShipmentItem'), params.id])}"
@@ -64,7 +64,7 @@ class ShipmentItemController {
         }
     }
 
-    def update = {
+    def update() {
         def shipmentItemInstance = ShipmentItem.get(params.id)
         if (shipmentItemInstance) {
             if (params.version) {
@@ -89,7 +89,7 @@ class ShipmentItemController {
         }
     }
 
-    def delete = {
+    def delete() {
         def shipmentItemInstance = ShipmentItem.get(params.id)
         if (shipmentItemInstance) {
             try {
@@ -107,7 +107,7 @@ class ShipmentItemController {
         }
     }
 
-    def pick = {
+    def pick() {
         def shipmentItem = ShipmentItem.get(params.id)
         if (!shipmentItem) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipmentItem.label', default: 'ShipmentItem'), params.id])}"
@@ -122,7 +122,7 @@ class ShipmentItemController {
 
     }
 
-    def split = {
+    def split() {
         log.info "Split " + params
         def shipmentItemInstance = ShipmentItem.get(params.id)
         if (!shipmentItemInstance) {
@@ -136,7 +136,7 @@ class ShipmentItemController {
     }
 
 
-    def updatePicklistItem = {
+    def updatePicklistItem() {
 
         def shipmentItemInstance = ShipmentItem.get(params.id)
         if (shipmentItemInstance) {

@@ -18,11 +18,11 @@ class ProductAssociationController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
 
         def terms = params.q ? params?.q?.split(" ") : null
@@ -64,13 +64,13 @@ class ProductAssociationController {
         [productAssociationInstanceList: productAssociations, productAssociationInstanceTotal: productAssociations.totalCount, selectedTypes: selectedTypes]
     }
 
-    def create = {
+    def create() {
         def productAssociationInstance = new ProductAssociation()
         productAssociationInstance.properties = params
         return [productAssociationInstance: productAssociationInstance]
     }
 
-    def save = {
+    def save() {
         def productAssociationInstance = new ProductAssociation(params)
         if (productAssociationInstance.save(flush: true)) {
             if (params.hasMutualAssociation) {
@@ -95,7 +95,7 @@ class ProductAssociationController {
         }
     }
 
-    def show = {
+    def show() {
         def productAssociationInstance = ProductAssociation.get(params.id)
         if (!productAssociationInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productAssociation.label', default: 'ProductAssociation'), params.id])}"
@@ -105,7 +105,7 @@ class ProductAssociationController {
         }
     }
 
-    def edit = {
+    def edit() {
         def productAssociationInstance = ProductAssociation.get(params.id)
         if (!productAssociationInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productAssociation.label', default: 'ProductAssociation'), params.id])}"
@@ -115,7 +115,7 @@ class ProductAssociationController {
         }
     }
 
-    def update = {
+    def update() {
         def productAssociationInstance = ProductAssociation.get(params.id)
         if (productAssociationInstance) {
             if (params.version) {
@@ -161,7 +161,7 @@ class ProductAssociationController {
         }
     }
 
-    def delete = {
+    def delete() {
         def productAssociationInstance = ProductAssociation.get(params.id)
         if (productAssociationInstance) {
             try {
@@ -190,7 +190,7 @@ class ProductAssociationController {
     }
 
 
-    def dialog = {
+    def dialog() {
         log.info "Display dialog " + params
         def product = Product.get(params.product.id)
         def productAssociation = ProductAssociation.get(params.id)
@@ -205,7 +205,7 @@ class ProductAssociationController {
     }
 
 
-    def export = {
+    def export() {
         def productAssociations = ProductAssociation.list()
         def data = productAssociations ? dataService.transformObjects(productAssociations, ProductAssociation.PROPERTIES) : [[:]]
         response.setHeader("Content-disposition",

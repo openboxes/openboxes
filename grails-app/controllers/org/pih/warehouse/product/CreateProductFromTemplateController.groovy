@@ -18,12 +18,12 @@ class CreateProductFromTemplateController {
     ProductService productService
     InventoryService inventoryService
 
-    def index = {
+    def index() {
         redirect(action: "create")
     }
 
 
-    def createFlow = {
+    def createFlow() {
         start {
             action {
                 flow.product = new ProductGloveCommand()

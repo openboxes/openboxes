@@ -9,11 +9,11 @@ class PartialReceivingController {
     def receiptService
     def stockMovementService
 
-    def index = {
+    def index() {
         redirect(action: "create")
     }
 
-    def create = {
+    def create() {
         Location currentLocation = Location.get(session.warehouse.id)
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         Shipment shipment = stockMovement?.shipment
@@ -30,7 +30,7 @@ class PartialReceivingController {
         render(template: "/partialReceiving/create")
     }
 
-    def rollbackLastReceipt = {
+    def rollbackLastReceipt() {
         Shipment shipment = Shipment.get(params.id)
 
         if (shipment) {

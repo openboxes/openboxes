@@ -10,11 +10,11 @@
 package org.pih.warehouse.user
 
 import grails.validation.ValidationException
-import org.pih.warehouse.core.*
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationRole
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.Role
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 
 import javax.imageio.ImageIO as IIO
@@ -33,19 +33,19 @@ class UserController {
     /**
      * Show index page - just a redirect to the list page.
      */
-    def index = {
+    def index() {
         log.info "user controller index"
         redirect(action: "list", params: params)
     }
 
-    def redirect = {
+    def redirect() {
         redirect(controller: "user", action: "edit", id: params.id)
     }
 
     /**
      * Show list of users
      */
-    def list = {
+    def list() {
 
         println params
         def userInstanceList = []
@@ -62,7 +62,7 @@ class UserController {
     }
 
 
-    def impersonate = {
+    def impersonate() {
         def userInstance = User.get(params.id)
         if (session.impersonateUserId) {
             flash.message = "Already impersonstating user ${session.user.username}"
@@ -78,7 +78,7 @@ class UserController {
         redirect(controller: "dashboard", action: "index")
     }
 
-    def sendTestEmail = {
+    def sendTestEmail() {
         def userInstance = User.get(params.id)
         if (!userInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
@@ -103,7 +103,7 @@ class UserController {
     /**
      * Create a user
      */
-    def create = {
+    def create() {
         log.info "create a new user based on request parameters"
         def userInstance = new User()
         userInstance.properties = params
@@ -114,7 +114,7 @@ class UserController {
     /**
      * Save a user
      */
-    def save = {
+    def save() {
         log.info "attempt to save the user; show form with validation errors on failure"
         def userInstance = new User(params)
 
@@ -140,7 +140,7 @@ class UserController {
     /**
      * Show a user
      */
-    def show = {
+    def show() {
         def userInstance = User.get(params.id)
         if (!userInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
@@ -153,7 +153,7 @@ class UserController {
     /**
      * Allow user to change their avatar/photo.
      */
-    def changePhoto = {
+    def changePhoto() {
         log.info "change photo for given user"
         def userInstance = User.get(params.id)
         if (!userInstance) {
@@ -164,7 +164,7 @@ class UserController {
         }
     }
 
-    def cropPhoto = {
+    def cropPhoto() {
         log.info "change photo for given user"
         def userInstance = User.get(params.id)
         if (!userInstance) {
@@ -179,7 +179,7 @@ class UserController {
     /**
      * Show user preferences.
      */
-    def preferences = {
+    def preferences() {
         log.info "show user preferences"
     }
 
@@ -187,7 +187,7 @@ class UserController {
     /**
      * Show the edit form for a user
      */
-    def edit = {
+    def edit() {
 
         def userInstance = User.get(params.id)
         if (!userInstance) {
@@ -200,7 +200,7 @@ class UserController {
     }
 
 
-    def toggleActivation = {
+    def toggleActivation() {
         def userInstance = User.get(params.id)
         if (!userInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
@@ -221,8 +221,7 @@ class UserController {
     /**
      * Update a user
      */
-    @CacheFlush(["megamenuCache"])
-    def update = {
+    def update() {
 
         def userInstance = User.get(params.id)
         if (userInstance) {
@@ -265,7 +264,7 @@ class UserController {
     }
 
 
-    def disableLocalizationMode = {
+    def disableLocalizationMode() {
         session.useDebugLocale = false
         if (!grailsApplication.config.openboxes.locale.custom.enabled) {
             flash.message = "${g.message(code: 'localization.invalid.custom.message')}"
@@ -279,7 +278,7 @@ class UserController {
         }
     }
 
-    def enableLocalizationMode = {
+    def enableLocalizationMode() {
         session.useDebugLocale = true
         if (!grailsApplication.config.openboxes.locale.custom.enabled) {
             flash.message = "${g.message(code: 'localization.invalid.custom.message')}"
@@ -299,7 +298,7 @@ class UserController {
      * Used by the locale selectors in the footer
      */
     //@CacheFlush(["megamenuCache"])
-    def updateAuthUserLocale = {
+    def updateAuthUserLocale() {
 
         log.info "update auth user locale " + params
         if (params.locale == 'debug') {
@@ -349,7 +348,7 @@ class UserController {
     /**
      * Delete a user
      */
-    def delete = {
+    def delete() {
 
         log.info(params)
 
@@ -378,7 +377,7 @@ class UserController {
     /**
      * View user's profile photo
      */
-    def viewPhoto = {
+    def viewPhoto() {
         def userInstance = User.get(params.id)
         if (userInstance) {
             byte[] image = userInstance.photo
@@ -389,7 +388,7 @@ class UserController {
     }
 
 
-    def viewThumb = {
+    def viewThumb() {
         def width = params.width ?: 128
         def height = params.height ?: 128
 
@@ -406,7 +405,7 @@ class UserController {
         }
     }
 
-    def uploadPhoto = {
+    def uploadPhoto() {
 
         def userInstance = User.get(params.id)
         if (userInstance) {
@@ -446,18 +445,18 @@ class UserController {
         }
     }
 
-    def createLocationRoles = {
+    def createLocationRoles() {
         LocationRole locationRoleInstance = new LocationRole()
         locationRoleInstance.user = User.get(params.user.id)
         render(template: "/locationRole/form", model: [locationRoleInstance: locationRoleInstance])
     }
 
-    def editLocationRole = {
+    def editLocationRole() {
         LocationRole locationRoleInstance = LocationRole.get(params.id)
         render(template: "/locationRole/form", model: [locationRoleInstance: locationRoleInstance])
     }
 
-    def deleteLocationRole = {
+    def deleteLocationRole() {
         LocationRole locationRole = params.id ? LocationRole.get(params.id) : null
         User user = locationRole.user
         user.removeFromLocationRoles(locationRole)
@@ -466,7 +465,7 @@ class UserController {
         redirect(action: "edit", id: user.id)
     }
 
-    def saveLocationRole = {
+    def saveLocationRole() {
         log.info("save location role " + params)
         User user = params.user.id ? User.get(params.user.id) : null
         Location location = params.location?.id ? Location.get(params.location.id) : null
@@ -564,7 +563,7 @@ class UserController {
     }
 
     // TODO Consider moving this to a utility or service
-    static resize = { bytes, out, maxW, maxH ->
+    static resize(bytes, out, maxW, maxH) {
         AWTImage ai = new ImageIcon(bytes).image
         int width = ai.getWidth(null)
         int height = ai.getHeight(null)

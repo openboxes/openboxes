@@ -22,8 +22,6 @@ import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.product.Product
 import org.springframework.orm.hibernate3.HibernateSystemException
 
 class RequisitionController {
@@ -35,11 +33,11 @@ class RequisitionController {
 
     static allowedMethods = [save: "POST", update: "POST"]
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         def user = User.get(session?.user?.id)
         def location = Location.get(session?.warehouse?.id)
 
@@ -53,11 +51,11 @@ class RequisitionController {
         render(view: "list", model: [requisitions: requisitions, requisitionStatistics: requisitionStatistics])
     }
 
-    def chooseTemplate = {
+    def chooseTemplate() {
         render(view: "chooseTemplate")
     }
 
-    def createStockFromTemplate = {
+    def createStockFromTemplate() {
         def requisition = new Requisition()
         def requisitionTemplate = Requisition.get(params.id)
         if (requisitionTemplate) {
@@ -86,13 +84,13 @@ class RequisitionController {
         render(view: "createStock", model: [requisition: requisition])
     }
 
-    def create = {
+    def create() {
         def requisition = new Requisition(status: RequisitionStatus.CREATED)
         requisition.type = params.type as RequisitionType
         render(view: "createNonStock", model: [requisition: requisition])
     }
 
-    def save = {
+    def save() {
         log.info "Save requisition " + params
         withForm {
             def requisition = new Requisition(params)
@@ -125,7 +123,7 @@ class RequisitionController {
     }
 
 
-    def edit = {
+    def edit() {
         def requisition = Requisition.get(params.id)
         if (requisition) {
 
@@ -145,13 +143,13 @@ class RequisitionController {
         }
     }
 
-    def editHeader = {
+    def editHeader() {
         def requisition = Requisition.get(params.id)
         [requisition: requisition]
     }
 
 
-    def saveHeader = {
+    def saveHeader() {
         def requisition = Requisition.get(params.id)
 
         if (requisition) {
@@ -170,13 +168,13 @@ class RequisitionController {
 
     }
 
-    def normalize = {
+    def normalize() {
         def requisition = Requisition.get(params.id)
         requisitionService.normalizeRequisition(requisition)
         redirect(action: "review", id: requisition.id)
     }
 
-    def normalizeAll = {
+    def normalizeAll() {
         def requisitions = Requisition.list()
         requisitions.each { requisition ->
             requisitionService.normalizeRequisition(requisition)
@@ -185,7 +183,7 @@ class RequisitionController {
     }
 
 
-    def review = {
+    def review() {
         def requisition = Requisition.get(params.id)
 
         if (requisition.status < RequisitionStatus.VERIFYING) {
@@ -219,7 +217,7 @@ class RequisitionController {
     }
 
 
-    def saveRequisitionItems = {
+    def saveRequisitionItems() {
         def jsonResponse = []
         def requisition = new Requisition()
         try {
@@ -251,7 +249,7 @@ class RequisitionController {
     }
 
 
-    def confirm = {
+    def confirm() {
         def requisition = Requisition.get(params?.id)
         if (requisition) {
 
@@ -274,7 +272,7 @@ class RequisitionController {
         [requisition: requisition]
     }
 
-    def saveDetails = {
+    def saveDetails() {
         def requisition = Requisition.get(params?.id)
         if (requisition) {
             requisition.properties = params
@@ -285,7 +283,7 @@ class RequisitionController {
     }
 
 
-    def pick = {
+    def pick() {
         println "Pick " + params
         def requisition = Requisition.get(params?.id)
         if (requisition) {
@@ -337,20 +335,20 @@ class RequisitionController {
         }
     }
 
-    def generatePicklist = {
+    def generatePicklist() {
         def requisition = Requisition.get(params?.id)
         requisitionService.generatePicklist(requisition)
 
         redirect(action: "pick", id: requisition?.id)
     }
 
-    def clearPicklist = {
+    def clearPicklist() {
         def requisition = Requisition.get(params?.id)
         requisitionService.clearPicklist(requisition)
         redirect(action: "pick", id: requisition?.id)
     }
 
-    def showPicklistDialog = {
+    def showPicklistDialog() {
         def location = Location.get(session.warehouse.id)
         def requisitionItem = RequisitionItem.get(params.id)
 
@@ -363,7 +361,7 @@ class RequisitionController {
                                                   availableItems : availableItems])
     }
 
-    def pickNextItem = {
+    def pickNextItem() {
         def nextItem
         def requisition = Requisition.get(params?.id)
         def requisitionItem = RequisitionItem.get(params?.requisitionItem?.id)
@@ -377,7 +375,7 @@ class RequisitionController {
                 params: ["requisitionItem.id": nextItem?.id])
     }
 
-    def pickPreviousItem = {
+    def pickPreviousItem() {
         def requisition = Requisition.get(params?.id)
         def requisitionItem = RequisitionItem.get(params.requisitionItem.id)
         if (!requisitionItem) {
@@ -393,7 +391,7 @@ class RequisitionController {
     }
 
 
-    def picked = {
+    def picked() {
         def requisition = Requisition.get(params.id)
         if (requisition) {
             requisition.status = RequisitionStatus.PENDING
@@ -403,7 +401,7 @@ class RequisitionController {
     }
 
 
-    def process = {
+    def process() {
         def requisition = Requisition.get(params?.id)
         if (requisition) {
             def currentInventory = Location.get(session.warehouse.id).inventory
@@ -426,14 +424,14 @@ class RequisitionController {
         }
     }
 
-    def transfer = {
+    def transfer() {
         def requisition = Requisition.get(params.id)
         def picklist = Picklist.findByRequisition(requisition)
 
         [requisition: requisition, picklist: picklist]
     }
 
-    def complete = {
+    def complete() {
         def requisition = Requisition.get(params.id)
         try {
             User issuedBy = User.get(params?.issuedBy?.id)
@@ -453,7 +451,7 @@ class RequisitionController {
         redirect(action: "show", id: params.id)
     }
 
-    def cancel = {
+    def cancel() {
         def requisition = Requisition.get(params?.id)
         if (requisition) {
             requisitionService.cancelRequisition(requisition)
@@ -462,7 +460,7 @@ class RequisitionController {
         redirect(action: "list")
     }
 
-    def rollback = {
+    def rollback() {
         def action = "show"
         def requisition = Requisition.get(params?.id)
         if (requisition) {
@@ -493,7 +491,7 @@ class RequisitionController {
     }
 
 
-    def undoCancel = {
+    def undoCancel() {
         def requisition = Requisition.get(params?.id)
         if (requisition) {
             requisitionService.undoCancelRequisition(requisition)
@@ -502,7 +500,7 @@ class RequisitionController {
         redirect(action: "list")
     }
 
-    def show = {
+    def show() {
         def requisition = Requisition.get(params.id)
         if (!requisition) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
@@ -519,7 +517,7 @@ class RequisitionController {
         }
     }
 
-    def delete = {
+    def delete() {
         def requisition = Requisition.get(params.id)
         if (requisition) {
             try {
@@ -535,7 +533,7 @@ class RequisitionController {
         redirect(action: "list", id: params.id)
     }
 
-    def printDraft = {
+    def printDraft() {
         println "print draft " + params
         def requisition = Requisition.get(params.id)
         def picklist = Picklist.findByRequisition(requisition)
@@ -544,7 +542,7 @@ class RequisitionController {
     }
 
 
-    def addToPicklistItems = { AddToPicklistItemsCommand command ->
+    def addToPicklistItems(AddToPicklistItemsCommand command) {
         def picklist = Picklist.findByRequisition(command.requisition)
         if (!picklist) {
             picklist = new Picklist()
@@ -574,53 +572,7 @@ class RequisitionController {
         redirect(action: "pick", id: command?.requisition?.id)
     }
 
-
-    private List<Location> getDepots() {
-        Location.list().findAll { location -> location.id != session.warehouse.id && location.isWarehouse() }.sort {
-            it.name
-        }
-    }
-
-    private List<Location> getWardsPharmacies() {
-        def current = Location.get(session.warehouse.id)
-        def locations = []
-        if (current) {
-            if (current?.locationGroup == null) {
-                locations = Location.list().findAll { location -> location.isWardOrPharmacy() }.sort {
-                    it.name
-                }
-            } else {
-                locations = Location.list().findAll { location -> location.locationGroup?.id == current.locationGroup?.id }.findAll { location -> location.isWardOrPharmacy() }.sort {
-                    it.name
-                }
-            }
-        }
-        return locations
-    }
-
-    /**
-     * Generate the name of the requisition.
-     *
-     * @param requisition
-     * @return
-     */
-    def getName(requisition) {
-        def commodityClass = (requisition.commodityClass) ? "${warehouse.message(code: 'enum.CommodityClass.' + requisition.commodityClass)}" : null
-        def requisitionType = (requisition.type) ? "${warehouse.message(code: 'enum.RequisitionType.' + requisition.type)}" : null
-        def requisitionName =
-                [
-                        requisitionType,
-                        requisition.destination,
-                        requisition.recipientProgram,
-                        commodityClass,
-                        requisition?.dateRequested?.format("MMM dd yyyy")
-                ]
-
-        return requisitionName.findAll { it }.join(" - ")
-    }
-
-
-    def exportRequisitions = {
+    def exportRequisitions() {
         def requisitions = getRequisitions(params)
         if (requisitions) {
             def date = new Date()
@@ -636,7 +588,7 @@ class RequisitionController {
 
     }
 
-    def exportRequisitionItems = {
+    def exportRequisitionItems() {
         def requisitions = getRequisitions(params)
         if (requisitions) {
             def date = new Date()
@@ -652,7 +604,7 @@ class RequisitionController {
 
     }
 
-    def export = {
+    def export() {
         def requisitions = getRequisitions(params)
         if (requisitions) {
             def date = new Date()
@@ -668,75 +620,12 @@ class RequisitionController {
 
     }
 
-    def getRequisitions(params) {
-
-        // Requisition that encapsulates the basic parameters in the search form
-        def requisition = new Requisition(params)
-        requisition.origin = Location.get(session?.warehouse?.id)
-
-        // Disables pagination
-        params.max = -1
-
-        // Requisitions to export
-        def requisitions = requisitionService.getRequisitions(requisition, params)
-
-        return requisitions
-    }
-
-
-    def getReviewRequisitionModel(params) {
-        def requisition = Requisition.get(params.id)
-        def location = Location.get(session.warehouse.id)
-        def status = params.status ? RequisitionItemStatus.valueOf(RequisitionItemStatus, params.status) : null
-        println "Status: " + status
-        // Get all product for all requisitions items (including substitutions, modifications)
-        def products = requisition?.requisitionItems.collect { it.product }
-
-        // But we only want to show the original requisition items
-        def requisitionItems = requisition?.originalRequisitionItems
-        def quantityProductMap = inventoryService.getQuantityByProductMap(location.inventory, products)
-        def quantityOnHandMap = [:]
-        def quantityAvailableToPromiseMap = [:]
-
-        requisitionItems?.each { requisitionItem ->
-            quantityOnHandMap[requisitionItem?.product?.id] = quantityProductMap[requisitionItem?.product] ?: 0
-        }
-        return [requisition: requisition, requisitionItems: requisitionItems, quantityOnHandMap: quantityOnHandMap]
-
-    }
-
-    // FIXME Move to requisition item class
-    def getRelatedProducts(requisitionItem) {
-        def products = []
-        products << requisitionItem.product
-        requisitionItem.product.productGroups.each { productGroup ->
-            productGroup.products.each { product ->
-                products.add(product)
-            }
-        }
-        products = products.unique()
-        return products
-    }
-
-
-    def getQuantityOnHandMap(location, products) {
-        def quantityOnHandMap = [:]
-        if (products) {
-            products.eachWithIndex { product, index ->
-                quantityOnHandMap[product] = inventoryService.getQuantityOnHand(location, product)
-            }
-            quantityOnHandMap = quantityOnHandMap.sort { a, b -> b.value <=> a.value }
-        }
-        return quantityOnHandMap
-    }
-
-
-    def showRequisitionItems = {
+    def showRequisitionItems() {
         log.info("Show requisition items " + params)
         render(template: 'requisitionItems2', model: getReviewRequisitionModel(params))
     }
 
-    def editRequisitionItem = {
+    def editRequisitionItem() {
         log.info "edit requisition item: " + params
         def location = Location.get(session.warehouse.id)
         def requisition = Requisition.get(params.id)
@@ -748,7 +637,7 @@ class RequisitionController {
     }
 
 
-    def nextRequisitionItem = {
+    def nextRequisitionItem() {
         log.info "next: " + params
         def requisition = Requisition.get(params.id)
         def requisitionItem = RequisitionItem.get(params.requisitionItem.id)
@@ -759,7 +648,7 @@ class RequisitionController {
         redirect(action: "editRequisitionItem", id: params.id, params: ['requisitionItem.id': nextItem?.id, 'actionType': 'show'])
     }
 
-    def previousRequisitionItem = {
+    def previousRequisitionItem() {
         log.info "previous: " + params
         def requisition = Requisition.get(params.id)
         def requisitionItem = RequisitionItem.get(params.requisitionItem.id)
@@ -774,7 +663,7 @@ class RequisitionController {
     }
 
 
-    def saveRequisitionItem = {
+    def saveRequisitionItem() {
         println "Save requisition item" + params
         def location = Location.get(session.warehouse.id)
         def requisition = Requisition.get(params.id)
@@ -831,7 +720,7 @@ class RequisitionController {
     }
 
 
-    def approveQuantity = {
+    def approveQuantity() {
         log.info "approve quantity = " + params
         def quantityOnHandMap = [:]
         def requisition = Requisition.get(params.id)
@@ -845,7 +734,7 @@ class RequisitionController {
         render(template: 'editRequisitionItem', model: [requisition: requisition, requisitionItem: requisitionItem, actionType: params.actionType, quantityOnHandMap: quantityOnHandMap])
     }
 
-    def undoChangesFromList = {
+    def undoChangesFromList() {
         log.info "cancel quantity = " + params
         def requisitionItem = RequisitionItem.get(params.requisitionItem.id)
         if (requisitionItem) {
@@ -856,7 +745,7 @@ class RequisitionController {
     }
 
 
-    def undoChanges = {
+    def undoChanges() {
         log.info "cancel quantity = " + params
         def quantityOnHandMap = [:]
         def location = Location.get(session.warehouse.id)
@@ -873,7 +762,7 @@ class RequisitionController {
     }
 
 
-    def changeQuantity = {
+    def changeQuantity() {
         log.info "change quantity " + params
         def requisitionItem = RequisitionItem.get(params?.requisitionItem?.id)
         def productPackage = ProductPackage.get(params?.productPackage?.id)
@@ -897,7 +786,7 @@ class RequisitionController {
     /**
      *  Allow user to cancel the given requisition item.
      */
-    def cancelQuantity = {
+    def cancelQuantity() {
         log.info "cancel quantity = " + params
         def requisitionItem = RequisitionItem.get(params.id)
         if (requisitionItem) {
@@ -949,7 +838,7 @@ class RequisitionController {
     /**
      * Allow user to choose substitute during the review process.
      */
-    def chooseSubstitute = {
+    def chooseSubstitute() {
         log.info "choose substitute " + params
         def redirectAction = params?.redirectAction ?: "review"
         def requisitionItem = RequisitionItem.get(params.id)
@@ -979,6 +868,112 @@ class RequisitionController {
             return
         }
         redirect(controller: "requisition", action: redirectAction, id: requisitionItem?.requisition?.id, params: ['requisitionItem.id': requisitionItem.id])
+    }
+
+    private List<Location> getDepots() {
+        Location.list().findAll { location -> location.id != session.warehouse.id && location.isWarehouse() }.sort {
+            it.name
+        }
+    }
+
+    private List<Location> getWardsPharmacies() {
+        def current = Location.get(session.warehouse.id)
+        def locations = []
+        if (current) {
+            if (current?.locationGroup == null) {
+                locations = Location.list().findAll { location -> location.isWardOrPharmacy() }.sort {
+                    it.name
+                }
+            } else {
+                locations = Location.list().findAll { location -> location.locationGroup?.id == current.locationGroup?.id }.findAll { location -> location.isWardOrPharmacy() }.sort {
+                    it.name
+                }
+            }
+        }
+        return locations
+    }
+
+    /**
+     * Generate the name of the requisition.
+     *
+     * @param requisition
+     * @return
+     */
+    private def getName(requisition) {
+        def commodityClass = (requisition.commodityClass) ? "${warehouse.message(code: 'enum.CommodityClass.' + requisition.commodityClass)}" : null
+        def requisitionType = (requisition.type) ? "${warehouse.message(code: 'enum.RequisitionType.' + requisition.type)}" : null
+        def requisitionName =
+                [
+                        requisitionType,
+                        requisition.destination,
+                        requisition.recipientProgram,
+                        commodityClass,
+                        requisition?.dateRequested?.format("MMM dd yyyy")
+                ]
+
+        return requisitionName.findAll { it }.join(" - ")
+    }
+
+    private def getRequisitions(params) {
+
+        // Requisition that encapsulates the basic parameters in the search form
+        def requisition = new Requisition(params)
+        requisition.origin = Location.get(session?.warehouse?.id)
+
+        // Disables pagination
+        params.max = -1
+
+        // Requisitions to export
+        def requisitions = requisitionService.getRequisitions(requisition, params)
+
+        return requisitions
+    }
+
+
+    private def getReviewRequisitionModel(params) {
+        def requisition = Requisition.get(params.id)
+        def location = Location.get(session.warehouse.id)
+        def status = params.status ? RequisitionItemStatus.valueOf(RequisitionItemStatus, params.status) : null
+        println "Status: " + status
+        // Get all product for all requisitions items (including substitutions, modifications)
+        def products = requisition?.requisitionItems.collect { it.product }
+
+        // But we only want to show the original requisition items
+        def requisitionItems = requisition?.originalRequisitionItems
+        def quantityProductMap = inventoryService.getQuantityByProductMap(location.inventory, products)
+        def quantityOnHandMap = [:]
+        def quantityAvailableToPromiseMap = [:]
+
+        requisitionItems?.each { requisitionItem ->
+            quantityOnHandMap[requisitionItem?.product?.id] = quantityProductMap[requisitionItem?.product] ?: 0
+        }
+        return [requisition: requisition, requisitionItems: requisitionItems, quantityOnHandMap: quantityOnHandMap]
+
+    }
+
+    // FIXME Move to requisition item class
+    private def getRelatedProducts(requisitionItem) {
+        def products = []
+        products << requisitionItem.product
+        requisitionItem.product.productGroups.each { productGroup ->
+            productGroup.products.each { product ->
+                products.add(product)
+            }
+        }
+        products = products.unique()
+        return products
+    }
+
+
+    private def getQuantityOnHandMap(location, products) {
+        def quantityOnHandMap = [:]
+        if (products) {
+            products.eachWithIndex { product, index ->
+                quantityOnHandMap[product] = inventoryService.getQuantityOnHand(location, product)
+            }
+            quantityOnHandMap = quantityOnHandMap.sort { a, b -> b.value <=> a.value }
+        }
+        return quantityOnHandMap
     }
 }
 

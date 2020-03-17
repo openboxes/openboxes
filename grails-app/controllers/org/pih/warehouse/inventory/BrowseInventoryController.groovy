@@ -22,12 +22,12 @@ class BrowseInventoryController {
     def productService
     def inventoryService
 
-    def index = {
+    def index() {
         redirect(action: "list")
     }
 
 
-    def list = {
+    def list() {
         def q = params.q
         def category = Category.get(params?.category?.id) ?: null
         def location = Location.get(params?.location?.id) ?: session.warehouse
