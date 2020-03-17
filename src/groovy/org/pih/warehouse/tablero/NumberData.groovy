@@ -15,5 +15,4 @@ class NumberData implements Serializable {
         this.id = id;
         
     }
-
 }
