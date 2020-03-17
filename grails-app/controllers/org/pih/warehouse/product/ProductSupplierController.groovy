@@ -26,11 +26,11 @@ class ProductSupplierController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: ["GET", "POST"]]
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         def productSuppliers = ProductSupplier.createCriteria().list(max: params.max, offset: params.offset) {
             if (params.product?.id) {
@@ -57,13 +57,13 @@ class ProductSupplierController {
         [productSupplierInstanceList: productSuppliers, productSupplierInstanceTotal: productSuppliers.totalCount]
     }
 
-    def create = {
+    def create() {
         def productSupplierInstance = new ProductSupplier()
         productSupplierInstance.properties = params
         return [productSupplierInstance: productSupplierInstance]
     }
 
-    def save = {
+    def save() {
         def productSupplierInstance = new ProductSupplier(params)
         updateAttributes(productSupplierInstance, params)
 
@@ -132,7 +132,7 @@ class ProductSupplierController {
         }
     }
 
-    def show = {
+    def show() {
         def productSupplierInstance = ProductSupplier.get(params.id)
         if (!productSupplierInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), params.id])}"
@@ -142,7 +142,7 @@ class ProductSupplierController {
         }
     }
 
-    def edit = {
+    def edit() {
         def productSupplierInstance = ProductSupplier.get(params.id)
         Location location = Location.get(session.warehouse.id)
         ProductSupplierPreference preference = productSupplierInstance?.productSupplierPreferences?.find {it.destinationParty == location.organization }
@@ -154,7 +154,7 @@ class ProductSupplierController {
         }
     }
 
-    def update = {
+    def update() {
         def productSupplierInstance = ProductSupplier.get(params.id)
         Location location = Location.get(session.warehouse.id)
         ProductSupplierPreference defaultPreference = productSupplierInstance?.globalProductSupplierPreference
@@ -259,7 +259,7 @@ class ProductSupplierController {
         }
     }
 
-    def delete = {
+    def delete() {
         def productSupplierInstance = ProductSupplier.get(params.id)
         if (productSupplierInstance) {
             try {
@@ -283,7 +283,7 @@ class ProductSupplierController {
         }
     }
 
-    def dialog = {
+    def dialog() {
         log.info "Display dialog " + params
         def product = Product.get(params.product.id)
         def productSupplier = ProductSupplier.get(params.id)
@@ -299,7 +299,7 @@ class ProductSupplierController {
         render(template: "dialog", model: [productSupplier: productSupplier, preferenceType: preference?.preferenceType])
     }
 
-    def export = {
+    def export() {
 
         def productSuppliers = []
 

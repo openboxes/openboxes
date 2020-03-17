@@ -49,11 +49,11 @@ class ProductController {
     static allowedMethods = [save: "POST", update: "POST"]
 
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def redirect = {
+    def redirect() {
         log.info("Redirecting to product " + params.id)
         redirect(controller: "inventoryItem", action: "showStockCard", id: params.id)
     }
@@ -61,7 +61,7 @@ class ProductController {
     /**
      * Perform a bulk update of
      */
-    def batchEdit = { BatchEditCommand cmd ->
+    def batchEdit(BatchEditCommand cmd) {
         def startTime = System.currentTimeMillis()
         //	def location = Location.get(session.warehouse.id)
         def category = Category.get(params.categoryId)
@@ -83,7 +83,7 @@ class ProductController {
         [commandInstance: cmd, products: cmd.productInstanceList ?: [], categoryInstance: category]
     }
 
-    def batchEditProperties = {
+    def batchEditProperties() {
         def startTime = System.currentTimeMillis()
 
         println "batch edit products: " + (System.currentTimeMillis() - startTime) + " ms"
@@ -92,7 +92,7 @@ class ProductController {
     }
 
 
-    def batchSave = { BatchEditCommand cmd ->
+    def batchSave(BatchEditCommand cmd) {
 
         println "Batch save " + cmd
 
@@ -137,12 +137,12 @@ class ProductController {
         println "params " + params
     }
 
-    def list = {
+    def list() {
         render(template: "/common/react")
     }
 
 
-    def create = {
+    def create() {
         def startTime = System.currentTimeMillis()
         def productInstance = new Product(params)
         def rootCategory = productService.getRootCategory()
@@ -154,7 +154,7 @@ class ProductController {
         println "After render create.gsp for product: " + (System.currentTimeMillis() - startTime) + " ms"
     }
 
-    def save = {
+    def save() {
         println "Save product: " + params
         def productInstance = new Product()
         productInstance.properties = params
@@ -192,10 +192,10 @@ class ProductController {
     }
 
 
-    def show = {}
+    def show() {}
 
 
-    def edit = {
+    def edit() {
 
         def productInstance = Product.get(params.id)
         def location = Location.get(session?.warehouse?.id)
@@ -212,7 +212,7 @@ class ProductController {
         }
     }
 
-    def renderTemplate = {
+    def renderTemplate() {
         Product productInstance = (params.id) ? Product.get(params.id) : new Product(params)
         Boolean renderNotFoundError = params.renderNotFoundError ? Boolean.valueOf(params.renderNotFoundError) : true
         if (!productInstance && renderNotFoundError) {
@@ -226,7 +226,7 @@ class ProductController {
         }
     }
 
-    def update = {
+    def update() {
         log.info "Update called with params " + params
         def productInstance = Product.get(params.id)
 
@@ -295,80 +295,7 @@ class ProductController {
         }
     }
 
-    def updateTags(productInstance, params) {
-        // Process product tags
-        try {
-
-            def tagList = []
-            if (params.tagsToBeAdded) {
-                params.tagsToBeAdded.split(",").each { tagText ->
-                    Tag tag = Tag.findByTag(tagText)
-                    if (!tag) tag = new Tag(tag: tagText)
-                    tagList << tag
-                }
-            }
-            println "product.tags: " + productInstance.tags
-            println "tagsToBeAdded: " + params.tagsToBeAdded
-            println "tags to be persisted " + tagList
-            productInstance?.tags?.clear()
-            tagList.each { tag ->
-                productInstance?.addToTags(tag)
-            }
-            productInstance?.save()
-            println "product.tags: " + productInstance.tags
-
-        } catch (Exception e) {
-            log.error("Error occurred: " + e.message)
-        }
-    }
-
-
-    def updateAttributes(Product productInstance, Map params) {
-        Map existingAtts = new HashMap()
-        productInstance.attributes.each() {
-            existingAtts.put(it.attribute.id, it)
-        }
-
-        // Process attributes
-        Attribute.findAllByActive(true).each() {
-
-            String value = params["productAttributes." + it.id + ".value"]
-            if (value == "_other" || value == null || value == '') {
-                value = params["productAttributes." + it.id + ".otherValue"]
-            }
-
-            log.info("Process attribute " + it.name + " = " + value + ", required = ${it.required}, active = ${it.active}")
-
-            if (it.active && it.required && !value) {
-                productInstance.errors.rejectValue("attributes", "product.attribute.required",
-                        [] as Object[],
-                        "Product attribute ${it.name} is required")
-                throw new ValidationException("Attribute required", productInstance.errors)
-            }
-
-            ProductAttribute existingAttribute = existingAtts.get(it.id)
-            if (value) {
-                if (!existingAttribute) {
-                    existingAttribute = new ProductAttribute("attribute": it, value: value)
-                    productInstance.addToAttributes(existingAttribute)
-                    productInstance.save()
-                } else {
-                    existingAttribute.value = value
-                    existingAttribute.save()
-                }
-            } else {
-                if (existingAttribute?.attribute?.active) {
-                    log.info("removing attribute ${existingAttribute.attribute.name}")
-                    productInstance.removeFromAttributes(existingAttribute)
-                    existingAttribute.delete()
-                    productInstance.save()
-                }
-            }
-        }
-    }
-
-
-    def delete = {
+    def delete() {
         def productInstance = Product.get(params.id)
         if (productInstance && !productInstance.hasAssociatedTransactionEntriesOrShipmentItems()) {
             try {
@@ -395,7 +322,7 @@ class ProductController {
     }
 
 
-    def deleteProducts = {
+    def deleteProducts() {
         println "Delete products: " + params
         def productIds = request.getParameterValues("product.id")
 
@@ -409,7 +336,7 @@ class ProductController {
     }
 
 
-    def removePackage = {
+    def removePackage() {
         def packageInstance = ProductPackage.get(params.id)
         def productInstance = packageInstance.product
         log.info "" + packageInstance.product
@@ -420,7 +347,7 @@ class ProductController {
         redirect(action: "edit", id: productInstance.id)
     }
 
-    def savePackage = {
+    def savePackage() {
 
         println "savePackage: " + params
         def productInstance = Product.get(params.product.id)
@@ -479,33 +406,11 @@ class ProductController {
     /**
      *
      */
-    def importDependencies = {
+    def importDependencies() {
         redirect(controller: "product", action: "importProducts")
     }
 
-
-    /**
-     * @param userInstance
-     * @return
-     */
-    def sendProductCreatedNotification(Product productInstance) {
-        try {
-            def recipientList = userService.findUsersByRoleType(RoleType.ROLE_PRODUCT_NOTIFICATION).collect {
-                it.email
-            }
-            if (recipientList) {
-                def subject = "${warehouse.message(code: 'email.productCreated.message', args: [productInstance?.name, productInstance?.createdBy?.name])}"
-                def body = "${g.render(template: '/email/productCreated', model: [productInstance: productInstance])}"
-                mailService.sendHtmlMail(subject, body.toString(), recipientList)
-            }
-        }
-        catch (Exception e) {
-            log.error("Error sending product notification email: " + e.message, e)
-        }
-    }
-
-
-    def search = {
+    def search() {
         log.info "search " + params
         if (params.q) {
             def products = productService.findProducts(URLEncoder.encode(params.q))
@@ -513,7 +418,7 @@ class ProductController {
         }
     }
 
-    def barcode = {
+    def barcode() {
         BarcodeFormat format = BarcodeFormat.valueOf(params.format)
         File file = File.createTempFile("barcode-", ".png")
         barcodeService.renderImageToFile(file, params.data, (params.width ?: 125) as int, (params.height ?: 50) as int, format)
@@ -526,7 +431,7 @@ class ProductController {
     /**
      * Upload a document to a product.
      */
-    def upload = { DocumentCommand command ->
+    def upload(DocumentCommand command) {
         log.info "Uploading document: " + params
 
         // HACK - for some reason the Product in document command is not getting bound
@@ -625,7 +530,7 @@ class ProductController {
     }
 
 
-    def deleteDocument = {
+    def deleteDocument() {
         def productInstance = Product.get(params.product.id)
         if (!productInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.product.id])}"
@@ -648,7 +553,7 @@ class ProductController {
         }
     }
 
-    def upnDatabase = {
+    def upnDatabase() {
 
         def file = new File("/home/jmiranda/Dropbox/OpenBoxes/Product Databases/HIBCC/UPNDownload.txt")
         def rows = []
@@ -689,7 +594,7 @@ class ProductController {
     }
 
 
-    def renderImage = {
+    def renderImage() {
         def documentInstance = Document.get(params.id)
         if (documentInstance) {
             response.outputStream << documentInstance.fileContents
@@ -698,7 +603,7 @@ class ProductController {
         }
     }
 
-    def downloadDocument = {
+    def downloadDocument() {
         log.info "viewImage: " + params
         def documentInstance = Document.get(params.id)
         if (documentInstance) {
@@ -712,7 +617,7 @@ class ProductController {
     /**
      * View document
      */
-    def viewImage = {
+    def viewImage() {
         log.info "viewImage: " + params
         def documentInstance = Document.get(params.id)
         if (documentInstance) {
@@ -738,7 +643,7 @@ class ProductController {
     }
 
 
-    def viewThumbnail = {
+    def viewThumbnail() {
         log.info "viewThumbnail: " + params
         def documentInstance = Document.get(params.id)
         if (documentInstance) {
@@ -771,7 +676,7 @@ class ProductController {
      *
      * @params product.id
      */
-    def exportProducts = {
+    def exportProducts() {
         println "export products: " + params
         def productIds = params.list('product.id')
         println "Product IDs: " + productIds
@@ -792,7 +697,7 @@ class ProductController {
     /**
      * Export all products as CSV
      */
-    def exportAsCsv = {
+    def exportAsCsv() {
 
         boolean includeAttributes = params.boolean("includeAttributes")?:false
         def products = Product.findAllByActive(true, [fetch:[attributes:"eager", tags:"eager"]])
@@ -828,12 +733,12 @@ class ProductController {
     /**
      * Renders form to begin the import process
      */
-    def importAsCsv = {}
+    def importAsCsv() {}
 
     /**
      * Upload CSV file
      */
-    def uploadCsv = { ImportDataCommand command ->
+    def uploadCsv(ImportDataCommand command) {
 
         log.info "uploadCsv " + params
 
@@ -891,7 +796,7 @@ class ProductController {
     /**
      * Perform import of CSV
      */
-    def importCsv = { ImportDataCommand command ->
+    def importCsv(ImportDataCommand command) {
 
         log.info "import " + params
 
@@ -930,7 +835,7 @@ class ProductController {
      *
      * @return
      */
-    def addProductGroupToProduct = {
+    def addProductGroupToProduct() {
         println "addProductGroupToProduct() " + params
         def product = Product.get(params.id)
         if (product) {
@@ -945,12 +850,12 @@ class ProductController {
     }
 
 
-    def addProductComponent = {
+    def addProductComponent() {
         Product assemblyProduct = productService.addProductComponent(params.assemblyProduct.id, params.componentProduct.id, params.quantity as BigDecimal, params.unitOfMeasure)
         render(template: 'productComponents', model: [productInstance: assemblyProduct])
     }
 
-    def deleteProductComponent = {
+    def deleteProductComponent() {
 
         def productInstance
         def productComponent = ProductComponent.get(params.id)
@@ -965,7 +870,7 @@ class ProductController {
     /**
      * Delete product group from database
      */
-    def removeFromProductGroups = {
+    def removeFromProductGroups() {
         println "removeFromProductGroup() " + params
 
         def product = Product.get(params.productId)
@@ -982,7 +887,7 @@ class ProductController {
     /**
      * Delete product group from database
      */
-    def deleteProductGroup = {
+    def deleteProductGroup() {
         println "deleteProductGroup() " + params
 
         def product = Product.get(params.productId)
@@ -1006,7 +911,7 @@ class ProductController {
      *
      * @return
      */
-    def addSynonymToProduct = {
+    def addSynonymToProduct() {
         println "addSynonymToProduct() " + params
         Product product = null
         try {
@@ -1022,7 +927,7 @@ class ProductController {
     /**
      * Delete synonym from database
      */
-    def deleteSynonym = {
+    def deleteSynonym() {
         println "deleteSynonym() " + params
 
         def product = Product.get(params.productId)
@@ -1038,13 +943,13 @@ class ProductController {
     }
 
 
-    def renderCreatedEmail = {
+    def renderCreatedEmail() {
         def productInstance = Product.get(params.id)
         def userInstance = User.get(session.user.id)
         render(template: "/email/productCreated", model: [productInstance: productInstance, userInstance: userInstance])
     }
 
-    def addToProductCatalog = { ProductCatalogCommand command ->
+    def addToProductCatalog(ProductCatalogCommand command) {
         log.info("Add product ${command.product} to ${command.productCatalog}" + params)
         def product = command.product
         def productCatalog = command.productCatalog
@@ -1057,13 +962,13 @@ class ProductController {
         redirect(action: "productCatalogs", id: command.product.id)
     }
 
-    def includesProduct = {
+    def includesProduct() {
         def product = Product.get(params.id)
 
         render([products: ProductCatalog.includesProduct(product).listDistinct()] as JSON)
     }
 
-    def removeFromProductCatalog = {
+    def removeFromProductCatalog() {
         log.info("params: " + params)
         def product = Product.get(params.id)
         def productCatalog = ProductCatalog.get(params.productCatalog.id)
@@ -1081,7 +986,7 @@ class ProductController {
     }
 
 
-    def productCatalogs = {
+    def productCatalogs() {
         def product = Product.get(params.id)
 
         def productCatalogs = ProductCatalogItem.createCriteria().list {
@@ -1097,7 +1002,7 @@ class ProductController {
         render template: "productCatalogs", model: [productInstance: product]
     }
 
-    def createProductSnapshot = {
+    def createProductSnapshot() {
 
         Product product = Product.get(params.id)
         Location location = Location.get(session.warehouse.id)
@@ -1109,8 +1014,100 @@ class ProductController {
         redirect(controller: "inventoryItem", action: "showStockCard", id: params.id)
     }
 
+    private def updateTags(productInstance, params) {
+        // Process product tags
+        try {
 
-    def addDocument = {
+            def tagList = []
+            if (params.tagsToBeAdded) {
+                params.tagsToBeAdded.split(",").each { tagText ->
+                    Tag tag = Tag.findByTag(tagText)
+                    if (!tag) tag = new Tag(tag: tagText)
+                    tagList << tag
+                }
+            }
+            println "product.tags: " + productInstance.tags
+            println "tagsToBeAdded: " + params.tagsToBeAdded
+            println "tags to be persisted " + tagList
+            productInstance?.tags?.clear()
+            tagList.each { tag ->
+                productInstance?.addToTags(tag)
+            }
+            productInstance?.save()
+            println "product.tags: " + productInstance.tags
+
+        } catch (Exception e) {
+            log.error("Error occurred: " + e.message)
+        }
+    }
+
+
+    private def updateAttributes(Product productInstance, Map params) {
+        Map existingAtts = new HashMap()
+        productInstance.attributes.each() {
+            existingAtts.put(it.attribute.id, it)
+        }
+
+        // Process attributes
+        Attribute.findAllByActive(true).each() {
+
+            String value = params["productAttributes." + it.id + ".value"]
+            if (value == "_other" || value == null || value == '') {
+                value = params["productAttributes." + it.id + ".otherValue"]
+            }
+
+            log.info("Process attribute " + it.name + " = " + value + ", required = ${it.required}, active = ${it.active}")
+
+            if (it.active && it.required && !value) {
+                productInstance.errors.rejectValue("attributes", "product.attribute.required",
+                        [] as Object[],
+                        "Product attribute ${it.name} is required")
+                throw new ValidationException("Attribute required", productInstance.errors)
+            }
+
+            ProductAttribute existingAttribute = existingAtts.get(it.id)
+            if (value) {
+                if (!existingAttribute) {
+                    existingAttribute = new ProductAttribute("attribute": it, value: value)
+                    productInstance.addToAttributes(existingAttribute)
+                    productInstance.save()
+                } else {
+                    existingAttribute.value = value
+                    existingAttribute.save()
+                }
+            } else {
+                if (existingAttribute?.attribute?.active) {
+                    log.info("removing attribute ${existingAttribute.attribute.name}")
+                    productInstance.removeFromAttributes(existingAttribute)
+                    existingAttribute.delete()
+                    productInstance.save()
+                }
+            }
+        }
+    }
+
+    /**
+     * @param userInstance
+     * @return
+     */
+    private def sendProductCreatedNotification(Product productInstance) {
+        try {
+            def recipientList = userService.findUsersByRoleType(RoleType.ROLE_PRODUCT_NOTIFICATION).collect {
+                it.email
+            }
+            if (recipientList) {
+                def subject = "${warehouse.message(code: 'email.productCreated.message', args: [productInstance?.name, productInstance?.createdBy?.name])}"
+                def body = "${g.render(template: '/email/productCreated', model: [productInstance: productInstance])}"
+                mailService.sendHtmlMail(subject, body.toString(), recipientList)
+            }
+        }
+        catch (Exception e) {
+            log.error("Error sending product notification email: " + e.message, e)
+        }
+    }
+
+
+    def addDocument() {
         Product productInstance = Product.get(params.id)
         def documentInstance = Document.get(params?.document?.id)
         if (!documentInstance) {

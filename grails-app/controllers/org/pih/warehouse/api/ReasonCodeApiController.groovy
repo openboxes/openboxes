@@ -19,7 +19,7 @@ class ReasonCodeApiController {
     def messageSource
     def localizationService
 
-    def list = {
+    def list() {
 
         List<ReasonCodeCommand> reasonCodes = []
         ActivityCode[] activityCodes = params.list("activityCode") as ActivityCode[]
@@ -36,13 +36,13 @@ class ReasonCodeApiController {
         render([data: reasonCodes.collect { it.toJson() }] as JSON)
     }
 
-    def read = {
+    def read() {
         ReasonCode reasonCodeEnum = params.id as ReasonCode
         ReasonCodeCommand reasonCode = getReasonCode(reasonCodeEnum)
         render([data: reasonCode?.toJson()] as JSON)
     }
 
-    List<ReasonCodeCommand> getReasonCodes(List<ReasonCode> reasonCodeEnums) {
+    private List<ReasonCodeCommand> getReasonCodes(List<ReasonCode> reasonCodeEnums) {
         List<ReasonCodeCommand> reasonCodes = []
         reasonCodeEnums.eachWithIndex { ReasonCode reasonCodeEnum, index ->
             reasonCodes << getReasonCode(reasonCodeEnum)
@@ -51,7 +51,7 @@ class ReasonCodeApiController {
     }
 
     ReasonCodeCommand getReasonCode(ReasonCode reasonCodeEnum) {
-        Locale locale = localizationService.getCurrentLocale();
+        Locale locale = localizationService.getCurrentLocale()
         ReasonCodeCommand reasonCode = new ReasonCodeCommand()
         reasonCode.id = reasonCodeEnum.name()
         reasonCode.name = messageSource.getMessage("enum.ReasonCode.${reasonCodeEnum.name()}", null, null, locale)

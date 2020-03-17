@@ -43,11 +43,10 @@ class BatchController {
     def genericApiService
     def uploadService
 
-    def index = {}
+    def index() {}
 
 
-    def uploadData = { ImportDataCommand command ->
-
+    def uploadData(ImportDataCommand command) {
         if (request instanceof DefaultMultipartHttpServletRequest) {
             def uploadFile = request.getFile('xlsFile')
             if (!uploadFile.empty) {
@@ -58,7 +57,7 @@ class BatchController {
     }
 
 
-    def downloadExcel = {
+    def downloadExcel() {
         println "Download XLS template " + params
 
         def objects = genericApiService.getList(params.type, [:])
@@ -71,7 +70,7 @@ class BatchController {
         response.outputStream.flush()
     }
 
-    def downloadTemplate = {
+    def downloadTemplate() {
         println "Download XLS template " + params
         def filename = params.template
         try {
@@ -86,7 +85,7 @@ class BatchController {
         }
     }
 
-    def downloadCsvTemplate = {
+    def downloadCsvTemplate() {
         println "Download csv template " + params
         def filename = params.template
         try {

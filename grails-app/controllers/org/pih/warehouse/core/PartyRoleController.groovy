@@ -13,22 +13,22 @@ class PartyRoleController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [partyRoleInstanceList: PartyRole.list(params), partyRoleInstanceTotal: PartyRole.count()]
     }
 
-    def create = {
+    def create() {
         def partyRoleInstance = new PartyRole()
         partyRoleInstance.properties = params
         return [partyRoleInstance: partyRoleInstance]
     }
 
-    def save = {
+    def save() {
         def partyRoleInstance = new PartyRole(params)
         if (partyRoleInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'partyRole.label', default: 'PartyRole'), partyRoleInstance.id])}"
@@ -38,7 +38,7 @@ class PartyRoleController {
         }
     }
 
-    def show = {
+    def show() {
         def partyRoleInstance = PartyRole.get(params.id)
         if (!partyRoleInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'partyRole.label', default: 'PartyRole'), params.id])}"
@@ -48,7 +48,7 @@ class PartyRoleController {
         }
     }
 
-    def edit = {
+    def edit() {
         def partyRoleInstance = PartyRole.get(params.id)
         if (!partyRoleInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'partyRole.label', default: 'PartyRole'), params.id])}"
@@ -58,7 +58,7 @@ class PartyRoleController {
         }
     }
 
-    def update = {
+    def update() {
         def partyRoleInstance = PartyRole.get(params.id)
         if (partyRoleInstance) {
             if (params.version) {
@@ -83,7 +83,7 @@ class PartyRoleController {
         }
     }
 
-    def delete = {
+    def delete() {
         def partyRoleInstance = PartyRole.get(params.id)
         if (partyRoleInstance) {
             try {

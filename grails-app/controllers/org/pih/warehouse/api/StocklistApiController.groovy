@@ -27,7 +27,7 @@ class StocklistApiController {
     def stocklistService
     def userService
 
-    def list = {
+    def list() {
         Requisition requisition = new Requisition(params)
         requisition.isTemplate = true
         requisition.isPublished = params.isPublished ? params.boolean("isPublished") : true
@@ -57,7 +57,7 @@ class StocklistApiController {
         ] as JSON)
     }
 
-    def read = {
+    def read() {
         Stocklist stocklist = stocklistService.getStocklist(params.id)
 
         if (!stocklist) {
@@ -67,7 +67,7 @@ class StocklistApiController {
         render([data: stocklist] as JSON)
     }
 
-    def create = { Stocklist stocklist ->
+    def create(Stocklist stocklist) {
 
         JSONObject jsonObject = request.JSON
         log.debug "create " + jsonObject.toString(4)
@@ -78,7 +78,7 @@ class StocklistApiController {
         render([data: stocklist] as JSON)
     }
 
-    def update = {
+    def update() {
         JSONObject jsonObject = request.JSON
         log.debug "update: " + jsonObject.toString(4)
 
@@ -93,7 +93,7 @@ class StocklistApiController {
         render([data: stocklist] as JSON)
     }
 
-    def delete = {
+    def delete() {
         try {
             stocklistService.deleteStocklist(params.id)
         } catch (org.springframework.dao.DataIntegrityViolationException e) {
@@ -105,7 +105,7 @@ class StocklistApiController {
         render status: 204
     }
 
-    def sendMail = {
+    def sendMail() {
         JSONObject jsonObject = request.JSON
         log.debug "send mail: " + jsonObject.toString(4)
         def emailBody = jsonObject.text + "\n\n" + "Sent by " + session.user.name

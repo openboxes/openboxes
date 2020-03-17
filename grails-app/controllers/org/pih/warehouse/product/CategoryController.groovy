@@ -16,12 +16,12 @@ class CategoryController {
     def productService
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
 
-    def tree = {
+    def tree() {
         long startTime = System.currentTimeMillis()
         def categoryInstance = Category.get(params.id)
 
@@ -31,7 +31,7 @@ class CategoryController {
     }
 
 
-    def move = {
+    def move() {
         def parent = Category.get(params.newParent)
         def child = Category.get(params.child)
         child.parentCategory = parent
@@ -42,7 +42,7 @@ class CategoryController {
     }
 
     @CacheFlush("selectCategoryCache")
-    def saveCategory = {
+    def saveCategory() {
         def categoryInstance = Category.get(params.id)
         if (!categoryInstance) {
             categoryInstance = new Category(params)
@@ -58,7 +58,7 @@ class CategoryController {
         }
     }
 
-    def deleteCategory = {
+    def deleteCategory() {
 
         def categoryInstance = Category.get(params.id)
 
@@ -75,12 +75,12 @@ class CategoryController {
     }
 
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [categoryInstanceList: Category.list(params), categoryInstanceTotal: Category.count()]
     }
 
-    def create = {
+    def create() {
         def categoryInstance = new Category()
         categoryInstance.properties = params
 
@@ -88,7 +88,7 @@ class CategoryController {
     }
 
     @CacheFlush("selectCategoryCache")
-    def save = {
+    def save() {
         def categoryInstance = new Category(params)
 
         if (categoryInstance.save(flush: true)) {
@@ -99,7 +99,7 @@ class CategoryController {
         }
     }
 
-    def show = {
+    def show() {
         def categoryInstance = Category.get(params.id)
         if (!categoryInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'category.label', default: 'Category'), params.id])}"
@@ -109,7 +109,7 @@ class CategoryController {
         }
     }
 
-    def edit = {
+    def edit() {
         def categoryInstance = Category.get(params.id)
 
         if (!categoryInstance) {
@@ -121,7 +121,7 @@ class CategoryController {
     }
 
     @CacheFlush("selectCategoryCache")
-    def update = {
+    def update() {
         def categoryInstance = Category.get(params.id)
         if (categoryInstance) {
             if (params.version) {
@@ -147,7 +147,7 @@ class CategoryController {
     }
 
     @CacheFlush("selectCategoryCache")
-    def delete = {
+    def delete() {
         def categoryInstance = Category.get(params.id)
         if (categoryInstance) {
             try {
