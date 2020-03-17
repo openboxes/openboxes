@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.order
 
+import grails.validation.ValidationException
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.grails.plugins.csv.CSVMapReader
 import org.pih.warehouse.core.*
@@ -221,6 +222,9 @@ class OrderService {
         // update the status of the order before saving
         order.updateStatus()
 
+        order.originParty = order.originParty?:order?.origin?.organization
+        order.destinationParty = order.destinationParty?:order?.destination?.organization
+
         if (!order.orderNumber) {
             order.orderNumber = identifierService.generateOrderIdentifier()
         }
@@ -228,8 +232,7 @@ class OrderService {
         if (!order.hasErrors() && order.save()) {
             return order
         } else {
-            println order.errors
-            throw new OrderException(message: "Unable to save order due to errors", order: order)
+            throw new ValidationException("Unable to save order due to errors", order.errors)
         }
     }
 
