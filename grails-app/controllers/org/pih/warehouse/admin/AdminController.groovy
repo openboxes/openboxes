@@ -27,10 +27,9 @@ class AdminController {
     def config = Holders.getConfig()
     def quartzScheduler
 
-    def index = {}
+    def index() {}
 
-
-    def controllerActions = {
+    def controllerActions() {
 
         List actionNames = []
         grailsApplication.controllerClasses.sort { it.logicalPropertyName }.each { controller ->
@@ -49,16 +48,16 @@ class AdminController {
         [actionNames: actionNames]
     }
 
-    def cache = {
+    def cache() {
         [cacheStatistics: sessionFactory.getStatistics()]
     }
 
-    def plugins = {}
-    def status = {}
+    def plugins() {}
+    def status() {}
 
     def static LOCAL_TEMP_WEBARCHIVE_PATH = "warehouse.war"
 
-    def showUpgrade = { UpgradeCommand command ->
+    def showUpgrade(UpgradeCommand command) {
         log.info "show upgrade " + params
 
         [
@@ -66,7 +65,7 @@ class AdminController {
         ]
     }
 
-    def evictDomainCache = {
+    def evictDomainCache() {
         def domainClass = grailsApplication.getDomainClass(params.name)
         if (domainClass) {
             sessionFactory.evict(domainClass.clazz)
@@ -77,7 +76,7 @@ class AdminController {
         redirect(action: "showSettings")
     }
 
-    def evictQueryCache = {
+    def evictQueryCache() {
         if (params.name) {
             sessionFactory.evictQueries(params.name)
             flash.message = "Query cache '${params.name}' was invalidated"
@@ -89,7 +88,7 @@ class AdminController {
     }
 
 
-    def sendMail = {
+    def sendMail() {
 
         println "sendMail: " + params
 
@@ -138,7 +137,7 @@ class AdminController {
     }
 
 
-    def download = { UpgradeCommand command ->
+    def download(UpgradeCommand command) {
         log.info "download " + params
         if (command?.remoteWebArchiveUrl) {
             session.command = command
@@ -154,7 +153,7 @@ class AdminController {
     }
 
 
-    def deploy = { UpgradeCommand command ->
+    def deploy(UpgradeCommand command) {
         log.info "deploy " + params
 
         session.command.localWebArchivePath = command.localWebArchivePath
@@ -173,7 +172,7 @@ class AdminController {
     }
 
 
-    def testZebraPrinter = {
+    def testZebraPrinter() {
         try {
 
             PrintService[] printServices = PrinterJob.lookupPrintServices()
@@ -198,7 +197,7 @@ class AdminController {
     }
 
 
-    def showSettings = {
+    def showSettings() {
         def externalConfigProperties = []
         grailsApplication.config.grails.config.locations.each { filename ->
             try {
@@ -242,12 +241,12 @@ class AdminController {
     }
 
 
-    def downloadWar = {
+    def downloadWar() {
         log.info("Updating war file " + params)
         redirect(action: "showSettings")
     }
 
-    def cancelUpdateWar = {
+    def cancelUpdateWar() {
         if (session.future) {
             session.future.cancel(true)
             new File(LOCAL_TEMP_WEBARCHIVE_PATH).delete()
@@ -255,7 +254,7 @@ class AdminController {
         redirect(action: "showSettings")
     }
 
-    def deployWar = { UpgradeCommand ->
+    def deployWar(UpgradeCommand) {
         def source = session.command.localWebArchive
 
         def backup = new File(session.command.localWebArchive.absolutePath + ".backup")
@@ -273,7 +272,7 @@ class UpgradeCommand {
     String remoteWebArchiveUrl
     String localWebArchivePath
 
-    static constraints = {
+    static constraints() {
         future(nullable: true)
         localWebArchive(nullable: true)
         remoteWebArchiveUrl(nullable: true)

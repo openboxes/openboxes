@@ -22,7 +22,7 @@ class StockMovementItemApiController {
     def inventoryService
     def stockMovementService
 
-    def list = {
+    def list() {
         StockMovement stockMovement = stockMovementService.getStockMovement(params?.stockMovement?.id)
         if (!stockMovement) {
             throw new ObjectNotFoundException(id, StockMovement.class.toString())
@@ -30,12 +30,12 @@ class StockMovementItemApiController {
         render([data: stockMovement.lineItems] as JSON)
     }
 
-    def read = {
+    def read() {
         StockMovementItem stockMovementItem = stockMovementService.getStockMovementItem(params.id)
         render([data: stockMovementItem] as JSON)
     }
 
-    def updatePicklist = {
+    def updatePicklist() {
         JSONObject jsonObject = request.JSON
 
         log.debug "JSON " + jsonObject.toString(4)
@@ -78,7 +78,7 @@ class StockMovementItemApiController {
         render([data: pickPageItem] as JSON)
     }
 
-    def createPicklist = {
+    def createPicklist() {
         StockMovementItem stockMovementItem = stockMovementService.getStockMovementItem(params.id)
 
         stockMovementService.removeShipmentItemsForModifiedRequisitionItem(stockMovementItem)
@@ -94,7 +94,7 @@ class StockMovementItemApiController {
         render([data: pickPageItem] as JSON)
     }
 
-    def clearPicklist = {
+    def clearPicklist() {
         StockMovementItem stockMovementItem = stockMovementService.getStockMovementItem(params.id)
 
         stockMovementService.removeShipmentItemsForModifiedRequisitionItem(stockMovementItem)
@@ -108,7 +108,7 @@ class StockMovementItemApiController {
         render([data: pickPageItem] as JSON)
     }
 
-    def substituteItem = {
+    def substituteItem() {
         JSONObject jsonObject = request.JSON
 
         log.debug "JSON " + jsonObject.toString(4)
@@ -134,7 +134,7 @@ class StockMovementItemApiController {
         render([data: editPageItem] as JSON)
     }
 
-    def revertItem = {
+    def revertItem() {
         StockMovementItem stockMovementItem = stockMovementService.getStockMovementItem(params.id)
 
         stockMovementService.revertItem(stockMovementItem)
@@ -144,7 +144,7 @@ class StockMovementItemApiController {
         render([data: editPageItem] as JSON)
     }
 
-    def cancelItem = {
+    def cancelItem() {
         StockMovementItem stockMovementItem = stockMovementService.getStockMovementItem(params.id)
 
         stockMovementItem = stockMovementService.cancelItem(stockMovementItem)
@@ -152,7 +152,7 @@ class StockMovementItemApiController {
         render([data: stockMovementItem] as JSON)
     }
 
-    def removeItem = {
+    def removeItem() {
         RequisitionItem requisitionItem = RequisitionItem.get(params.id)
 
         stockMovementService.removeRequisitionItem(requisitionItem)
@@ -160,7 +160,7 @@ class StockMovementItemApiController {
         render status: 204
     }
 
-    void bindLineItem(StockMovementItem stockMovementItem, def lineItem) {
+    private void bindLineItem(StockMovementItem stockMovementItem, def lineItem) {
         stockMovementItem.newQuantity = lineItem.newQuantity ? new BigDecimal(lineItem.remove("newQuantity")) : null
         stockMovementItem.quantityRevised = lineItem.quantityRevised ? new BigDecimal(lineItem.remove("quantityRevised")) : null
 

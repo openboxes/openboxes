@@ -15,11 +15,11 @@ class LocalizationController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST", upload: "POST"]
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
 
         def localizationInstanceList
@@ -45,13 +45,13 @@ class LocalizationController {
         [localizationInstanceList: localizationInstanceList, localizationInstanceTotal: localizationInstanceTotal]
     }
 
-    def create = {
+    def create() {
         def localizationInstance = new Localization()
         localizationInstance.properties = params
         return [localizationInstance: localizationInstance]
     }
 
-    def save = {
+    def save() {
 
         log.info "save localization: " + params
 
@@ -84,7 +84,7 @@ class LocalizationController {
         }
     }
 
-    def show = {
+    def show() {
         def localizationInstance = Localization.get(params.id)
         if (!localizationInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'localization.label', default: 'Localization'), params.id])}"
@@ -94,7 +94,7 @@ class LocalizationController {
         }
     }
 
-    def edit = {
+    def edit() {
         def localizationInstance = Localization.get(params.id)
         if (!localizationInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'localization.label', default: 'Localization'), params.id])}"
@@ -104,7 +104,7 @@ class LocalizationController {
         }
     }
 
-    def update = {
+    def update() {
         def localizationInstance = Localization.get(params.id)
         if (localizationInstance) {
             if (params.version) {
@@ -129,7 +129,7 @@ class LocalizationController {
         }
     }
 
-    def delete = {
+    def delete() {
         def localizationInstance = Localization.get(params.id)
         if (localizationInstance) {
             try {
@@ -148,7 +148,7 @@ class LocalizationController {
     }
 
 
-    def export = {
+    def export() {
         log.info("Locale: " + session.user.locale)
         Locale locale = session.user.locale
         def filename = locale.language == 'en' ? "messages.properties" : "messages_${locale.language}.properties"
@@ -163,7 +163,7 @@ class LocalizationController {
         render output
     }
 
-    def upload = { LocalizationCommand command ->
+    def upload(LocalizationCommand command) {
 
         try {
 

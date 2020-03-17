@@ -11,16 +11,17 @@ package org.pih.warehouse.order
 
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.core.Person
-import org.pih.warehouse.product.Product
 import org.springframework.dao.DataIntegrityViolationException
 
 class PurchaseOrderWorkflowController {
 
     def orderService
 
-    def index = { redirect(action: "purchaseOrder") }
-    def purchaseOrderFlow = {
+    def index() {
+        redirect(action: "purchaseOrder")
+    }
+
+    def purchaseOrderFlow() {
 
         start {
             action {

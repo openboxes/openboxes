@@ -17,22 +17,22 @@ class ShipmentWorkflowController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [shipmentWorkflowInstanceList: ShipmentWorkflow.list(params), shipmentWorkflowInstanceTotal: ShipmentWorkflow.count()]
     }
 
-    def create = {
+    def create() {
         def shipmentWorkflowInstance = new ShipmentWorkflow()
         shipmentWorkflowInstance.properties = params
         return [shipmentWorkflowInstance: shipmentWorkflowInstance, documentTemplates: documentTemplates]
     }
 
-    def save = {
+    def save() {
         def shipmentWorkflowInstance = new ShipmentWorkflow(params)
         if (shipmentWorkflowInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'shipmentWorkflow.label', default: 'ShipmentWorkflow'), shipmentWorkflowInstance.id])}"
@@ -42,7 +42,7 @@ class ShipmentWorkflowController {
         }
     }
 
-    def show = {
+    def show() {
         def shipmentWorkflowInstance = ShipmentWorkflow.get(params.id)
         if (!shipmentWorkflowInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipmentWorkflow.label', default: 'ShipmentWorkflow'), params.id])}"
@@ -52,7 +52,7 @@ class ShipmentWorkflowController {
         }
     }
 
-    def edit = {
+    def edit() {
         def shipmentWorkflowInstance = ShipmentWorkflow.get(params.id)
         if (!shipmentWorkflowInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipmentWorkflow.label', default: 'ShipmentWorkflow'), params.id])}"
@@ -62,7 +62,7 @@ class ShipmentWorkflowController {
         }
     }
 
-    def update = {
+    def update() {
         def shipmentWorkflowInstance = ShipmentWorkflow.get(params.id)
         if (shipmentWorkflowInstance) {
             if (params.version) {
@@ -87,7 +87,7 @@ class ShipmentWorkflowController {
         }
     }
 
-    def delete = {
+    def delete() {
         def shipmentWorkflowInstance = ShipmentWorkflow.get(params.id)
         if (shipmentWorkflowInstance) {
             try {
@@ -105,8 +105,7 @@ class ShipmentWorkflowController {
         }
     }
 
-
-    List getDocumentTemplates() {
+    private List getDocumentTemplates() {
         def documentTypes = DocumentType.findAllByDocumentCode(DocumentCode.SHIPPING_TEMPLATE)
         Document.findAllByDocumentTypeInList(documentTypes)
     }

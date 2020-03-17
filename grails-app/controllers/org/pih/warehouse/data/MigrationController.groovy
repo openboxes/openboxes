@@ -31,7 +31,7 @@ class MigrationController {
     def migrationService
     def inventoryService
 
-    def index = {
+    def index() {
 
         def organizations = migrationService.getSuppliersForMigration()
 
@@ -58,7 +58,7 @@ class MigrationController {
         ]
     }
 
-    def receiptsWithoutTransaction = {
+    def receiptsWithoutTransaction() {
         def receiptsWithoutTransaction = migrationService.getReceiptsWithoutTransaction()
         receiptsWithoutTransaction = receiptsWithoutTransaction.collect {
             [status: it.receiptStatusCode.name(), receiptNumber: it.receiptNumber, shipmentNumber: it.shipment?.shipmentNumber]
@@ -66,7 +66,7 @@ class MigrationController {
         render(receiptsWithoutTransaction as JSON)
     }
 
-    def shipmentsWithoutTransaction = {
+    def shipmentsWithoutTransaction() {
         def shipmentsWithoutTransaction = migrationService.getShipmentsWithoutTransaction()
         shipmentsWithoutTransaction = shipmentsWithoutTransaction.collect {
             [status: it.currentStatus.name(), shipmentNumber: it.shipmentNumber, origin: it.origin.name, destination: it.destination.name]
@@ -74,7 +74,7 @@ class MigrationController {
         render(shipmentsWithoutTransaction as JSON)
     }
 
-    def downloadCurrentInventory = {
+    def downloadCurrentInventory() {
         def startTime = System.currentTimeMillis()
         def location = Location.get(session.warehouse.id)
 
@@ -88,20 +88,20 @@ class MigrationController {
         render([responseTime: (System.currentTimeMillis() - startTime), count: data.size(), results: data] as JSON)
     }
 
-    def locationsWithInventoryTransactions = {
+    def locationsWithInventoryTransactions() {
         def locations = migrationService.getLocationsWithTransactions([TransactionCode.INVENTORY])
         render([count: locations.size(), locations: locations] as JSON)
     }
 
 
-    def productsWithInventoryTransactions = {
+    def productsWithInventoryTransactions() {
         def location = Location.get(session.warehouse.id)
         def products = migrationService.getProductsWithTransactions(location, [TransactionCode.INVENTORY])
         products = products.collect { [productCode: it.productCode] }
         render([products: products] as JSON)
     }
 
-    def nextInventoryTransaction = {
+    def nextInventoryTransaction() {
         def location = Location.get(session.warehouse.id)
         def products = migrationService.getProductsWithTransactions(location, [TransactionCode.INVENTORY])
         def product = products[0]
@@ -112,7 +112,7 @@ class MigrationController {
         }
     }
 
-    def migrateProduct = {
+    def migrateProduct() {
         def location = Location.get(session.warehouse.id)
         Product product = Product.get(params.id)
         try {
@@ -126,13 +126,13 @@ class MigrationController {
         redirect(controller: "inventoryItem", action: "showStockCard", id: params.id)
     }
 
-    def migrateAllInventoryTransactions = {
+    def migrateAllInventoryTransactions() {
         DataMigrationJob.triggerNow([:])
         flash.message = "Triggered data migration job in background"
         redirect(controller: "migration")
     }
 
-    def migrateInventoryTransactions = {
+    def migrateInventoryTransactions() {
         def startTime = System.currentTimeMillis()
         def location = Location.get(session.warehouse.id)
 
@@ -157,7 +157,7 @@ class MigrationController {
     }
 
 
-    def migrateProductSuppliers = { MigrationCommand command ->
+    def migrateProductSuppliers(MigrationCommand command) {
         def startTime = System.currentTimeMillis()
         try {
             def migratedList = migrationService.migrateProductSuppliersInParallel()
@@ -173,7 +173,7 @@ class MigrationController {
     }
 
 
-    def migrateOrganizations = { MigrationCommand command ->
+    def migrateOrganizations(MigrationCommand command) {
         def startTime = System.currentTimeMillis()
         try {
             def migratedList = migrationService.migrationOrganizationsInParallel()
@@ -186,13 +186,13 @@ class MigrationController {
     }
 
 
-    def deleteOrganizations = {
+    def deleteOrganizations() {
         def startTime = System.currentTimeMillis()
         def orgCount = migrationService.deleteOrganizations()
         render(template: "status", model: [message: "Deleted ${orgCount} organizations in ${System.currentTimeMillis() - startTime} ms"])
     }
 
-    def deleteProductSuppliers = {
+    def deleteProductSuppliers() {
         def startTime = System.currentTimeMillis()
         def productSupplierCount = migrationService.deleteProductSuppliers()
         render(template: "status", model: [message: "Deleted ${productSupplierCount} product suppliers in ${System.currentTimeMillis() - startTime} ms"])
