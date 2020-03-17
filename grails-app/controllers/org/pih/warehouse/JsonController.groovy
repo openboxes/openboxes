@@ -18,6 +18,7 @@ import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Localization
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
@@ -1693,19 +1694,27 @@ class JsonController {
 
     def productChanged = {
         Product product = Product.get(params.productId)
-        def productSuppliers = []
-        if (product != null) {
-            productSuppliers = ProductSupplier.findAllByProduct(product)
+        Organization supplier = Organization.get(params.supplierId)
+        List productSuppliers = []
+        if (product && supplier) {
+            productSuppliers = ProductSupplier.findAllByProductAndSupplier(product, supplier)
         }
+        productSuppliers = productSuppliers.collect { [id: it.id, code: it.code, label: it.code + " " + it.name]}
         render g.select(id:'productSupplier', name:'productSupplier.id', from: productSuppliers, optionKey:'id', optionValue: { it.code }, noSelection:['':''])
     }
 
     def productSupplierChanged = {
         ProductSupplier productSupplier = ProductSupplier.findById(params.productSupplierId)
-
-        render([supplierCode: productSupplier.supplierCode,
-                manufacturer: g.selectOrganization(id:'manufacturer', name:'manufacturer', roleTypes:[org.pih.warehouse.core.RoleType.ROLE_MANUFACTURER], noSelection:['':''], value:productSupplier?.manufacturer?.id),
-                manufacturerCode: productSupplier.manufacturerCode] as JSON)
+        render([
+                unitPrice: productSupplier?.unitPrice ? g.formatNumber(number: productSupplier?.unitPrice) : null,
+                supplierCode: productSupplier?.supplierCode,
+                manufacturer: g.selectOrganization(id:'manufacturer',
+                        name:'manufacturer',
+                        roleTypes:[org.pih.warehouse.core.RoleType.ROLE_MANUFACTURER],
+                        noSelection:['':''],
+                        value: productSupplier?.manufacturer?.id),
+                manufacturerCode: productSupplier?.manufacturerCode
+        ] as JSON)
     }
 }
 

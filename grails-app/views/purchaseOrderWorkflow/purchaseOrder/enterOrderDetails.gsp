@@ -1,3 +1,4 @@
+<%@ page import="org.pih.warehouse.order.OrderTypeCode" %>
 
 <html>
 <head>
@@ -28,8 +29,7 @@
 			</g:hasErrors>
 		</g:each>
 		<g:form action="purchaseOrder" method="post">
-
-        <g:hiddenField name="orderTypeCode" value="PURCHASE_ORDER"/>
+            <g:hiddenField name="orderTypeCode" value="${org.pih.warehouse.order.OrderTypeCode.PURCHASE_ORDER}"/>
             <div class="dialog">
                 <g:render template="/order/summary" model="[orderInstance:order,currentState:'editOrder']"/>
                 <div class="box">
@@ -67,7 +67,7 @@
                                 </td>
                             </tr>
                             <tr class='prop'>
-                                <td valign='top' class='name middle'><label for='dateOrdered'><warehouse:message code="order.creationDate.label"/></label></td>
+                                <td valign='top' class='name middle'><label for='dateOrdered'><warehouse:message code="order.dateOrdered.label"/></label></td>
                                 <td valign='top'
                                     class='value ${hasErrors(bean:order,field:'dateOrdered','errors')}'>
                                     <g:jqueryDatePicker

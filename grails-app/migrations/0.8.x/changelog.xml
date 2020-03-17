@@ -69,4 +69,5 @@
     <include file="0.8.x/changelog-2020-02-29-0005-alter-table-order-add-column-payment-method-type.xml"/>
     <include file="0.8.x/changelog-2020-02-29-0005-alter-table-order-add-column-payment-terms.xml"/>
     <include file="0.8.x/changelog-2020-03-09-1515-alter-table-order-add-column-approved-by.xml"/>
+    <include file="0.8.x/changelog-2020-03-16-1323-alter-table-order-add-columns-for-party-association.xml"/>
 </databaseChangeLog>
