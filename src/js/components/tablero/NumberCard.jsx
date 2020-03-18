@@ -26,10 +26,6 @@ export default NumberCard;
 NumberCard.propTypes = {
   cardTitle: PropTypes.string.isRequired,
   cardNumber: PropTypes.number.isRequired,
-  cardSubtitle: PropTypes.string,
+  cardSubtitle: PropTypes.string.isRequired,
   cardLink: PropTypes.string.isRequired,
-};
-
-NumberCard.defaultProps = {
-  cardSubtitle: '',
 };
