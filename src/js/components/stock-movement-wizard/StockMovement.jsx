@@ -180,19 +180,31 @@ class StockMovements extends Component {
             },
           };
 
-          let statuses = [];
-          if (this.props.hasPackingSupport) {
-            statuses = ['NEW', 'CREATED', 'REQUESTED', 'PICKING', 'PACKING', 'REVIEWING'];
-          } else {
-            statuses = ['NEW', 'CREATED', 'REQUESTED', 'PICKING', 'REVIEWING'];
+          let currentPage = 1;
+          switch (values.statusCode) {
+            case 'NEW':
+              break;
+            case 'CREATED':
+            case 'REQUESTING':
+              currentPage = 2;
+              break;
+            case 'REQUESTED':
+            case 'VALIDATING':
+              currentPage = 3;
+              break;
+            case 'VALIDATED':
+            case 'PICKING':
+              currentPage = 4;
+              break;
+            case 'PICKED':
+            case 'PACKING':
+              currentPage = 5;
+              break;
+            default:
+              currentPage = this.props.hasPackingSupport ? 6 : 5;
+              break;
           }
 
-          let currentPage = 1;
-          if (statuses.indexOf(values.statusCode) > 0) {
-            currentPage = statuses.indexOf(values.statusCode) + 1;
-          } else {
-            currentPage = this.props.hasPackingSupport ? 6 : 5;
-          }
           this.setState({ values, currentPage });
         })
         .catch(() => this.props.hideSpinner());

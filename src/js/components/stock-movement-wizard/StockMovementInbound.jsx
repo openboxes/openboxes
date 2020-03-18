@@ -139,12 +139,19 @@ class StockMovements extends Component {
             },
           };
 
-          const statuses = ['NEW', 'CREATED', 'CHECKING'];
-
-          let currentPage = 3;
-          if (statuses.indexOf(values.statusCode) > 0) {
-            currentPage = statuses.indexOf(values.statusCode) + 1;
+          let currentPage = 1;
+          switch (values.statusCode) {
+            case 'NEW':
+              break;
+            case 'CREATED':
+            case 'REQUESTING':
+              currentPage = 2;
+              break;
+            default:
+              currentPage = 3;
+              break;
           }
+
           this.setState({ values, currentPage });
         })
         .catch(() => this.props.hideSpinner());
