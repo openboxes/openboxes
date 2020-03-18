@@ -22,19 +22,27 @@ class FieldArrayComponent extends Component {
 
   focusField(index, fieldName) {
     const field = _.get(this.fieldRefs, `[${index}].${fieldName}`);
+    const fieldToScroll = _.get(this.fieldRefs, `[${index - 15 > 0 ? index - 15 : 0}].${fieldName}`);
 
     if (field) {
       field.focus();
+      if (fieldToScroll) {
+        fieldToScroll.scrollIntoView();
+      }
     }
   }
 
   copyDown(index, fieldName) {
     const field = _.get(this.fieldRefs, `[${index}].${fieldName}`);
+    const fieldToScroll = _.get(this.fieldRefs, `[${index - 15 > 0 ? index - 15 : 0}].${fieldName}`);
     const valueToCopy = _.get(this.fieldRefs, `[${index - 1}].${fieldName}.value`);
 
     if (field && valueToCopy && !field.disabled) {
       field.value = valueToCopy;
       field.focus();
+      if (fieldToScroll) {
+        fieldToScroll.scrollIntoView();
+      }
     }
   }
 
