@@ -52,7 +52,7 @@ const GraphCard = SortableElement(({
     <div className={`graphCard ${cardType === 'error' ? 'errorCard' : ''}`}>
       <div className="headerCard">
         {cardLink ?
-          <a href={cardLink} className="titleLink">
+          <a target="_blank" rel="noopener noreferrer" href={cardLink} className="titleLink">
             <span className="titleLink"> {cardTitle} </span>
           </a>
           :

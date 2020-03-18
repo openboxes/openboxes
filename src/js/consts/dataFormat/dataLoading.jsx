@@ -29,8 +29,8 @@ function loadColorDataset(data, chart, subtype) {
     datasets.backgroundColor = color;
     datasets.hoverBackgroundColor = color;
   } if (chart === 'horizontalBar') {
-    datasets.backgroundColor = color;
-    datasets.hoverBackgroundColor = color;
+    datasets.backgroundColor = [getColor(), getColor(), getColor(), getColor(), getColor()];
+    datasets.hoverBackgroundColor = datasets.backgroundColor;
   } if (chart === 'doughnut') {
     datasets.backgroundColor = color;
   }
