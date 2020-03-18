@@ -15,11 +15,7 @@ import apiClient from '../../utils/apiClient';
 import { showSpinner, hideSpinner, fetchTranslations } from '../../actions';
 import { translateWithDefaultMessage } from '../../utils/Translate';
 
-// TODO: Add SM wizard for REQUEST type (see code below)
-// const request = queryString.parse(window.location.search).type === 'REQUEST';
-// if (request && (status === 'CREATED' || !status)) { [ createStockMovement, addItemsPage ] }
 // TODO: check docs for SM wizard and Wizard related components
-// TODO: create separate pages for each workflow
 
 /** Main outbound stock movement form's wizard component. */
 class StockMovements extends Component {
@@ -132,10 +128,12 @@ class StockMovements extends Component {
 
   getAdditionalWizardTitle() {
     const { currentPage, values } = this.state;
+    const shipped = values.shipped ? 'SHIPPED' : '';
+    const received = values.received ? 'RECEIVED' : '';
     if (currentPage === 6) {
       return (
         <span className="shipment-status float-right">
-          {`${values.shipmentStatus ? values.shipmentStatus : 'PENDING'}`}
+          {`${shipped || received || 'PENDING'}`}
         </span>
       );
     }
