@@ -8,7 +8,7 @@ class NumberDataService {
 
     def dataService
 
-    List<NumberData> getListNumberData(def location){
+    List<NumberData> getListNumberData(def user, def location){
         def tomorrow = new Date() + 1;
         tomorrow.clearTime();
 
