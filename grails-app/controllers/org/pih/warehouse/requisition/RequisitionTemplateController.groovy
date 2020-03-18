@@ -31,8 +31,6 @@ class RequisitionTemplateController {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         def requisitionCriteria = new Requisition()
         requisitionCriteria.name = "%" + params.q + "%"
-        requisitionCriteria.commodityClass = params.commodityClass ?: null
-        requisitionCriteria.type = params.requisitionType ?: null
         requisitionCriteria.isTemplate = true
         if (!params.includeUnpublished) {
             requisitionCriteria.isPublished = true
