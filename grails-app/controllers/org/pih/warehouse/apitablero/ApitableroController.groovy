@@ -62,4 +62,9 @@ class ApitableroController {
         def incomingStock = indicatorDataService.getIncomingStock(location)
         render (incomingStock.toJson() as JSON)
     }
+
+    def getDiscrepancy = {
+        Location location = Location.get(session?.warehouse?.id)
+        render "discrepancy"
+    }
 }

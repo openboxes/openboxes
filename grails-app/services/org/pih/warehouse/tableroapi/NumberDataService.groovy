@@ -26,8 +26,6 @@ class NumberDataService {
             new NumberData("Discrepancy",discrepancy[0][0], "Items received", 6)
         ] as List<NumberData>
 
-        
-
         return numberDataList;
     }
 }
