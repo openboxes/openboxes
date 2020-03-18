@@ -111,12 +111,12 @@ class IndicatorDataService {
 
     DataGraph getSentStockMovements(def location, def params) {
         Integer querySize = params.querySize? params.querySize.toInteger() : 5
-        List originList = Shipment.executeQuery("select distinct s.origin from Shipment s where s.destination = :location and s.currentStatus <> 'PENDING'", ['location': location]);
+        List destinationList = Shipment.executeQuery("select distinct s.destination from Shipment s where s.origin = :location and s.currentStatus <> 'PENDING'", ['location': location]);
         List listDatasets = []
         List listLabel = []
         today.clearTime()
-        // originList is a query of all locations from which the current location received something
-        for(item in originList) {
+        // destinationList is a query of all locations which the current location sent something
+        for(item in destinationList) {
             List listData = []
             listLabel = []
             // querySize is the quantity of months in the filter : until which month query data
@@ -126,8 +126,8 @@ class IndicatorDataService {
                 monthBegin.set(month: today.month - i, date: 1)
                 monthEnd.set(month: today.month - i + 1, date: 1)
                 
-                // query counts each item with current location as destination and "stacks" it
-                def query = Shipment.executeQuery("select count(*) from Shipment s where s.lastUpdated >= :monthOne and s.lastUpdated < :monthTwo and s.origin = '" + item.id + "' and s.destination = :location",
+                // query counts each item with current location as origin and "stacks" it
+                def query = Shipment.executeQuery("select count(*) from Shipment s where s.lastUpdated >= :monthOne and s.lastUpdated < :monthTwo and s.destination = '" + item.id + "' and s.origin = :location",
                 // The column transaction_transaction_date doesn't exist, using lastUpdated instead
                 ['monthOne': monthBegin, 'monthTwo': monthEnd, 'location': location]);
                 String monthLabel = new java.text.DateFormatSymbols().months[monthBegin.month].substring(0,3)
