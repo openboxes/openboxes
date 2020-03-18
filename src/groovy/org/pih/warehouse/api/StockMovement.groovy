@@ -9,6 +9,7 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
@@ -61,6 +62,8 @@ class StockMovement {
     Float totalValue
 
     StockMovementType stockMovementType
+    StockMovementStatusCode stockMovementStatusCode
+
 
     PickPage pickPage
     EditPage editPage
@@ -89,6 +92,7 @@ class StockMovement {
         dateRequested(nullable: false)
 
         stockMovementType(nullable: true)
+        stockMovementStatusCode(nullable: true)
         receiptStatusCode(nullable: true)
         dateShipped(nullable: true)
         shipmentType(nullable: true)
@@ -245,7 +249,7 @@ class StockMovement {
                 name: requisition.name,
                 identifier: requisition.requestNumber,
                 description: requisition.description,
-                statusCode: requisition?.status?.name(),
+                statusCode: RequisitionStatus.toStockMovementStatus(requisition.status)?.name(),
                 origin: requisition.origin,
                 destination: requisition.destination,
                 dateRequested: requisition.dateRequested,

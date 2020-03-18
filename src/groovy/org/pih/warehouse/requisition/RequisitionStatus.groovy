@@ -65,6 +65,8 @@ enum RequisitionStatus {
                 return StockMovementStatusCode.REQUESTING
             case RequisitionStatus.VERIFYING:
                 return StockMovementStatusCode.REQUESTED
+            case RequisitionStatus.CHECKING:
+                return StockMovementStatusCode.PACKED
             case RequisitionStatus.ISSUED:
                 return StockMovementStatusCode.DISPATCHED
             default:
@@ -79,6 +81,8 @@ enum RequisitionStatus {
                 return RequisitionStatus.EDITING
             case StockMovementStatusCode.REQUESTED:
                 return RequisitionStatus.VERIFYING
+            case StockMovementStatusCode.PACKED:
+                return RequisitionStatus.CHECKING
             case StockMovementStatusCode.VALIDATED:
                 return RequisitionStatus.VERIFYING
             case StockMovementStatusCode.DISPATCHED:

@@ -150,6 +150,7 @@ class StockMovementService {
 
                         break
                     case StockMovementStatusCode.PICKED:
+                    case StockMovementStatusCode.PACKED:
                     case StockMovementStatusCode.CHECKING:
                     case StockMovementStatusCode.CHECKED:
                         createShipment(stockMovement)
