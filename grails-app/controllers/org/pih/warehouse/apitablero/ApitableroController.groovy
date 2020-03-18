@@ -16,7 +16,7 @@ class ApitableroController {
 
     def getNumberData = {
         Location location = Location.get(session?.warehouse?.id)
-        List<NumberData> numberData = numberDataService.getListNumberData(location)
+        List<NumberData> numberData = numberDataService.getListNumberData(session.user, location)
         render (numberData as JSON)
     }
 
