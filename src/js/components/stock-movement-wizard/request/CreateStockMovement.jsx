@@ -5,24 +5,19 @@ import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { withRouter } from 'react-router-dom';
 import { confirmAlert } from 'react-confirm-alert';
-import queryString from 'query-string';
 import { getTranslate } from 'react-localize-redux';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import moment from 'moment';
 
-import TextField from '../form-elements/TextField';
-import SelectField from '../form-elements/SelectField';
-import DateField from '../form-elements/DateField';
-import { renderFormField } from '../../utils/form-utils';
-import apiClient from '../../utils/apiClient';
-import { showSpinner, hideSpinner } from '../../actions';
-import { debounceUsersFetch, debounceLocationsFetch } from '../../utils/option-utils';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
-
-const request = queryString.parse(window.location.search).type === 'REQUEST';
-const inbound = queryString.parse(window.location.search).direction === 'INBOUND';
-const outbound = queryString.parse(window.location.search).direction === 'OUTBOUND';
+import TextField from '../../form-elements/TextField';
+import SelectField from '../../form-elements/SelectField';
+import DateField from '../../form-elements/DateField';
+import { renderFormField } from '../../../utils/form-utils';
+import apiClient from '../../../utils/apiClient';
+import { showSpinner, hideSpinner } from '../../../actions';
+import { debounceUsersFetch, debounceLocationsFetch } from '../../../utils/option-utils';
+import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
 
 function validate(values) {
   const errors = {};
@@ -80,7 +75,7 @@ const FIELDS = {
           props.fetchStockLists(value, props.destination);
         }
       },
-      disabled: outbound && !props.isSuperuser,
+      disabled: false,
     }),
   },
   destination: {
@@ -104,7 +99,7 @@ const FIELDS = {
           props.fetchStockLists(props.origin, value);
         }
       },
-      disabled: (inbound || request) && !props.isSuperuser,
+      disabled: !props.isSuperuser,
     }),
   },
   stocklist: {
@@ -183,48 +178,21 @@ class CreateStockMovement extends Component {
   setInitialValues(location, user) {
     const { id, locationType, name } = location;
 
-    if (inbound) {
-      const values = {
-        destination: {
-          id,
-          type: locationType ? locationType.locationTypeCode : null,
-          name,
-          label: `${name} [${locationType ? locationType.description : null}]`,
-        },
-      };
-      this.setState({ values, setInitialValues: false });
-    }
-
-    if (outbound) {
-      const values = {
-        origin: {
-          id,
-          type: locationType ? locationType.locationTypeCode : null,
-          name,
-          label: `${name} [${locationType ? locationType.description : null}]`,
-        },
-      };
-      this.setState({ values, setInitialValues: false });
-    }
-
-
-    if (request) {
-      const values = {
-        destination: {
-          id,
-          type: locationType ? locationType.locationTypeCode : null,
-          name,
-          label: `${name} [${locationType ? locationType.description : null}]`,
-        },
-        requestedBy: {
-          id: user.id,
-          name: user.name,
-          label: `${user.name}`,
-        },
-        dateRequested: moment(new Date()).format('MM/DD/YYYY'),
-      };
-      this.setState({ values, setInitialValues: false });
-    }
+    const values = {
+      destination: {
+        id,
+        type: locationType ? locationType.locationTypeCode : null,
+        name,
+        label: `${name} [${locationType ? locationType.description : null}]`,
+      },
+      requestedBy: {
+        id: user.id,
+        name: user.name,
+        label: `${user.name}`,
+      },
+      dateRequested: moment(new Date()).format('MM/DD/YYYY'),
+    };
+    this.setState({ values, setInitialValues: false });
   }
 
   checkStockMovementChange(newValues) {
@@ -303,7 +271,7 @@ class CreateStockMovement extends Component {
         .then((response) => {
           if (response.data) {
             const resp = response.data.data;
-            this.props.history.push(`/openboxes/stockMovement/create/${resp.id}${request ? '?type=REQUEST' : ''}`);
+            this.props.history.push(`/openboxes/stockMovement/create/${resp.id}?type=REQUEST`);
             this.props.nextPage({
               ...values,
               stockMovementId: resp.id,
