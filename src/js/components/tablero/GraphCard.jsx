@@ -67,9 +67,9 @@ const GraphCard = SortableElement(({
             onChange={e => reloadIndicator(cardMethod, cardType, cardTitle, cardLink, cardId, `querySize=${e.target.value}`)}
             disabled={!filter}
           >
-            <option value="6">Last 6 Months</option>
-            <option value="12">Last Year</option>
-            <option value="24">Last 2 Years</option>
+            <option value="5">Last 6 Months</option>
+            <option value="11">Last Year</option>
+            <option value="23">Last 2 Years</option>
           </select>
         </div>
         {graph}
