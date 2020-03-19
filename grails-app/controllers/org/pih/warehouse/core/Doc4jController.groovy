@@ -9,8 +9,10 @@
  **/
 package org.pih.warehouse.core
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.shipping.Shipment
 
+@Transactional
 class Doc4jController {
 
     def documentService

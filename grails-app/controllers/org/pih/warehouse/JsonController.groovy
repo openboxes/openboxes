@@ -10,9 +10,12 @@
 package org.pih.warehouse
 
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import grails.plugin.cache.Cacheable
 import groovy.time.TimeCategory
 import org.grails.web.json.JSONObject
+import org.pih.warehouse.CalculateHistoricalQuantityJob
+import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Localization
@@ -26,7 +29,6 @@ import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionType
-import org.pih.warehouse.CalculateHistoricalQuantityJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Category
@@ -43,13 +45,13 @@ import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemSortByCode
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.LocalizationUtil
 import org.quartz.JobKey
 import org.quartz.impl.StdScheduler
 
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 
+@Transactional
 class JsonController {
 
     def dataSource
@@ -120,7 +122,7 @@ class JsonController {
         render json as JSON
     }
 
-    def getRequisitionItems = {
+    def getRequisitionItems() {
         log.info "getRequisitionItems: ${params} "
         def json
         def requisition = Requisition.get(params?.id)
@@ -137,7 +139,7 @@ class JsonController {
         render json as JSON
     }
 
-    def updateRequisitionItems = {
+    def updateRequisitionItems() {
         log.info "updateRequisitionItems: ${params} "
 
         JSONObject jsonObject = request.JSON

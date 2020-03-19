@@ -9,9 +9,10 @@
  **/
 package org.pih.warehouse.shipping
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.Event
 
-
+@Transactional
 class ShipmentEventController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]

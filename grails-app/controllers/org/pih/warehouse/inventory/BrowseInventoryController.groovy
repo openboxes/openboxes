@@ -10,10 +10,12 @@
 
 package org.pih.warehouse.inventory
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.Location
 
+@Transactional
 class BrowseInventoryController {
 
     def dataSource

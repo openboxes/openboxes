@@ -9,8 +9,10 @@
  **/
 package org.pih.warehouse.core
 
+import grails.gorm.transactions.Transactional
 import org.springframework.web.multipart.MultipartFile
 
+@Transactional
 class LocalizationController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST", upload: "POST"]

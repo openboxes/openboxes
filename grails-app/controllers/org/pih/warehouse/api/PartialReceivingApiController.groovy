@@ -10,12 +10,14 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.product.Product
 
+@Transactional
 class PartialReceivingApiController {
 
     def receiptService

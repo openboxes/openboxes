@@ -9,6 +9,9 @@
  **/
 package org.pih.warehouse.core
 
+import grails.gorm.transactions.Transactional
+
+@Transactional
 class PersonController {
     def userService
 

@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import grails.plugins.rendering.pdf.PdfRenderingService
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.User
@@ -20,6 +21,7 @@ import org.pih.warehouse.order.Order
 /**
  * Should not extend BaseDomainApiController since stocklist is not a valid domain.
  */
+@Transactional
 class PutawayApiController {
 
     def putawayService
