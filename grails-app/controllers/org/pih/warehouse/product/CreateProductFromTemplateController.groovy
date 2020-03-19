@@ -9,9 +9,11 @@
  **/
 package org.pih.warehouse.product
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.inventory.InventoryService
 
+@Transactional
 class CreateProductFromTemplateController {
 
     MailService mailService

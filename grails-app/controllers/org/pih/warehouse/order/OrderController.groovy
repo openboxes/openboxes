@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.order
 
+import grails.gorm.transactions.Transactional
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
@@ -18,6 +19,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.springframework.web.multipart.MultipartFile
 
+@Transactional
 class OrderController {
     def orderService
     def reportService

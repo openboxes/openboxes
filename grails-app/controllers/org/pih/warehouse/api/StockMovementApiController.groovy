@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import org.apache.commons.lang.math.NumberUtils
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.Constants
@@ -23,6 +24,7 @@ import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionStatus
 
+@Transactional
 class StockMovementApiController {
 
     StockMovementService stockMovementService

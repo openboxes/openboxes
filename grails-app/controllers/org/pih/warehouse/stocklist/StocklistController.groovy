@@ -9,10 +9,12 @@
  */
 package org.pih.warehouse.stocklist
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.api.Stocklist
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.core.Location
 
+@Transactional
 class StocklistController {
 
     def stocklistService

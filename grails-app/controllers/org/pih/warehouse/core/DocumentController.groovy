@@ -10,6 +10,7 @@
 package org.pih.warehouse.core
 
 import grails.core.GrailsApplication
+import grails.gorm.transactions.Transactional
 import groovy.text.Template
 //import groovyx.net.http.HTTPBuilder
 import org.grails.gsp.GroovyPagesTemplateEngine
@@ -20,6 +21,7 @@ import org.pih.warehouse.shipping.Shipment
 import org.springframework.web.multipart.MultipartFile
 import util.FileUtil
 
+@Transactional
 class DocumentController {
 
     def fileService

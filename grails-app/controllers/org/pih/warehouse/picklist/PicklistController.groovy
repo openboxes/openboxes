@@ -10,10 +10,12 @@
 package org.pih.warehouse.picklist
 
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import grails.plugins.rendering.pdf.PdfRenderingService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.requisition.Requisition
 
+@Transactional
 class PicklistController {
 
     def scaffold = Picklist

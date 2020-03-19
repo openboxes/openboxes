@@ -10,6 +10,7 @@
 package org.pih.warehouse.reporting
 
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
@@ -23,6 +24,7 @@ import org.quartz.JobKey
 import org.quartz.impl.StdScheduler
 import util.ReportUtil
 
+@Transactional
 class ReportController {
 
     def dataService

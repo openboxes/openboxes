@@ -9,10 +9,12 @@
  **/
 package org.pih.warehouse.order
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.product.Product
 import org.springframework.dao.DataIntegrityViolationException
 
+@Transactional
 class PurchaseOrderWorkflowController {
 
     def orderService

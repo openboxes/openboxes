@@ -10,6 +10,7 @@
 package org.pih.warehouse.reporting
 
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import groovy.time.TimeCategory
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.collections.FactoryUtils
@@ -30,6 +31,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.report.ConsumptionService
 import org.pih.warehouse.report.ReportService
 
+@Transactional
 class ConsumptionController {
 
     def dataService
