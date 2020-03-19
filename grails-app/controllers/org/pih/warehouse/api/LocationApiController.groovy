@@ -13,6 +13,7 @@ import grails.converters.JSON
 import grails.validation.ValidationException
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.Criteria
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationRole
@@ -27,6 +28,7 @@ import grails.core.GrailsApplication
 import org.springframework.web.multipart.MultipartFile
 import org.pih.warehouse.core.LocationStatus
 
+@Transactional
 class LocationApiController extends BaseDomainApiController {
 
     def locationService

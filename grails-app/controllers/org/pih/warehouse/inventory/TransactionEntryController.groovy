@@ -9,6 +9,9 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.gorm.transactions.Transactional
+
+@Transactional
 class TransactionEntryController {
 
     def scaffold = TransactionEntry

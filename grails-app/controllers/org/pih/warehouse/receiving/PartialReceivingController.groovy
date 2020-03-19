@@ -1,9 +1,11 @@
 package org.pih.warehouse.receiving
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.shipping.Shipment
 
+@Transactional
 class PartialReceivingController {
 
     def receiptService

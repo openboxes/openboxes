@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.Constants
@@ -17,6 +18,7 @@ import org.pih.warehouse.inventory.AdjustStockCommand
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 
+@Transactional
 class StockAdjustmentApiController {
 
     def inventoryService
