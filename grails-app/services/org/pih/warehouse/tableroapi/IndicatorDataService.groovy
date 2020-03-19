@@ -113,14 +113,17 @@ class IndicatorDataService {
     DataGraph getSentStockMovements(def location, def params) {
         Integer querySize = params.querySize? params.querySize.toInteger() : 5
         today.clearTime()
+        
+        Date queryLimit = today.clone()
+        queryLimit.set(month: today.month - querySize, date: 1) 
 
-        String query = "SELECT COUNT(s.id) as total, YEAR(s.last_updated) as year, s.destination_id as destination, MONTH(s.last_updated) as month FROM openboxes.shipment s WHERE origin_id = '" + location.id + "' AND s.current_status <> 'PENDING' GROUP BY MONTH(s.last_updated), s.destination_id, YEAR(s.last_updated)"
-
-        List response = dataService.executeQuery(query)
+        List response = Shipment.executeQuery("SELECT COUNT(s.id), YEAR(s.lastUpdated), s.destination, MONTH(s.lastUpdated) FROM Shipment s WHERE s.origin = :location AND s.currentStatus <> 'PENDING' AND s.lastUpdated > :limit GROUP BY MONTH(s.lastUpdated), s.destination, YEAR(s.lastUpdated)", 
+        ['location': location, 'limit': queryLimit])
+        
         List listRes = []
         List listLabel = []
         for(item in response) {
-            Location itemLocation = Location.get(item.destination)
+            Location itemLocation = item[2]
             List listData = []
             listLabel = []
 
@@ -129,8 +132,8 @@ class IndicatorDataService {
                 month.set(month: today.month - i, date: 1)
 
                 Integer value = 0
-                if (month.month == item.month-1 && month.year + 1900 == item.year) {
-                    value = item.total
+                if (month.month == item[3]-1 && month.year + 1900 == item[1]) {
+                    value = item[0]
                 }
 
                 String monthLabel = new java.text.DateFormatSymbols().months[month.month].substring(0,3)
@@ -140,8 +143,11 @@ class IndicatorDataService {
             listRes.push(new IndicatorDatasets(itemLocation.name, listData))
         }
         List<IndicatorDatasets> datasets = listRes;
+
         IndicatorData data = new IndicatorData(datasets, listLabel);
+
         DataGraph indicatorData = new DataGraph(data, 1, "Stock Movements Sent by Month", "bar");
+        
         return indicatorData;
     }
 
