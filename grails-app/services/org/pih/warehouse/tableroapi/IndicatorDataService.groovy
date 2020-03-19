@@ -11,7 +11,6 @@ import org.pih.warehouse.tablero.IndicatorDatasets
 
 class IndicatorDataService {
 
-    def dataService
     Date today = new Date()
 
     DataGraph getExpirationSummaryData(def expirationData) {
@@ -147,7 +146,7 @@ class IndicatorDataService {
         IndicatorData data = new IndicatorData(datasets, listLabel);
 
         DataGraph indicatorData = new DataGraph(data, 1, "Stock Movements Sent by Month", "bar");
-        
+
         return indicatorData;
     }
 
