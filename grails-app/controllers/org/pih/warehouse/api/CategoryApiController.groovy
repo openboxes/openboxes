@@ -18,14 +18,14 @@ class CategoryApiController {
 
     def productService
 
-    def list = {
+    def list() {
         log.debug "List products " + params
         def categories = productService.getCategoryTree()
         categories = categories.collect { it.toJson() }
         render([data: categories] as JSON)
     }
 
-    def read = {
+    def read() {
         Category category = Category.get(params.id)
         if (!category) {
             throw new ObjectNotFoundException(params.id, "Category")
@@ -33,7 +33,7 @@ class CategoryApiController {
         render category.toJson() as JSON
     }
 
-    def save = {
+    def save() {
         log.debug "Save category " + params
         def category = Category.get(params.id)
         if (!category) {
@@ -49,7 +49,7 @@ class CategoryApiController {
         }
     }
 
-    def delete = {
+    def delete() {
         def category = Category.get(params.id)
         if (!category) {
             throw new ObjectNotFoundException(params.id, "Category")

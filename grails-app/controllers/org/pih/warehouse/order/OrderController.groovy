@@ -24,11 +24,11 @@ class OrderController {
 
     static allowedMethods = [save: "POST", update: "POST"]
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
 
         def suppliers = orderService.getSuppliers().sort()
 
@@ -63,16 +63,16 @@ class OrderController {
         ]
     }
 
-    def listOrderItems = {
+    def listOrderItems() {
         def orderItems = OrderItem.getAll().findAll { !it.isCompletelyFulfilled() }
         return [orderItems: orderItems]
     }
 
-    def create = {
+    def create() {
         redirect(controller: 'purchaseOrderWorkflow', action: 'index')
     }
 
-    def save = {
+    def save() {
         def orderInstance = new Order(params)
         if (orderInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.id])}"
@@ -82,7 +82,7 @@ class OrderController {
         }
     }
 
-    def show = {
+    def show() {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -92,7 +92,7 @@ class OrderController {
         }
     }
 
-    def edit = {
+    def edit() {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -102,7 +102,7 @@ class OrderController {
         }
     }
 
-    def placeOrder = {
+    def placeOrder() {
         log.info "Issue order " + params
         def orderInstance = orderService.placeOrder(params.id)
         if (orderInstance) {
@@ -119,7 +119,7 @@ class OrderController {
     }
 
 
-    def update = {
+    def update() {
         def orderInstance = Order.get(params.id)
         if (orderInstance) {
             if (params.version) {
@@ -145,7 +145,7 @@ class OrderController {
     }
 
 
-    def delete = {
+    def delete() {
         def orderInstance = Order.get(params.id)
         if (orderInstance) {
             try {
@@ -164,7 +164,7 @@ class OrderController {
     }
 
 
-    def addComment = {
+    def addComment() {
         def orderInstance = Order.get(params?.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -174,7 +174,7 @@ class OrderController {
         }
     }
 
-    def editComment = {
+    def editComment() {
         def orderInstance = Order.get(params?.order?.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -189,7 +189,7 @@ class OrderController {
         }
     }
 
-    def deleteComment = {
+    def deleteComment() {
         def orderInstance = Order.get(params.order.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.order.id])}"
@@ -211,7 +211,7 @@ class OrderController {
         }
     }
 
-    def saveComment = {
+    def saveComment() {
         log.info(params)
 
         def orderInstance = Order.get(params?.order?.id)
@@ -242,7 +242,7 @@ class OrderController {
 
     }
 
-    def addDocument = {
+    def addDocument() {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -252,7 +252,7 @@ class OrderController {
         }
     }
 
-    def editDocument = {
+    def editDocument() {
         def orderInstance = Order.get(params?.order?.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -267,7 +267,7 @@ class OrderController {
         }
     }
 
-    def deleteDocument = {
+    def deleteDocument() {
         def orderInstance = Order.get(params.order.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.order.id])}"
@@ -289,7 +289,7 @@ class OrderController {
         }
     }
 
-    def receive = {
+    def receive() {
         def orderCommand = orderService.getOrder(params.id, session.user.id)
         if (!orderCommand.order) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -299,7 +299,7 @@ class OrderController {
         }
     }
 
-    def saveOrderShipment = { OrderCommand command ->
+    def saveOrderShipment(OrderCommand command) {
         bindData(command, params)
         def orderInstance = Order.get(params?.order?.id)
         command.order = orderInstance
@@ -316,7 +316,7 @@ class OrderController {
     }
 
 
-    def fulfill = {
+    def fulfill() {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -326,7 +326,7 @@ class OrderController {
         }
     }
 
-    def addOrderItemToShipment = {
+    def addOrderItemToShipment() {
 
         def orderInstance = Order.get(params?.id)
         def orderItem = OrderItem.get(params?.orderItem?.id)
@@ -348,7 +348,7 @@ class OrderController {
 
     }
 
-    def download = {
+    def download() {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -401,7 +401,7 @@ class OrderController {
         }
     }
 
-    def downloadOrderItems = {
+    def downloadOrderItems() {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -444,7 +444,7 @@ class OrderController {
         }
     }
 
-    def importOrderItems = {
+    def importOrderItems() {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -476,7 +476,7 @@ class OrderController {
     }
 
 
-    def upload = {
+    def upload() {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -487,7 +487,7 @@ class OrderController {
     }
 
 
-    def print = {
+    def print() {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -498,7 +498,7 @@ class OrderController {
     }
 
 
-    def renderPdf = {
+    def renderPdf() {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
@@ -534,7 +534,7 @@ class OrderController {
     }
 
 
-    def rollbackOrderStatus = {
+    def rollbackOrderStatus() {
 
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {

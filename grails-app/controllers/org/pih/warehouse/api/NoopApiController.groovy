@@ -13,23 +13,23 @@ import org.apache.commons.lang.NotImplementedException
 
 class NoopApiController {
 
-    def list = {
+    def list() {
         throw new NotImplementedException("Action ${params.actionName} not implemented")
     }
 
-    def read = {
+    def read() {
         throw new NotImplementedException("Action ${params.actionName} not implemented")
     }
 
-    def create = {
+    def create() {
         throw new NotImplementedException("Action ${params.actionName} not implemented")
     }
 
-    def update = {
+    def update() {
         throw new NotImplementedException("Action ${params.actionName} not implemented")
     }
 
-    def delete = {
+    def delete() {
         throw new NotImplementedException("Action ${params.actionName} not implemented")
     }
 

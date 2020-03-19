@@ -23,11 +23,11 @@ class RequisitionTemplateController {
 
     static allowedMethods = [save: "POST", update: "POST"]
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         def requisitionCriteria = new Requisition()
         requisitionCriteria.name = "%" + params.q + "%"
@@ -133,7 +133,7 @@ class RequisitionTemplateController {
         render(view: "list", model: [requisitions: requisitions])
     }
 
-    def create = {
+    def create() {
         println params
         def requisition = new Requisition(status: RequisitionStatus.CREATED)
         requisition.type = params.type as RequisitionType
@@ -142,7 +142,7 @@ class RequisitionTemplateController {
         [requisition: requisition]
     }
 
-    def edit = {
+    def edit() {
         def requisition = Requisition.get(params.id)
         if (!requisition) {
             flash.message = "Could not find requisition with ID ${params.id}"
@@ -152,7 +152,7 @@ class RequisitionTemplateController {
         }
     }
 
-    def editHeader = {
+    def editHeader() {
         def requisition = Requisition.get(params.id)
         if (!requisition) {
             flash.message = "Could not find requisition with ID ${params.id}"
@@ -162,7 +162,7 @@ class RequisitionTemplateController {
         }
     }
 
-    def sendMail = {
+    def sendMail() {
         def requisition = Requisition.get(params.id)
         if (!requisition) {
             flash.message = "Could not find requisition with ID ${params.id}"
@@ -175,7 +175,7 @@ class RequisitionTemplateController {
         }
     }
 
-    def save = {
+    def save() {
         def requisition = new Requisition(params)
 
         if (!requisition.hasErrors() && requisition.save()) {
@@ -187,7 +187,7 @@ class RequisitionTemplateController {
         redirect(action: "edit", id: requisition.id)
     }
 
-    def publish = {
+    def publish() {
         def requisition = Requisition.get(params.id)
         if (requisition) {
             requisition.isPublished = true
@@ -203,7 +203,7 @@ class RequisitionTemplateController {
         }
     }
 
-    def unpublish = {
+    def unpublish() {
         def requisition = Requisition.get(params.id)
         if (requisition) {
             requisition.isPublished = false
@@ -220,7 +220,7 @@ class RequisitionTemplateController {
     }
 
 
-    def update = {
+    def update() {
         String viewName = params?.viewName ?: "edit"
 
         def requisition = Requisition.get(params.id)
@@ -252,7 +252,7 @@ class RequisitionTemplateController {
     }
 
 
-    def show = {
+    def show() {
         def requisition = Requisition.get(params.id)
 
         if (!requisition) {
@@ -263,7 +263,7 @@ class RequisitionTemplateController {
         }
     }
 
-    def delete = {
+    def delete() {
         def requisition = Requisition.get(params.id)
         if (requisition) {
             try {
@@ -279,7 +279,7 @@ class RequisitionTemplateController {
         redirect(action: "list", id: params.id)
     }
 
-    def clear = {
+    def clear() {
         def requisition = Requisition.get(params.id)
         if (requisition) {
             try {
@@ -296,7 +296,7 @@ class RequisitionTemplateController {
         redirect(action: "show", id: params.id)
     }
 
-    def clone = {
+    def clone() {
         def clone
         def requisition = Requisition.get(params.id)
         if (requisition) {
@@ -318,7 +318,7 @@ class RequisitionTemplateController {
         redirect(action: "list")
     }
 
-    def changeSortOrderAlpha = {
+    def changeSortOrderAlpha() {
         def requisition = Requisition.get(params.id)
         if (requisition) {
             def sortedItems = requisition.requisitionItems.sort { it.product.name }
@@ -330,7 +330,7 @@ class RequisitionTemplateController {
         redirect(action: "edit", id: requisition.id)
     }
 
-    def changeSortOrderChrono = {
+    def changeSortOrderChrono() {
         def requisition = Requisition.get(params.id)
         if (requisition) {
             def sortedItems = requisition.requisitionItems.sort { it.id }
@@ -343,7 +343,7 @@ class RequisitionTemplateController {
     }
 
 
-    def addToRequisitionItems = {
+    def addToRequisitionItems() {
         def requisition = Requisition.get(params.id)
         if (requisition) {
             def productCodes = params.multipleProductCodes.split(",")
@@ -379,7 +379,7 @@ class RequisitionTemplateController {
     }
 
 
-    def removeFromRequisitionItems = {
+    def removeFromRequisitionItems() {
         def requisition = Requisition.get(params.id)
 
         if (requisition) {
@@ -396,7 +396,7 @@ class RequisitionTemplateController {
     }
 
 
-    def export = {
+    def export() {
         def requisition = Requisition.get(params.id)
         def hasRoleFinance = userService.hasRoleFinance(session?.user)
 
@@ -440,7 +440,7 @@ class RequisitionTemplateController {
 
     }
 
-    def batch = {
+    def batch() {
         def requisition = Requisition.get(params.id)
 
 
@@ -448,7 +448,7 @@ class RequisitionTemplateController {
     }
 
 
-    def importAsString = {
+    def importAsString() {
         def lines = []
         def data = []
 
@@ -475,7 +475,7 @@ class RequisitionTemplateController {
         render(view: "batch", model: [requisition: requisition, data: data])
     }
 
-    def importAsFile = {
+    def importAsFile() {
 
         def skipLines = params.skipLines ?: 0
         def delimiter = params.delimiter ?: ","
@@ -504,7 +504,7 @@ class RequisitionTemplateController {
 
     }
 
-    def doImport = {
+    def doImport() {
 
         def updateCount = 0
         def insertCount = 0

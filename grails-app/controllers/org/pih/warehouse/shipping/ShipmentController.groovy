@@ -13,9 +13,6 @@ import au.com.bytecode.opencsv.CSVWriter
 import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.krysalis.barcode4j.impl.code128.Code128Bean
-import org.pih.warehouse.core.*
-import org.pih.warehouse.inventory.TransactionException
-import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Event
@@ -23,10 +20,13 @@ import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.TransactionException
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
+import org.pih.warehouse.receiving.ReceiptItem
 
 class ShipmentController {
 
@@ -43,15 +43,15 @@ class ShipmentController {
     def sessionFactory
 
 
-    def redirect = {
+    def redirect() {
         redirect(controller: "shipment", action: "showDetails", id: params.id)
     }
 
-    def show = {
+    def show() {
         redirect(action: "showDetails", params: ['id': params.id])
     }
 
-    def list = {
+    def list() {
         def startTime = System.currentTimeMillis()
         println "Get shipments: " + params
 
@@ -96,7 +96,7 @@ class ShipmentController {
     }
 
 
-    def create = {
+    def create() {
         def shipmentInstance = new Shipment()
         shipmentInstance.properties = params
 
@@ -109,7 +109,7 @@ class ShipmentController {
                                        warehouses      : Location.list(), eventTypes: EventType.list()])
     }
 
-    def save = {
+    def save() {
         def shipmentInstance = new Shipment(params)
 
         if (shipmentInstance.save(flush: true)) {
@@ -128,7 +128,7 @@ class ShipmentController {
         }
     }
 
-    def update = {
+    def update() {
 
         def shipmentInstance = Shipment.get(params.id)
         if (shipmentInstance) {
@@ -219,7 +219,7 @@ class ShipmentController {
         }
     }
 
-    def showDetails = {
+    def showDetails() {
         def shipmentInstance = Shipment.get(params.id)
         if (!shipmentInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
@@ -238,18 +238,18 @@ class ShipmentController {
         }
     }
 
-    def showTransactions = {
+    def showTransactions() {
         def shipmentInstance = Shipment.get(params.id)
         render(template: "showTransactions", model: [shipmentInstance: shipmentInstance])
     }
 
-    def syncTransactions = {
+    def syncTransactions() {
         def shipmentInstance = Shipment.get(params.id)
         shipmentService.synchronizeTransactions(shipmentInstance)
         redirect(action: "showDetails", id: params.id)
     }
 
-    def editDetails = {
+    def editDetails() {
 
         def shipmentInstance = Shipment.get(params.id)
         if (!shipmentInstance) {
@@ -260,7 +260,7 @@ class ShipmentController {
         }
     }
 
-    def sendShipment = {
+    def sendShipment() {
         def transactionInstance
         def shipmentInstance = Shipment.get(params.id)
         def shipmentWorkflow = shipmentService.getShipmentWorkflow(params.id)
@@ -308,19 +308,19 @@ class ShipmentController {
         }
     }
 
-    def refreshCurrentStatus = {
+    def refreshCurrentStatus() {
         shipmentService.refreshCurrentStatus(params.id)
         redirect(action: "showDetails", id: params?.id)
     }
 
 
-    def rollbackLastEvent = {
+    def rollbackLastEvent() {
         def shipmentInstance = Shipment.get(params.id)
         shipmentService.rollbackLastEvent(shipmentInstance)
         redirect(action: "showDetails", id: shipmentInstance?.id)
     }
 
-    def deleteShipment = {
+    def deleteShipment() {
         def shipmentInstance = Shipment.get(params.id)
         if (!shipmentInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
@@ -338,7 +338,7 @@ class ShipmentController {
         [shipmentInstance: shipmentInstance]
     }
 
-    def markAsReceived = {
+    def markAsReceived() {
         def shipmentInstance = Shipment.get(params.id)
 
         // actually process the receipt
@@ -350,7 +350,7 @@ class ShipmentController {
     }
 
 
-    def bulkDeleteShipments = {
+    def bulkDeleteShipments() {
         def shipmentIds = params.list("shipment.id")
 
         log.info "Shipment ids: " + shipmentIds
@@ -367,7 +367,7 @@ class ShipmentController {
         redirect(action: "list", params: [type: params.type, status: params.status])
     }
 
-    def bulkReceiveShipments = {
+    def bulkReceiveShipments() {
         def shipmentIds = params.list("shipment.id")
         try {
             shipmentService.receiveShipments(shipmentIds, null, session.user.id, session.warehouse.id, true)
@@ -380,7 +380,7 @@ class ShipmentController {
     }
 
 
-    def bulkMarkAsReceived = {
+    def bulkMarkAsReceived() {
         def shipmentIds = params.list("shipment.id")
         Location location = Location.load(session.warehouse.id)
         try {
@@ -397,7 +397,7 @@ class ShipmentController {
     }
 
 
-    def bulkRollbackShipments = {
+    def bulkRollbackShipments() {
         def shipmentIds = params.list("shipment.id")
         try {
             shipmentService.rollbackShipments(shipmentIds)
@@ -409,7 +409,7 @@ class ShipmentController {
         redirect(action: "list", params: [type: params.type, status: params.status])
     }
 
-    def downloadLabels = {
+    def downloadLabels() {
 
         Shipment shipmentInstance = Shipment.get(params.id)
         response.contentType = 'application/pdf'
@@ -438,7 +438,7 @@ class ShipmentController {
         renderPdf(template: 'barcodeLabel', model: [shipmentInstance: shipmentInstance, shipmentItems: shipmentItems, shipmentNumberBytes: baos.toByteArray()])
     }
 
-    def showPutawayLocations = {
+    def showPutawayLocations() {
         def location = Location.get(session.warehouse.id)
         ReceiptItem receiptItem = ReceiptItem.load(params.id)
 
@@ -449,7 +449,7 @@ class ShipmentController {
     }
 
 
-    def splitReceiptItem = {
+    def splitReceiptItem() {
         ReceiptItem receiptItem1 = ReceiptItem.load(params.id)
         ReceiptItem receiptItem2 = new ReceiptItem(receiptItem1.properties)
         receiptItem2.quantityReceived = 0
@@ -460,7 +460,7 @@ class ShipmentController {
         redirect(controller: "shipment", action: "receiveShipment", id: shipment?.id)
     }
 
-    def deleteReceiptItem = {
+    def deleteReceiptItem() {
         ReceiptItem receiptItem = ReceiptItem.load(params.id)
         Shipment shipmentInstance = receiptItem?.receipt?.shipment
 
@@ -483,7 +483,7 @@ class ShipmentController {
         redirect(controller: "shipment", action: "receiveShipment", id: shipmentInstance?.id)
     }
 
-    def deleteReceipt = {
+    def deleteReceipt() {
         Receipt receiptInstance = Receipt.get(params.id)
         Shipment shipmentInstance = receiptInstance?.shipment
         if (shipmentInstance) {
@@ -493,7 +493,7 @@ class ShipmentController {
         redirect(controller: "shipment", action: "showDetails", id: shipmentInstance?.id)
     }
 
-    def validateReceipt = {
+    def validateReceipt() {
         Receipt receiptInstance = Receipt.get(params.id)
         Shipment shipmentInstance = receiptInstance?.shipment
         if (shipmentService.validateReceipt(receiptInstance)) {
@@ -504,7 +504,7 @@ class ShipmentController {
     }
 
 
-    def receiveShipment = { ReceiveShipmentCommand command ->
+    def receiveShipment(ReceiveShipmentCommand command) {
         log.info "params: " + params
         def receiptInstance
         def location = Location.get(session.warehouse.id)
@@ -585,64 +585,20 @@ class ShipmentController {
         render(view: "receiveShipment", model: [shipmentInstance: shipmentInstance, receiptInstance: receiptInstance])
     }
 
-
-    /**
-     *
-     * @param shipmentInstance
-     * @param userInstance
-     * @param recipients
-     */
-    void triggerReceiveShipmentEmails(Shipment shipmentInstance, User userInstance, Set<Person> recipients) {
-        if (!userInstance) userInstance = User.get(session.user.id)
-        if (!shipmentInstance.hasErrors()) {
-            if (!recipients) recipients = new HashSet<Person>()
-
-            // add all admins to the email
-            def adminList = userService.findUsersByRoleType(RoleType.ROLE_SHIPMENT_NOTIFICATION)
-            adminList.each { adminUser ->
-                recipients.add(adminUser)
-            }
-
-            // add the current user to the list of email recipients
-            if (userInstance?.email) {
-                recipients.add(userInstance)
-            }
-
-            // add all shipment recipients
-            shipmentInstance?.recipients?.each { recipient ->
-                recipients.add(recipient)
-            }
-
-            def shipmentName = "${shipmentInstance.name}"
-            def shipmentType = "${format.metadata(obj: shipmentInstance.shipmentType)}"
-            def shipmentDate = "${formatDate(date: shipmentInstance?.actualDeliveryDate, format: 'MMMMM dd yyyy')}"
-            def subject = "${warehouse.message(code: 'shipment.hasBeenReceived.message', args: [shipmentType, shipmentName, shipmentDate])}"
-            def body = g.render(template: "/email/shipmentReceived", model: [shipmentInstance: shipmentInstance, userInstance: userInstance])
-            def toList = recipients?.collect { it?.email }?.unique()
-            log.info("Mailing shipment emails to ${toList} with subject ${subject}")
-
-            try {
-                mailService.sendHtmlMail(subject, body.toString(), toList)
-            } catch (Exception e) {
-                log.error "Error triggering receive shipment emails " + e.message
-            }
-        }
-    }
-
-    def renderReceivedEmail = {
+    def renderReceivedEmail() {
         def shipmentInstance = Shipment.get(params.id)
         def userInstance = User.get(session.user.id)
         render(template: "/email/shipmentReceived", model: [shipmentInstance: shipmentInstance, userInstance: userInstance])
     }
 
-    def renderShippedEmail = {
+    def renderShippedEmail() {
         def shipmentInstance = Shipment.get(params.id)
         def userInstance = User.get(session.user.id)
         render(template: "/email/shipmentShipped", model: [shipmentInstance: shipmentInstance, userInstance: userInstance])
     }
 
 
-    def showPackingList = {
+    def showPackingList() {
         def shipmentInstance = Shipment.get(params.id)
         if (!shipmentInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
@@ -652,7 +608,7 @@ class ShipmentController {
         }
     }
 
-    def downloadPackingList = {
+    def downloadPackingList() {
         def shipmentInstance = Shipment.get(params.id)
         if (!shipmentInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
@@ -707,7 +663,7 @@ class ShipmentController {
     }
 
 
-    def editContents = {
+    def editContents() {
         def shipmentInstance = Shipment.get(params.id)
         def containerInstance = Container.get(params?.container?.id)
 
@@ -724,7 +680,7 @@ class ShipmentController {
     }
 
 
-    def editContainer = {
+    def editContainer() {
 
         def shipmentInstance = Shipment.get(params.shipmentId)
         def containerInstance = Container.get(params.containerId)
@@ -766,7 +722,7 @@ class ShipmentController {
     }
 
 
-    def copyContainer = {
+    def copyContainer() {
         def container = Container.get(params.id)
         def shipment = Shipment.get(params.shipmentId)
 
@@ -797,7 +753,7 @@ class ShipmentController {
     }
 
 
-    def addDocument = {
+    def addDocument() {
 
         def shipmentInstance = Shipment.get(params.id)
         def documentInstance = Document.get(params?.document?.id)
@@ -811,7 +767,7 @@ class ShipmentController {
         render(view: "addDocument", model: [shipmentInstance: shipmentInstance, documentInstance: documentInstance])
     }
 
-    def editDocument = {
+    def editDocument() {
         def shipmentInstance = Shipment.get(params?.shipmentId)
         def documentInstance = Document.get(params?.documentId)
         if (!shipmentInstance) {
@@ -826,7 +782,7 @@ class ShipmentController {
     }
 
 
-    def addComment = {
+    def addComment() {
         log.debug params
         def shipmentInstance = Shipment.get(params.id)
         render(view: "addComment", model: [shipmentInstance: shipmentInstance, comment: new Comment()])
@@ -836,7 +792,7 @@ class ShipmentController {
      * This action is used to render the form page used to add a
      * new package/container to a shipment.
      */
-    def addPackage = {
+    def addPackage() {
         def shipmentInstance = Shipment.get(params.id)
         def containerName = (shipmentInstance?.containers) ? String.valueOf(shipmentInstance?.containers?.size() + 1) : "1"
         def containerInstance = new Container(name: containerName)
@@ -848,7 +804,7 @@ class ShipmentController {
     /**
      * This closure is used to process the 'add package' form.
      */
-    def savePackage = {
+    def savePackage() {
 
         log.info "params " + params
 
@@ -873,7 +829,7 @@ class ShipmentController {
     }
 
 
-    def saveComment = {
+    def saveComment() {
         def shipmentInstance = Shipment.get(params.shipmentId)
         def recipient = (params.recipientId) ? User.get(params.recipientId) : null
         def comment = new Comment(comment: params.comment, sender: session.user, recipient: recipient)
@@ -885,7 +841,7 @@ class ShipmentController {
     }
 
 
-    def editItem = {
+    def editItem() {
         def item = ShipmentItem.get(params.id)
         def container = item.getContainer()
         def shipmentId = container.getShipment().getId()
@@ -901,7 +857,7 @@ class ShipmentController {
     }
 
 
-    def deleteDocument = {
+    def deleteDocument() {
         def document = Document.get(params.id)
         def shipment = Shipment.get(params.shipmentId)
         if (shipment && document) {
@@ -914,7 +870,7 @@ class ShipmentController {
         redirect(action: 'showDetails', id: params.shipmentId)
     }
 
-    def deleteEvent = {
+    def deleteEvent() {
         def event = Event.get(params.id)
         def shipment = Shipment.get(params.shipmentId)
         if (shipment && event) {   // not allowed to delete a "created" event
@@ -928,7 +884,7 @@ class ShipmentController {
         redirect(action: 'showDetails', id: params.shipmentId)
     }
 
-    def deleteContainer = {
+    def deleteContainer() {
         def container = Container.get(params.id)
         def shipment = Shipment.get(params.shipmentId)
 
@@ -942,7 +898,7 @@ class ShipmentController {
         redirect(action: 'showDetails', id: params.shipmentId)
     }
 
-    def deleteItem = {
+    def deleteItem() {
         def shipmentItem = ShipmentItem.get(params.id)
         def container = shipmentItem.getContainer()
         def shipmentId = container.getShipment().getId()
@@ -956,7 +912,7 @@ class ShipmentController {
         }
     }
 
-    def deleteComment = {
+    def deleteComment() {
         def comment = Comment.get(params.id)
         def shipment = Shipment.get(params.shipmentId)
         if (shipment && comment) {
@@ -971,7 +927,7 @@ class ShipmentController {
     }
 
 
-    def editEvent = {
+    def editEvent() {
         def eventInstance = Event.get(params.id)
         def shipmentInstance = Shipment.get(params.shipmentId)
 
@@ -984,7 +940,7 @@ class ShipmentController {
     }
 
 
-    def addEvent = {
+    def addEvent() {
         def shipmentInstance = Shipment.get(params.id)
 
         if (!shipmentInstance) {
@@ -996,7 +952,7 @@ class ShipmentController {
         render(view: "editEvent", model: [shipmentInstance: shipmentInstance, eventInstance: eventInstance])
     }
 
-    def saveEvent = {
+    def saveEvent() {
         def shipmentInstance = Shipment.get(params.shipmentId)
         def eventInstance = Event.get(params.eventId) ?: new Event()
 
@@ -1021,7 +977,7 @@ class ShipmentController {
         redirect(action: 'showDetails', id: shipmentInstance.id)
     }
 
-    def addShipmentItem = {
+    def addShipmentItem() {
         log.info "parameters: " + params
 
         [shipmentInstance : Shipment.get(params.id),
@@ -1029,7 +985,7 @@ class ShipmentController {
          itemInstance     : new ShipmentItem()]
     }
 
-    def addReferenceNumber = {
+    def addReferenceNumber() {
         def referenceNumber = new ReferenceNumber(params)
         def shipment = Shipment.get(params.shipmentId)
         shipment.addToReferenceNumbers(referenceNumber)
@@ -1037,13 +993,13 @@ class ShipmentController {
         redirect(action: 'show', id: params.shipmentId)
     }
 
-    def form = {
+    def form() {
         [shipments: Shipment.list()]
     }
 
-    def view = {}
+    def view() {}
 
-    def generateDocuments = {
+    def generateDocuments() {
         def shipmentInstance = Shipment.get(params.id)
         def shipmentWorkflow = shipmentService.getShipmentWorkflow(shipmentInstance)
 
@@ -1055,27 +1011,7 @@ class ShipmentController {
         }
     }
 
-    Person convertStringToPerson(String name) {
-        def person = new Person()
-        if (name) {
-            def nameArray = name.split(" ")
-            nameArray.each {
-                if (it.contains("@")) {
-                    person.email = it
-                } else if (!person.firstName) {
-                    person.firstName = it
-                } else if (!person.lastName) {
-                    person.lastName = it
-                } else {
-                    person.lastName += " " + it
-                }
-            }
-        }
-        return person
-    }
-
-
-    def addToShipment = {
+    def addToShipment() {
 
         // Get product IDs and convert them to String
         def productIds = params.list('product.id')
@@ -1088,7 +1024,7 @@ class ShipmentController {
     }
 
 
-    def addToShipmentPost = { ItemListCommand command ->
+    def addToShipmentPost(ItemListCommand command) {
 
         println "add to shipment post " + params.shipmentContainerKey
 
@@ -1140,7 +1076,7 @@ class ShipmentController {
     }
 
 
-    def exportPackingList = {
+    def exportPackingList() {
         log.info "Export packing list for shipment " + params
         Shipment shipment = Shipment.get(params.id)
         if (!shipment) {
@@ -1175,6 +1111,67 @@ class ShipmentController {
         redirect(controller: "shipment", action: "showDetails", id: params.id)
     }
 
+    /**
+     *
+     * @param shipmentInstance
+     * @param userInstance
+     * @param recipients
+     */
+    private void triggerReceiveShipmentEmails(Shipment shipmentInstance, User userInstance, Set<Person> recipients) {
+        if (!userInstance) userInstance = User.get(session.user.id)
+        if (!shipmentInstance.hasErrors()) {
+            if (!recipients) recipients = new HashSet<Person>()
+
+            // add all admins to the email
+            def adminList = userService.findUsersByRoleType(RoleType.ROLE_SHIPMENT_NOTIFICATION)
+            adminList.each { adminUser ->
+                recipients.add(adminUser)
+            }
+
+            // add the current user to the list of email recipients
+            if (userInstance?.email) {
+                recipients.add(userInstance)
+            }
+
+            // add all shipment recipients
+            shipmentInstance?.recipients?.each { recipient ->
+                recipients.add(recipient)
+            }
+
+            def shipmentName = "${shipmentInstance.name}"
+            def shipmentType = "${format.metadata(obj: shipmentInstance.shipmentType)}"
+            def shipmentDate = "${formatDate(date: shipmentInstance?.actualDeliveryDate, format: 'MMMMM dd yyyy')}"
+            def subject = "${warehouse.message(code: 'shipment.hasBeenReceived.message', args: [shipmentType, shipmentName, shipmentDate])}"
+            def body = g.render(template: "/email/shipmentReceived", model: [shipmentInstance: shipmentInstance, userInstance: userInstance])
+            def toList = recipients?.collect { it?.email }?.unique()
+            log.info("Mailing shipment emails to ${toList} with subject ${subject}")
+
+            try {
+                mailService.sendHtmlMail(subject, body.toString(), toList)
+            } catch (Exception e) {
+                log.error "Error triggering receive shipment emails " + e.message
+            }
+        }
+    }
+
+    private Person convertStringToPerson(String name) {
+        def person = new Person()
+        if (name) {
+            def nameArray = name.split(" ")
+            nameArray.each {
+                if (it.contains("@")) {
+                    person.email = it
+                } else if (!person.firstName) {
+                    person.firstName = it
+                } else if (!person.lastName) {
+                    person.lastName = it
+                } else {
+                    person.lastName += " " + it
+                }
+            }
+        }
+        return person
+    }
 }
 
 class ReceiveShipmentCommand implements Serializable {

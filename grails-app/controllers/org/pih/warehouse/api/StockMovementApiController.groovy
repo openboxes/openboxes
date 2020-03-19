@@ -13,22 +13,22 @@ import grails.converters.JSON
 import org.apache.commons.lang.math.NumberUtils
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.Constants
-import org.pih.warehouse.importer.ImportDataCommand
-import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionStatus
 
 class StockMovementApiController {
 
     StockMovementService stockMovementService
     def dataService
 
-    def list = {
+    def list() {
         int max = Math.min(params.max ? params.int('max') : 10, 1000)
         int offset = params.offset ? params.int("offset") : 0
         def stockMovements = stockMovementService.getStockMovements(max, offset)
@@ -45,7 +45,7 @@ class StockMovementApiController {
         render([data: stockMovements] as JSON)
     }
 
-    def read = {
+    def read() {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id, params.stepNumber)
 
         // FIXME Debugging
@@ -55,7 +55,7 @@ class StockMovementApiController {
         render([data: stockMovement] as JSON)
     }
 
-    def create = { StockMovement stockMovement ->
+    def create(StockMovement stockMovement) {
 
         JSONObject jsonObject = request.JSON
         log.debug "create " + jsonObject.toString(4)
@@ -65,7 +65,7 @@ class StockMovementApiController {
         render([data: stockMovement] as JSON)
     }
 
-    def updateRequisition = { //StockMovement stockMovement ->
+    def updateRequisition() {
 
         JSONObject jsonObject = request.JSON
         log.debug "update: " + jsonObject.toString(4)
@@ -79,7 +79,7 @@ class StockMovementApiController {
         forward(action: "read")
     }
 
-    def updateShipment = { //StockMovement stockMovement ->
+    def updateShipment() {
 
         JSONObject jsonObject = request.JSON
         log.debug "update: " + jsonObject.toString(4)
@@ -93,18 +93,18 @@ class StockMovementApiController {
         render status: 200
     }
 
-    def delete = {
+    def delete() {
         stockMovementService.deleteStockMovement(params.id)
         render status: 204
     }
 
 
-    def status = {
+    def status() {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         render([data: stockMovement?.status] as JSON)
     }
 
-    def deleteStatus = {
+    def deleteStatus() {
         stockMovementService.rollbackStockMovement(params.id)
         forward(action: "read")
     }
@@ -112,7 +112,7 @@ class StockMovementApiController {
     /**
      * Peforms a status update on the stock movement and forwards to the read action.
      */
-    def updateStatus = {
+    def updateStatus() {
 
 
         JSONObject jsonObject = request.JSON
@@ -175,7 +175,7 @@ class StockMovementApiController {
         render status: 200
     }
 
-    def removeAllItems = {
+    def removeAllItems() {
         Requisition requisition = Requisition.get(params.id)
 
         stockMovementService.removeRequisitionItems(requisition)
@@ -183,7 +183,7 @@ class StockMovementApiController {
         render status: 204
     }
 
-    def reviseItems = {
+    def reviseItems() {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
         JSONObject jsonObject = request.JSON
@@ -196,7 +196,7 @@ class StockMovementApiController {
         render([data: revisedItems] as JSON)
     }
 
-    def updateItems = {
+    def updateItems() {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
         JSONObject jsonObject = request.JSON
@@ -209,7 +209,7 @@ class StockMovementApiController {
         render([data: stockMovement] as JSON)
     }
 
-    def updateShipmentItems = {
+    def updateShipmentItems() {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
         JSONObject jsonObject = request.JSON
@@ -222,7 +222,7 @@ class StockMovementApiController {
         render([data: stockMovement] as JSON)
     }
 
-    def updateAdjustedItems = {
+    def updateAdjustedItems() {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
         stockMovementService.updateAdjustedItems(stockMovement, params.adjustedProduct)
@@ -232,7 +232,7 @@ class StockMovementApiController {
         render([data: stockMovement] as JSON)
     }
 
-    def exportPickListItems = {
+    def exportPickListItems() {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id, "4")
 
         List<PicklistItem> picklistItems = stockMovement?.pickPage?.pickPageItems?.inject([]) { result, pickPageItem ->
@@ -258,7 +258,7 @@ class StockMovementApiController {
         render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
     }
 
-    def importPickListItems = { ImportDataCommand command ->
+    def importPickListItems(ImportDataCommand command) {
 
         try {
             StockMovement stockMovement = stockMovementService.getStockMovement(params.id, "4")
@@ -338,15 +338,15 @@ class StockMovementApiController {
      * @param jsonObject
      * @param dateField
      */
-    Date parseDateRequested(String date) {
+    private Date parseDateRequested(String date) {
         return date ? Constants.EXPIRATION_DATE_FORMATTER.parse(date) : null
     }
 
-    Date parseDateShipped(String date) {
+    private Date parseDateShipped(String date) {
         return date ? Constants.DELIVERY_DATE_FORMATTER.parse(date) : null
     }
 
-    void bindStockMovement(StockMovement stockMovement, JSONObject jsonObject) {
+    private void bindStockMovement(StockMovement stockMovement, JSONObject jsonObject) {
         // Remove attributes that cause issues in the default grails data binder
         List lineItems = jsonObject.remove("lineItems")
         List packPageItems = jsonObject.remove("packPageItems")
@@ -396,17 +396,17 @@ class StockMovementApiController {
      * @param stockMovement
      * @param lineItems
      */
-    void bindLineItems(StockMovement stockMovement, List lineItems) {
+    private void bindLineItems(StockMovement stockMovement, List lineItems) {
         log.debug "line items: " + lineItems
         List<StockMovementItem> stockMovementItems = createLineItemsFromJson(stockMovement, lineItems)
         stockMovement.lineItems.addAll(stockMovementItems)
     }
 
-    Boolean isNull(Object objectValue) {
+    private Boolean isNull(Object objectValue) {
         return objectValue == null || objectValue?.equals("")
     }
 
-    List<StockMovementItem> createLineItemsFromJson(StockMovement stockMovement, List lineItems) {
+    private List<StockMovementItem> createLineItemsFromJson(StockMovement stockMovement, List lineItems) {
         List<StockMovementItem> stockMovementItems = new ArrayList<StockMovementItem>()
         lineItems.each { lineItem ->
             StockMovementItem stockMovementItem = new StockMovementItem()
@@ -462,14 +462,14 @@ class StockMovementApiController {
         return stockMovementItems
     }
 
-    void bindPackPage(StockMovement stockMovement, List lineItems) {
+    private void bindPackPage(StockMovement stockMovement, List lineItems) {
         log.debug "line items: " + lineItems
         List<PackPageItem> packPageItems = createPackPageItemsFromJson(stockMovement, lineItems)
         PackPage packPage = new PackPage(packPageItems: packPageItems)
         stockMovement.packPage = packPage
     }
 
-    List<PackPageItem> createPackPageItemsFromJson(StockMovement stockMovement, List lineItems) {
+    private List<PackPageItem> createPackPageItemsFromJson(StockMovement stockMovement, List lineItems) {
         List<PackPageItem> packPageItems = new ArrayList<PackPageItem>()
         lineItems.each { lineItem ->
             PackPageItem packPageItem = new PackPageItem()

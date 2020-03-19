@@ -14,7 +14,7 @@ import org.pih.warehouse.core.Location
 
 class DeliveryNoteController {
 
-    def print = {
+    def print() {
         def requisition = Requisition.get(params.id)
         def picklist = Picklist.findByRequisition(requisition)
         def location = Location.get(session.warehouse.id)
