@@ -361,6 +361,7 @@ class EditItemsPage extends Component {
             })),
           },
         }, () => {
+          this.fetchAllData(false);
           this.props.hideSpinner();
         });
       }).catch(() => {
