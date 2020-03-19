@@ -9,6 +9,9 @@
  **/
 package org.pih.warehouse.core
 
+import grails.gorm.transactions.Transactional
+
+@Transactional
 class PartyController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]

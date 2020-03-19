@@ -9,8 +9,10 @@
  **/
 package org.pih.warehouse.product
 
+import grails.gorm.transactions.Transactional
 import grails.orm.PagedResultList
 
+@Transactional
 class ProductAssociationController {
 
     def dataService

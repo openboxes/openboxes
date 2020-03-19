@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.product
 
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.PreferenceType
@@ -16,6 +17,7 @@ import java.math.RoundingMode
 import java.text.SimpleDateFormat
 import org.pih.warehouse.core.ProductPrice
 
+@Transactional
 class ProductSupplierController {
 
     def dataService

@@ -10,10 +10,12 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.UnresolvableObjectException
 import org.pih.warehouse.core.Location
 
+@Transactional
 class BinLocationApiController {
 
     def locationService

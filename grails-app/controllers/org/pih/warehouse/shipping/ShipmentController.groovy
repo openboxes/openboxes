@@ -10,6 +10,7 @@
 package org.pih.warehouse.shipping
 
 import au.com.bytecode.opencsv.CSVWriter
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.krysalis.barcode4j.impl.code128.Code128Bean
@@ -31,6 +32,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 
+@Transactional
 class ShipmentController {
 
     def scaffold = Shipment

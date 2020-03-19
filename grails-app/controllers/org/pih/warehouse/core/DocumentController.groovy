@@ -11,6 +11,7 @@ package org.pih.warehouse.core
 
 import fr.w3blog.zpl.utils.ZebraUtils
 import grails.core.GrailsApplication
+import grails.gorm.transactions.Transactional
 import groovy.text.Template
 //import groovyx.net.http.HTTPBuilder
 import org.grails.gsp.GroovyPagesTemplateEngine
@@ -27,6 +28,7 @@ import org.pih.warehouse.core.Constants
 
 import static org.springframework.util.StringUtils.stripFilenameExtension
 
+@Transactional
 class DocumentController {
 
     def documentTemplateService

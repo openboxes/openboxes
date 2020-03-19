@@ -11,6 +11,7 @@
 package org.pih.warehouse.inventory
 
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.time.TimeCategory
 import org.apache.commons.collections.FactoryUtils
@@ -30,6 +31,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile
 
 import java.text.SimpleDateFormat
 
+@Transactional
 class InventoryController {
 
     def dataSource
