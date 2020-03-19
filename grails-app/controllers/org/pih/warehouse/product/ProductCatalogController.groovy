@@ -9,11 +9,12 @@
  **/
 package org.pih.warehouse.product
 
-
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.UploadService
 import org.pih.warehouse.importer.ImportDataCommand
 import grails.plugin.springcache.annotations.CacheFlush
 
+@Transactional
 class ProductCatalogController {
 
     UploadService uploadService

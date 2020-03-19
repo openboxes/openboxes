@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.jobs
 
-
+import grails.gorm.transactions.Transactional
 import org.quartz.JobDetail
 import org.quartz.JobKey
 import org.quartz.Trigger
@@ -18,6 +18,7 @@ import org.quartz.impl.StdScheduler
 
 import java.text.ParseException
 
+@Transactional
 class JobsController {
 
     StdScheduler quartzScheduler

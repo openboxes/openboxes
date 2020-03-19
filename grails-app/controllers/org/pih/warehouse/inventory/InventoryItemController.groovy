@@ -10,6 +10,7 @@
 package org.pih.warehouse.inventory
 
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.time.TimeCategory
 import org.grails.plugins.csv.CSVWriter
@@ -35,6 +36,7 @@ import grails.core.GrailsApplication
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
+@Transactional
 class InventoryItemController {
 
     def dataService

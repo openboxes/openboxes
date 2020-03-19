@@ -11,6 +11,7 @@ package org.pih.warehouse.data
 
 import grails.converters.JSON
 import grails.util.Holders
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.Constants
@@ -28,6 +29,7 @@ import org.pih.warehouse.reporting.LotDimension
 import org.pih.warehouse.reporting.ProductDimension
 import org.pih.warehouse.reporting.TransactionFact
 
+@Transactional
 class MigrationController {
 
     def dataService
@@ -88,7 +90,7 @@ class MigrationController {
         ]
     }
 
-    def stockMovementsWithoutShipmentItems = {
+    def stockMovementsWithoutShipmentItems() {
         def g = Holders.grailsApplication.mainContext.getBean( 'org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib' )
         def data = migrationService.stockMovementsWithoutShipmentItems
         // id, status, request_number, date_created, origin, requested, picked, shipped
@@ -230,7 +232,7 @@ class MigrationController {
     }
 
 
-    def receiptsWithoutTransaction = {
+    def receiptsWithoutTransaction() {
         def g = ApplicationHolder.application.mainContext.getBean( 'org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib' )
         def data = migrationService.getReceiptsWithoutTransaction()
         if ("count".equals(params.format)) {
@@ -252,7 +254,7 @@ class MigrationController {
         }
     }
 
-    def shipmentsWithoutTransactions = {
+    def shipmentsWithoutTransactions() {
         def data = migrationService.shipmentsWithoutTransactions
         if ("count".equals(params.format)) {
             render data.size()

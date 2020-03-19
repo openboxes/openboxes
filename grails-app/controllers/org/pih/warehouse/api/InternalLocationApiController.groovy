@@ -10,10 +10,12 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
 
+@Transactional
 class InternalLocationApiController {
 
     def locationService

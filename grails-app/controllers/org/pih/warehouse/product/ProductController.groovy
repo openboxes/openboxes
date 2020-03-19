@@ -11,6 +11,7 @@ package org.pih.warehouse.product
 
 import com.google.zxing.BarcodeFormat
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.apache.commons.io.FilenameUtils
 import grails.web.context.ServletContextHolder
@@ -35,6 +36,7 @@ import org.springframework.web.servlet.support.RequestContextUtils as RCU
 import javax.activation.MimetypesFileTypeMap
 import java.math.RoundingMode
 
+@Transactional
 class ProductController {
 
     def dataService
