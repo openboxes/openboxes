@@ -10,12 +10,14 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociation
 import grails.core.GrailsApplication
 
+@Transactional
 class ProductApiController extends BaseDomainApiController {
 
     def productService

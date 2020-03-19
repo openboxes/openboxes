@@ -11,6 +11,7 @@ package org.pih.warehouse
 
 import grails.converters.JSON
 import groovy.sql.Sql
+import grails.gorm.transactions.Transactional
 import grails.plugin.cache.Cacheable
 import groovy.time.TimeCategory
 import org.grails.web.json.JSONObject
@@ -53,6 +54,7 @@ import org.pih.warehouse.util.LocalizationUtil
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 
+@Transactional
 class JsonController {
 
     def dataSource
@@ -124,7 +126,7 @@ class JsonController {
         render json as JSON
     }
 
-    def getRequisitionItems = {
+    def getRequisitionItems() {
         log.info "getRequisitionItems: ${params} "
         def json
         def requisition = Requisition.get(params?.id)
@@ -141,7 +143,7 @@ class JsonController {
         render json as JSON
     }
 
-    def updateRequisitionItems = {
+    def updateRequisitionItems() {
         log.info "updateRequisitionItems: ${params} "
 
         JSONObject jsonObject = request.JSON

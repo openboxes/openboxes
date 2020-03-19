@@ -12,11 +12,13 @@ package org.pih.warehouse.order
 import grails.validation.ValidationException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.springframework.dao.DataIntegrityViolationException
 
+@Transactional
 class PurchaseOrderWorkflowController {
 
     def orderService
@@ -104,9 +106,7 @@ class PurchaseOrderWorkflowController {
                 log.info "adding an item " + params
                 if (!flow.order.orderItems) flow.order.orderItems = [] as HashSet
 
-                def product = Product.get(params.product?.id)
-                def supplier = Organization.get(params.supplier?.id)
-                def orderItem = OrderItem.get(params.orderItem?.id)
+                def orderItem = OrderItem.get(params?.orderItem?.id)
                 if (orderItem) {
                     orderItem.properties = params
                 } else {
