@@ -9,8 +9,10 @@
  **/
 package org.pih.warehouse.shipping
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.Document
 
+@Transactional
 class DocumentUploadCommand {
     String shipmentId
     Document document

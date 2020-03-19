@@ -9,6 +9,9 @@
  **/
 package org.pih.warehouse.product
 
+import grails.gorm.transactions.Transactional
+
+@Transactional
 class AttributeController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]

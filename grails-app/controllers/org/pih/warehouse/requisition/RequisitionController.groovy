@@ -10,6 +10,7 @@
 package org.pih.warehouse.requisition
 
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
@@ -24,6 +25,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
 import org.springframework.orm.hibernate3.HibernateSystemException
 
+@Transactional
 class RequisitionController {
 
     def dataService

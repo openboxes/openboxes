@@ -11,11 +11,13 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import org.hibernate.Criteria
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.ProductAvailability
 import grails.core.GrailsApplication
 
+@Transactional
 class LocationApiController extends BaseDomainApiController {
 
     def locationService

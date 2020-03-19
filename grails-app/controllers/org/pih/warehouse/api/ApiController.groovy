@@ -11,6 +11,7 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import grails.core.GrailsApplication
+import grails.gorm.transactions.Transactional
 import grails.util.Environment
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Location
@@ -21,6 +22,7 @@ import org.pih.warehouse.requisition.RequisitionType
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
+@Transactional
 class ApiController {
 
     def userService

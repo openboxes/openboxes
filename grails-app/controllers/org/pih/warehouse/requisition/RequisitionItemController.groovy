@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.requisition
 
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.apache.commons.lang.StringEscapeUtils
 import grails.plugins.csv.CSVWriter
@@ -19,6 +20,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
 
+@Transactional
 class RequisitionItemController {
 
     def requisitionService

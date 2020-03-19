@@ -11,6 +11,7 @@ package org.pih.warehouse.order
 
 import grails.converters.JSON
 import grails.validation.ValidationException
+import grails.gorm.transactions.Transactional
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.core.Comment
@@ -21,11 +22,13 @@ import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.core.Comment
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.springframework.web.multipart.MultipartFile
 
+@Transactional
 class OrderController {
     def orderService
     def stockMovementService
@@ -553,7 +556,7 @@ class OrderController {
     }
 
 
-    def fulfill = {
+    def fulfill() {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"

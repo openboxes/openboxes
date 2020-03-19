@@ -10,6 +10,7 @@
 package org.pih.warehouse.inventory
 
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.data.DataService
@@ -19,6 +20,7 @@ import org.pih.warehouse.product.Product
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
+@Transactional
 class InventorySnapshotController {
 
     DataService dataService

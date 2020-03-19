@@ -9,10 +9,12 @@
  * */
 package org.pih.warehouse.reporting
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.shipping.Shipment
 
+@Transactional
 class GoodsReceiptNoteController {
 
     StockMovementService stockMovementService

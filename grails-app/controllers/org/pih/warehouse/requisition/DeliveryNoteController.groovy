@@ -9,9 +9,11 @@
  * */
 package org.pih.warehouse.requisition
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.core.Location
 
+@Transactional
 class DeliveryNoteController {
 
     def print() {
