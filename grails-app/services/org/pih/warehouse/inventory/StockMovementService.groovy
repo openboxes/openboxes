@@ -139,14 +139,20 @@ class StockMovementService {
                     // RequisitionStatus.PICKING:
                     case StockMovementStatusCode.PICKING:
                         // Clear picklist
-                        Boolean clearPicklist =
-                                jsonObject.containsKey("clearPicklist") ? jsonObject.getBoolean("clearPicklist") : false
-                        if (clearPicklist) clearPicklist(stockMovement)
+                        Boolean shouldClearPicklist = jsonObject.containsKey("clearPicklist") ?
+                                jsonObject.getBoolean("clearPicklist") : Boolean.FALSE
+
+                        if (shouldClearPicklist) {
+                            clearPicklist(stockMovement)
+                        }
 
                         // Create picklist
-                        Boolean createPicklist =
-                                jsonObject.containsKey("createPicklist") ? jsonObject.getBoolean("createPicklist") : false
-                        if (createPicklist) createPicklist(stockMovement)
+                        Boolean shouldCreatePicklist = jsonObject.containsKey("createPicklist") ?
+                                jsonObject.getBoolean("createPicklist") : Boolean.FALSE
+
+                        if (shouldCreatePicklist) {
+                            createPicklist(stockMovement)
+                        }
 
                         break
                     case StockMovementStatusCode.PICKED:
