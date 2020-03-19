@@ -6,11 +6,12 @@ import org.pih.warehouse.tablero.IndicatorData
 import org.pih.warehouse.tablero.NumberIndicator
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
-
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.tablero.IndicatorDatasets
 
 class IndicatorDataService {
 
+    def dataService
     Date today = new Date()
 
     DataGraph getExpirationSummaryData(def expirationData) {
@@ -111,38 +112,36 @@ class IndicatorDataService {
 
     DataGraph getSentStockMovements(def location, def params) {
         Integer querySize = params.querySize? params.querySize.toInteger() : 5
-        List destinationList = Shipment.executeQuery("select distinct s.destination from Shipment s where s.origin = :location and s.currentStatus <> 'PENDING'", ['location': location]);
-        List listDatasets = []
-        List listLabel = []
         today.clearTime()
-        // destinationList is a query of all locations which the current location sent something
-        for(item in destinationList) {
+
+        String query = "SELECT COUNT(s.id) as total, YEAR(s.last_updated) as year, s.destination_id as destination, MONTH(s.last_updated) as month FROM openboxes.shipment s WHERE origin_id = '" + location.id + "' AND s.current_status <> 'PENDING' GROUP BY MONTH(s.last_updated), s.destination_id, YEAR(s.last_updated)"
+
+        List response = dataService.executeQuery(query)
+        List listRes = []
+        List listLabel = []
+        for(item in response) {
+            Location itemLocation = Location.get(item.destination)
             List listData = []
             listLabel = []
-            // querySize is the quantity of months in the filter : until which month query data
+
             for(int i = querySize; i >= 0; i--) {
-                def monthBegin = today.clone()
-                def monthEnd = today.clone()
-                monthBegin.set(month: today.month - i, date: 1)
-                monthEnd.set(month: today.month - i + 1, date: 1)
-                
-                // query counts each item with current location as origin and "stacks" it
-                def query = Shipment.executeQuery("select count(*) from Shipment s where s.lastUpdated >= :monthOne and s.lastUpdated < :monthTwo and s.destination = '" + item.id + "' and s.origin = :location",
-                // The column transaction_transaction_date doesn't exist, using lastUpdated instead
-                ['monthOne': monthBegin, 'monthTwo': monthEnd, 'location': location]);
-                String monthLabel = new java.text.DateFormatSymbols().months[monthBegin.month].substring(0,3)
+                Date month = today.clone()
+                month.set(month: today.month - i, date: 1)
 
+                Integer value = 0
+                if (month.month == item.month-1 && month.year + 1900 == item.year) {
+                    value = item.total
+                }
+
+                String monthLabel = new java.text.DateFormatSymbols().months[month.month].substring(0,3)
                 listLabel.push(monthLabel)
-                listData.push(query[0])
+                listData.push(value)
             }
-            listDatasets.push(new IndicatorDatasets(item.name, listData))
+            listRes.push(new IndicatorDatasets(itemLocation.name, listData))
         }
-        List<IndicatorDatasets> datasets = listDatasets;
-
+        List<IndicatorDatasets> datasets = listRes;
         IndicatorData data = new IndicatorData(datasets, listLabel);
-
         DataGraph indicatorData = new DataGraph(data, 1, "Stock Movements Sent by Month", "bar");
-
         return indicatorData;
     }
 
