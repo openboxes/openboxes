@@ -1,11 +1,13 @@
 package org.pih.warehouse.putaway
 
+import grails.gorm.transactions.Transactional
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.order.Order
 
+@Transactional
 class PutAwayController {
 
     def productAvailabilityService

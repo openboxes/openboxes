@@ -9,8 +9,10 @@
  **/
 package org.pih.warehouse.product
 
+import grails.gorm.transactions.Transactional
 // import grails.plugin.springcache.annotations.CacheFlush
 
+@Transactional
 class ProductGroupController {
 
     def productService

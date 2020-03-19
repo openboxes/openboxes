@@ -9,9 +9,11 @@
  **/
 package org.pih.warehouse.core
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.product.Product
 import grails.plugin.springcache.annotations.CacheFlush
 
+@Transactional
 class TagController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]

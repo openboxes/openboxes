@@ -12,6 +12,9 @@ package org.pih.warehouse.order
 import fr.opensagres.xdocreport.converter.ConverterTypeTo
 import grails.converters.JSON
 import grails.validation.ValidationException
+import grails.gorm.transactions.Transactional
+import org.apache.commons.lang.StringEscapeUtils
+import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.BudgetCode
@@ -32,9 +35,9 @@ import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.springframework.web.multipart.MultipartFile
-
 import java.math.RoundingMode
 
+@Transactional
 class OrderController {
     def orderService
     def stockMovementService

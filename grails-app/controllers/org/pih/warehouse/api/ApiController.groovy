@@ -13,6 +13,7 @@ import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
 import grails.core.GrailsApplication
+import grails.gorm.transactions.Transactional
 import grails.util.Environment
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.ActivityCode
@@ -25,6 +26,7 @@ import org.pih.warehouse.requisition.RequisitionType
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
+@Transactional
 class ApiController {
 
     def userService

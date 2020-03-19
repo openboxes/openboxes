@@ -10,6 +10,7 @@
 package org.pih.warehouse.reporting
 
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import grails.plugin.springcache.annotations.CacheFlush
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.plugins.csv.CSVWriter
@@ -33,6 +34,7 @@ import java.math.RoundingMode
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
+@Transactional
 class ReportController {
 
     def dataSource

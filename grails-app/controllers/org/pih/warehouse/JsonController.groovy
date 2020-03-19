@@ -10,6 +10,7 @@
 package org.pih.warehouse
 
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import grails.plugin.cache.Cacheable
 import groovy.time.TimeCategory
 import org.apache.commons.lang.StringEscapeUtils
@@ -57,6 +58,7 @@ import java.text.DateFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 
+@Transactional
 class JsonController {
 
     def dataSource
@@ -129,7 +131,7 @@ class JsonController {
         render json as JSON
     }
 
-    def getRequisitionItems = {
+    def getRequisitionItems() {
         log.info "getRequisitionItems: ${params} "
         def json
         def requisition = Requisition.get(params?.id)
@@ -146,7 +148,7 @@ class JsonController {
         render json as JSON
     }
 
-    def updateRequisitionItems = {
+    def updateRequisitionItems() {
         log.info "updateRequisitionItems: ${params} "
 
         JSONObject jsonObject = request.JSON
@@ -1744,7 +1746,6 @@ class JsonController {
         render([aaData: forecastingService.getDemandSummary(location, product)] as JSON)
     }
 
-    // @Cacheable("forecastCache")
     def getForecastingData = {
         Product product = Product.get(params.product.id)
         Location location = Location.get(params.location.id)
