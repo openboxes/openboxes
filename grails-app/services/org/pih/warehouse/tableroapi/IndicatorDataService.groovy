@@ -6,12 +6,11 @@ import org.pih.warehouse.tablero.IndicatorData
 import org.pih.warehouse.tablero.NumberIndicator
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
-
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.tablero.IndicatorDatasets
 
 class IndicatorDataService {
 
-    def dataService
     Date today = new Date()
 
     DataGraph getExpirationSummaryData(def expirationData) {
@@ -110,46 +109,57 @@ class IndicatorDataService {
         return indicatorData;
     }
 
-DataGraph getSentStockMovements(def location, def params) {
-    Integer querySize = params.querySize? params.querySize.toInteger() : 5
-    List allLocations = dataService.executeQuery("select id from location")
-    List listDatasets = []
-    List listLabel = []
-    today.clearTime()
-    // Query data for all locations
-    for(item in allLocations) {
-        List listData = []
-        listLabel = []
-        try {
-            List locationName = dataService.executeQuery("select name from location where id=" + item[0].value)
-            // querySize is the quantity of months in the filter : until which month query data
+    DataGraph getSentStockMovements(def location, def params) {
+        Integer querySize = params.querySize? params.querySize.toInteger()-1 : 5
+        today.clearTime()
+        
+        // queryLimit limits the query and avoid of getting data older than wanted
+        Date queryLimit = today.clone()
+        queryLimit.set(month: today.month - querySize, date: 1) 
+
+        List queryData = Shipment.executeQuery("SELECT COUNT(s.id), s.destination, MONTH(s.lastUpdated), YEAR(s.lastUpdated) FROM Shipment s WHERE s.origin = :location AND s.currentStatus <> 'PENDING' AND s.lastUpdated > :limit GROUP BY MONTH(s.lastUpdated), YEAR(s.lastUpdated), s.destination", 
+        ['location': location, 'limit': queryLimit])
+        // queryData gives an array of arrays [[count, destination, month, year], ...] of sent stock
+        
+        List listRes = []
+        List listLabel = []
+        // Loop 1: Each sent stock array in query data array
+        for(item in queryData) {
+            // item[0]: item total counted
+            // item[1]: item destination
+            // item[2]: item month
+            // item[3]: item year
+            Location itemLocation = item[1]
+            List listData = []
+            listLabel = []
+
+            // Loop 2: Give each requested month a value, label and month label; value is 0 when month have no data
             for(int i = querySize; i >= 0; i--) {
-                def monthBegin = today.clone()
-                def monthEnd = today.clone()
-                monthBegin.set(month: today.month - i, date: 1)
-                monthEnd.set(month: today.month - i + 1, date: 1)
+                Date month = today.clone()
+                month.set(month: today.month - i, date: 1)
 
-                def query = Shipment.executeQuery("select count(*) from Shipment s where s.lastUpdated >= :monthOne and s.lastUpdated < :monthTwo and s.origin = " + item[0].value + " and s.currentStatus <> 'PENDING'", 
-                // The column transaction_transaction_date doesn't exist, using lastUpdated instead
-                ['monthOne': monthBegin, 'monthTwo': monthEnd]);
-                String monthLabel = new java.text.DateFormatSymbols().months[monthBegin.month].substring(0,3)
+                // Places 0 in months where there is no sent stock, else places item total counted
+                Integer value = 0
+                if (month.month == item[2]-1 && month.year + 1900 == item[3]) {
+                    value = item[0]
+                }
 
+                // Pushs month label in label array and sent stock in the data array
+                String monthLabel = new java.text.DateFormatSymbols().months[month.month].substring(0,3)
                 listLabel.push(monthLabel)
-                listData.push(query[0])
+                listData.push(value)
             }
-            listDatasets.push(new IndicatorDatasets(locationName[0].name, listData))
-        } catch(err) {
-            log.error "Query error in getSentStockMovements : " + err
+            // Array of data lists: (stack it by destination)
+            listRes.push(new IndicatorDatasets(itemLocation.name, listData))
         }
+        List<IndicatorDatasets> datasets = listRes;
+
+        IndicatorData data = new IndicatorData(datasets, listLabel);
+
+        DataGraph indicatorData = new DataGraph(data, 1, "Stock Movements Sent by Month", "bar");
+
+        return indicatorData;
     }
-    List<IndicatorDatasets> datasets = listDatasets;
-
-    IndicatorData data = new IndicatorData(datasets, listLabel);
-
-    DataGraph indicatorData = new DataGraph(data, 1, "Stock Movements Sent by Month", "bar");
-
-    return indicatorData;
-}
 
     DataGraph getReceivedStockData(def location) {
         List listData = []
