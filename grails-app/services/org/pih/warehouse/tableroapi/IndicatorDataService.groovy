@@ -110,35 +110,46 @@ class IndicatorDataService {
     }
 
     DataGraph getSentStockMovements(def location, def params) {
-        Integer querySize = params.querySize? params.querySize.toInteger() : 5
+        Integer querySize = params.querySize? params.querySize.toInteger()-1 : 5
         today.clearTime()
         
+        // queryLimit limits the query and avoid of getting data older than wanted
         Date queryLimit = today.clone()
         queryLimit.set(month: today.month - querySize, date: 1) 
 
-        List response = Shipment.executeQuery("SELECT COUNT(s.id), YEAR(s.lastUpdated), s.destination, MONTH(s.lastUpdated) FROM Shipment s WHERE s.origin = :location AND s.currentStatus <> 'PENDING' AND s.lastUpdated > :limit GROUP BY MONTH(s.lastUpdated), s.destination, YEAR(s.lastUpdated)", 
+        List queryData = Shipment.executeQuery("SELECT COUNT(s.id), s.destination, MONTH(s.lastUpdated), YEAR(s.lastUpdated) FROM Shipment s WHERE s.origin = :location AND s.currentStatus <> 'PENDING' AND s.lastUpdated > :limit GROUP BY MONTH(s.lastUpdated), YEAR(s.lastUpdated), s.destination", 
         ['location': location, 'limit': queryLimit])
+        // queryData gives an array of arrays [[count, destination, month, year], ...] of sent stock
         
         List listRes = []
         List listLabel = []
-        for(item in response) {
-            Location itemLocation = item[2]
+        // Loop 1: Each sent stock array in query data array
+        for(item in queryData) {
+            // item[0]: item total counted
+            // item[1]: item destination
+            // item[2]: item month
+            // item[3]: item year
+            Location itemLocation = item[1]
             List listData = []
             listLabel = []
 
+            // Loop 2: Give each requested month a value, label and month label; value is 0 when month have no data
             for(int i = querySize; i >= 0; i--) {
                 Date month = today.clone()
                 month.set(month: today.month - i, date: 1)
 
+                // Places 0 in months where there is no sent stock, else places item total counted
                 Integer value = 0
-                if (month.month == item[3]-1 && month.year + 1900 == item[1]) {
+                if (month.month == item[2]-1 && month.year + 1900 == item[3]) {
                     value = item[0]
                 }
 
+                // Pushs month label in label array and sent stock in the data array
                 String monthLabel = new java.text.DateFormatSymbols().months[month.month].substring(0,3)
                 listLabel.push(monthLabel)
                 listData.push(value)
             }
+            // Array of data lists: (stack it by destination)
             listRes.push(new IndicatorDatasets(itemLocation.name, listData))
         }
         List<IndicatorDatasets> datasets = listRes;
