@@ -73,6 +73,8 @@ class StockMovement {
             LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(StockMovementItem.class))
 
     Boolean isFromOrder = Boolean.FALSE
+    Boolean isShipped = Boolean.FALSE
+    Boolean isReceived = Boolean.FALSE
 
     Requisition stocklist
     Requisition requisition
@@ -131,9 +133,9 @@ class StockMovement {
                 requestedBy       : requestedBy,
                 lineItems         : lineItems,
                 pickPage          : pickPage,
-                editPage          : editPage,
-                packPage          : packPage,
-                associations      : [
+                editPage    : editPage,
+                packPage    : packPage,
+                associations: [
                         requisition: [id: requisition?.id, requestNumber: requisition?.requestNumber, status: requisition?.status?.name()],
                         shipment   : [id: shipment?.id, shipmentNumber: shipment?.shipmentNumber, status: shipment?.currentStatus?.name()],
                         shipments  : requisition?.shipments?.collect {
@@ -141,7 +143,11 @@ class StockMovement {
                         },
                         documents  : documents
                 ],
-                isFromOrder        : isFromOrder,
+                isFromOrder : isFromOrder,
+                isShipped   : isShipped,
+                isReceived  : isReceived,
+                shipped     : isShipped,
+                received    : isReceived,
         ]
     }
 
@@ -215,7 +221,6 @@ class StockMovement {
                 shipmentType: shipment.shipmentType,
                 statusCode: statusCode,
                 dateShipped: shipment.expectedShippingDate,
-                //receiptStatusCode: , // FIXME Need to translate
                 identifier: shipment.shipmentNumber,
                 origin: shipment.origin,
                 destination: shipment.destination,
@@ -224,7 +229,9 @@ class StockMovement {
                 lastUpdated: shipment.lastUpdated,
                 requestedBy: shipment.createdBy,
                 shipment: shipment,
-                isFromOrder: shipment?.isFromPurchaseOrder
+                isFromOrder: shipment?.isFromPurchaseOrder,
+                isShipped: shipment?.status?.code >= ShipmentStatusCode.SHIPPED,
+                isReceived: shipment?.status?.code >= ShipmentStatusCode.RECEIVED
         )
 
         if (shipment.shipmentItems) {
@@ -263,6 +270,10 @@ class StockMovement {
                 trackingNumber: trackingNumber?.identifier,
                 currentStatus: shipment?.currentStatus,
                 stocklist: requisition?.requisitionTemplate,
+                isFromOrder: Boolean.FALSE,
+                isShipped: shipment?.status?.code >= ShipmentStatusCode.SHIPPED,
+                isReceived: shipment?.status?.code >= ShipmentStatusCode.RECEIVED
+
         )
 
         // Include all requisition items except those that are substitutions or modifications because the
