@@ -9,11 +9,13 @@
  **/
 package org.pih.warehouse.order
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.shipping.ReceiptException
 import org.pih.warehouse.shipping.ShipmentException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 
+@Transactional
 class ReceiveOrderWorkflowController {
 
     def orderService

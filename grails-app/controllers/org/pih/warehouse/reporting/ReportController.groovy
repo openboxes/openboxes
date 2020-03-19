@@ -10,6 +10,7 @@
 package org.pih.warehouse.reporting
 
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import grails.plugin.springcache.annotations.CacheFlush
 import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
@@ -28,6 +29,7 @@ import org.quartz.JobKey
 import org.quartz.impl.StdScheduler
 import util.ReportUtil
 
+@Transactional
 class ReportController {
 
     def dataSource

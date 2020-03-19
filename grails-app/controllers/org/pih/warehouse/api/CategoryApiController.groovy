@@ -10,10 +10,12 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.product.Category
 
+@Transactional
 class CategoryApiController {
 
     def productService

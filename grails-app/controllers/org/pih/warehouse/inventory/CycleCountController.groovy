@@ -9,10 +9,12 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.gorm.transactions.Transactional
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 
+@Transactional
 class CycleCountController {
 
     def dataService

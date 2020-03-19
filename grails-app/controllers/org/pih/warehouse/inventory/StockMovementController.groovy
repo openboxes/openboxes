@@ -11,6 +11,7 @@
 package org.pih.warehouse.inventory
 
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
@@ -31,6 +32,7 @@ import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
 
+@Transactional
 class StockMovementController {
 
     def dataService

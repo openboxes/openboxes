@@ -9,6 +9,9 @@
  **/
 package org.pih.warehouse.product
 
+import grails.gorm.transactions.Transactional
+
+@Transactional
 class CategoryController {
 
     def productService

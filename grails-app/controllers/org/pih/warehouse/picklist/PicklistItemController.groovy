@@ -9,6 +9,9 @@
  */
 package org.pih.warehouse.picklist
 
+import grails.gorm.transactions.Transactional
+
+@Transactional
 class PicklistItemController {
 
     def scaffold = PicklistItem
