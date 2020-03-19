@@ -306,7 +306,7 @@ class PickPage extends Component {
    */
   transitionToNextStep() {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
-    const payload = { status: this.props.hasPackingSupport ? 'PICKED' : 'PACKED' };
+    const payload = { status: 'PICKED' };
 
     return apiClient.post(url, payload);
   }
@@ -550,7 +550,6 @@ const mapStateToProps = state => ({
   reasonCodes: state.reasonCodes.data,
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
-  hasPackingSupport: state.session.currentLocation.hasPackingSupport,
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner, fetchReasonCodes })(PickPage);
@@ -579,6 +578,4 @@ PickPage.propTypes = {
   translate: PropTypes.func.isRequired,
   /** Is true when currently selected location supports bins */
   hasBinLocationSupport: PropTypes.bool.isRequired,
-  /** Is true when currently selected location supports packing */
-  hasPackingSupport: PropTypes.bool.isRequired,
 };

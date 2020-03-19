@@ -246,7 +246,7 @@ class PackingPage extends Component {
    */
   transitionToNextStep() {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
-    const status = 'REVIEWING';
+    const status = 'CHECKING';
     const payload = { status };
 
     if (this.state.values.statusCode !== status) {

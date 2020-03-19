@@ -214,7 +214,7 @@ class SendMovementPage extends Component {
       .then(() => {
         this.props.hideSpinner();
 
-        if (values.statusCode === 'ISSUED') {
+        if (values.statusCode === 'DISPATCHED') {
           this.fetchStockMovementData();
         }
         Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
@@ -233,7 +233,7 @@ class SendMovementPage extends Component {
       comments: values.comments || '',
     };
 
-    if (values.statusCode === 'ISSUED') {
+    if (values.statusCode === 'DISPATCHED') {
       payload = {
         'destination.id': values.destination.id,
         description: values.description,
@@ -360,12 +360,12 @@ class SendMovementPage extends Component {
   }
 
   /**
-   * Updates stock movement status to ISSUED with post method.
+   * Updates stock movement status to DISPATCHED with post method.
    * @public
    */
   stateTransitionToIssued() {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
-    const payload = { status: 'ISSUED' };
+    const payload = { status: 'DISPATCHED' };
 
     return apiClient.post(url, payload);
   }
@@ -520,8 +520,8 @@ class SendMovementPage extends Component {
                 <div id="stockMovementInfo" style={{ flexGrow: 2 }}>
                   {_.map(SHIPMENT_FIELDS, (fieldConfig, fieldName) =>
                     renderFormField(fieldConfig, fieldName, {
-                      canBeEdited: values.statusCode === 'ISSUED' && values.shipmentStatus !== 'PARTIALLY_RECEIVED' && values.shipmentStatus !== 'RECEIVED',
-                      issued: values.statusCode === 'ISSUED',
+                      canBeEdited: values.statusCode === 'DISPATCHED' && !values.received,
+                      issued: values.statusCode === 'DISPATCHED',
                       hasStockList: !!_.get(values.stocklist, 'id'),
                       debouncedLocationsFetch: this.debouncedLocationsFetch,
                     }))}
@@ -537,11 +537,12 @@ class SendMovementPage extends Component {
                       {...document}
                       key={idx}
                       onClick={() => this.saveValues(values)}
+                      disabled={false}
                     />);
                   })}
                   <div className="dropzone btn btn-outline-secondary">
                     <Dropzone
-                      disabled={values.statusCode === 'ISSUED'}
+                      disabled={values.statusCode === 'DISPATCHED'}
                       onDrop={this.onDrop}
                       multiple
                     >
@@ -587,15 +588,15 @@ class SendMovementPage extends Component {
                 {_.map(FIELDS, (fieldConfig, fieldName) =>
                   renderFormField(fieldConfig, fieldName, {
                     shipmentTypes: this.state.shipmentTypes,
-                    issued: values.statusCode === 'ISSUED',
-                    received: values.shipmentStatus === 'RECEIVED',
+                    issued: values.statusCode === 'DISPATCHED',
+                    received: values.received,
                   }))}
               </div>
               <div>
                 <button
                   type="submit"
                   className="btn btn-outline-primary btn-form btn-xs"
-                  disabled={values.statusCode === 'ISSUED'}
+                  disabled={values.statusCode === 'DISPATCHED'}
                   onClick={() => this.previousPage(values, invalid)}
                 >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
@@ -603,16 +604,16 @@ class SendMovementPage extends Component {
                 <button
                   type="submit"
                   onClick={() => { this.submitStockMovement(values); }}
-                  className={`${values.shipmentStatus === 'SHIPPED' ? 'btn btn-outline-secondary' : 'btn btn-outline-success'} float-right btn-form btn-xs`}
-                  disabled={invalid || values.statusCode === 'ISSUED'}
+                  className={`${values.shipped ? 'btn btn-outline-secondary' : 'btn btn-outline-success'} float-right btn-form btn-xs`}
+                  disabled={invalid || values.statusCode === 'DISPATCHED'}
                 ><Translate id="react.stockMovement.sendShipment.label" defaultMessage="Send shipment" />
                 </button>
-                {values.shipmentStatus === 'SHIPPED' && this.props.isUserAdmin ?
+                {values.shipped && this.props.isUserAdmin ?
                   <button
                     type="submit"
                     onClick={() => { this.rollbackStockMovement(values); }}
                     className="btn btn-outline-success float-right btn-xs"
-                    disabled={invalid || !(values.statusCode === 'ISSUED')}
+                    disabled={invalid || !(values.statusCode === 'DISPATCHED')}
                   >
                     <span><i className="fa fa-undo pr-2" /><Translate id="react.default.button.rollback.label" defaultMessage="Rollback" /></span>
                   </button> : null
@@ -669,23 +670,23 @@ class SendMovementPage extends Component {
                 <button
                   type="submit"
                   className="btn btn-outline-primary btn-form btn-xs"
-                  disabled={values.statusCode === 'ISSUED'}
+                  disabled={values.statusCode === 'DISPATCHED'}
                   onClick={() => this.previousPage(values, invalid)}
                 > <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button
                   type="submit"
                   onClick={() => { this.submitStockMovement(values); }}
-                  className={`${values.shipmentStatus === 'SHIPPED' ? 'btn btn-outline-secondary' : 'btn btn-outline-success'} float-right btn-form btn-xs`}
-                  disabled={invalid || values.statusCode === 'ISSUED'}
+                  className={`${values.shipped ? 'btn btn-outline-secondary' : 'btn btn-outline-success'} float-right btn-form btn-xs`}
+                  disabled={invalid || values.statusCode === 'DISPATCHED'}
                 ><Translate id="react.stockMovement.sendShipment.label" defaultMessage="Send shipment" />
                 </button>
-                {values.shipmentStatus === 'SHIPPED' && this.props.isUserAdmin ?
+                {values.shipped && this.props.isUserAdmin ?
                   <button
                     type="submit"
                     onClick={() => { this.rollbackStockMovement(values); }}
                     className="btn btn-outline-success float-right  btn-xs"
-                    disabled={invalid || !(values.statusCode === 'ISSUED')}
+                    disabled={invalid || !(values.statusCode === 'DISPATCHED')}
                   >
                     <span><i className="fa fa-undo pr-2" /><Translate id="react.default.button.rollback.label" defaultMessage="Rollback" /></span>
                   </button> : null
@@ -714,9 +715,7 @@ export default connect(mapStateToProps, { showSpinner, hideSpinner })(SendMoveme
 
 SendMovementPage.propTypes = {
   /** Initial component's data */
-  initialValues: PropTypes.shape({
-    shipmentStatus: PropTypes.string,
-  }).isRequired,
+  initialValues: PropTypes.shape({}).isRequired,
   /** Function returning user to the previous page */
   previousPage: PropTypes.func.isRequired,
   /** Function called when data is loading */

@@ -8,24 +8,21 @@ import arrayMutators from 'final-form-arrays';
 import Alert from 'react-s-alert';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
-import queryString from 'query-string';
 import moment from 'moment';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-import TextField from '../form-elements/TextField';
-import SelectField from '../form-elements/SelectField';
-import ArrayField from '../form-elements/ArrayField';
-import ButtonField from '../form-elements/ButtonField';
-import LabelField from '../form-elements/LabelField';
-import DateField from '../form-elements/DateField';
-import { renderFormField } from '../../utils/form-utils';
-import { showSpinner, hideSpinner, fetchUsers } from '../../actions';
-import apiClient from '../../utils/apiClient';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
-import { debounceProductsFetch } from '../../utils/option-utils';
-
-const request = queryString.parse(window.location.search).type === 'REQUEST';
+import TextField from '../../form-elements/TextField';
+import SelectField from '../../form-elements/SelectField';
+import ArrayField from '../../form-elements/ArrayField';
+import ButtonField from '../../form-elements/ButtonField';
+import LabelField from '../../form-elements/LabelField';
+import DateField from '../../form-elements/DateField';
+import { renderFormField } from '../../../utils/form-utils';
+import { showSpinner, hideSpinner, fetchUsers } from '../../../actions';
+import apiClient from '../../../utils/apiClient';
+import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
+import { debounceProductsFetch } from '../../../utils/option-utils';
 
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
@@ -36,10 +33,10 @@ const DELETE_BUTTON_FIELD = {
   buttonLabel: 'react.default.button.delete.label',
   buttonDefaultMessage: 'Delete',
   getDynamicAttr: ({
-    fieldValue, removeItem, removeRow, showOnly,
+    fieldValue, removeItem, removeRow,
   }) => ({
     onClick: fieldValue.id ? () => removeItem(fieldValue.id).then(() => removeRow()) : removeRow,
-    disabled: fieldValue.statusCode === 'SUBSTITUTED' || showOnly,
+    disabled: true,
   }),
   attributes: {
     className: 'btn btn-outline-danger',
@@ -51,11 +48,11 @@ const NO_STOCKLIST_FIELDS = {
     type: ArrayField,
     arrowsNavigation: true,
     // eslint-disable-next-line react/prop-types
-    addButton: ({ addRow, getSortOrder, showOnly }) => (
+    addButton: ({ addRow, getSortOrder }) => (
       <button
         type="button"
         className="btn btn-outline-success btn-xs"
-        disabled={showOnly}
+        disabled
         onClick={() => addRow({
           sortOrder: getSortOrder(),
         })}
@@ -220,12 +217,12 @@ const VENDOR_FIELDS = {
     // eslint-disable-next-line react/prop-types
     addButton: ({
       // eslint-disable-next-line react/prop-types
-      addRow, getSortOrder, showOnly, isFromOrder,
+      addRow, getSortOrder, isFromOrder,
     }) => (
       <button
         type="button"
         className="btn btn-outline-success btn-xs"
-        disabled={showOnly}
+        disabled
         hidden={isFromOrder}
         onClick={() => addRow({
           sortOrder: getSortOrder(),
@@ -721,7 +718,7 @@ class AddItemsPage extends Component {
           }
           this.transitionToNextStep('CHECKING')
             .then(() => {
-              this.props.goToPage(this.props.hasPackingSupport ? 6 : 5, values);
+              this.props.nextPage(values);
             })
             .catch(() => this.props.hideSpinner());
         })
@@ -1031,7 +1028,6 @@ class AddItemsPage extends Component {
   }
 
   render() {
-    const showOnly = true;
     return (
       <Form
         onSubmit={() => {}}
@@ -1040,74 +1036,14 @@ class AddItemsPage extends Component {
         initialValues={this.state.values}
         render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
-            { !showOnly ?
-              <span>
-                <label
-                  htmlFor="csvInput"
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-                >
-                  <span><i className="fa fa-download pr-2" /><Translate id="react.default.button.importTemplate.label" defaultMessage="Import template" /></span>
-                  <input
-                    id="csvInput"
-                    type="file"
-                    style={{ display: 'none' }}
-                    onChange={this.importTemplate}
-                    disabled={showOnly}
-                    onClick={(event) => {
-                    // eslint-disable-next-line no-param-reassign
-                    event.target.value = null;
-                  }}
-                    accept=".csv"
-                  />
-                </label>
-                <button
-                  type="button"
-                  onClick={() => this.exportTemplate(values)}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-                >
-                  <span><i className="fa fa-upload pr-2" /><Translate id="react.default.button.exportTemplate.label" defaultMessage="Export template" /></span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => this.refresh()}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-                >
-                  <span><i className="fa fa-refresh pr-2" /><Translate id="react.default.button.refresh.label" defaultMessage="Reload" /></span>
-                </button>
-                <button
-                  type="button"
-                  disabled={invalid}
-                  onClick={() => this.save(values)}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-                >
-                  <span><i className="fa fa-save pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
-                </button>
-                <button
-                  type="button"
-                  disabled={invalid}
-                  onClick={() => this.saveAndExit(values)}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-                >
-                  <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
-                </button>
-                <button
-                  type="button"
-                  disabled={invalid}
-                  onClick={() => this.removeAll().then(() => this.fetchAndSetLineItems())}
-                  className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs"
-                >
-                  <span><i className="fa fa-remove pr-2" /><Translate id="react.default.button.deleteAll.label" defaultMessage="Delete all" /></span>
-                </button>
-              </span>
-             :
-              <button
-                type="button"
-                disabled={invalid}
-                onClick={() => { window.location = '/openboxes/stockMovement/list?type=REQUEST'; }}
-                className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
-              >
-                <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.exit.label" defaultMessage="Exit" /></span>
-              </button> }
+            <button
+              type="button"
+              disabled={invalid}
+              onClick={() => { window.location = '/openboxes/stockMovement/list?type=REQUEST'; }}
+              className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
+            >
+              <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.exit.label" defaultMessage="Exit" /></span>
+            </button>
             <form onSubmit={handleSubmit}>
               {_.map(this.getFields(), (fieldConfig, fieldName) =>
                 renderFormField(fieldConfig, fieldName, {
@@ -1119,12 +1055,11 @@ class AddItemsPage extends Component {
                   newItemAdded: this.newItemAdded,
                   newItem: this.state.newItem,
                   isFromOrder: this.state.values.isFromOrder,
-                  showOnly,
                 }))}
               <div>
                 <button
                   type="submit"
-                  disabled={showOnly || invalid}
+                  disabled
                   onClick={() => this.previousPage(values, invalid)}
                   className="btn btn-outline-primary btn-form btn-xs"
                 >
@@ -1138,8 +1073,7 @@ class AddItemsPage extends Component {
                     }
                   }}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
-                  disabled={!_.some(values.lineItems, item => !_.isEmpty(item))
-                    || showOnly || invalid}
+                  disabled
                 ><Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>
@@ -1159,7 +1093,6 @@ const mapStateToProps = state => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
   minimumExpirationDate: state.session.minimumExpirationDate,
-  hasPackingSupport: state.session.currentLocation.hasPackingSupport,
 });
 
 export default (connect(mapStateToProps, {
@@ -1176,8 +1109,6 @@ AddItemsPage.propTypes = {
   }).isRequired,
   /** Function returning user to the previous page */
   previousPage: PropTypes.func.isRequired,
-  /** Function taking user to specified page */
-  goToPage: PropTypes.func.isRequired,
   /**
    * Function called with the form data when the handleSubmit()
    * is fired from within the form component.
@@ -1198,6 +1129,4 @@ AddItemsPage.propTypes = {
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
   minimumExpirationDate: PropTypes.string.isRequired,
-  /** Is true when currently selected location supports packing */
-  hasPackingSupport: PropTypes.bool.isRequired,
 };
