@@ -58,8 +58,8 @@ class StockMovementApiController {
     def create = { StockMovement stockMovement ->
         // Detect whether inbound or outbound stock movement
         def currentLocation = Location.get(session.warehouse.id)
-        def stockMovementType = stockMovement.origin.equals(currentLocation) ?
-                StockMovementType.OUTBOUND ? stockMovement.destination.equals(currentLocation) :
+        StockMovementType stockMovementType = stockMovement.origin.equals(currentLocation) ?
+                StockMovementType.OUTBOUND : stockMovement.destination.equals(currentLocation) ?
                         StockMovementType.INBOUND : null
 
         stockMovement.stockMovementType = stockMovementType
@@ -109,9 +109,9 @@ class StockMovementApiController {
      */
     def updateStatus = {
         JSONObject jsonObject = request.JSON
-        log.debug "update status: " + jsonObject.toString(4)
+        log.info "update status: " + jsonObject.toString(4)
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        stockMovementService.updateStatus(stockMovement, jsonObject)
+        stockMovementService.transitionStockMovement(stockMovement, jsonObject)
         render status: 200
     }
 
@@ -141,7 +141,7 @@ class StockMovementApiController {
     def updateItems = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         bindStockMovement(stockMovement, request.JSON)
-        stockMovementService.updateItems(stockMovement)
+        stockMovement = stockMovementService.updateItems(stockMovement)
         render([data: stockMovement] as JSON)
     }
 

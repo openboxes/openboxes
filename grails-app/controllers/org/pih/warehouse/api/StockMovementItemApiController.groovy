@@ -165,14 +165,7 @@ class StockMovementItemApiController {
     }
 
     def removeItem = {
-        throw new UnsupportedOperationException("Requires a good refactoring")
-//        ShipmentItem shipmentItem = ShipmentItem.get(params.id)
-//        Shipment shipment = shipmentItem.shipment
-//        shipment.removeFromShipmentItems(shipmentItem)
-//        shipment.save()
-
-//        RequisitionItem requisitionItem = RequisitionItem.get(params.id)
-//        stockMovementService.removeRequisitionItem(requisitionItem)
+        stockMovementService.removeStockMovementItem(params.id)
         render status: 204
     }
 

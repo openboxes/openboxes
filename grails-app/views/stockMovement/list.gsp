@@ -75,7 +75,7 @@
                 <img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}" />&nbsp;
                 <warehouse:message code="default.list.label" args="[warehouse.message(code: 'stockMovement.label')]"/>
             </g:link>
-            <g:link controller="stockMovement" action="index" class="button">
+            <g:link controller="stockMovement" action="create" class="button">
                 <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
                 <warehouse:message code="default.create.label" args="[warehouse.message(code: 'stockMovement.label')]" />
             </g:link>

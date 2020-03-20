@@ -118,14 +118,14 @@ class StockMovementServiceTests extends GroovyTestCase {
 	@Test
 	void test_updateRequisition_shouldUpdateRequisition() {
 		stockMovement.description = "changed"
-		def updated = stockMovementService.updateOutboundStockMovement(stockMovement)
+		def updated = stockMovementService.updateRequisitionBasedStockMovement(stockMovement)
 		assert updated.description == "changed"
 	}
 
 	@Test
 	void test_updateRequisitionWhenShipmentChanged_shouldThrowExceptionIfNoRequisitio() {
 		shouldFail (ObjectNotFoundException) {
-			stockMovementService.updateRequisitionWhenShipmentChanged(stockMovementEmpty)
+			stockMovementService.updateRequisitionOnShipmentChange(stockMovementEmpty)
 		}
 	}
 

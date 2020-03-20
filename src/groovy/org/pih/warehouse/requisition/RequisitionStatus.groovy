@@ -9,6 +9,8 @@
  **/
 package org.pih.warehouse.requisition
 
+import org.pih.warehouse.inventory.StockMovementStatusCode
+
 enum RequisitionStatus {
     CREATED(1),
     EDITING(2),
@@ -57,6 +59,41 @@ enum RequisitionStatus {
         [CREATED, EDITING, VERIFYING, PICKING, PICKED, PENDING, CHECKING, FULFILLED, ISSUED, RECEIVED, CANCELED, DELETED, ERROR]
     }
 
+    static toStockMovementStatus(RequisitionStatus requisitionStatus) {
+        switch(requisitionStatus) {
+            case RequisitionStatus.EDITING:
+                return StockMovementStatusCode.REQUESTING
+            case RequisitionStatus.VERIFYING:
+                return StockMovementStatusCode.REQUESTED
+            case RequisitionStatus.CHECKING:
+                return StockMovementStatusCode.PACKED
+            case RequisitionStatus.ISSUED:
+                return StockMovementStatusCode.DISPATCHED
+            default:
+                return StockMovementStatusCode.valueOf(requisitionStatus.toString())
+        }
+
+    }
+
+    static fromStockMovementStatus(StockMovementStatusCode stockMovementStatus) {
+        switch(stockMovementStatus) {
+            case StockMovementStatusCode.REQUESTING:
+                return RequisitionStatus.EDITING
+            case StockMovementStatusCode.REQUESTED:
+                return RequisitionStatus.VERIFYING
+            case StockMovementStatusCode.PACKED:
+                return RequisitionStatus.CHECKING
+            case StockMovementStatusCode.VALIDATED:
+                return RequisitionStatus.VERIFYING
+            case StockMovementStatusCode.DISPATCHED:
+                return RequisitionStatus.ISSUED
+            default:
+                return RequisitionStatus.valueOf(stockMovementStatus.toString())
+        }
+    }
+
     String toString() { return name() }
+
+
 
 }

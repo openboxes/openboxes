@@ -4,19 +4,17 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import { getTranslate } from 'react-localize-redux';
 
-import CreateStockMovement from './purchase-orders/CreateStockMovement';
-import AddItemsPage from './purchase-orders/AddItemsPage';
-import SendMovementPage from './purchase-orders/SendMovementPage';
+import CreateStockMovement from './request/CreateStockMovement';
+import AddItemsPage from './request/AddItemsPage';
 import Wizard from '../wizard/Wizard';
 import apiClient from '../../utils/apiClient';
 import { showSpinner, hideSpinner, fetchTranslations } from '../../actions';
 import { translateWithDefaultMessage } from '../../utils/Translate';
 
-// TODO: Cleanup not required code
-// TODO: Revise docs
+// TODO: check docs for SM wizard and Wizard related components
 
-/** Main inbound stock movement form's wizard component. */
-class StockMovementPurchaseOrders extends Component {
+/** Main outbound stock movement form's wizard component. */
+class StockMovementsRequest extends Component {
   constructor(props) {
     super(props);
 
@@ -24,8 +22,6 @@ class StockMovementPurchaseOrders extends Component {
       values: this.props.initialValues,
       currentPage: 1,
     };
-
-    this.updateWizardValues = this.updateWizardValues.bind(this);
   }
 
   componentDidMount() {
@@ -80,7 +76,7 @@ class StockMovementPurchaseOrders extends Component {
     const { currentPage, values } = this.state;
     const shipped = values.shipped ? 'SHIPPED' : '';
     const received = values.received ? 'RECEIVED' : '';
-    if (currentPage === 3) {
+    if (currentPage === 6) {
       return (
         <span className="shipment-status float-right">
           {`${shipped || received || 'PENDING'}`}
@@ -90,24 +86,18 @@ class StockMovementPurchaseOrders extends Component {
     return null;
   }
 
-  updateWizardValues(values) {
-    this.setState({ values });
-  }
-
   /**
    * Returns array of form steps.
    * @public
    */
-  stepList = [
-    this.props.translate('react.stockMovement.create.label', 'Create'),
-    this.props.translate('react.stockMovement.addItems.label', 'Add items'),
-    this.props.translate('react.stockMovement.send.label', 'Send')];
+  stepList = [this.props.translate('react.stockMovement.create.label', 'Create'),
+    this.props.translate('react.stockMovement.addItems.label', 'Add items')];
 
   /**
    * Returns array of form's components.
    * @public
    */
-  pageList = [CreateStockMovement, AddItemsPage, SendMovementPage];
+  pageList = [CreateStockMovement, AddItemsPage];
 
   dataFetched = false;
 
@@ -146,8 +136,8 @@ class StockMovementPurchaseOrders extends Component {
               label: resp.requestedBy.name,
             },
           };
-          const currentPage = values.statusCode === 'PENDING' ? 2 : 3;
-          this.setState({ values, currentPage });
+
+          this.setState({ values, currentPage: values.statusCode === 'NEW' ? 1 : 2 });
         })
         .catch(() => this.props.hideSpinner());
     }
@@ -157,17 +147,18 @@ class StockMovementPurchaseOrders extends Component {
     const { values, currentPage } = this.state;
     const title = this.getWizardTitle();
     const additionalTitle = this.getAdditionalWizardTitle();
+    const pageList = this.getPageList();
+    const stepList = this.getStepList();
 
     return (
       <Wizard
-        pageList={this.pageList}
-        stepList={this.stepList}
+        pageList={pageList}
+        stepList={stepList}
         initialValues={values}
         title={title}
         additionalTitle={additionalTitle}
         currentPage={currentPage}
         prevPage={currentPage === 1 ? 1 : currentPage - 1}
-        updateWizardValues={this.updateWizardValues}
       />
     );
   }
@@ -181,9 +172,9 @@ const mapStateToProps = state => ({
 
 export default connect(mapStateToProps, {
   showSpinner, hideSpinner, fetchTranslations,
-})(StockMovementPurchaseOrders);
+})(StockMovementsRequest);
 
-StockMovementPurchaseOrders.propTypes = {
+StockMovementsRequest.propTypes = {
   /** React router's object which contains information about url variables and params */
   match: PropTypes.shape({
     params: PropTypes.shape({ stockMovementId: PropTypes.string }),
@@ -202,6 +193,6 @@ StockMovementPurchaseOrders.propTypes = {
   translate: PropTypes.func.isRequired,
 };
 
-StockMovementPurchaseOrders.defaultProps = {
+StockMovementsRequest.defaultProps = {
   initialValues: {},
 };
