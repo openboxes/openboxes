@@ -470,6 +470,12 @@ class StockMovementService {
         return StockMovementItem.createFromRequisitionItem(requisitionItem)
     }
 
+    void removeStockMovementItem(String id) {
+        RequisitionItem requisitionItem = RequisitionItem.get(id)
+        removeRequisitionItem(requisitionItem)
+    }
+
+
     List<ReceiptItem> getStockMovementReceiptItems(StockMovement stockMovement) {
         return (stockMovement.requisition) ?
                 getRequisitionBasedStockMovementReceiptItems(stockMovement) :
