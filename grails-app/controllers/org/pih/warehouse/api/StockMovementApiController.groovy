@@ -141,7 +141,7 @@ class StockMovementApiController {
     def updateItems = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         bindStockMovement(stockMovement, request.JSON)
-        stockMovementService.updateItems(stockMovement)
+        stockMovement = stockMovementService.updateItems(stockMovement)
         render([data: stockMovement] as JSON)
     }
 
