@@ -54,6 +54,12 @@
       animation-duration: .8s;
       animation-timing-function: ease-out;
 
+      .numberDiv {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
       .titleCard {
         color: #cdcdcd;
         font-size: 14px;
@@ -130,6 +136,14 @@
     justify-content: space-between;
     color: #282d32;
 
+    .titleLink {
+      color: #282D32;
+      text-decoration: none;
+      &:hover{
+        text-decoration: none;
+      }
+    }
+
     .dragHandler {
       color: #999999;
       font-size: 25px;
@@ -189,6 +203,7 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        user-select: none;
 
         &:not(:last-child) {
           border-right: 1px solid #d8d8d8;
@@ -425,6 +440,7 @@
     flex-direction: column;
     font-size: 14px;
     align-items: center;
+    user-select: none;
 
     &.graph-preview {
       font-size: 25px;

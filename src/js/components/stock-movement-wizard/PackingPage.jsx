@@ -204,7 +204,7 @@ class PackingPage extends Component {
     this.setState({
       values: {
         ...this.state.values,
-        packPageItems: _.uniq(_.concat(this.state.values.packPageItems, data)),
+        packPageItems: _.uniqBy(_.concat(this.state.values.packPageItems, data), 'shipmentItemId'),
       },
     });
   }
