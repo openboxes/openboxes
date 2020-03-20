@@ -1614,14 +1614,8 @@ class StockMovementService {
             shipment.addToComments(new Comment(comment: stockMovement.comments))
         }
 
-        if (stockMovement.trackingNumber) {
-            ReferenceNumber referenceNumber = findOrCreateReferenceNumber(shipment, stockMovement.trackingNumber)
-            if (referenceNumber) {
-                shipment.addToReferenceNumbers(referenceNumber)
-            }
-        }
+        createOrUpdateTrackingNumber(shipment, stockMovement.trackingNumber)
         shipment.save()
-        //throw new IllegalStateException("Unable to update inbound shipment ${stockMovement.id} at this time")
     }
 
     Shipment updateShipmentForRequisitionBasedStockMovement(StockMovement stockMovement) {
@@ -1654,12 +1648,7 @@ class StockMovementService {
         shipment.expectedShippingDate = stockMovement.dateShipped ?: shipment.expectedShippingDate
         shipment.shipmentType = stockMovement.shipmentType ?: shipment.shipmentType
 
-        if (stockMovement.trackingNumber) {
-            ReferenceNumber referenceNumber = findOrCreateReferenceNumber(stockMovement.trackingNumber)
-            if (referenceNumber) {
-                shipment.addToReferenceNumbers(referenceNumber)
-            }
-        }
+        createOrUpdateTrackingNumber(shipment, stockMovement.trackingNumber)
 
         if (shipment.hasErrors() || !shipment.save(flush: true)) {
             throw new ValidationException("Invalid shipment", shipment.errors)
@@ -1671,7 +1660,7 @@ class StockMovementService {
     }
 
 
-    ReferenceNumber findOrCreateReferenceNumber(Shipment shipment, String trackingNumber) {
+    ReferenceNumber createOrUpdateTrackingNumber(Shipment shipment, String trackingNumber) {
         ReferenceNumberType trackingNumberType = ReferenceNumberType.findById(Constants.TRACKING_NUMBER_TYPE_ID)
         if (!trackingNumberType) {
             throw new IllegalStateException("Must configure reference number type for Tracking Number with ID '${Constants.TRACKING_NUMBER_TYPE_ID}'")
@@ -1688,13 +1677,15 @@ class StockMovementService {
                 referenceNumber = new ReferenceNumber()
                 referenceNumber.identifier = trackingNumber
                 referenceNumber.referenceNumberType = trackingNumberType
-
+                shipment.addToReferenceNumbers(referenceNumber)
             }
             // Update the existing reference number
             else {
                 referenceNumber.identifier = trackingNumber
             }
-        } else if (referenceNumber) {
+        }
+        // Reference number exists but the user-defined tracking number was empty so we should delete
+        else if (referenceNumber) {
             shipment.removeFromReferenceNumbers(referenceNumber)
         }
         return referenceNumber
