@@ -162,41 +162,47 @@ class IndicatorDataService {
         return indicatorData;
     }
 
-    DataGraph getReceivedStockData(def location, def params) {
-        Integer querySize = params.querySize? params.querySize.toInteger() : 5
-        List allLocations = dataService.executeQuery("select id from openboxes.location")
-        List listDatasets = []
-        List listLabel = []
+    DataGraph getReceivedStockData(Location location, def params) {
+        Integer querySize = params.querySize? params.querySize.toInteger()-1 : 5
         today.clearTime()
-        for(item in allLocations) {
+        
+        Date queryLimit = today.clone()
+        queryLimit.set(month: today.month - querySize, date: 1) 
+
+        List queryData = Shipment.executeQuery("SELECT COUNT(s.id), s.origin, MONTH(s.lastUpdated), YEAR(s.lastUpdated) FROM Shipment s WHERE s.destination = :location AND s.currentStatus <> 'PENDING' AND s.lastUpdated > :limit GROUP BY MONTH(s.lastUpdated), YEAR(s.lastUpdated), s.origin", 
+        ['location': location, 'limit': queryLimit])
+        
+        List listRes = []
+        List listLabel = []
+        for(item in queryData) {
+            // item[0]: item total counted
+            // item[1]: item origin
+            // item[2]: item month
+            // item[3]: item year
+            Location itemLocation = item[1]
             List listData = []
             listLabel = []
-            try {
-                List locationName = dataService.executeQuery("select name from location where id="+item[0].value)
-                for(int i = querySize ;i >= 0; i--) {
-                    def monthBegin = today.clone()
-                    def monthEnd = today.clone()
-                    monthBegin.set(month: today.month - i, date: 1)
-                    monthEnd.set(month: today.month - i + 1, date: 1)
 
-                    def query = Shipment.executeQuery("select count(*) from Shipment s where s.lastUpdated >= :monthOne and s.lastUpdated < :monthTwo and s.destination = "+ item[0].value +" and s.currentStatus <> 'PENDING'",
-                    // The column transaction_transaction_date doesn't exist, using lastUpdated instead
-                    ['monthOne': monthBegin, 'monthTwo': monthEnd]);
-                    String monthLabel = new java.text.DateFormatSymbols().months[monthBegin.month].substring(0,3)
+            for(int i = querySize; i >= 0; i--) {
+                Date month = today.clone()
+                month.set(month: today.month - i, date: 1)
 
-                    listLabel.push(monthLabel)
-                    listData.push(query[0])
+                Integer value = 0
+                if (month.month == item[2]-1 && month.year + 1900 == item[3]) {
+                    value = item[0]
                 }
-                listDatasets.push(new IndicatorDatasets(locationName[0].name, listData))
-            } catch(err) {
-                log.error "Query error in getReceivedStockData : " + err
+
+                String monthLabel = new java.text.DateFormatSymbols().months[month.month].substring(0,3)
+                listLabel.push(monthLabel)
+                listData.push(value)
             }
+            listRes.push(new IndicatorDatasets(itemLocation.name, listData))
         }
-        List<IndicatorDatasets> datasets = listDatasets;
+        List<IndicatorDatasets> datasets = listRes;
 
         IndicatorData data = new IndicatorData(datasets, listLabel);
 
-        DataGraph indicatorData = new DataGraph(data, 1, "Incoming Stock Movements by Month", "bar");
+        DataGraph indicatorData = new DataGraph(data, 1, "Stock Movements Sent by Month", "bar");
 
         return indicatorData;
     }
