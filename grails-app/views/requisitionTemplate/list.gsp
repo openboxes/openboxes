@@ -12,7 +12,6 @@
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
-
             <div class="buttonBar">
                 <g:link class="button" controller="requisitionTemplate" action="list">
                     <img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}" />&nbsp;
@@ -43,18 +42,6 @@
                                 <label>${g.message(code:'requisition.destination.label')}</label>
                                 <g:selectLocation name="destination" value="${params.destination}" multiple="true" class="chzn-select-deselect" noSelection="['null':'']" data-placeholder=" "/>
                             </div>
-
-
-                            <div class="filter-list-item">
-                                <label>${g.message(code:'requisition.requisitionType.label')}</label>
-                                <g:selectRequisitionType name="requisitionType" value="${params.requisitionType}"
-                                                         noSelection="['':'']" class="chzn-select-deselect"/>
-                            </div>
-                            <div class="filter-list-item">
-                                <label>${g.message(code:'requisition.commodityClass.label')}</label>
-                                <g:selectCommodityClass name="commodityClass" value="${params.commodityClass}"
-                                                        noSelection="['':'']" class="chzn-select-deselect"/>
-                            </div>
                             <div class="checkbox">
                                 <g:checkBox name="includeUnpublished" value="${params.includeUnpublished}"/>
                                 <label><warehouse:message code="stocklist.includeUnpublished.label" default="Include unpublished stocklists"/></label>
@@ -68,21 +55,17 @@
                             </div>
                         </g:form>
                     </div>
-
                 </div>
                 <div class="yui-u">
                     <g:set var="requisitions" value="${requisitions?.sort { it.status }}"/>
                     <g:set var="requisitionMap" value="${requisitions?.groupBy { it.status }}"/>
                     <div class="box">
-
                         <h2>
                             ${g.message(code:'requisitionTemplates.label')}
                             <small><g:message code="default.showingResults.message"
                                               args="[requisitions.size(), requisitions.totalCount]"/></small>
                         </h2>
-
                         <g:render template="list" model="[requisitions:requisitions]"/>
-
                         <div class="paginateButtons">
                             <g:paginate params="${params}" total="${requisitions.totalCount}" />
                         </div>

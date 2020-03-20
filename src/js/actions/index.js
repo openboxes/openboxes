@@ -107,16 +107,17 @@ export function changeCurrentLocale(locale) {
 // New Dashboard
 
 // eslint-disable-next-line max-len
-function fetchIndicator(dispatch, indicatorMethod, indicatorType, indicatorTitle, link = null, indicatorId = null) {
+function fetchIndicator(dispatch, indicatorMethod, indicatorType, indicatorTitle, link = null, indicatorId = null, params = null) {
   const archived = 0;
   const id = indicatorId || Math.random();
 
-  const url = `/openboxes/apitablero/${indicatorMethod}`;
+  const url = `/openboxes/apitablero/${indicatorMethod}?${params}`;
 
   dispatch({
     type: FETCH_INDICATORS,
     payload: {
       id,
+      method: indicatorMethod,
       title: indicatorTitle,
       type: 'loading',
       data: [],
@@ -130,6 +131,7 @@ function fetchIndicator(dispatch, indicatorMethod, indicatorType, indicatorTitle
       type: FETCH_INDICATORS,
       payload: {
         id,
+        method: indicatorMethod,
         title: indicatorTitle,
         type: indicatorType,
         data: res.data,
@@ -142,6 +144,7 @@ function fetchIndicator(dispatch, indicatorMethod, indicatorType, indicatorTitle
       type: FETCH_INDICATORS,
       payload: {
         id,
+        method: indicatorMethod,
         title: indicatorTitle,
         type: 'error',
         data: [],
@@ -152,14 +155,20 @@ function fetchIndicator(dispatch, indicatorMethod, indicatorType, indicatorTitle
   });
 }
 
+export function reloadIndicator(method, type, title, link, id, params) {
+  return (dispatch) => {
+    fetchIndicator(dispatch, method, type, title, link, id, params);
+  };
+}
+
 export function fetchIndicators() {
   return (dispatch) => {
     fetchIndicator(dispatch, 'getExpirationSummary', 'line', 'Expiration Summary');
     fetchIndicator(dispatch, 'getFillRate', 'bar', 'Fill Rate');
     fetchIndicator(dispatch, 'getInventorySummary', 'horizontalBar', 'Inventory Summary');
-    fetchIndicator(dispatch, 'getSentStockMovements', 'bar', 'Sent Stock Movements');
+    fetchIndicator(dispatch, 'getSentStockMovements', 'bar', 'Stock Movements Sent by Month');
     fetchIndicator(dispatch, 'getReceivedStockMovements', 'doughnut', 'Stock Movements Received');
-    fetchIndicator(dispatch, 'getOutgoingStock', 'numbers', 'Outgoing Stock Movements');
+    fetchIndicator(dispatch, 'getOutgoingStock', 'numbers', 'Outgoing Stock Movements in Progress', '/openboxes/stockMovement/list?receiptStatusCode=PENDING');
   };
 }
 

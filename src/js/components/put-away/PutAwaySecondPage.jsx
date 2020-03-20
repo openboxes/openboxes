@@ -275,7 +275,9 @@ class PutAwaySecondPage extends Component {
         const bins = _.map(response.data.data, bin => (
           { value: { id: bin.id, name: bin.name }, label: bin.name }
         ));
-        this.setState({ bins }, () => this.props.hideSpinner());
+        const expanded = {};
+        _.forEach(bins, (item, index) => { expanded[index] = true; });
+        this.setState({ bins, expanded }, () => this.props.hideSpinner());
       })
       .catch(() => this.props.hideSpinner());
   }

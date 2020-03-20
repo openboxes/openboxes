@@ -4,7 +4,7 @@ import { Line, Bar, Doughnut, HorizontalBar } from 'react-chartjs-2';
 import { SortableElement, sortableHandle } from 'react-sortable-hoc';
 import LoadingCard from './LoadingCard';
 import Numbers from './Numbers';
-import loadColors from '../../consts/dataFormat/dataLoading';
+import { loadColors } from '../../consts/dataFormat/dataLoading';
 
 
 const DragHandle = sortableHandle(() => (
@@ -12,16 +12,28 @@ const DragHandle = sortableHandle(() => (
 ));
 
 const GraphCard = SortableElement(({
-  cardTitle, cardType, cardLink, data,
+  cardMethod, cardId, cardTitle, cardType, cardLink, data, reloadIndicator,
 }) => {
   const cardData = data;
   let graph;
+  let filter = 0;
+  const stackedBar = {
+    scales: {
+      xAxes: [{
+        stacked: true,
+      }],
+      yAxes: [{
+        stacked: true,
+      }],
+    },
+  };
   if (cardType === 'line') {
     cardData.datasets = loadColors(data, 'line');
     graph = <Line data={data} />;
   } else if (cardType === 'bar') {
     cardData.datasets = loadColors(data, 'bar');
-    graph = <Bar data={data} />;
+    graph = <Bar data={data} options={cardMethod === 'getFillRate' ? null : stackedBar} />;
+    filter = 1;
   } else if (cardType === 'doughnut') {
     cardData.datasets = loadColors(data, 'doughnut');
     graph = <Doughnut data={data} />;
@@ -40,7 +52,7 @@ const GraphCard = SortableElement(({
     <div className={`graphCard ${cardType === 'error' ? 'errorCard' : ''}`}>
       <div className="headerCard">
         {cardLink ?
-          <a href={cardLink} className="titleLink">
+          <a target="_blank" rel="noopener noreferrer" href={cardLink} className="titleLink">
             <span className="titleLink"> {cardTitle} </span>
           </a>
           :
@@ -48,7 +60,20 @@ const GraphCard = SortableElement(({
         }
         <DragHandle />
       </div>
-      <div className="contentCard">{graph}</div>
+      <div className="contentCard">
+        <div className="dataFilter">
+          <select
+            className={filter ? 'customSelect' : 'customSelect disabled'}
+            onChange={e => reloadIndicator(cardMethod, cardType, cardTitle, cardLink, cardId, `querySize=${e.target.value}`)}
+            disabled={!filter}
+          >
+            <option value="6">Last 6 Months</option>
+            <option value="12">Last Year</option>
+            <option value="24">Last 2 Years</option>
+          </select>
+        </div>
+        {graph}
+      </div>
     </div>
   );
 });
@@ -59,4 +84,3 @@ GraphCard.propTypes = {
   cardTitle: PropTypes.string.isRequired,
   cardType: PropTypes.string.isRequired,
 };
-

@@ -5,6 +5,8 @@ import org.pih.warehouse.tablero.ColorNumber
 import org.pih.warehouse.tablero.IndicatorData
 import org.pih.warehouse.tablero.NumberIndicator
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.tablero.IndicatorDatasets
 
 class IndicatorDataService {
@@ -107,31 +109,54 @@ class IndicatorDataService {
         return indicatorData;
     }
 
-    DataGraph getSentStockMovements(def location) {
-        List listData = []
-        List listLabel = []
+    DataGraph getSentStockMovements(def location, def params) {
+        Integer querySize = params.querySize? params.querySize.toInteger()-1 : 5
         today.clearTime()
-        for(int i=5;i>=0;i--){
-            def monthBegin = today.clone()
-            def monthEnd = today.clone()
-            monthBegin.set(month: today.month - i, date: 1)
-            monthEnd.set(month: today.month - i + 1, date: 1)
-                
-            def temp = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated >= :monthOne and r.dateCreated < :monthTwo and r.origin = :location""",
-                ['monthOne': monthBegin, 'monthTwo': monthEnd, 'location': location]);
-            String monthLabel = new java.text.DateFormatSymbols().months[monthBegin.month]
+        
+        // queryLimit limits the query and avoid of getting data older than wanted
+        Date queryLimit = today.clone()
+        queryLimit.set(month: today.month - querySize, date: 1) 
 
-            listLabel.push(monthLabel)
-            listData.push(temp[0])
+        List queryData = Shipment.executeQuery("SELECT COUNT(s.id), s.destination, MONTH(s.lastUpdated), YEAR(s.lastUpdated) FROM Shipment s WHERE s.origin = :location AND s.currentStatus <> 'PENDING' AND s.lastUpdated > :limit GROUP BY MONTH(s.lastUpdated), YEAR(s.lastUpdated), s.destination", 
+        ['location': location, 'limit': queryLimit])
+        // queryData gives an array of arrays [[count, destination, month, year], ...] of sent stock
+        
+        List listRes = []
+        List listLabel = []
+        // Loop 1: Each sent stock array in query data array
+        for(item in queryData) {
+            // item[0]: item total counted
+            // item[1]: item destination
+            // item[2]: item month
+            // item[3]: item year
+            Location itemLocation = item[1]
+            List listData = []
+            listLabel = []
+
+            // Loop 2: Give each requested month a value, label and month label; value is 0 when month have no data
+            for(int i = querySize; i >= 0; i--) {
+                Date month = today.clone()
+                month.set(month: today.month - i, date: 1)
+
+                // Places 0 in months where there is no sent stock, else places item total counted
+                Integer value = 0
+                if (month.month == item[2]-1 && month.year + 1900 == item[3]) {
+                    value = item[0]
+                }
+
+                // Pushs month label in label array and sent stock in the data array
+                String monthLabel = new java.text.DateFormatSymbols().months[month.month].substring(0,3)
+                listLabel.push(monthLabel)
+                listData.push(value)
+            }
+            // Array of data lists: (stack it by destination)
+            listRes.push(new IndicatorDatasets(itemLocation.name, listData))
         }
-
-        List<IndicatorDatasets> datasets = [
-                new IndicatorDatasets('Inventory Summary', listData)
-            ];
+        List<IndicatorDatasets> datasets = listRes;
 
         IndicatorData data = new IndicatorData(datasets, listLabel);
 
-        DataGraph indicatorData = new DataGraph(data, 1, "Sent stock movements", "bar");
+        DataGraph indicatorData = new DataGraph(data, 1, "Stock Movements Sent by Month", "bar");
 
         return indicatorData;
     }
@@ -170,13 +195,13 @@ class IndicatorDataService {
         def m4 = today - 4;
         def m7 = today - 7;
 
-        def greenData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated >= :day and r.origin = :location""", 
+        def greenData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated > :day and r.origin = :location and r.status <> 'ISSUED'""", 
         ['day': m4, 'location': location]);
-        
-        def yellowData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated >= :dayOne and r.dateCreated < :dayTwo and r.origin = :location""",
+    
+        def yellowData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated >= :dayOne and r.dateCreated <= :dayTwo and r.origin = :location and r.status <> 'ISSUED'""",
         ['dayOne': m7, 'dayTwo': m4, 'location': location]);
 
-        def redData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated < :day and r.origin = :location""",
+        def redData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated < :day and r.origin = :location and r.status <> 'ISSUED'""", 
         ['day': m7, 'location': location]);
 
         ColorNumber green = new ColorNumber(greenData[0], 'Created < 4 days ago');

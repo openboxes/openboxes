@@ -318,7 +318,7 @@ class EditItemsPage extends Component {
         statusCode,
         totalCount,
       }, () => {
-        if (!this.props.isPaginated) {
+        if (!this.props.isPaginated || forceFetch) {
           this.fetchItems();
         }
       });
@@ -360,7 +360,10 @@ class EditItemsPage extends Component {
               })),
             })),
           },
-        }, () => this.fetchAllData(false));
+        }, () => {
+          this.fetchAllData(false);
+          this.props.hideSpinner();
+        });
       }).catch(() => {
         this.props.hideSpinner();
       });
@@ -495,8 +498,13 @@ class EditItemsPage extends Component {
           onClick: () => {
             this.setState({
               revisedItems: [],
+              values: {
+                ...this.state.values,
+                editPageItems: [],
+              },
+            }, () => {
+              this.fetchAllData(true);
             });
-            this.fetchAllData(true);
           },
         },
         {

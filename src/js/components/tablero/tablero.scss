@@ -54,6 +54,12 @@
       animation-duration: .8s;
       animation-timing-function: ease-out;
 
+      .numberDiv {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
       .titleCard {
         color: #cdcdcd;
         font-size: 14px;
@@ -130,6 +136,14 @@
     justify-content: space-between;
     color: #282d32;
 
+    .titleLink {
+      color: #282D32;
+      text-decoration: none;
+      &:hover{
+        text-decoration: none;
+      }
+    }
+
     .dragHandler {
       color: #999999;
       font-size: 25px;
@@ -139,6 +153,36 @@
 
   .contentCard {
     height: 100%;
+
+    .dataFilter {
+      margin: -15px 0 5px 0;
+      font-size: 12px;
+      font-weight: normal;
+      font-stretch: normal;
+      font-style: normal;
+      line-height: 0.83;
+      letter-spacing: normal;
+      text-align: right;
+      position: relative; 
+
+      .customSelect{
+        background-color: transparent;
+        border: transparent;
+        color: #aaacae;
+        font-family: Arial;
+        text-align: right;
+        cursor: pointer;
+
+        &:focus{
+          outline: none;
+        }
+      }
+    }
+
+    .dataFilter .disabled{
+      opacity: 0;
+      cursor: default;
+    }
 
     .loaderDiv {
       margin: auto;
@@ -159,6 +203,7 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        user-select: none;
 
         &:not(:last-child) {
           border-right: 1px solid #d8d8d8;
@@ -201,40 +246,40 @@
 
 @media (min-width: 630px) {
   .graphCard {
-    height: 400px;
+    height: 420px;
   }
 }
 
 @media (min-width: 730px) {
   .graphCard {
-    height: 450px;
+    height: 470px;
   }
 }
 
 @media (min-width: 868px) {
   .graphCard {
-    height: 300px;
+    height: 320px;
     width: 47%;
   }
 }
 
 @media (min-width: 1068px) {
   .graphCard {
-    height: 350px;
+    height: 370px;
     width: 47%;
   }
 }
 
 @media (min-width: 1268px) {
   .graphCard {
-    height: 400px;
+    height: 420px;
     width: 47%;
   }
 }
 
 @media (min-width: 1468px) {
   .graphCard {
-    height: 350px;
+    height: 370px;
     width: 30.6%;
   }
 }
@@ -395,6 +440,7 @@
     flex-direction: column;
     font-size: 14px;
     align-items: center;
+    user-select: none;
 
     &.graph-preview {
       font-size: 25px;

@@ -10,7 +10,7 @@ const NumberCard = ({
   cardTitle, cardNumber, cardSubtitle, cardLink,
 }) => {
   const card = (
-    <div className="numberCard">
+    <div className="numberDiv">
       <span className="titleCard"> {cardTitle} </span>
       <span className="resultCard"> {cardNumber.toLocaleString()} </span>
       <span className="subtitleCard"> {truncateString(cardSubtitle, 22)} </span>
@@ -18,19 +18,14 @@ const NumberCard = ({
   );
 
   return (
-    cardLink ? <a href={cardLink}>{card}</a> : card
+    cardLink ? <a target="_blank" rel="noopener noreferrer" href={cardLink} className="numberCard">{card}</a> : <div className="numberCard">{card}</div>
   );
 };
 
 export default NumberCard;
-// TO DELETE when data are received from the backend
-NumberCard.defaultProps = {
-  cardLink: '',
-};
-
 NumberCard.propTypes = {
   cardTitle: PropTypes.string.isRequired,
   cardNumber: PropTypes.number.isRequired,
   cardSubtitle: PropTypes.string.isRequired,
-  cardLink: PropTypes.string,
+  cardLink: PropTypes.string.isRequired,
 };
