@@ -7,6 +7,7 @@ import update from 'immutability-helper';
 import fileDownload from 'js-file-download';
 import { getTranslate } from 'react-localize-redux';
 import { Tooltip } from 'react-tippy';
+import { confirmAlert } from 'react-confirm-alert';
 
 import 'react-table/react-table.css';
 
@@ -124,7 +125,6 @@ class PutAwaySecondPage extends Component {
         if (edit) {
           return (
             <Tooltip
-              // eslint-disable-next-line max-len
               html={this.props.translate(
                 'react.putAway.higherQuantity.label',
                 'Quantity cannot be higher than original putaway item quantity',
@@ -153,7 +153,24 @@ class PutAwaySecondPage extends Component {
             </Tooltip>);
         }
 
-        return (<span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>);
+        return (
+          <Tooltip
+            html={this.props.translate(
+              'react.putAway.higherQuantity.label',
+              'Quantity cannot be higher than original putaway item quantity',
+            )}
+            disabled={props.original && props.value <= props.original.quantityAvailable}
+            theme="transparent"
+            arrow="true"
+            delay="150"
+            duration="250"
+            hideDelay="50"
+          >
+            <div className={props.original && props.value > props.original.quantityAvailable ? 'has-error' : ''}>
+              <span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>
+            </div>
+          </Tooltip>
+        );
       },
       Filter,
     }, {
@@ -339,13 +356,29 @@ class PutAwaySecondPage extends Component {
    * @public
    */
   nextPage() {
-    this.props.savePutAways(this.props.putAway, (putAway) => {
-      this.props.nextPage({
-        putAway,
-        pivotBy: this.state.pivotBy,
-        expanded: this.state.expanded,
+    if (_.some(this.props.putAway.putawayItems, putawayItem =>
+      putawayItem.quantity > putawayItem.quantityAvailable)) {
+      confirmAlert({
+        title: this.props.translate('react.putAway.message.putAwayError.label', 'Putaway error'),
+        message: this.props.translate(
+          'react.putAway.putAwayAlert.message',
+          'Cannot put away more than is available in the receiving bin. Reduce quantity of items in red to match the quantity in the receiving bin.',
+        ),
+        buttons: [
+          {
+            label: this.props.translate('react.default.ok.label', 'OK'),
+          },
+        ],
       });
-    });
+    } else {
+      this.props.savePutAways(this.props.putAway, (putAway) => {
+        this.props.nextPage({
+          putAway,
+          pivotBy: this.state.pivotBy,
+          expanded: this.state.expanded,
+        });
+      });
+    }
   }
 
   /**
@@ -466,8 +499,6 @@ class PutAwaySecondPage extends Component {
             type="button"
             onClick={() => this.nextPage()}
             className="btn btn-outline-primary align-self-end btn-xs"
-            disabled={_.some(this.props.putAway.putawayItems, putawayItem =>
-              putawayItem.quantity > putawayItem.quantityAvailable)}
           ><Translate id="react.default.button.next.label" defaultMessage="Next" />
           </button>
         </div>
@@ -491,8 +522,6 @@ class PutAwaySecondPage extends Component {
           type="button"
           onClick={() => this.nextPage()}
           className="btn btn-outline-primary float-right my-2 btn-xs"
-          disabled={_.some(this.props.putAway.putawayItems, putawayItem =>
-            putawayItem.quantity > putawayItem.quantityAvailable)}
         ><Translate id="react.default.button.next.label" defaultMessage="Next" />
         </button>
       </div>
