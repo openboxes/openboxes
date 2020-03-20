@@ -4,9 +4,9 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import { getTranslate } from 'react-localize-redux';
 
-import CreateStockMovement from './CreateStockMovement';
-import AddItemsPage from './AddItemsPage';
-import SendMovementPage from './SendMovementPage';
+import CreateStockMovement from './inbound/CreateStockMovement';
+import AddItemsPage from './inbound/AddItemsPage';
+import SendMovementPage from './inbound/SendMovementPage';
 import Wizard from '../wizard/Wizard';
 import apiClient from '../../utils/apiClient';
 import { showSpinner, hideSpinner, fetchTranslations } from '../../actions';
@@ -76,10 +76,12 @@ class StockMovements extends Component {
 
   getAdditionalWizardTitle() {
     const { currentPage, values } = this.state;
+    const shipped = values.shipped ? 'SHIPPED' : '';
+    const received = values.received ? 'RECEIVED' : '';
     if (currentPage === 3) {
       return (
         <span className="shipment-status float-right">
-          {`${values.shipmentStatus ? values.shipmentStatus : 'PENDING'}`}
+          {`${shipped || received || 'PENDING'}`}
         </span>
       );
     }
@@ -139,12 +141,19 @@ class StockMovements extends Component {
             },
           };
 
-          const statuses = ['NEW', 'CREATED', 'PICKED'];
-
           let currentPage = 1;
-          if (statuses.indexOf(values.statusCode) > 0) {
-            currentPage = statuses.indexOf(values.statusCode) + 1;
+          switch (values.statusCode) {
+            case 'NEW':
+              break;
+            case 'CREATED':
+            case 'REQUESTING':
+              currentPage = 2;
+              break;
+            default:
+              currentPage = 3;
+              break;
           }
+
           this.setState({ values, currentPage });
         })
         .catch(() => this.props.hideSpinner());

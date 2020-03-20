@@ -140,7 +140,7 @@
 </g:isUserInRole>
 
 <g:if test="${shipmentInstance.requisition}">
-    <g:link controller="stockMovement" action="index" id="${shipmentInstance?.requisition?.id}" class="button">
+    <g:link controller="stockMovement" action="edit" id="${shipmentInstance?.requisition?.id}" class="button">
         <img src="${createLinkTo(dir: 'images/icons/silk', file: 'package.png')}" class="middle"/>&nbsp;
         <warehouse:message code="stockMovement.edit.label" default="Edit stock movement"/>
     </g:link>
