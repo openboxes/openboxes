@@ -7,7 +7,7 @@
         <meta name="layout" content="custom" />
         <title><warehouse:message code="admin.title" default="Settings" /></title>
     </head>
-    <body>        
+    <body>
 		<div id="settings" role="main" class="yui-ga">
 
             <g:if test="${flash.message}">
@@ -36,6 +36,9 @@
                         </li>
                         <li>
                             <a href="#tabs-7" id="cache-tab"><warehouse:message code="admin.cache.header" default="Caches"/></a>
+                        </li>
+                        <li>
+                            <a href="${request.contextPath}/admin/showEngine"><warehouse:message code="admin.database.label" default="Database"/></a></li>
                         </li>
                     </ul>
                     <div id="tabs-1">

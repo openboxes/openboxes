@@ -32,6 +32,7 @@ class AdminController {
     def config = ConfigurationHolder.config
     def quartzScheduler
     def springcacheService
+    def dataService
 
     def index = {}
 
@@ -203,6 +204,12 @@ class AdminController {
         }
     }
 
+    def showEngine = {
+        def results = dataService.executeQuery("show engine innodb status")
+        def processlist = dataService.executeQuery("show processlist")
+
+        render "<h1>Processlist</h1><pre>${processlist.join('\n')}</pre><h1>Show Engine Innodb Status</h1><pre>${results.Status[0]}</pre>"
+    }
 
     def showSettings = {
         def externalConfigProperties = []

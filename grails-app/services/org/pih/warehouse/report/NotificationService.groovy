@@ -11,6 +11,7 @@ package org.pih.warehouse.report
 
 import org.codehaus.groovy.grails.plugins.web.taglib.RenderTagLib
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
+import org.codehaus.groovy.grails.web.errors.GrailsWrappedRuntimeException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.RoleType
@@ -127,6 +128,27 @@ class NotificationService {
         List emails = users.collect { it.email }
         if (!emails.empty) {
             mailService.sendHtmlMail(subject, body, emails)
+        }
+    }
+
+    def sendApplicationErrorNotification(Location location, Exception exception) {
+
+        if (location.active && location.supports(org.pih.warehouse.core.ActivityCode.ENABLE_NOTIFICATIONS)) {
+            List<RoleType> roleTypes = [RoleType.ROLE_ERROR_NOTIFICATION]
+            List subscribers = userService.findUsersByRoleTypes(location, roleTypes)
+            List emails = subscribers.collect { it.email }
+            List status = dataService.executeQuery("""SHOW ENGINE INNODB STATUS""")
+            List processes = dataService.executeQuery("""show full processlist;""")
+            List transactions = dataService.executeQuery("""SELECT * FROM information_schema.innodb_trx ORDER BY trx_started; """)
+            List locks = dataService.executeQuery("""SELECT * FROM information_schema.innodb_locks;""")
+
+            GrailsWrappedRuntimeException grailsException = new GrailsWrappedRuntimeException(ServletContextHolder.servletContext, exception)
+            String body = renderTemplate("/email/applicationError",
+                    [exception: grailsException, location: location, status: status, processes: processes, transactions: transactions, locks:locks])
+            mailService.sendHtmlMail("Application Error: ${exception?.message}", body, emails)
+        }
+        else {
+            log.warn("Unable to send notification because location ${location.name} is inactive or has not enabled notifications")
         }
     }
 

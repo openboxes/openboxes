@@ -243,6 +243,7 @@ class DashboardController {
 
     def triggerCalculateQuantityJob = {
         CalculateQuantityJob.triggerNow([locationId: session.warehouse.id])
+        render ([status: "ok", locationId: session.warehouse.id] as JSON)
     }
 
     @CacheFlush(["megamenuCache"])

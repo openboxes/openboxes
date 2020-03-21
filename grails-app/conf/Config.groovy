@@ -506,6 +506,7 @@ openboxes.jobs.assignIdentifierJob.cronExpression = "0 * * * * ?" // every five 
 // Calculate current quantity on hand
 openboxes.jobs.calculateQuantityJob.enabled = true
 openboxes.jobs.calculateQuantityJob.cronExpression = "0 */5 * * * ?" // every five minutes starting at the top of the hour
+openboxes.jobs.calculateQuantityJob.retryOnError = true
 
 // Calculate historical quantity on hand
 openboxes.jobs.calculateHistoricalQuantityJob.enabled = false

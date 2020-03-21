@@ -9,13 +9,16 @@
  **/
 package org.pih.warehouse.inventory
 
+import groovy.sql.BatchingStatementWrapper
 import groovy.sql.Sql
 import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
+import org.pih.warehouse.jobs.CalculateQuantityJob
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
@@ -32,6 +35,7 @@ class InventorySnapshotService {
     def locationService
     def inventoryService
     def persistenceInterceptor
+    def grailsApplication
 
     def populateInventorySnapshots(Date date) {
         def results
@@ -170,10 +174,17 @@ class InventorySnapshotService {
         return binLocationsTransformed
     }
 
+    def retryOnError(Location location) {
+        Boolean retryOnError = grailsApplication.config.openboxes.jobs.calculateQuantityJob.retryOnError?:false
+        if (retryOnError) {
+            CalculateQuantityJob.triggerNow([locationId: location.id])
+        }
+    }
+
     def saveInventorySnapshots(Date date, Location location, List binLocations) {
         def startTime = System.currentTimeMillis()
         def batchSize = ConfigurationHolder.config.openboxes.inventorySnapshot.batchSize ?: 1000
-        def sql = new Sql(dataSource)
+        Sql sql = new Sql(dataSource)
 
         try {
             // Clear time in case caller did not
@@ -182,34 +193,10 @@ class InventorySnapshotService {
             DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
             // Execute inventory snapshot insert/update in batches
-            sql.withBatch(batchSize) { stmt ->
-                binLocations.eachWithIndex { entry, index ->
-
-                    def onHandQuantity = entry.quantity
-                    String productId = "${StringEscapeUtils.escapeSql(entry.product?.id)}"
-                    String productCode = "${StringEscapeUtils.escapeSql(entry.product?.productCode)}"
-                    String lotNumber = entry?.inventoryItem?.lotNumber ?
-                            "'${StringEscapeUtils.escapeSql(entry?.inventoryItem?.lotNumber)}'" : "'DEFAULT'"
-                    String expirationDate = entry?.inventoryItem?.expirationDate ?
-                            "'${DATE_FORMAT.format(entry?.inventoryItem?.expirationDate)}'" : "NULL"
-                    String inventoryItemId = entry?.inventoryItem?.id ?
-                            "'${StringEscapeUtils.escapeSql(entry?.inventoryItem?.id)}'" : "NULL"
-                    String binLocationId = entry?.binLocation?.id ?
-                            "'${StringEscapeUtils.escapeSql(entry?.binLocation?.id)}'" : "NULL"
-                    String binLocationName = entry?.binLocation?.name ?
-                            "'${StringEscapeUtils.escapeSql(entry?.binLocation?.name)}'" : "'DEFAULT'"
-
-                    def insertStmt =
-                            "INSERT INTO inventory_snapshot (id, version, date, location_id, product_id, product_code, " +
-                                    "inventory_item_id, lot_number, expiration_date, bin_location_id, bin_location_name, " +
-                                    "quantity_on_hand, date_created, last_updated) " +
-                                    "values ('${UUID.randomUUID().toString()}', 0, '${dateString}', '${location?.id}', " +
-                                    "'${productId}', '${productCode}', " +
-                                    "${inventoryItemId}, ${lotNumber}, ${expirationDate}, " +
-                                    "${binLocationId}, ${binLocationName}, ${onHandQuantity}, now(), now()) " +
-                                    "ON DUPLICATE KEY UPDATE quantity_on_hand=${onHandQuantity}, version=version+1, last_updated=now()"
-
-                    stmt.addBatch(insertStmt)
+            sql.withBatch(batchSize) { BatchingStatementWrapper stmt ->
+                binLocations.eachWithIndex { Map binLocationEntry, index ->
+                    String insertStatement = generateInsertInventorySnapshotStatement(location, dateString, DATE_FORMAT, binLocationEntry)
+                    stmt.addBatch(insertStatement)
                 }
                 stmt.executeBatch()
             }
@@ -217,7 +204,36 @@ class InventorySnapshotService {
 
         } catch (Exception e) {
             log.error("Error executing batch update for ${location.name}: " + e.message, e)
+            publishEvent(new ApplicationExceptionEvent(e, location))
+            retryOnError(location)
         }
+    }
+
+    String generateInsertInventorySnapshotStatement(Location location, String dateString, DateFormat DATE_FORMAT, Map entry) {
+        def onHandQuantity = entry.quantity
+        String productId = "${StringEscapeUtils.escapeSql(entry.product?.id)}"
+        String productCode = "${StringEscapeUtils.escapeSql(entry.product?.productCode)}"
+        String lotNumber = entry?.inventoryItem?.lotNumber ?
+                "'${StringEscapeUtils.escapeSql(entry?.inventoryItem?.lotNumber)}'" : "'DEFAULT'"
+        String expirationDate = entry?.inventoryItem?.expirationDate ?
+                "'${DATE_FORMAT.format(entry?.inventoryItem?.expirationDate)}'" : "NULL"
+        String inventoryItemId = entry?.inventoryItem?.id ?
+                "'${StringEscapeUtils.escapeSql(entry?.inventoryItem?.id)}'" : "NULL"
+        String binLocationId = entry?.binLocation?.id ?
+                "'${StringEscapeUtils.escapeSql(entry?.binLocation?.id)}'" : "NULL"
+        String binLocationName = entry?.binLocation?.name ?
+                "'${StringEscapeUtils.escapeSql(entry?.binLocation?.name)}'" : "'DEFAULT'"
+
+        def insertStatement =
+                "INSERT INTO inventory_snapshot (id, version, date, location_id, product_id, product_code, " +
+                        "inventory_item_id, lot_number, expiration_date, bin_location_id, bin_location_name, " +
+                        "quantity_on_hand, date_created, last_updated) " +
+                        "values ('${UUID.randomUUID().toString()}', 0, '${dateString}', '${location?.id}', " +
+                        "'${productId}', '${productCode}', " +
+                        "${inventoryItemId}, ${lotNumber}, ${expirationDate}, " +
+                        "${binLocationId}, ${binLocationName}, ${onHandQuantity}, now(), now()) " +
+                        "ON DUPLICATE KEY UPDATE quantity_on_hand=${onHandQuantity}, version=version+1, last_updated=now()"
+        return insertStatement
     }
 
     def getTransactionDates() {
