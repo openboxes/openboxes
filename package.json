@@ -99,7 +99,7 @@
     "jest": "22.4.4",
     "jquery": "3.4.1",
     "mini-css-extract-plugin": "0.4.4",
-    "node-sass": "^4.11.0",
+    "node-sass": "^4.13.1",
     "optimize-css-assets-webpack-plugin": "5.0.1",
     "react-styleguidist": "^9.1.16",
     "react-test-renderer": "16.4.2",
