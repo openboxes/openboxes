@@ -17,9 +17,6 @@ import org.springframework.web.context.request.RequestContextHolder
 
 class LocalizationService {
 
-    // session-scoped (because it needs access to the user)
-    static scope = "session"
-
     // inject the grails application so we can access the default locale
     GrailsApplication grailsApplication
     ResourceLocator grailsResourceLocator
