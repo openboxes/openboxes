@@ -52,6 +52,7 @@ class Order implements Serializable {
 
     static transients = [
             "isApprovalRequired",
+            "displayStatus",
             "subtotal",
             "totalAdjustments",
             "totalOrderAdjustments",
@@ -111,6 +112,21 @@ class Order implements Serializable {
     OrderStatus getStatus() {
         return status
     }
+
+    def getDisplayStatus() {
+        def shipments = listShipments()
+        for (ShipmentStatusCode statusCode in
+                [ShipmentStatusCode.RECEIVED, ShipmentStatusCode.PARTIALLY_RECEIVED, ShipmentStatusCode.SHIPPED]) {
+            if (shipments.any { Shipment shipment ->
+                log.info "Shipment shipment ${shipment} status ${shipment.currentStatus} == ${statusCode} ? ${shipment.currentStatus == statusCode}"
+                shipment.currentStatus == statusCode
+            }) {
+                return statusCode
+            }
+        }
+        return status
+    }
+
 
     /**
      * Checks to see if this order has been received, or partially received, and

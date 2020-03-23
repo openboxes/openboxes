@@ -80,7 +80,7 @@
 										</td>
 										<td class="middle">
 											<div class="tag">
-												<format:metadata obj="${orderInstance?.status}"/>
+												<format:metadata obj="${orderInstance?.displayStatus}"/>
 											</div>
 										</td>
 										<td class="middle">
