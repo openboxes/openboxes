@@ -47,4 +47,42 @@ function loadColors(data, chart) {
   return dataset;
 }
 
-export { loadColors, getColor };
+function loadOptions(isStacked = false) {
+  const options = {
+    scales: isStacked ? {
+      xAxes: [{
+        stacked: true,
+      }],
+      yAxes: [{
+        stacked: true,
+      }],
+    } : null,
+    tooltips: {
+      displayColors: false,
+      enabled: true,
+      yPadding: 5,
+      xPadding: 15,
+      cornerRadius: 4,
+      titleAlign: 'center',
+      titleFontSize: 13,
+      bodyAlign: 'center',
+      callbacks: {
+        title: (tooltipItem, data) => {
+          let title = data.datasets[tooltipItem[0].datasetIndex].label || '';
+
+          if (title) {
+            title += ': ';
+          }
+          title += data.datasets[tooltipItem[0].datasetIndex].data[tooltipItem[0].index];
+
+          return title;
+        },
+        label: (tooltipItem, data) => data.labels[tooltipItem.index],
+      },
+    },
+  };
+
+  return options;
+}
+
+export { loadColors, getColor, loadOptions };

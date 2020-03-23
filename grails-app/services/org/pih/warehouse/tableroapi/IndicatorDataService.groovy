@@ -109,7 +109,7 @@ class IndicatorDataService {
         return indicatorData;
     }
 
-    DataGraph getSentStockMovements(def location, def params) {
+    DataGraph getSentStockMovements(Location location, def params) {
         Integer querySize = params.querySize? params.querySize.toInteger()-1 : 5
         today.clearTime()
         
@@ -140,6 +140,7 @@ class IndicatorDataService {
 
                 // Places 0 in months where there is no sent stock, else places item total counted
                 Integer value = 0
+                // Year + 1900 because groovy's date starts counting from 1900. Ex: 2020 = 120
                 if (month.month == item[2]-1 && month.year + 1900 == item[3]) {
                     value = item[0]
                 }
@@ -206,7 +207,7 @@ class IndicatorDataService {
         return indicatorData;
     }
 
-    NumberIndicator getOutgoingStock(def location) {
+    NumberIndicator getOutgoingStock(Location location) {
         today.clearTime();
         def m4 = today - 4;
         def m7 = today - 7;
@@ -229,7 +230,7 @@ class IndicatorDataService {
         return indicatorData;
     }
 
-    NumberIndicator getIncomingStock(def location) {
+    NumberIndicator getIncomingStock(Location location) {
         today.clearTime();
         def m4 = today - 4;
         def m7 = today - 7;

@@ -107,7 +107,7 @@ export function changeCurrentLocale(locale) {
 // New Dashboard
 
 // eslint-disable-next-line max-len
-function fetchIndicator(dispatch, indicatorMethod, indicatorType, indicatorTitle, link = null, indicatorId = null, params = null) {
+function fetchIndicator(dispatch, indicatorMethod, indicatorType, indicatorTitle, link = null, indicatorId = null, params = '') {
   const archived = 0;
   const id = indicatorId || Math.random();
 

@@ -4,7 +4,7 @@ import { Line, Bar, Doughnut, HorizontalBar } from 'react-chartjs-2';
 import { SortableElement, sortableHandle } from 'react-sortable-hoc';
 import LoadingCard from './LoadingCard';
 import Numbers from './Numbers';
-import { loadColors } from '../../consts/dataFormat/dataLoading';
+import { loadColors, loadOptions } from '../../consts/dataFormat/dataLoading';
 
 
 const DragHandle = sortableHandle(() => (
@@ -17,29 +17,19 @@ const GraphCard = SortableElement(({
   const cardData = data;
   let graph;
   let filter = 0;
-  const stackedBar = {
-    scales: {
-      xAxes: [{
-        stacked: true,
-      }],
-      yAxes: [{
-        stacked: true,
-      }],
-    },
-  };
   if (cardType === 'line') {
     cardData.datasets = loadColors(data, 'line');
-    graph = <Line data={data} />;
+    graph = <Line data={data} options={loadOptions()} />;
   } else if (cardType === 'bar') {
     cardData.datasets = loadColors(data, 'bar');
-    graph = <Bar data={data} options={cardMethod === 'getFillRate' ? null : stackedBar} />;
+    graph = <Bar data={data} options={loadOptions(cardMethod !== 'getFillRate')} />;
     filter = 1;
   } else if (cardType === 'doughnut') {
     cardData.datasets = loadColors(data, 'doughnut');
-    graph = <Doughnut data={data} />;
+    graph = <Doughnut data={data} options={loadOptions()} />;
   } else if (cardType === 'horizontalBar') {
     cardData.datasets = loadColors(data, 'horizontalBar');
-    graph = <HorizontalBar data={data} />;
+    graph = <HorizontalBar data={data} options={loadOptions()} />;
   } else if (cardType === 'numbers') {
     graph = <Numbers data={data} />;
   } else if (cardType === 'loading') {
