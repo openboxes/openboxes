@@ -11,17 +11,60 @@ import org.pih.warehouse.tablero.IndicatorDatasets
 
 class IndicatorDataService {
 
+    def dashboardService
     Date today = new Date()
 
-    DataGraph getExpirationSummaryData(def expirationData) {
-        List listData = []
-        for(item in expirationData){
-            def tmp = item.value? item.value : 0
-            listData.push(tmp)
-        }
+    // DataGraph getExpirationSummaryData(def expirationData) {
+    //     List listData = []
+    //     for(item in expirationData){
+    //         def tmp = item.value? item.value : 0
+    //         listData.push(tmp)
+    //     }
         
+    //     List<IndicatorDatasets> datasets = [
+    //         new IndicatorDatasets('Expiration summary', listData)
+    //     ];
+
+    //     IndicatorData data = new IndicatorData(datasets, ['Expired', '30 Days', '60 Days', '90 Days', '180 Days', '365 Days', '+365 Days']);
+
+    //     DataGraph indicatorData = new DataGraph(data, 1, "Expiration summary", "line");
+
+    //     return indicatorData;
+    // }
+
+    DataGraph getExpirationSummaryData(Location location, def params) {
+        Integer querySize = params.querySize? params.querySize.toInteger()-1 : 5
+        today.clearTime()
+
+        def expirationSummary = [:]
+        List expirationAlerts = dashboardService.getExpirationAlerts(location)
+        
+        Integer daysCounter = 0
+        Date month = today.clone()
+
+        expirationAlerts.each {
+            if(it.inventoryItem.expires != "never") {
+                if (it.daysToExpiry > 0) {
+                    for (int i=0; i<=querySize; i++) {
+                        month.set(month: today.month - i, date: i ? 1 : today.date)
+                        daysCounter += 30
+
+                        String monthLabel = new java.text.DateFormatSymbols().months[month.month].substring(0,3)
+
+                        if (it.daysToExpiry <= daysCounter ) {
+                            expirationSummary[monthLabel] =  expirationSummary[monthLabel] ? expirationSummary[monthLabel] + 1 : 1
+                        }
+                    }
+                } else {
+                    expirationSummary["expired"] = expirationSummary["expired"] ? expirationSummary["expired"] + 1 : 1
+                }
+            }
+        }
+
+        // println expirationSummary
+
         List<IndicatorDatasets> datasets = [
-            new IndicatorDatasets('Expiration summary', listData)
+            new IndicatorDatasets('Expiration summary', [0,0,0])
         ];
 
         IndicatorData data = new IndicatorData(datasets, ['Expired', '30 Days', '60 Days', '90 Days', '180 Days', '365 Days', '+365 Days']);
@@ -29,6 +72,8 @@ class IndicatorDataService {
         DataGraph indicatorData = new DataGraph(data, 1, "Expiration summary", "line");
 
         return indicatorData;
+
+
     }
 
     DataGraph getFillRate() {
