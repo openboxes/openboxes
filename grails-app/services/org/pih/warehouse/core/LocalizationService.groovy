@@ -16,9 +16,6 @@ import org.springframework.web.context.request.RequestContextHolder
 
 class LocalizationService {
 
-    // session-scoped (because it needs access to the user)
-    static scope = "session"
-
     // inject the grails application so we can access the default locale
     GrailsApplication grailsApplication
 
@@ -61,7 +58,7 @@ class LocalizationService {
      */
     Locale getCurrentLocale() {
         // fetch the locale of the current user; if there isn't one, use the default locale
-        return (RequestContextHolder.currentRequestAttributes().getSession().user?.locale ?:
+        return (RequestContextHolder?.requestAttributes?.session?.user?.locale ?:
                 new Locale(grailsApplication.config.openboxes.locale.defaultLocale ?: "en"))
     }
 
