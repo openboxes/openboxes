@@ -3,6 +3,7 @@ import update from 'immutability-helper';
 import {
   ADD_TO_INDICATORS,
   FETCH_INDICATORS,
+  FETCH_NUMBERS,
   REMOVE_FROM_INDICATORS,
   REORDER_INDICATORS,
 } from '../actions/types';
@@ -64,6 +65,11 @@ export default function (state = initialState, action) {
       return {
         ...state,
         data: arrayArchive(state.data, action.payload.index),
+      };
+    case FETCH_NUMBERS:
+      return {
+        ...state,
+        numberData: action.payload.data,
       };
     default:
       return state;

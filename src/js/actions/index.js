@@ -10,6 +10,7 @@ import {
   TRANSLATIONS_FETCHED,
   CHANGE_CURRENT_LOCALE,
   FETCH_INDICATORS,
+  FETCH_NUMBERS,
   ADD_TO_INDICATORS,
   REMOVE_FROM_INDICATORS,
   REORDER_INDICATORS,
@@ -189,5 +190,20 @@ export function reorderIndicators({ oldIndex, newIndex }, e) {
   return {
     type: REORDER_INDICATORS,
     payload: { oldIndex, newIndex },
+  };
+}
+
+export function fetchNumbersData() {
+  const url = '/openboxes/apitablero/getNumberData';
+
+  return (dispatch) => {
+    apiClient.get(url).then((res) => {
+      dispatch({
+        type: FETCH_NUMBERS,
+        payload: {
+          data: res.data,
+        },
+      });
+    });
   };
 }
