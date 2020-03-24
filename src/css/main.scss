@@ -274,6 +274,10 @@ body {
   color: $gray-epsilon;
 }
 
+.has-error {
+  color: red;
+}
+
 .has-error .help-block,
 .has-error .col-form-label {
   color: $red-beta;
