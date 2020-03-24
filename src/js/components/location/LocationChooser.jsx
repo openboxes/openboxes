@@ -44,7 +44,6 @@ class LocationChooser extends Component {
   closeModal(location) {
     if (location) {
       this.props.changeCurrentLocation(location);
-      window.location.reload();
     }
     this.setState({ showModal: false });
   }
