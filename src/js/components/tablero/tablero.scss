@@ -100,19 +100,19 @@
   }
 }
 
-// @keyframes slide-down {
-//   from {
-//     top: -200;
-//     margin: -100 1% -100 1%;
-//     padding: -100 24px -100 24px;
-//   }
+@keyframes slide-down {
+  from {
+    top: -200;
+    margin: -100 1% -100 1%;
+    padding: -100 24px -100 24px;
+  }
 
-//   to {
-//     top: 0;
-//     margin: 1%;
-//     padding: 24px;
-//   }
-// }
+  to {
+    top: 0;
+    margin: 1%;
+    padding: 24px;
+  }
+}
 
 .graphCard {
   margin: 1%;

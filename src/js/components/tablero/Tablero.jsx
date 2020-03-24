@@ -17,7 +17,6 @@ import NumberCard from './NumberCard';
 import './tablero.scss';
 import UnarchiveIndicator from './UnarchivePopout';
 
-
 // Disable charts legends by default.
 defaults.global.legend = false;
 defaults.scale.ticks.beginAtZero = true;
@@ -82,6 +81,19 @@ class Tablero extends Component {
   componentDidMount() {
     this.fetchData();
   }
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.currentLocation.id !== this.props.currentLocation.id) {
+      this.props.fetchNumbersData();
+      this.props.indicatorsData.map(item => this.props.reloadIndicator(
+        item.method,
+        item.type,
+        item.title,
+        item.link,
+        item.id,
+        item.params,
+      ));
+    }
+  }
   dataFetched = false;
 
   fetchData() {
@@ -142,6 +154,7 @@ class Tablero extends Component {
 const mapStateToProps = state => ({
   indicatorsData: state.indicators.data,
   numberData: state.indicators.numberData,
+  currentLocation: state.session.currentLocation,
 });
 
 export default connect(mapStateToProps, {
@@ -155,6 +168,7 @@ export default connect(mapStateToProps, {
 Tablero.defaultProps = {
   indicatorsData: null,
   numberData: [],
+  currentLocation: {},
 };
 
 Tablero.propTypes = {
@@ -165,6 +179,9 @@ Tablero.propTypes = {
   addToIndicators: PropTypes.func.isRequired,
   reloadIndicator: PropTypes.func.isRequired,
   fetchNumbersData: PropTypes.func.isRequired,
+  currentLocation: PropTypes.shape({
+    id: PropTypes.string,
+  }).isRequired,
 };
 
 NumberCardsRow.defaultProps = {
