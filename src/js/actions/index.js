@@ -11,6 +11,7 @@ import {
   CHANGE_CURRENT_LOCALE,
   FETCH_INDICATORS,
   FETCH_NUMBERS,
+  RESET_INDICATORS,
   ADD_TO_INDICATORS,
   REMOVE_FROM_INDICATORS,
   REORDER_INDICATORS,
@@ -177,6 +178,12 @@ export function fetchIndicators() {
     fetchIndicator(dispatch, 'getSentStockMovements', 'bar', 'Stock Movements Sent by Month');
     fetchIndicator(dispatch, 'getReceivedStockMovements', 'doughnut', 'Stock Movements Received');
     fetchIndicator(dispatch, 'getOutgoingStock', 'numbers', 'Outgoing Stock Movements in Progress', '/openboxes/stockMovement/list?receiptStatusCode=PENDING');
+  };
+}
+
+export function resetIndicators() {
+  return {
+    type: RESET_INDICATORS,
   };
 }
 

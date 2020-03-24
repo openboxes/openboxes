@@ -6,6 +6,7 @@ import {
   FETCH_NUMBERS,
   REMOVE_FROM_INDICATORS,
   REORDER_INDICATORS,
+  RESET_INDICATORS,
 } from '../actions/types';
 
 function arrayArchive(array, index) {
@@ -47,6 +48,10 @@ export default function (state = initialState, action) {
         data: newState,
       };
     }
+    case RESET_INDICATORS:
+      return {
+        data: [],
+      };
     case REORDER_INDICATORS:
       return {
         ...state,

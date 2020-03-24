@@ -10,6 +10,7 @@ import {
   reorderIndicators,
   reloadIndicator,
   fetchNumbersData,
+  resetIndicators,
 } from '../../actions';
 import GraphCard from './GraphCard';
 import LoadingNumbers from './LoadingNumbers';
@@ -82,16 +83,9 @@ class Tablero extends Component {
     this.fetchData();
   }
   componentWillReceiveProps(nextProps) {
-    if (nextProps.currentLocation.id !== this.props.currentLocation.id) {
-      this.props.fetchNumbersData();
-      this.props.indicatorsData.map(item => this.props.reloadIndicator(
-        item.method,
-        item.type,
-        item.title,
-        item.link,
-        item.id,
-        item.params,
-      ));
+    if (nextProps.currentLocation !== this.props.currentLocation) {
+      this.props.resetIndicators();
+      this.fetchData();
     }
   }
   dataFetched = false;
@@ -154,7 +148,7 @@ class Tablero extends Component {
 const mapStateToProps = state => ({
   indicatorsData: state.indicators.data,
   numberData: state.indicators.numberData,
-  currentLocation: state.session.currentLocation,
+  currentLocation: state.session.currentLocation.id,
 });
 
 export default connect(mapStateToProps, {
@@ -163,12 +157,13 @@ export default connect(mapStateToProps, {
   addToIndicators,
   reorderIndicators,
   fetchNumbersData,
+  resetIndicators,
 })(Tablero);
 
 Tablero.defaultProps = {
   indicatorsData: null,
   numberData: [],
-  currentLocation: {},
+  currentLocation: null,
 };
 
 Tablero.propTypes = {
@@ -179,9 +174,8 @@ Tablero.propTypes = {
   addToIndicators: PropTypes.func.isRequired,
   reloadIndicator: PropTypes.func.isRequired,
   fetchNumbersData: PropTypes.func.isRequired,
-  currentLocation: PropTypes.shape({
-    id: PropTypes.string,
-  }).isRequired,
+  resetIndicators: PropTypes.func.isRequired,
+  currentLocation: PropTypes.string.isRequired,
 };
 
 NumberCardsRow.defaultProps = {
