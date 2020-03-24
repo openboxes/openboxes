@@ -24,6 +24,8 @@ class StockMovements extends Component {
       values: this.props.initialValues,
       currentPage: 1,
     };
+
+    this.updateWizardValues = this.updateWizardValues.bind(this);
   }
 
   componentDidMount() {
@@ -86,6 +88,10 @@ class StockMovements extends Component {
       );
     }
     return null;
+  }
+
+  updateWizardValues(values) {
+    this.setState({ values });
   }
 
   /**
@@ -174,6 +180,7 @@ class StockMovements extends Component {
         additionalTitle={additionalTitle}
         currentPage={currentPage}
         prevPage={currentPage === 1 ? 1 : currentPage - 1}
+        updateWizardValues={this.updateWizardValues}
       />
     );
   }
