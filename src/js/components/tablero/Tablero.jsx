@@ -154,6 +154,7 @@ export default connect(mapStateToProps, {
 
 Tablero.defaultProps = {
   indicatorsData: null,
+  numberData: [],
 };
 
 Tablero.propTypes = {
