@@ -110,14 +110,17 @@ class IndicatorDataService {
     }
 
     DataGraph getSentStockMovements(Location location, def params) {
-        Integer querySize = params.querySize? params.querySize.toInteger()-1 : 5
+        Integer querySize = params.querySize? params.querySize.toInteger() - 1 : 5
         today.clearTime()
         
         // queryLimit limits the query and avoid of getting data older than wanted
         Date queryLimit = today.clone()
         queryLimit.set(month: today.month - querySize, date: 1) 
 
-        List queryData = Shipment.executeQuery("SELECT COUNT(s.id), s.destination, MONTH(s.lastUpdated), YEAR(s.lastUpdated) FROM Shipment s WHERE s.origin = :location AND s.currentStatus <> 'PENDING' AND s.lastUpdated > :limit GROUP BY MONTH(s.lastUpdated), YEAR(s.lastUpdated), s.destination", 
+        List queryData = Shipment.executeQuery("""SELECT COUNT(s.id), s.destination, 
+        MONTH(s.lastUpdated), YEAR(s.lastUpdated) FROM Shipment s WHERE s.origin = :location 
+        AND s.currentStatus <> 'PENDING' AND s.lastUpdated > :limit 
+        GROUP BY MONTH(s.lastUpdated), YEAR(s.lastUpdated), s.destination""", 
         ['location': location, 'limit': queryLimit])
         // queryData gives an array of arrays [[count, destination, month, year], ...] of sent stock
         
@@ -135,18 +138,18 @@ class IndicatorDataService {
 
             // Loop 2: Give each requested month a value, label and month label; value is 0 when month have no data
             for(int i = querySize; i >= 0; i--) {
-                Date month = today.clone()
-                month.set(month: today.month - i, date: 1)
+                Date tmpDate = today.clone()
+                tmpDate.set(month: today.month - i, date: 1)
 
                 // Places 0 in months where there is no sent stock, else places item total counted
                 Integer value = 0
                 // Year + 1900 because groovy's date starts counting from 1900. Ex: 2020 = 120
-                if (month.month == item[2]-1 && month.year + 1900 == item[3]) {
+                if (tmpDate.month == item[2] - 1 && tmpDate.year + 1900 == item[3]) {
                     value = item[0]
                 }
 
                 // Pushs month label in label array and sent stock in the data array
-                String monthLabel = new java.text.DateFormatSymbols().months[month.month].substring(0,3)
+                String monthLabel = new java.text.DateFormatSymbols().months[tmpDate.month].substring(0,3)
                 listLabel.push(monthLabel)
                 listData.push(value)
             }
@@ -163,13 +166,16 @@ class IndicatorDataService {
     }
 
     DataGraph getReceivedStockData(Location location, def params) {
-        Integer querySize = params.querySize? params.querySize.toInteger()-1 : 5
+        Integer querySize = params.querySize? params.querySize.toInteger() - 1 : 5
         today.clearTime()
         
         Date queryLimit = today.clone()
         queryLimit.set(month: today.month - querySize, date: 1) 
 
-        List queryData = Shipment.executeQuery("SELECT COUNT(s.id), s.origin, MONTH(s.lastUpdated), YEAR(s.lastUpdated) FROM Shipment s WHERE s.destination = :location AND s.currentStatus <> 'PENDING' AND s.lastUpdated > :limit GROUP BY MONTH(s.lastUpdated), YEAR(s.lastUpdated), s.origin", 
+        List queryData = Shipment.executeQuery("""SELECT COUNT(s.id), s.origin, 
+        MONTH(s.lastUpdated), YEAR(s.lastUpdated) FROM Shipment s WHERE s.destination = :location 
+        AND s.currentStatus <> 'PENDING' AND s.lastUpdated > :limit 
+        GROUP BY MONTH(s.lastUpdated), YEAR(s.lastUpdated), s.origin""", 
         ['location': location, 'limit': queryLimit])
         
         List listRes = []
@@ -184,15 +190,15 @@ class IndicatorDataService {
             listLabel = []
 
             for(int i = querySize; i >= 0; i--) {
-                Date month = today.clone()
-                month.set(month: today.month - i, date: 1)
+                Date tmpDate = today.clone()
+                tmpDate.set(month: today.month - i, date: 1)
 
                 Integer value = 0
-                if (month.month == item[2]-1 && month.year + 1900 == item[3]) {
+                if (tmpDate.month == item[2] - 1 && tmpDate.year + 1900 == item[3]) {
                     value = item[0]
                 }
 
-                String monthLabel = new java.text.DateFormatSymbols().months[month.month].substring(0,3)
+                String monthLabel = new java.text.DateFormatSymbols().months[tmpDate.month].substring(0,3)
                 listLabel.push(monthLabel)
                 listData.push(value)
             }
