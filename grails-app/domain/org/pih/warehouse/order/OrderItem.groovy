@@ -45,6 +45,9 @@ class OrderItem implements Serializable {
     Date dateCreated
     Date lastUpdated
 
+    Date currentDeliveryDate
+    Date quotedDeliveryDate
+
     static mapping = {
         id generator: 'uuid'
         shipmentItems joinTable: [name: 'order_shipment', key: 'order_item_id']
@@ -71,6 +74,8 @@ class OrderItem implements Serializable {
         recipient(nullable: true)
         currencyCode(nullable: true)
         productSupplier(nullable: true)
+        currentDeliveryDate(nullable: true)
+        quotedDeliveryDate(nullable: true)
     }
 
 
