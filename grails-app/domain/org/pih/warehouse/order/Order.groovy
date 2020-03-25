@@ -11,6 +11,7 @@ package org.pih.warehouse.order
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.*
+import org.pih.warehouse.shipping.ShipmentStatusCode
 
 class Order implements Serializable {
 
@@ -231,5 +232,11 @@ class Order implements Serializable {
         return name
     }
 
+    List getShipments() {
+        return orderItems?.shipmentItems*.shipment*.flatten().unique().collect { [currentStatus: it.currentStatus, id: it.id] }
+    }
+    List getShipments(ShipmentStatusCode statusCode) {
+        return getShipments().findAll { it -> it.currentStatus == statusCode }
+    }
 
 }

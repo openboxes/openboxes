@@ -15,6 +15,7 @@ import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.springframework.web.multipart.MultipartFile
 
 class OrderController {
@@ -84,9 +85,11 @@ class OrderController {
         }
 
         try {
-            def shipmentIds = command.order?.orderItems?.shipmentItems*.shipment*.id.flatten().unique()
-            if (shipmentIds.size() > 0) {
-                String shipmentId = shipmentIds.first()
+            String commandId = command.order.id
+            Order order = Order.get(commandId)
+            def pendingShipments = order.getShipments(ShipmentStatusCode.PENDING)
+            if (pendingShipments.size() > 0) {
+                String shipmentId = pendingShipments.first().id
                 shipmentService.updateOrCreateOrderBasedShipmentItems(command.order, Shipment.get(shipmentId))
                 redirect(controller: 'stockMovement', action: 'createPurchaseOrders', params: [id: shipmentId])
                 return
