@@ -4,6 +4,7 @@ import { Line, Bar, Doughnut, HorizontalBar } from 'react-chartjs-2';
 import { SortableElement, sortableHandle } from 'react-sortable-hoc';
 import LoadingCard from './LoadingCard';
 import Numbers from './Numbers';
+import TableCard from './TableCard';
 import { loadColors } from '../../consts/dataFormat/dataLoading';
 
 
@@ -42,6 +43,8 @@ const GraphCard = SortableElement(({
     graph = <HorizontalBar data={data} />;
   } else if (cardType === 'numbers') {
     graph = <Numbers data={data} />;
+  } else if (cardType === 'table') {
+    graph = <TableCard name="aaa" />;
   } else if (cardType === 'loading') {
     graph = <LoadingCard />;
   } else if (cardType === 'error') {

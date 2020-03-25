@@ -9,9 +9,8 @@ import apiClient from '../../utils/apiClient';
 import GraphCard from './GraphCard';
 import LoadingNumbers from './LoadingNumbers';
 import NumberCard from './NumberCard';
-import './tablero.scss';
 import UnarchiveIndicator from './UnarchivePopout';
-
+import './tablero.scss';
 
 // Disable charts legends by default.
 defaults.global.legend = false;

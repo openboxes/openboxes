@@ -169,6 +169,7 @@ export function fetchIndicators() {
     fetchIndicator(dispatch, 'getSentStockMovements', 'bar', 'Stock Movements Sent by Month');
     fetchIndicator(dispatch, 'getReceivedStockMovements', 'doughnut', 'Stock Movements Received');
     fetchIndicator(dispatch, 'getOutgoingStock', 'numbers', 'Outgoing Stock Movements in Progress', '/openboxes/stockMovement/list?receiptStatusCode=PENDING');
+    fetchIndicator(dispatch, 'getDiscrepancy', 'table', 'Items received with a discrepancy');
   };
 }
 
