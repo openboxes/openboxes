@@ -188,6 +188,7 @@ class AddItemsPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      currentLineItems: [],
       sortOrder: 0,
       values: this.props.initialValues,
       newItem: false,
@@ -232,8 +233,40 @@ class AddItemsPage extends Component {
    * @public
    */
   getLineItemsToBeSaved(lineItems) {
-    const lineItemsToBeAdded = _.filter(lineItems, item => !item.id);
-    const lineItemsToBeUpdated = _.filter(lineItems, item => item.id);
+    const lineItemsToBeAdded = _.filter(lineItems, item =>
+      !item.statusCode && item.quantityRequested && item.quantityRequested !== '0' && item.product);
+    const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
+    const lineItemsToBeUpdated = [];
+    _.forEach(lineItemsWithStatus, (item) => {
+      const oldItem = _.find(this.state.currentLineItems, old => old.id === item.id);
+      const oldQty = parseInt(oldItem.quantityRequested, 10);
+      const newQty = parseInt(item.quantityRequested, 10);
+      const oldRecipient = oldItem.recipient && _.isObject(oldItem.recipient) ?
+        oldItem.recipient.id : oldItem.recipient;
+      const newRecipient = item.recipient && _.isObject(item.recipient) ?
+        item.recipient.id : item.recipient;
+
+      // Intersection of keys common to both objects (excluding product key)
+      const keyIntersection = _.remove(
+        _.intersection(
+          _.keys(oldItem),
+          _.keys(item),
+        ),
+        key => key !== 'product',
+      );
+
+      if (
+        (this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory) &&
+        (
+          !_.isEqual(_.pick(item, keyIntersection), _.pick(oldItem, keyIntersection)) ||
+          (item.product.id !== oldItem.product.id)
+        )
+      ) {
+        lineItemsToBeUpdated.push(item);
+      } else if (newQty !== oldQty || newRecipient !== oldRecipient) {
+        lineItemsToBeUpdated.push(item);
+      }
+    });
 
     return [].concat(
       _.map(lineItemsToBeAdded, item => ({
@@ -387,6 +420,7 @@ class AddItemsPage extends Component {
 
       const sortOrder = _.toInteger(_.last(lineItemsData).sortOrder) + 100;
       this.setState({
+        currentLineItems: lineItems,
         values: {
           ...this.state.values,
           lineItems: lineItemsData,
@@ -521,7 +555,10 @@ class AddItemsPage extends Component {
             }),
           );
 
-          this.setState({ values: { ...this.state.values, lineItems: lineItemsBackendData } });
+          this.setState({
+            currentLineItems: lineItemsBackendData,
+            values: { ...this.state.values, lineItems: lineItemsBackendData },
+          });
         })
         .catch(() => Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items'))));
     }
