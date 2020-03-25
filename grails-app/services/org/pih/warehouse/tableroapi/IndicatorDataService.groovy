@@ -31,7 +31,7 @@ class IndicatorDataService {
                     listLabels = []
                     for (int i=0; i<=querySize; i++) {
                         tempDate.set(month: today.month + i, date: i ? 1 : today.date)
-                        daysCounter += 30
+                        daysCounter += tempDate.toCalendar().getActualMaximum(Calendar.DAY_OF_MONTH)
 
                         String monthLabel = new java.text.DateFormatSymbols().months[tempDate.month].substring(0,3)
                         listLabels.push(monthLabel)
