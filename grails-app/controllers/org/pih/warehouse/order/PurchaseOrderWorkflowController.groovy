@@ -94,17 +94,17 @@ class PurchaseOrderWorkflowController {
                 log.info "adding an item " + params
                 if (!flow.order.orderItems) flow.order.orderItems = [] as HashSet
 
-                def product = Product.get(params.product.id)
-                def supplier = Organization.get(params.supplier.id)
-                def orderItem = OrderItem.get(params.orderItem.id)
+                def product = Product.get(params.product?.id)
+                def supplier = Organization.get(params.supplier?.id)
+                def orderItem = OrderItem.get(params.orderItem?.id)
                 if (orderItem) {
                     orderItem.properties = params
                 } else {
                     orderItem = new OrderItem(params)
                 }
 
-                orderItem.category = product.category
-                orderItem.description = product.name
+                orderItem.category = product?.category
+                orderItem.description = product?.name
                 orderItem.requestedBy = Person.get(session.user.id)
 
                 if (!orderItem.validate() || orderItem.hasErrors()) {

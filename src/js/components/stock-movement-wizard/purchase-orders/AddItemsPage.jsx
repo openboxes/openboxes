@@ -646,10 +646,14 @@ class AddItemsPage extends Component {
    * @public
    */
   previousPage(values, invalid) {
+    this.props.showSpinner();
     if (!invalid) {
       this.saveRequisitionItemsInCurrentStep(values.lineItems)
-        .then(() => this.props.previousPage(values));
+        .then(() => {
+          window.location = `/openboxes/order/redirectFromStockMovement/${values.stockMovementId}`;
+        }).catch(() => this.props.hideSpinner());
     } else {
+      this.props.hideSpinner();
       confirmAlert({
         title: this.props.translate('react.stockMovement.confirmPreviousPage.label', 'Validation error'),
         message: this.props.translate('react.stockMovement.confirmPreviousPage.message.label', 'Cannot save due to validation error on page'),
@@ -659,7 +663,9 @@ class AddItemsPage extends Component {
           },
           {
             label: this.props.translate('react.stockMovement.confirmPreviousPage.continue.label', 'Continue (lose unsaved work)'),
-            onClick: () => this.props.previousPage(values),
+            onClick: () => {
+              window.location = `/openboxes/order/redirectFromStockMovement/${values.stockMovementId}`;
+            },
           },
         ],
       });
@@ -762,8 +768,6 @@ AddItemsPage.propTypes = {
     }),
     hasManageInventory: PropTypes.bool,
   }).isRequired,
-  /** Function returning user to the previous page */
-  previousPage: PropTypes.func.isRequired,
   /**
    * Function called with the form data when the handleSubmit()
    * is fired from within the form component.

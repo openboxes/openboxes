@@ -21,6 +21,7 @@ class OrderController {
     def orderService
     def stockMovementService
     def reportService
+    def shipmentService
 
     static allowedMethods = [save: "POST", update: "POST"]
 
@@ -83,9 +84,16 @@ class OrderController {
         }
 
         try {
+            def shipmentIds = command.order?.orderItems?.shipmentItems*.shipment*.id.flatten().unique()
+            if (shipmentIds.size() > 0) {
+                String shipmentId = shipmentIds.first()
+                shipmentService.updateOrCreateOrderBasedShipmentItems(command.order, Shipment.get(shipmentId))
+                redirect(controller: 'stockMovement', action: 'createPurchaseOrders', params: [id: shipmentId])
+                return
+            }
             Shipment shipment = stockMovementService.createInboundShipment(command)
             if (shipment) {
-                redirect(controller: 'stockMovement', action: "createPurchaseOrders", params: [id: shipment.id])
+                redirect(controller: 'stockMovement', action: 'createPurchaseOrders', params: [id: shipment.id])
                 return
             }
         } catch (ValidationException e) {
@@ -96,9 +104,7 @@ class OrderController {
 
         }
         redirect (action: "shipOrder", id: command.order.id)
-
     }
-
 
     def save = {
         def orderInstance = new Order(params)
@@ -658,4 +664,9 @@ class OrderController {
     }
 
 
+    def redirectFromStockMovement = {
+        def stockMovement = stockMovementService.getStockMovement(params.id)
+        def shipmentItem = stockMovement?.getShipment()?.getShipmentItems()?.first()
+        redirect(action: 'show', params: [id: shipmentItem?.orderItems*.order*.id])
+    }
 }
