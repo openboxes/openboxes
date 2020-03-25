@@ -15,7 +15,7 @@ class IndicatorDataService {
     Date today = new Date()
 
     DataGraph getExpirationSummaryData(Location location, def params) {
-        Integer querySize = params.querySize? params.querySize.toInteger() - 1 : 5
+        Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
         today.clearTime()
 
         List expirationSummary = []
@@ -56,8 +56,6 @@ class IndicatorDataService {
         DataGraph indicatorData = new DataGraph(data, 1, "Expiration summary", "line");
 
         return indicatorData;
-
-
     }
 
     DataGraph getFillRate() {
