@@ -17,9 +17,12 @@ const GraphCard = SortableElement(({
   const cardData = data;
   let graph;
   let filter = 0;
+  let label = 'Last';
   if (cardType === 'line') {
     cardData.datasets = loadColors(data, 'line');
     graph = <Line data={data} options={loadOptions()} />;
+    filter = 1;
+    label = 'Next';
   } else if (cardType === 'bar') {
     cardData.datasets = loadColors(data, 'bar');
     graph = <Bar data={data} options={loadOptions(cardMethod !== 'getFillRate')} />;
@@ -57,9 +60,9 @@ const GraphCard = SortableElement(({
             onChange={e => reloadIndicator(cardMethod, cardType, cardTitle, cardLink, cardId, `querySize=${e.target.value}`)}
             disabled={!filter}
           >
-            <option value="6">Last 6 Months</option>
-            <option value="12">Last Year</option>
-            <option value="24">Last 2 Years</option>
+            <option value="6">{label} 6 Months</option>
+            <option value="12">{label} Year</option>
+            <option value="24">{label} 2 Years</option>
           </select>
         </div>
         {graph}
