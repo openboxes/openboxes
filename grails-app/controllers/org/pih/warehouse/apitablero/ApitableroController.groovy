@@ -47,7 +47,7 @@ class ApitableroController {
 
     def getReceivedStockMovements = {
         Location location = Location.get(session?.warehouse?.id)
-        def receivedStockMovements = indicatorDataService.getReceivedStockData(location)["data"]
+        def receivedStockMovements = indicatorDataService.getReceivedStockData(location, params)["data"]
         render (receivedStockMovements.toJson() as JSON)
     }
 
