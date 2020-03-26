@@ -308,7 +308,10 @@ class PickPage extends Component {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const payload = { status: 'PICKED' };
 
-    return apiClient.post(url, payload);
+    if (this.state.values.statusCode !== 'PICKED' && this.state.values.statusCode !== 'PACKED') {
+      return apiClient.post(url, payload);
+    }
+    return Promise.resolve();
   }
 
   /**
