@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import org.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.picklist.PicklistItem
@@ -17,6 +18,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.requisition.RequisitionItem
 
+@Transactional
 class StockMovementItemApiController {
 
     def inventoryService

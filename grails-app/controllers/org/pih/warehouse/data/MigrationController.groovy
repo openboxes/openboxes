@@ -10,6 +10,7 @@
 package org.pih.warehouse.data
 
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.inventory.Transaction
@@ -25,6 +26,7 @@ import org.pih.warehouse.reporting.LotDimension
 import org.pih.warehouse.reporting.ProductDimension
 import org.pih.warehouse.reporting.TransactionFact
 
+@Transactional
 class MigrationController {
 
     def dataService

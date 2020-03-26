@@ -10,6 +10,7 @@
 package org.pih.warehouse
 
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import groovy.time.TimeCategory
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.CalculateHistoricalQuantityJob
@@ -44,6 +45,7 @@ import org.quartz.impl.StdScheduler
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 
+@Transactional
 class JsonController {
 
     def dataSource
