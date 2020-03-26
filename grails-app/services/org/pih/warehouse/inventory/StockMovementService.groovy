@@ -1375,6 +1375,7 @@ class StockMovementService {
                 ShipmentItem shipmentItem = createOrUpdateShipmentItem(requisitionItem)
                 shipmentItem.container = container
                 shipment.addToShipmentItems(shipmentItem)
+                shipment.save(flush:true)
             }
         } else {
             requisition.requisitionItems?.each { RequisitionItem requisitionItem ->
@@ -1382,6 +1383,7 @@ class StockMovementService {
 
                 shipmentItems.each { ShipmentItem shipmentItem ->
                     shipment.addToShipmentItems(shipmentItem)
+                    shipment.save(flush:true)
                 }
             }
         }
@@ -1398,6 +1400,7 @@ class StockMovementService {
 
                 shipmentItems.each { ShipmentItem shipmentItem ->
                     shipment.addToShipmentItems(shipmentItem)
+                    shipment.save(flush:true)
                 }
 
                 if (shipment.hasErrors() || !shipment.save(flush: true)) {
