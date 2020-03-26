@@ -122,7 +122,7 @@ class StockMovementService {
                     jsonObject.containsKey("rollback") ? jsonObject.getBoolean("rollback") : false
 
             if (rollback) {
-                rollbackStockMovement(params.id)
+                rollbackStockMovement(stockMovement.id)
             }
 
             if (status) {
