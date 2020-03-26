@@ -34,14 +34,16 @@ class Wizard extends Component {
    * @public
    */
   nextPage(values) {
-    if (this.props.pageList.length > this.state.currentPage) {
+    const { currentPage } = this.state;
+    if (this.props.pageList.length > currentPage) {
       this.setState({
-        prevPage: this.state.currentPage, currentPage: this.state.currentPage + 1, values,
+        prevPage: currentPage, currentPage: currentPage + 1, values,
       });
+      this.props.updateWizardValues(currentPage + 1, values);
     } else {
       this.setState({ values });
+      this.props.updateWizardValues(currentPage, values);
     }
-    this.props.updateWizardValues(values);
   }
 
   /**
@@ -50,14 +52,16 @@ class Wizard extends Component {
    * @public
    */
   prevPage(values) {
-    if (this.state.prevPage > 0) {
+    const { prevPage } = this.state;
+    if (prevPage > 0) {
       this.setState({
-        prevPage: this.state.prevPage - 1, currentPage: this.state.prevPage, values,
+        prevPage: prevPage - 1, currentPage: prevPage, values,
       });
+      this.props.updateWizardValues(prevPage, values);
     } else {
       this.setState({ values });
+      this.props.updateWizardValues(1, values);
     }
-    this.props.updateWizardValues(values);
   }
 
   /**
@@ -68,7 +72,7 @@ class Wizard extends Component {
    */
   goToPage(currentPage, values) {
     this.setState({ prevPage: currentPage - 1, currentPage, values });
-    this.props.updateWizardValues(values);
+    this.props.updateWizardValues(currentPage, values);
   }
 
   render() {

@@ -90,8 +90,8 @@ class StockMovementPurchaseOrders extends Component {
     return null;
   }
 
-  updateWizardValues(values) {
-    this.setState({ values });
+  updateWizardValues(currentPage, values) {
+    this.setState({ currentPage, values });
   }
 
   /**
