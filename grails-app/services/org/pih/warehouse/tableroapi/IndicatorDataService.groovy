@@ -1,13 +1,14 @@
 package org.pih.warehouse.tableroapi
 
 import org.pih.warehouse.tablero.DataGraph
+import org.pih.warehouse.tablero.TableData
 import org.pih.warehouse.tablero.ColorNumber
 import org.pih.warehouse.tablero.IndicatorData
 import org.pih.warehouse.tablero.NumberIndicator
+import org.pih.warehouse.tablero.IndicatorDatasets
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.tablero.IndicatorDatasets
 
 class IndicatorDataService {
 
@@ -232,6 +233,13 @@ class IndicatorDataService {
         ColorNumber red = new ColorNumber(redData[0], 'Created > 7 days ago');
 
         NumberIndicator indicatorData = new NumberIndicator(green, yellow, red)
+
+        return indicatorData;
+    }
+
+    List<TableData> getDiscrepancy(Location location, def params) {
+        
+        List<TableData> indicatorData = [new TableData(12, 'test', 2)];
 
         return indicatorData;
     }

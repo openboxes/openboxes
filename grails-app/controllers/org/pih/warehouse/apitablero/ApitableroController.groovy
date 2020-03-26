@@ -65,6 +65,7 @@ class ApitableroController {
 
     def getDiscrepancy = {
         Location location = Location.get(session?.warehouse?.id)
-        render "discrepancy"
+        def discrepancy = indicatorDataService.getDiscrepancy(location, params)
+        render (discrepancy as JSON)
     }
 }
