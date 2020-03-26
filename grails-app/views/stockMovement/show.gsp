@@ -68,7 +68,7 @@
                 <warehouse:message code="default.button.edit.label" />
             </g:link>
 
-            <g:set var="hasBeenIssued" value="${stockMovement?.statusCode==RequisitionStatus.ISSUED.toString()}"/>
+            <g:set var="hasBeenIssued" value="${stockMovement?.statusCode==RequisitionStatus.toStockMovementStatus(RequisitionStatus.ISSUED).toString()}"/>
             <g:set var="hasBeenReceived" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.RECEIVED}"/>
             <g:set var="hasBeenPartiallyReceived" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.PARTIALLY_RECEIVED}"/>
             <g:set var="hasBeenShipped" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.SHIPPED}"/>
