@@ -149,30 +149,6 @@ const VENDOR_FIELDS = {
           openOnClick: false,
         },
       },
-      split: {
-        type: ButtonField,
-        label: 'react.stockMovement.splitLine.label',
-        defaultMessage: 'Split',
-        flexWidth: '1',
-        fieldKey: '',
-        buttonLabel: 'react.stockMovement.splitLine.label',
-        buttonDefaultMessage: 'Split line',
-        getDynamicAttr: ({
-          fieldValue, addRow, rowIndex,
-        }) => ({
-          onClick: () => addRow({
-            product: {
-              ...fieldValue.product,
-              label: `${fieldValue.product.productCode} ${fieldValue.product.name}`,
-            },
-            sortOrder: fieldValue.sortOrder + 1,
-            orderItem: fieldValue.orderItem,
-          }, rowIndex),
-        }),
-        attributes: {
-          className: 'btn btn-outline-success',
-        },
-      },
       deleteButton: DELETE_BUTTON_FIELD,
     },
   },
