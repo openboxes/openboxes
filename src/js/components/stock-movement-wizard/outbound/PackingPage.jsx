@@ -249,7 +249,7 @@ class PackingPage extends Component {
     const status = 'CHECKING';
     const payload = { status };
 
-    if (this.state.values.statusCode !== status) {
+    if (this.state.values.statusCode !== 'PACKED') {
       return apiClient.post(url, payload);
     }
     return Promise.resolve();
