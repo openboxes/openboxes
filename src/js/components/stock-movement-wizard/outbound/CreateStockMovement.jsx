@@ -99,7 +99,6 @@ const FIELDS = {
           props.fetchStockLists(props.origin, value);
         }
       },
-      disabled: !props.isSuperuser,
     }),
   },
   stocklist: {
