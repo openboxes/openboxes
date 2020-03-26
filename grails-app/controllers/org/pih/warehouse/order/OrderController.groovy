@@ -87,7 +87,7 @@ class OrderController {
         try {
             String commandId = command.order.id
             Order order = Order.get(commandId)
-            def pendingShipments = order.getShipments(ShipmentStatusCode.PENDING)
+            def pendingShipments = order.getShipmentsByStatus(ShipmentStatusCode.PENDING)
             if (pendingShipments.size() > 0) {
                 String shipmentId = pendingShipments.first().id
                 shipmentService.updateOrCreateOrderBasedShipmentItems(command.order, Shipment.get(shipmentId))

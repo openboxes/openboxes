@@ -55,7 +55,8 @@ class Order implements Serializable {
             "totalAdjustments",
             "totalOrderAdjustments",
             "totalOrderItemAdjustments",
-            "total"
+            "total",
+            "shipments"
     ]
 
     static hasMany = [
@@ -177,10 +178,13 @@ class Order implements Serializable {
         return (status == OrderStatus.CANCELED)
     }
 
-    def listShipments() {
+    def getShipments() {
         return orderItems.collect { it.listShipments() }.flatten().unique() { it?.id }
     }
 
+    List getShipmentsByStatus(ShipmentStatusCode statusCode) {
+        return getShipments().findAll { it -> it.currentStatus == statusCode }
+    }
 
     def listOrderItems() {
         return orderItems ? orderItems.findAll {
@@ -230,13 +234,6 @@ class Order implements Serializable {
         if (dateCompleted) name += "${separator}${dateCompleted?.format("MMMMM d, yyyy")}"
         if (completedBy) name += "${separator}${completedBy.name}"
         return name
-    }
-
-    List getShipments() {
-        return orderItems?.shipmentItems*.shipment*.flatten().unique().collect { [currentStatus: it.currentStatus, id: it.id] }
-    }
-    List getShipments(ShipmentStatusCode statusCode) {
-        return getShipments().findAll { it -> it.currentStatus == statusCode }
     }
 
 }
