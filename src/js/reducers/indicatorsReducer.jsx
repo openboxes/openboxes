@@ -9,17 +9,17 @@ import {
   RESET_INDICATORS,
 } from '../actions/types';
 
-function arrayArchive(array, index) {
+function arrayArchive(array = [], index) {
   const newArray = update(array, { [index]: { archived: { $set: 1 } } });
   return newArray;
 }
 
-function arrayUnarchive(array, index) {
+function arrayUnarchive(array = [], index) {
   const newArray = update(array, { [index]: { archived: { $set: 0 } } });
   return newArray;
 }
 
-function findInArray(id, array) {
+function findInArray(id, array = []) {
   for (let i = 0; i < array.length; i += 1) {
     if (array[i].id === id) {
       return i;
