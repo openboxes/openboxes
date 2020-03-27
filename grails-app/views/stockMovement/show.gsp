@@ -212,7 +212,7 @@
                                     <g:message code="order.label"/>
                                 </td>
                                 <td class="value">
-                                    <g:each var="order" in="${stockMovement?.shipment?.shipmentItems*.orderItems?.order?.flatten()}">
+                                    <g:each var="order" in="${stockMovement?.shipment?.orders}">
                                         <g:link controller="order" action="show" id="${order?.id}" params="[override:true]">
                                             ${g.message(code:'default.view.label', args: [g.message(code: 'order.label')])}
                                             ${order.orderNumber}
