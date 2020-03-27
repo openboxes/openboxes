@@ -8,21 +8,20 @@ import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.tablero.IndicatorDatasets
+import org.joda.time.LocalDate
 
 class IndicatorDataService {
 
     def dashboardService
-    Date today = new Date()
 
     DataGraph getExpirationSummaryData(Location location, def params) {
         Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
-        today.clearTime()
 
         List expirationSummary = []
         List listLabels = []
         List expirationAlerts = dashboardService.getExpirationAlerts(location)
-        
-        Date tempDate = today.clone()
+
+        LocalDate date = LocalDate.now()
 
         expirationAlerts.each {
             Integer daysCounter = 0
@@ -30,10 +29,9 @@ class IndicatorDataService {
                 if (it.daysToExpiry > 0) {
                     listLabels = []
                     for (int i=0; i<=querySize; i++) {
-                        tempDate.set(month: today.month + i, date: i ? 1 : today.date)
-                        daysCounter += tempDate.toCalendar().getActualMaximum(Calendar.DAY_OF_MONTH)
+                        daysCounter += date.plusMonths(i).dayOfMonth().getMaximumValue()
 
-                        String monthLabel = new java.text.DateFormatSymbols().months[tempDate.month].substring(0,3)
+                        String monthLabel = date.plusMonths(i).toString("MMM", Locale.US)
                         listLabels.push(monthLabel)
 
                         if (it.daysToExpiry <= daysCounter ) {
@@ -41,9 +39,6 @@ class IndicatorDataService {
                         } 
                     }
                 } 
-                else {
-                    expirationSummary[querySize + 1] = expirationSummary[querySize + 1] ? expirationSummary[querySize + 1] + 1 : 1
-                }
             }
         }
 
@@ -59,6 +54,7 @@ class IndicatorDataService {
     }
 
     DataGraph getFillRate() {
+        Date today = new Date()
         List listData = []
         List bar2Data  = []
         List listLabel = []
@@ -137,6 +133,7 @@ class IndicatorDataService {
     }
 
     DataGraph getSentStockMovements(Location location, def params) {
+        Date today = new Date()
         Integer querySize = params.querySize? params.querySize.toInteger()-1 : 5
         today.clearTime()
         
@@ -190,6 +187,7 @@ class IndicatorDataService {
     }
 
     DataGraph getReceivedStockData(Location location) {
+        Date today = new Date()
         List listData = []
         List listLabel = []
         today.clearTime()
@@ -219,6 +217,7 @@ class IndicatorDataService {
     }
 
     NumberIndicator getOutgoingStock(Location location) {
+        Date today = new Date()
         today.clearTime();
         def m4 = today - 4;
         def m7 = today - 7;
@@ -242,6 +241,7 @@ class IndicatorDataService {
     }
 
     NumberIndicator getIncomingStock(Location location) {
+        Date today = new Date()
         today.clearTime();
         def m4 = today - 4;
         def m7 = today - 7;
