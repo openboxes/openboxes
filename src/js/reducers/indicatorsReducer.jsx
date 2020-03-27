@@ -30,6 +30,7 @@ function findInArray(id, array) {
 
 const initialState = {
   data: [],
+  numberData: [],
 };
 
 export default function (state = initialState, action) {
@@ -50,7 +51,7 @@ export default function (state = initialState, action) {
     }
     case RESET_INDICATORS:
       return {
-        data: [],
+        initialState,
       };
     case REORDER_INDICATORS:
       return {

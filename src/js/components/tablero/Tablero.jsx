@@ -75,13 +75,19 @@ const ArchiveIndicator = ({ hideArchive }) => (
 
 
 class Tablero extends Component {
-  state = {
-    isDragging: false,
-    showPopout: false,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      isDragging: false,
+      showPopout: false,
+    };
+  }
+
   componentDidMount() {
     this.fetchData();
   }
+
   componentWillReceiveProps(nextProps) {
     if (nextProps.currentLocation !== this.props.currentLocation) {
       this.props.resetIndicators();
@@ -161,9 +167,9 @@ export default connect(mapStateToProps, {
 })(Tablero);
 
 Tablero.defaultProps = {
+  currentLocation: null,
   indicatorsData: null,
   numberData: [],
-  currentLocation: null,
 };
 
 Tablero.propTypes = {
