@@ -23,6 +23,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.donation.Donor
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.order.Order
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
 
@@ -109,6 +110,7 @@ class Shipment implements Comparable, Serializable {
             "consigneeAddress",
             "receipt",
             "isFromPurchaseOrder",
+            "orders"
     ]
 
     static mappedBy = [
@@ -290,6 +292,10 @@ class Shipment implements Comparable, Serializable {
         }
         return containerMap
 
+    }
+
+    List<Order> getOrders() {
+        return this.shipmentItems*.orderItems?.order?.flatten()?.unique()
     }
 
     Boolean isPending() {
