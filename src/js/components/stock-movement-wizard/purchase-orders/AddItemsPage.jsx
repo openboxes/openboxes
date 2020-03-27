@@ -139,6 +139,7 @@ const VENDOR_FIELDS = {
               ...fieldValue.product,
               label: `${fieldValue.product.productCode} ${fieldValue.product.name}`,
             },
+            recipient: fieldValue.recipient,
             sortOrder: fieldValue.sortOrder + 1,
             referenceId: fieldValue.referenceId,
           }, rowIndex),
