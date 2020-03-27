@@ -40,13 +40,17 @@ class OrderItem implements Serializable {
     Location originBinLocation
     Location destinationBinLocation
 
+    Date estimatedReadyDate
+    Date estimatedShipDate
+    Date estimatedDeliveryDate
+
+    Date actualReadyDate
+    Date actualShipDate
+    Date actualDeliveryDate
 
     // Audit fields
     Date dateCreated
     Date lastUpdated
-
-    Date currentDeliveryDate
-    Date quotedDeliveryDate
 
     static mapping = {
         id generator: 'uuid'
@@ -74,8 +78,12 @@ class OrderItem implements Serializable {
         recipient(nullable: true)
         currencyCode(nullable: true)
         productSupplier(nullable: true)
-        currentDeliveryDate(nullable: true)
-        quotedDeliveryDate(nullable: true)
+        estimatedReadyDate(nullable: true)
+        estimatedShipDate(nullable: true)
+        estimatedDeliveryDate(nullable: true)
+        actualReadyDate(nullable: true)
+        actualShipDate(nullable: true)
+        actualDeliveryDate(nullable: true)
     }
 
 
