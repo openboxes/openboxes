@@ -2136,6 +2136,8 @@ class ShipmentService {
         if (order.orderItems) {
             order.orderItems.each { OrderItem orderItem ->
                 ShipmentItem shipmentItem = shipment.shipmentItems.find { it.orderItems?.any { it.id == orderItem.id } }
+                def lotNumber = shipmentItem.lotNumber
+                def expirationDate = shipmentItem.expirationDate
                 if (!shipmentItem) {
                     shipmentItem = new ShipmentItem(
                         product: orderItem.product,
@@ -2147,7 +2149,8 @@ class ShipmentService {
                     shipment.addToShipmentItems(shipmentItem)
                 } else {
                     shipmentItem.product = orderItem.product
-                    shipmentItem.inventoryItem = orderItem.inventoryItem
+                    shipmentItem.lotNumber = orderItem.inventoryItem?.lotNumber?:lotNumber
+                    shipmentItem.expirationDate = orderItem.inventoryItem?.expirationDate?:expirationDate
                     shipmentItem.recipient = orderItem.recipient
                     shipmentItem.quantity = orderItem.quantity
                 }
