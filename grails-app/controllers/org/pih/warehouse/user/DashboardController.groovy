@@ -20,7 +20,7 @@ import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.jobs.CalculateQuantityJob
+import org.pih.warehouse.jobs.RefreshInventorySnapshotJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
@@ -236,14 +236,9 @@ class DashboardController {
             "binLocationReportCache", "binLocationSummaryCache", "quantityOnHandCache", "selectTagCache",
             "selectTagsCache", "selectCategoryCache", "selectCatalogsCache"])
     def flushCache = {
-        flash.message = "All data caches have been flushed"
-        CalculateQuantityJob.triggerNow([locationId: session.warehouse.id, forceRefresh: true])
+        flash.message = "Data caches and inventory snapshot table have been flushed"
+        RefreshInventorySnapshotJob.triggerNow([location: session.warehouse.id, user: session.user.id, forceRefresh: false])
         redirect(action: "index")
-    }
-
-    def triggerCalculateQuantityJob = {
-        CalculateQuantityJob.triggerNow([locationId: session.warehouse.id])
-        render ([status: "ok", locationId: session.warehouse.id] as JSON)
     }
 
     @CacheFlush(["megamenuCache"])
