@@ -1084,7 +1084,7 @@ class StockMovementService {
         shipment.shipmentNumber = identifierService.generateShipmentIdentifier()
         shipment.expectedShippingDate = new Date()
         shipment.name = order.name
-        shipment.description = order.description
+        shipment.description = order.orderNumber
         shipment.origin = order.origin
         shipment.destination = order.destination
         shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
