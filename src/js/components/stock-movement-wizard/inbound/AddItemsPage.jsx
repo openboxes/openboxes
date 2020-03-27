@@ -232,11 +232,8 @@ class AddItemsPage extends Component {
       );
 
       if (
-        (this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory) &&
-        (
-          !_.isEqual(_.pick(item, keyIntersection), _.pick(oldItem, keyIntersection)) ||
-          (item.product.id !== oldItem.product.id)
-        )
+        !_.isEqual(_.pick(item, keyIntersection), _.pick(oldItem, keyIntersection)) ||
+        (item.product.id !== oldItem.product.id)
       ) {
         lineItemsToBeUpdated.push(item);
       } else if (newQty !== oldQty || newRecipient !== oldRecipient) {
