@@ -53,4 +53,22 @@ class InventorySnapshot implements java.io.Serializable {
         quantityOutbound(nullable: true)
     }
 
+    static namedQueries = {
+        firstUpdatedDate { locationId ->
+            projections {
+                min 'lastUpdated'
+            }
+            eq("location.id", locationId)
+            uniqueResult = true
+        }
+
+        lastUpdatedDate { locationId ->
+            projections {
+                max 'lastUpdated'
+            }
+            eq("location.id", locationId)
+            uniqueResult = true
+        }
+    }
+
 }

@@ -41,8 +41,6 @@ class CalculateQuantityJob {
         boolean includeAllDates = context.mergedJobDataMap.get('includeAllDates') ?
                 Boolean.valueOf(context.mergedJobDataMap.get('includeAllDates')) : false
 
-        log.info "includeAllDates: " + includeAllDates
-
         if (!date) {
             date = new Date() + 1
         }
@@ -56,7 +54,7 @@ class CalculateQuantityJob {
         } else {
             // Triggered by ?
             if (product && location) {
-                log.info "Triggered job for product ${product?.id} at ${location?.id} on ${date}"
+                log.info "Triggered for product ${product?.id} at ${location?.id} on ${date}"
                 if (forceRefresh) {
                     inventorySnapshotService.deleteInventorySnapshots(date, location, product)
                 }
@@ -64,7 +62,7 @@ class CalculateQuantityJob {
             }
             // Triggered by the Inventory Snapshot page
             else if (location) {
-                log.info "Triggered calculate quantity job for all products at ${location?.id} on ${date}"
+                log.info "Triggered for location ${location?.id} on ${date}"
                 if (forceRefresh) {
                     inventorySnapshotService.deleteInventorySnapshots(date, location)
                 }
@@ -72,17 +70,18 @@ class CalculateQuantityJob {
             }
             // Triggered by the CalculateQuantityJob
             else {
-                log.info "Triggered calculate quantity job for all locations and products on ${date}"
+                log.info "Triggered for all locations and products on ${date}"
                 if (forceRefresh) {
                     inventorySnapshotService.deleteInventorySnapshots(date)
                 }
-                inventorySnapshotService.populateInventorySnapshots(date)
+                boolean enableOptimization = CH.config.openboxes.jobs.calculateQuantityJob.enableOptimization
+                inventorySnapshotService.populateInventorySnapshots(date, enableOptimization)
             }
         }
 
         def elapsedTime = (System.currentTimeMillis() - startTime)
         log.info "Successfully completed job for location=${location ?: "ALL"}, product=${product?.id ?: "ALL"}, ${date ?: "ALL"}): " + elapsedTime + " ms"
-        println "=".multiply(180)
+        log.info "=".multiply(100)
     }
 
 

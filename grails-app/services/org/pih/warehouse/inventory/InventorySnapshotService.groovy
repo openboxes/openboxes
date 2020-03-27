@@ -38,6 +38,10 @@ class InventorySnapshotService {
     def grailsApplication
 
     def populateInventorySnapshots(Date date) {
+        populateInventorySnapshots(date, false)
+    }
+
+    def populateInventorySnapshots(Date date, Boolean enableOptimization) {
         def results
         def startTime = System.currentTimeMillis()
 
@@ -49,9 +53,12 @@ class InventorySnapshotService {
                 def innerStartTime = System.currentTimeMillis()
                 persistenceInterceptor.init()
                 Location location = Location.get(loc.id)
-                def binLocations = calculateBinLocations(location, date)
+                Date lastUpdatedDate = InventorySnapshot.lastUpdatedDate(loc.id).list()
+                Integer transactionCount = Transaction.countByLocationAsOf(location, lastUpdatedDate).list()
+                Boolean skipCalculation = enableOptimization && transactionCount == 0
+                def binLocations = (!skipCalculation) ? calculateBinLocations(location, date) : []
                 def readTime = (System.currentTimeMillis() - innerStartTime)
-                log.info "Read ${binLocations?.size()} snapshots location ${location} on date ${date.format("MMM-dd-yyyy")} in ${readTime}ms"
+                log.info "Calculate ${binLocations?.size()} inventory snapshots for location ${location} on date ${date.format("MMM-dd-yyyy")} in ${readTime}ms"
                 persistenceInterceptor.flush()
                 persistenceInterceptor.destroy()
                 return [binLocations: binLocations, location: location, date: date]
@@ -174,13 +181,6 @@ class InventorySnapshotService {
         return binLocationsTransformed
     }
 
-    def retryOnError(Location location) {
-        Boolean retryOnError = grailsApplication.config.openboxes.jobs.calculateQuantityJob.retryOnError?:false
-        if (retryOnError) {
-            CalculateQuantityJob.triggerNow([locationId: location.id])
-        }
-    }
-
     def saveInventorySnapshots(Date date, Location location, List binLocations) {
         def startTime = System.currentTimeMillis()
         def batchSize = ConfigurationHolder.config.openboxes.inventorySnapshot.batchSize ?: 1000
@@ -205,7 +205,7 @@ class InventorySnapshotService {
         } catch (Exception e) {
             log.error("Error executing batch update for ${location.name}: " + e.message, e)
             publishEvent(new ApplicationExceptionEvent(e, location))
-            retryOnError(location)
+            throw e;
         }
     }
 

@@ -104,8 +104,10 @@ class Transaction implements Comparable, Serializable {
     static hasMany = [transactionEntries: TransactionEntry]
     static belongsTo = [LocalTransfer, Requisition, Shipment]
 
-    static mappedBy = [outboundTransfer: 'destinationTransaction',
-                       inboundTransfer : 'sourceTransaction']
+    static mappedBy = [
+            outboundTransfer: 'destinationTransaction',
+            inboundTransfer : 'sourceTransaction'
+    ]
 
     static mapping = {
         id generator: 'uuid'
@@ -130,9 +132,18 @@ class Transaction implements Comparable, Serializable {
             }
             uniqueResult = true
         }
+
+        countByLocationAsOf { location, asOfDate ->
+            projections {
+                count "id"
+            }
+            eq("inventory.id", location?.inventory?.id)
+            gt("lastUpdated", asOfDate)
+            uniqueResult = true
+        }
     }
 
-    // Constraints 
+    // Constraints
     static constraints = {
         transactionType(nullable: false)
         transactionNumber(nullable: true, unique: true)
@@ -149,29 +160,33 @@ class Transaction implements Comparable, Serializable {
         confirmedBy(nullable: true)
         dateConfirmed(nullable: true)
         comment(nullable: true)
+        // transaction date cannot be in the future
         transactionDate(nullable: false,
                 validator: { value -> value <= new Date() })
-        // transaction date cannot be in the future
-
+        inventory(nullable: false)
         source(nullable: true,
                 validator: { value, obj ->
+                    // transaction cannot have both a source and a destination
                     if (value && obj.destination) {
                         return false
-                    }   // transaction cannot have both a source and a destination
+                    }
+                    // transfer in transaction must have source
                     if (obj.transactionType?.id == Constants.TRANSFER_IN_TRANSACTION_TYPE_ID && !value) {
                         return false
-                    } // transfer in transaction must have source
+                    }
                     return true
                 })
 
         destination(nullable: true,
                 validator: { value, obj ->
+                    // transaction cannot have both a source and a destination
                     if (value && obj.source) {
                         return false
-                    }  // transaction cannot have both a source and a destination
+                    }
+                    // transfer out transaction must have destination
                     if (obj.transactionType?.id == Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID && !value) {
                         return false
-                    } // transfer out transaction must have destination
+                    }
                     return true
                 })
     }
