@@ -944,8 +944,10 @@ class InventoryController {
         // either save as a local transfer, or a generic transaction
         // (catch any exceptions so that we display "nice" error messages)
         Boolean saved = null
-        if (!transactionInstance.hasErrors()) {
+        if (transactionInstance.validate() && !transactionInstance.hasErrors()) {
             try {
+                // Trigger the inventory snapshot process to be executed no matter what was changed
+                transactionInstance.lastUpdated = new Date()
                 saved = transactionInstance.save(flush: true)
             }
             catch (Exception e) {
@@ -958,14 +960,8 @@ class InventoryController {
             redirect(action: "editTransaction", id: transactionInstance?.id)
         } else {
             flash.message = "${warehouse.message(code: 'inventory.unableToSaveTransaction.message')}"
-            def model = [
-                    transactionInstance : transactionInstance,
-                    productInstanceMap  : Product.list().groupBy { it.category },
-                    transactionTypeList : TransactionType.list(),
-                    locationInstanceList: Location.list(),
-                    warehouseInstance   : Location.get(session?.warehouse?.id)
-            ]
-            render(view: "editTransaction", model: model)
+            flash.errors = transactionInstance.errors
+            redirect(action: "editTransaction", id: transactionInstance?.id)
         }
     }
 
@@ -1370,6 +1366,12 @@ class InventoryController {
         def warehouseInstance = Location.get(session?.warehouse?.id)
         def products = transactionInstance?.transactionEntries.collect { it.inventoryItem.product }
         def inventoryItems = InventoryItem.findAllByProductInList(products)
+
+        // Re-attach errors if we're coming from a redirect
+        if (flash.errors) {
+            transactionInstance.errors = flash.errors
+        }
+
         def model = [
                 inventoryItemsMap   : inventoryItems.groupBy { it.product?.id },
                 transactionInstance : transactionInstance ?: new Transaction(),
