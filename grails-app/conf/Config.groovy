@@ -493,20 +493,20 @@ openboxes.jobs.refreshInventorySnapshotJob.enabled = true
 
 // Refresh transaction fact table
 openboxes.jobs.refreshTransactionFactJob.enabled = true
-openboxes.jobs.refreshTransactionFactJob.cronExpression = "0 0 0 * * ?" // every day at midnight
+openboxes.jobs.refreshTransactionFactJob.cronExpression = "0 0 0 * * ?" // at midnight every day
 
 // Refresh demand data snapshots
 openboxes.jobs.refreshDemandDataJob.enabled = true
-openboxes.jobs.refreshDemandDataJob.cronExpression = "0 2-59/5 * * * ?" // every five minutes starting at the first minute of the hour
+openboxes.jobs.refreshDemandDataJob.cronExpression = "0 0 1 * * ?" // at 01:00:00am every day
 
 // Assign identifier job
 openboxes.jobs.assignIdentifierJob.enabled = true
-openboxes.jobs.assignIdentifierJob.cronExpression = "0 * * * * ?" // every five minutes
+openboxes.jobs.assignIdentifierJob.cronExpression = "0 * * * * ?" // every minute
 
 // Calculate current quantity on hand
 openboxes.jobs.calculateQuantityJob.enabled = true
-openboxes.jobs.calculateQuantityJob.cronExpression = "0 */5 * * * ?" // every five minutes starting at the top of the hour
-openboxes.jobs.calculateQuantityJob.retryOnError = true
+openboxes.jobs.calculateQuantityJob.cronExpression = "0 0 0/2 * * ?" // every two hours starting at midnight
+openboxes.jobs.calculateQuantityJob.enableOptimization = true
 
 // Calculate historical quantity on hand
 openboxes.jobs.calculateHistoricalQuantityJob.enabled = false
