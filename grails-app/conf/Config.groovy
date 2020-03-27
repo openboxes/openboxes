@@ -490,6 +490,8 @@ openboxes.jobs.sendStockAlertsJob.cronExpression = "0 0 0 * * ?" // every day at
 
 // Refresh inventory snapshots
 openboxes.jobs.refreshInventorySnapshotJob.enabled = true
+openboxes.jobs.refreshInventorySnapshotJob.retryOnError = true
+openboxes.jobs.refreshInventorySnapshotJob.maxRetryAttempts = 3
 
 // Refresh transaction fact table
 openboxes.jobs.refreshTransactionFactJob.enabled = true
