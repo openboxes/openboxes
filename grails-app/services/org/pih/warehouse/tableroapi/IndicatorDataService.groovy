@@ -13,7 +13,6 @@ import org.joda.time.LocalDate
 class IndicatorDataService {
 
     def dashboardService
-    Date today = new Date()
 
     DataGraph getExpirationSummaryData(Location location, def params) {
         Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
@@ -60,6 +59,7 @@ class IndicatorDataService {
     }
 
     DataGraph getFillRate() {
+        Date today = new Date()
         List listData = []
         List bar2Data  = []
         List listLabel = []
@@ -138,6 +138,7 @@ class IndicatorDataService {
     }
 
     DataGraph getSentStockMovements(Location location, def params) {
+        Date today = new Date()
         Integer querySize = params.querySize? params.querySize.toInteger()-1 : 5
         today.clearTime()
         
@@ -191,6 +192,7 @@ class IndicatorDataService {
     }
 
     DataGraph getReceivedStockData(Location location) {
+        Date today = new Date()
         List listData = []
         List listLabel = []
         today.clearTime()
@@ -220,6 +222,7 @@ class IndicatorDataService {
     }
 
     NumberIndicator getOutgoingStock(Location location) {
+        Date today = new Date()
         today.clearTime();
         def m4 = today - 4;
         def m7 = today - 7;
@@ -243,6 +246,7 @@ class IndicatorDataService {
     }
 
     NumberIndicator getIncomingStock(Location location) {
+        Date today = new Date()
         today.clearTime();
         def m4 = today - 4;
         def m7 = today - 7;
