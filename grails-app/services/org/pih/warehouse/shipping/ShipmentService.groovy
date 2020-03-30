@@ -2133,11 +2133,22 @@ class ShipmentService {
 
 
     void updateOrCreateOrderBasedShipmentItems(Order order, Shipment shipment) {
+        shipment.name = order.name
+        shipment.description = order.description
+        shipment.origin = order.origin
+        shipment.destination = order.destination
+
         if (order.orderItems) {
+            def itemsToRemove = shipment.shipmentItems.findAll {
+                sItem -> !order.orderItems?.any { oItem -> sItem.orderItems?.any { it.id == oItem.id } }
+            }
+
+            itemsToRemove.each { it -> deleteShipmentItem(it) }
+
             order.orderItems.each { OrderItem orderItem ->
-                ShipmentItem shipmentItem = shipment.shipmentItems.find { it.orderItems?.any { it.id == orderItem.id } }
-                def lotNumber = shipmentItem.lotNumber
-                def expirationDate = shipmentItem.expirationDate
+                def shipmentItem = shipment.shipmentItems.find { it.orderItems?.any { it.id == orderItem.id } }
+                def lotNumber = shipmentItem?.lotNumber
+                def expirationDate = shipmentItem?.expirationDate
                 if (!shipmentItem) {
                     shipmentItem = new ShipmentItem(
                         product: orderItem.product,
