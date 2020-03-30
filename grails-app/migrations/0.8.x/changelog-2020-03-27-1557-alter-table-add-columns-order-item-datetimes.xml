@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+  <changeSet author="jmiranda (generated)" id="1585342616463-1">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="order_item" columnName="estimated_ready_date"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="order_item">
+      <column name="estimated_ready_date" type="DATETIME"/>
+    </addColumn>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1585342616463-2">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="order_item" columnName="estimated_ship_date"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="order_item">
+      <column name="estimated_ship_date" type="DATETIME"/>
+    </addColumn>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1585342616463-3">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="order_item" columnName="estimated_delivery_date"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="order_item">
+      <column name="estimated_delivery_date" type="DATETIME"/>
+    </addColumn>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1585342616463-4">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="order_item" columnName="actual_ready_date"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="order_item">
+      <column name="actual_ready_date" type="DATETIME"/>
+    </addColumn>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1585342616463-5">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="order_item" columnName="actual_ship_date"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="order_item">
+      <column name="actual_ship_date" type="DATETIME"/>
+    </addColumn>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1585342616463-6">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="order_item" columnName="actual_delivery_date"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="order_item">
+      <column name="actual_delivery_date" type="DATETIME"/>
+    </addColumn>
+  </changeSet>
+</databaseChangeLog>
