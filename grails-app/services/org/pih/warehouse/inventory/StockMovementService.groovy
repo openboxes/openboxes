@@ -322,6 +322,13 @@ class StockMovementService {
             if (criteria.destination) eq("destination", criteria.destination)
             if (criteria.origin) eq("origin", criteria.origin)
             if (criteria.receiptStatusCode) eq("currentStatus", criteria.receiptStatusCode)
+            if (criteria.createdBy || criteria.requestedBy) {
+                or {
+                    eq("createdBy", criteria?.createdBy)
+                    eq("createdBy", criteria?.requestedBy)
+                }
+            }
+
             order("dateCreated", "desc")
         }
         def stockMovements = shipments.collect { Shipment shipment ->
