@@ -38,7 +38,13 @@ class StockMovementController {
     }
 
     def create = {
-        render(template: "/common/react", params: params)
+        StockMovementType stockMovementType = params.direction as StockMovementType
+        if (stockMovementType == StockMovementType.INBOUND) {
+            redirect(action: "createInbound")
+        }
+        else {
+            redirect(action: "createOutbound")
+        }
     }
 
     def createOutbound = {
@@ -85,23 +91,27 @@ class StockMovementController {
 
         def max = params.max ? params.max as int : 10
         def offset = params.offset ? params.offset as int : 0
-        User currentUser = User.get(session?.user?.id)
         Location currentLocation = Location.get(session?.warehouse?.id)
-        boolean incoming = params?.direction == "INBOUND" || params.destination?.id == currentLocation?.id
 
-        if (params.direction == "OUTBOUND") {
+        StockMovementType stockMovementType = params.direction ? params.direction as StockMovementType : null
+        // On initial request we set the origin and destination based on the direction
+        if (stockMovementType == StockMovementType.OUTBOUND) {
             params.origin = params.origin ?: currentLocation
             params.destination = params.destination ?: null
-        } else if (params.direction == "INBOUND") {
+        } else if (stockMovementType == StockMovementType.INBOUND) {
             params.origin = params.origin ?: null
             params.destination = params.destination ?: currentLocation
         } else {
+            // This is necessary because sometimes we need to infer the direction from the parameters
             if (params.origin?.id == currentLocation?.id && params.destination?.id == currentLocation?.id) {
+                stockMovementType = null
                 params.direction = null
             } else if (params.origin?.id == currentLocation?.id) {
-                params.direction = "OUTBOUND"
+                stockMovementType = StockMovementType.OUTBOUND
+                params.direction = stockMovementType.toString()
             } else if (params.destination?.id == currentLocation?.id) {
-                params.direction = "INBOUND"
+                stockMovementType = StockMovementType.INBOUND
+                params.direction = stockMovementType.toString()
             } else {
                 params.origin = params.origin ?: currentLocation
                 params.destination = params.destination ?: currentLocation
@@ -124,6 +134,8 @@ class StockMovementController {
             stockMovement.name = "%" + params.q + "%"
             stockMovement.description = "%" + params.q + "%"
         }
+
+        stockMovement.stockMovementType = stockMovementType
         stockMovement.requestedBy = requisition.requestedBy
         stockMovement.createdBy = requisition.createdBy
         stockMovement.origin = requisition.origin
@@ -131,8 +143,13 @@ class StockMovementController {
         stockMovement.statusCode = requisition?.status ? requisition?.status.toString() : null
         stockMovement.receiptStatusCode = params?.receiptStatusCode ? params.receiptStatusCode as ShipmentStatusCode : null
 
-        def stockMovements = stockMovementService.getInboundStockMovements(stockMovement, [max:max, offset:offset])
-        def statistics = [:]
+        def stockMovements
+
+        try {
+            stockMovements = stockMovementService.getStockMovements(stockMovement, [max: max, offset: offset])
+        } catch(Exception e) {
+            flash.message = "${e.message}"
+        }
 
         if (params.format && stockMovements) {
 
@@ -175,7 +192,7 @@ class StockMovementController {
             flash.message = "${warehouse.message(code:'request.submitMessage.label')} ${params.movementNumber}"
         }
 
-        render(view: "list", params: params, model: [stockMovements: stockMovements, statistics: statistics, incoming: incoming])
+        render(view: "list", params: params, model: [stockMovements: stockMovements])
     }
 
     def rollback = {
