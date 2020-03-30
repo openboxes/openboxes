@@ -48,25 +48,10 @@
                 </div>
             </g:if>
             <div class="button-group">
-                <g:link controller="stockMovement" action="list" params="['createdBy.id':session?.user?.id]" class="button ${relatedToMe?'primary':''}">
+                <g:link controller="stockMovement" action="list" params="${pageParams + ['createdBy.id':session.user.id, 'requestedBy.id':session.user.id]}" class="button">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'user.png')}" />&nbsp;
                     ${warehouse.message(code:'stockMovements.relatedToMe.label', default: 'My stock movements')}
-                    (${statistics["MINE"]?:0 })
                 </g:link>
-            </div>
-            <div class="button-group">
-                <g:link controller="stockMovement" action="list" class="button ${(!params.status && !relatedToMe)?'primary':''}">
-                    <warehouse:message code="default.all.label"/>
-                    (${statistics["ALL"]})
-                </g:link>
-                <g:each var="status" in="${RequisitionStatus.list()}">
-                    <g:if test="${statistics[status]>0}">
-                        <g:set var="isPrimary" value="${params.status==status.name()?true:false}"/>
-                        <g:link controller="stockMovement" action="list" params="[status:status]" class="button ${isPrimary?'primary':''}">
-                            <format:metadata obj="${status}"/>
-                            (${statistics[status]?:0 })
-                        </g:link>
-                    </g:if>
-                </g:each>
             </div>
         </div>
 
@@ -148,8 +133,9 @@
                             </p>
                         </div>
                         <hr/>
-                        <div class="filter-list-item">
-                            <button class="button icon search" name="search" class="button">
+                        <div class="buttons">
+                            <button name="search" class="button">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}" />&nbsp;
                                 ${warehouse.message(code:'default.search.label')}
                             </button>
                             <button name="format" value="csv" class="button">
