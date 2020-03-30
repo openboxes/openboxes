@@ -46,6 +46,8 @@
                             <th class="center"><warehouse:message code="order.unitPrice.label"/></th>
                             <th class="right"><warehouse:message code="orderItem.totalCost.label"/></th>
                             <th class="center"><warehouse:message code="order.recipient.label"/></th>
+                            <th class="center"><warehouse:message code="orderItem.estimatedDeliveryDate.label"/></th>
+                            <th class="center"><warehouse:message code="orderItem.actualDeliveryDate.label"/></th>
                             <th class="center" ><warehouse:message code="default.actions.label"/></th>
                         </tr>
                     </thead>
@@ -96,6 +98,12 @@
                                 </td>
                                 <td class="center middle">
                                     ${orderItem?.recipient}
+                                </td>
+                                <td class="center middle">
+                                    <g:formatDate date="${orderItem?.estimatedDeliveryDate}" format="dd/MMM/yyyy"/>
+                                </td>
+                                <td class="center middle">
+                                    <g:formatDate date="${orderItem?.actualDeliveryDate}" format="dd/MMM/yyyy"/>
                                 </td>
                                 <td class="actionButtons center">
                                     <g:if test="${orderItem?.id }">
@@ -157,6 +165,11 @@
                                     <g:selectPerson id="recipient" name="recipient" value="${order?.orderedBy?.id}"
                                                     noSelection="['':'']" class="chzn-select-deselect"/>
                                 </td>
+                                <td>
+                                    <g:jqueryDatePicker id="estimatedDeliveryDate" name="estimatedDeliveryDate" value=""
+                                                        autocomplete="off" noSelection="['':'']"/>
+                                </td>
+                                <td></td>
                                 <td class="center">
                                     <g:submitButton name="addItem" value="${warehouse.message(code:'order.button.save.label', default: 'Save')}" class="button icon add"/>
                                 </td>
@@ -166,7 +179,7 @@
                     </tbody>
                     <tfoot>
                         <tr class="${(i++ % 2) == 0 ? 'even' : 'odd'}">
-                            <th colspan="13" class="right">
+                            <th colspan="15" class="right">
                                 <warehouse:message code="default.total.label"/>
                                 <g:formatNumber number="${order?.totalPrice()?:0.0 }"/>
                                 ${order?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
