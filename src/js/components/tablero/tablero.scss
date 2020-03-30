@@ -487,3 +487,45 @@
     }
   }
 }
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: -15px;
+}
+
+td, th {
+  border-bottom: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+thead {
+  object-fit: contain;
+  font-size: 13px;
+  font-weight: 500;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.42;
+  letter-spacing: normal;
+  color: #909090;
+
+  .small-text {
+    font-size: 11px;
+  }
+}
+
+tbody {
+  object-fit: contain;
+  font-size: 13px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  color: #2d2d2d;
+
+  &:hover {
+    background-color: #fbfbfb;
+  }
+}

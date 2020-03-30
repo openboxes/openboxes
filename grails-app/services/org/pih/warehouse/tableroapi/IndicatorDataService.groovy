@@ -13,6 +13,7 @@ import org.pih.warehouse.core.Location
 class IndicatorDataService {
 
     Date today = new Date()
+    def dataService
 
     DataGraph getExpirationSummaryData(def expirationData) {
         List listData = []
@@ -238,8 +239,14 @@ class IndicatorDataService {
     }
 
     List<TableData> getDiscrepancy(Location location, def params) {
+        Integer querySize = params.querySize? params.querySize.toInteger() - 1 : 5
+
+        List<TableData> indicatorData = []
+
+        def query = dataService.executeQuery("""select count(receipt_item.id) from receipt_item, receipt, shipment WHERE receipt.receipt_status_code = 'RECEIVED' AND shipment.destination_id = """ + location.id + """ AND receipt_item.quantity_shipped <> receipt_item.quantity_received GROUP BY shipment.shipment_number""")
         
-        List<TableData> indicatorData = [new TableData(12, 'test', 2)];
+        indicatorData.push(new TableData(12, 'test', 2))
+        indicatorData.push(new TableData(14, 'aVeryVeryVeryLongName', 9))
 
         return indicatorData;
     }

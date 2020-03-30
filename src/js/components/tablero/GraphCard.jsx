@@ -44,7 +44,7 @@ const GraphCard = SortableElement(({
   } else if (cardType === 'numbers') {
     graph = <Numbers data={data} />;
   } else if (cardType === 'table') {
-    graph = <TableCard name="aaa" />;
+    graph = <TableCard data={data} />;
   } else if (cardType === 'loading') {
     graph = <LoadingCard />;
   } else if (cardType === 'error') {
