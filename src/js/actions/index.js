@@ -172,7 +172,7 @@ export function reloadIndicator(method, type, title, link, id, params) {
 
 export function fetchIndicators() {
   return (dispatch) => {
-    fetchIndicator(dispatch, 'getExpirationSummary', 'line', 'Expiration Summary');
+    fetchIndicator(dispatch, 'getExpirationSummary', 'line', 'Expiration Summary', '/openboxes/inventory/listExpiringStock');
     fetchIndicator(dispatch, 'getFillRate', 'bar', 'Fill Rate');
     fetchIndicator(dispatch, 'getInventorySummary', 'horizontalBar', 'Inventory Summary');
     fetchIndicator(dispatch, 'getSentStockMovements', 'bar', 'Stock Movements Sent by Month');

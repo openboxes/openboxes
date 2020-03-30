@@ -23,7 +23,7 @@ function loadColorDataset(data, chart, subtype) {
     datasets.pointBackgroundColor = color;
     datasets.pointHoverBackgroundColor = '#fff';
     datasets.pointHoverBorderColor = color;
-    datasets.lineTension = 0.4;
+    datasets.lineTension = 0;
     datasets.fill = !subtype;
   } if (chart === 'bar') {
     datasets.backgroundColor = color;

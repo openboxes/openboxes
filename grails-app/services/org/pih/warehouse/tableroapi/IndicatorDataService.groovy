@@ -8,23 +8,50 @@ import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.tablero.IndicatorDatasets
+import org.joda.time.LocalDate
 
 class IndicatorDataService {
 
-    Date today = new Date()
+    def dashboardService
 
-    DataGraph getExpirationSummaryData(def expirationData) {
-        List listData = []
-        for(item in expirationData){
-            def tmp = item.value? item.value : 0
-            listData.push(tmp)
+    DataGraph getExpirationSummaryData(Location location, def params) {
+        Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
+
+        // expirationSummary lists every expired item based on its month
+        List expirationSummary = []
+        List listLabels = []
+        List expirationAlerts = dashboardService.getExpirationAlerts(location)
+
+        LocalDate date = LocalDate.now()
+
+        expirationAlerts.each {
+            Integer daysCounter = 0
+            // We should count only items that will expire someday
+            if(it.inventoryItem.expires != "never") {
+                // If an item is already inspired, we don't count it
+                if (it.daysToExpiry > 0) {
+                    listLabels = []
+                    // For loop verifies if item expires in querySize coming months
+                    for (int i=0; i<=querySize; i++) {
+                        // daysCounter += number of days of (i) month
+                        daysCounter += date.plusMonths(i).dayOfMonth().getMaximumValue()
+
+                        String monthLabel = date.plusMonths(i).toString("MMM", Locale.US)
+                        listLabels.push(monthLabel)
+                        // if item expires in daysCounter incoming days, we count it
+                        if (it.daysToExpiry <= daysCounter ) {
+                            expirationSummary[i] =  expirationSummary[i] ? expirationSummary[i] + 1 : 1
+                        } 
+                    }
+                } 
+            }
         }
-        
+
         List<IndicatorDatasets> datasets = [
-            new IndicatorDatasets('Expiration summary', listData)
+            new IndicatorDatasets('Expiration(s)', expirationSummary)
         ];
 
-        IndicatorData data = new IndicatorData(datasets, ['Expired', '30 Days', '60 Days', '90 Days', '180 Days', '365 Days', '+365 Days']);
+        IndicatorData data = new IndicatorData(datasets, listLabels);
 
         DataGraph indicatorData = new DataGraph(data, 1, "Expiration summary", "line");
 
@@ -32,6 +59,7 @@ class IndicatorDataService {
     }
 
     DataGraph getFillRate() {
+        Date today = new Date()
         List listData = []
         List bar2Data  = []
         List listLabel = []
@@ -110,7 +138,8 @@ class IndicatorDataService {
     }
 
     DataGraph getSentStockMovements(Location location, def params) {
-        Integer querySize = params.querySize? params.querySize.toInteger() - 1 : 5
+        Date today = new Date()
+        Integer querySize = params.querySize? params.querySize.toInteger()-1 : 5
         today.clearTime()
         
         // queryLimit limits the query and avoid of getting data older than wanted
@@ -167,6 +196,7 @@ class IndicatorDataService {
 
     DataGraph getReceivedStockData(Location location, def params) {
         Integer querySize = params.querySize? params.querySize.toInteger() - 1 : 5
+        Date today = new Date()
         today.clearTime()
         
         Date queryLimit = today.clone()
@@ -214,6 +244,7 @@ class IndicatorDataService {
     }
 
     NumberIndicator getOutgoingStock(Location location) {
+        Date today = new Date()
         today.clearTime();
         def m4 = today - 4;
         def m7 = today - 7;
@@ -237,6 +268,7 @@ class IndicatorDataService {
     }
 
     NumberIndicator getIncomingStock(Location location) {
+        Date today = new Date()
         today.clearTime();
         def m4 = today - 4;
         def m7 = today - 7;
