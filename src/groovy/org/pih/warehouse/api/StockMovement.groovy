@@ -253,6 +253,7 @@ class StockMovement {
                 origin: requisition.origin,
                 destination: requisition.destination,
                 dateRequested: requisition.dateRequested,
+                dateCreated: requisition.dateCreated,
                 requestedBy: requisition.requestedBy,
                 requisition: requisition,
                 shipment: shipment,
