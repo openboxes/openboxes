@@ -91,7 +91,7 @@
                     <g:formatDate format="MMM dd, yyyy" date="${stockMovement?.dateRequested}"/>
                 </td>
                 <td>
-                    <g:formatDate format="MMM dd, yyyy" date="${stockMovement?.dateCreated}"/>
+                    <g:formatDate format="MMM dd, yyyy" date="${stockMovement?.dateCreated ?: stockMovement?.requisition?.dateCreated}"/>
                 </td>
             </tr>
         </g:each>
