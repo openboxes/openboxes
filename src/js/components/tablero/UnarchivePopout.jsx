@@ -50,6 +50,8 @@ const ArchivedIndicators = (props) => {
     );
   } else if (props.type === 'error') {
     graph = <i className="fa fa-repeat" />;
+  } else if (props.type === 'table') {
+    graph = <i className="fa fa-table" style={{ color: getColor() }} />;
   }
 
   return (

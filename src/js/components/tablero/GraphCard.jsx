@@ -45,6 +45,7 @@ const GraphCard = SortableElement(({
     graph = <Numbers data={data} />;
   } else if (cardType === 'table') {
     graph = <TableCard data={data} />;
+    filter = 1;
   } else if (cardType === 'loading') {
     graph = <LoadingCard />;
   } else if (cardType === 'error') {
@@ -70,7 +71,9 @@ const GraphCard = SortableElement(({
             onChange={e => reloadIndicator(cardMethod, cardType, cardTitle, cardLink, cardId, `querySize=${e.target.value}`)}
             disabled={!filter}
           >
-            <option value="6">Last 6 Months</option>
+            <option value="1">Last Month</option>
+            <option value="3">Last 3 Months</option>
+            <option value="6" selected="selected">Last 6 Months</option>
             <option value="12">Last Year</option>
             <option value="24">Last 2 Years</option>
           </select>
