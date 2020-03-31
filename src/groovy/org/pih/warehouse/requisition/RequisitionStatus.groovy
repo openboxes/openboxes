@@ -12,13 +12,14 @@ package org.pih.warehouse.requisition
 import org.pih.warehouse.inventory.StockMovementStatusCode
 
 enum RequisitionStatus {
+
     CREATED(1),
-    EDITING(2),
-    VERIFYING(3),
-    PICKING(4),
-    PICKED(5),
+    EDITING(2, PENDING),
+    VERIFYING(3, PENDING),
+    PICKING(4, PENDING),
+    PICKED(5, PENDING),
     PENDING(5),
-    CHECKING(6),
+    CHECKING(6, PENDING),
     ISSUED(7),
     RECEIVED(8),
     CANCELED(9),
@@ -31,8 +32,20 @@ enum RequisitionStatus {
     CONFIRMING(0)
 
     int sortOrder
+    RequisitionStatus displayStatusCode
 
-    RequisitionStatus(int sortOrder) { [this.sortOrder = sortOrder] }
+    RequisitionStatus() { }
+
+    RequisitionStatus(int sortOrder) { this.sortOrder = sortOrder }
+
+    RequisitionStatus(int sortOrder, RequisitionStatus displayStatusCode) {
+        this.sortOrder = sortOrder
+        this.displayStatusCode = displayStatusCode
+    }
+
+    RequisitionStatus getDisplayStatus() {
+        return this.displayStatusCode?:this
+    }
 
     static int compare(RequisitionStatus a, RequisitionStatus b) {
         return a.sortOrder <=> b.sortOrder
@@ -72,7 +85,6 @@ enum RequisitionStatus {
             default:
                 return StockMovementStatusCode.valueOf(requisitionStatus.toString())
         }
-
     }
 
     static fromStockMovementStatus(StockMovementStatusCode stockMovementStatus) {
