@@ -144,7 +144,7 @@ class OrderService {
      */
     OrderCommand saveOrderShipment(OrderCommand orderCommand) {
         def shipmentInstance = new Shipment()
-        def shipments = orderCommand?.order?.getShipments()
+        def shipments = orderCommand?.order?.shipments
         def numberOfShipments = (shipments) ? shipments?.size() + 1 : 1
 
         shipmentInstance.name = orderCommand?.order?.name + " - " + "Shipment #" + numberOfShipments
@@ -335,7 +335,7 @@ class OrderService {
         try {
 
             if (orderInstance.status in [OrderStatus.PLACED,  OrderStatus.PARTIALLY_RECEIVED, OrderStatus.RECEIVED]) {
-                orderInstance?.getShipments().each { Shipment shipmentInstance ->
+                orderInstance?.shipments?.each { Shipment shipmentInstance ->
                     if (shipmentInstance) {
 
                         shipmentInstance.incomingTransactions.each { transactionInstance ->

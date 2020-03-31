@@ -2143,16 +2143,13 @@ class ShipmentService {
                 sItem -> !order.orderItems?.any { oItem -> sItem.orderItems?.any { it.id == oItem.id } }
             }
 
-            itemsToRemove.each { it -> deleteShipmentItem(it) }
+            itemsToRemove.each { ShipmentItem shipmentItem -> deleteShipmentItem(shipmentItem) }
 
             order.orderItems.each { OrderItem orderItem ->
                 def shipmentItem = shipment.shipmentItems.find { it.orderItems?.any { it.id == orderItem.id } }
-                def lotNumber = shipmentItem?.lotNumber
-                def expirationDate = shipmentItem?.expirationDate
                 if (!shipmentItem) {
                     shipmentItem = new ShipmentItem(
                         product: orderItem.product,
-                        inventoryItem: orderItem.inventoryItem,
                         recipient: orderItem.recipient,
                         quantity: orderItem.quantity
                     )
@@ -2160,8 +2157,6 @@ class ShipmentService {
                     shipment.addToShipmentItems(shipmentItem)
                 } else {
                     shipmentItem.product = orderItem.product
-                    shipmentItem.lotNumber = orderItem.inventoryItem?.lotNumber?:lotNumber
-                    shipmentItem.expirationDate = orderItem.inventoryItem?.expirationDate?:expirationDate
                     shipmentItem.recipient = orderItem.recipient
                     shipmentItem.quantity = orderItem.quantity
                 }
