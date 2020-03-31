@@ -18,7 +18,7 @@ class IndicatorDataService {
         Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
 
         // expirationSummary lists every expired item based on its month
-        List expirationSummary = []
+        List expirationSummary = new int[querySize]
         List listLabels = []
         List expirationAlerts = dashboardService.getExpirationAlerts(location)
 
@@ -44,13 +44,6 @@ class IndicatorDataService {
                         } 
                     }
                 } 
-            }
-        }
-        // If a month have no expirationAlert, expirationSummary in this position is null
-        // This loop puts 0s instead null for graphic representation in indicators
-        for (int i=0; i<=querySize; i++) {
-            if(!expirationSummary[i]) {
-                expirationSummary[i] = 0
             }
         }
 
