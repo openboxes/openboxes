@@ -84,16 +84,13 @@ class Tablero extends Component {
     };
   }
 
-  componentDidMount() {
-    this.fetchData();
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.currentLocation !== this.props.currentLocation) {
+  componentDidUpdate(prevProps) {
+    if (prevProps.currentLocation !== this.props.currentLocation) {
       this.props.resetIndicators();
       this.fetchData();
     }
   }
+
   dataFetched = false;
 
   fetchData() {

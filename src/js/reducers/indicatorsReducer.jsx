@@ -50,9 +50,7 @@ export default function (state = initialState, action) {
       };
     }
     case RESET_INDICATORS:
-      return {
-        initialState,
-      };
+      return initialState;
     case REORDER_INDICATORS:
       return {
         ...state,
