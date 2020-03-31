@@ -11,23 +11,39 @@ package org.pih.warehouse.inventory
 
 enum StockMovementStatusCode {
 
+    // Display status code
+    PENDING,
+
+    // Actual status code
     CREATED(0),
-    REQUESTING(1),
-    REQUESTED(2),
-    VALIDATING(2),
-    VALIDATED(3),
-    PICKING(3),
-    PICKED(4),
-    CHECKING(4),
-    CHECKED(6),
-    PACKED(7),
-    REVIEWING(8),
+    REQUESTING(1, PENDING),
+    REQUESTED(2, PENDING),
+    VALIDATING(2, PENDING),
+    VALIDATED(3, PENDING),
+    PICKING(3, PENDING),
+    PICKED(4, PENDING),
+    CHECKING(4, PENDING),
+    CHECKED(6, PENDING),
+    PACKED(7, PENDING),
+    REVIEWING(8, PENDING),
     DISPATCHED(9),
     CANCELED(10)
 
     int sortOrder
+    StockMovementStatusCode displayStatusCode
 
-    StockMovementStatusCode(int sortOrder) { [this.sortOrder = sortOrder] }
+    StockMovementStatusCode() { }
+
+    StockMovementStatusCode(int sortOrder) { this.sortOrder = sortOrder }
+
+    StockMovementStatusCode(int sortOrder, StockMovementStatusCode displayStatusCode) {
+        this.sortOrder = sortOrder
+        this.displayStatusCode = displayStatusCode
+    }
+
+    StockMovementStatusCode getDisplayStatus() {
+        return this.displayStatusCode?:this
+    }
 
     static int compare(StockMovementStatusCode a, StockMovementStatusCode b) {
         return a.sortOrder <=> b.sortOrder
