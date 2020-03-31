@@ -207,74 +207,77 @@
                             </td>
                         </tr>
                         <g:isSuperuser>
-                            <tr class="prop">
-                                <td class="name">
-                                    <g:message code="order.label"/>
-                                </td>
-                                <td class="value">
-                                    <g:each var="order" in="${stockMovement?.shipment?.orders}">
-                                        <g:link controller="order" action="show" id="${order?.id}" params="[override:true]">
-                                            ${g.message(code:'default.view.label', args: [g.message(code: 'order.label')])}
-                                            ${order.orderNumber}
+                            <g:if test="${stockMovement?.shipment?.orders}">
+                                <tr class="prop">
+                                    <td class="name">
+                                        <g:message code="order.label"/>
+                                    </td>
+                                    <td class="value">
+                                        <g:each var="order" in="${stockMovement?.shipment?.orders}">
+                                            <g:link controller="order" action="show" id="${order?.id}" params="[override:true]">
+                                                ${g.message(code:'default.view.label', args: [g.message(code: 'order.label')])}
+                                                ${order.orderNumber}
+                                            </g:link>
+                                        </g:each>
+                                    </td>
+                                </tr>
+                            </g:if>
+                            <g:if test="${stockMovement.requisition}">
+                                <tr class="prop">
+                                    <td class="name">
+                                        <g:message code="requisition.label"/>
+                                    </td>
+                                    <td class="value">
+                                        <g:link controller="requisition" action="show" id="${stockMovement?.id}" params="[override:true]">
+                                            ${g.message(code:'default.view.label', args: [g.message(code: 'requisition.label')])}
+                                            ${stockMovement?.requisition?.requestNumber}
                                         </g:link>
-                                    </g:each>
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td class="name">
-                                    <g:message code="requisition.label"/>
-                                </td>
-                                <td class="value">
-                                    <g:link controller="requisition" action="show" id="${stockMovement?.id}" params="[override:true]">
-                                        ${g.message(code:'default.view.label', args: [g.message(code: 'requisition.label')])}
-                                        ${stockMovement?.requisition?.requestNumber}
-                                    </g:link>
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td class="name">
-                                    <g:message code="default.inbound.label"/>
-                                </td>
-                                <td class="value">
-                                    <g:if test="${stockMovement.shipment?.incomingTransactions}">
+                                    </td>
+                                </tr>
+                            </g:if>
+                            <g:if test="${stockMovement.shipment}">
+                                <tr class="prop">
+                                    <td class="name">
+                                        <g:message code="shipment.label"/>
+                                    </td>
+                                    <td class="value">
+                                        <g:link controller="shipment" action="show" id="${stockMovement?.id}" params="[override:true]">
+                                            ${g.message(code:'default.view.label', args: [g.message(code: 'shipment.label')])}
+                                            ${stockMovement?.shipment?.shipmentNumber}
+                                        </g:link>
+                                    </td>
+                                </tr>
+                            </g:if>
+                            <g:if test="${stockMovement.shipment?.incomingTransactions}">
+                                <tr class="prop">
+                                    <td class="name">
+                                        <g:message code="default.inbound.label"/>
+                                    </td>
+                                    <td class="value">
                                         <g:each var="inboundTransaction" in="${stockMovement?.shipment?.incomingTransactions}">
                                             <g:link controller="inventory" action="showTransaction" id="${inboundTransaction?.id}">
                                                 ${g.message(code:'default.view.label', args: [g.message(code: 'transaction.label')])}
                                                 ${inboundTransaction?.transactionNumber?:inboundTransaction?.id}
                                             </g:link>
                                         </g:each>
-                                    </g:if>
-                                    <g:else>
-                                        <g:if test="${stockMovement?.shipment?.currentStatus == ShipmentStatusCode.RECEIVED}">
-                                            <g:link controller="shipment" action="syncTransactions" id="${stockMovement.shipment?.id}">
-                                                <g:message code="default.create.label" args="[g.message(code:'transaction.label')]"/>
-                                            </g:link>
-                                        </g:if>
-                                    </g:else>
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td class="name">
-                                    <g:message code="default.outbound.label"/>
-                                </td>
-                                <td class="value">
-                                    <g:if test="${stockMovement.shipment?.outgoingTransactions}">
+                                    </td>
+                                </tr>
+                            </g:if>
+                            <g:if test="${stockMovement.shipment?.outgoingTransactions}">
+                                <tr class="prop">
+                                    <td class="name">
+                                        <g:message code="default.outbound.label"/>
+                                    </td>
+                                    <td class="value">
                                         <g:each var="outboundTransaction" in="${stockMovement?.shipment?.outgoingTransactions}">
                                             <g:link controller="inventory" action="showTransaction" id="${outboundTransaction?.id}">
                                                 ${g.message(code:'default.view.label', args: [g.message(code: 'transaction.label')])}
                                                 ${outboundTransaction?.transactionNumber?:outboundTransaction?.id}
                                             </g:link>
                                         </g:each>
-                                    </g:if>
-                                    <g:else>
-                                        <g:if test="${stockMovement?.shipment?.currentStatus == ShipmentStatusCode.SHIPPED}">
-                                            <g:link controller="shipment" action="syncTransactions" id="${stockMovement.shipment?.id}">
-                                                <g:message code="default.create.label" args="[g.message(code:'transaction.label')]"/>
-                                            </g:link>
-                                        </g:if>
-                                    </g:else>
-                                </td>
-                            </tr>
+                                    </td>
+                                </tr>
+                            </g:if>
                         </g:isSuperuser>
                     </table>
                 </div>
