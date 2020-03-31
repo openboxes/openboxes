@@ -58,7 +58,10 @@ class Order implements Serializable {
             "totalOrderAdjustments",
             "totalOrderItemAdjustments",
             "total",
-            "shipments"
+            "orderedOrderItems",
+            "receivedOrderItems",
+            "shipments",
+            "shippedOrderItems"
     ]
 
     static hasMany = [
@@ -114,13 +117,9 @@ class Order implements Serializable {
     }
 
     def getDisplayStatus() {
-        def shipments = listShipments()
         for (ShipmentStatusCode statusCode in
                 [ShipmentStatusCode.RECEIVED, ShipmentStatusCode.PARTIALLY_RECEIVED, ShipmentStatusCode.SHIPPED]) {
-            if (shipments.any { Shipment shipment ->
-                log.info "Shipment shipment ${shipment} status ${shipment.currentStatus} == ${statusCode} ? ${shipment.currentStatus == statusCode}"
-                shipment.currentStatus == statusCode
-            }) {
+            if (shipments.any { Shipment shipment -> shipment?.currentStatus == statusCode}) {
                 return statusCode
             }
         }
@@ -211,6 +210,19 @@ class Order implements Serializable {
                     a.product?.name <=> b.product?.name ?:
                             a.id <=> b.id
         } : []
+    }
+
+    def getOrderedOrderItems() {
+        return orderItems?.findAll { it.order.status >= OrderStatus.PLACED &&
+                it.orderItemStatusCode != OrderItemStatusCode.CANCELED }
+    }
+
+    def getShippedOrderItems() {
+        return orderItems?.findAll { it.completelyFulfilled }
+    }
+
+    def getReceivedOrderItems() {
+        return orderItems?.findAll { it.completelyReceived }
     }
 
     /**

@@ -56,6 +56,11 @@
                                     <th>${warehouse.message(code: 'order.orderedBy.label')}</th>
 									<th>${warehouse.message(code: 'order.dateOrdered.label')}</th>
 									<th>${warehouse.message(code: 'order.orderItems.label')}</th>
+									<g:if test="${orderTypeCode != OrderTypeCode.TRANSFER_ORDER}">
+										<th>${warehouse.message(code: 'order.ordered.label')}</th>
+										<th>${warehouse.message(code: 'order.shipped.label')}</th>
+										<th>${warehouse.message(code: 'order.received.label')}</th>
+									</g:if>
 									<th>${warehouse.message(code: 'order.totalPrice.label')}</th>
 								</tr>
 							</thead>
@@ -110,10 +115,21 @@
 										<td class="middle">
 											<format:date obj="${orderInstance?.dateOrdered}"/>
 										</td>
-										<td class="middle">
+										<td class="center middle">
 											<g:set var="lineItems" value="${orderInstance?.orderItems?.findAll { it.orderItemStatusCode != OrderItemStatusCode.CANCELED }}"/>
 											${lineItems.size()?:0}
 										</td>
+										<g:if test="${orderTypeCode != OrderTypeCode.TRANSFER_ORDER}">
+											<td class="center middle">
+												${orderInstance?.orderedOrderItems?.size()?:0}
+											</td>
+											<td class="center middle">
+												${orderInstance?.shippedOrderItems?.size()?:0}
+											</td>
+											<td class="center middle">
+												${orderInstance?.receivedOrderItems?.size()?:0}
+											</td>
+										</g:if>
 										<td class="right middle">
 											<g:formatNumber number="${orderInstance.totalPrice()}"/>
 											${orderInstance.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
@@ -131,10 +147,10 @@
 %{--								</tr>--}%
 %{--							</tfoot>--}%
 						</table>
-					</div>
-					<div class="paginateButtons">
-						<g:set var="pageParams" value="${pageScope.variables['params']}"/>
-						<g:paginate total="${orders.totalCount}" params="${params}"/>
+						<div class="paginateButtons">
+							<g:set var="pageParams" value="${pageScope.variables['params']}"/>
+							<g:paginate total="${orders.totalCount}" params="${params}"/>
+						</div>
 					</div>
 				</div>
 
