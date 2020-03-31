@@ -316,6 +316,18 @@ class StockMovementService {
         }
     }
 
+    def getStockMovements(StockMovement criteria, Map params) {
+        switch(criteria.stockMovementType) {
+            case StockMovementType.OUTBOUND:
+                return getOutboundStockMovements(criteria, params)
+            case StockMovementType.INBOUND:
+                return getInboundStockMovements(criteria, params)
+            default:
+                throw new IllegalArgumentException("Origin and destination cannot be the same")
+        }
+    }
+
+
     def getInboundStockMovements(Integer maxResults, Integer offset) {
         return getInboundStockMovements(new StockMovement(), [:], maxResults, offset)
     }
@@ -325,6 +337,13 @@ class StockMovementService {
             if (criteria.destination) eq("destination", criteria.destination)
             if (criteria.origin) eq("origin", criteria.origin)
             if (criteria.receiptStatusCode) eq("currentStatus", criteria.receiptStatusCode)
+            if (criteria.createdBy || criteria.requestedBy) {
+                or {
+                    eq("createdBy", criteria?.createdBy)
+                    eq("createdBy", criteria?.requestedBy)
+                }
+            }
+
             order("dateCreated", "desc")
         }
         def stockMovements = shipments.collect { Shipment shipment ->
@@ -339,15 +358,15 @@ class StockMovementService {
     }
 
     def getOutboundStockMovements(Integer maxResults, Integer offset) {
-        return getOutboundStockMovements(new StockMovement(), [:], maxResults, offset)
+        return getOutboundStockMovements(new StockMovement(), [maxResults:maxResults, offset:offset])
     }
 
-    def getOutboundStockMovements(StockMovement stockMovement, Map params, Integer maxResults, Integer offset) {
+    def getOutboundStockMovements(StockMovement stockMovement, Map params) {
         log.info "Get stock movements: " + stockMovement.toJson()
 
         log.info "Stock movement: ${stockMovement?.shipmentStatusCode}"
 
-        def requisitions = Requisition.createCriteria().list(max: maxResults, offset: offset) {
+        def requisitions = Requisition.createCriteria().list(max: params.maxResults?:10, offset: params.offset?:0) {
             eq("isTemplate", Boolean.FALSE)
 
             if (stockMovement?.receiptStatusCode) {
@@ -1087,6 +1106,7 @@ class StockMovementService {
         shipment.description = order.orderNumber
         shipment.origin = order.origin
         shipment.destination = order.destination
+        shipment.createdBy = order.orderedBy
         shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
 
         command.orderItems.each { ShipOrderItemCommand orderItemCommand ->
