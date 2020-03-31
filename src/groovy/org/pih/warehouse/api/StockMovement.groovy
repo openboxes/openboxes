@@ -47,6 +47,7 @@ class StockMovement {
     Location destination
     Person requestedBy
     Person createdBy
+    Person updatedBy
 
     Date dateRequested
     Date dateShipped
@@ -228,6 +229,8 @@ class StockMovement {
                 dateCreated: shipment.dateCreated,
                 lastUpdated: shipment.lastUpdated,
                 requestedBy: shipment.createdBy,
+                createdBy: shipment.createdBy,
+                updatedBy: shipment.updatedBy,
                 shipment: shipment,
                 isFromOrder: shipment?.isFromPurchaseOrder,
                 isShipped: shipment?.status?.code >= ShipmentStatusCode.SHIPPED,
@@ -261,7 +264,10 @@ class StockMovement {
                 destination: requisition.destination,
                 dateRequested: requisition.dateRequested,
                 dateCreated: requisition.dateCreated,
+                lastUpdated: requisition.lastUpdated,
                 requestedBy: requisition.requestedBy,
+                createdBy: requisition.createdBy,
+                updatedBy: requisition.updatedBy,
                 requisition: requisition,
                 shipment: shipment,
                 comments: shipment?.additionalInformation,
