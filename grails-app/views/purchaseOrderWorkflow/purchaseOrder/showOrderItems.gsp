@@ -46,8 +46,8 @@
                             <th class="center"><warehouse:message code="order.unitPrice.label"/></th>
                             <th class="right"><warehouse:message code="orderItem.totalCost.label"/></th>
                             <th class="center"><warehouse:message code="order.recipient.label"/></th>
-                            <th class="center"><warehouse:message code="orderItem.estimatedDeliveryDate.label"/></th>
-                            <th class="center"><warehouse:message code="orderItem.actualDeliveryDate.label"/></th>
+                            <th class="center"><warehouse:message code="orderItem.estimatedReadyDate.label"/></th>
+                            <th class="center"><warehouse:message code="orderItem.actualReadyDate.label"/></th>
                             <th class="center" ><warehouse:message code="default.actions.label"/></th>
                         </tr>
                     </thead>
@@ -100,10 +100,10 @@
                                     ${orderItem?.recipient}
                                 </td>
                                 <td class="center middle">
-                                    <g:formatDate date="${orderItem?.estimatedDeliveryDate}" format="dd/MMM/yyyy"/>
+                                    <g:formatDate date="${orderItem?.estimatedReadyDate}" format="dd/MMM/yyyy"/>
                                 </td>
                                 <td class="center middle">
-                                    <g:formatDate date="${orderItem?.actualDeliveryDate}" format="dd/MMM/yyyy"/>
+                                    <g:formatDate date="${orderItem?.actualReadyDate}" format="dd/MMM/yyyy"/>
                                 </td>
                                 <td class="actionButtons center">
                                     <g:if test="${orderItem?.id }">
@@ -166,7 +166,7 @@
                                                     noSelection="['':'']" class="chzn-select-deselect"/>
                                 </td>
                                 <td>
-                                    <g:jqueryDatePicker id="estimatedDeliveryDate" name="estimatedDeliveryDate" value=""
+                                    <g:jqueryDatePicker id="estimatedReadyDate" name="estimatedReadyDate" value=""
                                                         autocomplete="off" noSelection="['':'']"/>
                                 </td>
                                 <td></td>
