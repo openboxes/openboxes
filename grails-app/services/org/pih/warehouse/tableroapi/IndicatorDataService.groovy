@@ -18,7 +18,7 @@ class IndicatorDataService {
         Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
 
         // expirationSummary lists every expired item based on its month
-        List expirationSummary = new int[querySize]
+        List expirationSummary = [0] * querySize
         List listLabels = []
         List expirationAlerts = dashboardService.getExpirationAlerts(location)
 
