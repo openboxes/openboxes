@@ -32,6 +32,7 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
@@ -2130,4 +2131,40 @@ class ShipmentService {
         return count
     }
 
+
+    void updateOrCreateOrderBasedShipmentItems(Order order, Shipment shipment) {
+        shipment.name = order.name
+        shipment.description = order.description
+        shipment.origin = order.origin
+        shipment.destination = order.destination
+
+        if (order.orderItems) {
+            def itemsToRemove = shipment.shipmentItems.findAll {
+                sItem -> !order.orderItems?.any { oItem -> sItem.orderItems?.any { it.id == oItem.id } }
+            }
+
+            itemsToRemove.each { ShipmentItem shipmentItem -> deleteShipmentItem(shipmentItem) }
+
+            order.orderItems.each { OrderItem orderItem ->
+                def shipmentItem = shipment.shipmentItems.find { it.orderItems?.any { it.id == orderItem.id } }
+                if (!shipmentItem) {
+                    shipmentItem = new ShipmentItem(
+                        product: orderItem.product,
+                        recipient: orderItem.recipient,
+                        quantity: orderItem.quantity
+                    )
+                    shipmentItem.addToOrderItems(orderItem)
+                    shipment.addToShipmentItems(shipmentItem)
+                } else {
+                    shipmentItem.product = orderItem.product
+                    shipmentItem.recipient = orderItem.recipient
+                    shipmentItem.quantity = orderItem.quantity
+                }
+            }
+        }
+
+        if (shipment.hasErrors() || !shipment.save()) {
+            throw new ValidationException("Invalid shipment", shipment.errors)
+        }
+    }
 }
