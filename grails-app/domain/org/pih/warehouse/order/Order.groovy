@@ -11,6 +11,8 @@ package org.pih.warehouse.order
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.*
+import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentStatusCode
 
 class Order implements Serializable {
 
@@ -54,7 +56,8 @@ class Order implements Serializable {
             "totalAdjustments",
             "totalOrderAdjustments",
             "totalOrderItemAdjustments",
-            "total"
+            "total",
+            "shipments"
     ]
 
     static hasMany = [
@@ -176,10 +179,13 @@ class Order implements Serializable {
         return (status == OrderStatus.CANCELED)
     }
 
-    def listShipments() {
+    def getShipments() {
         return orderItems.collect { it.listShipments() }.flatten().unique() { it?.id }
     }
 
+    List getShipmentsByStatus(ShipmentStatusCode statusCode) {
+        return shipments.findAll { Shipment shipment -> shipment.currentStatus == statusCode }
+    }
 
     def listOrderItems() {
         return orderItems ? orderItems.findAll {
@@ -230,6 +236,5 @@ class Order implements Serializable {
         if (completedBy) name += "${separator}${completedBy.name}"
         return name
     }
-
 
 }
