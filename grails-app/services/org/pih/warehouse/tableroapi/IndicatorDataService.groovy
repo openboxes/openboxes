@@ -46,6 +46,13 @@ class IndicatorDataService {
                 } 
             }
         }
+        // If a month have no expirationAlert, expirationSummary in this position is null
+        // This loop puts 0s instead null for graphic representation in indicators
+        for (int i=0; i<=querySize; i++) {
+            if(!expirationSummary[i]) {
+                expirationSummary[i] = 0
+            }
+        }
 
         List<IndicatorDatasets> datasets = [
             new IndicatorDatasets('Expiration(s)', expirationSummary)
