@@ -245,6 +245,9 @@ class OrderService {
             } else {
                 if (orderInstance?.orderItems?.size() > 0) {
                     if (canApproveOrder(orderInstance, userInstance)) {
+                        orderInstance.orderItems.each { orderItem ->
+                            orderItem.actualReadyDate = orderItem.estimatedReadyDate
+                        }
                         orderInstance.status = OrderStatus.PLACED
                         orderInstance.dateApproved = new Date()
                         orderInstance.approvedBy = userInstance
