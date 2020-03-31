@@ -338,12 +338,12 @@
                                 <g:message code="default.dateCreated.label"/>
                             </td>
                             <td class="value">
-                                <span title="${g.formatDate(date:stockMovement?.requisition?.dateCreated)}">
-                                    <g:formatDate format="MMMM dd, yyyy" date="${stockMovement?.requisition?.dateCreated}"/>
+                                <span title="${g.formatDate(date:stockMovement?.dateCreated)}">
+                                    <g:formatDate format="MMMM dd, yyyy" date="${stockMovement?.dateCreated}"/>
                                 </span>
-                                <g:if test="${stockMovement?.requisition?.createdBy}">
+                                <g:if test="${stockMovement?.createdBy}">
                                     <g:message code="default.by.label"/>
-                                    ${stockMovement?.requisition?.createdBy?.name}
+                                    ${stockMovement?.createdBy?.name}
                                 </g:if>
                             </td>
                         </tr>
@@ -352,12 +352,12 @@
                                 <g:message code="default.lastUpdated.label"/>
                             </td>
                             <td class="value">
-                                <span title="${g.formatDate(date:stockMovement?.requisition?.lastUpdated)}">
-                                    <g:formatDate format="MMMM dd, yyyy" date="${stockMovement?.requisition?.lastUpdated}"/>
+                                <span title="${g.formatDate(date:stockMovement?.lastUpdated)}">
+                                    <g:formatDate format="MMMM dd, yyyy" date="${stockMovement?.lastUpdated}"/>
                                 </span>
-                                <g:if test="${stockMovement?.requisition?.updatedBy}">
+                                <g:if test="${stockMovement?.updatedBy}">
                                     <g:message code="default.by.label"/>
-                                    ${stockMovement?.requisition?.updatedBy?.name}
+                                    ${stockMovement?.updatedBy?.name}
                                 </g:if>
                             </td>
                         </tr>
