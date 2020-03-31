@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.order.OrderTypeCode" %>
+<%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode; org.pih.warehouse.order.OrderTypeCode" %>
 <%@ page import="org.pih.warehouse.order.OrderStatus" %>
 
 <div id="order-summary" class="summary">
@@ -20,7 +20,7 @@
                     </td>
                     <td class="top right" width="1%">
                         <div class="tag tag-alert">
-                            <format:metadata obj="${orderInstance?.status}"/>
+                            <format:metadata obj="${orderInstance?.displayStatus}"/>
                         </div>
                     </td>
                 </tr>

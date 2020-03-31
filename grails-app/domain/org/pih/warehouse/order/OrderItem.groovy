@@ -16,8 +16,8 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
-import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.shipping.ShipmentStatusCode
 
 class OrderItem implements Serializable {
 
@@ -57,7 +57,13 @@ class OrderItem implements Serializable {
         shipmentItems joinTable: [name: 'order_shipment', key: 'order_item_id']
     }
 
-    static transients = ["orderItemType", "total", "subtotal", "totalAdjustments"]
+    static transients = [
+            "orderItemType",
+            "total",
+            "shippedShipmentItems",
+            "subtotal",
+            "totalAdjustments"
+    ]
 
     static belongsTo = [order: Order, parentOrderItem: OrderItem]
 
@@ -86,19 +92,25 @@ class OrderItem implements Serializable {
         actualDeliveryDate(nullable: true)
     }
 
+    def getShippedShipmentItems() {
+        return shipmentItems.findAll { it.shipment.currentStatus >= ShipmentStatusCode.SHIPPED }
+    }
 
     String getOrderItemType() {
         return (product) ? "Product" : (category) ? "Category" : "Unclassified"
     }
 
     Integer quantityFulfilled() {
-        return shipmentItems?.sum { it?.quantity } ?: 0
+        return shippedShipmentItems?.sum { it?.quantity } ?: 0
     }
 
     Integer quantityRemaining() {
         return quantity - quantityFulfilled()
     }
 
+    Integer quantityReceived() {
+        return shippedShipmentItems?.sum { it?.quantityReceived() } ?: 0
+    }
 
     Boolean isPartiallyFulfilled() {
         return quantityFulfilled() > 0 && quantityFulfilled() < quantity
@@ -106,6 +118,10 @@ class OrderItem implements Serializable {
 
     Boolean isCompletelyFulfilled() {
         return quantityFulfilled() >= quantity
+    }
+
+    Boolean isCompletelyReceived() {
+        return quantityReceived() >= quantity
     }
 
     Boolean isPending() {

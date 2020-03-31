@@ -52,12 +52,16 @@ class Order implements Serializable {
 
     static transients = [
             "isApprovalRequired",
+            "displayStatus",
             "subtotal",
             "totalAdjustments",
             "totalOrderAdjustments",
             "totalOrderItemAdjustments",
             "total",
-            "shipments"
+            "orderedOrderItems",
+            "receivedOrderItems",
+            "shipments",
+            "shippedOrderItems"
     ]
 
     static hasMany = [
@@ -111,6 +115,17 @@ class Order implements Serializable {
     OrderStatus getStatus() {
         return status
     }
+
+    def getDisplayStatus() {
+        for (ShipmentStatusCode statusCode in
+                [ShipmentStatusCode.RECEIVED, ShipmentStatusCode.PARTIALLY_RECEIVED, ShipmentStatusCode.SHIPPED]) {
+            if (shipments.any { Shipment shipment -> shipment?.currentStatus == statusCode}) {
+                return statusCode
+            }
+        }
+        return status
+    }
+
 
     /**
      * Checks to see if this order has been received, or partially received, and
@@ -195,6 +210,19 @@ class Order implements Serializable {
                     a.product?.name <=> b.product?.name ?:
                             a.id <=> b.id
         } : []
+    }
+
+    def getOrderedOrderItems() {
+        return orderItems?.findAll { it.order.status >= OrderStatus.PLACED &&
+                it.orderItemStatusCode != OrderItemStatusCode.CANCELED }
+    }
+
+    def getShippedOrderItems() {
+        return orderItems?.findAll { it.completelyFulfilled }
+    }
+
+    def getReceivedOrderItems() {
+        return orderItems?.findAll { it.completelyReceived }
     }
 
     /**
