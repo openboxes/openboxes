@@ -1094,10 +1094,7 @@ class StockMovementService {
         return StockMovement.createFromShipment(shipment)
     }
 
-
-
     Shipment createInboundShipment(ShipOrderCommand command) {
-
         Order order = command.order
         Shipment shipment = new Shipment()
         shipment.shipmentNumber = identifierService.generateShipmentIdentifier()
@@ -1151,7 +1148,6 @@ class StockMovementService {
 
         stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
 
-            log.info "inventoryItem: ${stockMovementItem.inventoryItem}"
             if (!stockMovementItem.inventoryItem) {
                 stockMovementItem.inventoryItem =
                         inventoryService.findOrCreateInventoryItem(
@@ -1159,7 +1155,6 @@ class StockMovementService {
                                 stockMovementItem?.lotNumber,
                                 stockMovementItem?.expirationDate)
             }
-            log.info "inventoryItem: ${stockMovementItem.inventoryItem}"
 
             ShipmentItem shipmentItem = new ShipmentItem()
             shipmentItem.lotNumber = stockMovementItem.lotNumber
@@ -1211,7 +1206,11 @@ class StockMovementService {
             throw new ValidationException("Invalid requisition", requisition.errors)
         }
 
-        return StockMovement.createFromRequisition(requisition)
+        StockMovement savedStockMovement = StockMovement.createFromRequisition(requisition)
+
+        createShipment(savedStockMovement)
+
+        return savedStockMovement
     }
 
     void addStockListItemsToRequisition(StockMovement stockMovement, Requisition requisition) {
