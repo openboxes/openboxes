@@ -1206,11 +1206,7 @@ class StockMovementService {
             throw new ValidationException("Invalid requisition", requisition.errors)
         }
 
-        StockMovement savedStockMovement = StockMovement.createFromRequisition(requisition)
-
-        createShipment(savedStockMovement)
-
-        return savedStockMovement
+        return StockMovement.createFromRequisition(requisition)
     }
 
     void addStockListItemsToRequisition(StockMovement stockMovement, Requisition requisition) {
