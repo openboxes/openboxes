@@ -9,6 +9,7 @@ import org.pih.warehouse.tablero.IndicatorDatasets
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.core.Location
+import org.joda.time.LocalDate
 
 class IndicatorDataService {
 
@@ -243,13 +244,11 @@ class IndicatorDataService {
 
         List<TableData> indicatorData = []
 
-        def query = dataService.executeQuery("""select count(receipt_item.id) from receipt_item, receipt, shipment WHERE receipt.receipt_status_code = 'RECEIVED' AND shipment.destination_id = """ + location.id + """ AND receipt_item.quantity_shipped <> receipt_item.quantity_received GROUP BY shipment.shipment_number""")
+        LocalDate date = LocalDate.now().minusMonths(querySize)
 
-        for(int i=0; i<100; i++) {
-            indicatorData.push(new TableData(i+10, 'test', i))
-        }
-        
-        indicatorData.push(new TableData(14, 'aVeryVeryVeryLongName', 9))
+        def query = dataService.executeQuery("""select shipment.id, shipment.name, count(receipt_item.id) as count from receipt_item, receipt, shipment WHERE receipt.receipt_status_code = 'RECEIVED' AND shipment.destination_id = """ + location.id + """ AND receipt_item.quantity_shipped <> receipt_item.quantity_received AND receipt.actual_delivery_date > """ + date + """ GROUP BY shipment.shipment_number, shipment.id""")
+
+        indicatorData.push(query)
 
         return indicatorData;
     }
