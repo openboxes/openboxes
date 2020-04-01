@@ -250,10 +250,10 @@ class IndicatorDataService {
 
         LocalDate date = LocalDate.now().minusMonths(querySize)
 
-        def query = dataService.executeQuery("""select shipment.shipment_number as number, shipment.name, count(receipt_item.id) as count from receipt_item inner join receipt inner join shipment WHERE receipt.receipt_status_code = 'RECEIVED' AND shipment.destination_id = """ + location.id + """ AND receipt_item.quantity_shipped <> receipt_item.quantity_received AND receipt.actual_delivery_date > """ + date + """ GROUP BY shipment.shipment_number, shipment.id""")
+        def query = dataService.executeQuery("""select shipment.shipment_number as number, shipment.name, receipt_item.quantity_shipped - receipt_item.quantity_received as count, shipment.requisition_id as requisition from receipt_item inner join receipt inner join shipment WHERE receipt.receipt_status_code = 'RECEIVED' AND shipment.current_status = 'PARTIALLY_RECEIVED' AND shipment.destination_id = """ + location.id + """ AND receipt_item.quantity_shipped <> receipt_item.quantity_received AND receipt.actual_delivery_date > """ + date + """ GROUP BY shipment.shipment_number, shipment.id, receipt_item.quantity_shipped - receipt_item.quantity_received""")
 
         query.each{
-            indicatorData.push(new TableData(it.number, it.name, it.count))
+            indicatorData.push(new TableData(it.number, it.name, it.count, it.requisition))
         }
 
         return indicatorData;

@@ -529,3 +529,11 @@ tbody {
     background-color: #fbfbfb;
   }
 }
+
+.tableLink {
+  color: #282D32;
+  &:hover{
+    cursor: pointer;
+    color: #282D32;
+  }
+}
