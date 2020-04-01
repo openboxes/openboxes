@@ -2134,7 +2134,7 @@ class ShipmentService {
 
     void updateOrCreateOrderBasedShipmentItems(Order order, Shipment shipment) {
         shipment.name = order.name
-        shipment.description = order.description
+        shipment.description = order.orderNumber
         shipment.origin = order.origin
         shipment.destination = order.destination
 
