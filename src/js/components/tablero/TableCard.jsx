@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+/* global _ */
 const TableCard = props => (
   <div>
     <table>
       <thead>
         <tr>
-          <th><span className="small-text">Nº of<br /></span> Shipments</th>
+          <th><span className="small-text">Nº of<br /></span> Shipment</th>
           <th><span className="small-text"><br /></span>Name</th>
           <th><span className="small-text">Nº of<br /></span> Discrepancy</th>
         </tr>
@@ -14,9 +15,9 @@ const TableCard = props => (
       {props.data.map(item => (
         <tbody key={`item-${item.shipments}`}>
           <tr>
-            <td>{item.shipments}</td>
+            <td>{_.truncate(item.shipments, { length: 10, omission: '...' })}</td>
             <td>{item.name}</td>
-            <td>{item.discrepancy}</td>
+            <td>{_.truncate(item.discrepancy, { length: 10, omission: '...' })}</td>
           </tr>
         </tbody>
       ))}

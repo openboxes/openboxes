@@ -3,10 +3,10 @@ package org.pih.warehouse.tablero
 class TableData implements Serializable {
     
     String name;
-    Long shipments;
+    String shipments;
     Long discrepancy;
 
-    TableData(Long shipments, String name, Long discrepancy) {
+    TableData(String shipments, String name, Long discrepancy) {
         this.shipments = shipments;
         this.name = name;
         this.discrepancy = discrepancy;
