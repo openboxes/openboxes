@@ -258,12 +258,7 @@ class StockMovementService {
             throw new ValidationException("Invalid requisition", requisition.errors)
         }
 
-        if (requisition.status in
-                [RequisitionStatus.CHECKING, RequisitionStatus.PICKED, RequisitionStatus.ISSUED]) {
-            log.info "Updating shipment for stock movement ${stockMovement}"
-            updateShipmentOnRequisitionChange(stockMovement)
-        }
-
+        updateShipmentOnRequisitionChange(stockMovement)
         StockMovement savedStockMovement = StockMovement.createFromRequisition(requisition.refresh())
 
         createMissingPicklistItems(savedStockMovement)
@@ -1222,8 +1217,11 @@ class StockMovementService {
         if (requisition.hasErrors() || !requisition.save(flush: true)) {
             throw new ValidationException("Invalid requisition", requisition.errors)
         }
+        StockMovement savedStockMovement = StockMovement.createFromRequisition(requisition)
 
-        return StockMovement.createFromRequisition(requisition)
+        createShipment(savedStockMovement)
+
+        return savedStockMovement
     }
 
     void addStockListItemsToRequisition(StockMovement stockMovement, Requisition requisition) {
@@ -1602,6 +1600,7 @@ class StockMovementService {
         if (!shipment) {
             shipment = new Shipment()
         } else {
+            createMissingShipmentItems(stockMovement.requisition, shipment)
             return shipment
         }
 
@@ -1619,8 +1618,6 @@ class StockMovementService {
         shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
 
         shipment.name = stockMovement.generateName()
-
-        createMissingShipmentItems(stockMovement.requisition, shipment)
 
         if (shipment.hasErrors() || !shipment.save(flush: true)) {
             throw new ValidationException("Invalid shipment", shipment.errors)
@@ -1945,7 +1942,7 @@ class StockMovementService {
     void validateRequisition(Requisition requisition) {
 
         requisition.requisitionItems.each { requisitionItem ->
-            if (!requisition.origin.isSupplier() && requisition.origin.supports(ActivityCode.MANAGE_INVENTORY)) {
+            if (!requisition.origin.isSupplier() && requisition.origin.supports(ActivityCode.MANAGE_INVENTORY) && requisition.status > RequisitionStatus.CREATED) {
                 validateRequisitionItem(requisitionItem)
             }
         }
