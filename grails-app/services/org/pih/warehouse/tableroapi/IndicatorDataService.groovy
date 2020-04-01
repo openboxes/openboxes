@@ -264,7 +264,7 @@ class IndicatorDataService {
             group by s.shipmentNumber, s.id
         """, ['location': location, 'date': date])
 
-        query.each{
+        query.each {
             indicatorData.push(new TableData(it[0], it[1], it[2], it[3].id))
         }
 
