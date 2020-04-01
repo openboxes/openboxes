@@ -14,20 +14,46 @@ import org.joda.time.LocalDate
 
 class IndicatorDataService {
 
-    def dataService
+    def dashboardService
 
-    DataGraph getExpirationSummaryData(def expirationData) {
-        List listData = []
-        for(item in expirationData){
-            def tmp = item.value? item.value : 0
-            listData.push(tmp)
+    DataGraph getExpirationSummaryData(Location location, def params) {
+        Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
+
+        // expirationSummary lists every expired item based on its month
+        List expirationSummary = [0] * querySize
+        List listLabels = []
+        List expirationAlerts = dashboardService.getExpirationAlerts(location)
+
+        LocalDate date = LocalDate.now()
+
+        expirationAlerts.each {
+            Integer daysCounter = 0
+            // We should count only items that will expire someday
+            if(it.inventoryItem.expires != "never") {
+                // If an item is already inspired, we don't count it
+                if (it.daysToExpiry > 0) {
+                    listLabels = []
+                    // For loop verifies if item expires in querySize coming months
+                    for (int i=0; i<=querySize; i++) {
+                        // daysCounter += number of days of (i) month
+                        daysCounter += date.plusMonths(i).dayOfMonth().getMaximumValue()
+
+                        String monthLabel = date.plusMonths(i).toString("MMM", Locale.US)
+                        listLabels.push(monthLabel)
+                        // if item expires in daysCounter incoming days, we count it
+                        if (it.daysToExpiry <= daysCounter ) {
+                            expirationSummary[i] =  expirationSummary[i] ? expirationSummary[i] + 1 : 1
+                        } 
+                    }
+                } 
+            }
         }
-        
+
         List<IndicatorDatasets> datasets = [
-            new IndicatorDatasets('Expiration summary', listData)
+            new IndicatorDatasets('Expiration(s)', expirationSummary)
         ];
 
-        IndicatorData data = new IndicatorData(datasets, ['Expired', '30 Days', '60 Days', '90 Days', '180 Days', '365 Days', '+365 Days']);
+        IndicatorData data = new IndicatorData(datasets, listLabels);
 
         DataGraph indicatorData = new DataGraph(data, 1, "Expiration summary", "line");
 
@@ -113,7 +139,7 @@ class IndicatorDataService {
         return indicatorData;
     }
 
-    DataGraph getSentStockMovements(def location, def params) {
+    DataGraph getSentStockMovements(Location location, def params) {
         Integer querySize = params.querySize? params.querySize.toInteger()-1 : 5
         Date today = new Date()
         today.clearTime()
@@ -122,7 +148,10 @@ class IndicatorDataService {
         Date queryLimit = today.clone()
         queryLimit.set(month: today.month - querySize, date: 1) 
 
-        List queryData = Shipment.executeQuery("SELECT COUNT(s.id), s.destination, MONTH(s.lastUpdated), YEAR(s.lastUpdated) FROM Shipment s WHERE s.origin = :location AND s.currentStatus <> 'PENDING' AND s.lastUpdated > :limit GROUP BY MONTH(s.lastUpdated), YEAR(s.lastUpdated), s.destination", 
+        List queryData = Shipment.executeQuery("""SELECT COUNT(s.id), s.destination, 
+        MONTH(s.lastUpdated), YEAR(s.lastUpdated) FROM Shipment s WHERE s.origin = :location 
+        AND s.currentStatus <> 'PENDING' AND s.lastUpdated > :limit 
+        GROUP BY MONTH(s.lastUpdated), YEAR(s.lastUpdated), s.destination""", 
         ['location': location, 'limit': queryLimit])
         // queryData gives an array of arrays [[count, destination, month, year], ...] of sent stock
         
@@ -140,17 +169,18 @@ class IndicatorDataService {
 
             // Loop 2: Give each requested month a value, label and month label; value is 0 when month have no data
             for(int i = querySize; i >= 0; i--) {
-                Date month = today.clone()
-                month.set(month: today.month - i, date: 1)
+                Date tmpDate = today.clone()
+                tmpDate.set(month: today.month - i, date: 1)
 
                 // Places 0 in months where there is no sent stock, else places item total counted
                 Integer value = 0
-                if (month.month == item[2]-1 && month.year + 1900 == item[3]) {
+                // Year + 1900 because groovy's date starts counting from 1900. Ex: 2020 = 120
+                if (tmpDate.month == item[2] - 1 && tmpDate.year + 1900 == item[3]) {
                     value = item[0]
                 }
 
                 // Pushs month label in label array and sent stock in the data array
-                String monthLabel = new java.text.DateFormatSymbols().months[month.month].substring(0,3)
+                String monthLabel = new java.text.DateFormatSymbols().months[tmpDate.month].substring(0,3)
                 listLabel.push(monthLabel)
                 listData.push(value)
             }
@@ -166,37 +196,56 @@ class IndicatorDataService {
         return indicatorData;
     }
 
-    DataGraph getReceivedStockData(def location) {
-        List listData = []
-        List listLabel = []
+    DataGraph getReceivedStockData(Location location, def params) {
+        Integer querySize = params.querySize? params.querySize.toInteger() - 1 : 5
         Date today = new Date()
         today.clearTime()
-        for(int i=5;i>=0;i--){
-            def monthBegin = today.clone()
-            def monthEnd = today.clone()
-            monthBegin.set(month: today.month - i, date: 1)
-            monthEnd.set(month: today.month - i + 1, date: 1)
-                
-            def temp = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated >= :monthOne and r.dateCreated < :monthTwo and r.destination = :location""",
-            ['monthOne': monthBegin, 'monthTwo': monthEnd, 'location': location]);
-            String monthLabel = new java.text.DateFormatSymbols().months[monthBegin.month]
+        
+        Date queryLimit = today.clone()
+        queryLimit.set(month: today.month - querySize, date: 1) 
 
-            listLabel.push(monthLabel)
-            listData.push(temp[0])
+        List queryData = Shipment.executeQuery("""SELECT COUNT(s.id), s.origin, 
+        MONTH(s.lastUpdated), YEAR(s.lastUpdated) FROM Shipment s WHERE s.destination = :location 
+        AND s.currentStatus <> 'PENDING' AND s.lastUpdated > :limit 
+        GROUP BY MONTH(s.lastUpdated), YEAR(s.lastUpdated), s.origin""", 
+        ['location': location, 'limit': queryLimit])
+        
+        List listRes = []
+        List listLabel = []
+        for(item in queryData) {
+            // item[0]: item total counted
+            // item[1]: item origin
+            // item[2]: item month
+            // item[3]: item year
+            Location itemLocation = item[1]
+            List listData = []
+            listLabel = []
+
+            for(int i = querySize; i >= 0; i--) {
+                Date tmpDate = today.clone()
+                tmpDate.set(month: today.month - i, date: 1)
+
+                Integer value = 0
+                if (tmpDate.month == item[2] - 1 && tmpDate.year + 1900 == item[3]) {
+                    value = item[0]
+                }
+
+                String monthLabel = new java.text.DateFormatSymbols().months[tmpDate.month].substring(0,3)
+                listLabel.push(monthLabel)
+                listData.push(value)
+            }
+            listRes.push(new IndicatorDatasets(itemLocation.name, listData))
         }
-
-        List<IndicatorDatasets> datasets = [
-            new IndicatorDatasets('Stock movements received', listData)
-        ];
+        List<IndicatorDatasets> datasets = listRes;
 
         IndicatorData data = new IndicatorData(datasets, listLabel);
 
-        DataGraph indicatorData = new DataGraph(data, 1, "Stock movements received", "doughnut");
+        DataGraph indicatorData = new DataGraph(data, 1, "Stock Movements Sent by Month", "bar");
 
         return indicatorData;
     }
 
-    NumberIndicator getOutgoingStock(def location) {
+    NumberIndicator getOutgoingStock(Location location) {
         Date today = new Date()
         today.clearTime();
         def m4 = today - 4;
@@ -220,7 +269,7 @@ class IndicatorDataService {
         return indicatorData;
     }
 
-    NumberIndicator getIncomingStock(def location) {
+    NumberIndicator getIncomingStock(Location location) {
         Date today = new Date()
         today.clearTime();
         def m4 = today - 4;

@@ -1100,7 +1100,7 @@ class AddItemsPage extends Component {
   }
 
   render() {
-    const showOnly = this.props.showOnly && this.state.values.statusCode !== 'CREATED';
+    const showOnly = this.props.showOnly && (this.state.values.statusCode !== 'CREATED' || !request);
     return (
       <Form
         onSubmit={() => {}}

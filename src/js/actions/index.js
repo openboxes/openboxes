@@ -10,6 +10,8 @@ import {
   TRANSLATIONS_FETCHED,
   CHANGE_CURRENT_LOCALE,
   FETCH_INDICATORS,
+  FETCH_NUMBERS,
+  RESET_INDICATORS,
   ADD_TO_INDICATORS,
   REMOVE_FROM_INDICATORS,
   REORDER_INDICATORS,
@@ -106,8 +108,15 @@ export function changeCurrentLocale(locale) {
 
 // New Dashboard
 
-// eslint-disable-next-line max-len
-function fetchIndicator(dispatch, indicatorMethod, indicatorType, indicatorTitle, link = null, indicatorId = null, params = null) {
+function fetchIndicator(
+  dispatch,
+  indicatorMethod,
+  indicatorType,
+  indicatorTitle,
+  link = null,
+  indicatorId = null,
+  params = '',
+) {
   const archived = 0;
   const id = indicatorId || Math.random();
 
@@ -163,13 +172,19 @@ export function reloadIndicator(method, type, title, link, id, params) {
 
 export function fetchIndicators() {
   return (dispatch) => {
-    fetchIndicator(dispatch, 'getExpirationSummary', 'line', 'Expiration Summary');
+    fetchIndicator(dispatch, 'getExpirationSummary', 'line', 'Expiration Summary', '/openboxes/inventory/listExpiringStock');
     fetchIndicator(dispatch, 'getFillRate', 'bar', 'Fill Rate');
     fetchIndicator(dispatch, 'getInventorySummary', 'horizontalBar', 'Inventory Summary');
     fetchIndicator(dispatch, 'getSentStockMovements', 'bar', 'Stock Movements Sent by Month');
-    fetchIndicator(dispatch, 'getReceivedStockMovements', 'doughnut', 'Stock Movements Received');
+    fetchIndicator(dispatch, 'getReceivedStockMovements', 'bar', 'Incoming Stock Movements by Month');
     fetchIndicator(dispatch, 'getOutgoingStock', 'numbers', 'Outgoing Stock Movements in Progress', '/openboxes/stockMovement/list?receiptStatusCode=PENDING');
     fetchIndicator(dispatch, 'getDiscrepancy', 'table', 'Items received with a discrepancy');
+  };
+}
+
+export function resetIndicators() {
+  return {
+    type: RESET_INDICATORS,
   };
 }
 
@@ -190,5 +205,20 @@ export function reorderIndicators({ oldIndex, newIndex }, e) {
   return {
     type: REORDER_INDICATORS,
     payload: { oldIndex, newIndex },
+  };
+}
+
+export function fetchNumbersData() {
+  const url = '/openboxes/apitablero/getNumberData';
+
+  return (dispatch) => {
+    apiClient.get(url).then((res) => {
+      dispatch({
+        type: FETCH_NUMBERS,
+        payload: {
+          data: res.data,
+        },
+      });
+    });
   };
 }

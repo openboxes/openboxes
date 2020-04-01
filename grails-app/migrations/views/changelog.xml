@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet id="1580848680306-1" author="jmiranda" runAlways="true" failOnError="false">
+    <sqlFile path="views/product-demand-view.sql"/>
+  </changeSet>
+  <changeSet id="1580848680306-2" author="jmiranda" runAlways="true" failOnError="false">
+    <sqlFile path="views/product-inventory-snapshot-view.sql"/>
+  </changeSet>
+  <changeSet id="1580848680306-3" author="jmiranda" runAlways="true" failOnError="false">
+    <sqlFile path="views/product-inventory-extended-view.sql"/>
+  </changeSet>
+  <changeSet id="1580848680306-4" author="jmiranda" runAlways="true" failOnError="false">
+    <sqlFile path="views/product-inventory-pivot-view.sql"/>
+  </changeSet>
+  <changeSet id="1580848680306-5" author="jmiranda" runAlways="true" failOnError="false">
+    <sqlFile path="views/product-inventory-compare-view.sql"/>
+  </changeSet>
+  <changeSet id="1580848680306-6" author="jmiranda" runAlways="true" failOnError="false">
+    <sqlFile path="views/product-inventory-expiry-view.sql"/>
+  </changeSet>
+</databaseChangeLog>

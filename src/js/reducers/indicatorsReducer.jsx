@@ -3,21 +3,23 @@ import update from 'immutability-helper';
 import {
   ADD_TO_INDICATORS,
   FETCH_INDICATORS,
+  FETCH_NUMBERS,
   REMOVE_FROM_INDICATORS,
   REORDER_INDICATORS,
+  RESET_INDICATORS,
 } from '../actions/types';
 
-function arrayArchive(array, index) {
+function arrayArchive(array = [], index) {
   const newArray = update(array, { [index]: { archived: { $set: 1 } } });
   return newArray;
 }
 
-function arrayUnarchive(array, index) {
+function arrayUnarchive(array = [], index) {
   const newArray = update(array, { [index]: { archived: { $set: 0 } } });
   return newArray;
 }
 
-function findInArray(id, array) {
+function findInArray(id, array = []) {
   for (let i = 0; i < array.length; i += 1) {
     if (array[i].id === id) {
       return i;
@@ -28,6 +30,7 @@ function findInArray(id, array) {
 
 const initialState = {
   data: [],
+  numberData: [],
 };
 
 export default function (state = initialState, action) {
@@ -46,6 +49,8 @@ export default function (state = initialState, action) {
         data: newState,
       };
     }
+    case RESET_INDICATORS:
+      return initialState;
     case REORDER_INDICATORS:
       return {
         ...state,
@@ -64,6 +69,11 @@ export default function (state = initialState, action) {
       return {
         ...state,
         data: arrayArchive(state.data, action.payload.index),
+      };
+    case FETCH_NUMBERS:
+      return {
+        ...state,
+        numberData: action.payload.data,
       };
     default:
       return state;

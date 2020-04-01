@@ -5,7 +5,7 @@ import { SortableElement, sortableHandle } from 'react-sortable-hoc';
 import LoadingCard from './LoadingCard';
 import Numbers from './Numbers';
 import TableCard from './TableCard';
-import { loadColors } from '../../consts/dataFormat/dataLoading';
+import { loadColors, loadOptions } from '../../consts/dataFormat/dataLoading';
 
 
 const DragHandle = sortableHandle(() => (
@@ -18,29 +18,22 @@ const GraphCard = SortableElement(({
   const cardData = data;
   let graph;
   let filter = 0;
-  const stackedBar = {
-    scales: {
-      xAxes: [{
-        stacked: true,
-      }],
-      yAxes: [{
-        stacked: true,
-      }],
-    },
-  };
+  let label = 'Last';
   if (cardType === 'line') {
     cardData.datasets = loadColors(data, 'line');
-    graph = <Line data={data} />;
+    graph = <Line data={data} options={loadOptions()} />;
+    filter = 1;
+    label = 'Next';
   } else if (cardType === 'bar') {
     cardData.datasets = loadColors(data, 'bar');
-    graph = <Bar data={data} options={cardMethod === 'getFillRate' ? null : stackedBar} />;
+    graph = <Bar data={data} options={loadOptions(cardMethod !== 'getFillRate')} />;
     filter = 1;
   } else if (cardType === 'doughnut') {
     cardData.datasets = loadColors(data, 'doughnut');
-    graph = <Doughnut data={data} />;
+    graph = <Doughnut data={data} options={loadOptions()} />;
   } else if (cardType === 'horizontalBar') {
     cardData.datasets = loadColors(data, 'horizontalBar');
-    graph = <HorizontalBar data={data} />;
+    graph = <HorizontalBar data={data} options={loadOptions()} />;
   } else if (cardType === 'numbers') {
     graph = <Numbers data={data} />;
   } else if (cardType === 'table') {
@@ -72,11 +65,11 @@ const GraphCard = SortableElement(({
             disabled={!filter}
             defaultValue="6"
           >
-            <option value="1">Last Month</option>
-            <option value="3">Last 3 Months</option>
-            <option value="6">Last 6 Months</option>
-            <option value="12">Last Year</option>
-            <option value="24">Last 2 Years</option>
+            <option value="1">{label} Month</option>
+            <option value="3">{label} 3 Months</option>
+            <option value="6">{label} 6 Months</option>
+            <option value="12">{label} Year</option>
+            <option value="24">{label} 2 Years</option>
           </select>
         </div>
         {graph}

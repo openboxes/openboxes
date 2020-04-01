@@ -9,7 +9,6 @@ import org.pih.warehouse.tableroapi.IndicatorDataService
 
 class ApitableroController {
 
-    def dashboardService
     def numberDataService
     def indicatorDataService
     def inventorySnapshotService
@@ -22,8 +21,7 @@ class ApitableroController {
 
     def getExpirationSummary = {
         Location location = Location.get(session?.warehouse?.id)
-        def expirationData = dashboardService.getExpirationSummary(location)
-        def expirationSummary = indicatorDataService.getExpirationSummaryData(expirationData)["data"]
+        def expirationSummary = indicatorDataService.getExpirationSummaryData(location, params)["data"]
         render (expirationSummary.toJson() as JSON)
     }
 
@@ -47,7 +45,7 @@ class ApitableroController {
 
     def getReceivedStockMovements = {
         Location location = Location.get(session?.warehouse?.id)
-        def receivedStockMovements = indicatorDataService.getReceivedStockData(location)["data"]
+        def receivedStockMovements = indicatorDataService.getReceivedStockData(location, params)["data"]
         render (receivedStockMovements.toJson() as JSON)
     }
 

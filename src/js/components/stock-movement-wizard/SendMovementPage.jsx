@@ -351,7 +351,7 @@ class SendMovementPage extends Component {
    * @public
    */
   getFields() {
-    if (this.state.values.origin.type === 'SUPPLIER') {
+    if (this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory) {
       return SUPPLIER_FIELDS;
     }
     return FIELDS;

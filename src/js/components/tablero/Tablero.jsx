@@ -4,8 +4,14 @@ import { defaults } from 'react-chartjs-2';
 import { connect } from 'react-redux';
 import { SortableContainer } from 'react-sortable-hoc';
 import 'react-table/react-table.css';
-import { addToIndicators, fetchIndicators, reorderIndicators, reloadIndicator } from '../../actions';
-import apiClient from '../../utils/apiClient';
+import {
+  addToIndicators,
+  fetchIndicators,
+  reorderIndicators,
+  reloadIndicator,
+  fetchNumbersData,
+  resetIndicators,
+} from '../../actions';
 import GraphCard from './GraphCard';
 import LoadingNumbers from './LoadingNumbers';
 import NumberCard from './NumberCard';
@@ -69,25 +75,27 @@ const ArchiveIndicator = ({ hideArchive }) => (
 
 
 class Tablero extends Component {
-  state = {
-    isDragging: false,
-    showPopout: false,
-  };
-  componentDidMount() {
-    this.fetchData();
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      isDragging: false,
+      showPopout: false,
+    };
   }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.currentLocation !== this.props.currentLocation) {
+      this.fetchData();
+    }
+  }
+
   dataFetched = false;
 
   fetchData() {
+    this.props.resetIndicators();
     this.props.fetchIndicators();
-    this.fetchNumbersData();
-  }
-
-  fetchNumbersData() {
-    const url = '/openboxes/apitablero/getNumberData';
-    apiClient.get(url).then((res) => {
-      this.setState({ numberData: res.data });
-    });
+    this.props.fetchNumbersData();
   }
 
   sortStartHandle = () => {
@@ -119,7 +127,7 @@ class Tablero extends Component {
   render() {
     return (
       <div className="cardsContainer">
-        <NumberCardsRow data={this.state.numberData} />
+        <NumberCardsRow data={this.props.numberData} />
         <SortableCards
           data={this.props.indicatorsData}
           onSortStart={this.sortStartHandle}
@@ -142,6 +150,8 @@ class Tablero extends Component {
 
 const mapStateToProps = state => ({
   indicatorsData: state.indicators.data,
+  numberData: state.indicators.numberData,
+  currentLocation: state.session.currentLocation.id,
 });
 
 export default connect(mapStateToProps, {
@@ -149,18 +159,26 @@ export default connect(mapStateToProps, {
   reloadIndicator,
   addToIndicators,
   reorderIndicators,
+  fetchNumbersData,
+  resetIndicators,
 })(Tablero);
 
 Tablero.defaultProps = {
+  currentLocation: null,
   indicatorsData: null,
+  numberData: [],
 };
 
 Tablero.propTypes = {
   fetchIndicators: PropTypes.func.isRequired,
   reorderIndicators: PropTypes.func.isRequired,
   indicatorsData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  numberData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   addToIndicators: PropTypes.func.isRequired,
   reloadIndicator: PropTypes.func.isRequired,
+  fetchNumbersData: PropTypes.func.isRequired,
+  resetIndicators: PropTypes.func.isRequired,
+  currentLocation: PropTypes.string.isRequired,
 };
 
 NumberCardsRow.defaultProps = {
