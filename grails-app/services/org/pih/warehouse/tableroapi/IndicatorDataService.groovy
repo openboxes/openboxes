@@ -8,6 +8,7 @@ import org.pih.warehouse.tablero.NumberIndicator
 import org.pih.warehouse.tablero.IndicatorDatasets
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.core.Location
 import org.joda.time.LocalDate
 
@@ -248,12 +249,23 @@ class IndicatorDataService {
 
         List<TableData> indicatorData = []
 
-        LocalDate date = LocalDate.now().minusMonths(querySize)
+        Date date = LocalDate.now().minusMonths(querySize).toDate()
 
-        def query = dataService.executeQuery("""select shipment.shipment_number as number, shipment.name, count(receipt_item.id) as count, shipment.requisition_id as requisition from receipt_item inner join receipt inner join shipment WHERE receipt.receipt_status_code = 'RECEIVED' AND shipment.current_status = 'PARTIALLY_RECEIVED' AND shipment.destination_id = """ + location.id + """ AND receipt_item.quantity_shipped <> receipt_item.quantity_received AND receipt.actual_delivery_date > """ + date + """ GROUP BY shipment.shipment_number, shipment.id""")
+        def query = ReceiptItem.executeQuery("""
+            select s.shipmentNumber as number, s.name as name, count(ri.id) as count, s.requisition as requisition 
+            from ReceiptItem as ri
+            left join ri.receipt as r
+            left join r.shipment as s
+            where r.receiptStatusCode = 'RECEIVED'
+            and s.currentStatus = 'PARTIALLY_RECEIVED'
+            and s.destination = :location 
+            and ri.quantityShipped <> ri.quantityReceived
+            and r.actualDeliveryDate > :date 
+            group by s.shipmentNumber, s.id
+        """, ['location': location, 'date': date])
 
         query.each{
-            indicatorData.push(new TableData(it.number, it.name, it.count, it.requisition))
+            indicatorData.push(new TableData(it[0], it[1], it[2], it[3].id))
         }
 
         return indicatorData;
