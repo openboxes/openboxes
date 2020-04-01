@@ -10,6 +10,7 @@ import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
 import queryString from 'query-string';
 import moment from 'moment';
+import update from 'immutability-helper';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -389,8 +390,30 @@ class AddItemsPage extends Component {
    * @public
    */
   getLineItemsToBeSaved(lineItems) {
-    const lineItemsToBeAdded = _.filter(lineItems, item =>
+    const newItems = _.filter(lineItems, item =>
       !item.statusCode && item.quantityRequested && item.quantityRequested !== '0' && item.product);
+    let lineItemsToBeAdded = [];
+    _.forEach(newItems, (item) => {
+      // Search for duplicated item with the same product.id
+      const duplicatedItemIndex = _.findIndex(
+        lineItemsToBeAdded,
+        duplicate => _.get(duplicate, 'product.id') === _.get(item, 'product.id'),
+      );
+      // If there are duplicated items to add they should be consolidated into one
+      if (duplicatedItemIndex >= 0 && !(this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory)) {
+        // Add current item quantity to duplicated item quantity
+        lineItemsToBeAdded = update(lineItemsToBeAdded, {
+          [duplicatedItemIndex]: {
+            quantityRequested: {
+              $set: _.toInteger(item.quantityRequested) +
+              _.toInteger(lineItemsToBeAdded[duplicatedItemIndex].quantityRequested),
+            },
+          },
+        });
+      } else {
+        lineItemsToBeAdded.push(item);
+      }
+    });
     const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
@@ -401,6 +424,11 @@ class AddItemsPage extends Component {
         oldItem.recipient.id : oldItem.recipient;
       const newRecipient = item.recipient && _.isObject(item.recipient) ?
         item.recipient.id : item.recipient;
+      // Check if there is newly created item to add with the same product.id
+      const duplicatedItemIndex = _.findIndex(
+        lineItemsToBeAdded,
+        duplicate => _.get(duplicate, 'product.id') === _.get(item, 'product.id'),
+      );
 
       // Intersection of keys common to both objects (excluding product key)
       const keyIntersection = _.remove(
@@ -419,6 +447,21 @@ class AddItemsPage extends Component {
         )
       ) {
         lineItemsToBeUpdated.push(item);
+      } else if (duplicatedItemIndex >= 0 && !(this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory)) {
+        // Add quantity of duplicated item to item that already exists and should be updated
+        const itemToUpdate = update(item, {
+          quantityRequested: {
+            $set: _.toInteger(item.quantityRequested) +
+              _.toInteger(lineItemsToBeAdded[duplicatedItemIndex].quantityRequested),
+          },
+        });
+        // Remove duplicated item from items to be added
+        lineItemsToBeAdded = update(lineItemsToBeAdded, {
+          $splice: [
+            [duplicatedItemIndex, 1],
+          ],
+        });
+        lineItemsToBeUpdated.push(itemToUpdate);
       } else if (newQty !== oldQty || newRecipient !== oldRecipient) {
         lineItemsToBeUpdated.push(item);
       }
