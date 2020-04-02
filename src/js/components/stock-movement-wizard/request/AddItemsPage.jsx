@@ -695,6 +695,10 @@ class AddItemsPage extends Component {
       .catch(err => err);
   }
 
+  isRowLoaded({ index }) {
+    return !!this.state.values.lineItems[index];
+  }
+
   /**
    * Fetches stock movement's line items and sets them in redux form and in
    * state as current line items.

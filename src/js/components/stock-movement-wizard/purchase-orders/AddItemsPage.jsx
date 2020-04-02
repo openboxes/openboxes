@@ -36,7 +36,7 @@ const DELETE_BUTTON_FIELD = {
     onClick: fieldValue && fieldValue.id ?
       () => null :
       () => { updateTotalCount(-1); removeRow(); },
-    disabled: !!fieldValue.id,
+    disabled: fieldValue && fieldValue.id,
   }),
   attributes: {
     className: 'btn btn-outline-danger',
@@ -429,6 +429,36 @@ class AddItemsPage extends Component {
         this.setLineItems(response);
       })
       .catch(err => err);
+  }
+
+  /**
+   * Fetches stock movement's line items and sets them in redux form and in
+   * state as current line items.
+   * @public
+   */
+  fetchAddItemsPageData() {
+    this.props.showSpinner();
+
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
+    apiClient.get(url)
+      .then((resp) => {
+        const { hasManageInventory } = resp.data.data;
+        const { statusCode } = resp.data.data;
+        const { totalCount } = resp.data;
+
+        this.setState({
+          values: {
+            ...this.state.values,
+            hasManageInventory,
+            statusCode,
+          },
+          totalCount: totalCount === 0 ? 1 : totalCount,
+        }, () => this.props.hideSpinner());
+      });
+  }
+
+  isRowLoaded({ index }) {
+    return !!this.state.values.lineItems[index];
   }
 
   loadMoreRows({ startIndex, stopIndex }) {
