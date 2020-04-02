@@ -62,7 +62,6 @@ class FieldArrayComponent extends Component {
       }
     };
     const TableBodyComponent = virtualized && isPaginated ? TableBodyVirtualized : TableBody;
-    const { hasBinLocationSupport } = properties;
 
     return (
       <div className="d-flex flex-column">

@@ -22,10 +22,11 @@ import TextField from '../../form-elements/TextField';
 import LabelField from '../../form-elements/LabelField';
 import { debounceLocationsFetch } from '../../../utils/option-utils';
 import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
+import ArrayField from '../../form-elements/ArrayField';
 
 const showOnly = queryString.parse(window.location.search).type === 'REQUEST';
 
-const SHIPMENT_FIELDS = {
+const BASIC_FIELDS = {
   description: {
     label: 'react.stockMovement.description.label',
     defaultMessage: 'Description',
@@ -91,7 +92,7 @@ const SHIPMENT_FIELDS = {
   },
 };
 
-const FIELDS = {
+const SHIPMENT_FIELDS = {
   dateShipped: {
     type: DateField,
     label: 'react.stockMovement.shipDate.label',
@@ -145,6 +146,63 @@ const FIELDS = {
   },
 };
 
+const SUPPLIER_FIELDS = {
+  tableItems: {
+    type: ArrayField,
+    virtualized: true,
+    totalCount: ({ totalCount }) => totalCount,
+    isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
+    loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
+    fields: {
+      palletName: {
+        type: LabelField,
+        label: 'react.stockMovement.packLevel1.label',
+        defaultMessage: 'Pack level 1',
+      },
+      boxName: {
+        type: LabelField,
+        label: 'react.stockMovement.packLevel2.label',
+        defaultMessage: 'Pack level 2',
+      },
+      productCode: {
+        type: LabelField,
+        label: 'react.stockMovement.code.label',
+        defaultMessage: 'Code',
+      },
+      'product.name': {
+        type: LabelField,
+        label: 'react.stockMovement.product.label',
+        defaultMessage: 'Product',
+        headerAlign: 'left',
+        attributes: {
+          className: 'text-left',
+        },
+      },
+      lotNumber: {
+        type: LabelField,
+        label: 'react.stockMovement.lot.label',
+        defaultMessage: 'Lot',
+      },
+      expirationDate: {
+        type: LabelField,
+        label: 'react.stockMovement.expiry.label',
+        defaultMessage: 'Expiry',
+      },
+      quantityRequested: {
+        type: LabelField,
+        fixedWidth: '150px',
+        label: 'react.stockMovement.quantityPicked.label',
+        defaultMessage: 'Qty Picked',
+      },
+      'recipient.name': {
+        type: LabelField,
+        label: 'react.stockMovement.recipient.label',
+        defaultMessage: 'Recipient',
+      },
+    },
+  },
+};
+
 function validate(values) {
   const errors = {};
 
@@ -169,14 +227,15 @@ class SendMovementPage extends Component {
     super(props);
     this.state = {
       shipmentTypes: [],
-      tableItems: [],
-      supplier: false,
       documents: [],
       files: [],
-      values: this.props.initialValues,
+      values: { ...this.props.initialValues, tableItems: [] },
+      totalCount: 0,
     };
     this.props.showSpinner();
     this.onDrop = this.onDrop.bind(this);
+    this.isRowLoaded = this.isRowLoaded.bind(this);
+    this.loadMoreRows = this.loadMoreRows.bind(this);
 
     this.debouncedLocationsFetch =
       debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength);
@@ -285,6 +344,39 @@ class SendMovementPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  fetchStockMovementItems() {
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=6`;
+    apiClient.get(url)
+      .then((response) => {
+        const { data } = response.data;
+        const tableItems = data;
+        this.setState({
+          values: {
+            ...this.state.values,
+            tableItems,
+          },
+        });
+      });
+  }
+
+  loadMoreRows({ startIndex, stopIndex }) {
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${stopIndex - startIndex > 0 ? stopIndex - startIndex : 1}&stepNumber=6`;
+    apiClient.get(url)
+      .then((response) => {
+        const { data } = response.data;
+        this.setState({
+          values: {
+            ...this.state.values,
+            tableItems: _.uniq(_.concat(this.state.values.tableItems, data)),
+          },
+        });
+      });
+  }
+
+  isRowLoaded({ index }) {
+    return !!this.state.values.tableItems[index];
+  }
+
   /**
    * Fetches 5th step data from current stock movement.
    * @public
@@ -296,23 +388,13 @@ class SendMovementPage extends Component {
       .then((response) => {
         const stockMovementData = response.data.data;
         const { associations } = response.data.data;
+        const { totalCount } = response.data;
 
-        let tableItems;
-        let supplier;
-        if (!_.isEmpty(stockMovementData) && stockMovementData.packPage
-          && stockMovementData.packPage.packPageItems.length) {
-          tableItems = stockMovementData.packPage.packPageItems;
-          supplier = false;
-        } else {
-          tableItems = stockMovementData.lineItems;
-          supplier = true;
-        }
         const documents = _.filter(associations.documents, doc => doc.stepNumber === 5);
         const destinationType = stockMovementData.destination.locationType;
         this.setState({
-          tableItems,
-          supplier,
           documents,
+          totalCount,
           values: {
             ...this.state.values,
             dateShipped: stockMovementData.dateShipped,
@@ -334,6 +416,9 @@ class SendMovementPage extends Component {
         }, () => {
           this.props.nextPage(this.state.values);
           this.fetchShipmentTypes();
+          if (!this.props.isPaginated) {
+            this.fetchStockMovementItems();
+          }
         });
       })
       .catch(() => this.props.hideSpinner());
@@ -523,7 +608,7 @@ class SendMovementPage extends Component {
             <form onSubmit={handleSubmit}>
               <div className="d-flex">
                 <div id="stockMovementInfo" style={{ flexGrow: 2 }}>
-                  {_.map(SHIPMENT_FIELDS, (fieldConfig, fieldName) =>
+                  {_.map(BASIC_FIELDS, (fieldConfig, fieldName) =>
                     renderFormField(fieldConfig, fieldName, {
                       canBeEdited: values.statusCode === 'ISSUED' && !values.received,
                       issued: values.statusCode === 'ISSUED',
@@ -602,7 +687,7 @@ class SendMovementPage extends Component {
                   <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>
                 </button> }
               <div className="col-md-9 pl-0">
-                {_.map(FIELDS, (fieldConfig, fieldName) =>
+                {_.map(SHIPMENT_FIELDS, (fieldConfig, fieldName) =>
                   renderFormField(fieldConfig, fieldName, {
                     shipmentTypes: this.state.shipmentTypes,
                     issued: values.statusCode === 'ISSUED',
@@ -635,55 +720,16 @@ class SendMovementPage extends Component {
                     <span><i className="fa fa-undo pr-2" /><Translate id="react.default.button.rollback.label" defaultMessage="Rollback" /></span>
                   </button> : null
                 }
-                <table className="table table-striped text-center border my-2 table-xs">
-                  <thead>
-                    <tr>
-                      <th><Translate id="react.stockMovement.packLevel1.label" defaultMessage="Pack level 1" /> </th>
-                      <th><Translate id="react.stockMovement.packLevel2.label" defaultMessage="Pack level 2" /> </th>
-                      <th><Translate id="react.stockMovement.code.label" defaultMessage="Code" /> </th>
-                      <th className="text-left"><span className="ml-4"><Translate id="react.stockMovement.product.label" defaultMessage="Product" /></span></th>
-                      <th><Translate id="react.stockMovement.lot.label" defaultMessage="Lot" /> </th>
-                      <th><Translate id="react.stockMovement.expiry.label" defaultMessage="Expiry" /> </th>
-                      <th style={{ width: '150px' }}><Translate id="react.stockMovement.quantityPicked.label" defaultMessage="Qty Picked" /> </th>
-                      {!(this.state.supplier) && this.props.hasBinLocationSupport &&
-                      <th><Translate id="react.stockMovement.binLocation.label" defaultMessage="Bin Location" /> </th>
-                    }
-                      <th><Translate id="react.stockMovement.recipient.label" defaultMessage="Recipient" /> </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {
-                    _.map(
-                      this.state.tableItems,
-                      (item, index) =>
-                        (
-                          <tr key={index}>
-                            <td>{item.palletName}</td>
-                            <td>{item.boxName}</td>
-                            <td>{item.productCode || item.product.productCode}</td>
-                            <td className="text-left">
-                              <span className="ml-4">{item.productName || item.product.name}</span>
-                            </td>
-                            <td>{item.lotNumber}</td>
-                            <td>
-                              {item.expirationDate}
-                            </td>
-                            <td style={{ width: '150px' }}>
-                              {(item.quantityShipped ? item.quantityShipped.toLocaleString('en-US') : item.quantityShipped) ||
-                              (item.quantityRequested ? item.quantityRequested.toLocaleString('en-US') : item.quantityRequested)}
-                            </td>
-                            {!(this.state.supplier) && this.props.hasBinLocationSupport &&
-                            <td>{item.binLocationName}</td>
-                            }
-                            <td>
-                              {item.recipient ? item.recipient.name : null}
-                            </td>
-                          </tr>
-                        ),
-                    )
-                  }
-                  </tbody>
-                </table>
+                <div className="my-2">
+                  {_.map(SUPPLIER_FIELDS, (fieldConfig, fieldName) =>
+                      renderFormField(fieldConfig, fieldName, {
+                        hasBinLocationSupport: this.props.hasBinLocationSupport,
+                        totalCount: this.state.totalCount,
+                        loadMoreRows: this.loadMoreRows,
+                        isRowLoaded: this.isRowLoaded,
+                        isPaginated: this.props.isPaginated,
+                      }))}
+                </div>
                 <button
                   type="submit"
                   className="btn btn-outline-primary btn-form btn-xs"
@@ -726,6 +772,7 @@ const mapStateToProps = state => ({
   locale: state.session.activeLanguage,
   isUserAdmin: state.session.isUserAdmin,
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
+  isPaginated: state.session.isPaginated,
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner })(SendMovementPage);
@@ -750,4 +797,6 @@ SendMovementPage.propTypes = {
   isUserAdmin: PropTypes.bool.isRequired,
   /** Is true when currently selected location supports bins */
   hasBinLocationSupport: PropTypes.bool.isRequired,
+  /** Return true if pagination is enabled */
+  isPaginated: PropTypes.bool.isRequired,
 };

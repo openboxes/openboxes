@@ -242,7 +242,6 @@ const mapStateToProps = state => ({
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   hasPackingSupport: state.session.currentLocation.hasPackingSupport,
-  currentLocation: state.session.currentLocation,
 });
 
 export default connect(mapStateToProps, {
@@ -268,9 +267,6 @@ StockMovements.propTypes = {
   translate: PropTypes.func.isRequired,
   /** Is true when currently selected location supports packing */
   hasPackingSupport: PropTypes.bool.isRequired,
-  currentLocation: PropTypes.shape({
-    id: PropTypes.string,
-  }).isRequired,
 };
 
 StockMovements.defaultProps = {

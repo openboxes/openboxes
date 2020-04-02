@@ -31,9 +31,11 @@ const DELETE_BUTTON_FIELD = {
   buttonLabel: 'react.default.button.delete.label',
   buttonDefaultMessage: 'Delete',
   getDynamicAttr: ({
-    fieldValue, removeRow,
+    fieldValue, removeRow, updateTotalCount,
   }) => ({
-    onClick: fieldValue.id ? () => null : removeRow,
+    onClick: fieldValue && fieldValue.id ?
+      () => null :
+      () => { updateTotalCount(-1); removeRow(); },
     disabled: !!fieldValue.id,
   }),
   attributes: {
@@ -45,6 +47,10 @@ const VENDOR_FIELDS = {
   lineItems: {
     type: ArrayField,
     arrowsNavigation: true,
+    virtualized: true,
+    totalCount: ({ totalCount }) => totalCount,
+    isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
+    loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     fields: {
       palletName: {
         type: TextField,
@@ -164,7 +170,8 @@ class AddItemsPage extends Component {
     super(props);
     this.state = {
       sortOrder: 0,
-      values: this.props.initialValues,
+      values: { ...this.props.initialValues, lineItems: [] },
+      totalCount: 0,
     };
 
     this.props.showSpinner();
@@ -172,6 +179,9 @@ class AddItemsPage extends Component {
     this.confirmSave = this.confirmSave.bind(this);
     this.confirmTransition = this.confirmTransition.bind(this);
     this.validate = this.validate.bind(this);
+    this.isRowLoaded = this.isRowLoaded.bind(this);
+    this.loadMoreRows = this.loadMoreRows.bind(this);
+    this.updateTotalCount = this.updateTotalCount.bind(this);
 
     this.debouncedProductsFetch = debounceProductsFetch(
       this.props.debounceTime,
@@ -237,6 +247,47 @@ class AddItemsPage extends Component {
     });
 
     return this.state.sortOrder;
+  }
+
+  setLineItems(response) {
+    const { data } = response.data;
+    let lineItemsData;
+
+    if (this.state.values.lineItems.length === 0 && !data.length) {
+      lineItemsData = new Array(1).fill({ sortOrder: 100 });
+    } else {
+      lineItemsData = _.map(
+        data,
+        val => ({
+          ...val,
+          disabled: true,
+          product: {
+            ...val.product,
+            label: `${val.productCode} ${val.product.name}`,
+          },
+        }),
+      );
+    }
+
+    const sortOrder = _.toInteger(_.last(lineItemsData).sortOrder) + 100;
+    this.setState({
+      currentLineItems: this.props.isPaginated ?
+        _.uniqBy(_.concat(this.state.currentLineItems, data), 'id') : data,
+      values: {
+        ...this.state.values,
+        lineItems: this.props.isPaginated ?
+          _.uniqBy(_.concat(this.state.values.lineItems, lineItemsData), 'id') : lineItemsData,
+      },
+      sortOrder,
+      totalCount: lineItemsData.length > this.state.totalCount ?
+        lineItemsData.length : this.state.totalCount,
+    }, () => this.props.hideSpinner());
+  }
+
+  updateTotalCount(value) {
+    this.setState({
+      totalCount: this.state.totalCount + value === 0 ? 1 : this.state.totalCount + value,
+    });
   }
 
   dataFetched = false;
@@ -360,49 +411,10 @@ class AddItemsPage extends Component {
       this.props.fetchUsers();
     }
 
-    this.fetchAndSetLineItems();
-  }
-
-  /**
-   * Fetches stock movement's line items and sets them in redux form and in
-   * state as current line items.
-   * @public
-   */
-  fetchAndSetLineItems() {
-    this.props.showSpinner();
-    this.fetchLineItems().then((resp) => {
-      const { lineItems } = resp.data.data;
-      const { hasManageInventory } = resp.data.data;
-      const { statusCode } = resp.data.data;
-      let lineItemsData;
-      if (!lineItems.length) {
-        lineItemsData = new Array(1).fill({ sortOrder: 100 });
-      } else {
-        lineItemsData = _.map(
-          lineItems,
-          val => ({
-            ...val,
-            disabled: true,
-            referenceId: val.id,
-            product: {
-              ...val.product,
-              label: `${val.productCode} ${val.product.name}`,
-            },
-          }),
-        );
-      }
-
-      const sortOrder = _.toInteger(_.last(lineItemsData).sortOrder) + 100;
-      this.setState({
-        values: {
-          ...this.state.values,
-          lineItems: lineItemsData,
-          hasManageInventory,
-          statusCode,
-        },
-        sortOrder,
-      }, () => this.props.hideSpinner());
-    }).catch(() => this.props.hideSpinner());
+    this.fetchAddItemsPageData();
+    if (!this.props.isPaginated) {
+      this.fetchLineItems();
+    }
   }
 
   /**
@@ -410,11 +422,21 @@ class AddItemsPage extends Component {
    * @public
    */
   fetchLineItems() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=2`;
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=2`;
 
     return apiClient.get(url)
-      .then(resp => resp)
+      .then((response) => {
+        this.setLineItems(response);
+      })
       .catch(err => err);
+  }
+
+  loadMoreRows({ startIndex, stopIndex }) {
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${stopIndex - startIndex > 0 ? stopIndex - startIndex : 1}&stepNumber=2`;
+    apiClient.get(url)
+      .then((response) => {
+        this.setLineItems(response);
+      });
   }
 
   /**
@@ -714,6 +736,11 @@ class AddItemsPage extends Component {
                   recipients: this.props.recipients,
                   debouncedProductsFetch: this.debouncedProductsFetch,
                   getSortOrder: this.getSortOrder,
+                  totalCount: this.state.totalCount,
+                  loadMoreRows: this.loadMoreRows,
+                  isRowLoaded: this.isRowLoaded,
+                  updateTotalCount: this.updateTotalCount,
+                  isPaginated: this.props.isPaginated,
                   isFromOrder: this.state.values.isFromOrder,
                 }))}
               <div>
@@ -755,6 +782,7 @@ const mapStateToProps = state => ({
   minSearchLength: state.session.searchConfig.minSearchLength,
   minimumExpirationDate: state.session.minimumExpirationDate,
   hasPackingSupport: state.session.currentLocation.hasPackingSupport,
+  isPaginated: state.session.isPaginated,
 });
 
 export default (connect(mapStateToProps, {
@@ -789,4 +817,6 @@ AddItemsPage.propTypes = {
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
   minimumExpirationDate: PropTypes.string.isRequired,
+  /** Return true if pagination is enabled */
+  isPaginated: PropTypes.bool.isRequired,
 };
