@@ -412,9 +412,10 @@ class AddItemsPage extends Component {
     }
 
     this.fetchAddItemsPageData();
-    if (!this.props.isPaginated) {
-      this.fetchLineItems();
-    }
+    // TODO: Fix pagination support
+    // if (!this.props.isPaginated) {
+    //   this.fetchLineItems();
+    // }
   }
 
   /**
@@ -443,7 +444,7 @@ class AddItemsPage extends Component {
     apiClient.get(url)
       .then((resp) => {
         const { hasManageInventory } = resp.data.data;
-        const { statusCode } = resp.data.data;
+        const { statusCode, lineItems } = resp.data.data;
         const { totalCount } = resp.data;
 
         this.setState({
@@ -451,6 +452,18 @@ class AddItemsPage extends Component {
             ...this.state.values,
             hasManageInventory,
             statusCode,
+            // TODO: Fix pagination support
+            lineItems: _.map(
+              lineItems,
+              val => ({
+                ...val,
+                disabled: true,
+                product: {
+                  ...val.product,
+                  label: `${val.productCode} ${val.product.name}`,
+                },
+              }),
+            ),
           },
           totalCount: totalCount === 0 ? 1 : totalCount,
         }, () => this.props.hideSpinner());
@@ -464,8 +477,9 @@ class AddItemsPage extends Component {
   loadMoreRows({ startIndex, stopIndex }) {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${stopIndex - startIndex > 0 ? stopIndex - startIndex : 1}&stepNumber=2`;
     apiClient.get(url)
-      .then((response) => {
-        this.setLineItems(response);
+    // TODO: Fix pagination support
+      .then(() => {
+        // this.setLineItems(response);
       });
   }
 
