@@ -169,7 +169,7 @@ export default connect(mapStateToProps, {
 })(Tablero);
 
 Tablero.defaultProps = {
-  currentLocation: null,
+  currentLocation: '',
   indicatorsData: null,
   numberData: [],
 };

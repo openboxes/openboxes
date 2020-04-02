@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 /* global _ */
 const TableCard = props => (
-  <div>
+  <div className="tableCard">
     <table>
       <thead>
         <tr>
