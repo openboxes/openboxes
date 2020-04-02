@@ -5,9 +5,9 @@ class TableData implements Serializable {
     String name;
     String number;
     String link;
-    Long value;
+    String value;
 
-    TableData(String number, String name, Long value, String link) {
+    TableData(String number, String name, String value, String link = null) {
         this.number = number;
         this.name = name;
         this.value = value;

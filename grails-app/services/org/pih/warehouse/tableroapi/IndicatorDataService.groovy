@@ -2,6 +2,7 @@ package org.pih.warehouse.tableroapi
 
 import org.pih.warehouse.tablero.DataGraph
 import org.pih.warehouse.tablero.TableData
+import org.pih.warehouse.tablero.Table
 import org.pih.warehouse.tablero.ColorNumber
 import org.pih.warehouse.tablero.IndicatorData
 import org.pih.warehouse.tablero.NumberIndicator
@@ -293,10 +294,10 @@ class IndicatorDataService {
         return indicatorData;
     }
 
-    List<TableData> getDiscrepancy(Location location, def params) {
+    Table getDiscrepancy(Location location, def params) {
         Integer querySize = params.querySize? params.querySize.toInteger() - 1 : 5
 
-        List<TableData> indicatorData = []
+        List<TableData> tableBody = []
 
         Date date = LocalDate.now().minusMonths(querySize).toDate()
 
@@ -314,8 +315,12 @@ class IndicatorDataService {
         """, ['location': location, 'date': date])
 
         query.each {
-            indicatorData.push(new TableData(it[0], it[1], it[2], "/openboxes/stockMovement/show/" + it[3].id))
+            tableBody.push(new TableData(it[0], it[1], it[2].toString(), "/openboxes/stockMovement/show/" + it[3].id))
         }
+
+        TableData tableHeader = new TableData("Shipment", "Name", "Discrepancy")
+
+        Table indicatorData = new Table(tableHeader, tableBody)
 
         return indicatorData;
     }

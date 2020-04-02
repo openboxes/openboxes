@@ -7,10 +7,12 @@ const TableCard = props => (
     <table>
       <thead>
         <tr>
-          {props.headItems.map(item => <th>{item}</th>)}
+          <th>{props.data.head.number}</th>
+          <th>{_.truncate(props.data.head.name, { length: 50, omission: '...' })}</th>
+          <th>{_.truncate(props.data.head.value, { length: 50, omission: '...' })}</th>
         </tr>
       </thead>
-      {props.data.map(item => (
+      {props.data.body.map(item => (
         <tbody key={`item-${Math.random()}`} className="tableLink">
           <tr onClick={() => window.open(item.link, '_blank')}>
             <td>{item.number}</td>
@@ -24,8 +26,14 @@ const TableCard = props => (
 );
 
 TableCard.propTypes = {
-  data: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  headItems: PropTypes.arrayOf().isRequired,
+  data: PropTypes.shape({
+    head: PropTypes.shape({
+      number: PropTypes.string,
+      name: PropTypes.string,
+      value: PropTypes.string,
+    }),
+    body: PropTypes.arrayOf(PropTypes.shape({})),
+  }).isRequired,
 };
 
 TableCard.defaultProps = {
