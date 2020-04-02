@@ -7,9 +7,7 @@ const TableCard = props => (
     <table>
       <thead>
         <tr>
-          <th><span className="small-text">Nº of<br /></span> Shipment</th>
-          <th><span className="small-text"><br /></span>Name</th>
-          <th><span className="small-text">Nº of<br /></span> Discrepancy</th>
+          {props.headItems.map(item => <th>{item}</th>)}
         </tr>
       </thead>
       {props.data.map(item => (
@@ -27,6 +25,7 @@ const TableCard = props => (
 
 TableCard.propTypes = {
   data: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  headItems: PropTypes.arrayOf().isRequired,
 };
 
 TableCard.defaultProps = {

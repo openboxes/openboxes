@@ -37,7 +37,12 @@ const GraphCard = SortableElement(({
   } else if (cardType === 'numbers') {
     graph = <Numbers data={data} />;
   } else if (cardType === 'table') {
-    graph = <TableCard data={data} />;
+    const headItems = [
+      <span><span className="small-text">Nº of<br /></span> Shipment</span>,
+      <span><span className="small-text"><br /></span>Name</span>,
+      <span><span className="small-text">Nº of<br /></span> Discrepancy</span>,
+    ];
+    graph = <TableCard data={data} headItems={headItems} />;
     filter = 1;
   } else if (cardType === 'loading') {
     graph = <LoadingCard />;
