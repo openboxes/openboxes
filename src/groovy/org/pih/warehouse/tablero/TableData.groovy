@@ -3,23 +3,23 @@ package org.pih.warehouse.tablero
 class TableData implements Serializable {
     
     String name;
-    String shipments;
-    String requisition;
-    Long discrepancy;
+    String number;
+    String link;
+    Long value;
 
-    TableData(String shipments, String name, Long discrepancy, String requisition) {
-        this.shipments = shipments;
+    TableData(String number, String name, Long value, String link) {
+        this.number = number;
         this.name = name;
-        this.discrepancy = discrepancy;
-        this.requisition = requisition;
+        this.value = value;
+        this.link = link;
     }
 
     Map toJson() {
         [
-                "name"        : name.toJson(),
-                "shipments"   : shipments.toJson(),
-                "discrepancy" : discrepancy.toJson(),
-                "requisiton"  : requisition.toJson(),
+                "name"   : name.toJson(),
+                "number" : number.toJson(),
+                "value"  : value.toJson(),
+                "link"   : link.toJson(),
         ]
     }
 }

@@ -12,10 +12,10 @@ const TableCard = props => (
       </thead>
       {props.data.map(item => (
         <tbody key={`item-${Math.random()}`} className="tableLink">
-          <tr onClick={() => window.open(`/openboxes/stockMovement/show/${item.requisition}`, '_blank')}>
-            <td>{item.shipments}</td>
+          <tr onClick={() => window.open(item.link, '_blank')}>
+            <td>{item.number}</td>
             <td>{_.truncate(item.name, { length: 50, omission: '...' })}</td>
-            <td>{_.truncate(item.discrepancy, { length: 10, omission: '...' })}</td>
+            <td>{_.truncate(item.value, { length: 10, omission: '...' })}</td>
           </tr>
         </tbody>
       ))}

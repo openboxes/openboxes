@@ -314,7 +314,7 @@ class IndicatorDataService {
         """, ['location': location, 'date': date])
 
         query.each {
-            indicatorData.push(new TableData(it[0], it[1], it[2], it[3].id))
+            indicatorData.push(new TableData(it[0], it[1], it[2], "/openboxes/stockMovement/show/" + it[3].id))
         }
 
         return indicatorData;
