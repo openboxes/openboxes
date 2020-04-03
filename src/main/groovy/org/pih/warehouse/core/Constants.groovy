@@ -19,8 +19,8 @@ class Constants {
     static final actionsWithAuthUserNotRequired = ['test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale']
     static final actionsWithLocationNotRequired = ['test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'chooseLocation', 'json', 'updateAuthUserLocale']
     static final changeActions = ['edit', 'delete', 'create', 'add', 'process', 'save', 'update', 'importData', 'receive', 'showRecordInventory', 'withdraw', 'cancel', 'change', 'toggle']
-    static final changeControllers = ['createProductFromTemplate']
-    static final adminControllers = ['createProduct', 'createProductFromTemplate', 'admin']
+    static final changeControllers = []
+    static final adminControllers = ['createProduct', 'admin']
     static final adminActions = ['product': ['create'], 'person': ['list'], 'user': ['list'], 'location': ['edit'], 'shipper': ['create'], 'locationGroup': ['create'], 'locationType': ['create'], '*': ['delete']]
 
     static final String DEFAULT_YEAR_FORMAT = "yyyy"
