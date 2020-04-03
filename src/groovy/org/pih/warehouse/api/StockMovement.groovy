@@ -218,7 +218,7 @@ class StockMovement {
                 description: shipment.description,
                 shipmentType: shipment.shipmentType,
                 statusCode: statusCode,
-                dateShipped: shipment.expectedShippingDate,
+                dateShipped: shipment?.actualShippingDate,
                 identifier: shipment.shipmentNumber,
                 origin: shipment.origin,
                 destination: shipment.destination,
