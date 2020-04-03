@@ -13,10 +13,12 @@ class NumberDataService {
         Date tomorrow = new Date() + 1;
         tomorrow.clearTime();
 
-        def binLocations = InventorySnapshot.executeQuery('select count(*) from InventorySnapshot i where i.location=:location and i.date = :tomorrow and i.quantityOnHand > 0', ['location': location, 'tomorrow': tomorrow]);
-        def shipments = Requisition.executeQuery("""select count(*) from Requisition r where r.origin = :location and r.status <> 'ISSUED' and r.createdBy = :user""", 
+        def binLocations = InventorySnapshot.executeQuery("select count(*) from InventorySnapshot i where i.location=:location and i.date = :tomorrow and i.quantityOnHand > 0", ['location': location, 'tomorrow': tomorrow]);
+        def shipments = Requisition.executeQuery("select count(*) from Requisition r where r.origin = :location and r.status <> 'ISSUED' and r.createdBy = :user", 
         ['location': location, 'user': user]);
         def incompletePutaways = Order.executeQuery("select count(o.id) from Order o where o.orderTypeCode = 'TRANSFER_ORDER' AND o.status = 'PENDING' AND o.orderedBy = :user", ['user':user]);
+
+        def receivingBin = InventorySnapshot.executeQuery("select count(distinct i.product) from InventorySnapshot i where i.location = :location and i.quantityOnHand > 0 and i.date = :tomorrow", ['location': location, 'tomorrow': tomorrow]);
 
         def pending = dataService.executeQuery("select count(*) from shipment where shipment.current_status = 'PENDING'");
         def notCompleted = dataService.executeQuery("select count(*) from openboxes.order  where order.status != 'COMPLETED'");
