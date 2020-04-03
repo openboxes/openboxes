@@ -13,9 +13,9 @@ class RoleInterceptor {
     def dependsOn = [SecurityInterceptor]
     def static changeActions = ['delete', 'create', 'add', 'process', 'save',
                                 'update', 'importData', 'receive', 'showRecordInventory', 'withdraw', 'cancel', 'change', 'toggle', 'exportAsCsv']
-    def static changeControllers = ['createProductFromTemplate']
+    def static changeControllers = []
 
-    def static adminControllers = ['createProduct', 'createProductFromTemplate', 'admin']
+    def static adminControllers = ['createProduct', 'admin']
     def static adminActions = [
             'product'      : ['create'],
             'person'       : ['list'],
