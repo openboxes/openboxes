@@ -108,9 +108,10 @@ const FIELDS = {
         },
         getDynamicAttr: ({
           fieldValue, subfield, stockMovementId, updatePickPageItem,
-          reasonCodes, hasBinLocationSupport,
+          reasonCodes, hasBinLocationSupport, showOnly,
         }) => ({
           fieldValue: flattenRequest(fieldValue),
+          btnOpenDisabled: showOnly,
           subfield,
           stockMovementId,
           btnOpenText: fieldValue && fieldValue.hasChangedPick ? '' : 'react.default.button.edit.label',
@@ -132,8 +133,9 @@ const FIELDS = {
         attributes: {
           className: 'btn btn-outline-primary',
         },
-        getDynamicAttr: ({ subfield, translate }) => ({
+        getDynamicAttr: ({ subfield, translate, showOnly }) => ({
           hidden: subfield,
+          disabled: showOnly,
           onClick: () => Alert.error(translate('react.stockMovement.alert.disabledAdjustment.label', 'This feature is not available yet. Please adjust stock on the electronic stock card page.')),
         }),
       },
@@ -145,9 +147,12 @@ const FIELDS = {
         fieldKey: '',
         buttonLabel: 'react.default.button.undoEdit.label',
         buttonDefaultMessage: 'Undo edit',
-        getDynamicAttr: ({ fieldValue, revertUserPick, subfield }) => ({
+        getDynamicAttr: ({
+          fieldValue, revertUserPick, subfield, showOnly,
+        }) => ({
           onClick: flattenRequest(fieldValue)['requisitionItem.id'] ? () => revertUserPick(flattenRequest(fieldValue)['requisitionItem.id']) : () => null,
           hidden: subfield,
+          disabled: showOnly,
         }),
         attributes: {
           className: 'btn btn-outline-danger',
@@ -528,6 +533,7 @@ class PickPage extends Component {
   }
 
   render() {
+    const { showOnly } = this.props;
     return (
       <Form
         onSubmit={values => this.nextPage(values)}
@@ -535,62 +541,71 @@ class PickPage extends Component {
         initialValues={this.state.values}
         render={({ handleSubmit, values }) => (
           <div className="d-flex flex-column">
-            <span>
-              <label
-                htmlFor="csvInput"
-                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-              >
-                <span><i className="fa fa-download pr-2" /><Translate id="react.default.button.importTemplate.label" defaultMessage="Import template" /></span>
-                <input
-                  id="csvInput"
-                  type="file"
-                  style={{ display: 'none' }}
-                  onChange={this.importTemplate}
-                  onClick={(event) => {
-                    // eslint-disable-next-line no-param-reassign
-                    event.target.value = null;
-                  }}
-                  accept=".csv"
-                />
-              </label>
+            { !showOnly ?
+              <span>
+                <label
+                  htmlFor="csvInput"
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                >
+                  <span><i className="fa fa-download pr-2" /><Translate id="react.default.button.importTemplate.label" defaultMessage="Import template" /></span>
+                  <input
+                    id="csvInput"
+                    type="file"
+                    style={{ display: 'none' }}
+                    onChange={this.importTemplate}
+                    onClick={(event) => {
+                      // eslint-disable-next-line no-param-reassign
+                      event.target.value = null;
+                    }}
+                    accept=".csv"
+                  />
+                </label>
+                <button
+                  type="button"
+                  onClick={() => this.exportTemplate(values)}
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                >
+                  <span><i className="fa fa-upload pr-2" /><Translate id="react.default.button.exportTemplate.label" defaultMessage="Export template" /></span>
+                </button>
+                <a
+                  href={`${this.state.printPicksUrl}${this.state.sorted ? '?sorted=true' : ''}`}
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span><i className="fa fa-print pr-2" /><Translate id="react.stockMovement.printPicklist.label" defaultMessage="Print picklist" /></span>
+                </a>
+                <button
+                  type="button"
+                  onClick={() => this.refresh()}
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
+                >
+                  <span><i className="fa fa-refresh pr-2" /><Translate id="react.default.button.refresh.label" defaultMessage="Reload" /></span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { window.location = `/openboxes/stockMovement/show/${values.stockMovementId}`; }}
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
+                >
+                  <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => this.sortByBins()}
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+                >
+                  {this.state.sorted && <span><i className="fa fa-sort pr-2" /><Translate id="react.stockMovement.originalOrder.label" defaultMessage="Original order" /></span>}
+                  {!this.state.sorted && <span><i className="fa fa-sort pr-2" /><Translate id="react.stockMovement.sortByBins.label" defaultMessage="Sort by bins" /></span>}
+                </button>
+              </span>
+                :
               <button
                 type="button"
-                onClick={() => this.exportTemplate(values)}
-                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                onClick={() => { window.location = '/openboxes/stockMovement/list?direction=OUTBOUND'; }}
+                className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
               >
-                <span><i className="fa fa-upload pr-2" /><Translate id="react.default.button.exportTemplate.label" defaultMessage="Export template" /></span>
-              </button>
-              <a
-                href={`${this.state.printPicksUrl}${this.state.sorted ? '?sorted=true' : ''}`}
-                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <span><i className="fa fa-print pr-2" /><Translate id="react.stockMovement.printPicklist.label" defaultMessage="Print picklist" /></span>
-              </a>
-              <button
-                type="button"
-                onClick={() => this.refresh()}
-                className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
-              >
-                <span><i className="fa fa-refresh pr-2" /><Translate id="react.default.button.refresh.label" defaultMessage="Reload" /></span>
-              </button>
-              <button
-                type="button"
-                onClick={() => { window.location = `/openboxes/stockMovement/show/${values.stockMovementId}`; }}
-                className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
-              >
-                <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
-              </button>
-              <button
-                type="button"
-                onClick={() => this.sortByBins()}
-                className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
-              >
-                {this.state.sorted && <span><i className="fa fa-sort pr-2" /><Translate id="react.stockMovement.originalOrder.label" defaultMessage="Original order" /></span>}
-                {!this.state.sorted && <span><i className="fa fa-sort pr-2" /><Translate id="react.stockMovement.sortByBins.label" defaultMessage="Sort by bins" /></span>}
-              </button>
-            </span>
+                <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>
+              </button> }
             <form onSubmit={handleSubmit} className="print-mt">
               {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
                 stockMovementId: values.stockMovementId,
@@ -606,12 +621,13 @@ class PickPage extends Component {
                 loadMoreRows: this.loadMoreRows,
                 isRowLoaded: this.isRowLoaded,
                 isPaginated: this.props.isPaginated,
+                showOnly,
               }))}
               <div className="d-print-none">
-                <button type="button" className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.props.previousPage(values)}>
+                <button type="button" disabled={showOnly} className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.props.previousPage(values)}>
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
-                <button type="submit" className="btn btn-outline-primary btn-form float-right btn-xs">
+                <button type="submit" disabled={showOnly} className="btn btn-outline-primary btn-form float-right btn-xs">
                   <Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>
@@ -660,4 +676,6 @@ PickPage.propTypes = {
   hasBinLocationSupport: PropTypes.bool.isRequired,
   /** Return true if pagination is enabled */
   isPaginated: PropTypes.bool.isRequired,
+  /** Return true if show only */
+  showOnly: PropTypes.bool.isRequired,
 };

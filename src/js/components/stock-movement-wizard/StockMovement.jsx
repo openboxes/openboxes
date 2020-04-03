@@ -217,10 +217,12 @@ class StockMovements extends Component {
 
   render() {
     const { values, currentPage } = this.state;
+    const { currentLocation } = this.props;
     const title = this.getWizardTitle();
     const additionalTitle = this.getAdditionalWizardTitle();
     const pageList = this.getPageList();
     const stepList = this.getStepList();
+    const showOnly = values.origin && values.origin.id !== currentLocation.id;
 
     return (
       <Wizard
@@ -232,6 +234,7 @@ class StockMovements extends Component {
         currentPage={currentPage}
         prevPage={currentPage === 1 ? 1 : currentPage - 1}
         updateWizardValues={this.updateWizardValues}
+        additionalProps={{ showOnly }}
       />
     );
   }
@@ -242,6 +245,7 @@ const mapStateToProps = state => ({
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   hasPackingSupport: state.session.currentLocation.hasPackingSupport,
+  currentLocation: state.session.currentLocation,
 });
 
 export default connect(mapStateToProps, {
@@ -257,16 +261,19 @@ StockMovements.propTypes = {
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
-  /** Initial components' data */
-  initialValues: PropTypes.shape({
-    shipmentStatus: PropTypes.string,
-  }),
   locale: PropTypes.string.isRequired,
   stockMovementTranslationsFetched: PropTypes.bool.isRequired,
   fetchTranslations: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
   /** Is true when currently selected location supports packing */
   hasPackingSupport: PropTypes.bool.isRequired,
+  currentLocation: PropTypes.shape({
+    id: PropTypes.string,
+  }).isRequired,
+  /** Initial components' data */
+  initialValues: PropTypes.shape({
+    shipmentStatus: PropTypes.string,
+  }),
 };
 
 StockMovements.defaultProps = {

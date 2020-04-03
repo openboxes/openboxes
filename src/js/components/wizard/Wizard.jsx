@@ -78,7 +78,7 @@ class Wizard extends Component {
   render() {
     const { currentPage, values } = this.state;
     const {
-      title, pageList, stepList, additionalTitle,
+      title, pageList, stepList, additionalTitle, additionalProps,
     } = this.props;
 
     return (
@@ -93,6 +93,7 @@ class Wizard extends Component {
             nextPage={this.nextPage}
             prevPage={this.prevPage}
             goToPage={this.goToPage}
+            additionalProps={additionalProps}
           />
         </div>
       </div>
@@ -122,10 +123,12 @@ Wizard.propTypes = {
   pageList: PropTypes.arrayOf(PropTypes.func).isRequired,
   stepList: PropTypes.arrayOf(PropTypes.string).isRequired,
   updateWizardValues: PropTypes.func,
+  additionalProps: PropTypes.shape({}),
 };
 
 Wizard.defaultProps = {
   initialValues: {},
+  additionalProps: {},
   additionalTitle: null,
   updateWizardValues: () => {},
 };

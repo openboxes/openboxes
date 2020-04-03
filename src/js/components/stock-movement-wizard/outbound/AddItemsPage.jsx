@@ -32,13 +32,13 @@ const DELETE_BUTTON_FIELD = {
   buttonLabel: 'react.default.button.delete.label',
   buttonDefaultMessage: 'Delete',
   getDynamicAttr: ({
-    fieldValue, removeItem, removeRow, updateTotalCount,
+    fieldValue, removeItem, removeRow, showOnly, updateTotalCount,
   }) => ({
     onClick: fieldValue && fieldValue.id ? () => {
       removeItem(fieldValue.id).then(() => removeRow());
       updateTotalCount(-1);
     } : () => { updateTotalCount(-1); removeRow(); },
-    disabled: fieldValue && fieldValue.statusCode === 'SUBSTITUTED',
+    disabled: (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') || showOnly,
   }),
   attributes: {
     className: 'btn btn-outline-danger',
@@ -53,11 +53,14 @@ const NO_STOCKLIST_FIELDS = {
     totalCount: ({ totalCount }) => totalCount,
     isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
-    // eslint-disable-next-line react/prop-types
-    addButton: ({ addRow, getSortOrder, updateTotalCount }) => (
+    addButton: ({
+      // eslint-disable-next-line react/prop-types
+      addRow, getSortOrder, showOnly, updateTotalCount,
+    }) => (
       <button
         type="button"
         className="btn btn-outline-success btn-xs"
+        disabled={showOnly}
         onClick={() => {
           updateTotalCount(1);
           addRow({ sortOrder: getSortOrder() });
@@ -925,6 +928,7 @@ class AddItemsPage extends Component {
   }
 
   render() {
+    const { showOnly } = this.props;
     return (
       <Form
         onSubmit={() => {}}
@@ -933,63 +937,73 @@ class AddItemsPage extends Component {
         initialValues={this.state.values}
         render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
-            <span>
-              <label
-                htmlFor="csvInput"
-                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-              >
-                <span><i className="fa fa-download pr-2" /><Translate id="react.default.button.importTemplate.label" defaultMessage="Import template" /></span>
-                <input
-                  id="csvInput"
-                  type="file"
-                  style={{ display: 'none' }}
-                  onChange={this.importTemplate}
-                  onClick={(event) => {
-                    // eslint-disable-next-line no-param-reassign
-                    event.target.value = null;
-                  }}
-                  accept=".csv"
-                />
-              </label>
-              <button
-                type="button"
-                onClick={() => this.exportTemplate(values)}
-                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-              >
-                <span><i className="fa fa-upload pr-2" /><Translate id="react.default.button.exportTemplate.label" defaultMessage="Export template" /></span>
-              </button>
-              <button
-                type="button"
-                onClick={() => this.refresh()}
-                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-              >
-                <span><i className="fa fa-refresh pr-2" /><Translate id="react.default.button.refresh.label" defaultMessage="Reload" /></span>
-              </button>
+            { !showOnly ?
+              <span>
+                <label
+                  htmlFor="csvInput"
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                >
+                  <span><i className="fa fa-download pr-2" /><Translate id="react.default.button.importTemplate.label" defaultMessage="Import template" /></span>
+                  <input
+                    id="csvInput"
+                    type="file"
+                    style={{ display: 'none' }}
+                    onChange={this.importTemplate}
+                    onClick={(event) => {
+                      // eslint-disable-next-line no-param-reassign
+                      event.target.value = null;
+                    }}
+                    accept=".csv"
+                  />
+                </label>
+                <button
+                  type="button"
+                  onClick={() => this.exportTemplate(values)}
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                >
+                  <span><i className="fa fa-upload pr-2" /><Translate id="react.default.button.exportTemplate.label" defaultMessage="Export template" /></span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => this.refresh()}
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                >
+                  <span><i className="fa fa-refresh pr-2" /><Translate id="react.default.button.refresh.label" defaultMessage="Reload" /></span>
+                </button>
+                <button
+                  type="button"
+                  disabled={invalid}
+                  onClick={() => this.save(values)}
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                >
+                  <span><i className="fa fa-save pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
+                </button>
+                <button
+                  type="button"
+                  disabled={invalid}
+                  onClick={() => this.saveAndExit(values)}
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                >
+                  <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
+                </button>
+                <button
+                  type="button"
+                  disabled={invalid}
+                  onClick={() => this.removeAll()}
+                  className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs"
+                >
+                  <span><i className="fa fa-remove pr-2" /><Translate id="react.default.button.deleteAll.label" defaultMessage="Delete all" /></span>
+                </button>
+              </span>
+              :
               <button
                 type="button"
                 disabled={invalid}
-                onClick={() => this.save(values)}
-                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                onClick={() => { window.location = '/openboxes/stockMovement/list?direction=OUTBOUND'; }}
+                className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
               >
-                <span><i className="fa fa-save pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
-              </button>
-              <button
-                type="button"
-                disabled={invalid}
-                onClick={() => this.saveAndExit(values)}
-                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-              >
-                <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
-              </button>
-              <button
-                type="button"
-                disabled={invalid}
-                onClick={() => this.removeAll().then(() => this.fetchAndSetLineItems())}
-                className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs"
-              >
-                <span><i className="fa fa-remove pr-2" /><Translate id="react.default.button.deleteAll.label" defaultMessage="Delete all" /></span>
-              </button>
-            </span>
+                <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.exit.label" defaultMessage="Exit" /></span>
+              </button> }
             <form onSubmit={handleSubmit}>
               {_.map(this.getFields(), (fieldConfig, fieldName) =>
                 renderFormField(fieldConfig, fieldName, {
@@ -1006,11 +1020,12 @@ class AddItemsPage extends Component {
                   updateTotalCount: this.updateTotalCount,
                   isPaginated: this.props.isPaginated,
                   isFromOrder: this.state.values.isFromOrder,
+                  showOnly,
                 }))}
               <div>
                 <button
                   type="submit"
-                  disabled={invalid}
+                  disabled={invalid || showOnly}
                   onClick={() => this.previousPage(values, invalid)}
                   className="btn btn-outline-primary btn-form btn-xs"
                 >
@@ -1024,7 +1039,9 @@ class AddItemsPage extends Component {
                     }
                   }}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
-                  disabled={!_.some(values.lineItems, item => !_.isEmpty(item)) || invalid}
+                  disabled={
+                    !_.some(values.lineItems, item => !_.isEmpty(item)) || invalid || showOnly
+                  }
                 ><Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>
@@ -1084,4 +1101,6 @@ AddItemsPage.propTypes = {
   minimumExpirationDate: PropTypes.string.isRequired,
   /** Return true if pagination is enabled */
   isPaginated: PropTypes.bool.isRequired,
+  /** Return true if show only */
+  showOnly: PropTypes.bool.isRequired,
 };

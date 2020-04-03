@@ -125,13 +125,13 @@ const FIELDS = {
         },
         getDynamicAttr: ({
           fieldValue, rowIndex, stockMovementId, onResponse,
-          reviseRequisitionItems, values, reasonCodes,
+          reviseRequisitionItems, values, reasonCodes, showOnly,
         }) => ({
           onOpen: () => reviseRequisitionItems(values),
           productCode: fieldValue && fieldValue.productCode,
           btnOpenText: `react.stockMovement.${fieldValue && fieldValue.substitutionStatus}.label`,
           btnOpenDefaultText: `${fieldValue && fieldValue.substitutionStatus}`,
-          btnOpenDisabled: fieldValue && fieldValue.statusCode === 'SUBSTITUTED',
+          btnOpenDisabled: (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') || showOnly,
           btnOpenClassName: BTN_CLASS_MAPPER[(fieldValue && fieldValue.substitutionStatus) || 'HIDDEN'],
           rowIndex,
           lineItem: fieldValue,
@@ -149,8 +149,8 @@ const FIELDS = {
         attributes: {
           type: 'number',
         },
-        getDynamicAttr: ({ fieldValue, subfield }) => ({
-          disabled: (fieldValue && fieldValue === 'SUBSTITUTED') || subfield,
+        getDynamicAttr: ({ fieldValue, subfield, showOnly }) => ({
+          disabled: (fieldValue && fieldValue === 'SUBSTITUTED') || subfield || showOnly,
         }),
       },
       reasonCode: {
@@ -173,10 +173,13 @@ const FIELDS = {
         fieldKey: '',
         buttonLabel: 'react.default.button.undo.label',
         buttonDefaultMessage: 'Undo',
-        getDynamicAttr: ({ fieldValue, revertItem, values }) => ({
+        getDynamicAttr: ({
+          fieldValue, revertItem, values, showOnly,
+        }) => ({
           onClick: fieldValue && fieldValue.requisitionItemId ?
             () => revertItem(values, fieldValue.requisitionItemId) : () => null,
           hidden: fieldValue && fieldValue.statusCode ? !_.includes(['CHANGED', 'CANCELED'], fieldValue.statusCode) : false,
+          btnOpenDisabled: showOnly,
         }),
         attributes: {
           className: 'btn btn-outline-danger',
@@ -662,6 +665,7 @@ class EditItemsPage extends Component {
   }
 
   render() {
+    const { showOnly } = this.props;
     return (
       <Form
         onSubmit={() => {}}
@@ -670,41 +674,52 @@ class EditItemsPage extends Component {
         initialValues={this.state.values}
         render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
-            <span>
+            { !showOnly ?
+              <span>
+                <button
+                  type="button"
+                  onClick={() => this.refresh()}
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                >
+                  <span><i className="fa fa-refresh pr-2" /><Translate
+                    id="react.default.button.refresh.label"
+                    defaultMessage="Reload"
+                  />
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => this.save(values)}
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                >
+                  <span><i className="fa fa-save pr-2" /><Translate
+                    id="react.default.button.save.label"
+                    defaultMessage="Save"
+                  />
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => this.saveAndExit(values)}
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+                >
+                  <span><i className="fa fa-sign-out pr-2" /><Translate
+                    id="react.default.button.saveAndExit.label"
+                    defaultMessage="Save and exit"
+                  />
+                  </span>
+                </button>
+              </span>
+                :
               <button
                 type="button"
-                onClick={() => this.refresh()}
-                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                onClick={() => {
+                  window.location = '/openboxes/stockMovement/list?direction=OUTBOUND';
+                }}
+                className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
               >
-                <span><i className="fa fa-refresh pr-2" /><Translate
-                  id="react.default.button.refresh.label"
-                  defaultMessage="Reload"
-                />
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => this.save(values)}
-                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-              >
-                <span><i className="fa fa-save pr-2" /><Translate
-                  id="react.default.button.save.label"
-                  defaultMessage="Save"
-                />
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => this.saveAndExit(values)}
-                className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
-              >
-                <span><i className="fa fa-sign-out pr-2" /><Translate
-                  id="react.default.button.saveAndExit.label"
-                  defaultMessage="Save and exit"
-                />
-                </span>
-              </button>
-            </span>
+                <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>
+              </button> }
             <form onSubmit={handleSubmit}>
               {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
                 stockMovementId: values.stockMovementId,
@@ -719,18 +734,20 @@ class EditItemsPage extends Component {
                 isRowLoaded: this.isRowLoaded,
                 isPaginated: this.props.isPaginated,
                 values,
+                showOnly,
               }))}
               <div>
                 <button
                   type="submit"
                   onClick={() => this.previousPage(values, invalid)}
+                  disabled={showOnly}
                   className="btn btn-outline-primary btn-form btn-xs"
                 >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button
                   type="submit"
-                  disabled={!this.state.hasItemsLoaded}
+                  disabled={!this.state.hasItemsLoaded || showOnly}
                   onClick={() => {
                     if (!invalid) {
                       this.nextPage(values);
@@ -785,4 +802,6 @@ EditItemsPage.propTypes = {
   stockMovementTranslationsFetched: PropTypes.bool.isRequired,
   /** Return true if pagination is enabled */
   isPaginated: PropTypes.bool.isRequired,
+  /** Return true if show only */
+  showOnly: PropTypes.bool.isRequired,
 };

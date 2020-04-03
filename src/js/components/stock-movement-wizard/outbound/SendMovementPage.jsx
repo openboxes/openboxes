@@ -599,6 +599,7 @@ class SendMovementPage extends Component {
   }
 
   render() {
+    const { showOnly } = this.props;
     return (
       <div>
         <hr />
@@ -630,12 +631,12 @@ class SendMovementPage extends Component {
                       {...document}
                       key={idx}
                       onClick={() => this.saveValues(values)}
-                      disabled={false}
+                      disabled={showOnly}
                     />);
                   })}
                   <div className="dropzone btn btn-outline-secondary">
                     <Dropzone
-                      disabled={values.statusCode === 'DISPATCHED'}
+                      disabled={values.statusCode === 'DISPATCHED' || showOnly}
                       onDrop={this.onDrop}
                       multiple
                     >
@@ -660,36 +661,49 @@ class SendMovementPage extends Component {
                 </div>
               </div>
               <hr />
-              <span>
+              { !showOnly ?
+                <span>
+                  <button
+                    type="button"
+                    onClick={() => this.onSave(values)}
+                    className="btn btn-outline-secondary float-right btn-form btn-xs"
+                    disabled={invalid}
+                  >
+                    <span><i className="fa fa-save pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => this.saveAndExit(values)}
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+                  >
+                    <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
+                  </button>
+                </span>
+                  :
                 <button
                   type="button"
-                  onClick={() => this.onSave(values)}
-                  className="btn btn-outline-secondary float-right btn-form btn-xs"
                   disabled={invalid}
+                  onClick={() => {
+                    window.location = '/openboxes/stockMovement/list?direction=OUTBOUND';
+                  }}
+                  className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
                 >
-                  <span><i className="fa fa-save pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => this.saveAndExit(values)}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
-                >
-                  <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
-                </button>
-              </span>
+                  <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>
+                </button> }
               <div className="col-md-9 pl-0">
                 {_.map(SHIPMENT_FIELDS, (fieldConfig, fieldName) =>
                   renderFormField(fieldConfig, fieldName, {
                     shipmentTypes: this.state.shipmentTypes,
                     issued: values.statusCode === 'DISPATCHED',
                     received: values.received,
+                    showOnly,
                   }))}
               </div>
               <div>
                 <button
                   type="submit"
                   className="btn btn-outline-primary btn-form btn-xs"
-                  disabled={values.statusCode === 'DISPATCHED'}
+                  disabled={values.statusCode === 'DISPATCHED' || showOnly}
                   onClick={() => this.previousPage(values, invalid)}
                 >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
@@ -698,7 +712,7 @@ class SendMovementPage extends Component {
                   type="submit"
                   onClick={() => { this.submitStockMovement(values); }}
                   className={`${values.shipped ? 'btn btn-outline-secondary' : 'btn btn-outline-success'} float-right btn-form btn-xs`}
-                  disabled={invalid || values.statusCode === 'DISPATCHED'}
+                  disabled={invalid || values.statusCode === 'DISPATCHED' || showOnly}
                 ><Translate id="react.stockMovement.sendShipment.label" defaultMessage="Send shipment" />
                 </button>
                 {values.shipped && this.props.isUserAdmin ?
@@ -706,7 +720,7 @@ class SendMovementPage extends Component {
                     type="submit"
                     onClick={() => { this.rollbackStockMovement(values); }}
                     className="btn btn-outline-success float-right btn-xs"
-                    disabled={invalid || !(values.statusCode === 'DISPATCHED')}
+                    disabled={invalid || values.statusCode !== 'DISPATCHED' || showOnly}
                   >
                     <span><i className="fa fa-undo pr-2" /><Translate id="react.default.button.rollback.label" defaultMessage="Rollback" /></span>
                   </button> : null
@@ -724,7 +738,7 @@ class SendMovementPage extends Component {
                 <button
                   type="submit"
                   className="btn btn-outline-primary btn-form btn-xs"
-                  disabled={values.statusCode === 'DISPATCHED'}
+                  disabled={values.statusCode === 'DISPATCHED' || showOnly}
                   onClick={() => this.previousPage(values, invalid)}
                 > <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
@@ -732,7 +746,7 @@ class SendMovementPage extends Component {
                   type="submit"
                   onClick={() => { this.submitStockMovement(values); }}
                   className={`${values.shipped ? 'btn btn-outline-secondary' : 'btn btn-outline-success'} float-right btn-form btn-xs`}
-                  disabled={invalid || values.statusCode === 'DISPATCHED'}
+                  disabled={invalid || values.statusCode === 'DISPATCHED' || showOnly}
                 ><Translate id="react.stockMovement.sendShipment.label" defaultMessage="Send shipment" />
                 </button>
                 {values.shipped && this.props.isUserAdmin ?
@@ -740,7 +754,7 @@ class SendMovementPage extends Component {
                     type="submit"
                     onClick={() => { this.rollbackStockMovement(values); }}
                     className="btn btn-outline-success float-right  btn-xs"
-                    disabled={invalid || !(values.statusCode === 'DISPATCHED')}
+                    disabled={invalid || values.statusCode !== 'DISPATCHED' || showOnly}
                   >
                     <span><i className="fa fa-undo pr-2" /><Translate id="react.default.button.rollback.label" defaultMessage="Rollback" /></span>
                   </button> : null
@@ -790,4 +804,6 @@ SendMovementPage.propTypes = {
   hasBinLocationSupport: PropTypes.bool.isRequired,
   /** Return true if pagination is enabled */
   isPaginated: PropTypes.bool.isRequired,
+  /** Return true if show only */
+  showOnly: PropTypes.bool.isRequired,
 };
