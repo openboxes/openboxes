@@ -8,6 +8,7 @@ import Alert from 'react-s-alert';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
 import moment from 'moment';
+import fileDownload from 'js-file-download';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -390,6 +391,7 @@ class AddItemsPage extends Component {
 
     this.props.showSpinner();
     this.removeItem = this.removeItem.bind(this);
+    this.importTemplate = this.importTemplate.bind(this);
     this.getSortOrder = this.getSortOrder.bind(this);
     this.confirmSave = this.confirmSave.bind(this);
     this.confirmTransition = this.confirmTransition.bind(this);
@@ -597,6 +599,71 @@ class AddItemsPage extends Component {
     this.setState({
       newItem: true,
     });
+  }
+
+  /**
+   * Exports current state of stock movement's to csv file.
+   * @param {object} formValues
+   * @public
+   */
+  exportTemplate(formValues) {
+    const lineItems = _.filter(formValues.lineItems, item => !_.isEmpty(item));
+
+    this.saveItemsAndExportTemplate(formValues, lineItems);
+  }
+
+  /**
+   * Exports current state of stock movement's to csv file.
+   * @param {object} formValues
+   * @param {object} lineItems
+   * @public
+   */
+  saveItemsAndExportTemplate(formValues, lineItems) {
+    this.props.showSpinner();
+
+    const { movementNumber, stockMovementId } = formValues;
+    const url = `/openboxes/stockMovement/exportCsv/${stockMovementId}`;
+    this.saveRequisitionItemsInCurrentStep(lineItems)
+      .then(() => {
+        apiClient.get(url, { responseType: 'blob' })
+          .then((response) => {
+            fileDownload(response.data, `ItemList${movementNumber ? `-${movementNumber}` : ''}.csv`, 'text/csv');
+            this.props.hideSpinner();
+          })
+          .catch(() => this.props.hideSpinner());
+      });
+  }
+
+  /**
+   * Imports chosen file to backend and then fetches line items.
+   * @param {object} event
+   * @public
+   */
+  importTemplate(event) {
+    this.props.showSpinner();
+    const formData = new FormData();
+    const file = event.target.files[0];
+    const { stockMovementId } = this.state.values;
+
+    formData.append('importFile', file.slice(0, file.size, 'text/csv'));
+    const config = {
+      headers: {
+        'content-type': 'multipart/form-data',
+      },
+    };
+
+    const url = `/openboxes/stockMovement/importCsv/${stockMovementId}`;
+
+    return apiClient.post(url, formData, config)
+      .then(() => {
+        this.fetchAddItemsPageData();
+        if (!this.props.isPaginated) {
+          this.fetchLineItems();
+        }
+      })
+      .catch(() => {
+        this.props.hideSpinner();
+      });
   }
 
   /**
@@ -1030,14 +1097,63 @@ class AddItemsPage extends Component {
         initialValues={this.state.values}
         render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
-            <button
-              type="button"
-              disabled={invalid}
-              onClick={() => { window.location = '/openboxes/stockMovement/list?type=REQUEST'; }}
-              className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
-            >
-              <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.exit.label" defaultMessage="Exit" /></span>
-            </button>
+            <span>
+              <label
+                htmlFor="csvInput"
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+              >
+                <span><i className="fa fa-download pr-2" /><Translate id="react.default.button.importTemplate.label" defaultMessage="Import template" /></span>
+                <input
+                  id="csvInput"
+                  type="file"
+                  style={{ display: 'none' }}
+                  onChange={this.importTemplate}
+                  onClick={(event) => {
+                    // eslint-disable-next-line no-param-reassign
+                    event.target.value = null;
+                  }}
+                  accept=".csv"
+                />
+              </label>
+              <button
+                type="button"
+                onClick={() => this.exportTemplate(values)}
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+              >
+                <span><i className="fa fa-upload pr-2" /><Translate id="react.default.button.exportTemplate.label" defaultMessage="Export template" /></span>
+              </button>
+              <button
+                type="button"
+                onClick={() => this.refresh()}
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+              >
+                <span><i className="fa fa-refresh pr-2" /><Translate id="react.default.button.refresh.label" defaultMessage="Reload" /></span>
+              </button>
+              <button
+                type="button"
+                disabled={invalid}
+                onClick={() => this.save(values)}
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+              >
+                <span><i className="fa fa-save pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
+              </button>
+              <button
+                type="button"
+                disabled={invalid}
+                onClick={() => this.saveAndExit(values)}
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+              >
+                <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
+              </button>
+              <button
+                type="button"
+                disabled={invalid}
+                onClick={() => this.removeAll()}
+                className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs"
+              >
+                <span><i className="fa fa-remove pr-2" /><Translate id="react.default.button.deleteAll.label" defaultMessage="Delete all" /></span>
+              </button>
+            </span>
             <form onSubmit={handleSubmit}>
               {_.map(this.getFields(), (fieldConfig, fieldName) =>
                 renderFormField(fieldConfig, fieldName, {
