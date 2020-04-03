@@ -360,17 +360,19 @@ class SendMovementPage extends Component {
   }
 
   loadMoreRows({ startIndex, stopIndex }) {
+    // eslint-disable-next-line no-unused-vars
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${stopIndex - startIndex > 0 ? stopIndex - startIndex : 1}&stepNumber=6`;
-    apiClient.get(url)
-      .then((response) => {
-        const { data } = response.data;
-        this.setState({
-          values: {
-            ...this.state.values,
-            tableItems: _.uniq(_.concat(this.state.values.tableItems, data)),
-          },
-        });
-      });
+    // TODO: Fix pagination support
+    // apiClient.get(url)
+    //   .then((response) => {
+    //     const { data } = response.data;
+    //     this.setState({
+    //       values: {
+    //         ...this.state.values,
+    //         tableItems: _.uniq(_.concat(this.state.values.tableItems, data)),
+    //       },
+    //     });
+    //   });
   }
 
   isRowLoaded({ index }) {
@@ -412,13 +414,15 @@ class SendMovementPage extends Component {
               label: `${stockMovementData.destination.name}
                 [${destinationType ? destinationType.description : null}]`,
             },
+            tableItems: stockMovementData.lineItems,
           },
         }, () => {
           this.props.nextPage(this.state.values);
           this.fetchShipmentTypes();
-          if (!this.props.isPaginated) {
-            this.fetchStockMovementItems();
-          }
+          // TODO: Fix pagination support
+          // if (!this.props.isPaginated) {
+          //   this.fetchStockMovementItems();
+          // }
         });
       })
       .catch(() => this.props.hideSpinner());
