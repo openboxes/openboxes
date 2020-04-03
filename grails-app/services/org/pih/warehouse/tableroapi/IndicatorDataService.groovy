@@ -283,22 +283,22 @@ class IndicatorDataService {
         ['location': location]);
 
         // Initial state
-        ColorNumber green = new ColorNumber(0, 'Pending', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=PENDING');
-        ColorNumber yellow = new ColorNumber(0, 'Shipped', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=SHIPPED');
-        ColorNumber red = new ColorNumber(0, 'Partially Received', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=PARTIALLY_RECEIVED');
+        ColorNumber pending = new ColorNumber(0, 'Pending', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=PENDING');
+        ColorNumber shipped = new ColorNumber(0, 'Shipped', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=SHIPPED');
+        ColorNumber partiallyReceived = new ColorNumber(0, 'Partially Received', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=PARTIALLY_RECEIVED');
 
         // Changes each ColorNumber if found in query
         query.each {
             if (it[0].name == 'PENDING') {
-                green = new ColorNumber(it[1], 'Pending', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=PENDING')
+                pending = new ColorNumber(it[1], 'Pending', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=PENDING')
             } else if (it[0].name == 'SHIPPED') {
-                yellow = new ColorNumber(it[1], 'Shipped', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=SHIPPED')
+                shipped = new ColorNumber(it[1], 'Shipped', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=SHIPPED')
             } else if (it[0].name == 'PARTIALLY_RECEIVED') {
-                red = new ColorNumber(it[1], 'Partially Received', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=PARTIALLY_RECEIVED')
+                partiallyReceived = new ColorNumber(it[1], 'Partially Received', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=PARTIALLY_RECEIVED')
             }
         }
 
-        NumberIndicator indicatorData = new NumberIndicator(green, yellow, red)
+        NumberIndicator indicatorData = new NumberIndicator(pending, shipped, partiallyReceived, false)
 
         return indicatorData;
     }

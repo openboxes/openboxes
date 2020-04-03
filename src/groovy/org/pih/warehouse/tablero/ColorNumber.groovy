@@ -15,9 +15,9 @@ class ColorNumber implements Serializable {
 
     Map toJson() {
         [
-                "value"    : value,
-                "subtitle" : subtitle,
-                "link"     : link,
+                "value"     : value,
+                "subtitle"  : subtitle,
+                "link"      : link,
         ]
     }
 }

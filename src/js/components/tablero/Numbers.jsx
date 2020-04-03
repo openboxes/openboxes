@@ -3,40 +3,41 @@ import PropTypes from 'prop-types';
 
 const Numbers = props => (
   <div className="gyrIndicator">
-    <a className="numberIndicator" href={props.data.green.link}>
+    <a className="numberIndicator" href={props.data.first.link}>
       <div className="value">
-        <div className="circle green" /> {props.data.green.value}
+        <div className={props.data.gyrColors ? 'circle green' : 'circle gray'} /> {props.data.first.value}
       </div>
-      <div className="subtitle">{props.data.green.subtitle}</div>
+      <div className="subtitle">{props.data.first.subtitle}</div>
     </a>
-    <a className="numberIndicator" href={props.data.yellow.link}>
+    <a className="numberIndicator" href={props.data.second.link}>
       <div className="value">
-        <div className="circle yellow" /> {props.data.yellow.value}
+        <div className={props.data.gyrColors ? 'circle yellow' : 'circle gray'} /> {props.data.second.value}
       </div>
-      <div className="subtitle">{props.data.yellow.subtitle}</div>
+      <div className="subtitle">{props.data.second.subtitle}</div>
     </a>
-    <a className="numberIndicator" href={props.data.red.link}>
+    <a className="numberIndicator" href={props.data.third.link}>
       <div className="value">
-        <div className="circle red" /> {props.data.red.value}
+        <div className={props.data.gyrColors ? 'circle red' : 'circle gray'} /> {props.data.third.value}
       </div>
-      <div className="subtitle">{props.data.red.subtitle}</div>
+      <div className="subtitle">{props.data.third.subtitle}</div>
     </a>
   </div>
 );
 
 Numbers.propTypes = {
   data: PropTypes.shape({
-    red: PropTypes.shape({
+    gyrColors: PropTypes.bool,
+    third: PropTypes.shape({
       subtitle: PropTypes.string,
       value: PropTypes.number,
       link: PropTypes.string,
     }),
-    yellow: PropTypes.shape({
+    second: PropTypes.shape({
       subtitle: PropTypes.string,
       value: PropTypes.number,
       link: PropTypes.string,
     }),
-    green: PropTypes.shape({
+    first: PropTypes.shape({
       subtitle: PropTypes.string,
       value: PropTypes.number,
       link: PropTypes.string,
