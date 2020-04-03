@@ -278,25 +278,27 @@ class IndicatorDataService {
     }
 
     NumberIndicator getIncomingStock(Location location) {
-        Date today = new Date()
-        today.clearTime();
-        def m4 = today - 4;
-        def m7 = today - 7;
 
-        def greenData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated >= :day and r.destination = :location""",
-        ['day': m4, 'location': location]);
-        
-        def yellowData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated >= :dayOne and r.dateCreated < :dayTwo and r.destination = :location""",
-        ['dayOne': m7, 'dayTwo': m4, 'location': location]);
+        def query = Shipment.executeQuery("""select s.currentStatus, count(s) from Shipment s where s.destination = :location and s.currentStatus <> 'RECEIVED' group by s.currentStatus""",
+        ['location': location]);
 
-        def redData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated < :day and r.destination = :location""",
-        ['day': m7, 'location': location]);
+        // Initial state
+        ColorNumber pending = new ColorNumber(0, 'Pending', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=PENDING');
+        ColorNumber shipped = new ColorNumber(0, 'Shipped', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=SHIPPED');
+        ColorNumber partiallyReceived = new ColorNumber(0, 'Partially Received', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=PARTIALLY_RECEIVED');
 
-        ColorNumber green = new ColorNumber(greenData[0], 'Created < 4 days ago');
-        ColorNumber yellow = new ColorNumber(yellowData[0], 'Created > 4 days ago');
-        ColorNumber red = new ColorNumber(redData[0], 'Created > 7 days ago');
+        // Changes each ColorNumber if found in query
+        query.each {
+            if (it[0].name == 'PENDING') {
+                pending = new ColorNumber(it[1], 'Pending', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=PENDING')
+            } else if (it[0].name == 'SHIPPED') {
+                shipped = new ColorNumber(it[1], 'Shipped', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=SHIPPED')
+            } else if (it[0].name == 'PARTIALLY_RECEIVED') {
+                partiallyReceived = new ColorNumber(it[1], 'Partially Received', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=PARTIALLY_RECEIVED')
+            }
+        }
 
-        NumberIndicator indicatorData = new NumberIndicator(green, yellow, red)
+        NumberIndicator indicatorData = new NumberIndicator(pending, shipped, partiallyReceived, false)
 
         return indicatorData;
     }

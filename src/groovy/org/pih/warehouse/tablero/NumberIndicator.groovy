@@ -4,21 +4,24 @@ import org.pih.warehouse.tablero.ColorNumber
 
 class NumberIndicator implements Serializable {
     
-    ColorNumber green;
-    ColorNumber yellow;
-    ColorNumber red;
+    ColorNumber first;
+    ColorNumber second;
+    ColorNumber third;
+    Boolean gyrColors;
 
-    NumberIndicator(ColorNumber green, ColorNumber yellow, ColorNumber red) {
-        this.green = green;
-        this.yellow = yellow;
-        this.red = red;
+    NumberIndicator(ColorNumber first, ColorNumber second, ColorNumber third, Boolean gyrColors = true) {
+        this.first = first;
+        this.second = second;
+        this.third = third;
+        this.gyrColors = gyrColors;
     }
 
     Map toJson() {
         [
-                "green"  : green.toJson(),
-                "yellow" : yellow.toJson(),
-                "red"    : red.toJson(),
+                "first"     : first.toJson(),
+                "second"    : second.toJson(),
+                "third"     : third.toJson(),
+                "gyrColors" : gyrColors,
         ]
     }
 }

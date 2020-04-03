@@ -204,6 +204,12 @@
         justify-content: center;
         align-items: center;
         user-select: none;
+        color: #282d32;
+
+        &:hover {
+          text-decoration: none;
+          color: #282d32;
+        }
 
         &:not(:last-child) {
           border-right: 1px solid #d8d8d8;
@@ -231,6 +237,10 @@
 
             &.red {
               background-color: #e02020;
+            }
+
+            &.gray {
+              background-color: rgba(0, 0, 0, 0.438);
             }
           }
         }
