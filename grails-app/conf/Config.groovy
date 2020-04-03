@@ -7,9 +7,12 @@
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
  **/
+
+import com.mchange.v2.c3p0.example.IsValidOnlyConnectionTester30
 import grails.util.GrailsUtil
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.ReasonCode
+import org.pih.warehouse.core.RoleType
 
 // Locations to search for config files that get merged into the main config
 // config files can either be Java properties files or ConfigSlurper scripts
@@ -394,6 +397,11 @@ openboxes.identifier.shipment.format = Constants.DEFAULT_SHIPMENT_NUMBER_FORMAT
 
 // OpenBoxes default line printer port
 openboxes.linePrinterTerminal.port = "LPT1"
+
+// Require approval on purchase orders
+openboxes.purchasing.approval.enabled = false
+openboxes.purchasing.approval.minimumAmount = 0.00
+openboxes.purchasing.approval.defaultRoleTypes = [RoleType.ROLE_APPROVER]
 
 // OpenBoxes default uploads directory location
 openboxes.uploads.location = "uploads"

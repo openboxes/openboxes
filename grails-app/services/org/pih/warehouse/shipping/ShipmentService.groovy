@@ -32,6 +32,8 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
@@ -220,16 +222,29 @@ class ShipmentService {
     }
 
 
+    List<Shipment> getShipmentsByLocation(Location location) {
+        return getShipmentsByLocation(location, location, null)
+    }
+
     /**
      *
      * @param location
      * @return
      */
-    List<Shipment> getShipmentsByLocation(Location location) {
+    List<Shipment> getShipmentsByLocation(Location origin, Location destination, ShipmentStatusCode shipmentStatusCode) {
         return Shipment.withCriteria {
-            or {
-                eq("destination", location)
-                eq("origin", location)
+            and {
+                or {
+                    if (origin) {
+                        eq("origin", origin)
+                    }
+                    if (destination) {
+                        eq("destination", destination)
+                    }
+                }
+                if (shipmentStatusCode) {
+                    eq("currentStatus", shipmentStatusCode)
+                }
             }
         }
     }
@@ -794,7 +809,14 @@ class ShipmentService {
      * @param shipment
      */
     void deleteShipment(Shipment shipment) {
-        shipment.delete(flush: true)
+        shipment.shipmentItems.toArray().each { ShipmentItem shipmentItem ->
+            shipment.removeFromShipmentItems(shipmentItem)
+            shipmentItem.orderItems.toArray().flatten().each { OrderItem orderItem ->
+                orderItem.removeFromShipmentItems(shipmentItem)
+            }
+            shipmentItem.delete()
+        }
+        shipment.delete()
     }
 
 
@@ -2109,4 +2131,40 @@ class ShipmentService {
         return count
     }
 
+
+    void updateOrCreateOrderBasedShipmentItems(Order order, Shipment shipment) {
+        shipment.name = order.name
+        shipment.description = order.orderNumber
+        shipment.origin = order.origin
+        shipment.destination = order.destination
+
+        if (order.orderItems) {
+            def itemsToRemove = shipment.shipmentItems.findAll {
+                sItem -> !order.orderItems?.any { oItem -> sItem.orderItems?.any { it.id == oItem.id } }
+            }
+
+            itemsToRemove.each { ShipmentItem shipmentItem -> deleteShipmentItem(shipmentItem) }
+
+            order.orderItems.each { OrderItem orderItem ->
+                def shipmentItem = shipment.shipmentItems.find { it.orderItems?.any { it.id == orderItem.id } }
+                if (!shipmentItem) {
+                    shipmentItem = new ShipmentItem(
+                        product: orderItem.product,
+                        recipient: orderItem.recipient,
+                        quantity: orderItem.quantity
+                    )
+                    shipmentItem.addToOrderItems(orderItem)
+                    shipment.addToShipmentItems(shipmentItem)
+                } else {
+                    shipmentItem.product = orderItem.product
+                    shipmentItem.recipient = orderItem.recipient
+                    shipmentItem.quantity = orderItem.quantity
+                }
+            }
+        }
+
+        if (shipment.hasErrors() || !shipment.save()) {
+            throw new ValidationException("Invalid shipment", shipment.errors)
+        }
+    }
 }

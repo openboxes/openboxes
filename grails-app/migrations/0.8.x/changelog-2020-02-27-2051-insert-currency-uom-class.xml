@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda" id="1582858163230-1">
+        <insert tableName="unit_of_measure_class">
+            <column name="id" value="CURRENCY"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="name" value="Currency"/>
+            <column name="code" value="CURRENCY"/>
+            <column name="description" value=""/>
+            <column name="date_created" valueDate="2018-09-10T00:00:00.0"/>
+            <column name="last_updated" valueDate="2018-09-10T00:00:00.0"/>
+
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda" id="1582858163230-2">
+        <insert tableName="unit_of_measure">
+            <column name="id" value="USD"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="code" value="USD"/>
+            <column name="name" value="US Dollar"/>
+            <column name="description" value="USD (US$)"/>
+            <column name="uom_class_id" value="CURRENCY"/>
+            <column name="created_by_id" value="1"/>
+            <column name="updated_by_id" value="1"/>
+            <column name="date_created" valueDate="2018-09-10T00:00:00.0"/>
+            <column name="last_updated" valueDate="2018-09-10T00:00:00.0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda" id="1582858163230-3">
+        <insert tableName="unit_of_measure">
+            <column name="id" value="EUR"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="code" value="EUR"/>
+            <column name="name" value="Euro"/>
+            <column name="description" value="EUR (€)"/>
+            <column name="uom_class_id" value="CURRENCY"/>
+            <column name="created_by_id" value="1"/>
+            <column name="updated_by_id" value="1"/>
+            <column name="date_created" valueDate="2018-09-10T00:00:00.0"/>
+            <column name="last_updated" valueDate="2018-09-10T00:00:00.0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda" id="1582858163230-4">
+        <comment>Set base unit of measure for currency class to USD.</comment>
+        <update tableName="unit_of_measure_class">
+            <column name="base_uom_id" value="USD" />
+            <where>id='CURRENCY'</where>
+        </update>
+    </changeSet>
+    <changeSet author="jmiranda" id="1582858163230-5">
+        <update tableName="unit_of_measure_class">
+            <column name="type" value="CURRENCY" />
+            <where>id='CURRENCY'</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>

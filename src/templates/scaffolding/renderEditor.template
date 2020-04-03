@@ -28,7 +28,7 @@
         out << renderOneToMany(domainClass, property)
 
     private renderEnumEditor(domainClass, property) {
-        return "<g:select class=\"chzn-select-deselect\" name=\"${property.name}\" from=\"\${${property.type.name}?.values()}\" value=\"\${${domainInstance}?.${property.name}}\" ${renderNoSelection(property)} />"
+        return "<g:select class=\"chzn-select-deselect\" name=\"${property.name}\" noSelection=\"['':'']\" from=\"\${${property.type.name}?.values()}\" value=\"\${${domainInstance}?.${property.name}}\" ${renderNoSelection(property)} />"
     }
 
     private renderStringEditor(domainClass, property) {
@@ -98,7 +98,7 @@
             }
             else if (cp.inList) {
                 return "<g:select class=\"chzn-select-deselect\" name=\"${property.name}\" from=\"\${${domainClass.propertyName}.constraints.${property.name}.inList}\" value=\"\${fieldValue(bean: ${domainInstance}, field: '${property.name}')}\" valueMessagePrefix=\"${domainClass.propertyName}.${property?.name}\" ${renderNoSelection(property)} />"
-            }            
+            }
             else {
                 return "<g:textField class=\"text\" name=\"${property.name}\" value=\"\${fieldValue(bean: ${domainInstance}, field: '${property.name}')}\" />"
             }
