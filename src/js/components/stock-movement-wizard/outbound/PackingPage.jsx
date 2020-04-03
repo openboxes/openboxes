@@ -26,6 +26,10 @@ const FIELDS = {
   packPageItems: {
     type: ArrayField,
     arrowsNavigation: true,
+    virtualized: true,
+    totalCount: ({ totalCount }) => totalCount,
+    isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
+    loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     fields: {
       productCode: {
         type: LabelField,
@@ -52,7 +56,9 @@ const FIELDS = {
         label: 'react.stockMovement.binLocation.label',
         defaultMessage: 'Bin location',
         flexWidth: '1',
-        hide: ({ hasBinLocationSupport }) => !hasBinLocationSupport,
+        getDynamicAttr: ({ hasBinLocationSupport }) => ({
+          hide: !hasBinLocationSupport,
+        }),
       },
       lotNumber: {
         type: LabelField,
@@ -97,6 +103,7 @@ const FIELDS = {
         },
         getDynamicAttr: props => ({
           loadOptions: props.debouncedUsersFetch,
+          disabled: props.showOnly,
         }),
       },
       palletName: {
@@ -104,12 +111,18 @@ const FIELDS = {
         label: 'react.stockMovement.packLevel1.label',
         defaultMessage: 'Pack level 1',
         flexWidth: '0.8',
+        getDynamicAttr: ({ showOnly }) => ({
+          disabled: showOnly,
+        }),
       },
       boxName: {
         type: TextField,
         label: 'react.stockMovement.packLevel2.label',
         defaultMessage: 'Pack level 2',
         flexWidth: '0.8',
+        getDynamicAttr: ({ showOnly }) => ({
+          disabled: showOnly,
+        }),
       },
       splitLineItems: {
         type: PackingSplitLineModal,
@@ -124,9 +137,10 @@ const FIELDS = {
           btnOpenClassName: 'btn btn-outline-success',
         },
         getDynamicAttr: ({
-          fieldValue, rowIndex, onSave, formValues,
+          fieldValue, rowIndex, onSave, formValues, showOnly,
         }) => ({
           lineItem: fieldValue,
+          btnOpenDisabled: showOnly,
           onSave: splitLineItems => onSave(formValues, rowIndex, splitLineItems),
         }),
       },
@@ -156,9 +170,12 @@ class PackingPage extends Component {
 
     this.state = {
       values: { ...this.props.initialValues, packPageItems: [] },
+      totalCount: 0,
     };
 
     this.saveSplitLines = this.saveSplitLines.bind(this);
+    this.isRowLoaded = this.isRowLoaded.bind(this);
+    this.loadMoreRows = this.loadMoreRows.bind(this);
 
     this.debouncedUsersFetch =
       debounceUsersFetch(this.props.debounceTime, this.props.minSearchLength);
@@ -182,6 +199,16 @@ class PackingPage extends Component {
     }
   }
 
+  setPackPageItems(response) {
+    const { data } = response.data;
+    this.setState({
+      values: {
+        ...this.state.values,
+        packPageItems: _.uniqBy(_.concat(this.state.values.packPageItems, data), 'shipmentItemId'),
+      },
+    });
+  }
+
   dataFetched = false;
 
   /**
@@ -189,15 +216,49 @@ class PackingPage extends Component {
    * @public
    */
   fetchAllData() {
-    this.fetchLineItems().then((resp) => {
-      const { packPageItems } = resp.data.data.packPage;
-      const { statusCode } = resp.data.data;
-      this.setState({ values: { ...this.state.values, statusCode, packPageItems } }, () => {
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=5`;
+
+    apiClient.get(url)
+      .then((resp) => {
+        const { statusCode } = resp.data.data;
+        const { totalCount } = resp.data;
+
+        this.setState({ values: { ...this.state.values, statusCode }, totalCount }, () => {
+          this.props.hideSpinner();
+        });
+      }).catch(() => {
         this.props.hideSpinner();
       });
-    }).catch(() => {
-      this.props.hideSpinner();
-    });
+
+    if (!this.props.isPaginated) {
+      this.fetchLineItems().then((response) => {
+        this.setPackPageItems(response);
+      });
+    }
+  }
+
+  loadMoreRows({ startIndex, stopIndex }) {
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${stopIndex - startIndex > 0 ? stopIndex - startIndex : 1}&stepNumber=5`;
+    apiClient.get(url)
+      .then((response) => {
+        this.setPackPageItems(response);
+      });
+  }
+
+  isRowLoaded({ index }) {
+    return !!this.state.values.packPageItems[index];
+  }
+
+  /**
+   * Fetches 5th step data from current stock movement.
+   * @public
+   */
+  fetchLineItems() {
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=5`;
+
+    return apiClient.get(url)
+      .then(resp => resp)
+      .catch(err => err);
   }
 
   /**
@@ -209,8 +270,8 @@ class PackingPage extends Component {
     this.props.showSpinner();
     this.savePackingData(formValues.packPageItems)
       .then((resp) => {
-        const { packPageItems } = resp.data.data.packPage;
-        this.setState({ values: { ...this.state.values, packPageItems } });
+        const { data } = resp.data;
+        this.setState({ values: { ...this.state.values, packPageItems: data } });
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
       })
@@ -253,18 +314,6 @@ class PackingPage extends Component {
       return apiClient.post(url, payload);
     }
     return Promise.resolve();
-  }
-
-  /**
-   * Fetches 5th step data from current stock movement.
-   * @public
-   */
-  fetchLineItems() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=5`;
-
-    return apiClient.get(url)
-      .then(resp => resp)
-      .catch(err => err);
   }
 
   /**
@@ -322,14 +371,21 @@ class PackingPage extends Component {
       },
     }))
       .then((resp) => {
-        const { packPageItems } = resp.data.data.packPage;
-        this.setState({ values: { ...this.state.values, packPageItems } });
+        const { data } = resp.data;
+        this.setState({
+          values: {
+            ...this.state.values,
+            packPageItems: data,
+          },
+          totalCount: this.state.totalCount + (splitLineItems.length - 1),
+        });
         this.props.hideSpinner();
       })
       .catch(() => this.props.hideSpinner());
   }
 
   render() {
+    const { showOnly } = this.props;
     return (
       <Form
         onSubmit={values => this.nextPage(values)}
@@ -338,53 +394,68 @@ class PackingPage extends Component {
         validate={validate}
         render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
-            <span>
-              <button
-                type="button"
-                onClick={() => this.refresh()}
-                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-              >
-                <span><i className="fa fa-refresh pr-2" />
-                  <Translate id="react.default.button.refresh.label" defaultMessage="Reload" />
-                </span>
-              </button>
+            { !showOnly ?
+              <span>
+                <button
+                  type="button"
+                  onClick={() => this.refresh()}
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                >
+                  <span><i className="fa fa-refresh pr-2" />
+                    <Translate id="react.default.button.refresh.label" defaultMessage="Reload" />
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  disabled={invalid}
+                  onClick={() => this.save(values)}
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
+                >
+                  <span><i className="fa fa-save pr-2" />
+                    <Translate id="react.default.button.save.label" defaultMessage="Save" />
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  disabled={invalid}
+                  onClick={() => this.savePackingData(values.packPageItems).then(() => { window.location = `/openboxes/stockMovement/show/${values.stockMovementId}`; })}
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+                >
+                  <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
+                </button>
+              </span>
+                :
               <button
                 type="button"
                 disabled={invalid}
-                onClick={() => this.save(values)}
-                className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
+                onClick={() => { window.location = '/openboxes/stockMovement/list?direction=OUTBOUND'; }}
+                className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
               >
-                <span><i className="fa fa-save pr-2" />
-                  <Translate id="react.default.button.save.label" defaultMessage="Save" />
-                </span>
-              </button>
-              <button
-                type="button"
-                disabled={invalid}
-                onClick={() => this.savePackingData(values.packPageItems).then(() => { window.location = `/openboxes/stockMovement/show/${values.stockMovementId}`; })}
-                className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
-              >
-                <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
-              </button>
-            </span>
+                <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>
+              </button> }
             <form onSubmit={handleSubmit}>
               {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
                 onSave: this.saveSplitLines,
                 formValues: values,
                 debouncedUsersFetch: this.debouncedUsersFetch,
                 hasBinLocationSupport: this.props.hasBinLocationSupport,
+                totalCount: this.state.totalCount,
+                loadMoreRows: this.loadMoreRows,
+                isRowLoaded: this.isRowLoaded,
+                isPaginated: this.props.isPaginated,
+                showOnly,
               }))}
               <div>
                 <button
                   type="button"
                   className="btn btn-outline-primary btn-form btn-xs"
-                  disabled={invalid}
+                  disabled={showOnly || invalid}
                   onClick={() => this.savePackingData(values.packPageItems)
                     .then(() => this.props.previousPage(values))}
                 >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
-                <button type="submit" className="btn btn-outline-primary btn-form float-right btn-xs" disabled={invalid}>
+                <button type="submit" className="btn btn-outline-primary btn-form float-right btn-xs" disabled={showOnly || invalid}>
                   <Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>
@@ -404,6 +475,7 @@ const mapStateToProps = state => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
+  isPaginated: state.session.isPaginated,
 });
 
 export default (connect(mapStateToProps, {
@@ -430,4 +502,8 @@ PackingPage.propTypes = {
   minSearchLength: PropTypes.number.isRequired,
   /** Is true when currently selected location supports bins */
   hasBinLocationSupport: PropTypes.bool.isRequired,
+  /** Return true if pagination is enabled */
+  isPaginated: PropTypes.bool.isRequired,
+  /** Return true if show only */
+  showOnly: PropTypes.bool.isRequired,
 };

@@ -26,6 +26,10 @@ import Translate, { translateWithDefaultMessage } from '../../../utils/Translate
 const FIELDS = {
   pickPageItems: {
     type: ArrayField,
+    virtualized: true,
+    totalCount: ({ totalCount }) => totalCount,
+    isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
+    loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     rowComponent: TableRowWithSubfields,
     subfieldKey: 'picklistItems',
     getDynamicRowAttr: ({ rowValues, subfield }) => {
@@ -71,7 +75,9 @@ const FIELDS = {
         flexWidth: '1.1',
         label: 'react.stockMovement.binLocation.label',
         defaultMessage: 'Bin location',
-        hide: ({ hasBinLocationSupport }) => !hasBinLocationSupport,
+        getDynamicAttr: ({ hasBinLocationSupport }) => ({
+          hide: !hasBinLocationSupport,
+        }),
       },
       quantityRequired: {
         type: LabelField,
@@ -102,14 +108,15 @@ const FIELDS = {
         },
         getDynamicAttr: ({
           fieldValue, subfield, stockMovementId, updatePickPageItem,
-          reasonCodes, hasBinLocationSupport,
+          reasonCodes, hasBinLocationSupport, showOnly,
         }) => ({
           fieldValue: flattenRequest(fieldValue),
+          btnOpenDisabled: showOnly,
           subfield,
           stockMovementId,
-          btnOpenText: fieldValue.hasChangedPick ? '' : 'react.default.button.edit.label',
-          btnOpenDefaultText: fieldValue.hasChangedPick ? '' : 'Edit',
-          btnOpenClassName: fieldValue.hasChangedPick ? ' btn fa fa-check btn-outline-success' : 'btn btn-outline-primary',
+          btnOpenText: fieldValue && fieldValue.hasChangedPick ? '' : 'react.default.button.edit.label',
+          btnOpenDefaultText: fieldValue && fieldValue.hasChangedPick ? '' : 'Edit',
+          btnOpenClassName: fieldValue && fieldValue.hasChangedPick ? ' btn fa fa-check btn-outline-success' : 'btn btn-outline-primary',
           onResponse: updatePickPageItem,
           reasonCodes,
           hasBinLocationSupport,
@@ -126,8 +133,9 @@ const FIELDS = {
         attributes: {
           className: 'btn btn-outline-primary',
         },
-        getDynamicAttr: ({ subfield, translate }) => ({
+        getDynamicAttr: ({ subfield, translate, showOnly }) => ({
           hidden: subfield,
+          disabled: showOnly,
           onClick: () => Alert.error(translate('react.stockMovement.alert.disabledAdjustment.label', 'This feature is not available yet. Please adjust stock on the electronic stock card page.')),
         }),
       },
@@ -139,9 +147,12 @@ const FIELDS = {
         fieldKey: '',
         buttonLabel: 'react.default.button.undoEdit.label',
         buttonDefaultMessage: 'Undo edit',
-        getDynamicAttr: ({ fieldValue, revertUserPick, subfield }) => ({
+        getDynamicAttr: ({
+          fieldValue, revertUserPick, subfield, showOnly,
+        }) => ({
           onClick: flattenRequest(fieldValue)['requisitionItem.id'] ? () => revertUserPick(flattenRequest(fieldValue)['requisitionItem.id']) : () => null,
           hidden: subfield,
+          disabled: showOnly,
         }),
         attributes: {
           className: 'btn btn-outline-danger',
@@ -164,7 +175,8 @@ class PickPage extends Component {
       bins: [],
       sorted: false,
       printPicksUrl: '',
-      values: this.props.initialValues,
+      values: { ...this.props.initialValues, pickPageItems: [] },
+      totalCount: 0,
     };
 
     this.revertUserPick = this.revertUserPick.bind(this);
@@ -172,6 +184,8 @@ class PickPage extends Component {
     this.fetchAdjustedItems = this.fetchAdjustedItems.bind(this);
     this.sortByBins = this.sortByBins.bind(this);
     this.importTemplate = this.importTemplate.bind(this);
+    this.isRowLoaded = this.isRowLoaded.bind(this);
+    this.loadMoreRows = this.loadMoreRows.bind(this);
   }
 
   componentDidMount() {
@@ -190,6 +204,26 @@ class PickPage extends Component {
     }
   }
 
+  setPickPageItems(response) {
+    const { data } = response.data;
+    this.setState({
+      values: {
+        ...this.state.values,
+        pickPageItems: this.props.isPaginated ? _.uniqBy(_.concat(
+          this.state.values.pickPageItems,
+          _.map(
+            parseResponse(data),
+            item => this.checkForInitialPicksChanges(item),
+          ),
+        ), 'requisitionItem.id') : _.map(
+          parseResponse(data),
+          item => this.checkForInitialPicksChanges(item),
+        ),
+      },
+      sorted: false,
+    });
+  }
+
   dataFetched = false;
 
   /**
@@ -205,6 +239,9 @@ class PickPage extends Component {
     }
 
     this.fetchPickPageData();
+    if (!this.props.isPaginated) {
+      this.fetchPickPageItems();
+    }
   }
 
   /**
@@ -246,6 +283,7 @@ class PickPage extends Component {
 
     return apiClient.get(url)
       .then((resp) => {
+        const { totalCount } = resp.data;
         const { associations } = resp.data.data;
         const { pickPageItems } = resp.data.data.pickPage;
 
@@ -254,6 +292,7 @@ class PickPage extends Component {
           doc => doc.documentType === 'PICKLIST' && doc.uri.includes('print'),
         );
         this.setState({
+          totalCount,
           printPicksUrl: printPicks ? printPicks.uri : '/',
           values: {
             ...this.state.values,
@@ -264,6 +303,44 @@ class PickPage extends Component {
         }, () => this.fetchBins());
       })
       .catch(() => this.props.hideSpinner());
+  }
+
+  fetchPickPageItems() {
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=4`;
+    apiClient.get(url)
+      .then((response) => {
+        this.setPickPageItems(response);
+      });
+  }
+
+  fetchItemsAfterImport() {
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=4`;
+    apiClient.get(url)
+      .then((response) => {
+        const { data } = response.data;
+        this.setState({
+          values: {
+            ...this.state.values,
+            pickPageItems: _.map(
+              parseResponse(data),
+              item => this.checkForInitialPicksChanges(item),
+            ),
+          },
+          sorted: false,
+        });
+      });
+  }
+
+  loadMoreRows({ startIndex, stopIndex }) {
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${stopIndex - startIndex > 0 ? stopIndex - startIndex : 1}&stepNumber=4`;
+    apiClient.get(url)
+      .then((response) => {
+        this.setPickPageItems(response);
+      });
+  }
+
+  isRowLoaded({ index }) {
+    return !!this.state.values.pickPageItems[index];
   }
 
   fetchAdjustedItems(adjustedProductCode) {
@@ -423,7 +500,7 @@ class PickPage extends Component {
     return apiClient.post(url, formData, config)
       .then(() => {
         this.props.hideSpinner();
-        this.fetchAllData(false);
+        this.fetchItemsAfterImport();
       })
       .catch(() => {
         this.props.hideSpinner();
@@ -456,6 +533,7 @@ class PickPage extends Component {
   }
 
   render() {
+    const { showOnly } = this.props;
     return (
       <Form
         onSubmit={values => this.nextPage(values)}
@@ -463,62 +541,71 @@ class PickPage extends Component {
         initialValues={this.state.values}
         render={({ handleSubmit, values }) => (
           <div className="d-flex flex-column">
-            <span>
-              <label
-                htmlFor="csvInput"
-                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-              >
-                <span><i className="fa fa-download pr-2" /><Translate id="react.default.button.importTemplate.label" defaultMessage="Import template" /></span>
-                <input
-                  id="csvInput"
-                  type="file"
-                  style={{ display: 'none' }}
-                  onChange={this.importTemplate}
-                  onClick={(event) => {
-                    // eslint-disable-next-line no-param-reassign
-                    event.target.value = null;
-                  }}
-                  accept=".csv"
-                />
-              </label>
+            { !showOnly ?
+              <span>
+                <label
+                  htmlFor="csvInput"
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                >
+                  <span><i className="fa fa-download pr-2" /><Translate id="react.default.button.importTemplate.label" defaultMessage="Import template" /></span>
+                  <input
+                    id="csvInput"
+                    type="file"
+                    style={{ display: 'none' }}
+                    onChange={this.importTemplate}
+                    onClick={(event) => {
+                      // eslint-disable-next-line no-param-reassign
+                      event.target.value = null;
+                    }}
+                    accept=".csv"
+                  />
+                </label>
+                <button
+                  type="button"
+                  onClick={() => this.exportTemplate(values)}
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                >
+                  <span><i className="fa fa-upload pr-2" /><Translate id="react.default.button.exportTemplate.label" defaultMessage="Export template" /></span>
+                </button>
+                <a
+                  href={`${this.state.printPicksUrl}${this.state.sorted ? '?sorted=true' : ''}`}
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span><i className="fa fa-print pr-2" /><Translate id="react.stockMovement.printPicklist.label" defaultMessage="Print picklist" /></span>
+                </a>
+                <button
+                  type="button"
+                  onClick={() => this.refresh()}
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
+                >
+                  <span><i className="fa fa-refresh pr-2" /><Translate id="react.default.button.refresh.label" defaultMessage="Reload" /></span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { window.location = `/openboxes/stockMovement/show/${values.stockMovementId}`; }}
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
+                >
+                  <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => this.sortByBins()}
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+                >
+                  {this.state.sorted && <span><i className="fa fa-sort pr-2" /><Translate id="react.stockMovement.originalOrder.label" defaultMessage="Original order" /></span>}
+                  {!this.state.sorted && <span><i className="fa fa-sort pr-2" /><Translate id="react.stockMovement.sortByBins.label" defaultMessage="Sort by bins" /></span>}
+                </button>
+              </span>
+                :
               <button
                 type="button"
-                onClick={() => this.exportTemplate(values)}
-                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                onClick={() => { window.location = '/openboxes/stockMovement/list?direction=OUTBOUND'; }}
+                className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
               >
-                <span><i className="fa fa-upload pr-2" /><Translate id="react.default.button.exportTemplate.label" defaultMessage="Export template" /></span>
-              </button>
-              <a
-                href={`${this.state.printPicksUrl}${this.state.sorted ? '?sorted=true' : ''}`}
-                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <span><i className="fa fa-print pr-2" /><Translate id="react.stockMovement.printPicklist.label" defaultMessage="Print picklist" /></span>
-              </a>
-              <button
-                type="button"
-                onClick={() => this.refresh()}
-                className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
-              >
-                <span><i className="fa fa-refresh pr-2" /><Translate id="react.default.button.refresh.label" defaultMessage="Reload" /></span>
-              </button>
-              <button
-                type="button"
-                onClick={() => { window.location = `/openboxes/stockMovement/show/${values.stockMovementId}`; }}
-                className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
-              >
-                <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
-              </button>
-              <button
-                type="button"
-                onClick={() => this.sortByBins()}
-                className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
-              >
-                {this.state.sorted && <span><i className="fa fa-sort pr-2" /><Translate id="react.stockMovement.originalOrder.label" defaultMessage="Original order" /></span>}
-                {!this.state.sorted && <span><i className="fa fa-sort pr-2" /><Translate id="react.stockMovement.sortByBins.label" defaultMessage="Sort by bins" /></span>}
-              </button>
-            </span>
+                <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>
+              </button> }
             <form onSubmit={handleSubmit} className="print-mt">
               {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
                 stockMovementId: values.stockMovementId,
@@ -530,12 +617,17 @@ class PickPage extends Component {
                 reasonCodes: this.props.reasonCodes,
                 translate: this.props.translate,
                 hasBinLocationSupport: this.props.hasBinLocationSupport,
+                totalCount: this.state.totalCount,
+                loadMoreRows: this.loadMoreRows,
+                isRowLoaded: this.isRowLoaded,
+                isPaginated: this.props.isPaginated,
+                showOnly,
               }))}
               <div className="d-print-none">
-                <button type="button" className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.props.previousPage(values)}>
+                <button type="button" disabled={showOnly} className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.props.previousPage(values)}>
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
-                <button type="submit" className="btn btn-outline-primary btn-form float-right btn-xs">
+                <button type="submit" disabled={showOnly} className="btn btn-outline-primary btn-form float-right btn-xs">
                   <Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>
@@ -553,6 +645,7 @@ const mapStateToProps = state => ({
   reasonCodes: state.reasonCodes.data,
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
+  isPaginated: state.session.isPaginated,
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner, fetchReasonCodes })(PickPage);
@@ -581,4 +674,8 @@ PickPage.propTypes = {
   translate: PropTypes.func.isRequired,
   /** Is true when currently selected location supports bins */
   hasBinLocationSupport: PropTypes.bool.isRequired,
+  /** Return true if pagination is enabled */
+  isPaginated: PropTypes.bool.isRequired,
+  /** Return true if show only */
+  showOnly: PropTypes.bool.isRequired,
 };

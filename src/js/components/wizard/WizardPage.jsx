@@ -10,6 +10,7 @@ const WizardPage = (props) => {
         nextPage={props.nextPage}
         previousPage={props.prevPage}
         goToPage={props.goToPage}
+        {...props.additionalProps}
       />
     </div>
   );
@@ -24,8 +25,10 @@ WizardPage.propTypes = {
   goToPage: PropTypes.func.isRequired,
   currentPage: PropTypes.number.isRequired,
   initialValues: PropTypes.shape({}),
+  additionalProps: PropTypes.shape({}),
 };
 
 WizardPage.defaultProps = {
   initialValues: {},
+  additionalProps: {},
 };
