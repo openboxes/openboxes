@@ -318,9 +318,7 @@ class IndicatorDataService {
             tableBody.push(new TableData(it[0], it[1], it[2].toString(), "/openboxes/stockMovement/show/" + it[3].id))
         }
 
-        TableData tableHeader = new TableData("Shipment", "Name", "Discrepancy")
-
-        Table indicatorData = new Table(tableHeader, tableBody)
+        Table indicatorData = new Table("Shipment", "Name", "Discrepancy", tableBody)
 
         return indicatorData;
     }

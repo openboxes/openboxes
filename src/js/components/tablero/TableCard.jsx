@@ -7,9 +7,9 @@ const TableCard = props => (
     <table>
       <thead>
         <tr>
-          <th>{props.data.head.number}</th>
-          <th>{_.truncate(props.data.head.name, { length: 50, omission: '...' })}</th>
-          <th>{_.truncate(props.data.head.value, { length: 50, omission: '...' })}</th>
+          <th>{props.data.number}</th>
+          <th>{_.truncate(props.data.name, { length: 50, omission: '...' })}</th>
+          <th>{_.truncate(props.data.value, { length: 50, omission: '...' })}</th>
         </tr>
       </thead>
       {props.data.body.map(item => (
@@ -27,11 +27,9 @@ const TableCard = props => (
 
 TableCard.propTypes = {
   data: PropTypes.shape({
-    head: PropTypes.shape({
-      number: PropTypes.string,
-      name: PropTypes.string,
-      value: PropTypes.string,
-    }),
+    number: PropTypes.string,
+    name: PropTypes.string,
+    value: PropTypes.string,
     body: PropTypes.arrayOf(PropTypes.shape({})),
   }).isRequired,
 };
