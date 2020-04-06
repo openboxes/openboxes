@@ -460,6 +460,12 @@ a.disabled {
   z-index: 100 !important;
 }
 
+.react-confirm-alert-body {
+  overflow-y: auto;
+  max-height: 90%;
+  width: 100%;
+}
+
 .react-confirm-alert-overlay {
   z-index: 110 !important;
 }
