@@ -302,6 +302,9 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             modificationItem.save(flush: true, failOnError: true)
         }
     }
+    def chooseSubstitute(Product newProduct, ProductPackage newProductPackage, Integer newQuantity, String reasonCode, String comments) {
+        chooseSubstitute(newProduct, newProductPackage, newQuantity, reasonCode, comments, null)
+    }
 
     /**
      *
@@ -312,7 +315,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      * @param comments
      * @return
      */
-    def chooseSubstitute(Product newProduct, ProductPackage newProductPackage, Integer newQuantity, String reasonCode, String comments) {
+    def chooseSubstitute(Product newProduct, ProductPackage newProductPackage, Integer newQuantity, String reasonCode, String comments, Integer sortOrder) {
 
         if (!newProduct || newProduct == product) {
             errors.rejectValue("product", "requisitionItem.product.invalid")
@@ -338,7 +341,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         substitutionItem.quantity = newQuantity
         substitutionItem.quantityApproved = newQuantity
         addToRequisitionItems(substitutionItem)
-        substitutionItem.orderIndex = orderIndex
+        substitutionItem.orderIndex = sortOrder ?: orderIndex
         substitutionItem.save(flush: true, failOnError: true)
     }
 

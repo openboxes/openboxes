@@ -484,16 +484,16 @@ class StockMovementService {
             requisitionItems = RequisitionItem.createCriteria().list(max: max.toInteger(), offset: offset.toInteger()) {
                 eq("requisition", requisition)
                 isNull("parentRequisitionItem")
+                order("orderIndex", 'asc')
             }
         } else {
             requisitionItems = RequisitionItem.createCriteria().list() {
                 eq("requisition", requisition)
                 isNull("parentRequisitionItem")
+                order("orderIndex", 'asc')
             }
         }
-        requisitionItems.sort { a, b ->
-            a.orderIndex <=> b.orderIndex ?: a.id <=> b.id
-        }.each { requisitionItem ->
+        requisitionItems.each { requisitionItem ->
             StockMovementItem stockMovementItem = StockMovementItem.createFromRequisitionItem(requisitionItem)
             stockMovementItems.add(stockMovementItem)
         }
@@ -1486,7 +1486,8 @@ class StockMovementService {
                         null,
                         subItem?.newQuantity?.intValueExact(),
                         subItem.reasonCode,
-                        subItem.comments)
+                        subItem.comments,
+                        subItem.sortOrder)
                 requisitionItem.quantityApproved = 0
             }
         }
