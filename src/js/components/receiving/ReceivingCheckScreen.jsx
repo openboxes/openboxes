@@ -2,6 +2,7 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import update from 'immutability-helper';
 
 import ArrayField from '../form-elements/ArrayField';
 import CheckboxField from '../form-elements/CheckboxField';
@@ -34,7 +35,7 @@ const FIELDS = {
   buttonsTop: {
     type: ({
       // eslint-disable-next-line react/prop-types
-      prevPage, onSave, saveDisabled, saveAndExit,
+      prevPage, onSave, saveDisabled, saveAndExit, cancelAllRemaining,
     }) => (
       <div className="mb-1 text-center">
         <button type="button" className="btn btn-outline-primary float-left btn-form btn-xs" onClick={prevPage}>
@@ -60,6 +61,13 @@ const FIELDS = {
           className="btn btn-outline-primary float-right btn-form btn-xs"
           disabled={saveDisabled}
         ><Translate id="react.partialReceiving.receiveShipment.label" defaultMessage="Receive shipment" />
+        </button>
+        <button
+          type="button"
+          className="btn btn-outline-danger float-right btn-form btn-xs"
+          onClick={cancelAllRemaining}
+          disabled={saveDisabled}
+        ><Translate id="react.partialReceiving.cancelAllRemaining.label" defaultMessage="Cancel all remaining" />
         </button>
       </div>),
   },
@@ -181,7 +189,7 @@ const FIELDS = {
 
     type: ({
     // eslint-disable-next-line react/prop-types
-      prevPage, onSave, saveDisabled, saveAndExit,
+      prevPage, onSave, saveDisabled, saveAndExit, cancelAllRemaining,
     }) => (
       <div className="my-1 text-center">
         <button type="button" className="btn btn-outline-primary float-left btn-form btn-xs" onClick={prevPage}>
@@ -208,6 +216,13 @@ const FIELDS = {
           disabled={saveDisabled}
         ><Translate id="react.partialReceiving.receiveShipment.label" defaultMessage="Receive shipment" />
         </button>
+        <button
+          type="button"
+          className="btn btn-outline-danger float-right btn-form btn-xs"
+          onClick={cancelAllRemaining}
+          disabled={saveDisabled}
+        ><Translate id="react.partialReceiving.cancelAllRemaining.label" defaultMessage="Cancel all remaining" />
+        </button>
       </div>),
   },
 };
@@ -217,11 +232,18 @@ const FIELDS = {
  * receiving process. The user can cancel quantities not received and finalize the receipt.
  */
 class ReceivingCheckScreen extends Component {
+  static cancelRemaining(shipmentItem) {
+    return {
+      ...shipmentItem,
+      cancelRemaining: true,
+    };
+  }
   constructor(props) {
     super(props);
 
     this.onSave = this.onSave.bind(this);
     this.onExit = this.onExit.bind(this);
+    this.cancelAllRemaining = this.cancelAllRemaining.bind(this);
   }
 
   /**
@@ -240,6 +262,18 @@ class ReceivingCheckScreen extends Component {
     this.props.saveAndExit(this.props.formValues);
   }
 
+  cancelAllRemaining() {
+    const containers = update(this.props.formValues.containers, {
+      $apply: items => (!items ? [] : items.map(item => update(item, {
+        shipmentItems: {
+          $apply: shipmentItems => (!shipmentItems ? [] : shipmentItems.map(shipmentItem =>
+            ReceivingCheckScreen.cancelRemaining(shipmentItem))),
+        },
+      }))),
+    });
+    this.props.change('containers', containers);
+  }
+
   render() {
     return (
       <div>
@@ -250,6 +284,7 @@ class ReceivingCheckScreen extends Component {
             saveDisabled: this.props.completed || !_.size(this.props.formValues.containers),
             saveAndExit: this.onExit,
             hasBinLocationSupport: this.props.hasBinLocationSupport,
+            cancelAllRemaining: this.cancelAllRemaining,
           }))}
       </div>
     );
@@ -277,6 +312,8 @@ ReceivingCheckScreen.propTypes = {
   completed: PropTypes.bool,
   /** Is true when currently selected location supports bins */
   hasBinLocationSupport: PropTypes.bool.isRequired,
+  /** Function changing the value of a field in the Redux store */
+  change: PropTypes.func.isRequired,
 };
 
 ReceivingCheckScreen.defaultProps = {
