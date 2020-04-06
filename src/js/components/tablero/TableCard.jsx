@@ -8,19 +8,23 @@ const TableCard = props => (
       <thead>
         <tr>
           <th>{props.data.number}</th>
-          <th>{_.truncate(props.data.name, { length: 50, omission: '...' })}</th>
-          <th>{_.truncate(props.data.value, { length: 50, omission: '...' })}</th>
+          <th>{_.truncate(props.data.name, { length: 50 })}</th>
+          <th>{_.truncate(props.data.value, { length: 50 })}</th>
         </tr>
       </thead>
-      {props.data.body.map(item => (
-        <tbody key={`item-${Math.random()}`} className="tableLink">
-          <tr onClick={() => window.open(item.link, '_blank')}>
+      <tbody>
+        {props.data.body.map(item => (
+          <tr
+            onClick={() => window.open(item.link, '_blank')}
+            key={`item-${item.number}`}
+            className="tableLink"
+          >
             <td>{item.number}</td>
-            <td>{_.truncate(item.name, { length: 50, omission: '...' })}</td>
-            <td>{_.truncate(item.value, { length: 10, omission: '...' })}</td>
+            <td>{_.truncate(item.name, { length: 50 })}</td>
+            <td>{_.truncate(item.value, { length: 10 })}</td>
           </tr>
-        </tbody>
-      ))}
+        ))}
+      </tbody>
     </table>
   </div>
 );

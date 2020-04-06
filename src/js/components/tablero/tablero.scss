@@ -225,10 +225,6 @@
           line-height: normal;
           letter-spacing: normal;
           color: #2d2d2d;
-        
-          &:hover {
-            background-color: #fbfbfb;
-          }
         }
         
         .tableLink {
@@ -237,6 +233,7 @@
           &:hover {
             cursor: pointer;
             color: #282D32;
+            background-color: #fbfbfb;
           }
         }
       }
