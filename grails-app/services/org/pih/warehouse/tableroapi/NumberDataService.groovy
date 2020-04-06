@@ -20,8 +20,12 @@ class NumberDataService {
 
         def incompletePutaways = Order.executeQuery("select count(o.id) from Order o where o.orderTypeCode = 'TRANSFER_ORDER' AND o.status = 'PENDING' AND o.orderedBy = :user", ['user':user]);
 
-        def receivingBin = InventorySnapshot.executeQuery("select count(distinct i.product) from InventorySnapshot i, Location l where i.location = :location and i.quantityOnHand > 0 and i.date = :tomorrow and l.locationType = 'ff8081816482352b01648249e8cc0001'",
-        ['location': location, 'tomorrow': tomorrow]);
+        def receivingBin = InventorySnapshot.executeQuery("""
+            select count(distinct i.product) from InventorySnapshot i 
+            left join i.location as l on i.bin_location_id = l.id filter by l.location_type 
+            where i.location = :location and i.quantityOnHand > 0 
+            and i.date = :tomorrow and l.locationType = 'ff8081816482352b01648249e8cc0001'""",
+            ['location': location, 'tomorrow': tomorrow]);
 
         def pending = dataService.executeQuery("select count(*) from shipment where shipment.current_status = 'PENDING'");
         def notCompleted = dataService.executeQuery("select count(*) from openboxes.order  where order.status != 'COMPLETED'");
