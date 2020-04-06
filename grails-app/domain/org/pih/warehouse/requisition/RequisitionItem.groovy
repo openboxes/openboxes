@@ -10,6 +10,7 @@
 package org.pih.warehouse.requisition
 
 import grails.validation.ValidationException
+import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
@@ -88,7 +89,17 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     String pickReasonCode
 
 
-    static transients = ["type", "substitutionItems", "monthlyDemand", 'totalCost', 'quantityIssued', 'quantityAdjusted']
+    static transients = [
+            "type",
+            "substitutionItems",
+            "monthlyDemand",
+            "totalCost",
+            "quantityIssued",
+            "quantityAdjusted",
+            "status",
+            "change",
+            "substitution"
+    ]
 
     static belongsTo = [requisition: Requisition]
     static hasMany = [requisitionItems: RequisitionItem, picklistItems: PicklistItem]
@@ -137,6 +148,17 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         updatedBy(nullable: true)
         pickReasonCode(nullable: true)
 	}
+
+    static RequisitionItem createFromStockMovementItem(StockMovementItem stockMovementItem) {
+        return new RequisitionItem(
+                id: stockMovementItem?.id,
+                product: stockMovementItem?.product,
+                inventoryItem: stockMovementItem?.inventoryItem,
+                quantity: stockMovementItem.quantityRequested,
+                recipient: stockMovementItem.recipient,
+                orderIndex: stockMovementItem.sortOrder
+        )
+    }
 
     /**
      * @return

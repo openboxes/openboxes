@@ -190,7 +190,7 @@
                         <g:if test="${megamenuConfig.stockMovement.enabled}">
                             <h3><warehouse:message code="stockMovements.label" default="Stock Movements" /></h3>
                             <div class="mm-menu-item">
-                                <g:link controller="stockMovement" action="create" params="[direction:'INBOUND']">
+                                <g:link controller="stockMovement" action="createInbound" params="[direction:'INBOUND']">
                                     <warehouse:message code="default.create.label" args="[warehouse.message(code: 'stockMovement.inbound.label')]"/>
                                 </g:link>
                             </div>
@@ -273,7 +273,7 @@
                             <h3><warehouse:message code="stockMovements.label" default="Stock Movements" /></h3>
 
                             <div class="mm-menu-item">
-                                <g:link controller="stockMovement" action="create" params="[direction:'OUTBOUND']">
+                                <g:link controller="stockMovement" action="createOutbound" params="[direction:'OUTBOUND']">
                                     <warehouse:message code="default.create.label" args="[warehouse.message(code: 'stockMovement.outbound.label')]"/>
                                 </g:link>
                             </div>
@@ -690,6 +690,16 @@
                                 <g:link controller="eventType" action="list"
                                         class="eventType">
                                     <warehouse:message code="location.eventTypes.label" default="Event Types" />
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
+                                <g:link controller="paymentMethodType" action="list">
+                                    <warehouse:message code="paymentMethodTypes.label" />
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
+                                <g:link controller="paymentTerm" action="list">
+                                    <warehouse:message code="paymentTerms.label" />
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">

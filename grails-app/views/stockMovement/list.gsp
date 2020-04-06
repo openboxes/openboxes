@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.requisition.RequisitionStatus" %>
+<%@ page import="org.pih.warehouse.api.StockMovementType; org.pih.warehouse.requisition.RequisitionStatus" %>
 <%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode" %>
 <html>
 <head>
@@ -17,7 +17,7 @@
        value="['origin.id':params?.origin?.id, 'destination.id':params?.destination?.id, q:params.q,
                commodityClass:params.commodityClass, status:params.status, direction: params?.direction,
                requestedDateRange:params.requestedDateRange, issuedDateRange:params.issuedDateRange, type:params.type,
-               'createdBy.id':params?.createdBy?.id, sort:params?.sort, order:params?.order, relatedToMe:params.relatedToMe,
+               'createdBy.id':params?.createdBy?.id, sort:params?.sort, order:params?.order,
                'requestedBy.id': params?.requestedBy?.id, receiptStatusCode: params.receiptStatusCode]"/>
 
 <div class="body">
@@ -30,16 +30,17 @@
 
     <div class="summary">
         <div class="title">
-            ${entityName} &rsaquo; <warehouse:message code="enum.StockMovementType.${params.direction}"/>
+            ${entityName}
+            <g:if test="${params.direction}">
+                &rsaquo; <warehouse:message code="enum.StockMovementType.${params.direction}"/>
+            </g:if>
         </div>
     </div>
 
     <div class="buttonBar">
 
         <div class="right">
-
-            <g:set var="relatedToMe" value="${params?.createdBy?.id==session?.user?.id}"/>
-            <g:if test="${incoming}">
+            <g:if test="${params.direction as StockMovementType == StockMovementType.INBOUND}">
                 <div class="button-group">
                     <g:link controller="stockMovement" action="exportItems" class="button">
                         <img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" />
@@ -48,34 +49,19 @@
                 </div>
             </g:if>
             <div class="button-group">
-                <g:link controller="stockMovement" action="list" params="['createdBy.id':session?.user?.id]" class="button ${relatedToMe?'primary':''}">
-                    ${warehouse.message(code:'stockMovements.relatedToMe.label', default: 'My stock movements')}
-                    (${statistics["MINE"]?:0 })
+                <g:link controller="stockMovement" action="list" params="${pageParams + ['createdBy.id':session.user.id, 'requestedBy.id':session.user.id]}" class="button">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'user.png')}" />&nbsp;
+                    ${warehouse.message(code:'stockMovements.myStockMovements.label', default: 'My stock movements')}
                 </g:link>
-            </div>
-            <div class="button-group">
-                <g:link controller="stockMovement" action="list" class="button ${(!params.status && !relatedToMe)?'primary':''}">
-                    <warehouse:message code="default.all.label"/>
-                    (${statistics["ALL"]})
-                </g:link>
-                <g:each var="status" in="${RequisitionStatus.list()}">
-                    <g:if test="${statistics[status]>0}">
-                        <g:set var="isPrimary" value="${params.status==status.name()?true:false}"/>
-                        <g:link controller="stockMovement" action="list" params="[status:status]" class="button ${isPrimary?'primary':''}">
-                            <format:metadata obj="${status}"/>
-                            (${statistics[status]?:0 })
-                        </g:link>
-                    </g:if>
-                </g:each>
             </div>
         </div>
 
         <div class="button-container">
-            <g:link controller="stockMovement" action="list" class="button">
+            <g:link controller="stockMovement" action="list" class="button" params="[direction:params.direction]">
                 <img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}" />&nbsp;
                 <warehouse:message code="default.list.label" args="[warehouse.message(code: 'stockMovement.label')]"/>
             </g:link>
-            <g:link controller="stockMovement" action="index" class="button">
+            <g:link controller="stockMovement" action="create" class="button" params="[direction:params.direction]">
                 <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
                 <warehouse:message code="default.create.label" args="[warehouse.message(code: 'stockMovement.label')]" />
             </g:link>
@@ -89,8 +75,8 @@
             <div class="box">
                 <h2><warehouse:message code="default.filters.label"/></h2>
                 <g:form action="list" method="GET">
-                    <g:hiddenField name="max" value="${params.max}"/>
-                    <g:hiddenField name="offset" value="0"/>
+                    <g:hiddenField name="max" value="${params.max?:10}"/>
+                    <g:hiddenField name="offset" value="${params.offset?:0}"/>
                     <div class="filter-list">
                         <div class="filter-list-item">
                             <label><warehouse:message code="default.search.label"/></label>
@@ -98,20 +84,24 @@
                                 <g:textField name="q" style="width:100%" class="text" value="${params.q}" placeholder="Search by requisition number, name, etc"/>
                             </p>
                         </div>
-                        <div class="filter-list-item">
-                            <label><warehouse:message code="stockMovement.status.label"/></label>
-                            <p>
-                                <g:selectRequisitionStatus name="status" value="${params?.status}"
-                                                           noSelection="['null':'']" class="chzn-select-deselect"/>
-                            </p>
-                        </div>
-                        <div class="filter-list-item">
-                            <label><warehouse:message code="stockMovement.receiptStatus.label" default="Receipt Status"/></label>
-                            <p>
-                                <g:select name="receiptStatusCode" value="${params?.receiptStatusCode}" from="${ShipmentStatusCode.list()}"
-                                                           noSelection="['':'']" class="chzn-select-deselect"/>
-                            </p>
-                        </div>
+                        <g:if test="${!params.direction || params.direction as StockMovementType == StockMovementType.OUTBOUND}">
+                            <div class="filter-list-item">
+                                <label><warehouse:message code="stockMovement.status.label"/></label>
+                                <p>
+                                    <g:selectRequisitionStatus name="status" value="${params?.status}"
+                                                               noSelection="['null':'']" class="chzn-select-deselect"/>
+                                </p>
+                            </div>
+                        </g:if>
+                        <g:if test="${!params.direction || params.direction as StockMovementType == StockMovementType.INBOUND}">
+                            <div class="filter-list-item">
+                                <label><warehouse:message code="stockMovement.receiptStatus.label" default="Receipt Status"/></label>
+                                <p>
+                                    <g:select name="receiptStatusCode" value="${params?.receiptStatusCode}" from="${ShipmentStatusCode.list()}"
+                                                               noSelection="['':'']" class="chzn-select-deselect"/>
+                                </p>
+                            </div>
+                        </g:if>
                         <div class="filter-list-item">
                             <label><warehouse:message code="stockMovement.origin.label"/></label>
                             <p>
@@ -148,8 +138,9 @@
                             </p>
                         </div>
                         <hr/>
-                        <div class="filter-list-item">
-                            <button class="button icon search" name="search" class="button">
+                        <div class="buttons">
+                            <button name="search" class="button">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}" />&nbsp;
                                 ${warehouse.message(code:'default.search.label')}
                             </button>
                             <button name="format" value="csv" class="button">

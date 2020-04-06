@@ -106,7 +106,6 @@
             <div id="loader" style="display:none; position: absolute; right: 0; top: 0" class="right notice">
                 ${g.message(code: 'default.loading.label')}
             </div>
-
         </div>
         <div id="breadcrumb">
             <g:render template="/common/breadcrumb"/>

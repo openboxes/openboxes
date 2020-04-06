@@ -4,15 +4,19 @@ import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.codehaus.groovy.grails.validation.Validateable
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 
@@ -43,10 +47,13 @@ class StockMovement {
     Location destination
     Person requestedBy
     Person createdBy
-    Date dateRequested
+    Person updatedBy
 
-    // Shipment information
+    Date dateRequested
     Date dateShipped
+    Date dateCreated
+    Date lastUpdated
+
     ShipmentType shipmentType
     ShipmentStatusCode receiptStatusCode
     String trackingNumber
@@ -56,9 +63,15 @@ class StockMovement {
     Float totalValue
 
     StockMovementType stockMovementType
+    StockMovementStatusCode stockMovementStatusCode
+
 
     List<StockMovementItem> lineItems =
             LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(StockMovementItem.class))
+
+    Boolean isFromOrder = Boolean.FALSE
+    Boolean isShipped = Boolean.FALSE
+    Boolean isReceived = Boolean.FALSE
 
     Requisition stocklist
     Requisition requisition
@@ -76,15 +89,23 @@ class StockMovement {
         stocklist(nullable: true)
         requestedBy(nullable: false)
         dateRequested(nullable: false)
+
         stockMovementType(nullable: true)
+        stockMovementStatusCode(nullable: true)
         receiptStatusCode(nullable: true)
-        shipment(nullable: true)
         dateShipped(nullable: true)
         shipmentType(nullable: true)
         trackingNumber(nullable: true)
         driverName(nullable: true)
         comments(nullable: true)
         totalValue(nullable: true)
+
+        shipment(nullable:true)
+        requisition(nullable:true)
+        order(nullable: true)
+
+        dateCreated(nullable: true)
+        lastUpdated(nullable: true)
     }
 
 
@@ -94,7 +115,7 @@ class StockMovement {
                 name              : name,
                 description       : description,
                 statusCode        : statusCode,
-                identifier        : requisition?.requestNumber,
+                identifier        : identifier,
                 origin            : origin,
                 destination       : destination,
                 hasManageInventory: origin?.supports(ActivityCode.MANAGE_INVENTORY),
@@ -108,14 +129,19 @@ class StockMovement {
                 comments          : comments,
                 requestedBy       : requestedBy,
                 lineItems         : lineItems,
-                associations      : [
+                associations: [
                         requisition: [id: requisition?.id, requestNumber: requisition?.requestNumber, status: requisition?.status?.name()],
-                        shipment   : [id: shipment?.id, shipmentNUmber: shipment?.shipmentNumber, status: shipment?.currentStatus?.name()],
+                        shipment   : [id: shipment?.id, shipmentNumber: shipment?.shipmentNumber, status: shipment?.currentStatus?.name()],
                         shipments  : requisition?.shipments?.collect {
                             [id: it?.id, shipmentNumber: it?.shipmentNumber, status: it?.currentStatus?.name()]
                         },
                         documents  : documents
                 ],
+                isFromOrder : isFromOrder,
+                isShipped   : isShipped,
+                isReceived  : isReceived,
+                shipped     : isShipped,
+                received    : isReceived,
         ]
     }
 
@@ -148,6 +174,15 @@ class StockMovement {
         return itemsWithPrice.collect { it?.quantity * it?.product?.pricePerUnit }.sum() ?: 0
     }
 
+    Boolean isDeleteOrRollbackAuthorized(Location currentLocation) {
+        Location origin = requisition?.origin?:shipment?.origin
+        Location destination = requisition?.destination?:shipment?.destination
+        boolean isOrigin = origin?.id == currentLocation.id
+        boolean isDestination = destination?.id == currentLocation.id
+        boolean canOriginManageInventory = origin?.supports(ActivityCode.MANAGE_INVENTORY)
+        return ((canOriginManageInventory && isOrigin) || (!canOriginManageInventory && isDestination))
+    }
+
     /**
      * “FROM.TO.DATEREQUESTED.STOCKLIST.TRACKING#.DESCRIPTION”
      *
@@ -168,6 +203,43 @@ class StockMovement {
         return name
     }
 
+    static StockMovement createFromShipment(Shipment shipment) {
+
+        String statusCode = (shipment.status.code == ShipmentStatusCode.SHIPPED) ?
+                RequisitionStatus.ISSUED.toString() : RequisitionStatus.PENDING.toString()
+
+        StockMovement stockMovement = new StockMovement(
+                id: shipment.id,
+                name: shipment.name,
+                description: shipment.description,
+                shipmentType: shipment.shipmentType,
+                statusCode: statusCode,
+                dateShipped: shipment.expectedShippingDate,
+                identifier: shipment.shipmentNumber,
+                origin: shipment.origin,
+                destination: shipment.destination,
+                dateRequested: shipment.dateCreated,
+                dateCreated: shipment.dateCreated,
+                lastUpdated: shipment.lastUpdated,
+                requestedBy: shipment.createdBy,
+                createdBy: shipment.createdBy,
+                updatedBy: shipment.updatedBy,
+                shipment: shipment,
+                isFromOrder: shipment?.isFromPurchaseOrder,
+                isShipped: shipment?.status?.code >= ShipmentStatusCode.SHIPPED,
+                isReceived: shipment?.status?.code >= ShipmentStatusCode.RECEIVED
+        )
+
+        if (shipment.shipmentItems) {
+            shipment.shipmentItems.each { ShipmentItem shipmentItem ->
+                StockMovementItem stockMovementItem = StockMovementItem.createFromShipmentItem(shipmentItem)
+                stockMovementItem.sortOrder = stockMovement.lineItems ? stockMovement.lineItems.size() * 100 : 0
+                stockMovement.lineItems.add(stockMovementItem)
+            }
+        }
+        return stockMovement
+    }
+
 
     static StockMovement createFromRequisition(Requisition requisition) {
         Shipment shipment = Shipment.findByRequisition(requisition)
@@ -180,11 +252,15 @@ class StockMovement {
                 name: requisition.name,
                 identifier: requisition.requestNumber,
                 description: requisition.description,
-                statusCode: requisition?.status?.name(),
+                statusCode: RequisitionStatus.toStockMovementStatus(requisition.status)?.name(),
                 origin: requisition.origin,
                 destination: requisition.destination,
                 dateRequested: requisition.dateRequested,
+                dateCreated: requisition.dateCreated,
+                lastUpdated: requisition.lastUpdated,
                 requestedBy: requisition.requestedBy,
+                createdBy: requisition.createdBy,
+                updatedBy: requisition.updatedBy,
                 requisition: requisition,
                 shipment: shipment,
                 comments: shipment?.additionalInformation,
@@ -193,12 +269,15 @@ class StockMovement {
                 driverName: shipment?.driverName,
                 trackingNumber: trackingNumber?.identifier,
                 currentStatus: shipment?.currentStatus,
-                stocklist: requisition?.requisitionTemplate
+                stocklist: requisition?.requisitionTemplate,
+                isFromOrder: Boolean.FALSE,
+                isShipped: shipment?.status?.code >= ShipmentStatusCode.SHIPPED,
+                isReceived: shipment?.status?.code >= ShipmentStatusCode.RECEIVED
+
         )
 
         // Include all requisition items except those that are substitutions or modifications because the
         // original requisition item will represent these changes
-
         if (requisition.requisitionItems) {
             SortedSet<RequisitionItem> requisitionItems = new TreeSet<RequisitionItem>(requisition.requisitionItems)
             requisitionItems.each { requisitionItem ->
@@ -210,6 +289,7 @@ class StockMovement {
         }
         return stockMovement
     }
+
 }
 
 enum DocumentGroupCode {

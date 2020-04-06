@@ -5,74 +5,60 @@
         <g:hiddenField name="max" value="${params.max ?: 10}"/>
         <div class="filter-list">
             <div class="filter-list-item">
-                <label class="block">${warehouse.message(code: 'order.orderNumber.label')}</label>
-                <div>
-                    <g:textField class="text" id="orderNumber" name="orderNumber" value="${params.orderNumber}" style="width:100%"/>
+                <label>${warehouse.message(code: 'order.orderNumber.label')}</label>
+                <g:textField class="text" id="orderNumber" name="orderNumber" value="${params.orderNumber}" style="width:100%"/>
 
-                </div>
             </div>
             <div class="filter-list-item">
-                <label class="block">${warehouse.message(code: 'order.orderTypeCode.label')}</label>
-                <div>
-                    <g:select id="orderTypeCode" name="orderTypeCode"
-                              from="${org.pih.warehouse.order.OrderTypeCode.list()}" class="chzn-select-deselect"
-                              optionValue="${{ format.metadata(obj: it) }}" value="${params.orderTypeCode}"
-                              noSelection="['': warehouse.message(code: 'default.all.label')]"/>
-                </div>
+                <label>${warehouse.message(code: 'order.orderTypeCode.label')}</label>
+                <g:select id="orderTypeCode" name="orderTypeCode"
+                          from="${org.pih.warehouse.order.OrderTypeCode.list()}" class="chzn-select-deselect"
+                          optionValue="${{ format.metadata(obj: it) }}" value="${params.orderTypeCode}"
+                          noSelection="['': warehouse.message(code: 'default.all.label')]"/>
             </div>
             <div class="filter-list-item">
-                <label class="block">${warehouse.message(code: 'order.status.label')}</label>
-                <div>
-                    <g:select id="status" name="status"
-                              from="${org.pih.warehouse.order.OrderStatus.list()}" class="chzn-select-deselect"
-                              optionValue="${{ format.metadata(obj: it) }}" value="${status}"
-                              noSelection="['': warehouse.message(code: 'default.all.label')]"/>
-
-                </div>
+                <label>${warehouse.message(code: 'order.status.label')}</label>
+                <g:select id="status" name="status"
+                          from="${org.pih.warehouse.order.OrderStatus.list()}" class="chzn-select-deselect"
+                          optionValue="${{ format.metadata(obj: it) }}" value="${params.status}"
+                          noSelection="['': warehouse.message(code: 'default.all.label')]"/>
             </div>
             <div class="filter-list-item">
                 <label><warehouse:message code="order.origin.label"/></label>
-                <div>
-                    <g:selectLocation id="origin" name="origin" class="chzn-select-deselect"
-                                      optionKey="id" optionValue="name" value="${params.origin}" noSelection="['':'']" />
-                </div>
+                <g:selectLocation id="origin" name="origin" class="chzn-select-deselect"
+                          optionKey="id" optionValue="name" value="${params.origin}" noSelection="['':'']" />
             </div>
             <div class="filter-list-item">
                 <label><warehouse:message code="order.destination.label"/></label>
-                <div>
-                    <g:selectLocation id="destination" name="destination" class="chzn-select-deselect"
-                                      optionKey="id" optionValue="name"
-                                      value="${params.destination?:session?.warehouse?.id}" noSelection="['':'']" />
-                </div>
+                <g:selectLocation id="destination" name="destination" class="chzn-select-deselect"
+                          optionKey="id" optionValue="name"
+                          value="${params.destination?:session?.warehouse?.id}" noSelection="['':'']" />
             </div>
             <div class="filter-list-item">
                 <label><warehouse:message code="order.orderedBy.label"/></label>
-                <div>
-                    <g:select id="orderedById" name="orderedById" class="chzn-select-deselect"
-                              from="${orderedByList}"
-                              optionKey="id" optionValue="name" value="${params?.orderedById}"
-                              noSelection="['': warehouse.message(code: 'default.all.label')]"/>
-                </div>
+                <g:select id="orderedById" name="orderedById" class="chzn-select-deselect"
+                          from="${orderedByList}"
+                          optionKey="id" optionValue="name" value="${params?.orderedById}"
+                          noSelection="['': warehouse.message(code: 'default.all.label')]"/>
             </div>
             <div class="filter-list-item">
-                <label class="block">${warehouse.message(code: 'default.lastUpdateAfter.label', default: 'Last updated after')}</label>
-                <div>
-                    <g:jqueryDatePicker id="statusStartDate" name="statusStartDate" placeholder="Start date"
-                                        size="40" numberOfMonths="2" changeMonthAndYear="false"
-                                        value="${statusStartDate}" format="MM/dd/yyyy"/>
-                    <a href="javascript:void(0);" id="clearStartDate">Clear</a>
-                </div>
+                <label>
+                    ${warehouse.message(code: 'default.lastUpdateAfter.label', default: 'Last updated after')}
+                </label>
+                <a href="javascript:void(0);" id="clearStartDate">Clear</a>
+                <g:jqueryDatePicker id="statusStartDate" name="statusStartDate" placeholder="Start date"
+                                    size="40" numberOfMonths="2" changeMonthAndYear="false"
+                                    value="${params.statusStartDate}" format="MM/dd/yyyy"/>
             </div>
+
             <div class="filter-list-item">
-                <label class="block">${warehouse.message(code: 'default.lastUpdatedBefore.label', default: 'Last updated before')}</label>
-                <div>
-                    <g:jqueryDatePicker id="statusEndDate" name="statusEndDate" placeholder="End date" size="40"
-                                        numberOfMonths="2" changeMonthAndYear="true"
-                                        value="${statusEndDate}" format="MM/dd/yyyy"/>
-                    <a href="javascript:void(0);" id="clearEndDate">Clear</a>
-                </div>
+                <label>${warehouse.message(code: 'default.lastUpdatedBefore.label', default: 'Last updated before')}</label>
+                <a href="javascript:void(0);" id="clearEndDate">Clear</a>
+                <g:jqueryDatePicker id="statusEndDate" name="statusEndDate" placeholder="End date" size="40"
+                                    numberOfMonths="2" changeMonthAndYear="true"
+                                    value="${params.statusEndDate}" format="MM/dd/yyyy"/>
             </div>
-            <div class="center">
+            <div class="filter-list-item buttons center">
                 <button type="submit" class="button icon search" name="search" value="true">
                     <warehouse:message code="default.search.label"/>
                 </button>

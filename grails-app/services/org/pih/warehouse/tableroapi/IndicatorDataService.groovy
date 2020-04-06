@@ -156,39 +156,41 @@ class IndicatorDataService {
         ['location': location, 'limit': queryLimit])
         // queryData gives an array of arrays [[count, destination, month, year], ...] of sent stock
         
-        List listRes = []
+        Map listRes = [:]
         List listLabel = []
-        // Loop 1: Each sent stock array in query data array
-        for(item in queryData) {
+
+        for (item in queryData) {
             // item[0]: item total counted
             // item[1]: item destination
             // item[2]: item month
             // item[3]: item year
-            Location itemLocation = item[1]
-            List listData = []
-            listLabel = []
 
-            // Loop 2: Give each requested month a value, label and month label; value is 0 when month have no data
-            for(int i = querySize; i >= 0; i--) {
+            Location itemLocation = item[1]
+
+            // If the destination is new, add it to the list with empty values for now
+            if (listRes.get(itemLocation.name) == null) {
+                listRes.put(itemLocation.name, new IndicatorDatasets(itemLocation.name, [0] * querySize))
+            }
+
+            for (int i = querySize; i >= 0; i--) {
                 Date tmpDate = today.clone()
                 tmpDate.set(month: today.month - i, date: 1)
 
-                // Places 0 in months where there is no sent stock, else places item total counted
-                Integer value = 0
-                // Year + 1900 because groovy's date starts counting from 1900. Ex: 2020 = 120
+                // If there is data, update the dataset in the proper position
                 if (tmpDate.month == item[2] - 1 && tmpDate.year + 1900 == item[3]) {
-                    value = item[0]
+                    Integer value = item[0]
+                    IndicatorDatasets locationDataset = listRes.get(itemLocation.name)
+                    locationDataset.data[querySize - i] = value
                 }
 
-                // Pushs month label in label array and sent stock in the data array
-                String monthLabel = new java.text.DateFormatSymbols().months[tmpDate.month].substring(0,3)
-                listLabel.push(monthLabel)
-                listData.push(value)
+                // If the list of labels is incomplete, add the label
+                if (listLabel.size() <= querySize) {
+                    String monthLabel = new java.text.DateFormatSymbols().months[tmpDate.month].substring(0,3)
+                    listLabel.push(monthLabel)
+                }
             }
-            // Array of data lists: (stack it by destination)
-            listRes.push(new IndicatorDatasets(itemLocation.name, listData))
         }
-        List<IndicatorDatasets> datasets = listRes;
+        List<IndicatorDatasets> datasets = (List<IndicatorDatasets>) listRes.values().toList();
 
         IndicatorData data = new IndicatorData(datasets, listLabel);
 
@@ -211,37 +213,45 @@ class IndicatorDataService {
         GROUP BY MONTH(s.lastUpdated), YEAR(s.lastUpdated), s.origin""", 
         ['location': location, 'limit': queryLimit])
         
-        List listRes = []
+        Map listRes = [:]
         List listLabel = []
-        for(item in queryData) {
+
+        for (item in queryData) {
             // item[0]: item total counted
             // item[1]: item origin
             // item[2]: item month
             // item[3]: item year
-            Location itemLocation = item[1]
-            List listData = []
-            listLabel = []
 
-            for(int i = querySize; i >= 0; i--) {
+            Location itemLocation = item[1]
+
+            // If the origin is new, add it to the list with empty values for now
+            if (listRes.get(itemLocation.name) == null) {
+                listRes.put(itemLocation.name, new IndicatorDatasets(itemLocation.name, [0] * querySize))
+            }
+
+            for (int i = querySize; i >= 0; i--) {
                 Date tmpDate = today.clone()
                 tmpDate.set(month: today.month - i, date: 1)
 
-                Integer value = 0
+                // If there is data, update the dataset in the proper position
                 if (tmpDate.month == item[2] - 1 && tmpDate.year + 1900 == item[3]) {
-                    value = item[0]
+                    Integer value = item[0]
+                    IndicatorDatasets locationDataset = listRes.get(itemLocation.name)
+                    locationDataset.data[querySize - i] = value
                 }
 
-                String monthLabel = new java.text.DateFormatSymbols().months[tmpDate.month].substring(0,3)
-                listLabel.push(monthLabel)
-                listData.push(value)
+                // If the list of labels is incomplete, add the label
+                if (listLabel.size() <= querySize) {
+                    String monthLabel = new java.text.DateFormatSymbols().months[tmpDate.month].substring(0,3)
+                    listLabel.push(monthLabel)
+                }
             }
-            listRes.push(new IndicatorDatasets(itemLocation.name, listData))
         }
-        List<IndicatorDatasets> datasets = listRes;
+        List<IndicatorDatasets> datasets = (List<IndicatorDatasets>) listRes.values().toList();
 
         IndicatorData data = new IndicatorData(datasets, listLabel);
 
-        DataGraph indicatorData = new DataGraph(data, 1, "Stock Movements Sent by Month", "bar");
+        DataGraph indicatorData = new DataGraph(data, 1, "Stock Movements Received by Month", "bar");
 
         return indicatorData;
     }
@@ -271,25 +281,27 @@ class IndicatorDataService {
     }
 
     NumberIndicator getIncomingStock(Location location) {
-        Date today = new Date()
-        today.clearTime();
-        def m4 = today - 4;
-        def m7 = today - 7;
 
-        def greenData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated >= :day and r.destination = :location""",
-        ['day': m4, 'location': location]);
-        
-        def yellowData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated >= :dayOne and r.dateCreated < :dayTwo and r.destination = :location""",
-        ['dayOne': m7, 'dayTwo': m4, 'location': location]);
+        def query = Shipment.executeQuery("""select s.currentStatus, count(s) from Shipment s where s.destination = :location and s.currentStatus <> 'RECEIVED' group by s.currentStatus""",
+        ['location': location]);
 
-        def redData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated < :day and r.destination = :location""",
-        ['day': m7, 'location': location]);
+        // Initial state
+        ColorNumber pending = new ColorNumber(0, 'Pending', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=PENDING');
+        ColorNumber shipped = new ColorNumber(0, 'Shipped', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=SHIPPED');
+        ColorNumber partiallyReceived = new ColorNumber(0, 'Partially Received', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=PARTIALLY_RECEIVED');
 
-        ColorNumber green = new ColorNumber(greenData[0], 'Created < 4 days ago');
-        ColorNumber yellow = new ColorNumber(yellowData[0], 'Created > 4 days ago');
-        ColorNumber red = new ColorNumber(redData[0], 'Created > 7 days ago');
+        // Changes each ColorNumber if found in query
+        query.each {
+            if (it[0].name == 'PENDING') {
+                pending = new ColorNumber(it[1], 'Pending', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=PENDING')
+            } else if (it[0].name == 'SHIPPED') {
+                shipped = new ColorNumber(it[1], 'Shipped', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=SHIPPED')
+            } else if (it[0].name == 'PARTIALLY_RECEIVED') {
+                partiallyReceived = new ColorNumber(it[1], 'Partially Received', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=PARTIALLY_RECEIVED')
+            }
+        }
 
-        NumberIndicator indicatorData = new NumberIndicator(green, yellow, red)
+        NumberIndicator indicatorData = new NumberIndicator(pending, shipped, partiallyReceived, false)
 
         return indicatorData;
     }

@@ -58,4 +58,17 @@
     <include file="0.8.x/changelog-2019-09-12-2110-update-inventory-snapshot-id.xml"/>
     <include file="0.8.x/changelog-2019-11-26-2246-update-transaction-set-requisition-id.xml"/>
     <include file="0.8.x/changelog-2020-01-13-1630-replace-view-product-demand.xml"/>
+    <include file="0.8.x/changelog-2020-01-14-1235-alter-table-order-shipment.xml"/>
+    <include file="0.8.x/changelog-2020-02-12-2045-add-column-order-item-product-supplier-id.xml"/>
+    <include file="0.8.x/changelog-2020-02-27-2000-add-column-order-currency.xml"/>
+    <include file="0.8.x/changelog-2020-02-27-2051-insert-currency-uom-class.xml"/>
+    <include file="0.8.x/changelog-2020-02-27-2052-create-table-uom-conversion.xml"/>
+    <include file="0.8.x/changelog-2020-02-27-2235-create-table-order-adjustment.xml"/>
+    <include file="0.8.x/changelog-2020-02-29-0000-create-table-payment-method-type.xml"/>
+    <include file="0.8.x/changelog-2020-02-29-0000-create-table-payment-term.xml"/>
+    <include file="0.8.x/changelog-2020-02-29-0005-alter-table-order-add-column-payment-method-type.xml"/>
+    <include file="0.8.x/changelog-2020-02-29-0005-alter-table-order-add-column-payment-terms.xml"/>
+    <include file="0.8.x/changelog-2020-03-09-1515-alter-table-order-add-column-approved-by.xml"/>
+    <include file="0.8.x/changelog-2020-03-16-1323-alter-table-order-add-columns-for-party-association.xml"/>
+    <include file="0.8.x/changelog-2020-03-27-1557-alter-table-add-columns-order-item-datetimes.xml"/>
 </databaseChangeLog>
