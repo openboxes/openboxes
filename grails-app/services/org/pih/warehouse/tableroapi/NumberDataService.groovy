@@ -17,8 +17,7 @@ class NumberDataService {
 
         def shipments = Requisition.executeQuery("select count(*) from Requisition r where r.origin = :location and r.status <> 'ISSUED' and r.createdBy = :user", 
         ['location': location, 'user': user]);
-
-        def incompletePutaways = Order.executeQuery("select count(o.id) from Order o where o.orderTypeCode = 'TRANSFER_ORDER' AND o.status = 'PENDING' AND o.orderedBy = :user", ['user':user]);
+        def incompletePutaways = Order.executeQuery("select count(o.id) from Order o where o.orderTypeCode = 'TRANSFER_ORDER' AND o.status = 'PENDING' AND o.orderedBy = :user AND o.destination = :location", ['user':user, 'location': location]);
 
         def receivingBin = InventorySnapshot.executeQuery("""
             SELECT COUNT(distinct i.product) from InventorySnapshot i 

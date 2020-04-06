@@ -2,30 +2,25 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import fileDownload from 'js-file-download';
 import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import Alert from 'react-s-alert';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
-import queryString from 'query-string';
 import moment from 'moment';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-import TextField from '../form-elements/TextField';
-import SelectField from '../form-elements/SelectField';
-import ArrayField from '../form-elements/ArrayField';
-import ButtonField from '../form-elements/ButtonField';
-import LabelField from '../form-elements/LabelField';
-import DateField from '../form-elements/DateField';
-import { renderFormField } from '../../utils/form-utils';
-import { showSpinner, hideSpinner, fetchUsers } from '../../actions';
-import apiClient from '../../utils/apiClient';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
-import { debounceProductsFetch } from '../../utils/option-utils';
-
-const request = queryString.parse(window.location.search).type === 'REQUEST';
+import TextField from '../../form-elements/TextField';
+import SelectField from '../../form-elements/SelectField';
+import ArrayField from '../../form-elements/ArrayField';
+import ButtonField from '../../form-elements/ButtonField';
+import DateField from '../../form-elements/DateField';
+import { renderFormField } from '../../../utils/form-utils';
+import { showSpinner, hideSpinner, fetchUsers } from '../../../actions';
+import apiClient from '../../../utils/apiClient';
+import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
+import { debounceProductsFetch } from '../../../utils/option-utils';
 
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
@@ -36,203 +31,15 @@ const DELETE_BUTTON_FIELD = {
   buttonLabel: 'react.default.button.delete.label',
   buttonDefaultMessage: 'Delete',
   getDynamicAttr: ({
-    fieldValue, removeItem, removeRow, showOnly, updateTotalCount,
+    fieldValue, removeRow, updateTotalCount,
   }) => ({
-    onClick: fieldValue && fieldValue.id ? () => {
-      removeItem(fieldValue.id).then(() => removeRow());
-      updateTotalCount(-1);
-    } : () => { updateTotalCount(-1); removeRow(); },
-    disabled: (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') || showOnly,
+    onClick: fieldValue && fieldValue.id ?
+      () => null :
+      () => { updateTotalCount(-1); removeRow(); },
+    disabled: fieldValue && fieldValue.id,
   }),
   attributes: {
     className: 'btn btn-outline-danger',
-  },
-};
-
-const NO_STOCKLIST_FIELDS = {
-  lineItems: {
-    type: ArrayField,
-    arrowsNavigation: true,
-    virtualized: true,
-    totalCount: ({ totalCount }) => totalCount,
-    isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
-    loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
-    addButton: ({
-      // eslint-disable-next-line react/prop-types
-      addRow, getSortOrder, showOnly, updateTotalCount,
-    }) => (
-      <button
-        type="button"
-        className="btn btn-outline-success btn-xs"
-        disabled={showOnly}
-        onClick={() => {
-          updateTotalCount(1);
-          addRow({ sortOrder: getSortOrder() });
-        }
-        }
-      ><Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
-      </button>
-    ),
-    fields: {
-      product: {
-        fieldKey: 'disabled',
-        type: SelectField,
-        label: 'react.stockMovement.requestedProduct.label',
-        defaultMessage: 'Requested product',
-        headerAlign: 'left',
-        flexWidth: '9.5',
-        attributes: {
-          async: true,
-          openOnClick: false,
-          autoload: false,
-          filterOptions: options => options,
-          cache: false,
-          options: [],
-          showValueTooltip: true,
-          className: 'text-left',
-        },
-        getDynamicAttr: ({
-          fieldValue, debouncedProductsFetch, rowIndex, rowCount,
-        }) => ({
-          disabled: !!fieldValue,
-          loadOptions: debouncedProductsFetch,
-          autoFocus: rowIndex === rowCount - 1,
-        }),
-      },
-      quantityRequested: {
-        type: TextField,
-        label: 'react.stockMovement.quantity.label',
-        defaultMessage: 'Quantity',
-        flexWidth: '2.5',
-        attributes: {
-          type: 'number',
-        },
-        fieldKey: '',
-        getDynamicAttr: ({
-          fieldValue,
-        }) => ({
-          disabled: (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') || _.isNil(fieldValue && fieldValue.product),
-        }),
-      },
-      recipient: {
-        type: SelectField,
-        label: 'react.stockMovement.recipient.label',
-        defaultMessage: 'Recipient',
-        flexWidth: '2.5',
-        fieldKey: '',
-        getDynamicAttr: ({
-          fieldValue, recipients, addRow, rowCount, rowIndex, getSortOrder, updateTotalCount,
-        }) => ({
-          options: recipients,
-          disabled: (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') || _.isNil(fieldValue && fieldValue.product),
-          onTabPress: rowCount === rowIndex + 1 ? () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-          arrowRight: rowCount === rowIndex + 1 ? () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-          arrowDown: rowCount === rowIndex + 1 ? () => () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-        }),
-        attributes: {
-          labelKey: 'name',
-          openOnClick: false,
-        },
-      },
-      deleteButton: DELETE_BUTTON_FIELD,
-    },
-  },
-};
-
-const STOCKLIST_FIELDS = {
-  lineItems: {
-    type: ArrayField,
-    arrowsNavigation: true,
-    virtualized: true,
-    totalCount: ({ totalCount }) => totalCount,
-    isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
-    loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
-    addButton: ({
-    // eslint-disable-next-line react/prop-types
-      addRow, getSortOrder, newItemAdded, updateTotalCount,
-    }) => (
-      <button
-        type="button"
-        className="btn btn-outline-success btn-xs"
-        onClick={() => {
-          updateTotalCount(1);
-          addRow({ sortOrder: getSortOrder() });
-          newItemAdded();
-        }}
-      ><Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
-      </button>
-    ),
-    fields: {
-      product: {
-        fieldKey: 'disabled',
-        type: SelectField,
-        label: 'react.stockMovement.requestedProduct.label',
-        defaultMessage: 'Requested product',
-        headerAlign: 'left',
-        flexWidth: '9',
-        attributes: {
-          async: true,
-          openOnClick: false,
-          autoload: false,
-          filterOptions: options => options,
-          cache: false,
-          options: [],
-          showValueTooltip: true,
-          className: 'text-left',
-        },
-        getDynamicAttr: ({
-          fieldValue, debouncedProductsFetch, rowIndex, rowCount, newItem,
-        }) => ({
-          disabled: !!fieldValue,
-          loadOptions: debouncedProductsFetch,
-          autoFocus: newItem && rowIndex === rowCount - 1,
-        }),
-      },
-      quantityAllowed: {
-        type: LabelField,
-        label: 'react.stockMovement.maxQuantity.label',
-        defaultMessage: 'Max Qty',
-        flexWidth: '1.7',
-        attributes: {
-          type: 'number',
-        },
-      },
-      quantityRequested: {
-        type: TextField,
-        label: 'react.stockMovement.neededQuantity.label',
-        defaultMessage: 'Needed Qty',
-        flexWidth: '1.7',
-        attributes: {
-          type: 'number',
-        },
-        getDynamicAttr: ({
-          addRow, rowCount, rowIndex, getSortOrder, updateTotalCount,
-        }) => ({
-          onTabPress: rowCount === rowIndex + 1 ? () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-          arrowRight: rowCount === rowIndex + 1 ? () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-          arrowDown: rowCount === rowIndex + 1 ? () => () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-        }),
-      },
-      deleteButton: DELETE_BUTTON_FIELD,
-    },
   },
 };
 
@@ -244,18 +51,6 @@ const VENDOR_FIELDS = {
     totalCount: ({ totalCount }) => totalCount,
     isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
-    // eslint-disable-next-line react/prop-types
-    addButton: ({ addRow, getSortOrder, updateTotalCount }) => (
-      <button
-        type="button"
-        className="btn btn-outline-success btn-xs"
-        onClick={() => {
-          updateTotalCount(1);
-          addRow({ sortOrder: getSortOrder() });
-        }}
-      ><Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
-      </button>
-    ),
     fields: {
       palletName: {
         type: TextField,
@@ -287,6 +82,7 @@ const VENDOR_FIELDS = {
           filterOptions: options => options,
           cache: false,
           options: [],
+          disabled: true,
           showValueTooltip: true,
         },
         getDynamicAttr: ({ debouncedProductsFetch }) => ({
@@ -325,26 +121,37 @@ const VENDOR_FIELDS = {
         label: 'react.stockMovement.recipient.label',
         defaultMessage: 'Recipient',
         flexWidth: '1.5',
-        getDynamicAttr: ({
-          recipients, addRow, rowCount, rowIndex, getSortOrder, updateTotalCount,
-        }) => ({
+        getDynamicAttr: ({ recipients }) => ({
           options: recipients,
-          onTabPress: rowCount === rowIndex + 1 ? () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-          arrowRight: rowCount === rowIndex + 1 ? () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-          arrowDown: rowCount === rowIndex + 1 ? () => () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
         }),
         attributes: {
           labelKey: 'name',
           openOnClick: false,
+        },
+      },
+      split: {
+        type: ButtonField,
+        label: 'react.stockMovement.splitLine.label',
+        defaultMessage: 'Split',
+        flexWidth: '1',
+        fieldKey: '',
+        buttonLabel: 'react.stockMovement.splitLine.label',
+        buttonDefaultMessage: 'Split line',
+        getDynamicAttr: ({
+          fieldValue, addRow, rowIndex,
+        }) => ({
+          onClick: () => addRow({
+            product: {
+              ...fieldValue.product,
+              label: `${fieldValue.product.productCode} ${fieldValue.product.name}`,
+            },
+            recipient: fieldValue.recipient,
+            sortOrder: fieldValue.sortOrder + 1,
+            referenceId: fieldValue.referenceId,
+          }, rowIndex),
+        }),
+        attributes: {
+          className: 'btn btn-outline-success',
         },
       },
       deleteButton: DELETE_BUTTON_FIELD,
@@ -352,6 +159,7 @@ const VENDOR_FIELDS = {
   },
 };
 
+/* eslint class-methods-use-this: ["error",{ "exceptMethods": ["getLineItemsToBeSaved"] }] */
 /**
  * The second step of stock movement where user can add items to stock list.
  * This component supports three different cases: with or without stocklist
@@ -361,20 +169,15 @@ class AddItemsPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentLineItems: [],
       sortOrder: 0,
       values: { ...this.props.initialValues, lineItems: [] },
-      newItem: false,
       totalCount: 0,
     };
 
     this.props.showSpinner();
-    this.removeItem = this.removeItem.bind(this);
-    this.importTemplate = this.importTemplate.bind(this);
     this.getSortOrder = this.getSortOrder.bind(this);
     this.confirmSave = this.confirmSave.bind(this);
     this.confirmTransition = this.confirmTransition.bind(this);
-    this.newItemAdded = this.newItemAdded.bind(this);
     this.validate = this.validate.bind(this);
     this.isRowLoaded = this.isRowLoaded.bind(this);
     this.loadMoreRows = this.loadMoreRows.bind(this);
@@ -404,91 +207,23 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Returns proper fields depending on origin type or if stock list is chosen.
-   * @public
-   */
-  getFields() {
-    if ((this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory) && !request) {
-      return VENDOR_FIELDS;
-    } else if (_.get(this.state.values.stocklist, 'id')) {
-      return STOCKLIST_FIELDS;
-    }
-
-    return NO_STOCKLIST_FIELDS;
-  }
-
-  /**
    * Returns an array of new stock movement's items and items to be
    * updated (comparing to previous state of line items).
    * @param {object} lineItems
    * @public
    */
   getLineItemsToBeSaved(lineItems) {
-    const lineItemsToBeAdded = _.filter(lineItems, item =>
-      !item.statusCode && item.quantityRequested && item.quantityRequested !== '0' && item.product);
-    const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
-    const lineItemsToBeUpdated = [];
-    _.forEach(lineItemsWithStatus, (item) => {
-      const oldItem = _.find(this.state.currentLineItems, old => old.id === item.id);
-      const oldQty = parseInt(oldItem.quantityRequested, 10);
-      const newQty = parseInt(item.quantityRequested, 10);
-      const oldRecipient = oldItem.recipient && _.isObject(oldItem.recipient) ?
-        oldItem.recipient.id : oldItem.recipient;
-      const newRecipient = item.recipient && _.isObject(item.recipient) ?
-        item.recipient.id : item.recipient;
-
-      // Intersection of keys common to both objects (excluding product key)
-      const keyIntersection = _.remove(
-        _.intersection(
-          _.keys(oldItem),
-          _.keys(item),
-        ),
-        key => key !== 'product',
-      );
-
-      if (
-        (this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory) &&
-        (
-          !_.isEqual(_.pick(item, keyIntersection), _.pick(oldItem, keyIntersection)) ||
-          (item.product.id !== oldItem.product.id)
-        )
-      ) {
-        lineItemsToBeUpdated.push(item);
-      } else if (newQty !== oldQty || newRecipient !== oldRecipient) {
-        lineItemsToBeUpdated.push(item);
-      }
-    });
-
-    if (this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory) {
-      return [].concat(
-        _.map(lineItemsToBeAdded, item => ({
-          'product.id': item.product.id,
-          quantityRequested: item.quantityRequested,
-          palletName: item.palletName,
-          boxName: item.boxName,
-          lotNumber: item.lotNumber,
-          expirationDate: item.expirationDate,
-          'recipient.id': _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '',
-          sortOrder: item.sortOrder,
-        })),
-        _.map(lineItemsToBeUpdated, item => ({
-          id: item.id,
-          'product.id': item.product.id,
-          quantityRequested: item.quantityRequested,
-          palletName: item.palletName,
-          boxName: item.boxName,
-          lotNumber: item.lotNumber,
-          expirationDate: item.expirationDate,
-          'recipient.id': _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '',
-          sortOrder: item.sortOrder,
-        })),
-      );
-    }
+    const lineItemsToBeAdded = _.filter(lineItems, item => !item.id);
+    const lineItemsToBeUpdated = _.filter(lineItems, item => item.id);
 
     return [].concat(
       _.map(lineItemsToBeAdded, item => ({
         'product.id': item.product.id,
         quantityRequested: item.quantityRequested,
+        palletName: item.palletName,
+        boxName: item.boxName,
+        lotNumber: item.lotNumber,
+        expirationDate: item.expirationDate,
         'recipient.id': _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '',
         sortOrder: item.sortOrder,
       })),
@@ -496,6 +231,10 @@ class AddItemsPage extends Component {
         id: item.id,
         'product.id': item.product.id,
         quantityRequested: item.quantityRequested,
+        palletName: item.palletName,
+        boxName: item.boxName,
+        lotNumber: item.lotNumber,
+        expirationDate: item.expirationDate,
         'recipient.id': _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '',
         sortOrder: item.sortOrder,
       })),
@@ -570,14 +309,30 @@ class AddItemsPage extends Component {
       if (date.diff(dateRequested) > 0) {
         errors.lineItems[key] = { expirationDate: 'react.stockMovement.error.invalidDate.label' };
       }
+      if (item.id) {
+        const splitItems = _.filter(values.lineItems, lineItem =>
+          lineItem.referenceId === item.referenceId);
+        const requestedQuantity = _.reduce(
+          splitItems, (sum, val) =>
+            (sum + (val.quantityRequested ? _.toInteger(val.quantityRequested) : 0)),
+          0,
+        );
+        if (requestedQuantity !== item.quantityRequired) {
+          if (splitItems.length === 1) {
+            errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.changedQuantity.label' };
+          } else {
+            _.forEach(values.lineItems, (lineItem, lineItemKey) => {
+              _.forEach(splitItems, (splitItem) => {
+                if (lineItem === splitItem) {
+                  errors.lineItems[lineItemKey] = { quantityRequested: 'react.stockMovement.error.changedSplitQuantity.label' };
+                }
+              });
+            });
+          }
+        }
+      }
     });
     return errors;
-  }
-
-  newItemAdded() {
-    this.setState({
-      newItem: true,
-    });
   }
 
   /**
@@ -657,9 +412,10 @@ class AddItemsPage extends Component {
     }
 
     this.fetchAddItemsPageData();
-    if (!this.props.isPaginated) {
-      this.fetchLineItems();
-    }
+    // TODO: Fix pagination support
+    // if (!this.props.isPaginated) {
+    //   this.fetchLineItems();
+    // }
   }
 
   /**
@@ -688,7 +444,7 @@ class AddItemsPage extends Component {
     apiClient.get(url)
       .then((resp) => {
         const { hasManageInventory } = resp.data.data;
-        const { statusCode } = resp.data.data;
+        const { statusCode, lineItems } = resp.data.data;
         const { totalCount } = resp.data;
 
         this.setState({
@@ -696,18 +452,35 @@ class AddItemsPage extends Component {
             ...this.state.values,
             hasManageInventory,
             statusCode,
+            // TODO: Fix pagination support
+            lineItems: _.map(
+              lineItems,
+              val => ({
+                ...val,
+                disabled: true,
+                product: {
+                  ...val.product,
+                  label: `${val.productCode} ${val.product.name}`,
+                },
+                referenceId: val.id,
+              }),
+            ),
           },
           totalCount: totalCount === 0 ? 1 : totalCount,
         }, () => this.props.hideSpinner());
       });
   }
 
+  isRowLoaded({ index }) {
+    return !!this.state.values.lineItems[index];
+  }
 
   loadMoreRows({ startIndex, stopIndex }) {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${stopIndex - startIndex > 0 ? stopIndex - startIndex : 1}&stepNumber=2`;
     apiClient.get(url)
-      .then((response) => {
-        this.setLineItems(response);
+    // TODO: Fix pagination support
+      .then(() => {
+        // this.setLineItems(response);
       });
   }
 
@@ -757,35 +530,19 @@ class AddItemsPage extends Component {
   saveAndTransitionToNextStep(formValues, lineItems) {
     this.props.showSpinner();
 
-    if (formValues.origin.type === 'SUPPLIER' || !formValues.hasManageInventory) {
-      this.saveRequisitionItems(lineItems)
-        .then((resp) => {
-          let values = formValues;
-          if (resp) {
-            values = { ...formValues, lineItems: resp.data.data.lineItems };
-          }
-          this.transitionToNextStep('CHECKING')
-            .then(() => {
-              this.props.goToPage(this.props.hasPackingSupport ? 6 : 5, values);
-            })
-            .catch(() => this.props.hideSpinner());
-        })
-        .catch(() => this.props.hideSpinner());
-    } else {
-      this.saveRequisitionItems(lineItems)
-        .then((resp) => {
-          let values = formValues;
-          if (resp) {
-            values = { ...formValues, lineItems: resp.data.data.lineItems };
-          }
-          this.transitionToNextStep('VERIFYING')
-            .then(() => {
-              this.props.onSubmit(values);
-            })
-            .catch(() => this.props.hideSpinner());
-        })
-        .catch(() => this.props.hideSpinner());
-    }
+    this.saveRequisitionItems(lineItems)
+      .then((resp) => {
+        let values = formValues;
+        if (resp) {
+          values = { ...formValues, lineItems: resp.data.data.lineItems };
+        }
+        this.transitionToNextStep('CHECKING')
+          .then(() => {
+            this.props.nextPage(values);
+          })
+          .catch(() => this.props.hideSpinner());
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   /**
@@ -833,16 +590,13 @@ class AddItemsPage extends Component {
               ...val,
               product: {
                 ...val.product,
-                label: `${val.productCode} ${val.product.name}`,
+                label: `${val.product.productCode} ${val.product.name}`,
               },
+              referenceId: val.id,
             }),
           );
 
           this.setState({ values: { ...this.state.values, lineItems: lineItemsBackendData } });
-
-          this.setState({
-            currentLineItems: lineItemsBackendData,
-          });
         })
         .catch(() => Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items'))));
     }
@@ -937,45 +691,6 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Removes chosen item from requisition's items list.
-   * @param {string} itemId
-   * @public
-   */
-  removeItem(itemId) {
-    const removeItemsUrl = `/openboxes/api/stockMovementItems/${itemId}/removeItem`;
-
-    return apiClient.delete(removeItemsUrl)
-      .catch(() => {
-        this.props.hideSpinner();
-        return Promise.reject(new Error('react.stockMovement.error.deleteRequisitionItem.label'));
-      });
-  }
-
-  /**
-   * Removes all items from requisition's items list.
-   * @public
-   */
-  removeAll() {
-    const removeItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/removeAllItems`;
-
-    return apiClient.delete(removeItemsUrl)
-      .then(() => {
-        this.setState({
-          totalCount: 1,
-          currentLineItems: [],
-          values: {
-            ...this.state.values,
-            lineItems: new Array(1).fill({ sortOrder: 100 }),
-          },
-        });
-      })
-      .catch(() => {
-        this.fetchLineItems();
-        return Promise.reject(new Error('react.stockMovement.error.deleteRequisitionItem.label'));
-      });
-  }
-
-  /**
    * Transition to next stock movement status:
    * - 'CHECKING' if origin type is supplier.
    * - 'VERIFYING' if origin type is other than supplier.
@@ -985,91 +700,11 @@ class AddItemsPage extends Component {
   transitionToNextStep(status) {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const payload = { status };
-    const { movementNumber } = this.state.values;
 
     if (this.state.values.statusCode === 'CREATED') {
-      return apiClient.post(url, payload)
-        .then(() => {
-          if (request) {
-            window.location = `/openboxes/stockMovement/list?type=REQUEST&movementNumber=${movementNumber}&submitted=true`;
-          }
-        });
+      return apiClient.post(url, payload);
     }
     return Promise.resolve();
-  }
-
-  /**
-   * Exports current state of stock movement's to csv file.
-   * @param {object} formValues
-   * @public
-   */
-  exportTemplate(formValues) {
-    const lineItems = _.filter(formValues.lineItems, item => !_.isEmpty(item));
-
-    this.saveItemsAndExportTemplate(formValues, lineItems);
-  }
-
-  isRowLoaded({ index }) {
-    return !!this.state.values.lineItems[index];
-  }
-
-  /**
-   * Exports current state of stock movement's to csv file.
-   * @param {object} formValues
-   * @param {object} lineItems
-   * @public
-   */
-  saveItemsAndExportTemplate(formValues, lineItems) {
-    this.props.showSpinner();
-
-    const { movementNumber, stockMovementId } = formValues;
-    const url = `/openboxes/stockMovement/exportCsv/${stockMovementId}`;
-    this.saveRequisitionItemsInCurrentStep(lineItems)
-      .then(() => {
-        apiClient.get(url, { responseType: 'blob' })
-          .then((response) => {
-            fileDownload(response.data, `ItemList${movementNumber ? `-${movementNumber}` : ''}.csv`, 'text/csv');
-            this.props.hideSpinner();
-          })
-          .catch(() => this.props.hideSpinner());
-      });
-  }
-
-  /**
-   * Imports chosen file to backend and then fetches line items.
-   * @param {object} event
-   * @public
-   */
-  importTemplate(event) {
-    this.props.showSpinner();
-    const formData = new FormData();
-    const file = event.target.files[0];
-    const { stockMovementId } = this.state.values;
-
-    formData.append('importFile', file.slice(0, file.size, 'text/csv'));
-    const config = {
-      headers: {
-        'content-type': 'multipart/form-data',
-      },
-    };
-
-    const url = `/openboxes/stockMovement/importCsv/${stockMovementId}`;
-
-    return apiClient.post(url, formData, config)
-      .then(() => {
-        this.fetchLineItems();
-        if (_.isNil(_.last(this.state.values.lineItems).product)) {
-          this.setState({
-            values: {
-              ...this.state.values,
-              lineItems: [],
-            },
-          });
-        }
-      })
-      .catch(() => {
-        this.props.hideSpinner();
-      });
   }
 
   /**
@@ -1079,10 +714,14 @@ class AddItemsPage extends Component {
    * @public
    */
   previousPage(values, invalid) {
+    this.props.showSpinner();
     if (!invalid) {
       this.saveRequisitionItemsInCurrentStep(values.lineItems)
-        .then(() => this.props.previousPage(values));
+        .then(() => {
+          window.location = `/openboxes/order/redirectFromStockMovement/${values.stockMovementId}`;
+        }).catch(() => this.props.hideSpinner());
     } else {
+      this.props.hideSpinner();
       confirmAlert({
         title: this.props.translate('react.stockMovement.confirmPreviousPage.label', 'Validation error'),
         message: this.props.translate('react.stockMovement.confirmPreviousPage.message.label', 'Cannot save due to validation error on page'),
@@ -1092,7 +731,9 @@ class AddItemsPage extends Component {
           },
           {
             label: this.props.translate('react.stockMovement.confirmPreviousPage.continue.label', 'Continue (lose unsaved work)'),
-            onClick: () => this.props.previousPage(values),
+            onClick: () => {
+              window.location = `/openboxes/order/redirectFromStockMovement/${values.stockMovementId}`;
+            },
           },
         ],
       });
@@ -1100,7 +741,6 @@ class AddItemsPage extends Component {
   }
 
   render() {
-    const showOnly = this.props.showOnly && (this.state.values.statusCode !== 'CREATED' || !request);
     return (
       <Form
         onSubmit={() => {}}
@@ -1109,95 +749,49 @@ class AddItemsPage extends Component {
         initialValues={this.state.values}
         render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
-            { !showOnly ?
-              <span>
-                <label
-                  htmlFor="csvInput"
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-                >
-                  <span><i className="fa fa-download pr-2" /><Translate id="react.default.button.importTemplate.label" defaultMessage="Import template" /></span>
-                  <input
-                    id="csvInput"
-                    type="file"
-                    style={{ display: 'none' }}
-                    onChange={this.importTemplate}
-                    disabled={showOnly}
-                    onClick={(event) => {
-                    // eslint-disable-next-line no-param-reassign
-                    event.target.value = null;
-                  }}
-                    accept=".csv"
-                  />
-                </label>
-                <button
-                  type="button"
-                  onClick={() => this.exportTemplate(values)}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-                >
-                  <span><i className="fa fa-upload pr-2" /><Translate id="react.default.button.exportTemplate.label" defaultMessage="Export template" /></span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => this.refresh()}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-                >
-                  <span><i className="fa fa-refresh pr-2" /><Translate id="react.default.button.refresh.label" defaultMessage="Reload" /></span>
-                </button>
-                <button
-                  type="button"
-                  disabled={invalid}
-                  onClick={() => this.save(values)}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-                >
-                  <span><i className="fa fa-save pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
-                </button>
-                <button
-                  type="button"
-                  disabled={invalid}
-                  onClick={() => this.saveAndExit(values)}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-                >
-                  <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
-                </button>
-                <button
-                  type="button"
-                  disabled={invalid}
-                  onClick={() => this.removeAll()}
-                  className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs"
-                >
-                  <span><i className="fa fa-remove pr-2" /><Translate id="react.default.button.deleteAll.label" defaultMessage="Delete all" /></span>
-                </button>
-              </span>
-             :
+            <span>
+              <button
+                type="button"
+                onClick={() => this.refresh()}
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+              >
+                <span><i className="fa fa-refresh pr-2" /><Translate id="react.default.button.refresh.label" defaultMessage="Reload" /></span>
+              </button>
               <button
                 type="button"
                 disabled={invalid}
-                onClick={() => { window.location = '/openboxes/stockMovement/list?type=REQUEST'; }}
-                className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
+                onClick={() => this.save(values)}
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.exit.label" defaultMessage="Exit" /></span>
-              </button> }
+                <span><i className="fa fa-save pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
+              </button>
+              <button
+                type="button"
+                disabled={invalid}
+                onClick={() => this.saveAndExit(values)}
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+              >
+                <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
+              </button>
+            </span>
             <form onSubmit={handleSubmit}>
-              {_.map(this.getFields(), (fieldConfig, fieldName) =>
+              {_.map(VENDOR_FIELDS, (fieldConfig, fieldName) =>
                 renderFormField(fieldConfig, fieldName, {
                   stocklist: values.stocklist,
                   recipients: this.props.recipients,
-                  removeItem: this.removeItem,
                   debouncedProductsFetch: this.debouncedProductsFetch,
                   getSortOrder: this.getSortOrder,
-                  newItemAdded: this.newItemAdded,
-                  newItem: this.state.newItem,
                   totalCount: this.state.totalCount,
                   loadMoreRows: this.loadMoreRows,
                   isRowLoaded: this.isRowLoaded,
                   updateTotalCount: this.updateTotalCount,
                   isPaginated: this.props.isPaginated,
-                  showOnly,
+                  isFromOrder: this.state.values.isFromOrder,
                 }))}
               <div>
                 <button
                   type="submit"
-                  disabled={showOnly || invalid}
+                  disabled={invalid}
                   onClick={() => this.previousPage(values, invalid)}
                   className="btn btn-outline-primary btn-form btn-xs"
                 >
@@ -1207,19 +801,12 @@ class AddItemsPage extends Component {
                   type="submit"
                   onClick={() => {
                     if (!invalid) {
-                      if (!request) {
-                        this.nextPage(values);
-                      } else if (request || (this.props.currentLocation.id !== this.state.values.origin.id && this.state.values.origin.type !== 'SUPPLIER')) {
-                        this.confirmSubmit(() =>
-                          // eslint-disable-next-line max-len
-                          this.saveRequisitionItems(_.filter(values.lineItems, val => !_.isEmpty(val) && val.product)).then(() =>
-                            this.transitionToNextStep(this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory ? 'CHECKING' : 'VERIFYING')));
-                      }
+                      this.nextPage(values);
                     }
                   }}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                   disabled={!_.some(values.lineItems, item => !_.isEmpty(item))
-                    || showOnly || invalid}
+                    || invalid}
                 ><Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>
@@ -1255,15 +842,11 @@ AddItemsPage.propTypes = {
     }),
     hasManageInventory: PropTypes.bool,
   }).isRequired,
-  /** Function returning user to the previous page */
-  previousPage: PropTypes.func.isRequired,
-  /** Function taking user to specified page */
-  goToPage: PropTypes.func.isRequired,
   /**
    * Function called with the form data when the handleSubmit()
    * is fired from within the form component.
    */
-  onSubmit: PropTypes.func.isRequired,
+  nextPage: PropTypes.func.isRequired,
   /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */
@@ -1279,12 +862,6 @@ AddItemsPage.propTypes = {
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
   minimumExpirationDate: PropTypes.string.isRequired,
-  /** Is true when currently selected location supports packing */
-  hasPackingSupport: PropTypes.bool.isRequired,
   /** Return true if pagination is enabled */
   isPaginated: PropTypes.bool.isRequired,
-  currentLocation: PropTypes.shape({
-    id: PropTypes.string,
-  }).isRequired,
-  showOnly: PropTypes.bool.isRequired,
 };

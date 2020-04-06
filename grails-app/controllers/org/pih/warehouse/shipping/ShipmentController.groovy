@@ -213,6 +213,7 @@ class ShipmentController {
     }
 
     def showDetails = {
+        log.info "showDetails " + params
         def shipmentInstance = Shipment.get(params.id)
         if (!shipmentInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"

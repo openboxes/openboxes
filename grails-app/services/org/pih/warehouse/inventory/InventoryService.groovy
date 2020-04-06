@@ -1553,19 +1553,15 @@ class InventoryService implements ApplicationContextAware {
             and {
                 eq("product.id", product?.id)
                 if (lotNumber) {
-                    log.debug "lot number is not null"
                     eq("lotNumber", lotNumber)
                 } else {
                     or {
-                        log.debug "lot number is null"
                         isNull("lotNumber")
                         eq("lotNumber", "")
                     }
                 }
             }
         }
-        log.debug("Returned inventory items " + inventoryItems)
-        // If the list is non-empty, return the first item
         if (inventoryItems) {
             return inventoryItems.get(0)
         }

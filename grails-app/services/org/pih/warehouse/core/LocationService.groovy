@@ -108,6 +108,12 @@ class LocationService {
                             (it.locationGroup != currentLocation.locationGroup && it.locationType.locationTypeCode == LocationTypeCode.DEPOT)
                 }
             }
+        } else {
+            if (direction == "INBOUND") {
+                return locations.findAll {
+                    it.locationType.locationTypeCode == LocationTypeCode.SUPPLIER || !it.supports(ActivityCode.MANAGE_INVENTORY)
+                }
+            }
         }
 
         if (params.locationTypeCode) {

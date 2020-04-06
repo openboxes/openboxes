@@ -11,17 +11,17 @@ import { confirmAlert } from 'react-confirm-alert';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-import { renderFormField } from '../../utils/form-utils';
-import { showSpinner, hideSpinner } from '../../actions';
-import apiClient from '../../utils/apiClient';
-import DateField from '../form-elements/DateField';
-import DocumentButton from '../DocumentButton';
-import SelectField from '../form-elements/SelectField';
-import TextField from '../form-elements/TextField';
-import LabelField from '../form-elements/LabelField';
-import { debounceLocationsFetch } from '../../utils/option-utils';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
-import ArrayField from '../form-elements/ArrayField';
+import { renderFormField } from '../../../utils/form-utils';
+import { showSpinner, hideSpinner } from '../../../actions';
+import apiClient from '../../../utils/apiClient';
+import DateField from '../../form-elements/DateField';
+import DocumentButton from '../../DocumentButton';
+import SelectField from '../../form-elements/SelectField';
+import TextField from '../../form-elements/TextField';
+import LabelField from '../../form-elements/LabelField';
+import { debounceLocationsFetch } from '../../../utils/option-utils';
+import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
+import ArrayField from '../../form-elements/ArrayField';
 
 const BASIC_FIELDS = {
   description: {
@@ -140,63 +140,6 @@ const SHIPMENT_FIELDS = {
     getDynamicAttr: ({ received, showOnly }) => ({
       disabled: showOnly || received,
     }),
-  },
-};
-
-const SUPPLIER_FIELDS = {
-  tableItems: {
-    type: ArrayField,
-    virtualized: true,
-    totalCount: ({ totalCount }) => totalCount,
-    isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
-    loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
-    fields: {
-      palletName: {
-        type: LabelField,
-        label: 'react.stockMovement.packLevel1.label',
-        defaultMessage: 'Pack level 1',
-      },
-      boxName: {
-        type: LabelField,
-        label: 'react.stockMovement.packLevel2.label',
-        defaultMessage: 'Pack level 2',
-      },
-      productCode: {
-        type: LabelField,
-        label: 'react.stockMovement.code.label',
-        defaultMessage: 'Code',
-      },
-      'product.name': {
-        type: LabelField,
-        label: 'react.stockMovement.product.label',
-        defaultMessage: 'Product',
-        headerAlign: 'left',
-        attributes: {
-          className: 'text-left',
-        },
-      },
-      lotNumber: {
-        type: LabelField,
-        label: 'react.stockMovement.lot.label',
-        defaultMessage: 'Lot',
-      },
-      expirationDate: {
-        type: LabelField,
-        label: 'react.stockMovement.expiry.label',
-        defaultMessage: 'Expiry',
-      },
-      quantityRequested: {
-        type: LabelField,
-        fixedWidth: '150px',
-        label: 'react.stockMovement.quantityPicked.label',
-        defaultMessage: 'Qty Picked',
-      },
-      'recipient.name': {
-        type: LabelField,
-        label: 'react.stockMovement.recipient.label',
-        defaultMessage: 'Recipient',
-      },
-    },
   },
 };
 
@@ -338,23 +281,12 @@ class SendMovementPage extends Component {
       .then(() => {
         this.props.hideSpinner();
 
-        if (values.statusCode === 'ISSUED') {
+        if (values.statusCode === 'DISPATCHED') {
           this.fetchStockMovementData();
         }
         Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
       })
       .catch(() => this.props.hideSpinner());
-  }
-
-  /**
-   * Returns proper fields depending on origin type
-   * @public
-   */
-  getFields() {
-    if (this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory) {
-      return SUPPLIER_FIELDS;
-    }
-    return FIELDS;
   }
 
   dataFetched = false;
@@ -368,7 +300,7 @@ class SendMovementPage extends Component {
       comments: values.comments || '',
     };
 
-    if (values.statusCode === 'ISSUED') {
+    if (values.statusCode === 'DISPATCHED') {
       payload = {
         'destination.id': values.destination.id,
         description: values.description,
@@ -415,7 +347,6 @@ class SendMovementPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
-
   fetchStockMovementItems() {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=6`;
     apiClient.get(url)
@@ -439,7 +370,7 @@ class SendMovementPage extends Component {
         this.setState({
           values: {
             ...this.state.values,
-            tableItems: _.uniqBy(_.concat(this.state.values.tableItems, data), 'shipmentItemId'),
+            tableItems: _.uniq(_.concat(this.state.values.tableItems, data)),
           },
         });
       });
@@ -486,7 +417,7 @@ class SendMovementPage extends Component {
             },
           },
         }, () => {
-          this.props.setValues(this.state.values);
+          this.props.nextPage(this.state.values);
           this.fetchShipmentTypes();
           if (!this.props.isPaginated) {
             this.fetchStockMovementItems();
@@ -522,12 +453,12 @@ class SendMovementPage extends Component {
   }
 
   /**
-   * Updates stock movement status to ISSUED with post method.
+   * Updates stock movement status to DISPATCHED with post method.
    * @public
    */
   stateTransitionToIssued() {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
-    const payload = { status: 'ISSUED' };
+    const payload = { status: 'DISPATCHED' };
 
     return apiClient.post(url, payload);
   }
@@ -683,8 +614,8 @@ class SendMovementPage extends Component {
                 <div id="stockMovementInfo" style={{ flexGrow: 2 }}>
                   {_.map(BASIC_FIELDS, (fieldConfig, fieldName) =>
                     renderFormField(fieldConfig, fieldName, {
-                      canBeEdited: values.statusCode === 'ISSUED' && values.shipmentStatus !== 'PARTIALLY_RECEIVED' && values.shipmentStatus !== 'RECEIVED',
-                      issued: values.statusCode === 'ISSUED',
+                      canBeEdited: values.statusCode === 'DISPATCHED' && !values.received,
+                      issued: values.statusCode === 'DISPATCHED',
                       hasStockList: !!_.get(values.stocklist, 'id'),
                       debouncedLocationsFetch: this.debouncedLocationsFetch,
                     }))}
@@ -696,16 +627,16 @@ class SendMovementPage extends Component {
                     }
                     return (<DocumentButton
                       link={document.uri}
-                      disabled={showOnly}
                       buttonTitle={document.name}
                       {...document}
                       key={idx}
                       onClick={() => this.saveValues(values)}
+                      disabled={showOnly}
                     />);
                   })}
                   <div className="dropzone btn btn-outline-secondary">
                     <Dropzone
-                      disabled={values.statusCode === 'ISSUED' || showOnly}
+                      disabled={values.statusCode === 'DISPATCHED' || showOnly}
                       onDrop={this.onDrop}
                       multiple
                     >
@@ -748,12 +679,12 @@ class SendMovementPage extends Component {
                     <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
                   </button>
                 </span>
-                :
+                  :
                 <button
                   type="button"
                   disabled={invalid}
                   onClick={() => {
-                    window.location = '/openboxes/stockMovement/list?type=REQUEST';
+                    window.location = '/openboxes/stockMovement/list?direction=OUTBOUND';
                   }}
                   className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
                 >
@@ -763,8 +694,8 @@ class SendMovementPage extends Component {
                 {_.map(SHIPMENT_FIELDS, (fieldConfig, fieldName) =>
                   renderFormField(fieldConfig, fieldName, {
                     shipmentTypes: this.state.shipmentTypes,
-                    issued: values.statusCode === 'ISSUED',
-                    received: values.shipmentStatus === 'RECEIVED',
+                    issued: values.statusCode === 'DISPATCHED',
+                    received: values.received,
                     showOnly,
                   }))}
               </div>
@@ -772,7 +703,7 @@ class SendMovementPage extends Component {
                 <button
                   type="submit"
                   className="btn btn-outline-primary btn-form btn-xs"
-                  disabled={values.statusCode === 'ISSUED' || showOnly}
+                  disabled={values.statusCode === 'DISPATCHED' || showOnly}
                   onClick={() => this.previousPage(values, invalid)}
                 >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
@@ -780,51 +711,50 @@ class SendMovementPage extends Component {
                 <button
                   type="submit"
                   onClick={() => { this.submitStockMovement(values); }}
-                  className={`${values.shipmentStatus === 'SHIPPED' ? 'btn btn-outline-secondary' : 'btn btn-outline-success'} float-right btn-form btn-xs`}
-                  disabled={invalid || values.statusCode === 'ISSUED' || showOnly}
+                  className={`${values.shipped ? 'btn btn-outline-secondary' : 'btn btn-outline-success'} float-right btn-form btn-xs`}
+                  disabled={invalid || values.statusCode === 'DISPATCHED' || showOnly}
                 ><Translate id="react.stockMovement.sendShipment.label" defaultMessage="Send shipment" />
                 </button>
-                {values.shipmentStatus === 'SHIPPED' && this.props.isUserAdmin ?
+                {values.shipped && this.props.isUserAdmin ?
                   <button
                     type="submit"
                     onClick={() => { this.rollbackStockMovement(values); }}
                     className="btn btn-outline-success float-right btn-xs"
-                    disabled={invalid || !(values.statusCode === 'ISSUED') || showOnly}
+                    disabled={invalid || values.statusCode !== 'DISPATCHED' || showOnly}
                   >
                     <span><i className="fa fa-undo pr-2" /><Translate id="react.default.button.rollback.label" defaultMessage="Rollback" /></span>
                   </button> : null
                 }
                 <div className="my-2">
-                  {_.map(this.getFields(), (fieldConfig, fieldName) =>
-                    renderFormField(fieldConfig, fieldName, {
-                      hasBinLocationSupport: this.props.hasBinLocationSupport,
-                      supplier: values.origin.type === 'SUPPLIER',
-                      totalCount: this.state.totalCount,
-                      loadMoreRows: this.loadMoreRows,
-                      isRowLoaded: this.isRowLoaded,
-                      isPaginated: this.props.isPaginated,
-                    }))}
+                  {_.map(FIELDS, (fieldConfig, fieldName) =>
+                      renderFormField(fieldConfig, fieldName, {
+                        hasBinLocationSupport: this.props.hasBinLocationSupport,
+                        totalCount: this.state.totalCount,
+                        loadMoreRows: this.loadMoreRows,
+                        isRowLoaded: this.isRowLoaded,
+                        isPaginated: this.props.isPaginated,
+                      }))}
                 </div>
                 <button
                   type="submit"
                   className="btn btn-outline-primary btn-form btn-xs"
-                  disabled={values.statusCode === 'ISSUED' || showOnly}
+                  disabled={values.statusCode === 'DISPATCHED' || showOnly}
                   onClick={() => this.previousPage(values, invalid)}
                 > <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button
                   type="submit"
                   onClick={() => { this.submitStockMovement(values); }}
-                  className={`${values.shipmentStatus === 'SHIPPED' ? 'btn btn-outline-secondary' : 'btn btn-outline-success'} float-right btn-form btn-xs`}
-                  disabled={invalid || values.statusCode === 'ISSUED' || showOnly}
+                  className={`${values.shipped ? 'btn btn-outline-secondary' : 'btn btn-outline-success'} float-right btn-form btn-xs`}
+                  disabled={invalid || values.statusCode === 'DISPATCHED' || showOnly}
                 ><Translate id="react.stockMovement.sendShipment.label" defaultMessage="Send shipment" />
                 </button>
-                {values.shipmentStatus === 'SHIPPED' && this.props.isUserAdmin ?
+                {values.shipped && this.props.isUserAdmin ?
                   <button
                     type="submit"
                     onClick={() => { this.rollbackStockMovement(values); }}
                     className="btn btn-outline-success float-right  btn-xs"
-                    disabled={invalid || !(values.statusCode === 'ISSUED') || showOnly}
+                    disabled={invalid || values.statusCode !== 'DISPATCHED' || showOnly}
                   >
                     <span><i className="fa fa-undo pr-2" /><Translate id="react.default.button.rollback.label" defaultMessage="Rollback" /></span>
                   </button> : null
@@ -854,16 +784,14 @@ export default connect(mapStateToProps, { showSpinner, hideSpinner })(SendMoveme
 
 SendMovementPage.propTypes = {
   /** Initial component's data */
-  initialValues: PropTypes.shape({
-    shipmentStatus: PropTypes.string,
-  }).isRequired,
+  initialValues: PropTypes.shape({}).isRequired,
   /** Function returning user to the previous page */
   previousPage: PropTypes.func.isRequired,
   /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
-  setValues: PropTypes.func.isRequired,
+  nextPage: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
   /** Name of the currently selected location */
   currentLocationId: PropTypes.string.isRequired,
@@ -876,5 +804,6 @@ SendMovementPage.propTypes = {
   hasBinLocationSupport: PropTypes.bool.isRequired,
   /** Return true if pagination is enabled */
   isPaginated: PropTypes.bool.isRequired,
+  /** Return true if show only */
   showOnly: PropTypes.bool.isRequired,
 };

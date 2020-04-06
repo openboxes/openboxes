@@ -21,6 +21,10 @@ enum ShipmentStatusCode {
 
     ShipmentStatusCode(int sortOrder) { [this.sortOrder = sortOrder] }
 
+    ShipmentStatusCode getDisplayStatus() {
+        return this
+    }
+
     static int compare(ShipmentStatusCode a, ShipmentStatusCode b) {
         return a.sortOrder <=> b.sortOrder
     }

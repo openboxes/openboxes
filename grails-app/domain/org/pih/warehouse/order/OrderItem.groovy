@@ -15,8 +15,9 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.shipping.ShipmentStatusCode
 
 class OrderItem implements Serializable {
 
@@ -28,6 +29,7 @@ class OrderItem implements Serializable {
     Integer quantity
     BigDecimal unitPrice
     String currencyCode
+    ProductSupplier productSupplier
 
     User requestedBy    // the person who actually requested the item
     Person recipient
@@ -38,6 +40,13 @@ class OrderItem implements Serializable {
     Location originBinLocation
     Location destinationBinLocation
 
+    Date estimatedReadyDate
+    Date estimatedShipDate
+    Date estimatedDeliveryDate
+
+    Date actualReadyDate
+    Date actualShipDate
+    Date actualDeliveryDate
 
     // Audit fields
     Date dateCreated
@@ -45,13 +54,20 @@ class OrderItem implements Serializable {
 
     static mapping = {
         id generator: 'uuid'
+        shipmentItems joinTable: [name: 'order_shipment', key: 'order_item_id']
     }
 
-    static transients = ["orderItemType"]
+    static transients = [
+            "orderItemType",
+            "total",
+            "shippedShipmentItems",
+            "subtotal",
+            "totalAdjustments"
+    ]
 
     static belongsTo = [order: Order, parentOrderItem: OrderItem]
 
-    static hasMany = [orderShipments: OrderShipment, orderItems: OrderItem]
+    static hasMany = [orderItems: OrderItem, shipmentItems: ShipmentItem, orderAdjustments: OrderAdjustment]
 
     static constraints = {
         description(nullable: true)
@@ -67,29 +83,34 @@ class OrderItem implements Serializable {
         destinationBinLocation(nullable: true)
         recipient(nullable: true)
         currencyCode(nullable: true)
+        productSupplier(nullable: true)
+        estimatedReadyDate(nullable: true)
+        estimatedShipDate(nullable: true)
+        estimatedDeliveryDate(nullable: true)
+        actualReadyDate(nullable: true)
+        actualShipDate(nullable: true)
+        actualDeliveryDate(nullable: true)
     }
 
+    def getShippedShipmentItems() {
+        return shipmentItems.findAll { it.shipment.currentStatus >= ShipmentStatusCode.SHIPPED }
+    }
 
     String getOrderItemType() {
         return (product) ? "Product" : (category) ? "Category" : "Unclassified"
     }
 
     Integer quantityFulfilled() {
-        def quantity = 0
-        try {
-            def shipmentItems = shipmentItems()
-            quantity = shipmentItems?.sum { it?.quantity }
-        }
-        catch (Exception e) {
-            log.error "Error calculating quantity fulfilled: " + e.message
-        }
-        return quantity ?: 0
+        return shippedShipmentItems?.sum { it?.quantity } ?: 0
     }
 
     Integer quantityRemaining() {
         return quantity - quantityFulfilled()
     }
 
+    Integer quantityReceived() {
+        return shippedShipmentItems?.sum { it?.quantityReceived() } ?: 0
+    }
 
     Boolean isPartiallyFulfilled() {
         return quantityFulfilled() > 0 && quantityFulfilled() < quantity
@@ -97,6 +118,10 @@ class OrderItem implements Serializable {
 
     Boolean isCompletelyFulfilled() {
         return quantityFulfilled() >= quantity
+    }
+
+    Boolean isCompletelyReceived() {
+        return quantityReceived() >= quantity
     }
 
     Boolean isPending() {
@@ -110,17 +135,6 @@ class OrderItem implements Serializable {
      * @return
      */
     def shipmentItems() {
-        def shipmentItems = []
-        orderShipments?.each {
-            try {
-                def shipmentItem = ShipmentItem.get(it?.shipmentItem?.id)
-                if (shipmentItem) {
-                    shipmentItems << shipmentItem
-                }
-            } catch (Exception e) {
-                log.error "Error getting shipment items: " + e.message
-            }
-        }
         return shipmentItems
     }
 
@@ -131,22 +145,29 @@ class OrderItem implements Serializable {
      * @return
      */
     def listShipments() {
-        def shipments = []
-        orderShipments.each {
-            try {
-                def shipment = Shipment.get(it?.shipmentItem?.shipment?.id)
-                if (shipment) {
-                    shipments << shipment
-                }
-            } catch (Exception e) {
-                log.error "Error getting shipment: " + e.message
-            }
-        }
-        return shipments
+        return shipmentItems*.shipment
     }
 
     def totalPrice() {
-        return (quantity ? quantity : 0.0) * (unitPrice ? unitPrice : 0.0)
+        return total
+    }
+
+    def getTotalAdjustments() {
+        return orderAdjustments?.sum {
+            return it.amount ?: it.percentage ? (it.percentage/100) * subtotal : 0
+        }?:0
+    }
+
+    def getSubtotal() {
+        return (quantity ?: 0.0) * (unitPrice ?: 0.0)
+    }
+
+    def getTotal() {
+        return (subtotal + totalAdjustments)?:0
+    }
+
+    String toString() {
+        return product?.name
     }
 
 }

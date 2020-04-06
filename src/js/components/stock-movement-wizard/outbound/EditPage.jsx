@@ -11,17 +11,17 @@ import update from 'immutability-helper';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-import ArrayField from '../form-elements/ArrayField';
-import TextField from '../form-elements/TextField';
-import { renderFormField } from '../../utils/form-utils';
-import LabelField from '../form-elements/LabelField';
-import SelectField from '../form-elements/SelectField';
-import SubstitutionsModal from './modals/SubstitutionsModal';
-import apiClient from '../../utils/apiClient';
-import TableRowWithSubfields from '../form-elements/TableRowWithSubfields';
-import { showSpinner, hideSpinner, fetchReasonCodes } from '../../actions';
-import ButtonField from '../form-elements/ButtonField';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
+import ArrayField from '../../form-elements/ArrayField';
+import TextField from '../../form-elements/TextField';
+import { renderFormField } from '../../../utils/form-utils';
+import LabelField from '../../form-elements/LabelField';
+import SelectField from '../../form-elements/SelectField';
+import SubstitutionsModal from '../modals/SubstitutionsModal';
+import apiClient from '../../../utils/apiClient';
+import TableRowWithSubfields from '../../form-elements/TableRowWithSubfields';
+import { showSpinner, hideSpinner, fetchReasonCodes } from '../../../actions';
+import ButtonField from '../../form-elements/ButtonField';
+import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
 
 const BTN_CLASS_MAPPER = {
   YES: 'btn btn-outline-success',
@@ -216,6 +216,7 @@ function validateForSave(values) {
 
 function validate(values) {
   const errors = validateForSave(values);
+
   _.forEach(values.editPageItems, (item, key) => {
     if (_.isNil(item.quantityRevised) && (item.quantityRequested > item.quantityAvailable) && (item.statusCode !== 'SUBSTITUTED')) {
       errors.editPageItems[key] = { quantityRevised: 'react.stockMovement.errors.lowerQty.label' };
@@ -292,7 +293,7 @@ class EditItemsPage extends Component {
         editPageItems: _.uniqBy(_.concat(this.state.values.editPageItems, editPageItems), 'requisitionItemId'),
       },
       hasItemsLoaded: this.state.hasItemsLoaded
-        || this.state.totalCount === _.uniqBy(_.concat(this.state.values.editPageItems, editPageItems), 'requisitionItemId').length,
+      || this.state.totalCount === _.uniqBy(_.concat(this.state.values.editPageItems, editPageItems), 'requisitionItemId').length,
     }, () => this.props.hideSpinner());
   }
 
@@ -380,7 +381,6 @@ class EditItemsPage extends Component {
   isRowLoaded({ index }) {
     return !!this.state.values.editPageItems[index];
   }
-
 
   /**
    * Sends data of revised items with post method.
@@ -498,13 +498,8 @@ class EditItemsPage extends Component {
           onClick: () => {
             this.setState({
               revisedItems: [],
-              values: {
-                ...this.state.values,
-                editPageItems: [],
-              },
-            }, () => {
-              this.fetchAllData(true);
             });
+            this.fetchAllData(true);
           },
         },
         {
@@ -523,7 +518,7 @@ class EditItemsPage extends Component {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const payload = {
       status: 'PICKING',
-      createPicklist: this.state.statusCode === 'VERIFYING' ? 'true' : 'false',
+      createPicklist: this.state.statusCode === 'REQUESTED' ? 'true' : 'false',
     };
 
     return apiClient.post(url, payload);
@@ -551,7 +546,7 @@ class EditItemsPage extends Component {
     this.reviseRequisitionItems(formValues)
       .then(() => {
         this.transitionToNextStep()
-          .then(() => this.props.onSubmit(formValues))
+          .then(() => this.props.nextPage(formValues))
           .catch(() => this.props.hideSpinner());
       }).catch(() => this.props.hideSpinner());
   }
@@ -715,11 +710,11 @@ class EditItemsPage extends Component {
                   </span>
                 </button>
               </span>
-              :
+                :
               <button
                 type="button"
                 onClick={() => {
-                  window.location = '/openboxes/stockMovement/list?type=REQUEST';
+                  window.location = '/openboxes/stockMovement/list?direction=OUTBOUND';
                 }}
                 className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
               >
@@ -792,7 +787,7 @@ EditItemsPage.propTypes = {
    * Function called with the form data when the handleSubmit()
    * is fired from within the form component.
    */
-  onSubmit: PropTypes.func.isRequired,
+  nextPage: PropTypes.func.isRequired,
   /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */
@@ -807,5 +802,6 @@ EditItemsPage.propTypes = {
   stockMovementTranslationsFetched: PropTypes.bool.isRequired,
   /** Return true if pagination is enabled */
   isPaginated: PropTypes.bool.isRequired,
+  /** Return true if show only */
   showOnly: PropTypes.bool.isRequired,
 };

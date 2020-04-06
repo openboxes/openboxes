@@ -12,11 +12,17 @@
             <g:if test="\${flash.message}">
             	<div class="message">\${flash.message}</div>
             </g:if>
-            <div class="list">
-            
+            <div class="dialog">
+
 				<div class="button-bar">
-                    <g:link class="button" action="list"><warehouse:message code="default.list.label" args="['${domainClass.propertyName}']"/></g:link>
-                    <g:link class="button" action="create"><warehouse:message code="default.add.label" args="['${domainClass.propertyName}']"/></g:link>
+                    <g:link class="button" action="list">
+                        <img src="\${resource(dir: 'images/icons/silk', file: 'application_view_list.png')}" />&nbsp;
+                        <warehouse:message code="default.list.label" args="[g.message(code:'${domainClass.propertyName}.label')]"/>
+                    </g:link>
+                    <g:link class="button" action="create">
+                        <img src="\${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
+                        <warehouse:message code="default.add.label" args="[g.message(code:'${domainClass.propertyName}.label')]"/>
+                    </g:link>
 	        	</div>
 
                 <div class="box">
@@ -53,12 +59,19 @@
                             <%  }   }   } %>
                             </tr>
                         </g:each>
+                        <g:unless test="\${${propertyName}List}">
+                            <tr>
+                                <td colspan="${props.size()}" class="center fade empty">
+                                    <g:message code="default.noResults.label"/>
+                                </td>
+                            </tr>
+                        </g:unless>
                         </tbody>
                     </table>
                 </div>
-            </div>
-            <div class="paginateButtons">
-                <g:paginate total="\${${propertyName}Total}" />
+                <div class="paginateButtons">
+                    <g:paginate total="\${${propertyName}Total}" />
+                </div>
             </div>
         </div>
     </body>

@@ -9,18 +9,20 @@
  **/
 package org.pih.warehouse.order
 
+import grails.validation.ValidationException
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Document
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.User
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.springframework.web.multipart.MultipartFile
 
 class OrderController {
     def orderService
+    def stockMovementService
     def reportService
+    def shipmentService
 
     static allowedMethods = [save: "POST", update: "POST"]
 
@@ -28,26 +30,15 @@ class OrderController {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list = { OrderCommand command ->
 
         def suppliers = orderService.getSuppliers().sort()
 
-        def name = params.name
-        def orderNumber = params.orderNumber
-        def orderTypeCode = params.orderTypeCode ? params.orderTypeCode as OrderTypeCode : null
-        def origin = params.origin ? Location.get(params.origin) : null
-        def destination = params.destination ? Location.get(params.destination) : Location.get(session?.warehouse?.id)
-        def status = params.status ? Enum.valueOf(OrderStatus.class, params.status) : null
+        def orderTemplate = new Order(params)
+        orderTemplate.status = params.status ? Enum.valueOf(OrderStatus.class, params.status) : null
         def statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
         def statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
-        def orderedBy = params.orderedById ? User.get(params.orderedById) : null
-
-        def orders = orderService.getOrders(name, orderNumber, destination, origin, orderedBy, orderTypeCode, status, statusStartDate, statusEndDate)
-
-        // sort by order date
-        orders = orders.sort({ a, b ->
-            return b.dateOrdered <=> a.dateOrdered
-        })
+        def orders = orderService.getOrders(orderTemplate, statusStartDate, statusEndDate, params)
 
         def totalPrice = 0.00
         if (orders) {
@@ -56,10 +47,16 @@ class OrderController {
 
         def orderedByList = orders.collect { it.orderedBy }.unique()
 
-        [orders       : orders, origin: origin?.id, destination: destination?.id,
-         status       : status, statusStartDate: statusStartDate, statusEndDate: statusEndDate,
-         suppliers    : suppliers, totalPrice: totalPrice, orderedByList: orderedByList,
-         orderTypeCode: orderTypeCode
+        [
+                orders         : orders,
+                command        : command,
+                status         : orderTemplate.status,
+                statusStartDate: statusStartDate,
+                statusEndDate  : statusEndDate,
+                suppliers      : suppliers,
+                totalPrice     : totalPrice,
+                orderedByList  : orderedByList,
+                orderTypeCode  : orderTemplate?.orderTypeCode
         ]
     }
 
@@ -70,6 +67,45 @@ class OrderController {
 
     def create = {
         redirect(controller: 'purchaseOrderWorkflow', action: 'index')
+    }
+
+
+
+    def shipOrder = {
+        Order orderInstance = Order.get(params.id)
+        [orderInstance:orderInstance]
+    }
+
+    def saveShipmentItems = { ShipOrderCommand command ->
+        log.info "Command: ${command}"
+        if (!command.validate() || command.hasErrors()) {
+            render(view: "shipOrderItems", model: [orderInstance: command.order, command: command])
+            return
+        }
+
+        try {
+            String commandId = command.order.id
+            Order order = Order.get(commandId)
+            def pendingShipments = order.getShipmentsByStatus(ShipmentStatusCode.PENDING)
+            if (pendingShipments.size() > 0) {
+                String shipmentId = pendingShipments.first().id
+                shipmentService.updateOrCreateOrderBasedShipmentItems(command.order, Shipment.get(shipmentId))
+                redirect(controller: 'stockMovement', action: 'createPurchaseOrders', params: [id: shipmentId])
+                return
+            }
+            Shipment shipment = stockMovementService.createInboundShipment(command)
+            if (shipment) {
+                redirect(controller: 'stockMovement', action: 'createPurchaseOrders', params: [id: shipment.id])
+                return
+            }
+        } catch (ValidationException e) {
+            command.errors = e.errors
+            command.order = Order.load(command.order.id)
+            render (view: "shipOrder", model: [command:command, orderInstance: command.order])
+            return
+
+        }
+        redirect (action: "shipOrder", id: command.order.id)
     }
 
     def save = {
@@ -104,7 +140,7 @@ class OrderController {
 
     def placeOrder = {
         log.info "Issue order " + params
-        def orderInstance = orderService.placeOrder(params.id)
+        def orderInstance = orderService.placeOrder(params.id, session.user.id)
         if (orderInstance) {
             if (orderInstance.hasErrors()) {
                 render(view: 'show', model: [orderInstance: orderInstance])
@@ -162,6 +198,87 @@ class OrderController {
             redirect(action: "list")
         }
     }
+
+    def addAdjustment = {
+        def orderInstance = Order.get(params?.id)
+        if (!orderInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
+            redirect(action: "list")
+        } else {
+            render(view: "editAdjustment", model: [orderInstance: orderInstance, orderAdjustment: new OrderAdjustment()])
+        }
+    }
+
+    def editAdjustment = {
+        log.info "params: ${params}"
+        def orderInstance = Order.get(params?.order?.id)
+        if (!orderInstance) {
+                log.info "order not found"
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
+            redirect(action: "list")
+        } else {
+            def orderAdjustment = OrderAdjustment.get(params?.id)
+            if (!orderAdjustment) {
+                log.info "order adjustement not found"
+                flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'comment.label', default: 'Comment'), commentInstance.id])}"
+                redirect(action: "show", id: orderInstance?.id)
+            }
+            render(view: "editAdjustment", model: [orderInstance: orderInstance, orderAdjustment: orderAdjustment])
+        }
+    }
+
+    def saveAdjustment = {
+        def orderInstance = Order.get(params?.order?.id)
+        if (orderInstance) {
+            def orderAdjustment = OrderAdjustment.get(params?.id)
+            if (orderAdjustment) {
+                orderAdjustment.properties = params
+                if (!orderAdjustment.hasErrors() && orderAdjustment.save(flush: true)) {
+                    flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'orderAdjustment.label', default: 'Order Adjustment'), orderAdjustment.id])}"
+                    redirect(action: "show", id: orderInstance.id)
+                } else {
+                    render(view: "editAdjustment", model: [orderInstance: orderInstance, orderAdjustment: orderAdjustment])
+                }
+            } else {
+                orderAdjustment = new OrderAdjustment(params)
+                orderInstance.addToOrderAdjustments(orderAdjustment)
+                if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
+                    flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.id])}"
+                    redirect(action: "show", id: orderInstance.id)
+                } else {
+                    render(view: "editAdjustment", model: [orderInstance: orderInstance, orderAdjustment: orderAdjustment])
+                }
+            }
+        } else {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
+            redirect(action: "list")
+        }
+
+    }
+
+    def deleteAdjustment = {
+        def orderInstance = Order.get(params.order.id)
+        if (!orderInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.order.id])}"
+            redirect(action: "list")
+        } else {
+            def orderAdjustment = OrderAdjustment.get(params?.id)
+            if (!orderAdjustment) {
+                flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'orderAdjustment.label', default: 'Order Adjustment'), params.id])}"
+                redirect(action: "show", id: orderInstance?.id)
+            } else {
+                orderInstance.removeFromOrderAdjustments(orderAdjustment)
+                orderAdjustment.delete()
+                if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
+                    flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.id])}"
+                    redirect(action: "show", id: orderInstance.id)
+                } else {
+                    render(view: "show", model: [orderInstance: orderInstance])
+                }
+            }
+        }
+    }
+
 
 
     def addComment = {
@@ -549,4 +666,9 @@ class OrderController {
     }
 
 
+    def redirectFromStockMovement = {
+        def stockMovement = stockMovementService.getStockMovement(params.id)
+        def shipmentItem = stockMovement?.getShipment()?.getShipmentItems()?.first()
+        redirect(action: 'show', params: [id: shipmentItem?.orderItems*.order*.id])
+    }
 }

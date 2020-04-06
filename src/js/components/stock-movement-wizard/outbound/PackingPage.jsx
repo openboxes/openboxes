@@ -11,16 +11,16 @@ import { getTranslate } from 'react-localize-redux';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-import ArrayField from '../form-elements/ArrayField';
-import TextField from '../form-elements/TextField';
-import { renderFormField } from '../../utils/form-utils';
-import LabelField from '../form-elements/LabelField';
-import SelectField from '../form-elements/SelectField';
-import apiClient, { flattenRequest } from '../../utils/apiClient';
-import { showSpinner, hideSpinner } from '../../actions';
-import PackingSplitLineModal from './modals/PackingSplitLineModal';
-import { debounceUsersFetch } from '../../utils/option-utils';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
+import ArrayField from '../../form-elements/ArrayField';
+import TextField from '../../form-elements/TextField';
+import { renderFormField } from '../../../utils/form-utils';
+import LabelField from '../../form-elements/LabelField';
+import SelectField from '../../form-elements/SelectField';
+import apiClient, { flattenRequest } from '../../../utils/apiClient';
+import { showSpinner, hideSpinner } from '../../../actions';
+import PackingSplitLineModal from '../modals/PackingSplitLineModal';
+import { debounceUsersFetch } from '../../../utils/option-utils';
+import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
 
 const FIELDS = {
   packPageItems: {
@@ -230,7 +230,6 @@ class PackingPage extends Component {
         this.props.hideSpinner();
       });
 
-
     if (!this.props.isPaginated) {
       this.fetchLineItems().then((response) => {
         this.setPackPageItems(response);
@@ -311,7 +310,7 @@ class PackingPage extends Component {
     const status = 'CHECKING';
     const payload = { status };
 
-    if (this.state.values.statusCode !== status) {
+    if (this.state.values.statusCode !== 'PACKED') {
       return apiClient.post(url, payload);
     }
     return Promise.resolve();
@@ -329,7 +328,7 @@ class PackingPage extends Component {
         this.transitionToNextStep()
           .then(() => {
             this.props.hideSpinner();
-            this.props.onSubmit(formValues);
+            this.props.nextPage(formValues);
           })
           .catch(() => this.props.hideSpinner());
       })
@@ -425,11 +424,11 @@ class PackingPage extends Component {
                   <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
                 </button>
               </span>
-              :
+                :
               <button
                 type="button"
                 disabled={invalid}
-                onClick={() => { window.location = '/openboxes/stockMovement/list?type=REQUEST'; }}
+                onClick={() => { window.location = '/openboxes/stockMovement/list?direction=OUTBOUND'; }}
                 className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
               >
                 <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>
@@ -492,7 +491,7 @@ PackingPage.propTypes = {
    * Function called with the form data when the handleSubmit()
    * is fired from within the form component.
    */
-  onSubmit: PropTypes.func.isRequired,
+  nextPage: PropTypes.func.isRequired,
   /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */
@@ -505,5 +504,6 @@ PackingPage.propTypes = {
   hasBinLocationSupport: PropTypes.bool.isRequired,
   /** Return true if pagination is enabled */
   isPaginated: PropTypes.bool.isRequired,
+  /** Return true if show only */
   showOnly: PropTypes.bool.isRequired,
 };

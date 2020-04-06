@@ -9,10 +9,12 @@
  **/
 package org.pih.warehouse.order
 
-
+import grails.validation.ValidationException
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.grails.plugins.csv.CSVMapReader
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductException
@@ -20,49 +22,53 @@ import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentException
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.shipping.ShipmentService
 
 class OrderService {
 
     boolean transactional = true
 
-    def productService
-    def shipmentService
-    def identifierService
-    def inventoryService
+    UserService userService
+    ShipmentService shipmentService
+    IdentifierService identifierService
+    InventoryService inventoryService
+    GrailsApplication grailsApplication
 
-
-    List<Order> getOrders(String name, String orderNumber, Location destination, Location origin, User orderedBy, OrderTypeCode orderTypeCode, OrderStatus status, Date orderedFromDate, Date orderedToDate) {
-        def orders = Order.withCriteria {
+    def getOrders(Order orderTemplate, Date dateOrderedFrom, Date dateOrderedTo, Map params) {
+        def orders = Order.createCriteria().list(params) {
             and {
-                if (name) {
+                if (orderTemplate.name || orderTemplate.description) {
                     or {
-                        ilike("name", "%" + name + "%")
-                        ilike("description", "%" + name + "%")
+                        ilike("name", "%" + orderTemplate.name + "%")
+                        ilike("description", "%" + orderTemplate.name + "%")
                     }
                 }
-                if (orderNumber) {
-                    ilike("orderNumber", "%" + orderNumber + "%")
+                if (orderTemplate.orderNumber) {
+                    ilike("orderNumber", "%" + orderTemplate.orderNumber + "%")
                 }
-                if (orderTypeCode) {
-                    eq("orderTypeCode", orderTypeCode)
+                if (orderTemplate.orderTypeCode) {
+                    eq("orderTypeCode", orderTemplate.orderTypeCode)
                 }
-                if (destination) eq("destination", destination)
-                if (origin) {
-                    eq("origin", origin)
+                if (orderTemplate.destination) {
+                    eq("destination", orderTemplate.destination)
                 }
-                if (status) {
-                    eq("status", status)
+                if (orderTemplate.origin) {
+                    eq("origin", orderTemplate.origin)
                 }
-                if (orderedFromDate) {
-                    ge("dateOrdered", orderedFromDate)
+                if (orderTemplate.status) {
+                    eq("status", orderTemplate.status)
                 }
-                if (orderedToDate) {
-                    le("dateOrdered", orderedToDate)
+                if (dateOrderedFrom) {
+                    ge("dateOrdered", dateOrderedFrom)
                 }
-                if (orderedBy) {
-                    eq("orderedBy", orderedBy)
+                if (dateOrderedTo) {
+                    le("dateOrdered", dateOrderedTo)
+                }
+                if (orderTemplate.orderedBy) {
+                    eq("orderedBy", orderTemplate.orderedBy)
                 }
             }
+            order("dateOrdered", "desc")
         }
         return orders
     }
@@ -138,7 +144,7 @@ class OrderService {
      */
     OrderCommand saveOrderShipment(OrderCommand orderCommand) {
         def shipmentInstance = new Shipment()
-        def shipments = orderCommand?.order?.listShipments()
+        def shipments = orderCommand?.order?.shipments
         def numberOfShipments = (shipments) ? shipments?.size() + 1 : 1
 
         shipmentInstance.name = orderCommand?.order?.name + " - " + "Shipment #" + numberOfShipments
@@ -171,11 +177,8 @@ class OrderService {
                 shipmentItem.quantity = orderItemCommand.quantityReceived
                 shipmentItem.recipient = orderCommand?.recipient
                 shipmentItem.inventoryItem = inventoryItem
+                shipmentItem.addToOrderItems(orderItemCommand?.orderItem)
                 shipmentInstance.addToShipmentItems(shipmentItem)
-
-                def orderShipment = new OrderShipment(shipmentItem: shipmentItem, orderItem: orderItemCommand?.orderItem)
-                shipmentItem.addToOrderShipments(orderShipment)
-                orderItemCommand?.orderItem.addToOrderShipments(orderShipment)
             }
         }
 
@@ -219,6 +222,9 @@ class OrderService {
         // update the status of the order before saving
         order.updateStatus()
 
+        order.originParty = order.originParty?:order?.origin?.organization
+        order.destinationParty = order.destinationParty?:order?.destination?.organization
+
         if (!order.orderNumber) {
             order.orderNumber = identifierService.generateOrderIdentifier()
         }
@@ -226,29 +232,52 @@ class OrderService {
         if (!order.hasErrors() && order.save()) {
             return order
         } else {
-            println order.errors
-            throw new OrderException(message: "Unable to save order due to errors", order: order)
+            throw new ValidationException("Unable to save order due to errors", order.errors)
         }
     }
 
-    Order placeOrder(String id) {
+    Order placeOrder(String id, String userId) {
         def orderInstance = Order.get(id)
+        def userInstance = User.get(userId)
         if (orderInstance) {
             if (orderInstance?.status >= OrderStatus.PLACED) {
                 orderInstance.errors.rejectValue("status", "order.hasAlreadyBeenPlaced.message")
             } else {
                 if (orderInstance?.orderItems?.size() > 0) {
-                    orderInstance.status = OrderStatus.PLACED
-                    if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
-                        return orderInstance
+                    if (canApproveOrder(orderInstance, userInstance)) {
+                        orderInstance.orderItems.each { orderItem ->
+                            orderItem.actualReadyDate = orderItem.estimatedReadyDate
+                        }
+                        orderInstance.status = OrderStatus.PLACED
+                        orderInstance.dateApproved = new Date()
+                        orderInstance.approvedBy = userInstance
+                        if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
+                            return orderInstance
+                        }
                     }
+                    else {
+                        orderInstance.errors.reject("User does not have permission to approve order")
+                    }
+
                 } else {
                     orderInstance.errors.rejectValue("orderItems", "order.mustContainAtLeastOneItem.message")
                 }
             }
         }
         return orderInstance
+    }
 
+    boolean canApproveOrder(Order order, User userInstance) {
+        if (isApprovalRequired(order)) {
+            List<RoleType> defaultRoleTypes = grailsApplication.config.openboxes.purchasing.approval.defaultRoleTypes
+            return userService.hasAnyRoles(userInstance, defaultRoleTypes)
+        }
+        return Boolean.TRUE
+    }
+
+    boolean isApprovalRequired(Order order) {
+        // FIXME this could take order into account (see Order.isApprovalRequired())
+        return grailsApplication.config.openboxes.purchasing.approval.enabled
     }
 
     /**
@@ -308,25 +337,23 @@ class OrderService {
 
         try {
 
-            if (orderInstance.status == OrderStatus.RECEIVED || orderInstance.status == OrderStatus.PARTIALLY_RECEIVED) {
-                orderInstance?.listShipments().each { Shipment shipmentInstance ->
+            if (orderInstance.status in [OrderStatus.PLACED,  OrderStatus.PARTIALLY_RECEIVED, OrderStatus.RECEIVED]) {
+                orderInstance?.shipments?.each { Shipment shipmentInstance ->
                     if (shipmentInstance) {
 
-                        def transactions = Transaction.findAllByIncomingShipment(shipmentInstance)
-                        transactions.each { transactionInstance ->
+                        shipmentInstance.incomingTransactions.each { transactionInstance ->
                             if (transactionInstance) {
                                 shipmentInstance.removeFromIncomingTransactions(transactionInstance)
                                 transactionInstance?.delete()
                             }
                         }
 
-                        shipmentInstance.shipmentItems.toArray().each { shipmentItem ->
+                        shipmentInstance.shipmentItems.flatten().toArray().each { ShipmentItem shipmentItem ->
 
                             // Remove all order shipment records associated with this shipment item
-                            shipmentItem.orderShipments.toArray().each { orderShipment ->
-                                orderShipment.orderItem.removeFromOrderShipments(orderShipment)
-                                orderShipment.shipmentItem.removeFromOrderShipments(orderShipment)
-                                orderShipment.delete()
+                            shipmentItem.orderItems?.flatten().toArray().each { OrderItem orderItem ->
+                                orderItem.removeFromShipmentItems(shipmentItem)
+                                shipmentItem.removeFromOrderItems(orderItem)
                             }
 
                             // Remove the shipment item from the shipment
@@ -336,26 +363,34 @@ class OrderService {
                             shipmentItem.delete()
                         }
 
+                        shipmentInstance.events.toArray().each { Event event ->
+                            shipmentInstance.removeFromEvents(event)
+                            shipmentInstance.currentEvent = null
+                        }
+
                         // Delete all receipt items associated with the receipt
-                        shipmentInstance.receipt.receiptItems.toArray().each { receiptItem ->
+                        shipmentInstance?.receipt?.receiptItems?.toArray().each { receiptItem ->
                             shipmentInstance.receipt.removeFromReceiptItems(receiptItem)
                             receiptItem.delete()
                         }
 
                         // Delete the receipt from the shipment
-                        shipmentInstance.receipt.delete()
+                        if (shipmentInstance.receipt) {
+                            shipmentInstance?.receipt?.delete()
+                        }
 
                         // Delete the shipment
                         shipmentInstance.delete()
 
                     }
                 }
-                orderInstance.status = OrderStatus.PLACED
+                orderInstance.status = OrderStatus.PENDING
+                orderInstance.approvedBy = null
+                orderInstance.dateApproved = null
+
             } else if (orderInstance?.status == OrderStatus.COMPLETED) {
                 deleteTransactions(orderInstance)
                 orderInstance.status = OrderStatus.PENDING
-            } else if (orderInstance.status == OrderStatus.PLACED) {
-                orderInstance?.status = OrderStatus.PENDING
             }
 
 
@@ -471,7 +506,6 @@ class OrderService {
     boolean validateOrderItems(List orderItems) {
         return true
     }
-
 
     List<OrderItem> getPendingInboundOrderItems(Location destination, Product product) {
         def orderItems = OrderItem.createCriteria().list() {

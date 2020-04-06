@@ -20,9 +20,11 @@ enum ActivityCode {
 
     EXTERNAL('EXTERNAL'),
 
+    APPROVE_REQUEST('APPROVE_REQUEST'),
     PLACE_REQUEST('PLACE_REQUEST'),
     FULFILL_REQUEST('FULFILL_REQUEST'),
 
+    APPROVE_ORDER('APPROVE_ORDER'),
     PLACE_ORDER('PLACE_ORDER'),
     FULFILL_ORDER('FULFILL_ORDER'),
 
@@ -50,6 +52,8 @@ enum ActivityCode {
         [
                 MANAGE_INVENTORY,
                 ADJUST_INVENTORY,
+                APPROVE_ORDER,
+                APPROVE_REQUEST,
                 PLACE_ORDER,
                 PLACE_REQUEST,
                 FULFILL_ORDER,

@@ -26,7 +26,7 @@
 	                <div class="dialog">
 	                    <table>
 	                        <tbody>
-	                        
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="container"><warehouse:message code="shipmentItem.container.label" default="Container" /></label>
@@ -35,7 +35,7 @@
 	                                    <g:select name="container.id" from="${org.pih.warehouse.shipping.Container.list()}" optionKey="id" value="${shipmentItemInstance?.container?.id}" noSelection="['null': '']" />
 	                                </td>
 	                            </tr>
-	                        
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="product"><warehouse:message code="shipmentItem.product.label" default="Product" /></label>
@@ -44,7 +44,7 @@
 	                                    <g:select name="product.id" from="${org.pih.warehouse.product.Product.list()}" optionKey="id" value="${shipmentItemInstance?.product?.id}"  />
 	                                </td>
 	                            </tr>
-	                        
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="lotNumber"><warehouse:message code="shipmentItem.lotNumber.label" default="Lot Number" /></label>
@@ -53,7 +53,7 @@
 	                                    <g:textArea name="lotNumber" cols="40" rows="5" value="${shipmentItemInstance?.lotNumber}" />
 	                                </td>
 	                            </tr>
-	                        
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="expirationDate"><warehouse:message code="shipmentItem.expirationDate.label" default="Expiration Date" /></label>
@@ -62,16 +62,16 @@
 	                                    <g:datePicker name="expirationDate" precision="minute" value="${shipmentItemInstance?.expirationDate}" noSelection="['': '']" />
 	                                </td>
 	                            </tr>
-	                        
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="quantity"><warehouse:message code="shipmentItem.quantity.label" default="Quantity" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: shipmentItemInstance, field: 'quantity', 'errors')}">
-	                                    <g:textField name="quantity" value="${shipmentItemInstance?.quantity }" size="10" class="text"/>	                                    
+	                                    <g:textField name="quantity" value="${shipmentItemInstance?.quantity }" size="10" class="text"/>
 	                                </td>
 	                            </tr>
-	                        
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="recipient"><warehouse:message code="shipmentItem.recipient.label" default="Recipient" /></label>
@@ -80,7 +80,7 @@
 	                                    <g:select name="recipient.id" from="${org.pih.warehouse.core.Person.list()}" optionKey="id" value="${shipmentItemInstance?.recipient?.id}" noSelection="['null': '']" />
 	                                </td>
 	                            </tr>
-	                        
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="inventoryItem"><warehouse:message code="shipmentItem.inventoryItem.label" default="Inventory Item" /></label>
@@ -98,7 +98,7 @@
 	                                    <g:select name="donor.id" from="${org.pih.warehouse.donation.Donor.list()}" optionKey="id" value="${shipmentItemInstance?.donor?.id}" noSelection="['null': '']" />
 	                                </td>
 	                            </tr>
-	                        
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="dateCreated"><warehouse:message code="shipmentItem.dateCreated.label" default="Date Created" /></label>
@@ -107,7 +107,7 @@
 	                                    <g:datePicker name="dateCreated" precision="minute" value="${shipmentItemInstance?.dateCreated}"  />
 	                                </td>
 	                            </tr>
-	                        
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="lastUpdated"><warehouse:message code="shipmentItem.lastUpdated.label" default="Last Updated" /></label>
@@ -116,41 +116,38 @@
 	                                    <g:datePicker name="lastUpdated" precision="minute" value="${shipmentItemInstance?.lastUpdated}"  />
 	                                </td>
 	                            </tr>
-	                        
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="orderShipments"><warehouse:message code="shipmentItem.orderShipments.label" default="Order Shipments" /></label>
+	                                  <label for="orderItems"><warehouse:message code="shipmentItem.orderItems.label" default="Order Items" /></label>
 	                                </td>
-	                                <td valign="top" class="value ${hasErrors(bean: shipmentItemInstance, field: 'orderShipments', 'errors')}">
-	                                    
-<ul>
-<g:each in="${shipmentItemInstance?.orderShipments?}" var="o">
-    <li><g:link controller="orderShipment" action="show" id="${o.id}">${o?.encodeAsHTML()}</g:link></li>
-</g:each>
-</ul>
-<g:link controller="orderShipment" action="create" params="['shipmentItem.id': shipmentItemInstance?.id]">${warehouse.message(code: 'default.add.label', args: [warehouse.message(code: 'orderShipment.label', default: 'OrderShipment')])}</g:link>
-
+	                                <td valign="top" class="value ${hasErrors(bean: shipmentItemInstance, field: 'orderItems', 'errors')}">
+										<ul id="orderItems">
+											<g:each in="${shipmentItemInstance?.orderItems?}" var="o">
+												<li><g:link controller="orderItem" action="show" id="${o.id}">${o?.encodeAsHTML()}</g:link></li>
+											</g:each>
+										</ul>
 	                                </td>
 	                            </tr>
-	                        
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
-	                                  <label for="shipment"><warehouse:message code="shipmentItem.shipment.label" default="Shipment" /></label>
+	                                  <label for="shipment.id"><warehouse:message code="shipmentItem.shipment.label" default="Shipment" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: shipmentItemInstance, field: 'shipment', 'errors')}">
 	                                    <g:select name="shipment.id" from="${org.pih.warehouse.shipping.Shipment.list()}" optionKey="id" value="${shipmentItemInstance?.shipment?.id}"  />
 	                                </td>
 	                            </tr>
-	                        	                        
+
                             	<tr class="prop">
 		                        	<td valign="top"></td>
-		                        	<td valign="top">                        	
+		                        	<td valign="top">
 						                <div class="buttons">
 						                    <g:actionSubmit class="save" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
 						                    <g:actionSubmit class="delete" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
 						                </div>
-		    						</td>                    	
-	                        	</tr>	                        
+		    						</td>
+	                        	</tr>
 	                        </tbody>
 	                    </table>
 	                </div>

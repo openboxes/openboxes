@@ -12,16 +12,16 @@ import { confirmAlert } from 'react-confirm-alert';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-import ArrayField from '../form-elements/ArrayField';
-import LabelField from '../form-elements/LabelField';
-import { renderFormField } from '../../utils/form-utils';
+import ArrayField from '../../form-elements/ArrayField';
+import LabelField from '../../form-elements/LabelField';
+import { renderFormField } from '../../../utils/form-utils';
 
-import EditPickModal from './modals/EditPickModal';
-import { showSpinner, hideSpinner, fetchReasonCodes } from '../../actions';
-import TableRowWithSubfields from '../form-elements/TableRowWithSubfields';
-import apiClient, { parseResponse, flattenRequest } from '../../utils/apiClient';
-import ButtonField from '../form-elements/ButtonField';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
+import EditPickModal from '../modals/EditPickModal';
+import { showSpinner, hideSpinner, fetchReasonCodes } from '../../../actions';
+import TableRowWithSubfields from '../../form-elements/TableRowWithSubfields';
+import apiClient, { parseResponse, flattenRequest } from '../../../utils/apiClient';
+import ButtonField from '../../form-elements/ButtonField';
+import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
 
 const FIELDS = {
   pickPageItems: {
@@ -285,6 +285,8 @@ class PickPage extends Component {
       .then((resp) => {
         const { totalCount } = resp.data;
         const { associations } = resp.data.data;
+        const { pickPageItems } = resp.data.data.pickPage;
+
         const printPicks = _.find(
           associations.documents,
           doc => doc.documentType === 'PICKLIST' && doc.uri.includes('print'),
@@ -292,6 +294,11 @@ class PickPage extends Component {
         this.setState({
           totalCount,
           printPicksUrl: printPicks ? printPicks.uri : '/',
+          values: {
+            ...this.state.values,
+            pickPageItems: _.map(parseResponse(pickPageItems), item =>
+              this.checkForInitialPicksChanges(item)),
+          },
           sorted: false,
         }, () => this.fetchBins());
       })
@@ -376,9 +383,12 @@ class PickPage extends Component {
    */
   transitionToNextStep() {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
-    const payload = { status: this.props.hasPackingSupport ? 'PICKED' : 'CHECKING' };
+    const payload = { status: 'PICKED' };
 
-    return apiClient.post(url, payload);
+    if (this.state.values.statusCode !== 'PICKED' && this.state.values.statusCode !== 'PACKED') {
+      return apiClient.post(url, payload);
+    }
+    return Promise.resolve();
   }
 
   /**
@@ -389,7 +399,7 @@ class PickPage extends Component {
   nextPage(formValues) {
     this.props.showSpinner();
     this.transitionToNextStep()
-      .then(() => this.props.onSubmit(formValues))
+      .then(() => this.props.nextPage(formValues))
       .catch(() => this.props.hideSpinner());
   }
 
@@ -544,9 +554,9 @@ class PickPage extends Component {
                     style={{ display: 'none' }}
                     onChange={this.importTemplate}
                     onClick={(event) => {
-                  // eslint-disable-next-line no-param-reassign
-                  event.target.value = null;
-                }}
+                      // eslint-disable-next-line no-param-reassign
+                      event.target.value = null;
+                    }}
                     accept=".csv"
                   />
                 </label>
@@ -588,10 +598,10 @@ class PickPage extends Component {
                   {!this.state.sorted && <span><i className="fa fa-sort pr-2" /><Translate id="react.stockMovement.sortByBins.label" defaultMessage="Sort by bins" /></span>}
                 </button>
               </span>
-              :
+                :
               <button
                 type="button"
-                onClick={() => { window.location = '/openboxes/stockMovement/list?type=REQUEST'; }}
+                onClick={() => { window.location = '/openboxes/stockMovement/list?direction=OUTBOUND'; }}
                 className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
               >
                 <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>
@@ -635,7 +645,6 @@ const mapStateToProps = state => ({
   reasonCodes: state.reasonCodes.data,
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
-  hasPackingSupport: state.session.currentLocation.hasPackingSupport,
   isPaginated: state.session.isPaginated,
 });
 
@@ -648,7 +657,7 @@ PickPage.propTypes = {
    * Function called with the form data when the handleSubmit()
    * is fired from within the form component.
    */
-  onSubmit: PropTypes.func.isRequired,
+  nextPage: PropTypes.func.isRequired,
   /** Function returning user to the previous page */
   previousPage: PropTypes.func.isRequired,
   /** Function called when data is loading */
@@ -665,9 +674,8 @@ PickPage.propTypes = {
   translate: PropTypes.func.isRequired,
   /** Is true when currently selected location supports bins */
   hasBinLocationSupport: PropTypes.bool.isRequired,
-  /** Is true when currently selected location supports packing */
-  hasPackingSupport: PropTypes.bool.isRequired,
   /** Return true if pagination is enabled */
   isPaginated: PropTypes.bool.isRequired,
+  /** Return true if show only */
   showOnly: PropTypes.bool.isRequired,
 };

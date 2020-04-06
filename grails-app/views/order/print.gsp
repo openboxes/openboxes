@@ -46,7 +46,7 @@
         </div>
         <div class="right">
             <div class="title">
-                <warehouse:message code="order.label"/>
+                <warehouse:message code="enum.OrderTypeCode.${orderInstance?.orderTypeCode}"/>
             </div>
             <table width="25%">
                 <tr>
@@ -212,12 +212,30 @@
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <th colspan="6">
+                                        <th colspan="6" class="right">
+                                            <warehouse:message code="default.subtotal.label" default="Subtotal"/>
+                                        </th>
+                                        <th class="right">
+                                            <g:formatNumber number="${orderInstance?.subtotal}"/>
+                                            ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th colspan="6" class="right">
+                                            <warehouse:message code="default.adjustments.label" default="Adjustments"/>
+                                        </th>
+                                        <th class="right">
+                                            <g:formatNumber number="${orderInstance?.totalAdjustments}"/>
+                                            ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th colspan="6" class="right">
                                             <warehouse:message code="default.total.label"/>
                                         </th>
                                         <th class="right">
-                                            <g:formatNumber number="${orderInstance?.totalPrice()}"/>
-                                            ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                            <g:formatNumber number="${orderInstance?.total}"/>
+                                            ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                         </th>
                                     </tr>
                                 </tfoot>
