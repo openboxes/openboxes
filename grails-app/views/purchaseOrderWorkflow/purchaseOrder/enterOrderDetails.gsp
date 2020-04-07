@@ -67,19 +67,6 @@
                                 </td>
                             </tr>
                             <tr class='prop'>
-                                <td valign='top' class='name middle'><label for='dateOrdered'><warehouse:message code="order.dateOrdered.label"/></label></td>
-                                <td valign='top'
-                                    class='value ${hasErrors(bean:order,field:'dateOrdered','errors')}'>
-                                    <g:jqueryDatePicker
-                                            id="dateOrdered"
-                                            name="dateOrdered"
-                                            value="${order?.dateOrdered?:new Date() }"
-                                            format="MM/dd/yyyy"
-                                            size="30"
-                                            showTrigger="false" />
-                                </td>
-                            </tr>
-                            <tr class='prop'>
                                 <td valign='top' class='name middle'>
                                     <label for="destination.id"><warehouse:message code="order.destination.label"/></label>
                                 </td>
@@ -118,14 +105,25 @@
                                     <g:selectPaymentTerm name="paymentTerm.id" value="${order?.paymentTerm?.id}" class="chzn-select-deselect" noSelection="['':'']"/>
                                 </td>
                             </tr>
-
-
                             <tr class='prop'>
-                                <td valign='top' class='name middle'><label for='orderedBy.id'><warehouse:message code="order.createdBy.label"/></label></td>
+                                <td valign='top' class='name middle'><label for='orderedBy.id'><warehouse:message code="order.orderedBy.label"/></label></td>
                                 <td valign='top'
                                     class='value ${hasErrors(bean:order,field:'orderedBy','errors')}'>
-                                    <g:select class="chzn-select-deselect" name="orderedBy.id" from="${org.pih.warehouse.core.Person.list().sort()}"
-                                              optionKey="id" value="${order?.orderedBy?.id}" noSelection="['null':'']" />
+                                    <g:selectPerson id="orderedBy.id" name="orderedBy.id" value="${order?.orderedBy?.id}"
+                                                    noSelection="['null':'']" class="chzn-select-deselect"/>
+                                </td>
+                            </tr>
+                            <tr class='prop'>
+                                <td valign='top' class='name middle'><label for='dateOrdered'><warehouse:message code="order.dateOrdered.label"/></label></td>
+                                <td valign='top'
+                                    class='value ${hasErrors(bean:order,field:'dateOrdered','errors')}'>
+                                    <g:jqueryDatePicker
+                                            id="dateOrdered"
+                                            name="dateOrdered"
+                                            value="${order?.dateOrdered?:new Date() }"
+                                            format="MM/dd/yyyy"
+                                            size="30"
+                                            showTrigger="false" />
                                 </td>
                             </tr>
                         </tbody>

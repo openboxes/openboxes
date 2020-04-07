@@ -34,6 +34,7 @@ class Order implements Serializable {
     Person approvedBy
     Person orderedBy
     Person completedBy
+    Person createdBy
 
     Date dateApproved
     Date dateOrdered
@@ -108,6 +109,7 @@ class Order implements Serializable {
         paymentTerm(nullable: true)
         dateCreated(nullable: true)
         lastUpdated(nullable: true)
+        createdBy(nullable: false)
     }
 
     /**

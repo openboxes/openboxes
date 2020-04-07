@@ -12,6 +12,7 @@ package org.pih.warehouse.order
 import grails.validation.ValidationException
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.grails.plugins.csv.CSVMapReader
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryService
@@ -66,6 +67,9 @@ class OrderService {
                 }
                 if (orderTemplate.orderedBy) {
                     eq("orderedBy", orderTemplate.orderedBy)
+                }
+                if (orderTemplate.createdBy) {
+                    eq("createdBy", orderTemplate.createdBy)
                 }
             }
             order("dateOrdered", "desc")
@@ -224,9 +228,16 @@ class OrderService {
 
         order.originParty = order.originParty?:order?.origin?.organization
         order.destinationParty = order.destinationParty?:order?.destination?.organization
+        order.lastUpdated = new Date()
 
         if (!order.orderNumber) {
             order.orderNumber = identifierService.generateOrderIdentifier()
+        }
+        if (!order.dateCreated) {
+            order.dateCreated = new Date()
+        }
+        if (!order.createdBy) {
+            order.createdBy = AuthService.getCurrentUser().get()
         }
 
         if (!order.hasErrors() && order.save()) {
