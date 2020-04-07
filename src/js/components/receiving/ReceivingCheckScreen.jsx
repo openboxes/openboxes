@@ -235,7 +235,7 @@ class ReceivingCheckScreen extends Component {
   static cancelRemaining(shipmentItem) {
     return {
       ...shipmentItem,
-      cancelRemaining: true,
+      cancelRemaining: shipmentItem.quantityRemaining > 0,
     };
   }
   constructor(props) {
