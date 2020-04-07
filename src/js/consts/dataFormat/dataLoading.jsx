@@ -68,7 +68,7 @@ function getHorizontalBarColors(type, index) {
   return horizontalColors;
 }
 
-let index = 0;
+let index = 5;
 function loadColorDataset(data, chart, subtype) {
   const datasets = data;
   index = index > 7 ? index % 8 : index;
