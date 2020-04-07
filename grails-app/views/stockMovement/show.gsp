@@ -68,26 +68,31 @@
                 <warehouse:message code="default.button.edit.label" />
             </g:link>
 
-            <g:set var="hasBeenIssued" value="${stockMovement?.statusCode==RequisitionStatus.toStockMovementStatus(RequisitionStatus.ISSUED).toString()}"/>
+            <%-- TODO  Move status to stock movement; make consistent across all types --%>
+            <g:set var="hasBeenIssued" value="${stockMovement?.requisition?.status==RequisitionStatus.ISSUED}"/>
             <g:set var="hasBeenReceived" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.RECEIVED}"/>
             <g:set var="hasBeenPartiallyReceived" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.PARTIALLY_RECEIVED}"/>
             <g:set var="hasBeenShipped" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.SHIPPED}"/>
             <g:set var="hasBeenPending" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.PENDING}"/>
+            <g:set var="hasBeenPlaced" value="${stockMovement?.isFromOrder && hasBeenShipped}"/>
             <g:set var="isSameLocation" value="${stockMovement?.destination?.id==session.warehouse.id}"/>
-            <g:set var="disableReceivingButton" value="${!hasBeenIssued || !isSameLocation || !(hasBeenShipped || hasBeenPartiallyReceived)}"/>
+            <g:set var="disableReceivingButton" value="${!(hasBeenIssued || hasBeenPlaced) || !isSameLocation || !(hasBeenShipped || hasBeenPartiallyReceived)}"/>
             <g:set var="showRollbackLastReceiptButton" value="${hasBeenReceived || hasBeenPartiallyReceived}"/>
             <g:if test="${!(hasBeenShipped || hasBeenPartiallyReceived)}">
                 <g:set var="disabledMessage" value="${g.message(code:'stockMovement.hasNotBeenShipped.message', args: [stockMovement?.identifier])}"/>
             </g:if>
-            <g:if test="${!hasBeenIssued}">
+            <g:elseif test="${!hasBeenPlaced}">
+                <g:set var="disabledMessage" value="${g.message(code:'stockMovement.hasNotBeenPlaced.message', args: [stockMovement?.identifier])}"/>
+            </g:elseif>
+            <g:elseif test="${!hasBeenIssued}">
                 <g:set var="disabledMessage" value="${g.message(code:'stockMovement.hasNotBeenIssued.message', args: [stockMovement?.identifier])}"/>
-            </g:if>
-            <g:if test="${hasBeenReceived}">
+            </g:elseif>
+            <g:elseif test="${hasBeenReceived}">
                 <g:set var="disabledMessage" value="${g.message(code:'stockMovement.hasAlreadyBeenReceived.message', args: [stockMovement?.identifier])}"/>
-            </g:if>
-            <g:if test="${!isSameLocation}">
+            </g:elseif>
+            <g:elseif test="${!isSameLocation}">
                 <g:set var="disabledMessage" value="${g.message(code:'stockMovement.isDifferentLocation.message')}"/>
-            </g:if>
+            </g:elseif>
             <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button"
                     disabled="${disableReceivingButton}" disabledMessage="${disabledMessage}">
                 <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
@@ -100,7 +105,7 @@
                         <warehouse:message code="stockMovement.rollbackLastReceipt.label" />
                     </g:link>
                 </g:if>
-                <g:elseif test="${stockMovement?.requisition?.status == RequisitionStatus.ISSUED}">
+                <g:elseif test="${hasBeenIssued}">
                     <g:link controller="stockMovement" action="rollback" id="${stockMovement.id}" class="button">
                         <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
                         <warehouse:message code="default.button.rollback.label" />
