@@ -4,7 +4,6 @@ import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.codehaus.groovy.grails.validation.Validateable
-import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -15,6 +14,7 @@ import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.ReferenceNumber
+import org.pih.warehouse.shipping.ReferenceNumberType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
@@ -208,6 +208,10 @@ class StockMovement {
         String statusCode = (shipment.status.code == ShipmentStatusCode.SHIPPED) ?
                 RequisitionStatus.ISSUED.toString() : RequisitionStatus.PENDING.toString()
 
+        ReferenceNumber trackingNumber = shipment?.referenceNumbers?.find { ReferenceNumber rn ->
+            rn.referenceNumberType.id == Constants.TRACKING_NUMBER_TYPE_ID
+        }
+
         StockMovement stockMovement = new StockMovement(
                 id: shipment.id,
                 name: shipment.name,
@@ -227,7 +231,10 @@ class StockMovement {
                 shipment: shipment,
                 isFromOrder: shipment?.isFromPurchaseOrder,
                 isShipped: shipment?.status?.code >= ShipmentStatusCode.SHIPPED,
-                isReceived: shipment?.status?.code >= ShipmentStatusCode.RECEIVED
+                isReceived: shipment?.status?.code >= ShipmentStatusCode.RECEIVED,
+                driverName: shipment.driverName,
+                trackingNumber: trackingNumber?.identifier,
+                comments: shipment.additionalInformation,
         )
 
         if (shipment.shipmentItems) {
