@@ -1,40 +1,93 @@
-/* global _ */
-function getColor() {
-  const colors = [
-    '#6fb98f',
-    '#004445',
-    '#2e5685',
-    '#fcc169',
-    '#cf455c',
-    '#ff0000',
-    '#e89da2',
-    '#e0b623',
-    '#444444',
-  ];
-  return colors[_.random(0, colors.length - 1)];
+function getColor(color = 'states', type = 'normal', index = 0) {
+  const colors = {
+    default: '#8798ad',
+    primary: {
+      normal: '#0ddbdd',
+      dark: '#08c6c8',
+      light: '#52e8e8',
+    },
+    secondary: {
+      normal: '#ea6227',
+      dark: '#d05622',
+      light: '#ff9c72',
+    },
+    tertiary: {
+      normal: '#0c60e5',
+      dark: '#0a58d5',
+      light: '#186cf2',
+    },
+    states: {
+      normal: [
+        '#f57c00',
+        '#fbc02d',
+        '#689f38',
+        '#00796b',
+        '#0288d1',
+        '#303f9f',
+        '#7b1fa2',
+        '#d32f2f',
+      ],
+      dark: [
+        '#e65100',
+        '#f57f17',
+        '#33691e',
+        '#004d40',
+        '#01579b',
+        '#1a237e',
+        '#4a148c',
+        '#b71c1c',
+      ],
+      light: [
+        '#ffa726',
+        '#ffee58',
+        '#9ccc65',
+        '#26a69a',
+        '#29b6f6',
+        '#5c6bc0',
+        '#ab47bc',
+        '#ef5350',
+      ],
+    },
+  };
+
+  try {
+    return colors[color][type][index];
+  } catch (error) {
+    return colors.default;
+  }
 }
 
+function getHorizontalBarColors(type, index) {
+  const horizontalColors = [];
+  for (let i = 0; i < 5; i += 1) {
+    horizontalColors.push(getColor('states', type, i + (index % 8)));
+  }
+  return horizontalColors;
+}
+
+let index = 0;
 function loadColorDataset(data, chart, subtype) {
   const datasets = data;
-  const color = getColor();
+  index = index > 7 ? index % 8 : index;
 
   if (chart === 'line') {
-    datasets.borderColor = color;
-    datasets.pointBackgroundColor = color;
+    datasets.borderColor = getColor('states', 'normal', index);
+    datasets.pointBackgroundColor = getColor('states', 'normal', index);
     datasets.pointHoverBackgroundColor = '#fff';
-    datasets.pointHoverBorderColor = color;
+    datasets.pointHoverBorderColor = getColor('states', 'normal', index);
     datasets.lineTension = 0;
     datasets.fill = !subtype;
   } if (chart === 'bar') {
-    datasets.backgroundColor = color;
-    datasets.hoverBackgroundColor = color;
+    datasets.backgroundColor = getColor('states', 'normal', index);
+    datasets.hoverBackgroundColor = getColor('states', 'dark', index);
   } if (chart === 'horizontalBar') {
-    datasets.backgroundColor = [getColor(), getColor(), getColor(), getColor(), getColor()];
-    datasets.hoverBackgroundColor = datasets.backgroundColor;
+    datasets.backgroundColor = getHorizontalBarColors('normal', index);
+    datasets.hoverBackgroundColor = getHorizontalBarColors('dark', index);
   } if (chart === 'doughnut') {
-    datasets.backgroundColor = color;
+    datasets.backgroundColor = getColor('states', 'normal', index);
   }
 
+  index += 1;
   return datasets;
 }
 
@@ -52,11 +105,20 @@ function loadOptions(isStacked = false) {
     scales: isStacked ? {
       xAxes: [{
         stacked: true,
+        gridLines: {
+          color: 'transparent',
+        },
       }],
       yAxes: [{
         stacked: true,
       }],
-    } : null,
+    } : {
+      xAxes: [{
+        gridLines: {
+          color: 'transparent',
+        },
+      }],
+    },
     tooltips: {
       displayColors: false,
       enabled: true,
