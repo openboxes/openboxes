@@ -4,6 +4,7 @@ import { Line, Bar, Doughnut, HorizontalBar } from 'react-chartjs-2';
 import { SortableElement, sortableHandle } from 'react-sortable-hoc';
 import LoadingCard from './LoadingCard';
 import Numbers from './Numbers';
+import TableCard from './TableCard';
 import { loadColors, loadOptions } from '../../consts/dataFormat/dataLoading';
 
 
@@ -35,6 +36,9 @@ const GraphCard = SortableElement(({
     graph = <HorizontalBar data={data} options={loadOptions()} />;
   } else if (cardType === 'numbers') {
     graph = <Numbers data={data} />;
+  } else if (cardType === 'table') {
+    graph = <TableCard data={data} />;
+    filter = 1;
   } else if (cardType === 'loading') {
     graph = <LoadingCard />;
   } else if (cardType === 'error') {
@@ -59,7 +63,10 @@ const GraphCard = SortableElement(({
             className={filter ? 'customSelect' : 'customSelect disabled'}
             onChange={e => reloadIndicator(cardMethod, cardType, cardTitle, cardLink, cardId, `querySize=${e.target.value}`)}
             disabled={!filter}
+            defaultValue="6"
           >
+            <option value="1">{label} Month</option>
+            <option value="3">{label} 3 Months</option>
             <option value="6">{label} 6 Months</option>
             <option value="12">{label} Year</option>
             <option value="24">{label} 2 Years</option>

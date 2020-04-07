@@ -1,13 +1,16 @@
 package org.pih.warehouse.tableroapi
 
 import org.pih.warehouse.tablero.DataGraph
+import org.pih.warehouse.tablero.TableData
+import org.pih.warehouse.tablero.Table
 import org.pih.warehouse.tablero.ColorNumber
 import org.pih.warehouse.tablero.IndicatorData
 import org.pih.warehouse.tablero.NumberIndicator
+import org.pih.warehouse.tablero.IndicatorDatasets
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.tablero.IndicatorDatasets
 import org.joda.time.LocalDate
 
 class IndicatorDataService {
@@ -59,10 +62,10 @@ class IndicatorDataService {
     }
 
     DataGraph getFillRate() {
-        Date today = new Date()
         List listData = []
         List bar2Data  = []
         List listLabel = []
+        Date today = new Date()
         today.clearTime()
         for(int i=5;i>=0;i--){
             def monthBegin = today.clone()
@@ -138,8 +141,8 @@ class IndicatorDataService {
     }
 
     DataGraph getSentStockMovements(Location location, def params) {
-        Date today = new Date()
         Integer querySize = params.querySize? params.querySize.toInteger()-1 : 5
+        Date today = new Date()
         today.clearTime()
         
         // queryLimit limits the query and avoid of getting data older than wanted
@@ -299,6 +302,35 @@ class IndicatorDataService {
         }
 
         NumberIndicator indicatorData = new NumberIndicator(pending, shipped, partiallyReceived, false)
+
+        return indicatorData;
+    }
+
+    Table getDiscrepancy(Location location, def params) {
+        Integer querySize = params.querySize? params.querySize.toInteger() - 1 : 5
+
+        List<TableData> tableBody = []
+
+        Date date = LocalDate.now().minusMonths(querySize).toDate()
+
+        def query = ReceiptItem.executeQuery("""
+            select s.shipmentNumber as number, s.name as name, count(ri.id) as count, s.requisition as requisition 
+            from ReceiptItem as ri
+            left join ri.receipt as r
+            left join r.shipment as s
+            where r.receiptStatusCode = 'RECEIVED'
+            and s.currentStatus = 'PARTIALLY_RECEIVED'
+            and s.destination = :location 
+            and ri.quantityShipped <> ri.quantityReceived
+            and r.actualDeliveryDate > :date 
+            group by s.shipmentNumber, s.id
+        """, ['location': location, 'date': date])
+
+        query.each {
+            tableBody.push(new TableData(it[0], it[1], it[2].toString(), "/openboxes/stockMovement/show/" + it[3].id))
+        }
+
+        Table indicatorData = new Table("Shipment", "Name", "Discrepancy", tableBody)
 
         return indicatorData;
     }

@@ -15,8 +15,8 @@ import {
 import GraphCard from './GraphCard';
 import LoadingNumbers from './LoadingNumbers';
 import NumberCard from './NumberCard';
-import './tablero.scss';
 import UnarchiveIndicator from './UnarchivePopout';
+import './tablero.scss';
 
 // Disable charts legends by default.
 defaults.global.legend = false;
@@ -89,15 +89,16 @@ class Tablero extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.currentLocation !== this.props.currentLocation) {
-      this.props.resetIndicators();
+    const prevLocation = prevProps.currentLocation;
+    const newLocation = this.props.currentLocation;
+    if (prevLocation !== '' && prevLocation !== newLocation) {
       this.fetchData();
     }
   }
-
   dataFetched = false;
 
   fetchData() {
+    this.props.resetIndicators();
     this.props.fetchIndicators();
     this.props.fetchNumbersData();
   }
@@ -168,7 +169,7 @@ export default connect(mapStateToProps, {
 })(Tablero);
 
 Tablero.defaultProps = {
-  currentLocation: null,
+  currentLocation: '',
   indicatorsData: null,
   numberData: [],
 };
