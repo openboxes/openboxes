@@ -222,13 +222,18 @@ class SubstitutionsModal extends Component {
     const payload = {
       newQuantity: originalItem.quantitySelected && originalItem.quantitySelected !== '0' ? originalItem.quantityRequested - subQty : '',
       quantityRevised: originalItem.quantitySelected,
-      sortOrder: _.toInteger(originalItem.sortOrder) + 1,
+      // Newly created substitution with the same product should have
+      // higher sort order than other substitution items
+      sortOrder: substitutions.length > 0 ?
+        _.toInteger(originalItem.sortOrder) + substitutions.length :
+        _.toInteger(originalItem.sortOrder) + 1,
       reasonCode: values.reasonCode,
-      substitutionItems: _.map(substitutions, sub => ({
+      substitutionItems: _.map(substitutions, (sub, key) => ({
         'newProduct.id': sub.product.id,
         newQuantity: sub.quantitySelected,
         reasonCode: values.reasonCode === 'SUBSTITUTION' ? values.reasonCode : `SUBSTITUTION${values.reasonCode ? ` (${values.reasonCode})` : ''}`,
-        sortOrder: originalItem.sortOrder,
+        // Sort order of substitution items should be different for each of them so it is increased
+        sortOrder: originalItem.sortOrder + key,
       })),
     };
 
