@@ -1,20 +1,21 @@
-function getColor(color = 'states', type = 'normal', index = 0) {
+/* global _ */
+function getColor(color = 'default', type = 'normal', index = 0) {
   const colors = {
     default: '#8798ad',
     primary: {
-      normal: '#0ddbdd',
-      dark: '#08c6c8',
-      light: '#52e8e8',
+      normal: ['#0ddbdd'],
+      dark: ['#08c6c8'],
+      light: ['#52e8e8'],
     },
     secondary: {
-      normal: '#ea6227',
-      dark: '#d05622',
-      light: '#ff9c72',
+      normal: ['#ea6227'],
+      dark: ['#d05622'],
+      light: ['#ff9c72'],
     },
     tertiary: {
-      normal: '#0c60e5',
-      dark: '#0a58d5',
-      light: '#186cf2',
+      normal: ['#0c60e5'],
+      dark: ['#0a58d5'],
+      light: ['#186cf2'],
     },
     states: {
       normal: [
@@ -50,7 +51,9 @@ function getColor(color = 'states', type = 'normal', index = 0) {
     },
   };
 
-  try {
+  if (color === 'default') {
+    return colors.states.normal[_.random(0, 8)];
+  } try {
     return colors[color][type][index];
   } catch (error) {
     return colors.default;

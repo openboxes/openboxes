@@ -20,19 +20,19 @@ const GraphCard = SortableElement(({
   let filter = 0;
   let label = 'Last';
   if (cardType === 'line') {
-    cardData.datasets = loadColors(data, 'line');
+    cardData.datasets = cardData.datasets[0].borderColor ? cardData.datasets : loadColors(data, 'line');
     graph = <Line data={data} options={loadOptions()} />;
     filter = 1;
     label = 'Next';
   } else if (cardType === 'bar') {
-    cardData.datasets = loadColors(data, 'bar');
+    cardData.datasets = cardData.datasets[0].backgroundColor || cardData.datasets[0].borderColor ? cardData.datasets : loadColors(data, 'bar');
     graph = <Bar data={data} options={loadOptions(cardMethod !== 'getFillRate')} />;
     filter = 1;
   } else if (cardType === 'doughnut') {
-    cardData.datasets = loadColors(data, 'doughnut');
+    cardData.datasets = cardData.datasets[0].backgroundColor ? cardData.datasets : loadColors(data, 'doughnut');
     graph = <Doughnut data={data} options={loadOptions()} />;
   } else if (cardType === 'horizontalBar') {
-    cardData.datasets = loadColors(data, 'horizontalBar');
+    cardData.datasets = cardData.datasets[0].backgroundColor ? cardData.datasets : loadColors(data, 'horizontalBar');
     graph = <HorizontalBar data={data} options={loadOptions()} />;
   } else if (cardType === 'numbers') {
     graph = <Numbers data={data} />;
