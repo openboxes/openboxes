@@ -285,8 +285,6 @@ class PickPage extends Component {
       .then((resp) => {
         const { totalCount } = resp.data;
         const { associations } = resp.data.data;
-        const { pickPageItems } = resp.data.data.pickPage;
-
         const printPicks = _.find(
           associations.documents,
           doc => doc.documentType === 'PICKLIST' && doc.uri.includes('print'),
@@ -294,11 +292,6 @@ class PickPage extends Component {
         this.setState({
           totalCount,
           printPicksUrl: printPicks ? printPicks.uri : '/',
-          values: {
-            ...this.state.values,
-            pickPageItems: _.map(parseResponse(pickPageItems), item =>
-              this.checkForInitialPicksChanges(item)),
-          },
           sorted: false,
         }, () => this.fetchBins());
       })
