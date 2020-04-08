@@ -8,8 +8,6 @@
 <script language="javascript">
     $(document).ready(function() {
 
-        $.notify.defaults({autoHideDelay: 1000});
-
         $("#${attrs.id}-suggest").click(function() {
             $(this).trigger("focus");
         });
@@ -23,6 +21,8 @@
         $("#${attrs.id}-suggest").autocomplete({
             delay: ${attrs.delay},
             minLength: ${attrs.minLength},
+            autoFocus: true,
+            selectFirst: true,
             dataType: 'json',
             //define callback to format results
             source: function(req, add){
@@ -33,7 +33,6 @@
                 }
 
                 var currentLocationId = $("#currentLocationId").val();
-
                 $element.data( "jqXHR",
                     $.getJSON('${attrs.jsonUrl}', { term: req.term, warehouseId: currentLocationId }, function(data) {
                         var items = [];
@@ -43,9 +42,7 @@
                         add(items);
                     }));
             },
-            focus: function(event, ui) {
-                return false;
-            },
+            //focus: function( event, ui ) { event.preventDefault(); },
             change: function(event, ui) {
                 console.log("changed: ", ui.item);
                 // If the user does not select a value, we remove the value
@@ -88,7 +85,7 @@
                     // Otherwise display selected person
                     else {
                         selectItem(hiddenField, textField, ui.item.id, ui.item.label);
-                        $(this).notify("Selected item " + ui.item.label, {className: "success"});
+                        //$(this).notify("Selected item " + ui.item.label, {className: "success"});
                     }
                 }
 
@@ -99,13 +96,7 @@
                 $("#${attrs.id}-suggest").trigger("selected");
                 return false;
             }
-        }).data("autocomplete")._renderItem = function( ul, item ) {
-            var text = item.label;
-            if (item.description) {
-                text += "<br/><small class='fade'>" + item.description + "</small>"
-            }
-            return $( "<li></li>" ).data( "item.autocomplete", item).append("<a>" + text + "</a>").appendTo( ul );
-        };
+        })
     });
 
     function selectItem(hiddenField, textField, id, label) {

@@ -31,12 +31,11 @@
 
             <div class="box">
                 <h2><warehouse:message code="order.wizard.addItems.label"/></h2>
-                <table style="">
+                <table id="orderItemsTable">
                     <thead>
                         <tr class="odd">
                             <th><warehouse:message code="order.lineItemNumber.label" default="#"/></th>
-                            <th><warehouse:message code="product.code.label"/></th>
-                            <th><warehouse:message code="product.name.label"/></th>
+                            <th><warehouse:message code="product.label"/></th>
                             <th class="center"><warehouse:message code="product.sourceCode.label"/></th>
                             <th class="center"><warehouse:message code="product.supplierCode.label"/></th>
                             <th class="center"><warehouse:message code="product.manufacturer.label"/></th>
@@ -48,137 +47,15 @@
                             <th class="center"><warehouse:message code="order.recipient.label"/></th>
                             <th class="center"><warehouse:message code="orderItem.estimatedReadyDate.label"/></th>
                             <th class="center"><warehouse:message code="orderItem.actualReadyDate.label"/></th>
-                            <th class="center" ><warehouse:message code="default.actions.label"/></th>
+                            <th class="center" width="1%"><warehouse:message code="default.actions.label"/></th>
                         </tr>
                     </thead>
                     <tbody>
-                        <g:set var="i" value="${0 }"/>
-                        <g:each var="orderItem" in="${order?.listOrderItems()}">
-                            <tr class="${(i++ % 2) == 0 ? 'even' : 'odd'}">
-                                <g:hiddenField name="orderItems[${i }].order.id" value="${orderItem?.order?.id }" size="5"/>
-                                <td class="middle">
-                                    ${i}
-                                </td>
-                                <td class="middle">
-                                    <g:link controller="inventoryItem" action="showStockCard" id="${orderItem?.product?.id}">
-                                        ${orderItem?.product?.productCode}
-                                    </g:link>
-                                </td>
-                                <td class="middle">
-                                    <g:link controller="inventoryItem" action="showStockCard" id="${orderItem?.product?.id}">
-                                        ${orderItem?.product?.name?:orderItem?.description?.encodeAsHTML()}
-                                    </g:link>
-                                </td>
-                                <td class="center middle">
-                                    ${orderItem?.productSupplier?.code}
-                                </td>
-                                <td class="center middle">
-                                    ${orderItem?.productSupplier?.supplierCode}
-                                </td>
-                                <td class="center middle">
-                                    ${orderItem?.productSupplier?.manufacturer}
-                                </td>
-                                <td class="center middle">
-                                    ${orderItem?.productSupplier?.manufacturerCode}
-                                </td>
-                                <td class="middle center">
-                                    ${orderItem?.quantity }
-                                    <g:hiddenField name="orderItems[${i }].quantity" value="${orderItem?.quantity }" size="5"/>
-                                </td>
-                                <td class="middle center">
-                                    ${orderItem?.product?.unitOfMeasure?:"EA"}
-                                </td>
-                                <td class="center middle">
-                                    <g:formatNumber number="${orderItem?.unitPrice ?: 0.00 }" format="###,###,##0.00##"/>
-                                    ${order?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-                                </td>
-                                <td class="right middle">
-                                    <g:formatNumber number="${orderItem?.totalPrice() }" />
-                                    ${order?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-                                </td>
-                                <td class="center middle">
-                                    ${orderItem?.recipient}
-                                </td>
-                                <td class="center middle">
-                                    <g:formatDate date="${orderItem?.estimatedReadyDate}" format="dd/MMM/yyyy"/>
-                                </td>
-                                <td class="center middle">
-                                    <g:formatDate date="${orderItem?.actualReadyDate}" format="dd/MMM/yyyy"/>
-                                </td>
-                                <td class="actionButtons center">
-                                    <g:if test="${orderItem?.id }">
-                                        <a href="javascript:void(-1);" id="edit-item-dialog-${orderItem?.id}"
-                                           class="button edit-item-button" data-order-item-id="${orderItem?.id}">
-                                            <warehouse:message code="default.button.edit.label"/>
-                                        </a>
-                                        <g:link action="purchaseOrder" id="${orderItem.id}" event="deleteItem"
-                                                class="button" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-                                            <warehouse:message code="default.button.delete.label"/>
-                                        </g:link>
-                                    </g:if>
-                                </td>
-                            </tr>
-                        </g:each>
-                        <g:form action="purchaseOrder" method="post">
-                            <g:hiddenField id="orderId" name="order.id" value="${order?.id }"></g:hiddenField>
-                            <g:hiddenField id="orderItemId" name="orderItem.id" value="${orderItem?.id }"></g:hiddenField>
-                            <g:hiddenField id="supplierId" name="supplier.id" value="${order?.originParty?.id }"></g:hiddenField>
-                            <tr>
-                                <td>
-                                    ${i+1}
-                                </td>
-                                <td>
-
-                                </td>
-                                <td>
-                                    <g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName?skipQuantity=true"
-                                                   width="400" valueId="" valueName="" styleClass="text"/>
-                                </td>
-                                <td class="middle center">
-                                    <g:select id="productSupplier" name="productSupplier.id"/>
-                                </td>
-                                <td class="middle center">
-                                    <input type="text" id="supplierCode" name='supplierCode' disabled value="" size="10" class="text" />
-                                </td>
-                                <td class="middle center">
-                                    <g:selectOrganization name="manufacturer"
-                                                          id="manufacturer"
-                                                          disabled="true"
-                                                          noSelection="['':'']"
-                                                          roleTypes="[org.pih.warehouse.core.RoleType.ROLE_MANUFACTURER]"/>
-                                </td>
-                                <td class="middle center">
-                                    <input type="text" id="manufacturerCode" name='manufacturerCode' disabled value="" size="10" class="text" />
-                                </td>
-                                <td class="middle center">
-                                    <input type="text" id="quantity" name='quantity' value="" size="10" class="text" />
-                                </td>
-                                <td class="center middle">
-                                    <g:hiddenField name="unitOfMeasure" value="each"/>
-                                    each
-                                </td>
-                                <td class="center middle">
-                                    <input type="text" id="unitPrice" name='unitPrice' size="10" class="text" />
-                                </td>
-                                <td></td>
-                                <td>
-                                    <g:selectPerson id="recipient" name="recipient" value="${order?.orderedBy?.id}"
-                                                    noSelection="['':'']" class="chzn-select-deselect"/>
-                                </td>
-                                <td>
-                                    <g:jqueryDatePicker id="estimatedReadyDate" name="estimatedReadyDate" value=""
-                                                        autocomplete="off" noSelection="['':'']"/>
-                                </td>
-                                <td></td>
-                                <td class="center">
-                                    <g:submitButton name="addItem" value="${warehouse.message(code:'order.button.save.label', default: 'Save')}" class="button icon add"/>
-                                </td>
-                            </tr>
-
-                        </g:form>
+                        <!-- data is dynamically loaded -->
                     </tbody>
                     <tfoot>
-                        <tr class="${(i++ % 2) == 0 ? 'even' : 'odd'}">
+                        <g:render template="/order/orderItemForm"/>
+                        <tr class="">
                             <th colspan="15" class="right">
                                 <warehouse:message code="default.total.label"/>
                                 <g:formatNumber number="${order?.totalPrice()?:0.0 }"/>
@@ -219,82 +96,10 @@
             </div>
 		</div>
         <div id="edit-item-dialog" class="dlg box">
-            <g:form action="purchaseOrder" method="post">
-                <g:hiddenField id="edit-orderId" name="order.id" value="" />
-                <g:hiddenField id ="edit-orderItemId" name="orderItem.id" value=""/>
-                <table>
-                    <tbody>
-                    <tr class='prop'>
-                        <td valign='top' class='name'>
-                            <label for='product'><warehouse:message code="product.label"/>:</label>
-                        </td>
-                        <td valign='top' class='value' nowrap="nowrap">
-                            <div id="edit-product-name"></div>
-                            <input type="hidden" id="edit-product-id"/>
-                        </td>
-                    </tr>
-                    <tr class='prop'>
-                        <td valign='top' class='name'>
-                            <label for='quantity'><warehouse:message code="default.quantity.label"/>:</label>
-                        </td>
-                        <td valign='top' class='value'>
-                            <input type="text" id="edit-quantity" name='quantity' value="" size="10" class="text" />
-                        </td>
-                    </tr>
-                    <tr class='prop'>
-                        <td valign='top' class='name'>
-                            <label for='unitOfMeasure'><warehouse:message code="product.unitOfMeasure.label"/>:</label>
-                        </td>
-                        <td valign='top' class='value'>
-                            <div id="edit-uom"></div>
-                        </td>
-                    </tr>
-                    <tr class='prop'>
-                        <td valign='top' class='name'>
-                            <label for='unitPrice'><warehouse:message code="order.unitPrice.label"/>:</label>
-                        </td>
-                        <td valign='top' class='value'>
-                            <input type="text" id="edit-unitPrice" name='unitPrice' value="" size="10" class="text" />
-                            <div class="fade"><warehouse:message code="order.unitPrice.hint"/></div>
-                        </td>
-                    </tr>
-                    <tr class="prop">
-                        <td valign="top" class="value" colspan="2">
-                            <div class="buttons">
-                                <span class="formButton">
-                                    <g:submitButton name="addItem" value="${warehouse.message(code:'order.saveItem.label', default: 'Save item')}" class="button"></g:submitButton>
-                                </span>
-                            </div>
-                        </td>
-                    </tr>
-                    </tbody>
-
-                </table>
-            </g:form>
+            <!-- contents will be lazy loaded -->
         </div>
-
     </div>
-	<g:comboBox />
     <script type="text/javascript">
-        $( function() {
-            var cookieName, $tabs, stickyTab;
-
-            cookieName = 'stickyTab';
-            $tabs = $( '.tabs' );
-
-            $tabs.tabs( {
-                select: function( e, ui )
-                {
-                    $.cookies.set( cookieName, ui.index );
-                }
-            } );
-
-            stickyTab = $.cookies.get( cookieName );
-            if( ! isNaN( stickyTab )  )
-            {
-                $tabs.tabs( 'select', stickyTab );
-            }
-        } );
 
         // When chosen product has changed, trigger function that updates source code column
         $("#product-id").change(function() {
@@ -303,9 +108,93 @@
         });
 
         // When chosen source code has changed, trigger function that updates supplier code, manufacturer and manufacturer code columns
-        $("#productSupplier").change(function() {
-          sourceCodeChanged($("#productSupplier option:selected").val());
+        $("#productSupplier").live('change', function(event) {
+          sourceCodeChanged($("#productSupplier option:selected")
+          .val());
         });
+
+        function deleteOrderItem(id) {
+          $.ajax({
+            url: '${g.createLink(controller:'order', action:'deleteOrderItem')}',
+            data: { id: id },
+            success: function () {
+              clearOrderItems();
+              loadOrderItems();
+              $.notify("Successfully deleted item " + id, "success")
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              alert(textStatus + " " + errorThrown);
+              $.notify("Error deleting item " + id, "error")
+            }
+          });
+          return false
+        }
+
+        function saveOrderItem() {
+            $(".save-item").attr("disabled", true);
+            var data = $("#orderItemForm").serialize();
+            data += "&productSupplier.id=" + $("#productSupplier").val();
+            $.ajax({
+                url:'${g.createLink(controller:'order', action:'saveOrderItem')}',
+                data: data,
+                success: function() {
+                    clearOrderItemForm();
+                    loadOrderItems();
+                    applyFocus("#product-suggest");
+                    $.notify("Successfully saved new item", "success")
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                  $.notify("An error occurred: " + textStatus + " " + errorThrown);
+                },
+                complete: function(jqXHR, textStatus) {
+                    //$(".save-item").removeAttr("disabled");
+                }
+            });
+            return false
+        }
+
+        function initializeTable() {
+            loadOrderItems();
+        }
+
+        function applyFocus(id) {
+            // Place focus on product search box
+            $(id).focus();
+        }
+
+
+        function clearOrderItemForm() {
+          $("#orderItemForm")[0].reset();
+          $("#productSupplier").html("");
+          $("#supplierCode").html("");
+          $("#manufacturer").html("");
+          $("#manufacturerCode").html("");
+        }
+
+        function clearOrderItems() {
+            $("#orderItemsTable.body tr").remove();
+        }
+
+        function loadOrderItems(table) {
+            clearOrderItems();
+            var orderId = $("#orderId").val();
+            $.ajax({
+                url:'${g.createLink( controller:'order', action:'getOrderItems')}',
+                data: { id: orderId },
+                success: function(data, textStatus, jqXHR){
+                    $("#orderItemsTable > tbody").find("tr").remove();
+                    $.each(data, function(index, row){
+                        $(buildOrderItemRow(index, row)).appendTo("#orderItemsTable > tbody");
+                    });
+                    $("#orderItemsTable > tbody tr").removeClass("odd").filter(":odd").addClass("odd");
+                    $("#orderItemsTable > tbody").show();
+                }
+            });
+        }
+
+        function buildOrderItemRow(index, data) {
+          return $("#rowTemplate").tmpl(data);
+	    }
 
         // Update source code column with product supplier source codes based on product chosen by user
         function productChanged(productId, supplierId) {
@@ -317,7 +206,8 @@
             },
             url: '${request.contextPath}/json/productChanged',
             success: function (data, textStatus) {
-              $('#productSupplier').html(data);
+              $('#productSupplier').replaceWith(data);
+              $("#productSupplier").show().focus();
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
             }
@@ -332,8 +222,8 @@
             url: '${request.contextPath}/json/productSupplierChanged',
             success: function (data, textStatus) {
               console.log("data: ", data);
-              $('#supplierCode').val(data.supplierCode);
-              $('#manufacturerCode').val(data.manufacturerCode);
+              $('#supplierCode').html(data.supplierCode);
+              $('#manufacturerCode').html(data.manufacturerCode);
               $('#manufacturer').html(data.manufacturer);
               $("#unitPrice").val(data.unitPrice);
             },
@@ -342,53 +232,191 @@
           });
         }
 
-        $(document).ready(function(){
-
-            // Place focus on product search box
-            $("#product-suggest").focus();
-
-            $("#edit-item-dialog").dialog({autoOpen:false, modal: true, width: 800, title: "Edit line item"});
-            $(".edit-item-button").click(function(event){
-                var id = $(this).attr("data-order-item-id");
-                $.ajax({
-                    dataType: "json",
-                    timeout: 2000,
-                    url: "${request.contextPath}/json/getOrderItem",
-                    data: { id: id },
-                    success: function (data) {
-                        console.log(data);
-                        $("#edit-product-id").val(data.product.id);
-                        $("#edit-product-name").html(data.product.productCode + " " + data.product.name);
-                        $("#edit-orderId").val(data.order.id);
-                        $("#edit-uom").text(data.product.unitOfMeasure);
-                        $("#edit-orderItemId").val(data.id);
-                        $("#edit-quantity").val(data.quantity);
-                        $("#edit-unitPrice").val(data.unitPrice);
-
-                    },
-                    error: function(xhr, status, error) {
-                        alert(error);
-                    }
-                });
-
-                $("#edit-item-dialog").dialog("open");
+        function getOrderItem(id) {
+          $.ajax({
+                dataType: "json",
+                timeout: 2000,
+                url: "${request.contextPath}/json/getOrderItem",
+                data: { id: id },
+                success: function (data) {
+                    console.log(data);
+                    return data;
+                },
+                error: function(xhr, status, error) {
+                    alert(error);
+                }
             });
+        }
+        function onCompleteHandler(response, status, xhr ) {
+          if (status == "error") {
+            var errorMessage = "Sorry, there was an error: " + xhr.status + " " + xhr.statusText;
+            var errorHtml = $("<div/>").addClass("fade empty center").append(errorMessage);
+            $(this).html(errorHtml);
+          }
+        }
 
-            $("#btnImportItems").click(function(event){
-                $("#dlgImportItems").dialog('open');
-            });
-            $("#dlgImportItems").dialog({
-                autoOpen: false,
-                modal: true,
-                width: 600
-            });
+        function editOrderItem(id) {
+            var executionKey = $(this).data("execution");
+            var url = "${request.contextPath}/order/orderItemFormDialog/" + id + "?execution=" + executionKey;
+            $('.loading').show();
+            $("#edit-item-dialog").html("Loading ...").load(url, onCompleteHandler).dialog("open");
+        }
 
 
+        $(document).ready(function() {
 
+          initializeTable();
+          applyFocus("#product-suggest");
+
+          $("table").dblclick(function(event) {
+            var id = event.target.closest("tr").id;
+            if (id) {
+              editOrderItem(id);
+            }
+            return false;
+          });
+
+          $("#edit-item-dialog").dialog({
+            autoOpen: false,
+            modal: true,
+            width: 800,
+            title: "Edit line item"
+          });
+
+          $("#estimatedReadyDate-datepicker")
+          .focusout(function () {
+            saveOrderItem();
+          });
+
+          $("#product-suggest")
+          .keydown(function (event) {
+            console.log(event);
+            if (event.keyCode == 13) {
+              event.preventDefault();
+              return false;
+            }
+          });
+
+          $(".clear-item-form")
+          .live("click", function (event) {
+            event.preventDefault();
+            clearOrderItemForm();
+          });
+
+          $(".delete-item")
+          .live("click", function (event) {
+            event.preventDefault();
+            var id = $(this)
+            .data("order-item-id");
+            deleteOrderItem(id);
+
+          });
+
+          $('.save-item')
+          .live("click", function (event) {
+            event.preventDefault();
+            var id = $(this)
+            .data("order-item-id");
+            saveOrderItem();
+          });
+
+          $('.edit-item')
+          .live("click", function (event) {
+            event.preventDefault();
+            var id = $(this)
+            .data("order-item-id");
+            editOrderItem(id);
+          });
+
+          $("#btnImportItems")
+          .click(function (event) {
+            $("#dlgImportItems")
+            .dialog('open');
+          });
+
+          $("#dlgImportItems")
+          .dialog({
+            autoOpen: false,
+            modal: true,
+            width: 600
+          });
         });
-
 
     </script>
 
+<script id="rowTemplate" type="x-jquery-tmpl">
+<tr id="{{= id}}" tabindex="{{= index}}">
+	<td class="center middle">
+	</td>
+	<td class="left middle">
+	    {{= product.productCode }}
+	    {{= product.name }}
+	</td>
+	<td class="center middle">
+    	{{if productSupplier }}
+	    {{= productSupplier.code }}
+	    {{/if}}
+	</td>
+	<td class="center middle">
+    	{{if productSupplier }}
+	    {{= productSupplier.supplierCode }}
+	    {{/if}}
+	</td>
+	<td class="center middle">
+    	{{if productSupplier && productSupplier.manufacturer }}
+	    {{= productSupplier.manufacturer.name || "None"  }}
+	    {{/if}}
+	</td>
+	<td class="center middle">
+    	{{if productSupplier && productSupplier.manufacturer }}
+	    {{= productSupplier.manufacturer.manufacturerCode || "None" }}
+	    {{/if}}
+	</td>
+	<td class="center middle">
+	    {{= quantity }}
+	</td>
+	<td class="center middle">
+	    {{= unitOfMeasure }}
+	</td>
+	<td class="center middle">
+	    {{= unitPrice }}
+	</td>
+	<td class="center middle">
+	    {{= totalPrice }}
+	</td>
+	<td class="center middle">
+    	{{if recipient }}
+	    {{= recipient.name }}
+	    {{/if}}
+	</td>
+	<td class="center middle">
+	    {{= estimatedReadyDate }}
+	</td>
+	<td class="center middle">
+	    {{= actualReadyDate }}
+	</td>
+	<td class="center middle">
+        <div class="action-menu">
+            <button class="action-btn">
+                <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}"/>
+            </button>
+            <div class="actions">
+                <div class="action-menu-item">
+                    <a href="javascript:void(-1);" class="edit-item" data-order-item-id="{{= id}}">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
+                        <warehouse:message code="default.button.edit.label"/>
+                    </a>
+                </div>
+                <div class="action-menu-item">
+                    <a href="javascript:void(-1);" class="delete-item" data-order-item-id="{{= id}}">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>
+                        <warehouse:message code="default.button.delete.label"/>
+                    </a>
+                </div>
+            </div>
+        </div>
+	</td>
+</tr>
+</script>
 </body>
 </html>

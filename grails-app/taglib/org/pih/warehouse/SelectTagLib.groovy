@@ -14,6 +14,7 @@ import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PartyRole
 import org.pih.warehouse.core.PaymentMethodType
 import org.pih.warehouse.core.PaymentTerm
@@ -36,6 +37,7 @@ import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.product.ProductCatalog
+import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.requisition.CommodityClass
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
@@ -172,6 +174,23 @@ class SelectTagLib {
         attrs.optionKey = 'id'
         out << g.select(attrs)
 
+    }
+
+    def selectProduct = { attrs, body ->
+        attrs.from = Product.findAllByActive(true)
+        attrs.optionKey = 'id'
+        attrs.optionValue = { it.name }
+        out << g.select(attrs)
+    }
+
+    def selectProductSupplier = { attrs, body ->
+        Product product = Product.get(attrs?.product?.id)
+        Organization supplier = Organization.get(attrs?.supplier?.id)
+        log.info ("product: ${product}, supplier ${supplier}")
+        attrs.from = ProductSupplier.findAllByProductAndSupplier(product, supplier) ?: []
+        attrs.optionKey = 'id'
+        attrs.optionValue = { it.code + " - " + it.supplierCode + " - " + (it.manufacturer?.name?:"") + " - " + (it.manufacturerCode?:"") + " - " + (it.unitPrice?:"") }
+        out << g.select(attrs)
     }
 
     def selectProductPackage = { attrs, body ->

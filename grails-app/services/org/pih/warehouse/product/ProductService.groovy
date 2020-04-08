@@ -14,6 +14,7 @@ import groovy.xml.Namespace
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
@@ -1081,6 +1082,10 @@ class ProductService {
         }
     }
 
+    List<Product> searchProducts(String[] terms, List<Category> categories) {
+        return searchProducts(terms, categories, null)
+    }
+
     /**
      * Get all products matching the given terms and categories.
      *
@@ -1088,12 +1093,20 @@ class ProductService {
      * @param categories
      * @return
      */
-    List<Product> searchProducts(String[] terms, List<Category> categories) {
+    List<Product> searchProducts(String[] terms, List<Category> categories, Organization organization) {
         def results = Product.createCriteria().list {
 
             eq("active", true)
             if (categories) {
                 inList("category", categories)
+            }
+            if (organization) {
+                productSuppliers {
+                    or {
+                        eq("supplier.id", organization.id)
+                        eq("manufacturer.id", organization.id)
+                    }
+                }
             }
 
             if (terms) {
@@ -1130,7 +1143,6 @@ class ProductService {
                                 }
                             }
                         }
-
                         inventoryItems {
                             ilike("lotNumber", term)
                         }
