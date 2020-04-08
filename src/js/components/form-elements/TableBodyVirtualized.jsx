@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { AutoSizer, InfiniteLoader, List } from 'react-virtualized';
+import _ from 'lodash';
 
 import TableRow from './TableRow';
 
@@ -11,12 +12,40 @@ class TableBodyVirtualized extends Component {
     this.rowRenderer = this.rowRenderer.bind(this);
     this.getRowHeight = this.getRowHeight.bind(this);
     this.bindListRef = this.bindListRef.bind(this);
+    this.getHeight = this.getHeight.bind(this);
   }
 
   componentDidUpdate() {
     if (this.list) {
       this.list.recomputeRowHeights();
     }
+  }
+
+  getHeight() {
+    const { fieldsConfig: { subfieldKey }, fields, properties } = this.props;
+    const { totalCount } = properties;
+    let height = 0;
+
+    if (!subfieldKey) {
+      if (totalCount * 28 > 450) {
+        height = 450;
+      } else if (totalCount > 0) {
+        height = totalCount * 28;
+      }
+    } else {
+      _.forEach(fields.value, (field) => {
+        const subfields = field[subfieldKey];
+        if (!height) {
+          height = 28 * (subfields.length + 1);
+        } else if (height + (28 * (subfields.length + 1)) > 450) {
+          height = 450;
+        } else {
+          height += (28 * (subfields.length + 1));
+        }
+      });
+    }
+
+    return height || 28;
   }
 
   getRowHeight({ index }) {
@@ -102,7 +131,7 @@ class TableBodyVirtualized extends Component {
               {({ width }) => (
                 <List
                   ref={this.bindListRef}
-                  height={445}
+                  height={this.getHeight()}
                   onRowsRendered={onRowsRendered}
                   rowCount={totalCount || 50}
                   rowHeight={this.getRowHeight}
