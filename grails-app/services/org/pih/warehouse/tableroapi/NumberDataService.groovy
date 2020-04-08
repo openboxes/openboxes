@@ -4,6 +4,7 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.tablero.NumberData
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.inventory.InventorySnapshot
+import org.pih.warehouse.core.Constants
 
 class NumberDataService {
 
@@ -21,10 +22,10 @@ class NumberDataService {
         def incompletePutaways = Order.executeQuery("select count(o.id) from Order o where o.orderTypeCode = 'TRANSFER_ORDER' AND o.status = 'PENDING' AND o.orderedBy = :user AND o.destination = :location", ['user':user, 'location': location]);
 
         def receivingBin = InventorySnapshot.executeQuery("""
-            SELECT COUNT(distinct i.product) from InventorySnapshot i 
+            SELECT COUNT(distinct i.product.id) from InventorySnapshot i 
             LEFT JOIN i.location l 
             WHERE l = :location AND i.quantityOnHand > 0 
-            AND i.date = :tomorrow AND l.locationType = 'ff8081816482352b01648249e8cc0001'""",
+            AND i.date = :tomorrow AND l.locationType.id = '${Constants.RECEIVING_LOCATION_TYPE_ID}'""",
             ['location': location, 'tomorrow': tomorrow]);
 
         def pending = dataService.executeQuery("select count(*) from shipment where shipment.current_status = 'PENDING'");
@@ -33,7 +34,7 @@ class NumberDataService {
         List<NumberData> numberDataList = [
             new NumberData("Lot and Bin", binLocations[0], 'In stock', 1, "/openboxes/report/showBinLocationReport?location.id=" + location.id + "&status=inStock"),
 
-            new NumberData("Receiving Bin ",receivingBin[0], "Products", 2, "/openboxes/report/showBinLocationReport?status=inStock"),
+            new NumberData("Receiving Bin", receivingBin[0], "Products", 2, "/openboxes/report/showBinLocationReport?status=inStock"),
 
             new NumberData("Your Shipments", shipments[0], "In Progress", 3, "/openboxes/stockMovement/list?receiptStatusCode=PENDING&origin.id=" + location.id + "&createdBy.id=" + user.id),
 
