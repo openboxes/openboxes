@@ -25,8 +25,12 @@ class NumberDataService {
             SELECT COUNT(distinct i.product.id) from InventorySnapshot i 
             LEFT JOIN i.location l 
             WHERE l = :location AND i.quantityOnHand > 0 
-            AND i.date = :tomorrow AND l.locationType.id = '${Constants.RECEIVING_LOCATION_TYPE_ID}'""",
-            ['location': location, 'tomorrow': tomorrow]);
+            AND i.date = :tomorrow AND l.locationType.id = :locationType""",
+            [
+                'location': location, 
+                'tomorrow': tomorrow, 
+                'locationType': Constants.RECEIVING_LOCATION_TYPE_ID,
+            ]);
 
         def pending = dataService.executeQuery("select count(*) from shipment where shipment.current_status = 'PENDING'");
         def notCompleted = dataService.executeQuery("select count(*) from openboxes.order  where order.status != 'COMPLETED'");
