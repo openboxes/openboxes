@@ -13,7 +13,7 @@
                 <label>${warehouse.message(code: 'order.orderTypeCode.label')}</label>
                 <g:select id="orderTypeCode" name="orderTypeCode"
                           from="${org.pih.warehouse.order.OrderTypeCode.list()}" class="chzn-select-deselect"
-                          optionValue="${{ format.metadata(obj: it) }}" value="${params.orderTypeCode}"
+                          optionValue="${{ format.metadata(obj: it) }}" value="${params?.orderTypeCode}"
                           noSelection="['': warehouse.message(code: 'default.all.label')]"/>
             </div>
             <div class="filter-list-item">

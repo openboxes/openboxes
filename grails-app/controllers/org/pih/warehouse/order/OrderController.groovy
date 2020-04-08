@@ -36,10 +36,14 @@ class OrderController {
 
         def suppliers = orderService.getSuppliers().sort()
 
-        def orderTemplate = new Order(params)
-        orderTemplate.status = params.status ? Enum.valueOf(OrderStatus.class, params.status) : null
+        params.orderTypeCode = params.orderTypeCode ? Enum.valueOf(OrderTypeCode.class, params.orderTypeCode) : OrderTypeCode.PURCHASE_ORDER
+        params.status = params.status ? Enum.valueOf(OrderStatus.class, params.status) : null
         def statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
         def statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
+        params.max = params.max?:10
+        params.offset = params.offset?:0
+
+        def orderTemplate = new Order(params)
         def orders = orderService.getOrders(orderTemplate, statusStartDate, statusEndDate, params)
 
         def totalPrice = 0.00
