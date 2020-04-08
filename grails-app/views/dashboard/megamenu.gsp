@@ -203,7 +203,7 @@
                         <g:if test="${megamenuConfig.stockRequest.enabled}">
                             <h3><warehouse:message code="stockRequests.label" default="Stock Requests" /></h3>
                             <div class="mm-menu-item">
-                                <g:link controller="stockMovement" action="create" params="[type:'REQUEST']">
+                                <g:link controller="stockMovement" action="createRequest">
                                     <warehouse:message code="default.create.label" args="[warehouse.message(code: 'stockRequest.label', default: 'Stock Request')]"/>
                                 </g:link>
                             </div>

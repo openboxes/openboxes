@@ -137,8 +137,8 @@ const fr = {
         },
         request: {
           configName: 'stockMovement',
-          label: 'Demande de stock',
-          link: '/openboxes/stockMovement/create?type=REQUEST',
+          label: 'Request Stock',
+          link: '/openboxes/stockMovement/createRequest',
         },
         createPutAway: {
           configName: 'stockMovement',

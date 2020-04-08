@@ -54,34 +54,10 @@ const FIELDS = {
       autoFocus: true,
     },
   },
-  origin: {
-    type: SelectField,
-    label: 'react.stockMovement.origin.label',
-    defaultMessage: 'Origin',
-    attributes: {
-      required: true,
-      async: true,
-      showValueTooltip: true,
-      openOnClick: false,
-      autoload: false,
-      cache: false,
-      options: [],
-      filterOptions: options => options,
-    },
-    getDynamicAttr: props => ({
-      loadOptions: props.debouncedLocationsFetch,
-      onChange: (value) => {
-        if (value && props.destination && props.destination.id) {
-          props.fetchStockLists(value, props.destination);
-        }
-      },
-      disabled: false,
-    }),
-  },
   destination: {
     type: SelectField,
-    label: 'react.stockMovement.destination.label',
-    defaultMessage: 'Destination',
+    label: 'react.stockMovement.requestingLocation.label',
+    defaultMessage: 'Requesting Location',
     attributes: {
       required: true,
       async: true,
@@ -100,6 +76,30 @@ const FIELDS = {
         }
       },
       disabled: !props.isSuperuser,
+    }),
+  },
+  origin: {
+    type: SelectField,
+    label: 'react.stockMovement.fulfillingLocation.label',
+    defaultMessage: 'Fulfilling Location',
+    attributes: {
+      required: true,
+      async: true,
+      showValueTooltip: true,
+      openOnClick: false,
+      autoload: false,
+      cache: false,
+      options: [],
+      filterOptions: options => options,
+    },
+    getDynamicAttr: props => ({
+      loadOptions: props.debouncedLocationsFetch,
+      onChange: (value) => {
+        if (value && props.destination && props.destination.id) {
+          props.fetchStockLists(value, props.destination);
+        }
+      },
+      disabled: false,
     }),
   },
   stocklist: {
