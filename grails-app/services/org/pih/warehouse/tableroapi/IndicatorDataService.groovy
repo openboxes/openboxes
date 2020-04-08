@@ -319,7 +319,6 @@ class IndicatorDataService {
             left join ri.receipt as r
             left join r.shipment as s
             where r.receiptStatusCode = 'RECEIVED'
-            and s.currentStatus = 'PARTIALLY_RECEIVED'
             and s.destination = :location 
             and ri.quantityShipped <> ri.quantityReceived
             and r.actualDeliveryDate > :date 
