@@ -59,6 +59,10 @@ class StockMovementController {
         render(template: "/common/react", params: params)
     }
 
+    def createRequest = {
+        render(template: "/common/react", params: params)
+    }
+
     def edit = {
         Location currentLocation = Location.get(session.warehouse.id)
         StockMovement stockMovement = params.id ? stockMovementService.getStockMovement(params.id) : null

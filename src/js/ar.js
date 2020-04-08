@@ -138,7 +138,7 @@ const ar = {
         request: {
           configName: 'stockMovement',
           label: 'Request Stock',
-          link: '/openboxes/stockMovement/create?type=REQUEST',
+          link: '/openboxes/stockMovement/createRequest',
         },
         createPutAway: {
           configName: 'stockMovement',
