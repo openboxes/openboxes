@@ -58,6 +58,7 @@ function getColor(color = 'default', type = 'normal', index = 0) {
   } catch (error) {
     return colors.default;
   }
+  // if can't return desired color, returns gray
 }
 
 function getHorizontalBarColors(type, index) {

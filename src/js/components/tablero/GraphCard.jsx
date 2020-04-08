@@ -7,6 +7,13 @@ import Numbers from './Numbers';
 import TableCard from './TableCard';
 import { loadColors, loadOptions } from '../../consts/dataFormat/dataLoading';
 
+// getColors loads indicator colors if it doesn't have defined colors yet
+function getColors(data, type) {
+  if (data.datasets[0].borderColor || data.datasets[0].backgroundColor) {
+    return data.datasets;
+  }
+  return loadColors(data, type);
+}
 
 const DragHandle = sortableHandle(() => (
   <span className="dragHandler">::</span>
@@ -20,23 +27,19 @@ const GraphCard = SortableElement(({
   let filter = 0;
   let label = 'Last';
   if (cardType === 'line') {
-    // Defines a new color if there is no color defined yet
-    cardData.datasets = cardData.datasets[0].borderColor ? cardData.datasets : loadColors(data, 'line');
+    cardData.datasets = getColors(data, 'line');
     graph = <Line data={data} options={loadOptions()} />;
     filter = 1;
     label = 'Next';
   } else if (cardType === 'bar') {
-    // Defines a new color if there is no color defined yet
-    cardData.datasets = cardData.datasets[0].backgroundColor || cardData.datasets[0].borderColor ? cardData.datasets : loadColors(data, 'bar');
+    cardData.datasets = getColors(data, 'bar');
     graph = <Bar data={data} options={loadOptions(cardMethod !== 'getFillRate')} />;
     filter = 1;
   } else if (cardType === 'doughnut') {
-    // Defines a new color if there is no color defined yet
-    cardData.datasets = cardData.datasets[0].backgroundColor ? cardData.datasets : loadColors(data, 'doughnut');
+    cardData.datasets = getColors(data, 'doughnut');
     graph = <Doughnut data={data} options={loadOptions()} />;
   } else if (cardType === 'horizontalBar') {
-    // Defines a new color if there is no color defined yet
-    cardData.datasets = cardData.datasets[0].backgroundColor ? cardData.datasets : loadColors(data, 'horizontalBar');
+    cardData.datasets = getColors(data, 'horizontalBar');
     graph = <HorizontalBar data={data} options={loadOptions()} />;
   } else if (cardType === 'numbers') {
     graph = <Numbers data={data} />;
