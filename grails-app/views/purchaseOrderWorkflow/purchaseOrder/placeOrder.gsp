@@ -40,7 +40,6 @@
             </div>
 		</div>
 	</div>
-	<g:comboBox />
     <script type="text/javascript">
         $( function() {
             var cookieName, $tabs, stickyTab;
