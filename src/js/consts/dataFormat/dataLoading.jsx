@@ -72,6 +72,9 @@ let index = 5;
 function loadColorDataset(data, chart, subtype) {
   const datasets = data;
   index = index > 7 ? index % 8 : index;
+  // Index makes sure that index is between 0 and 8
+  // That following indicators have different colors
+  // And a smooth color change
 
   if (chart === 'line') {
     datasets.borderColor = getColor('states', 'normal', index);

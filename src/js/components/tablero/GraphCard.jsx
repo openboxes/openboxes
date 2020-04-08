@@ -20,18 +20,22 @@ const GraphCard = SortableElement(({
   let filter = 0;
   let label = 'Last';
   if (cardType === 'line') {
+    // Defines a new color if there is no color defined yet
     cardData.datasets = cardData.datasets[0].borderColor ? cardData.datasets : loadColors(data, 'line');
     graph = <Line data={data} options={loadOptions()} />;
     filter = 1;
     label = 'Next';
   } else if (cardType === 'bar') {
+    // Defines a new color if there is no color defined yet
     cardData.datasets = cardData.datasets[0].backgroundColor || cardData.datasets[0].borderColor ? cardData.datasets : loadColors(data, 'bar');
     graph = <Bar data={data} options={loadOptions(cardMethod !== 'getFillRate')} />;
     filter = 1;
   } else if (cardType === 'doughnut') {
+    // Defines a new color if there is no color defined yet
     cardData.datasets = cardData.datasets[0].backgroundColor ? cardData.datasets : loadColors(data, 'doughnut');
     graph = <Doughnut data={data} options={loadOptions()} />;
   } else if (cardType === 'horizontalBar') {
+    // Defines a new color if there is no color defined yet
     cardData.datasets = cardData.datasets[0].backgroundColor ? cardData.datasets : loadColors(data, 'horizontalBar');
     graph = <HorizontalBar data={data} options={loadOptions()} />;
   } else if (cardType === 'numbers') {
