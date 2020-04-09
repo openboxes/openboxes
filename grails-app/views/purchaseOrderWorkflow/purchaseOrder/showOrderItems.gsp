@@ -1,3 +1,4 @@
+<%@ page import="org.pih.warehouse.order.OrderStatus" %>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -31,40 +32,47 @@
 
             <div class="box">
                 <h2><warehouse:message code="order.wizard.addItems.label"/></h2>
-                <table id="orderItemsTable">
-                    <thead>
-                        <tr class="odd">
-                            <th><warehouse:message code="order.lineItemNumber.label" default="#"/></th>
-                            <th><warehouse:message code="product.label"/></th>
-                            <th class="center"><warehouse:message code="product.sourceCode.label"/></th>
-                            <th class="center"><warehouse:message code="product.supplierCode.label"/></th>
-                            <th class="center"><warehouse:message code="product.manufacturer.label"/></th>
-                            <th class="center"><warehouse:message code="product.manufacturerCode.label"/></th>
-                            <th class="center"><warehouse:message code="default.quantity.label"/></th>
-                            <th class="center"><warehouse:message code="default.uom.label"/></th>
-                            <th class="center"><warehouse:message code="order.unitPrice.label"/></th>
-                            <th class="right"><warehouse:message code="orderItem.totalCost.label"/></th>
-                            <th class="center"><warehouse:message code="order.recipient.label"/></th>
-                            <th class="center"><warehouse:message code="orderItem.estimatedReadyDate.label"/></th>
-                            <th class="center"><warehouse:message code="orderItem.actualReadyDate.label"/></th>
-                            <th class="center" width="1%"><warehouse:message code="default.actions.label"/></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- data is dynamically loaded -->
-                    </tbody>
-                    <tfoot>
-                        <g:render template="/order/orderItemForm"/>
-                        <tr class="">
-                            <th colspan="15" class="right">
-                                <warehouse:message code="default.total.label"/>
-                                <g:formatNumber number="${order?.totalPrice()?:0.0 }"/>
-                                ${order?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-                            </th>
-                        </tr>
-                    </tfoot>
+                <g:form name="orderItemForm" action="purchaseOrder" method="post">
+                    <g:hiddenField id="orderId" name="order.id" value="${order?.id }"></g:hiddenField>
+                    <g:hiddenField id="orderItemId" name="orderItem.id" value="${orderItem?.id }"></g:hiddenField>
+                    <g:hiddenField id="supplierId" name="supplier.id" value="${order?.originParty?.id }"></g:hiddenField>
+                    <table id="orderItemsTable">
+                        <thead>
+                            <tr class="odd">
+                                <th><warehouse:message code="order.lineItemNumber.label" default="#"/></th>
+                                <th><warehouse:message code="product.label"/></th>
+                                <th class="center"><warehouse:message code="product.sourceCode.label"/></th>
+                                <th class="center"><warehouse:message code="product.supplierCode.label"/></th>
+                                <th class="center"><warehouse:message code="product.manufacturer.label"/></th>
+                                <th class="center"><warehouse:message code="product.manufacturerCode.label"/></th>
+                                <th class="center"><warehouse:message code="default.quantity.label"/></th>
+                                <th class="center"><warehouse:message code="default.uom.label"/></th>
+                                <th class="center"><warehouse:message code="order.unitPrice.label"/></th>
+                                <th class="right"><warehouse:message code="orderItem.totalCost.label"/></th>
+                                <th class="center"><warehouse:message code="order.recipient.label"/></th>
+                                <th class="center"><warehouse:message code="orderItem.estimatedReadyDate.label"/></th>
+                                <th class="center"><warehouse:message code="orderItem.actualReadyDate.label"/></th>
+                                <th class="center" width="1%"><warehouse:message code="default.actions.label"/></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- data is dynamically loaded -->
+                        </tbody>
+                        <tfoot>
+                            <g:if test="${order?.status < org.pih.warehouse.order.OrderStatus.PLACED}">
+                                <g:render template="/order/orderItemForm"/>
+                            </g:if>
+                            <tr class="">
+                                <th colspan="15" class="right">
+                                    <warehouse:message code="default.total.label"/>
+                                    <g:formatNumber number="${order?.totalPrice()?:0.0 }"/>
+                                    ${order?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                </th>
+                            </tr>
+                        </tfoot>
 
-                </table>
+                    </table>
+                </g:form>
             </div>
 
             <div class="buttons">
@@ -193,17 +201,22 @@
                 url:'${g.createLink( controller:'order', action:'getOrderItems')}',
                 data: { id: orderId },
                 success: function(data, textStatus, jqXHR){
+                    // Remove all rows
                     $("#orderItemsTable > tbody").find("tr").remove();
+
+                    // Generate HTML for each row in response data
                     $.each(data, function(index, row){
-                        $(buildOrderItemRow(index, row)).appendTo("#orderItemsTable > tbody");
+                      row["index"] = index + 1;
+                        $(buildOrderItemRow(row)).appendTo("#orderItemsTable > tbody");
                     });
+
+                    // Style table rows
                     $("#orderItemsTable > tbody tr").removeClass("odd").filter(":odd").addClass("odd");
-                    $("#orderItemsTable > tbody").show();
                 }
             });
         }
 
-        function buildOrderItemRow(index, data) {
+        function buildOrderItemRow(data) {
           return $("#rowTemplate").tmpl(data);
 	    }
 
@@ -358,6 +371,7 @@
 <script id="rowTemplate" type="x-jquery-tmpl">
 <tr id="{{= id}}" tabindex="{{= index}}">
 	<td class="center middle">
+    	{{= index }}
 	</td>
 	<td class="left middle">
 	    {{= product.productCode }}
