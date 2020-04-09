@@ -1693,7 +1693,6 @@ class JsonController {
     }
 
     def productChanged = {
-        log.info "params ${params}"
         Product product = Product.get(params.productId)
         Organization supplier = Organization.get(params.supplierId)
         List productSuppliers = []

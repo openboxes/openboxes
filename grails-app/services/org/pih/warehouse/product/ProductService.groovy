@@ -1082,10 +1082,6 @@ class ProductService {
         }
     }
 
-    List<Product> searchProducts(String[] terms, List<Category> categories) {
-        return searchProducts(terms, categories, null)
-    }
-
     /**
      * Get all products matching the given terms and categories.
      *
@@ -1093,22 +1089,13 @@ class ProductService {
      * @param categories
      * @return
      */
-    List<Product> searchProducts(String[] terms, List<Category> categories, Organization organization) {
+    List<Product> searchProducts(String[] terms, List<Category> categories) {
         def results = Product.createCriteria().list {
 
             eq("active", true)
             if (categories) {
                 inList("category", categories)
             }
-            if (organization) {
-                productSuppliers {
-                    or {
-                        eq("supplier.id", organization.id)
-                        eq("manufacturer.id", organization.id)
-                    }
-                }
-            }
-
             if (terms) {
                 terms.each { term ->
                     term = term + "%"
