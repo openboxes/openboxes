@@ -576,6 +576,7 @@ class OrderController {
                     actualReadyDate: g.formatDate(date: it.actualReadyDate, format: Constants.DEFAULT_DATE_FORMAT),
                     productSupplier: it.productSupplier,
                     recipient: it.recipient,
+                    isOrderPending: it?.order?.status == OrderStatus.PENDING,
                     dateCreated: it.dateCreated,
             ]
         }

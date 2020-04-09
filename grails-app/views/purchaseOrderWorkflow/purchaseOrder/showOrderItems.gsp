@@ -432,12 +432,14 @@
                         <warehouse:message code="default.button.edit.label"/>
                     </a>
                 </div>
+                {{if isOrderPending }}
                 <div class="action-menu-item">
                     <a href="javascript:void(-1);" class="delete-item" data-order-item-id="{{= id}}">
                         <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>
                         <warehouse:message code="default.button.delete.label"/>
                     </a>
                 </div>
+                {{/if}}
             </div>
         </div>
 	</td>
