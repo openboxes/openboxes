@@ -314,6 +314,9 @@
                         <tr class="prop">
                             <td class="name">
                                 <g:message code="stockMovement.dateShipped.label"/>
+                                <g:if test="${stockMovement?.shipment?.status?.code==org.pih.warehouse.shipping.ShipmentStatusCode.PENDING}">
+                                    <small><g:message code="default.expected.label"/></small>
+                                </g:if>
                             </td>
                             <td class="value">
                                 <g:if test="${stockMovement?.dateShipped}">
