@@ -149,8 +149,11 @@ const FIELDS = {
         attributes: {
           type: 'number',
         },
-        getDynamicAttr: ({ fieldValue, subfield, showOnly }) => ({
+        getDynamicAttr: ({
+          fieldValue, subfield, showOnly, updateRow, values, rowIndex,
+        }) => ({
           disabled: (fieldValue && fieldValue === 'SUBSTITUTED') || subfield || showOnly,
+          onBlur: () => updateRow(values, rowIndex),
         }),
       },
       reasonCode: {
@@ -159,10 +162,13 @@ const FIELDS = {
         defaultMessage: 'Reason code',
         flexWidth: '1.4',
         fieldKey: 'quantityRevised',
-        getDynamicAttr: ({ fieldValue, subfield, reasonCodes }) => ({
+        getDynamicAttr: ({
+          fieldValue, subfield, reasonCodes, updateRow, values, rowIndex,
+        }) => ({
           disabled: !fieldValue || subfield,
           options: reasonCodes,
           showValueTooltip: true,
+          onBlur: () => updateRow(values, rowIndex),
         }),
       },
       revert: {
@@ -246,6 +252,7 @@ class EditItemsPage extends Component {
     this.reviseRequisitionItems = this.reviseRequisitionItems.bind(this);
     this.isRowLoaded = this.isRowLoaded.bind(this);
     this.loadMoreRows = this.loadMoreRows.bind(this);
+    this.updateRow = this.updateRow.bind(this);
     this.props.showSpinner();
   }
 
@@ -439,6 +446,17 @@ class EditItemsPage extends Component {
     }
 
     return Promise.resolve();
+  }
+
+  updateRow(values, index) {
+    const item = values.editPageItems[index];
+    let val = values;
+    val = update(values, {
+      editPageItems: { [index]: { $set: item } },
+    });
+    this.setState({
+      values: val,
+    });
   }
 
   /**
@@ -733,6 +751,7 @@ class EditItemsPage extends Component {
                 loadMoreRows: this.loadMoreRows,
                 isRowLoaded: this.isRowLoaded,
                 isPaginated: this.props.isPaginated,
+                updateRow: this.updateRow,
                 values,
                 showOnly,
               }))}

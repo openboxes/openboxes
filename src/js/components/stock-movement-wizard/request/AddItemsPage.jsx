@@ -9,6 +9,7 @@ import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
 import moment from 'moment';
 import fileDownload from 'js-file-download';
+import update from 'immutability-helper';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -99,9 +100,10 @@ const NO_STOCKLIST_FIELDS = {
         },
         fieldKey: '',
         getDynamicAttr: ({
-          fieldValue,
+          fieldValue, updateRow, values, rowIndex,
         }) => ({
           disabled: (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') || _.isNil(fieldValue && fieldValue.product),
+          onBlur: () => updateRow(values, rowIndex),
         }),
       },
       recipient: {
@@ -111,7 +113,8 @@ const NO_STOCKLIST_FIELDS = {
         flexWidth: '2.5',
         fieldKey: '',
         getDynamicAttr: ({
-          fieldValue, recipients, addRow, rowCount, rowIndex, getSortOrder, updateTotalCount,
+          fieldValue, recipients, addRow, rowCount, rowIndex, getSortOrder,
+          updateTotalCount, updateRow, values,
         }) => ({
           options: recipients,
           disabled: (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') || _.isNil(fieldValue && fieldValue.product),
@@ -127,6 +130,7 @@ const NO_STOCKLIST_FIELDS = {
             updateTotalCount(1);
             addRow({ sortOrder: getSortOrder() });
           } : null,
+          onBlur: () => updateRow(values, rowIndex),
         }),
         attributes: {
           labelKey: 'name',
@@ -205,7 +209,7 @@ const STOCKLIST_FIELDS = {
           type: 'number',
         },
         getDynamicAttr: ({
-          addRow, rowCount, rowIndex, getSortOrder, updateTotalCount,
+          addRow, rowCount, rowIndex, getSortOrder, updateTotalCount, values, updateRow,
         }) => ({
           onTabPress: rowCount === rowIndex + 1 ? () => {
             updateTotalCount(1);
@@ -219,6 +223,7 @@ const STOCKLIST_FIELDS = {
             updateTotalCount(1);
             addRow({ sortOrder: getSortOrder() });
           } : null,
+          onBlur: () => updateRow(values, rowIndex),
         }),
       },
       deleteButton: DELETE_BUTTON_FIELD,
@@ -400,6 +405,7 @@ class AddItemsPage extends Component {
     this.isRowLoaded = this.isRowLoaded.bind(this);
     this.loadMoreRows = this.loadMoreRows.bind(this);
     this.updateTotalCount = this.updateTotalCount.bind(this);
+    this.updateRow = this.updateRow.bind(this);
 
     this.debouncedProductsFetch = debounceProductsFetch(
       this.props.debounceTime,
@@ -569,6 +575,17 @@ class AddItemsPage extends Component {
   updateTotalCount(value) {
     this.setState({
       totalCount: this.state.totalCount + value === 0 ? 1 : this.state.totalCount + value,
+    });
+  }
+
+  updateRow(values, index) {
+    const item = values.editPageItems[index];
+    let val = values;
+    val = update(values, {
+      editPageItems: { [index]: { $set: item } },
+    });
+    this.setState({
+      values: val,
     });
   }
 
@@ -1170,6 +1187,8 @@ class AddItemsPage extends Component {
                   updateTotalCount: this.updateTotalCount,
                   isPaginated: this.props.isPaginated,
                   isFromOrder: this.state.values.isFromOrder,
+                  updateRow: this.updateRow,
+                  values,
                 }))}
               <div>
                 <button
