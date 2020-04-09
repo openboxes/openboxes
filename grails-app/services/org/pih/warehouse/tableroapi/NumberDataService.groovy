@@ -24,8 +24,9 @@ class NumberDataService {
         def receivingBin = InventorySnapshot.executeQuery("""
             SELECT COUNT(distinct i.product.id) from InventorySnapshot i 
             LEFT JOIN i.location l 
+            LEFT JOIN i.binLocation bl
             WHERE l = :location AND i.quantityOnHand > 0 
-            AND i.date = :tomorrow AND l.locationType.id = :locationType""",
+            AND i.date = :tomorrow AND bl.locationType.id = :locationType""",
             [
                 'location': location, 
                 'tomorrow': tomorrow, 
