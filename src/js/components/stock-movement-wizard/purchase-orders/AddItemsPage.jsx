@@ -138,17 +138,20 @@ const VENDOR_FIELDS = {
         buttonLabel: 'react.stockMovement.splitLine.label',
         buttonDefaultMessage: 'Split line',
         getDynamicAttr: ({
-          fieldValue, addRow, rowIndex,
+          fieldValue, addRow, rowIndex, updateTotalCount,
         }) => ({
-          onClick: () => addRow({
-            product: {
-              ...fieldValue.product,
-              label: `${fieldValue.product.productCode} ${fieldValue.product.name}`,
-            },
-            recipient: fieldValue.recipient,
-            sortOrder: fieldValue.sortOrder + 1,
-            referenceId: fieldValue.referenceId,
-          }, rowIndex),
+          onClick: () => {
+            updateTotalCount(1);
+            addRow({
+              product: {
+                ...fieldValue.product,
+                label: `${fieldValue.product.productCode} ${fieldValue.product.name}`,
+              },
+              recipient: fieldValue.recipient,
+              sortOrder: fieldValue.sortOrder + 1,
+              referenceId: fieldValue.referenceId,
+            }, rowIndex);
+          },
         }),
         attributes: {
           className: 'btn btn-outline-success',
