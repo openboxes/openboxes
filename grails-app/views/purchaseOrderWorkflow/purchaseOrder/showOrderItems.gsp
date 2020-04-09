@@ -81,7 +81,7 @@
                 </div>
                 <div class="right">
                     <g:if test="${!order?.isPlaced()}">
-                        <g:link controller="order" action="placeOrder" id="${order?.id}" class="button" >
+                        <g:link controller="order" action="placeOrder" id="${order?.id}" class="button validate" >
                             <img src="${resource(dir: 'images/icons/silk', file: 'cart_go.png')}" />&nbsp;
                             ${warehouse.message(code: 'order.wizard.placeOrder.label')}
                         </g:link>
@@ -100,6 +100,20 @@
         </div>
     </div>
     <script type="text/javascript">
+
+        // Validate the create line item form in case someone forgot to
+        $(".validate").click(function (event) {
+          var productId = $("#product-suggest").val();
+          var quantity = $("#quantity").val();
+          var unitPrice = $("#unitPrice").val();
+          if (productId || quantity || unitPrice) {
+            $.notify("Please save item before proceeding");
+            return false;
+          } else {
+            // This seems to be the best way to proceed after stopping propagation
+            window.location = $(this).attr("href");
+          }
+        });
 
         // When chosen product has changed, trigger function that updates source code column
         $("#product-id").change(function() {
@@ -123,7 +137,6 @@
               $.notify("Successfully deleted item " + id, "success")
             },
             error: function (jqXHR, textStatus, errorThrown) {
-              alert(textStatus + " " + errorThrown);
               $.notify("Error deleting item " + id, "error")
             }
           });
@@ -131,7 +144,6 @@
         }
 
         function saveOrderItem() {
-            $(".save-item").attr("disabled", true);
             var data = $("#orderItemForm").serialize();
             data += "&productSupplier.id=" + $("#productSupplier").val();
             $.ajax({
@@ -144,10 +156,10 @@
                     $.notify("Successfully saved new item", "success")
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
-                  $.notify("An error occurred: " + textStatus + " " + errorThrown);
+                  $.notify("Error saving your item");
                 },
                 complete: function(jqXHR, textStatus) {
-                    //$(".save-item").removeAttr("disabled");
+
                 }
             });
             return false
@@ -161,7 +173,6 @@
             // Place focus on product search box
             $(id).focus();
         }
-
 
         function clearOrderItemForm() {
           $("#orderItemForm")[0].reset();
@@ -283,8 +294,10 @@
             title: "Edit line item"
           });
 
+          // Submit order item form when we blur on the last field (before button)
           $("#estimatedReadyDate-datepicker")
-          .focusout(function () {
+          .blur(function (event) {
+            event.preventDefault();
             saveOrderItem();
           });
 
@@ -315,8 +328,6 @@
           $('.save-item')
           .live("click", function (event) {
             event.preventDefault();
-            var id = $(this)
-            .data("order-item-id");
             saveOrderItem();
           });
 

@@ -86,7 +86,7 @@
                 </button>
                 <div class="right">
                     <button class="button close-dialog-button">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'bullet_go.png')}" />&nbsp;
+                        <img src="${resource(dir: 'images/icons/silk', file: 'bullet_cross.png')}" />&nbsp;
                         <warehouse:message code="default.button.close.label"/>
                     </button>
                 </div>
