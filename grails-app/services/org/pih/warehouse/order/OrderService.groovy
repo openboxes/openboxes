@@ -228,16 +228,9 @@ class OrderService {
 
         order.originParty = order.originParty?:order?.origin?.organization
         order.destinationParty = order.destinationParty?:order?.destination?.organization
-        order.lastUpdated = new Date()
 
         if (!order.orderNumber) {
             order.orderNumber = identifierService.generateOrderIdentifier()
-        }
-        if (!order.dateCreated) {
-            order.dateCreated = new Date()
-        }
-        if (!order.createdBy) {
-            order.createdBy = AuthService.getCurrentUser().get()
         }
 
         if (!order.hasErrors() && order.save()) {
