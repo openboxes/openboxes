@@ -222,12 +222,8 @@ class OrderService {
         // update the status of the order before saving
         order.updateStatus()
 
-        if (order.originParty != order?.origin?.organization) {
-            order.originParty = order?.origin?.organization
-        }
-        if (order.destinationParty != order?.destination?.organization) {
-            order.destinationParty = order?.destination?.organization
-        }
+        order.originParty = order?.origin?.organization
+        order.destinationParty = order?.destination?.organization
 
         if (!order.orderNumber) {
             order.orderNumber = identifierService.generateOrderIdentifier()

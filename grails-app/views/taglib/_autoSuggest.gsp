@@ -42,7 +42,6 @@
                         add(items);
                     }));
             },
-            //focus: function( event, ui ) { event.preventDefault(); },
             change: function(event, ui) {
                 console.log("changed: ", ui.item);
                 // If the user does not select a value, we remove the value
@@ -85,7 +84,7 @@
                     // Otherwise display selected person
                     else {
                         selectItem(hiddenField, textField, ui.item.id, ui.item.label);
-                        //$(this).notify("Selected item " + ui.item.label, {className: "success"});
+                        $(this).notify("Selected item " + ui.item.label, {className: "success"});
                     }
                 }
 

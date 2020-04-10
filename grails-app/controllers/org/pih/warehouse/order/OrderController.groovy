@@ -525,7 +525,6 @@ class OrderController {
     }
 
     def orderItemFormDialog = {
-        log.info "params " + params
         OrderItem orderItem = OrderItem.get(params.id)
         render(template: "orderItemFormDialog", model: [orderItem:orderItem])
     }
@@ -537,7 +536,7 @@ class OrderController {
             order.removeFromOrderItems(orderItem)
             orderItem.delete()
             order.save()
-            render (status: 201, text: "Successfully deleted order item")
+            render (status: 200, text: "Successfully deleted order item")
         }
         else {
             render (status: 404, text: "Unable to locate order item")
@@ -558,7 +557,6 @@ class OrderController {
         if (!order.save()) {
             throw new ValidationException("Order is invalid", order.errors)
         }
-
         render (status: 200, text: "Successfully added order item")
     }
 
@@ -580,9 +578,7 @@ class OrderController {
                     dateCreated: it.dateCreated,
             ]
         }
-
         orderItems = orderItems.sort { it.dateCreated }
-
         render orderItems as JSON
     }
 
@@ -626,7 +622,6 @@ class OrderController {
                         "\n"
             }
             render csv
-
         }
     }
 

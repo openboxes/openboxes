@@ -18,14 +18,14 @@
         <div id="manufacturerCode"></div>
     </td>
     <td class="middle center">
-        <input type="number" id="quantity" required="true" name='quantity' value="" size="10" class="text" />
+        <input type="number" id="quantity" required="true" name="quantity" value="" size="10" class="text" />
     </td>
     <td class="center middle">
         <g:hiddenField name="unitOfMeasure" value="each"/>
         each
     </td>
     <td class="center middle">
-        <input type="number" id="unitPrice" required name='unitPrice' size="5" class="text"/>
+        <input type="number" id="unitPrice" required name="unitPrice" size="5" class="text"/>
     </td>
     <td></td>
     <td>
