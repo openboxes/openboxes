@@ -9,9 +9,11 @@
  **/
 package org.pih.warehouse.order
 
+import grails.converters.JSON
 import grails.validation.ValidationException
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Comment
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
@@ -34,10 +36,14 @@ class OrderController {
 
         def suppliers = orderService.getSuppliers().sort()
 
-        def orderTemplate = new Order(params)
-        orderTemplate.status = params.status ? Enum.valueOf(OrderStatus.class, params.status) : null
+        params.orderTypeCode = params.orderTypeCode ? Enum.valueOf(OrderTypeCode.class, params.orderTypeCode) : OrderTypeCode.PURCHASE_ORDER
+        params.status = params.status ? Enum.valueOf(OrderStatus.class, params.status) : null
         def statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
         def statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
+        params.max = params.max?:10
+        params.offset = params.offset?:0
+
+        def orderTemplate = new Order(params)
         def orders = orderService.getOrders(orderTemplate, statusStartDate, statusEndDate, params)
 
         def totalPrice = 0.00
@@ -518,6 +524,64 @@ class OrderController {
         }
     }
 
+    def orderItemFormDialog = {
+        OrderItem orderItem = OrderItem.get(params.id)
+        render(template: "orderItemFormDialog", model: [orderItem:orderItem])
+    }
+
+    def deleteOrderItem = {
+        OrderItem orderItem = OrderItem.get(params.id)
+        if (orderItem) {
+            Order order = orderItem.order
+            order.removeFromOrderItems(orderItem)
+            orderItem.delete()
+            order.save()
+            render (status: 200, text: "Successfully deleted order item")
+        }
+        else {
+            render (status: 404, text: "Unable to locate order item")
+        }
+    }
+
+    def saveOrderItem = {
+        Order order = Order.get(params.order.id)
+        OrderItem orderItem = OrderItem.get(params.orderItem.id)
+        if (!orderItem) {
+            orderItem = new OrderItem(params)
+            order.addToOrderItems(orderItem)
+        }
+        else {
+            orderItem.properties = params
+        }
+        if (!order.save()) {
+            throw new ValidationException("Order is invalid", order.errors)
+        }
+        render (status: 200, text: "Successfully added order item")
+    }
+
+    def getOrderItems = {
+        def orderInstance = Order.get(params.id)
+        def orderItems = orderInstance.orderItems.collect {
+            [
+                    id: it.id,
+                    product: it.product,
+                    quantity: it.quantity,
+                    unitPrice:  g.formatNumber(number: it.unitPrice),
+                    totalPrice: g.formatNumber(number: it.totalPrice()),
+                    unitOfMeasure: it.product?.unitOfMeasure?:g.message(code: 'default.each.label'),
+                    estimatedReadyDate: g.formatDate(date: it.estimatedReadyDate, format: Constants.DEFAULT_DATE_FORMAT),
+                    actualReadyDate: g.formatDate(date: it.actualReadyDate, format: Constants.DEFAULT_DATE_FORMAT),
+                    productSupplier: it.productSupplier,
+                    recipient: it.recipient,
+                    isOrderPending: it?.order?.status == OrderStatus.PENDING,
+                    dateCreated: it.dateCreated,
+            ]
+        }
+        orderItems = orderItems.sort { it.dateCreated }
+        render orderItems as JSON
+    }
+
+
     def downloadOrderItems = {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
@@ -557,7 +621,6 @@ class OrderController {
                         "\n"
             }
             render csv
-
         }
     }
 
