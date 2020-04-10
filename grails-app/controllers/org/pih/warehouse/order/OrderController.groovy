@@ -544,7 +544,6 @@ class OrderController {
     }
 
     def saveOrderItem = {
-        log.info "params " + params
         Order order = Order.get(params.order.id)
         OrderItem orderItem = OrderItem.get(params.orderItem.id)
         if (!orderItem) {

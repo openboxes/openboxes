@@ -245,7 +245,6 @@
             data: 'productSupplierId=' + productSupplierId,
             url: '${request.contextPath}/json/productSupplierChanged',
             success: function (data, textStatus) {
-              console.log("data: ", data);
               $('#supplierCode').html(data.supplierCode);
               $('#manufacturerCode').html(data.manufacturerCode);
               $('#manufacturer').html(data.manufacturer);
@@ -263,7 +262,6 @@
                 url: "${request.contextPath}/json/getOrderItem",
                 data: { id: id },
                 success: function (data) {
-                    console.log(data);
                     return data;
                 },
                 error: function(xhr, status, error) {
@@ -316,7 +314,6 @@
 
           $("#product-suggest")
           .keydown(function (event) {
-            console.log(event);
             if (event.keyCode == 13) {
               event.preventDefault();
               return false;

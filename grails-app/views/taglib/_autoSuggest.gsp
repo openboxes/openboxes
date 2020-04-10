@@ -43,7 +43,6 @@
                     }));
             },
             change: function(event, ui) {
-                console.log("changed: ", ui.item);
                 // If the user does not select a value, we remove the value
                 if (!ui.item) {
                     var textField = $(this);
@@ -54,8 +53,6 @@
                 return false;
             },
             select: function(event, ui) {
-                console.log("selected: ", ui.item);
-
                 if (ui.item) {
                     var textField = $(this);
                     var hiddenField = $("#${attrs.id}-id");

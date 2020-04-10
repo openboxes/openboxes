@@ -144,7 +144,7 @@
             <td></td>
             <td valign="top" class="value">
                 <button class="button save-item-button">
-                    <img src="${resource(dir: "images/icons/silk', file: 'tick.png')}" />&nbsp;
+                    <img src="${resource(dir: 'images/icons/silk', file: 'tick.png')}" />&nbsp;
                     <warehouse:message code="default.button.save.label"/>
                 </button>
                 <button class="button delete-item-button">
