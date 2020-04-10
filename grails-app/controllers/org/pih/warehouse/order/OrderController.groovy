@@ -529,6 +529,9 @@ class OrderController {
     def deleteOrderItem = {
         OrderItem orderItem = OrderItem.get(params.id)
         if (orderItem) {
+            if (orderItem?.order?.status != OrderStatus.PENDING) {
+                throw new IllegalStateException("Cannot delete items when order is not pending")
+            }
             Order order = orderItem.order
             order.removeFromOrderItems(orderItem)
             orderItem.delete()
