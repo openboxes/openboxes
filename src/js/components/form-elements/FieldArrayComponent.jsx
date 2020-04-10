@@ -104,7 +104,7 @@ class FieldArrayComponent extends Component {
         </div>
         <div
           className="text-center border mb-1 flex-grow-1"
-          style={{ overflowY: virtualized && isPaginated ? 'hidden' : 'scroll', maxHeight: virtualized && isPaginated ? '450px' : maxTableHeight }}
+          style={{ overflowY: virtualized && isPaginated ? 'hidden' : 'scroll', maxHeight: virtualized && isPaginated ? window.innerHeight - 450 : maxTableHeight }}
         >
           <TableBodyComponent
             fields={fields}

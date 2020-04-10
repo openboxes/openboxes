@@ -25,10 +25,11 @@ class TableBodyVirtualized extends Component {
     const { fieldsConfig: { subfieldKey }, fields, properties } = this.props;
     const { totalCount } = properties;
     let height = 0;
+    const maxTableHeight = window.innerHeight - 450;
 
     if (!subfieldKey) {
-      if (totalCount * 28 > 450) {
-        height = 450;
+      if (totalCount * 28 > maxTableHeight) {
+        height = maxTableHeight;
       } else if (totalCount > 0) {
         height = totalCount * 28;
       }
@@ -37,8 +38,8 @@ class TableBodyVirtualized extends Component {
         const subfields = field[subfieldKey];
         if (!height) {
           height = 28 * (subfields.length + 1);
-        } else if (height + (28 * (subfields.length + 1)) > 450) {
-          height = 450;
+        } else if (height + (28 * (subfields.length + 1)) > maxTableHeight) {
+          height = maxTableHeight;
         } else {
           height += (28 * (subfields.length + 1));
         }
