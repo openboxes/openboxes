@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+  <changeSet author="jmiranda (generated)" id="1586452540228-1">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="order" columnName="created_by_id"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="order">
+      <column name="created_by_id" type="CHAR(38)"/>
+    </addColumn>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1586452540228-2">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="order" columnName="updated_by_id"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="order">
+      <column name="updated_by_id" type="CHAR(38)"/>
+    </addColumn>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1586452540228-3">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="FK651874E6D91063C"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="created_by_id" baseTableName="order"
+      constraintName="FK651874E6D91063C" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="person"/>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1586452540228-4">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="FK651874E8E7F7DCF"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="updated_by_id" baseTableName="order"
+      constraintName="FK651874E8E7F7DCF" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="person"/>
+  </changeSet>
+</databaseChangeLog>
+
+
+

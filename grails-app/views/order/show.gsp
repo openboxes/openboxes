@@ -109,23 +109,7 @@
                             <table>
                                 <tr class="prop">
                                     <td valign="top" class="name">
-                                            <label><warehouse:message code="default.dateCreated.label"/></label>
-                                    </td>
-                                    <td valign="top" class="value">
-                                        <small><format:date obj="${orderInstance?.dateOrdered}"/></small>
-                                    </td>
-                                </tr>
-                                <tr class="prop">
-                                    <td valign="top" class="name">
-                                            <label><warehouse:message code="default.lastUpdated.label"/></label>
-                                    </td>
-                                    <td valign="top" class="value">
-                                        <small><format:date obj="${orderInstance?.dateOrdered}"/></small>
-                                    </td>
-                                </tr>
-                                <tr class="prop">
-                                    <td valign="top" class="name">
-                                            <label><warehouse:message code="order.orderedBy.label"/></label>
+                                        <label><warehouse:message code="order.orderedBy.label"/></label>
                                     </td>
                                     <td valign="top" class="value">
                                         <g:if test="${orderInstance?.orderedBy}">
@@ -139,7 +123,7 @@
                                 </tr>
                                 <tr class="prop">
                                     <td valign="top" class="name">
-                                            <label><warehouse:message code="order.approvedBy.label"/></label>
+                                        <label><warehouse:message code="order.approvedBy.label"/></label>
                                     </td>
                                     <td valign="top" class="value">
                                         <g:if test="${orderInstance?.approvedBy}">
@@ -153,7 +137,7 @@
                                 </tr>
                                 <tr class="prop">
                                     <td valign="top" class="name">
-                                            <label><warehouse:message code="order.completedBy.label"/></label>
+                                        <label><warehouse:message code="order.completedBy.label"/></label>
                                     </td>
                                     <td valign="top" class="value">
                                         <g:if test="${orderInstance?.completedBy}">
@@ -163,6 +147,24 @@
                                         <g:else>
                                             <g:message code="default.none.label"/>
                                         </g:else>
+                                    </td>
+                                </tr>
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                        <label><warehouse:message code="order.createdBy.label"/></label>
+                                    </td>
+                                    <td valign="top" class="value">
+                                        <div>${orderInstance?.createdBy?.name }</div>
+                                        <small><format:date obj="${orderInstance?.dateCreated}"/></small>
+                                    </td>
+                                </tr>
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                            <label><warehouse:message code="default.updatedBy.label"/></label>
+                                    </td>
+                                    <td valign="top" class="value">
+                                        <div>${orderInstance?.updatedBy?.name }</div>
+                                        <small><format:date obj="${orderInstance?.lastUpdated}"/></small>
                                     </td>
                                 </tr>
                             </table>

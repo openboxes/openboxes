@@ -51,8 +51,6 @@ class OrderController {
             totalPrice = orders.sum { it.totalPrice() }
         }
 
-        def orderedByList = orders.collect { it.orderedBy }.unique()
-
         [
                 orders         : orders,
                 command        : command,
@@ -61,7 +59,6 @@ class OrderController {
                 statusEndDate  : statusEndDate,
                 suppliers      : suppliers,
                 totalPrice     : totalPrice,
-                orderedByList  : orderedByList,
                 orderTypeCode  : orderTemplate?.orderTypeCode
         ]
     }
