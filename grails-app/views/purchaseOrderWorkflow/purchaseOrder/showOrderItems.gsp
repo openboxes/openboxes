@@ -51,7 +51,6 @@
                                 <th class="right"><warehouse:message code="orderItem.totalCost.label"/></th>
                                 <th class="center"><warehouse:message code="order.recipient.label"/></th>
                                 <th class="center"><warehouse:message code="orderItem.estimatedReadyDate.label"/></th>
-                                <th class="center"><warehouse:message code="orderItem.actualReadyDate.label"/></th>
                                 <th class="center" width="1%"><warehouse:message code="default.actions.label"/></th>
                             </tr>
                         </thead>
@@ -63,7 +62,7 @@
                                 <g:render template="/order/orderItemForm"/>
                             </g:if>
                             <tr class="">
-                                <th colspan="15" class="right">
+                                <th colspan="13" class="right">
                                     <warehouse:message code="default.total.label"/>
                                     <g:formatNumber number="${order?.totalPrice()?:0.0 }"/>
                                     ${order?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
@@ -151,25 +150,34 @@
           return false
         }
 
+        function validateForm() {
+          var productId = $("#product-suggest").val();
+          var quantity = $("#quantity").val();
+          var unitPrice = $("#unitPrice").val();
+          return productId && quantity && unitPrice
+        }
+
         function saveOrderItem() {
             var data = $("#orderItemForm").serialize();
             data += "&productSupplier.id=" + $("#productSupplier").val();
-            $.ajax({
-                url:'${g.createLink(controller:'order', action:'saveOrderItem')}',
-                data: data,
-                success: function() {
-                    clearOrderItemForm();
-                    loadOrderItems();
-                    applyFocus("#product-suggest");
-                    $.notify("Successfully saved new item", "success")
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                  $.notify("Error saving your item");
-                },
-                complete: function(jqXHR, textStatus) {
-
-                }
-            });
+            if (validateForm()) {
+                $.ajax({
+                    url:'${g.createLink(controller:'order', action:'saveOrderItem')}',
+                    data: data,
+                    success: function() {
+                        clearOrderItemForm();
+                        loadOrderItems();
+                        applyFocus("#product-suggest");
+                        $.notify("Successfully saved new item", "success")
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                      $.notify("Error saving your item");
+                    }
+                });
+            }
+            else {
+              $.notify("Please enter a value for all required fields: Product, Quantity, and Unit Price")
+            }
             return false
         }
 
@@ -184,10 +192,15 @@
 
         function clearOrderItemForm() {
           $("#orderItemForm")[0].reset();
+          $("#product-id").val("");
+          $("#product-value").val("");
           $("#productSupplier").html("");
           $("#supplierCode").html("");
           $("#manufacturer").html("");
           $("#manufacturerCode").html("");
+          var defaultRecipient = $("#defaultRecipient").val();
+          $("#recipient").val(defaultRecipient).trigger("chosen:updated");
+          $("#estimatedReadyDate-datepicker").datepicker('setDate', null);
         }
 
         function clearOrderItems() {
@@ -286,7 +299,6 @@
 
 
         $(document).ready(function() {
-
           initializeTable();
           applyFocus("#product-suggest");
 
@@ -309,7 +321,12 @@
           $("#estimatedReadyDate-datepicker")
           .blur(function (event) {
             event.preventDefault();
-            saveOrderItem();
+
+            // Only save if the blur event is sending focus to save button
+            // Note: we don't save on focus of save button because it creates duplicate requests
+            if ($(event.relatedTarget).attr("id") === "save-item-button") {
+              saveOrderItem();
+            }
           });
 
           $("#product-suggest")
@@ -371,8 +388,8 @@
     	{{= index }}
 	</td>
 	<td class="left middle">
-	    {{= product.productCode }}
-	    {{= product.name }}
+        {{= product.productCode }}
+        {{= product.name }}
 	</td>
 	<td class="center middle">
     	{{if productSupplier }}
@@ -413,9 +430,6 @@
 	</td>
 	<td class="center middle">
 	    {{= estimatedReadyDate }}
-	</td>
-	<td class="center middle">
-	    {{= actualReadyDate }}
 	</td>
 	<td class="center middle">
         <div class="action-menu">

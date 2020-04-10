@@ -18,17 +18,18 @@
         <div id="manufacturerCode"></div>
     </td>
     <td class="middle center">
-        <input type="number" id="quantity" required="true" name="quantity" value="" size="10" class="text" />
+        <input type="number" id="quantity" name="quantity" value="" size="10" class="text" />
     </td>
     <td class="center middle">
         <g:hiddenField name="unitOfMeasure" value="each"/>
-        each
+        <g:message code="default.each.label"/>
     </td>
     <td class="center middle">
         <input type="number" id="unitPrice" required name="unitPrice" size="5" class="text"/>
     </td>
     <td></td>
     <td>
+        <g:hiddenField id="defaultRecipient" name="defaultRecipient" value="${order?.orderedBy?.id}"/>
         <g:selectPerson id="recipient" name="recipient" value="${order?.orderedBy?.id}"
                         noSelection="['':'']" class="chzn-select-deselect"/>
     </td>
@@ -36,9 +37,8 @@
         <g:jqueryDatePicker id="estimatedReadyDate" name="estimatedReadyDate" value=""
                             autocomplete="off" noSelection="['':'']"/>
     </td>
-    <td></td>
     <td class="center" colspan="2">
-        <button class="button save-item">
+        <button id="save-item-button" class="button save-item">
             <img src="${resource(dir: 'images/icons/silk', file: 'tick.png')}" />&nbsp;
             <warehouse:message code="default.button.save.label"/>
         </button>
