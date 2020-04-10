@@ -417,6 +417,8 @@ class StockMovementApiController {
             // Pack page fields
             stockMovementItem.quantityShipped = lineItem.quantityShipped ? new BigDecimal(lineItem.quantityShipped) : null
             stockMovementItem.shipmentItemId = lineItem.shipmentItemId
+            stockMovementItem.orderItemId = lineItem.orderItemId
+
             List splitLineItems = lineItem.splitLineItems
             if (splitLineItems) {
                 stockMovementItem.splitLineItems = createLineItemsFromJson(stockMovement, splitLineItems)
