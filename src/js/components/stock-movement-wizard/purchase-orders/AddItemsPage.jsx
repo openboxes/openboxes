@@ -169,6 +169,7 @@ const VENDOR_FIELDS = {
               recipient: fieldValue.recipient,
               sortOrder: fieldValue.sortOrder + 1,
               referenceId: fieldValue.referenceId,
+              orderItemId: fieldValue.orderItemId,
             }, rowIndex);
           },
         }),
@@ -249,6 +250,7 @@ class AddItemsPage extends Component {
         expirationDate: item.expirationDate,
         'recipient.id': _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '',
         sortOrder: item.sortOrder,
+        orderItemId: item.orderItemId,
       })),
       _.map(lineItemsToBeUpdated, item => ({
         id: item.id,
@@ -260,6 +262,7 @@ class AddItemsPage extends Component {
         expirationDate: item.expirationDate,
         'recipient.id': _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '',
         sortOrder: item.sortOrder,
+        orderItemId: item.orderItemId,
       })),
     );
   }
