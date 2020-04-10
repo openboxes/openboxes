@@ -74,21 +74,21 @@
             <g:set var="hasBeenPartiallyReceived" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.PARTIALLY_RECEIVED}"/>
             <g:set var="hasBeenShipped" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.SHIPPED}"/>
             <g:set var="hasBeenPending" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.PENDING}"/>
-            <g:set var="hasBeenPlaced" value="${stockMovement?.isFromOrder && hasBeenShipped}"/>
+            <g:set var="hasBeenPlaced" value="${stockMovement?.isFromOrder && hasBeenShipped || hasBeenPartiallyReceived}"/>
             <g:set var="isSameLocation" value="${stockMovement?.destination?.id==session.warehouse.id}"/>
-            <g:set var="disableReceivingButton" value="${!(hasBeenIssued || hasBeenPlaced) || !isSameLocation || !(hasBeenShipped || hasBeenPartiallyReceived)}"/>
+            <g:set var="disableReceivingButton" value="${!(hasBeenIssued || hasBeenPlaced) || !isSameLocation || !(hasBeenShipped || hasBeenPartiallyReceived) || hasBeenReceived}"/>
             <g:set var="showRollbackLastReceiptButton" value="${hasBeenReceived || hasBeenPartiallyReceived}"/>
-            <g:if test="${!(hasBeenShipped || hasBeenPartiallyReceived)}">
-                <g:set var="disabledMessage" value="${g.message(code:'stockMovement.hasNotBeenShipped.message', args: [stockMovement?.identifier])}"/>
+            <g:if test="${hasBeenReceived}">
+                <g:set var="disabledMessage" value="${g.message(code:'stockMovement.hasAlreadyBeenReceived.message', args: [stockMovement?.identifier])}"/>
             </g:if>
+            <g:elseif test="${!(hasBeenShipped || hasBeenPartiallyReceived)}">
+                <g:set var="disabledMessage" value="${g.message(code:'stockMovement.hasNotBeenShipped.message', args: [stockMovement?.identifier])}"/>
+            </g:elseif>
             <g:elseif test="${!hasBeenPlaced}">
                 <g:set var="disabledMessage" value="${g.message(code:'stockMovement.hasNotBeenPlaced.message', args: [stockMovement?.identifier])}"/>
             </g:elseif>
             <g:elseif test="${!hasBeenIssued}">
                 <g:set var="disabledMessage" value="${g.message(code:'stockMovement.hasNotBeenIssued.message', args: [stockMovement?.identifier])}"/>
-            </g:elseif>
-            <g:elseif test="${hasBeenReceived}">
-                <g:set var="disabledMessage" value="${g.message(code:'stockMovement.hasAlreadyBeenReceived.message', args: [stockMovement?.identifier])}"/>
             </g:elseif>
             <g:elseif test="${!isSameLocation}">
                 <g:set var="disabledMessage" value="${g.message(code:'stockMovement.isDifferentLocation.message')}"/>
