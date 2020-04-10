@@ -233,7 +233,7 @@
                                         <g:message code="requisition.label"/>
                                     </td>
                                     <td class="value">
-                                        <g:link controller="requisition" action="show" id="${stockMovement?.id}" params="[override:true]">
+                                        <g:link controller="requisition" action="show" id="${stockMovement?.requisition?.id}" params="[override:true]">
                                             ${g.message(code:'default.view.label', args: [g.message(code: 'requisition.label')])}
                                             ${stockMovement?.requisition?.requestNumber}
                                         </g:link>
@@ -246,7 +246,7 @@
                                         <g:message code="shipment.label"/>
                                     </td>
                                     <td class="value">
-                                        <g:link controller="shipment" action="show" id="${stockMovement?.id}" params="[override:true]">
+                                        <g:link controller="shipment" action="showDetails" id="${stockMovement?.shipment?.id}" params="[override:true]">
                                             ${g.message(code:'default.view.label', args: [g.message(code: 'shipment.label')])}
                                             ${stockMovement?.shipment?.shipmentNumber}
                                         </g:link>
@@ -297,28 +297,40 @@
                                 <g:message code="stockMovement.dateRequested.label"/>
                             </td>
                             <td class="value">
-                                <span title="${g.formatDate(date:stockMovement?.dateRequested)}">
-                                    <g:formatDate format="MMMM dd, yyyy" date="${stockMovement.dateRequested}"/>
-                                </span>
-                                <g:if test="${stockMovement?.requisition?.requestedBy}">
-                                    <g:message code="default.by.label"/>
-                                    ${stockMovement?.requisition?.requestedBy?.name}
+                                <g:if test="${stockMovement?.dateRequested}">
+                                    <span title="${g.formatDate(date:stockMovement?.dateRequested)}">
+                                        <g:formatDate format="MMMM dd, yyyy" date="${stockMovement.dateRequested}"/>
+                                    </span>
+                                    <g:if test="${stockMovement?.requestedBy}">
+                                        <g:message code="default.by.label"/>
+                                        ${stockMovement?.requestedBy?.name}
+                                    </g:if>
                                 </g:if>
+                                <g:else>
+                                    <g:message code="default.none.label"/>
+                                </g:else>
                             </td>
                         </tr>
                         <tr class="prop">
                             <td class="name">
                                 <g:message code="stockMovement.dateShipped.label"/>
+                                <g:if test="${stockMovement?.shipment?.status?.code==org.pih.warehouse.shipping.ShipmentStatusCode.PENDING}">
+                                    <small><g:message code="default.expected.label"/></small>
+                                </g:if>
                             </td>
                             <td class="value">
-                                <span title="${g.formatDate(date:stockMovement?.dateShipped)}">
-                                    <g:formatDate format="MMMM dd, yyyy" date="${stockMovement.dateShipped}"/>
-                                </span>
-                                <g:if test="${stockMovement?.shipment?.createdBy}">
-                                    <g:message code="default.by.label"/>
-                                    ${stockMovement?.shipment?.createdBy?.name}
+                                <g:if test="${stockMovement?.dateShipped}">
+                                    <span title="${g.formatDate(date:stockMovement?.dateShipped)}">
+                                        <g:formatDate format="MMMM dd, yyyy" date="${stockMovement?.dateShipped}"/>
+                                    </span>
+                                    <g:if test="${stockMovement?.shipment?.createdBy}">
+                                        <g:message code="default.by.label"/>
+                                        ${stockMovement?.shipment?.createdBy?.name}
+                                    </g:if>
                                 </g:if>
-
+                                <g:else>
+                                    <g:message code="default.none.label"/>
+                                </g:else>
                             </td>
                         </tr>
                         <tr class="prop">
@@ -326,15 +338,20 @@
                                 <g:message code="stockMovement.dateReceived.label"/>
                             </td>
                             <td class="value">
-                                <g:each var="receipt" in="${stockMovement?.shipment?.receipts}">
-                                    <span title="${g.formatDate(date:receipt?.actualDeliveryDate)}">
-                                        <g:formatDate format="MMMM dd, yyyy" date="${receipt?.actualDeliveryDate}"/>
-                                    </span>
-                                    <g:if test="${receipt.recipient}">
-                                        <g:message code="default.by.label"/>
-                                        ${receipt.recipient?.name}
-                                    </g:if>
-                                </g:each>
+                                <g:if test="${stockMovement?.shipment?.receipts}">
+                                    <g:each var="receipt" in="${stockMovement?.shipment?.receipts}">
+                                        <span title="${g.formatDate(date:receipt?.actualDeliveryDate)}">
+                                            <g:formatDate format="MMMM dd, yyyy" date="${receipt?.actualDeliveryDate}"/>
+                                        </span>
+                                        <g:if test="${receipt.recipient}">
+                                            <g:message code="default.by.label"/>
+                                            ${receipt.recipient?.name}
+                                        </g:if>
+                                    </g:each>
+                                </g:if>
+                                <g:else>
+                                    <g:message code="default.none.label"/>
+                                </g:else>
 
                             </td>
                         </tr>
@@ -343,13 +360,18 @@
                                 <g:message code="default.dateCreated.label"/>
                             </td>
                             <td class="value">
-                                <span title="${g.formatDate(date:stockMovement?.dateCreated)}">
-                                    <g:formatDate format="MMMM dd, yyyy" date="${stockMovement?.dateCreated}"/>
-                                </span>
-                                <g:if test="${stockMovement?.createdBy}">
-                                    <g:message code="default.by.label"/>
-                                    ${stockMovement?.createdBy?.name}
+                                <g:if test="${stockMovement?.dateCreated}">
+                                    <span title="${g.formatDate(date:stockMovement?.dateCreated)}">
+                                        <g:formatDate format="MMMM dd, yyyy" date="${stockMovement?.dateCreated}"/>
+                                    </span>
+                                    <g:if test="${stockMovement?.createdBy}">
+                                        <g:message code="default.by.label"/>
+                                        ${stockMovement?.createdBy?.name}
+                                    </g:if>
                                 </g:if>
+                                <g:else>
+                                    <g:message code="default.none.label"/>
+                                </g:else>
                             </td>
                         </tr>
                         <tr class="prop">
@@ -357,13 +379,18 @@
                                 <g:message code="default.lastUpdated.label"/>
                             </td>
                             <td class="value">
-                                <span title="${g.formatDate(date:stockMovement?.lastUpdated)}">
-                                    <g:formatDate format="MMMM dd, yyyy" date="${stockMovement?.lastUpdated}"/>
-                                </span>
-                                <g:if test="${stockMovement?.updatedBy}">
-                                    <g:message code="default.by.label"/>
-                                    ${stockMovement?.updatedBy?.name}
+                                <g:if test="${stockMovement?.lastUpdated}">
+                                    <span title="${g.formatDate(date:stockMovement?.lastUpdated)}">
+                                        <g:formatDate format="MMMM dd, yyyy" date="${stockMovement?.lastUpdated}"/>
+                                    </span>
+                                    <g:if test="${stockMovement?.updatedBy}">
+                                        <g:message code="default.by.label"/>
+                                        ${stockMovement?.updatedBy?.name}
+                                    </g:if>
                                 </g:if>
+                                <g:else>
+                                    <g:message code="default.none.label"/>
+                                </g:else>
                             </td>
                         </tr>
                     </table>
