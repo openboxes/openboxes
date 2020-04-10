@@ -2157,7 +2157,6 @@ class ShipmentService {
                     shipment.addToShipmentItems(shipmentItem)
                 } else {
                     shipmentItem.product = orderItem.product
-                    shipmentItem.recipient = orderItem.recipient
                     shipmentItem.quantity = orderItem.quantity
                 }
             }
