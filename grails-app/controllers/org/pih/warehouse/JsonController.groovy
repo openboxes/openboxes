@@ -326,7 +326,6 @@ class JsonController {
         redirect(controller: "inventory", action: "browse")
     }
 
-
     @Cacheable("dashboardCache")
     def getGenericProductSummary = {
         def startTime = System.currentTimeMillis()
@@ -344,18 +343,21 @@ class JsonController {
 
     }
 
+    @Cacheable("dashboardCache")
     def getDashboardAlerts = {
         def location = Location.get(session?.warehouse?.id)
         def dashboardAlerts = dashboardService.getDashboardAlerts(location)
         render dashboardAlerts as JSON
     }
 
+    @Cacheable("dashboardCache")
     def getDashboardExpiryAlerts = {
         def location = Location.get(session?.warehouse?.id)
         def map = dashboardService.getExpirationSummary(location)
         render map as JSON
     }
 
+    @Cacheable("dashboardCache")
     def getTotalStockValue = {
         def location = Location.get(session?.warehouse?.id)
         def result = dashboardService.getTotalStockValue(location)
@@ -376,6 +378,7 @@ class JsonController {
         render data as JSON
     }
 
+    @Cacheable("dashboardCache")
     def getStockValueByProduct = {
         def location = Location.get(session?.warehouse?.id)
         def result = dashboardService.getTotalStockValue(location)
@@ -1282,6 +1285,7 @@ class JsonController {
         render([data: data] as JSON)
     }
 
+    @Cacheable("dashboardCache")
     def getFastMovers = {
         def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
         def date = new Date()
@@ -1315,6 +1319,7 @@ class JsonController {
         render "${CalculateHistoricalQuantityJob.enabled ? 'enabled' : 'disabled'}"
     }
 
+    @Cacheable("dashboardCache")
     def getBinLocationSummary = {
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
@@ -1538,6 +1543,7 @@ class JsonController {
         render([count: count] as JSON)
     }
 
+    @Cacheable("dashboardCache")
     def getDashboardActivity = {
 
         List activityList = []

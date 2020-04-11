@@ -64,15 +64,9 @@
                                         </li>
                                     </g:else>
                                     <li class="action-menu-item">
-                                        <g:link controller="dashboard" action="flushMegamenu" style="color: #666">
-                                            <img src="${resource(dir: 'images/icons/silk', file: 'page_white_refresh.png')}"/>
-                                            ${warehouse.message(code:'cache.flush.label', default: 'Refresh megamenu')}
-                                        </g:link>
-                                    </li>
-                                    <li class="action-menu-item">
                                         <g:link controller="dashboard" action="flushCache" style="color: #666">
                                             <img src="${resource(dir: 'images/icons/silk', file: 'database_refresh.png')}"/>
-                                            ${warehouse.message(code:'cache.flush.label', default: 'Refresh data caches')}
+                                            ${warehouse.message(code:'cache.flush.label', default: 'Refresh caches')}
                                         </g:link>
                                     </li>
                                     <li class="action-menu-item">
