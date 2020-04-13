@@ -124,6 +124,12 @@ class OrderController {
         try {
             Order order = Order.get(command?.order?.id)
 
+            boolean hasAtLeastOneItem = command.shipOrderItems.any { ShipOrderItemCommand shipOrderItem -> shipOrderItem.quantityToShip > 0 }
+            if (!hasAtLeastOneItem) {
+                order.errors.reject("Must specify at least one item to ship")
+                throw new ValidationException("Invalid order", order.errors)
+            }
+
             def shipOrderItemsByOrderItem = command.shipOrderItems.groupBy { ShipOrderItemCommand shipOrderItem -> shipOrderItem.orderItem }
             order.orderItems.each { OrderItem orderItem ->
                 List shipOrderItems = shipOrderItemsByOrderItem.get(orderItem)

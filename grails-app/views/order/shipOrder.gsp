@@ -51,13 +51,15 @@
 							<tr>
 								<th><g:message code="product.label"/></th>
 								<th><g:message code="product.unitOfMeasure.label" default="Unit of Measure"/></th>
-								<th><g:message code="orderItem.quantityOrdered.label" default="Ordered"/></th>
-								<th><g:message code="shipmentItem.quantityShipped.label" default="Shipped"/></th>
-								<th><g:message code="orderItem.quantityRemaining.label" default="Remaining"/></th>
-								<th><g:message code="shipmentItem.packLevel.label" default="Pack Level"/></th>
-								<th><g:message code="inventoryItem.lotNumber.label" default="Lot number"/></th>
-								<th><g:message code="inventoryItem.expirationDate.label" default="Expiration date"/></th>
-								<th><g:message code="orderItem.quantityToShip.label" default="Quantity To Ship"/></th>
+								<th class="center"><g:message code="orderItem.quantityOrdered.label" default="Ordered"/></th>
+								<th class="center"><g:message code="shipmentItem.quantityShipped.label" default="Shipped"/></th>
+								<th class="center"><g:message code="orderItem.quantityRemaining.label" default="Remaining"/></th>
+								<g:if test="${command.shipment}">
+									<th class="center"><g:message code="shipmentItem.packLevel.label" default="Pack Level"/></th>
+									<th class="center"><g:message code="inventoryItem.lotNumber.label" default="Lot number"/></th>
+									<th class="center"><g:message code="inventoryItem.expirationDate.label" default="Expiration date"/></th>
+								</g:if>
+								<th class="left"><g:message code="orderItem.quantityToShip.label" default="Quantity To Ship"/></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -80,17 +82,17 @@
 												${orderItem?.product?.unitOfMeasure}
 												</g:if>
 											</td>
-											<td class="middle">
+											<td class="center middle">
 												<g:if test="${!j}">
 												${orderItem?.quantity}
 												</g:if>
 											</td>
-											<td class="middle">
+											<td class="center middle">
 												<g:if test="${!j}">
 												${orderItem?.quantityFulfilled()}
 												</g:if>
 											</td>
-											<td class="middle">
+											<td class="center middle border-right">
 												<g:if test="${!j}">
 													<g:if test="${orderItem.quantityRemaining()>0}">
 														${orderItem?.quantityRemaining()}
@@ -98,18 +100,20 @@
 													<g:else>0</g:else>
 												</g:if>
 											</td>
-											<td class="middle">
-												<g:if test="${shipOrderItem?.shipmentItem?.container?.parentContainer}">
-													${shipOrderItem?.shipmentItem?.container?.parentContainer} &rsaquo;
-												</g:if>
-												${shipOrderItem?.shipmentItem?.container}
-											</td>
-											<td class="middle">
-												${shipOrderItem?.shipmentItem?.inventoryItem?.lotNumber}
-											</td>
-											<td class="middle">
-												<g:formatDate date="${shipOrderItem?.shipmentItem?.inventoryItem?.expirationDate}" format="dd/MMM/yyyy"/>
-											</td>
+											<g:if test="${command.shipment}">
+												<td class="center middle">
+													<g:if test="${shipOrderItem?.shipmentItem?.container?.parentContainer}">
+														${shipOrderItem?.shipmentItem?.container?.parentContainer} &rsaquo;
+													</g:if>
+													${shipOrderItem?.shipmentItem?.container}
+												</td>
+												<td class="center middle">
+													${shipOrderItem?.shipmentItem?.inventoryItem?.lotNumber}
+												</td>
+												<td class="center middle">
+													<g:formatDate date="${shipOrderItem?.shipmentItem?.inventoryItem?.expirationDate}" format="dd/MMM/yyyy"/>
+												</td>
+											</g:if>
 											<td>
 												<input type="number"
 													   class="text"
