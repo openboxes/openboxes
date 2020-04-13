@@ -314,15 +314,22 @@ class IndicatorDataService {
         Date date = LocalDate.now().minusMonths(querySize).toDate()
 
         def query = ReceiptItem.executeQuery("""
-            select s.shipmentNumber as number, s.name as name, count(ri.id) as count, s.requisition as requisition 
+            select 
+                s.shipmentNumber, 
+                s.name, 
+                count(ri.id), 
+                s.requisition
             from ReceiptItem as ri
+            left join ri.shipmentItem as si
             left join ri.receipt as r
             left join r.shipment as s
-            where r.receiptStatusCode = 'RECEIVED'
-            and s.destination = :location 
-            and ri.quantityShipped <> ri.quantityReceived
-            and r.actualDeliveryDate > :date 
+            where 
+                r.receiptStatusCode = 'RECEIVED'
+                and si.quantity <> ri.quantityReceived
+                and s.destination = :location 
+                and r.actualDeliveryDate > :date 
             group by s.shipmentNumber, s.id
+            having sum(si.quantity) <> sum(ri.quantityReceived)
         """, ['location': location, 'date': date])
 
         query.each {

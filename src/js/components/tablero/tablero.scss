@@ -194,6 +194,10 @@
         height: 100%;
         overflow-y: auto;
         margin-top: 10px;
+
+        .mid {
+          width: 80%;
+        }
   
         td, th {
           border-bottom: 1px solid #dddddd;
