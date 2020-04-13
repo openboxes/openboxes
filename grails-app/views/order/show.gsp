@@ -391,9 +391,10 @@
                                                 <tr class="odd">
                                                     <th><warehouse:message code="order.orderItem.label"/></th>
                                                     <th width="25%"><warehouse:message code="product.label"/></th>
-                                                    <th><warehouse:message code="default.type.label"/></th>
                                                     <th><warehouse:message code="shipment.label"/></th>
+                                                    <th><warehouse:message code="default.type.label"/></th>
                                                     <th><warehouse:message code="default.status.label"/></th>
+                                                    <th><warehouse:message code="shipmentItem.packLevel.label" default="Pack Level"/></th>
                                                     <th><warehouse:message code="inventoryItem.lotNumber.label"/></th>
                                                     <th><warehouse:message code="inventoryItem.expirationDate.label"/></th>
                                                     <th class="right"><warehouse:message code="default.quantity.label"/></th>
@@ -423,6 +424,12 @@
                                                         </td>
                                                         <td>
                                                             <format:metadata obj="${shipmentItem?.shipment?.currentStatus}"/>
+                                                        </td>
+                                                        <td class="center middle">
+                                                            <g:if test="${shipmentItem?.container?.parentContainer}">
+                                                                ${shipmentItem?.container?.parentContainer?.name} &rsaquo;
+                                                            </g:if>
+                                                            ${shipmentItem?.container?.name}
                                                         </td>
                                                         <td>
                                                             ${shipmentItem?.inventoryItem?.lotNumber}
