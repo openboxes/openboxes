@@ -17,7 +17,6 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
-import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.springframework.web.multipart.MultipartFile
 
 class OrderController {
@@ -33,8 +32,6 @@ class OrderController {
     }
 
     def list = { OrderCommand command ->
-
-        def suppliers = orderService.getSuppliers().sort()
 
         params.orderTypeCode = params.orderTypeCode ? Enum.valueOf(OrderTypeCode.class, params.orderTypeCode) : OrderTypeCode.PURCHASE_ORDER
         params.status = params.status ? Enum.valueOf(OrderStatus.class, params.status) : null
@@ -57,7 +54,6 @@ class OrderController {
                 status         : orderTemplate.status,
                 statusStartDate: statusStartDate,
                 statusEndDate  : statusEndDate,
-                suppliers      : suppliers,
                 totalPrice     : totalPrice,
                 orderTypeCode  : orderTemplate?.orderTypeCode
         ]
@@ -75,25 +71,76 @@ class OrderController {
 
 
     def shipOrder = {
-        Order orderInstance = Order.get(params.id)
-        [orderInstance:orderInstance]
+        Order order = Order.get(params.id)
+
+        // Use command populated on saveShipmentItems (probably contains errors) OR create a new one
+        ShipOrderCommand command = new ShipOrderCommand(order: order, shipment: order.pendingShipment)
+
+        // Populate the line items from existing pending shipment
+        order.orderItems.each { OrderItem orderItem ->
+
+            // Find shipment item associated with given order item
+            def shipmentItems =
+                    order?.pendingShipment?.shipmentItems?.findAll { ShipmentItem shipmentItem ->
+                        return shipmentItem.orderItems.any { it == orderItem }
+            }
+
+            if (shipmentItems) {
+                shipmentItems.each { ShipmentItem shipmentItem ->
+                    ShipOrderItemCommand shipOrderItem =
+                            new ShipOrderItemCommand(
+                                    lotNumber: shipmentItem?.inventoryItem?.lotNumber,
+                                    expirationDate: shipmentItem?.inventoryItem?.expirationDate,
+                                    orderItem: orderItem,
+                                    shipmentItem: shipmentItem,
+                                    quantityMinimum: 0,
+                                    quantityToShip: shipmentItem.quantity,
+                                    quantityMaximum: orderItem.quantityRemaining()
+
+                            )
+                    command.shipOrderItems.add(shipOrderItem)
+                }
+            }
+            // Or populate line items from quantity remaining on order item
+            else {
+                def quantityRemaining = orderItem?.quantityRemaining()?:0
+                ShipOrderItemCommand shipOrderItem =
+                            new ShipOrderItemCommand(
+                                    orderItem: orderItem,
+                                    quantityMinimum: 0,
+                                    quantityToShip: order.pendingShipment ? 0 : quantityRemaining,
+                                    quantityMaximum: quantityRemaining)
+                    command.shipOrderItems.add(shipOrderItem)
+            }
+        }
+        [command: command]
     }
 
     def saveShipmentItems = { ShipOrderCommand command ->
-        log.info "Command: ${command}"
         if (!command.validate() || command.hasErrors()) {
             render(view: "shipOrderItems", model: [orderInstance: command.order, command: command])
             return
         }
-
         try {
-            String commandId = command.order.id
-            Order order = Order.get(commandId)
-            def pendingShipments = order.getShipmentsByStatus(ShipmentStatusCode.PENDING)
-            if (pendingShipments.size() > 0) {
-                String shipmentId = pendingShipments.first().id
-                shipmentService.updateOrCreateOrderBasedShipmentItems(command.order, Shipment.get(shipmentId))
-                redirect(controller: 'stockMovement', action: 'createPurchaseOrders', params: [id: shipmentId])
+            Order order = Order.get(command?.order?.id)
+
+            def shipOrderItemsByOrderItem = command.shipOrderItems.groupBy { ShipOrderItemCommand shipOrderItem -> shipOrderItem.orderItem }
+            order.orderItems.each { OrderItem orderItem ->
+                List shipOrderItems = shipOrderItemsByOrderItem.get(orderItem)
+                BigDecimal totalQuantityToShip = shipOrderItems.sum { it.quantityToShip }
+                if (totalQuantityToShip > orderItem.quantityRemaining()) {
+                    orderItem.errors.reject("Sum of quantity to ship (${totalQuantityToShip}) " +
+                            "cannot be greater than remaining quantity (${orderItem.quantityRemaining()}) " +
+                            "for order item '${orderItem.product.productCode} ${orderItem.product.name}'"
+                    )
+                    throw new ValidationException("Invalid order item", orderItem.errors)
+                }
+            }
+
+            if (order?.pendingShipment) {
+                command.shipment = order.pendingShipment
+                shipmentService.updateOrCreateOrderBasedShipmentItems(command)
+                redirect(controller: 'stockMovement', action: 'createPurchaseOrders', params: [id: order?.pendingShipment?.id])
                 return
             }
             Shipment shipment = stockMovementService.createInboundShipment(command)
@@ -102,11 +149,8 @@ class OrderController {
                 return
             }
         } catch (ValidationException e) {
-            command.errors = e.errors
-            command.order = Order.load(command.order.id)
-            render (view: "shipOrder", model: [command:command, orderInstance: command.order])
-            return
-
+            log.error("Validation error: " + e.message, e)
+            flash.errors = e.errors
         }
         redirect (action: "shipOrder", id: command.order.id)
     }
@@ -730,8 +774,11 @@ class OrderController {
 
 
     def redirectFromStockMovement = {
+        // FIXME Need to clean this up a bit (move logic to Shipment or ShipmentItem)
         def stockMovement = stockMovementService.getStockMovement(params.id)
-        def shipmentItem = stockMovement?.getShipment()?.getShipmentItems()?.first()
-        redirect(action: 'show', params: [id: shipmentItem?.orderItems*.order*.id])
+        def shipmentItem = stockMovement?.shipment?.shipmentItems?.first()
+        def orderIds = shipmentItem?.orderItems*.order*.id
+        def orderId = orderIds?.flatten().first()
+        redirect(action: 'shipOrder', id: orderId)
     }
 }

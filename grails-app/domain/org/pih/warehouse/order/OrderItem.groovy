@@ -19,7 +19,7 @@ import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
 
-class OrderItem implements Serializable {
+class OrderItem implements Serializable, Comparable<OrderItem> {
 
     String id
     String description
@@ -105,7 +105,8 @@ class OrderItem implements Serializable {
     }
 
     Integer quantityRemaining() {
-        return quantity - quantityFulfilled()
+        def quantityRemaining = quantity - quantityFulfilled()
+        return quantityRemaining > 0 ? quantityRemaining : 0
     }
 
     Integer quantityReceived() {
@@ -169,5 +170,26 @@ class OrderItem implements Serializable {
     String toString() {
         return product?.name
     }
+
+    int compareTo(OrderItem orderItem) {
+        def sortOrder =
+                dateCreated <=> orderItem?.dateCreated ?:
+                        product?.name <=> orderItem?.product?.name ?:
+                                quantity <=> orderItem?.quantity ?:
+                                        id <=> orderItem?.id
+        return sortOrder
+    }
+
+
+    Map toJson() {
+        return [
+                id           : id,
+                product      : product,
+                quantity     : quantity,
+                shipmentItems: shipmentItems,
+        ]
+    }
+
+
 
 }

@@ -72,15 +72,16 @@ class Order implements Serializable {
     static transients = [
             "isApprovalRequired",
             "displayStatus",
+            "orderedOrderItems",
+            "pendingShipment",
+            "receivedOrderItems",
+            "shipments",
+            "shippedOrderItems",
             "subtotal",
             "totalAdjustments",
             "totalOrderAdjustments",
             "totalOrderItemAdjustments",
             "total",
-            "orderedOrderItems",
-            "receivedOrderItems",
-            "shipments",
-            "shippedOrderItems"
     ]
 
     static hasMany = [
@@ -223,6 +224,15 @@ class Order implements Serializable {
         return shipments.findAll { Shipment shipment -> shipment.currentStatus == statusCode }
     }
 
+    Shipment getPendingShipment() {
+        def pendingShipments = getShipmentsByStatus(ShipmentStatusCode.PENDING)
+        if (pendingShipments.size() > 1) {
+            throw new IllegalStateException("An order can only have one pending shipment")
+        }
+        pendingShipments ? pendingShipments?.first() : null
+    }
+
+
     def listOrderItems() {
         return orderItems ? orderItems.findAll {
             it.orderItemStatusCode != OrderItemStatusCode.CANCELED
@@ -283,6 +293,19 @@ class Order implements Serializable {
         if (dateCompleted) name += "${separator}${dateCompleted?.format("MMMMM d, yyyy")}"
         if (completedBy) name += "${separator}${completedBy.name}"
         return name
+    }
+
+
+    Map toJson() {
+        return [
+                id         : id,
+                orderNumber: orderNumber,
+                name       : name,
+                status     : status,
+                origin     : origin,
+                destination: destination,
+                orderItems : orderItems,
+        ]
     }
 
 }

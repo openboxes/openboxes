@@ -39,6 +39,8 @@ import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Category
@@ -149,6 +151,14 @@ class BootStrap {
                     hasBinLocationSupport: location.hasBinLocationSupport(),
                     hasPackingSupport    : location.supports(ActivityCode.PACK_SHIPMENT)
             ]
+        }
+
+        JSON.registerObjectMarshaller(Order) { Order order ->
+            return order.toJson()
+        }
+
+        JSON.registerObjectMarshaller(OrderItem) { OrderItem orderItem ->
+            return orderItem.toJson()
         }
 
         JSON.registerObjectMarshaller(Person) { Person person ->

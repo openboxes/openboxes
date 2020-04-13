@@ -196,11 +196,12 @@
                                                 </g:if>
                                                 <th><warehouse:message code="product.productCode.label" /></th>
                                                 <th><warehouse:message code="product.label" /></th>
-                                                <th>${warehouse.message(code: 'orderItem.quantity.label')}</th>
+                                                <th class="center">${warehouse.message(code: 'product.unitOfMeasure.label')}</th>
+                                                <th class="right">${warehouse.message(code: 'orderItem.quantity.label')}</th>
                                                 <g:if test="${orderInstance.orderTypeCode==OrderTypeCode.PURCHASE_ORDER}">
-                                                    <th>${warehouse.message(code: 'order.ordered.label')}</th>
-                                                    <th>${warehouse.message(code: 'order.shipped.label')}</th>
-                                                    <th>${warehouse.message(code: 'order.received.label')}</th>
+                                                    <th class="right">${warehouse.message(code: 'order.ordered.label')}</th>
+                                                    <th class="right">${warehouse.message(code: 'order.shipped.label')}</th>
+                                                    <th class="right">${warehouse.message(code: 'order.received.label')}</th>
                                                     <th><warehouse:message code="order.unitPrice.label" /></th>
                                                     <th><warehouse:message code="order.totalPrice.label" /></th>
                                                 </g:if>
@@ -234,22 +235,21 @@
                                                             ${orderItem?.description }
                                                         </g:else>
                                                     </td>
-                                                    <td class="order-item-quantity">
-                                                        ${orderItem?.quantity}
+                                                    <td class="center">
                                                         ${orderItem?.product?.unitOfMeasure?:"EA"}
                                                     </td>
+                                                    <td class="order-item-quantity right">
+                                                        ${orderItem?.quantity}
+                                                    </td>
                                                     <g:if test="${orderInstance.orderTypeCode==OrderTypeCode.PURCHASE_ORDER}">
-                                                        <td class="order-item-ordered">
+                                                        <td class="order-item-ordered right">
                                                             ${orderInstance.isPlaced()?orderItem?.quantity:0}
-                                                            ${orderItem?.product?.unitOfMeasure?:"EA"}
                                                         </td>
-                                                        <td class="order-item-fullfilled">
+                                                        <td class="order-item-fullfilled right">
                                                             ${orderItem?.quantityFulfilled()?:0}
-                                                            ${orderItem?.product?.unitOfMeasure?:"EA"}
                                                         </td>
-                                                        <td class="order-item-received">
+                                                        <td class="order-item-received right">
                                                             ${orderItem?.quantityReceived()?:0}
-                                                            ${orderItem?.product?.unitOfMeasure?:"EA"}
                                                         </td>
                                                         <td class="">
                                                             <g:formatNumber number="${orderItem?.unitPrice?:0}" />
@@ -280,7 +280,7 @@
                                             <g:if test="${orderInstance.orderTypeCode==OrderTypeCode.PURCHASE_ORDER}">
                                                 <tfoot>
                                                 <tr class="">
-                                                    <th colspan="7" class="right">
+                                                    <th colspan="8" class="right">
                                                     </th>
                                                     <th colspan="1" class="left">
                                                         <g:formatNumber number="${orderInstance?.totalPrice()?:0.0 }"/>
@@ -390,13 +390,14 @@
                                                 <thead>
                                                 <tr class="odd">
                                                     <th><warehouse:message code="order.orderItem.label"/></th>
-                                                    <th><warehouse:message code="product.label"/></th>
+                                                    <th width="25%"><warehouse:message code="product.label"/></th>
                                                     <th><warehouse:message code="default.type.label"/></th>
                                                     <th><warehouse:message code="shipment.label"/></th>
                                                     <th><warehouse:message code="default.status.label"/></th>
                                                     <th><warehouse:message code="inventoryItem.lotNumber.label"/></th>
                                                     <th><warehouse:message code="inventoryItem.expirationDate.label"/></th>
-                                                    <th><warehouse:message code="default.quantity.label"/></th>
+                                                    <th class="right"><warehouse:message code="default.quantity.label"/></th>
+                                                    <th class="center"><warehouse:message code="product.unitOfMeasure.label"/></th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
@@ -405,12 +406,14 @@
                                                     <tr class="${i%2?'even':'odd'}">
                                                         <td>
                                                             <g:if test="${!j}">
-                                                                ${g.message(code:'order.orderItem.label')} ${i+1}
+                                                                ${i+1}
                                                             </g:if>
                                                         </td>
                                                         <td>
-                                                            ${shipmentItem?.product?.productCode}
-                                                            <format:product product="${shipmentItem?.product}"/>
+                                                            <g:if test="${!j}">
+                                                                ${shipmentItem?.product?.productCode}
+                                                                <format:product product="${shipmentItem?.product}"/>
+                                                            </g:if>
                                                         </td>
                                                         <td>
                                                             <g:link controller="stockMovement" action="show" id="${shipmentItem?.shipment?.id }">${shipmentItem?.shipment?.shipmentNumber} ${shipmentItem?.shipment?.name }</g:link>
@@ -427,8 +430,11 @@
                                                         <td>
                                                             <g:formatDate date="${shipmentItem?.inventoryItem?.expirationDate}" format="MMM yyyy"/>
                                                         </td>
-                                                        <td>
+                                                        <td class="right">
                                                             ${shipmentItem?.quantity}
+                                                        </td>
+                                                        <td class="center">
+                                                            ${shipmentItem?.product?.unitOfMeasure}
                                                         </td>
                                                     </tr>
                                                         </g:each>
