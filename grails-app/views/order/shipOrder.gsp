@@ -25,54 +25,133 @@
 				<g:renderErrors bean="${command}" as="list" />
 			</div>
 		</g:hasErrors>
+		<g:hasErrors bean="${flash.errors}">
+			<div class="errors">
+				<g:renderErrors bean="${flash.errors}" as="list" />
+			</div>
+		</g:hasErrors>
 
 		<div class="dialog">
 
-			<g:render template="summary" model="[orderInstance:orderInstance]" />
+			<g:render template="summary" model="[orderInstance:command?.order]" />
 
 			<g:form action="saveShipmentItems">
 				<div class="box">
-					<h2><warehouse:message code="order.shipOrder" default="Ship Order" /></h2>
-					<g:hiddenField name="order.id" value="${orderInstance?.id}" />
+					<h2>
+						<warehouse:message code="order.shipOrder" default="Ship Order" />
+						<g:if test="${command.shipment}">
+							&rsaquo; ${command.shipment.shipmentNumber} ${command?.shipment?.name} (${command?.shipment?.status})
+						</g:if>
+					</h2>
+					<g:hiddenField name="order.id" value="${command?.order?.id}" />
+					<g:hiddenField name="shipment.id" value="${command?.shipment?.id}" />
 
 					<table>
 						<thead>
 							<tr>
-								<th width="60%"><g:message code="product.label"/></th>
-								<th><g:message code="orderItem.quantityOrdered.label" default="Ordered"/></th>
-								<th><g:message code="shipmentItem.quantityShipped.label" default="Shipped"/></th>
-								<th><g:message code="orderItem.quantityRemaining.label" default="Remaining"/></th>
-								<th><g:message code="orderItem.quantityToShip.label" default="Quantity To Ship"/></th>
+								<th><g:message code="product.label"/></th>
+								<th><g:message code="product.unitOfMeasure.label" default="Unit of Measure"/></th>
+								<th class="center"><g:message code="orderItem.quantityOrdered.label" default="Ordered"/></th>
+								<th class="center"><g:message code="shipmentItem.quantityShipped.label" default="Shipped"/></th>
+								<th class="center"><g:message code="orderItem.quantityRemaining.label" default="Remaining"/></th>
+								<g:if test="${command.shipment}">
+									<th class="center"><g:message code="shipmentItem.packLevel.label" default="Pack Level"/></th>
+									<th class="center"><g:message code="inventoryItem.lotNumber.label" default="Lot number"/></th>
+									<th class="center"><g:message code="inventoryItem.expirationDate.label" default="Expiration date"/></th>
+								</g:if>
+								<th class="left"><g:message code="orderItem.quantityToShip.label" default="Quantity To Ship"/></th>
 							</tr>
 						</thead>
 						<tbody>
-							<g:each var="orderItem" in="${orderInstance.orderItems.sort { it.id }}" status="status">
-								<g:hiddenField name="orderItems[${status}].orderItem.id" value="${orderItem.id}"/>
-								<tr class="${status%2?'odd':'even'}">
-									<td class="middle">
-										${orderItem.product}
-									</td>
-									<td class="middle">
-										${orderItem.quantity}
-									</td>
-									<td class="middle">
-										${orderItem.quantityFulfilled()}
-									</td>
-									<td class="middle">
-										<g:if test="${orderItem.quantityRemaining()>0}">
-											${orderItem?.quantityRemaining()}
-										</g:if>
-										<g:else>0</g:else>
-									</td>
-									<td>
-										<input type="number" class="large text" size="3"
-											   name="orderItems[${status}].quantityToShip"
-											   min="0"
-											   max="${orderItem.quantityRemaining()>0?orderItem.quantityRemaining():0}"
-											   value="${orderItem.quantityRemaining()>0?orderItem.quantityRemaining():0}"/>
-									</td>
-								</tr>
+							<g:set var="status" value="${0}"/>
+							<g:each var="orderItem" in="${command?.order?.orderItems.sort()}" status="i">
+								<g:set var="shipOrderItemsByOrderItem" value="${command?.getShipOrderItemsByOrderItem(orderItem)}"/>
+								<g:if test="${shipOrderItemsByOrderItem}">
+									<g:each var="shipOrderItem" in="${shipOrderItemsByOrderItem}" status="j">
+										<g:hiddenField name="shipOrderItems[${status}].orderItem.id" value="${shipOrderItem.orderItem.id}"/>
+										<g:hiddenField name="shipOrderItems[${status}].shipmentItem.id" value="${shipOrderItem?.shipmentItem?.id}"/>
+										<tr class="${status%2?'odd':'even'} ${!j?'prop':''}">
+											<td class="middle">
+												<g:if test="${!j}">
+													${orderItem.product?.productCode}
+													${orderItem.product?.name}
+												</g:if>
+											</td>
+											<td class="middle">
+												<g:if test="${!j}">
+												${orderItem?.product?.unitOfMeasure}
+												</g:if>
+											</td>
+											<td class="center middle">
+												<g:if test="${!j}">
+												${orderItem?.quantity}
+												</g:if>
+											</td>
+											<td class="center middle">
+												<g:if test="${!j}">
+												${orderItem?.quantityFulfilled()}
+												</g:if>
+											</td>
+											<td class="center middle border-right">
+												<g:if test="${!j}">
+													<g:if test="${orderItem.quantityRemaining()>0}">
+														${orderItem?.quantityRemaining()}
+													</g:if>
+													<g:else>0</g:else>
+												</g:if>
+											</td>
+											<g:if test="${command.shipment}">
+												<td class="center middle">
+													<g:if test="${shipOrderItem?.shipmentItem?.container?.parentContainer}">
+														${shipOrderItem?.shipmentItem?.container?.parentContainer} &rsaquo;
+													</g:if>
+													${shipOrderItem?.shipmentItem?.container}
+												</td>
+												<td class="center middle">
+													${shipOrderItem?.shipmentItem?.inventoryItem?.lotNumber}
+												</td>
+												<td class="center middle">
+													<g:formatDate date="${shipOrderItem?.shipmentItem?.inventoryItem?.expirationDate}" format="dd/MMM/yyyy"/>
+												</td>
+											</g:if>
+											<td>
+												<input type="number"
+													   class="text"
+													   size="10"
+													   data-default-value="${shipOrderItem?.quantityToShip}"
+													   id="orderItems-quantityToShip${status}"
+													   name="shipOrderItems[${status}].quantityToShip"
+													   min="${shipOrderItem.quantityMinimum}"
+													   max="${shipOrderItem?.quantityMaximum}"
+													   value="${shipOrderItem.quantityToShip}"/>
+												<a href="#" class="change-quantity"
+												   data-id="#orderItems-quantityToShip${status}"
+												   data-delta="-1"
+												   data-min="${shipOrderItem.quantityMinimum}"
+												   data-max="${shipOrderItem.quantityMaximum}">
+													<img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" /></a>
+												<a href="#" class="change-quantity"
+												   data-id="#orderItems-quantityToShip${status}"
+												   data-delta="1"
+												   data-min="${shipOrderItem.quantityMinimum}"
+												   data-max="${shipOrderItem.quantityMaximum}">
+													<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" /></a>
+
+												<a href="#" class="change-quantity"
+												   data-id="#orderItems-quantityToShip${status}"
+												   data-delta="0"
+												   data-min="${shipOrderItem.quantityMinimum}"
+												   data-max="${shipOrderItem.quantityMaximum}">
+													<img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}" /></a>
+
+											</td>
+										</tr>
+										<g:set var="status" value="${status+1}"/>
+									</g:each>
+								</g:if>
+
 							</g:each>
+
 						</tbody>
 					</table>
 				</div>
@@ -80,7 +159,7 @@
 					<div class="left">
 						<g:link controller="purchaseOrderWorkflow"
 								action="purchaseOrder"
-								id="${orderInstance?.id}"
+								id="${command?.order.id}"
 								event="enterOrderDetails"
 								params="[skipTo:'items']"
 								class="button">
@@ -97,7 +176,22 @@
 				</div>
 			</g:form>
 		</div>
-
 	</div>
+<script type="text/javascript">
+
+$(document).ready(function() {
+	$(".change-quantity").click(function() {
+		var id = $(this).data("id");
+		var minimumValue = parseInt($(this).data("min"));
+		var maximumValue = parseInt($(this).data("max"));
+		var changeValue = parseInt($(this).data("delta"));
+		var oldValue = parseInt($(id).val());
+		var newValue = changeValue ? (oldValue + changeValue) : 0;
+		if (newValue <= maximumValue && newValue >= minimumValue) {
+			$(id).val(newValue);
+		}
+	});
+});
+</script>
 </body>
 </html>

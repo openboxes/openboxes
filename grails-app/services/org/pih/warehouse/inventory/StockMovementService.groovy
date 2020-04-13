@@ -1118,7 +1118,7 @@ class StockMovementService {
         shipment.createdBy = order.orderedBy
         shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
 
-        command.orderItems.each { ShipOrderItemCommand orderItemCommand ->
+        command.shipOrderItems.each { ShipOrderItemCommand orderItemCommand ->
             if (orderItemCommand.quantityToShip > 0) {
                 OrderItem orderItem = orderItemCommand.orderItem
                 ShipmentItem shipmentItem = new ShipmentItem()

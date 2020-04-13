@@ -34,6 +34,8 @@ import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.order.ShipOrderCommand
+import org.pih.warehouse.order.ShipOrderItemCommand
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
@@ -919,7 +921,11 @@ class ShipmentService {
         if (shipmentItem) {
             def shipment = Shipment.get(shipmentItem.shipment.id)
             shipment.removeFromShipmentItems(shipmentItem)
-            shipmentItem.delete(flush: true)
+            shipmentItem.orderItems.toArray().each { OrderItem orderItem ->
+                orderItem.removeFromShipmentItems(shipmentItem)
+            }
+            //shipmentItem.delete()
+            shipment.save(flush:true)
         }
     }
 
@@ -2132,29 +2138,33 @@ class ShipmentService {
     }
 
 
-    void updateOrCreateOrderBasedShipmentItems(Order order, Shipment shipment) {
+    void updateOrCreateOrderBasedShipmentItems(ShipOrderCommand command) {
+        Order order = command.order
+        Shipment shipment = command.shipment
         shipment.name = order.name
         shipment.description = order.orderNumber
         shipment.origin = order.origin
         shipment.destination = order.destination
 
-        if (order.orderItems) {
-            def itemsToRemove = shipment.shipmentItems.findAll {
-                sItem -> !order.orderItems?.any { oItem -> sItem.orderItems?.any { it.id == oItem.id } }
-            }
+        command.shipOrderItems.each { ShipOrderItemCommand shipOrderItem ->
 
-            itemsToRemove.each { ShipmentItem shipmentItem -> deleteShipmentItem(shipmentItem) }
-
-            order.orderItems.each { OrderItem orderItem ->
-                def shipmentItem = shipment.shipmentItems.find { it.orderItems?.any { it.id == orderItem.id } }
-                if (!shipmentItem) {
-                    shipmentItem = new ShipmentItem(
-                        product: orderItem.product,
-                        recipient: orderItem.recipient,
-                        quantity: orderItem.quantity
+            // Remove shipment item if quantity to ship is 0
+            if (!shipOrderItem.quantityToShip) {
+                if (shipOrderItem.shipmentItem) {
+                    deleteShipmentItem(shipOrderItem.shipmentItem)
+                }
+            // Otherwise create or update the shipment item
+            } else {
+                if (!shipOrderItem.shipmentItem) {
+                    ShipmentItem shipmentItem = new ShipmentItem(
+                            product: shipOrderItem.orderItem.product,
+                            recipient: shipOrderItem.orderItem.recipient,
+                            quantity: shipOrderItem.quantityToShip
                     )
-                    shipmentItem.addToOrderItems(orderItem)
+                    shipmentItem.addToOrderItems(shipOrderItem.orderItem)
                     shipment.addToShipmentItems(shipmentItem)
+                } else {
+                    shipOrderItem.shipmentItem.quantity = shipOrderItem.quantityToShip
                 }
             }
         }
