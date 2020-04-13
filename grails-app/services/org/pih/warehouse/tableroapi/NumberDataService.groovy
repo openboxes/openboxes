@@ -43,7 +43,7 @@ class NumberDataService {
 
             new NumberData("Your Shipments", shipments[0], "In Progress", 3, "/openboxes/stockMovement/list?receiptStatusCode=PENDING&origin.id=" + location.id + "&createdBy.id=" + user.id),
 
-            new NumberData("Your in progress putaways",incompletePutaways[0], "Putaways", 4, "/openboxes/order/list/listForm?orderedById=" + user.id),
+            new NumberData("Your in Progress Putaways",incompletePutaways[0], "Putaways", 4, "/openboxes/order/list/listForm?orderedById=" + user.id),
 
             new NumberData("User Incomplete Tasks", pending[0][0], "Not shipped", 5),
 
