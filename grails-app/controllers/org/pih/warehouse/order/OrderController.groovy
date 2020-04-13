@@ -127,7 +127,7 @@ class OrderController {
             def shipOrderItemsByOrderItem = command.shipOrderItems.groupBy { ShipOrderItemCommand shipOrderItem -> shipOrderItem.orderItem }
             order.orderItems.each { OrderItem orderItem ->
                 List shipOrderItems = shipOrderItemsByOrderItem.get(orderItem)
-                BigDecimal totalQuantityToShip = shipOrderItems.sum { it.quantityToShip }
+                BigDecimal totalQuantityToShip = shipOrderItems.sum { it?.quantityToShip?:0 }
                 if (totalQuantityToShip > orderItem.quantityRemaining()) {
                     orderItem.errors.reject("Sum of quantity to ship (${totalQuantityToShip}) " +
                             "cannot be greater than remaining quantity (${orderItem.quantityRemaining()}) " +
