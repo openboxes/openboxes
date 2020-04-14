@@ -510,6 +510,8 @@ openboxes.jobs.sendStockAlertsJob.cronExpression = "0 0 0 * * ?" // every day at
 
 // Refresh inventory snapshots
 openboxes.jobs.refreshInventorySnapshotJob.enabled = true
+openboxes.jobs.refreshInventorySnapshotJob.retryOnError = false
+openboxes.jobs.refreshInventorySnapshotJob.maxRetryAttempts = 3
 
 // Refresh transaction fact table
 openboxes.jobs.refreshTransactionFactJob.enabled = true
@@ -517,15 +519,16 @@ openboxes.jobs.refreshTransactionFactJob.cronExpression = "0 0 0 * * ?" // every
 
 // Refresh demand data snapshots
 openboxes.jobs.refreshDemandDataJob.enabled = true
-openboxes.jobs.refreshDemandDataJob.cronExpression = "0 2-59/5 * * * ?" // every five minutes starting at the first minute of the hour
+openboxes.jobs.refreshDemandDataJob.cronExpression = "0 0 1 * * ?" // at 01:00:00am every day
 
 // Assign identifier job
 openboxes.jobs.assignIdentifierJob.enabled = true
-openboxes.jobs.assignIdentifierJob.cronExpression = "0 * * * * ?" // every five minutes
+openboxes.jobs.assignIdentifierJob.cronExpression = "0 * * * * ?" // every minute
 
 // Calculate current quantity on hand
 openboxes.jobs.calculateQuantityJob.enabled = true
-openboxes.jobs.calculateQuantityJob.cronExpression = "0 */5 * * * ?" // every five minutes starting at the top of the hour
+openboxes.jobs.calculateQuantityJob.cronExpression = "0 0 0/2 * * ?" // every two hours starting at midnight
+openboxes.jobs.calculateQuantityJob.enableOptimization = false
 
 // Calculate historical quantity on hand
 openboxes.jobs.calculateHistoricalQuantityJob.enabled = false
@@ -639,8 +642,6 @@ grails.doc.footer = ""
 // Added by the Joda-Time plugin:
 grails.gorm.default.mapping = {
     id generator: 'uuid'
-    //cache true
-    dynamicUpdate true
     "user-type" type: org.jadira.usertype.dateandtime.joda.PersistentDateMidnight, class: org.joda.time.DateMidnight
     "user-type" type: org.jadira.usertype.dateandtime.joda.PersistentDateTime, class: org.joda.time.DateTime
     "user-type" type: org.jadira.usertype.dateandtime.joda.PersistentDateTimeZoneAsString, class: org.joda.time.DateTimeZone

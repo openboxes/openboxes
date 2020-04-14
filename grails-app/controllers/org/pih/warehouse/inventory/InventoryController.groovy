@@ -895,8 +895,9 @@ class InventoryController {
         // either save as a local transfer, or a generic transaction
         // (catch any exceptions so that we display "nice" error messages)
         Boolean saved = null
-        if (!transactionInstance.hasErrors()) {
+        if (transactionInstance.validate() && !transactionInstance.hasErrors()) {
             try {
+                transactionInstance.lastUpdated = new Date()
                 saved = transactionInstance.save(flush: true)
             }
             catch (Exception e) {
@@ -909,17 +910,10 @@ class InventoryController {
             redirect(action: "editTransaction", id: transactionInstance?.id)
         } else {
             flash.message = "${warehouse.message(code: 'inventory.unableToSaveTransaction.message')}"
-            def model = [
-                    transactionInstance : transactionInstance,
-                    productInstanceMap  : Product.list().groupBy { it.category },
-                    transactionTypeList : TransactionType.list(),
-                    locationInstanceList: Location.list(),
-                    warehouseInstance   : Location.get(session?.warehouse?.id)
-            ]
-            render(view: "editTransaction", model: model)
+            flash.errors = transactionInstance.errors
+            redirect(action: "editTransaction", id: transactionInstance?.id)
         }
     }
-
 
     /**
      * Show the transaction.
