@@ -24,6 +24,11 @@
 	                <g:renderErrors bean="${transactionInstance}" as="list" />
 	            </div>
             </g:hasErrors>
+            <g:if test="${flash.errors}">
+	            <div class="errors">
+	                <g:renderErrors bean="${flash.errors}" as="list" />
+	            </div>
+            </g:if>
 
 			<div class="dialog" >
 				<g:render template="../transaction/summary"/>
