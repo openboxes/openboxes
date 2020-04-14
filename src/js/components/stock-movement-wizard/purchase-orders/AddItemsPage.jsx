@@ -168,7 +168,6 @@ const VENDOR_FIELDS = {
               },
               recipient: fieldValue.recipient,
               sortOrder: fieldValue.sortOrder + 1,
-              referenceId: fieldValue.referenceId,
               orderItemId: fieldValue.orderItemId,
             }, rowIndex);
           },
@@ -348,7 +347,7 @@ class AddItemsPage extends Component {
       }
       if (item.id) {
         const splitItems = _.filter(values.lineItems, lineItem =>
-          lineItem.referenceId === item.referenceId);
+          lineItem.orderItemId === item.orderItemId);
         const requestedQuantity = _.reduce(
           splitItems, (sum, val) =>
             (sum + (val.quantityRequested ? _.toInteger(val.quantityRequested) : 0)),
@@ -499,7 +498,6 @@ class AddItemsPage extends Component {
                   ...val.product,
                   label: `${val.productCode} ${val.product.name}`,
                 },
-                referenceId: val.id,
               }),
             ),
           },
@@ -629,7 +627,6 @@ class AddItemsPage extends Component {
                 ...val.product,
                 label: `${val.product.productCode} ${val.product.name}`,
               },
-              referenceId: val.id,
             }),
           );
 
