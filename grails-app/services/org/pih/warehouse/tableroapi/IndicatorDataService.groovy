@@ -44,9 +44,9 @@ class IndicatorDataService {
                         // if item expires in daysCounter incoming days, we count it
                         if (it.daysToExpiry <= daysCounter ) {
                             expirationSummary[i] =  expirationSummary[i] ? expirationSummary[i] + 1 : 1
-                        } 
+                        }
                     }
-                } 
+                }
             }
         }
 
@@ -72,17 +72,17 @@ class IndicatorDataService {
             def monthEnd = today.clone()
             monthBegin.set(month: today.month - i, date: 1)
             monthEnd.set(month: today.month - i + 1, date: 1)
-                
+
             def query1 = Requisition.executeQuery("""select count(*) from RequisitionItem where dateCreated >= ? and dateCreated < ?""", [monthBegin, monthEnd]);
 
             def query2 = Requisition.executeQuery("""select count(*) from RequisitionItem where dateCreated >= ? and dateCreated < ? and quantityCanceled > 0 and (cancelReasonCode = 'STOCKOUT' or cancelReasonCode = 'LOW_STOCK' or cancelReasonCode = 'COULD_NOT_LOCATE')""", [monthBegin, monthEnd]);
             String monthLabel = new java.text.DateFormatSymbols().months[monthBegin.month]
-                
+
             listLabel.push(monthLabel)
             listData.push(query1[0])
             bar2Data.push(query2[0])
         }
-        
+
         List<IndicatorDatasets> datasets = [
             new IndicatorDatasets('Line1 Dataset', listData, 'line'),
             new IndicatorDatasets('Line2 Dataset', [15, 15, 15, 15, 15, 15], 'line'),
@@ -114,7 +114,7 @@ class IndicatorDataService {
             it.quantityOnHand <= 0
         }.size()
         //def totalCount = results.size()
-        
+
         def inventoryData = [
                     inStockCount    : inStockCount,
                     lowStockCount   : lowStockCount,
@@ -123,7 +123,7 @@ class IndicatorDataService {
                     stockOutCount   : stockOutCount,
                     //totalCount      : totalCount
                 ];
-        
+
         List listData = []
         for(item in inventoryData){
             listData.push(item.value? item.value : 0)
@@ -144,18 +144,18 @@ class IndicatorDataService {
         Integer querySize = params.querySize? params.querySize.toInteger()-1 : 5
         Date today = new Date()
         today.clearTime()
-        
+
         // queryLimit limits the query and avoid of getting data older than wanted
         Date queryLimit = today.clone()
-        queryLimit.set(month: today.month - querySize, date: 1) 
+        queryLimit.set(month: today.month - querySize, date: 1)
 
         List queryData = Shipment.executeQuery("""SELECT COUNT(s.id), s.destination, 
         MONTH(s.lastUpdated), YEAR(s.lastUpdated) FROM Shipment s WHERE s.origin = :location 
         AND s.currentStatus <> 'PENDING' AND s.lastUpdated > :limit 
-        GROUP BY MONTH(s.lastUpdated), YEAR(s.lastUpdated), s.destination""", 
+        GROUP BY MONTH(s.lastUpdated), YEAR(s.lastUpdated), s.destination""",
         ['location': location, 'limit': queryLimit])
         // queryData gives an array of arrays [[count, destination, month, year], ...] of sent stock
-        
+
         Map listRes = [:]
         List listLabel = []
 
@@ -203,16 +203,16 @@ class IndicatorDataService {
         Integer querySize = params.querySize? params.querySize.toInteger() - 1 : 5
         Date today = new Date()
         today.clearTime()
-        
+
         Date queryLimit = today.clone()
-        queryLimit.set(month: today.month - querySize, date: 1) 
+        queryLimit.set(month: today.month - querySize, date: 1)
 
         List queryData = Shipment.executeQuery("""SELECT COUNT(s.id), s.origin, 
         MONTH(s.lastUpdated), YEAR(s.lastUpdated) FROM Shipment s WHERE s.destination = :location 
         AND s.currentStatus <> 'PENDING' AND s.lastUpdated > :limit 
-        GROUP BY MONTH(s.lastUpdated), YEAR(s.lastUpdated), s.origin""", 
+        GROUP BY MONTH(s.lastUpdated), YEAR(s.lastUpdated), s.origin""",
         ['location': location, 'limit': queryLimit])
-        
+
         Map listRes = [:]
         List listLabel = []
 
@@ -262,13 +262,13 @@ class IndicatorDataService {
         def m4 = today - 4;
         def m7 = today - 7;
 
-        def greenData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated > :day and r.origin = :location and r.status <> 'ISSUED'""", 
+        def greenData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated > :day and r.origin = :location and r.status <> 'ISSUED'""",
         ['day': m4, 'location': location]);
-    
+
         def yellowData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated >= :dayOne and r.dateCreated <= :dayTwo and r.origin = :location and r.status <> 'ISSUED'""",
         ['dayOne': m7, 'dayTwo': m4, 'location': location]);
 
-        def redData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated < :day and r.origin = :location and r.status <> 'ISSUED'""", 
+        def redData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated < :day and r.origin = :location and r.status <> 'ISSUED'""",
         ['day': m7, 'location': location]);
 
         ColorNumber green = new ColorNumber(greenData[0], 'Created < 4 days ago');
@@ -306,34 +306,59 @@ class IndicatorDataService {
         return indicatorData;
     }
 
-    Table getDiscrepancy(Location location, def params) {
+    def getDiscrepancy(Location location, def params) {
         Integer querySize = params.querySize? params.querySize.toInteger() - 1 : 5
-
-        List<TableData> tableBody = []
 
         Date date = LocalDate.now().minusMonths(querySize).toDate()
 
-        def query = ReceiptItem.executeQuery("""
+        def results = ReceiptItem.executeQuery("""
             select 
+                s.id,
                 s.shipmentNumber, 
                 s.name, 
+                si.id,
                 count(ri.id), 
                 s.requisition.id
-            from ReceiptItem as ri
-            left join ri.shipmentItem as si
-            left join ri.receipt as r
-            left join r.shipment as s
+            from ShipmentItem as si
+            left outer join si.receiptItems as ri
+            join ri.receipt as r
+            join r.shipment as s
             where 
                 r.receiptStatusCode = 'RECEIVED'
-                and si.quantity <> ri.quantityReceived
                 and s.destination = :location 
                 and r.actualDeliveryDate > :date 
-            group by s.shipmentNumber, s.id
+            group by s.shipmentNumber, s.id, si.id
             having sum(si.quantity) <> sum(ri.quantityReceived)
         """, ['location': location, 'date': date])
 
-        query.each {
-            tableBody.push(new TableData(it[0], it[1], it[2].toString(), "/openboxes/stockMovement/show/" + it[3]))
+        // Transform to map
+        results = results.collect { [
+                shipmentId: it[0],
+                shipmentNumber: it[1],
+                shipmentName: it[2],
+                requisitionId: it[5]
+            ]
+        }
+
+        // Find discrepancies by shipment
+        Map discrepenciesByShipmentId =
+                results.inject([:]) { map, row ->
+                    // Initialize map entry for shipment id
+                    if (!map[row.shipmentId])
+                        map[row.shipmentId] = row << [count: 0];
+
+                    // Each new shipment row in teh results should increment count
+                    map[row.shipmentId].count += 1;
+                    return map
+                }
+
+        List<TableData> tableBody = discrepenciesByShipmentId.keySet().collect {
+            def row = discrepenciesByShipmentId[it]
+            return new TableData(row.shipmentNumber,
+                    row.shipmentName,
+                    row.count.toString(),
+                    "/openboxes/stockMovement/show/${row.requisitionId}"
+            )
         }
 
         Table indicatorData = new Table("Shipment", "Name", "Discrepancy", tableBody)

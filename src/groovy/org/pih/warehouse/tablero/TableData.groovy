@@ -1,7 +1,7 @@
 package org.pih.warehouse.tablero
 
 class TableData implements Serializable {
-    
+
     String name;
     String number;
     String link;
