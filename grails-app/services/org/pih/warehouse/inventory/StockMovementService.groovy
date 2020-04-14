@@ -1278,13 +1278,13 @@ class StockMovementService {
 
             stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
                 ShipmentItem shipmentItem = findOrCreateShipmentItem(shipment, stockMovementItem.id)
-                shipmentItem.container = createOrUpdateContainer(shipment, stockMovementItem.palletName, stockMovementItem.boxName)
                 shipmentItem.lotNumber = stockMovementItem.lotNumber
                 shipmentItem.expirationDate = stockMovementItem.expirationDate
                 shipmentItem.product = stockMovementItem.product
                 shipmentItem.inventoryItem = stockMovementItem.inventoryItem
                 shipmentItem.quantity = stockMovementItem.quantityRequested
                 shipmentItem.recipient = stockMovementItem.recipient
+                shipmentItem.container = createOrUpdateContainer(shipment, stockMovementItem.palletName, stockMovementItem.boxName)
 
                 if (stockMovement.isFromOrder) {
                     OrderItem orderItem = OrderItem.get(stockMovementItem.orderItemId)
