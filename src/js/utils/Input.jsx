@@ -66,6 +66,9 @@ const Input = ({
       {...props}
       onChange={handleChange}
       onFocus={handleFocus}
+      onDragStart={(event) => {
+        event.preventDefault();
+      }}
     />
   );
 };
