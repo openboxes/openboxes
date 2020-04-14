@@ -7,7 +7,7 @@
         <meta name="layout" content="custom" />
         <title><warehouse:message code="admin.title" default="Settings" /></title>
     </head>
-    <body>        
+    <body>
 		<div id="settings" role="main" class="yui-ga">
 
             <g:if test="${flash.message}">
@@ -17,25 +17,40 @@
                 <div class="tabs">
                     <ul>
                         <li>
-                            <a href="#tabs-1" id="general-settings-tab"><warehouse:message code="admin.generalSettings.header"/></a>
+                            <a href="#tabs-1" id="general-settings-tab">
+                                <warehouse:message code="admin.generalSettings.header"/></a>
                         </li>
                         <li>
-                            <a href="#tabs-2" id="email-settings-tab"><warehouse:message code="admin.emailSettings.header"/></a>
+                            <a href="#tabs-2" id="email-settings-tab">
+                                <warehouse:message code="admin.emailSettings.header"/></a>
                         </li>
                         <li>
-                            <a href="#tabs-3" id="external-config-tab"><warehouse:message code="admin.externalAppConfig.header"/></a>
+                            <a href="#tabs-3" id="external-config-tab">
+                                <warehouse:message code="admin.externalAppConfig.header"/></a>
                         </li>
                         <li>
-                            <a href="#tabs-4" id="system-properties-tab"><warehouse:message code="admin.systemProperties.header"/></a>
+                            <a href="#tabs-4" id="system-properties-tab">
+                                <warehouse:message code="admin.systemProperties.header"/></a>
                         </li>
                         <li>
-                            <a href="#tabs-5" id="printers-tab"><warehouse:message code="admin.printers.header" default="Printers"/></a>
+                            <a href="#tabs-5" id="printers-tab">
+                                <warehouse:message code="admin.printers.header" default="Printers"/></a>
                         </li>
                         <li>
-                            <a href="#tabs-6" id="background-jobs-tab"><warehouse:message code="admin.backgroundJobs.header"/></a>
+                            <a href="#tabs-6" id="background-jobs-tab">
+                                <warehouse:message code="admin.backgroundJobs.header"/></a>
                         </li>
                         <li>
-                            <a href="#tabs-7" id="cache-tab"><warehouse:message code="admin.cache.header" default="Caches"/></a>
+                            <a href="#tabs-7" id="cache-tab">
+                                <warehouse:message code="admin.cache.header" default="Caches"/></a>
+                        </li>
+                        <li>
+                            <a href="${request.contextPath}/admin/showDatabaseStatus">
+                                <warehouse:message code="admin.database.status.label" default="Database Status"/></a></li>
+                        </li>
+                        <li>
+                            <a href="${request.contextPath}/admin/showDatabaseProcessList">
+                                <warehouse:message code="admin.database.processListlabel" default="Database Process List"/></a></li>
                         </li>
                     </ul>
                     <div id="tabs-1">
