@@ -318,7 +318,7 @@ class IndicatorDataService {
                 s.shipmentNumber, 
                 s.name, 
                 count(ri.id), 
-                s.requisition
+                s.requisition.id
             from ReceiptItem as ri
             left join ri.shipmentItem as si
             left join ri.receipt as r
@@ -333,7 +333,7 @@ class IndicatorDataService {
         """, ['location': location, 'date': date])
 
         query.each {
-            tableBody.push(new TableData(it[0], it[1], it[2].toString(), "/openboxes/stockMovement/show/" + it[3].id))
+            tableBody.push(new TableData(it[0], it[1], it[2].toString(), "/openboxes/stockMovement/show/" + it[3]))
         }
 
         Table indicatorData = new Table("Shipment", "Name", "Discrepancy", tableBody)
