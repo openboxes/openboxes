@@ -17,12 +17,39 @@ function getColor(color = 'default', type = 'normal', index = 0) {
     tertiary: {
       normal: ColorPalette.colorTertiaryNormal,
       dark: ColorPalette.colorTertiaryDark,
-      light: ColorPalette.colorTertiaryLight,
+      light: ColorPalette.colorTertiaryNormal,
     },
     states: {
-      normal: ColorPalette.normalState,
-      dark: ColorPalette.darkState,
-      light: ColorPalette.lightState,
+      normal: [
+        ColorPalette.normalState1,
+        ColorPalette.normalState2,
+        ColorPalette.normalState3,
+        ColorPalette.normalState4,
+        ColorPalette.normalState5,
+        ColorPalette.normalState6,
+        ColorPalette.normalState7,
+        ColorPalette.normalState8,
+      ],
+      dark: [
+        ColorPalette.darkState1,
+        ColorPalette.darkState2,
+        ColorPalette.darkState3,
+        ColorPalette.darkState4,
+        ColorPalette.darkState5,
+        ColorPalette.darkState6,
+        ColorPalette.darkState7,
+        ColorPalette.darkState8,
+      ],
+      light: [
+        ColorPalette.lightState1,
+        ColorPalette.lightState2,
+        ColorPalette.lightState3,
+        ColorPalette.lightState4,
+        ColorPalette.lightState5,
+        ColorPalette.lightState6,
+        ColorPalette.lightState7,
+        ColorPalette.lightState8,
+      ],
     },
   };
 

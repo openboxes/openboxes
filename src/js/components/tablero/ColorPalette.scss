@@ -17,52 +17,70 @@ $colorTertiaryLight: #186cf2;
 
 // State Colors
 
-$normalState :  
-#f57c00,
-#fbc02d,
-#689f38,
-#00796b,
-#0288d1,
-#303f9f,
-#7b1fa2,
-#d32f2f;
+$normalState1 : #f57c00;
+$normalState2 : #fbc02d;
+$normalState3 : #00796b;
+$normalState4 : #0288d1;
+$normalState5 : #303f9f;
+$normalstate6 : #7b1fa2;
+$normalState7 : #d32f2f;
 
-$darkState : 
-#e65100,
-#f57f17,
-#33691e,
-#004d40,
-#01579b,
-#1a237e,
-#4a148c,
-#b71c1c;
+$darkState1 : #e65100;
+$darkState2 : #f57f17;
+$darkState3 : #33691e;
+$darkState4 : #004d40;
+$darkState5 : #01579b;
+$darkState6 : #1a237e;
+$darkState7 : #4a148c;
+$darksState8 : #b71c1c;
 
-$lightState : 
-#ffa726,
-#ffee58,
-#9ccc65,
-#26a69a,
-#29b6f6,
-#5c6bc0,
-#ab47bc,
-#ef5350;
+$lightState1 :#ffa726;
+$lightState2 : #ffee58;
+$lightState3 : #9ccc65;
+$lightState4 : #26a69a;
+$lightState5 : #29b6f6;
+$lightState6 : #5c6bc0;
+$lightState7 : #ab47bc;
+$lightState8 : #ef5350;
 
 :export {
     colorDefault : $colorDefault;
     
-    colorPrimaryNormal: $colorPrimaryNormal;
+    colorPrimaryNormal : $colorPrimaryNormal;
     colorPrimaryDark : $colorPrimaryDark;
-    colorPrimaryLight: $colorPrimaryLight;
+    colorPrimaryLight : $colorPrimaryLight;
   
-    colorSecondaryNormal: $colorSecondaryNormal;
-    colorSecondaryDark: $colorSecondaryDark;
-    colorSecondaryLight: $colorSecondaryLight;
+    colorSecondaryNormal : $colorSecondaryNormal;
+    colorSecondaryDark : $colorSecondaryDark;
+    colorSecondaryLight : $colorSecondaryLight;
 
-    colorTertiaryNormal: $colorTertiaryNormal;
-    colorTertiaryDark: $colorTertiaryDark;
-    colorTertiaryLight: $colorTertiaryLight;
+    colorTertiaryNormal : $colorTertiaryNormal;
+    colorTertiaryDark : $colorTertiaryDark;
+    colorTertiaryLight : $colorTertiaryLight;
 
-    normalState: $normalState;
-    darkState: $darkState;
-    lightState: $lightState;
+    normalState1 : $normalState1;  
+    normalState2 : $normalState2;
+    normalState3 : $normalState3; 
+    normalState4 : $normalState4;
+    normalState5 : $normalState5; 
+    normalstate6 : $normalstate6; 
+    normalState7 : $normalState7;
+
+    darkState1 : $darkState1;
+    darkState2 : $darkState2;
+    darkState3 : $darkState3;
+    darkState4 : $darkState4;
+    darkState5 : $darkState5;
+    darkState6 : $darkState6;
+    darkState7 : $darkState7;
+    darksState8: $darksState8;
+
+    lightState1 : $lightState1;
+    lightState2 : $lightState2;
+    lightState3 : $lightState3;
+    lightState4 : $lightState4;
+    lightState5 : $lightState5;
+    lightState6 : $lightState6;
+    lightState7 : $lightState7;
+    lightState8 : $lightState8;
   }
