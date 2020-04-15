@@ -29,7 +29,7 @@ function getColor(index = 0, type = 'default') {
     // index % 8 makes sure that index is between 0 and 8
     return states[type][index % 8];
   } catch (error) {
-    // if can't return desired color, returns a random color
+    // if type != dark or normal, returns a random normal color
     return states.normal[_.random(0, 8)];
   }
 }
