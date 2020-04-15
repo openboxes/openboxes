@@ -207,11 +207,6 @@
                                     <warehouse:message code="default.create.label" args="[warehouse.message(code: 'stockRequest.label', default: 'Stock Request')]"/>
                                 </g:link>
                             </div>
-                            <div class="mm-menu-item">
-                                <g:link controller="stockMovement" action="list" params="['requestedBy.id':session.user.id]">
-                                    <warehouse:message code="default.list.label" args="[warehouse.message(code: 'stockRequests.label', default: 'Stock Requests')]"/>
-                                </g:link>
-                            </div>
                         </g:if>
                         <g:if test="${megamenuConfig.putaways.enabled}">
                             <h3><warehouse:message code="putaways.label" default="Putaways" /></h3>
