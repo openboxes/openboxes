@@ -8,7 +8,7 @@ const TableCard = props => (
       <thead>
         <tr>
           <th>{props.data.number}</th>
-          <th>{_.truncate(props.data.name, { length: 50 })}</th>
+          <th className="mid">{_.truncate(props.data.name, { length: 50 })}</th>
           <th>{_.truncate(props.data.value, { length: 50 })}</th>
         </tr>
       </thead>
@@ -20,7 +20,7 @@ const TableCard = props => (
             className="tableLink"
           >
             <td>{item.number}</td>
-            <td>{_.truncate(item.name, { length: 50 })}</td>
+            <td className="mid">{_.truncate(item.name, { length: 80 })}</td>
             <td>{_.truncate(item.value, { length: 10 })}</td>
           </tr>
         ))}
