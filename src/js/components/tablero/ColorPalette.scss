@@ -19,11 +19,12 @@ $colorTertiaryLight: #186cf2;
 
 $normalState1 : #f57c00;
 $normalState2 : #fbc02d;
-$normalState3 : #00796b;
-$normalState4 : #0288d1;
-$normalState5 : #303f9f;
-$normalstate6 : #7b1fa2;
-$normalState7 : #d32f2f;
+$normalState3 : #689f38;
+$normalState4 : #00796b;
+$normalState5 : #0288d1;
+$normalState6 : #303f9f;
+$normalState7 : #7b1fa2;
+$normalState8 : #d32f2f;
 
 $darkState1 : #e65100;
 $darkState2 : #f57f17;
@@ -32,7 +33,7 @@ $darkState4 : #004d40;
 $darkState5 : #01579b;
 $darkState6 : #1a237e;
 $darkState7 : #4a148c;
-$darksState8 : #b71c1c;
+$darkState8 : #b71c1c;
 
 $lightState1 :#ffa726;
 $lightState2 : #ffee58;
@@ -63,8 +64,9 @@ $lightState8 : #ef5350;
     normalState3 : $normalState3; 
     normalState4 : $normalState4;
     normalState5 : $normalState5; 
-    normalstate6 : $normalstate6; 
+    normalState6 : $normalState6; 
     normalState7 : $normalState7;
+    normalState8 : $normalState8;
 
     darkState1 : $darkState1;
     darkState2 : $darkState2;
@@ -73,7 +75,7 @@ $lightState8 : #ef5350;
     darkState5 : $darkState5;
     darkState6 : $darkState6;
     darkState7 : $darkState7;
-    darksState8: $darksState8;
+    darkState8 : $darkState8;
 
     lightState1 : $lightState1;
     lightState2 : $lightState2;
