@@ -1,40 +1,73 @@
+import ColorPalette from '../../components/tablero/ColorPalette.scss';
+
 /* global _ */
-function getColor() {
-  const colors = [
-    '#6fb98f',
-    '#004445',
-    '#2e5685',
-    '#fcc169',
-    '#cf455c',
-    '#ff0000',
-    '#e89da2',
-    '#e0b623',
-    '#444444',
-  ];
-  return colors[_.random(0, colors.length - 1)];
+function getColor(index = 0, type = 'default') {
+  const states = {
+    normal: [
+      ColorPalette.normalState1,
+      ColorPalette.normalState2,
+      ColorPalette.normalState3,
+      ColorPalette.normalState4,
+      ColorPalette.normalState5,
+      ColorPalette.normalState6,
+      ColorPalette.normalState7,
+      ColorPalette.normalState8,
+    ],
+    dark: [
+      ColorPalette.darkState1,
+      ColorPalette.darkState2,
+      ColorPalette.darkState3,
+      ColorPalette.darkState4,
+      ColorPalette.darkState5,
+      ColorPalette.darkState6,
+      ColorPalette.darkState7,
+      ColorPalette.darkState8,
+    ],
+  };
+
+  try {
+    // index % 8 makes sure that index is between 0 and 8
+    return states[type][index % 8];
+  } catch (error) {
+    // if type != dark or normal, returns a random normal color
+    return states.normal[_.random(0, 8)];
+  }
 }
 
+function getHorizontalBarColors(index = 0, type = 'normal') {
+  const horizontalColors = [];
+  for (let i = 0; i < 5; i += 1) {
+    horizontalColors.push(getColor(index + i, type));
+  }
+  return horizontalColors;
+}
+
+let index = 5;
 function loadColorDataset(data, chart, subtype) {
   const datasets = data;
-  const color = getColor();
+  index = index > 7 ? index % 8 : index;
+  // Index makes sure that index is between 0 and 8
+  // That following indicators have different colors
+  // And a smooth color change
 
   if (chart === 'line') {
-    datasets.borderColor = color;
-    datasets.pointBackgroundColor = color;
+    datasets.borderColor = getColor(index, 'normal');
+    datasets.pointBackgroundColor = getColor(index, 'normal');
     datasets.pointHoverBackgroundColor = '#fff';
-    datasets.pointHoverBorderColor = color;
+    datasets.pointHoverBorderColor = getColor(index, 'normal');
     datasets.lineTension = 0;
     datasets.fill = !subtype;
   } if (chart === 'bar') {
-    datasets.backgroundColor = color;
-    datasets.hoverBackgroundColor = color;
+    datasets.backgroundColor = getColor(index, 'normal');
+    datasets.hoverBackgroundColor = getColor(index, 'dark');
   } if (chart === 'horizontalBar') {
-    datasets.backgroundColor = [getColor(), getColor(), getColor(), getColor(), getColor()];
-    datasets.hoverBackgroundColor = datasets.backgroundColor;
+    datasets.backgroundColor = getHorizontalBarColors(index, 'normal');
+    datasets.hoverBackgroundColor = getHorizontalBarColors(index, 'dark');
   } if (chart === 'doughnut') {
-    datasets.backgroundColor = color;
+    datasets.backgroundColor = getColor(index, 'normal');
   }
 
+  index += 1;
   return datasets;
 }
 
@@ -52,11 +85,20 @@ function loadOptions(isStacked = false) {
     scales: isStacked ? {
       xAxes: [{
         stacked: true,
+        gridLines: {
+          color: 'transparent',
+        },
       }],
       yAxes: [{
         stacked: true,
       }],
-    } : null,
+    } : {
+      xAxes: [{
+        gridLines: {
+          color: 'transparent',
+        },
+      }],
+    },
     tooltips: {
       displayColors: false,
       enabled: true,
