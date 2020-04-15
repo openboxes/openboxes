@@ -1,72 +1,43 @@
 import ColorPalette from '../../components/tablero/ColorPalette.scss';
 
 /* global _ */
-function getColor(color = 'default', type = 'normal', index = 0) {
-  const colors = {
-    default: ColorPalette.colorDefault,
-    primary: {
-      normal: ColorPalette.colorPrimaryNormal,
-      dark: ColorPalette.colorPrimaryDark,
-      light: ColorPalette.colorPrimaryLight,
-    },
-    secondary: {
-      normal: ColorPalette.colorSecondaryNormal,
-      dark: ColorPalette.colorSecondaryDark,
-      light: ColorPalette.colorSecondaryLight,
-    },
-    tertiary: {
-      normal: ColorPalette.colorTertiaryNormal,
-      dark: ColorPalette.colorTertiaryDark,
-      light: ColorPalette.colorTertiaryNormal,
-    },
-    states: {
-      normal: [
-        ColorPalette.normalState1,
-        ColorPalette.normalState2,
-        ColorPalette.normalState3,
-        ColorPalette.normalState4,
-        ColorPalette.normalState5,
-        ColorPalette.normalState6,
-        ColorPalette.normalState7,
-        ColorPalette.normalState8,
-      ],
-      dark: [
-        ColorPalette.darkState1,
-        ColorPalette.darkState2,
-        ColorPalette.darkState3,
-        ColorPalette.darkState4,
-        ColorPalette.darkState5,
-        ColorPalette.darkState6,
-        ColorPalette.darkState7,
-        ColorPalette.darkState8,
-      ],
-      light: [
-        ColorPalette.lightState1,
-        ColorPalette.lightState2,
-        ColorPalette.lightState3,
-        ColorPalette.lightState4,
-        ColorPalette.lightState5,
-        ColorPalette.lightState6,
-        ColorPalette.lightState7,
-        ColorPalette.lightState8,
-      ],
-    },
+function getColor(index = 0, type = 'default') {
+  const states = {
+    normal: [
+      ColorPalette.normalState1,
+      ColorPalette.normalState2,
+      ColorPalette.normalState3,
+      ColorPalette.normalState4,
+      ColorPalette.normalState5,
+      ColorPalette.normalState6,
+      ColorPalette.normalState7,
+      ColorPalette.normalState8,
+    ],
+    dark: [
+      ColorPalette.darkState1,
+      ColorPalette.darkState2,
+      ColorPalette.darkState3,
+      ColorPalette.darkState4,
+      ColorPalette.darkState5,
+      ColorPalette.darkState6,
+      ColorPalette.darkState7,
+      ColorPalette.darkState8,
+    ],
   };
 
-  if (color === 'default') {
-    return colors.states.normal[_.random(0, 8)];
-  } try {
-    return colors[color][type][index];
+  try {
+    // index % 8 makes sure that index is between 0 and 8
+    return states[type][index % 8];
   } catch (error) {
-    return colors.default;
+    // if can't return desired color, returns a random color
+    return states.normal[_.random(0, 8)];
   }
-  // if can't return desired color, returns gray
 }
 
-function getHorizontalBarColors(type, index) {
+function getHorizontalBarColors(index = 0, type = 'normal') {
   const horizontalColors = [];
   for (let i = 0; i < 5; i += 1) {
-    horizontalColors.push(getColor('states', type, i + (index % 8)));
+    horizontalColors.push(getColor(index + i, type));
   }
   return horizontalColors;
 }
@@ -80,20 +51,20 @@ function loadColorDataset(data, chart, subtype) {
   // And a smooth color change
 
   if (chart === 'line') {
-    datasets.borderColor = getColor('states', 'normal', index);
-    datasets.pointBackgroundColor = getColor('states', 'normal', index);
+    datasets.borderColor = getColor(index, 'normal');
+    datasets.pointBackgroundColor = getColor(index, 'normal');
     datasets.pointHoverBackgroundColor = '#fff';
-    datasets.pointHoverBorderColor = getColor('states', 'normal', index);
+    datasets.pointHoverBorderColor = getColor(index, 'normal');
     datasets.lineTension = 0;
     datasets.fill = !subtype;
   } if (chart === 'bar') {
-    datasets.backgroundColor = getColor('states', 'normal', index);
-    datasets.hoverBackgroundColor = getColor('states', 'dark', index);
+    datasets.backgroundColor = getColor(index, 'normal');
+    datasets.hoverBackgroundColor = getColor(index, 'dark');
   } if (chart === 'horizontalBar') {
-    datasets.backgroundColor = getHorizontalBarColors('normal', index);
-    datasets.hoverBackgroundColor = getHorizontalBarColors('dark', index);
+    datasets.backgroundColor = getHorizontalBarColors(index, 'normal');
+    datasets.hoverBackgroundColor = getHorizontalBarColors(index, 'dark');
   } if (chart === 'doughnut') {
-    datasets.backgroundColor = getColor('states', 'normal', index);
+    datasets.backgroundColor = getColor(index, 'normal');
   }
 
   index += 1;
