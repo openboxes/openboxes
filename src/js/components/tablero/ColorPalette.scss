@@ -1,0 +1,68 @@
+$colorDefault : #8798ad;
+
+// Primary Colors
+$colorPrimaryNormal : #0ddbdd;
+$colorPrimaryDark : #08c6c8;
+$colorPrimaryLight : #52e8e8;
+
+//Secondary Colors
+$colorSecondaryNormal: #ea6227;
+$colorSecondaryDark: #d05622;
+$colorSecondaryLight: #ff9c72;
+
+// Tertiary Colors
+$colorTertiaryNormal :#0c60e5 ;
+$colorTertiaryDark : #0a58d5;
+$colorTertiaryLight: #186cf2;
+
+// State Colors
+
+$normalState :  
+#f57c00,
+#fbc02d,
+#689f38,
+#00796b,
+#0288d1,
+#303f9f,
+#7b1fa2,
+#d32f2f;
+
+$darkState : 
+#e65100,
+#f57f17,
+#33691e,
+#004d40,
+#01579b,
+#1a237e,
+#4a148c,
+#b71c1c;
+
+$lightState : 
+#ffa726,
+#ffee58,
+#9ccc65,
+#26a69a,
+#29b6f6,
+#5c6bc0,
+#ab47bc,
+#ef5350;
+
+:export {
+    colorDefault : $colorDefault;
+    
+    colorPrimaryNormal: $colorPrimaryNormal;
+    colorPrimaryDark : $colorPrimaryDark;
+    colorPrimaryLight: $colorPrimaryLight;
+  
+    colorSecondaryNormal: $colorSecondaryNormal;
+    colorSecondaryDark: $colorSecondaryDark;
+    colorSecondaryLight: $colorSecondaryLight;
+
+    colorTertiaryNormal: $colorTertiaryNormal;
+    colorTertiaryDark: $colorTertiaryDark;
+    colorTertiaryLight: $colorTertiaryLight;
+
+    normalState: $normalState;
+    darkState: $darkState;
+    lightState: $lightState;
+  }

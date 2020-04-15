@@ -9,8 +9,10 @@ import { loadColors, loadOptions } from '../../consts/dataFormat/dataLoading';
 
 // getColors loads indicator colors if it doesn't have defined colors yet
 function getColors(data, type) {
-  if (data.datasets[0].borderColor || data.datasets[0].backgroundColor) {
-    return data.datasets;
+  if (data.datasets.length !== 0) {
+    if (data.datasets[0].borderColor || data.datasets[0].backgroundColor) {
+      return data.datasets;
+    }
   }
   return loadColors(data, type);
 }
