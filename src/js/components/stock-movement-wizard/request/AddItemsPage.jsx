@@ -40,7 +40,6 @@ const DELETE_BUTTON_FIELD = {
       removeItem(fieldValue.id).then(() => removeRow());
       updateTotalCount(-1);
     } : () => { updateTotalCount(-1); removeRow(); },
-    disabled: true,
   }),
   attributes: {
     className: 'btn btn-outline-danger',
@@ -56,11 +55,18 @@ const NO_STOCKLIST_FIELDS = {
     isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     // eslint-disable-next-line react/prop-types
-    addButton: () => (
+    addButton: ({
+      // eslint-disable-next-line react/prop-types
+      addRow, getSortOrder, newItemAdded, updateTotalCount,
+    }) => (
       <button
         type="button"
         className="btn btn-outline-success btn-xs"
-        disabled
+        onClick={() => {
+          updateTotalCount(1);
+          addRow({ sortOrder: getSortOrder() });
+          newItemAdded();
+        }}
       ><Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
       </button>
     ),
@@ -1193,7 +1199,7 @@ class AddItemsPage extends Component {
               <div>
                 <button
                   type="submit"
-                  disabled
+                  disabled={invalid}
                   onClick={() => this.previousPage(values, invalid)}
                   className="btn btn-outline-primary btn-form btn-xs"
                 >
@@ -1203,11 +1209,11 @@ class AddItemsPage extends Component {
                   type="submit"
                   onClick={() => {
                     if (!invalid) {
-                      this.confirmSubmit(() => this.saveRequisitionItems(_.filter(values.lineItems, val => !_.isEmpty(val) && val.product)).then(() => this.transitionToNextStep('VERIFYING')));
+                      this.confirmSubmit(() => this.saveRequisitionItems(_.filter(values.lineItems, val => !_.isEmpty(val) && val.product)).then(() => this.transitionToNextStep('REQUESTED')));
                     }
                   }}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
-                  disabled
+                  disabled={invalid}
                 ><Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>
