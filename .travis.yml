@@ -2,6 +2,8 @@ dist: trusty
 language: groovy
 jdk:
 - openjdk8
+services:
+- mysql
 before_install:
 - curl -s http://get.sdkman.io | bash
 - echo sdkman_auto_answer=true > ~/.sdkman/etc/config
@@ -11,7 +13,8 @@ before_script:
 - nvm install 10.12.0
 - npm install
 - npm run bundle
-script: 'grails test-app -unit --non-interactive -echoOut -echoErr'
+- echo "USE mysql;\nUPDATE user SET password=PASSWORD('password') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root
+script: 'grails test-app --non-interactive -echoOut -echoErr'
 cache:
   directories:
   - "$HOME/.grails"
