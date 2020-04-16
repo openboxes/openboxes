@@ -96,6 +96,12 @@ class LocationService {
             locations = locations.findAll { location -> user.hasPrimaryRole(location) }
         }
 
+        if (params.activityCodes) {
+            return locations.findAll {
+                it.supportsAll(params.activityCodes instanceof String ? params.activityCodes as ActivityCode : params.activityCodes as ActivityCode[])
+            }
+        }
+
         if (!isSuperuser) {
             if (direction == "INBOUND") {
                 return locations.findAll {
