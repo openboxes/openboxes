@@ -324,7 +324,7 @@ class IndicatorDataService {
             join ri.receipt as r
             join r.shipment as s
             where 
-                r.receiptStatusCode = 'RECEIVED'
+                s.currentStatus = 'RECEIVED'
                 and s.destination = :location 
                 and r.actualDeliveryDate > :date 
             group by s.shipmentNumber, s.id, si.id
