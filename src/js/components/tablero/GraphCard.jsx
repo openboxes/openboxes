@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Line, Bar, Doughnut, HorizontalBar } from 'react-chartjs-2';
@@ -21,6 +22,16 @@ const DragHandle = sortableHandle(() => (
   <span className="dragHandler">::</span>
 ));
 
+const handleChartClick = (element) => {
+  let status;
+  if ((element[0]._index > 0 && element[0]._index < 2) || element[0]._index === 0) status = 'within30Days';
+  if ((element[0]._index > 2 && element[0]._index < 5) || element[0]._index === 2) status = 'within90Days';
+  if ((element[0]._index > 5 && element[0]._index < 11) || element[0]._index === 5) status = 'within180Days';
+  if (element[0]._index > 11 || element[0]._index === 11) status = 'within365Days';
+
+  window.location = `/openboxes/inventory/listExpiringStock?category=&status=${status}&filter=`;
+};
+
 const GraphCard = SortableElement(({
   cardMethod, cardId, cardTitle, cardType, cardLink, data, reloadIndicator,
 }) => {
@@ -30,7 +41,7 @@ const GraphCard = SortableElement(({
   let label = 'Last';
   if (cardType === 'line') {
     cardData.datasets = getColors(data, 'line');
-    graph = <Line data={data} options={loadOptions()} />;
+    graph = <Line data={data} options={loadOptions()} onElementsClick={element => handleChartClick(element)} />;
     filter = 1;
     label = 'Next';
   } else if (cardType === 'bar') {
@@ -72,7 +83,7 @@ const GraphCard = SortableElement(({
             className={filter ? 'customSelect' : 'customSelect disabled'}
             onChange={e => reloadIndicator(cardMethod, cardType, cardTitle, cardLink, cardId, `querySize=${e.target.value}`)}
             disabled={!filter}
-            defaultValue="6"
+            defaultValue={data.labels ? data.labels.length : '6'}
           >
             <option value="1">{label} Month</option>
             <option value="3">{label} 3 Months</option>

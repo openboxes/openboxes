@@ -31,16 +31,19 @@ class IndicatorDataService {
             Integer daysCounter = 0
             // We should count only items that will expire someday
             if(it.inventoryItem.expires != "never") {
-                // If an item is already inspired, we don't count it
+                // If an item is already expired, we don't count it
                 if (it.daysToExpiry > 0) {
                     listLabels = []
                     // For loop verifies if item expires in querySize coming months
                     for (int i=0; i<=querySize; i++) {
                         // daysCounter += number of days of (i) month
+                        String monthLabel;
+                        if(i != 0 ) monthLabel = "+" + i * 30 + " days";
+                        else monthLabel = "today";
+
                         daysCounter += date.plusMonths(i).dayOfMonth().getMaximumValue()
 
-                        String monthLabel = date.plusMonths(i).toString("MMM", Locale.US)
-                        listLabels.push(monthLabel)
+                        listLabels.push(monthLabel);
                         // if item expires in daysCounter incoming days, we count it
                         if (it.daysToExpiry <= daysCounter ) {
                             expirationSummary[i] =  expirationSummary[i] ? expirationSummary[i] + 1 : 1
