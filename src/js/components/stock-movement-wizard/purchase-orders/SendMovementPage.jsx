@@ -414,7 +414,7 @@ class SendMovementPage extends Component {
               label: `${stockMovementData.destination.name}
                 [${destinationType ? destinationType.description : null}]`,
             },
-            tableItems: stockMovementData.lineItems,
+            tableItems: _.sortBy(stockMovementData.lineItems, ['sortOrder']),
           },
         }, () => {
           this.props.nextPage(this.state.values);
