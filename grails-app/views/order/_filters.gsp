@@ -14,14 +14,14 @@
                 <g:select id="orderTypeCode" name="orderTypeCode"
                           from="${org.pih.warehouse.order.OrderTypeCode.list()}" class="chzn-select-deselect"
                           optionValue="${{ format.metadata(obj: it) }}" value="${params?.orderTypeCode}"
-                          noSelection="['': warehouse.message(code: 'default.all.label')]"/>
+                          noSelection="['': '']"/>
             </div>
             <div class="filter-list-item">
                 <label>${warehouse.message(code: 'order.status.label')}</label>
                 <g:select id="status" name="status"
                           from="${org.pih.warehouse.order.OrderStatus.list()}" class="chzn-select-deselect"
                           optionValue="${{ format.metadata(obj: it) }}" value="${params.status}"
-                          noSelection="['': warehouse.message(code: 'default.all.label')]"/>
+                          noSelection="['': '']"/>
             </div>
             <div class="filter-list-item">
                 <label><warehouse:message code="order.origin.label"/></label>
@@ -38,13 +38,13 @@
                 <label><warehouse:message code="order.orderedBy.label"/></label>
                 <g:selectPerson id="orderedBy" name="orderedBy"
                                 class="chzn-select-deselect" value="${params?.orderedBy}"
-                                noSelection="['': warehouse.message(code: 'default.all.label')]"/>
+                                noSelection="['': '']"/>
             </div>
             <div class="filter-list-item">
                 <label><warehouse:message code="order.createdBy.label"/></label>
                 <g:selectPerson id="createdBy" name="createdBy"
                                 class="chzn-select-deselect" value="${params?.createdBy}"
-                                noSelection="['': warehouse.message(code: 'default.all.label')]"/>
+                                noSelection="['': '']"/>
             </div>
             <div class="filter-list-item">
                 <label>
