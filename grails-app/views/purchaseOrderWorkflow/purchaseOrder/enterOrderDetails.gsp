@@ -118,6 +118,15 @@
                                     <g:selectCurrency name="currencyCode" class="chzn-select-deselect" value="${order?.currencyCode}" noSelection="['':'']"/>
                                 </td>
                             </tr>
+                            <g:if test="${order?.currencyCode && order?.currencyCode!=grailsApplication.config.openboxes.locale.defaultCurrencyCode}">
+                                <tr class='prop'>
+                                    <td valign='top' class='name middle'><label for='exchangeRate'><warehouse:message code="order.exchangeRate.label"/></label></td>
+                                    <td valign='top' class='value ${hasErrors(bean:order,field:'exchangeRate','errors')}'>
+                                        <input type="text" id="exchangeRate" name='exchangeRate' value="${order?.exchangeRate}" class="text large"
+                                               placeholder="${warehouse.message(code:'order.exchangeRate.message')}"/>
+                                    </td>
+                                </tr>
+                            </g:if>
 
                             <tr class='prop'>
                                 <td valign='top' class='name middle'>

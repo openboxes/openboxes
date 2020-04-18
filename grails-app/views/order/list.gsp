@@ -39,7 +39,7 @@
 					<div class="box">
 						<h2>
 							<warehouse:message code="default.list.label" args="[entityName]" />
-%{--							<small>(<g:formatNumber number="${totalPrice}"/> ${grailsApplication.config.openboxes.locale.defaultCurrencyCode})</small>--}%
+							<small>(<g:formatNumber number="${totalPrice}"/> ${grailsApplication.config.openboxes.locale.defaultCurrencyCode})</small>
 						</h2>
 						<table>
 							<thead>
@@ -61,13 +61,20 @@
 										<th>${warehouse.message(code: 'order.shipped.label')}</th>
 										<th>${warehouse.message(code: 'order.received.label')}</th>
 									</g:if>
-									<th>${warehouse.message(code: 'order.totalPrice.label')}</th>
+									<th>
+										<div>${warehouse.message(code: 'order.totalPrice.label')}</div>
+										<small>${warehouse.message(code: 'order.localCurrency.label', default: 'Local Currency')}</small>
+									</th>
+									<th>
+										<div>${warehouse.message(code: 'order.totalPrice.label')}</div>
+										<small>${warehouse.message(code: 'order.defaultCurrency.label', default: 'Default Currency')}</small>
+									</th>
 								</tr>
 							</thead>
 							<tbody>
 								<g:unless test="${orders}">
 									<tr class="prop">
-										<td colspan="11">
+										<td colspan="15">
 											<div class="empty fade center">
 												<warehouse:message code="orders.none.message"/>
 											</div>
@@ -130,22 +137,27 @@
 												${orderInstance?.receivedOrderItems?.size()?:0}
 											</td>
 										</g:if>
-										<td class="right middle">
-											<g:formatNumber number="${orderInstance.totalPrice()}"/>
+										<td class="center middle">
+											<g:formatNumber number="${orderInstance.total}"/>
 											${orderInstance.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+										</td>
+										<td class="center middle">
+											<g:formatNumber number="${orderInstance.totalNormalized}"/>
+											${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
 										</td>
 									</tr>
 								</g:each>
 							</tbody>
-%{--							<tfoot>--}%
-%{--								<tr class="odd">--}%
-%{--									<th colspan="10"><label>${warehouse.message(code:'default.total.label')}</label></th>--}%
-%{--									<th colspan="1" class="right">--}%
-%{--										<g:formatNumber number="${totalPrice}"/>--}%
-%{--										${grailsApplication.config.openboxes.locale.defaultCurrencyCode}--}%
-%{--									</th>--}%
-%{--								</tr>--}%
-%{--							</tfoot>--}%
+							<tfoot>
+								<tr class="odd">
+									<th colspan="12"></th>
+									<th><label>${warehouse.message(code:'order.totalPrice.label')}</label></th>
+									<th colspan="2" class="right">
+										<g:formatNumber number="${totalPrice}"/>
+										${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+									</th>
+								</tr>
+							</tfoot>
 						</table>
 						<div class="paginateButtons">
 							<g:set var="pageParams" value="${pageScope.variables['params']}"/>

@@ -1,3 +1,4 @@
+<%@ page import="org.pih.warehouse.core.ActivityCode" %>
 <div class="box">
     <h2><warehouse:message code="default.filters.label"/></h2>
     <g:form id="listForm" action="list" method="GET">
@@ -25,13 +26,13 @@
             </div>
             <div class="filter-list-item">
                 <label><warehouse:message code="order.origin.label"/></label>
-                <g:selectLocation id="origin" name="origin" class="chzn-select-deselect"
+                <g:selectLocation id="origin" name="origin" class="chzn-select-deselect" activityCode="${org.pih.warehouse.core.ActivityCode.FULFILL_ORDER}"
                           optionKey="id" optionValue="name" value="${params.origin}" noSelection="['':'']" />
             </div>
             <div class="filter-list-item">
                 <label><warehouse:message code="order.destination.label"/></label>
                 <g:selectLocation id="destination" name="destination" class="chzn-select-deselect"
-                          optionKey="id" optionValue="name"
+                          optionKey="id" optionValue="name" activityCode="${org.pih.warehouse.core.ActivityCode.PLACE_ORDER}"
                           value="${params.destination?:session?.warehouse?.id}" noSelection="['':'']" />
             </div>
             <div class="filter-list-item">
