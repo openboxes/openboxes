@@ -542,6 +542,10 @@ openboxes.jobs.dataCleaningJob.cronExpression = "0 */5 * * * ?" // every five mi
 // Data Migration Job (enabled, but needs to be triggered manually)
 openboxes.jobs.dataMigrationJob.enabled = true
 
+// Update exchange rates job
+openboxes.jobs.updateExchangeRatesJob.enabled = false
+openboxes.jobs.updateExchangeRatesJob.cronExpression = "0 0 * * * ?" // every hour
+
 // LDAP configuration
 openboxes.ldap.enabled = false
 openboxes.ldap.context.managerDn = "cn=read-only-admin,dc=example,dc=com"
@@ -576,11 +580,17 @@ openboxes.locale.supportedLocales = ['ar', 'en', 'fr', 'de', 'it', 'es', 'pt', '
 // Currency configuration
 openboxes.locale.defaultCurrencyCode = "USD"
 openboxes.locale.defaultCurrencySymbol = "\$"
-//openboxes.locale.supportedCurrencyCodes = ["USD","CFA"]
+openboxes.locale.supportedCurrencyCodes = ["USD","CAD","EUR","GBP"]
 
-openboxes.translation.url = "https://frengly.com/frengly/data/translateREST"
-openboxes.translation.apiKey = "openboxes@pih.org"
-openboxes.translation.password = "0p3nb0x3s"
+// Currency API configuration
+openboxes.locale.currencyApi.url = "https://api.exchangeratesapi.io/latest?base=%s"
+openboxes.locale.currencyApi.apiKey = ""
+openboxes.locale.currencyApi.password = ""
+
+// Translation API configuration
+openboxes.locale.translationApi.url = "https://frengly.com/frengly/data/translateREST"
+openboxes.locale.translationApi.apiKey = ""
+openboxes.locale.translationApi.password = ""
 
 // Inventory snapshot configuration
 openboxes.inventorySnapshot.batchSize = 1500

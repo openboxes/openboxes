@@ -9,36 +9,32 @@
 **/
 package org.pih.warehouse.core
 
+import org.codehaus.groovy.grails.web.json.JSONObject
+
 class TranslationService {
 
     def grailsApplication
+    def apiClientService
 
     def getTranslation(String text, String source, String destination) {
-        String translation
+        String data
         try {
-            def email = grailsApplication.config.openboxes.translation.apiKey
-            def password = grailsApplication.config.openboxes.translation.password
-            String urlString = grailsApplication.config.openboxes.translation.url
-                    //[source.encodeAsURL(), destination.encodeAsURL(), text.encodeAsURL(), email.encodeAsURL(), password.encodeAsURL()])
+            def apiKey = grailsApplication.config.openboxes.locale.translationApi.apiKey
+            def password = grailsApplication.config.openboxes.locale.translationApi.password
+            String url = grailsApplication.config.openboxes.locale.translationApi.url
 
+            JSONObject postData = new JSONObject([
+                    src: source,
+                    dest: destination,
+                    text: text,
+                    email: apiKey,
+                    password: password
+            ]);
+            apiClientService.post(url, postData)
 
-            log.info "urlString " + urlString
-            def url = new URL(urlString)
-            def connection = url.openConnection()
-            log.info "content type; " + connection.contentType
-            if (connection.responseCode == 200) {
-                def xml = connection.content.text
-                log.info "XML: " + xml
-                def root = new XmlParser(false, true).parseText(xml)
-                translation = root.translation.text()
-            } else {
-                log.info "connection " + connection.responseCode
-                log.info "contentType" + connection.contentType
-                translation = connection.content.toString()
-            }
         } catch (Exception e) {
-            log.error("Error trying to translate using syslang API ", e)
-            throw new ApiException("Unable to query syslang API: " + e.message)
+            log.error("Error trying to translate using translation API ", e)
+            throw new ApiException("Unable to query translation API: " + e.message, e)
         }
-        return translation
+        return data
     }}
