@@ -987,7 +987,7 @@ class AddItemsPage extends Component {
     if (!errors.length) {
       this.saveRequisitionItemsInCurrentStep(formValues.lineItems)
         .then(() => {
-          window.location = `/openboxes/stockMovement/show/${formValues.stockMovementId}`;
+          window.location = '/openboxes/stockMovement/list?direction=INBOUND';
         });
     } else {
       confirmAlert({
@@ -999,7 +999,7 @@ class AddItemsPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = `/openboxes/stockMovement/show/${formValues.stockMovementId}`; },
+            onClick: () => { window.location = '/openboxes/stockMovement/list?direction=INBOUND'; },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),
@@ -1078,7 +1078,7 @@ class AddItemsPage extends Component {
     if (this.state.values.statusCode === 'CREATED') {
       return apiClient.post(url, payload)
         .then(() => {
-          window.location = `/openboxes/stockMovement/list?type=REQUEST&movementNumber=${movementNumber}&submitted=true`;
+          window.location = `/openboxes/stockMovement/list?direction=INBOUND&movementNumber=${movementNumber}&submitted=true`;
         });
     }
     return Promise.resolve();
