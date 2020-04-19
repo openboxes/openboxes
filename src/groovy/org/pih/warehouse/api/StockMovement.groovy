@@ -240,7 +240,10 @@ class StockMovement {
         if (shipment.shipmentItems) {
             shipment.shipmentItems.each { ShipmentItem shipmentItem ->
                 StockMovementItem stockMovementItem = StockMovementItem.createFromShipmentItem(shipmentItem)
-                stockMovementItem.sortOrder = stockMovement.lineItems ? stockMovement.lineItems.size() * 100 : 0
+                if (!stockMovementItem.sortOrder) {
+                    stockMovementItem.sortOrder = stockMovement.lineItems ? stockMovement.lineItems.size() * 100 : 0
+                }
+
                 stockMovement.lineItems.add(stockMovementItem)
             }
         }
