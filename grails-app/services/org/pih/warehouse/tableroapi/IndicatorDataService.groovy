@@ -50,7 +50,11 @@ class IndicatorDataService {
                         // if item expires in daysCounter incoming days, count it
                         if (it.daysToExpiry <= daysCounter) {
                             expirationSummary[i] = expirationSummary[i] ? expirationSummary[i] + 1 : 1
-                            linksExpirationSummary[i] = "/openboxes/inventory/listExpiringStock?status=" + linkStatus
+                            if (i > 0) {
+                                linksExpirationSummary[i] = "/openboxes/inventory/listExpiringStock?status=" + linkStatus
+                            } else {
+                                linksExpirationSummary[i] = "/openboxes/inventory/listExpiredStock?status=expired"
+                            }
                         }
                     }
                 }
