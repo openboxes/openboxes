@@ -17,24 +17,20 @@ class TranslationService {
     def apiClientService
 
     def getTranslation(String text, String source, String destination) {
-        String data
+        JSONObject data
         try {
-            def apiKey = grailsApplication.config.openboxes.locale.translationApi.apiKey
-            def password = grailsApplication.config.openboxes.locale.translationApi.password
             String url = grailsApplication.config.openboxes.locale.translationApi.url
-
-            JSONObject postData = new JSONObject([
-                    src: source,
-                    dest: destination,
-                    text: text,
-                    email: apiKey,
-                    password: password
-            ]);
-            apiClientService.post(url, postData)
+            String apiKey = grailsApplication.config.openboxes.locale.translationApi.apiKey
+            String format = grailsApplication.config.openboxes.locale.translationApi.format
+            String lang = "$source-$destination"
+            String urlFormatted = String.format(url, apiKey, text.encodeAsURL(), lang.encodeAsURL(), format)
+            data = apiClientService.get(urlFormatted)
 
         } catch (Exception e) {
             log.error("Error trying to translate using translation API ", e)
-            throw new ApiException("Unable to query translation API: " + e.message, e)
+            throw new ApiException("Unable to query translation API: ${e.message}")
         }
         return data
-    }}
+    }
+
+}

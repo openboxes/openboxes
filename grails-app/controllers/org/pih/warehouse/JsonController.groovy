@@ -185,11 +185,9 @@ class JsonController {
     }
 
     def getTranslation = {
-        def translation = translationService.getTranslation(params.text, params.src, params.dest)
-        render ([translation: translation] as JSON)
+        def data = translationService.getTranslation(params.text, params.src, params.dest)
+        render ([data: data] as JSON)
     }
-
-
 
     def getLocalization = {
         log.info "get localization " + params

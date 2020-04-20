@@ -587,10 +587,10 @@ openboxes.locale.currencyApi.url = "https://api.exchangeratesapi.io/latest?base=
 openboxes.locale.currencyApi.apiKey = ""
 openboxes.locale.currencyApi.password = ""
 
-// Translation API configuration
-openboxes.locale.translationApi.url = "https://frengly.com/frengly/data/translateREST"
+// Translation API configuration (https://tech.yandex.com/translate/)
+openboxes.locale.translationApi.url = "https://translate.yandex.net/api/v1.5/tr.json/translate?key=%s&text=%s&lang=%s&format=%s"
 openboxes.locale.translationApi.apiKey = ""
-openboxes.locale.translationApi.password = ""
+openboxes.locale.translationApi.format = "plain"
 
 // Inventory snapshot configuration
 openboxes.inventorySnapshot.batchSize = 1500
