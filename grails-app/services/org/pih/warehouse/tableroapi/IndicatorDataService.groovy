@@ -31,30 +31,35 @@ class IndicatorDataService {
         expirationAlerts.each {
             // We should count only items that will expire someday
             if (it.inventoryItem.expires != "never") {
-                // If an item already expired, we don't count it
+                // The first element of the dataset represents expired items
+                if (it.daysToExpiry <= 0) {
+                    expirationSummary[0] += 1
+                    linksExpirationSummary[0] = "/openboxes/inventory/listExpiredStock?status=expired"
+                }
+
                 if (it.daysToExpiry > 0) {
-                    listLabels = []
+                    listLabels = ["today"]
 
                     // For loop verifies if item expires in querySize coming months
-                    for (int i = 0; i <= querySize; i++) {
+                    for (int i = 1; i < querySize; i++) {
                         Integer daysCounter = i * 30
 
-                        String monthLabel = (daysCounter == 0) ? "today" : "within " + daysCounter + " days"
-                        String linkStatus = (daysCounter <= 30) ? "within30Days" :
-                                (daysCounter <= 90) ? "within90Days" :
-                                        (daysCounter <= 180) ? "within180Days" :
-                                                (daysCounter <= 365) ? "within365Days" : "greaterThan365Days"
-
+                        String monthLabel = "within " + daysCounter + " days"
                         listLabels.push(monthLabel)
+
+                        // 1, 3 and 6 months
+                        if (i == 1 || i == 3 || i == 6) {
+                            linksExpirationSummary[i] = "/openboxes/inventory/listExpiringStock?status=within"
+                                + daysCounter + "Days"
+                        }
+                        // 12 month will be 360 days but will link to 365 in the report
+                        if (i == 12) {
+                            linksExpirationSummary[i] = "/openboxes/inventory/listExpiringStock?status=within365Days"
+                        }
 
                         // if item expires in daysCounter incoming days, count it
                         if (it.daysToExpiry <= daysCounter) {
-                            expirationSummary[i] = expirationSummary[i] ? expirationSummary[i] + 1 : 1
-                            if (i > 0) {
-                                linksExpirationSummary[i] = "/openboxes/inventory/listExpiringStock?status=" + linkStatus
-                            } else {
-                                linksExpirationSummary[i] = "/openboxes/inventory/listExpiredStock?status=expired"
-                            }
+                            expirationSummary[i] += 1
                         }
                     }
                 }
