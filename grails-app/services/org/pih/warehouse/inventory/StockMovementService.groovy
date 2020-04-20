@@ -900,6 +900,7 @@ class StockMovementService {
             substitutionItem.quantitySelected = item?.quantity
             substitutionItem.quantityConsumed = calculateMonthlyStockListQuantity(item.product, location)
             substitutionItem.availableItems = availableItems
+            substitutionItem.sortOrder = item?.orderIndex
             return substitutionItem
         }
     }
@@ -927,7 +928,7 @@ class StockMovementService {
         List pickPageItems = []
         RequisitionItem requisitionItem = RequisitionItem.load(stockMovementItem.id)
         if (requisitionItem.isSubstituted()) {
-            pickPageItems = requisitionItem.substitutionItems.collect {
+            pickPageItems = requisitionItem.substitutionItems.sort { it.orderIndex }. collect {
                 return buildPickPageItem(it, stockMovementItem.sortOrder)
             }
         } else if (requisitionItem.modificationItem) {
@@ -1043,7 +1044,7 @@ class StockMovementService {
         editPageItem.quantityConsumed = calculateMonthlyStockListQuantity(stockMovementItem)
         editPageItem.availableSubstitutions = availableSubstitutions
         editPageItem.availableItems = availableItems
-        editPageItem.substitutionItems = substitutionItems
+        editPageItem.substitutionItems = substitutionItems?.sort { it.sortOrder }
         editPageItem.sortOrder = stockMovementItem.sortOrder
         return editPageItem
     }
@@ -1068,7 +1069,7 @@ class StockMovementService {
         List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
         pickPageItem.availableItems = availableItems
         pickPageItem.suggestedItems = suggestedItems
-        pickPageItem.sortOrder = sortOrder
+        pickPageItem.sortOrder = requisitionItem.orderIndex ?: sortOrder
 
         return pickPageItem
     }

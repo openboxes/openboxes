@@ -323,6 +323,7 @@ class SubstitutionItem {
     String productName
     Integer quantitySelected
     Integer quantityConsumed
+    Integer sortOrder
 
     List availableItems
 
