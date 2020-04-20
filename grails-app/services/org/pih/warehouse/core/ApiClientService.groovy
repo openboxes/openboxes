@@ -14,7 +14,12 @@ import org.apache.commons.io.IOUtils
 import org.apache.http.HttpResponse
 import org.apache.http.client.HttpClient
 import org.apache.http.client.config.RequestConfig
+import org.apache.http.client.methods.HttpDelete
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase
 import org.apache.http.client.methods.HttpGet
+import org.apache.http.client.methods.HttpPost
+import org.apache.http.client.methods.HttpPut
+import org.apache.http.client.methods.HttpRequestBase
 import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.message.BasicHeader
@@ -23,26 +28,50 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 
 class ApiClientService {
 
-    boolean transactional = true
+    boolean transactional = false
 
-    @Cacheable("apiResponseCache")
-    JSONObject get(String url, JSONObject jsonObject) {
+    JSONObject get(String url) {
+        return execute(new HttpGet(url))
+    }
+
+    JSONObject post(String url, Map requestData) {
+        return execute(new HttpPost(url), requestData)
+    }
+
+    def delete(String url) {
+        return execute(new HttpDelete(url))
+    }
+
+    def put(String url, Map requestData) {
+        return execute(new HttpPut(url), requestData)
+    }
+
+    JSONObject execute(HttpEntityEnclosingRequestBase request, Map requestData) {
+        if (requestData) {
+            JSONObject jsonObject = new JSONObject(requestData)
+            StringEntity entity = new StringEntity(jsonObject.toString(), "UTF-8")
+            BasicHeader basicHeader = new BasicHeader(HTTP.CONTENT_TYPE,"application/json");
+            entity.setContentType(basicHeader);
+            request.setEntity(entity)
+        }
+        return execute(request)
+    }
+
+    JSONObject execute(HttpRequestBase request) {
+        // Request config
+        request.setConfig(requestConfig)
+
+        // Execute request
         HttpClient httpClient = HttpClientBuilder.create().build();
-        HttpGet httpGet = new HttpGet(url);
-        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(10000).build();
-        httpGet.setConfig(requestConfig);
+        HttpResponse response = httpClient.execute(request)
 
-        HttpResponse response = httpClient.execute(httpGet)
-        StringEntity entity = new StringEntity(jsonObject.toMapString(), "UTF-8");
-        BasicHeader basicHeader = new BasicHeader(HTTP.CONTENT_TYPE,"application/json");
-        entity.setContentType(basicHeader);
-
+        // Process response
         InputStream is = response.entity.content
         String data = IOUtils.toString(is, "UTF-8")
         return new JSONObject(data)
     }
 
-    def post() {
-
+    static private getRequestConfig() {
+        return RequestConfig.custom().setConnectTimeout(10000).build();
     }
 }
