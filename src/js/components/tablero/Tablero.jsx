@@ -42,6 +42,30 @@ const SortableCards = SortableContainer(({ data, reloadIndicator }) => (
   </div>
 ));
 
+const SortableNumberCards = SortableContainer(({ data }) => {
+  if (data) {
+    return (
+      <div className="cardComponent">
+        {data.map((value, index) => (
+          (value.archived ? null : (
+            <NumberCard
+              key={`item-${value.id}`}
+              index={index}
+              cardTitle={value.title}
+              cardNumber={value.number}
+              cardSubtitle={value.subtitle}
+              cardLink={value.link}
+            />
+          ))
+        ))}
+      </div>
+    );
+  }
+  return (
+    <LoadingNumbers />
+  );
+});
+
 const NumberCardsRow = ({ data }) => {
   if (data) {
     return (
@@ -107,13 +131,21 @@ class Tablero extends Component {
     this.setState({ isDragging: true });
   };
 
-  sortEndHandle = ({ oldIndex, newIndex }, e) => {
+  sortEndHandle = ({ oldIndex, newIndex }, e, type) => {
     const maxHeight = window.innerHeight - (((6 * window.innerHeight) / 100) + 80);
     if (e.clientY > maxHeight) {
       e.target.id = 'archive';
     }
-    this.props.reorderIndicators({ oldIndex, newIndex }, e);
+    this.props.reorderIndicators({ oldIndex, newIndex }, e, type);
     this.setState({ isDragging: false });
+  };
+
+  sortEndHandleNumber = ({ oldIndex, newIndex }, e) => {
+    this.sortEndHandle({ oldIndex, newIndex }, e, 'number');
+  };
+
+  sortEndHandleGraph = ({ oldIndex, newIndex }, e) => {
+    this.sortEndHandle({ oldIndex, newIndex }, e, 'graph');
   };
 
   unarchiveHandler = () => {
@@ -122,8 +154,8 @@ class Tablero extends Component {
     else this.setState({ showPopout: false });
   };
 
-  handleAdd = (index) => {
-    this.props.addToIndicators(index);
+  handleAdd = (index, type) => {
+    this.props.addToIndicators(index, type);
     const size = this.props.indicatorsData.filter(data => data.archived).length - 1;
     if (size) this.setState({ showPopout: true });
     else this.setState({ showPopout: false });
@@ -132,18 +164,23 @@ class Tablero extends Component {
   render() {
     return (
       <div className="cardsContainer">
-        <NumberCardsRow data={this.props.numberData} />
+        <SortableNumberCards
+          data={this.props.numberData}
+          onSortStart={this.sortStartHandle}
+          onSortEnd={this.sortEndHandleNumber}
+        />
         <SortableCards
           data={this.props.indicatorsData}
           onSortStart={this.sortStartHandle}
-          onSortEnd={this.sortEndHandle}
+          onSortEnd={this.sortEndHandleGraph}
           reloadIndicator={this.props.reloadIndicator}
           axis="xy"
           useDragHandle
         />
         <ArchiveIndicator hideArchive={!this.state.isDragging} />
         <UnarchiveIndicator
-          data={this.props.indicatorsData}
+          graphData={this.props.indicatorsData}
+          numberData={this.props.numberData}
           showPopout={this.state.showPopout}
           unarchiveHandler={this.unarchiveHandler}
           handleAdd={this.handleAdd}
