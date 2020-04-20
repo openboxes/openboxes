@@ -22,14 +22,12 @@ const DragHandle = sortableHandle(() => (
   <span className="dragHandler">::</span>
 ));
 
-const handleChartClick = (element) => {
-  let status;
-  if ((element[0]._index > 0 && element[0]._index < 2) || element[0]._index === 0) status = 'within30Days';
-  if ((element[0]._index > 2 && element[0]._index < 5) || element[0]._index === 2) status = 'within90Days';
-  if ((element[0]._index > 5 && element[0]._index < 11) || element[0]._index === 5) status = 'within180Days';
-  if (element[0]._index > 11 || element[0]._index === 11) status = 'within365Days';
+const handleChartClick = (elements) => {
+  const link = elements[0]._chart.data.datasets[0].links[elements[0]._index];
 
-  window.location = `/openboxes/inventory/listExpiringStock?category=&status=${status}&filter=`;
+  if (link && link !== '') {
+    window.location = link;
+  }
 };
 
 const GraphCard = SortableElement(({
@@ -41,7 +39,13 @@ const GraphCard = SortableElement(({
   let label = 'Last';
   if (cardType === 'line') {
     cardData.datasets = getColors(data, 'line');
-    graph = <Line data={data} options={loadOptions()} onElementsClick={element => handleChartClick(element)} />;
+    graph = (
+      <Line
+        data={data}
+        options={loadOptions()}
+        onElementsClick={elements => handleChartClick(elements)}
+      />
+    );
     filter = 1;
     label = 'Next';
   } else if (cardType === 'bar') {
