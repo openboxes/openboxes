@@ -1284,6 +1284,7 @@ class StockMovementService {
                 shipmentItem.inventoryItem = stockMovementItem.inventoryItem
                 shipmentItem.quantity = stockMovementItem.quantityRequested
                 shipmentItem.recipient = stockMovementItem.recipient
+                shipmentItem.sortOrder = stockMovementItem.sortOrder
                 shipmentItem.container = createOrUpdateContainer(shipment, stockMovementItem.palletName, stockMovementItem.boxName)
 
                 if (stockMovement.isFromOrder) {
@@ -1297,7 +1298,7 @@ class StockMovementService {
             throw new ValidationException("Invalid shipment", shipment.errors)
         }
 
-        return StockMovement.createFromShipment(shipment)
+        return StockMovement.createFromShipment(Shipment.get(shipment.id))
     }
 
 

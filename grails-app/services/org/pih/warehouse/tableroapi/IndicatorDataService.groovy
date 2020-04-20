@@ -325,6 +325,7 @@ class IndicatorDataService {
                 s.shipmentNumber, 
                 s.name, 
                 si.id,
+                si.quantity,
                 count(ri.id), 
                 s.requisition.id
             from ShipmentItem as si
@@ -332,20 +333,18 @@ class IndicatorDataService {
             join ri.receipt as r
             join r.shipment as s
             where 
-                r.receiptStatusCode = 'RECEIVED'
+                s.currentStatus = 'RECEIVED'
                 and s.destination = :location 
                 and r.actualDeliveryDate > :date 
-            group by s.shipmentNumber, s.id, si.id
-            having sum(si.quantity) <> sum(ri.quantityReceived)
+            group by s.shipmentNumber, s.id, si.id, si.quantity
+            having si.quantity <> sum(ri.quantityReceived)
         """, ['location': location, 'date': date])
 
         // Transform to map
-        results = results.collect {
-            [
-                    shipmentId    : it[0],
-                    shipmentNumber: it[1],
-                    shipmentName  : it[2],
-                    requisitionId : it[5]
+        results = results.collect { [
+                shipmentId: it[0],
+                shipmentNumber: it[1],
+                shipmentName: it[2]
             ]
         }
 
@@ -366,7 +365,7 @@ class IndicatorDataService {
             return new TableData(row.shipmentNumber,
                     row.shipmentName,
                     row.count.toString(),
-                    "/openboxes/stockMovement/show/${row.requisitionId}"
+                    "/openboxes/stockMovement/show/${row.shipmentId}"
             )
         }
 
