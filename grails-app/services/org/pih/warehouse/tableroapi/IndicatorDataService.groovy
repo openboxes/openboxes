@@ -33,15 +33,13 @@ class IndicatorDataService {
             if (it.inventoryItem.expires != "never") {
                 // If an item already expired, we don't count it
                 if (it.daysToExpiry > 0) {
-                    Integer daysCounter = 0
-
                     listLabels = []
 
                     // For loop verifies if item expires in querySize coming months
                     for (int i = 0; i <= querySize; i++) {
-                        daysCounter += i * 30
+                        Integer daysCounter = i * 30
 
-                        String monthLabel = (daysCounter == 0) ? "today" : "within" + daysCounter + " days"
+                        String monthLabel = (daysCounter == 0) ? "today" : "within " + daysCounter + " days"
                         String linkStatus = (daysCounter <= 30) ? "within30Days" :
                                 (daysCounter <= 90) ? "within90Days" :
                                         (daysCounter <= 180) ? "within180Days" :
