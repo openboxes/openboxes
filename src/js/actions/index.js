@@ -130,7 +130,6 @@ export function changeCurrentLocale(locale) {
         type: CHANGE_CURRENT_LOCALE,
         payload: locale,
       });
-    });
   };
 }
 

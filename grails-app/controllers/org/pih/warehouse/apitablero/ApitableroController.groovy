@@ -9,7 +9,7 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.tablero.NumberData
 import org.pih.warehouse.tableroapi.NumberDataService
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import org.pih.warehouse.tableroapi.IndicatorDataService
 
 class ApitableroController {

@@ -10,12 +10,14 @@
 package org.pih.warehouse.inventory
 
 import grails.gorm.transactions.Transactional
+import groovy.sql.BatchingStatementWrapper
 import groovy.sql.Sql
 import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringEscapeUtils
 import grails.util.Holders
 import org.hibernate.Criteria
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.product.Category
