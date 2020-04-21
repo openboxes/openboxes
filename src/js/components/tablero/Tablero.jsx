@@ -22,8 +22,8 @@ import './tablero.scss';
 defaults.global.legend = false;
 defaults.scale.ticks.beginAtZero = true;
 
-// eslint-disable-next-line no-shadow
-const SortableCards = SortableContainer(({ data, reloadIndicator }) => (
+
+const SortableCards = SortableContainer(({ data, reloadSingleIndicator }) => (
   <div className="cardComponent">
     {data.map((value, index) =>
       (value.archived ? null : (
@@ -36,14 +36,15 @@ const SortableCards = SortableContainer(({ data, reloadIndicator }) => (
           cardType={value.type}
           cardLink={value.link}
           data={value.data}
-          reloadIndicator={reloadIndicator}
+          reloadIndicator={reloadSingleIndicator}
         />
       )))}
   </div>
 ));
 
+
 const SortableNumberCards = SortableContainer(({ data }) => {
-  if (data) {
+  if (data && data.length) {
     return (
       <div className="cardComponent">
         {data.map((value, index) => (
@@ -65,28 +66,6 @@ const SortableNumberCards = SortableContainer(({ data }) => {
     <LoadingNumbers />
   );
 });
-
-const NumberCardsRow = ({ data }) => {
-  if (data) {
-    return (
-      <div className="cardComponent">
-        {data.map((value, index) => (
-          <NumberCard
-            key={`item-${value.id}`}
-            index={index}
-            cardTitle={value.title}
-            cardNumber={value.number}
-            cardSubtitle={value.subtitle}
-            cardLink={value.link}
-          />
-        ))}
-      </div>
-    );
-  }
-  return (
-    <LoadingNumbers />
-  );
-};
 
 
 const ArchiveIndicator = ({ hideArchive }) => (
@@ -156,7 +135,8 @@ class Tablero extends Component {
 
   handleAdd = (index, type) => {
     this.props.addToIndicators(index, type);
-    const size = this.props.indicatorsData.filter(data => data.archived).length - 1;
+    const size = (this.props.indicatorsData.filter(data => data.archived).length
+       + this.props.numberData.filter(data => data.archived).length) - 1;
     if (size) this.setState({ showPopout: true });
     else this.setState({ showPopout: false });
   };
@@ -168,6 +148,8 @@ class Tablero extends Component {
           data={this.props.numberData}
           onSortStart={this.sortStartHandle}
           onSortEnd={this.sortEndHandleNumber}
+          axis="xy"
+          useDragHandle
         />
         <SortableCards
           data={this.props.indicatorsData}
@@ -221,14 +203,6 @@ Tablero.propTypes = {
   fetchNumbersData: PropTypes.func.isRequired,
   resetIndicators: PropTypes.func.isRequired,
   currentLocation: PropTypes.string.isRequired,
-};
-
-NumberCardsRow.defaultProps = {
-  data: null,
-};
-
-NumberCardsRow.propTypes = {
-  data: PropTypes.arrayOf(PropTypes.shape({})),
 };
 
 ArchiveIndicator.propTypes = {
