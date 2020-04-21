@@ -39,81 +39,82 @@
   a:hover {
     text-decoration: none;
   }
+}
 
-  .numberCard {
-    position: relative;
-    width: 47.5%;
-    margin: 1%;
-    padding: 25px;
-    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.09);
-    background-color: white;
+.numberCard {
+  position: relative;
+  width: 47.5%;
+  margin: 1%;
+  padding: 25px;
+  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.09);
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  .numberDiv {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    width: 100%;
+  }
+
+  .numberBody {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    flex-wrap: wrap;
+    width: 80%;
 
-    // animation-name: slide-down;
-    // animation-duration: .8s;
-    // animation-timing-function: ease-out;
+    .titleCard {
+      color: #282d32;
+      font-size: 14px;
+    }
 
-    .numberDiv {
+    .resultCard {
+      color: #282d32;
+      font-size: 28px;
+      flex-grow: 1;
       display: flex;
-      flex-direction: row;
-      width: 100%;
+      align-items: flex-end;
     }
 
-    .numberBody {
-      display: flex;
-      flex-direction: column;
-      flex-wrap: wrap;
-      width: 80%;
-
-      .titleCard {
-        color: #282d32;
-        font-size: 14px;
-      }
-
-      .resultCard {
-        color: #282d32;
-        font-size: 28px;
-      }
-
-      .subtitleCard {
-        color: #cdcdcd;
-        font-size: 14px;
-      }
-
+    .subtitleCard {
+      color: #cdcdcd;
+      font-size: 14px;
     }
 
-    .loaderDiv {
-      margin: auto;
-    }
-
-    .dragHandler {
-      top: 0;
-      width: 20%;
-      text-align: right;
-      color: #999999;
-      font-size: 18px;
-      cursor: all-scroll;
-    }
   }
 
-  @media (min-width: 535px) {
-    .numberCard {
-      width: 31%;
-    }
+  .loaderDiv {
+    margin: auto;
   }
 
-  @media (min-width: 868px) {
-    .numberCard {
-      width: 30.66%;
-    }
+  .dragHandler {
+    position: absolute;
+    right: 10;
+    top: 0;
+    text-align: right;
+    color: #999999;
+    font-size: 20px;
+    cursor: all-scroll;
   }
+}
 
-  @media (min-width: 1115px) {
-    .numberCard {
-      width: 14.32%;
-    }
+@media (min-width: 535px) {
+  .numberCard {
+    width: 31%;
+  }
+}
+
+@media (min-width: 868px) {
+  .numberCard {
+    width: 30.66%;
+  }
+}
+
+@media (min-width: 1115px) {
+  .numberCard {
+    width: 14.32%;
   }
 }
 
