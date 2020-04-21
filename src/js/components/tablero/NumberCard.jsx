@@ -16,9 +16,11 @@ const NumberCard = SortableElement(({
 }) => {
   const card = (
     <div className="numberDiv">
-      <span className="titleCard"> {cardTitle} </span>
-      <span className="resultCard"> {cardNumber.toLocaleString()} </span>
-      <span className="subtitleCard"> {truncateString(cardSubtitle, 22)} </span>
+      <div className="numberBody">
+        <span className="titleCard"> {cardTitle} </span>
+        <span className="resultCard"> {cardNumber.toLocaleString()} </span>
+        <span className="subtitleCard"> {truncateString(cardSubtitle, 22)} </span>
+      </div>
       <DragHandle />
     </div>
   );
