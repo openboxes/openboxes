@@ -43,29 +43,22 @@ const SortableCards = SortableContainer(({ data, reloadSingleIndicator }) => (
 ));
 
 
-const SortableNumberCards = SortableContainer(({ data }) => {
-  if (data && data.length) {
-    return (
-      <div className="cardComponent">
-        {data.map((value, index) => (
-          (value.archived ? null : (
-            <NumberCard
-              key={`item-${value.id}`}
-              index={index}
-              cardTitle={value.title}
-              cardNumber={value.number}
-              cardSubtitle={value.subtitle}
-              cardLink={value.link}
-            />
-          ))
-        ))}
-      </div>
-    );
-  }
-  return (
-    <LoadingNumbers />
-  );
-});
+const SortableNumberCards = SortableContainer(({ data }) => (
+  <div className="cardComponent">
+    {data.map((value, index) => (
+      (value.archived ? null : (
+        <NumberCard
+          key={`item-${value.id}`}
+          index={index}
+          cardTitle={value.title}
+          cardNumber={value.number}
+          cardSubtitle={value.subtitle}
+          cardLink={value.link}
+        />
+      ))
+    ))}
+  </div>
+));
 
 
 const ArchiveIndicator = ({ hideArchive }) => (
@@ -128,7 +121,8 @@ class Tablero extends Component {
   };
 
   unarchiveHandler = () => {
-    const size = this.props.indicatorsData.filter(data => data.archived).length;
+    const size = this.props.indicatorsData.filter(data => data.archived).length
+      + this.props.numberData.filter(data => data.archived).length;
     if (size) this.setState({ showPopout: !this.state.showPopout });
     else this.setState({ showPopout: false });
   };
@@ -142,8 +136,9 @@ class Tablero extends Component {
   };
 
   render() {
-    return (
-      <div className="cardsContainer">
+    let numberCards;
+    if (this.props.numberData.length) {
+      numberCards = (
         <SortableNumberCards
           data={this.props.numberData}
           onSortStart={this.sortStartHandle}
@@ -151,6 +146,14 @@ class Tablero extends Component {
           axis="xy"
           useDragHandle
         />
+      );
+    } else {
+      numberCards = <LoadingNumbers />;
+    }
+
+    return (
+      <div className="cardsContainer">
+        {numberCards}
         <SortableCards
           data={this.props.indicatorsData}
           onSortStart={this.sortStartHandle}
