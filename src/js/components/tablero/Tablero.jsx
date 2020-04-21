@@ -15,7 +15,7 @@ import {
 import GraphCard from './GraphCard';
 import LoadingNumbers from './LoadingNumbers';
 import NumberCard from './NumberCard';
-import UnarchiveIndicator from './UnarchivePopout';
+import UnarchiveIndicators from './UnarchiveIndicators';
 import './tablero.scss';
 
 // Disable charts legends by default.
@@ -160,7 +160,7 @@ class Tablero extends Component {
           useDragHandle
         />
         <ArchiveIndicator hideArchive={!this.state.isDragging} />
-        <UnarchiveIndicator
+        <UnarchiveIndicators
           graphData={this.props.indicatorsData}
           numberData={this.props.numberData}
           showPopout={this.state.showPopout}
