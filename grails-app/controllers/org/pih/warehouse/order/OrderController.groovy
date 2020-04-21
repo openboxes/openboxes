@@ -602,6 +602,13 @@ class OrderController {
         }
         else {
             orderItem.properties = params
+            Shipment pendingShipment = order.pendingShipment
+            if (pendingShipment) {
+                List<ShipmentItem> itemsToUpdate = pendingShipment.shipmentItems.findAll { it.orderItemId == orderItem.id }
+                itemsToUpdate.each { itemToUpdate ->
+                    itemToUpdate.recipient = orderItem.recipient
+                }
+            }
         }
 
         if (!orderItem.productPackage) {
