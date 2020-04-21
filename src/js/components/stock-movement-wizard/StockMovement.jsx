@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { getTranslate } from 'react-localize-redux';
-import queryString from 'query-string';
 
 import CreateStockMovement from './outbound/CreateStockMovement';
 import AddItemsPage from './outbound/AddItemsPage';

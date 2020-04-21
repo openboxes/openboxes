@@ -4,7 +4,7 @@ import grails.converters.JSON
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.tablero.NumberData
 import org.pih.warehouse.tableroapi.NumberDataService
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import org.pih.warehouse.tableroapi.IndicatorDataService
 
 class ApitableroController {

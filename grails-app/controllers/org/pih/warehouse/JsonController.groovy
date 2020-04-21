@@ -190,12 +190,12 @@ class JsonController {
     }
 
     def getTranslation() {
-        def translation = getTranslation(params.text, params.src, params.dest)
+        def translation = getTranslationMessage(params.text, params.src, params.dest)
         def json = [translation]
         render json as JSON
     }
 
-    def getTranslation(String text, String source, String destination) {
+    def getTranslationMessage(String text, String source, String destination) {
         def translation = ""
         text = text.encodeAsURL()
         def email = "openboxes@pih.org"

@@ -105,7 +105,6 @@ export function changeCurrentLocale(locale) {
           payload: locale,
         });
       });
-    });
   };
 }
 

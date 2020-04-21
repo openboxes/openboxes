@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.order
 
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem

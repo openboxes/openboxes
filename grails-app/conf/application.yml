@@ -356,6 +356,8 @@ openboxes:
         # Refresh inventory snapshots
         refreshInventorySnapshotJob:
             enabled: true
+            retryOnError: false
+            maxRetryAttempts: 3
 
         # Refresh transaction fact table
         refreshTransactionFactJob:
@@ -364,17 +366,18 @@ openboxes:
 
         refreshDemandDataJob:
             enabled: true
-            cronExpression: "0 2-59/5 * * * ?" # every five minutes starting at the first minute of the hour
+            cronExpression: "0 0 1 * * ?" # at 01:00:00am every day
 
         # Assign identifier job
         assignIdentifierJob:
             enabled: true
-            cronExpression: "0 * * * * ?" # every five minutes
+            cronExpression: "0 * * * * ?" # every minute
 
         # Calculate current quantity on hand
         calculateQuantityJob:
             enabled: true
-            cronExpression: "0 */5 * * * ?" # every five minutes starting at the top of the hour
+            cronExpression: "0 0 0/2 * * ?" # every two hours starting at midnight
+            enableOptimization: false
 
         # Calculate historical quantity on hand
         calculateHistoricalQuantityJob:
@@ -466,6 +469,8 @@ openboxes:
             enabled: true
         requisitionTemplate:
             enabled: true
+        stockRequest:
+            enabled: true
 
     # Allow users to customize logo image url as well as label
     logo:
@@ -502,6 +507,16 @@ openboxes:
         minValue: "01/01/2000"
     cycleCount:
         additionalColumns: {}
+
+    purchasing:
+        approval:
+            enabled: false
+            minimumAmount: 0.00
+            defaultRoleTypes: ["ROLE_APPROVER"]
+
+    api:
+        pagination:
+            enabled: false
 
 mail:
     error:

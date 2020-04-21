@@ -601,32 +601,6 @@ class EditItemsPage extends Component {
   }
 
   /**
-   * Saves changes made in subsitution modal and updates data.
-   * @public
-   */
-  fetchEditPageItems() {
-    this.fetchLineItems().then((resp) => {
-      const { editPage } = resp.data.data;
-
-      this.setState({
-        values: {
-          ...this.state.values,
-          editPageItems: _.map(editPage.editPageItems, item => ({
-            ...item,
-            quantityAvailable: item.quantityAvailable || 0,
-            substitutionItems: _.map(item.substitutionItems, sub => ({
-              ...sub,
-              requisitionItemId: item.requisitionItemId,
-            })),
-          })),
-        },
-      }, () => this.props.hideSpinner());
-    }).catch(() => {
-      this.props.hideSpinner();
-    });
-  }
-
-  /**
    * Saves changes made by user in this step and redirects to the shipment view page
    * @param {object} formValues
    * @public
@@ -709,6 +683,7 @@ class EditItemsPage extends Component {
   }
 
   render() {
+    const { showOnly } = this.props;
     return (
       <Form
         onSubmit={() => {}}
