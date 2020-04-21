@@ -73,6 +73,7 @@ class StockMovementController {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
         [stockMovement: stockMovement]
+    }
 
     def edit() {
         Location currentLocation = Location.get(session.warehouse.id)
@@ -454,4 +455,3 @@ class StockMovementController {
     }
 
 }
-

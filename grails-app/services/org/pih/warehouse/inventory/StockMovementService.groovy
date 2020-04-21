@@ -718,22 +718,6 @@ class StockMovementService {
     }
 
     void createPicklist(StockMovementItem stockMovementItem) {
-        log.info "Create picklist for stock movement item ${stockMovementItem.toJson()}"
-
-        RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
-        createPicklist(requisitionItem)
-    }
-
-    /**
-     * Create an automated picklist for the given stock movement item.
-     *
-     * @param id
-     */
-    void createPicklist(StockMovementItem stockMovementItem) {
-
-        log.info "Create picklist for stock movement item ${stockMovementItem.toJson()}"
-
-        // This is kind of a hack, but it's the only way I could figure out how to get the origin field
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
         Product product = requisitionItem.product
         Location location = requisitionItem?.requisition?.origin
