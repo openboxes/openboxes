@@ -22,14 +22,11 @@ import liquibase.database.DatabaseFactory
 import liquibase.database.jvm.JdbcConnection
 import liquibase.resource.ClassLoaderResourceAccessor
 import org.pih.warehouse.api.AvailableItem
-import org.pih.warehouse.api.EditPage
 import org.pih.warehouse.api.EditPageItem
-import org.pih.warehouse.api.PackPage
 import org.pih.warehouse.api.PackPageItem
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptContainer
 import org.pih.warehouse.api.PartialReceiptItem
-import org.pih.warehouse.api.PickPage
 import org.pih.warehouse.api.PickPageItem
 import org.pih.warehouse.api.StockAdjustment
 import org.pih.warehouse.api.StockMovement
@@ -49,6 +46,8 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Category
@@ -244,6 +243,14 @@ class BootStrap {
             ]
         }
 
+        JSON.registerObjectMarshaller(Order) { Order order ->
+            return order.toJson()
+        }
+
+        JSON.registerObjectMarshaller(OrderItem) { OrderItem orderItem ->
+            return orderItem.toJson()
+        }
+
         JSON.registerObjectMarshaller(Person) { Person person ->
             return person.toJson()
         }
@@ -435,10 +442,6 @@ class BootStrap {
             return availableItem.toJson()
         }
 
-        JSON.registerObjectMarshaller(EditPage) { EditPage editPage ->
-            return editPage.toJson()
-        }
-
         JSON.registerObjectMarshaller(EditPageItem) { EditPageItem editPageItem ->
             return editPageItem.toJson()
         }
@@ -454,16 +457,8 @@ class BootStrap {
             return partialReceiptContainer.toJson()
         }
 
-        JSON.registerObjectMarshaller(PickPage) { PickPage pickPage ->
-            return pickPage.toJson()
-        }
-
         JSON.registerObjectMarshaller(PickPageItem) { PickPageItem pickPageItem ->
             return pickPageItem.toJson()
-        }
-
-        JSON.registerObjectMarshaller(PackPage) { PackPage packPage ->
-            return packPage.toJson()
         }
 
         JSON.registerObjectMarshaller(PackPageItem) { PackPageItem packPageItem ->
