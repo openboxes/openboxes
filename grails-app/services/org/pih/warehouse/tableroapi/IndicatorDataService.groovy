@@ -19,43 +19,47 @@ class IndicatorDataService {
 
     DataGraph getExpirationSummaryData(Location location, def params) {
         Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
-
-        // expirationSummary lists every expired item based on its month
-        List expirationSummary = [0] * querySize
-        List linksExpirationSummary = [""] * querySize
-        List listLabels = []
-        List expirationAlerts = dashboardService.getExpirationAlerts(location)
-
         LocalDate date = LocalDate.now()
 
+        List expirationSummary = [0] * querySize
+
+        List linksExpirationSummary = [""] * querySize
+        List listLabels = []
+
+        // Fill labels and links
+        for (int i = 0; i < querySize; i++) {
+            Integer daysCounter = i * 30
+
+            String monthLabel = (i == 0) ? "today" : "within " + daysCounter + " days"
+            listLabels.push(monthLabel)
+
+            // Expired items
+            if (i == 0) {
+                linksExpirationSummary[0] = "/openboxes/inventory/listExpiredStock?status=expired"
+            }
+
+            // 1, 3 and 6 months
+            if (i == 1 || i == 3 || i == 6) {
+                linksExpirationSummary[i] = "/openboxes/inventory/listExpiringStock?status=within" + daysCounter + "Days"
+            }
+            // 12 month will be 360 days but will link to 365 in the report
+            if (i == 12) {
+                linksExpirationSummary[i] = "/openboxes/inventory/listExpiringStock?status=within365Days"
+            }
+        }
+
+        List expirationAlerts = dashboardService.getExpirationAlerts(location)
+
         expirationAlerts.each {
-            // We should count only items that will expire someday
+            // Count only items that expire
             if (it.inventoryItem.expires != "never") {
                 // The first element of the dataset represents expired items
                 if (it.daysToExpiry <= 0) {
                     expirationSummary[0] += 1
-                    linksExpirationSummary[0] = "/openboxes/inventory/listExpiredStock?status=expired"
-                }
-
-                if (it.daysToExpiry > 0) {
-                    listLabels = ["today"]
-
-                    // For loop verifies if item expires in querySize coming months
+                } else {
+                    // Verifies if item expires within querySize * 30 days
                     for (int i = 1; i < querySize; i++) {
                         Integer daysCounter = i * 30
-
-                        String monthLabel = "within " + daysCounter + " days"
-                        listLabels.push(monthLabel)
-
-                        // 1, 3 and 6 months
-                        if (i == 1 || i == 3 || i == 6) {
-                            linksExpirationSummary[i] = "/openboxes/inventory/listExpiringStock?status=within"
-                                + daysCounter + "Days"
-                        }
-                        // 12 month will be 360 days but will link to 365 in the report
-                        if (i == 12) {
-                            linksExpirationSummary[i] = "/openboxes/inventory/listExpiringStock?status=within365Days"
-                        }
 
                         // if item expires in daysCounter incoming days, count it
                         if (it.daysToExpiry <= daysCounter) {
@@ -348,10 +352,11 @@ class IndicatorDataService {
         """, ['location': location, 'date': date])
 
         // Transform to map
-        results = results.collect { [
-                shipmentId: it[0],
-                shipmentNumber: it[1],
-                shipmentName: it[2]
+        results = results.collect {
+            [
+                    shipmentId    : it[0],
+                    shipmentNumber: it[1],
+                    shipmentName  : it[2]
             ]
         }
 
