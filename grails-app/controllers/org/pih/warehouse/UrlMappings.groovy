@@ -90,6 +90,11 @@ class UrlMappings {
             action = [DELETE: "removeItem"]
         }
 
+        "/api/stockMovements/$id/stockMovementItems"(parseRequest: true) {
+            controller = "stockMovementItemApi"
+            action = [GET: "getStockMovementItems"]
+        }
+
         // Stock Movement API
 
         "/api/stockMovements/$id/removeAllItems"(parseRequest: true) {
