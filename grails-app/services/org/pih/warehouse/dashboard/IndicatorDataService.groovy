@@ -1,5 +1,6 @@
 package org.pih.warehouse.dashboard
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.Requisition
@@ -12,6 +13,7 @@ import org.pih.warehouse.core.Location
 import org.joda.time.LocalDate
 import org.pih.warehouse.util.LocalizationUtil
 
+@Transactional
 class IndicatorDataService {
 
     def dashboardService
@@ -607,10 +609,10 @@ class IndicatorDataService {
                 results.inject([:]) { map, row ->
                     // Initialize map entry for shipment id
                     if (!map[row.shipmentId])
-                        map[row.shipmentId] = row << [count: 0];
+                        map[row.shipmentId] = row << [count: 0]
 
                     // Each new shipment row in teh results should increment count
-                    map[row.shipmentId].count += 1;
+                    map[row.shipmentId].count += 1
                     return map
                 }
 
