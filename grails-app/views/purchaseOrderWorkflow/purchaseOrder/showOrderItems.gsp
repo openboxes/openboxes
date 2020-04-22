@@ -46,9 +46,9 @@
                                 <th class="center"><warehouse:message code="product.manufacturer.label"/></th>
                                 <th class="center"><warehouse:message code="product.manufacturerCode.label"/></th>
                                 <th class="center"><warehouse:message code="default.quantity.label"/></th>
-                                <th class="center"><warehouse:message code="default.uom.label"/></th>
-                                <th class="center"><warehouse:message code="order.unitPrice.label"/></th>
-                                <th class="right"><warehouse:message code="orderItem.totalCost.label"/></th>
+                                <th class="center" colspan="2"><warehouse:message code="default.quantityTotal.label"/></th>
+                                <th class="center"><warehouse:message code="orderItem.unitPrice.label"/></th>
+                                <th class="center"><warehouse:message code="orderItem.totalCost.label"/></th>
                                 <th class="center"><warehouse:message code="order.recipient.label"/></th>
                                 <th class="center"><warehouse:message code="orderItem.estimatedReadyDate.label"/></th>
                                 <th class="center" width="1%"><warehouse:message code="default.actions.label"/></th>
@@ -262,6 +262,17 @@
               $('#manufacturerCode').html(data.manufacturerCode);
               $('#manufacturer').html(data.manufacturer);
               $("#unitPrice").val(data.unitPrice);
+              if (data.minOrderQuantity) {
+                $("#quantity").val(data.minOrderQuantity);
+                $("#quantity").attr("min", data.minOrderQuantity)
+              }
+              if (data.unitOfMeasure) {
+                $("#quantityUom").val(data.unitOfMeasure.id).trigger("chosen:updated");
+              }
+              if (data.quantityPerUom) {
+                $("#quantityPerUom").val(data.quantityPerUom)
+              }
+
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
             }
@@ -412,16 +423,16 @@
 	    {{/if}}
 	</td>
 	<td class="center middle">
-	    {{= quantity }}
+	    {{= quantity }} <small>{{= unitOfMeasure }}</small>
+	</td>
+	<td class="center middle" colspan="2">
+	    {{= totalQuantity }} <small>EA/1</small>
 	</td>
 	<td class="center middle">
-	    {{= unitOfMeasure }}
+	    {{= unitPrice }} {{= currencyCode }} <small>per {{= unitOfMeasure }}</small>
 	</td>
 	<td class="center middle">
-	    {{= unitPrice }}
-	</td>
-	<td class="center middle">
-	    {{= totalPrice }}
+	    {{= totalPrice }} {{= currencyCode }}
 	</td>
 	<td class="center middle">
     	{{if recipient }}

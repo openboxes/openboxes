@@ -603,7 +603,7 @@ class OrderController {
         else {
             orderItem.properties = params
         }
-        if (!order.save()) {
+        if (!order.save(flush:true)) {
             throw new ValidationException("Order is invalid", order.errors)
         }
         render (status: 200, text: "Successfully added order item")
@@ -612,13 +612,23 @@ class OrderController {
     def getOrderItems = {
         def orderInstance = Order.get(params.id)
         def orderItems = orderInstance.orderItems.collect {
+
+            String quantityUom = "${it?.quantityUom?.code?:g.message(code:'default.ea.label')?.toUpperCase()}"
+            String quantityPerUom = "${g.formatNumber(number: it?.quantityPerUom?:1, maxFractionDigits: 0)}"
+            String unitOfMeasure = "${quantityUom}\\${quantityPerUom}"
+
             [
                     id: it.id,
                     product: it.product,
                     quantity: it.quantity,
+                    quantityUom: quantityUom,
+                    quantityPerUom: quantityPerUom,
+                    unitOfMeasure: unitOfMeasure,
+                    totalQuantity: (it?.quantity?:1) * (it?.quantityPerUom?:1),
+                    productPackage: it?.productPackage,
+                    currencyCode: it?.order?.currencyCode,
                     unitPrice:  g.formatNumber(number: it.unitPrice),
                     totalPrice: g.formatNumber(number: it.totalPrice()),
-                    unitOfMeasure: it.product?.unitOfMeasure?:g.message(code: 'default.each.label'),
                     estimatedReadyDate: g.formatDate(date: it.estimatedReadyDate, format: Constants.DEFAULT_DATE_FORMAT),
                     actualReadyDate: g.formatDate(date: it.actualReadyDate, format: Constants.DEFAULT_DATE_FORMAT),
                     productSupplier: it.productSupplier,
