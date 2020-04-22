@@ -1,5 +1,6 @@
 package org.pih.warehouse.tableroapi
 
+import grails.gorm.transactions.Transactional
 import org.joda.time.LocalDate
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.inventory.InventorySnapshot
@@ -9,6 +10,7 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.tablero.NumberData
 
+@Transactional
 class NumberDataService {
 
     NumberData getInventoryByLotAndBin(def location) {
@@ -22,7 +24,7 @@ class NumberDataService {
 
     NumberData getInProgressShipments(def user, def location) {
         def shipments = Requisition.executeQuery("select count(*) from Requisition r join r.shipments s where r.origin = :location and s.currentStatus = 'PENDING' and r.createdBy = :user",
-                ['location': location, 'user': user]);
+        ['location': location, 'user': user]);
 
         return new NumberData("Your in Progress Shipments", shipments[0], "Shipments", "/openboxes/stockMovement/list?receiptStatusCode=PENDING&origin.id=" + location.id + "&createdBy.id=" + user.id)
     }
@@ -47,7 +49,7 @@ class NumberDataService {
                         'location'    : location,
                         'tomorrow'    : tomorrow,
                         'locationType': Constants.RECEIVING_LOCATION_TYPE_ID,
-                ]);
+            ]);
 
         return new NumberData("Products in Receiving Bin", receivingBin[0], "Products", "/openboxes/report/showBinLocationReport?status=inStock")
     }
