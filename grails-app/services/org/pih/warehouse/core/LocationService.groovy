@@ -97,8 +97,9 @@ class LocationService {
         }
 
         if (params.activityCodes) {
+            ActivityCode[] activityCodes = params.list("activityCodes") as ActivityCode[]
             return locations.findAll {
-                it.supportsAll(params.activityCodes instanceof String ? params.activityCodes as ActivityCode : params.activityCodes as ActivityCode[])
+                it.supportsAll(activityCodes)
             }
         }
 
