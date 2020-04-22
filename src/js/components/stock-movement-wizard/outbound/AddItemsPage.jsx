@@ -432,13 +432,11 @@ class AddItemsPage extends Component {
   }
 
   updateRow(values, index) {
-    const item = values.editPageItems[index];
-    let val = values;
-    val = update(values, {
-      editPageItems: { [index]: { $set: item } },
-    });
+    const item = values.lineItems[index];
     this.setState({
-      values: val,
+      values: update(values, {
+        lineItems: { [index]: { $set: item } },
+      }),
     });
   }
 
