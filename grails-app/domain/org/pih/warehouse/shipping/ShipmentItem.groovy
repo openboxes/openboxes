@@ -92,7 +92,7 @@ class ShipmentItem implements Comparable, Serializable {
     }
 
     String getOrderItemId() {
-        return orderItems?.collect { OrderItem orderItem -> orderItem.id }?.unique()?.first()
+        return orderItems?.findResult { OrderItem orderItem -> orderItem?.id }
     }
 
     def totalQuantityShipped() {
