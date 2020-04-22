@@ -29,4 +29,22 @@ class UnitOfMeasureConversion {
         toUnitOfMeasure(nullable: false)
         conversionRate(nullable: false)
     }
+
+    static namedQueries = {
+        conversionRateLookup { fromUomCode, toUomCode ->
+            projections {
+                property "conversionRate"
+            }
+            eq("active", Boolean.TRUE)
+            fromUnitOfMeasure {
+                eq("code", fromUomCode)
+            }
+            toUnitOfMeasure {
+                eq("code", toUomCode)
+            }
+            uniqueResult = true
+        }
+    }
+
+
 }
