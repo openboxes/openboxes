@@ -1,5 +1,6 @@
 package org.pih.warehouse.tableroapi
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.tablero.GraphData
 import org.pih.warehouse.tablero.TableData
 import org.pih.warehouse.tablero.Table
@@ -11,15 +12,13 @@ import org.pih.warehouse.tablero.IndicatorDatasets
 import org.pih.warehouse.tablero.NumberTableData
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.inventory.InventorySnapshot
-import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.core.Location
 import org.joda.time.LocalDate
 
+@Transactional
 class IndicatorDataService {
 
     def dashboardService
@@ -105,9 +104,9 @@ class IndicatorDataService {
             monthBegin.set(month: today.month - i, date: 1)
             monthEnd.set(month: today.month - i + 1, date: 1)
 
-            def query1 = Requisition.executeQuery("""select count(*) from RequisitionItem where dateCreated >= ? and dateCreated < ?""", [monthBegin, monthEnd]);
+            def query1 = Requisition.executeQuery("""select count(*) from RequisitionItem where dateCreated >= ? and dateCreated < ?""", [monthBegin, monthEnd])
 
-            def query2 = Requisition.executeQuery("""select count(*) from RequisitionItem where dateCreated >= ? and dateCreated < ? and quantityCanceled > 0 and (cancelReasonCode = 'STOCKOUT' or cancelReasonCode = 'LOW_STOCK' or cancelReasonCode = 'COULD_NOT_LOCATE')""", [monthBegin, monthEnd]);
+            def query2 = Requisition.executeQuery("""select count(*) from RequisitionItem where dateCreated >= ? and dateCreated < ? and quantityCanceled > 0 and (cancelReasonCode = 'STOCKOUT' or cancelReasonCode = 'LOW_STOCK' or cancelReasonCode = 'COULD_NOT_LOCATE')""", [monthBegin, monthEnd])
             String monthLabel = new java.text.DateFormatSymbols().months[monthBegin.month]
 
             listLabel.push(monthLabel)
@@ -120,7 +119,7 @@ class IndicatorDataService {
                 new IndicatorDatasets('Line2 Dataset', [15, 15, 15, 15, 15, 15], null, 'line'),
                 new IndicatorDatasets('Bar1 Dataset', listData),
                 new IndicatorDatasets('Bar2 Dataset', bar2Data),
-        ];
+        ]
 
         IndicatorData indicatorData = new IndicatorData(datasets, listLabel);
 
@@ -207,7 +206,7 @@ class IndicatorDataService {
                 }
             }
         }
-        List<IndicatorDatasets> datasets = (List<IndicatorDatasets>) listRes.values().toList();
+        List<IndicatorDatasets> datasets = (List<IndicatorDatasets>) listRes.values().toList()
 
         IndicatorData indicatorData = new IndicatorData(datasets, listLabel);
 
@@ -258,7 +257,7 @@ class IndicatorDataService {
                 }
             }
         }
-        List<IndicatorDatasets> datasets = (List<IndicatorDatasets>) listRes.values().toList();
+        List<IndicatorDatasets> datasets = (List<IndicatorDatasets>) listRes.values().toList()
 
         IndicatorData indicatorData = new IndicatorData(datasets, listLabel);
 
@@ -269,22 +268,22 @@ class IndicatorDataService {
 
     GraphData getOutgoingStock(Location location) {
         Date today = new Date()
-        today.clearTime();
-        def m4 = today - 4;
-        def m7 = today - 7;
+        today.clearTime()
+        def m4 = today - 4
+        def m7 = today - 7
 
         def greenData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated > :day and r.origin = :location and r.status <> 'ISSUED'""",
-                ['day': m4, 'location': location]);
+        ['day': m4, 'location': location])
 
         def yellowData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated >= :dayOne and r.dateCreated <= :dayTwo and r.origin = :location and r.status <> 'ISSUED'""",
-                ['dayOne': m7, 'dayTwo': m4, 'location': location]);
+        ['dayOne': m7, 'dayTwo': m4, 'location': location])
 
         def redData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated < :day and r.origin = :location and r.status <> 'ISSUED'""",
-                ['day': m7, 'location': location]);
+        ['day': m7, 'location': location])
 
-        ColorNumber green = new ColorNumber(greenData[0], 'Created < 4 days ago');
-        ColorNumber yellow = new ColorNumber(yellowData[0], 'Created > 4 days ago');
-        ColorNumber red = new ColorNumber(redData[0], 'Created > 7 days ago');
+        ColorNumber green = new ColorNumber(greenData[0], 'Created < 4 days ago')
+        ColorNumber yellow = new ColorNumber(yellowData[0], 'Created > 4 days ago')
+        ColorNumber red = new ColorNumber(redData[0], 'Created > 7 days ago')
 
         NumbersIndicator numbersIndicator = new NumbersIndicator(green, yellow, red)
 
@@ -296,12 +295,12 @@ class IndicatorDataService {
     GraphData getIncomingStock(Location location) {
 
         def query = Shipment.executeQuery("""select s.currentStatus, count(s) from Shipment s where s.destination = :location and s.currentStatus <> 'RECEIVED' group by s.currentStatus""",
-                ['location': location]);
+        ['location': location])
 
         // Initial state
-        ColorNumber pending = new ColorNumber(0, 'Pending', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=PENDING');
-        ColorNumber shipped = new ColorNumber(0, 'Shipped', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=SHIPPED');
-        ColorNumber partiallyReceived = new ColorNumber(0, 'Partially Received', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=PARTIALLY_RECEIVED');
+        ColorNumber pending = new ColorNumber(0, 'Pending', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=PENDING')
+        ColorNumber shipped = new ColorNumber(0, 'Shipped', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=SHIPPED')
+        ColorNumber partiallyReceived = new ColorNumber(0, 'Partially Received', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=PARTIALLY_RECEIVED')
 
         // Changes each ColorNumber if found in query
         query.each {
@@ -361,10 +360,10 @@ class IndicatorDataService {
                 results.inject([:]) { map, row ->
                     // Initialize map entry for shipment id
                     if (!map[row.shipmentId])
-                        map[row.shipmentId] = row << [count: 0];
+                        map[row.shipmentId] = row << [count: 0]
 
                     // Each new shipment row in teh results should increment count
-                    map[row.shipmentId].count += 1;
+                    map[row.shipmentId].count += 1
                     return map
                 }
 

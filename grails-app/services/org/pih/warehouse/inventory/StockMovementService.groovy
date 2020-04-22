@@ -70,8 +70,6 @@ class StockMovementService {
     def inventoryService
     def inventorySnapshotService
 
-    boolean transactional = true
-
     GrailsApplication grailsApplication
 
     def createStockMovement(StockMovement stockMovement) {
