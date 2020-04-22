@@ -9,11 +9,12 @@
  **/
 package org.pih.warehouse.core
 
+import grails.gorm.transactions.Transactional
 import org.springframework.context.ApplicationListener
 
+@Transactional
 class ApplicationExceptionEventService implements ApplicationListener<ApplicationExceptionEvent> {
 
-    def transactional = true
     def notificationService
 
     void onApplicationEvent(ApplicationExceptionEvent event) {
