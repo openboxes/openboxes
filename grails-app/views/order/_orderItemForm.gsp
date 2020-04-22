@@ -24,17 +24,23 @@
         <div id="manufacturerCode"></div>
     </td>
     <td class="middle center">
-        <input type="number" id="quantity" name="quantity" value="" size="10" class="text" />
+        <input type="number" id="quantity" name="quantity" value="" size="2" class="text" />
     </td>
     <td class="center middle">
-        <g:hiddenField name="unitOfMeasure" value="each"/>
-        <g:message code="default.each.label"/>
+        <g:selectUnitOfMeasure id="quantityUom"
+                               name="quantityUom.id" class="chzn-select"
+                               noSelection="['':'']"/>
     </td>
-    <td class="center middle">
-        <input type="number" id="unitPrice" required name="unitPrice" size="5" class="text"/>
-    </td>
-    <td></td>
     <td>
+        <input type="number" id="quantityPerUom" name="quantityPerUom" class="text" value=""  placeholder="Quantity per UoM"/>
+    </td>
+    <td class="center middle">
+        <input type="number" id="unitPrice" required name="unitPrice" size="2" class="text"/>
+    </td>
+    <td class="center middle">
+        <input type="number" id="totalPrice" required name="totalPrice" size="2" class="text"/>
+    </td>
+    <td class="center middle">
         <g:hiddenField id="defaultRecipient" name="defaultRecipient" value="${order?.orderedBy?.id}"/>
 %{--        <g:selectPerson id="recipient" name="recipient" value="${order?.orderedBy?.id}"--}%
 %{--                        noSelection="['':'']" class="chzn-select-deselect"/>--}%
@@ -45,7 +51,7 @@
                   data-ajax--cache="true"/>
 
     </td>
-    <td>
+    <td class="center middle">
         <g:jqueryDatePicker id="estimatedReadyDate" name="estimatedReadyDate" value=""
                             autocomplete="off" noSelection="['':'']"/>
     </td>
