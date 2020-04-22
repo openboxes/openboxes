@@ -1,5 +1,6 @@
 package org.pih.warehouse.tableroapi
 
+import grails.gorm.transactions.Transactional
 import org.joda.time.LocalDate
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.inventory.InventorySnapshot
@@ -12,6 +13,7 @@ import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.tablero.NumberData
 
+@Transactional
 class NumberDataService {
     def messageService
 
