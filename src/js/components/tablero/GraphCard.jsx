@@ -1,12 +1,13 @@
 /* eslint-disable no-underscore-dangle */
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Line, Bar, Doughnut, HorizontalBar } from 'react-chartjs-2';
-import { SortableElement, sortableHandle } from 'react-sortable-hoc';
+import { Bar, Doughnut, HorizontalBar, Line } from 'react-chartjs-2';
+import { SortableElement } from 'react-sortable-hoc';
+import { loadColors, loadOptions } from '../../consts/dataFormat/dataLoading';
+import DragHandle from './DragHandle';
 import LoadingCard from './LoadingCard';
 import Numbers from './Numbers';
 import TableCard from './TableCard';
-import { loadColors, loadOptions } from '../../consts/dataFormat/dataLoading';
 
 // getColors loads indicator colors if it doesn't have defined colors yet
 function getColors(data, type) {
@@ -17,10 +18,6 @@ function getColors(data, type) {
   }
   return loadColors(data, type);
 }
-
-const DragHandle = sortableHandle(() => (
-  <span className="dragHandler">::</span>
-));
 
 const handleChartClick = (elements) => {
   const link = elements[0]._chart.data.datasets[0].links[elements[0]._index];
@@ -70,21 +67,21 @@ const GraphCard = SortableElement(({
   }
 
   return (
-    <div className={`graphCard ${cardType === 'error' ? 'errorCard' : ''}`}>
-      <div className="headerCard">
+    <div className={`graph-card ${cardType === 'error' ? 'error-card' : ''}`}>
+      <div className="header-card">
         {cardLink ?
-          <a target="_blank" rel="noopener noreferrer" href={cardLink} className="titleLink">
-            <span className="titleLink"> {cardTitle} </span>
+          <a target="_blank" rel="noopener noreferrer" href={cardLink} className="title-link">
+            <span className="title-link"> {cardTitle} </span>
           </a>
           :
-          <span className="titleLink"> {cardTitle} </span>
+          <span className="title-link"> {cardTitle} </span>
         }
         <DragHandle />
       </div>
-      <div className="contentCard">
-        <div className="dataFilter">
+      <div className="content-card">
+        <div className="data-filter">
           <select
-            className={filter ? 'customSelect' : 'customSelect disabled'}
+            className={filter ? 'custom-select' : 'custom-select disabled'}
             onChange={e => reloadIndicator(cardMethod, cardType, cardTitle, cardLink, cardId, `querySize=${e.target.value}`)}
             disabled={!filter}
             defaultValue={data.labels ? data.labels.length : '6'}
