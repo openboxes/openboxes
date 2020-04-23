@@ -106,6 +106,10 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         actualDeliveryDate(nullable: true)
     }
 
+    Integer getQuantityPerUom() {
+        return this.quantityPerUom?:1
+    }
+
     def getShippedShipmentItems() {
         return shipmentItems.findAll { it.shipment.currentStatus >= ShipmentStatusCode.SHIPPED }
     }
