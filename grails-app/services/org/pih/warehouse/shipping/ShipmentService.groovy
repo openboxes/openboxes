@@ -2159,12 +2159,13 @@ class ShipmentService {
                     ShipmentItem shipmentItem = new ShipmentItem(
                             product: shipOrderItem.orderItem.product,
                             recipient: shipOrderItem.orderItem.recipient,
-                            quantity: shipOrderItem.quantityToShip
+                            quantity: shipOrderItem.quantityToShip * shipOrderItem.orderItem.quantityPerUom
                     )
                     shipmentItem.addToOrderItems(shipOrderItem.orderItem)
                     shipment.addToShipmentItems(shipmentItem)
                 } else {
-                    shipOrderItem.shipmentItem.quantity = shipOrderItem.quantityToShip
+                    shipOrderItem.shipmentItem.quantity = shipOrderItem.quantityToShip * shipOrderItem.orderItem.quantityPerUom
+                    shipOrderItem.shipmentItem.recipient = shipOrderItem.orderItem.recipient ?: order.orderedBy
                 }
             }
         }
