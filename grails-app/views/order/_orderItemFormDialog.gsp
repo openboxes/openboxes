@@ -107,7 +107,7 @@
                 </td>
                 <td valign="top" class="value">
                     ${orderItem.quantity}
-                    ${orderItem.product?.unitOfMeasure?:"EA"}
+                    ${orderItem?.unitOfMeasure}
                 </td>
             </tr>
             <tr class="prop">

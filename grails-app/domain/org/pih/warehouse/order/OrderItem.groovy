@@ -106,6 +106,16 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         actualDeliveryDate(nullable: true)
     }
 
+    String getUnitOfMeasure() {
+        if (quantityUom) {
+            return "${quantityUom?.code}/${quantityPerUom as Integer}"
+        }
+        else {
+            def g = ApplicationHolder.application.mainContext.getBean( 'org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib' )
+            return "${g.message(code:'default.ea.label').toUpperCase()}/1"
+        }
+    }
+
     Integer getQuantityPerUom() {
         return this.quantityPerUom?:1
     }
