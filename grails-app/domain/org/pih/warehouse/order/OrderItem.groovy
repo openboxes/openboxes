@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.order
 
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.UnitOfMeasure
@@ -30,7 +31,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     InventoryItem inventoryItem
     Integer quantity
     UnitOfMeasure quantityUom
-    BigDecimal quantityPerUom
+    BigDecimal quantityPerUom = 1
 
     BigDecimal unitPrice
     String currencyCode
@@ -65,10 +66,14 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
 
     static transients = [
             "orderItemType",
+            "quantityPerUom",
+            "quantityReceived",
+            "quantityShipped",
             "total",
             "shippedShipmentItems",
             "subtotal",
-            "totalAdjustments"
+            "totalAdjustments",
+            "unitOfMeasure"
     ]
 
     static belongsTo = [order: Order, parentOrderItem: OrderItem]
@@ -105,12 +110,22 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         return shipmentItems.findAll { it.shipment.currentStatus >= ShipmentStatusCode.SHIPPED }
     }
 
+    def getQuantityShipped() {
+        def quantityShipped = shippedShipmentItems?.sum { it?.quantity }?:0
+        return quantityShipped / (quantityPerUom?:1)
+    }
+
+    def getQuantityReceived() {
+        def quantityReceived = shippedShipmentItems?.sum { it?.quantityReceived() }?:0
+        return quantityReceived / (quantityPerUom?:1)
+    }
+
     String getOrderItemType() {
-        return (product) ? "Product" : (category) ? "Category" : "Unclassified"
+        return "Product"
     }
 
     Integer quantityFulfilled() {
-        return shippedShipmentItems?.sum { it?.quantity } ?: 0
+        return quantityShipped
     }
 
     Integer quantityRemaining() {
@@ -119,7 +134,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     }
 
     Integer quantityReceived() {
-        return shippedShipmentItems?.sum { it?.quantityReceived() } ?: 0
+        return quantityReceived
     }
 
     Boolean isPartiallyFulfilled() {
