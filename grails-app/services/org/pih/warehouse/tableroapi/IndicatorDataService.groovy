@@ -18,7 +18,8 @@ class IndicatorDataService {
     def dashboardService
 
     DataGraph getExpirationSummaryData(Location location, def params) {
-        Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
+        Integer querySize = params.querySize ? params.querySize.toInteger() + 1 : 7
+    
         LocalDate date = LocalDate.now()
 
         List expirationSummary = [0] * querySize
