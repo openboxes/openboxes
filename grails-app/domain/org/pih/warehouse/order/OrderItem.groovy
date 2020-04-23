@@ -128,6 +128,10 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         return shipmentItems.findAll { it.shipment.currentStatus >= ShipmentStatusCode.SHIPPED }
     }
 
+    def hasShippedItems() {
+        return shippedShipmentItems?shippedShipmentItems.size()>0:false
+    }
+
     Integer getQuantityInStandardUom() {
         return quantity * quantityPerUom
     }

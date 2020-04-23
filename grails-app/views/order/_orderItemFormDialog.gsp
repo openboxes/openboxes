@@ -204,7 +204,13 @@
             applyFocus("#product-suggest");
           },
           error: function (jqXHR, textStatus, errorThrown) {
-            $.notify("An error occurred", "errur");
+            if (jqXHR.responseText) {
+              let data = JSON.parse(jqXHR.responseText);
+              $.notify(data.errorMessage, "error");
+            }
+            else {
+              $.notify("An error occurred", "error");
+            }
           }
         });
         return false

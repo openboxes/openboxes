@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.order.OrderStatus" %>
+<%@ page import="org.pih.warehouse.shipping.ShipmentStatus; org.pih.warehouse.order.OrderStatus" %>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -6,11 +6,16 @@
 <title><warehouse:message code="order.addOrderItems.label"/></title>
 <style>
     .dlg { display: none; }
+    .non-editable { background-color: #e6e6e6; cursor: not-allowed }
+    .non-editable.odd { background-color: #e1e1e1; }
 </style>
 
 </head>
 <body>
 	<div class="body">
+        <g:isUserInRole roles="[org.pih.warehouse.core.RoleType.ROLE_APPROVER]">
+            <g:set var="isApprover" value="true" />
+        </g:isUserInRole>
 		<g:if test="${flash.message}">
 			<div class="message">
 				${flash.message}
@@ -58,7 +63,7 @@
                             <!-- data is dynamically loaded -->
                         </tbody>
                         <tfoot>
-                            <g:if test="${order?.status < org.pih.warehouse.order.OrderStatus.PLACED}">
+                            <g:if test="${isApprover.toBoolean()}">
                                 <g:render template="/order/orderItemForm"/>
                             </g:if>
                             <tr class="">
@@ -133,7 +138,7 @@
 
         function deleteOrderItem(id) {
           $.ajax({
-            url: '${g.createLink(controller:'order', action:'deleteOrderItem')}',
+            url: '${g.createLink(controller:'order', action:'removeOrderItem')}',
             data: { id: id },
             success: function () {
               clearOrderItems();
@@ -141,7 +146,13 @@
               $.notify("Successfully deleted item " + id, "success")
             },
             error: function (jqXHR, textStatus, errorThrown) {
-              $.notify("Error deleting item " + id, "error")
+              if (jqXHR.responseText) {
+                let data = JSON.parse(jqXHR.responseText);
+                $.notify(data.errorMessage, "error");
+              }
+              else {
+                $.notify("Error deleting item " + id, "error")
+              }
             }
           });
           return false
@@ -314,10 +325,10 @@
         }
 
         function editOrderItem(id) {
-            var executionKey = $(this).data("execution");
-            var url = "${request.contextPath}/order/orderItemFormDialog/" + id + "?execution=" + executionKey;
-            $('.loading').show();
-            $("#edit-item-dialog").html("Loading ...").load(url, onCompleteHandler).dialog("open");
+          var executionKey = $(this).data("execution");
+          var url = "${request.contextPath}/order/orderItemFormDialog/" + id + "?execution=" + executionKey;
+          $('.loading').show();
+          $("#edit-item-dialog").html("Loading ...").load(url, onCompleteHandler).dialog("open");
         }
 
 
@@ -369,8 +380,7 @@
           $(".delete-item")
           .live("click", function (event) {
             event.preventDefault();
-            var id = $(this)
-            .data("order-item-id");
+            var id = $(this).data("order-item-id");
             deleteOrderItem(id);
 
           });
@@ -406,7 +416,7 @@
     </script>
 
 <script id="rowTemplate" type="x-jquery-tmpl">
-<tr id="{{= id}}" tabindex="{{= index}}">
+<tr id="{{= id}}" tabindex="{{= index}}" {{if !canEdit }} class="non-editable" {{/if}}>
 	<td class="center middle">
     	{{= index }}
 	</td>
@@ -467,14 +477,12 @@
                         <warehouse:message code="default.button.edit.label"/>
                     </a>
                 </div>
-                {{if isOrderPending }}
                 <div class="action-menu-item">
                     <a href="javascript:void(-1);" class="delete-item" data-order-item-id="{{= id}}">
                         <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>
                         <warehouse:message code="default.button.delete.label"/>
                     </a>
                 </div>
-                {{/if}}
             </div>
         </div>
 	</td>
