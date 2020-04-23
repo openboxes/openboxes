@@ -15,8 +15,7 @@ class DataGraph implements Serializable {
         this.type = type;
         this.id = id;
         this.archived = archived;
-        this.data = data;
-        
+        this.data = data; 
     }
 
     Map toJson() {
