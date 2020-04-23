@@ -26,7 +26,7 @@
 				<warehouse:message code="errors.dataAccess.message" default="Apologies, but you just tried to do something unspeakable to the database."/>
 			</div>
 			<div style="padding-left: 45px;" class="nailthumb-container">
-				<img src="${createLinkTo(dir:'images',file:'jgreenspan.jpg')}"/>
+				<img src="${createLinkTo(dir:'images',file:'jgreenspan.png')}"/>
 			</div>
 		</div>
 
@@ -57,8 +57,8 @@
         </g:if>
 	</div>
 	<script>
-		$(function() { 		
+		$(function() {
 			$('.nailthumb-container img').nailthumb({width : 100, height : 100});
 		});
-	</script>	
+	</script>
 </body>
