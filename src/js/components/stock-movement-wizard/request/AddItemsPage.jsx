@@ -677,10 +677,13 @@ class AddItemsPage extends Component {
 
     return apiClient.post(url, formData, config)
       .then(() => {
-        this.fetchAddItemsPageData();
-        if (!this.props.isPaginated) {
-          this.fetchLineItems();
-        }
+        this.setState({
+          values: {
+            ...this.state.values,
+            lineItems: [],
+          },
+        });
+        this.fetchLineItems();
       })
       .catch(() => {
         this.props.hideSpinner();
