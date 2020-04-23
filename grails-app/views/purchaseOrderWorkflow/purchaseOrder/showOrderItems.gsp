@@ -46,7 +46,7 @@
                                 <th class="center"><warehouse:message code="product.manufacturer.label"/></th>
                                 <th class="center"><warehouse:message code="product.manufacturerCode.label"/></th>
                                 <th class="center"><warehouse:message code="default.quantity.label"/></th>
-                                <th class="center" colspan="2"><warehouse:message code="default.quantityTotal.label"/></th>
+                                <th class="center"><warehouse:message code="default.unitOfMeasure.label"/></th>
                                 <th class="center"><warehouse:message code="orderItem.unitPrice.label"/></th>
                                 <th class="center"><warehouse:message code="orderItem.totalCost.label"/></th>
                                 <th class="center"><warehouse:message code="order.recipient.label"/></th>
@@ -62,7 +62,7 @@
                                 <g:render template="/order/orderItemForm"/>
                             </g:if>
                             <tr class="">
-                                <th colspan="13" class="right">
+                                <th colspan="14" class="right">
                                     <warehouse:message code="default.total.label"/>
                                     <g:formatNumber number="${order?.totalPrice()?:0.0 }"/>
                                     ${order?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
@@ -198,6 +198,7 @@
           $("#supplierCode").html("");
           $("#manufacturer").html("");
           $("#manufacturerCode").html("");
+          $("#quantityUom").val("").trigger("chosen:updated");
           var defaultRecipient = $("#defaultRecipient").val();
           $("#recipient").val(defaultRecipient).trigger("chosen:updated");
           $("#estimatedReadyDate-datepicker").datepicker('setDate', null);
@@ -423,13 +424,14 @@
 	    {{/if}}
 	</td>
 	<td class="center middle">
-	    {{= quantity }} <small>{{= unitOfMeasure }}</small>
-	</td>
-	<td class="center middle" colspan="2">
-	    {{= totalQuantity }} <small>EA/1</small>
+	    {{= quantity }}
 	</td>
 	<td class="center middle">
-	    {{= unitPrice }} {{= currencyCode }} <small>per {{= unitOfMeasure }}</small>
+    	{{= unitOfMeasure }}
+	</td>
+	<td class="center middle">
+	    {{= unitPrice }} {{= currencyCode }}<br/>
+	    <small>per {{= unitOfMeasure }}</small>
 	</td>
 	<td class="center middle">
 	    {{= totalPrice }} {{= currencyCode }}

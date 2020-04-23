@@ -15,6 +15,8 @@ import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.UomService
+import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.springframework.web.multipart.MultipartFile
@@ -24,6 +26,7 @@ class OrderController {
     def stockMovementService
     def reportService
     def shipmentService
+    UomService uomService
 
     static allowedMethods = [save: "POST", update: "POST"]
 
@@ -603,8 +606,38 @@ class OrderController {
         else {
             orderItem.properties = params
         }
-        if (!order.save(flush:true)) {
-            throw new ValidationException("Order is invalid", order.errors)
+
+        if (!orderItem.productPackage) {
+            ProductPackage productPackage = uomService.getProductPackage(orderItem.product, orderItem.quantityUom, orderItem.quantityPerUom as Integer)
+            // Create a new product package
+            if (!productPackage) {
+                productPackage = new ProductPackage()
+                productPackage.product = orderItem.product
+                productPackage.name = "${orderItem.quantityUom.code}/${orderItem.quantityPerUom as Integer}"
+                productPackage.uom = orderItem.quantityUom
+                productPackage.quantity = orderItem.quantityPerUom as Integer
+                productPackage.price = orderItem.unitPrice
+                productPackage.save()
+            }
+            // Associate product package with order item
+            orderItem.productPackage = productPackage
+        }
+
+        // Update last price on product package and product supplier
+        if (orderItem.productPackage) {
+            orderItem.productPackage.price = orderItem.unitPrice
+        }
+        if (orderItem.productSupplier) {
+            orderItem.productSupplier.unitPrice = orderItem.unitPrice
+        }
+
+        try {
+            if (!order.save(flush:true)) {
+                throw new ValidationException("Order is invalid", order.errors)
+            }
+        } catch (Exception e) {
+            log.error("Error " + e.message, e)
+            render(status: 500, text: "Not saved")
         }
         render (status: 200, text: "Successfully added order item")
     }
@@ -615,7 +648,7 @@ class OrderController {
 
             String quantityUom = "${it?.quantityUom?.code?:g.message(code:'default.ea.label')?.toUpperCase()}"
             String quantityPerUom = "${g.formatNumber(number: it?.quantityPerUom?:1, maxFractionDigits: 0)}"
-            String unitOfMeasure = "${quantityUom}\\${quantityPerUom}"
+            String unitOfMeasure = "${quantityUom}/${quantityPerUom}"
 
             [
                     id: it.id,

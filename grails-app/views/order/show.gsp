@@ -236,7 +236,7 @@
                                                         </g:else>
                                                     </td>
                                                     <td class="center">
-                                                        ${orderItem?.product?.unitOfMeasure?:"EA"}
+                                                        ${orderItem?.quantityUom?:g.message(code:"default.each.label").capitalize()}
                                                     </td>
                                                     <td class="order-item-quantity right">
                                                         ${orderItem?.quantity}

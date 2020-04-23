@@ -1713,8 +1713,10 @@ class JsonController {
         ProductSupplier productSupplier = ProductSupplier.findById(params.productSupplierId)
         ProductPackage productPackage =
                 ProductPackage.findByProductAndUom(productSupplier.product, productSupplier.unitOfMeasure)
+
+        BigDecimal unitPrice = productSupplier?.unitPrice ?: productPackage.price  ?: null
         render([
-                unitPrice: productSupplier?.unitPrice ? g.formatNumber(number: productSupplier?.unitPrice) : null,
+                unitPrice: unitPrice ? g.formatNumber(number: unitPrice) : null,
                 supplierCode: productSupplier?.supplierCode,
                 manufacturer: productSupplier?.manufacturer?.name,
                 manufacturerCode: productSupplier?.manufacturerCode,
