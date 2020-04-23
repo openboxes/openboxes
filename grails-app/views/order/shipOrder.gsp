@@ -79,7 +79,7 @@
 											</td>
 											<td class="middle">
 												<g:if test="${!j}">
-												${orderItem?.product?.unitOfMeasure}
+												${orderItem?.unitOfMeasure}
 												</g:if>
 											</td>
 											<td class="center middle">
@@ -92,7 +92,7 @@
 												${orderItem?.quantityFulfilled()}
 												</g:if>
 											</td>
-											<td class="center middle border-right">
+											<td class="center middle">
 												<g:if test="${!j}">
 													<g:if test="${orderItem.quantityRemaining()>0}">
 														${orderItem?.quantityRemaining()}
