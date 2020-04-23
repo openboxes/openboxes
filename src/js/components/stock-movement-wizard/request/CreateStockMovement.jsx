@@ -66,6 +66,7 @@ const FIELDS = {
       autoload: false,
       cache: false,
       options: [],
+      disabled: true,
       filterOptions: options => options,
     },
     getDynamicAttr: props => ({
@@ -75,7 +76,6 @@ const FIELDS = {
           props.fetchStockLists(props.origin, value);
         }
       },
-      disabled: !props.isSuperuser,
     }),
   },
   origin: {
@@ -159,7 +159,7 @@ class CreateStockMovement extends Component {
       debounceUsersFetch(this.props.debounceTime, this.props.minSearchLength);
 
     this.debouncedLocationsFetch =
-      debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength);
+      debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength, ['FULFILL_REQUEST']);
   }
 
   componentDidMount() {

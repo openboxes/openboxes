@@ -82,6 +82,7 @@ class Order implements Serializable {
             "totalOrderAdjustments",
             "totalOrderItemAdjustments",
             "total",
+            "totalNormalized"
     ]
 
     static hasMany = [
@@ -284,6 +285,25 @@ class Order implements Serializable {
     def getTotal() {
         return (subtotal + totalAdjustments)?:0
     }
+
+    def getTotalNormalized() {
+        total * lookupCurrentExchangeRate()
+    }
+
+    def lookupCurrentExchangeRate() {
+
+        // Use fixed exchange rate if it exists on order
+        if (exchangeRate) { return exchangeRate }
+
+        // Otherwise find a suitable exchange rate from the UomConversion table (or default to 1.0)
+        BigDecimal currentExchangeRate
+        String defaultCurrencyCode = ConfigurationHolder.config.openboxes.locale.defaultCurrencyCode
+        if (currencyCode != defaultCurrencyCode) {
+            currentExchangeRate = UnitOfMeasureConversion.conversionRateLookup(defaultCurrencyCode, currencyCode).list()
+        }
+        return currentExchangeRate?:1.0
+    }
+
 
     String generateName() {
         final String separator =
