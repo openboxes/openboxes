@@ -18,7 +18,7 @@ const Numbers = () => {
 
 
 const PreviewIndicator = props => (
-  <li className="unarchivedItem">
+  <li className="unarchived-item">
     <div className="archived-indicator">
       <div className="row">
         <div className="col col-3 graph-preview">{props.children}</div>
@@ -144,7 +144,7 @@ const UnarchiveIndicators = (props) => {
   return (
     <div
       className={
-        props.showPopout ? 'unarchivedItems popover-active' : 'unarchivedItems'
+        props.showPopout ? 'unarchived-items popover-active' : 'unarchived-items'
       }
     >
       <div className="unarchive" role="button" tabIndex={0} onClick={props.unarchiveHandler} onKeyDown={props.unarchiveHandler}>
@@ -156,7 +156,7 @@ const UnarchiveIndicators = (props) => {
         <span role="button" tabIndex={0} className="close-button" onClick={props.unarchiveHandler} onKeyDown={props.unarchiveHandler} >
           &times;
         </span>
-        <ul className="unarchivedList">
+        <ul className="unarchived-list">
           <ArchivedIndicators
             graphData={props.graphData}
             numberData={props.numberData}

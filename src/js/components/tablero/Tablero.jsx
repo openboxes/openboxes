@@ -23,8 +23,9 @@ defaults.global.legend = false;
 defaults.scale.ticks.beginAtZero = true;
 
 
-const SortableCards = SortableContainer(({ data, reloadSingleIndicator }) => (
-  <div className="cardComponent">
+// eslint-disable-next-line no-shadow
+const SortableCards = SortableContainer(({ data, reloadIndicator }) => (
+  <div className="card-component">
     {data.map((value, index) =>
       (value.archived ? null : (
         <GraphCard
@@ -36,7 +37,7 @@ const SortableCards = SortableContainer(({ data, reloadSingleIndicator }) => (
           cardType={value.type}
           cardLink={value.link}
           data={value.data}
-          reloadIndicator={reloadSingleIndicator}
+          reloadIndicator={reloadIndicator}
         />
       )))}
   </div>
@@ -44,7 +45,7 @@ const SortableCards = SortableContainer(({ data, reloadSingleIndicator }) => (
 
 
 const SortableNumberCards = SortableContainer(({ data }) => (
-  <div className="cardComponent">
+  <div className="card-component">
     {data.map((value, index) => (
       (value.archived ? null : (
         <NumberCard
@@ -62,7 +63,7 @@ const SortableNumberCards = SortableContainer(({ data }) => (
 
 
 const ArchiveIndicator = ({ hideArchive }) => (
-  <div className={hideArchive ? 'archiveDiv hideArchive' : 'archiveDiv'}>
+  <div className={hideArchive ? 'archive-div hide-archive' : 'archive-div'}>
     <span>
       Archive indicator <i className="fa fa-archive" />
     </span>
@@ -152,7 +153,7 @@ class Tablero extends Component {
     }
 
     return (
-      <div className="cardsContainer">
+      <div className="cards-container">
         {numberCards}
         <SortableCards
           data={this.props.indicatorsData}

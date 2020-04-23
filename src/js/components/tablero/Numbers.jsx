@@ -2,20 +2,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const Numbers = props => (
-  <div className="gyrIndicator">
-    <a className="numberIndicator" href={props.data.first.link}>
+  <div className="gyr-indicator">
+    <a className="number-indicator" href={props.data.first.link}>
       <div className="value">
         <div className={props.data.gyrColors ? 'circle green' : 'circle gray'} /> {props.data.first.value}
       </div>
       <div className="subtitle">{props.data.first.subtitle}</div>
     </a>
-    <a className="numberIndicator" href={props.data.second.link}>
+    <a className="number-indicator" href={props.data.second.link}>
       <div className="value">
         <div className={props.data.gyrColors ? 'circle yellow' : 'circle gray'} /> {props.data.second.value}
       </div>
       <div className="subtitle">{props.data.second.subtitle}</div>
     </a>
-    <a className="numberIndicator" href={props.data.third.link}>
+    <a className="number-indicator" href={props.data.third.link}>
       <div className="value">
         <div className={props.data.gyrColors ? 'circle red' : 'circle gray'} /> {props.data.third.value}
       </div>
