@@ -585,13 +585,11 @@ class AddItemsPage extends Component {
   }
 
   updateRow(values, index) {
-    const item = values.editPageItems[index];
-    let val = values;
-    val = update(values, {
-      editPageItems: { [index]: { $set: item } },
-    });
+    const item = values.lineItems[index];
     this.setState({
-      values: val,
+      values: update(values, {
+        lineItems: { [index]: { $set: item } },
+      }),
     });
   }
 
@@ -1059,6 +1057,30 @@ class AddItemsPage extends Component {
     return apiClient.delete(removeItemsUrl)
       .catch(() => {
         this.props.hideSpinner();
+        return Promise.reject(new Error('react.stockMovement.error.deleteRequisitionItem.label'));
+      });
+  }
+
+  /**
+   * Removes all items from requisition's items list.
+   * @public
+   */
+  removeAll() {
+    const removeItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/removeAllItems`;
+
+    return apiClient.delete(removeItemsUrl)
+      .then(() => {
+        this.setState({
+          totalCount: 1,
+          currentLineItems: [],
+          values: {
+            ...this.state.values,
+            lineItems: new Array(1).fill({ sortOrder: 100 }),
+          },
+        });
+      })
+      .catch(() => {
+        this.fetchLineItems();
         return Promise.reject(new Error('react.stockMovement.error.deleteRequisitionItem.label'));
       });
   }
