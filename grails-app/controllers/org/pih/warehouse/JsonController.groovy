@@ -764,6 +764,7 @@ class JsonController {
                         [
                                 id         : it.id,
                                 label      : it.name,
+                                text: it.name,
                                 description: it?.email,
                                 value      : it.id,
                                 valueText  : it.name,
@@ -778,7 +779,7 @@ class JsonController {
 
         }
         log.info "returning ${items?.size()} items: " + items
-        render items as JSON
+        render ([results: items] as JSON)
 
 
     }
@@ -790,11 +791,10 @@ class JsonController {
         def products = new TreeSet()
 
         if (params.term) {
-            def terms = params.term.split(" ")
+            def terms = params?.term ? params?.term?.split(" ") : []
 
             // Get all products that match terms
             products = productService.searchProducts(terms, [])
-
             products = products.unique()
 
             if (terms) {
@@ -811,6 +811,9 @@ class JsonController {
                 }
                 products = products.reverse()
             }
+        }
+        else {
+            products = Product.list([max: 100, offset: 0])
         }
 
         String NEVER = "${warehouse.message(code: 'default.never.label')}"
@@ -850,6 +853,7 @@ class JsonController {
                 // Convert product attributes to JSON object attributes
                 [
                         id            : product?.id,
+                        text          : product?.productCode + " " + localizedName,
                         product       : product,
                         category      : product?.category,
                         quantity      : productQuantity,
@@ -869,7 +873,7 @@ class JsonController {
         }
 
         log.info "Returning " + products.size() + " results for search " + params.term
-        render products as JSON
+        render ([results: products] as JSON)
     }
 
     def findRequestItems = {
