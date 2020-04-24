@@ -12,9 +12,12 @@ class DelayedShipments implements Serializable {
      String labelByLand;
      String labelShipment;
      String labelName;
+     String urlIconSea;
+     String urlIconAir;
+     String urlIconLand;
      List<ShipmentsData> shipmentsData;
 
-    DelayedShipments(Integer numberByAir, Integer numberBySea , Integer numberByLand , String labelByAir, String labelBySea, String labelByLand, String labelShipment, String labelName, List<ShipmentsData> shipmentsData) {
+    DelayedShipments(Integer numberByAir, Integer numberBySea , Integer numberByLand , String labelByAir, String labelBySea, String labelByLand, String labelShipment, String labelName, String urlIconSea, String urlIconAir, String urlIconLand, List<ShipmentsData> shipmentsData) {
         this.numberByAir = numberByAir;
         this.numberBySea = numberBySea;
         this.numberByLand = numberByLand;
@@ -23,6 +26,9 @@ class DelayedShipments implements Serializable {
         this.labelByLand = labelByLand;
         this.labelShipment = labelShipment;
         this.labelName = labelName;
+        this.urlIconSea = urlIconSea;
+        this.urlIconAir = urlIconAir;
+        this.urlIconLand = urlIconLand;
         this.shipmentsData = shipmentsData;
     }
 }

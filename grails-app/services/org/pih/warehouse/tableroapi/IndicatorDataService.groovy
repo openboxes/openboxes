@@ -405,8 +405,10 @@ class IndicatorDataService {
    
             return shipmentData
         }
-
-        DelayedShipments delayedShipments = new DelayedShipments(numberDelayed['air'], numberDelayed['sea'], numberDelayed['landAndSuitcase'],'By air', 'By sea', 'By land', 'Shipment', 'Name', results)
+        String urlSea = '/openboxes/images/icons/shipmentType/ShipmentTypeSea.png';
+        String urlAir = '/openboxes/images/icons/shipmentType/ShipmentTypeAir.png';
+        String urlLand = '/openboxes/images/icons/shipmentType/ShipmentTypeLand.png';
+        DelayedShipments delayedShipments = new DelayedShipments(numberDelayed['air'], numberDelayed['sea'], numberDelayed['landAndSuitcase'],'By air', 'By sea', 'By land', 'Shipment', 'Name', urlSea, urlAir, urlLand, results)
 
         return delayedShipments;
     }

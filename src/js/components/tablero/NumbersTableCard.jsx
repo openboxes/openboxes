@@ -6,15 +6,15 @@ const NumbersTableCard = props => (
   <div className="delayedShipment">
     <div className="delayedShipmentNumber">
       <div className="shipmentNumberCard">
-        <div> <img src="/openboxes/images/icons/shipmentType/ShipmentTypeAir.png" alt="air" />{props.data.numberByAir} </div>
+        <div> <img src={props.data.urlIconAir} alt="air" />{props.data.numberByAir} </div>
         <div>{props.data.labelByAir}</div>
       </div>
       <div className="shipmentNumberCard">
-        <div> <img src="/openboxes/images/icons/shipmentType/ShipmentTypeSea.png" alt="air" /> {props.data.numberBySea} </div>
+        <div> <img src={props.data.urlIconSea} alt="sea" /> {props.data.numberBySea} </div>
         <div>{props.data.labelBySea}</div>
       </div>
       <div className="shipmentNumberCard">
-        <div> <img src="/openboxes/images/icons/shipmentType/ShipmentTypeLand.png" alt="air" /> {props.data.numberByLand} </div>
+        <div> <img src={props.data.urlIconLand} alt="land" /> {props.data.numberByLand} </div>
         <div>{props.data.labelByLand}</div>
       </div>
     </div>
@@ -53,6 +53,9 @@ NumbersTableCard.propTypes = {
     numberByLand: PropTypes.number,
     labelShipment: PropTypes.string,
     labelName: PropTypes.string,
+    urlIconAir: PropTypes.string,
+    urlIconSea: PropTypes.string,
+    urlIconLand: PropTypes.string,
     shipmentsData: PropTypes.arrayOf(PropTypes.shape({})),
   }).isRequired,
 };
