@@ -46,9 +46,9 @@
                                 <th class="center"><warehouse:message code="product.manufacturer.label"/></th>
                                 <th class="center"><warehouse:message code="product.manufacturerCode.label"/></th>
                                 <th class="center"><warehouse:message code="default.quantity.label"/></th>
-                                <th class="center"><warehouse:message code="default.uom.label"/></th>
-                                <th class="center"><warehouse:message code="order.unitPrice.label"/></th>
-                                <th class="right"><warehouse:message code="orderItem.totalCost.label"/></th>
+                                <th class="center"><warehouse:message code="default.unitOfMeasure.label"/></th>
+                                <th class="center"><warehouse:message code="orderItem.unitPrice.label"/></th>
+                                <th class="center"><warehouse:message code="orderItem.totalCost.label"/></th>
                                 <th class="center"><warehouse:message code="order.recipient.label"/></th>
                                 <th class="center"><warehouse:message code="orderItem.estimatedReadyDate.label"/></th>
                                 <th class="center" width="1%"><warehouse:message code="default.actions.label"/></th>
@@ -62,7 +62,7 @@
                                 <g:render template="/order/orderItemForm"/>
                             </g:if>
                             <tr class="">
-                                <th colspan="13" class="right">
+                                <th colspan="14" class="right">
                                     <warehouse:message code="default.total.label"/>
                                     <g:formatNumber number="${order?.totalPrice()?:0.0 }"/>
                                     ${order?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
@@ -198,6 +198,7 @@
           $("#supplierCode").html("");
           $("#manufacturer").html("");
           $("#manufacturerCode").html("");
+          $("#quantityUom").val("").trigger("chosen:updated");
           var defaultRecipient = $("#defaultRecipient").val();
           $("#recipient").val(defaultRecipient).trigger("chosen:updated");
           $("#estimatedReadyDate-datepicker").datepicker('setDate', null);
@@ -262,6 +263,17 @@
               $('#manufacturerCode').html(data.manufacturerCode);
               $('#manufacturer').html(data.manufacturer);
               $("#unitPrice").val(data.unitPrice);
+              if (data.minOrderQuantity) {
+                $("#quantity").val(data.minOrderQuantity);
+                $("#quantity").attr("min", data.minOrderQuantity)
+              }
+              if (data.unitOfMeasure) {
+                $("#quantityUom").val(data.unitOfMeasure.id).trigger("chosen:updated");
+              }
+              if (data.quantityPerUom) {
+                $("#quantityPerUom").val(data.quantityPerUom)
+              }
+
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
             }
@@ -415,13 +427,14 @@
 	    {{= quantity }}
 	</td>
 	<td class="center middle">
-	    {{= unitOfMeasure }}
+    	{{= unitOfMeasure }}
 	</td>
 	<td class="center middle">
-	    {{= unitPrice }}
+	    {{= unitPrice }} {{= currencyCode }}<br/>
+	    <small>per {{= unitOfMeasure }}</small>
 	</td>
 	<td class="center middle">
-	    {{= totalPrice }}
+	    {{= totalPrice }} {{= currencyCode }}
 	</td>
 	<td class="center middle">
     	{{if recipient }}

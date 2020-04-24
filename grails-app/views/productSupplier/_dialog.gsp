@@ -20,11 +20,31 @@
                 </tr>
                 <tr class="prop">
                     <td class="name">
-                        <label for="code"><warehouse:message code="default.code.label"/></label>
+                        <label for="code"><warehouse:message code="productSupplier.code.label"/></label>
                     </td>
                     <td class="value ">
                         <g:textField name="code" size="80" class="medium text" value="${productSupplier?.code}"
                                      placeholder="${g.message(code:'productSupplier.code.placeholder')}"/>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td class="name">
+                        <label for="supplier"><warehouse:message code="productSupplier.supplier.label"/></label>
+                    </td>
+                    <td class="value ">
+                        <g:selectOrganization name="supplier"
+                                              noSelection="['':'']"
+                                              roleTypes="[org.pih.warehouse.core.RoleType.ROLE_SUPPLIER]"
+                                              value="${productSupplier?.supplier?.id}"
+                                              class="chzn-select-deselect"/>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td class="name">
+                        <label for="supplierCode"><warehouse:message code="productSupplier.supplierCode.label"/></label>
+                    </td>
+                    <td class="value ">
+                        <g:textField name="supplierCode" size="80" class="medium text" value="${productSupplier?.supplierCode}" />
                     </td>
                 </tr>
                 <tr class="prop">
@@ -50,6 +70,15 @@
                     </td>
                     <td class="value ">
                         <g:textArea name="description" class="medium text" value="${productSupplier?.description}" />
+                    </td>
+                </tr>
+
+                <tr class="prop">
+                    <td class="name">
+                        <label for="ndc"><warehouse:message code="productSupplier.minOrderQuantity.label"/></label>
+                    </td>
+                    <td class="value ">
+                        <g:textField name="minOrderQuantity" size="80" class="medium text" value="${productSupplier?.minOrderQuantity}" />
                     </td>
                 </tr>
                 <tr class="prop">
@@ -100,26 +129,6 @@
                     </td>
                     <td class="value ">
                         <g:textField name="brandName" size="80" class="medium text" value="${productSupplier?.brandName}" />
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td class="name">
-                        <label for="supplier"><warehouse:message code="productSupplier.supplier.label"/></label>
-                    </td>
-                    <td class="value ">
-                        <g:selectOrganization name="supplier"
-                                              noSelection="['':'']"
-                                              roleTypes="[org.pih.warehouse.core.RoleType.ROLE_SUPPLIER]"
-                                              value="${productSupplier?.supplier?.id}"
-                                              class="chzn-select-deselect"/>
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td class="name">
-                        <label for="supplierCode"><warehouse:message code="productSupplier.supplierCode.label"/></label>
-                    </td>
-                    <td class="value ">
-                        <g:textField name="supplierCode" size="80" class="medium text" value="${productSupplier?.supplierCode}" />
                     </td>
                 </tr>
                 <tr class="prop">

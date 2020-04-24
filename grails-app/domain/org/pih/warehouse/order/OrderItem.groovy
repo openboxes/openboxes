@@ -11,10 +11,12 @@ package org.pih.warehouse.order
 
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
@@ -27,9 +29,13 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     Product product
     InventoryItem inventoryItem
     Integer quantity
+    UnitOfMeasure quantityUom
+    BigDecimal quantityPerUom
+
     BigDecimal unitPrice
     String currencyCode
     ProductSupplier productSupplier
+    ProductPackage productPackage
 
     User requestedBy    // the person who actually requested the item
     Person recipient
@@ -76,6 +82,9 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         inventoryItem(nullable: true)
         requestedBy(nullable: true)
         quantity(nullable: false, min: 1)
+        quantityUom(nullable: true)
+        quantityPerUom(nullable: true)
+        productPackage(nullable: true)
         unitPrice(nullable: true)
         orderItemStatusCode(nullable: true)
         parentOrderItem(nullable: true)

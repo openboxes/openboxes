@@ -32,11 +32,27 @@
             </tr>
             <tr class="prop">
                 <td valign="top" class="name">
-                    <label for="dlgQuantity"><warehouse:message code="default.quantity.label"/></label>
+                    <label for="dlgQuantity"><warehouse:message code="orderItem.quantity.label"/></label>
                 </td>
                 <td valign="top" class="value">
                     <input type="text" id="dlgQuantity" name="quantity" value="${orderItem.quantity}" size="10" class="text" />
-                    ${orderItem.product?.unitOfMeasure?:g.message("default.each.label")}
+                </td>
+            </tr>
+            <tr class="prop">
+                <td valign="top" class="name">
+                    <label for="dlgQuantityUom"><warehouse:message code="orderItem.quantityUom.label"/></label>
+                </td>
+                <td valign="top" class="value">
+                    <g:selectUnitOfMeasure name="quantityUom.id" class="chzn-select-deselect" value="${orderItem?.quantityUom?.id}"
+                    noSelection="['':'']"/>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td valign="top" class="name">
+                    <label for="dlgQuantityPerUom"><warehouse:message code="orderItem.quantityPerUom.label"/></label>
+                </td>
+                <td valign="top" class="value">
+                    <input type="text" id="dlgQuantityPerUom" name="quantityPerUom" value="${orderItem?.quantityPerUom?:1}" size="10" class="text" />
                 </td>
             </tr>
             <tr class="prop">
@@ -62,7 +78,8 @@
                     <label for="dlgEstimatedReadyDate"><warehouse:message code="orderItem.estimatedReadyDate.label"/></label>
                 </td>
                 <td valign="top" class="value">
-                    <input class="text large datepicker" id="dlgEstimatedReadyDate" name="estimatedReadyDate" value="${orderItem?.estimatedReadyDate?.format("MM/dd/yyyy")}" />
+                    <input class="text large datepicker" id="dlgEstimatedReadyDate" name="estimatedReadyDate"
+                           value="${orderItem?.estimatedReadyDate?.format("MM/dd/yyyy")}" />
                 </td>
             </tr>
         </g:if>
