@@ -380,34 +380,27 @@
         'hide_method': 'simple'
       });
 
-      // Chozen select default
+      // Chosen select default default configuration
       $(".chzn-select")
-      .chosen({ search_contains: true });
+      .chosen({
+        width: '100%',
+        search_contains: true,
+      });
+
       $(".chzn-select-deselect")
       .chosen({
-        allow_single_deselect: true,
         width: '100%',
-        search_contains: true
+        search_contains: true,
+        allow_single_deselect: true,
       });
+
+      // Select 2 default configuration
       $(".select2").select2({
         placeholder: 'Select an option',
         width: '100%',
         allowClear: true,
-      });
+        });
 
-      // $(".chzn-select-readonly")
-      // .chosen()
-      // .prop("disabled", "disabled")
-      // .trigger("chosen:updated");
-      // $(".chzn-select-deselect")
-      // .livequery(function () {
-      //   $(this)
-      //   .chosen({
-      //     allow_single_deselect: true,
-      //     width: '100%',
-      //     search_contains: true
-      //   });
-      // });
 
 
       $(".warehouse-switch")
