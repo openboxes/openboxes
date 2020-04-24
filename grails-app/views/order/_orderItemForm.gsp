@@ -2,8 +2,14 @@
     <td class="middle">
     </td>
     <td>
-        <g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName?skipQuantity=true&supplierId=${order?.originParty?.id}"
-                       styleClass="text large"/>
+%{--        <g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName?skipQuantity=true&supplierId=${order?.originParty?.id}"--}%
+%{--                       styleClass="text large"/>--}%
+
+        <g:select id="product" name="product.id" from="[]" class="chzn-select-deselect"
+                  data-ajax--url="${request.contextPath }/json/findProductByName?skipQuantity=true&supplierId=${order?.originParty?.id}"
+                  data-allow-clear="true"
+                  data-ajax--cache="true"/>
+
     </td>
     <td class="middle center">
         <select id="productSupplier" name="productSupplier.id"></select>
@@ -30,8 +36,14 @@
     <td></td>
     <td>
         <g:hiddenField id="defaultRecipient" name="defaultRecipient" value="${order?.orderedBy?.id}"/>
-        <g:selectPerson id="recipient" name="recipient" value="${order?.orderedBy?.id}"
-                        noSelection="['':'']" class="chzn-select-deselect"/>
+%{--        <g:selectPerson id="recipient" name="recipient" value="${order?.orderedBy?.id}"--}%
+%{--                        noSelection="['':'']" class="chzn-select-deselect"/>--}%
+
+        <g:select name="recipient" value="${order?.orderedBy?.id}" from="[]" class="chzn-select-deselect"
+                  data-ajax--url="${request.contextPath}/json/findPersonByName"
+                  data-allow-clear="true"
+                  data-ajax--cache="true"/>
+
     </td>
     <td>
         <g:jqueryDatePicker id="estimatedReadyDate" name="estimatedReadyDate" value=""

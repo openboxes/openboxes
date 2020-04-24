@@ -151,7 +151,7 @@
         }
 
         function validateForm() {
-          var productId = $("#product-suggest").val();
+          var productId = $("#product").val();
           var quantity = $("#quantity").val();
           var unitPrice = $("#unitPrice").val();
           return productId && quantity && unitPrice
@@ -167,7 +167,7 @@
                     success: function() {
                         clearOrderItemForm();
                         loadOrderItems();
-                        applyFocus("#product-suggest");
+                        applyFocus("#product");
                         $.notify("Successfully saved new item", "success")
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
@@ -193,6 +193,7 @@
         function clearOrderItemForm() {
           $("#orderItemForm")[0].reset();
           $("#product-id").val("");
+          $("#product").val(null).trigger("change");
           $("#product-value").val("");
           $("#productSupplier").html("");
           $("#supplierCode").html("");
@@ -300,7 +301,11 @@
 
         $(document).ready(function() {
           initializeTable();
-          applyFocus("#product-suggest");
+          applyFocus("#product");
+
+          $("chzn-select-deselect").focus(function() {
+            alert("test");
+          });
 
           $("table").dblclick(function(event) {
             var id = event.target.closest("tr").id;
