@@ -3,6 +3,7 @@ package org.pih.warehouse.tableroapi
 import org.joda.time.LocalDate
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.inventory.InventorySnapshot
+import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
@@ -39,13 +40,13 @@ class NumberDataService {
             SELECT COUNT(distinct ii.product.id) from TransactionEntry te
             INNER JOIN te.inventoryItem ii
             INNER JOIN te.transaction t
-            INNER JOIN t.inventory i
-            WHERE i = :location
-            AND t.transactionType.id = 11
+            WHERE t.inventory = :inventory
+            AND t.transactionType.transactionCode = :transactionCode 
             AND t.transactionDate >= :firstOfMonth""",
                 [
-                        'location'    : location,
-                        'firstOfMonth': firstOfMonth,
+                        inventory    : location?.inventory,
+                        transactionCode : TransactionCode.PRODUCT_INVENTORY,
+                        firstOfMonth: firstOfMonth,
                 ]);
 
         List<NumberData> numberDataList = [
