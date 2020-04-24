@@ -184,6 +184,36 @@
       cursor: default;
     }
 
+    .delayedShipment{
+      display: flex;
+      flex-direction: row;
+      height: 100%;
+
+      .delayedShipmentNumber{
+        width: 25%;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        justify-content: space-between;
+        margin-right: 20%;
+
+        .shipmentNumberCard{
+          display: flex;
+          flex-direction: column;
+
+          div{
+            font-weight: bold;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            img{
+              width:30%;
+            }
+          }
+        }
+      }
+    }
     .tableCard {
       align-items: flex-end;
   
@@ -556,3 +586,5 @@
     }
   }
 }
+
+

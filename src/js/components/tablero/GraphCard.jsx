@@ -5,6 +5,7 @@ import { SortableElement, sortableHandle } from 'react-sortable-hoc';
 import LoadingCard from './LoadingCard';
 import Numbers from './Numbers';
 import TableCard from './TableCard';
+import NumbersTableCard from './NumbersTableCard';
 import { loadColors, loadOptions } from '../../consts/dataFormat/dataLoading';
 
 // getColors loads indicator colors if it doesn't have defined colors yet
@@ -48,6 +49,8 @@ const GraphCard = SortableElement(({
   } else if (cardType === 'table') {
     graph = <TableCard data={data} />;
     filter = 1;
+  } else if (cardType === 'numberTable') {
+    graph = <NumbersTableCard data={data} />;
   } else if (cardType === 'loading') {
     graph = <LoadingCard />;
   } else if (cardType === 'error') {

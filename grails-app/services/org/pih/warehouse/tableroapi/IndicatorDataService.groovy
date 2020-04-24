@@ -368,7 +368,7 @@ class IndicatorDataService {
         return indicatorData;
     }
 
-        def getDelayedShipments(Location location) {
+    def getDelayedShipments(Location location) {
         Date oneWeekAgo = LocalDate.now().minusWeeks(1).toDate()
         Date oneMonthAgo = LocalDate.now().minusMonths(1).toDate()
         Date twoMonthsAgo = LocalDate.now().minusMonths(2).toDate()
@@ -394,12 +394,11 @@ class IndicatorDataService {
         def numberDelayed = [
                 air : 0,
                 sea : 0,
-                land: 0,
+                landAndSuitcase: 0,
         ]
-            
         results = results.collect {
             if (it[0] == '1') numberDelayed['air'] += 1
-            else if (it[0] == '2') tanumberDelayed['sea'] += 1
+            else if (it[0] == '2') numberDelayed['sea'] += 1
             else numberDelayed['landAndSuitcase'] += 1
         
             ShipmentsData shipmentData = new ShipmentsData(it[1],it[2], '/openboxes/stockMovement/show/' + it[3] )
@@ -407,7 +406,7 @@ class IndicatorDataService {
             return shipmentData
         }
 
-        DelayedShipments delayedShipments = new DelayedShipments(numberDelayed['air'], numberDelayed['sea'], numberDelayed['landAndSuitcase'], results)
+        DelayedShipments delayedShipments = new DelayedShipments(numberDelayed['air'], numberDelayed['sea'], numberDelayed['landAndSuitcase'],'By air', 'By sea', 'By land', 'Shipment', 'Name', results)
 
         return delayedShipments;
     }
