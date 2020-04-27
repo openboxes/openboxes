@@ -44,9 +44,20 @@ class NumberDataService {
             AND t.transactionType.transactionCode = :transactionCode 
             AND t.transactionDate >= :firstOfMonth""",
                 [
-                        inventory    : location?.inventory,
-                        transactionCode : TransactionCode.PRODUCT_INVENTORY,
-                        firstOfMonth: firstOfMonth,
+                        inventory      : location?.inventory,
+                        transactionCode: TransactionCode.PRODUCT_INVENTORY,
+                        firstOfMonth   : firstOfMonth,
+                ]);
+
+        def productsInDefaultBin = InventorySnapshot.executeQuery("""
+            SELECT COUNT(distinct i.product.id) FROM InventorySnapshot i
+            WHERE i.location = :location
+            AND i.quantityOnHand > 0
+            AND i.binLocationName = 'DEFAULT'
+            AND i.date = :tomorrow""",
+                [
+                        'location': location,
+                        'tomorrow': tomorrow
                 ]);
 
         List<NumberData> numberDataList = [
@@ -59,6 +70,8 @@ class NumberDataService {
                 new NumberData("Your in Progress Putaways", incompletePutaways[0], "Putaways", 4, "/openboxes/order/list/listForm?orderedById=" + user.id),
 
                 new NumberData("Items Inventoried this Month", itemsInventoried[0], "Items", 5),
+
+                new NumberData("Products in Default Bin", productsInDefaultBin[0], "Products", 6, "/openboxes/report/showBinLocationReport?location.id=" + location.id + "&status=inStock"),
         ] as List<NumberData>
 
         return numberDataList;
