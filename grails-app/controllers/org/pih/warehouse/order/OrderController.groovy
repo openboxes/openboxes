@@ -94,7 +94,7 @@ class OrderController {
                                     orderItem: orderItem,
                                     shipmentItem: shipmentItem,
                                     quantityMinimum: 0,
-                                    quantityToShip: shipmentItem.quantity / orderItem?.quantityPerUom,
+                                    quantityToShip: (shipmentItem.quantity / orderItem?.quantityPerUom) as int,
                                     quantityMaximum: orderItem.quantityRemaining
 
                             )
