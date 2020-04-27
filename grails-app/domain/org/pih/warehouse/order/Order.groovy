@@ -82,7 +82,15 @@ class Order implements Serializable {
             "totalOrderAdjustments",
             "totalOrderItemAdjustments",
             "total",
-            "totalNormalized"
+            "totalNormalized",
+            // Statuses
+            "pending",
+            "placed",
+            "partiallyReceived",
+            "received",
+            "canceled",
+            "completed",
+
     ]
 
     static hasMany = [

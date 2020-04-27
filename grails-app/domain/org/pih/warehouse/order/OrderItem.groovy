@@ -66,14 +66,22 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
 
     static transients = [
             "orderItemType",
-            "quantityPerUom",
+            "quantityInStandardUom",
+            "quantityRemaining",
             "quantityReceived",
+            "quantityReceivedInStandardUom",
             "quantityShipped",
+            "quantityShippedInStandardUom",
             "total",
             "shippedShipmentItems",
             "subtotal",
             "totalAdjustments",
-            "unitOfMeasure"
+            "unitOfMeasure",
+            // Statuses
+            "partiallyFulfilled",
+            "completelyFulfilled",
+            "completelyReceived",
+            "pending",
     ]
 
     static belongsTo = [order: Order, parentOrderItem: OrderItem]
@@ -88,7 +96,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         requestedBy(nullable: true)
         quantity(nullable: false, min: 1)
         quantityUom(nullable: true)
-        quantityPerUom(nullable: true)
+        quantityPerUom(nullable: false)
         productPackage(nullable: true)
         unitPrice(nullable: true)
         orderItemStatusCode(nullable: true)
@@ -116,51 +124,53 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         }
     }
 
-    Integer getQuantityPerUom() {
-        return this.quantityPerUom?:1
-    }
-
     def getShippedShipmentItems() {
         return shipmentItems.findAll { it.shipment.currentStatus >= ShipmentStatusCode.SHIPPED }
     }
 
-    def getQuantityShipped() {
-        def quantityShipped = shippedShipmentItems?.sum { it?.quantity }?:0
-        return quantityShipped / (quantityPerUom?:1)
+    Integer getQuantityInStandardUom() {
+        return quantity * quantityPerUom
     }
 
-    def getQuantityReceived() {
-        def quantityReceived = shippedShipmentItems?.sum { it?.quantityReceived() }?:0
-        return quantityReceived / (quantityPerUom?:1)
+    Integer getQuantityShippedInStandardUom() {
+        return shippedShipmentItems?.sum { ShipmentItem shipmentItem ->
+            shipmentItem?.quantity
+        }?:0
+    }
+
+    Integer getQuantityReceivedInStandardUom() {
+        return shippedShipmentItems?.sum { ShipmentItem shipmentItem ->
+            shipmentItem?.quantityReceived
+        }?:0
+    }
+
+    Integer getQuantityShipped() {
+        return quantityShippedInStandardUom / quantityPerUom
+    }
+
+    Integer getQuantityReceived() {
+        return quantityReceivedInStandardUom / quantityPerUom
     }
 
     String getOrderItemType() {
         return "Product"
     }
 
-    Integer quantityFulfilled() {
-        return quantityShipped
-    }
-
-    Integer quantityRemaining() {
-        def quantityRemaining = quantity - quantityFulfilled()
+    Integer getQuantityRemaining() {
+        def quantityRemaining = quantity - quantityShipped
         return quantityRemaining > 0 ? quantityRemaining : 0
     }
 
-    Integer quantityReceived() {
-        return quantityReceived
-    }
-
     Boolean isPartiallyFulfilled() {
-        return quantityFulfilled() > 0 && quantityFulfilled() < quantity
+        return quantityShipped > 0 && quantityShipped < quantity
     }
 
     Boolean isCompletelyFulfilled() {
-        return quantityFulfilled() >= quantity
+        return quantityShipped >= quantity
     }
 
     Boolean isCompletelyReceived() {
-        return quantityReceived() >= quantity
+        return quantityReceived >= quantity
     }
 
     Boolean isPending() {

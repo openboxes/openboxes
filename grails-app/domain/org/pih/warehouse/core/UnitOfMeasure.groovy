@@ -39,10 +39,9 @@ class UnitOfMeasure implements Serializable {
 
     static constraints = {
         name(nullable: false, maxSize: 255)
-        code(nullable: false, maxSize: 255)
+        code(nullable: false, unique: true, maxSize: 255)
         description(nullable: true, maxSize: 255)
         uomClass(nullable: true)
-
         createdBy(nullable: true)
         updatedBy(nullable: true)
     }

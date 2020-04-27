@@ -89,13 +89,13 @@
 											</td>
 											<td class="center middle">
 												<g:if test="${!j}">
-												${orderItem?.quantityFulfilled()}
+												${orderItem?.quantityShipped}
 												</g:if>
 											</td>
 											<td class="center middle">
 												<g:if test="${!j}">
-													<g:if test="${orderItem.quantityRemaining()>0}">
-														${orderItem?.quantityRemaining()}
+													<g:if test="${orderItem.quantityRemaining>0}">
+														${orderItem?.quantityRemaining}
 													</g:if>
 													<g:else>0</g:else>
 												</g:if>
