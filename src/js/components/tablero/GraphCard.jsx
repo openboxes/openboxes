@@ -1,12 +1,14 @@
+/* eslint-disable no-underscore-dangle */
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Line, Bar, Doughnut, HorizontalBar } from 'react-chartjs-2';
-import { SortableElement, sortableHandle } from 'react-sortable-hoc';
+import { Bar, Doughnut, HorizontalBar, Line } from 'react-chartjs-2';
+import { SortableElement } from 'react-sortable-hoc';
+import { loadColors, loadOptions } from '../../consts/dataFormat/dataLoading';
+import DragHandle from './DragHandle';
 import LoadingCard from './LoadingCard';
 import Numbers from './Numbers';
-import TableCard from './TableCard';
 import NumbersTableCard from './NumbersTableCard';
-import { loadColors, loadOptions } from '../../consts/dataFormat/dataLoading';
+import TableCard from './TableCard';
 
 // getColors loads indicator colors if it doesn't have defined colors yet
 function getColors(data, type) {
@@ -18,9 +20,13 @@ function getColors(data, type) {
   return loadColors(data, type);
 }
 
-const DragHandle = sortableHandle(() => (
-  <span className="dragHandler">::</span>
-));
+const handleChartClick = (elements) => {
+  const link = elements[0]._chart.data.datasets[0].links[elements[0]._index];
+
+  if (link && link !== '') {
+    window.location = link;
+  }
+};
 
 const GraphCard = SortableElement(({
   cardMethod, cardId, cardTitle, cardType, cardLink, data, reloadIndicator,
@@ -31,7 +37,13 @@ const GraphCard = SortableElement(({
   let label = 'Last';
   if (cardType === 'line') {
     cardData.datasets = getColors(data, 'line');
-    graph = <Line data={data} options={loadOptions()} />;
+    graph = (
+      <Line
+        data={data}
+        options={loadOptions()}
+        onElementsClick={elements => handleChartClick(elements)}
+      />
+    );
     filter = 1;
     label = 'Next';
   } else if (cardType === 'bar') {
@@ -45,14 +57,11 @@ const GraphCard = SortableElement(({
     cardData.datasets = getColors(data, 'horizontalBar');
     graph = <HorizontalBar data={data} options={loadOptions()} />;
   } else if (cardType === 'numbers') {
-    console.log(data);
     graph = <Numbers data={data} />;
   } else if (cardType === 'table') {
-    console.log(data);
     graph = <TableCard data={data} />;
     filter = 1;
   } else if (cardType === 'numberTable') {
-    console.log(data);
     graph = <NumbersTableCard data={data} />;
   } else if (cardType === 'loading') {
     graph = <LoadingCard />;
@@ -61,24 +70,24 @@ const GraphCard = SortableElement(({
   }
 
   return (
-    <div className={`graphCard ${cardType === 'error' ? 'errorCard' : ''}`}>
-      <div className="headerCard">
+    <div className={`graph-card ${cardType === 'error' ? 'error-card' : ''}`}>
+      <div className="header-card">
         {cardLink ?
-          <a target="_blank" rel="noopener noreferrer" href={cardLink} className="titleLink">
-            <span className="titleLink"> {cardTitle} </span>
+          <a target="_blank" rel="noopener noreferrer" href={cardLink} className="title-link">
+            <span className="title-link"> {cardTitle} </span>
           </a>
           :
-          <span className="titleLink"> {cardTitle} </span>
+          <span className="title-link"> {cardTitle} </span>
         }
         <DragHandle />
       </div>
-      <div className="contentCard">
-        <div className="dataFilter">
+      <div className="content-card">
+        <div className="data-filter">
           <select
-            className={filter ? 'customSelect' : 'customSelect disabled'}
+            className={filter ? 'custom-select' : 'custom-select disabled'}
             onChange={e => reloadIndicator(cardMethod, cardType, cardTitle, cardLink, cardId, `querySize=${e.target.value}`)}
             disabled={!filter}
-            defaultValue="6"
+            defaultValue={data.labels ? data.labels.length : '6'}
           >
             <option value="1">{label} Month</option>
             <option value="3">{label} 3 Months</option>

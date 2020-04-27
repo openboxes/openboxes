@@ -9,16 +9,8 @@
  **/
 package org.pih.warehouse.core
 
-class ApiException extends RuntimeException {
-    String message
+class UnitOfMeasureConversionController {
 
-    ApiException(String message) {
-        this.message = message
-    }
-
-    ApiException(String message, Throwable cause) {
-        this.message = message
-        this.cause = cause
-    }
+    def scaffold = UnitOfMeasureConversion
 
 }

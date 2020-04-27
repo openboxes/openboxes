@@ -7,8 +7,8 @@ import { getColor } from '../../consts/dataFormat/dataLoading';
 const LoadingNumbers = () => {
   const loadingNumbers = [];
   for (let i = 0; i < 6; i += 1) {
-    loadingNumbers.push(<div className="numberCard" key={i}>
-      <div className="loaderDiv">
+    loadingNumbers.push(<div className="number-card" key={i}>
+      <div className="loader-div">
         <ReactLoading
           type="bubbles"
           color={getColor()}
@@ -20,7 +20,7 @@ const LoadingNumbers = () => {
   }
 
   return (
-    <div className="cardComponent">
+    <div className="card-component">
       {loadingNumbers}
     </div>
   );

@@ -20,31 +20,51 @@ class IndicatorDataService {
 
     DataGraph getExpirationSummaryData(Location location, def params) {
         Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
-
-        // expirationSummary lists every expired item based on its month
-        List expirationSummary = [0] * querySize
-        List listLabels = []
-        List expirationAlerts = dashboardService.getExpirationAlerts(location)
-
         LocalDate date = LocalDate.now()
 
-        expirationAlerts.each {
-            Integer daysCounter = 0
-            // We should count only items that will expire someday
-            if (it.inventoryItem.expires != "never") {
-                // If an item is already inspired, we don't count it
-                if (it.daysToExpiry > 0) {
-                    listLabels = []
-                    // For loop verifies if item expires in querySize coming months
-                    for (int i = 0; i <= querySize; i++) {
-                        // daysCounter += number of days of (i) month
-                        daysCounter += date.plusMonths(i).dayOfMonth().getMaximumValue()
+        List expirationSummary = [0] * querySize
 
-                        String monthLabel = date.plusMonths(i).toString("MMM", Locale.US)
-                        listLabels.push(monthLabel)
-                        // if item expires in daysCounter incoming days, we count it
+        List linksExpirationSummary = [""] * querySize
+        List listLabels = []
+
+        // Fill labels and links
+        for (int i = 0; i < querySize; i++) {
+            Integer daysCounter = i * 30
+
+            String monthLabel = (i == 0) ? "today" : "within " + daysCounter + " days"
+            listLabels.push(monthLabel)
+
+            // Expired items
+            if (i == 0) {
+                linksExpirationSummary[0] = "/openboxes/inventory/listExpiredStock?status=expired"
+            }
+
+            // 1, 3 and 6 months
+            if (i == 1 || i == 3 || i == 6) {
+                linksExpirationSummary[i] = "/openboxes/inventory/listExpiringStock?status=within" + daysCounter + "Days"
+            }
+            // 12 month will be 360 days but will link to 365 in the report
+            if (i == 12) {
+                linksExpirationSummary[i] = "/openboxes/inventory/listExpiringStock?status=within365Days"
+            }
+        }
+
+        List expirationAlerts = dashboardService.getExpirationAlerts(location)
+
+        expirationAlerts.each {
+            // Count only items that expire
+            if (it.inventoryItem.expires != "never") {
+                // The first element of the dataset represents expired items
+                if (it.daysToExpiry <= 0) {
+                    expirationSummary[0] += 1
+                } else {
+                    // Verifies if item expires within querySize * 30 days
+                    for (int i = 1; i < querySize; i++) {
+                        Integer daysCounter = i * 30
+
+                        // if item expires in daysCounter incoming days, count it
                         if (it.daysToExpiry <= daysCounter) {
-                            expirationSummary[i] = expirationSummary[i] ? expirationSummary[i] + 1 : 1
+                            expirationSummary[i] += 1
                         }
                     }
                 }
@@ -52,14 +72,14 @@ class IndicatorDataService {
         }
 
         List<IndicatorDatasets> datasets = [
-                new IndicatorDatasets('Expiration(s)', expirationSummary)
-        ];
+                new IndicatorDatasets('Expiration(s)', expirationSummary, linksExpirationSummary)
+        ]
 
-        IndicatorData data = new IndicatorData(datasets, listLabels);
+        IndicatorData data = new IndicatorData(datasets, listLabels)
 
-        DataGraph indicatorData = new DataGraph(data, 1, "Expiration summary", "line");
+        DataGraph indicatorData = new DataGraph(data, 1, "Expiration summary", "line")
 
-        return indicatorData;
+        return indicatorData
     }
 
     DataGraph getFillRate() {
@@ -85,8 +105,8 @@ class IndicatorDataService {
         }
 
         List<IndicatorDatasets> datasets = [
-                new IndicatorDatasets('Line1 Dataset', listData, 'line'),
-                new IndicatorDatasets('Line2 Dataset', [15, 15, 15, 15, 15, 15], 'line'),
+                new IndicatorDatasets('Line1 Dataset', listData, null, 'line'),
+                new IndicatorDatasets('Line2 Dataset', [15, 15, 15, 15, 15, 15], null, 'line'),
                 new IndicatorDatasets('Bar1 Dataset', listData),
                 new IndicatorDatasets('Bar2 Dataset', bar2Data),
         ];
@@ -122,7 +142,6 @@ class IndicatorDataService {
                 reoderStockCount: reoderStockCount,
                 overStockCount  : overStockCount,
                 stockOutCount   : stockOutCount,
-                //totalCount      : totalCount
         ];
 
         List listData = []
@@ -412,7 +431,7 @@ class IndicatorDataService {
         ColorNumber delayedShipmentBySea = new ColorNumber(numberDelayed['sea'], 'By sea')
         ColorNumber delayedShipmentByLand = new ColorNumber(numberDelayed['landAndSuitcase'], 'By land')
 
-        NumberIndicator numberIndicator = new NumberIndicator(delayedShipmentByAir, delayedShipmentBySea, delayedShipmentByLand)
+        NumberIndicator numberIndicator = new NumberIndicator(delayedShipmentByAir, delayedShipmentBySea, delayedShipmentByLand, false)
 
         NumberTableData numberTableData = new NumberTableData(table, numberIndicator)
 

@@ -33,7 +33,7 @@
 			<div class="dialog">
                 <g:render template="/order/summary" model="[orderInstance:order,currentState:'editOrder']"/>
                 <div class="box">
-                    <h2><warehouse:message code="order.enterOrderDetails.label" /></h2>
+                    <h2><warehouse:message code="order.header.label" default="Order Header"/></h2>
                     <table>
                         <tbody>
 
@@ -83,29 +83,6 @@
                                 </td>
                             </tr>
                             <tr class='prop'>
-                                <td valign='top' class='name middle'><label for='currencyCode'><warehouse:message code="order.currencyCode.label"/></label></td>
-                                <td valign='top'
-                                    class='value ${hasErrors(bean:order,field:'currency','errors')}'>
-                                    <g:selectCurrency name="currencyCode" class="chzn-select-deselect" value="${order?.currencyCode}" noSelection="['':'']"/>
-                                </td>
-                            </tr>
-                            <tr class='prop'>
-                                <td valign='top' class='name middle'>
-                                    <label for="paymentMethodType.id"><warehouse:message code="order.paymentMethodType.label"/></label>
-                                </td>
-                                <td valign='top' class='value ${hasErrors(bean:order,field:'paymentMethodType','errors')}'>
-                                    <g:selectPaymentMethodType name="paymentMethodType.id" value="${order?.paymentMethodType?.id}" class="chzn-select-deselect" noSelection="['':'']"/>
-                                </td>
-                            </tr>
-                            <tr class='prop'>
-                                <td valign='top' class='name middle'>
-                                    <label for="paymentTerm.id"><warehouse:message code="order.paymentTerm.label"/></label>
-                                </td>
-                                <td valign='top' class='value ${hasErrors(bean:order,field:'paymentTerm','errors')}'>
-                                    <g:selectPaymentTerm name="paymentTerm.id" value="${order?.paymentTerm?.id}" class="chzn-select-deselect" noSelection="['':'']"/>
-                                </td>
-                            </tr>
-                            <tr class='prop'>
                                 <td valign='top' class='name middle'><label for='orderedBy.id'><warehouse:message code="order.orderedBy.label"/></label></td>
                                 <td valign='top'
                                     class='value ${hasErrors(bean:order,field:'orderedBy','errors')}'>
@@ -126,6 +103,48 @@
                                             showTrigger="false" />
                                 </td>
                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="box">
+                    <h2><warehouse:message code="order.terms.label" default="Order Terms" /></h2>
+
+                    <table>
+                        <tbody>
+                            <tr class='prop'>
+                                <td valign='top' class='name middle'><label for='currencyCode'><warehouse:message code="order.currencyCode.label"/></label></td>
+                                <td valign='top'
+                                    class='value ${hasErrors(bean:order,field:'currency','errors')}'>
+                                    <g:selectCurrency name="currencyCode" class="chzn-select-deselect" value="${order?.currencyCode}" noSelection="['':'']"/>
+                                </td>
+                            </tr>
+                            <g:if test="${order?.currencyCode && order?.currencyCode!=grailsApplication.config.openboxes.locale.defaultCurrencyCode}">
+                                <tr class='prop'>
+                                    <td valign='top' class='name middle'><label for='exchangeRate'><warehouse:message code="order.exchangeRate.label"/></label></td>
+                                    <td valign='top' class='value ${hasErrors(bean:order,field:'exchangeRate','errors')}'>
+                                        <input type="text" id="exchangeRate" name='exchangeRate' value="${order?.exchangeRate}" class="text large"
+                                               placeholder="${warehouse.message(code:'order.exchangeRate.message')}"/>
+                                    </td>
+                                </tr>
+                            </g:if>
+
+                            <tr class='prop'>
+                                <td valign='top' class='name middle'>
+                                    <label for="paymentMethodType.id"><warehouse:message code="order.paymentMethodType.label"/></label>
+                                </td>
+                                <td valign='top' class='value ${hasErrors(bean:order,field:'paymentMethodType','errors')}'>
+                                    <g:selectPaymentMethodType name="paymentMethodType.id" value="${order?.paymentMethodType?.id}" class="chzn-select-deselect" noSelection="['':'']"/>
+                                </td>
+                            </tr>
+                            <tr class='prop'>
+                                <td valign='top' class='name middle'>
+                                    <label for="paymentTerm.id"><warehouse:message code="order.paymentTerm.label"/></label>
+                                </td>
+                                <td valign='top' class='value ${hasErrors(bean:order,field:'paymentTerm','errors')}'>
+                                    <g:selectPaymentTerm name="paymentTerm.id" value="${order?.paymentTerm?.id}" class="chzn-select-deselect" noSelection="['':'']"/>
+                                </td>
+                            </tr>
+
                         </tbody>
                     </table>
                 </div>

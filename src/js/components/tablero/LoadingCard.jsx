@@ -3,7 +3,7 @@ import ReactLoading from 'react-loading';
 import { getColor } from '../../consts/dataFormat/dataLoading';
 
 const LoadingCard = () => (
-  <div className="loaderDiv">
+  <div className="loader-div">
     <ReactLoading
       type="bubbles"
       color={getColor()}

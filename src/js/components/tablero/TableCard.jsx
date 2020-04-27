@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 /* global _ */
 const TableCard = props => (
-  <div className="tableCard">
+  <div className="table-card">
     <table>
       <thead>
         <tr>
@@ -17,7 +17,7 @@ const TableCard = props => (
           <tr
             onClick={() => window.open(item.link, '_blank')}
             key={`item-${item.number}`}
-            className="tableLink"
+            className="table-link"
           >
             <td>{item.number}</td>
             <td className="mid">{_.truncate(item.name, { length: 80 })}</td>

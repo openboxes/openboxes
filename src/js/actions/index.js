@@ -9,7 +9,7 @@ import {
   CHANGE_CURRENT_LOCATION,
   TRANSLATIONS_FETCHED,
   CHANGE_CURRENT_LOCALE,
-  FETCH_INDICATORS,
+  FETCH_GRAPHS,
   FETCH_NUMBERS,
   RESET_INDICATORS,
   ADD_TO_INDICATORS,
@@ -123,7 +123,7 @@ function fetchIndicator(
   const url = `/openboxes/apitablero/${indicatorMethod}?${params}`;
 
   dispatch({
-    type: FETCH_INDICATORS,
+    type: FETCH_GRAPHS,
     payload: {
       id,
       method: indicatorMethod,
@@ -137,7 +137,7 @@ function fetchIndicator(
 
   apiClient.get(url).then((res) => {
     dispatch({
-      type: FETCH_INDICATORS,
+      type: FETCH_GRAPHS,
       payload: {
         id,
         method: indicatorMethod,
@@ -150,7 +150,7 @@ function fetchIndicator(
     });
   }, () => {
     dispatch({
-      type: FETCH_INDICATORS,
+      type: FETCH_GRAPHS,
       payload: {
         id,
         method: indicatorMethod,
@@ -190,23 +190,23 @@ export function resetIndicators() {
   };
 }
 
-export function addToIndicators(index) {
+export function addToIndicators(index, type) {
   return {
     type: ADD_TO_INDICATORS,
-    payload: { index },
+    payload: { index, type },
   };
 }
 
-export function reorderIndicators({ oldIndex, newIndex }, e) {
+export function reorderIndicators({ oldIndex, newIndex }, e, type) {
   if (e.target.id === 'archive') {
     return {
       type: REMOVE_FROM_INDICATORS,
-      payload: { index: oldIndex },
+      payload: { index: oldIndex, type },
     };
   }
   return {
     type: REORDER_INDICATORS,
-    payload: { oldIndex, newIndex },
+    payload: { oldIndex, newIndex, type },
   };
 }
 
@@ -215,10 +215,14 @@ export function fetchNumbersData() {
 
   return (dispatch) => {
     apiClient.get(url).then((res) => {
+      const data = res.data.map(item => {
+        item.archived = 0;
+        return item;
+      });
       dispatch({
         type: FETCH_NUMBERS,
         payload: {
-          data: res.data,
+          data,
         },
       });
     });

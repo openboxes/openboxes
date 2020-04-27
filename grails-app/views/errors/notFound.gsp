@@ -15,27 +15,26 @@
 			</div>
 		</g:if>
 		<div class="summary">
-			<div class="title">
-				<g:message code="errors.resourceNotFound.message" default="Resource Not Found"/> (404)
+			<div class="title middle">
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'error.png')}" style="vertical-align: middle"/>
+				<g:if test="${params.id}">
+					<warehouse:message code="errors.resourceWithIdNotFound.title"
+									   default="Sorry, a resource with ID {0} could not be found." args="[params.id]"/>
+				</g:if>
+				<g:else>
+					<g:message code="errors.resourceNotFound.title" default="Resource Not Found"/> (404)
+				</g:else>
 			</div>
 		</div>
-		<div id="doc">
-			<div class="triangle-isosceles">
+		<div id="doc" style="width: 25%; height: 400px">
+			<div class="triangle-isosceles title">
 				<g:if test="${request?.exception?.message}">
 					${request?.exception?.message}
 				</g:if>
-				<g:elseif test="${params.id}">
-					<warehouse:message code="errors.resourceWithIdNotFound.message"
-									   default="Sorry, a resource with ID {0} could not be found." args="[params.id]"/>
-				</g:elseif>
-				<g:else>
-					<warehouse:message code="errors.resourceNotFound.message" default="Sorry, that resource could not be found."/>
-				</g:else>
 
+				<warehouse:message code="errors.resourceNotFound.message" default="Sorry, that resource could not be found."/>
 			</div>
-			<div>
-				<img src="${createLinkTo(dir:'images',file:'jgreenspan.jpg')}"/>
-			</div>
+			<img src="${createLinkTo(dir:'images',file:'jgreenspan-removebg-preview.png')}"/>
 		</div>
 	</div>
 </body>

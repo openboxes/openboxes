@@ -43,10 +43,7 @@ class OrderController {
         def orderTemplate = new Order(params)
         def orders = orderService.getOrders(orderTemplate, statusStartDate, statusEndDate, params)
 
-        def totalPrice = 0.00
-        if (orders) {
-            totalPrice = orders.sum { it.totalPrice() }
-        }
+        def totalPrice = orders?.sum { it.totalNormalized?:0.0 } ?:0.0
 
         [
                 orders         : orders,
@@ -602,6 +599,13 @@ class OrderController {
         }
         else {
             orderItem.properties = params
+            Shipment pendingShipment = order.pendingShipment
+            if (pendingShipment) {
+                List<ShipmentItem> itemsToUpdate = pendingShipment.shipmentItems.findAll { it.orderItemId == orderItem.id }
+                itemsToUpdate.each { itemToUpdate ->
+                    itemToUpdate.recipient = orderItem.recipient
+                }
+            }
         }
         if (!order.save()) {
             throw new ValidationException("Order is invalid", order.errors)
