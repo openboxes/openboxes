@@ -604,7 +604,7 @@ class OrderController {
             orderItem.properties = params
             Shipment pendingShipment = order.pendingShipment
             if (pendingShipment) {
-                List<ShipmentItem> itemsToUpdate = pendingShipment.shipmentItems.findAll { it.orderItemId == orderItem.id }
+                Set<ShipmentItem> itemsToUpdate = pendingShipment.shipmentItems.findAll { it.orderItemId == orderItem.id }
                 itemsToUpdate.each { itemToUpdate ->
                     itemToUpdate.recipient = orderItem.recipient
                 }
