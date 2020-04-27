@@ -9,7 +9,7 @@ class NumberIndicator implements Serializable {
     ColorNumber third;
     Boolean gyrColors;
 
-    NumberIndicator(ColorNumber first, ColorNumber second, ColorNumber third, Boolean gyrColors = true, String labelShipment = "", String labelName = "") {
+    NumberIndicator(ColorNumber first, ColorNumber second, ColorNumber third, Boolean gyrColors = true) {
         this.first = first;
         this.second = second;
         this.third = third;
