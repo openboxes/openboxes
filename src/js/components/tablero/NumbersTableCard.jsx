@@ -33,7 +33,12 @@ NumbersTableCard.propTypes = {
         subtitle: PropTypes.string,
       }).isRequired,
     }).isRequired,
-    tableData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+    tableData: PropTypes.shape({
+      number: PropTypes.string,
+      name: PropTypes.string,
+      value: PropTypes.string,
+      body: PropTypes.arrayOf(PropTypes.shape({})),
+    }).isRequired,
   }).isRequired,
 };
 

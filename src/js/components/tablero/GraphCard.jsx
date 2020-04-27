@@ -82,9 +82,9 @@ const GraphCard = SortableElement(({
         <DragHandle />
       </div>
       <div className="content-card">
-        <div className="data-filter">
+        <div className={filter ? 'data-filter' : 'data-filter disabled'}>
           <select
-            className={filter ? 'custom-select' : 'custom-select disabled'}
+            className="custom-select"
             onChange={e => reloadIndicator(cardMethod, cardType, cardTitle, cardLink, cardId, `querySize=${e.target.value}`)}
             disabled={!filter}
             defaultValue={data.labels ? data.labels.length : '6'}
