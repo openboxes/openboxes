@@ -6,28 +6,28 @@ const NumbersTableCard = props => (
   <div className="delayedShipment">
     <div className="delayedShipmentNumber">
       <div className="shipmentNumberCard">
-        <div> <img src={props.data.urlIconAir} alt="air" />{props.data.numberByAir} </div>
-        <div>{props.data.labelByAir}</div>
+        <div> <img src={props.data.numberIndicator.first.link} alt="air" />{props.data.numberIndicator.first.value} </div>
+        <div>{props.data.numberIndicator.first.subtitle}</div>
       </div>
       <div className="shipmentNumberCard">
-        <div> <img src={props.data.urlIconSea} alt="sea" /> {props.data.numberBySea} </div>
-        <div>{props.data.labelBySea}</div>
+        <div> <img src={props.data.numberIndicator.second.link} alt="sea" /> {props.data.numberIndicator.second.value} </div>
+        <div>{props.data.numberIndicator.second.subtitle}</div>
       </div>
       <div className="shipmentNumberCard">
-        <div> <img src={props.data.urlIconLand} alt="land" /> {props.data.numberByLand} </div>
-        <div>{props.data.labelByLand}</div>
+        <div> <img src={props.data.numberIndicator.third.link} alt="land" /> {props.data.numberIndicator.third.value} </div>
+        <div>{props.data.numberIndicator.third.subtitle}</div>
       </div>
     </div>
     <div className="tableCard">
       <table>
         <thead>
           <tr>
-            <th>{props.data.labelShipment}</th>
-            <th className="end">{props.data.labelName}</th>
+            <th>{props.data.numberIndicator.labelShipment}</th>
+            <th className="end">{props.data.numberIndicator.labelName}</th>
           </tr>
         </thead>
         <tbody>
-          {props.data.shipmentsData.map(item => (
+          {props.data.tableData.map(item => (
             <tr
               onClick={() => window.open(item.link, '_blank')}
               key={`item-${item.number}`}
@@ -45,18 +45,26 @@ const NumbersTableCard = props => (
 
 NumbersTableCard.propTypes = {
   data: PropTypes.shape({
-    labelByAir: PropTypes.string,
-    labelBySea: PropTypes.string,
-    labelByLand: PropTypes.string,
-    numberByAir: PropTypes.number,
-    numberBySea: PropTypes.number,
-    numberByLand: PropTypes.number,
-    labelShipment: PropTypes.string,
-    labelName: PropTypes.string,
-    urlIconAir: PropTypes.string,
-    urlIconSea: PropTypes.string,
-    urlIconLand: PropTypes.string,
-    shipmentsData: PropTypes.arrayOf(PropTypes.shape({})),
+    numberIndicator: PropTypes.shape({
+      labelShipment: PropTypes.string,
+      labelName: PropTypes.string,
+      first: PropTypes.shape({
+        link: PropTypes.string,
+        value: PropTypes.number,
+        subtitle: PropTypes.string,
+      }).isRequired,
+      second: PropTypes.shape({
+        link: PropTypes.string,
+        value: PropTypes.number,
+        subtitle: PropTypes.string,
+      }).isRequired,
+      third: PropTypes.shape({
+        link: PropTypes.string,
+        value: PropTypes.number,
+        subtitle: PropTypes.string,
+      }).isRequired,
+    }).isRequired,
+    tableData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   }).isRequired,
 };
 

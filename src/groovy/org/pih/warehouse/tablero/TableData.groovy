@@ -2,10 +2,10 @@ package org.pih.warehouse.tablero
 
 class TableData implements Serializable {
 
-    String name;
     String number;
-    String link;
+    String name;
     String value;
+    String link;
 
     TableData(String number, String name, String value, String link = null) {
         this.number = number;

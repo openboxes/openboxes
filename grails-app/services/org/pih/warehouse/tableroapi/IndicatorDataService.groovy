@@ -7,8 +7,7 @@ import org.pih.warehouse.tablero.ColorNumber
 import org.pih.warehouse.tablero.IndicatorData
 import org.pih.warehouse.tablero.NumberIndicator
 import org.pih.warehouse.tablero.IndicatorDatasets
-import org.pih.warehouse.tablero.DelayedShipments
-import org.pih.warehouse.tablero.ShipmentsData
+import org.pih.warehouse.tablero.NumberTableData
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.receiving.ReceiptItem
@@ -401,15 +400,22 @@ class IndicatorDataService {
             else if (it[0] == '2') numberDelayed['sea'] += 1
             else numberDelayed['landAndSuitcase'] += 1
         
-            ShipmentsData shipmentData = new ShipmentsData(it[1],it[2], '/openboxes/stockMovement/show/' + it[3] )
-   
-            return shipmentData
-        }
+            TableData tableData = new TableData(it[1],it[2], '' ,'/openboxes/stockMovement/show/' + it[3] )
+            return tableData
+        }        
+        
         String urlSea = '/openboxes/images/icons/shipmentType/ShipmentTypeSea.png';
         String urlAir = '/openboxes/images/icons/shipmentType/ShipmentTypeAir.png';
         String urlLand = '/openboxes/images/icons/shipmentType/ShipmentTypeLand.png';
-        DelayedShipments delayedShipments = new DelayedShipments(numberDelayed['air'], numberDelayed['sea'], numberDelayed['landAndSuitcase'],'By air', 'By sea', 'By land', 'Shipment', 'Name', urlSea, urlAir, urlLand, results)
+        
+        ColorNumber delayedShipmentByAir = new ColorNumber(numberDelayed['air'], 'By air', urlAir)
+        ColorNumber delayedShipmentBySea = new ColorNumber(numberDelayed['sea'], 'By sea', urlSea)
+        ColorNumber delayedShipmentByLand = new ColorNumber(numberDelayed['landAndSuitcase'], 'By land', urlLand)
 
-        return delayedShipments;
+        NumberIndicator  numberIndicator = new NumberIndicator(delayedShipmentByAir, delayedShipmentBySea, delayedShipmentByLand)
+
+        NumberTableData numberTableData = new NumberTableData(results, numberIndicator)
+
+        return numberTableData;
     }
 }
