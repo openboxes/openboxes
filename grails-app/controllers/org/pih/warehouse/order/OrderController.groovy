@@ -263,7 +263,6 @@ class OrderController {
     }
 
     def editAdjustment = {
-        log.info "params: ${params}"
         def orderInstance = Order.get(params?.order?.id)
         if (!orderInstance) {
                 log.info "order not found"
@@ -594,7 +593,6 @@ class OrderController {
     }
 
     def saveOrderItem = {
-        log.info "params " + params
         Order order = Order.get(params.order.id)
         OrderItem orderItem = OrderItem.get(params.orderItem.id)
         if (!orderItem) {
