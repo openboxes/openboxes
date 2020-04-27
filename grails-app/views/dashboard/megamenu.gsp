@@ -54,19 +54,6 @@
                 </a>
                 <div class="mm-item-content">
                     <div class="mm-content-section">
-                        <h3><warehouse:message code="inventory.manage.label"/></h3>
-                        <g:supports activityCode="${org.pih.warehouse.core.ActivityCode.ADJUST_INVENTORY}">
-                            <div class="mm-menu-item">
-                                <g:link controller="inventory" action="manage">
-                                    <warehouse:message code="inventory.manage.label" />
-                                </g:link>
-                            </div>
-                        </g:supports>
-                        <div class="mm-menu-item">
-                            <g:link controller="batch" action="importData" params="[type:'inventory']" class="inventory">
-                                <g:message code="default.import.label" args="[g.message(code:'inventory.label', default: 'Inventory')]"/>
-                            </g:link>
-                        </div>
                         <h3><warehouse:message code="inventory.browse.label"/></h3>
                         <div style="max-height: 400px; overflow: auto;">
                             <div class="mm-menu-item">
@@ -105,57 +92,39 @@
                             </g:elseif>
                         </div>
                     </div>
+                    <div class="mm-content-section">
+                        <h3><warehouse:message code="inventory.manage.label"/></h3>
+                        <g:supports activityCode="${org.pih.warehouse.core.ActivityCode.ADJUST_INVENTORY}">
+                            <div class="mm-menu-item">
+                                <g:link controller="inventory" action="manage">
+                                    <warehouse:message code="inventory.manage.label" />
+                                </g:link>
+                            </div>
+                        </g:supports>
+                        <div class="mm-menu-item">
+                            <g:link controller="batch" action="importData" params="[type:'inventory']" class="inventory">
+                                <g:message code="default.import.label" args="[g.message(code:'inventory.label', default: 'Inventory')]"/>
+                            </g:link>
+                        </div>
+                    </div>
+
                 </div>
             </li>
         </g:authorize>
     </g:if>
 
-    <g:if test="${megamenuConfig.orders.enabled}">
-        <g:authorize activity="[ActivityCode.PLACE_ORDER,ActivityCode.FULFILL_ORDER]">
-            <li class="mm-item">
-                <a href="javascript:void(0)" class="mm-item-link">
-                    <warehouse:message code="orders.label"/>
-                </a>
-                <div class="mm-item-content">
-                    <div class="mm-menu-item">
-                        <g:link controller="purchaseOrderWorkflow" action="index" class="create">
-                            <warehouse:message code="default.create.label" args="[warehouse.message(code:'purchaseOrder.label')]"/>
-                        </g:link>
-                    </div>
-                    <div class="mm-menu-item">
-                        <g:link controller="order" action="list" params="[orderTypeCode:OrderTypeCode.PURCHASE_ORDER]" class="list">
-                            <warehouse:message code="order.listPurchase.label" default="List Purchase Orders" />
-                        </g:link>
-                    </div>
-                </div>
-            </li>
-        </g:authorize>
-    </g:if>
+
 
     <g:if test="${megamenuConfig.requisitions.enabled}">
         <g:authorize activity="[ActivityCode.PLACE_REQUEST,ActivityCode.FULFILL_REQUEST]">
             <li class="mm-item">
                 <a href="javascript:void(0)" class="mm-item-link">
                     <warehouse:message code="requests.label"/>
+                    <span class="deprecated"
+                          onclick="javascript:alert('${g.message(code: "requisition.deprecation.message")}')">deprecated</span>
                 </a>
                 <div class="mm-item-content">
                     <div class="mm-content-section">
-                        <h3><warehouse:message code="default.create.label" args="[warehouse.message(code: 'requisitions.label')]" /></h3>
-                        <div class="mm-menu-item">
-                            <g:link controller="requisition" action="chooseTemplate" class="create" params="[type:'STOCK']">
-                                <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardStock.label')]" />
-                            </g:link>
-                        </div>
-                        <div class="mm-menu-item">
-                            <g:link controller="requisition" action="create" class="create" params="[type:'NON_STOCK']">
-                                <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardNonStock.label')]" />
-                            </g:link>
-                        </div>
-                        <div class="mm-menu-item">
-                            <g:link controller="requisition" action="create" class="create" params="[type:'ADHOC']">
-                                <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardAdhoc.label')]" />
-                            </g:link>
-                        </div>
                         <h3><warehouse:message code="default.list.label" args="[warehouse.message(code: 'requisitions.label')]" /></h3>
                         <div class="mm-menu-item">
                             <g:link controller="requisition" action="list" class="list">
@@ -174,6 +143,24 @@
                             </g:if>
                         </g:each>
                     </div>
+                    <div class="mm-content-section">
+                        <h3><warehouse:message code="default.create.label" args="[warehouse.message(code: 'requisitions.label')]" /></h3>
+                        <div class="mm-menu-item">
+                            <g:link controller="requisition" action="chooseTemplate" class="create" params="[type:'STOCK']">
+                                <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardStock.label')]" />
+                            </g:link>
+                        </div>
+                        <div class="mm-menu-item">
+                            <g:link controller="requisition" action="create" class="create" params="[type:'NON_STOCK']">
+                                <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardNonStock.label')]" />
+                            </g:link>
+                        </div>
+                        <div class="mm-menu-item">
+                            <g:link controller="requisition" action="create" class="create" params="[type:'ADHOC']">
+                                <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardAdhoc.label')]" />
+                            </g:link>
+                        </div>
+                    </div>
                 </div>
             </li>
         </g:authorize>
@@ -186,29 +173,45 @@
                     <warehouse:message code="default.inbound.label" />
                 </a>
                 <div class="mm-item-content">
-                    <div class="mm-content-section">
-                        <g:if test="${megamenuConfig.stockMovement.enabled}">
+                    <g:if test="${megamenuConfig.stockMovement.enabled}">
+                        <div class="mm-content-section">
                             <h3><warehouse:message code="stockMovements.label" default="Stock Movements" /></h3>
                             <div class="mm-menu-item">
                                 <g:link controller="stockMovement" action="createInbound" params="[direction:'INBOUND']">
                                     <warehouse:message code="default.create.label" args="[warehouse.message(code: 'stockMovement.inbound.label')]"/>
                                 </g:link>
                             </div>
+                            <g:if test="${megamenuConfig.stockRequest.enabled}">
+                                <div class="mm-menu-item">
+                                    <g:link controller="stockMovement" action="createRequest">
+                                        <warehouse:message code="default.create.label" args="[warehouse.message(code: 'stockRequest.label', default: 'Stock Request')]"/>
+                                    </g:link>
+                                </div>
+                            </g:if>
                             <div class="mm-menu-item">
                                 <g:link controller="stockMovement" action="list" params="[direction:'INBOUND']">
                                     <warehouse:message code="default.list.label" args="[warehouse.message(code: 'stockMovements.inbound.label')]"/>
                                 </g:link>
                             </div>
-                        </g:if>
-                        <g:if test="${megamenuConfig.stockRequest.enabled}">
-                            <h3><warehouse:message code="stockRequests.label" default="Stock Requests" /></h3>
+                        </div>
+                    </g:if>
+                    <g:if test="${megamenuConfig.orders.enabled}">
+                        <div class="mm-content-section">
+                            <h3><warehouse:message code="purchaseOrders.label" default="Purchase Orders"/></h3>
                             <div class="mm-menu-item">
-                                <g:link controller="stockMovement" action="createRequest">
-                                    <warehouse:message code="default.create.label" args="[warehouse.message(code: 'stockRequest.label', default: 'Stock Request')]"/>
+                                <g:link controller="purchaseOrderWorkflow" action="index" class="create">
+                                    <warehouse:message code="default.create.label" args="[warehouse.message(code:'purchaseOrder.label')]"/>
                                 </g:link>
                             </div>
-                        </g:if>
-                        <g:if test="${megamenuConfig.putaways.enabled}">
+                            <div class="mm-menu-item">
+                                <g:link controller="order" action="list" params="[orderTypeCode:OrderTypeCode.PURCHASE_ORDER]" class="list">
+                                    <warehouse:message code="order.listPurchase.label" default="List Purchase Orders" />
+                                </g:link>
+                            </div>
+                        </div>
+                    </g:if>
+                    <g:if test="${megamenuConfig.putaways.enabled}">
+                        <div class="mm-content-section">
                             <h3><warehouse:message code="putaways.label" default="Putaways" /></h3>
                             <div class="mm-menu-item">
                                 <g:link controller="putAway" action="index">
@@ -220,10 +223,14 @@
                                     <warehouse:message code="default.list.label" args="[g.message(code:'putAways.label')]"/>
                                 </g:link>
                             </div>
-                        </g:if>
-                        <g:if test="${megamenuConfig.receiving.enabled}">
-                            <h3><warehouse:message code="receiving.label" default="Receiving" /></h3>
-
+                        </div>
+                    </g:if>
+                    <g:if test="${megamenuConfig.receiving.enabled}">
+                        <div class="mm-content-section">
+                            <h3>
+                                <warehouse:message code="receiving.label" default="Receiving" />
+                                <span class="deprecated" onclick="javascript:alert('${g.message(code: "receiving.deprecation.message")}')">deprecated</span>
+                            </h3>
                             <div class="mm-menu-item">
                                 <g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'INCOMING']" class="create">
                                     <warehouse:message code="shipping.createIncomingShipment.label"/>
@@ -246,8 +253,8 @@
                                     </g:link>
                                 </div>
                             </g:each>
-                        </g:if>
-                    </div>
+                        </div>
+                    </g:if>
                 </div>
             </li>
         </a>
@@ -262,11 +269,9 @@
                     <warehouse:message code="default.outbound.label" />
                 </a>
                 <div class="mm-item-content">
-                    <div class="mm-content-section">
-                        <g:if test="${megamenuConfig.stockMovement.enabled}">
-
+                    <g:if test="${megamenuConfig.stockMovement.enabled}">
+                        <div class="mm-content-section">
                             <h3><warehouse:message code="stockMovements.label" default="Stock Movements" /></h3>
-
                             <div class="mm-menu-item">
                                 <g:link controller="stockMovement" action="createOutbound" params="[direction:'OUTBOUND']">
                                     <warehouse:message code="default.create.label" args="[warehouse.message(code: 'stockMovement.outbound.label')]"/>
@@ -277,10 +282,14 @@
                                     <warehouse:message code="default.list.label" args="[warehouse.message(code: 'stockMovements.outbound.label')]"/>
                                 </g:link>
                             </div>
-                        </g:if>
-                        <g:if test="${megamenuConfig.shipping.enabled}">
-                            <h3><warehouse:message code="shipping.label" default="Shipping" /></h3>
-
+                        </div>
+                    </g:if>
+                    <g:if test="${megamenuConfig.shipping.enabled}">
+                        <div class="mm-content-section">
+                            <h3>
+                                <warehouse:message code="shipping.label" default="Shipping" />
+                                <span class="deprecated" onclick="javascript:alert('${g.message(code: "shipping.deprecation.message")}')">deprecated</span>
+                            </h3>
                             <div class="mm-menu-item">
                                 <g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'OUTGOING']" class="create">
                                     <warehouse:message code="shipping.createOutgoingShipment.label"/>
