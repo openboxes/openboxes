@@ -5,10 +5,10 @@ import org.pih.warehouse.tablero.NumberIndicator
 
 class NumberTableData implements Serializable {
 
-    List<TableData> tableData;
+    Table tableData;
     NumberIndicator numberIndicator;
 
-    NumberTableData(List<TableData> tableData, NumberIndicator numberIndicator){
+    NumberTableData(Table tableData, NumberIndicator numberIndicator) {
         this.tableData = tableData;
         this.numberIndicator = numberIndicator;
     }

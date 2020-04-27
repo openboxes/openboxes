@@ -8,16 +8,12 @@ class NumberIndicator implements Serializable {
     ColorNumber second;
     ColorNumber third;
     Boolean gyrColors;
-    String labelShipment;
-    String labelName;
 
     NumberIndicator(ColorNumber first, ColorNumber second, ColorNumber third, Boolean gyrColors = true, String labelShipment = "", String labelName = "") {
         this.first = first;
         this.second = second;
         this.third = third;
         this.gyrColors = gyrColors;
-        this.labelShipment = labelShipment;
-        this.labelName = labelName;
     }
 
     Map toJson() {

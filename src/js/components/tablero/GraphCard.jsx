@@ -45,11 +45,14 @@ const GraphCard = SortableElement(({
     cardData.datasets = getColors(data, 'horizontalBar');
     graph = <HorizontalBar data={data} options={loadOptions()} />;
   } else if (cardType === 'numbers') {
+    console.log(data);
     graph = <Numbers data={data} />;
   } else if (cardType === 'table') {
+    console.log(data);
     graph = <TableCard data={data} />;
     filter = 1;
   } else if (cardType === 'numberTable') {
+    console.log(data);
     graph = <NumbersTableCard data={data} />;
   } else if (cardType === 'loading') {
     graph = <LoadingCard />;

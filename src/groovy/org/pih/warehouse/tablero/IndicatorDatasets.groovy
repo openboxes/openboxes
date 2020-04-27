@@ -15,9 +15,9 @@ class IndicatorDatasets implements Serializable {
 
     Map toJson() {
         [
-                "label"        : label,
-                "data"         : data,
-                "type"         : type
+                "label": label,
+                "data" : data,
+                "type" : type
         ]
     }
 }

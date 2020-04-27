@@ -7,7 +7,7 @@ class TableData implements Serializable {
     String value;
     String link;
 
-    TableData(String number, String name, String value, String link = null) {
+    TableData(String number, String name, String value = null, String link = null) {
         this.number = number;
         this.name = name;
         this.value = value;
