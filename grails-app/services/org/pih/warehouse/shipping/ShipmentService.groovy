@@ -703,7 +703,7 @@ class ShipmentService {
 
             log.info("Checking shipment item ${shipmentItem?.inventoryItem} quantity [" +
                     shipmentItem.quantity + "] <= quantity on hand [" + quantityOnHand + "]")
-            if (duplicatedShipmentItemsQuantity > quantityOnHand) {
+            if (duplicatedShipmentItemsQuantity > quantityOnHand && origin.supports(ActivityCode.MANAGE_INVENTORY)) {
                 shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedAvailableQuantity",
                         [
                                 shipmentItem.quantity + " " + shipmentItem?.product?.unitOfMeasure,
