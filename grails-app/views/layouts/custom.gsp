@@ -9,7 +9,7 @@
     <yui:stylesheet dir="reset-fonts-grids" file="reset-fonts-grids.css" />
 
     <!-- Include Favicon -->
-    <link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
+    <link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'favicon.ico')}?v2" type="image/x-icon" />
 
     <!-- Include Main CSS -->
     <link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.megaMenu/',file:'jquery.megamenu.css')}" type="text/css" media="all" />

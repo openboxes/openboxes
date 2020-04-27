@@ -102,16 +102,31 @@
 											</td>
 											<g:if test="${command.shipment}">
 												<td class="center middle">
-													<g:if test="${shipOrderItem?.shipmentItem?.container?.parentContainer}">
-														${shipOrderItem?.shipmentItem?.container?.parentContainer} &rsaquo;
+													<g:if test="${shipOrderItem?.shipmentItem?.container}">
+														<g:if test="${shipOrderItem?.shipmentItem?.container?.parentContainer}">
+															${shipOrderItem?.shipmentItem?.container?.parentContainer} &rsaquo;
+														</g:if>
+														${shipOrderItem?.shipmentItem?.container}
 													</g:if>
-													${shipOrderItem?.shipmentItem?.container}
+													<g:else>
+														<div class="fade">(${g.message(code: 'default.blank.label')})</div>
+													</g:else>
 												</td>
 												<td class="center middle">
-													${shipOrderItem?.shipmentItem?.inventoryItem?.lotNumber}
+													<g:if test="${shipOrderItem?.shipmentItem?.inventoryItem?.lotNumber}">
+														${shipOrderItem?.shipmentItem?.inventoryItem?.lotNumber}
+													</g:if>
+													<g:else>
+														<div class="fade">(${g.message(code: 'default.blank.label')})</div>
+													</g:else>
 												</td>
 												<td class="center middle">
-													<g:formatDate date="${shipOrderItem?.shipmentItem?.inventoryItem?.expirationDate}" format="dd/MMM/yyyy"/>
+													<g:if test="${shipOrderItem?.shipmentItem?.inventoryItem?.expirationDate}">
+														<g:formatDate date="${shipOrderItem?.shipmentItem?.inventoryItem?.expirationDate}" format="dd/MMM/yyyy"/>
+													</g:if>
+													<g:else>
+														<div class="fade">(${g.message(code: 'default.blank.label')})</div>
+													</g:else>
 												</td>
 											</g:if>
 											<td>
