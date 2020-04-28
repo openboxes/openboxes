@@ -756,27 +756,30 @@ class JsonController {
                         }
                     }
                 }
-
-                if (items) {
-                    items.unique()
-                    items = items.collect() {
-
-                        [
-                                id         : it.id,
-                                label      : it.name,
-                                text: it.name,
-                                description: it?.email,
-                                value      : it.id,
-                                valueText  : it.name,
-                                desc       : (it?.email) ? it.email : "",
-                        ]
-                    }
-                }
-                items.add([id: "new", label: 'Create new record for ' + params.term, value: null, valueText: params.term])
             }
+            else {
+                items = Person.list()
+            }
+
+            if (items) {
+                items.unique()
+                items = items.collect() {
+
+                    [
+                            id         : it.id,
+                            label      : it.name,
+                            text: it.name,
+                            description: it?.email,
+                            value      : it.id,
+                            valueText  : it.name,
+                            desc       : (it?.email) ? it.email : "",
+                    ]
+                }
+            }
+            items.add([id: "new", label: 'Create new record for ' + params.term, value: null, valueText: params.term])
+
         } catch (Exception e) {
             e.printStackTrace()
-
         }
         log.info "returning ${items?.size()} items: " + items
         render ([results: items] as JSON)
@@ -874,6 +877,20 @@ class JsonController {
 
         log.info "Returning " + products.size() + " results for search " + params.term
         render ([results: products] as JSON)
+    }
+
+    def selectLocations = {
+        def locations
+        if (params.term) {
+            locations = Location.createCriteria().list {
+                ilike("name", params.term + "%")
+            }
+        }
+        else {
+            locations = Location.list([max:100])
+        }
+        locations = locations.collect { [id: it.id, text: it.name]}
+        render ([results: locations] as JSON)
     }
 
     def findRequestItems = {

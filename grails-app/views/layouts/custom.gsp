@@ -383,15 +383,18 @@
       // Chozen select default
       $(".chzn-select")
       .chosen({ search_contains: true });
-      // $(".chzn-select-deselect")
-      // .chosen({
-      //   allow_single_deselect: true,
-      //   width: '100%',
-      //   search_contains: true
-      // });
-      $(".chzn-select-deselect").select2({
-        placeholder: 'Select an option', width: '100%'
+      $(".chzn-select-deselect")
+      .chosen({
+        allow_single_deselect: true,
+        width: '100%',
+        search_contains: true
       });
+      $(".select2").select2({
+        placeholder: 'Select an option',
+        width: '100%',
+        allowClear: true
+      });
+
       // $(".chzn-select-readonly")
       // .chosen()
       // .prop("disabled", "disabled")
