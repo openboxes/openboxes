@@ -54,7 +54,11 @@ const GraphCard = SortableElement(({
     graph = <Doughnut data={data} options={loadOptions()} />;
   } else if (cardType === 'horizontalBar') {
     cardData.datasets = getColors(data, 'horizontalBar');
-    graph = <HorizontalBar data={data} options={loadOptions()} />;
+    graph = (<HorizontalBar
+      data={data}
+      options={loadOptions()}
+      onElementsClick={elements => handleChartClick(elements)}
+    />);
   } else if (cardType === 'numbers') {
     graph = <Numbers data={data} />;
   } else if (cardType === 'table') {

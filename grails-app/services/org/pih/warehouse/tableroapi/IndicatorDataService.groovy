@@ -152,8 +152,15 @@ class IndicatorDataService {
             listData.push(item.value ? item.value : 0)
         }
 
+        List<String> links = [
+            "/openboxes/inventory/listInStock",
+            "/openboxes/inventory/listOverStock", 
+            "/openboxes/inventory/listReorderStock", 
+            "/openboxes/inventory/listLowStock", 
+            "/openboxes/inventory/listQuantityOnHandZero" ]
+
         List<IndicatorDatasets> datasets = [
-                new IndicatorDatasets('Inventory Summary', listData)
+                new IndicatorDatasets('Inventory Summary', listData, links)
         ];
 
         IndicatorData data = new IndicatorData(datasets, ['In stock', 'Above maximum', 'Below reorder', 'Below minimum', 'No longer in stock']);
