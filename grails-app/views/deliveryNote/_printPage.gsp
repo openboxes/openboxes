@@ -158,6 +158,11 @@
                                         </blockquote>
                                     </g:if>
                                 </g:if>
+                                <g:if test="${requisitionItem?.pickReasonCode}">
+                                    <div>
+                                        ${warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.pickReasonCode)}
+                                    </div>
+                                </g:if>
                             </td>
                         </g:if>
 
