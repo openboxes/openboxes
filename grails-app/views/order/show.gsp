@@ -236,7 +236,7 @@
                                                         </g:else>
                                                     </td>
                                                     <td class="center">
-                                                        ${orderItem?.quantityUom?:g.message(code:"default.each.label").capitalize()}
+                                                        ${orderItem?.unitOfMeasure}
                                                     </td>
                                                     <td class="order-item-quantity right">
                                                         ${orderItem?.quantity}
@@ -246,10 +246,10 @@
                                                             ${orderInstance.isPlaced()?orderItem?.quantity:0}
                                                         </td>
                                                         <td class="order-item-fullfilled right">
-                                                            ${orderItem?.quantityFulfilled()?:0}
+                                                            ${orderItem?.quantityShipped}
                                                         </td>
                                                         <td class="order-item-received right">
-                                                            ${orderItem?.quantityReceived()?:0}
+                                                            ${orderItem?.quantityReceived}
                                                         </td>
                                                         <td class="">
                                                             <g:formatNumber number="${orderItem?.unitPrice?:0}" />

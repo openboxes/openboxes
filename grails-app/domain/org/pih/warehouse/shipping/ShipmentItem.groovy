@@ -49,7 +49,7 @@ class ShipmentItem implements Comparable, Serializable {
 
     static hasMany = [orderItems: OrderItem, receiptItems: ReceiptItem]
 
-    static transients = ["comments", "orderItemId", "quantityReceivedAndCanceled", "quantityRemaining"]
+    static transients = ["comments", "orderItemId", "quantityReceivedAndCanceled", "quantityCanceled", "quantityReceived", "quantityRemaining"]
 
     static mapping = {
         id generator: 'uuid'
@@ -125,15 +125,30 @@ class ShipmentItem implements Comparable, Serializable {
         return totalQuantityReceived
     }
 
-
+    /**
+     * @deprecated
+     * @return
+     */
     Integer quantityReceived() {
+        return quantityReceived
+    }
+
+    Integer getQuantityReceived() {
         return (receiptItems) ? receiptItems.sum { ReceiptItem receiptItem ->
             ReceiptStatusCode.RECEIVED == receiptItem?.receipt?.receiptStatusCode && receiptItem?.product == product &&
                     receiptItem?.quantityReceived ? receiptItem.quantityReceived : 0
         } : 0
     }
 
+    /**
+     * @deprecated
+     * @return
+     */
     Integer quantityCanceled() {
+        return quantityCanceled
+    }
+
+    Integer getQuantityCanceled() {
         return (receiptItems) ? receiptItems.sum { ReceiptItem receiptItem ->
             ReceiptStatusCode.RECEIVED == receiptItem?.receipt?.receiptStatusCode && receiptItem?.product == product &&
                     receiptItem?.quantityCanceled ? receiptItem.quantityCanceled : 0
@@ -145,7 +160,7 @@ class ShipmentItem implements Comparable, Serializable {
     }
 
     Integer getQuantityReceivedAndCanceled() {
-        return quantityReceived() + quantityCanceled()
+        return quantityReceived + quantityCanceled
     }
 
 

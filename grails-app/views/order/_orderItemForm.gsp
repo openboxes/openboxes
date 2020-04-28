@@ -2,8 +2,9 @@
     <td class="middle">
     </td>
     <td class="middle">
-        <g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName?skipQuantity=true&supplierId=${order?.originParty?.id}"
-                       styleClass="text large"/>
+        <g:autoSuggest id="product" name="product"
+                       jsonUrl="${request.contextPath }/json/findProductByName?skipQuantity=true&supplierId=${order?.originParty?.id}"
+                       styleClass="text large required"/>
     </td>
     <td class="middle center">
         <select id="productSupplier" name="productSupplier.id"></select>
@@ -18,16 +19,18 @@
         <div id="manufacturerCode"></div>
     </td>
     <td class="middle center">
-        <input type="number" id="quantity" name="quantity" class="text"/>
+        <input type="number" id="quantity" name="quantity" class="text" placeholder="Quantity" style="width:100px;"/>
     </td>
     <td class="center middle">
         <g:selectUnitOfMeasure id="quantityUom"
-                               name="quantityUom.id" class="chzn-select-deselect"
+                               name="quantityUom.id" class="chzn-select-deselect required" style="width: 100px"
                                noSelection="['':'']"/>
-        <input type="number" id="quantityPerUom" name="quantityPerUom" class="text" placeholder="Quantity per UoM"/>
     </td>
     <td class="center middle">
-        <input type="number" id="unitPrice" required name="unitPrice" size="2" class="text" placeholder="Price per UoM"/>
+        <input type="number" id="quantityPerUom" name="quantityPerUom" class="text required" placeholder="Qty per UoM" style="width: 100px"/>
+    </td>
+    <td class="center middle">
+        <input type="number" id="unitPrice" required name="unitPrice" size="2" class="text required" placeholder="Price per UoM" style="width: 100px"/>
     </td>
     <td class="center middle">
     </td>
@@ -37,7 +40,7 @@
                         noSelection="['':'']" class="chzn-select-deselect"/>
     </td>
     <td class="center middle">
-        <g:jqueryDatePicker id="estimatedReadyDate" name="estimatedReadyDate" value=""
+        <g:jqueryDatePicker id="estimatedReadyDate" name="estimatedReadyDate" value="" placeholder="Expected ready date"
                             autocomplete="off" noSelection="['':'']"/>
     </td>
     <td class="center middle" colspan="2">

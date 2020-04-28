@@ -94,8 +94,8 @@ class OrderController {
                                     orderItem: orderItem,
                                     shipmentItem: shipmentItem,
                                     quantityMinimum: 0,
-                                    quantityToShip: shipmentItem.quantity,
-                                    quantityMaximum: orderItem.quantityRemaining()
+                                    quantityToShip: (shipmentItem.quantity / orderItem?.quantityPerUom) as int,
+                                    quantityMaximum: orderItem.quantityRemaining
 
                             )
                     command.shipOrderItems.add(shipOrderItem)
@@ -103,7 +103,7 @@ class OrderController {
             }
             // Or populate line items from quantity remaining on order item
             else {
-                def quantityRemaining = orderItem?.quantityRemaining()?:0
+                def quantityRemaining = orderItem?.quantityRemaining
                 ShipOrderItemCommand shipOrderItem =
                             new ShipOrderItemCommand(
                                     orderItem: orderItem,
@@ -134,9 +134,9 @@ class OrderController {
             order.orderItems.each { OrderItem orderItem ->
                 List shipOrderItems = shipOrderItemsByOrderItem.get(orderItem)
                 BigDecimal totalQuantityToShip = shipOrderItems.sum { it?.quantityToShip?:0 }
-                if (totalQuantityToShip > orderItem.quantityRemaining()) {
+                if (totalQuantityToShip > orderItem.quantityRemaining) {
                     orderItem.errors.reject("Sum of quantity to ship (${totalQuantityToShip}) " +
-                            "cannot be greater than remaining quantity (${orderItem.quantityRemaining()}) " +
+                            "cannot be greater than remaining quantity (${orderItem.quantityRemaining}) " +
                             "for order item '${orderItem.product.productCode} ${orderItem.product.name}'"
                     )
                     throw new ValidationException("Invalid order item", orderItem.errors)
@@ -263,7 +263,6 @@ class OrderController {
     }
 
     def editAdjustment = {
-        log.info "params: ${params}"
         def orderInstance = Order.get(params?.order?.id)
         if (!orderInstance) {
                 log.info "order not found"
@@ -558,7 +557,7 @@ class OrderController {
                         "${StringEscapeUtils.escapeCsv(orderItem?.product?.name)}," +
                         "${orderItem?.product?.vendorCode ?: ''}," +
                         "${quantityString}," +
-                        "${orderItem?.product?.unitOfMeasure ?: 'EA'}," +
+                        "${orderItem?.unitOfMeasure}," +
                         "${StringEscapeUtils.escapeCsv(unitPriceString)}," +
                         "${StringEscapeUtils.escapeCsv(totalPriceString)}" +
                         "\n"
@@ -617,7 +616,7 @@ class OrderController {
             if (!productPackage) {
                 productPackage = new ProductPackage()
                 productPackage.product = orderItem.product
-                productPackage.name = "${orderItem.quantityUom.code}/${orderItem.quantityPerUom as Integer}"
+                productPackage.name = "${orderItem?.quantityUom?.code}/${orderItem?.quantityPerUom as Integer}"
                 productPackage.uom = orderItem.quantityUom
                 productPackage.quantity = orderItem.quantityPerUom as Integer
                 productPackage.price = orderItem.unitPrice
@@ -712,7 +711,7 @@ class OrderController {
                         "${StringEscapeUtils.escapeCsv(orderItem?.product?.name)}," +
                         "${orderItem?.product?.vendorCode ?: ''}," +
                         "${quantityString}," +
-                        "${orderItem?.product?.unitOfMeasure ?: 'EA'}," +
+                        "${orderItem?.unitOfMeasure}," +
                         "${StringEscapeUtils.escapeCsv(unitPriceString)}," +
                         "${StringEscapeUtils.escapeCsv(totalPriceString)}" +
                         "\n"

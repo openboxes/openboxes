@@ -79,7 +79,7 @@
 											</td>
 											<td class="middle">
 												<g:if test="${!j}">
-												${orderItem?.product?.unitOfMeasure}
+												${orderItem?.unitOfMeasure}
 												</g:if>
 											</td>
 											<td class="center middle">
@@ -89,29 +89,44 @@
 											</td>
 											<td class="center middle">
 												<g:if test="${!j}">
-												${orderItem?.quantityFulfilled()}
+												${orderItem?.quantityShipped}
 												</g:if>
 											</td>
-											<td class="center middle border-right">
+											<td class="center middle">
 												<g:if test="${!j}">
-													<g:if test="${orderItem.quantityRemaining()>0}">
-														${orderItem?.quantityRemaining()}
+													<g:if test="${orderItem.quantityRemaining>0}">
+														${orderItem?.quantityRemaining}
 													</g:if>
 													<g:else>0</g:else>
 												</g:if>
 											</td>
 											<g:if test="${command.shipment}">
 												<td class="center middle">
-													<g:if test="${shipOrderItem?.shipmentItem?.container?.parentContainer}">
-														${shipOrderItem?.shipmentItem?.container?.parentContainer} &rsaquo;
+													<g:if test="${shipOrderItem?.shipmentItem?.container}">
+														<g:if test="${shipOrderItem?.shipmentItem?.container?.parentContainer}">
+															${shipOrderItem?.shipmentItem?.container?.parentContainer} &rsaquo;
+														</g:if>
+														${shipOrderItem?.shipmentItem?.container}
 													</g:if>
-													${shipOrderItem?.shipmentItem?.container}
+													<g:else>
+														<div class="fade">(${g.message(code: 'default.blank.label')})</div>
+													</g:else>
 												</td>
 												<td class="center middle">
-													${shipOrderItem?.shipmentItem?.inventoryItem?.lotNumber}
+													<g:if test="${shipOrderItem?.shipmentItem?.inventoryItem?.lotNumber}">
+														${shipOrderItem?.shipmentItem?.inventoryItem?.lotNumber}
+													</g:if>
+													<g:else>
+														<div class="fade">(${g.message(code: 'default.blank.label')})</div>
+													</g:else>
 												</td>
 												<td class="center middle">
-													<g:formatDate date="${shipOrderItem?.shipmentItem?.inventoryItem?.expirationDate}" format="dd/MMM/yyyy"/>
+													<g:if test="${shipOrderItem?.shipmentItem?.inventoryItem?.expirationDate}">
+														<g:formatDate date="${shipOrderItem?.shipmentItem?.inventoryItem?.expirationDate}" format="dd/MMM/yyyy"/>
+													</g:if>
+													<g:else>
+														<div class="fade">(${g.message(code: 'default.blank.label')})</div>
+													</g:else>
 												</td>
 											</g:if>
 											<td>

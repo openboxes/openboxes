@@ -110,27 +110,7 @@
         </g:authorize>
     </g:if>
 
-    <g:if test="${megamenuConfig.orders.enabled}">
-        <g:authorize activity="[ActivityCode.PLACE_ORDER,ActivityCode.FULFILL_ORDER]">
-            <li class="mm-item">
-                <a href="javascript:void(0)" class="mm-item-link">
-                    <warehouse:message code="orders.label"/>
-                </a>
-                <div class="mm-item-content">
-                    <div class="mm-menu-item">
-                        <g:link controller="purchaseOrderWorkflow" action="index" class="create">
-                            <warehouse:message code="default.create.label" args="[warehouse.message(code:'purchaseOrder.label')]"/>
-                        </g:link>
-                    </div>
-                    <div class="mm-menu-item">
-                        <g:link controller="order" action="list" params="[orderTypeCode:OrderTypeCode.PURCHASE_ORDER]" class="list">
-                            <warehouse:message code="order.listPurchase.label" default="List Purchase Orders" />
-                        </g:link>
-                    </div>
-                </div>
-            </li>
-        </g:authorize>
-    </g:if>
+
 
     <g:if test="${megamenuConfig.requisitions.enabled}">
         <g:authorize activity="[ActivityCode.PLACE_REQUEST,ActivityCode.FULFILL_REQUEST]">
@@ -178,7 +158,6 @@
             </li>
         </g:authorize>
     </g:if>
-
     <g:if test="${megamenuConfig.inbound.enabled}">
         <g:authorize activity="[ActivityCode.RECEIVE_STOCK]">
             <li class="mm-item">
@@ -205,6 +184,19 @@
                             <div class="mm-menu-item">
                                 <g:link controller="stockMovement" action="createRequest">
                                     <warehouse:message code="default.create.label" args="[warehouse.message(code: 'stockRequest.label', default: 'Stock Request')]"/>
+                                </g:link>
+                            </div>
+                        </g:if>
+                        <g:if test="${megamenuConfig.orders.enabled}">
+                            <h3><warehouse:message code="purchaseOrders.label" default="Purchase Orders"/></h3>
+                            <div class="mm-menu-item">
+                                <g:link controller="purchaseOrderWorkflow" action="index" class="create">
+                                    <warehouse:message code="default.create.label" args="[warehouse.message(code:'purchaseOrder.label')]"/>
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
+                                <g:link controller="order" action="list" params="[orderTypeCode:OrderTypeCode.PURCHASE_ORDER]" class="list">
+                                    <warehouse:message code="order.listPurchase.label" default="List Purchase Orders" />
                                 </g:link>
                             </div>
                         </g:if>

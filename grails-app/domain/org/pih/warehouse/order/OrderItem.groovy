@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.order
 
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.UnitOfMeasure
@@ -30,7 +31,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     InventoryItem inventoryItem
     Integer quantity
     UnitOfMeasure quantityUom
-    BigDecimal quantityPerUom
+    BigDecimal quantityPerUom = 1
 
     BigDecimal unitPrice
     String currencyCode
@@ -65,10 +66,22 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
 
     static transients = [
             "orderItemType",
+            "quantityInStandardUom",
+            "quantityRemaining",
+            "quantityReceived",
+            "quantityReceivedInStandardUom",
+            "quantityShipped",
+            "quantityShippedInStandardUom",
             "total",
             "shippedShipmentItems",
             "subtotal",
-            "totalAdjustments"
+            "totalAdjustments",
+            "unitOfMeasure",
+            // Statuses
+            "partiallyFulfilled",
+            "completelyFulfilled",
+            "completelyReceived",
+            "pending",
     ]
 
     static belongsTo = [order: Order, parentOrderItem: OrderItem]
@@ -83,7 +96,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         requestedBy(nullable: true)
         quantity(nullable: false, min: 1)
         quantityUom(nullable: true)
-        quantityPerUom(nullable: true)
+        quantityPerUom(nullable: false)
         productPackage(nullable: true)
         unitPrice(nullable: true)
         orderItemStatusCode(nullable: true)
@@ -101,37 +114,63 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         actualDeliveryDate(nullable: true)
     }
 
+    String getUnitOfMeasure() {
+        if (quantityUom) {
+            return "${quantityUom?.code}/${quantityPerUom as Integer}"
+        }
+        else {
+            def g = ApplicationHolder.application.mainContext.getBean( 'org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib' )
+            return "${g.message(code:'default.ea.label').toUpperCase()}/1"
+        }
+    }
+
     def getShippedShipmentItems() {
         return shipmentItems.findAll { it.shipment.currentStatus >= ShipmentStatusCode.SHIPPED }
     }
 
+    Integer getQuantityInStandardUom() {
+        return quantity * quantityPerUom
+    }
+
+    Integer getQuantityShippedInStandardUom() {
+        return shippedShipmentItems?.sum { ShipmentItem shipmentItem ->
+            shipmentItem?.quantity
+        }?:0
+    }
+
+    Integer getQuantityReceivedInStandardUom() {
+        return shippedShipmentItems?.sum { ShipmentItem shipmentItem ->
+            shipmentItem?.quantityReceived
+        }?:0
+    }
+
+    Integer getQuantityShipped() {
+        return quantityShippedInStandardUom / quantityPerUom
+    }
+
+    Integer getQuantityReceived() {
+        return quantityReceivedInStandardUom / quantityPerUom
+    }
+
     String getOrderItemType() {
-        return (product) ? "Product" : (category) ? "Category" : "Unclassified"
+        return "Product"
     }
 
-    Integer quantityFulfilled() {
-        return shippedShipmentItems?.sum { it?.quantity } ?: 0
-    }
-
-    Integer quantityRemaining() {
-        def quantityRemaining = quantity - quantityFulfilled()
+    Integer getQuantityRemaining() {
+        def quantityRemaining = quantity - quantityShipped
         return quantityRemaining > 0 ? quantityRemaining : 0
     }
 
-    Integer quantityReceived() {
-        return shippedShipmentItems?.sum { it?.quantityReceived() } ?: 0
-    }
-
     Boolean isPartiallyFulfilled() {
-        return quantityFulfilled() > 0 && quantityFulfilled() < quantity
+        return quantityShipped > 0 && quantityShipped < quantity
     }
 
     Boolean isCompletelyFulfilled() {
-        return quantityFulfilled() >= quantity
+        return quantityShipped >= quantity
     }
 
     Boolean isCompletelyReceived() {
-        return quantityReceived() >= quantity
+        return quantityReceived >= quantity
     }
 
     Boolean isPending() {

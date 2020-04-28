@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda" id="1587869843708-1" failOnError="false">
+        <insert tableName="unit_of_measure_class">
+            <column name="id" value="QUANTITY"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="name" value="Quantity"/>
+            <column name="code" value="QUANTITY"/>
+            <column name="type" value="QUANTITY"/>
+            <column name="description" value=""/>
+            <column name="date_created" valueDate="2020-04-25T00:00:00.0"/>
+            <column name="last_updated" valueDate="2020-04-25T00:00:00.0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda" id="1587869843708-2" failOnError="false">
+        <insert tableName="unit_of_measure">
+            <column name="id" value="EA"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="code" value="EA"/>
+            <column name="name" value="Each"/>
+            <column name="uom_class_id" value="QUANTITY"/>
+            <column name="created_by_id" value="1"/>
+            <column name="updated_by_id" value="1"/>
+            <column name="date_created" valueDate="2020-04-25T00:00:00.0"/>
+            <column name="last_updated" valueDate="2020-04-25T00:00:00.0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda" id="1587869843708-3" failOnError="false">
+        <insert tableName="unit_of_measure">
+            <column name="id" value="BTL"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="code" value="BTL"/>
+            <column name="name" value="Bottle"/>
+            <column name="uom_class_id" value="QUANTITY"/>
+            <column name="created_by_id" value="1"/>
+            <column name="updated_by_id" value="1"/>
+            <column name="date_created" valueDate="2020-04-25T00:00:00.0"/>
+            <column name="last_updated" valueDate="2020-04-25T00:00:00.0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda" id="1587869843708-4" failOnError="false">
+        <insert tableName="unit_of_measure">
+            <column name="id" value="PK"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="code" value="PK"/>
+            <column name="name" value="Pack"/>
+            <column name="uom_class_id" value="QUANTITY"/>
+            <column name="created_by_id" value="1"/>
+            <column name="updated_by_id" value="1"/>
+            <column name="date_created" valueDate="2020-04-25T00:00:00.0"/>
+            <column name="last_updated" valueDate="2020-04-25T00:00:00.0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda" id="1587869843708-5" failOnError="false">
+        <insert tableName="unit_of_measure">
+            <column name="id" value="BX"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="code" value="BX"/>
+            <column name="name" value="Box"/>
+            <column name="uom_class_id" value="QUANTITY"/>
+            <column name="created_by_id" value="1"/>
+            <column name="updated_by_id" value="1"/>
+            <column name="date_created" valueDate="2020-04-25T00:00:00.0"/>
+            <column name="last_updated" valueDate="2020-04-25T00:00:00.0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda" id="1587869843708-6" failOnError="false">
+        <insert tableName="unit_of_measure">
+            <column name="id" value="CS"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="code" value="CS"/>
+            <column name="name" value="Case"/>
+            <column name="uom_class_id" value="QUANTITY"/>
+            <column name="created_by_id" value="1"/>
+            <column name="updated_by_id" value="1"/>
+            <column name="date_created" valueDate="2020-04-25T00:00:00.0"/>
+            <column name="last_updated" valueDate="2020-04-25T00:00:00.0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda" id="1587869843708-7" failOnError="false">
+        <insert tableName="unit_of_measure">
+            <column name="id" value="RL"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="code" value="RL"/>
+            <column name="name" value="Roll"/>
+            <column name="uom_class_id" value="QUANTITY"/>
+            <column name="created_by_id" value="1"/>
+            <column name="updated_by_id" value="1"/>
+            <column name="date_created" valueDate="2020-04-25T00:00:00.0"/>
+            <column name="last_updated" valueDate="2020-04-25T00:00:00.0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda" id="1587869843708-8" failOnError="false">
+        <comment>Set base unit of measure for quantity class to EA.</comment>
+        <update tableName="unit_of_measure_class">
+            <column name="base_uom_id" value="EA" />
+            <where>code='QUANTITY' AND base_uom_id is NULL</where>
+        </update>
+    </changeSet>
+    <changeSet author="jmiranda" id="1587869843708-9" failOnError="false">
+        <update tableName="unit_of_measure_class">
+            <column name="type" value="QUANTITY" />
+            <where>code='QUANTITY' and type is NULL</where>
+        </update>
+    </changeSet>
+    <changeSet author="jmiranda" id="1587869843708-10" failOnError="false">
+        <update tableName="order_item">
+            <column name="quantity_uom_id" value="EA"/>
+            <column name="quantity_per_uom" value="1" />
+            <where>quantity_per_uom is NULL</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>
