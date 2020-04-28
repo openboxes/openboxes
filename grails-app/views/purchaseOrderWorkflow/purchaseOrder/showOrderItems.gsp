@@ -46,7 +46,7 @@
                                 <th class="center"><warehouse:message code="product.manufacturer.label"/></th>
                                 <th class="center"><warehouse:message code="product.manufacturerCode.label"/></th>
                                 <th class="center"><warehouse:message code="default.quantity.label"/></th>
-                                <th class="center"><warehouse:message code="default.unitOfMeasure.label"/></th>
+                                <th class="center" colspan="2"><warehouse:message code="default.unitOfMeasure.label"/></th>
                                 <th class="center"><warehouse:message code="orderItem.unitPrice.label"/></th>
                                 <th class="center"><warehouse:message code="orderItem.totalCost.label"/></th>
                                 <th class="center"><warehouse:message code="order.recipient.label"/></th>
@@ -110,10 +110,7 @@
 
         // Validate the create line item form in case someone forgot to
         $(".validate").click(function (event) {
-          var productId = $("#product-suggest").val();
-          var quantity = $("#quantity").val();
-          var unitPrice = $("#unitPrice").val();
-          if (productId || quantity || unitPrice) {
+          if (!validateForm()) {
             $.notify("Please save item before proceeding");
             return false;
           } else {
@@ -150,11 +147,25 @@
           return false
         }
 
+        /**
+         * @FIXME Didn't have time to make this pretty - should use required class on
+         * fields instead of hardcoding the IDs.
+         */
         function validateForm() {
-          var productId = $("#product").val();
+
+          var product = $("#product-suggest").val();
           var quantity = $("#quantity").val();
           var unitPrice = $("#unitPrice").val();
-          return productId && quantity && unitPrice
+          var quantityUom = $("#quantityUom").val();
+          var quantityPerUom = $("#quantityPerUom").val();
+
+          if (!product) $("#product-suggest").notify("Required")
+          if (!quantity) $("#quantity").notify("Required")
+          if (!unitPrice) $("#unitPrice").notify("Required")
+          if (!quantityUom) $("#quantityUom_chosen").notify("Required")
+          if (!quantityPerUom) $("#quantityPerUom").notify("Required")
+
+          return product && quantity && unitPrice && quantityPerUom && quantityUom
         }
 
         function saveOrderItem() {
@@ -167,7 +178,7 @@
                     success: function() {
                         clearOrderItemForm();
                         loadOrderItems();
-                        applyFocus("#product");
+                        applyFocus("#product-suggest");
                         $.notify("Successfully saved new item", "success")
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
@@ -176,7 +187,7 @@
                 });
             }
             else {
-              $.notify("Please enter a value for all required fields: Product, Quantity, and Unit Price")
+              $.notify("Please enter a value for all required fields")
             }
             return false
         }
@@ -193,7 +204,6 @@
         function clearOrderItemForm() {
           $("#orderItemForm")[0].reset();
           $("#product-id").val("");
-          $("#product").val(null).trigger("change");
           $("#product-value").val("");
           $("#productSupplier").html("");
           $("#supplierCode").html("");
@@ -313,11 +323,7 @@
 
         $(document).ready(function() {
           initializeTable();
-          applyFocus("#product");
-
-          $("chzn-select-deselect").focus(function() {
-            alert("test");
-          });
+          applyFocus("#product-suggest");
 
           $("table").dblclick(function(event) {
             var id = event.target.closest("tr").id;
@@ -431,7 +437,7 @@
 	<td class="center middle">
 	    {{= quantity }}
 	</td>
-	<td class="center middle">
+	<td class="center middle" colspan="2">
     	{{= unitOfMeasure }}
 	</td>
 	<td class="center middle">
