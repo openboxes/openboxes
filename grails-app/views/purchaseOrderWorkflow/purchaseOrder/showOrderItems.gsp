@@ -115,7 +115,7 @@
 
         // Validate the create line item form in case someone forgot to
         $(".validate").click(function (event) {
-          if (!validateForm()) {
+          if (isFormDirty()) {
             $.notify("Please save item before proceeding");
             return false;
           } else {
@@ -177,6 +177,15 @@
           if (!quantityPerUom) $("#quantityPerUom").notify("Required")
 
           return product && quantity && unitPrice && quantityPerUom && quantityUom
+        }
+
+        function isFormDirty() {
+          var product = $("#product-suggest").val();
+          var quantity = $("#quantity").val();
+          var unitPrice = $("#unitPrice").val();
+          var quantityUom = $("#quantityUom").val();
+          var quantityPerUom = $("#quantityPerUom").val();
+          return product || quantity || unitPrice || quantityPerUom || quantityUom
         }
 
         function saveOrderItem() {
