@@ -46,9 +46,9 @@
                                 <th class="center"><warehouse:message code="product.manufacturer.label"/></th>
                                 <th class="center"><warehouse:message code="product.manufacturerCode.label"/></th>
                                 <th class="center"><warehouse:message code="default.quantity.label"/></th>
-                                <th class="center"><warehouse:message code="default.uom.label"/></th>
-                                <th class="center"><warehouse:message code="order.unitPrice.label"/></th>
-                                <th class="right"><warehouse:message code="orderItem.totalCost.label"/></th>
+                                <th class="center" colspan="2"><warehouse:message code="default.unitOfMeasure.label"/></th>
+                                <th class="center"><warehouse:message code="orderItem.unitPrice.label"/></th>
+                                <th class="center"><warehouse:message code="orderItem.totalCost.label"/></th>
                                 <th class="center"><warehouse:message code="order.recipient.label"/></th>
                                 <th class="center"><warehouse:message code="orderItem.estimatedReadyDate.label"/></th>
                                 <th class="center" width="1%"><warehouse:message code="default.actions.label"/></th>
@@ -62,7 +62,7 @@
                                 <g:render template="/order/orderItemForm"/>
                             </g:if>
                             <tr class="">
-                                <th colspan="13" class="right">
+                                <th colspan="14" class="right">
                                     <warehouse:message code="default.total.label"/>
                                     <g:formatNumber number="${order?.totalPrice()?:0.0 }"/>
                                     ${order?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
@@ -110,10 +110,7 @@
 
         // Validate the create line item form in case someone forgot to
         $(".validate").click(function (event) {
-          var productId = $("#product-suggest").val();
-          var quantity = $("#quantity").val();
-          var unitPrice = $("#unitPrice").val();
-          if (productId || quantity || unitPrice) {
+          if (!validateForm()) {
             $.notify("Please save item before proceeding");
             return false;
           } else {
@@ -150,11 +147,25 @@
           return false
         }
 
+        /**
+         * @FIXME Didn't have time to make this pretty - should use required class on
+         * fields instead of hardcoding the IDs.
+         */
         function validateForm() {
-          var productId = $("#product-suggest").val();
+
+          var product = $("#product-suggest").val();
           var quantity = $("#quantity").val();
           var unitPrice = $("#unitPrice").val();
-          return productId && quantity && unitPrice
+          var quantityUom = $("#quantityUom").val();
+          var quantityPerUom = $("#quantityPerUom").val();
+
+          if (!product) $("#product-suggest").notify("Required")
+          if (!quantity) $("#quantity").notify("Required")
+          if (!unitPrice) $("#unitPrice").notify("Required")
+          if (!quantityUom) $("#quantityUom_chosen").notify("Required")
+          if (!quantityPerUom) $("#quantityPerUom").notify("Required")
+
+          return product && quantity && unitPrice && quantityPerUom && quantityUom
         }
 
         function saveOrderItem() {
@@ -176,7 +187,7 @@
                 });
             }
             else {
-              $.notify("Please enter a value for all required fields: Product, Quantity, and Unit Price")
+              $.notify("Please enter a value for all required fields")
             }
             return false
         }
@@ -198,6 +209,7 @@
           $("#supplierCode").html("");
           $("#manufacturer").html("");
           $("#manufacturerCode").html("");
+          $("#quantityUom").val("").trigger("chosen:updated");
           var defaultRecipient = $("#defaultRecipient").val();
           $("#recipient").val(defaultRecipient).trigger("chosen:updated");
           $("#estimatedReadyDate-datepicker").datepicker('setDate', null);
@@ -262,6 +274,17 @@
               $('#manufacturerCode').html(data.manufacturerCode);
               $('#manufacturer').html(data.manufacturer);
               $("#unitPrice").val(data.unitPrice);
+              if (data.minOrderQuantity) {
+                $("#quantity").val(data.minOrderQuantity);
+                $("#quantity").attr("min", data.minOrderQuantity)
+              }
+              if (data.unitOfMeasure) {
+                $("#quantityUom").val(data.unitOfMeasure.id).trigger("chosen:updated");
+              }
+              if (data.quantityPerUom) {
+                $("#quantityPerUom").val(data.quantityPerUom)
+              }
+
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
             }
@@ -414,14 +437,15 @@
 	<td class="center middle">
 	    {{= quantity }}
 	</td>
-	<td class="center middle">
-	    {{= unitOfMeasure }}
+	<td class="center middle" colspan="2">
+    	{{= unitOfMeasure }}
 	</td>
 	<td class="center middle">
-	    {{= unitPrice }}
+	    {{= unitPrice }} {{= currencyCode }}<br/>
+	    <small>per {{= unitOfMeasure }}</small>
 	</td>
 	<td class="center middle">
-	    {{= totalPrice }}
+	    {{= totalPrice }} {{= currencyCode }}
 	</td>
 	<td class="center middle">
     	{{if recipient }}

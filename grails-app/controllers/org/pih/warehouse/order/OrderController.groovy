@@ -15,6 +15,8 @@ import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.UomService
+import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.springframework.web.multipart.MultipartFile
@@ -24,6 +26,7 @@ class OrderController {
     def stockMovementService
     def reportService
     def shipmentService
+    UomService uomService
 
     static allowedMethods = [save: "POST", update: "POST"]
 
@@ -91,8 +94,8 @@ class OrderController {
                                     orderItem: orderItem,
                                     shipmentItem: shipmentItem,
                                     quantityMinimum: 0,
-                                    quantityToShip: shipmentItem.quantity,
-                                    quantityMaximum: orderItem.quantityRemaining()
+                                    quantityToShip: (shipmentItem.quantity / orderItem?.quantityPerUom) as int,
+                                    quantityMaximum: orderItem.quantityRemaining
 
                             )
                     command.shipOrderItems.add(shipOrderItem)
@@ -100,7 +103,7 @@ class OrderController {
             }
             // Or populate line items from quantity remaining on order item
             else {
-                def quantityRemaining = orderItem?.quantityRemaining()?:0
+                def quantityRemaining = orderItem?.quantityRemaining
                 ShipOrderItemCommand shipOrderItem =
                             new ShipOrderItemCommand(
                                     orderItem: orderItem,
@@ -131,9 +134,9 @@ class OrderController {
             order.orderItems.each { OrderItem orderItem ->
                 List shipOrderItems = shipOrderItemsByOrderItem.get(orderItem)
                 BigDecimal totalQuantityToShip = shipOrderItems.sum { it?.quantityToShip?:0 }
-                if (totalQuantityToShip > orderItem.quantityRemaining()) {
+                if (totalQuantityToShip > orderItem.quantityRemaining) {
                     orderItem.errors.reject("Sum of quantity to ship (${totalQuantityToShip}) " +
-                            "cannot be greater than remaining quantity (${orderItem.quantityRemaining()}) " +
+                            "cannot be greater than remaining quantity (${orderItem.quantityRemaining}) " +
                             "for order item '${orderItem.product.productCode} ${orderItem.product.name}'"
                     )
                     throw new ValidationException("Invalid order item", orderItem.errors)
@@ -260,7 +263,6 @@ class OrderController {
     }
 
     def editAdjustment = {
-        log.info "params: ${params}"
         def orderInstance = Order.get(params?.order?.id)
         if (!orderInstance) {
                 log.info "order not found"
@@ -555,7 +557,7 @@ class OrderController {
                         "${StringEscapeUtils.escapeCsv(orderItem?.product?.name)}," +
                         "${orderItem?.product?.vendorCode ?: ''}," +
                         "${quantityString}," +
-                        "${orderItem?.product?.unitOfMeasure ?: 'EA'}," +
+                        "${orderItem?.unitOfMeasure}," +
                         "${StringEscapeUtils.escapeCsv(unitPriceString)}," +
                         "${StringEscapeUtils.escapeCsv(totalPriceString)}" +
                         "\n"
@@ -601,14 +603,44 @@ class OrderController {
             orderItem.properties = params
             Shipment pendingShipment = order.pendingShipment
             if (pendingShipment) {
-                List<ShipmentItem> itemsToUpdate = pendingShipment.shipmentItems.findAll { it.orderItemId == orderItem.id }
+                Set<ShipmentItem> itemsToUpdate = pendingShipment.shipmentItems.findAll { it.orderItemId == orderItem.id }
                 itemsToUpdate.each { itemToUpdate ->
                     itemToUpdate.recipient = orderItem.recipient
                 }
             }
         }
-        if (!order.save()) {
-            throw new ValidationException("Order is invalid", order.errors)
+
+        if (!orderItem.productPackage) {
+            ProductPackage productPackage = uomService.getProductPackage(orderItem.product, orderItem.quantityUom, orderItem.quantityPerUom as Integer)
+            // Create a new product package
+            if (!productPackage) {
+                productPackage = new ProductPackage()
+                productPackage.product = orderItem.product
+                productPackage.name = "${orderItem?.quantityUom?.code}/${orderItem?.quantityPerUom as Integer}"
+                productPackage.uom = orderItem.quantityUom
+                productPackage.quantity = orderItem.quantityPerUom as Integer
+                productPackage.price = orderItem.unitPrice
+                productPackage.save()
+            }
+            // Associate product package with order item
+            orderItem.productPackage = productPackage
+        }
+
+        // Update last price on product package and product supplier
+        if (orderItem.productPackage) {
+            orderItem.productPackage.price = orderItem.unitPrice
+        }
+        if (orderItem.productSupplier) {
+            orderItem.productSupplier.unitPrice = orderItem.unitPrice
+        }
+
+        try {
+            if (!order.save(flush:true)) {
+                throw new ValidationException("Order is invalid", order.errors)
+            }
+        } catch (Exception e) {
+            log.error("Error " + e.message, e)
+            render(status: 500, text: "Not saved")
         }
         render (status: 200, text: "Successfully added order item")
     }
@@ -616,13 +648,23 @@ class OrderController {
     def getOrderItems = {
         def orderInstance = Order.get(params.id)
         def orderItems = orderInstance.orderItems.collect {
+
+            String quantityUom = "${it?.quantityUom?.code?:g.message(code:'default.ea.label')?.toUpperCase()}"
+            String quantityPerUom = "${g.formatNumber(number: it?.quantityPerUom?:1, maxFractionDigits: 0)}"
+            String unitOfMeasure = "${quantityUom}/${quantityPerUom}"
+
             [
                     id: it.id,
                     product: it.product,
                     quantity: it.quantity,
+                    quantityUom: quantityUom,
+                    quantityPerUom: quantityPerUom,
+                    unitOfMeasure: unitOfMeasure,
+                    totalQuantity: (it?.quantity?:1) * (it?.quantityPerUom?:1),
+                    productPackage: it?.productPackage,
+                    currencyCode: it?.order?.currencyCode,
                     unitPrice:  g.formatNumber(number: it.unitPrice),
                     totalPrice: g.formatNumber(number: it.totalPrice()),
-                    unitOfMeasure: it.product?.unitOfMeasure?:g.message(code: 'default.each.label'),
                     estimatedReadyDate: g.formatDate(date: it.estimatedReadyDate, format: Constants.DEFAULT_DATE_FORMAT),
                     actualReadyDate: g.formatDate(date: it.actualReadyDate, format: Constants.DEFAULT_DATE_FORMAT),
                     productSupplier: it.productSupplier,
@@ -669,7 +711,7 @@ class OrderController {
                         "${StringEscapeUtils.escapeCsv(orderItem?.product?.name)}," +
                         "${orderItem?.product?.vendorCode ?: ''}," +
                         "${quantityString}," +
-                        "${orderItem?.product?.unitOfMeasure ?: 'EA'}," +
+                        "${orderItem?.unitOfMeasure}," +
                         "${StringEscapeUtils.escapeCsv(unitPriceString)}," +
                         "${StringEscapeUtils.escapeCsv(totalPriceString)}" +
                         "\n"

@@ -703,7 +703,7 @@ class ShipmentService {
 
             log.info("Checking shipment item ${shipmentItem?.inventoryItem} quantity [" +
                     shipmentItem.quantity + "] <= quantity on hand [" + quantityOnHand + "]")
-            if (duplicatedShipmentItemsQuantity > quantityOnHand) {
+            if (duplicatedShipmentItemsQuantity > quantityOnHand && origin.supports(ActivityCode.MANAGE_INVENTORY)) {
                 shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedAvailableQuantity",
                         [
                                 shipmentItem.quantity + " " + shipmentItem?.product?.unitOfMeasure,
@@ -2159,12 +2159,13 @@ class ShipmentService {
                     ShipmentItem shipmentItem = new ShipmentItem(
                             product: shipOrderItem.orderItem.product,
                             recipient: shipOrderItem.orderItem.recipient,
-                            quantity: shipOrderItem.quantityToShip
+                            quantity: shipOrderItem.quantityToShip * shipOrderItem.orderItem.quantityPerUom
                     )
                     shipmentItem.addToOrderItems(shipOrderItem.orderItem)
                     shipment.addToShipmentItems(shipmentItem)
                 } else {
-                    shipOrderItem.shipmentItem.quantity = shipOrderItem.quantityToShip
+                    shipOrderItem.shipmentItem.quantity = shipOrderItem.quantityToShip * shipOrderItem.orderItem.quantityPerUom
+                    shipOrderItem.shipmentItem.recipient = shipOrderItem.orderItem.recipient ?: order.orderedBy
                 }
             }
         }

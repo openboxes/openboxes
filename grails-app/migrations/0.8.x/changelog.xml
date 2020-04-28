@@ -72,4 +72,6 @@
     <include file="0.8.x/changelog-2020-03-16-1323-alter-table-order-add-columns-for-party-association.xml"/>
     <include file="0.8.x/changelog-2020-03-27-1557-alter-table-add-columns-order-item-datetimes.xml"/>
     <include file="0.8.x/changelog-2020-04-09-1218-alter-table-add-columns-order-audit-fields.xml"/>
+    <include file="0.8.x/changelog-2020-04-23-1026-alter-table-add-column-order-item-quantity-uom.xml"/>
+    <include file="0.8.x/changelog-2020-04-25-2156-insert-default-quantity-unit-of-measures.xml"/>
 </databaseChangeLog>

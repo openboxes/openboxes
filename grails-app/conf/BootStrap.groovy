@@ -199,12 +199,7 @@ class BootStrap {
 
 
         JSON.registerObjectMarshaller(Product) { Product product ->
-            [
-                    id         : product.id,
-                    productCode: product.productCode,
-                    name       : product.name,
-                    description: product.description
-            ]
+            return product.toJson()
         }
 
         JSON.registerObjectMarshaller(ProductAssociation) { ProductAssociation productAssociation ->
