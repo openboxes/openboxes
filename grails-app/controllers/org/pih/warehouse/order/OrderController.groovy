@@ -616,7 +616,7 @@ class OrderController {
             if (!productPackage) {
                 productPackage = new ProductPackage()
                 productPackage.product = orderItem.product
-                productPackage.name = "${orderItem.quantityUom.code}/${orderItem.quantityPerUom as Integer}"
+                productPackage.name = "${orderItem?.quantityUom?.code}/${orderItem?.quantityPerUom as Integer}"
                 productPackage.uom = orderItem.quantityUom
                 productPackage.quantity = orderItem.quantityPerUom as Integer
                 productPackage.price = orderItem.unitPrice
