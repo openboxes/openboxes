@@ -7,6 +7,7 @@ import org.pih.warehouse.tablero.ColorNumber
 import org.pih.warehouse.tablero.IndicatorData
 import org.pih.warehouse.tablero.NumberIndicator
 import org.pih.warehouse.tablero.IndicatorDatasets
+import org.pih.warehouse.tablero.NumberTableData
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.receiving.ReceiptItem
@@ -388,5 +389,56 @@ class IndicatorDataService {
         Table indicatorData = new Table("Shipment", "Name", "Discrepancy", tableBody)
 
         return indicatorData;
+    }
+
+    def getDelayedShipments(Location location) {
+        Date oneWeekAgo = LocalDate.now().minusWeeks(1).toDate()
+        Date oneMonthAgo = LocalDate.now().minusMonths(1).toDate()
+        Date twoMonthsAgo = LocalDate.now().minusMonths(2).toDate()
+
+        def results = Shipment.executeQuery("""
+            select s.shipmentType.id, s.shipmentNumber, s.name, s.id
+            from Shipment as s
+            inner join s.currentEvent as e
+            where s.destination = :location
+            and s.currentStatus in ('SHIPPED', 'PARTIALLY_RECEIVED')
+            and (
+                (s.shipmentType.id = 1 and e.eventDate < :oneMonthAgo)
+                or (s.shipmentType.id = 2 and e.eventDate < :twoMonthsAgo)
+                or (s.shipmentType.id in (3, 4) and e.eventDate < :oneWeekAgo)
+            )
+        """, [
+                'location'    : location,
+                'oneWeekAgo'  : oneWeekAgo,
+                'oneMonthAgo' : oneMonthAgo,
+                'twoMonthsAgo': twoMonthsAgo
+        ])
+
+        def numberDelayed = [
+                air            : 0,
+                sea            : 0,
+                landAndSuitcase: 0,
+        ]
+
+        results = results.collect {
+            if (it[0] == '1') numberDelayed['air'] += 1
+            else if (it[0] == '2') numberDelayed['sea'] += 1
+            else numberDelayed['landAndSuitcase'] += 1
+
+            TableData tableData = new TableData(it[1], it[2], null, '/openboxes/stockMovement/show/' + it[3])
+            return tableData
+        }
+
+        Table table = new Table("Shipment", "Name", null, results)
+
+        ColorNumber delayedShipmentByAir = new ColorNumber(numberDelayed['air'], 'By air')
+        ColorNumber delayedShipmentBySea = new ColorNumber(numberDelayed['sea'], 'By sea')
+        ColorNumber delayedShipmentByLand = new ColorNumber(numberDelayed['landAndSuitcase'], 'By land')
+
+        NumberIndicator numberIndicator = new NumberIndicator(delayedShipmentByAir, delayedShipmentBySea, delayedShipmentByLand, false)
+
+        NumberTableData numberTableData = new NumberTableData(table, numberIndicator)
+
+        return numberTableData;
     }
 }
