@@ -179,8 +179,9 @@ class DashboardService {
         long startTime = System.currentTimeMillis()
 
         def today = new Date()
+        today.clearTime()
         // Get all stock expiring ever (we'll filter later)
-        def expiringStock = InventoryItem.findAllByExpirationDateGreaterThan(today + 1, [sort: 'expirationDate', order: 'asc'])
+        def expiringStock = InventoryItem.findAllByExpirationDateGreaterThanEquals(today + 1, [sort: 'expirationDate', order: 'asc'])
         def quantityMap = inventorySnapshotService.getQuantityOnHandByInventoryItem(location)
         expiringStock = expiringStock.findAll { quantityMap[it] > 0 }
         if (category) {
