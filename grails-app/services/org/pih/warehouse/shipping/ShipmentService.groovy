@@ -2165,7 +2165,6 @@ class ShipmentService {
                     shipment.addToShipmentItems(shipmentItem)
                 } else {
                     shipOrderItem.shipmentItem.quantity = shipOrderItem.quantityToShip * shipOrderItem.orderItem.quantityPerUom
-                    shipOrderItem.shipmentItem.recipient = shipOrderItem.orderItem.recipient ?: order.orderedBy
                 }
             }
         }
