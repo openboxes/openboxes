@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.megaMenu/',file:'jquery.megamenu.css')}" type="text/css" media="all" />
     <link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.nailthumb',file:'jquery.nailthumb.1.1.css')}" type="text/css" media="all" />
     <link rel="stylesheet" href="${createLinkTo(dir:'js/chosen',file:'chosen.css')}" type="text/css" media="all" />
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" type="text/css" />
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/css/jquery.dataTables.min.css" type="text/css">
     <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footable.css')}" type="text/css" media="all" />
 
@@ -162,8 +163,9 @@
 <script src="${createLinkTo(dir:'js/', file:'underscore-min.js')}" type="text/javascript" ></script>
 <script src="${createLinkTo(dir:'js/chosen/', file:'chosen.jquery.min.js')}" type="text/javascript" ></script>
 <script src="${createLinkTo(dir:'js/feedback/', file:'feedback.js')}" type="text/javascript" ></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/jquery.dataTables.js" type="text/javascript" ></script>
 <script src="${createLinkTo(dir:'js/footable/', file:'footable.js')}" type="text/javascript" ></script>
+<script src="//cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/jquery.dataTables.js" type="text/javascript" ></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/notify/0.4.2/notify.js" type="text/javascript"></script>
 
 <!-- JIRA Issue Collector -->
@@ -371,102 +373,157 @@
 <script type="text/javascript">
     $(document).ready(function() {
 
-        // Megamenu
-        $(".megamenu").megamenu({'show_method':'simple', 'hide_method': 'simple'});
+      // Megamenu
+      $(".megamenu")
+      .megamenu({
+        'show_method': 'simple',
+        'hide_method': 'simple'
+      });
 
-        // Chozen select default
-      $(".chzn-select").chosen({search_contains: true});
-        $(".chzn-select-deselect").chosen({ allow_single_deselect:true, width: '100%', search_contains: true });
-      $(".chzn-select-readonly").chosen().prop("disabled", "disabled").trigger("chosen:updated");
-        $(".chzn-select-deselect").livequery(function(){
-            $(this).chosen({allow_single_deselect:true, width:'100%', search_contains: true});
-        });
+      // Chosen select default default configuration
+      $(".chzn-select")
+      .chosen({
+        width: '100%',
+        search_contains: true,
+      });
 
+      $(".chzn-select-deselect")
+      .chosen({
+        width: '100%',
+        search_contains: true,
+        allow_single_deselect: true,
+      });
 
-        $(".warehouse-switch").click(function() {
-            $("#warehouseMenu").dialog({
-                autoOpen: true,
-                modal: true,
-                width: 800
-            });
-        });
+      // Select 2 default configuration
+      $(".select2")
+      .select2({
+        placeholder: 'Select an option',
+        width: '100%',
+        allowClear: true,
+      });
 
-
-        function showActions() {}
-
-        function hideActions() {
-            $(this).children(".actions").hide();
+      $(".ajaxSelect2")
+      .select2({
+        placeholder: 'Select an option',
+        width: '100%',
+        allowClear: true,
+        ajax: {
+          // Instead of changing all of the JSON endpoints to return a map with key
+          // results (as required by select2), we're just going to change the data
+          // on the client side. In other words, select2 is expecting the data to be
+          // in data.results, but we're just going to return the data from the server.
+          processResults: function (data) {
+            return { results: data };
+          }
         }
+      });
 
-        /* This is used to remove the action menu when the cursor is no longer over the menu */
-        $(".action-menu").hoverIntent({
-            sensitivity: 1, // number = sensitivity threshold (must be 1 or higher)
-            interval: 5,   // number = milliseconds for onMouseOver polling interval
-            over: showActions,     // function = onMouseOver callback (required)
-            timeout: 100,   // number = milliseconds delay before onMouseOut
-            out: hideActions       // function = onMouseOut callback (required)
+      $(".warehouse-switch")
+      .click(function () {
+        $("#warehouseMenu")
+        .dialog({
+          autoOpen: true,
+          modal: true,
+          width: 800
+        });
+      });
+
+      function showActions() {
+      }
+
+      function hideActions() {
+        $(this)
+        .children(".actions")
+        .hide();
+      }
+
+      /* This is used to remove the action menu when the cursor is no longer over the menu */
+      $(".action-menu")
+      .hoverIntent({
+        sensitivity: 1, // number = sensitivity threshold (must be 1 or higher)
+        interval: 5,   // number = milliseconds for onMouseOver polling interval
+        over: showActions,     // function = onMouseOver callback (required)
+        timeout: 100,   // number = milliseconds delay before onMouseOut
+        out: hideActions       // function = onMouseOut callback (required)
+      });
+
+      // Added to fix bug with the now dynamically load Current Stock tab on the stock card page
+      $(".action-menu")
+      .livequery(function () {
+        $(this)
+        .hoverIntent({
+          sensitivity: 1, // number = sensitivity threshold (must be 1 or higher)
+          interval: 5,   // number = milliseconds for onMouseOver polling interval
+          over: showActions,     // function = onMouseOver callback (required)
+          timeout: 100,   // number = milliseconds delay before onMouseOut
+          out: hideActions       // function = onMouseOut callback (required)
+        });
+      });
+
+      $(".action-btn")
+      .live('click', function (event) {
+        //show the menu directly over the placeholder
+        var actions = $(this)
+        .parent()
+        .children(".actions");
+
+        // Need to toggle before setting the position
+        actions.toggle();
+
+        // Set the position for the actions menu
+        actions.position({
+          my: "left top",
+          at: "left bottom",
+          of: $(this)
+          .closest(".action-btn"),
+          collision: "flip fit"
         });
 
-        // Added to fix bug with the now dynamically load Current Stock tab on the stock card page
-        $(".action-menu").livequery(function() {
-            $(this).hoverIntent({
-                sensitivity: 1, // number = sensitivity threshold (must be 1 or higher)
-                interval: 5,   // number = milliseconds for onMouseOver polling interval
-                over: showActions,     // function = onMouseOver callback (required)
-                timeout: 100,   // number = milliseconds delay before onMouseOut
-                out: hideActions       // function = onMouseOut callback (required)
-            });
+        // To prevent the action button from POST'ing to the server
+        event.preventDefault();
+      });
+
+      $(".action-menu-item")
+      .click(function (event) {
+        var actions = $(this)
+        .parent()
+        .children(".actions");
+
+        // Need to toggle before setting the position
+        actions.toggle();
+      });
+
+      $(".action-hover-btn")
+      .click(function (event) {
+        //show the menu directly over the placeholder
+        var actions = $(this)
+        .parent()
+        .children(".actions");
+
+        // Need to toggle before setting the position
+        actions.toggle();
+
+        // Set the position for the actions menu
+        actions.position({
+          my: "right top",
+          at: "right bottom",
+          of: $(this)
+          .closest(".action-hover-btn"),
+          collision: "flip"
         });
 
-        $(".action-btn").live('click', function(event) {
-            //show the menu directly over the placeholder
-            var actions = $(this).parent().children(".actions");
+        // To prevent the action button from POST'ing to the server
+        event.preventDefault();
+      });
 
-            // Need to toggle before setting the position
-            actions.toggle();
-
-            // Set the position for the actions menu
-            actions.position({
-                my: "left top",
-                at: "left bottom",
-                of: $(this).closest(".action-btn"),
-                collision: "flip fit"
-            });
-
-            // To prevent the action button from POST'ing to the server
-            event.preventDefault();
+      // OBPIH-2683 Prevent double clicking links
+      $("a")
+      .one("click", function () {
+        $(this)
+        .click(function () {
+          return false;
         });
-
-        $(".action-menu-item").click(function(event) {
-            var actions = $(this).parent().children(".actions");
-
-            // Need to toggle before setting the position
-            actions.toggle();
-        });
-
-        $(".action-hover-btn").click(function(event) {
-            //show the menu directly over the placeholder
-            var actions = $(this).parent().children(".actions");
-
-            // Need to toggle before setting the position
-            actions.toggle();
-
-            // Set the position for the actions menu
-            actions.position({
-                my: "right top",
-                at: "right bottom",
-                of: $(this).closest(".action-hover-btn"),
-                collision: "flip"
-            });
-
-            // To prevent the action button from POST'ing to the server
-            event.preventDefault();
-        });
-
-        // OBPIH-2683 Prevent double clicking links
-        $("a").one("click", function() {
-          $(this).click(function() { return false; });
-        });
+      });
 
     });
 </script>

@@ -171,24 +171,38 @@
 
 		<script type="text/javascript">
 			$(document).ready(function() {
-				$(".clear-all").click(function() {
-					$('#statusStartDate-datepicker').val('');
-					$('#statusEndDate-datepicker').val('');
-					$('#statusStartDate').val('');
-					$('#statusEndDate').val('');
-					$('#totalPrice').val('');
-					$('#description').val('');
-					$("#origin").val('').trigger("chosen:updated");
-					$("#status").val('').trigger("chosen:updated");
+				$(".clear-all")
+				.click(function () {
+					$('#statusStartDate-datepicker')
+					.val('');
+					$('#statusEndDate-datepicker')
+					.val('');
+					$('#statusStartDate')
+					.val('');
+					$('#statusEndDate')
+					.val('');
+					$('#totalPrice')
+					.val('');
+					$('#description')
+					.val('');
+					$("#origin")
+					.val('')
+					.trigger("chosen:updated");
+					$("#status")
+					.val('')
+					.trigger("chosen:updated");
 				});
 
-                $("#clearStartDate").click(function() {
-                    $('#statusStartDate-datepicker').datepicker('setDate', null);
-                });
-                $("#clearEndDate").click(function() {
-                    $('#statusEndDate-datepicker').datepicker('setDate', null);
-                });
-
+				$("#clearStartDate")
+				.click(function () {
+					$('#statusStartDate-datepicker')
+					.datepicker('setDate', null);
+				});
+				$("#clearEndDate")
+				.click(function () {
+					$('#statusEndDate-datepicker')
+					.datepicker('setDate', null);
+				});
 			});
         </script>
     </body>

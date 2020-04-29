@@ -19,15 +19,15 @@
         <div id="manufacturerCode"></div>
     </td>
     <td class="middle center">
-        <input type="number" id="quantity" name="quantity" class="text" placeholder="Quantity" style="width:100px;"/>
+        <input type="number" id="quantity" name="quantity" class="text" placeholder="Quantity" />
     </td>
     <td class="center middle">
         <g:selectUnitOfMeasure id="quantityUom"
-                               name="quantityUom.id" class="chzn-select-deselect required" style="width: 100px"
+                               name="quantityUom.id" class="select2 required" style="width: 100px"
                                noSelection="['':'']"/>
     </td>
     <td class="center middle">
-        <input type="number" id="quantityPerUom" name="quantityPerUom" class="text required" placeholder="Qty per UoM" style="width: 100px"/>
+        <input type="number" id="quantityPerUom" name="quantityPerUom" class="text required" placeholder="Qty per UoM"/>
     </td>
     <td class="center middle">
         <input type="number" id="unitPrice" required name="unitPrice" size="2" class="text required" placeholder="Price per UoM" style="width: 100px"/>
@@ -43,7 +43,7 @@
         <g:jqueryDatePicker id="estimatedReadyDate" name="estimatedReadyDate" value="" placeholder="Expected ready date"
                             autocomplete="off" noSelection="['':'']"/>
     </td>
-    <td class="center middle" colspan="2">
+    <td class="center middle">
         <button id="save-item-button" class="button save-item">
             <img src="${resource(dir: 'images/icons/silk', file: 'tick.png')}" />&nbsp;
             <warehouse:message code="default.button.save.label"/>
