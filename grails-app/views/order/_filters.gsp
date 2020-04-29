@@ -28,7 +28,7 @@
                 <label><warehouse:message code="order.origin.label"/></label>
                 <g:selectLocationViaAjax id="origin"
                                          name="origin"
-                                         class="select2"
+                                         class="select2Ajax"
                                          noSelection="['':'']"
                                          value="${params.origin}"
                                          data-ajax--url="${request.contextPath }/json/findLocations?activityCode=${org.pih.warehouse.core.ActivityCode.FULFILL_ORDER}"
@@ -39,7 +39,7 @@
                 <label><warehouse:message code="order.destination.label"/></label>
                 <g:selectLocationViaAjax id="destination"
                                          name="destination"
-                                         class="select2"
+                                         class="select2Ajax"
                                          noSelection="['':'']"
                                          value="${params.destination}"
                                          data-ajax--url="${request.contextPath }/json/findLocations?activityCode=${org.pih.warehouse.core.ActivityCode.PLACE_ORDER}"
@@ -50,22 +50,22 @@
                 <label><warehouse:message code="order.orderedBy.label"/></label>
                 <g:selectPersonViaAjax id="orderedBy"
                                          name="orderedBy"
-                                         class="select2"
+                                         class="select2Ajax"
                                          noSelection="['':'']"
                                          value="${params.orderedBy}"
-                                         data-ajax--url="${request.contextPath }/json/findPersonByName"
                                          data-allow-clear="true"
+                                         data-ajax--url="${request.contextPath }/json/findPersonByName"
                                          data-ajax--cache="true"/>
             </div>
             <div class="filter-list-item">
                 <label><warehouse:message code="order.createdBy.label"/></label>
                 <g:selectPersonViaAjax id="createdBy"
                                          name="createdBy"
-                                         class="select2"
+                                         class="select2Ajax"
                                          noSelection="['':'']"
                                          value="${params.createdBy}"
-                                         data-ajax--url="${request.contextPath }/json/findPersonByName"
                                          data-allow-clear="true"
+                                         data-ajax--url="${request.contextPath }/json/findPersonByName"
                                          data-ajax--cache="true"/>
             </div>
             <div class="filter-list-item">

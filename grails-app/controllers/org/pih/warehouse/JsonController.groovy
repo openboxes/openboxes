@@ -782,7 +782,7 @@ class JsonController {
             e.printStackTrace()
         }
         log.info "returning ${items?.size()} items: " + items
-        render ([results: items] as JSON)
+        render items as JSON
 
 
     }
@@ -876,7 +876,7 @@ class JsonController {
         }
 
         log.info "Returning " + products.size() + " results for search " + params.term
-        render ([results: products] as JSON)
+        render products as JSON
     }
 
     def findLocations = {
@@ -892,7 +892,7 @@ class JsonController {
             locations = locations.findAll { it.supports(activityCode) }
         }
         locations = locations.collect { [id: it.id, text: it.name]}
-        render ([results: locations] as JSON)
+        render locations as JSON
     }
 
     def findRequestItems = {

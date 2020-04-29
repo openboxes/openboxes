@@ -395,13 +395,12 @@
       });
 
       // Select 2 default configuration
-      $(".select2").select2({
+      $(".select2")
+      .select2({
         placeholder: 'Select an option',
         width: '100%',
         allowClear: true,
-        });
-
-
+      });
 
       $(".warehouse-switch")
       .click(function () {
@@ -412,7 +411,6 @@
           width: 800
         });
       });
-
 
       function showActions() {
       }

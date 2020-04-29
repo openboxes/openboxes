@@ -56,7 +56,7 @@
                                 <th class="center"><warehouse:message code="orderItem.totalCost.label"/></th>
                                 <th class="center"><warehouse:message code="order.recipient.label"/></th>
                                 <th class="center"><warehouse:message code="orderItem.estimatedReadyDate.label"/></th>
-                                <th class="center" width="1%"><warehouse:message code="default.actions.label"/></th>
+                                <th class="center"><warehouse:message code="default.actions.label"/></th>
                             </tr>
                         </thead>
                         <tbody>

@@ -171,23 +171,54 @@
 
 		<script type="text/javascript">
 			$(document).ready(function() {
-				$(".clear-all").click(function() {
-					$('#statusStartDate-datepicker').val('');
-					$('#statusEndDate-datepicker').val('');
-					$('#statusStartDate').val('');
-					$('#statusEndDate').val('');
-					$('#totalPrice').val('');
-					$('#description').val('');
-					$("#origin").val('').trigger("chosen:updated");
-					$("#status").val('').trigger("chosen:updated");
+				$(".clear-all")
+				.click(function () {
+					$('#statusStartDate-datepicker')
+					.val('');
+					$('#statusEndDate-datepicker')
+					.val('');
+					$('#statusStartDate')
+					.val('');
+					$('#statusEndDate')
+					.val('');
+					$('#totalPrice')
+					.val('');
+					$('#description')
+					.val('');
+					$("#origin")
+					.val('')
+					.trigger("chosen:updated");
+					$("#status")
+					.val('')
+					.trigger("chosen:updated");
 				});
 
-                $("#clearStartDate").click(function() {
-                    $('#statusStartDate-datepicker').datepicker('setDate', null);
-                });
-                $("#clearEndDate").click(function() {
-                    $('#statusEndDate-datepicker').datepicker('setDate', null);
-                });
+				$("#clearStartDate")
+				.click(function () {
+					$('#statusStartDate-datepicker')
+					.datepicker('setDate', null);
+				});
+				$("#clearEndDate")
+				.click(function () {
+					$('#statusEndDate-datepicker')
+					.datepicker('setDate', null);
+				});
+
+				$(".select2Ajax")
+				.select2({
+					placeholder: 'Select an option',
+					width: '100%',
+					allowClear: true,
+					ajax: {
+						// Instead of changing all of the JSON endpoints to return a map with key
+						// results (as required by select2), we're just going to change the data
+						// on the client side. In other words, select2 is expecting the data to be
+						// in data.results, but we're just going to return the data from the server.
+						processResults: function (data) {
+							return { results: data };
+						}
+					}
+				});
 
 			});
         </script>
