@@ -744,37 +744,33 @@ class JsonController {
         def items = new TreeSet()
         try {
 
-            if (params.term) {
-
-                def terms = params.term.split(" ")
+            def terms = params?.term?.split(" ")
+            items = Person.withCriteria {
+                eq("active", Boolean.TRUE)
                 for (term in terms) {
-                    items = Person.withCriteria {
-                        or {
-                            ilike("firstName", term + "%")
-                            ilike("lastName", term + "%")
-                            ilike("email", term + "%")
-                        }
+                    or {
+                        ilike("firstName", term + "%")
+                        ilike("lastName", term + "%")
+                        ilike("email", term + "%")
                     }
                 }
-            }
-            else {
-                items = Person.list()
+                order("firstName", "asc")
+                order("lastName", "asc")
             }
 
             if (items) {
-                items.unique()
                 items = items.collect() {
 
                     [
                             id         : it.id,
                             label      : it.name,
-                            text: it.name,
+                            text       : it.name,
                             description: it?.email,
                             value      : it.id,
                             valueText  : it.name,
                             desc       : (it?.email) ? it.email : "",
                     ]
-                }
+                }?.unique()
             }
             items.add([id: "new", label: 'Create new record for ' + params.term, value: null, valueText: params.term])
 
@@ -814,9 +810,6 @@ class JsonController {
                 }
                 products = products.reverse()
             }
-        }
-        else {
-            products = Product.list([max: 100, offset: 0])
         }
 
         String NEVER = "${warehouse.message(code: 'default.never.label')}"
@@ -886,6 +879,7 @@ class JsonController {
             }
             eq("active", Boolean.TRUE)
             isNull("parentLocation")
+            order("name", "asc")
         }
         if (params.activityCode) {
             ActivityCode activityCode = params.activityCode as ActivityCode
