@@ -214,9 +214,10 @@ export function fetchNumbersData() {
 
   return (dispatch) => {
     apiClient.get(url).then((res) => {
-      const data = res.data.map(item => {
-        item.archived = 0;
-        return item;
+      const data = res.data.map((item) => {
+        const myItem = item;
+        myItem.archived = 0;
+        return myItem;
       });
       dispatch({
         type: FETCH_NUMBERS,

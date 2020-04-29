@@ -1,3 +1,5 @@
+// eslint-disable-next-line no-unused-vars
+import datalabels from 'chartjs-plugin-datalabels';
 import ColorPalette from '../../components/tablero/ColorPalette.scss';
 
 /* global _ */
@@ -93,7 +95,7 @@ function loadColors(data, chart) {
   return dataset;
 }
 
-function loadOptions(isStacked = false) {
+function loadOptions(isStacked = false, hasDataLabel = false) {
   const options = {
     scales: isStacked ? {
       xAxes: [{
@@ -111,6 +113,20 @@ function loadOptions(isStacked = false) {
           color: 'transparent',
         },
       }],
+    },
+    plugins: hasDataLabel ? {
+      datalabels: {
+        anchor: 'end',
+        align: 'right',
+        offset: 30,
+        font: {
+          weight: 'bold',
+        },
+      },
+    } : {
+      datalabels: {
+        display: false,
+      },
     },
     tooltips: {
       displayColors: false,

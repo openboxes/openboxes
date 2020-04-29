@@ -38,7 +38,7 @@ const GraphCard = SortableElement(({
     cardData.datasets = getColors(data, 'line');
     graph = (
       <Line
-        data={data}
+        data={cardData}
         options={loadOptions()}
         onElementsClick={elements => handleChartClick(elements)}
       />
@@ -47,22 +47,22 @@ const GraphCard = SortableElement(({
     label = 'Next';
   } else if (cardType === 'bar') {
     cardData.datasets = getColors(data, 'bar');
-    graph = <Bar data={data} options={loadOptions(cardMethod !== 'getFillRate')} />;
+    graph = <Bar data={cardData} options={loadOptions(cardMethod !== 'getFillRate')} />;
     filter = 1;
   } else if (cardType === 'doughnut') {
     cardData.datasets = getColors(data, 'doughnut');
-    graph = <Doughnut data={data} options={loadOptions()} />;
+    graph = <Doughnut data={cardData} options={loadOptions()} />;
   } else if (cardType === 'horizontalBar') {
     cardData.datasets = getColors(data, 'horizontalBar');
     graph = (<HorizontalBar
-      data={data}
-      options={loadOptions()}
+      data={cardData}
+      options={loadOptions(null, true)}
       onElementsClick={elements => handleChartClick(elements)}
     />);
   } else if (cardType === 'numbers') {
-    graph = <Numbers data={data} />;
+    graph = <Numbers data={cardData} />;
   } else if (cardType === 'table') {
-    graph = <TableCard data={data} />;
+    graph = <TableCard data={cardData} />;
     filter = 1;
   } else if (cardType === 'loading') {
     graph = <LoadingCard />;
