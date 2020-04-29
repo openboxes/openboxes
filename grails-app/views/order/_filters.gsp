@@ -57,6 +57,7 @@
                 <g:selectPersonViaAjax id="orderedBy"
                                          name="orderedBy"
                                          class="ajaxSelect2"
+                                         noSelection="['':'']"
                                          value="${params.orderedBy}"
                                          data-allow-clear="true"
                                          data-ajax--url="${request.contextPath }/json/findPersonByName"
