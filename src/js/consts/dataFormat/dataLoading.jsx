@@ -37,11 +37,11 @@ function getRandomColor(index = 0, type = 'default') {
 function getColor(index = 0, typeChart = '') {
   const colors = {
     horizontalBar: [
-      ColorPalette.normalState1,
-      ColorPalette.normalState2,
       ColorPalette.normalState3,
-      ColorPalette.normalState4,
-      ColorPalette.normalState5,
+      ColorPalette.normalState2,
+      ColorPalette.normalState2,
+      ColorPalette.normalState2,
+      ColorPalette.normalState8,
     ],
   };
   return colors[typeChart][index];
