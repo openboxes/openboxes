@@ -14,7 +14,7 @@ import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
 import groovy.time.TimeCategory
 import org.codehaus.groovy.grails.web.json.JSONObject
-import org.pih.warehouse.core.ApiException
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Localization
 import org.pih.warehouse.core.Location
@@ -879,15 +879,17 @@ class JsonController {
         render ([results: products] as JSON)
     }
 
-    def selectLocations = {
-        def locations
-        if (params.term) {
-            locations = Location.createCriteria().list {
+    def findLocations = {
+        def locations = Location.createCriteria().list {
+            if (params.term) {
                 ilike("name", params.term + "%")
             }
+            eq("active", Boolean.TRUE)
+            isNull("parentLocation")
         }
-        else {
-            locations = Location.list([max:100])
+        if (params.activityCode) {
+            ActivityCode activityCode = params.activityCode as ActivityCode
+            locations = locations.findAll { it.supports(activityCode) }
         }
         locations = locations.collect { [id: it.id, text: it.name]}
         render ([results: locations] as JSON)

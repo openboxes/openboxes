@@ -26,51 +26,47 @@
             </div>
             <div class="filter-list-item">
                 <label><warehouse:message code="order.origin.label"/></label>
-
-                <g:select id="origin" name="origin" class="select2"
-                    noSelection="['':'']"
-                  data-ajax--url="${request.contextPath }/json/selectLocations?activityCode=${org.pih.warehouse.core.ActivityCode.FULFILL_ORDER}"
-                  data-allow-clear="true"
-                  data-ajax--cache="true"/>
-
-%{--                <g:selectLocation id="origin"--}%
-%{--                                  name="origin"--}%
-%{--                                  class="chzn-select-deselect"--}%
-%{--                                  activityCode="${org.pih.warehouse.core.ActivityCode.FULFILL_ORDER}"--}%
-%{--                                  optionKey="id"--}%
-%{--                                  optionValue="name"--}%
-%{--                                  value="${params.origin}"--}%
-%{--                                  noSelection="['':'']" />--}%
-
+                <g:selectLocationViaAjax id="origin"
+                                         name="origin"
+                                         class="select2"
+                                         noSelection="['':'']"
+                                         value="${params.origin}"
+                                         data-ajax--url="${request.contextPath }/json/findLocations?activityCode=${org.pih.warehouse.core.ActivityCode.FULFILL_ORDER}"
+                                         data-allow-clear="true"
+                                         data-ajax--cache="true"/>
             </div>
             <div class="filter-list-item">
                 <label><warehouse:message code="order.destination.label"/></label>
-%{--                <g:selectLocation id="destination" name="destination" class="chzn-select-deselect"--}%
-%{--                          optionKey="id" optionValue="name" activityCode="${org.pih.warehouse.core.ActivityCode.PLACE_ORDER}"--}%
-%{--                          value="${params.destination?:session?.warehouse?.id}" noSelection="['':'']" />--}%
-
-                <g:select id="destination" name="destination" class="select2"
-                    noSelection="['':'']"
-                    data-value="${params.destination}"
-                    data-selected="${params.destination}"
-                    value="${params.destination}"
-                  data-ajax--url="${request.contextPath }/json/selectLocations?activityCode=${org.pih.warehouse.core.ActivityCode.PLACE_ORDER}"
-                  data-allow-clear="true"/>
-                    ${params.destination}
+                <g:selectLocationViaAjax id="destination"
+                                         name="destination"
+                                         class="select2"
+                                         noSelection="['':'']"
+                                         value="${params.destination}"
+                                         data-ajax--url="${request.contextPath }/json/findLocations?activityCode=${org.pih.warehouse.core.ActivityCode.PLACE_ORDER}"
+                                         data-allow-clear="true"/>
             </div>
             <div class="filter-list-item">
+
                 <label><warehouse:message code="order.orderedBy.label"/></label>
-                <g:select id="orderedBy" name="orderedBy" value="${params?.orderedBy}"
-                    data-ajax--url="${request.contextPath }/json/findPersonByName"
-                                class="select2"
-                                noSelection="['': '']"/>
+                <g:selectPersonViaAjax id="orderedBy"
+                                         name="orderedBy"
+                                         class="select2"
+                                         noSelection="['':'']"
+                                         value="${params.orderedBy}"
+                                         data-ajax--url="${request.contextPath }/json/findPersonByName"
+                                         data-allow-clear="true"
+                                         data-ajax--cache="true"/>
             </div>
             <div class="filter-list-item">
                 <label><warehouse:message code="order.createdBy.label"/></label>
-                <g:select id="createdBy" name="createdBy"
-                    data-ajax--url="${request.contextPath }/json/findPersonByName"
-                                class="select2" value="${params?.createdBy}"
-                                noSelection="['': '']"/>
+                <g:selectPersonViaAjax id="createdBy"
+                                         name="createdBy"
+                                         class="select2"
+                                         noSelection="['':'']"
+                                         value="${params.createdBy}"
+                                         data-ajax--url="${request.contextPath }/json/findPersonByName"
+                                         data-allow-clear="true"
+                                         data-ajax--cache="true"/>
             </div>
             <div class="filter-list-item">
                 <label>
