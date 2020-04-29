@@ -1,7 +1,7 @@
 import ColorPalette from '../../components/tablero/ColorPalette.scss';
 
 /* global _ */
-function getColor(index = 0, type = 'default') {
+function getRandomColor(index = 0, type = 'default') {
   const states = {
     normal: [
       ColorPalette.normalState1,
@@ -34,10 +34,23 @@ function getColor(index = 0, type = 'default') {
   }
 }
 
-function getHorizontalBarColors(index = 0, type = 'normal') {
+function getColor(index = 0, typeChart = '') {
+  const colors = {
+    horizontalBar: [
+      ColorPalette.normalState1,
+      ColorPalette.normalState2,
+      ColorPalette.normalState3,
+      ColorPalette.normalState4,
+      ColorPalette.normalState5,
+    ],
+  };
+  return colors[typeChart][index];
+}
+
+function getHorizontalBarColors() {
   const horizontalColors = [];
-  for (let i = 0; i < 5; i += 1) {
-    horizontalColors.push(getColor(index + i, type));
+  for (let index = 0; index < 5; index += 1) {
+    horizontalColors.push(getColor(index, 'horizontalBar'));
   }
   return horizontalColors;
 }
@@ -51,20 +64,20 @@ function loadColorDataset(data, chart, subtype) {
   // And a smooth color change
 
   if (chart === 'line') {
-    datasets.borderColor = getColor(index, 'normal');
-    datasets.pointBackgroundColor = getColor(index, 'normal');
+    datasets.borderColor = getRandomColor(index, 'normal');
+    datasets.pointBackgroundColor = getRandomColor(index, 'normal');
     datasets.pointHoverBackgroundColor = '#fff';
-    datasets.pointHoverBorderColor = getColor(index, 'normal');
+    datasets.pointHoverBorderColor = getRandomColor(index, 'normal');
     datasets.lineTension = 0;
     datasets.fill = !subtype;
   } if (chart === 'bar') {
-    datasets.backgroundColor = getColor(index, 'normal');
-    datasets.hoverBackgroundColor = getColor(index, 'dark');
+    datasets.backgroundColor = getRandomColor(index, 'normal');
+    datasets.hoverBackgroundColor = getRandomColor(index, 'dark');
   } if (chart === 'horizontalBar') {
-    datasets.backgroundColor = getHorizontalBarColors(index, 'normal');
-    datasets.hoverBackgroundColor = getHorizontalBarColors(index, 'dark');
+    datasets.backgroundColor = getHorizontalBarColors();
+    datasets.hoverBackgroundColor = getHorizontalBarColors();
   } if (chart === 'doughnut') {
-    datasets.backgroundColor = getColor(index, 'normal');
+    datasets.backgroundColor = getRandomColor(index, 'normal');
   }
 
   index += 1;
@@ -127,4 +140,4 @@ function loadOptions(isStacked = false) {
   return options;
 }
 
-export { loadColors, getColor, loadOptions };
+export { loadColors, getRandomColor, loadOptions };
