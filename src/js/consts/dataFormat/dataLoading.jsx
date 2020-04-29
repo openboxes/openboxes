@@ -118,7 +118,7 @@ function loadOptions(isStacked = false, hasDataLabel = false) {
       datalabels: {
         anchor: 'end',
         align: 'right',
-        offset: 30,
+        offset: 10,
         font: {
           weight: 'bold',
         },
