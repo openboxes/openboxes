@@ -402,6 +402,22 @@
         allowClear: true,
       });
 
+      $(".ajaxSelect2")
+      .select2({
+        placeholder: 'Select an option',
+        width: '100%',
+        allowClear: true,
+        ajax: {
+          // Instead of changing all of the JSON endpoints to return a map with key
+          // results (as required by select2), we're just going to change the data
+          // on the client side. In other words, select2 is expecting the data to be
+          // in data.results, but we're just going to return the data from the server.
+          processResults: function (data) {
+            return { results: data };
+          }
+        }
+      });
+
       $(".warehouse-switch")
       .click(function () {
         $("#warehouseMenu")
