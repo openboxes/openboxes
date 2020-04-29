@@ -392,7 +392,7 @@
       $(".select2").select2({
         placeholder: 'Select an option',
         width: '100%',
-        allowClear: true
+        allowClear: true,
       });
 
       // $(".chzn-select-readonly")

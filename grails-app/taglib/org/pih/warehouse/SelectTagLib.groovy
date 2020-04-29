@@ -14,6 +14,7 @@ import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PartyRole
 import org.pih.warehouse.core.PaymentMethodType
@@ -331,6 +332,12 @@ class SelectTagLib {
         out << g.select(attrs)
     }
 
+    def selectPersonViaAjax = { attrs, body ->
+        attrs.from = attrs.value ? [Person.get(attrs.value)] : []
+        attrs.optionKey = 'id'
+        out << g.select(attrs)
+    }
+
     def selectPerson = { attrs, body ->
         attrs.from = Person.list().sort { it.firstName }
         attrs.optionKey = 'id'
@@ -400,6 +407,16 @@ class SelectTagLib {
         out << g.selectWithOptGroup(attrs)
     }
 
+
+    /**
+     * For select lists that use Ajax, we just need to load the selected location(s) so that it
+     * will be selected.
+     */
+    def selectLocationViaAjax = { attrs, body ->
+        attrs.from = attrs.value ? [Location.get(attrs.value)] : []
+        attrs.optionKey = 'id'
+        out << g.select(attrs)
+    }
 
     def selectLocation = { attrs, body ->
 
