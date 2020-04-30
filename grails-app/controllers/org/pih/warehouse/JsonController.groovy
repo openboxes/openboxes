@@ -14,7 +14,7 @@ import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
 import groovy.time.TimeCategory
 import org.codehaus.groovy.grails.web.json.JSONObject
-import org.pih.warehouse.core.ApiException
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Localization
 import org.pih.warehouse.core.Location
@@ -744,38 +744,38 @@ class JsonController {
         def items = new TreeSet()
         try {
 
-            if (params.term) {
-
-                def terms = params.term.split(" ")
+            def terms = params?.term?.split(" ")
+            items = Person.withCriteria {
+                eq("active", Boolean.TRUE)
                 for (term in terms) {
-                    items = Person.withCriteria {
-                        or {
-                            ilike("firstName", term + "%")
-                            ilike("lastName", term + "%")
-                            ilike("email", term + "%")
-                        }
+                    or {
+                        ilike("firstName", term + "%")
+                        ilike("lastName", term + "%")
+                        ilike("email", term + "%")
                     }
                 }
-
-                if (items) {
-                    items.unique()
-                    items = items.collect() {
-
-                        [
-                                id         : it.id,
-                                label      : it.name,
-                                description: it?.email,
-                                value      : it.id,
-                                valueText  : it.name,
-                                desc       : (it?.email) ? it.email : "",
-                        ]
-                    }
-                }
-                items.add([id: "new", label: 'Create new record for ' + params.term, value: null, valueText: params.term])
+                order("firstName", "asc")
+                order("lastName", "asc")
             }
+
+            if (items) {
+                items = items.collect() {
+
+                    [
+                            id         : it.id,
+                            label      : it.name,
+                            text       : it.name,
+                            description: it?.email,
+                            value      : it.id,
+                            valueText  : it.name,
+                            desc       : (it?.email) ? it.email : "",
+                    ]
+                }?.unique()
+            }
+            items.add([id: "new", label: 'Create new record for ' + params.term, value: null, valueText: params.term])
+
         } catch (Exception e) {
             e.printStackTrace()
-
         }
         log.info "returning ${items?.size()} items: " + items
         render items as JSON
@@ -790,11 +790,10 @@ class JsonController {
         def products = new TreeSet()
 
         if (params.term) {
-            def terms = params.term.split(" ")
+            def terms = params?.term ? params?.term?.split(" ") : []
 
             // Get all products that match terms
             products = productService.searchProducts(terms, [])
-
             products = products.unique()
 
             if (terms) {
@@ -850,6 +849,7 @@ class JsonController {
                 // Convert product attributes to JSON object attributes
                 [
                         id            : product?.id,
+                        text          : product?.productCode + " " + localizedName,
                         product       : product,
                         category      : product?.category,
                         quantity      : productQuantity,
@@ -870,6 +870,23 @@ class JsonController {
 
         log.info "Returning " + products.size() + " results for search " + params.term
         render products as JSON
+    }
+
+    def findLocations = {
+        def locations = Location.createCriteria().list {
+            if (params.term) {
+                ilike("name", params.term + "%")
+            }
+            eq("active", Boolean.TRUE)
+            isNull("parentLocation")
+            order("name", "asc")
+        }
+        if (params.activityCode) {
+            ActivityCode activityCode = params.activityCode as ActivityCode
+            locations = locations.findAll { it.supports(activityCode) }
+        }
+        locations = locations.collect { [id: it.id, text: it.name]}
+        render locations as JSON
     }
 
     def findRequestItems = {

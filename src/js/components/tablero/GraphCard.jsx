@@ -7,6 +7,7 @@ import { loadColors, loadOptions } from '../../consts/dataFormat/dataLoading';
 import DragHandle from './DragHandle';
 import LoadingCard from './LoadingCard';
 import Numbers from './Numbers';
+import NumbersTableCard from './NumbersTableCard';
 import TableCard from './TableCard';
 
 // getColors loads indicator colors if it doesn't have defined colors yet
@@ -64,6 +65,8 @@ const GraphCard = SortableElement(({
   } else if (cardType === 'table') {
     graph = <TableCard data={cardData} />;
     filter = 1;
+  } else if (cardType === 'numberTable') {
+    graph = <NumbersTableCard data={data} />;
   } else if (cardType === 'loading') {
     graph = <LoadingCard />;
   } else if (cardType === 'error') {
@@ -83,9 +86,9 @@ const GraphCard = SortableElement(({
         <DragHandle />
       </div>
       <div className="content-card">
-        <div className="data-filter">
+        <div className={filter ? 'data-filter' : 'data-filter disabled'}>
           <select
-            className={filter ? 'custom-select' : 'custom-select disabled'}
+            className="custom-select"
             onChange={e => reloadIndicator(cardMethod, cardType, cardTitle, cardLink, cardId, `querySize=${e.target.value}`)}
             disabled={!filter}
             defaultValue={data.labels ? data.labels.length : '6'}

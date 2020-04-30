@@ -2502,6 +2502,7 @@ blockquote {
 .modified { color: red; }
 .approved { color: green; }
 .beta { background-color: #ffd351; display: inline-block; padding: 2px 5px 2px 5px; text-transform: uppercase; border-radius: 3px; color: #594300; font-weight: bold; line-height:99%; }
+.deprecated { background-color: #dc3545; display: inline-block; padding: 2px 5px 2px 5px; text-transform: uppercase; border-radius: 3px; border-color: #dc3545; color: white; font-weight: bold; line-height:99%; }
 .tooltip {
     position: absolute;
     width: 100px;

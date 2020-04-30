@@ -66,4 +66,10 @@ class ApitableroController {
         def discrepancy = indicatorDataService.getDiscrepancy(location, params)
         render (discrepancy as JSON)
     }
+
+    def getDelayedShipments = {
+        Location location = Location.get(session?.warehouse?.id)
+        def delayedShipments = indicatorDataService.getDelayedShipments(location)
+        render (delayedShipments as JSON)
+    }
 }

@@ -603,11 +603,8 @@ openboxes.megamenu.dashboard.enabled = true
 openboxes.megamenu.analytics.enabled = true
 openboxes.megamenu.inventory.enabled = true
 openboxes.megamenu.orders.enabled = true
-openboxes.megamenu.requisitions.enabled = true
-openboxes.megamenu.shipping.enabled = true
 openboxes.megamenu.stockRequest.enabled = true
 openboxes.megamenu.stockMovement.enabled = true
-openboxes.megamenu.receiving.enabled = true
 openboxes.megamenu.putaways.enabled = true
 openboxes.megamenu.reporting.enabled = true
 openboxes.megamenu.products.enabled = true
@@ -616,6 +613,10 @@ openboxes.megamenu.customLinks.enabled = false
 openboxes.megamenu.inbound.enabled = true
 openboxes.megamenu.outbound.enabled = true
 openboxes.megamenu.requisitionTemplate.enabled = true
+// Global megamenu configuration (deprecated)
+openboxes.megamenu.requisitions.enabled = false
+openboxes.megamenu.shipping.enabled = false
+openboxes.megamenu.receiving.enabled = false
 
 
 // Custom links example
