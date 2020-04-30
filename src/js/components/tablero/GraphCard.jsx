@@ -57,7 +57,7 @@ const GraphCard = SortableElement(({
     cardData.datasets = getColors(data, 'horizontalBar');
     graph = (<HorizontalBar
       data={cardData}
-      options={loadOptions(null, true)}
+      options={loadOptions(null, true, 'right')}
       onElementsClick={elements => handleChartClick(elements)}
     />);
   } else if (cardType === 'numbers') {
