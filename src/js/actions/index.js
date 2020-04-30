@@ -215,10 +215,10 @@ export function fetchNumbersData() {
   return (dispatch) => {
     apiClient.get(url).then((res) => {
       const data = res.data.map((item) => {
-        const myItem = item;
-        myItem.archived = 0;
-        return myItem;
+        item.archived = 0;
+        return item;
       });
+
       dispatch({
         type: FETCH_NUMBERS,
         payload: {

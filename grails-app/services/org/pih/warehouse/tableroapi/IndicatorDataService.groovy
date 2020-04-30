@@ -22,7 +22,7 @@ class IndicatorDataService {
         // Here it represents the last month we want to show
         // Add + 1 to include today (expired items) as the first point
         Integer querySize = params.querySize ? params.querySize.toInteger() + 1 : 7
-    
+
         LocalDate date = LocalDate.now()
 
         List expirationSummary = [0] * querySize
@@ -151,14 +151,15 @@ class IndicatorDataService {
         for (item in inventoryData) {
             listData.push(item.value ? item.value : 0)
         }
-        listData.push(listData.max()+1)
+        // Add one for the number to be visible at the end of the graph
+        listData.push(listData.max() + 1)
 
         List<String> links = [
-            "/openboxes/inventory/listInStock",
-            "/openboxes/inventory/listOverStock", 
-            "/openboxes/inventory/listReorderStock", 
-            "/openboxes/inventory/listLowStock", 
-            "/openboxes/inventory/listQuantityOnHandZero" ]
+                "/openboxes/inventory/listInStock",
+                "/openboxes/inventory/listOverStock",
+                "/openboxes/inventory/listReorderStock",
+                "/openboxes/inventory/listLowStock",
+                "/openboxes/inventory/listQuantityOnHandZero"]
 
         List<IndicatorDatasets> datasets = [
                 new IndicatorDatasets('Inventory Summary', listData, links)
