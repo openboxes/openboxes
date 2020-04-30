@@ -52,7 +52,6 @@
                                          data-allow-clear="true"/>
             </div>
             <div class="filter-list-item">
-
                 <label><warehouse:message code="order.orderedBy.label"/></label>
                 <g:selectPersonViaAjax id="orderedBy"
                                          name="orderedBy"

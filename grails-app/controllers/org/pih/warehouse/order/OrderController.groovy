@@ -38,10 +38,16 @@ class OrderController {
 
     def list = { OrderCommand command ->
 
+        // Parse date parameters
+        Date statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
+        Date statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
+
+        // Set default values
+        params.destination = params.destination?:session?.warehouse?.id
         params.orderTypeCode = params.orderTypeCode ? Enum.valueOf(OrderTypeCode.class, params.orderTypeCode) : OrderTypeCode.PURCHASE_ORDER
         params.status = params.status ? Enum.valueOf(OrderStatus.class, params.status) : null
-        def statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
-        def statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
+
+        // Pagination parameters
         params.max = params.max?:10
         params.offset = params.offset?:0
 
