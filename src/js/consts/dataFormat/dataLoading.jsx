@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 // eslint-disable-next-line no-unused-vars
 import datalabels from 'chartjs-plugin-datalabels';
 import ColorPalette from '../../components/tablero/ColorPalette.scss';
@@ -95,7 +96,22 @@ function loadColors(data, chart) {
   return dataset;
 }
 
-function loadOptions(isStacked = false, hasDataLabel = false) {
+function loadDatalabel(context) {
+  const datasets = context.chart.data.datasets;
+
+  // If this is the last visible dataset of the bar :
+  if (datasets.indexOf(context.dataset) === datasets.length - 1) {
+    let sum = 0;
+    datasets.map((dataset) => {
+      sum += dataset.data[context.dataIndex];
+      return sum;
+    });
+    return sum;
+  }
+  return '';
+}
+
+function loadOptions(isStacked = false, hasDataLabel = false, alignLabel = '') {
   const options = {
     scales: isStacked ? {
       xAxes: [{
@@ -117,10 +133,14 @@ function loadOptions(isStacked = false, hasDataLabel = false) {
     plugins: hasDataLabel ? {
       datalabels: {
         anchor: 'end',
-        align: 'right',
+        align: alignLabel,
         offset: 10,
         color(context) {
-          return context.dataset.backgroundColor[context.dataIndex];
+          return context.dataset.backgroundColor;
+        },
+        formatter(value, context) {
+          if (isStacked) return loadDatalabel(context);
+          return value;
         },
       },
     } : {
