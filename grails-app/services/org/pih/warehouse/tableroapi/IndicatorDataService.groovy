@@ -151,6 +151,7 @@ class IndicatorDataService {
         for (item in inventoryData) {
             listData.push(item.value ? item.value : 0)
         }
+        listData.push(listData.max()+1)
 
         List<String> links = [
             "/openboxes/inventory/listInStock",
