@@ -119,8 +119,8 @@ function loadOptions(isStacked = false, hasDataLabel = false) {
         anchor: 'end',
         align: 'right',
         offset: 10,
-        font: {
-          weight: 'bold',
+        color(context) {
+          return context.dataset.backgroundColor[context.dataIndex];
         },
       },
     } : {
