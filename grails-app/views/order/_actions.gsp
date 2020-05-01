@@ -84,8 +84,9 @@
 					</g:link>
 				</div>
 				<div class="action-menu-item">
-					<g:link controller="order" action="delete" id="${orderInstance?.id}"
-							disabled="${orderInstance?.isCompleted()}" disabledMessage="Cannot delete a completed order"
+					<g:link controller="order" action="remove" id="${orderInstance?.id}"
+							disabled="${orderInstance?.status != org.pih.warehouse.order.OrderStatus.PENDING}"
+							disabledMessage="${g.message(code:'order.errors.delete.message')}"
 							onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
 						<img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}" />
 						&nbsp;${warehouse.message(code: 'order.deleteOrder.label')}
