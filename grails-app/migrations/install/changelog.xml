@@ -3,10 +3,13 @@
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
-	<include file="install/changelog-create-tables.groovy"/>
-	<include file="install/changelog-create-indices.groovy"/>
-	<include file="install/changelog-add-foreign-key-constraints.groovy"/>
-	<include file="install/changelog-add-unique-constraints.groovy"/>
+	<include file="install/changelog-create-schema.groovy"/>
+	<!-- FIXME Create separate changelogs when we're closer to release -->
+	<!--	<include file="install/changelog-create-tables.groovy"/>-->
+	<!--	<include file="install/changelog-create-indices.groovy"/>-->
+	<!--	<include file="install/changelog-add-foreign-key-constraints.groovy"/>-->
+	<!--	<include file="install/changelog-add-unique-constraints.groovy"/>-->
+
 	<!-- Disable foreign key checks in case data is not inserted in correct order -->
 	<include file="install/changelog-disable-foreign-key-checks.groovy"/>
 	<include file="install/changelog-insert-data-core.groovy"/>
