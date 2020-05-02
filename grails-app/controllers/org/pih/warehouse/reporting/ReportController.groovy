@@ -287,7 +287,7 @@ class ReportController {
                 command           : command,
                 locationKey       : locationKey,
                 transactionCount  : locationKey ? TransactionFact.countByLocationKey(locationKey) : 0,
-                productCount      : TransactionFact.countDistinctProducts(locationKey?.locationId).list(),
+                productCount      : TransactionFact.countDistinctProducts(locationKey?.locationId).get(),
                 minTransactionDate: TransactionFact.minTransactionDate(locationKey?.locationId).list(),
                 maxTransactionDate: TransactionFact.maxTransactionDate(locationKey?.locationId).list(),
                 previousFireTime  : previousFireTime,
