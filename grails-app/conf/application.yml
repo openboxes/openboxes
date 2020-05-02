@@ -210,6 +210,8 @@ environments:
             url: jdbc:mysql://localhost:3306/openboxes?useSSL=false
 ---
 openboxes:
+    ajaxRequest:
+        timeout: 10000
     # Dashboard configuration to allow specific ordering of widgets (overrides enabled/disabled config)
     dashboard:
         column1:
