@@ -11,5 +11,5 @@ package org.pih.warehouse.core
 
 class PaymentMethodTypeController {
 
-    def scaffold = PaymentMethodType
+    static scaffold = PaymentMethodType
 }

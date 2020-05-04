@@ -16,7 +16,7 @@ import org.springframework.transaction.TransactionStatus
 class OrganizationController {
 
     def identifierService
-    def scaffold = Organization
+    static scaffold = Organization
 
     def search = {
 

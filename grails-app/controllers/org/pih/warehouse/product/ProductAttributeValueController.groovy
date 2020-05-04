@@ -12,7 +12,7 @@ package org.pih.warehouse.product
 
 class ProductAttributeValueController {
 
-    def scaffold = ProductAttribute
+    static scaffold = ProductAttribute
 
 
 }

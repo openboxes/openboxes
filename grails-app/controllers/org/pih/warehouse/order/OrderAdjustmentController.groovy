@@ -11,6 +11,6 @@ package org.pih.warehouse.order
 
 class OrderAdjustmentController {
 
-    def scaffold = OrderAdjustment
+    static scaffold = OrderAdjustment
 
 }

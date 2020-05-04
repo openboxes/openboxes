@@ -35,7 +35,7 @@ import org.pih.warehouse.receiving.ReceiptItem
 @Transactional
 class ShipmentController {
 
-    def scaffold = Shipment
+    static scaffold = Shipment
     def shipmentService
     def userService
     def reportService
