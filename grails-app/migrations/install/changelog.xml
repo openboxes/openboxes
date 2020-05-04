@@ -13,6 +13,7 @@
 	<!-- Disable foreign key checks in case data is not inserted in correct order -->
 	<include file="install/changelog-disable-foreign-key-checks.groovy"/>
 	<include file="install/changelog-insert-data-core.groovy"/>
+	<include file="install/changelog-insert-data-static.xml"/>
 	<include file="install/changelog-insert-data-roles.xml"/>
 	<include file="install/changelog-insert-data-user-roles.xml"/>
 	<include file="install/changelog-insert-data-location-type-supported-activities.xml"/>

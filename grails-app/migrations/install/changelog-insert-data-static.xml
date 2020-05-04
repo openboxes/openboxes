@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda (generated)" id="1588569173851-1">
+        <insert tableName="transaction_type">
+            <column name="id" valueNumeric="2"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="description"/>
+            <column name="name" value="Consumption|fr:Consommation"/>
+            <column name="transaction_code" value="DEBIT"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="sort_order"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1588569173851-2">
+        <insert tableName="transaction_type">
+            <column name="id" valueNumeric="3"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="description"/>
+            <column name="name" value="Adjustment|fr:Ajustement"/>
+            <column name="transaction_code" value="CREDIT"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="sort_order"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1588569173851-3">
+        <insert tableName="transaction_type">
+            <column name="id" valueNumeric="4"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="description"/>
+            <column name="name" value="Expired|fr:Expiré"/>
+            <column name="transaction_code" value="DEBIT"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1588569173851-4">
+        <insert tableName="transaction_type">
+            <column name="id" valueNumeric="5"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="description"/>
+            <column name="name" value="Damaged|fr:Endommagé"/>
+            <column name="transaction_code" value="DEBIT"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1588569173851-5">
+        <insert tableName="transaction_type">
+            <column name="id" valueNumeric="7"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="description"/>
+            <column name="name" value="Inventory|fr:Inventaire"/>
+            <column name="transaction_code" value="INVENTORY"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1588569173851-6">
+        <insert tableName="transaction_type">
+            <column name="id" valueNumeric="8"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="description"/>
+            <column name="name" value="Transfer In|fr:Transfert Entrée"/>
+            <column name="transaction_code" value="CREDIT"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1588569173851-7">
+        <insert tableName="transaction_type">
+            <column name="id" valueNumeric="9"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="description"/>
+            <column name="name" value="Transfer Out|fr:Transfert Sortie"/>
+            <column name="transaction_code" value="DEBIT"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1588569173851-8">
+        <insert tableName="transaction_type">
+            <column name="id" valueNumeric="10"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="description"/>
+            <column name="name" value="Adjustment - Debit|fr:Ajustement - Débit"/>
+            <column name="transaction_code" value="DEBIT"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1588569173851-9">
+        <insert tableName="transaction_type">
+            <column name="id" valueNumeric="11"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="description"/>
+            <column name="name" value="Product Inventory|fr:Inventaire de Produits"/>
+            <column name="transaction_code" value="PRODUCT_INVENTORY"/>
+            <column name="date_created" valueDate="2010-08-25"/>
+            <column name="last_updated" valueDate="2010-08-25"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
