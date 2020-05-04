@@ -58,12 +58,12 @@ class Person implements Comparable, Serializable {
     }
 
     String getName() {
-        boolean anonymize = Holders.getConfig().getProperty("openboxes.anonymize.enabled")
+        Boolean anonymize = Holders.config.getProperty("openboxes.anonymize.enabled", Boolean.class, Boolean.FALSE)
         return "$firstName ${anonymize ? lastInitial : lastName}"
     }
 
     Map toJson() {
-        boolean anonymize = Holders.getConfig().getProperty("openboxes.anonymize.enabled")
+        Boolean anonymize = Holders.config.getProperty("openboxes.anonymize.enabled", Boolean.class, Boolean.FALSE)
         return [
                 "id"       : id,
                 "name"     : name,
