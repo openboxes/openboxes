@@ -10,7 +10,7 @@
             <g:message code="application.commitSha.label" default="SHA"/>: <b><a href="https://github.com/openboxes/openboxes/commit/${gitProperties?.commitId}">${gitProperties?.shortCommitId}</a></b>&nbsp;&nbsp; | &nbsp;&nbsp;
         </g:if>
 		<g:message code="application.environment.label"/>: <b>${grails.util.Environment?.current?.name}</b> &nbsp;&nbsp; | &nbsp;&nbsp;
-        <g:message code="application.buildNumber.label"/>: <b><g:meta name="app.revisionNumber"/></b>&nbsp;&nbsp; | &nbsp;&nbsp;
+        <g:message code="application.buildNumber.label"/>: <b><g:meta name="git.commit.id.describe"/></b>&nbsp;&nbsp; | &nbsp;&nbsp;
 		<g:message code="application.buildDate.label"/>: <b><g:meta name="build.time"/></b>
     </div>
     <div class="center" style="line-height: 2em;">
