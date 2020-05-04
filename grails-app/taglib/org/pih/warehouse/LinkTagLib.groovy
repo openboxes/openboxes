@@ -1,9 +1,9 @@
-import org.grails.plugins.web.taglib.ApplicationTagLib
+package org.pih.warehouse
 
 import org.pih.warehouse.RoleInterceptor
 import org.pih.warehouse.SecurityInterceptor
 
-class LinkTagLib extends ApplicationTagLib {
+class LinkTagLib {
 
     static namespace = "g"
     def userService
