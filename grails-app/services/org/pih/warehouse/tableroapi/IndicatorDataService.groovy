@@ -138,7 +138,6 @@ class IndicatorDataService {
         def stockOutCount = results.findAll {
             it.quantityOnHand <= 0
         }.size()
-        //def totalCount = results.size()
 
         def inventoryData = [
                 inStockCount    : inStockCount,
@@ -152,8 +151,6 @@ class IndicatorDataService {
         for (item in inventoryData) {
             listData.push(item.value ? item.value : 0)
         }
-        // Add one for the number to be visible at the end of the graph
-        listData.push(listData.max() + 1)
 
         List<String> links = [
                 "/openboxes/inventory/listInStock",

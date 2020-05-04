@@ -37,6 +37,7 @@ const SortableCards = SortableContainer(({ data, reloadIndicator }) => (
           cardType={value.type}
           cardLink={value.link}
           data={value.data}
+          options={value.options}
           reloadIndicator={reloadIndicator}
         />
       )))}

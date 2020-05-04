@@ -1,5 +1,6 @@
 import { arrayMove } from 'react-sortable-hoc';
 import update from 'immutability-helper';
+import { loadColors, loadOptions } from '../consts/dataFormat/dataLoading';
 import {
   ADD_TO_INDICATORS,
   FETCH_GRAPHS,
@@ -28,6 +29,16 @@ function findInArray(id, array = []) {
   return false;
 }
 
+function getGraphOptions(payload) {
+  if (payload.type === 'bar') {
+    return loadOptions(payload.method !== 'getFillRate');
+  }
+  if (payload.type === 'horizontalBar') {
+    return loadOptions(null, true, 'right', Math.max(...payload.data.datasets[0].data));
+  }
+  return loadOptions();
+}
+
 const initialState = {
   data: [],
   numberData: [],
@@ -36,13 +47,19 @@ const initialState = {
 export default function (state = initialState, action) {
   switch (action.type) {
     case FETCH_GRAPHS: {
+      const { payload } = action;
+      // Data formatting
+      if (payload.type === 'bar' || payload.type === 'doughnut' || payload.type === 'horizontalBar' || payload.type === 'line') {
+        payload.data.datasets = loadColors(payload.data, payload.type);
+        payload.options = getGraphOptions(payload);
+      }
       // new reference to array so the component is re-rendered when value changes
       const newState = [].concat(state.data);
-      const index = findInArray(action.payload.id, state.data);
+      const index = findInArray(payload.id, state.data);
       if (index === false) {
-        newState.push(action.payload);
+        newState.push(payload);
       } else {
-        newState[index] = action.payload;
+        newState[index] = payload;
       }
       return {
         ...state,

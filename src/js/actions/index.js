@@ -1,5 +1,4 @@
 import { addTranslationForLanguage } from 'react-localize-redux';
-
 import {
   SHOW_SPINNER,
   HIDE_SPINNER,

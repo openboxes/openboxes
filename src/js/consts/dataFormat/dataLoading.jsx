@@ -88,18 +88,18 @@ function loadColorDataset(data, chart, subtype) {
 }
 
 function loadColors(data, chart) {
-  const dataset = data.datasets;
-  for (let i = 0; i < dataset.length; i += 1) {
-    const type = dataset[i].type || chart;
-    dataset[i] = loadColorDataset(dataset[i], type, dataset[i].type);
+  const datasets = data.datasets;
+  for (let i = 0; i < datasets.length; i += 1) {
+    const type = datasets[i].type || chart;
+    datasets[i] = loadColorDataset(datasets[i], type, datasets[i].type);
   }
-  return dataset;
+  return datasets;
 }
 
 function loadDatalabel(context) {
   const datasets = context.chart.data.datasets;
 
-  // If this is the last visible dataset of the bar :
+  // If this is the last visible dataset of the chart
   if (datasets.indexOf(context.dataset) === datasets.length - 1) {
     let sum = 0;
     datasets.map((dataset) => {
@@ -111,39 +111,17 @@ function loadDatalabel(context) {
   return '';
 }
 
-function loadOptions(isStacked = false, hasDataLabel = false, alignLabel = '') {
+function loadOptions(isStacked = false, hasDataLabel = false, alignLabel = '', maxValue = null) {
   const options = {
-    scales: isStacked ? {
-      xAxes: [{
-        stacked: true,
-        gridLines: {
-          color: 'transparent',
-        },
-      }],
-      yAxes: [{
-        stacked: true,
-      }],
-    } : {
+    scales: {
       xAxes: [{
         gridLines: {
           color: 'transparent',
         },
       }],
+      yAxes: [{}],
     },
-    plugins: hasDataLabel ? {
-      datalabels: {
-        anchor: 'end',
-        align: alignLabel,
-        offset: 10,
-        color(context) {
-          return context.dataset.backgroundColor;
-        },
-        formatter(value, context) {
-          if (isStacked) return loadDatalabel(context);
-          return value;
-        },
-      },
-    } : {
+    plugins: {
       datalabels: {
         display: false,
       },
@@ -172,6 +150,38 @@ function loadOptions(isStacked = false, hasDataLabel = false, alignLabel = '') {
       },
     },
   };
+
+  if (isStacked) {
+    options.scales.xAxes[0].stacked = true;
+    options.scales.yAxes[0].stacked = true;
+  }
+
+  if (hasDataLabel) {
+    options.plugins.datalabels = {
+      anchor: 'end',
+      align: alignLabel,
+      offset: 10,
+      color(context) {
+        return context.dataset.backgroundColor;
+      },
+      formatter(value, context) {
+        if (isStacked) return loadDatalabel(context);
+        return value;
+      },
+    };
+
+    if (alignLabel === 'right' && maxValue) {
+      options.scales.xAxes[0].ticks = {
+        suggestedMax: maxValue + 1,
+      };
+    }
+
+    if (alignLabel === 'top' && maxValue) {
+      options.scales.yAxes[0].ticks = {
+        suggestedMax: maxValue + 1,
+      };
+    }
+  }
 
   return options;
 }
