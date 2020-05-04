@@ -14,7 +14,7 @@ import grails.gorm.transactions.Transactional
 @Transactional
 class TransactionEntryController {
 
-    def scaffold = TransactionEntry
+    static scaffold = TransactionEntry
 
     def delete() {
         def transactionEntryInstance = TransactionEntry.get(params.id)

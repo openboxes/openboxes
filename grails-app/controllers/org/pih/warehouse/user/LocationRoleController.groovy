@@ -13,6 +13,6 @@ import org.pih.warehouse.core.LocationRole
 
 class LocationRoleController {
 
-    def scaffold = LocationRole
+    static scaffold = LocationRole
 
 }
