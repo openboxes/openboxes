@@ -10,6 +10,7 @@
 package org.pih.warehouse.forecasting
 
 import grails.core.GrailsApplication
+import grails.util.Holders
 import groovy.sql.Sql
 import groovy.time.TimeCategory
 import org.pih.warehouse.core.Location
@@ -29,7 +30,7 @@ class ForecastingService {
 
     def getDemand(Location origin, Product product) {
 
-        boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
+        boolean forecastingEnabled = Holders.config.openboxes.forecasting.enabled ?: false
         Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod ?: 365
         if (forecastingEnabled) {
             Map defaultDateRange = DateUtil.getDateRange(new Date(), -1)
@@ -56,13 +57,13 @@ class ForecastingService {
 
     def getDemandDetails(Location origin, Product product) {
         Date today = new Date()
-        Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod?:365
+        Integer demandPeriod = Holders.config.openboxes.forecasting.demandPeriod?:365
         return getDemandDetails(origin, product, today - demandPeriod, today)
     }
 
     def getDemandDetails(Location origin, Product product, Date startDate, Date endDate) {
         List data = []
-        boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
+        boolean forecastingEnabled = Holders.config.openboxes.forecasting.enabled ?: false
         if (forecastingEnabled) {
             Map params = [startDate: startDate, endDate: endDate]
             String query = """
@@ -173,8 +174,8 @@ class ForecastingService {
 
     def getDemandSummary(Location origin, Product product) {
         List data = []
-        Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod?:365
-        boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
+        Integer demandPeriod = Holders.config.openboxes.forecasting.demandPeriod?:365
+        boolean forecastingEnabled = Holders.config.openboxes.forecasting.enabled ?: false
         if (forecastingEnabled) {
             String query = """
                 select 
