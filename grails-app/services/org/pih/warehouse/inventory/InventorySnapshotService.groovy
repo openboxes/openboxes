@@ -37,6 +37,10 @@ class InventorySnapshotService {
     def persistenceInterceptor
 
     def populateInventorySnapshots(Date date) {
+        populateInventorySnapshots(date, false)
+    }
+
+    def populateInventorySnapshots(Date date, Boolean enableOptimization) {
         def results
         def startTime = System.currentTimeMillis()
 
@@ -52,8 +56,8 @@ class InventorySnapshotService {
 
                 // Recalculate inventory snapshot records only if there are new transactions
                 if (enableOptimization) {
-                    Date lastUpdatedDate = InventorySnapshot.lastUpdatedDate(loc.id).list()
-                    Integer transactionCount = Transaction.countByLocationAsOf(location, lastUpdatedDate).list()
+                    Date lastUpdatedDate = InventorySnapshot.lastUpdatedDate(loc.id).get()
+                    Integer transactionCount = Transaction.countByLocationAsOf(location, lastUpdatedDate).get()
                     Boolean skipCalculation = transactionCount == 0
                     binLocations = (!skipCalculation) ? calculateBinLocations(location, date) : []
                 }
