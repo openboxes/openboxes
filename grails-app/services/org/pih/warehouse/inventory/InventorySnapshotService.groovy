@@ -37,6 +37,10 @@ class InventorySnapshotService {
     def persistenceInterceptor
 
     def populateInventorySnapshots(Date date) {
+        populateInventorySnapshots(date, false)
+    }
+
+    def populateInventorySnapshots(Date date, Boolean enableOptimization) {
         def results
         def startTime = System.currentTimeMillis()
 
@@ -48,9 +52,12 @@ class InventorySnapshotService {
                 def innerStartTime = System.currentTimeMillis()
                 persistenceInterceptor.init()
                 Location location = Location.get(loc.id)
-                def binLocations = calculateBinLocations(location, date)
+                Date lastUpdatedDate = InventorySnapshot.lastUpdatedDate(loc.id).get()
+                Integer transactionCount = Transaction.countByLocationAsOf(location, lastUpdatedDate).get()
+                Boolean skipCalculation = enableOptimization && transactionCount == 0
+                def binLocations = (!skipCalculation) ? calculateBinLocations(location, date) : []
                 def readTime = (System.currentTimeMillis() - innerStartTime)
-                log.info "Read ${binLocations?.size()} snapshots location ${location} on date ${date.format("MMM-dd-yyyy")} in ${readTime}ms"
+                log.info "Read ${binLocations?.size()} inventory snapshots for location ${location} on date ${date.format("MMM-dd-yyyy")} in ${readTime}ms"
                 persistenceInterceptor.flush()
                 persistenceInterceptor.destroy()
                 return [binLocations: binLocations, location: location, date: date]
