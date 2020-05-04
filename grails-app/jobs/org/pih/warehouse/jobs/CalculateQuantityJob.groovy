@@ -17,12 +17,12 @@ class CalculateQuantityJob {
     // cron job needs to be triggered after the staging deployment
     static triggers = {
         cron name: 'calculateQuantityCronTrigger',
-                cronExpression: Holders.getConfig().getProperty("openboxes.jobs.calculateQuantityJob.cronExpression")
+                cronExpression: Holders.config.getProperty("openboxes.jobs.calculateQuantityJob.cronExpression")
     }
 
     def execute(JobExecutionContext context) {
 
-        Boolean enabled = Holders.getConfig().getProperty("openboxes.jobs.calculateQuantityJob.enabled")
+        Boolean enabled = Holders.config.getProperty("openboxes.jobs.calculateQuantityJob.enabled")
         if (!enabled) {
             return
         }
@@ -76,7 +76,7 @@ class CalculateQuantityJob {
                 if (forceRefresh) {
                     inventorySnapshotService.deleteInventorySnapshots(date)
                 }
-                boolean enableOptimization = CH.config.openboxes.jobs.calculateQuantityJob.enableOptimization
+                boolean enableOptimization = Holders.config.openboxes.jobs.calculateQuantityJob.enableOptimization
                 inventorySnapshotService.populateInventorySnapshots(date, enableOptimization)
             }
         }
