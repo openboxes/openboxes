@@ -10,6 +10,7 @@
 package org.pih.warehouse
 
 import grails.converters.JSON
+import groovy.sql.Sql
 import grails.gorm.transactions.Transactional
 import grails.plugin.cache.Cacheable
 import groovy.time.TimeCategory
