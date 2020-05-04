@@ -11,7 +11,7 @@ package org.pih.warehouse.shipping
 
 class ShipperServiceController {
 
-    def scaffold = ShipperService
+    static scaffold = ShipperService
 
 
 }

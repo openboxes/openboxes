@@ -11,6 +11,6 @@ package org.pih.warehouse.product
 
 class ProductComponentController {
 
-    def scaffold = ProductComponent
+    static scaffold = ProductComponent
 
 }
