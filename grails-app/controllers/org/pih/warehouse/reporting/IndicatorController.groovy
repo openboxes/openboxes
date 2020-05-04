@@ -11,7 +11,7 @@ package org.pih.warehouse.reporting
 
 class IndicatorController {
 
-    def scaffold = Indicator
+    static scaffold = Indicator
 
     // Proof of concept to see if we could evalute a string of code
     // Could be used to create dynamic indicators for the dashboard

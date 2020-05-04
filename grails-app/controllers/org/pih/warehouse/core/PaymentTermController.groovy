@@ -11,5 +11,5 @@ package org.pih.warehouse.core
 
 class PaymentTermController {
 
-    def scaffold = PaymentTerm
+    static scaffold = PaymentTerm
 }

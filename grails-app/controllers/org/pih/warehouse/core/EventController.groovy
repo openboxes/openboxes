@@ -11,5 +11,5 @@ package org.pih.warehouse.core
 
 class EventController {
 
-    def scaffold = Event
+    static scaffold = Event
 }

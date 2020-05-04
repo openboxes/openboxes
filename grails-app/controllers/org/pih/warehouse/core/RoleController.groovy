@@ -11,6 +11,6 @@ package org.pih.warehouse.core
 
 class RoleController {
 
-    def scaffold = Role
+    static scaffold = Role
 
 }
