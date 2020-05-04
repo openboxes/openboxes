@@ -10,6 +10,7 @@
 package org.pih.warehouse.forecasting
 
 import grails.core.GrailsApplication
+import grails.util.Holders
 import groovy.sql.Sql
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
@@ -21,12 +22,10 @@ import java.text.NumberFormat
 class ForecastingService {
 
     def dataSource
-    GrailsApplication grailsApplication
     def inventoryService
 
     def getDemand(Location origin, Product product) {
-
-        boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
+        boolean forecastingEnabled = Holders.config.openboxes.forecasting.enabled ?: false
         if (forecastingEnabled) {
             def numberFormat = NumberFormat.getIntegerInstance()
             def rows = getDemandDetails(origin, product)
@@ -48,13 +47,14 @@ class ForecastingService {
                     onHandMonths: onHandMonths
             ]
         }
+        return [dateRange: null, totalDays: 0, totalDemand: 0, dailyDemand: 0, monthlyDemand: 0, onHandMonths: 0]
     }
 
     def getDemandDetails(Location origin, Product product) {
         List data = []
-        Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod?:180
+        Integer demandPeriod = Holders.config.openboxes.forecasting.demandPeriod?:180
         Map params = [demandPeriod: demandPeriod]
-        boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
+        boolean forecastingEnabled = Holders.config.openboxes.forecasting.enabled ?: false
         if (forecastingEnabled) {
             String query = """
                 select 
@@ -103,8 +103,8 @@ class ForecastingService {
 
     def getDemandSummary(Location origin, Product product) {
         List data = []
-        Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod?:180
-        boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
+        Integer demandPeriod = Holders.config.openboxes.forecasting.demandPeriod?:180
+        boolean forecastingEnabled = Holders.config.openboxes.forecasting.enabled ?: false
         if (forecastingEnabled) {
             String query = """
                 select 
