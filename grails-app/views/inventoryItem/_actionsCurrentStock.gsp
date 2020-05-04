@@ -1,7 +1,7 @@
 <div class="action-menu">
     <g:set var="dialogId" value="${itemInstance?.id}-${binLocation?.id}"/>
     <button class="action-btn">
-        <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/>
+        <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}"/>
     </button>
     <div class="actions">
         <g:if test="${isSuperuser}">
@@ -21,60 +21,7 @@
                     <g:message code="inventory.adjustStock.label"/>
                 </a>
             </div>
-	</g:supports>
-            <div class="action-menu-item">
-                <a href="javascript:void(0);" class="btn-show-dialog" data-title="${g.message(code:'inventory.returnStock.label')}"
-                    data-url="${request.contextPath}/inventoryItem/showDialog?id=${itemInstance?.id}&binLocation=${binLocation?.id}&template=returnStock">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'book_previous.png')}"/>&nbsp;
-                    <g:message code="inventory.returnStock.label" default="Return stock"/>
-                </a>
-            </div>
-            <div class="action-menu-item">
-                <a href="javascript:void(0);" class="btn-show-dialog" data-title="${g.message(code:'shipping.addToShipment.label')}"
-                    data-url="${request.contextPath}/inventoryItem/showDialog?id=${itemInstance?.id}&binLocation=${binLocation?.id}&template=addToShipment">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'lorry_add.png')}"/>&nbsp;
-                    <g:message code="shipping.addToShipment.label"/>
-                </a>
-            </div>
-            <g:isSuperuser>
-                <g:set var="templates" value="${org.pih.warehouse.core.Document.findAllByDocumentCode(org.pih.warehouse.core.DocumentCode.ZEBRA_TEMPLATE)}"/>
-                <g:each in="${templates}" var="template">
-                    <hr/>
-                    <div class="action-menu-item">
-                        <a href="javascript:void(-1)">
-                            <label>${template.name}</label>
-                        </a>
-                    </div>
-                    <div class="action-menu-item">
-                        <g:link controller="document" action="buildZebraTemplate" id="${template.id}" params="['inventoryItem.id': itemInstance?.id]" target="_blank">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'brick.png')}"/>&nbsp;
-                            <g:message code="default.build.label" args="[template.name]"/>
-                        </g:link>
-                    </div>
-                    <div class="action-menu-item">
-                        <g:link controller="document" action="renderZebraTemplate" id="${template.id}" params="['inventoryItem.id': itemInstance?.id]" target="_blank">
-                            <img src="${resource(dir: 'images/icons', file: 'barcode.png')}"/>&nbsp;
-                            <g:message code="default.render.label" args="[template.name]"/>
-                        </g:link>
-                    </div>
-                    <div class="action-menu-item">
-                        <g:link controller="document" action="exportZebraTemplate" id="${template.id}" params="['inventoryItem.id': itemInstance?.id]" target="_blank">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'application_link.png')}"/>&nbsp;
-                            <g:message code="default.export.label" args="[template.name]"/>
-                        </g:link>
-                    </div>
-                    <div class="action-menu-item">
-                        <g:link controller="document" action="printZebraTemplate" id="${template.id}" params="['inventoryItem.id': itemInstance?.id]" target="_blank">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}"/>&nbsp;
-                            <g:message code="default.print.label" args="[template.name]"/>
-                        </g:link>
-                    </div>
-                </g:each>
-
-            </g:isSuperuser>
-
-
-        </div>
+	    </g:supports>
         <div class="action-menu-item">
             <a href="javascript:void(0);" class="btn-show-dialog" data-title="${g.message(code:'inventory.returnStock.label')}"
                 data-url="${request.contextPath}/inventoryItem/showDialog?id=${itemInstance?.id}&binLocation=${binLocation?.id}&template=returnStock">
@@ -100,7 +47,7 @@
                 </div>
                 <div class="action-menu-item">
                     <g:link controller="document" action="buildZebraTemplate" id="${template.id}" params="['inventoryItem.id': itemInstance?.id]" target="_blank">
-                        <img src="${recource(dir: 'images/icons/silk', file: 'brick.png')}"/>&nbsp;
+                        <img src="${resource(dir: 'images/icons/silk', file: 'brick.png')}"/>&nbsp;
                         <g:message code="default.build.label" args="[template.name]"/>
                     </g:link>
                 </div>
