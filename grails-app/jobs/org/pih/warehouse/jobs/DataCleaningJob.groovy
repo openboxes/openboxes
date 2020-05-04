@@ -1,4 +1,4 @@
-package org.pih.warehouse
+package org.pih.warehouse.jobs
 
 import org.quartz.DisallowConcurrentExecution
 
