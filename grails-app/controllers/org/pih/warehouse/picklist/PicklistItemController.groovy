@@ -14,7 +14,7 @@ import grails.gorm.transactions.Transactional
 @Transactional
 class PicklistItemController {
 
-    def scaffold = PicklistItem
+    static scaffold = PicklistItem
 
     def picklistService
 

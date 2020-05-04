@@ -10,5 +10,5 @@
 package org.pih.warehouse.receiving
 
 class ReceiptController {
-    def scaffold = Receipt
+    static scaffold = Receipt
 }

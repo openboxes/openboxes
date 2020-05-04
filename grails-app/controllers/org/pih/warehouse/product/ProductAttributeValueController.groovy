@@ -14,7 +14,7 @@ import org.pih.warehouse.core.EntityTypeCode
 
 class ProductAttributeValueController {
 
-    def scaffold = ProductAttribute
+    static scaffold = ProductAttribute
     def dataService
     def documentService
 
