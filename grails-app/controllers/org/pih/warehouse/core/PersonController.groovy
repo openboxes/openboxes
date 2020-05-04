@@ -15,7 +15,7 @@ import grails.gorm.transactions.Transactional
 class PersonController {
     def userService
 
-    def scaffold = Person
+    static scaffold = Person
 
     def redirect() {
         redirect(action: "show", id: params.id)
