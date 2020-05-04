@@ -2,15 +2,15 @@ package org.pih.warehouse
 
 import org.grails.plugins.web.taglib.FormatTagLib
 
-class FormatDateTagLib extends FormatTagLib {
+class FormatDateTagLib {
 
     static namespace = "g"
 
     Closure formatDate = { attrs, body ->
-        FormatTagLib formatTagLib = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.FormatTagLib')
         if (session.timezone) {
             attrs.timeZone = session.timezone
         }
+        FormatTagLib formatTagLib = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.FormatTagLib')
         out << formatTagLib.formatDate.call(attrs)
     }
 }
