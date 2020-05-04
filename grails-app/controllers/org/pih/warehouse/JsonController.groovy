@@ -12,10 +12,10 @@ package org.pih.warehouse
 import grails.converters.JSON
 import groovy.sql.Sql
 import grails.gorm.transactions.Transactional
-import grails.plugin.cache.Cacheable
 import groovy.time.TimeCategory
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.jobs.CalculateHistoricalQuantityJob
 import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Localization
@@ -50,6 +50,7 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.util.LocalizationUtil
+import org.quartz.impl.StdScheduler
 
 import java.text.NumberFormat
 import java.text.SimpleDateFormat

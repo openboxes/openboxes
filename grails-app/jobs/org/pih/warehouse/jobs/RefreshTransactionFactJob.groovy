@@ -1,4 +1,4 @@
-package org.pih.warehouse
+package org.pih.warehouse.jobs
 
 import grails.core.GrailsApplication
 import grails.util.Holders

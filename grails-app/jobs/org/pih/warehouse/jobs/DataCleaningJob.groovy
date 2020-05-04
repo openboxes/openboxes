@@ -1,4 +1,4 @@
-package org.pih.warehouse
+package org.pih.warehouse.jobs
 
 import grails.util.Holders
 import org.quartz.DisallowConcurrentExecution
