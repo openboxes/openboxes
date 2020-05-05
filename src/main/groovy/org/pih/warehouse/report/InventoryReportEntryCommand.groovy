@@ -9,11 +9,12 @@
  **/
 package org.pih.warehouse.report
 
+import grails.validation.Validateable
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
 
-class InventoryReportEntryCommand {
+class InventoryReportEntryCommand implements Validateable {
     // Entries are index by product or by inventory item
     Product product
     List<InventoryItem> inventoryItems = []

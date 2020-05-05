@@ -12,7 +12,7 @@ package org.pih.warehouse
 import grails.converters.JSON
 import groovy.sql.Sql
 import grails.gorm.transactions.Transactional
-import grails.plugin.cache.Cacheable
+import grails.validation.Validateable
 import groovy.time.TimeCategory
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.StringUtils
@@ -1900,7 +1900,7 @@ class JsonController {
 }
 
 
-class InventorySnapshotCommand {
+class InventorySnapshotCommand implements Validateable {
 
     Date date
     Location location
@@ -1912,7 +1912,7 @@ class InventorySnapshotCommand {
 
 }
 
-class TransactionReportCommand {
+class TransactionReportCommand implements Validateable  {
     Date startDate
     Date endDate
     Location location
