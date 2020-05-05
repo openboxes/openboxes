@@ -12,6 +12,7 @@ package org.pih.warehouse.admin
 import grails.core.GrailsApplication
 import grails.util.Environment
 import grails.util.Holders
+import grails.validation.Validateable
 import org.pih.warehouse.core.MailService
 import org.springframework.web.multipart.MultipartFile
 
@@ -277,7 +278,7 @@ class AdminController {
     }
 }
 
-class UpgradeCommand {
+class UpgradeCommand implements Validateable  {
 
     FutureTask future
     File localWebArchive

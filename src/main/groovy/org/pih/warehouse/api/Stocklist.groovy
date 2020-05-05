@@ -1,10 +1,11 @@
 package org.pih.warehouse.api
 
+import grails.validation.Validateable
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.requisition.Requisition
 
-class Stocklist {
+class Stocklist implements Validateable {
 
     Requisition requisition
 

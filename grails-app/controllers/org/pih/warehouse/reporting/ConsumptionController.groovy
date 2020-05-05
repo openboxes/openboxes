@@ -11,6 +11,7 @@ package org.pih.warehouse.reporting
 
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
+import grails.validation.Validateable
 import groovy.time.TimeCategory
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.collections.FactoryUtils
@@ -401,7 +402,7 @@ class ConsumptionController {
 }
 
 
-class ShowConsumptionCommand {
+class ShowConsumptionCommand implements Validateable  {
 
     // Map of product to ShowConsumptionRowCommand
     def rows = new TreeMap()
@@ -474,7 +475,7 @@ class ShowConsumptionCommand {
     }
 }
 
-class ShowConsumptionRowCommand {
+class ShowConsumptionRowCommand implements Validateable  {
 
     Product product
     ShowConsumptionCommand command
@@ -543,7 +544,7 @@ class ShowConsumptionRowCommand {
     }
 }
 
-class ConsumptionCommand {
+class ConsumptionCommand implements Validateable  {
 
     Category category
     Location location

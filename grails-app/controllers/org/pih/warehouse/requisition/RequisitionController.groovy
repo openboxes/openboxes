@@ -11,6 +11,7 @@ package org.pih.warehouse.requisition
 
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
+import grails.validation.Validateable
 import grails.validation.ValidationException
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
@@ -980,7 +981,7 @@ class RequisitionController {
 }
 
 
-class AddToPicklistItemsCommand {
+class AddToPicklistItemsCommand implements Validateable {
     Requisition requisition
     RequisitionItem requisitionItem
     def picklistItems = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(PicklistItem.class))
