@@ -10,14 +10,10 @@
 package org.pih.warehouse.shipping
 
 import grails.gorm.transactions.Transactional
+import grails.validation.Validateable
 import org.pih.warehouse.core.Document
 
 @Transactional
-class DocumentUploadCommand {
-    String shipmentId
-    Document document
-}
-
 class DocumentUploadController {
     def upload(DocumentUploadCommand command) {
         def shipment = Shipment.get(command.shipmentId)
@@ -29,4 +25,9 @@ class DocumentUploadController {
         [shipments: Shipment.list()]
     }
     def view() {}
+}
+
+class DocumentUploadCommand implements Validateable  {
+    String shipmentId
+    Document document
 }

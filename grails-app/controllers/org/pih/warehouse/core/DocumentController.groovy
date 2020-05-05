@@ -12,6 +12,7 @@ package org.pih.warehouse.core
 import fr.w3blog.zpl.utils.ZebraUtils
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import grails.validation.Validateable
 import groovy.text.Template
 //import groovyx.net.http.HTTPBuilder
 import org.grails.gsp.GroovyPagesTemplateEngine
@@ -575,7 +576,7 @@ class DocumentController {
 /**
  * Command object
  */
-class DocumentCommand {
+class DocumentCommand implements Validateable  {
     String name
     String typeId
     String invoiceId

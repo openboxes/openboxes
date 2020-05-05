@@ -9,13 +9,14 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.validation.Validateable
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
 
-class InventoryItemCommand {
+class InventoryItemCommand implements Validateable  {
 
     String description
     Category category
