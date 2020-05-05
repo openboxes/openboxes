@@ -226,8 +226,8 @@ tasks.withType(Test) {
 }
 
 assets {
-    minifyJs = true
-    minifyCss = true
+    minifyJs = false
+    minifyCss = false
 
     minifyOptions = [
         languageMode: 'ES6',
