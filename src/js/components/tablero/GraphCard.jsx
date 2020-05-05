@@ -105,6 +105,6 @@ const GraphCard = SortableElement(({
 export default GraphCard;
 
 GraphCard.propTypes = {
-  cardTitle: PropTypes.string.isRequired,
+  cardTitle: PropTypes.string,
   cardType: PropTypes.string.isRequired,
 };

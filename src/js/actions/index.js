@@ -119,34 +119,47 @@ function fetchIndicator(
 
   const url = `/openboxes/apitablero/${indicatorConfig.endpoint}?${params}`;
 
-  dispatch({
-    type: FETCH_GRAPHS,
-    payload: {
-      id,
-      title: indicatorConfig.title,
-      type: 'loading',
-      data: [],
-      archived: indicatorConfig.archived,
-    },
-  });
-
-  apiClient.get(url).then((res) => {
+  if (indicatorConfig.type !== 'number') {
     dispatch({
       type: FETCH_GRAPHS,
       payload: {
         id,
         title: indicatorConfig.title,
-        type: indicatorConfig.type,
-        data: res.data,
+        type: 'loading',
+        data: [],
         archived: indicatorConfig.archived,
-        link: indicatorConfig.link,
-        config: {
-          stacked: indicatorConfig.stacked,
-          datalabel: indicatorConfig.datalabel,
-          colors: indicatorConfig.colors,
-        },
       },
     });
+  }
+
+  apiClient.get(url).then((res) => {
+    if (indicatorConfig.type === 'number') {
+      dispatch({
+        type: FETCH_NUMBERS,
+        payload: {
+          ...res.data,
+          id,
+          archived: indicatorConfig.archived,
+        },
+      });
+    } else {
+      dispatch({
+        type: FETCH_GRAPHS,
+        payload: {
+          id,
+          title: indicatorConfig.title,
+          type: indicatorConfig.type,
+          data: res.data,
+          archived: indicatorConfig.archived,
+          link: indicatorConfig.link,
+          config: {
+            stacked: indicatorConfig.stacked,
+            datalabel: indicatorConfig.datalabel,
+            colors: indicatorConfig.colors,
+          },
+        },
+      });
+    }
   }, () => {
     dispatch({
       type: FETCH_GRAPHS,

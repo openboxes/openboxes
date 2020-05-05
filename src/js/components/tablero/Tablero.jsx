@@ -99,7 +99,6 @@ class Tablero extends Component {
     this.props.resetIndicators();
     if (this.props.dashboardConfig && this.props.dashboardConfig.length) {
       this.props.fetchIndicators(this.props.dashboardConfig);
-      this.props.fetchNumbersData();
     } else {
       this.props.fetchConfigAndData();
     }
@@ -157,13 +156,11 @@ class Tablero extends Component {
       numberCards = <LoadingNumbers />;
     }
 
-    console.log(this.props.indicatorsData);
-
     return (
       <div className="cards-container">
         {numberCards}
         <SortableCards
-          data={this.props.indicatorsData}
+          data={this.props.indicatorsData.filter(indicator => indicator)}
           onSortStart={this.sortStartHandle}
           onSortEnd={this.sortEndHandleGraph}
           reloadIndicator={this.props.reloadIndicator}

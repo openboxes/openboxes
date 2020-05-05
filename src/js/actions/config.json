@@ -1,5 +1,41 @@
 [
     {
+        "endpoint": "getInProgresPutaways",
+        "archived": false,
+        "type": "number",
+        "order": 3
+    },
+    {
+        "endpoint": "getInventoryByLotAndBin",
+        "archived": false,
+        "type": "number",
+        "order": 1
+    },
+    {
+        "endpoint": "getInProgressShipments",
+        "archived": false,
+        "type": "number",
+        "order": 2
+    },
+    {
+        "endpoint": "getReceivingBin",
+        "archived": false,
+        "type": "number",
+        "order": 4
+    },
+    {
+        "endpoint": "getItemsInventoried",
+        "archived": true,
+        "type": "number",
+        "order": 5
+    },
+    {
+        "endpoint": "getDefaultBin",
+        "archived": true,
+        "type": "number",
+        "order": 6
+    },
+    {
         "title": "Inventory Summary",
         "endpoint": "getInventorySummary",
         "archived": false,

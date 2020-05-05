@@ -22,7 +22,7 @@ function arrayUnarchive(array = [], index) {
 
 function findInArray(id, array = []) {
   for (let i = 0; i < array.length; i += 1) {
-    if (array[i].id === id) {
+    if (array[i] && array[i].id === id) {
       return i;
     }
   }
@@ -51,11 +51,20 @@ export default function (state = initialState, action) {
         data: newState,
       };
     }
-    case FETCH_NUMBERS:
+    case FETCH_NUMBERS: {
+      // new reference to array so the component is re-rendered when value changes
+      const newState = [].concat(state.numberData);
+      const index = findInArray(action.payload.id, state.numberData);
+      if (index === false) {
+        newState[action.payload.id - 1] = action.payload;
+      } else {
+        newState[index] = action.payload;
+      }
       return {
         ...state,
-        numberData: action.payload.data,
+        numberData: newState,
       };
+    }
     case RESET_INDICATORS:
       return {
         ...state,

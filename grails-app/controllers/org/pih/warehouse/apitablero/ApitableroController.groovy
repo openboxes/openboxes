@@ -2,6 +2,10 @@ package org.pih.warehouse.apitablero
 
 import grails.converters.JSON
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.InventorySnapshot
+import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.order.Order
+import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.tablero.NumberData
 import org.pih.warehouse.tableroapi.NumberDataService
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -13,9 +17,39 @@ class ApitableroController {
     def indicatorDataService
     def inventorySnapshotService
 
-    def getNumberData = {
+    def getInventoryByLotAndBin = {
         Location location = Location.get(session?.warehouse?.id)
-        List<NumberData> numberData = numberDataService.getListNumberData(session.user, location)
+        NumberData numberData = numberDataService.getInventoryByLotAndBin(location)
+        render (numberData as JSON)
+    }
+
+    def getInProgressShipments = {
+        Location location = Location.get(session?.warehouse?.id)
+        NumberData numberData = numberDataService.getInProgressShipments(session.user, location)
+        render (numberData as JSON)
+    }
+
+    def getInProgresPutaways = {
+        Location location = Location.get(session?.warehouse?.id)
+        NumberData numberData = numberDataService.getInProgresPutaways(session.user, location)
+        render (numberData as JSON)
+    }
+
+    def getReceivingBin = {
+        Location location = Location.get(session?.warehouse?.id)
+        NumberData numberData = numberDataService.getReceivingBin(location)
+        render (numberData as JSON)
+    }
+
+    def getItemsInventoried = {
+        Location location = Location.get(session?.warehouse?.id)
+        NumberData numberData = numberDataService.getItemsInventoried(location)
+        render (numberData as JSON)
+    }
+
+    def getDefaultBin = {
+        Location location = Location.get(session?.warehouse?.id)
+        NumberData numberData = numberDataService.getDefaultBin(location)
         render (numberData as JSON)
     }
 
