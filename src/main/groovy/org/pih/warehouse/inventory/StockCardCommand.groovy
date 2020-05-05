@@ -9,17 +9,12 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.validation.Validateable
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.inventory.Inventory
-import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.InventoryLevel
-import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.inventory.TransactionEntry
-import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
 
-class StockCardCommand {
+class StockCardCommand implements Validateable {
 
     // Used when adding a new inventory item (not implemented yet)
     InventoryItem inventoryItem

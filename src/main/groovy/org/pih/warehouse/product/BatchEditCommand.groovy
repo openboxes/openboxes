@@ -9,12 +9,13 @@
  **/
 package org.pih.warehouse.product
 
+import grails.validation.Validateable
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 
-class BatchEditCommand {
+class BatchEditCommand implements Validateable {
 
     Category rootCategory
     List productInstanceList =
