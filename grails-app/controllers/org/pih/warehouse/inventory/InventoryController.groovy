@@ -12,6 +12,7 @@ package org.pih.warehouse.inventory
 
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
+import grails.validation.Validateable
 import grails.validation.ValidationException
 import groovy.time.TimeCategory
 import org.apache.commons.collections.FactoryUtils
@@ -1668,7 +1669,7 @@ class InventoryController {
 }
 
 
-class QuantityOnHandReportCommand {
+class QuantityOnHandReportCommand implements Validateable  {
     List<Location> locations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class))
     List dates = []
     List products = []
@@ -1689,7 +1690,7 @@ class QuantityOnHandReportCommand {
     }
 }
 
-class ManageInventoryCommand {
+class ManageInventoryCommand implements Validateable  {
 
     List<ManageInventoryEntryCommand> entries = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(ManageInventoryEntryCommand.class))
     List inventoryItems = []
@@ -1698,7 +1699,7 @@ class ManageInventoryCommand {
     List tags = []
 }
 
-class ManageInventoryEntryCommand {
+class ManageInventoryEntryCommand implements Validateable  {
     InventoryItem inventoryItem
     Integer quantity
 

@@ -10,6 +10,7 @@
 package org.pih.warehouse.core
 
 import grails.gorm.transactions.Transactional
+import grails.validation.Validateable
 import org.springframework.web.multipart.MultipartFile
 import java.nio.charset.Charset
 
@@ -203,7 +204,7 @@ class LocalizationController {
 
 }
 
-class LocalizationCommand {
+class LocalizationCommand implements Validateable  {
 
     Locale locale
     MultipartFile messageProperties
