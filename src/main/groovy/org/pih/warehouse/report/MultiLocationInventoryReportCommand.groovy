@@ -9,13 +9,14 @@
  **/
 package org.pih.warehouse.report
 
+import grails.validation.Validateable
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 
-class MultiLocationInventoryReportCommand {
+class MultiLocationInventoryReportCommand implements Validateable  {
 
     String actionButton
     Boolean includeSubcategories = Boolean.TRUE

@@ -9,7 +9,9 @@
  **/
 package org.pih.warehouse.product
 
-class ProductCommand {
+import grails.validation.Validateable
+
+class ProductCommand implements Validateable  {
     String id
     String ean
     String name
