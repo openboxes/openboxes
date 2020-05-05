@@ -25,21 +25,21 @@
                     </a>
                     <div class="mm-content-base">
                         <div class="mm-menu-item">
-                            <g:link controller="inventoryBrowser" action="index" class="list">
+                            <g:link controller="inventoryBrowser" class="list">
                                 <warehouse:message code="inventory.browse.label" default="Inventory browser" />
                                 <span class="beta">Beta</span>
                             </g:link>
 
                         </div>
                         <div class="mm-menu-item">
-                            <g:link controller="inventorySnapshot" action="list" class="list">
+                            <g:link controller="inventorySnapshot" class="list">
                                 <warehouse:message code="inventory.snapshot.label" default="Inventory Snapshots" />
                                 <span class="beta">Beta</span>
                             </g:link>
 
                         </div>
                         <div class="mm-menu-item">
-                            <g:link controller="consumption" action="list" class="list">
+                            <g:link controller="consumption" class="list">
                                 <warehouse:message code="consumption.report.label" default="Consumption Report" />
                                 <span class="beta">Beta</span>
                             </g:link>
