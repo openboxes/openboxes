@@ -71,6 +71,10 @@ server:
         timeout: 3600
 ---
 grails:
+    assets:
+        minifyJs: false
+        minifyCss: false
+        bundle: false
     #serverURL: "http://localhost:8080/${appName}"
     doc:
         title: "OpenBoxes"

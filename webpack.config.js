@@ -65,25 +65,35 @@ module.exports = env => {
         filename: `${COMMON_VIEW}/_react.gsp`,
         template: `${ASSETS}/grails-template.html`,
         inject: false,
-        templateParameters: compilation => ({
-          jsSource: `\${resource(dir:'/grails-app/assets/javascripts', file:'bundle.${compilation.hash}.js')}`,
-          cssSource: `\${resource(dir:'/grails-app/assets/stylesheets', file:'bundle.${compilation.hash}.css')}`,
-          receivingIfStatement: '',
-        }),
+        templateParameters: compilation => {
+          console.log('');
+          console.log(`Embedding compilation hash: ${compilation.hash} into _react.gsp template`);
+          console.log('');
+          return {
+            jsSource: `\${resource(dir:'/grails-app/assets/javascripts', file:'bundle.${compilation.hash}.js')}`,
+            cssSource: `\${resource(dir:'/grails-app/assets/stylesheets', file:'bundle.${compilation.hash}.css')}`,
+            receivingIfStatement: '',
+          };
+        },
       }),
       new HtmlWebpackPlugin({
         filename: `${RECEIVING_VIEW}/_create.gsp`,
         template: `${ASSETS}/grails-template.html`,
         inject: false,
-        templateParameters: compilation => ({
-          jsSource: `\${resource(dir:'/grails-app/assets/javascripts', file:'bundle.${compilation.hash}.js')}`,
-          cssSource: `\${resource(dir:'/grails-app/assets/stylesheets', file:'bundle.${compilation.hash}.css')}`,
-          receivingIfStatement:
-          // eslint-disable-next-line no-template-curly-in-string
-          '<g:if test="${!params.id}">' +
-          'You can access the Partial Receiving feature through the details page for an inbound shipment.' +
-          '</g:if>',
-        }),
+        templateParameters: compilation => {
+          console.log('');
+          console.log(`Embedding compilation hash: ${compilation.hash} into _create.gsp template`);
+          console.log('');
+          return {
+            jsSource: `\${resource(dir:'/grails-app/assets/javascripts', file:'bundle.${compilation.hash}.js')}`,
+            cssSource: `\${resource(dir:'/grails-app/assets/stylesheets', file:'bundle.${compilation.hash}.css')}`,
+            receivingIfStatement:
+            // eslint-disable-next-line no-template-curly-in-string
+            '<g:if test="${!params.id}">' +
+            'You can access the Partial Receiving feature through the details page for an inbound shipment.' +
+            '</g:if>',
+          };
+        },
       }),
       new webpack.DefinePlugin({
         'process.env.REACT_APP_API_PATH': JSON.stringify(env && env.REACT_APP_API_PATH ? env.REACT_APP_API_PATH : '/openboxes')
