@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.validation.Validateable
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.ReasonCode
 
@@ -59,11 +60,9 @@ class ReasonCodeApiController {
         reasonCode.sortOrder = reasonCodeEnum.sortOrder
         return reasonCode
     }
-
 }
 
-
-class ReasonCodeCommand {
+class ReasonCodeCommand implements Validateable  {
 
     String id
     String name

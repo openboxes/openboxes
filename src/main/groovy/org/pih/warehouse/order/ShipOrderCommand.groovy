@@ -1,12 +1,13 @@
 package org.pih.warehouse.order
 
+import grails.validation.Validateable
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
-class ShipOrderCommand {
+class ShipOrderCommand implements Validateable {
 
     Order order
     Shipment shipment
@@ -31,7 +32,7 @@ class ShipOrderCommand {
 }
 
 
-class ShipOrderItemCommand {
+class ShipOrderItemCommand implements Validateable {
 
     String lotNumber
     Date expirationDate

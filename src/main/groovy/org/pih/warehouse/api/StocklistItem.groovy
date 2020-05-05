@@ -1,8 +1,9 @@
 package org.pih.warehouse.api
 
+import grails.validation.Validateable
 import org.pih.warehouse.requisition.RequisitionItem
 
-class StocklistItem {
+class StocklistItem implements Validateable {
 
     RequisitionItem requisitionItem
     Integer monthlyDemand

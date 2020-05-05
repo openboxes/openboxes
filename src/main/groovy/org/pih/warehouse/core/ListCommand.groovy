@@ -9,7 +9,9 @@
  **/
 package org.pih.warehouse.core
 
-class ListCommand {
+import grails.validation.Validateable
+
+class ListCommand implements Validateable  {
     String category
     List objectList
     Integer sortOrder

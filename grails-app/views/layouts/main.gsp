@@ -16,19 +16,30 @@
 
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark navbar-static-top" role="navigation">
-    <g:displayLogo location="${session?.warehouse?.id}" includeLink="${true}"/>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
+<header>
+    <nav class="navbar navbar-expand-md navbar-light bg-light" role="navigation">
+        <div class="navbar-brand">
+            <g:displayLogo location="${session?.warehouse?.id}" includeLink="${false}"/>
+        </div>
+        <button class="navbar-toggler" type="button" data-toggle="collapse"
+                data-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-    <div class="collapse navbar-collapse" aria-expanded="false" id="navbarContent">
-        <ul class="nav navbar-nav ml-auto">
-            <g:pageProperty name="page.nav"/>
-        </ul>
-    </div>
+        <div class="collapse navbar-collapse" aria-expanded="false" id="navbarContent">
+            <ul class="navbar-nav">
 
-</nav>
+                <li class="nav-item ">
+                    <g:link controller="dashboard" action="index" class="nav-link">
+                        <i class="fa fa-step-backward"></i>
+                        <warehouse:message code="default.ignoreError.label"/>&nbsp;
+                    </g:link>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</header>
 
 <g:layoutBody/>
 

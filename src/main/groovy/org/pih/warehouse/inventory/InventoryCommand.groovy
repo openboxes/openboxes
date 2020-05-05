@@ -9,13 +9,15 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.validation.Validateable
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.shipping.Shipment
 
-class InventoryCommand {
+
+class InventoryCommand implements Validateable {
 
     List<Tag> tags
     List<ProductCatalog> catalogs
