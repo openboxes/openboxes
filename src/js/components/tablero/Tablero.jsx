@@ -11,6 +11,7 @@ import {
   reloadIndicator,
   fetchNumbersData,
   resetIndicators,
+  fetchConfigAndData,
 } from '../../actions';
 import GraphCard from './GraphCard';
 import LoadingNumbers from './LoadingNumbers';
@@ -32,11 +33,11 @@ const SortableCards = SortableContainer(({ data, reloadIndicator }) => (
           key={`item-${value.id}`}
           index={index}
           cardId={value.id}
-          cardMethod={value.method}
           cardTitle={value.title}
           cardType={value.type}
           cardLink={value.link}
           data={value.data}
+          config={value.config}
           reloadIndicator={reloadIndicator}
         />
       )))}
@@ -96,8 +97,12 @@ class Tablero extends Component {
 
   fetchData() {
     this.props.resetIndicators();
-    this.props.fetchIndicators();
-    this.props.fetchNumbersData();
+    if (this.props.dashboardConfig && this.props.dashboardConfig.length) {
+      this.props.fetchIndicators(this.props.dashboardConfig);
+      this.props.fetchNumbersData();
+    } else {
+      this.props.fetchConfigAndData();
+    }
   }
 
   sortStartHandle = () => {
@@ -152,6 +157,8 @@ class Tablero extends Component {
       numberCards = <LoadingNumbers />;
     }
 
+    console.log(this.props.indicatorsData);
+
     return (
       <div className="cards-container">
         {numberCards}
@@ -179,6 +186,7 @@ class Tablero extends Component {
 const mapStateToProps = state => ({
   indicatorsData: state.indicators.data,
   numberData: state.indicators.numberData,
+  dashboardConfig: state.indicators.config,
   currentLocation: state.session.currentLocation.id,
 });
 
@@ -189,6 +197,7 @@ export default connect(mapStateToProps, {
   reorderIndicators,
   fetchNumbersData,
   resetIndicators,
+  fetchConfigAndData,
 })(Tablero);
 
 Tablero.defaultProps = {
@@ -202,11 +211,13 @@ Tablero.propTypes = {
   reorderIndicators: PropTypes.func.isRequired,
   indicatorsData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   numberData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  dashboardConfig: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  currentLocation: PropTypes.string.isRequired,
   addToIndicators: PropTypes.func.isRequired,
   reloadIndicator: PropTypes.func.isRequired,
   fetchNumbersData: PropTypes.func.isRequired,
   resetIndicators: PropTypes.func.isRequired,
-  currentLocation: PropTypes.string.isRequired,
+  fetchConfigAndData: PropTypes.func.isRequired,
 };
 
 ArchiveIndicator.propTypes = {

@@ -88,7 +88,7 @@ const ArchivedGraph = (props) => {
     );
   } else if (props.type === 'error') {
     graph = <i className="fa fa-repeat" />;
-  } else if (props.type === 'table') {
+  } else if (props.type === 'table' || props.type === 'numberTable') {
     graph = <i className="fa fa-table" style={{ color: getColor() }} />;
   }
 
@@ -193,7 +193,7 @@ ArchivedGraph.propTypes = {
   title: PropTypes.string.isRequired,
   handleAdd: PropTypes.func.isRequired,
   index: PropTypes.number.isRequired,
-  data: PropTypes.shape().isRequired,
+  data: PropTypes.oneOfType([PropTypes.shape({}), PropTypes.array]).isRequired,
 };
 
 ArchivedNumber.propTypes = {

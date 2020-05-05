@@ -15,8 +15,10 @@ import {
   ADD_TO_INDICATORS,
   REMOVE_FROM_INDICATORS,
   REORDER_INDICATORS,
+  FETCH_CONFIG,
 } from './types';
 import apiClient, { parseResponse } from '../utils/apiClient';
+import { default as config } from './config.json';
 
 export function showSpinner() {
   return {
@@ -110,28 +112,21 @@ export function changeCurrentLocale(locale) {
 
 function fetchIndicator(
   dispatch,
-  indicatorMethod,
-  indicatorType,
-  indicatorTitle,
-  link = null,
-  indicatorId = null,
+  indicatorConfig,
   params = '',
 ) {
-  const archived = 0;
-  const id = indicatorId || Math.random();
+  const id = indicatorConfig.order;
 
-  const url = `/openboxes/apitablero/${indicatorMethod}?${params}`;
+  const url = `/openboxes/apitablero/${indicatorConfig.endpoint}?${params}`;
 
   dispatch({
     type: FETCH_GRAPHS,
     payload: {
       id,
-      method: indicatorMethod,
-      title: indicatorTitle,
+      title: indicatorConfig.title,
       type: 'loading',
       data: [],
-      archived,
-      link,
+      archived: indicatorConfig.archived,
     },
   });
 
@@ -140,12 +135,16 @@ function fetchIndicator(
       type: FETCH_GRAPHS,
       payload: {
         id,
-        method: indicatorMethod,
-        title: indicatorTitle,
-        type: indicatorType,
+        title: indicatorConfig.title,
+        type: indicatorConfig.type,
         data: res.data,
-        archived,
-        link,
+        archived: indicatorConfig.archived,
+        link: indicatorConfig.link,
+        config: {
+          stacked: indicatorConfig.stacked,
+          datalabel: indicatorConfig.datalabel,
+          colors: indicatorConfig.colors,
+        },
       },
     });
   }, () => {
@@ -153,12 +152,11 @@ function fetchIndicator(
       type: FETCH_GRAPHS,
       payload: {
         id,
-        method: indicatorMethod,
-        title: indicatorTitle,
+        title: indicatorConfig.title,
         type: 'error',
         data: [],
-        archived,
-        link,
+        archived: indicatorConfig.archived,
+        link: indicatorConfig.link,
       },
     });
   });
@@ -170,17 +168,25 @@ export function reloadIndicator(method, type, title, link, id, params) {
   };
 }
 
-export function fetchIndicators() {
+function getData(dispatch, configData) {
+  configData.forEach((indicatorConfig) => {
+    fetchIndicator(dispatch, indicatorConfig);
+  });
+}
+
+export function fetchIndicators(configData) {
   return (dispatch) => {
-    fetchIndicator(dispatch, 'getExpirationSummary', 'line', 'Expiration Summary', '/openboxes/inventory/listExpiringStock');
-    fetchIndicator(dispatch, 'getFillRate', 'bar', 'Fill Rate');
-    fetchIndicator(dispatch, 'getInventorySummary', 'horizontalBar', 'Inventory Summary');
-    fetchIndicator(dispatch, 'getSentStockMovements', 'bar', 'Stock Movements Sent by Month');
-    fetchIndicator(dispatch, 'getReceivedStockMovements', 'bar', 'Incoming Stock Movements by Month');
-    fetchIndicator(dispatch, 'getOutgoingStock', 'numbers', 'Outgoing Stock Movements in Progress', '/openboxes/stockMovement/list?receiptStatusCode=PENDING');
-    fetchIndicator(dispatch, 'getDiscrepancy', 'table', 'Items received with a discrepancy');
-    fetchIndicator(dispatch, 'getIncomingStock', 'numbers', 'Incoming Stock Movements by Status', '/openboxes/stockMovement/list?direction=INBOUND');
-    fetchIndicator(dispatch, 'getDelayedShipments', 'numberTable', 'Delayed Shipments');
+    getData(dispatch, configData);
+
+    // fetchIndicator(dispatch, 'getExpirationSummary', 'line', 'Expiration Summary', '/openboxes/inventory/listExpiringStock');
+    // fetchIndicator(dispatch, 'getFillRate', 'bar', 'Fill Rate');
+    // fetchIndicator(dispatch, 'getInventorySummary', 'horizontalBar', 'Inventory Summary');
+    // fetchIndicator(dispatch, 'getSentStockMovements', 'bar', 'Stock Movements Sent by Month');
+    // fetchIndicator(dispatch, 'getReceivedStockMovements', 'bar', 'Incoming Stock Movements by Month');
+    // fetchIndicator(dispatch, 'getOutgoingStock', 'numbers', 'Outgoing Stock Movements in Progress', '/openboxes/stockMovement/list?receiptStatusCode=PENDING');
+    // fetchIndicator(dispatch, 'getDiscrepancy', 'table', 'Items received with a discrepancy');
+    // fetchIndicator(dispatch, 'getIncomingStock', 'numbers', 'Incoming Stock Movements by Status', '/openboxes/stockMovement/list?direction=INBOUND');
+    // fetchIndicator(dispatch, 'getDelayedShipments', 'numberTable', 'Delayed Shipments');
   };
 }
 
@@ -215,7 +221,7 @@ export function fetchNumbersData() {
 
   return (dispatch) => {
     apiClient.get(url).then((res) => {
-      const data = res.data.map(item => {
+      const data = res.data.map((item) => {
         item.archived = 0;
         return item;
       });
@@ -225,6 +231,26 @@ export function fetchNumbersData() {
           data,
         },
       });
+    });
+  };
+}
+
+export function fetchConfigAndData() {
+  const fakePromise = new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(config);
+    }, 1000);
+  });
+
+  return (dispatch) => {
+    fakePromise.then((data) => {
+      dispatch({
+        type: FETCH_CONFIG,
+        payload: {
+          data,
+        },
+      });
+      getData(dispatch, data);
     });
   };
 }

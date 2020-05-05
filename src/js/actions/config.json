@@ -1,0 +1,57 @@
+[
+    {
+        "title": "Inventory Summary",
+        "endpoint": "getInventorySummary",
+        "archived": false,
+        "type": "horizontalBar",
+        "datalabel": true,
+        "order": 1
+    },
+    {
+        "title": "Expiration Summary",
+        "endpoint": "getExpirationSummary",
+        "archived": false,
+        "type": "line",
+        "order": 2,
+        "link": "/openboxes/inventory/listExpiringStock"
+    },
+    {
+        "title": "Stock Movements Sent by Month",
+        "endpoint": "getSentStockMovements",
+        "archived": false,
+        "type": "bar",
+        "stacked": true,
+        "datalabel": true,
+        "order": 3
+    },
+    {
+        "title": "Outgoing Stock Movements in Progress",
+        "endpoint": "getOutgoingStock",
+        "archived": false,
+        "type": "numbers",
+        "order": 4,
+        "link": "/openboxes/stockMovement/list?receiptStatusCode=PENDING"
+    },
+    {
+        "title": "Stock Movements Received by Month",
+        "endpoint": "getReceivedStockMovements",
+        "archived": false,
+        "type": "bar",
+        "stacked": true,
+        "datalabel": true,
+        "order": 5
+    },
+    {
+        "title": "Items received with a discrepancy",
+        "endpoint": "getDiscrepancy",
+        "archived": false,
+        "type": "table",
+        "order": 6
+    }, {
+        "title": "Delayed Shipments",
+        "endpoint": "getDelayedShipments",
+        "archived": true,
+        "type": "numberTable",
+        "order": 7
+    }
+]

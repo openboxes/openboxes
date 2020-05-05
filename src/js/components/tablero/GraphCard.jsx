@@ -29,7 +29,7 @@ const handleChartClick = (elements) => {
 };
 
 const GraphCard = SortableElement(({
-  cardMethod, cardId, cardTitle, cardType, cardLink, data, reloadIndicator,
+  cardId, cardTitle, cardType, cardLink, data, config, reloadIndicator,
 }) => {
   const cardData = data;
   let graph;
@@ -48,7 +48,7 @@ const GraphCard = SortableElement(({
     label = 'Next';
   } else if (cardType === 'bar') {
     cardData.datasets = getColors(data, 'bar');
-    graph = <Bar data={data} options={loadOptions(cardMethod !== 'getFillRate')} />;
+    graph = <Bar data={data} options={loadOptions(config.stacked)} />;
     filter = 1;
   } else if (cardType === 'doughnut') {
     cardData.datasets = getColors(data, 'doughnut');
@@ -85,7 +85,7 @@ const GraphCard = SortableElement(({
         <div className={filter ? 'data-filter' : 'data-filter disabled'}>
           <select
             className="custom-select"
-            onChange={e => reloadIndicator(cardMethod, cardType, cardTitle, cardLink, cardId, `querySize=${e.target.value}`)}
+            onChange={e => reloadIndicator(cardType, cardTitle, cardLink, cardId, `querySize=${e.target.value}`)}
             disabled={!filter}
             defaultValue={data.labels ? data.labels.length : '6'}
           >

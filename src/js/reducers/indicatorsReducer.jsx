@@ -7,6 +7,7 @@ import {
   REMOVE_FROM_INDICATORS,
   REORDER_INDICATORS,
   RESET_INDICATORS,
+  FETCH_CONFIG,
 } from '../actions/types';
 
 function arrayArchive(array = [], index) {
@@ -31,6 +32,7 @@ function findInArray(id, array = []) {
 const initialState = {
   data: [],
   numberData: [],
+  config: [],
 };
 
 export default function (state = initialState, action) {
@@ -40,7 +42,7 @@ export default function (state = initialState, action) {
       const newState = [].concat(state.data);
       const index = findInArray(action.payload.id, state.data);
       if (index === false) {
-        newState.push(action.payload);
+        newState[action.payload.id - 1] = action.payload;
       } else {
         newState[index] = action.payload;
       }
@@ -55,7 +57,11 @@ export default function (state = initialState, action) {
         numberData: action.payload.data,
       };
     case RESET_INDICATORS:
-      return initialState;
+      return {
+        ...state,
+        data: [],
+        numberData: [],
+      };
     case REORDER_INDICATORS: {
       if (action.payload.type === 'graph') {
         return {
@@ -108,6 +114,11 @@ export default function (state = initialState, action) {
       }
       return state;
     }
+    case FETCH_CONFIG:
+      return {
+        ...state,
+        config: action.payload.data,
+      };
     default:
       return state;
   }
