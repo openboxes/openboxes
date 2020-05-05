@@ -20,21 +20,21 @@
                 </a>
                 <div class="mm-content-base">
                     <div class="mm-menu-item">
-                        <g:link controller="inventoryBrowser" action="index" class="list">
+                        <g:link controller="inventoryBrowser" class="list">
                             <warehouse:message code="inventory.browse.label" default="Inventory browser" />
                             <span class="beta">Beta</span>
                         </g:link>
 
                     </div>
                     <div class="mm-menu-item">
-                        <g:link controller="inventorySnapshot" action="list" class="list">
+                        <g:link controller="inventorySnapshot" class="list">
                             <warehouse:message code="inventory.snapshot.label" default="Inventory Snapshots" />
                             <span class="beta">Beta</span>
                         </g:link>
 
                     </div>
                     <div class="mm-menu-item">
-                        <g:link controller="consumption" action="list" class="list">
+                        <g:link controller="consumption" class="list">
                             <warehouse:message code="consumption.report.label" default="Consumption Report" />
                             <span class="beta">Beta</span>
                         </g:link>
@@ -441,11 +441,11 @@
 
                     <div class="mm-content-section">
                         <div class="mm-menu-item">
-                            <g:link controller="attribute" action="list" class="list">
+                            <g:link controller="attribute" class="list">
                                 <warehouse:message code="attributes.label"/></g:link>
                         </div>
                         <div class="mm-menu-item">
-                            <g:link controller="productCatalog" action="list" class="list">
+                            <g:link controller="productCatalog" class="list">
                                 <warehouse:message code="product.catalogs.label" default="Catalogs"/></g:link>
                         </div>
                         <div class="mm-menu-item">
@@ -453,41 +453,41 @@
                                 <warehouse:message code="categories.label"/></g:link>
                         </div>
                         <div class="mm-menu-item">
-                            <g:link controller="productComponent" action="list" class="list">
+                            <g:link controller="productComponent" class="list">
                                 <warehouse:message code="product.components.label" default="Components"/></g:link>
                         </div>
                         <div class="mm-menu-item">
-                            <g:link controller="productGroup" action="list" class="list">
+                            <g:link controller="productGroup" class="list">
                                 <warehouse:message code="productGroups.label"/></g:link>
                         </div>
                         <div class="mm-menu-item">
-                            <g:link controller="inventoryLevel" action="list" class="site">
+                            <g:link controller="inventoryLevel" class="site">
                                 <warehouse:message code="inventoryLevels.label" default="Inventory Levels" /></g:link>
                         </div>
                     </div>
                     <div class="mm-content-section">
                         <div class="mm-menu-item">
-                            <g:link controller="product" action="list" class="list">
+                            <g:link controller="product" class="list">
                                 <warehouse:message code="products.label"/></g:link>
                         </div>
                         <div class="mm-menu-item">
-                            <g:link controller="productSupplier" action="list" class="list">
+                            <g:link controller="productSupplier" class="list">
                                 <warehouse:message code="productSuppliers.label"/></g:link>
                         </div>
                         <div class="mm-menu-item">
-                            <g:link controller="productAssociation" action="list" class="list">
+                            <g:link controller="productAssociation" class="list">
                                 <warehouse:message code="product.associations.label" default="Product Associations"/></g:link>
                         </div>
                         <div class="mm-menu-item">
-                            <g:link controller="tag" action="list" class="list">
+                            <g:link controller="tag" class="list">
                                 <warehouse:message code="product.tags.label"/></g:link>
                         </div>
                         <div class="mm-menu-item">
-                            <g:link controller="unitOfMeasure" action="list" class="list">
+                            <g:link controller="unitOfMeasure" class="list">
                                 <warehouse:message code="unitOfMeasure.label"/></g:link>
                         </div>
                         <div class="mm-menu-item">
-                            <g:link controller="unitOfMeasureClass" action="list" class="list">
+                            <g:link controller="unitOfMeasureClass" class="list">
                                 <warehouse:message code="unitOfMeasureClass.label"/></g:link>
                         </div>
                         <div class="mm-menu-item">
@@ -599,7 +599,7 @@
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">
-                                <g:link controller="localization" action="list" class="list">
+                                <g:link controller="localization" class="list">
                                     <g:message code="localization.label" default="Localization"/>
                                 </g:link>
                             </div>
@@ -612,12 +612,12 @@
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">
-                                <g:link controller="locationGroup" action="list" class="site">
+                                <g:link controller="locationGroup" class="site">
                                     <warehouse:message code="locationGroups.label" default="Location Groups" />
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">
-                                <g:link controller="locationType" action="list"
+                                <g:link controller="locationType"
                                         class="locationType">
                                     <warehouse:message code="location.locationTypes.label" default="Location Types" />
                                 </g:link>
@@ -693,22 +693,22 @@
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">
-                                <g:link controller="containerType" action="list">
+                                <g:link controller="containerType">
                                     <warehouse:message code="containerTypes.label" default="Container Types"/>
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">
-                                <g:link controller="document" action="list" >
+                                <g:link controller="document" >
                                     <warehouse:message code="documents.label" default="Documents" />
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">
-                                <g:link controller="documentType" action="list">
+                                <g:link controller="documentType">
                                     <warehouse:message code="documentTypes.label" default="Document Types"/>
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">
-                                <g:link controller="eventType" action="list"
+                                <g:link controller="eventType"
                                         class="eventType">
                                     <warehouse:message code="location.eventTypes.label" default="Event Types" />
                                 </g:link>
@@ -734,17 +734,17 @@
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">
-                                <g:link controller="paymentTerm" action="list">
+                                <g:link controller="paymentTerm">
                                     <warehouse:message code="paymentTerms.label" />
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">
-                                <g:link controller="shipper" action="list" class="shipper">
+                                <g:link controller="shipper" class="shipper">
                                     <warehouse:message code="location.shippers.label" />
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">
-                                <g:link controller="shipmentWorkflow" action="list" >
+                                <g:link controller="shipmentWorkflow">
                                     <warehouse:message code="shipmentWorkflows.label" default="Shipment Workflows" />
                                 </g:link>
                             </div>
