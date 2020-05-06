@@ -20,6 +20,7 @@ import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.DefaultNullableCommand
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.CSVUtils
@@ -1693,7 +1694,7 @@ class QuantityOnHandReportCommand implements Validateable {
     }
 }
 
-class ManageInventoryCommand implements Validateable {
+class ManageInventoryCommand extends DefaultNullableCommand {
 
     List<ManageInventoryEntryCommand> entries = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(ManageInventoryEntryCommand.class))
     List inventoryItems = []
@@ -1702,7 +1703,7 @@ class ManageInventoryCommand implements Validateable {
     List tags = []
 }
 
-class ManageInventoryEntryCommand implements Validateable {
+class ManageInventoryEntryCommand extends DefaultNullableCommand {
     InventoryItem inventoryItem
     Integer quantity
 
