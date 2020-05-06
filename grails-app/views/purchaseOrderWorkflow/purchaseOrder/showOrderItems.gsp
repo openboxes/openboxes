@@ -8,6 +8,7 @@
     .dlg { display: none; }
     .non-editable { background-color: #e6e6e6; cursor: not-allowed }
     .non-editable.odd { background-color: #e1e1e1; }
+    table { table-layout: fixed; }
 </style>
 
 </head>
@@ -44,13 +45,13 @@
                     <table id="orderItemsTable">
                         <thead>
                             <tr class="odd">
-                                <th><warehouse:message code="order.lineItemNumber.label" default="#"/></th>
-                                <th><warehouse:message code="product.label"/></th>
+                                <th width="1%"><warehouse:message code="order.lineItemNumber.label" default="#"/></th>
+                                <th width="15%"><warehouse:message code="product.label"/></th>
                                 <th class="center"><warehouse:message code="product.sourceCode.label"/></th>
                                 <th class="center"><warehouse:message code="product.supplierCode.label"/></th>
                                 <th class="center"><warehouse:message code="product.manufacturer.label"/></th>
                                 <th class="center"><warehouse:message code="product.manufacturerCode.label"/></th>
-                                <th class="center"><warehouse:message code="default.quantity.label"/></th>
+                                <th class="center" width="8%"><warehouse:message code="default.quantity.label"/></th>
                                 <th class="center" colspan="2"><warehouse:message code="default.unitOfMeasure.label"/></th>
                                 <th class="center"><warehouse:message code="orderItem.unitPrice.label"/></th>
                                 <th class="center"><warehouse:message code="orderItem.totalCost.label"/></th>
