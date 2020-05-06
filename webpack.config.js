@@ -3,6 +3,7 @@ const path = require('path');
 const ROOT = path.resolve(__dirname, 'src');
 const SRC = path.resolve(ROOT, 'js');
 const DEST = path.resolve(__dirname, 'grails-app/assets');
+const BUILD_ASSETS = path.resolve(__dirname, 'build/assets');
 const ASSETS = path.resolve(ROOT, 'assets');
 const JS_DEST = path.resolve(__dirname, 'grails-app/assets/javascripts');
 const CSS_DEST = path.resolve(__dirname, 'grails-app/assets/stylesheets');
@@ -34,7 +35,11 @@ module.exports = env => {
     plugins: [
       new FileManagerPlugin({
         onStart: {
-          delete: [`${JS_DEST}/bundle.**`, `${CSS_DEST}/bundle.**`]
+          delete: [
+            `${JS_DEST}/bundle.**`,
+            `${CSS_DEST}/bundle.**`,
+            `${BUILD_ASSETS}/bundle.**`
+          ]
         },
         onEnd: {
           copy: [
@@ -44,7 +49,9 @@ module.exports = env => {
             { source: `${DEST}/*.svg`, destination: IMAGES_DEST },
             { source: `${DEST}/*.woff2`, destination: IMAGES_DEST },
             { source: `${DEST}/*.ttf`, destination: IMAGES_DEST },
-            { source: `${DEST}/*.woff`, destination: IMAGES_DEST }
+            { source: `${DEST}/*.woff`, destination: IMAGES_DEST },
+            { source: `${JS_DEST}/bundle.*.js`, destination: BUILD_ASSETS },
+            { source: `${CSS_DEST}/bundle.*.css`, destination: BUILD_ASSETS }
           ],
           delete: [
             `${DEST}/bundle.**`,
@@ -65,35 +72,25 @@ module.exports = env => {
         filename: `${COMMON_VIEW}/_react.gsp`,
         template: `${ASSETS}/grails-template.html`,
         inject: false,
-        templateParameters: compilation => {
-          console.log('');
-          console.log(`Embedding compilation hash: ${compilation.hash} into _react.gsp template`);
-          console.log('');
-          return {
-            jsSource: `\${resource(dir:'/grails-app/assets/javascripts', file:'bundle.${compilation.hash}.js')}`,
-            cssSource: `\${resource(dir:'/grails-app/assets/stylesheets', file:'bundle.${compilation.hash}.css')}`,
+        templateParameters: compilation => ({
+            jsSource: `\${resource(dir:'/assets', file:'bundle.${compilation.hash}.js')}`,
+            cssSource: `\${resource(dir:'/assets', file:'bundle.${compilation.hash}.css')}`,
             receivingIfStatement: '',
-          };
-        },
+          }),
       }),
       new HtmlWebpackPlugin({
         filename: `${RECEIVING_VIEW}/_create.gsp`,
         template: `${ASSETS}/grails-template.html`,
         inject: false,
-        templateParameters: compilation => {
-          console.log('');
-          console.log(`Embedding compilation hash: ${compilation.hash} into _create.gsp template`);
-          console.log('');
-          return {
-            jsSource: `\${resource(dir:'/grails-app/assets/javascripts', file:'bundle.${compilation.hash}.js')}`,
-            cssSource: `\${resource(dir:'/grails-app/assets/stylesheets', file:'bundle.${compilation.hash}.css')}`,
+        templateParameters: compilation => ({
+            jsSource: `\${resource(dir:'/assets', file:'bundle.${compilation.hash}.js')}`,
+            cssSource: `\${resource(dir:'/assets', file:'bundle.${compilation.hash}.css')}`,
             receivingIfStatement:
             // eslint-disable-next-line no-template-curly-in-string
             '<g:if test="${!params.id}">' +
             'You can access the Partial Receiving feature through the details page for an inbound shipment.' +
             '</g:if>',
-          };
-        },
+          }),
       }),
       new webpack.DefinePlugin({
         'process.env.REACT_APP_API_PATH': JSON.stringify(env && env.REACT_APP_API_PATH ? env.REACT_APP_API_PATH : '/openboxes')
