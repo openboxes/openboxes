@@ -56,19 +56,16 @@
 <div class="buttonBar">
 
     <div class="button-container">
-
         <g:link controller="order" action="list" class="button">
             <img src="${resource(dir: 'images/icons/silk', file: 'application_view_list.png')}" />&nbsp;
             <warehouse:message code="default.list.label" args="[g.message(code: 'orders.label')]" default="List purchase order"/>
         </g:link>
-
         <g:if test="${!orderInstance?.id}">
             <g:link controller="order" action="create" class="button">
                 <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
                 <warehouse:message code="default.create.label" args="[g.message(code: 'order.label')]" default="Create purchase order" />
             </g:link>
         </g:if>
-
         <g:if test="${orderInstance?.id}">
             <g:hasRoleApprover>
                 <g:set var="isApprover" value="${true}"/>
@@ -109,7 +106,9 @@
                 </g:elseif>
             </div>
             <div class="button-group">
-                <g:link controller="order" action="addAdjustment" id="${orderInstance?.id}" class="button">
+                <g:link controller="order" action="addAdjustment" id="${orderInstance?.id}" class="button"
+                        disabled="${orderInstance?.status >= OrderStatus.PLACED && !isApprover}"
+                        disabledMessage="${g.message(code:'errors.noPermissions.label')}">
                     <img src="${resource(dir: 'images/icons/silk', file: 'basket_put.png')}" />&nbsp;
                     <warehouse:message code="default.add.label" args="[g.message(code: 'orderAdjustment.label')]"/>
                 </g:link>
