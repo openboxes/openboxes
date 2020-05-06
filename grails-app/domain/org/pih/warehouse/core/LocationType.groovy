@@ -39,6 +39,7 @@ class LocationType implements Comparable, Serializable {
         name(nullable: false, maxSize: 255)
         locationTypeCode(nullable: true)
         description(nullable: true, maxSize: 255)
+        supportedActivities(nullable: true, display: false)
         sortOrder(nullable: true)
         dateCreated(display: false)
         lastUpdated(display: false)
