@@ -13,7 +13,7 @@ import grails.validation.Validateable
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 
-class MultiLocationInventoryReportCommand implements Validateable  {
+class MultiLocationInventoryReportCommand implements Validateable {
 
     Location[] locations
 

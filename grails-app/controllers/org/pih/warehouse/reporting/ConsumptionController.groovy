@@ -453,7 +453,7 @@ class ConsumptionController {
 }
 
 
-class ShowConsumptionCommand implements Validateable  {
+class ShowConsumptionCommand implements Validateable {
 
     // Map of product to ShowConsumptionRowCommand
     def rows = new TreeMap()
@@ -526,7 +526,7 @@ class ShowConsumptionCommand implements Validateable  {
     }
 }
 
-class ShowConsumptionRowCommand implements Validateable  {
+class ShowConsumptionRowCommand implements Validateable {
 
     Product product
     ShowConsumptionCommand command
@@ -602,7 +602,7 @@ class ShowConsumptionRowCommand implements Validateable  {
     }
 }
 
-class ConsumptionCommand implements Validateable  {
+class ConsumptionCommand implements Validateable {
 
     Category category
     Location location
