@@ -3,6 +3,7 @@ const path = require('path');
 const ROOT = path.resolve(__dirname, 'src');
 const SRC = path.resolve(ROOT, 'js');
 const DEST = path.resolve(__dirname, 'grails-app/assets');
+const BUILD_ASSETS = path.resolve(__dirname, 'build/assets');
 const ASSETS = path.resolve(ROOT, 'assets');
 const JS_DEST = path.resolve(__dirname, 'grails-app/assets/javascripts');
 const CSS_DEST = path.resolve(__dirname, 'grails-app/assets/stylesheets');
@@ -33,7 +34,11 @@ module.exports = env => ({
   plugins: [
     new FileManagerPlugin({
       onStart: {
-        delete: [`${JS_DEST}/bundle.**`, `${CSS_DEST}/bundle.**`]
+        delete: [
+          `${JS_DEST}/bundle.**`,
+          `${CSS_DEST}/bundle.**`,
+          `${BUILD_ASSETS}/bundle.**`
+        ]
       },
       onEnd: {
         copy: [
@@ -43,7 +48,9 @@ module.exports = env => ({
           { source: `${DEST}/*.svg`, destination: IMAGES_DEST },
           { source: `${DEST}/*.woff2`, destination: IMAGES_DEST },
           { source: `${DEST}/*.ttf`, destination: IMAGES_DEST },
-          { source: `${DEST}/*.woff`, destination: IMAGES_DEST }
+          { source: `${DEST}/*.woff`, destination: IMAGES_DEST },
+          { source: `${JS_DEST}/bundle.*.js`, destination: BUILD_ASSETS },
+          { source: `${CSS_DEST}/bundle.*.css`, destination: BUILD_ASSETS }
         ],
         delete: [
           `${DEST}/bundle.**`,
@@ -65,8 +72,8 @@ module.exports = env => ({
       template: `${ASSETS}/grails-template.html`,
       inject: false,
       templateParameters: compilation => ({
-        jsSource: `\${resource(dir:'/grails-app/assets/javascripts', file:'bundle.${compilation.hash}.js')}`,
-        cssSource: `\${resource(dir:'/grails-app/assets/stylesheets', file:'bundle.${compilation.hash}.css')}`,
+        jsSource: `\${resource(dir:'/assets', file:'bundle.${compilation.hash}.js')}`,
+        cssSource: `\${resource(dir:'/assets', file:'bundle.${compilation.hash}.css')}`,
         receivingIfStatement: '',
       }),
     }),
@@ -75,8 +82,8 @@ module.exports = env => ({
       template: `${ASSETS}/grails-template.html`,
       inject: false,
       templateParameters: compilation => ({
-        jsSource: `\${resource(dir:'/grails-app/assets/javascripts', file:'bundle.${compilation.hash}.js')}`,
-        cssSource: `\${resource(dir:'/grails-app/assets/stylesheets', file:'bundle.${compilation.hash}.css')}`,
+        jsSource: `\${resource(dir:'/assets', file:'bundle.${compilation.hash}.js')}`,
+        cssSource: `\${resource(dir:'/assets', file:'bundle.${compilation.hash}.css')}`,
         receivingIfStatement:
         // eslint-disable-next-line no-template-curly-in-string
           '<g:if test="${!params.id}">' +
