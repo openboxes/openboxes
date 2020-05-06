@@ -226,13 +226,18 @@ tasks.withType(Test) {
 }
 
 assets {
-    minifyJs = false
-    minifyCss = false
+    minifyJs = true
+    minifyCss = true
 
     minifyOptions = [
         languageMode: 'ES6',
         targetLanguage: 'ES5',
         optimizationLevel: 'SIMPLE',
+    ]
+
+    excludes = [
+        "**/bundle.*.js",
+        "**/bundle.*.css",
     ]
 }
 
