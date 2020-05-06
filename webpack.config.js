@@ -27,7 +27,7 @@ module.exports = env => {
       path: DEST,
       filename: 'javascripts/bundle.[hash].js',
       chunkFilename: 'bundle.[hash].[name].js',
-      publicPath: '/assets/',
+      publicPath: `${env && env.REACT_APP_API_PATH ? env.REACT_APP_API_PATH : '/openboxes/'}assets/`,
     },
     stats: {
       colors: true,
