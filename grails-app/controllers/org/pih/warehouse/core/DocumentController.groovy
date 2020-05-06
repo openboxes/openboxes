@@ -498,7 +498,7 @@ class DocumentController {
 /**
  * Command object
  */
-class DocumentCommand implements Validateable  {
+class DocumentCommand implements Validateable {
     String name
     String typeId
     String orderId

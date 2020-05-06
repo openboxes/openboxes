@@ -14,7 +14,7 @@ import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.Document
 import org.springframework.web.multipart.MultipartFile
 
-class DocumentCommand implements Validateable  {
+class DocumentCommand implements Validateable {
     String name
     Product product
     String documentNumber

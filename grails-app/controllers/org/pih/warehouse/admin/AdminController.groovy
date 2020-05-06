@@ -278,7 +278,7 @@ class AdminController {
     }
 }
 
-class UpgradeCommand implements Validateable  {
+class UpgradeCommand implements Validateable {
 
     FutureTask future
     File localWebArchive
