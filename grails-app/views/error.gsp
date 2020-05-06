@@ -6,19 +6,16 @@
         <g:if env="development"><asset:stylesheet src="errors.css"/></g:if>
     </head>
     <body>
-        <content tag="page.actions">
-            test
+        <content tag="actions">
             <nav class="navbar">
-                <ul class="nav navbar-nav">
-                    <li class="nav-item">
-                        <g:link controller="dashboard" action="index" onClick="javascript:window.history.go(-1);" class="btn btn-info">
-                            <g:message code="default.reportAsError.label"/>&nbsp;
-                        </g:link>
-                        <g:link controller="dashboard" action="index" onClick="javascript:window.history.go(-1);" class="btn btn-danger">
-                            <g:message code="default.ignoreError.label"/>&nbsp;
-                        </g:link>
-                    </li>
-                </ul>
+                <div class="button-group">
+                    <a href="mailto:support@openboxes.com" class="btn btn-outline-danger">
+                        <g:message code="default.reportAsError.label"/>&nbsp;
+                    </a>
+                    <g:link controller="dashboard" action="index" onClick="javascript:window.history.go(-1);" class="btn btn-outline-success">
+                        <g:message code="default.ignoreError.label"/>&nbsp;
+                    </g:link>
+                </div>
             </nav>
         </content>
         <div class="container-fluid">
