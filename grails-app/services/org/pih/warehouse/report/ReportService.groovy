@@ -411,7 +411,7 @@ class ReportService implements ApplicationContextAware {
     }
 
     void buildDateDimension() {
-        def minTransactionDate = Transaction.minTransactionDate.list()
+        def minTransactionDate = Transaction.minTransactionDate.get()
         log.info("minTransactionDate: " + minTransactionDate)
         Date today = new Date()
         (minTransactionDate..today).each { Date date ->
