@@ -166,7 +166,7 @@ function fetchIndicator(
       type: FETCH_GRAPHS,
       payload: {
         id,
-        title: 'Error!',
+        title: 'Indicator could not be loaded',
         type: 'error',
         data: [],
         archived: indicatorConfig.archived,

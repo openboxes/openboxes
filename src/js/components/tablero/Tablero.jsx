@@ -24,7 +24,7 @@ defaults.scale.ticks.beginAtZero = true;
 
 
 // eslint-disable-next-line no-shadow
-const SortableCards = SortableContainer(({ data, filterIndicator }) => (
+const SortableCards = SortableContainer(({ data, loadIndicator }) => (
   <div className="card-component">
     {data.map((value, index) =>
       (value.archived ? null : (
@@ -37,7 +37,7 @@ const SortableCards = SortableContainer(({ data, filterIndicator }) => (
           cardLink={value.link}
           data={value.data}
           config={value.config}
-          filterIndicator={filterIndicator}
+          loadIndicator={loadIndicator}
         />
       )))}
   </div>
@@ -103,7 +103,7 @@ class Tablero extends Component {
     }
   }
 
-  filterIndicator = (id, params) => {
+  loadIndicator = (id, params) => {
     const indicatorConfig = this.props.dashboardConfig.filter(config => config.order === id && config.type === 'graph')[0];
 
     this.props.reloadIndicator(indicatorConfig, params);
@@ -168,7 +168,7 @@ class Tablero extends Component {
           data={this.props.indicatorsData.filter(indicator => indicator)}
           onSortStart={this.sortStartHandle}
           onSortEnd={this.sortEndHandleGraph}
-          filterIndicator={this.filterIndicator}
+          loadIndicator={this.loadIndicator}
           axis="xy"
           useDragHandle
         />

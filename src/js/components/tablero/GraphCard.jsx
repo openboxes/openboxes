@@ -29,7 +29,7 @@ const handleChartClick = (elements) => {
 };
 
 const GraphCard = SortableElement(({
-  cardId, cardTitle, cardType, cardLink, data, config, filterIndicator,
+  cardId, cardTitle, cardType, cardLink, data, config, loadIndicator,
 }) => {
   const cardData = data;
   let graph;
@@ -66,7 +66,7 @@ const GraphCard = SortableElement(({
   } else if (cardType === 'loading') {
     graph = <LoadingCard />;
   } else if (cardType === 'error') {
-    graph = <i className="fa fa-repeat" />;
+    graph = <button onClick={() => loadIndicator(cardId)} ><i className="fa fa-repeat" /></button>;
   }
 
   return (
@@ -85,7 +85,7 @@ const GraphCard = SortableElement(({
         <div className={filter ? 'data-filter' : 'data-filter disabled'}>
           <select
             className="custom-select"
-            onChange={e => filterIndicator(cardId, `querySize=${e.target.value}`)}
+            onChange={e => loadIndicator(cardId, `querySize=${e.target.value}`)}
             disabled={!filter}
             defaultValue={data.labels ? data.labels.length : '6'}
           >

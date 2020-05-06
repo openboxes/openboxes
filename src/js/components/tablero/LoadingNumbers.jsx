@@ -6,7 +6,7 @@ import { getColor } from '../../consts/dataFormat/dataLoading';
 
 const LoadingNumbers = () => {
   const loadingNumbers = [];
-  for (let i = 0; i < 6; i += 1) {
+  for (let i = 0; i < 4; i += 1) {
     loadingNumbers.push(<div className="number-card" key={i}>
       <div className="loader-div">
         <ReactLoading

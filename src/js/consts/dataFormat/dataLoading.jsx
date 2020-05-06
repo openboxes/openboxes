@@ -3,15 +3,15 @@ import ColorPalette from '../../components/tablero/ColorPalette.scss';
 /* global _ */
 function getColor(index = 0, type = 'default') {
   const states = {
-    normal: [
-      ColorPalette.normalState1,
-      ColorPalette.normalState2,
-      ColorPalette.normalState3,
-      ColorPalette.normalState4,
-      ColorPalette.normalState5,
-      ColorPalette.normalState6,
-      ColorPalette.normalState7,
-      ColorPalette.normalState8,
+    default: [
+      ColorPalette.state1,
+      ColorPalette.state2,
+      ColorPalette.state3,
+      ColorPalette.state4,
+      ColorPalette.state5,
+      ColorPalette.state6,
+      ColorPalette.state7,
+      ColorPalette.state8,
     ],
     dark: [
       ColorPalette.darkState1,
@@ -34,7 +34,7 @@ function getColor(index = 0, type = 'default') {
   }
 }
 
-function getHorizontalBarColors(index = 0, type = 'normal') {
+function getHorizontalBarColors(index = 0, type = 'default') {
   const horizontalColors = [];
   for (let i = 0; i < 5; i += 1) {
     horizontalColors.push(getColor(index + i, type));
@@ -51,20 +51,20 @@ function loadColorDataset(data, chart, subtype) {
   // And a smooth color change
 
   if (chart === 'line') {
-    datasets.borderColor = getColor(index, 'normal');
-    datasets.pointBackgroundColor = getColor(index, 'normal');
+    datasets.borderColor = getColor(index);
+    datasets.pointBackgroundColor = getColor(index);
     datasets.pointHoverBackgroundColor = '#fff';
-    datasets.pointHoverBorderColor = getColor(index, 'normal');
+    datasets.pointHoverBorderColor = getColor(index);
     datasets.lineTension = 0;
     datasets.fill = !subtype;
   } if (chart === 'bar') {
-    datasets.backgroundColor = getColor(index, 'normal');
+    datasets.backgroundColor = getColor(index);
     datasets.hoverBackgroundColor = getColor(index, 'dark');
   } if (chart === 'horizontalBar') {
-    datasets.backgroundColor = getHorizontalBarColors(index, 'normal');
+    datasets.backgroundColor = getHorizontalBarColors(index);
     datasets.hoverBackgroundColor = getHorizontalBarColors(index, 'dark');
   } if (chart === 'doughnut') {
-    datasets.backgroundColor = getColor(index, 'normal');
+    datasets.backgroundColor = getColor(index);
   }
 
   index += 1;
