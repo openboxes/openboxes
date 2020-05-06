@@ -15,7 +15,7 @@ import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
 
-class ChecklistReportCommand implements Validateable  {
+class ChecklistReportCommand implements Validateable {
 
     Shipment shipment
     Location location

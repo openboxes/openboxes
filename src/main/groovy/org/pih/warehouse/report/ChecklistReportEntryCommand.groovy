@@ -14,7 +14,7 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ShipmentItem
 
-class ChecklistReportEntryCommand implements Validateable  {
+class ChecklistReportEntryCommand implements Validateable {
 
     Product product
     ShipmentItem shipmentItem

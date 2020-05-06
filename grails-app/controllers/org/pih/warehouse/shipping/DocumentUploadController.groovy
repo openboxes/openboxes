@@ -27,7 +27,7 @@ class DocumentUploadController {
     def view() {}
 }
 
-class DocumentUploadCommand implements Validateable  {
+class DocumentUploadCommand implements Validateable {
     String shipmentId
     Document document
 }
