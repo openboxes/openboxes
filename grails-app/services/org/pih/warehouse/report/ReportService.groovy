@@ -376,7 +376,7 @@ class ReportService implements ApplicationContextAware {
             SELECT 0, transaction_type.transaction_code, substring_index(transaction_type.name, '|', 1), transaction_type.id
             FROM transaction_type
         """
-        executeStatements([insertStatement])
+        dataService.executeStatements([insertStatement])
     }
 
     void buildLotDimension() {
@@ -386,7 +386,7 @@ class ReportService implements ApplicationContextAware {
             FROM inventory_item
             JOIN product ON product.id = inventory_item.product_id;
         """
-        executeStatements([insertStatement])
+        dataService.executeStatements([insertStatement])
     }
 
     void buildProductDimension() {
@@ -413,20 +413,22 @@ class ReportService implements ApplicationContextAware {
     void buildDateDimension() {
         def minTransactionDate = Transaction.minTransactionDate.get()
         log.info("minTransactionDate: " + minTransactionDate)
-        Date today = new Date()
-        (minTransactionDate..today).each { Date date ->
-            date.clearTime()
-            DateDimension dateDimension = new DateDimension()
-            dateDimension.date = date
-            dateDimension.dayOfMonth = date[Calendar.DAY_OF_MONTH]
-            dateDimension.dayOfWeek = date[Calendar.DAY_OF_WEEK]
-            dateDimension.month = date[Calendar.MONTH] + 1
-            dateDimension.year = date[Calendar.YEAR]
-            dateDimension.week = date[Calendar.WEEK_OF_YEAR]
-            dateDimension.monthName = date.format("MMMMM")
-            dateDimension.monthYear = date.format("MM-yyyy")
-            dateDimension.weekdayName = date.format("EEEEE")
-            dateDimension.save(flush: true)
+        Date maxTransactionDate = new Date()
+        if (minTransactionDate && maxTransactionDate) {
+            (minTransactionDate..maxTransactionDate).each { Date date ->
+                date.clearTime()
+                DateDimension dateDimension = new DateDimension()
+                dateDimension.date = date
+                dateDimension.dayOfMonth = date[Calendar.DAY_OF_MONTH]
+                dateDimension.dayOfWeek = date[Calendar.DAY_OF_WEEK]
+                dateDimension.month = date[Calendar.MONTH] + 1
+                dateDimension.year = date[Calendar.YEAR]
+                dateDimension.week = date[Calendar.WEEK_OF_YEAR]
+                dateDimension.monthName = date.format("MMMMM")
+                dateDimension.monthYear = date.format("MM-yyyy")
+                dateDimension.weekdayName = date.format("EEEEE")
+                dateDimension.save()
+            }
         }
     }
 
