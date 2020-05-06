@@ -1,9 +1,8 @@
-[
-    {
+[{
         "endpoint": "getInProgresPutaways",
         "archived": false,
         "type": "number",
-        "order": 3
+        "order": 4
     },
     {
         "endpoint": "getInventoryByLotAndBin",
@@ -15,13 +14,13 @@
         "endpoint": "getInProgressShipments",
         "archived": false,
         "type": "number",
-        "order": 2
+        "order": 3
     },
     {
         "endpoint": "getReceivingBin",
         "archived": false,
         "type": "number",
-        "order": 4
+        "order": 2
     },
     {
         "endpoint": "getItemsInventoried",
@@ -36,58 +35,62 @@
         "order": 6
     },
     {
-        "title": "Inventory Summary",
         "endpoint": "getInventorySummary",
         "archived": false,
-        "type": "horizontalBar",
+        "type": "graph",
         "datalabel": true,
         "order": 1
     },
     {
-        "title": "Expiration Summary",
         "endpoint": "getExpirationSummary",
         "archived": false,
-        "type": "line",
-        "order": 2,
-        "link": "/openboxes/inventory/listExpiringStock"
+        "type": "graph",
+        "order": 2
     },
     {
-        "title": "Stock Movements Sent by Month",
         "endpoint": "getSentStockMovements",
-        "archived": false,
-        "type": "bar",
+        "archived": true,
+        "type": "graph",
         "stacked": true,
         "datalabel": true,
-        "order": 3
+        "order": 9
     },
     {
-        "title": "Outgoing Stock Movements in Progress",
         "endpoint": "getOutgoingStock",
         "archived": false,
-        "type": "numbers",
-        "order": 4,
-        "link": "/openboxes/stockMovement/list?receiptStatusCode=PENDING"
+        "type": "graph",
+        "order": 4
     },
     {
-        "title": "Stock Movements Received by Month",
         "endpoint": "getReceivedStockMovements",
-        "archived": false,
-        "type": "bar",
+        "archived": true,
+        "type": "graph",
         "stacked": true,
         "datalabel": true,
+        "order": 7
+    },
+    {
+        "endpoint": "getDiscrepancy",
+        "archived": false,
+        "type": "graph",
+        "order": 6
+    },
+    {
+        "endpoint": "getDelayedShipments",
+        "archived": false,
+        "type": "graph",
         "order": 5
     },
     {
-        "title": "Items received with a discrepancy",
-        "endpoint": "getDiscrepancy",
-        "archived": false,
-        "type": "table",
-        "order": 6
-    }, {
-        "title": "Delayed Shipments",
-        "endpoint": "getDelayedShipments",
+        "endpoint": "getFillRate",
         "archived": true,
-        "type": "numberTable",
-        "order": 7
+        "type": "graph",
+        "order": 8
+    },
+    {
+        "endpoint": "getIncomingStock",
+        "archived": false,
+        "type": "graph",
+        "order": 3
     }
 ]

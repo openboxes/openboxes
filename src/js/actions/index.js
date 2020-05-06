@@ -124,7 +124,7 @@ function fetchIndicator(
       type: FETCH_GRAPHS,
       payload: {
         id,
-        title: indicatorConfig.title,
+        title: 'Loading...',
         type: 'loading',
         data: [],
         archived: indicatorConfig.archived,
@@ -133,11 +133,12 @@ function fetchIndicator(
   }
 
   apiClient.get(url).then((res) => {
+    const indicatorData = res.data;
     if (indicatorConfig.type === 'number') {
       dispatch({
         type: FETCH_NUMBERS,
         payload: {
-          ...res.data,
+          ...indicatorData,
           id,
           archived: indicatorConfig.archived,
         },
@@ -147,11 +148,11 @@ function fetchIndicator(
         type: FETCH_GRAPHS,
         payload: {
           id,
-          title: indicatorConfig.title,
-          type: indicatorConfig.type,
-          data: res.data,
+          title: indicatorData.title,
+          type: indicatorData.type,
+          data: indicatorData.data,
           archived: indicatorConfig.archived,
-          link: indicatorConfig.link,
+          link: indicatorData.link,
           config: {
             stacked: indicatorConfig.stacked,
             datalabel: indicatorConfig.datalabel,
@@ -165,19 +166,18 @@ function fetchIndicator(
       type: FETCH_GRAPHS,
       payload: {
         id,
-        title: indicatorConfig.title,
+        title: 'Error!',
         type: 'error',
         data: [],
         archived: indicatorConfig.archived,
-        link: indicatorConfig.link,
       },
     });
   });
 }
 
-export function reloadIndicator(method, type, title, link, id, params) {
+export function reloadIndicator(indicatorConfig, params) {
   return (dispatch) => {
-    fetchIndicator(dispatch, method, type, title, link, id, params);
+    fetchIndicator(dispatch, indicatorConfig, params);
   };
 }
 
@@ -190,16 +190,6 @@ function getData(dispatch, configData) {
 export function fetchIndicators(configData) {
   return (dispatch) => {
     getData(dispatch, configData);
-
-    // fetchIndicator(dispatch, 'getExpirationSummary', 'line', 'Expiration Summary', '/openboxes/inventory/listExpiringStock');
-    // fetchIndicator(dispatch, 'getFillRate', 'bar', 'Fill Rate');
-    // fetchIndicator(dispatch, 'getInventorySummary', 'horizontalBar', 'Inventory Summary');
-    // fetchIndicator(dispatch, 'getSentStockMovements', 'bar', 'Stock Movements Sent by Month');
-    // fetchIndicator(dispatch, 'getReceivedStockMovements', 'bar', 'Incoming Stock Movements by Month');
-    // fetchIndicator(dispatch, 'getOutgoingStock', 'numbers', 'Outgoing Stock Movements in Progress', '/openboxes/stockMovement/list?receiptStatusCode=PENDING');
-    // fetchIndicator(dispatch, 'getDiscrepancy', 'table', 'Items received with a discrepancy');
-    // fetchIndicator(dispatch, 'getIncomingStock', 'numbers', 'Incoming Stock Movements by Status', '/openboxes/stockMovement/list?direction=INBOUND');
-    // fetchIndicator(dispatch, 'getDelayedShipments', 'numberTable', 'Delayed Shipments');
   };
 }
 
@@ -226,25 +216,6 @@ export function reorderIndicators({ oldIndex, newIndex }, e, type) {
   return {
     type: REORDER_INDICATORS,
     payload: { oldIndex, newIndex, type },
-  };
-}
-
-export function fetchNumbersData() {
-  const url = '/openboxes/apitablero/getNumberData';
-
-  return (dispatch) => {
-    apiClient.get(url).then((res) => {
-      const data = res.data.map((item) => {
-        item.archived = 0;
-        return item;
-      });
-      dispatch({
-        type: FETCH_NUMBERS,
-        payload: {
-          data,
-        },
-      });
-    });
   };
 }
 

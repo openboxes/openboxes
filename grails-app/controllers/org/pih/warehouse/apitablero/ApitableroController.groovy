@@ -55,31 +55,31 @@ class ApitableroController {
 
     def getExpirationSummary = {
         Location location = Location.get(session?.warehouse?.id)
-        def expirationSummary = indicatorDataService.getExpirationSummaryData(location, params)["data"]
+        def expirationSummary = indicatorDataService.getExpirationSummaryData(location, params)
         render (expirationSummary.toJson() as JSON)
     }
 
     def getFillRate = {
-        def fillRate = indicatorDataService.getFillRate()["data"]
+        def fillRate = indicatorDataService.getFillRate()
         render (fillRate.toJson() as JSON)
     }
 
     def getInventorySummary = {
         Location location = Location.get(session?.warehouse?.id)
         def results = inventorySnapshotService.findInventorySnapshotByLocation(location)
-        def inventorySummary = indicatorDataService.getInventorySummaryData(results)["data"]
+        def inventorySummary = indicatorDataService.getInventorySummaryData(results)
         render (inventorySummary.toJson() as JSON)
     }
 
     def getSentStockMovements = {
         Location location = Location.get(session?.warehouse?.id)
-        def sentStockMovements = indicatorDataService.getSentStockMovements(location, params)["data"]
+        def sentStockMovements = indicatorDataService.getSentStockMovements(location, params)
         render (sentStockMovements.toJson() as JSON)
     }
 
     def getReceivedStockMovements = {
         Location location = Location.get(session?.warehouse?.id)
-        def receivedStockMovements = indicatorDataService.getReceivedStockData(location, params)["data"]
+        def receivedStockMovements = indicatorDataService.getReceivedStockData(location, params)
         render (receivedStockMovements.toJson() as JSON)
     }
 

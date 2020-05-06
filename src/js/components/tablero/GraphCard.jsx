@@ -29,7 +29,7 @@ const handleChartClick = (elements) => {
 };
 
 const GraphCard = SortableElement(({
-  cardId, cardTitle, cardType, cardLink, data, config, reloadIndicator,
+  cardId, cardTitle, cardType, cardLink, data, config, filterIndicator,
 }) => {
   const cardData = data;
   let graph;
@@ -85,7 +85,7 @@ const GraphCard = SortableElement(({
         <div className={filter ? 'data-filter' : 'data-filter disabled'}>
           <select
             className="custom-select"
-            onChange={e => reloadIndicator(cardType, cardTitle, cardLink, cardId, `querySize=${e.target.value}`)}
+            onChange={e => filterIndicator(cardId, `querySize=${e.target.value}`)}
             disabled={!filter}
             defaultValue={data.labels ? data.labels.length : '6'}
           >

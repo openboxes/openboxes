@@ -9,7 +9,6 @@ import {
   fetchIndicators,
   reorderIndicators,
   reloadIndicator,
-  fetchNumbersData,
   resetIndicators,
   fetchConfigAndData,
 } from '../../actions';
@@ -25,7 +24,7 @@ defaults.scale.ticks.beginAtZero = true;
 
 
 // eslint-disable-next-line no-shadow
-const SortableCards = SortableContainer(({ data, reloadIndicator }) => (
+const SortableCards = SortableContainer(({ data, filterIndicator }) => (
   <div className="card-component">
     {data.map((value, index) =>
       (value.archived ? null : (
@@ -38,7 +37,7 @@ const SortableCards = SortableContainer(({ data, reloadIndicator }) => (
           cardLink={value.link}
           data={value.data}
           config={value.config}
-          reloadIndicator={reloadIndicator}
+          filterIndicator={filterIndicator}
         />
       )))}
   </div>
@@ -104,6 +103,12 @@ class Tablero extends Component {
     }
   }
 
+  filterIndicator = (id, params) => {
+    const indicatorConfig = this.props.dashboardConfig.filter(config => config.order === id && config.type === 'graph')[0];
+
+    this.props.reloadIndicator(indicatorConfig, params);
+  }
+
   sortStartHandle = () => {
     this.setState({ isDragging: true });
   };
@@ -163,7 +168,7 @@ class Tablero extends Component {
           data={this.props.indicatorsData.filter(indicator => indicator)}
           onSortStart={this.sortStartHandle}
           onSortEnd={this.sortEndHandleGraph}
-          reloadIndicator={this.props.reloadIndicator}
+          filterIndicator={this.filterIndicator}
           axis="xy"
           useDragHandle
         />
@@ -192,7 +197,6 @@ export default connect(mapStateToProps, {
   reloadIndicator,
   addToIndicators,
   reorderIndicators,
-  fetchNumbersData,
   resetIndicators,
   fetchConfigAndData,
 })(Tablero);
@@ -212,7 +216,6 @@ Tablero.propTypes = {
   currentLocation: PropTypes.string.isRequired,
   addToIndicators: PropTypes.func.isRequired,
   reloadIndicator: PropTypes.func.isRequired,
-  fetchNumbersData: PropTypes.func.isRequired,
   resetIndicators: PropTypes.func.isRequired,
   fetchConfigAndData: PropTypes.func.isRequired,
 };
