@@ -1842,7 +1842,7 @@ class InventorySnapshotCommand implements Validateable {
 
 }
 
-class TransactionReportCommand implements Validateable  {
+class TransactionReportCommand implements Validateable {
     Date startDate
     Date endDate
     Location location

@@ -204,7 +204,7 @@ class LocalizationController {
 
 }
 
-class LocalizationCommand implements Validateable  {
+class LocalizationCommand implements Validateable {
 
     Locale locale
     MultipartFile messageProperties

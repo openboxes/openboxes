@@ -259,6 +259,6 @@ class MigrationController {
 
 }
 
-class MigrationCommand implements Validateable  {
+class MigrationCommand implements Validateable {
 
 }
