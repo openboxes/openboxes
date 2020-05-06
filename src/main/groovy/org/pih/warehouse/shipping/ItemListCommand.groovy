@@ -9,10 +9,11 @@
  **/
 package org.pih.warehouse.shipping
 
+import grails.validation.Validateable
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 
-class ItemListCommand implements Serializable {
+class ItemListCommand implements Serializable, Validateable {
 
     def items =
             LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(ItemCommand.class))

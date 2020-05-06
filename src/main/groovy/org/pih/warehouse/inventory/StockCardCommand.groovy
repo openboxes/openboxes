@@ -10,12 +10,13 @@
 package org.pih.warehouse.inventory
 
 import grails.validation.Validateable
+import org.pih.warehouse.core.DefaultNullableCommand
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
 
-class StockCardCommand implements Validateable {
+class StockCardCommand extends DefaultNullableCommand {
 
     // Used when adding a new inventory item (not implemented yet)
     InventoryItem inventoryItem
@@ -55,7 +56,7 @@ class StockCardCommand implements Validateable {
     }
 
     Map getAllTransactionLogMap() {
-        return transactionEntryList.groupBy { it.transaction }
+        return transactionEntryList?.groupBy { it.transaction }
     }
 
     /**
