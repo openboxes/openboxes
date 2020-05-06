@@ -12,7 +12,7 @@ package org.pih.warehouse.report
 import grails.validation.Validateable
 import org.pih.warehouse.inventory.TransactionEntry
 
-class ProductReportEntryCommand implements Validateable  {
+class ProductReportEntryCommand implements Validateable {
 
     TransactionEntry transactionEntry
     Integer balance

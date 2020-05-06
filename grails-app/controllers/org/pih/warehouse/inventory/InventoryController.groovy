@@ -1668,7 +1668,7 @@ class InventoryController {
 }
 
 
-class QuantityOnHandReportCommand implements Validateable  {
+class QuantityOnHandReportCommand implements Validateable {
     List<Location> locations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class))
     List dates = []
     List products = []
@@ -1689,7 +1689,7 @@ class QuantityOnHandReportCommand implements Validateable  {
     }
 }
 
-class ManageInventoryCommand implements Validateable  {
+class ManageInventoryCommand implements Validateable {
 
     List<ManageInventoryEntryCommand> entries = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(ManageInventoryEntryCommand.class))
     List inventoryItems = []
@@ -1698,7 +1698,7 @@ class ManageInventoryCommand implements Validateable  {
     List tags = []
 }
 
-class ManageInventoryEntryCommand implements Validateable  {
+class ManageInventoryEntryCommand implements Validateable {
     InventoryItem inventoryItem
     Integer quantity
 

@@ -62,7 +62,7 @@ class ReasonCodeApiController {
     }
 }
 
-class ReasonCodeCommand implements Validateable  {
+class ReasonCodeCommand implements Validateable {
 
     String id
     String name

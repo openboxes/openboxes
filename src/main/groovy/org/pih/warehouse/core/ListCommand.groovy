@@ -11,7 +11,7 @@ package org.pih.warehouse.core
 
 import grails.validation.Validateable
 
-class ListCommand implements Validateable  {
+class ListCommand implements Validateable {
     String category
     List objectList
     Integer sortOrder
