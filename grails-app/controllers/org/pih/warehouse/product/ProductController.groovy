@@ -176,14 +176,10 @@ class ProductController {
 
 
     def create() {
-        def startTime = System.currentTimeMillis()
         def productInstance = new Product(params)
         def rootCategory = productService.getRootCategory()
 
-        println "Create product: " + (System.currentTimeMillis() - startTime) + " ms"
-
         render(view: "edit", model: [productInstance: productInstance, rootCategory: rootCategory])
-        println "After render create.gsp for product: " + (System.currentTimeMillis() - startTime) + " ms"
     }
 
     def save() {
