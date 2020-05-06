@@ -44,6 +44,11 @@ class AuthTagLib {
             }
         }
     }
+    def hasRoleApprover = { attrs, body ->
+        if (userService.hasRoleApprover(session?.user))
+            out << body()
+
+    }
 
     def isUserInRole = { attrs, body ->
         if (session.user) {
