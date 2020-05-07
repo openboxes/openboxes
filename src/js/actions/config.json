@@ -76,7 +76,14 @@
         "endpoint": "getOutgoingStock",
         "archived": false,
         "type": "graph",
-        "order": 4
+        "order": 4,
+        "colors": {
+            "datasets": {
+                "first": "success",
+                "second": "warning",
+                "third": "error"
+            }
+        }
     },
     {
         "endpoint": "getReceivedStockMovements",

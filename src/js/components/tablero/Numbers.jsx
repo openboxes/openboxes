@@ -5,19 +5,19 @@ const Numbers = props => (
   <div className="gyr-indicator">
     <a className="number-indicator" href={props.data.first.link}>
       <div className="value">
-        <div className={props.data.gyrColors ? 'circle green' : 'circle gray'} /> {props.data.first.value}
+        <div className="circle" style={{ backgroundColor: props.options.colors.first }} /> {props.data.first.value}
       </div>
       <div className="subtitle">{props.data.first.subtitle}</div>
     </a>
     <a className="number-indicator" href={props.data.second.link}>
       <div className="value">
-        <div className={props.data.gyrColors ? 'circle yellow' : 'circle gray'} /> {props.data.second.value}
+        <div className="circle" style={{ backgroundColor: props.options.colors.second }} /> {props.data.second.value}
       </div>
       <div className="subtitle">{props.data.second.subtitle}</div>
     </a>
     <a className="number-indicator" href={props.data.third.link}>
       <div className="value">
-        <div className={props.data.gyrColors ? 'circle red' : 'circle gray'} /> {props.data.third.value}
+        <div className="circle" style={{ backgroundColor: props.options.colors.third }} /> {props.data.third.value}
       </div>
       <div className="subtitle">{props.data.third.subtitle}</div>
     </a>
@@ -43,6 +43,13 @@ Numbers.propTypes = {
       link: PropTypes.string,
     }),
   }),
+  options: PropTypes.shape({
+    colors: PropTypes.shape({
+      first: PropTypes.string,
+      second: PropTypes.string,
+      third: PropTypes.string,
+    }),
+  }).isRequired,
 };
 
 Numbers.defaultProps = {

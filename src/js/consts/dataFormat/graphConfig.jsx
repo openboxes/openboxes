@@ -1,70 +1,8 @@
 // eslint-disable-next-line no-unused-vars
 import datalabels from 'chartjs-plugin-datalabels';
-import colorsData from './colorMapping';
+import { getColor, getArrayOfColors } from './colorMapping';
 
-/* global _ */
-
-function getRandomColor(index = null, palette = 'default') {
-  const paletteLength = colorsData.state[palette].length;
-
-  if (!index) {
-    return colorsData.state.default[_.random(0, paletteLength)];
-  }
-
-  try {
-    // index % length makes sure that index is in range
-    return colorsData.state[palette][index % paletteLength];
-  } catch (error) {
-    // if error, returns a random normal color
-    return colorsData.state.default[_.random(0, paletteLength)];
-  }
-}
-
-function getColorByName(name, palette) {
-  const gyrMatch = name.match(/(success|warning|error)/);
-  const stateMatch = name.match(/state([0-9]+)/);
-
-  if (gyrMatch) {
-    let gyrIndex = 0;
-    if (gyrMatch[1].toLowerCase() === 'warning') {
-      gyrIndex = 1;
-    } else if (gyrMatch[1].toLowerCase() === 'error') {
-      gyrIndex = 2;
-    }
-    return colorsData.gyr[palette][gyrIndex];
-  }
-  if (stateMatch) {
-    const stateIndex = stateMatch[1] - 1;
-    return colorsData.state[palette][stateIndex];
-  }
-
-  // If no match, return random color
-  return getRandomColor(_.random(0, 8), palette);
-}
-
-function getColor(index, config, hover = false) {
-  let { palette } = config;
-  if (hover) {
-    const palettes = ['default', 'dark', 'light'];
-    palette = palettes[(palettes.indexOf(palette) + 1) % palettes.length];
-  }
-
-  if (!config.data) {
-    return getRandomColor(index, palette);
-  } else if (Array.isArray(config.data)) {
-    return getColorByName(config.data[index], palette);
-  }
-  return getColorByName(config.data, palette);
-}
-
-function getArrayOfColors(length, config, hover = false) {
-  const colorsArray = [];
-  for (let index = 0; index < length; index += 1) {
-    const color = getColor(index, config, hover);
-    colorsArray.push(color);
-  }
-  return colorsArray;
-}
+// === COLOR OPTIONS ===
 
 function loadColorDataset(index, data, type, subtype, colorConfig) {
   const dataset = data;
@@ -111,7 +49,13 @@ function loadGraphColors(payload) {
       colorConfig.data = payload.config.colors.datasets[datasets[i].label];
     }
 
-    datasets[i] = loadColorDataset(payload.id + i, datasets[i], type, datasets[i].type, colorConfig);
+    datasets[i] = loadColorDataset(
+      payload.id + i,
+      datasets[i],
+      type,
+      datasets[i].type,
+      colorConfig,
+    );
   }
   return datasets;
 }
@@ -232,4 +176,4 @@ function loadGraphOptions(payload) {
   return getOptions(payload.config.stacked, payload.config.datalabel, labelAlignment, maxValue);
 }
 
-export { loadGraphColors, getRandomColor, loadGraphOptions };
+export { loadGraphColors, loadGraphOptions };

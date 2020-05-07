@@ -45,12 +45,12 @@ const GraphCard = SortableElement(({
       onElementsClick={elements => handleChartClick(elements)}
     />);
   } else if (cardType === 'numbers') {
-    graph = <Numbers data={data} />;
+    graph = <Numbers data={data} options={options} />;
   } else if (cardType === 'table') {
     graph = <TableCard data={data} />;
     filter = 1;
   } else if (cardType === 'numberTable') {
-    graph = <NumbersTableCard data={data} />;
+    graph = <NumbersTableCard data={data} options={options} />;
   } else if (cardType === 'loading') {
     graph = <LoadingCard />;
   } else if (cardType === 'error') {

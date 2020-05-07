@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactLoading from 'react-loading';
-import { getRandomColor } from '../../consts/dataFormat/dataLoading';
+import { getRandomColor } from '../../consts/dataFormat/colorMapping';
 
 const LoadingCard = () => (
   <div className="loader-div">

@@ -1,6 +1,6 @@
 import { arrayMove } from 'react-sortable-hoc';
 import update from 'immutability-helper';
-import { loadGraphColors, loadGraphOptions } from '../consts/dataFormat/dataLoading';
+import { loadGraphColors, loadGraphOptions } from '../consts/dataFormat/graphConfig';
 import {
   ADD_TO_INDICATORS,
   FETCH_GRAPHS,
@@ -10,6 +10,7 @@ import {
   RESET_INDICATORS,
   FETCH_CONFIG,
 } from '../actions/types';
+import { loadNumbersOptions } from '../consts/dataFormat/customGraphConfig';
 
 function arrayArchive(array = [], index) {
   const newArray = update(array, { [index]: { archived: { $set: 1 } } });
@@ -41,6 +42,9 @@ export default function (state = initialState, action) {
     case FETCH_GRAPHS: {
       const { payload } = action;
       // Data formatting
+      if (payload.type === 'numbers' || payload.type === 'numberTable') {
+        payload.options = loadNumbersOptions(payload);
+      }
       if (payload.type === 'bar' || payload.type === 'doughnut' || payload.type === 'horizontalBar' || payload.type === 'line') {
         payload.data.datasets = loadGraphColors(payload);
         payload.options = loadGraphOptions(payload);

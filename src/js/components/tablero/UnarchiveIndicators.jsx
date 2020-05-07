@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ReactLoading from 'react-loading';
-import { getRandomColor } from '../../consts/dataFormat/dataLoading';
+import { getRandomColor } from '../../consts/dataFormat/colorMapping';
 
 /* global _ */
 
@@ -122,7 +122,6 @@ const ArchivedIndicators = props => (
           index={index}
           title={value.title}
           type={value.type}
-          data={value.data}
           handleAdd={props.handleAdd}
           unarchiveHandler={props.unarchiveHandler}
           size={props.size}
@@ -188,7 +187,6 @@ ArchivedGraph.propTypes = {
   title: PropTypes.string.isRequired,
   handleAdd: PropTypes.func.isRequired,
   index: PropTypes.number.isRequired,
-  data: PropTypes.oneOfType([PropTypes.shape({}), PropTypes.array]).isRequired,
 };
 
 ArchivedNumber.propTypes = {

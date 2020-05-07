@@ -6,7 +6,7 @@ import TableCard from './TableCard';
 const NumbersTableCard = props => (
   <div className="numbers-table-card">
     <div className="numbers-left">
-      <Numbers data={props.data.numberIndicator} />
+      <Numbers data={props.data.numberIndicator} options={props.options} />
     </div>
     <div className="table-right">
       <TableCard data={props.data.tableData} />
@@ -40,6 +40,7 @@ NumbersTableCard.propTypes = {
       body: PropTypes.arrayOf(PropTypes.shape({})),
     }).isRequired,
   }).isRequired,
+  options: PropTypes.shape({}).isRequired,
 };
 
 export default NumbersTableCard;

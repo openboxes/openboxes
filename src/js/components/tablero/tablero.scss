@@ -297,22 +297,6 @@
             border-radius: 100%;
             position: absolute;
             margin-left: -22px;
-
-            &.green {
-              background-color: $success;
-            }
-
-            &.yellow {
-              background-color: $warning;
-            }
-
-            &.red {
-              background-color: $error;
-            }
-
-            &.gray {
-              background-color: $default;
-            }
           }
         }
 
@@ -586,18 +570,6 @@
           height: 7px;
           border-radius: 100%;
           margin-right: 6px;
-
-          &.green {
-            background-color: $success;
-          }
-
-          &.yellow {
-            background-color: $warning;
-          }
-
-          &.red {
-            background-color: $error;
-          }
         }
       }
     }
