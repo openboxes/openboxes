@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ReactLoading from 'react-loading';
-import { loadColors, getColor } from '../../consts/dataFormat/dataLoading';
+import { getRandomColor } from '../../consts/dataFormat/dataLoading';
 
 /* global _ */
 
@@ -56,23 +56,18 @@ const ArchivedNumber = props => (
 
 const ArchivedGraph = (props) => {
   let graph;
-  const property = props;
 
   if (props.type === 'line') {
-    property.data.datasets = loadColors(props.data, 'line');
-    graph = <i className="fa fa-line-chart" style={{ color: getColor() }} />;
+    graph = <i className="fa fa-line-chart" style={{ color: getRandomColor() }} />;
   } else if (props.type === 'bar') {
-    property.data.datasets = loadColors(props.data, 'bar');
-    graph = <i className="fa fa-bar-chart" style={{ color: getColor() }} />;
+    graph = <i className="fa fa-bar-chart" style={{ color: getRandomColor() }} />;
   } else if (props.type === 'doughnut') {
-    property.data.datasets = loadColors(props.data, 'doughnut');
-    graph = <i className="fa fa-pie-chart" style={{ color: getColor() }} />;
+    graph = <i className="fa fa-pie-chart" style={{ color: getRandomColor() }} />;
   } else if (props.type === 'horizontalBar') {
-    property.data.datasets = loadColors(props.data, 'horizontalBar');
     graph = (
       <i
         className="fa fa-bar-chart horizontal-bar"
-        style={{ color: getColor() }}
+        style={{ color: getRandomColor() }}
       />
     );
   } else if (props.type === 'numbers') {
@@ -81,7 +76,7 @@ const ArchivedGraph = (props) => {
     graph = (
       <ReactLoading
         type="bubbles"
-        color={getColor()}
+        color={getRandomColor()}
         height="40px"
         width="40px"
       />
@@ -89,7 +84,7 @@ const ArchivedGraph = (props) => {
   } else if (props.type === 'error') {
     graph = <i className="fa fa-repeat" />;
   } else if (props.type === 'table' || props.type === 'numberTable') {
-    graph = <i className="fa fa-table" style={{ color: getColor() }} />;
+    graph = <i className="fa fa-table" style={{ color: getRandomColor() }} />;
   }
 
   return (

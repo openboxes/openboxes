@@ -36,7 +36,7 @@ const SortableCards = SortableContainer(({ data, loadIndicator }) => (
           cardType={value.type}
           cardLink={value.link}
           data={value.data}
-          config={value.config}
+          options={value.options}
           loadIndicator={loadIndicator}
         />
       )))}

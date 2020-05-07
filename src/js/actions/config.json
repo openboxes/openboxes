@@ -39,13 +39,27 @@
         "archived": false,
         "type": "graph",
         "datalabel": true,
-        "order": 1
+        "order": 1,
+        "colors": {
+            "labels": {
+                "In stock": "success",
+                "Above maximum": "warning",
+                "Below reorder": "warning",
+                "Below minimum": "warning",
+                "No longer in stock": "error"
+            }
+        }
     },
     {
         "endpoint": "getExpirationSummary",
         "archived": false,
         "type": "graph",
-        "order": 2
+        "order": 2,
+        "colors": {
+            "datasets": {
+                "Expiration(s)": "state6"
+            }
+        }
     },
     {
         "endpoint": "getSentStockMovements",
@@ -53,7 +67,10 @@
         "type": "graph",
         "stacked": true,
         "datalabel": true,
-        "order": 9
+        "order": 9,
+        "colors": {
+            "palette": "light"
+        }
     },
     {
         "endpoint": "getOutgoingStock",

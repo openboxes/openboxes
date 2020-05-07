@@ -1,103 +1,152 @@
-import ColorPalette from '../../components/tablero/ColorPalette.scss';
+// eslint-disable-next-line no-unused-vars
+import datalabels from 'chartjs-plugin-datalabels';
+import colorsData from './colorMapping';
 
 /* global _ */
-function getColor(index = 0, type = 'default') {
-  const states = {
-    default: [
-      ColorPalette.state1,
-      ColorPalette.state2,
-      ColorPalette.state3,
-      ColorPalette.state4,
-      ColorPalette.state5,
-      ColorPalette.state6,
-      ColorPalette.state7,
-      ColorPalette.state8,
-    ],
-    dark: [
-      ColorPalette.darkState1,
-      ColorPalette.darkState2,
-      ColorPalette.darkState3,
-      ColorPalette.darkState4,
-      ColorPalette.darkState5,
-      ColorPalette.darkState6,
-      ColorPalette.darkState7,
-      ColorPalette.darkState8,
-    ],
-  };
+
+function getRandomColor(index = null, palette = 'default') {
+  const paletteLength = colorsData.state[palette].length;
+
+  if (!index) {
+    return colorsData.state.default[_.random(0, paletteLength)];
+  }
 
   try {
-    // index % 8 makes sure that index is between 0 and 8
-    return states[type][index % 8];
+    // index % length makes sure that index is in range
+    return colorsData.state[palette][index % paletteLength];
   } catch (error) {
-    // if type != dark or normal, returns a random normal color
-    return states.normal[_.random(0, 8)];
+    // if error, returns a random normal color
+    return colorsData.state.default[_.random(0, paletteLength)];
   }
 }
 
-function getHorizontalBarColors(index = 0, type = 'default') {
-  const horizontalColors = [];
-  for (let i = 0; i < 5; i += 1) {
-    horizontalColors.push(getColor(index + i, type));
+function getColorByName(name, palette) {
+  const gyrMatch = name.match(/(success|warning|error)/);
+  const stateMatch = name.match(/state([0-9]+)/);
+
+  if (gyrMatch) {
+    let gyrIndex = 0;
+    if (gyrMatch[1].toLowerCase() === 'warning') {
+      gyrIndex = 1;
+    } else if (gyrMatch[1].toLowerCase() === 'error') {
+      gyrIndex = 2;
+    }
+    return colorsData.gyr[palette][gyrIndex];
   }
-  return horizontalColors;
+  if (stateMatch) {
+    const stateIndex = stateMatch[1] - 1;
+    return colorsData.state[palette][stateIndex];
+  }
+
+  // If no match, return random color
+  return getRandomColor(_.random(0, 8), palette);
 }
 
-let index = 5;
-function loadColorDataset(data, chart, subtype) {
-  const datasets = data;
-  index = index > 7 ? index % 8 : index;
-  // Index makes sure that index is between 0 and 8
-  // That following indicators have different colors
-  // And a smooth color change
-
-  if (chart === 'line') {
-    datasets.borderColor = getColor(index);
-    datasets.pointBackgroundColor = getColor(index);
-    datasets.pointHoverBackgroundColor = '#fff';
-    datasets.pointHoverBorderColor = getColor(index);
-    datasets.lineTension = 0;
-    datasets.fill = !subtype;
-  } if (chart === 'bar') {
-    datasets.backgroundColor = getColor(index);
-    datasets.hoverBackgroundColor = getColor(index, 'dark');
-  } if (chart === 'horizontalBar') {
-    datasets.backgroundColor = getHorizontalBarColors(index);
-    datasets.hoverBackgroundColor = getHorizontalBarColors(index, 'dark');
-  } if (chart === 'doughnut') {
-    datasets.backgroundColor = getColor(index);
+function getColor(index, config, hover = false) {
+  let { palette } = config;
+  if (hover) {
+    const palettes = ['default', 'dark', 'light'];
+    palette = palettes[(palettes.indexOf(palette) + 1) % palettes.length];
   }
 
-  index += 1;
-  return datasets;
+  if (!config.data) {
+    return getRandomColor(index, palette);
+  } else if (Array.isArray(config.data)) {
+    return getColorByName(config.data[index], palette);
+  }
+  return getColorByName(config.data, palette);
 }
 
-function loadColors(data, chart) {
-  const dataset = data.datasets;
-  for (let i = 0; i < dataset.length; i += 1) {
-    const type = dataset[i].type || chart;
-    dataset[i] = loadColorDataset(dataset[i], type, dataset[i].type);
+function getArrayOfColors(length, config, hover = false) {
+  const colorsArray = [];
+  for (let index = 0; index < length; index += 1) {
+    const color = getColor(index, config, hover);
+    colorsArray.push(color);
   }
+  return colorsArray;
+}
+
+function loadColorDataset(index, data, type, subtype, colorConfig) {
+  const dataset = data;
+
+  if (type === 'line') {
+    dataset.borderColor = getColor(index, colorConfig);
+    dataset.pointBackgroundColor = getColor(index, colorConfig);
+    dataset.pointHoverBorderColor = getColor(index, colorConfig, true);
+    dataset.pointHoverBackgroundColor = getColor(index, colorConfig, true);
+    dataset.lineTension = 0;
+    dataset.fill = !subtype;
+  } if (type === 'bar') {
+    dataset.backgroundColor = getColor(index, colorConfig);
+    dataset.hoverBackgroundColor = getColor(index, colorConfig, true);
+  } if (type === 'horizontalBar') {
+    dataset.backgroundColor = getArrayOfColors(dataset.data.length, colorConfig);
+    dataset.hoverBackgroundColor = getArrayOfColors(dataset.data.length, colorConfig, true);
+  } if (type === 'doughnut') {
+    dataset.backgroundColor = getColor(index, colorConfig);
+  }
+
   return dataset;
 }
 
-function loadOptions(isStacked = false) {
+function loadGraphColors(payload) {
+  const { datasets } = payload.data;
+
+  const colorConfig = {
+    palette: 'default',
+    data: null,
+  };
+  if (payload.config.colors && payload.config.colors.palette) {
+    colorConfig.palette = payload.config.colors.palette;
+  }
+
+  for (let i = 0; i < datasets.length; i += 1) {
+    const type = datasets[i].type || payload.type;
+
+    if (payload.config.colors && payload.config.colors.labels) {
+      colorConfig.data = payload.data.labels.map(label => payload.config.colors.labels[label]);
+    }
+
+    if (payload.config.colors && payload.config.colors.datasets) {
+      colorConfig.data = payload.config.colors.datasets[datasets[i].label];
+    }
+
+    datasets[i] = loadColorDataset(payload.id + i, datasets[i], type, datasets[i].type, colorConfig);
+  }
+  return datasets;
+}
+
+// === GRAPH OPTIONS ===
+
+function loadDatalabel(context) {
+  const { datasets } = context.chart.data;
+
+  // If this is the last visible dataset of the chart
+  if (datasets.indexOf(context.dataset) === datasets.length - 1) {
+    let sum = 0;
+    datasets.map((dataset) => {
+      sum += dataset.data[context.dataIndex];
+      return sum;
+    });
+    return sum;
+  }
+  return '';
+}
+
+function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', maxValue = null) {
   const options = {
-    scales: isStacked ? {
-      xAxes: [{
-        stacked: true,
-        gridLines: {
-          color: 'transparent',
-        },
-      }],
-      yAxes: [{
-        stacked: true,
-      }],
-    } : {
+    scales: {
       xAxes: [{
         gridLines: {
           color: 'transparent',
         },
       }],
+      yAxes: [{}],
+    },
+    plugins: {
+      datalabels: {
+        display: false,
+      },
     },
     tooltips: {
       displayColors: false,
@@ -124,7 +173,63 @@ function loadOptions(isStacked = false) {
     },
   };
 
+  if (isStacked) {
+    options.scales.xAxes[0].stacked = true;
+    options.scales.yAxes[0].stacked = true;
+  }
+
+  if (hasDataLabel) {
+    options.plugins.datalabels = {
+      anchor: 'end',
+      align: alignLabel,
+      offset: 10,
+      color(context) {
+        return context.dataset.backgroundColor;
+      },
+      formatter(value, context) {
+        if (isStacked) return loadDatalabel(context);
+        return value;
+      },
+    };
+
+    if (alignLabel === 'right' && maxValue) {
+      options.scales.xAxes[0].ticks = {
+        suggestedMax: maxValue + 1,
+      };
+    }
+
+    if (alignLabel === 'top' && maxValue) {
+      options.scales.yAxes[0].ticks = {
+        suggestedMax: maxValue + 1,
+      };
+    }
+  }
+
   return options;
 }
 
-export { loadColors, getColor, loadOptions };
+function loadGraphOptions(payload) {
+  let labelAlignment = null;
+  let maxValue = null;
+
+  if (payload.config.datalabel) {
+    labelAlignment = (payload.type === 'horizontalBar') ? 'right' : 'top';
+
+    let sumDatasets = 0;
+    if (!payload.config.stacked) {
+      sumDatasets = payload.data.datasets[0].data;
+    } else {
+      sumDatasets = payload.data.datasets.reduce((sum, value) => {
+        if (sum.data) {
+          return sum.data.map((s, index) => s + value.data[index]);
+        }
+        return sum.map((s, index) => s + value.data[index]);
+      });
+    }
+    maxValue = Math.max(...sumDatasets);
+  }
+
+  return getOptions(payload.config.stacked, payload.config.datalabel, labelAlignment, maxValue);
+}
+
+export { loadGraphColors, getRandomColor, loadGraphOptions };

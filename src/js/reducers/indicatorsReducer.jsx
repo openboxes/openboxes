@@ -1,5 +1,6 @@
 import { arrayMove } from 'react-sortable-hoc';
 import update from 'immutability-helper';
+import { loadGraphColors, loadGraphOptions } from '../consts/dataFormat/dataLoading';
 import {
   ADD_TO_INDICATORS,
   FETCH_GRAPHS,
@@ -38,13 +39,19 @@ const initialState = {
 export default function (state = initialState, action) {
   switch (action.type) {
     case FETCH_GRAPHS: {
+      const { payload } = action;
+      // Data formatting
+      if (payload.type === 'bar' || payload.type === 'doughnut' || payload.type === 'horizontalBar' || payload.type === 'line') {
+        payload.data.datasets = loadGraphColors(payload);
+        payload.options = loadGraphOptions(payload);
+      }
       // new reference to array so the component is re-rendered when value changes
       const newState = [].concat(state.data);
-      const index = findInArray(action.payload.id, state.data);
+      const index = findInArray(payload.id, state.data);
       if (index === false) {
         newState[action.payload.id - 1] = action.payload;
       } else {
-        newState[index] = action.payload;
+        newState[index] = payload;
       }
       return {
         ...state,

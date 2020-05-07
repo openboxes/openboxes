@@ -3,22 +3,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Bar, Doughnut, HorizontalBar, Line } from 'react-chartjs-2';
 import { SortableElement } from 'react-sortable-hoc';
-import { loadColors, loadOptions } from '../../consts/dataFormat/dataLoading';
 import DragHandle from './DragHandle';
 import LoadingCard from './LoadingCard';
 import Numbers from './Numbers';
 import NumbersTableCard from './NumbersTableCard';
 import TableCard from './TableCard';
-
-// getColors loads indicator colors if it doesn't have defined colors yet
-function getColors(data, type) {
-  if (data.datasets.length !== 0) {
-    if (data.datasets[0].borderColor || data.datasets[0].backgroundColor) {
-      return data.datasets;
-    }
-  }
-  return loadColors(data, type);
-}
 
 const handleChartClick = (elements) => {
   const link = elements[0]._chart.data.datasets[0].links[elements[0]._index];
@@ -29,33 +18,32 @@ const handleChartClick = (elements) => {
 };
 
 const GraphCard = SortableElement(({
-  cardId, cardTitle, cardType, cardLink, data, config, loadIndicator,
+  cardId, cardTitle, cardType, cardLink, data, options, loadIndicator,
 }) => {
-  const cardData = data;
   let graph;
   let filter = 0;
   let label = 'Last';
   if (cardType === 'line') {
-    cardData.datasets = getColors(data, 'line');
     graph = (
       <Line
         data={data}
-        options={loadOptions()}
+        options={options}
         onElementsClick={elements => handleChartClick(elements)}
       />
     );
     filter = 1;
     label = 'Next';
   } else if (cardType === 'bar') {
-    cardData.datasets = getColors(data, 'bar');
-    graph = <Bar data={data} options={loadOptions(config.stacked)} />;
+    graph = <Bar data={data} options={options} />;
     filter = 1;
   } else if (cardType === 'doughnut') {
-    cardData.datasets = getColors(data, 'doughnut');
-    graph = <Doughnut data={data} options={loadOptions()} />;
+    graph = <Doughnut data={data} options={options} />;
   } else if (cardType === 'horizontalBar') {
-    cardData.datasets = getColors(data, 'horizontalBar');
-    graph = <HorizontalBar data={data} options={loadOptions()} />;
+    graph = (<HorizontalBar
+      data={data}
+      options={options}
+      onElementsClick={elements => handleChartClick(elements)}
+    />);
   } else if (cardType === 'numbers') {
     graph = <Numbers data={data} />;
   } else if (cardType === 'table') {
