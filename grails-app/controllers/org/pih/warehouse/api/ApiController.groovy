@@ -77,29 +77,32 @@ class ApiController {
         def hostname = session.hostname ?: "Unknown"
         def timezone = session?.timezone?.ID
         def isPaginated = grailsApplication.config.openboxes.api.pagination.enabled
+        def tablero = grailsApplication.config.openboxes.tablero
         DateFormat dateFormat = new SimpleDateFormat("MM/DD/YYYY");
         String minimumExpirationDate = dateFormat.format(grailsApplication.config.openboxes.expirationDate.minValue)
         render([
                 data: [
-                        user               : user,
-                        location           : location,
-                        isSuperuser        : isSuperuser,
-                        isUserAdmin        : isUserAdmin,
-                        supportedActivities: supportedActivities,
-                        menuConfig         : menuConfig,
-                        isImpersonated     : isImpersonated,
-                        grailsVersion      : grailsVersion,
-                        appVersion         : appVersion,
-                        branchName         : branchName,
-                        buildNumber        : buildNumber,
-                        environment        : environment,
-                        buildDate          : buildDate,
-                        ipAddress          : ipAddress,
-                        hostname           : hostname,
-                        timezone           : timezone,
-                        minimumExpirationDate : minimumExpirationDate,
-                        activeLanguage     : locale.language,
-                        isPaginated        : isPaginated],
+                        user                 : user,
+                        location             : location,
+                        isSuperuser          : isSuperuser,
+                        isUserAdmin          : isUserAdmin,
+                        supportedActivities  : supportedActivities,
+                        menuConfig           : menuConfig,
+                        isImpersonated       : isImpersonated,
+                        grailsVersion        : grailsVersion,
+                        appVersion           : appVersion,
+                        branchName           : branchName,
+                        buildNumber          : buildNumber,
+                        environment          : environment,
+                        buildDate            : buildDate,
+                        ipAddress            : ipAddress,
+                        hostname             : hostname,
+                        timezone             : timezone,
+                        tablero              : tablero,
+                        minimumExpirationDate: minimumExpirationDate,
+                        activeLanguage       : locale.language,
+                        isPaginated          : isPaginated,
+                ],
         ] as JSON)
     }
 

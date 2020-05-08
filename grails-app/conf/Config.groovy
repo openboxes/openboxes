@@ -381,6 +381,12 @@ openboxes.dashboard.catalogsSummary.enabled = true
 // Default value for news summary
 openboxes.dashboard.newsSummary.newsItems = []
 
+openboxes {
+    tablero {
+        enabled = false
+    }
+}
+
 // OpenBoxes identifier config
 openboxes.identifier.separator = Constants.DEFAULT_IDENTIFIER_SEPARATOR
 openboxes.identifier.numeric = Constants.RANDOM_IDENTIFIER_NUMERIC_CHARACTERS
