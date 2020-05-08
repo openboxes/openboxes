@@ -46,7 +46,7 @@
                                         <label><warehouse:message code="default.status.label" /></label>
                                     </td>
                                     <td valign="top" id="status" class="value">
-                                        <format:metadata obj="${orderInstance?.status}"/>
+                                        <format:metadata obj="${orderInstance?.displayStatus}"/>
                                     </td>
                                 </tr>
                                 <tr class="prop">
