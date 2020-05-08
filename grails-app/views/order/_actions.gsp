@@ -91,7 +91,7 @@
 							disabled="${orderInstance?.shipments || !isApprover}"
 							disabledMessage="${disabledMessage}">
 						<img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />
-						&nbsp;${warehouse.message(code: 'order.rollbackOrderStatus.label', default: "Rollack order status" )}
+						&nbsp;${warehouse.message(code: 'order.rollbackOrderStatus.label', default: "Rollback order status" )}
 					</g:link>
 				</div>
 				<div class="action-menu-item">
