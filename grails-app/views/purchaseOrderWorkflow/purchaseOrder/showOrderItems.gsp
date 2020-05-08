@@ -99,9 +99,9 @@
                         </g:link>
                     </g:if>
                     <g:else>
-                        <g:link controller="order" action="shipOrder" id="${order?.id}" class="button">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />&nbsp;
-                            ${warehouse.message(code: 'order.wizard.shipOrder.label', default: 'Ship Order')}
+                        <g:link controller="order" action="show" id="${order?.id}" class="button">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'cart_magnify.png')}" />&nbsp;
+                            <warehouse:message code="default.button.saveAndExit.label" default="Save and Exit"/>
                         </g:link>
                     </g:else>
                 </div>
