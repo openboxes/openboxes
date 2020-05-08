@@ -14,7 +14,7 @@ function loadNumbersOptions(payload) {
 
   if (payload.config.colors && payload.config.colors.datasets) {
     Object.entries(payload.config.colors.datasets).forEach(([key, value]) => {
-      options.colors[key] = getColorByName(value, palette);
+      options.colors[value] = getColorByName(key, palette);
     });
   }
 

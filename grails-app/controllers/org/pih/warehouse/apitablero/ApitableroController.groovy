@@ -29,9 +29,9 @@ class ApitableroController {
         render (numberData as JSON)
     }
 
-    def getInProgresPutaways = {
+    def getInProgressPutaways = {
         Location location = Location.get(session?.warehouse?.id)
-        NumberData numberData = numberDataService.getInProgresPutaways(session.user, location)
+        NumberData numberData = numberDataService.getInProgressPutaways(session.user, location)
         render (numberData as JSON)
     }
 

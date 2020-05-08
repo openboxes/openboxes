@@ -27,7 +27,7 @@ class NumberDataService {
         return new NumberData("Your in Progress Shipments", shipments[0], "Shipments", "/openboxes/stockMovement/list?receiptStatusCode=PENDING&origin.id=" + location.id + "&createdBy.id=" + user.id)
     }
 
-    NumberData getInProgresPutaways(def user, def location) {
+    NumberData getInProgressPutaways(def user, def location) {
         def incompletePutaways = Order.executeQuery("select count(o.id) from Order o where o.orderTypeCode = 'TRANSFER_ORDER' AND o.status = 'PENDING' AND o.orderedBy = :user AND o.destination = :location",
                 ['user': user, 'location': location]);
 

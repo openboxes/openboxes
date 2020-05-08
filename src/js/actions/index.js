@@ -1,3 +1,4 @@
+/* eslint no-param-reassign: ["error", { "props": false }] */
 import { addTranslationForLanguage } from 'react-localize-redux';
 import {
   SHOW_SPINNER,
@@ -17,7 +18,6 @@ import {
   FETCH_CONFIG,
 } from './types';
 import apiClient, { parseResponse } from '../utils/apiClient';
-import { default as config } from './config.json';
 
 export function showSpinner() {
   return {
@@ -109,7 +109,7 @@ export function changeCurrentLocale(locale) {
 
 // New Dashboard
 
-function fetchIndicator(
+function fetchGraphIndicator(
   dispatch,
   indicatorConfig,
   params = '',
@@ -118,48 +118,35 @@ function fetchIndicator(
 
   const url = `/openboxes/apitablero/${indicatorConfig.endpoint}?${params}`;
 
-  if (indicatorConfig.type !== 'number') {
+  dispatch({
+    type: FETCH_GRAPHS,
+    payload: {
+      id,
+      title: 'Loading...',
+      type: 'loading',
+      data: [],
+      archived: indicatorConfig.archived,
+    },
+  });
+
+  apiClient.get(url).then((res) => {
+    const indicatorData = res.data;
     dispatch({
       type: FETCH_GRAPHS,
       payload: {
         id,
-        title: 'Loading...',
-        type: 'loading',
-        data: [],
+        title: indicatorData.title,
+        type: indicatorData.type,
+        data: indicatorData.data,
         archived: indicatorConfig.archived,
+        link: indicatorData.link,
+        config: {
+          stacked: indicatorConfig.stacked,
+          datalabel: indicatorConfig.datalabel,
+          colors: indicatorConfig.colors,
+        },
       },
     });
-  }
-
-  apiClient.get(url).then((res) => {
-    const indicatorData = res.data;
-    if (indicatorConfig.type === 'number') {
-      dispatch({
-        type: FETCH_NUMBERS,
-        payload: {
-          ...indicatorData,
-          id,
-          archived: indicatorConfig.archived,
-        },
-      });
-    } else {
-      dispatch({
-        type: FETCH_GRAPHS,
-        payload: {
-          id,
-          title: indicatorData.title,
-          type: indicatorData.type,
-          data: indicatorData.data,
-          archived: indicatorConfig.archived,
-          link: indicatorData.link,
-          config: {
-            stacked: indicatorConfig.stacked,
-            datalabel: indicatorConfig.datalabel,
-            colors: indicatorConfig.colors,
-          },
-        },
-      });
-    }
   }, () => {
     dispatch({
       type: FETCH_GRAPHS,
@@ -174,16 +161,52 @@ function fetchIndicator(
   });
 }
 
+function fetchNumberIndicator(
+  dispatch,
+  indicatorConfig,
+) {
+  const id = indicatorConfig.order;
+
+  const url = `/openboxes/apitablero/${indicatorConfig.endpoint}`;
+
+  apiClient.get(url).then((res) => {
+    const indicatorData = res.data;
+    dispatch({
+      type: FETCH_NUMBERS,
+      payload: {
+        ...indicatorData,
+        id,
+        archived: indicatorConfig.archived,
+      },
+    });
+  });
+}
+
 export function reloadIndicator(indicatorConfig, params) {
   return (dispatch) => {
-    fetchIndicator(dispatch, indicatorConfig, params);
+    fetchGraphIndicator(dispatch, indicatorConfig, params);
   };
 }
 
 function getData(dispatch, configData) {
-  configData.forEach((indicatorConfig) => {
-    fetchIndicator(dispatch, indicatorConfig);
-  });
+  if (configData.enabled) {
+    Object.values(configData.endpoints.graph).forEach((indicatorConfig) => {
+      fetchGraphIndicator(dispatch, indicatorConfig);
+    });
+    Object.values(configData.endpoints.number).forEach((indicatorConfig) => {
+      fetchNumberIndicator(dispatch, indicatorConfig);
+    });
+  } else {
+    Object.values(configData.endpoints.graph).forEach((indicatorConfig) => {
+      indicatorConfig.archived = false;
+      indicatorConfig.colors = undefined;
+      fetchGraphIndicator(dispatch, indicatorConfig);
+    });
+    Object.values(configData.endpoints.number).forEach((indicatorConfig) => {
+      indicatorConfig.archived = false;
+      fetchNumberIndicator(dispatch, indicatorConfig);
+    });
+  }
 }
 
 export function fetchIndicators(configData) {
@@ -219,21 +242,15 @@ export function reorderIndicators({ oldIndex, newIndex }, e, type) {
 }
 
 export function fetchConfigAndData() {
-  const fakePromise = new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(config);
-    }, 1000);
-  });
-
   return (dispatch) => {
-    fakePromise.then((data) => {
+    apiClient.get('/openboxes/tablero/config').then((res) => {
       dispatch({
         type: FETCH_CONFIG,
         payload: {
-          data,
+          data: res.data.data,
         },
       });
-      getData(dispatch, data);
+      getData(dispatch, res.data.data);
     });
   };
 }

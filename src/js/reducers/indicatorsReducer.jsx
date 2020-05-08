@@ -34,7 +34,7 @@ function findInArray(id, array = []) {
 const initialState = {
   data: [],
   numberData: [],
-  config: [],
+  config: {},
 };
 
 export default function (state = initialState, action) {

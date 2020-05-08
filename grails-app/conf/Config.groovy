@@ -383,7 +383,115 @@ openboxes.dashboard.newsSummary.newsItems = []
 
 openboxes {
     tablero {
-        enabled = false
+        enabled = true
+        endpoints {
+            number {
+                inProgressPutaways {
+                    endpoint = "getInProgressPutaways"
+                    archived = false
+                    order = 4
+                }
+                inventoryByLotAndBin {
+                    endpoint = "getInventoryByLotAndBin"
+                    archived = false
+                    order = 1
+                }
+                inProgressShipments {
+                    endpoint = "getInProgressShipments"
+                    archived = false
+                    order = 3
+                }
+                receivingBin {
+                    endpoint = "getReceivingBin"
+                    archived = false
+                    order = 2
+                }
+                itemsInventoried {
+                    endpoint = "getItemsInventoried"
+                    archived = true
+                    order = 5
+                }
+                defaultBin {
+                    endpoint = "getDefaultBin"
+                    archived = true
+                    order = 6
+                }
+            }
+            graph {
+                inventorySummary {
+                    endpoint = "getInventorySummary"
+                    archived = false
+                    datalabel = true
+                    order = 1
+                    colors {
+                        labels {
+                            success = ["In stock"]
+                            warning = ["Above maximum", "Below reorder", "Below minimum"]
+                            error = ["No longer in stock"]
+                        }
+                    }
+                }
+                expirationSummary {
+                    endpoint = "getExpirationSummary"
+                    archived = false
+                    order = 2
+                    colors {
+                        datasets {
+                            state6 = ["Expiration(s)"]
+                        }
+                    }
+                }
+                sentStockMovements {
+                    endpoint = "getSentStockMovements"
+                    archived = true
+                    stacked = true
+                    datalabel = true
+                    order = 9
+                    colors {
+                        palette = "light"
+                    }
+                }
+                outgoingStock {
+                    endpoint = "getOutgoingStock"
+                    archived = false
+                    order = 4
+                    colors {
+                        datasets {
+                            success = ["first"]
+                            warning = ["second"]
+                            error = ["third"]
+                        }
+                    }
+                }
+                receivedStockMovements {
+                    endpoint = "getReceivedStockMovements"
+                    archived = true
+                    stacked = true
+                    datalabel = true
+                    order = 7
+                }
+                discrepancy {
+                    endpoint = "getDiscrepancy"
+                    archived = false
+                    order = 6
+                }
+                delayedShipments {
+                    endpoint = "getDelayedShipments"
+                    archived = false
+                    order = 5
+                }
+                fillRate {
+                    endpoint = "getFillRate"
+                    archived = true
+                    order = 8
+                }
+                incomingStock {
+                    endpoint = "getIncomingStock"
+                    archived = false
+                    order = 3
+                }
+            }
+        }
     }
 }
 

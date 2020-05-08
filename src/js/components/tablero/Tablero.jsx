@@ -96,7 +96,7 @@ class Tablero extends Component {
 
   fetchData() {
     this.props.resetIndicators();
-    if (this.props.dashboardConfig && this.props.dashboardConfig.length) {
+    if (this.props.dashboardConfig && this.props.dashboardConfig.endpointsq) {
       this.props.fetchIndicators(this.props.dashboardConfig);
     } else {
       this.props.fetchConfigAndData();
@@ -104,7 +104,8 @@ class Tablero extends Component {
   }
 
   loadIndicator = (id, params) => {
-    const indicatorConfig = this.props.dashboardConfig.filter(config => config.order === id && config.type === 'graph')[0];
+    const indicatorConfig = Object.values(this.props.dashboardConfig.endpoints.graph)
+      .filter(config => config.order === id)[0];
 
     this.props.reloadIndicator(indicatorConfig, params);
   }
@@ -212,7 +213,13 @@ Tablero.propTypes = {
   reorderIndicators: PropTypes.func.isRequired,
   indicatorsData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   numberData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  dashboardConfig: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  dashboardConfig: PropTypes.shape({
+    enabled: PropTypes.bool,
+    endpoints: PropTypes.shape({
+      graph: PropTypes.shape({}),
+      number: PropTypes.shape({}),
+    }),
+  }).isRequired,
   currentLocation: PropTypes.string.isRequired,
   addToIndicators: PropTypes.func.isRequired,
   reloadIndicator: PropTypes.func.isRequired,

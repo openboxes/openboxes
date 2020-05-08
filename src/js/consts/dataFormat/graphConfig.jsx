@@ -42,11 +42,16 @@ function loadGraphColors(payload) {
     const type = datasets[i].type || payload.type;
 
     if (payload.config.colors && payload.config.colors.labels) {
-      colorConfig.data = payload.data.labels.map(label => payload.config.colors.labels[label]);
+      colorConfig.data = payload.data.labels.map((label) => {
+        const labelColor = Object.keys(payload.config.colors.labels)
+          .find(key => payload.config.colors.labels[key].includes(label));
+        return labelColor;
+      });
     }
 
     if (payload.config.colors && payload.config.colors.datasets) {
-      colorConfig.data = payload.config.colors.datasets[datasets[i].label];
+      colorConfig.data = Object.keys(payload.config.colors.datasets)
+        .find(key => payload.config.colors.datasets[key].includes(datasets[i].label));
     }
 
     datasets[i] = loadColorDataset(
