@@ -197,13 +197,46 @@ class InventorySnapshotService {
             String dateString = date.format("yyyy-MM-dd HH:mm:ss")
             DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
+            String insertStatement = "INSERT INTO inventory_snapshot (id, version, date, location_id, product_id, product_code, " +
+                    "inventory_item_id, lot_number, expiration_date, bin_location_id, bin_location_name, quantity_on_hand, date_created, last_updated) " +
+                    "values (:id, 0, :date, :locationId, :productId, :productCode, :inventoryItemId, :lotNumber, :expirationDate, " +
+                    ":binLocationId, :binLocationName, :onHandQuantity, now(), now()) " +
+                    "ON DUPLICATE KEY UPDATE quantity_on_hand=:onHandQuantity, version=version+1, last_updated=now()"
+
             // Execute inventory snapshot insert/update in batches
-            sql.withBatch(batchSize) { BatchingStatementWrapper stmt ->
-                binLocations.eachWithIndex { Map binLocationEntry, index ->
-                    String insertStatement = generateInsertInventorySnapshotStatement(location, dateString, DATE_FORMAT, binLocationEntry)
-                    stmt.addBatch(insertStatement)
+            if (binLocations) {
+                sql.withBatch(batchSize, insertStatement) { stmt ->
+                    binLocations.eachWithIndex { Map entry, index ->
+                        String productId = "${StringEscapeUtils.escapeSql(entry.product?.id)}"
+                        String productCode = "${StringEscapeUtils.escapeSql(entry.product?.productCode)}"
+                        String inventoryItemId = entry?.inventoryItem?.id ?
+                                "${StringEscapeUtils.escapeSql(entry?.inventoryItem?.id)}" : null
+                        String lotNumber = entry?.inventoryItem?.lotNumber ?
+                                "${StringEscapeUtils.escapeSql(entry?.inventoryItem?.lotNumber)}" : "DEFAULT"
+                        String expirationDate = entry?.inventoryItem?.expirationDate ?
+                                "${DATE_FORMAT.format(entry?.inventoryItem?.expirationDate)}" : null
+                        String binLocationId = entry?.binLocation?.id ?
+                                "${StringEscapeUtils.escapeSql(entry?.binLocation?.id)}" : null
+                        String binLocationName = entry?.binLocation?.name ?
+                                "${StringEscapeUtils.escapeSql(entry?.binLocation?.name)}" : "DEFAULT"
+
+                        def params = [
+                                id             : UUID.randomUUID().toString(),
+                                date           : dateString,
+                                locationId     : location?.id,
+                                productId      : productId,
+                                productCode    : productCode,
+                                inventoryItemId: inventoryItemId,
+                                lotNumber      : lotNumber,
+                                expirationDate : expirationDate,
+                                binLocationId  : binLocationId,
+                                binLocationName: binLocationName,
+                                onHandQuantity : entry.quantity
+                        ]
+                        stmt.addBatch(params)
+                    }
+                    stmt.executeBatch()
                 }
-                stmt.executeBatch()
             }
             log.info "Saved ${binLocations?.size()} inventory snapshots for location ${location} on date ${date.format("MMM-dd-yyyy")} in ${System.currentTimeMillis() - startTime}ms"
 
@@ -213,34 +246,6 @@ class InventorySnapshotService {
             throw e;
         }
     }
-
-    String generateInsertInventorySnapshotStatement(Location location, String dateString, DateFormat DATE_FORMAT, Map entry) {
-        def onHandQuantity = entry.quantity
-        String productId = "${StringEscapeUtils.escapeSql(entry.product?.id)}"
-        String productCode = "${StringEscapeUtils.escapeSql(entry.product?.productCode)}"
-        String lotNumber = entry?.inventoryItem?.lotNumber ?
-                "'${StringEscapeUtils.escapeSql(entry?.inventoryItem?.lotNumber)}'" : "'DEFAULT'"
-        String expirationDate = entry?.inventoryItem?.expirationDate ?
-                "'${DATE_FORMAT.format(entry?.inventoryItem?.expirationDate)}'" : "NULL"
-        String inventoryItemId = entry?.inventoryItem?.id ?
-                "'${StringEscapeUtils.escapeSql(entry?.inventoryItem?.id)}'" : "NULL"
-        String binLocationId = entry?.binLocation?.id ?
-                "'${StringEscapeUtils.escapeSql(entry?.binLocation?.id)}'" : "NULL"
-        String binLocationName = entry?.binLocation?.name ?
-                "'${StringEscapeUtils.escapeSql(entry?.binLocation?.name)}'" : "'DEFAULT'"
-
-        def insertStatement =
-                "INSERT INTO inventory_snapshot (id, version, date, location_id, product_id, product_code, " +
-                        "inventory_item_id, lot_number, expiration_date, bin_location_id, bin_location_name, " +
-                        "quantity_on_hand, date_created, last_updated) " +
-                        "values ('${UUID.randomUUID().toString()}', 0, '${dateString}', '${location?.id}', " +
-                        "'${productId}', '${productCode}', " +
-                        "${inventoryItemId}, ${lotNumber}, ${expirationDate}, " +
-                        "${binLocationId}, ${binLocationName}, ${onHandQuantity}, now(), now()) " +
-                        "ON DUPLICATE KEY UPDATE quantity_on_hand=${onHandQuantity}, version=version+1, last_updated=now()"
-        return insertStatement
-    }
-
 
     def getTransactionDates() {
         return Transaction.executeQuery("select distinct(date(transactionDate)) from Transaction order by date(transactionDate) desc")
