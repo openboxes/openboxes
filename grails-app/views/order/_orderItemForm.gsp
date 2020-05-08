@@ -19,15 +19,15 @@
         <div id="manufacturerCode"></div>
     </td>
     <td class="middle center">
-        <input type="number" id="quantity" name="quantity" class="text" placeholder="Quantity" />
+        <input type="number" id="quantity" name="quantity" class="text" placeholder="Quantity" style="width: 100px"/>
     </td>
     <td class="center middle">
         <g:selectUnitOfMeasure id="quantityUom"
-                               name="quantityUom.id" class="select2 required" style="width: 100px"
+                               name="quantityUom.id" class="select2 required" style="width: 120px"
                                noSelection="['':'']"/>
     </td>
     <td class="center middle">
-        <input type="number" id="quantityPerUom" name="quantityPerUom" class="text required" placeholder="Qty per UoM"/>
+        <input type="number" id="quantityPerUom" name="quantityPerUom" class="text required" placeholder="Qty per UoM" style="width: 100px"/>
     </td>
     <td class="center middle">
         <input type="number" id="unitPrice" required name="unitPrice" size="2" class="text required" placeholder="Price per UoM" style="width: 100px"/>
