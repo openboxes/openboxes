@@ -96,7 +96,7 @@ class Tablero extends Component {
 
   fetchData() {
     this.props.resetIndicators();
-    if (this.props.dashboardConfig && this.props.dashboardConfig.endpointsq) {
+    if (this.props.dashboardConfig && this.props.dashboardConfig.endpoints) {
       this.props.fetchIndicators(this.props.dashboardConfig);
     } else {
       this.props.fetchConfigAndData();
