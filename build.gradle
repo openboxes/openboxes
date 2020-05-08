@@ -196,6 +196,9 @@ dependencies {
     compile ('org.grails.plugins:quartz:2.0.13')
     compile ('org.grails.plugins:ajax-tags:1.0.0')
 
+    // replace jar from lib directory
+    compile ('org.xhtmlrenderer:core-renderer:R8')
+
 }
 
 sourceSets {
