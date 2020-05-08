@@ -8,7 +8,7 @@
     .dlg { display: none; }
     .non-editable { background-color: #e6e6e6; cursor: not-allowed }
     .non-editable.odd { background-color: #e1e1e1; }
-    table { table-layout: fixed; }
+    .items-table { table-layout: fixed; }
 </style>
 
 </head>
@@ -42,7 +42,7 @@
                     <g:hiddenField id="orderId" name="order.id" value="${order?.id }"></g:hiddenField>
                     <g:hiddenField id="orderItemId" name="orderItem.id" value="${orderItem?.id }"></g:hiddenField>
                     <g:hiddenField id="supplierId" name="supplier.id" value="${order?.originParty?.id }"></g:hiddenField>
-                    <table id="orderItemsTable">
+                    <table id="orderItemsTable" class="items-table">
                         <thead>
                             <tr class="odd">
                                 <th width="1%"><warehouse:message code="order.lineItemNumber.label" default="#"/></th>
