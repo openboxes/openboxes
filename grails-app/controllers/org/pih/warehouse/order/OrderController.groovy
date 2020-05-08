@@ -580,13 +580,13 @@ class OrderController {
 
     def orderItemFormDialog = {
         OrderItem orderItem = OrderItem.get(params.id)
-        render(template: "orderItemFormDialog", model: [orderItem:orderItem])
+        render(template: "orderItemFormDialog", model: [orderItem:orderItem, canEdit: orderService.canOrderItemBeEdited(orderItem, session.user)])
     }
 
     def removeOrderItem = {
         OrderItem orderItem = OrderItem.get(params.id)
         if (orderItem) {
-            if (!orderService.canOrderItemBeEdited(orderItem, session.user.id)) {
+            if (!orderService.canOrderItemBeEdited(orderItem, session.user)) {
                 throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
             }
             Order order = orderItem.order
@@ -608,7 +608,7 @@ class OrderController {
             order.addToOrderItems(orderItem)
         }
         else {
-            if (!orderService.canOrderItemBeEdited(orderItem, session.user.id)) {
+            if (!orderService.canOrderItemBeEdited(orderItem, session.user)) {
                 throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
             }
             orderItem.properties = params
@@ -682,7 +682,7 @@ class OrderController {
                     recipient: it.recipient,
                     isOrderPending: it?.order?.status == OrderStatus.PENDING,
                     dateCreated: it.dateCreated,
-                    canEdit: orderService.canOrderItemBeEdited(it, session.user.id)
+                    canEdit: orderService.canOrderItemBeEdited(it, session.user)
             ]
         }
         orderItems = orderItems.sort { it.dateCreated }

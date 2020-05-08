@@ -334,10 +334,13 @@
         }
 
         function editOrderItem(id) {
-          var executionKey = $(this).data("execution");
-          var url = "${request.contextPath}/order/orderItemFormDialog/" + id + "?execution=" + executionKey;
-          $('.loading').show();
-          $("#edit-item-dialog").html("Loading ...").load(url, onCompleteHandler).dialog("open");
+          var canEdit = !event.target.closest("tr").className.includes("non-editable");
+          if (canEdit) {
+            var executionKey = $(this).data("execution");
+            var url = "${request.contextPath}/order/orderItemFormDialog/" + id + "?execution=" + executionKey;
+            $('.loading').show();
+            $("#edit-item-dialog").html("Loading ...").load(url, onCompleteHandler).dialog("open");
+          }
         }
 
 
@@ -347,7 +350,8 @@
 
           $("table").dblclick(function(event) {
             var id = event.target.closest("tr").id;
-            if (id) {
+            var canEdit = !event.target.closest("tr").className.includes("non-editable");
+            if (id && canEdit) {
               editOrderItem(id);
             }
             return false;
