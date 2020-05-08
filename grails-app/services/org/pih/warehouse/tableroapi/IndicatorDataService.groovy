@@ -333,7 +333,7 @@ class IndicatorDataService {
             }
         }
 
-        NumberIndicator numberIndicator = new NumberIndicator(pending, shipped, partiallyReceived, false)
+        NumberIndicator numberIndicator = new NumberIndicator(pending, shipped, partiallyReceived)
 
         GraphData graphData = new GraphData(numberIndicator, "Incoming Stock Movements By Status", "numbers", "/openboxes/stockMovement/list?direction=INBOUND");
 
@@ -447,7 +447,7 @@ class IndicatorDataService {
         ColorNumber delayedShipmentBySea = new ColorNumber(numberDelayed['sea'], 'By sea')
         ColorNumber delayedShipmentByLand = new ColorNumber(numberDelayed['landAndSuitcase'], 'By land')
 
-        NumberIndicator numberIndicator = new NumberIndicator(delayedShipmentByAir, delayedShipmentBySea, delayedShipmentByLand, false)
+        NumberIndicator numberIndicator = new NumberIndicator(delayedShipmentByAir, delayedShipmentBySea, delayedShipmentByLand)
 
         NumberTableData numberTableData = new NumberTableData(table, numberIndicator)
 

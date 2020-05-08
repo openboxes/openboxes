@@ -21,4 +21,5 @@ function loadNumbersOptions(payload) {
   return options;
 }
 
-export default loadNumbersOptions;
+// eslint-disable-next-line import/prefer-default-export
+export { loadNumbersOptions };

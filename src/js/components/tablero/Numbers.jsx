@@ -26,7 +26,6 @@ const Numbers = props => (
 
 Numbers.propTypes = {
   data: PropTypes.shape({
-    gyrColors: PropTypes.bool,
     third: PropTypes.shape({
       subtitle: PropTypes.string,
       value: PropTypes.number,
