@@ -63,7 +63,7 @@
                             <!-- data is dynamically loaded -->
                         </tbody>
                         <tfoot>
-                            <g:if test="${isApprover}">
+                            <g:if test="${order?.status < org.pih.warehouse.order.OrderStatus.PLACED || isApprover}">
                                 <g:render template="/order/orderItemForm"/>
                             </g:if>
                             <tr class="">
