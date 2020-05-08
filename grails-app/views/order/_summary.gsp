@@ -54,15 +54,7 @@
 	</g:else>
 </div>
 <div class="buttonBar">
-
     <div class="button-container">
-<<<<<<< e13ad539c80d06b3f19de179223610a81c217ce9
-        <g:link controller="order" action="list" class="button">
-            <img src="${resource(dir: 'images/icons/silk', file: 'application_view_list.png')}" />&nbsp;
-            <warehouse:message code="default.list.label" args="[g.message(code: 'orders.label')]" default="List purchase order"/>
-        </g:link>
-=======
->>>>>>> OBPIH-2865 Improve buttons section in pending PO edit items screen
         <g:if test="${!orderInstance?.id}">
             <g:link controller="order" action="create" class="button">
                 <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
@@ -70,6 +62,15 @@
             </g:link>
         </g:if>
         <g:if test="${orderInstance?.id}">
+            <g:hasRoleApprover>
+                <g:set var="isApprover" value="${true}"/>
+            </g:hasRoleApprover>
+            <g:if test="${!isApprover}">
+                <g:set var="disabledMessage" value="${g.message(code:'errors.noPermissions.label')}"/>
+            </g:if>
+            <g:elseif test="${orderInstance?.shipments}">
+                <g:set var="disabledMessage" value="${g.message(code:'order.errors.rollback.message')}"/>
+            </g:elseif>
             <g:if test="${currentState}">
                 <g:if test="${currentState == 'showOrder' || currentState == 'editOrder'}">
                     <g:link controller="order" action="list" class="button">
@@ -79,7 +80,7 @@
                     <g:if test="${orderInstance?.status == OrderStatus.PENDING}">
                         <div class="button-group">
                             <g:link controller="purchaseOrderWorkflow" action="purchaseOrder"
-                                     id="${orderInstance?.id}" event="showOrderItems" params="[skipTo:'items']" class="button">
+                                    id="${orderInstance?.id}" event="showOrderItems" params="[skipTo:'items']" class="button">
                                 <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
                                 <warehouse:message code="order.wizard.editOrder.label" default="Edit"/>
                             </g:link>
@@ -124,7 +125,9 @@
                                 <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
                                 <warehouse:message code="order.wizard.editOrder.label" default="Edit"/>
                             </g:link>
-                            <g:link controller="order" action="rollbackOrderStatus" id="${orderInstance?.id}" class="button">
+                            <g:link controller="order" action="rollbackOrderStatus" id="${orderInstance?.id}" class="button"
+                                    disabled="${orderInstance?.shipments || !isApprover}"
+                                    disabledMessage="${disabledMessage}">
                                 <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
                                 ${warehouse.message(code: 'default.button.rollback.label')}
                             </g:link>
@@ -166,19 +169,21 @@
                 <g:elseif test="${currentState == 'addItems'}">
                     <g:if test="${orderInstance?.status == OrderStatus.PENDING}">
                         <div class="button-group">
-                        <g:link controller="order" action="show" id="${orderInstance?.id}" class="button">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'cart_magnify.png')}" />&nbsp;
-                            <warehouse:message code="default.button.saveAndExit.label" default="Save and Exit"/>
-                        </g:link>
-                        <g:link controller="order" action="placeOrder" id="${orderInstance?.id}" class="button"
-                                disabled="${orderInstance?.status >= OrderStatus.PLACED}"
-                                disabledMessage="Order has already been placed">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'cart_go.png')}" />&nbsp;
-                            ${warehouse.message(code: 'order.wizard.placeOrder.label')}
-                        </g:link>
+                            <g:link controller="order" action="show" id="${orderInstance?.id}" class="button">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'cart_magnify.png')}" />&nbsp;
+                                <warehouse:message code="default.button.saveAndExit.label" default="Save and Exit"/>
+                            </g:link>
+                            <g:link controller="order" action="placeOrder" id="${orderInstance?.id}" class="button"
+                                    disabled="${orderInstance?.status >= OrderStatus.PLACED}"
+                                    disabledMessage="Order has already been placed">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'cart_go.png')}" />&nbsp;
+                                ${warehouse.message(code: 'order.wizard.placeOrder.label')}
+                            </g:link>
                         </div>
                         <div class="button-group">
-                            <g:link controller="order" action="addAdjustment" id="${orderInstance?.id}" class="button">
+                            <g:link controller="order" action="addAdjustment" id="${orderInstance?.id}" class="button"
+                                    disabled="${orderInstance?.status >= OrderStatus.PLACED && !isApprover}"
+                                    disabledMessage="${g.message(code:'errors.noPermissions.label')}">
                                 <img src="${resource(dir: 'images/icons/silk', file: 'basket_put.png')}" />&nbsp;
                                 <warehouse:message code="default.add.label" args="[g.message(code: 'orderAdjustment.label')]"/>
                             </g:link>
@@ -236,6 +241,23 @@
                             </g:link>
                         </div>
                     </g:elseif>
+                </g:elseif>
+                <g:elseif test="${currentState == 'shipOrder'}">
+                    <div class="button-group">
+                        <g:link controller="order" action="list" class="button">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'application_view_list.png')}" />&nbsp;
+                            <warehouse:message code="default.list.label" args="[g.message(code: 'orders.label')]" default="List purchase order"/>
+                        </g:link>
+                        <g:link controller="order" action="show" id="${orderInstance?.id}" class="button">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'cart_magnify.png')}" />&nbsp;
+                            <warehouse:message code="order.wizard.showOrder.label" default="Show Order"/>
+                        </g:link>
+                        <g:link controller="purchaseOrderWorkflow" action="purchaseOrder"
+                                id="${orderInstance?.id}" event="showOrderItems" params="[skipTo:'items']" class="button">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
+                            <warehouse:message code="order.wizard.editOrder.label" default="Edit"/>
+                        </g:link>
+                    </div>
                 </g:elseif>
             </g:if>
         </g:if>

@@ -33,7 +33,7 @@
 
 		<div class="dialog">
 
-			<g:render template="summary" model="[orderInstance:command?.order]" />
+			<g:render template="summary" model="[orderInstance:command?.order,currentState:'shipOrder']" />
 
 			<g:form action="saveShipmentItems">
 				<div class="box">
