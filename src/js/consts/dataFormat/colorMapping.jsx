@@ -85,7 +85,7 @@ function getColor(index, config, hover = false) {
     palette = palettes[(palettes.indexOf(palette) + 1) % palettes.length];
   }
 
-  if (!config.data) {
+  if (!config.data || !config.data[index]) {
     return getRandomColor(index, palette);
   } else if (Array.isArray(config.data)) {
     return getColorByName(config.data[index], palette);

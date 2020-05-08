@@ -9,11 +9,20 @@ function loadColorDataset(index, data, type, subtype, colorConfig) {
 
   if (type === 'line') {
     dataset.borderColor = getColor(index, colorConfig);
-    dataset.pointBackgroundColor = getColor(index, colorConfig);
-    dataset.pointHoverBorderColor = getColor(index, colorConfig, true);
-    dataset.pointHoverBackgroundColor = getColor(index, colorConfig, true);
     dataset.lineTension = 0;
     dataset.fill = !subtype;
+    // for a line graph we want a single color for all unless specified
+    if (Array.isArray(colorConfig.data)) {
+      dataset.pointBackgroundColor = getArrayOfColors(dataset.data.length, colorConfig);
+      dataset.pointBorderColor = getArrayOfColors(dataset.data.length, colorConfig);
+      dataset.pointHoverBackgroundColor = getArrayOfColors(dataset.data.length, colorConfig, true);
+      dataset.pointHoverBorderColor = getArrayOfColors(dataset.data.length, colorConfig, true);
+    } else {
+      dataset.pointBackgroundColor = getColor(index, colorConfig);
+      dataset.pointBorderColor = getColor(index, colorConfig);
+      dataset.pointHoverBackgroundColor = getColor(index, colorConfig, true);
+      dataset.pointHoverBorderColor = getColor(index, colorConfig, true);
+    }
   } if (type === 'bar') {
     dataset.backgroundColor = getColor(index, colorConfig);
     dataset.hoverBackgroundColor = getColor(index, colorConfig, true);
@@ -41,17 +50,22 @@ function loadGraphColors(payload) {
   for (let i = 0; i < datasets.length; i += 1) {
     const type = datasets[i].type || payload.type;
 
-    if (payload.config.colors && payload.config.colors.labels) {
-      colorConfig.data = payload.data.labels.map((label) => {
-        const labelColor = Object.keys(payload.config.colors.labels)
-          .find(key => payload.config.colors.labels[key].includes(label));
-        return labelColor;
-      });
-    }
-
     if (payload.config.colors && payload.config.colors.datasets) {
       colorConfig.data = Object.keys(payload.config.colors.datasets)
         .find(key => payload.config.colors.datasets[key].includes(datasets[i].label));
+    }
+
+    if (payload.config.colors && payload.config.colors.labels) {
+      const datasetColor = colorConfig.data;
+      colorConfig.data = payload.data.labels.map(() => datasetColor);
+
+      payload.data.labels.forEach((label, index) => {
+        const labelColor = Object.keys(payload.config.colors.labels)
+          .find(key => payload.config.colors.labels[key].includes(label));
+        if (labelColor) {
+          colorConfig.data[index] = labelColor;
+        }
+      });
     }
 
     datasets[i] = loadColorDataset(
