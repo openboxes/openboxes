@@ -13,9 +13,9 @@
 </head>
 <body>
 	<div class="body">
-        <g:isUserInRole roles="[org.pih.warehouse.core.RoleType.ROLE_APPROVER]">
-            <g:set var="isApprover" value="true" />
-        </g:isUserInRole>
+        <g:hasRoleApprover>
+            <g:set var="isApprover" value="${true}"/>
+        </g:hasRoleApprover>
 		<g:if test="${flash.message}">
 			<div class="message">
 				${flash.message}

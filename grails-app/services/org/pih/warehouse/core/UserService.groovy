@@ -163,6 +163,14 @@ class UserService {
         return false
     }
 
+    Boolean hasRoleApprover(User user) {
+        if (user) {
+            def roleTypes = [RoleType.ROLE_APPROVER]
+            return getEffectiveRoles(user).any { Role role -> roleTypes.contains(role.roleType) }
+        }
+        return false
+    }
+
 
     Boolean canEditUserRoles(User currentUser, User otherUser) {
         def location = AuthService.currentLocation.get()
