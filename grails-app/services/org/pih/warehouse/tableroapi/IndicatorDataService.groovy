@@ -451,7 +451,7 @@ class IndicatorDataService {
 
         NumberTableData numberTableData = new NumberTableData(table, numberIndicator)
 
-        GraphData graphData = new GraphData(numberTableData, "DelayedShipments", "numberTable");
+        GraphData graphData = new GraphData(numberTableData, "Delayed Shipments", "numberTable");
 
         return graphData;
     }
