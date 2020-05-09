@@ -23,6 +23,8 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.reporting.TransactionFact
 import org.pih.warehouse.util.LocalizationUtil
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.ApplicationEventPublisher
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -36,7 +38,9 @@ class InventorySnapshotService {
     def locationService
     def productAvailabilityService
     def persistenceInterceptor
-    def grailsApplication
+
+    @Autowired
+    ApplicationEventPublisher applicationEventPublisher
 
     def populateInventorySnapshots(Date date) {
         populateInventorySnapshots(date, false)
@@ -170,7 +174,7 @@ class InventorySnapshotService {
             log.info "Saved ${binLocations?.size()} inventory snapshots for location ${location} on date ${date.format("MMM-dd-yyyy")} in ${System.currentTimeMillis() - startTime}ms"
         } catch (Exception e) {
             log.error("Error executing batch update for ${location.name}: " + e.message, e)
-            publishEvent(new ApplicationExceptionEvent(e, location))
+            applicationEventPublisher.publishEvent(new ApplicationExceptionEvent(e, location))
             throw e;
         } finally {
             sql.close()
