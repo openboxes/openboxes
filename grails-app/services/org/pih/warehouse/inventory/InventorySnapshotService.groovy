@@ -207,16 +207,11 @@ class InventorySnapshotService {
             if (binLocations) {
                 sql.withBatch(batchSize, insertStatement) { stmt ->
                     binLocations.eachWithIndex { Map entry, index ->
-                        String productId = "${StringEscapeUtils.escapeSql(entry.product?.id)}"
                         String productCode = "${StringEscapeUtils.escapeSql(entry.product?.productCode)}"
-                        String inventoryItemId = entry?.inventoryItem?.id ?
-                                "${StringEscapeUtils.escapeSql(entry?.inventoryItem?.id)}" : null
                         String lotNumber = entry?.inventoryItem?.lotNumber ?
                                 "${StringEscapeUtils.escapeSql(entry?.inventoryItem?.lotNumber)}" : "DEFAULT"
                         String expirationDate = entry?.inventoryItem?.expirationDate ?
                                 "${DATE_FORMAT.format(entry?.inventoryItem?.expirationDate)}" : null
-                        String binLocationId = entry?.binLocation?.id ?
-                                "${StringEscapeUtils.escapeSql(entry?.binLocation?.id)}" : null
                         String binLocationName = entry?.binLocation?.name ?
                                 "${StringEscapeUtils.escapeSql(entry?.binLocation?.name)}" : "DEFAULT"
 
@@ -224,12 +219,12 @@ class InventorySnapshotService {
                                 id             : UUID.randomUUID().toString(),
                                 date           : dateString,
                                 locationId     : location?.id,
-                                productId      : productId,
+                                productId      : entry.product?.id,
                                 productCode    : productCode,
-                                inventoryItemId: inventoryItemId,
+                                inventoryItemId: entry?.inventoryItem?.id,
                                 lotNumber      : lotNumber,
                                 expirationDate : expirationDate,
-                                binLocationId  : binLocationId,
+                                binLocationId  : entry?.binLocation?.id,
                                 binLocationName: binLocationName,
                                 onHandQuantity : entry.quantity
                         ]
