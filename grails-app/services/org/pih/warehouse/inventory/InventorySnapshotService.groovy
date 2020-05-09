@@ -235,7 +235,6 @@ class InventorySnapshotService {
                         ]
                         stmt.addBatch(params)
                     }
-                    stmt.executeBatch()
                 }
             }
             log.info "Saved ${binLocations?.size()} inventory snapshots for location ${location} on date ${date.format("MMM-dd-yyyy")} in ${System.currentTimeMillis() - startTime}ms"
