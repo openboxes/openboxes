@@ -24,6 +24,8 @@ import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.reporting.TransactionFact
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.ApplicationEventPublisher
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -35,6 +37,9 @@ class InventorySnapshotService {
     def locationService
     def inventoryService
     def persistenceInterceptor
+
+    @Autowired
+    ApplicationEventPublisher applicationEventPublisher
 
     def populateInventorySnapshots(Date date) {
         populateInventorySnapshots(date, false)
@@ -236,7 +241,7 @@ class InventorySnapshotService {
 
         } catch (Exception e) {
             log.error("Error executing batch update for ${location.name}: " + e.message, e)
-            publishEvent(new ApplicationExceptionEvent(e, location))
+            applicationEventPublisher.publishEvent(new ApplicationExceptionEvent(e, location))
             throw e;
         }
     }
