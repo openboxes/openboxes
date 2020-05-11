@@ -106,7 +106,7 @@
                         <warehouse:message code="stockMovement.rollbackLastReceipt.label" />
                     </g:link>
                 </g:if>
-                <g:elseif test="${hasBeenIssued}">
+                <g:elseif test="${hasBeenIssued || (hasBeenPlaced && isFromOrder)}">
                     <g:link controller="stockMovement" action="rollback" id="${stockMovement.id}" class="button">
                         <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
                         <warehouse:message code="default.button.rollback.label" />

@@ -77,10 +77,21 @@
 				</div>
 
 				<div class="action-menu-item">
+					<g:hasRoleApprover>
+						<g:set var="isApprover" value="${true}"/>
+					</g:hasRoleApprover>
+					<g:if test="${!isApprover}">
+						<g:set var="disabledMessage" value="${g.message(code:'errors.noPermissions.label')}"/>
+					</g:if>
+					<g:elseif test="${orderInstance?.shipments}">
+						<g:set var="disabledMessage" value="${g.message(code:'order.errors.rollback.message')}"/>
+					</g:elseif>
 					<g:link controller="order" action="rollbackOrderStatus" id="${orderInstance?.id}"
-							onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+							onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
+							disabled="${orderInstance?.shipments || !isApprover}"
+							disabledMessage="${disabledMessage}">
 						<img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />
-						&nbsp;${warehouse.message(code: 'order.rollbackOrderStatus.label', default: "Rollack order status" )}
+						&nbsp;${warehouse.message(code: 'order.rollbackOrderStatus.label', default: "Rollback order status" )}
 					</g:link>
 				</div>
 				<div class="action-menu-item">

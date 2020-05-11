@@ -5,7 +5,7 @@
     <table>
         <tbody>
 
-        <g:if test="${orderItem?.order.status <= org.pih.warehouse.order.OrderStatus.PENDING}">
+        <g:if test="${canEdit && !orderItem.hasShipmentAssociated()}">
             <tr class="prop">
                 <td valign="top" class="name">
                     <label for="dlgProduct"><warehouse:message code="product.label"/></label>
@@ -89,7 +89,7 @@
                 </td>
             </tr>
         </g:if>
-        <g:else>
+        <g:elseif test="${canEdit && orderItem.hasShipmentAssociated()}">
             <tr class="prop">
                 <td valign="top" class="name">
                     <label for="dlgProduct"><warehouse:message code="product.label"/></label>
@@ -159,7 +159,7 @@
                     <input class="text large datepicker" id="dlgActualReadyDate" name="actualReadyDate" value="${orderItem?.actualReadyDate?.format("MM/dd/yyyy")}" />
                 </td>
             </tr>
-        </g:else>
+        </g:elseif>
 
         </tbody>
         <tfoot>

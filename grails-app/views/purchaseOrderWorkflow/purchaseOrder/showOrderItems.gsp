@@ -8,6 +8,7 @@
     .dlg { display: none; }
     .non-editable { background-color: #e6e6e6; cursor: not-allowed }
     .non-editable.odd { background-color: #e1e1e1; }
+    .items-table { table-layout: fixed; }
 </style>
 
 </head>
@@ -41,16 +42,16 @@
                     <g:hiddenField id="orderId" name="order.id" value="${order?.id }"></g:hiddenField>
                     <g:hiddenField id="orderItemId" name="orderItem.id" value="${orderItem?.id }"></g:hiddenField>
                     <g:hiddenField id="supplierId" name="supplier.id" value="${order?.originParty?.id }"></g:hiddenField>
-                    <table id="orderItemsTable">
+                    <table id="orderItemsTable" class="items-table">
                         <thead>
                             <tr class="odd">
-                                <th><warehouse:message code="order.lineItemNumber.label" default="#"/></th>
-                                <th><warehouse:message code="product.label"/></th>
+                                <th width="1%"><warehouse:message code="order.lineItemNumber.label" default="#"/></th>
+                                <th width="15%"><warehouse:message code="product.label"/></th>
                                 <th class="center"><warehouse:message code="product.sourceCode.label"/></th>
                                 <th class="center"><warehouse:message code="product.supplierCode.label"/></th>
                                 <th class="center"><warehouse:message code="product.manufacturer.label"/></th>
                                 <th class="center"><warehouse:message code="product.manufacturerCode.label"/></th>
-                                <th class="center"><warehouse:message code="default.quantity.label"/></th>
+                                <th class="center" width="8%"><warehouse:message code="default.quantity.label"/></th>
                                 <th class="center" colspan="2"><warehouse:message code="default.unitOfMeasure.label"/></th>
                                 <th class="center"><warehouse:message code="orderItem.unitPrice.label"/></th>
                                 <th class="center"><warehouse:message code="orderItem.totalCost.label"/></th>
@@ -63,7 +64,7 @@
                             <!-- data is dynamically loaded -->
                         </tbody>
                         <tfoot>
-                            <g:if test="${isApprover.toBoolean()}">
+                            <g:if test="${order?.status < org.pih.warehouse.order.OrderStatus.PLACED || isApprover}">
                                 <g:render template="/order/orderItemForm"/>
                             </g:if>
                             <tr class="">
@@ -99,9 +100,9 @@
                         </g:link>
                     </g:if>
                     <g:else>
-                        <g:link controller="order" action="shipOrder" id="${order?.id}" class="button">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />&nbsp;
-                            ${warehouse.message(code: 'order.wizard.shipOrder.label', default: 'Ship Order')}
+                        <g:link controller="order" action="show" id="${order?.id}" class="button">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'cart_magnify.png')}" />&nbsp;
+                            <warehouse:message code="default.button.saveAndExit.label" default="Save and Exit"/>
                         </g:link>
                     </g:else>
                 </div>
@@ -327,17 +328,22 @@
         }
         function onCompleteHandler(response, status, xhr ) {
           if (status == "error") {
-            var errorMessage = "Sorry, there was an error: " + xhr.status + " " + xhr.statusText;
-            var errorHtml = $("<div/>").addClass("fade empty center").append(errorMessage);
-            $(this).html(errorHtml);
+            if (xhr.responseText) {
+              let data = JSON.parse(xhr.responseText);
+              $.notify(data.errorMessage, "error");
+            } else {
+              $.notify("Error deleting item " + id, "error")
+            }
+          } else {
+            $(this).dialog("open");
           }
         }
 
         function editOrderItem(id) {
-          var executionKey = $(this).data("execution");
-          var url = "${request.contextPath}/order/orderItemFormDialog/" + id + "?execution=" + executionKey;
-          $('.loading').show();
-          $("#edit-item-dialog").html("Loading ...").load(url, onCompleteHandler).dialog("open");
+            var executionKey = $(this).data("execution");
+            var url = "${request.contextPath}/order/orderItemFormDialog/" + id + "?execution=" + executionKey;
+            $('.loading').show();
+            $("#edit-item-dialog").html("Loading ...").load(url, onCompleteHandler);
         }
 
 
