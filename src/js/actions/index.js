@@ -167,7 +167,7 @@ function fetchNumberIndicator(
 ) {
   const id = indicatorConfig.order;
 
-  const url = `${indicatorConfig.endpoint}`;
+  const url = indicatorConfig.endpoint;
 
   apiClient.get(url).then((res) => {
     const indicatorData = res.data;
