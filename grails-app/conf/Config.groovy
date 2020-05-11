@@ -135,7 +135,6 @@ grails.serverURL = "http://localhost:8080/${appName}"
 // UI performance
 uiperformance.enabled = false
 
-
 /* Default settings for emails sent through the SMTP appender  */
 //mail.error.server = 'localhost'
 //mail.error.port = 25
@@ -386,40 +385,40 @@ openboxes {
         enabled = true
         endpoints {
             number {
-                inProgressPutaways {
-                    endpoint = "getInProgressPutaways"
+                 inProgressPutaways {
+                    endpoint = "${grails.serverURL}/apitablero/getInProgressPutaways"
                     archived = false
                     order = 4
                 }
                 inventoryByLotAndBin {
-                    endpoint = "getInventoryByLotAndBin"
+                    endpoint =  "${grails.serverURL}/apitablero/getInventoryByLotAndBin"
                     archived = false
                     order = 1
                 }
                 inProgressShipments {
-                    endpoint = "getInProgressShipments"
+                    endpoint =  "${grails.serverURL}/apitablero/getInProgressShipments"
                     archived = false
                     order = 3
                 }
                 receivingBin {
-                    endpoint = "getReceivingBin"
+                    endpoint =  "${grails.serverURL}/apitablero/getReceivingBin"
                     archived = false
                     order = 2
                 }
                 itemsInventoried {
-                    endpoint = "getItemsInventoried"
+                    endpoint =  "${grails.serverURL}/apitablero/getItemsInventoried"
                     archived = true
                     order = 5
                 }
                 defaultBin {
-                    endpoint = "getDefaultBin"
+                    endpoint =  "${grails.serverURL}/apitablero/getDefaultBin"
                     archived = true
                     order = 6
                 }
             }
             graph {
                 inventorySummary {
-                    endpoint = "getInventorySummary"
+                    endpoint =  "${grails.serverURL}/apitablero/getInventorySummary"
                     archived = false
                     datalabel = true
                     order = 1
@@ -432,7 +431,7 @@ openboxes {
                     }
                 }
                 expirationSummary {
-                    endpoint = "getExpirationSummary"
+                    endpoint =  "${grails.serverURL}/apitablero/getExpirationSummary"
                     archived = false
                     order = 2
                     colors {
@@ -442,7 +441,7 @@ openboxes {
                     }
                 }
                 sentStockMovements {
-                    endpoint = "getSentStockMovements"
+                    endpoint =  "${grails.serverURL}/apitablero/getSentStockMovements"
                     archived = true
                     stacked = true
                     datalabel = true
@@ -452,7 +451,7 @@ openboxes {
                     }
                 }
                 outgoingStock {
-                    endpoint = "getOutgoingStock"
+                    endpoint =  "${grails.serverURL}/apitablero/getOutgoingStock"
                     archived = false
                     order = 4
                     colors {
@@ -464,29 +463,29 @@ openboxes {
                     }
                 }
                 receivedStockMovements {
-                    endpoint = "getReceivedStockMovements"
+                    endpoint =  "${grails.serverURL}/apitablero/getReceivedStockMovements"
                     archived = true
                     stacked = true
                     datalabel = true
                     order = 7
                 }
                 discrepancy {
-                    endpoint = "getDiscrepancy"
+                    endpoint =  "${grails.serverURL}/apitablero/getDiscrepancy"
                     archived = false
                     order = 6
                 }
                 delayedShipments {
-                    endpoint = "getDelayedShipments"
+                    endpoint =  "${grails.serverURL}/apitablero/getDelayedShipments"
                     archived = false
                     order = 5
                 }
                 fillRate {
-                    endpoint = "getFillRate"
+                    endpoint =  "${grails.serverURL}/apitablero/getFillRate"
                     archived = true
                     order = 8
                 }
                 incomingStock {
-                    endpoint = "getIncomingStock"
+                    endpoint =  "${grails.serverURL}/apitablero/getIncomingStock"
                     archived = false
                     order = 3
                 }

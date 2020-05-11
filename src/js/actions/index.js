@@ -116,7 +116,7 @@ function fetchGraphIndicator(
 ) {
   const id = indicatorConfig.order;
 
-  const url = `/openboxes/apitablero/${indicatorConfig.endpoint}?${params}`;
+  const url = `${indicatorConfig.endpoint}?${params}`;
 
   dispatch({
     type: FETCH_GRAPHS,
@@ -167,7 +167,7 @@ function fetchNumberIndicator(
 ) {
   const id = indicatorConfig.order;
 
-  const url = `/openboxes/apitablero/${indicatorConfig.endpoint}`;
+  const url = `${indicatorConfig.endpoint}`;
 
   apiClient.get(url).then((res) => {
     const indicatorData = res.data;
