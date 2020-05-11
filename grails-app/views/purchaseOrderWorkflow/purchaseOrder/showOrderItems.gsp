@@ -328,20 +328,22 @@
         }
         function onCompleteHandler(response, status, xhr ) {
           if (status == "error") {
-            var errorMessage = "Sorry, there was an error: " + xhr.status + " " + xhr.statusText;
-            var errorHtml = $("<div/>").addClass("fade empty center").append(errorMessage);
-            $(this).html(errorHtml);
+            if (xhr.responseText) {
+              let data = JSON.parse(xhr.responseText);
+              $.notify(data.errorMessage, "error");
+            } else {
+              $.notify("Error deleting item " + id, "error")
+            }
+          } else {
+            $(this).dialog("open");
           }
         }
 
         function editOrderItem(id) {
-          var canEdit = !event.target.closest("tr").className.includes("non-editable");
-          if (canEdit) {
             var executionKey = $(this).data("execution");
             var url = "${request.contextPath}/order/orderItemFormDialog/" + id + "?execution=" + executionKey;
             $('.loading').show();
-            $("#edit-item-dialog").html("Loading ...").load(url, onCompleteHandler).dialog("open");
-          }
+            $("#edit-item-dialog").html("Loading ...").load(url, onCompleteHandler);
         }
 
 
@@ -351,8 +353,7 @@
 
           $("table").dblclick(function(event) {
             var id = event.target.closest("tr").id;
-            var canEdit = !event.target.closest("tr").className.includes("non-editable");
-            if (id && canEdit) {
+            if (id) {
               editOrderItem(id);
             }
             return false;
