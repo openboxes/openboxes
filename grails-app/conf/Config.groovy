@@ -439,7 +439,7 @@ openboxes {
                             state6 = ["Expiration(s)"]
                         }
                         labels {
-                            state5 = ["within 30 days", "within 90 days", "within 180 days", "within 360 days"]
+                            state5 = ["today", "within 30 days", "within 90 days", "within 180 days", "within 360 days"]
                         }
                     }
                 }
