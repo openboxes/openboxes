@@ -527,10 +527,6 @@ class OrderService {
     }
 
     def canOrderItemBeEdited(OrderItem orderItem, User user) {
-        if (orderItem.hasShippedItems()) {
-            return false
-        }
-
         def isPending = orderItem?.order?.status == OrderStatus.PENDING
         def isApprover = userService.hasRoleApprover(user)
 

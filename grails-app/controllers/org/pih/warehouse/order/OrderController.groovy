@@ -580,13 +580,16 @@ class OrderController {
 
     def orderItemFormDialog = {
         OrderItem orderItem = OrderItem.get(params.id)
+        if (!orderService.canOrderItemBeEdited(orderItem, session.user)) {
+            throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
+        }
         render(template: "orderItemFormDialog", model: [orderItem:orderItem, canEdit: orderService.canOrderItemBeEdited(orderItem, session.user)])
     }
 
     def removeOrderItem = {
         OrderItem orderItem = OrderItem.get(params.id)
         if (orderItem) {
-            if (!orderService.canOrderItemBeEdited(orderItem, session.user)) {
+            if (orderItem.hasShipmentAssociated() || !orderService.canOrderItemBeEdited(orderItem, session.user)) {
                 throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
             }
             Order order = orderItem.order
