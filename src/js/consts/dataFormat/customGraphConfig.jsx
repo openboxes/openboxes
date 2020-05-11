@@ -1,4 +1,4 @@
-import { getColorByName, getRandomColor } from './colorMapping';
+import { getColorByName } from './colorMapping';
 
 function loadNumbersOptions(payload) {
   const palette = (payload.config.colors && payload.config.colors.palette) ?
@@ -6,9 +6,9 @@ function loadNumbersOptions(payload) {
 
   const options = {
     colors: {
-      first: getRandomColor(null, palette),
-      second: getRandomColor(null, palette),
-      third: getRandomColor(null, palette),
+      first: getColorByName('default'),
+      second: getColorByName('default'),
+      third: getColorByName('default'),
     },
   };
 

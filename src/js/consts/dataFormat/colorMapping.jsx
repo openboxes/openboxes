@@ -15,6 +15,7 @@ function formatColorPalette(colorPalette) {
       dark: [],
       light: [],
     },
+    default: null,
   };
 
   Object.entries(colorPalette).forEach(([key, value]) => {
@@ -32,6 +33,9 @@ function formatColorPalette(colorPalette) {
         index = 2;
       }
       formattedPalette.gyr[gyrMatch[1] || 'default'][index] = value;
+    }
+    if (key === 'default') {
+      formattedPalette.default = value;
     }
   });
 
@@ -60,6 +64,9 @@ function getColorByName(name, palette) {
   const gyrMatch = name.match(/(success|warning|error)/);
   const stateMatch = name.match(/state([0-9]+)/);
 
+  if (name === 'default') {
+    return COLORS.default;
+  }
   if (gyrMatch) {
     let gyrIndex = 0;
     if (gyrMatch[1].toLowerCase() === 'warning') {
