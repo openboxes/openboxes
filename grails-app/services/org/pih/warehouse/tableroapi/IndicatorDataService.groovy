@@ -1,6 +1,6 @@
 package org.pih.warehouse.tableroapi
 
-import org.pih.warehouse.tablero.DataGraph
+import org.pih.warehouse.tablero.GraphData
 import org.pih.warehouse.tablero.TableData
 import org.pih.warehouse.tablero.Table
 import org.pih.warehouse.tablero.ColorNumber
@@ -18,12 +18,12 @@ class IndicatorDataService {
 
     def dashboardService
 
-    DataGraph getExpirationSummaryData(Location location, def params) {
+    GraphData getExpirationSummaryData(Location location, def params) {
         // querySize = value of the date filter (1 month, 3 months, etc.)
         // Here it represents the last month we want to show
         // Add + 1 to include today (expired items) as the first point
         Integer querySize = params.querySize ? params.querySize.toInteger() + 1 : 7
-    
+
         LocalDate date = LocalDate.now()
 
         List expirationSummary = [0] * querySize
@@ -79,14 +79,14 @@ class IndicatorDataService {
                 new IndicatorDatasets('Expiration(s)', expirationSummary, linksExpirationSummary)
         ]
 
-        IndicatorData data = new IndicatorData(datasets, listLabels)
+        IndicatorData indicatorData = new IndicatorData(datasets, listLabels)
 
-        DataGraph indicatorData = new DataGraph(data, 1, "Expiration summary", "line")
+        GraphData graphData = new GraphData(indicatorData, "Expiration summary", "line", "/openboxes/inventory/listExpiringStock")
 
-        return indicatorData
+        return graphData
     }
 
-    DataGraph getFillRate() {
+    GraphData getFillRate() {
         List listData = []
         List bar2Data = []
         List listLabel = []
@@ -115,14 +115,14 @@ class IndicatorDataService {
                 new IndicatorDatasets('Bar2 Dataset', bar2Data),
         ];
 
-        IndicatorData data = new IndicatorData(datasets, listLabel);
+        IndicatorData indicatorData = new IndicatorData(datasets, listLabel);
 
-        DataGraph indicatorData = new DataGraph(data, 1, "Fill rate", "line");
+        GraphData graphData = new GraphData(indicatorData, "Fill rate", "bar");
 
-        return indicatorData;
+        return graphData;
     }
 
-    DataGraph getInventorySummaryData(def results) {
+    GraphData getInventorySummaryData(def results) {
         def inStockCount = results.findAll {
             it.quantityOnHand > 0
         }.size()
@@ -138,7 +138,6 @@ class IndicatorDataService {
         def stockOutCount = results.findAll {
             it.quantityOnHand <= 0
         }.size()
-        //def totalCount = results.size()
 
         def inventoryData = [
                 inStockCount    : inStockCount,
@@ -153,18 +152,25 @@ class IndicatorDataService {
             listData.push(item.value ? item.value : 0)
         }
 
+        List<String> links = [
+                "/openboxes/inventory/listInStock",
+                "/openboxes/inventory/listOverStock",
+                "/openboxes/inventory/listReorderStock",
+                "/openboxes/inventory/listLowStock",
+                "/openboxes/inventory/listQuantityOnHandZero"]
+
         List<IndicatorDatasets> datasets = [
-                new IndicatorDatasets('Inventory Summary', listData)
+                new IndicatorDatasets('Inventory Summary', listData, links)
         ];
 
-        IndicatorData data = new IndicatorData(datasets, ['In stock', 'Above maximum', 'Below reorder', 'Below minimum', 'No longer in stock']);
+        IndicatorData indicatorData = new IndicatorData(datasets, ['In stock', 'Above maximum', 'Below reorder', 'Below minimum', 'No longer in stock']);
 
-        DataGraph indicatorData = new DataGraph(data, 1, "Inventory Summary", "horizontalBar");
+        GraphData graphData = new GraphData(indicatorData, "Inventory Summary", "horizontalBar");
 
-        return indicatorData;
+        return graphData;
     }
 
-    DataGraph getSentStockMovements(Location location, def params) {
+    GraphData getSentStockMovements(Location location, def params) {
         Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
         Date today = new Date()
         today.clearTime()
@@ -216,14 +222,14 @@ class IndicatorDataService {
         }
         List<IndicatorDatasets> datasets = (List<IndicatorDatasets>) listRes.values().toList();
 
-        IndicatorData data = new IndicatorData(datasets, listLabel);
+        IndicatorData indicatorData = new IndicatorData(datasets, listLabel);
 
-        DataGraph indicatorData = new DataGraph(data, 1, "Stock Movements Sent by Month", "bar");
+        GraphData graphData = new GraphData(indicatorData, "Stock Movements Sent by Month", "bar");
 
-        return indicatorData;
+        return graphData;
     }
 
-    DataGraph getReceivedStockData(Location location, def params) {
+    GraphData getReceivedStockData(Location location, def params) {
         Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
         Date today = new Date()
         today.clearTime()
@@ -273,14 +279,14 @@ class IndicatorDataService {
         }
         List<IndicatorDatasets> datasets = (List<IndicatorDatasets>) listRes.values().toList();
 
-        IndicatorData data = new IndicatorData(datasets, listLabel);
+        IndicatorData indicatorData = new IndicatorData(datasets, listLabel);
 
-        DataGraph indicatorData = new DataGraph(data, 1, "Stock Movements Received by Month", "bar");
+        GraphData graphData = new GraphData(indicatorData, "Stock Movements Received by Month", "bar");
 
-        return indicatorData;
+        return graphData;
     }
 
-    NumberIndicator getOutgoingStock(Location location) {
+    GraphData getOutgoingStock(Location location) {
         Date today = new Date()
         today.clearTime();
         def m4 = today - 4;
@@ -299,12 +305,14 @@ class IndicatorDataService {
         ColorNumber yellow = new ColorNumber(yellowData[0], 'Created > 4 days ago');
         ColorNumber red = new ColorNumber(redData[0], 'Created > 7 days ago');
 
-        NumberIndicator indicatorData = new NumberIndicator(green, yellow, red)
+        NumberIndicator numberIndicator = new NumberIndicator(green, yellow, red)
 
-        return indicatorData;
+        GraphData graphData = new GraphData(numberIndicator, "Outgoing Stock Movements in Progress", "numbers", "/openboxes/stockMovement/list?receiptStatusCode=PENDING");
+
+        return graphData;
     }
 
-    NumberIndicator getIncomingStock(Location location) {
+    GraphData getIncomingStock(Location location) {
 
         def query = Shipment.executeQuery("""select s.currentStatus, count(s) from Shipment s where s.destination = :location and s.currentStatus <> 'RECEIVED' group by s.currentStatus""",
                 ['location': location]);
@@ -317,20 +325,22 @@ class IndicatorDataService {
         // Changes each ColorNumber if found in query
         query.each {
             if (it[0].name == 'PENDING') {
-                pending = new ColorNumber(it[1], 'Pending', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=PENDING')
+                pending.value = it[1]
             } else if (it[0].name == 'SHIPPED') {
-                shipped = new ColorNumber(it[1], 'Shipped', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=SHIPPED')
+                shipped.value = it[1]
             } else if (it[0].name == 'PARTIALLY_RECEIVED') {
-                partiallyReceived = new ColorNumber(it[1], 'Partially Received', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=PARTIALLY_RECEIVED')
+                partiallyReceived.value = it[1]
             }
         }
 
-        NumberIndicator indicatorData = new NumberIndicator(pending, shipped, partiallyReceived, false)
+        NumberIndicator numberIndicator = new NumberIndicator(pending, shipped, partiallyReceived)
 
-        return indicatorData;
+        GraphData graphData = new GraphData(numberIndicator, "Incoming Stock Movements By Status", "numbers", "/openboxes/stockMovement/list?direction=INBOUND");
+
+        return graphData;
     }
 
-    def getDiscrepancy(Location location, def params) {
+    GraphData getDiscrepancy(Location location, def params) {
         Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
 
         Date date = LocalDate.now().minusMonths(querySize).toDate()
@@ -386,12 +396,14 @@ class IndicatorDataService {
             )
         }
 
-        Table indicatorData = new Table("Shipment", "Name", "Discrepancy", tableBody)
+        Table tableData = new Table("Shipment", "Name", "Discrepancy", tableBody)
 
-        return indicatorData;
+        GraphData graphData = new GraphData(tableData, "Items received with a discrepancy", "table");
+
+        return graphData;
     }
 
-    def getDelayedShipments(Location location) {
+    GraphData getDelayedShipments(Location location) {
         Date oneWeekAgo = LocalDate.now().minusWeeks(1).toDate()
         Date oneMonthAgo = LocalDate.now().minusMonths(1).toDate()
         Date twoMonthsAgo = LocalDate.now().minusMonths(2).toDate()
@@ -435,10 +447,12 @@ class IndicatorDataService {
         ColorNumber delayedShipmentBySea = new ColorNumber(numberDelayed['sea'], 'By sea')
         ColorNumber delayedShipmentByLand = new ColorNumber(numberDelayed['landAndSuitcase'], 'By land')
 
-        NumberIndicator numberIndicator = new NumberIndicator(delayedShipmentByAir, delayedShipmentBySea, delayedShipmentByLand, false)
+        NumberIndicator numberIndicator = new NumberIndicator(delayedShipmentByAir, delayedShipmentBySea, delayedShipmentByLand)
 
         NumberTableData numberTableData = new NumberTableData(table, numberIndicator)
 
-        return numberTableData;
+        GraphData graphData = new GraphData(numberTableData, "Delayed Shipments", "numberTable");
+
+        return graphData;
     }
 }

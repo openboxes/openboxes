@@ -2,16 +2,16 @@
 
 import React from 'react';
 import ReactLoading from 'react-loading';
-import { getColor } from '../../consts/dataFormat/dataLoading';
+import { getRandomColor } from '../../consts/dataFormat/colorMapping';
 
 const LoadingNumbers = () => {
   const loadingNumbers = [];
-  for (let i = 0; i < 6; i += 1) {
+  for (let i = 0; i < 4; i += 1) {
     loadingNumbers.push(<div className="number-card" key={i}>
       <div className="loader-div">
         <ReactLoading
           type="bubbles"
-          color={getColor()}
+          color={getRandomColor()}
           height="100px"
           width="100px"
         />

@@ -135,7 +135,6 @@ grails.serverURL = "http://localhost:8080/${appName}"
 // UI performance
 uiperformance.enabled = false
 
-
 /* Default settings for emails sent through the SMTP appender  */
 //mail.error.server = 'localhost'
 //mail.error.port = 25
@@ -380,6 +379,123 @@ openboxes.dashboard.catalogsSummary.enabled = true
 
 // Default value for news summary
 openboxes.dashboard.newsSummary.newsItems = []
+
+openboxes {
+    tablero {
+        enabled = true
+        endpoints {
+            number {
+                 inProgressPutaways {
+                    endpoint = "${grails.serverURL}/apitablero/getInProgressPutaways"
+                    archived = false
+                    order = 4
+                }
+                inventoryByLotAndBin {
+                    endpoint = "${grails.serverURL}/apitablero/getInventoryByLotAndBin"
+                    archived = false
+                    order = 1
+                }
+                inProgressShipments {
+                    endpoint = "${grails.serverURL}/apitablero/getInProgressShipments"
+                    archived = false
+                    order = 3
+                }
+                receivingBin {
+                    endpoint = "${grails.serverURL}/apitablero/getReceivingBin"
+                    archived = false
+                    order = 2
+                }
+                itemsInventoried {
+                    endpoint = "${grails.serverURL}/apitablero/getItemsInventoried"
+                    archived = true
+                    order = 5
+                }
+                defaultBin {
+                    endpoint = "${grails.serverURL}/apitablero/getDefaultBin"
+                    archived = true
+                    order = 6
+                }
+            }
+            graph {
+                inventorySummary {
+                    endpoint = "${grails.serverURL}/apitablero/getInventorySummary"
+                    archived = false
+                    datalabel = true
+                    order = 1
+                    colors {
+                        labels {
+                            success = ["In stock"]
+                            warning = ["Above maximum", "Below reorder", "Below minimum"]
+                            error = ["No longer in stock"]
+                        }
+                    }
+                }
+                expirationSummary {
+                    endpoint = "${grails.serverURL}/apitablero/getExpirationSummary"
+                    archived = false
+                    order = 2
+                    colors {
+                        datasets {
+                            state6 = ["Expiration(s)"]
+                        }
+                        labels {
+                            state5 = ["today", "within 30 days", "within 90 days", "within 180 days", "within 360 days"]
+                        }
+                    }
+                }
+                sentStockMovements {
+                    endpoint = "${grails.serverURL}/apitablero/getSentStockMovements"
+                    archived = true
+                    stacked = true
+                    datalabel = true
+                    order = 9
+                    colors {
+                        palette = "light"
+                    }
+                }
+                outgoingStock {
+                    endpoint = "${grails.serverURL}/apitablero/getOutgoingStock"
+                    archived = false
+                    order = 4
+                    colors {
+                        datasets {
+                            success = ["first"]
+                            warning = ["second"]
+                            error = ["third"]
+                        }
+                    }
+                }
+                receivedStockMovements {
+                    endpoint = "${grails.serverURL}/apitablero/getReceivedStockMovements"
+                    archived = true
+                    stacked = true
+                    datalabel = true
+                    order = 7
+                }
+                discrepancy {
+                    endpoint = "${grails.serverURL}/apitablero/getDiscrepancy"
+                    archived = false
+                    order = 6
+                }
+                delayedShipments {
+                    endpoint = "${grails.serverURL}/apitablero/getDelayedShipments"
+                    archived = false
+                    order = 5
+                }
+                fillRate {
+                    endpoint = "${grails.serverURL}/apitablero/getFillRate"
+                    archived = true
+                    order = 8
+                }
+                incomingStock {
+                    endpoint = "${grails.serverURL}/apitablero/getIncomingStock"
+                    archived = false
+                    order = 3
+                }
+            }
+        }
+    }
+}
 
 // OpenBoxes identifier config
 openboxes.identifier.separator = Constants.DEFAULT_IDENTIFIER_SEPARATOR

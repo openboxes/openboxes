@@ -1,5 +1,6 @@
 import { arrayMove } from 'react-sortable-hoc';
 import update from 'immutability-helper';
+import { loadGraphColors, loadGraphOptions } from '../consts/dataFormat/graphConfig';
 import {
   ADD_TO_INDICATORS,
   FETCH_GRAPHS,
@@ -7,7 +8,9 @@ import {
   REMOVE_FROM_INDICATORS,
   REORDER_INDICATORS,
   RESET_INDICATORS,
+  FETCH_CONFIG,
 } from '../actions/types';
+import { loadNumbersOptions } from '../consts/dataFormat/customGraphConfig';
 
 function arrayArchive(array = [], index) {
   const newArray = update(array, { [index]: { archived: { $set: 1 } } });
@@ -21,7 +24,7 @@ function arrayUnarchive(array = [], index) {
 
 function findInArray(id, array = []) {
   for (let i = 0; i < array.length; i += 1) {
-    if (array[i].id === id) {
+    if (array[i] && array[i].id === id) {
       return i;
     }
   }
@@ -31,31 +34,54 @@ function findInArray(id, array = []) {
 const initialState = {
   data: [],
   numberData: [],
+  config: {},
 };
 
 export default function (state = initialState, action) {
   switch (action.type) {
     case FETCH_GRAPHS: {
+      const { payload } = action;
+      // Data formatting
+      if (payload.type === 'numbers' || payload.type === 'numberTable') {
+        payload.options = loadNumbersOptions(payload);
+      }
+      if (payload.type === 'bar' || payload.type === 'doughnut' || payload.type === 'horizontalBar' || payload.type === 'line') {
+        payload.data.datasets = loadGraphColors(payload);
+        payload.options = loadGraphOptions(payload);
+      }
       // new reference to array so the component is re-rendered when value changes
       const newState = [].concat(state.data);
-      const index = findInArray(action.payload.id, state.data);
+      const index = findInArray(payload.id, state.data);
       if (index === false) {
-        newState.push(action.payload);
+        newState[action.payload.id - 1] = action.payload;
       } else {
-        newState[index] = action.payload;
+        newState[index] = payload;
       }
       return {
         ...state,
         data: newState,
       };
     }
-    case FETCH_NUMBERS:
+    case FETCH_NUMBERS: {
+      // new reference to array so the component is re-rendered when value changes
+      const newState = [].concat(state.numberData);
+      const index = findInArray(action.payload.id, state.numberData);
+      if (index === false) {
+        newState[action.payload.id - 1] = action.payload;
+      } else {
+        newState[index] = action.payload;
+      }
       return {
         ...state,
-        numberData: action.payload.data,
+        numberData: newState,
       };
+    }
     case RESET_INDICATORS:
-      return initialState;
+      return {
+        ...state,
+        data: [],
+        numberData: [],
+      };
     case REORDER_INDICATORS: {
       if (action.payload.type === 'graph') {
         return {
@@ -108,6 +134,11 @@ export default function (state = initialState, action) {
       }
       return state;
     }
+    case FETCH_CONFIG:
+      return {
+        ...state,
+        config: action.payload.data,
+      };
     default:
       return state;
   }

@@ -9,8 +9,8 @@ import {
   fetchIndicators,
   reorderIndicators,
   reloadIndicator,
-  fetchNumbersData,
   resetIndicators,
+  fetchConfigAndData,
 } from '../../actions';
 import GraphCard from './GraphCard';
 import LoadingNumbers from './LoadingNumbers';
@@ -24,7 +24,7 @@ defaults.scale.ticks.beginAtZero = true;
 
 
 // eslint-disable-next-line no-shadow
-const SortableCards = SortableContainer(({ data, reloadIndicator }) => (
+const SortableCards = SortableContainer(({ data, loadIndicator }) => (
   <div className="card-component">
     {data.map((value, index) =>
       (value.archived ? null : (
@@ -32,12 +32,12 @@ const SortableCards = SortableContainer(({ data, reloadIndicator }) => (
           key={`item-${value.id}`}
           index={index}
           cardId={value.id}
-          cardMethod={value.method}
           cardTitle={value.title}
           cardType={value.type}
           cardLink={value.link}
           data={value.data}
-          reloadIndicator={reloadIndicator}
+          options={value.options}
+          loadIndicator={loadIndicator}
         />
       )))}
   </div>
@@ -96,8 +96,18 @@ class Tablero extends Component {
 
   fetchData() {
     this.props.resetIndicators();
-    this.props.fetchIndicators();
-    this.props.fetchNumbersData();
+    if (this.props.dashboardConfig && this.props.dashboardConfig.endpoints) {
+      this.props.fetchIndicators(this.props.dashboardConfig);
+    } else {
+      this.props.fetchConfigAndData();
+    }
+  }
+
+  loadIndicator = (id, params) => {
+    const indicatorConfig = Object.values(this.props.dashboardConfig.endpoints.graph)
+      .filter(config => config.order === id)[0];
+
+    this.props.reloadIndicator(indicatorConfig, params);
   }
 
   sortStartHandle = () => {
@@ -156,10 +166,10 @@ class Tablero extends Component {
       <div className="cards-container">
         {numberCards}
         <SortableCards
-          data={this.props.indicatorsData}
+          data={this.props.indicatorsData.filter(indicator => indicator)}
           onSortStart={this.sortStartHandle}
           onSortEnd={this.sortEndHandleGraph}
-          reloadIndicator={this.props.reloadIndicator}
+          loadIndicator={this.loadIndicator}
           axis="xy"
           useDragHandle
         />
@@ -179,6 +189,7 @@ class Tablero extends Component {
 const mapStateToProps = state => ({
   indicatorsData: state.indicators.data,
   numberData: state.indicators.numberData,
+  dashboardConfig: state.indicators.config,
   currentLocation: state.session.currentLocation.id,
 });
 
@@ -187,8 +198,8 @@ export default connect(mapStateToProps, {
   reloadIndicator,
   addToIndicators,
   reorderIndicators,
-  fetchNumbersData,
   resetIndicators,
+  fetchConfigAndData,
 })(Tablero);
 
 Tablero.defaultProps = {
@@ -202,11 +213,18 @@ Tablero.propTypes = {
   reorderIndicators: PropTypes.func.isRequired,
   indicatorsData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   numberData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  dashboardConfig: PropTypes.shape({
+    enabled: PropTypes.bool,
+    endpoints: PropTypes.shape({
+      graph: PropTypes.shape({}),
+      number: PropTypes.shape({}),
+    }),
+  }).isRequired,
+  currentLocation: PropTypes.string.isRequired,
   addToIndicators: PropTypes.func.isRequired,
   reloadIndicator: PropTypes.func.isRequired,
-  fetchNumbersData: PropTypes.func.isRequired,
   resetIndicators: PropTypes.func.isRequired,
-  currentLocation: PropTypes.string.isRequired,
+  fetchConfigAndData: PropTypes.func.isRequired,
 };
 
 ArchiveIndicator.propTypes = {
