@@ -72,7 +72,7 @@
                 <g:set var="disabledMessage" value="${g.message(code:'order.errors.rollback.message')}"/>
             </g:elseif>
             <g:if test="${currentState}">
-                <g:if test="${currentState == 'showOrder' || currentState == 'editOrder'}">
+                <g:if test="${currentState == 'showOrder'}">
                     <g:link controller="order" action="list" class="button">
                         <img src="${resource(dir: 'images/icons/silk', file: 'application_view_list.png')}" />&nbsp;
                         <warehouse:message code="default.list.label" args="[g.message(code: 'orders.label')]" default="List purchase order"/>
@@ -166,7 +166,7 @@
                         </div>
                     </g:elseif>
                 </g:if>
-                <g:elseif test="${currentState == 'addItems'}">
+                <g:elseif test="${currentState == 'addItems' || currentState == 'editOrder'}">
                     <g:if test="${orderInstance?.status == OrderStatus.PENDING}">
                         <div class="button-group">
                             <g:link controller="order" action="show" id="${orderInstance?.id}" class="button">
