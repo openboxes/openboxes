@@ -386,39 +386,39 @@ openboxes {
         endpoints {
             number {
                  inProgressPutaways {
-                    endpoint = "${grails.serverURL}/apitablero/getInProgressPutaways"
+                    endpoint = "/openboxes/apitablero/getInProgressPutaways"
                     archived = false
                     order = 4
                 }
                 inventoryByLotAndBin {
-                    endpoint = "${grails.serverURL}/apitablero/getInventoryByLotAndBin"
+                    endpoint = "/openboxes/apitablero/getInventoryByLotAndBin"
                     archived = false
                     order = 1
                 }
                 inProgressShipments {
-                    endpoint = "${grails.serverURL}/apitablero/getInProgressShipments"
+                    endpoint = "/openboxes/apitablero/getInProgressShipments"
                     archived = false
                     order = 3
                 }
                 receivingBin {
-                    endpoint = "${grails.serverURL}/apitablero/getReceivingBin"
+                    endpoint = "/openboxes/apitablero/getReceivingBin"
                     archived = false
                     order = 2
                 }
                 itemsInventoried {
-                    endpoint = "${grails.serverURL}/apitablero/getItemsInventoried"
+                    endpoint = "/openboxes/apitablero/getItemsInventoried"
                     archived = true
                     order = 5
                 }
                 defaultBin {
-                    endpoint = "${grails.serverURL}/apitablero/getDefaultBin"
+                    endpoint = "/openboxes/apitablero/getDefaultBin"
                     archived = true
                     order = 6
                 }
             }
             graph {
                 inventorySummary {
-                    endpoint = "${grails.serverURL}/apitablero/getInventorySummary"
+                    endpoint = "/openboxes/apitablero/getInventorySummary"
                     archived = false
                     datalabel = true
                     order = 1
@@ -431,7 +431,7 @@ openboxes {
                     }
                 }
                 expirationSummary {
-                    endpoint = "${grails.serverURL}/apitablero/getExpirationSummary"
+                    endpoint = "/openboxes/apitablero/getExpirationSummary"
                     archived = false
                     order = 2
                     colors {
@@ -444,7 +444,7 @@ openboxes {
                     }
                 }
                 sentStockMovements {
-                    endpoint = "${grails.serverURL}/apitablero/getSentStockMovements"
+                    endpoint = "/openboxes/apitablero/getSentStockMovements"
                     archived = true
                     stacked = true
                     datalabel = true
@@ -454,7 +454,7 @@ openboxes {
                     }
                 }
                 outgoingStock {
-                    endpoint = "${grails.serverURL}/apitablero/getOutgoingStock"
+                    endpoint = "/openboxes/apitablero/getOutgoingStock"
                     archived = false
                     order = 4
                     colors {
@@ -466,29 +466,29 @@ openboxes {
                     }
                 }
                 receivedStockMovements {
-                    endpoint = "${grails.serverURL}/apitablero/getReceivedStockMovements"
+                    endpoint = "/openboxes/apitablero/getReceivedStockMovements"
                     archived = true
                     stacked = true
                     datalabel = true
                     order = 7
                 }
                 discrepancy {
-                    endpoint = "${grails.serverURL}/apitablero/getDiscrepancy"
+                    endpoint = "/openboxes/apitablero/getDiscrepancy"
                     archived = false
                     order = 6
                 }
                 delayedShipments {
-                    endpoint = "${grails.serverURL}/apitablero/getDelayedShipments"
+                    endpoint = "/openboxes/apitablero/getDelayedShipments"
                     archived = false
                     order = 5
                 }
                 fillRate {
-                    endpoint = "${grails.serverURL}/apitablero/getFillRate"
+                    endpoint = "/openboxes/apitablero/getFillRate"
                     archived = true
                     order = 8
                 }
                 incomingStock {
-                    endpoint = "${grails.serverURL}/apitablero/getIncomingStock"
+                    endpoint = "/openboxes/apitablero/getIncomingStock"
                     archived = false
                     order = 3
                 }
