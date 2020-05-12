@@ -87,6 +87,7 @@ const NO_STOCKLIST_FIELDS = {
           options: [],
           showValueTooltip: true,
           className: 'text-left',
+          optionRenderer: option => <strong style={{ color: option.color ? option.color : 'black' }}>{option.label}</strong>,
         },
         getDynamicAttr: ({
           fieldValue, debouncedProductsFetch, rowIndex, rowCount,
@@ -188,6 +189,7 @@ const STOCKLIST_FIELDS = {
           options: [],
           showValueTooltip: true,
           className: 'text-left',
+          optionRenderer: option => <strong style={{ color: option.color ? option.color : 'black' }}>{option.label}</strong>,
         },
         getDynamicAttr: ({
           fieldValue, debouncedProductsFetch, rowIndex, rowCount, newItem,
@@ -296,6 +298,7 @@ const VENDOR_FIELDS = {
           cache: false,
           options: [],
           showValueTooltip: true,
+          optionRenderer: option => <strong style={{ color: option.color ? option.color : 'black' }}>{option.label}</strong>,
         },
         getDynamicAttr: ({ debouncedProductsFetch }) => ({
           loadOptions: debouncedProductsFetch,

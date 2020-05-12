@@ -90,6 +90,7 @@ const VENDOR_FIELDS = {
           options: [],
           disabled: true,
           showValueTooltip: true,
+          optionRenderer: option => <strong style={{ color: option.color ? option.color : 'black' }}>{option.label}</strong>,
         },
         getDynamicAttr: ({ debouncedProductsFetch }) => ({
           loadOptions: debouncedProductsFetch,
