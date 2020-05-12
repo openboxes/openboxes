@@ -16,6 +16,7 @@ import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCommand
 import org.pih.warehouse.core.DocumentType
@@ -278,7 +279,7 @@ class StockMovementController {
         document.contentType = command.fileContents.fileItem.contentType
         document.name = command.fileContents.fileItem.name
         document.filename = command.fileContents.fileItem.name
-        document.documentType = DocumentType.get(9)
+        document.documentType = DocumentType.get(Constants.DEFAULT_DOCUMENT_TYPE_ID)
 
         shipment.addToDocuments(document)
         shipment.save()

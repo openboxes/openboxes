@@ -18,8 +18,6 @@
 			<g:renderErrors bean="${shipmentInstance}" as="list" />
 		</div>
 	</g:hasErrors>
-
-
 	<g:render template="summary" />
 	<div class="box">
 		<h2><warehouse:message code="shipping.addDocument.label" /></h2>
@@ -55,29 +53,22 @@
 						<input name="fileContents" type="file" />
 					</td>
 				</tr>
-
 				</tbody>
 				<tfoot>
 				<tr>
 					<td>
-
 					</td>
 					<td>
 						<div class="buttons left">
 							<button type="submit" class="button">${warehouse.message(code:'default.button.upload.label')}</button>
-
-							&nbsp;
 							<g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id}">
 								<warehouse:message code="default.button.cancel.label" />
 							</g:link>
 						</div>
-
 					</td>
 				</tr>
 				</tfoot>
 			</table>
-
-
 		</g:uploadForm>
 	</div>
 </div>

@@ -2078,7 +2078,7 @@ class StockMovementService {
             }
 
             stockMovement?.shipment?.documents.each { Document document ->
-                def action = document.documentType.documentCode == DocumentCode.SHIPPING_TEMPLATE ? "render" : "download"
+                def action = document.documentType?.documentCode == DocumentCode.SHIPPING_TEMPLATE ? "render" : "download"
                 documentList << [
                         name        : document?.name,
                         documentType: document?.documentType?.name,
