@@ -1,3 +1,4 @@
+/* eslint no-param-reassign: ["error", { "props": false }] */
 // eslint-disable-next-line no-unused-vars
 import datalabels from 'chartjs-plugin-datalabels';
 import { getColor, getArrayOfColors } from './colorMapping';
@@ -8,11 +9,8 @@ function loadColorDataset(index, data, type, subtype, colorConfig) {
   const dataset = data;
 
   if (type === 'line') {
-    dataset.borderColor = getColor(index, colorConfig);
-    dataset.lineTension = 0;
-    dataset.fill = !subtype;
     // for a line graph we want a single color for all unless specified
-    if (Array.isArray(colorConfig.data)) {
+    if (colorConfig.data.colorsArray && colorConfig.data.colorsArray.length) {
       dataset.pointBackgroundColor = getArrayOfColors(dataset.data.length, colorConfig);
       dataset.pointBorderColor = getArrayOfColors(dataset.data.length, colorConfig);
       dataset.pointHoverBackgroundColor = getArrayOfColors(dataset.data.length, colorConfig, true);
@@ -23,6 +21,10 @@ function loadColorDataset(index, data, type, subtype, colorConfig) {
       dataset.pointHoverBackgroundColor = getColor(index, colorConfig, true);
       dataset.pointHoverBorderColor = getColor(index, colorConfig, true);
     }
+    colorConfig.data.colorsArray = null;
+    dataset.borderColor = getColor(index, colorConfig);
+    dataset.lineTension = 0;
+    dataset.fill = !subtype;
   } if (type === 'bar') {
     dataset.backgroundColor = getColor(index, colorConfig);
     dataset.hoverBackgroundColor = getColor(index, colorConfig, true);
@@ -41,7 +43,10 @@ function loadGraphColors(payload) {
 
   const colorConfig = {
     palette: 'default',
-    data: null,
+    data: {
+      color: null,
+      colorsArray: null,
+    },
   };
   if (payload.config.colors && payload.config.colors.palette) {
     colorConfig.palette = payload.config.colors.palette;
@@ -51,19 +56,19 @@ function loadGraphColors(payload) {
     const type = datasets[i].type || payload.type;
 
     if (payload.config.colors && payload.config.colors.datasets) {
-      colorConfig.data = Object.keys(payload.config.colors.datasets)
+      colorConfig.data.color = Object.keys(payload.config.colors.datasets)
         .find(key => payload.config.colors.datasets[key].includes(datasets[i].label));
     }
 
     if (payload.config.colors && payload.config.colors.labels) {
-      const datasetColor = colorConfig.data;
-      colorConfig.data = payload.data.labels.map(() => datasetColor);
+      const datasetColor = colorConfig.data.color;
+      colorConfig.data.colorsArray = payload.data.labels.map(() => datasetColor);
 
       payload.data.labels.forEach((label, index) => {
         const labelColor = Object.keys(payload.config.colors.labels)
           .find(key => payload.config.colors.labels[key].includes(label));
         if (labelColor) {
-          colorConfig.data[index] = labelColor;
+          colorConfig.data.colorsArray[index] = labelColor;
         }
       });
     }
