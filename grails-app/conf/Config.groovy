@@ -371,7 +371,7 @@ openboxes.dashboard.genericProductSummary.enabled = false
 openboxes.dashboard.expiringSummary.enabled = true
 
 // Column 3
-openboxes.dashboard.newsSummary.enabled = false
+openboxes.dashboard.newsSummary.enabled = true
 openboxes.dashboard.activitySummary.enabled = true
 openboxes.dashboard.valueSummary.enabled = false
 openboxes.dashboard.tagSummary.enabled = true
@@ -379,6 +379,8 @@ openboxes.dashboard.catalogsSummary.enabled = true
 
 // Default value for news summary
 openboxes.dashboard.newsSummary.newsItems = []
+openboxes.dashboard.newsSummary.rssUrl = "https://openboxes.com/blog/index.xml"
+openboxes.dashboard.newsSummary.limit = 25
 
 openboxes {
     tablero {
