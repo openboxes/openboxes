@@ -108,8 +108,15 @@ function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', ma
         gridLines: {
           color: 'transparent',
         },
+        ticks: {
+          precision: 0,
+        },
       }],
-      yAxes: [{}],
+      yAxes: [{
+        ticks: {
+          precision: 0,
+        },
+      }],
     },
     plugins: {
       datalabels: {
@@ -160,15 +167,17 @@ function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', ma
       },
     };
 
+    // Add Math.ceil(maxValue / maxTicks) to try to ensure an extra tick will be added
+    // maxTicks = 11
     if (alignLabel === 'right' && maxValue) {
       options.scales.xAxes[0].ticks = {
-        suggestedMax: maxValue + 1,
+        suggestedMax: maxValue + Math.ceil(maxValue / 11),
       };
     }
 
     if (alignLabel === 'top' && maxValue) {
       options.scales.yAxes[0].ticks = {
-        suggestedMax: maxValue + 1,
+        suggestedMax: maxValue + Math.ceil(maxValue / 11),
       };
     }
   }
