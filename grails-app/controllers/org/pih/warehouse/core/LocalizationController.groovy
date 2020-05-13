@@ -25,22 +25,22 @@ class LocalizationController {
         def localizationInstanceList
         def localizationInstanceTotal
 
-        if (params.q || params.locale) {
-            localizationInstanceList = Localization.createCriteria().list(params) {
-                if (params.locale) {
-                    eq("locale", params.locale)
-                }
+        def defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
+        def currentLocale = session?.user?.locale ?: session.locale ?: defaultLocale
+        params.locale = params.locale ?: currentLocale?.language
+
+        localizationInstanceList = Localization.createCriteria().list(params) {
+            if (params.locale) {
+                eq("locale", params.locale)
+            }
+            if (params.q) {
                 or {
                     ilike("code", params.q + "%")
                     ilike("text", "%" + params.q + "%")
                 }
             }
-            localizationInstanceTotal = localizationInstanceList.totalCount
-        } else {
-            localizationInstanceList = Localization.list(params)
-            localizationInstanceTotal = Localization.count()
-
         }
+        localizationInstanceTotal = localizationInstanceList.totalCount
 
         [localizationInstanceList: localizationInstanceList, localizationInstanceTotal: localizationInstanceTotal]
     }
@@ -142,7 +142,9 @@ class LocalizationController {
                 redirect(action: "list", id: params.id)
             }
         } else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'localization.label', default: 'Localization'), params.id])}"
+            //flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'localization.label', default: 'Localization'), params.id])}"
+            Localization.all*.delete()
+
             redirect(action: "list")
         }
     }
@@ -150,7 +152,7 @@ class LocalizationController {
 
     def export = {
         log.info("Locale: " + session.user.locale)
-        Locale locale = session.user.locale
+        Locale locale = params.locale ? new Locale(params.locale) : session.user.locale
         def filename = locale.language == 'en' ? "messages.properties" : "messages_${locale.language}.properties"
         def localizationInstanceList = Localization.findAllByLocale(locale.language)
         response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
