@@ -15,7 +15,6 @@ class ApitableroController {
 
     def numberDataService
     def indicatorDataService
-    def inventorySnapshotService
 
     def getInventoryByLotAndBin = {
         Location location = Location.get(session?.warehouse?.id)
@@ -66,8 +65,7 @@ class ApitableroController {
 
     def getInventorySummary = {
         Location location = Location.get(session?.warehouse?.id)
-        def results = inventorySnapshotService.findInventorySnapshotByLocation(location)
-        def inventorySummary = indicatorDataService.getInventorySummaryData(results)
+        def inventorySummary = indicatorDataService.getInventorySummaryData(location)
         render (inventorySummary.toJson() as JSON)
     }
 
