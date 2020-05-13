@@ -9,15 +9,14 @@
  **/
 package org.pih.warehouse.core
 
-import groovy.text.Template
 import groovyx.net.http.HTTPBuilder
-import org.codehaus.groovy.grails.web.pages.GroovyPagesTemplateEngine
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 import org.springframework.web.multipart.MultipartFile
 import util.FileUtil
+import org.pih.warehouse.core.Constants
 
 class DocumentController {
 
@@ -182,7 +181,8 @@ class DocumentController {
             flash.message = "${warehouse.message(code: 'document.documentTooLarge.message')}"
         } else if (file.size < 10 * 1024 * 1000) {
             log.info "Creating new document "
-            def typeId = command?.typeId ?: "0"
+            // Document type with id 9 is "Other" and it's default in case there's no document type chosen
+            def typeId = command?.typeId ?: Constants.DEFAULT_DOCUMENT_TYPE_ID;
             Document documentInstance = new Document(
                     size: file.size,
                     name: command.name ?: file.originalFilename,
@@ -210,9 +210,9 @@ class DocumentController {
             // If there are errors, we need to redisplay the document form
             else {
                 log.info "Document did not save " + documentInstance.errors
-                flash.message = "${warehouse.message(code: 'document.cannotSave.messagee', args: [documentInstance.errors])}"
+                flash.message = "${warehouse.message(code: 'document.cannotSave.message', args: [documentInstance.errors])}"
                 if (shipmentInstance) {
-                    redirect(controller: "shipment", action: "addDocument", id: shipmentInstance.id,
+                    redirect(controller: "stockMovement", action: "addDocument", id: shipmentInstance.id,
                             model: [shipmentInstance: shipmentInstance, documentInstance: documentInstance])
                     return
                 } else if (orderInstance) {
