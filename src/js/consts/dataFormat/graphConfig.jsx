@@ -93,7 +93,7 @@ function loadDatalabel(context) {
   if (datasets.indexOf(context.dataset) === datasets.length - 1) {
     let sum = 0;
     datasets.map((dataset) => {
-      sum += dataset.data[context.dataIndex];
+      sum += dataset.data[context.dataIndex] || 0;
       return sum;
     });
     return sum;
@@ -150,7 +150,7 @@ function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', ma
     options.plugins.datalabels = {
       anchor: 'end',
       align: alignLabel,
-      offset: 10,
+      offset: 5,
       color(context) {
         return context.dataset.backgroundColor;
       },
@@ -184,7 +184,7 @@ function loadGraphOptions(payload) {
     labelAlignment = (payload.type === 'horizontalBar') ? 'right' : 'top';
 
     let sumDatasets = 0;
-    if (!payload.config.stacked) {
+    if (!payload.config.stacked || payload.data.datasets.length === 1) {
       sumDatasets = payload.data.datasets[0].data;
     } else {
       sumDatasets = payload.data.datasets.reduce((sum, value) => {

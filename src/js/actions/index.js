@@ -184,6 +184,7 @@ function fetchNumberIndicator(
 
 export function reloadIndicator(indicatorConfig, params) {
   return (dispatch) => {
+    indicatorConfig.archived = false;
     fetchGraphIndicator(dispatch, indicatorConfig, params);
   };
 }
