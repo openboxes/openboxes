@@ -347,7 +347,8 @@
                                                         <g:hasRoleApprover>
                                                             <g:set var="isApprover" value="${true}"/>
                                                         </g:hasRoleApprover>
-                                                        <g:set var="canManageAdjustments" value="${orderInstance?.status >= OrderStatus.PLACED && isApprover}"/>
+                                                        <g:set var="canManageAdjustments" value="${orderInstance?.status >= OrderStatus.PLACED && isApprover
+                                                                || orderInstance?.status == OrderStatus.PENDING}"/>
                                                         <g:link action="editAdjustment" id="${orderAdjustment.id}" params="['order.id':orderInstance?.id]" class="button"
                                                                 disabled="${!canManageAdjustments}"
                                                                 disabledMessage="${g.message(code:'errors.noPermissions.label')}">

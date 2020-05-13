@@ -704,6 +704,13 @@ class ShipmentService {
             log.info("Checking shipment item ${shipmentItem?.inventoryItem} quantity [" +
                     shipmentItem.quantity + "] <= quantity on hand [" + quantityOnHand + "]")
             if (duplicatedShipmentItemsQuantity > quantityOnHand && origin.supports(ActivityCode.MANAGE_INVENTORY)) {
+                String errorMessage = "Shipping quantity (${shipmentItem.quantity}) can not exceed on hand quantity (${quantityOnHand}) for " +
+                        "product code ''${shipmentItem.product.productCode}'' " +
+                        "and lot number ''${shipmentItem?.inventoryItem?.lotNumber}'' " +
+                        "at origin ''${origin.name}'' " +
+                        "bin ''${shipmentItem?.binLocation?.name ?: 'Default'}''. " +
+                        "This can occur if changes were made to inventory after this shipment was picked but before it shipped. " +
+                        "To move forward, please remove the lines above from the shipment or reduce to reflect current QOH."
                 shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedAvailableQuantity",
                         [
                                 shipmentItem.quantity + " " + shipmentItem?.product?.unitOfMeasure,
@@ -712,8 +719,7 @@ class ShipmentService {
                                 shipmentItem?.inventoryItem?.lotNumber,
                                 origin.name,
                                 shipmentItem?.binLocation?.name ?: 'Default'
-                        ].toArray(),
-                        "Shipping quantity cannot exceed on-hand quantity for product code " + shipmentItem.product.productCode + " " + allPendingShipmentsWithProduct.shipment.shipmentNumber.unique())
+                        ].toArray(), errorMessage)
                 throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
             }
         }
