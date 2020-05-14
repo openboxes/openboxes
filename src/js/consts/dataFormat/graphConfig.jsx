@@ -1,3 +1,4 @@
+/* eslint no-param-reassign: ["error", { "props": false }] */
 // eslint-disable-next-line no-unused-vars
 import datalabels from 'chartjs-plugin-datalabels';
 import { getColor, getArrayOfColors } from './colorMapping';
@@ -8,11 +9,8 @@ function loadColorDataset(index, data, type, subtype, colorConfig) {
   const dataset = data;
 
   if (type === 'line') {
-    dataset.borderColor = getColor(index, colorConfig);
-    dataset.lineTension = 0;
-    dataset.fill = !subtype;
     // for a line graph we want a single color for all unless specified
-    if (Array.isArray(colorConfig.data)) {
+    if (colorConfig.data.colorsArray && colorConfig.data.colorsArray.length) {
       dataset.pointBackgroundColor = getArrayOfColors(dataset.data.length, colorConfig);
       dataset.pointBorderColor = getArrayOfColors(dataset.data.length, colorConfig);
       dataset.pointHoverBackgroundColor = getArrayOfColors(dataset.data.length, colorConfig, true);
@@ -23,6 +21,10 @@ function loadColorDataset(index, data, type, subtype, colorConfig) {
       dataset.pointHoverBackgroundColor = getColor(index, colorConfig, true);
       dataset.pointHoverBorderColor = getColor(index, colorConfig, true);
     }
+    colorConfig.data.colorsArray = null;
+    dataset.borderColor = getColor(index, colorConfig);
+    dataset.lineTension = 0;
+    dataset.fill = !subtype;
   } if (type === 'bar') {
     dataset.backgroundColor = getColor(index, colorConfig);
     dataset.hoverBackgroundColor = getColor(index, colorConfig, true);
@@ -41,7 +43,10 @@ function loadGraphColors(payload) {
 
   const colorConfig = {
     palette: 'default',
-    data: null,
+    data: {
+      color: null,
+      colorsArray: null,
+    },
   };
   if (payload.config.colors && payload.config.colors.palette) {
     colorConfig.palette = payload.config.colors.palette;
@@ -51,19 +56,19 @@ function loadGraphColors(payload) {
     const type = datasets[i].type || payload.type;
 
     if (payload.config.colors && payload.config.colors.datasets) {
-      colorConfig.data = Object.keys(payload.config.colors.datasets)
+      colorConfig.data.color = Object.keys(payload.config.colors.datasets)
         .find(key => payload.config.colors.datasets[key].includes(datasets[i].label));
     }
 
     if (payload.config.colors && payload.config.colors.labels) {
-      const datasetColor = colorConfig.data;
-      colorConfig.data = payload.data.labels.map(() => datasetColor);
+      const datasetColor = colorConfig.data.color;
+      colorConfig.data.colorsArray = payload.data.labels.map(() => datasetColor);
 
       payload.data.labels.forEach((label, index) => {
         const labelColor = Object.keys(payload.config.colors.labels)
           .find(key => payload.config.colors.labels[key].includes(label));
         if (labelColor) {
-          colorConfig.data[index] = labelColor;
+          colorConfig.data.colorsArray[index] = labelColor;
         }
       });
     }
@@ -88,7 +93,7 @@ function loadDatalabel(context) {
   if (datasets.indexOf(context.dataset) === datasets.length - 1) {
     let sum = 0;
     datasets.map((dataset) => {
-      sum += dataset.data[context.dataIndex];
+      sum += dataset.data[context.dataIndex] || 0;
       return sum;
     });
     return sum;
@@ -103,8 +108,15 @@ function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', ma
         gridLines: {
           color: 'transparent',
         },
+        ticks: {
+          precision: 0,
+        },
       }],
-      yAxes: [{}],
+      yAxes: [{
+        ticks: {
+          precision: 0,
+        },
+      }],
     },
     plugins: {
       datalabels: {
@@ -145,7 +157,7 @@ function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', ma
     options.plugins.datalabels = {
       anchor: 'end',
       align: alignLabel,
-      offset: 10,
+      offset: 5,
       color(context) {
         return context.dataset.backgroundColor;
       },
@@ -155,15 +167,17 @@ function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', ma
       },
     };
 
+    // Add Math.ceil(maxValue / maxTicks) to try to ensure an extra tick will be added
+    // maxTicks = 11
     if (alignLabel === 'right' && maxValue) {
       options.scales.xAxes[0].ticks = {
-        suggestedMax: maxValue + 1,
+        suggestedMax: maxValue + Math.ceil(maxValue / 11),
       };
     }
 
     if (alignLabel === 'top' && maxValue) {
       options.scales.yAxes[0].ticks = {
-        suggestedMax: maxValue + 1,
+        suggestedMax: maxValue + Math.ceil(maxValue / 11),
       };
     }
   }
@@ -179,7 +193,7 @@ function loadGraphOptions(payload) {
     labelAlignment = (payload.type === 'horizontalBar') ? 'right' : 'top';
 
     let sumDatasets = 0;
-    if (!payload.config.stacked) {
+    if (!payload.config.stacked || payload.data.datasets.length === 1) {
       sumDatasets = payload.data.datasets[0].data;
     } else {
       sumDatasets = payload.data.datasets.reduce((sum, value) => {
