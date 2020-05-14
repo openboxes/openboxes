@@ -185,7 +185,7 @@ class IndicatorDataService {
 
             // If the destination is new, add it to the list with empty values for now
             if (listRes.get(itemLocation.name) == null) {
-                listRes.put(itemLocation.name, new IndicatorDatasets(itemLocation.name, [0] * querySize))
+                listRes.put(itemLocation.name, new IndicatorDatasets(itemLocation.name, [0] * (querySize + 1)))
             }
 
             for (int i = querySize; i >= 0; i--) {
@@ -242,7 +242,7 @@ class IndicatorDataService {
 
             // If the origin is new, add it to the list with empty values for now
             if (listRes.get(itemLocation.name) == null) {
-                listRes.put(itemLocation.name, new IndicatorDatasets(itemLocation.name, [0] * querySize))
+                listRes.put(itemLocation.name, new IndicatorDatasets(itemLocation.name, [0] * (querySize + 1)))
             }
 
             for (int i = querySize; i >= 0; i--) {
