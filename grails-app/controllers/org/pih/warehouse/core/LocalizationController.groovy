@@ -142,9 +142,7 @@ class LocalizationController {
                 redirect(action: "list", id: params.id)
             }
         } else {
-            //flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'localization.label', default: 'Localization'), params.id])}"
-            Localization.all*.delete()
-
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'localization.label', default: 'Localization'), params.id])}"            
             redirect(action: "list")
         }
     }
