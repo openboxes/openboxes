@@ -71,7 +71,42 @@
             <g:elseif test="${orderInstance?.shipments}">
                 <g:set var="disabledMessage" value="${g.message(code:'order.errors.rollback.message')}"/>
             </g:elseif>
-            <g:if test="${currentState}">
+            <g:if test="${orderInstance?.orderTypeCode == OrderTypeCode.TRANSFER_ORDER}">
+                <g:link controller="order" action="list" class="button">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'application_view_list.png')}" />&nbsp;
+                    <warehouse:message code="default.list.label" args="[g.message(code: 'orders.label')]" default="List purchase order"/>
+                </g:link>
+                <g:link controller="order" action="create" class="button">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
+                    <warehouse:message code="default.create.label" args="[g.message(code: 'order.label')]" default="Create purchase order" />
+                </g:link>
+                <div class="button-group right">
+                    <g:link controller="order" action="addComment" id="${orderInstance?.id}" class="button">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />&nbsp;
+                        <warehouse:message code="order.wizard.addComment.label" default="Add comment"/>
+                    </g:link>
+                    <g:link controller="order" action="addDocument" id="${orderInstance?.id}" class="button">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />&nbsp;
+                        <warehouse:message code="order.wizard.addDocument.label" default="Add document"/>
+                    </g:link>
+                    <g:link controller="putAway" action="generatePdf" id="${orderInstance?.id}" class="button" target="_blank">
+                        <img src="${resource(dir: 'images/icons', file: 'pdf.png')}" />&nbsp;
+                        <warehouse:message code="putaway.generatePutawayList.label" default="Generate Putaway List"/>
+                    </g:link>
+                </div>
+                <div class="button-group right">
+                    <g:link controller="order" action="show" id="${orderInstance?.id}" class="button">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'cart_magnify.png')}" />&nbsp;
+                        <warehouse:message code="order.wizard.showOrder.label" default="Show Order"/>
+                    </g:link>
+                    <g:set var="disabled" value="${orderInstance?.status in [OrderStatus.COMPLETED, OrderStatus.CANCELED]}"/>
+                    <g:link controller="putAway" action="create" id="${orderInstance?.id}" class="button" disabled="${disabled}" disabledMessage="This feature is not available for completed and canceled putaways">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
+                        <warehouse:message code="default.edit.label" args="[warehouse.message(code:'putawayOrder.label')]"/>
+                    </g:link>
+                </div>
+            </g:if>
+            <g:elseif test="${currentState}">
                 <g:if test="${currentState == 'showOrder'}">
                     <g:link controller="order" action="list" class="button">
                         <img src="${resource(dir: 'images/icons/silk', file: 'application_view_list.png')}" />&nbsp;
@@ -257,7 +292,7 @@
                         </g:link>
                     </div>
                 </g:elseif>
-            </g:if>
+            </g:elseif>
         </g:if>
     </div>
 </div>
