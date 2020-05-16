@@ -24,9 +24,7 @@
 
             <th><g:message code="productSupplier.ratingTypeCode.label" default="Rating Type" /></th>
 
-            <th><g:message code="productSupplier.unitOfMeasure.label" default="Unit of Measure" /></th>
-
-            <th><g:message code="productSupplier.unitPrice.label" default="Unit Price" /></th>
+            <th><g:message code="productSupplier.productPackages.label" default="Product Packages" /></th>
 
             </thead>
             <tbody>
@@ -53,11 +51,10 @@
 
                         <td>${fieldValue(bean: productSupplier, field: "ratingTypeCode")}</td>
 
-                        <td>${fieldValue(bean: productSupplier, field: "unitOfMeasure")}</td>
-
                         <td>
                             <g:hasRoleFinance>
-                                ${fieldValue(bean: productSupplier, field: "unitPrice")}
+                                <!-- Placeholder for unit price from default product package -->
+                                ${productSupplier?.productPackages?.size()}
                             </g:hasRoleFinance>
                         </td>
 

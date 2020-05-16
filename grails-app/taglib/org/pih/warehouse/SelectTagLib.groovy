@@ -190,7 +190,7 @@ class SelectTagLib {
         log.info ("product: ${product}, supplier ${supplier}")
         attrs.from = ProductSupplier.findAllByProductAndSupplier(product, supplier) ?: []
         attrs.optionKey = 'id'
-        attrs.optionValue = { it.code + " - " + it.supplierCode + " - " + (it.manufacturer?.name?:"") + " - " + (it.manufacturerCode?:"") + " - " + (it.unitPrice?:"") }
+        attrs.optionValue = { it.code + " - " + it.supplierCode + " - " + (it.manufacturer?.name?:"") + " - " + (it.manufacturerCode?:"") }
         out << g.select(attrs)
     }
 

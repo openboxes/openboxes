@@ -1127,7 +1127,6 @@ button.action-btn, button.previous, button.next {
 
 #product-details-box span.name {   }
 #product-details-box span.value { font-size: 1.0em; }
-#product-details-box span.name:after { content:":" }
 #product-details-box th { color: lightgrey; }
 #product-details-box fieldset table td { padding: 6px; }
 .product-details { height: 45px; line-height: 2px; }
@@ -1931,10 +1930,6 @@ div#dashboard li {
 
 .prop .label {
     width: 45%;
-}
-
-.label label:after {
-    content: ':';
 }
 
 .prop .value {

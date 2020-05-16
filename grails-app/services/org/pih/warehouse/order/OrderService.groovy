@@ -24,6 +24,8 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentException
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentService
+import org.pih.warehouse.shipping.ShipmentStatusCode
+import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
 
 class OrderService {
 
@@ -256,6 +258,7 @@ class OrderService {
                         orderInstance.dateApproved = new Date()
                         orderInstance.approvedBy = userInstance
                         if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
+                            grailsApplication.mainContext.publishEvent(new OrderStatusEvent(OrderStatus.PLACED, orderInstance))
                             return orderInstance
                         }
                     }
@@ -397,6 +400,7 @@ class OrderService {
                 orderInstance.status = OrderStatus.PENDING
             }
 
+            grailsApplication.mainContext.publishEvent(new OrderStatusEvent(orderInstance.status, orderInstance))
 
         } catch (Exception e) {
             log.error("Failed to rollback order status due to error: " + e.message, e)

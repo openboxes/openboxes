@@ -24,9 +24,7 @@
 
             <th><g:message code="productSupplier.ratingTypeCode.label" default="Rating Type" /></th>
 
-            <th><g:message code="productSupplier.unitOfMeasure.label" default="Unit of Measure" /></th>
-
-            <th><g:message code="productSupplier.unitPrice.label" default="Unit Price" /></th>
+            <th><g:message code="productSupplier.productPackages.label" default="Product Packages" /></th>
 
             <th><g:message code="default.actions.label" default="Actions" /></th>
 
@@ -55,14 +53,18 @@
 
                             <td>${fieldValue(bean: productSupplier, field: "ratingTypeCode")}</td>
 
-                            <td>${fieldValue(bean: productSupplier, field: "unitOfMeasure")}</td>
 
                             <td>
-                                <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: ['0.00'])}">
-                                    ${fieldValue(bean: productSupplier, field: "unitPrice")}
-                                    ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-                                </g:hasRoleFinance>
+                                ${productSupplier.productPackages.size()}
                             </td>
+%{--                            <td>${fieldValue(bean: productSupplier, field: "unitOfMeasure")}</td>--}%
+
+%{--                            <td>--}%
+%{--                                <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: ['0.00'])}">--}%
+%{--                                    ${fieldValue(bean: productSupplier, field: "unitPrice")}--}%
+%{--                                    ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}--}%
+%{--                                </g:hasRoleFinance>--}%
+%{--                            </td>--}%
 
                             <td>
                                 <div class="button-group">
@@ -97,9 +99,11 @@
                         <button class="button btn-show-dialog" data-position="top"
                                 data-title="${g.message(code: 'default.add.label', args: [g.message(code:'productSupplier.label')])}"
                                 data-url="${request.contextPath}/productSupplier/dialog?product.id=${productInstance?.id}">
+                            <img src="${createLinkTo(dir:'images/icons/silk', file:'add.png')}" />
                             ${g.message(code: 'default.create.label', default: 'Create', args: [g.message(code:'productSupplier.label')])}
                         </button>
                         <g:link class="button" controller="productSupplier" action="export" params="['productSupplier.id':productInstance?.productSuppliers*.id]">
+                            <img src="${createLinkTo(dir:'images/icons/silk', file:'page_excel.png')}" />
                             ${g.message(code: 'default.export.label', default: 'Export', args: [g.message(code:'productSuppliers.label')])}
                         </g:link>
                     </div>

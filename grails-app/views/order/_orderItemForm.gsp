@@ -22,8 +22,8 @@
         <input type="number" id="quantity" name="quantity" class="text" placeholder="Quantity" style="width: 100px"/>
     </td>
     <td class="center middle">
-        <g:selectUnitOfMeasure id="quantityUom"
-                               name="quantityUom.id" class="select2 required" style="width: 120px"
+        <g:selectUnitOfMeasure id="quantityUom" data-placeholder="UoM"
+                               name="quantityUom.id" class="select2 required" style="width: 100px"
                                noSelection="['':'']"/>
     </td>
     <td class="center middle">

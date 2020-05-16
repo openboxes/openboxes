@@ -53,7 +53,7 @@
                                 <th class="center"><warehouse:message code="product.manufacturerCode.label"/></th>
                                 <th class="center" width="8%"><warehouse:message code="default.quantity.label"/></th>
                                 <th class="center" colspan="2"><warehouse:message code="default.unitOfMeasure.label"/></th>
-                                <th class="center"><warehouse:message code="orderItem.unitPrice.label"/></th>
+                                <th class="center"><warehouse:message code="default.cost.label"/></th>
                                 <th class="center"><warehouse:message code="orderItem.totalCost.label"/></th>
                                 <th class="center"><warehouse:message code="order.recipient.label"/></th>
                                 <th class="center"><warehouse:message code="orderItem.estimatedReadyDate.label"/></th>
