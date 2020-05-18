@@ -17,7 +17,7 @@ class NumberDataService {
         def binLocations = InventorySnapshot.executeQuery("select count(*) from InventorySnapshot i where i.location = :location and i.date = :tomorrow and i.quantityOnHand > 0",
                 ['location': location, 'tomorrow': tomorrow]);
 
-        return new NumberData("Lot and Bin", binLocations[0], "In stock", "/openboxes/report/showBinLocationReport?location.id=" + location.id + "&status=inStock")
+        return new NumberData("Inventory Details", binLocations[0], "In stock", "/openboxes/report/showBinLocationReport?location.id=" + location.id + "&status=inStock")
     }
 
     NumberData getInProgressShipments(def user, def location) {
