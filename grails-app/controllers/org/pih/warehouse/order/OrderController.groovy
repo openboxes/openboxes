@@ -12,6 +12,7 @@ package org.pih.warehouse.order
 import grails.converters.JSON
 import grails.validation.ValidationException
 import org.apache.commons.lang.StringEscapeUtils
+import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
@@ -53,6 +54,61 @@ class OrderController {
 
         def orderTemplate = new Order(params)
         def orders = orderService.getOrders(orderTemplate, statusStartDate, statusEndDate, params)
+
+        if (params.format && orders) {
+
+            def sw = new StringWriter()
+            def csv = new CSVWriter(sw, {
+                "Supplier organization" { it.supplierOrganization }
+                "Supplier location" { it.supplierLocation }
+                "PO Number" { it.number }
+                "PO Description" { it.description }
+                "PO Status" { it.status }
+                "Code" { it.code }
+                "Product" { it.productName }
+                "Source Code" { it.sourceCode }
+                "Supplier Code" { it.supplierCode }
+                "Manufacturer" { it.manufacturer }
+                "Manufacturer Code" { it.manufacturerCode }
+                "Unit of Measure" { it.unitOfMeasure }
+                "Quantity Ordered" { it.quantityOrdered }
+                "Quantity Shipped" { it.quantityShipped}
+                "Quantity Received" { it.quantityReceived}
+                "Unit Price" { it.unitPrice}
+                "Total Cost" { it.totalCost}
+                "Recipient" { it.recipient}
+                "Estimated Ready Date" { it.estimatedReadyDate}
+                "Actual Ready Date" { it.actualReadyDate}
+            })
+
+            orders*.orderItems*.each { orderItem ->
+                csv << [
+                        supplierOrganization: orderItem.order.origin.organization,
+                        supplierLocation: orderItem.order.origin.name,
+                        number       : orderItem.order.orderNumber,
+                        description       : orderItem.order.name ?: '',
+                        status       : orderItem.order.status,
+                        code       : orderItem.product.productCode,
+                        productName       : orderItem.product.name,
+                        sourceCode       : orderItem.productSupplier?.code ?: '',
+                        supplierCode       : orderItem.productSupplier?.supplierCode ?: '',
+                        manufacturer       : orderItem.productSupplier?.manufacturer?.name ?: '',
+                        manufacturerCode       : orderItem.productSupplier?.manufacturer?.manufacturerCode ?: '',
+                        unitOfMeasure: orderItem.unitOfMeasure ?: '',
+                        quantityOrdered: orderItem.quantity,
+                        quantityShipped: orderItem.quantityShipped,
+                        quantityReceived: orderItem.quantityReceived,
+                        unitPrice:  orderItem.unitPrice ?: '',
+                        totalCost: orderItem.total ?: '',
+                        recipient: orderItem.recipient ?: '',
+                        estimatedReadyDate: orderItem.estimatedReadyDate?.format("MM/dd/yyyy") ?: '',
+                        actualReadyDate: orderItem.actualReadyDate?.format("MM/dd/yyyy") ?: '',
+                ]
+            }
+
+            response.setHeader("Content-disposition", "attachment; filename=\"Orders-${new Date().format("MM/dd/yyyy")}.csv\"")
+            render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
+        }
 
         def totalPrice = orders?.sum { it.totalNormalized?:0.0 } ?:0.0
 

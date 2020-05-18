@@ -104,6 +104,10 @@
                 <button type="submit" class="button icon search" name="search" value="true">
                     <warehouse:message code="default.search.label"/>
                 </button>
+                <button name="format" value="csv" class="button">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" />&nbsp;
+                    <warehouse:message code="order.downloadOrderLineDetails.label" default="Download order line details"/>
+                </button>
                 <g:link controller="order" action="list" class="button icon reload">
                     <warehouse:message code="default.button.cancel.label"/>
                 </g:link>
