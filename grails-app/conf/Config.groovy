@@ -482,9 +482,9 @@ openboxes {
                     order = 5
                      colors {
                         datasets {
-                            state1 = ["first"]
+                            state5 = ["first"]
                             state4 = ["second"]
-                            state8 = ["third"]
+                            state3 = ["third"]
                         }
                     }
                 }
