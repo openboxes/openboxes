@@ -490,6 +490,13 @@ openboxes {
                     endpoint = "/openboxes/apitablero/getIncomingStock"
                     archived = false
                     order = 3
+                    colors {
+                        datasets {
+                            state6 = ["first"]
+                            state7 = ["second"]
+                            state8 = ["third"]
+                        }
+                    }
                 }
             }
         }
