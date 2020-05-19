@@ -1,23 +1,37 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { SortableElement } from 'react-sortable-hoc';
+import { Tooltip } from 'react-tippy';
 import DragHandle from './DragHandle';
 import './tablero.scss';
 
 /* global _ */
 
+const CardTooltip = ({dataTooltip}) => (
+  <div className="cardTooltip">
+    {dataTooltip.map(value => <p> {value.name}: {value.value}  </p>)}
+  </div>
+);
 const NumberCard = SortableElement(({
-  cardTitle, cardNumber, cardSubtitle, cardLink,
+  cardTitle, cardNumber, cardSubtitle, cardLink, cardDataTooltip,
 }) => {
   const card = (
-    <div className="number-div">
-      <div className="number-body">
-        <span className="title-card"> {cardTitle} </span>
-        <span className="result-card"> {cardNumber.toLocaleString()} </span>
-        <span className="subtitle-card"> {_.truncate(cardSubtitle, { length: 22 })} </span>
+    <Tooltip
+      html={<CardTooltip dataTooltip={cardDataTooltip} />}
+      theme="transparent"
+      arrow="true"
+      disabled={cardDataTooltip.length > 0 ? null : 'true'}
+
+    >
+      <div className="number-div">
+        <div className="number-body">
+          <span className="title-card"> {cardTitle} </span>
+          <span className="result-card"> {cardNumber.toLocaleString()} </span>
+          <span className="subtitle-card"> {_.truncate(cardSubtitle, { length: 22 })} </span>
+        </div>
+        <DragHandle />
       </div>
-      <DragHandle />
-    </div>
+    </Tooltip>
   );
 
   return (
@@ -31,4 +45,8 @@ NumberCard.propTypes = {
   cardNumber: PropTypes.number.isRequired,
   cardSubtitle: PropTypes.string.isRequired,
   cardLink: PropTypes.string.isRequired,
+  cardDataTooltip: PropTypes.arrayOf(PropTypes.shape({
+    name: PropTypes.string,
+    value: PropTypes.string,
+  })),
 };

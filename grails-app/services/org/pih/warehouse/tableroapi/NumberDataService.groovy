@@ -8,6 +8,7 @@ import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.tablero.NumberData
+import org.pih.warehouse.tablero.TooltipData
 
 class NumberDataService {
 
@@ -102,7 +103,32 @@ class NumberDataService {
                         'location': location,
                         'tomorrow': tomorrow
                 ]);
+        
+        def productTooltipData = InventorySnapshot.executeQuery("""
+        SELECT i.productCode, i.product.name, i.lotNumber, i.binLocationName, i.quantityOnHand FROM InventorySnapshot i
+        WHERE i.location = :location
+        AND i.quantityOnHand < 0
+        AND i.date = :tomorrow
+        ORDER BY i.quantityOnHand ASC
+        limit 1
+        """,
+                [
+                        'location': location,
+                        'tomorrow': tomorrow     
+                ]);
 
-        return new NumberData("Products with negative inventory", productsWithNegativeInventory[0], "Products", "/openboxes/report/showBinLocationReport?location.id=" + location.id)
+        List listTooltipData = []
+        //item[0] product code
+        //item[1] Product name
+        //item[2] Lot number
+        //item[3] Quantity on hand
+        if(productTooltipData[0] != null){
+            listTooltipData.add(new TooltipData("Product code", productTooltipData[0][0]))
+            listTooltipData.add(new TooltipData("Product name", productTooltipData[0][1]))
+            listTooltipData.add(new TooltipData("Lot number", productTooltipData[0][2]))
+            listTooltipData.add(new TooltipData("Quantity on hand", productTooltipData[0][3]))
+        }
+        
+        return new NumberData("Products with negative inventory", productsWithNegativeInventory[0], "Products", "/openboxes/report/showBinLocationReport?location.id=" + location.id, listTooltipData)
     }
 }
