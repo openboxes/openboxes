@@ -11,6 +11,7 @@ package org.pih.warehouse.core
 
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
+import org.pih.warehouse.product.ProductSupplier
 
 class UomService {
 
@@ -21,7 +22,7 @@ class UomService {
             eq("product", product)
             eq("uom", unitOfMeasure)
             eq("quantity", quantity)
-            isNull("prodcut")
+            isNull("productSupplier")
         }
     }
 }
