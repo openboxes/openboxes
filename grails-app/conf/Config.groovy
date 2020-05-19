@@ -417,6 +417,11 @@ openboxes {
                     archived = true
                     order = 6
                 }
+                negativeInventory {
+                    endpoint = "/openboxes/apitablero/getProductWithNegativeInventory"
+                    archived = false
+                    order = 7
+                }
             }
             graph {
                 inventorySummary {

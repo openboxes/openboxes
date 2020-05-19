@@ -87,4 +87,22 @@ class NumberDataService {
 
         return new NumberData("Products in Default Bin", productsInDefaultBin[0], "Products", "/openboxes/report/showBinLocationReport?location.id=" + location.id + "&status=inStock")
     }
+
+      NumberData getProductWithNegativeInventory(def location) {
+
+        Date tomorrow = LocalDate.now().plusDays(1).toDate();
+
+         def productsWithNegativeInventory = InventorySnapshot.executeQuery("""
+            SELECT COUNT(distinct i.product.id) FROM InventorySnapshot i
+            WHERE i.location = :location
+            AND i.quantityOnHand < 0
+            AND i.date = :tomorrow
+            """,
+                [
+                        'location': location,
+                        'tomorrow': tomorrow
+                ]);
+
+        return new NumberData("Products with negative inventory", productsWithNegativeInventory[0], "Products", "/openboxes/report/showBinLocationReport?location.id=" + location.id)
+    }
 }
