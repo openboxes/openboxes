@@ -24,16 +24,20 @@
 
             <th><g:message code="productSupplier.ratingTypeCode.label" default="Rating Type" /></th>
 
-            <th><g:message code="productSupplier.productPackages.label" default="Product Packages" /></th>
+            <th><g:message code="unitOfMeasure.label" default="Unit of Measure" /></th>
+
+            <th><g:message code="productPackage.price.label" default="Price" /></th>
 
             <th><g:message code="default.actions.label" default="Actions" /></th>
-
 
             </thead>
             <tbody>
                 <g:if test="${productInstance?.productSuppliers}">
 
                     <g:each var="productSupplier" in="${productInstance?.productSuppliers.sort()}" status="status">
+
+                        <g:set var="defaultProductPackage" value="${productSupplier.defaultProductPackage}"/>
+
                         <tr class="prop ${status%2==0?'odd':'even'}">
                             <td>${fieldValue(bean: productSupplier, field: "code")?:g.message(code:'default.none.label')}</td>
 
@@ -53,18 +57,21 @@
 
                             <td>${fieldValue(bean: productSupplier, field: "ratingTypeCode")}</td>
 
+                            <td>
+                                <g:if test="${defaultProductPackage}">
+                                    ${fieldValue(bean: defaultProductPackage?.uom, field: "code")}/${fieldValue(bean: defaultProductPackage, field: "quantity")}
+                                </g:if>
+                            </td>
+
 
                             <td>
-                                ${productSupplier.productPackages.size()}
+                                <g:if test="${defaultProductPackage}">
+                                    <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: ['0.00'])}">
+                                        ${fieldValue(bean: defaultProductPackage, field: "price")}
+                                        ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                    </g:hasRoleFinance>
+                                </g:if>
                             </td>
-%{--                            <td>${fieldValue(bean: productSupplier, field: "unitOfMeasure")}</td>--}%
-
-%{--                            <td>--}%
-%{--                                <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: ['0.00'])}">--}%
-%{--                                    ${fieldValue(bean: productSupplier, field: "unitPrice")}--}%
-%{--                                    ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}--}%
-%{--                                </g:hasRoleFinance>--}%
-%{--                            </td>--}%
 
                             <td>
                                 <div class="button-group">

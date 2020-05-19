@@ -41,7 +41,12 @@
                     ${pkg?.uom?.code }/${pkg?.quantity }
                 </td>
                 <td>
-                    ${pkg?.productSupplier?:warehouse.message(code:'default.none.label') }
+                    <g:if test="${pkg.productSupplier}">
+                        ${pkg?.productSupplier?.code}
+                    </g:if>
+                    <g:else>
+                        ${warehouse.message(code:'default.none.label') }
+                    </g:else>
                 </td>
                 <td>
                     ${pkg?.gtin?:warehouse.message(code:'default.none.label') }
@@ -75,7 +80,6 @@
                 </td>
             </tr>
         </g:unless>
-
         </tbody>
         <tfoot>
             <tr>
@@ -99,8 +103,6 @@
                     </div>
                 </td>
             </tr>
-
         </tfoot>
     </table>
-
 </div>

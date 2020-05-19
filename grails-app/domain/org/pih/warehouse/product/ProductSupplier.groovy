@@ -66,6 +66,8 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
     Date dateCreated
     Date lastUpdated
 
+    static transients = ["defaultProductPackage"]
+
     static hasMany = [productPackages:ProductPackage]
 
     static mapping = {
@@ -99,6 +101,11 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
         comments(nullable: true)
 
     }
+
+    ProductPackage getDefaultProductPackage() {
+        return productPackages ? productPackages.toArray()[0] : null
+    }
+
 
     int compareTo(ProductSupplier obj) {
         return preferenceTypeCode <=> obj.preferenceTypeCode ?:
