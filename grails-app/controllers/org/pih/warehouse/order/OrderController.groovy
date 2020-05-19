@@ -93,7 +93,7 @@ class OrderController {
                         sourceCode       : orderItem.productSupplier?.code ?: '',
                         supplierCode       : orderItem.productSupplier?.supplierCode ?: '',
                         manufacturer       : orderItem.productSupplier?.manufacturer?.name ?: '',
-                        manufacturerCode       : orderItem.productSupplier?.manufacturer?.manufacturerCode ?: '',
+                        manufacturerCode       : orderItem.productSupplier?.manufacturerCode ?: '',
                         unitOfMeasure: orderItem.unitOfMeasure ?: '',
                         quantityOrdered: orderItem.quantity,
                         quantityShipped: orderItem.quantityShipped,
