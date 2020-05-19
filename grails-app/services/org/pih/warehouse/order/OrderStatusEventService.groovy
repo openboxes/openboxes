@@ -29,9 +29,6 @@ class OrderStatusEventService implements ApplicationListener<OrderStatusEvent> {
         OrderStatus orderStatus = event?.source
         Order order = Order.get(event?.order?.id)
 
-        log.info "Order ${order.orderNumber} ${order.status} has just transitioned to status ${orderStatus}"
-        //notificationService.sendShipmentReceiptNotification(shipment, shipment.destination, inboundReceivedRoleTypes)
-
         if (orderStatus == OrderStatus.PLACED) {
 
             order.orderItems.each { OrderItem orderItem ->
