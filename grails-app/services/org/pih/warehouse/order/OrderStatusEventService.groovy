@@ -32,27 +32,22 @@ class OrderStatusEventService implements ApplicationListener<OrderStatusEvent> {
         log.info "Order ${order.orderNumber} ${order.status} has just transitioned to status ${orderStatus}"
         //notificationService.sendShipmentReceiptNotification(shipment, shipment.destination, inboundReceivedRoleTypes)
 
-        log.info "OrderStatus ${orderStatus == OrderStatus.PLACED}"
-
         if (orderStatus == OrderStatus.PLACED) {
 
             order.orderItems.each { OrderItem orderItem ->
-
-                log.info "Order item" + orderItem.toJson()
-                log.info "Product package" + orderItem.productPackage
 
                 // Convert package price to default currency
                 BigDecimal packagePrice = orderItem.unitPrice * order.lookupCurrentExchangeRate()
 
                 // If there's no product package already we create a new one
                 if (!orderItem.productPackage) {
-                    // Find an existing product package for a specific supplier
+                    // Find an existing product package associated with a specific supplier
                     ProductPackage productPackage = orderItem?.productSupplier?.productPackages.find { ProductPackage productPackage ->
                         return productPackage.product == orderItem.product &&
                                 productPackage.uom == orderItem.quantityUom &&
                                 productPackage.quantity == orderItem.quantityPerUom
 
-                        // If not found, then we look for a product packages for the product
+                        // If not found, then we look for a product package associated with the product
                         if (!productPackage) {
                             orderItem.product.packages.find { ProductPackage productPackage1 ->
                                 return productPackage1.product == orderItem.product &&
