@@ -87,7 +87,7 @@ class OrderController {
                         supplierLocation: orderItem.order.origin.name,
                         number       : orderItem.order.orderNumber,
                         description       : orderItem.order.name ?: '',
-                        status       : orderItem.order.status,
+                        status       : orderItem.order.displayStatus,
                         code       : orderItem.product.productCode,
                         productName       : orderItem.product.name,
                         sourceCode       : orderItem.productSupplier?.code ?: '',
