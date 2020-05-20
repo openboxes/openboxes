@@ -480,6 +480,13 @@ openboxes {
                     endpoint = "/openboxes/apitablero/getDelayedShipments"
                     archived = false
                     order = 5
+                     colors {
+                        datasets {
+                            state5 = ["first"]
+                            state4 = ["second"]
+                            state3 = ["third"]
+                        }
+                    }
                 }
                 fillRate {
                     endpoint = "/openboxes/apitablero/getFillRate"
