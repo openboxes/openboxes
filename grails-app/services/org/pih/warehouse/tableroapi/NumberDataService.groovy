@@ -8,7 +8,6 @@ import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.tablero.NumberData
-import org.pih.warehouse.tablero.TooltipData
 
 class NumberDataService {
 
@@ -92,43 +91,36 @@ class NumberDataService {
       NumberData getProductWithNegativeInventory(def location) {
 
         Date tomorrow = LocalDate.now().plusDays(1).toDate();
+        Integer numberOfProduct = 0;
 
          def productsWithNegativeInventory = InventorySnapshot.executeQuery("""
-            SELECT COUNT(distinct i.product.id) FROM InventorySnapshot i
+            SELECT (SELECT COUNT(distinct i.product.id) FROM InventorySnapshot i), i.productCode, i.product.name, i.lotNumber, i.binLocationName, i.quantityOnHand FROM InventorySnapshot i
             WHERE i.location = :location
             AND i.quantityOnHand < 0
             AND i.date = :tomorrow
+            ORDER BY i.quantityOnHand ASC
             """,
                 [
                         'location': location,
                         'tomorrow': tomorrow
                 ]);
-        
-        def productTooltipData = InventorySnapshot.executeQuery("""
-        SELECT i.productCode, i.product.name, i.lotNumber, i.binLocationName, i.quantityOnHand FROM InventorySnapshot i
-        WHERE i.location = :location
-        AND i.quantityOnHand < 0
-        AND i.date = :tomorrow
-        ORDER BY i.quantityOnHand ASC
-        limit 1
-        """,
-                [
-                        'location': location,
-                        'tomorrow': tomorrow     
-                ]);
 
         List listTooltipData = []
-        //item[0] product code
-        //item[1] Product name
-        //item[2] Lot number
-        //item[3] Quantity on hand
-        if(productTooltipData[0] != null){
-            listTooltipData.add(new TooltipData("Product code", productTooltipData[0][0]))
-            listTooltipData.add(new TooltipData("Product name", productTooltipData[0][1]))
-            listTooltipData.add(new TooltipData("Lot number", productTooltipData[0][2]))
-            listTooltipData.add(new TooltipData("Quantity on hand", productTooltipData[0][3]))
+        //productsWithNegativeInventory[0][0] product count
+        //productsWithNegativeInventory[0][1] product code
+        //productsWithNegativeInventory[0][2] Product name
+        //productsWithNegativeInventory[0][3] Lot number
+        //productsWithNegativeInventory[0][4] Bin location name
+        //productsWithNegativeInventory[0][5] Quantity on hand
+        if (productsWithNegativeInventory[0] != null){
+            numberOfProduct = productsWithNegativeInventory[0][0];
+            listTooltipData.add("Product code : ${productsWithNegativeInventory[0][1]}")
+            listTooltipData.add("Product name : ${productsWithNegativeInventory[0][2]}")
+            listTooltipData.add("Lot number : ${productsWithNegativeInventory[0][3]}")
+            listTooltipData.add("Bin location name : ${productsWithNegativeInventory[0][4]}")
+            listTooltipData.add("Quantity on hand : ${productsWithNegativeInventory[0][5]}")
         }
         
-        return new NumberData("Products with negative inventory", productsWithNegativeInventory[0], "Products", "/openboxes/report/showBinLocationReport?location.id=" + location.id, listTooltipData)
+        return new NumberData("Products with negative inventory", numberOfProduct, "Products", "/openboxes/report/showBinLocationReport?location.id=" + location.id, listTooltipData)
     }
 }

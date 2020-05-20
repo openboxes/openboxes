@@ -7,21 +7,15 @@ import './tablero.scss';
 
 /* global _ */
 
-const CardTooltip = ({dataTooltip}) => (
-  <div className="cardTooltip">
-    {dataTooltip.map(value => <p> {value.name}: {value.value}  </p>)}
-  </div>
-);
 const NumberCard = SortableElement(({
   cardTitle, cardNumber, cardSubtitle, cardLink, cardDataTooltip,
 }) => {
   const card = (
     <Tooltip
-      html={<CardTooltip dataTooltip={cardDataTooltip} />}
+      html={cardDataTooltip.map(value => <p> {value}  </p>)}
       theme="transparent"
       arrow="true"
       disabled={cardDataTooltip.length > 0 ? null : 'true'}
-
     >
       <div className="number-div">
         <div className="number-body">
