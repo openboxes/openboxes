@@ -74,4 +74,6 @@
     <include file="0.8.x/changelog-2020-04-09-1218-alter-table-add-columns-order-audit-fields.xml"/>
     <include file="0.8.x/changelog-2020-04-23-1026-alter-table-add-column-order-item-quantity-uom.xml"/>
     <include file="0.8.x/changelog-2020-04-25-2156-insert-default-quantity-unit-of-measures.xml"/>
+    <include file="0.8.x/changelog-2020-05-16-1233-alter-table-add-product-supplier-to-product-package.xml"/>
+
 </databaseChangeLog>

@@ -22,7 +22,7 @@ class CurrencyService {
             String urlTemplate = grailsApplication.config.openboxes.locale.currencyApi.url
             String defaultCurrencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode
             String url = String.format(urlTemplate, defaultCurrencyCode)
-            data = apiClientService.get(url, new JSONObject())
+            data = apiClientService.get(url)
 
         } catch (Exception e) {
             log.error("Error trying to translate using translation API ", e)

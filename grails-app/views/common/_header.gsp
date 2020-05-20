@@ -31,22 +31,6 @@
                                             <g:message code="default.edit.label" args="[g.message(code:'user.profile.label')]"></g:message>
                                         </g:link>
                                     </li>
-                                    <g:if test="${session._showTime}">
-                                        <li class="action-menu-item">
-                                            <g:link controller="dashboard" action="index" params="[showTime:'off']" style="color: #666;">
-                                                <img src="${resource(dir: 'images/icons/silk', file: 'clock_delete.png')}"/>
-                                                <warehouse:message code="dashboard.disableResponseTime.label" default="Hide response time"/>
-                                            </g:link>
-                                        </li>
-                                    </g:if>
-                                    <g:else>
-                                        <li class="action-menu-item">
-                                            <g:link controller="dashboard" action="index" params="[showTime:'on']" style="color: #666;">
-                                                <img src="${resource(dir: 'images/icons/silk', file: 'clock_add.png')}"/>
-                                                <warehouse:message code="dashboard.enableResponseTime.label" default="Enable response time"/>
-                                            </g:link>
-                                        </li>
-                                    </g:else>
                                     <g:if test="${session.useDebugLocale }">
                                         <li class="action-menu-item">
                                             <g:link controller="user" action="disableLocalizationMode" style="color: #666;">
@@ -58,14 +42,14 @@
                                     <g:else>
                                         <li class="action-menu-item">
                                             <g:link controller="user" action="enableLocalizationMode" style="color: #666;">
-                                                <img src="${resource(dir: 'images/icons/silk', file: 'flag_france.png')}"/>
+                                                <img src="${resource(dir: 'images/icons/flags/png', file: 'ht.png')}"/>
                                                 ${warehouse.message(code:'localization.enable.label', default: 'Enable translation mode')}
                                             </g:link>
                                         </li>
                                     </g:else>
                                     <li class="action-menu-item">
                                         <g:link controller="dashboard" action="flushCache" style="color: #666">
-                                            <img src="${resource(dir: 'images/icons/silk', file: 'database_refresh.png')}"/>
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'database_wrench.png')}"/>
                                             ${warehouse.message(code:'cache.flush.label', default: 'Refresh caches')}
                                         </g:link>
                                     </li>
@@ -93,54 +77,51 @@
 
                     <li>
                         <span class="action-menu">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'help.png')}" class="action-hover-btn"/>
+                            <button class="action-hover-btn button">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'help.png')}" />
+                                <g:message code="default.support.label" default="Support"/>
+                            </button>
                             <ul class="actions" style="text-align:left;">
-
                                 <li class="action-menu-item">
-                                    <g:link url="http://openboxes.readthedocs.org/en/latest/" style="color: #666;" target="_blank">
-                                        <img src="${resource(dir: 'images/icons/silk', file: 'book.png')}"/>
+                                    <g:link url="https://openboxes.com/community" style="color: #666;" target="_blank">
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'comments.png')}"/>&nbsp;
+                                        <warehouse:message code="default.discussionForum.label" default="Discussion Forum"/>
+                                    </g:link>
+                                </li>
+                                <li class="action-menu-item">
+                                    <g:link url="https://docs.openboxes.com/en/develop/" style="color: #666;" target="_blank">
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'book.png')}"/>&nbsp;
                                         <warehouse:message code="docs.userGuide.label" default="User Guide"/>
                                     </g:link>
                                 </li>
                                 <li class="action-menu-item">
-                                    <g:link url="http://openboxes.atlassian.net/wiki/questions" style="color: #666;" target="_blank">
-                                        <img src="${resource(dir: 'images/icons/silk', file: 'help.png')}"/>
-                                        <warehouse:message code="docs.faq.label" default="FAQ"/>
+                                    <g:link url="https://openboxes.com/tutorials" style="color: #666;" target="_blank">
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'film.png')}"/>&nbsp;
+                                        <warehouse:message code="default.tutorials.label" default="Tutorials"/>
                                     </g:link>
                                 </li>
                                 <li class="action-menu-item">
-                                    <g:link url="https://groups.google.com/forum/#!forum/openboxes" style="color: #666;" target="_blank">
-                                        <img src="${resource(dir: 'images/icons/silk', file: 'comment.png')}"/>
-                                        <warehouse:message code="docs.forum.label" default="Forum"/>
+                                    <g:link url="https://openboxes.com/roadmap" style="color: #666;" target="_blank">
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'date.png')}"/>&nbsp;
+                                        <warehouse:message code="default.roadmap.label" default="RoadMap"/>
                                     </g:link>
                                 </li>
                                 <li class="action-menu-item">
                                     <g:link url="https://github.com/openboxes/openboxes/releases/tag/v${g.meta(name:'app.version')}" style="color: #666;" target="_blank">
-                                        <img src="${resource(dir: 'images/icons/silk', file: 'note.png')}"/>
-                                        <warehouse:message code="docs.releaseNotes.label" default="Release Notes"/> (${g.meta(name:'app.version')})
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'package.png')}"/>&nbsp;
+                                        <warehouse:message code="docs.releaseNotes.label" default="Release Notes"/>
                                     </g:link>
                                 </li>
                                 <li>
                                     <hr/>
                                 </li>
                                 <li class="action-menu-item">
-                                    <g:link url="https://openboxes.atlassian.net/secure/CreateIssue!default.jspa" style="color: #666;" target="_blank">
-                                        <img src="${resource(dir: 'images/icons/silk', file: 'bug.png')}"/>
-                                        <warehouse:message code="docs.reportBug.label" default="Report a Bug"/>
+                                    <g:link url="https://openboxes.com/support" style="color: #666;" target="_blank">
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'help.png')}"/>&nbsp;
+                                        <warehouse:message code="default.generalSupport.label" default="General Support"/>
                                     </g:link>
                                 </li>
-                                <li class="action-menu-item">
-                                    <g:link url="mailto:support@openboxes.com" style="color: #666;" target="_blank">
-                                        <img src="${resource(dir: 'images/icons/silk', file: 'email.png')}"/>
-                                        <warehouse:message code="docs.contactSupport.label" default="Email Support"/>
-                                    </g:link>
-                                </li>
-                                <li class="action-menu-item">
-                                    <g:link url="mailto:feedback@openboxes.com" data-uv-trigger="contact" style="color: #666;" target="_blank">
-                                        <img src="${resource(dir: 'images/icons/silk', file: 'lightbulb.png')}"/>
-                                        <warehouse:message code="docs.provideFeedback.label" default="Request a New Feature"/>
-                                    </g:link>
-                                </li>
+
                             </ul>
                         </span>
                     </li>
