@@ -49,8 +49,8 @@ class OrderController {
         params.status = params.status ? Enum.valueOf(OrderStatus.class, params.status) : null
 
         // Pagination parameters
-        params.max = params.max?:10
-        params.offset = params.offset?:0
+        params.max = params.format ? null : params.max?:10
+        params.offset = params.format ? null : params.offset?:0
 
         def orderTemplate = new Order(params)
         def orders = orderService.getOrders(orderTemplate, statusStartDate, statusEndDate, params)
