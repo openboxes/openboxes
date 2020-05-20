@@ -33,6 +33,7 @@ class StockMovementItem {
 
     String shipmentItemId
     String orderItemId
+    String orderNumber
 
     List<StockMovementItem> splitLineItems = []
     List<StockMovementItem> substitutionItems = []
@@ -102,7 +103,6 @@ class StockMovementItem {
     }
 
     Map toJson() {
-
         return [
                 id               : id,
                 productCode      : productCode,
@@ -124,7 +124,8 @@ class StockMovementItem {
                 recipient        : recipient,
                 substitutionItems: substitutionItems,
                 sortOrder        : sortOrder,
-                orderItemId      : orderItemId
+                orderItemId      : orderItemId,
+                orderNumber      : orderNumber
         ]
     }
 
@@ -154,6 +155,7 @@ class StockMovementItem {
                 lotNumber: shipmentItem?.inventoryItem?.lotNumber ?: "",
                 expirationDate: shipmentItem?.inventoryItem?.expirationDate,
                 sortOrder: shipmentItem?.sortOrder,
+                orderNumber: shipmentItem?.orderNumber
         )
     }
 
