@@ -419,7 +419,7 @@ openboxes {
                 }
                 negativeInventory {
                     endpoint = "/openboxes/apitablero/getProductWithNegativeInventory"
-                    archived = false
+                    archived = true
                     order = 7
                 }
             }
