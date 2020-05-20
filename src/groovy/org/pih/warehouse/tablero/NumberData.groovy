@@ -6,13 +6,13 @@ class NumberData implements Serializable {
      Long number;
      String subtitle;
      String link;
-     List<String> listTooltipData;
+     String tooltipData;
 
-    NumberData(String title, Long number, String subtitle, String link = '', List<String> listTooltipData = []) {
+    NumberData(String title, Long number, String subtitle, String link = '', tooltipData = null) {
         this.title = title;
         this.number = number;
         this.subtitle = subtitle;
         this.link = link;
-        this.listTooltipData = listTooltipData;
+        this.tooltipData = tooltipData;
     }
 }

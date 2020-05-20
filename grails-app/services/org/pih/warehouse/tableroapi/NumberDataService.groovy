@@ -88,13 +88,13 @@ class NumberDataService {
         return new NumberData("Products in Default Bin", productsInDefaultBin[0], "Products", "/openboxes/report/showBinLocationReport?location.id=" + location.id + "&status=inStock")
     }
 
-      NumberData getProductWithNegativeInventory(def location) {
+    NumberData getProductWithNegativeInventory(def location) {
 
         Date tomorrow = LocalDate.now().plusDays(1).toDate();
-        Integer numberOfProduct = 0;
+        Integer numberOfProducts = 0;
 
-         def productsWithNegativeInventory = InventorySnapshot.executeQuery("""
-            SELECT (SELECT COUNT(distinct i.product.id) FROM InventorySnapshot i), i.productCode, i.product.name, i.lotNumber, i.binLocationName, i.quantityOnHand FROM InventorySnapshot i
+        def productsWithNegativeInventory = InventorySnapshot.executeQuery("""
+            SELECT i.productCode, i.product.name, i.lotNumber, i.binLocationName, i.quantityOnHand FROM InventorySnapshot i
             WHERE i.location = :location
             AND i.quantityOnHand < 0
             AND i.date = :tomorrow
@@ -105,22 +105,27 @@ class NumberDataService {
                         'tomorrow': tomorrow
                 ]);
 
-        List listTooltipData = []
-        //productsWithNegativeInventory[0][0] product count
-        //productsWithNegativeInventory[0][1] product code
-        //productsWithNegativeInventory[0][2] Product name
-        //productsWithNegativeInventory[0][3] Lot number
-        //productsWithNegativeInventory[0][4] Bin location name
-        //productsWithNegativeInventory[0][5] Quantity on hand
-        if (productsWithNegativeInventory[0] != null){
-            numberOfProduct = productsWithNegativeInventory[0][0];
-            listTooltipData.add("Product code : ${productsWithNegativeInventory[0][1]}")
-            listTooltipData.add("Product name : ${productsWithNegativeInventory[0][2]}")
-            listTooltipData.add("Lot number : ${productsWithNegativeInventory[0][3]}")
-            listTooltipData.add("Bin location name : ${productsWithNegativeInventory[0][4]}")
-            listTooltipData.add("Quantity on hand : ${productsWithNegativeInventory[0][5]}")
+        numberOfProducts = productsWithNegativeInventory.size()
+
+        String tooltipData = null
+
+        if (numberOfProducts) {
+            // Display only the first item in the tooltip
+            // productsWithNegativeInventory[0][0] product code
+            // productsWithNegativeInventory[0][1] Product name
+            // productsWithNegativeInventory[0][2] Lot number
+            // productsWithNegativeInventory[0][3] Bin location name
+            // productsWithNegativeInventory[0][4] Quantity on hand
+            tooltipData = """\
+                Code: ${productsWithNegativeInventory[0][0]}
+                Name: ${productsWithNegativeInventory[0][1]}
+                Lot number: ${productsWithNegativeInventory[0][2]}
+                Bin location: ${productsWithNegativeInventory[0][3]}
+                Quantity: ${productsWithNegativeInventory[0][4]}"""
+            tooltipData = tooltipData.stripIndent()
         }
-        
-        return new NumberData("Products with negative inventory", numberOfProduct, "Products", "/openboxes/report/showBinLocationReport?location.id=" + location.id, listTooltipData)
+
+        return new NumberData("Products with Negative Inventory", numberOfProducts, "Products",
+                "/openboxes/report/showBinLocationReport?location.id=" + location.id, tooltipData)
     }
 }

@@ -12,10 +12,10 @@ const NumberCard = SortableElement(({
 }) => {
   const card = (
     <Tooltip
-      html={cardDataTooltip.map(value => <p> {value}  </p>)}
+      html={<p style={{ whiteSpace: 'pre' }}> {cardDataTooltip} </p>}
       theme="transparent"
       arrow="true"
-      disabled={cardDataTooltip.length > 0 ? null : 'true'}
+      disabled={!cardDataTooltip}
     >
       <div className="number-div">
         <div className="number-body">
@@ -39,8 +39,5 @@ NumberCard.propTypes = {
   cardNumber: PropTypes.number.isRequired,
   cardSubtitle: PropTypes.string.isRequired,
   cardLink: PropTypes.string.isRequired,
-  cardDataTooltip: PropTypes.arrayOf(PropTypes.shape({
-    name: PropTypes.string,
-    value: PropTypes.string,
-  })),
+  cardDataTooltip: PropTypes.string,
 };
