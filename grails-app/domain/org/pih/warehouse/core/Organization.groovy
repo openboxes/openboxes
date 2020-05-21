@@ -9,6 +9,8 @@
  **/
 package org.pih.warehouse.core
 
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
+
 class Organization extends Party {
 
     String id
@@ -25,7 +27,9 @@ class Organization extends Party {
     }
 
     static constraints = {
-        code(nullable: true)
+        code(nullable: false, unique: true,
+                minSize: ConfigurationHolder.config.openboxes.identifier.organization.minSize,
+                maxSize: ConfigurationHolder.config.openboxes.identifier.organization.maxSize)
         name(nullable: false, maxSize: 255)
         description(nullable: true, maxSize: 255)
     }
