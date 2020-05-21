@@ -57,7 +57,12 @@
 								  <label for="code"><warehouse:message code="organization.code.label" default="Code" /></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: organizationInstance, field: 'code', 'errors')}">
-									<g:textField class="text" size="80" name="code" maxlength="255" value="${organizationInstance?.code}" />
+									<g:if test="${!organizationInstance.hasPurchaseOrders()}">
+										<g:textField class="text" size="80" name="code" maxlength="255" value="${organizationInstance?.code}" />
+									</g:if>
+									<g:else>
+										${organizationInstance.code}
+									</g:else>
 								</td>
 							</tr>
 

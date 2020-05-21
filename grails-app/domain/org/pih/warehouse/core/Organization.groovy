@@ -10,6 +10,8 @@
 package org.pih.warehouse.core
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderTypeCode
 
 class Organization extends Party {
 
@@ -45,5 +47,15 @@ class Organization extends Party {
                         id <=> obj.id
     }
 
+    boolean hasPurchaseOrders() {
+        return Order.createCriteria().get {
+            projections {
+                count("id")
+            }
+            eq("orderTypeCode", OrderTypeCode.PURCHASE_ORDER)
+            eq("destinationParty", this)
+        }
+
+    }
 
 }
