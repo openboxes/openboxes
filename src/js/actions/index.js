@@ -184,35 +184,41 @@ function fetchNumberIndicator(
 
 export function reloadIndicator(indicatorConfig, params) {
   return (dispatch) => {
-    indicatorConfig.archived = false;
-    fetchGraphIndicator(dispatch, indicatorConfig, params);
+    // new reference so that the original config is not modified
+    const indicatorConfigData = JSON.parse(JSON.stringify(indicatorConfig));
+    indicatorConfigData.archived = false;
+    fetchGraphIndicator(dispatch, indicatorConfigData, params);
   };
 }
 
-function getData(dispatch, configData) {
+function getData(dispatch, configData, config = 'personal') {
+  // new reference so that the original config is not modified
+  const dataEndpoints = JSON.parse(JSON.stringify(configData.endpoints));
   if (configData.enabled) {
-    Object.values(configData.endpoints.graph).forEach((indicatorConfig) => {
+    Object.values(dataEndpoints.graph).forEach((indicatorConfig) => {
+      indicatorConfig.archived = indicatorConfig.archived.includes(config);
       fetchGraphIndicator(dispatch, indicatorConfig);
     });
-    Object.values(configData.endpoints.number).forEach((indicatorConfig) => {
+    Object.values(dataEndpoints.number).forEach((indicatorConfig) => {
+      indicatorConfig.archived = indicatorConfig.archived.includes(config);
       fetchNumberIndicator(dispatch, indicatorConfig);
     });
   } else {
-    Object.values(configData.endpoints.graph).forEach((indicatorConfig) => {
+    Object.values(dataEndpoints.graph).forEach((indicatorConfig) => {
       indicatorConfig.archived = false;
       indicatorConfig.colors = undefined;
       fetchGraphIndicator(dispatch, indicatorConfig);
     });
-    Object.values(configData.endpoints.number).forEach((indicatorConfig) => {
+    Object.values(dataEndpoints.number).forEach((indicatorConfig) => {
       indicatorConfig.archived = false;
       fetchNumberIndicator(dispatch, indicatorConfig);
     });
   }
 }
 
-export function fetchIndicators(configData) {
+export function fetchIndicators(configData, config) {
   return (dispatch) => {
-    getData(dispatch, configData);
+    getData(dispatch, configData, config);
   };
 }
 
