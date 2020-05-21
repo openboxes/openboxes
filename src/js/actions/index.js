@@ -16,6 +16,7 @@ import {
   REMOVE_FROM_INDICATORS,
   REORDER_INDICATORS,
   FETCH_CONFIG,
+  SET_ACTIVE_CONFIG,
 } from './types';
 import apiClient, { parseResponse } from '../utils/apiClient';
 
@@ -218,6 +219,13 @@ function getData(dispatch, configData, config = 'personal') {
 
 export function fetchIndicators(configData, config) {
   return (dispatch) => {
+    dispatch({
+      type: SET_ACTIVE_CONFIG,
+      payload: {
+        data: config,
+      },
+    });
+
     getData(dispatch, configData, config);
   };
 }

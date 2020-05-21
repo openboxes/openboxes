@@ -65,6 +65,7 @@
     "react-loadable": "5.5.0",
     "react-loading": "^2.0.3",
     "react-localize-redux": "^3.5.3",
+    "react-meta-tags": "^0.7.4",
     "react-modal": "3.5.1",
     "react-overlays": "0.8.3",
     "react-redux": "5.0.7",
