@@ -24,7 +24,7 @@
                 <label>${warehouse.message(code: 'order.status.label')}</label>
                 <g:select id="status"
                           name="status"
-                          from="${org.pih.warehouse.order.OrderStatus.list()}"
+                          from="${org.pih.warehouse.order.OrderStatus.displayStatusList()}"
                           class="select2"
                           optionValue="${{ format.metadata(obj: it) }}"
                           value="${params.status}"

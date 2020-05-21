@@ -161,7 +161,7 @@
 						</table>
 						<div class="paginateButtons">
 							<g:set var="pageParams" value="${pageScope.variables['params']}"/>
-							<g:paginate total="${orders.totalCount}" params="${params}"/>
+							<g:paginate total="${orders.total}" params="${params}"/>
 						</div>
 					</div>
 				</div>

@@ -46,7 +46,7 @@ class OrderController {
         // Set default values
         params.destination = params.destination?:session?.warehouse?.id
         params.orderTypeCode = params.orderTypeCode ? Enum.valueOf(OrderTypeCode.class, params.orderTypeCode) : OrderTypeCode.PURCHASE_ORDER
-        params.status = params.status ? Enum.valueOf(OrderStatus.class, params.status) : null
+        params.status = null
 
         // Pagination parameters
         params.max = params.format ? null : params.max?:10
@@ -54,6 +54,9 @@ class OrderController {
 
         def orderTemplate = new Order(params)
         def orders = orderService.getOrders(orderTemplate, statusStartDate, statusEndDate, params)
+        if (params.displayStatus) {
+            orders = orders.findAll { it.displayStatus.toString() == params.displayStatus }
+        }
 
         if (params.format && orders) {
 

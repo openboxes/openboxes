@@ -32,6 +32,10 @@ enum OrderStatus {
         [PENDING, PLACED, PARTIALLY_RECEIVED, RECEIVED, COMPLETED, CANCELED, REJECTED]
     }
 
+    static displayStatusList() {
+        ['PENDING','PLACED','SHIPPED','PARTIALLY_RECEIVED','RECEIVED','CANCELED']
+    }
+
     String toString() { return name() }
 
 }
