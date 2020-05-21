@@ -137,6 +137,11 @@ class IdentifierService {
         return identifier.toUpperCase()
     }
 
+    def generateSequenceNumber(String sequenceNumber) {
+        String sequenceNumberFormat = ConfigurationHolder.config.openboxes.identifier.sequenceNumber.format
+        return StringUtils.leftPad(sequenceNumber, sequenceNumberFormat.length(), sequenceNumberFormat.substring(0, 1))
+    }
+
     void assignTransactionIdentifiers() {
         def transactions = Transaction.findAll("from Transaction as t where transactionNumber is null or transactionNumber = ''")
         transactions.each { transaction ->

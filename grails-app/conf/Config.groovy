@@ -523,6 +523,8 @@ openboxes.identifier.productSupplier.format = Constants.DEFAULT_PRODUCT_SUPPLIER
 openboxes.identifier.receipt.format = Constants.DEFAULT_RECEIPT_NUMBER_FORMAT
 openboxes.identifier.requisition.format = Constants.DEFAULT_REQUISITION_NUMBER_FORMAT
 openboxes.identifier.shipment.format = Constants.DEFAULT_SHIPMENT_NUMBER_FORMAT
+openboxes.identifier.sequenceNumber.format = Constants.DEFAULT_SEQUENCE_NUMBER_FORMAT
+
 openboxes.identifier.organization.format = Constants.DEFAULT_ORGANIZATION_NUMBER_FORMAT
 openboxes.identifier.organization.minSize = 2
 openboxes.identifier.organization.maxSize = 3
