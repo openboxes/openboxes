@@ -49,7 +49,8 @@ class ShipmentItem implements Comparable, Serializable {
 
     static hasMany = [orderItems: OrderItem, receiptItems: ReceiptItem]
 
-    static transients = ["comments", "orderItemId", "quantityReceivedAndCanceled", "quantityCanceled", "quantityReceived", "quantityRemaining", "orderNumber"]
+    static transients = ["comments", "orderItemId", "quantityReceivedAndCanceled", "quantityCanceled", "quantityReceived", "quantityRemaining",
+                         "orderNumber", "orderName"]
 
     static mapping = {
         id generator: 'uuid'
@@ -97,6 +98,10 @@ class ShipmentItem implements Comparable, Serializable {
 
     String getOrderNumber() {
         return orderItems?.collect { OrderItem orderItem -> orderItem.order.orderNumber }?.unique()?.first()
+    }
+
+    String getOrderName() {
+        return orderItems?.collect { OrderItem orderItem -> orderItem.order.name }?.unique()?.first()
     }
 
     def totalQuantityShipped() {
