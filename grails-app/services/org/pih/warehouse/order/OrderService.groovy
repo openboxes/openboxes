@@ -31,11 +31,11 @@ class OrderService {
 
     boolean transactional = true
 
-    UserService userService
-    ShipmentService shipmentService
-    IdentifierService identifierService
-    InventoryService inventoryService
-    GrailsApplication grailsApplication
+    def userService
+    def shipmentService
+    def identifierService
+    def inventoryService
+    def grailsApplication
 
     def getOrders(Order orderTemplate, Date dateOrderedFrom, Date dateOrderedTo, Map params) {
         def orders = Order.createCriteria().list(params) {
