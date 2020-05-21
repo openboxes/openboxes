@@ -61,7 +61,8 @@
                             </tbody>
                         </table>
                         <div class="paginateButtons">
-                            <g:paginate total="${organizationInstanceTotal}" />
+                            <g:set var="pageParams" value="${pageScope.variables['params']}"/>
+                            <g:paginate total="${organizationInstanceTotal}" params="${params}" />
                         </div>
                     </div>
                 </div>
