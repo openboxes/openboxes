@@ -11,6 +11,9 @@ package org.pih.warehouse.core
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
 import org.apache.commons.lang.RandomStringUtils
+import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang.WordUtils
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.Order
@@ -81,9 +84,6 @@ class IdentifierService {
         return generateIdentifier(grailsApplication.config.openboxes.identifier.order.format)
     }
 
-    /**
-     * @return
-     */
     def generateProductIdentifier() {
         return generateIdentifier(grailsApplication.config.openboxes.identifier.product.format)
     }
@@ -92,9 +92,6 @@ class IdentifierService {
         return generateProductSupplierIdentifier(null)
     }
 
-    /**
-     * @return
-     */
     def generateProductSupplierIdentifier(String prefix) {
         String identifier = generateIdentifier(grailsApplication.config.openboxes.identifier.productSupplier.format)
         Boolean prefixEnabled = grailsApplication.config.openboxes.identifier.productSupplier.prefix.enabled
@@ -104,35 +101,41 @@ class IdentifierService {
         return identifier
     }
 
-
-    /**
-     * @return
-     */
     def generateRequisitionIdentifier() {
         return generateIdentifier(grailsApplication.config.openboxes.identifier.requisition.format)
     }
 
-    /**
-     * @return
-     */
     def generateShipmentIdentifier() {
         return generateIdentifier(grailsApplication.config.openboxes.identifier.shipment.format)
     }
 
-    /**
-     * @return
-     */
     def generateReceiptIdentifier() {
         return generateIdentifier(grailsApplication.config.openboxes.identifier.receipt.format)
     }
 
-    /**
-     * @return
-     */
     def generateTransactionIdentifier() {
         return generateIdentifier(grailsApplication.config.openboxes.identifier.transaction.format)
     }
 
+    def generateOrganizationIdentifier() {
+        return generateIdentifier(grailsApplication.config.openboxes.identifier.organization.format)
+    }
+
+    def generateOrganizationIdentifier(String name) {
+        Integer minSize = ConfigurationHolder.config.openboxes.identifier.organization.minSize
+        Integer maxSize = ConfigurationHolder.config.openboxes.identifier.organization.maxSize
+
+        // Clean up string by removing everything after command
+        name = name.split(",")[0].capitalize()
+        String identifier = WordUtils.initials(name)?.replaceAll("[^a-zA-Z0-9]", "")
+        if (identifier.length() < minSize) {
+            identifier = WordUtils.abbreviate(name, minSize, maxSize, null)
+        }
+        else if (identifier.length() > maxSize) {
+            identifier = identifier.substring(0, maxSize)
+        }
+        return identifier.toUpperCase()
+    }
 
     void assignTransactionIdentifiers() {
         def transactions = Transaction.findAll("from Transaction as t where transactionNumber is null or transactionNumber = ''")
