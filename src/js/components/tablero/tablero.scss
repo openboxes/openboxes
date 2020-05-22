@@ -222,7 +222,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  height: 350px;
+  height: 390px;
   width: 97%;
 
   >div {
@@ -434,40 +434,40 @@
 
 @media (min-width: 630px) {
   .graph-card {
-    height: 420px;
+    height: 450px;
   }
 }
 
 @media (min-width: 730px) {
   .graph-card {
-    height: 470px;
+    height: 517px;
   }
 }
 
 @media (min-width: 868px) {
   .graph-card {
-    height: 320px;
+    height: 350px;
     width: 47%;
   }
 }
 
 @media (min-width: 1068px) {
   .graph-card {
-    height: 370px;
+    height: 390px;
     width: 47%;
   }
 }
 
 @media (min-width: 1268px) {
   .graph-card {
-    height: 420px;
+    height: 440px;
     width: 47%;
   }
 }
 
 @media (min-width: 1468px) {
   .graph-card {
-    height: 370px;
+    height: 390px;
     width: 30.6%;
   }
 }
