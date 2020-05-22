@@ -1695,8 +1695,15 @@ class JsonController {
         if (product && supplier) {
             productSuppliers = ProductSupplier.findAllByProductAndSupplier(product, supplier)
         }
-        productSuppliers = productSuppliers.collect { [id: it.id, code: it.code, label: it.code + " " + it.name]}
-        render g.select(name:'productSupplier', from: productSuppliers, optionKey:'id', optionValue: { it.code }, noSelection:['':''])
+        productSuppliers = productSuppliers.collect {[
+            id: it.id,
+            code: it.code,
+            text: it.name,
+            manufacturerCode: it.manufacturerCode,
+            manufacturer: it.manufacturer?.id,
+        ]}
+
+        render([productSupplierOptions: productSuppliers] as JSON)
     }
 
     def productSupplierChanged = {

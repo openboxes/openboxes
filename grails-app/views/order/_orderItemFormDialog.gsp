@@ -14,6 +14,7 @@
                     <format:metadata obj="${orderItem?.product?.productCode}"/>
                     <format:product product="${orderItem.product}"/>
                     <g:hiddenField id="dlgProduct" name="product.id" value="${orderItem?.product?.id}"/>
+                    <g:hiddenField id="dlgSupplierId" name="supplier.id" value="${orderItem?.order?.originParty?.id }"></g:hiddenField>
                 </td>
             </tr>
             <tr class="prop">
@@ -26,8 +27,38 @@
                                              product="${orderItem.product}"
                                              supplier="${orderItem?.order?.originParty}"
                                              value="${orderItem?.productSupplier?.id}"
-                                             class="chzn-select-deselect"
-                                             noSelection="['':'']"></g:selectProductSupplier>
+                                             class="select2withTag"
+                                             noSelection="['':'']" />
+                </td>
+            </tr>
+            <tr class="prop hidden" id="dlgSupplierCodeRow">
+                <td valign="top" class="name">
+                    <label for="dlgSupplierCode"><warehouse:message code="product.supplierCode.label"/></label>
+                </td>
+                <td>
+                    <input type="text" id="dlgSupplierCode" name="supplierCode" class="text" placeholder="Supplier code" style="width: 100px" disabled />
+                </td>
+            </tr>
+            <tr class="prop hidden" id="dlgManufacturerRow">
+                <td valign="top" class="name">
+                    <label for="dlgManufacturer"><warehouse:message code="product.manufacturer.label"/></label>
+                </td>
+                <td>
+                    <g:selectOrganization name="manufacturer"
+                                          id="dlgManufacturer"
+                                          value="${manufacturer?.id}"
+                                          roleTypes="[org.pih.warehouse.core.RoleType.ROLE_MANUFACTURER]"
+                                          noSelection="['':'']"
+                                          class="select2"
+                                          disabled="${true}" />
+                </td>
+            </tr>
+            <tr class="prop hidden" id="dlgManufacturerCodeRow">
+                <td valign="top" class="name">
+                    <label for="dlgManufacturerCode"><warehouse:message code="product.manufacturerCode.label"/></label>
+                </td>
+                <td>
+                    <input type="text" id="dlgManufacturerCode" name="manufacturerCode" class="text" placeholder="Manufacturer code" style="width: 100px" disabled />
                 </td>
             </tr>
             <tr class="prop">
@@ -43,7 +74,7 @@
                     <label for="dlgQuantityUom"><warehouse:message code="orderItem.quantityUom.label"/></label>
                 </td>
                 <td valign="top" class="value">
-                    <g:selectUnitOfMeasure name="quantityUom.id" class="chzn-select-deselect" value="${orderItem?.quantityUom?.id}"
+                    <g:selectUnitOfMeasure id="dlgQuantityUom" name="quantityUom.id" class="select2" value="${orderItem?.quantityUom?.id}"
                     noSelection="['':'']"/>
                 </td>
             </tr>
@@ -76,7 +107,7 @@
                 </td>
                 <td valign="top" class="value">
                    <g:selectPerson id="dlgRecipient" name="recipient" value="${orderItem?.recipient?.id}"
-                                noSelection="['':'']" class="chzn-select-deselect"/>
+                                noSelection="['':'']" class="select2"/>
                 </td>
             </tr>
             <tr class="prop">
@@ -140,7 +171,7 @@
                 </td>
                 <td valign="top" class="value">
                    <g:selectPerson id="dlgRecipient" name="recipient" value="${orderItem?.recipient?.id}"
-                                noSelection="['':'']" class="chzn-select-deselect"/>
+                                noSelection="['':'']" class="select2"/>
                 </td>
             </tr>
             <tr class="prop">
@@ -191,6 +222,53 @@
 </g:form>
 <script>
 
+    function enableEditing() {
+        $("#dlgSupplierCode").removeAttr("disabled");
+        $("#dlgSupplierCodeRow").removeClass("hidden");
+        $("#dlgManufacturer").removeAttr("disabled");
+        $("#dlgManufacturerRow").removeClass("hidden");
+        $("#dlgManufacturerCode").removeAttr("disabled");
+        $("#dlgManufacturerCodeRow").removeClass("hidden");
+    }
+
+    function disableEditing() {
+        $("#dlgSupplierCode").attr("disabled", true);
+        $("#dlgSupplierCodeRow").addClass("hidden");
+        $("#dlgManufacturer").attr("disabled", true);
+        $("#dlgManufacturerRow").addClass("hidden");
+        $("#dlgManufacturerCode").attr("disabled", true);
+        $("#dlgManufacturerCodeRow").addClass("hidden");
+    }
+
+    function clearSource() {
+        $("#dlgSupplierCode").val("");
+        $("#dlgManufacturer").val(null).trigger('change');
+        $("#dlgManufacturerCode").val("");
+    }
+
+    $('#dlgProductSupplier').on('select2:select', function (e) {
+        if (e.params.data.isNew) {
+            enableEditing();
+            $("#dlgSupplierCode").val(e.params.data.id);
+        } else {
+            clearSource();
+            disableEditing();
+            $("#dlgSupplierCode").val(e.params.data.code);
+            $("#dlgManufacturer").val(e.params.data.manufacturerCode);
+            $("#dlgManufacturerCode").val(e.params.data.manufacturer);
+        }
+    });
+
+    $('#dlgProductSupplier').on('select2:unselect', function (e) {
+        clearSource();
+        disableEditing();
+    });
+
+    $('#dlgProductSupplier').on('select2:clear', function (e) {
+        clearSource();
+        disableEditing();
+    });
+
     function saveOrderItemDialog() {
         var id = $("#dlgOrderItemId").val();
         var data = $("#editOrderItemForm").serialize();
@@ -239,6 +317,21 @@
             $(this).datepicker({dateFormat: "mm/dd/yy"})
         });
 
+        $("#dlgProductSupplier")
+            .select2({
+                placeholder: 'Select an option',
+                width: '100%',
+                allowClear: true,
+                tags: true,
+                tokenSeparators: [","],
+                createTag: function (tag) {
+                return {
+                    id: tag.term,
+                    text: tag.term + " (create new)",
+                    isNew : true
+                };
+            }
+        });
     });
 
 </script>

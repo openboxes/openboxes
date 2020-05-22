@@ -17,8 +17,7 @@ import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.UomService
-import org.pih.warehouse.product.ProductPackage
-import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.springframework.web.multipart.MultipartFile
@@ -30,6 +29,7 @@ class OrderController {
     def shipmentService
     UomService uomService
     def userService
+    def productSupplierDataService
 
     static allowedMethods = [save: "POST", update: "POST"]
 
@@ -662,6 +662,10 @@ class OrderController {
     def saveOrderItem = {
         Order order = Order.get(params.order.id)
         OrderItem orderItem = OrderItem.get(params.orderItem.id)
+        ProductSupplier productSupplier = productSupplierDataService.getOrCreateNew(params)
+        params.remove("productSupplier")
+        params.remove("productSupplier.id")
+
         if (!orderItem) {
             orderItem = new OrderItem(params)
             order.addToOrderItems(orderItem)
@@ -679,6 +683,9 @@ class OrderController {
                 }
             }
         }
+
+        orderItem.productSupplier = productSupplier
+
         try {
             if (!order.save(flush:true)) {
                 throw new ValidationException("Order is invalid", order.errors)
@@ -716,7 +723,8 @@ class OrderController {
                     recipient: it.recipient,
                     isOrderPending: it?.order?.status == OrderStatus.PENDING,
                     dateCreated: it.dateCreated,
-                    canEdit: orderService.canOrderItemBeEdited(it, session.user)
+                    canEdit: orderService.canOrderItemBeEdited(it, session.user),
+                    manufacturerName: it.productSupplier?.manufacturer?.name
             ]
         }
         orderItems = orderItems.sort { it.dateCreated }
