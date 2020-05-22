@@ -114,7 +114,7 @@ class Order implements Serializable {
         orderTypeCode(nullable: false)
         name(nullable: false)
         description(nullable: true, maxSize: 255)
-        orderNumber(nullable: true, maxSize: 255)
+        orderNumber(nullable: true, maxSize: 255, unique: true)
         currencyCode(nullable:true)
         exchangeRate(nullable:true)
         origin(nullable: false, validator: { Location origin, Order obj ->
