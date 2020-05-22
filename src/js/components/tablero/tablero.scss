@@ -286,6 +286,14 @@
       }
     }
 
+    .graph-container {
+      position: relative;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+    }
+
     .table-card {
       align-items: flex-end;
       height: 100%;
@@ -467,7 +475,7 @@
 
 @media (min-width: 1468px) {
   .graph-card {
-    height: 390px;
+    height: 490px;
     width: 30.6%;
   }
 }
