@@ -364,7 +364,7 @@ class Product implements Comparable, Serializable {
 
 
     List<ProductCatalog> getProductCatalogs() {
-        return ProductCatalog.includesProduct(this).listDistinct()
+        return this.productCatalogItems?.productCatalog?.unique()
     }
 
     /**
