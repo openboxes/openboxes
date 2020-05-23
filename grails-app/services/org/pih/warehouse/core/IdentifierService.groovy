@@ -77,12 +77,12 @@ class IdentifierService {
         return RandomStringUtils.random(length, grailsApplication.config.openboxes.identifier.alphanumeric)
     }
 
-
-    /**
-     * @return
-     */
     def generateOrderIdentifier() {
         return generateIdentifier(grailsApplication.config.openboxes.identifier.order.format)
+    }
+
+    def generatePurchaseOrderIdentifier() {
+        return generateIdentifier(grailsApplication.config.openboxes.identifier.purchaseOrder.format)
     }
 
     def generateProductIdentifier() {
@@ -145,12 +145,6 @@ class IdentifierService {
 
     def renderTemplate(String template, Map model) {
         return StringSubstitutor.replace(template, model);
-    }
-
-    def generatePurchaseOrderSequenceNumber(String prefix, Integer sequenceNumber) {
-        String format = ConfigurationHolder.config.openboxes.identifier.purchaseOrder.format
-        String sequenceNumberStr = generateSequenceNumber(sequenceNumber.toString())
-        String.format(format, prefix, sequenceNumberStr)
     }
 
     void assignTransactionIdentifiers() {

@@ -24,7 +24,6 @@
                         </div>
                     </td>
                 </tr>
-
 			</tbody>
 		</table>
 	</g:if>

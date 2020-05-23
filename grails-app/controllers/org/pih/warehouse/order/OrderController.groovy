@@ -235,13 +235,6 @@ class OrderController {
         }
     }
 
-    def orderNumber = {
-        def orderInstance = Order.get(params.id)
-        def orderNumber = orderService.generatePurchaseOrderSequenceNumber(orderInstance)
-        render ([orderNumber:orderNumber] as JSON)
-    }
-
-
     def show = {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {

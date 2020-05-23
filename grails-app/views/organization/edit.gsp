@@ -85,6 +85,14 @@
 							</tr>
 							<tr class="prop">
 								<td valign="top" class="name">
+								  <label for="sequences"><warehouse:message code="organization.sequences.label" default="Sequences" /></label>
+								</td>
+								<td valign="top" class="value ${hasErrors(bean: organizationInstance, field: 'sequences', 'errors')}">
+									${organizationInstance.sequences}
+								</td>
+							</tr>
+							<tr class="prop">
+								<td valign="top" class="name">
 								  <label for="roles"><warehouse:message code="organization.roles.label" default="Roles" /></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: organizationInstance, field: 'roles', 'errors')}">

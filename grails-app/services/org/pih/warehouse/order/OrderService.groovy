@@ -11,12 +11,9 @@ package org.pih.warehouse.order
 
 import grails.validation.ValidationException
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
-import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.grails.plugins.csv.CSVMapReader
-import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductException
@@ -24,11 +21,6 @@ import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentException
 import org.pih.warehouse.shipping.ShipmentItem
-import org.pih.warehouse.shipping.ShipmentService
-import org.pih.warehouse.shipping.ShipmentStatusCode
-import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
-
-import java.util.concurrent.atomic.AtomicInteger
 
 class OrderService {
 
@@ -225,7 +217,7 @@ class OrderService {
 
     int getNextSequenceNumber(String partyId) {
         Organization organization = Organization.get(partyId)
-        Integer sequenceNumber = Integer.valueOf(organization.sequences.get(IdentifierTypeCode.PURCHASE_ORDER_NUMBER.toString()))
+        Integer sequenceNumber = Integer.valueOf(organization.sequences.get(IdentifierTypeCode.PURCHASE_ORDER_NUMBER.toString())?:0)
         Integer nextSequenceNumber = sequenceNumber + 1
         organization.sequences.put(IdentifierTypeCode.PURCHASE_ORDER_NUMBER.toString(), nextSequenceNumber.toString())
         organization.save()
@@ -262,11 +254,9 @@ class OrderService {
 
             if (identifierGeneratorTypeCode == IdentifierGeneratorTypeCode.SEQUENCE) {
                 order.orderNumber = generatePurchaseOrderSequenceNumber(order)
-                //order.orderNumber = identifierService.generatePurchaseOrderSequenceNumber(
-                //        ((Organization)order.destinationParty).code, sequenceNumber)
             }
             else if (identifierGeneratorTypeCode == IdentifierGeneratorTypeCode.RANDOM) {
-                order.orderNumber = identifierService.generateOrderIdentifier()
+                order.orderNumber = identifierService.generatePurchaseOrderIdentifier()
             }
             else {
                 throw new IllegalArgumentException("No identifier generator type associated with " + identifierGeneratorTypeCode)

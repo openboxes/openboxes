@@ -13,8 +13,6 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderTypeCode
 
-import java.util.concurrent.atomic.AtomicInteger
-
 class Organization extends Party {
 
     String id
