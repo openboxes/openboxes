@@ -1708,18 +1708,15 @@ class JsonController {
 
     def productSupplierChanged = {
         ProductSupplier productSupplier = ProductSupplier.findById(params.productSupplierId)
-        ProductPackage productPackage =
-                ProductPackage.findByProductAndUom(productSupplier.product, productSupplier.unitOfMeasure)
-
-        BigDecimal unitPrice = productSupplier?.unitPrice ?: productPackage.price  ?: null
+        ProductPackage productPackage = productSupplier?.defaultProductPackage
         render([
-                unitPrice: unitPrice ? g.formatNumber(number: unitPrice) : null,
+                unitPrice: productPackage?.price ? g.formatNumber(number: productPackage?.price) : null,
                 supplierCode: productSupplier?.supplierCode,
                 manufacturer: productSupplier?.manufacturer?.name,
                 manufacturerCode: productSupplier?.manufacturerCode,
-                minOrderQuantity: productSupplier.minOrderQuantity,
+                minOrderQuantity: productSupplier?.minOrderQuantity,
                 quantityPerUom: productPackage?.quantity,
-                unitOfMeasure: productSupplier.unitOfMeasure,
+                unitOfMeasure: productPackage?.uom,
         ] as JSON)
     }
 }
