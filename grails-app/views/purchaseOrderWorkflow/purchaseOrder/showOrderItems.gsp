@@ -318,7 +318,7 @@
                 $("#quantity").attr("min", data.minOrderQuantity)
               }
               if (data.unitOfMeasure) {
-                $("#quantityUom").val(data.unitOfMeasure.id).trigger("chosen:updated");
+                $("#quantityUom").val(data.unitOfMeasure.id).trigger("change");
               }
               if (data.quantityPerUom) {
                 $("#quantityPerUom").val(data.quantityPerUom)
