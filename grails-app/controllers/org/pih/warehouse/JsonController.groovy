@@ -1695,24 +1695,28 @@ class JsonController {
         if (product && supplier) {
             productSuppliers = ProductSupplier.findAllByProductAndSupplier(product, supplier)
         }
-        productSuppliers = productSuppliers.collect { [id: it.id, code: it.code, label: it.code + " " + it.name]}
-        render g.select(name:'productSupplier', from: productSuppliers, optionKey:'id', optionValue: { it.code }, noSelection:['':''])
+        productSuppliers = productSuppliers.collect {[
+            id: it.id,
+            code: it.code,
+            text: it.code,
+            manufacturerCode: it.manufacturerCode,
+            manufacturer: it.manufacturer?.id,
+        ]}
+
+        render([productSupplierOptions: productSuppliers] as JSON)
     }
 
     def productSupplierChanged = {
         ProductSupplier productSupplier = ProductSupplier.findById(params.productSupplierId)
-        ProductPackage productPackage =
-                ProductPackage.findByProductAndUom(productSupplier.product, productSupplier.unitOfMeasure)
-
-        BigDecimal unitPrice = productSupplier?.unitPrice ?: productPackage.price  ?: null
+        ProductPackage productPackage = productSupplier?.defaultProductPackage
         render([
-                unitPrice: unitPrice ? g.formatNumber(number: unitPrice) : null,
+                unitPrice: productPackage?.price ? g.formatNumber(number: productPackage?.price) : null,
                 supplierCode: productSupplier?.supplierCode,
                 manufacturer: productSupplier?.manufacturer?.name,
                 manufacturerCode: productSupplier?.manufacturerCode,
-                minOrderQuantity: productSupplier.minOrderQuantity,
+                minOrderQuantity: productSupplier?.minOrderQuantity,
                 quantityPerUom: productPackage?.quantity,
-                unitOfMeasure: productSupplier.unitOfMeasure,
+                unitOfMeasure: productPackage?.uom,
         ] as JSON)
     }
 }
