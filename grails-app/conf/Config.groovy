@@ -11,6 +11,7 @@
 import com.mchange.v2.c3p0.example.IsValidOnlyConnectionTester30
 import grails.util.GrailsUtil
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.IdentifierGeneratorTypeCode
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.RoleType
 
@@ -533,6 +534,10 @@ openboxes.identifier.sequenceNumber.format = Constants.DEFAULT_SEQUENCE_NUMBER_F
 openboxes.identifier.organization.format = Constants.DEFAULT_ORGANIZATION_NUMBER_FORMAT
 openboxes.identifier.organization.minSize = 2
 openboxes.identifier.organization.maxSize = 3
+
+openboxes.identifier.purchaseOrder.generatorType = IdentifierGeneratorTypeCode.SEQUENCE
+openboxes.identifier.purchaseOrder.format = "PO-\${destinationPartyCode}-\${sequenceNumber}"
+openboxes.identifier.purchaseOrder.properties = ["destinationPartyCode":"destinationParty.code"]
 
 // OpenBoxes default line printer port
 openboxes.linePrinterTerminal.port = "LPT1"

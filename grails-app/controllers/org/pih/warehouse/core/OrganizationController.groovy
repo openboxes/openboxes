@@ -84,4 +84,13 @@ class OrganizationController {
         }
     }
 
+    def resetSequence = {
+        IdentifierTypeCode identifierTypeCode = params.identifierTypeCode as IdentifierTypeCode
+        Integer sequenceNumber = params.sequenceNumber?:0 as Integer
+        def organizationInstance = Organization.get(params.id)
+        organizationInstance.sequences.put(identifierTypeCode.toString(), sequenceNumber.toString())
+        organizationInstance.save()
+        redirect(action: "edit", id: params.id)
+    }
+
 }

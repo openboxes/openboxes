@@ -23,6 +23,7 @@ class Organization extends Party {
     Date dateCreated
     Date lastUpdated
 
+    Map<IdentifierTypeCode, Integer> sequences
 
     static mapping = {
         id generator: 'uuid'

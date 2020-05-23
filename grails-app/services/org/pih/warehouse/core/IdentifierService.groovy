@@ -13,6 +13,7 @@ import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationExceptio
 import org.apache.commons.lang.RandomStringUtils
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.WordUtils
+import org.apache.commons.text.StringSubstitutor
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.inventory.Transaction
@@ -76,12 +77,12 @@ class IdentifierService {
         return RandomStringUtils.random(length, grailsApplication.config.openboxes.identifier.alphanumeric)
     }
 
-
-    /**
-     * @return
-     */
     def generateOrderIdentifier() {
         return generateIdentifier(grailsApplication.config.openboxes.identifier.order.format)
+    }
+
+    def generatePurchaseOrderIdentifier() {
+        return generateIdentifier(grailsApplication.config.openboxes.identifier.purchaseOrder.format)
     }
 
     def generateProductIdentifier() {
@@ -140,6 +141,10 @@ class IdentifierService {
     def generateSequenceNumber(String sequenceNumber) {
         String sequenceNumberFormat = ConfigurationHolder.config.openboxes.identifier.sequenceNumber.format
         return StringUtils.leftPad(sequenceNumber, sequenceNumberFormat.length(), sequenceNumberFormat.substring(0, 1))
+    }
+
+    def renderTemplate(String template, Map model) {
+        return StringSubstitutor.replace(template, model);
     }
 
     void assignTransactionIdentifiers() {

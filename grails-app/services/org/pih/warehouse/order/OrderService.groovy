@@ -10,12 +10,10 @@
 package org.pih.warehouse.order
 
 import grails.validation.ValidationException
-import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.grails.plugins.csv.CSVMapReader
-import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductException
@@ -23,15 +21,13 @@ import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentException
 import org.pih.warehouse.shipping.ShipmentItem
-import org.pih.warehouse.shipping.ShipmentService
-import org.pih.warehouse.shipping.ShipmentStatusCode
-import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
 
 class OrderService {
 
     boolean transactional = true
 
     def userService
+    def dataService
     def shipmentService
     def identifierService
     def inventoryService
@@ -219,11 +215,32 @@ class OrderService {
         return orderCommand
     }
 
-    /**
-     *
-     * @param order
-     * @return
-     */
+    int getNextSequenceNumber(String partyId) {
+        Organization organization = Organization.get(partyId)
+        Integer sequenceNumber = Integer.valueOf(organization.sequences.get(IdentifierTypeCode.PURCHASE_ORDER_NUMBER.toString())?:0)
+        Integer nextSequenceNumber = sequenceNumber + 1
+        organization.sequences.put(IdentifierTypeCode.PURCHASE_ORDER_NUMBER.toString(), nextSequenceNumber.toString())
+        organization.save()
+        return nextSequenceNumber
+    }
+
+    String generatePurchaseOrderSequenceNumber(Order order) {
+        try {
+            Integer sequenceNumber = getNextSequenceNumber(order.destinationParty.id)
+            String sequenceNumberStr = identifierService.generateSequenceNumber(sequenceNumber.toString())
+
+            // Properties to be used to get argument values for the template
+            Map properties = ConfigurationHolder.config.openboxes.identifier.purchaseOrder.properties
+            Map model = dataService.transformObject(order, properties)
+            model.put("sequenceNumber", sequenceNumberStr)
+            String template = ConfigurationHolder.config.openboxes.identifier.purchaseOrder.format
+            return identifierService.renderTemplate(template, model)
+        } catch(Exception e) {
+            log.error("Error " + e.message, e)
+            throw e;
+        }
+    }
+
     Order saveOrder(Order order) {
         // update the status of the order before saving
         order.updateStatus()
@@ -232,7 +249,18 @@ class OrderService {
         order.destinationParty = order?.destination?.organization
 
         if (!order.orderNumber) {
-            order.orderNumber = identifierService.generateOrderIdentifier()
+            IdentifierGeneratorTypeCode identifierGeneratorTypeCode =
+                    ConfigurationHolder.config.openboxes.identifier.purchaseOrder.generatorType
+
+            if (identifierGeneratorTypeCode == IdentifierGeneratorTypeCode.SEQUENCE) {
+                order.orderNumber = generatePurchaseOrderSequenceNumber(order)
+            }
+            else if (identifierGeneratorTypeCode == IdentifierGeneratorTypeCode.RANDOM) {
+                order.orderNumber = identifierService.generatePurchaseOrderIdentifier()
+            }
+            else {
+                throw new IllegalArgumentException("No identifier generator type associated with " + identifierGeneratorTypeCode)
+            }
         }
 
         if (!order.hasErrors() && order.save()) {
