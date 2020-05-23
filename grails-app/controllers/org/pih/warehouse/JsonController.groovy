@@ -1698,7 +1698,7 @@ class JsonController {
         productSuppliers = productSuppliers.collect {[
             id: it.id,
             code: it.code,
-            text: it.name,
+            text: it.code,
             manufacturerCode: it.manufacturerCode,
             manufacturer: it.manufacturer?.id,
         ]}
