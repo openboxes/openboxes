@@ -19,8 +19,14 @@
             </g:hasErrors>
 
 			<div class="button-bar">
-				<g:link class="button" action="list"><warehouse:message code="default.list.label" args="['organization']"/></g:link>
-				<g:link class="button" action="create"><warehouse:message code="default.add.label" args="['organization']"/></g:link>
+				<g:link class="button" action="list">
+					<img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}" />&nbsp;
+					<warehouse:message code="default.list.label" args="['organization']"/>
+				</g:link>
+				<g:link class="button" action="create">
+					<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
+					<warehouse:message code="default.add.label" args="['organization']"/>
+				</g:link>
 			</div>
 
 			<g:form method="post" >
@@ -30,16 +36,36 @@
 					<h2><warehouse:message code="default.edit.label" args="[entityName]" /></h2>
 					<table>
 						<tbody>
-						
 							<tr class="prop">
 								<td valign="top" class="name">
-								  <label for="partyType"><warehouse:message code="organization.partyType.label" default="Party Type" /></label>
+								  <label for="organization.id"><warehouse:message code="default.id.label" default="ID" /></label>
+								</td>
+								<td valign="top" class="value ${hasErrors(bean: organizationInstance, field: 'id', 'errors')}">
+									${organizationInstance?.id}
+								</td>
+							</tr>
+							<tr class="prop">
+								<td valign="top" class="name">
+								  <label for="partyType.id"><warehouse:message code="organization.partyType.label" default="Party Type" /></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: organizationInstance, field: 'partyType', 'errors')}">
 									<g:select class="chzn-select-deselect" name="partyType.id" from="${org.pih.warehouse.core.PartyType.list()}" optionKey="id" value="${organizationInstance?.partyType?.id}"  />
 								</td>
 							</tr>
-						
+							<tr class="prop">
+								<td valign="top" class="name">
+								  <label for="code"><warehouse:message code="organization.code.label" default="Code" /></label>
+								</td>
+								<td valign="top" class="value ${hasErrors(bean: organizationInstance, field: 'code', 'errors')}">
+									<g:if test="${!organizationInstance.hasPurchaseOrders()}">
+										<g:textField class="text" size="80" name="code" maxlength="255" value="${organizationInstance?.code}" />
+									</g:if>
+									<g:else>
+										${organizationInstance.code}
+									</g:else>
+								</td>
+							</tr>
+
 							<tr class="prop">
 								<td valign="top" class="name">
 								  <label for="name"><warehouse:message code="organization.name.label" default="Name" /></label>
@@ -48,7 +74,7 @@
 									<g:textField class="text" size="80" name="name" maxlength="255" value="${organizationInstance?.name}" />
 								</td>
 							</tr>
-						
+
 							<tr class="prop">
 								<td valign="top" class="name">
 								  <label for="description"><warehouse:message code="organization.description.label" default="Description" /></label>
@@ -57,37 +83,17 @@
 									<g:textArea class="text" name="description" maxlength="255" value="${organizationInstance?.description}" />
 								</td>
 							</tr>
-
-							<tr class="prop">
-								<td valign="top" class="name">
-								  <label for="dateCreated"><warehouse:message code="organization.dateCreated.label" default="Date Created" /></label>
-								</td>
-								<td valign="top" class="value ${hasErrors(bean: organizationInstance, field: 'dateCreated', 'errors')}">
-									<g:datePicker name="dateCreated" precision="minute" value="${organizationInstance?.dateCreated}"  />
-								</td>
-							</tr>
-						
-							<tr class="prop">
-								<td valign="top" class="name">
-								  <label for="lastUpdated"><warehouse:message code="organization.lastUpdated.label" default="Last Updated" /></label>
-								</td>
-								<td valign="top" class="value ${hasErrors(bean: organizationInstance, field: 'lastUpdated', 'errors')}">
-									<g:datePicker name="lastUpdated" precision="minute" value="${organizationInstance?.lastUpdated}"  />
-								</td>
-							</tr>
-						
 							<tr class="prop">
 								<td valign="top" class="name">
 								  <label for="roles"><warehouse:message code="organization.roles.label" default="Roles" /></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: organizationInstance, field: 'roles', 'errors')}">
-									
 									<ul>
-									<g:each in="${organizationInstance?.roles?}" var="r">
-										<li><g:link controller="partyRole" action="show" id="${r.id}">${r?.encodeAsHTML()}</g:link></li>
-									</g:each>
+										<g:each in="${organizationInstance?.roles?}" var="r">
+											<li><g:link controller="partyRole" action="show" id="${r.id}">${r?.encodeAsHTML()}</g:link></li>
+										</g:each>
 									</ul>
-									<g:link controller="partyRole" action="create" params="['organization.id': organizationInstance?.id]">${warehouse.message(code: 'default.add.label', args: [warehouse.message(code: 'partyRole.label', default: 'PartyRole')])}</g:link>
+									<g:link controller="partyRole" action="create" params="['party.id': organizationInstance?.id]">${warehouse.message(code: 'default.add.label', args: [warehouse.message(code: 'partyRole.label', default: 'PartyRole')])}</g:link>
 
 								</td>
 							</tr>
