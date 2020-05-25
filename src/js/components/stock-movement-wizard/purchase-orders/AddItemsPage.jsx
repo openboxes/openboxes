@@ -176,6 +176,7 @@ const VENDOR_FIELDS = {
               sortOrder: fieldValue.sortOrder + 1,
               orderItemId: fieldValue.orderItemId,
               referenceId: fieldValue.id,
+              orderNumber: fieldValue.orderNumber,
             }, rowIndex);
           },
         }),
