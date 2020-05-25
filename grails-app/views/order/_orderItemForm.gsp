@@ -90,7 +90,7 @@
     } else {
       clearSource();
       disableEditing();
-      $("#supplierCode").val(e.params.data.code);
+      $("#supplierCode").val(e.params.data.supplierCode);
       $("#manufacturerCode").val(e.params.data.manufacturerCode);
       $("#manufacturer").val(e.params.data.manufacturer).trigger('change');
     }
