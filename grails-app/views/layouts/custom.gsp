@@ -396,13 +396,28 @@
         });
       });
 
-
       // Select 2 default configuration
       $(".select2")
       .select2({
         placeholder: $(this).data("placeholder") || 'Select an option',
         width: '100%',
         allowClear: true,
+      });
+
+      $(".select2withTag")
+      .select2({
+        placeholder: 'Select an option',
+        width: '100%',
+        allowClear: true,
+        tags: true,
+        tokenSeparators: [","],
+        createTag: function (tag) {
+          return {
+            id: tag.term,
+            text: tag.term + " (create new)",
+            isNew : true
+          };
+        }
       });
 
       $(".ajaxSelect2")

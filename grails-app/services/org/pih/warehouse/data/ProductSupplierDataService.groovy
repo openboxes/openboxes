@@ -90,4 +90,24 @@ class ProductSupplierDataService {
         }
         return productSupplier
     }
+
+    def getOrCreateNew(Map params) {
+        if (ProductSupplier.get(params.productSupplier.id) != null) {
+            return ProductSupplier.get(params.productSupplier.id)
+        }
+
+        Product product = Product.get(params.product.id)
+        ProductSupplier productSupplier = new ProductSupplier()
+        productSupplier.name = params.supplierCode
+        productSupplier.product = product
+        productSupplier.manufacturer = Organization.get(params.manufacturer)
+        productSupplier.manufacturerCode = params.manufacturerCode
+        productSupplier.code = params.supplierCode
+        productSupplier.supplier = Organization.get(params.supplier.id)
+
+        if (productSupplier.validate()) {
+            productSupplier.save(failOnError: true)
+        }
+        return productSupplier
+    }
 }

@@ -11,6 +11,7 @@
 import com.mchange.v2.c3p0.example.IsValidOnlyConnectionTester30
 import grails.util.GrailsUtil
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.IdentifierGeneratorTypeCode
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.RoleType
 
@@ -392,39 +393,44 @@ openboxes {
         endpoints {
             number {
                  inProgressPutaways {
-                    endpoint = "/openboxes/apitablero/getInProgressPutaways"
+                    endpoint = "/${appName}/apitablero/getInProgressPutaways"
                     archived = ['warehouse']
                     order = 4
                 }
                 inventoryByLotAndBin {
-                    endpoint = "/openboxes/apitablero/getInventoryByLotAndBin"
+                    endpoint = "/${appName}/apitablero/getInventoryByLotAndBin"
                     archived = ['warehouse']
                     order = 1
                 }
                 inProgressShipments {
-                    endpoint = "/openboxes/apitablero/getInProgressShipments"
+                    endpoint = "/${appName}/apitablero/getInProgressShipments"
                     archived = []
                     order = 3
                 }
                 receivingBin {
-                    endpoint = "/openboxes/apitablero/getReceivingBin"
+                    endpoint = "/${appName}/apitablero/getReceivingBin"
                     archived = ['warehouse']
                     order = 2
                 }
                 itemsInventoried {
-                    endpoint = "/openboxes/apitablero/getItemsInventoried"
+                    endpoint = "/${appName}/apitablero/getItemsInventoried"
                     archived = ['personal', 'warehouse']
                     order = 5
                 }
                 defaultBin {
-                    endpoint = "/openboxes/apitablero/getDefaultBin"
+                    endpoint = "/${appName}/apitablero/getDefaultBin"
                     archived = ['personal']
                     order = 6
+                }
+                negativeInventory {
+                    endpoint = "/${appName}/apitablero/getProductWithNegativeInventory"
+                    archived = ['personal']
+                    order = 7
                 }
             }
             graph {
                 inventorySummary {
-                    endpoint = "/openboxes/apitablero/getInventorySummary"
+                    endpoint = "/${appName}/apitablero/getInventorySummary"
                     archived = []
                     datalabel = true
                     order = 1
@@ -437,7 +443,7 @@ openboxes {
                     }
                 }
                 expirationSummary {
-                    endpoint = "/openboxes/apitablero/getExpirationSummary"
+                    endpoint = "/${appName}/apitablero/getExpirationSummary"
                     archived = ['warehouse']
                     order = 2
                     colors {
@@ -450,14 +456,14 @@ openboxes {
                     }
                 }
                 sentStockMovements {
-                    endpoint = "/openboxes/apitablero/getSentStockMovements"
+                    endpoint = "/${appName}/apitablero/getSentStockMovements"
                     archived = ['personal']
                     stacked = true
                     datalabel = true
                     order = 9
                 }
                 outgoingStock {
-                    endpoint = "/openboxes/apitablero/getOutgoingStock"
+                    endpoint = "/${appName}/apitablero/getOutgoingStock"
                     archived = ['warehouse']
                     order = 4
                     colors {
@@ -469,19 +475,19 @@ openboxes {
                     }
                 }
                 receivedStockMovements {
-                    endpoint = "/openboxes/apitablero/getReceivedStockMovements"
+                    endpoint = "/${appName}/apitablero/getReceivedStockMovements"
                     archived = ['personal']
                     stacked = true
                     datalabel = true
                     order = 7
                 }
                 discrepancy {
-                    endpoint = "/openboxes/apitablero/getDiscrepancy"
+                    endpoint = "/${appName}/apitablero/getDiscrepancy"
                     archived = []
                     order = 6
                 }
                 delayedShipments {
-                    endpoint = "/openboxes/apitablero/getDelayedShipments"
+                    endpoint = "/${appName}/apitablero/getDelayedShipments"
                     archived = ['warehouse']
                     order = 5
                      colors {
@@ -493,7 +499,7 @@ openboxes {
                     }
                 }
                 incomingStock {
-                    endpoint = "/openboxes/apitablero/getIncomingStock"
+                    endpoint = "/${appName}/apitablero/getIncomingStock"
                     archived = ['warehouse']
                     order = 3
                     colors {
@@ -522,6 +528,15 @@ openboxes.identifier.productSupplier.format = Constants.DEFAULT_PRODUCT_SUPPLIER
 openboxes.identifier.receipt.format = Constants.DEFAULT_RECEIPT_NUMBER_FORMAT
 openboxes.identifier.requisition.format = Constants.DEFAULT_REQUISITION_NUMBER_FORMAT
 openboxes.identifier.shipment.format = Constants.DEFAULT_SHIPMENT_NUMBER_FORMAT
+openboxes.identifier.sequenceNumber.format = Constants.DEFAULT_SEQUENCE_NUMBER_FORMAT
+
+openboxes.identifier.organization.format = Constants.DEFAULT_ORGANIZATION_NUMBER_FORMAT
+openboxes.identifier.organization.minSize = 2
+openboxes.identifier.organization.maxSize = 3
+
+openboxes.identifier.purchaseOrder.generatorType = IdentifierGeneratorTypeCode.SEQUENCE
+openboxes.identifier.purchaseOrder.format = "PO-\${destinationPartyCode}-\${sequenceNumber}"
+openboxes.identifier.purchaseOrder.properties = ["destinationPartyCode":"destinationParty.code"]
 
 // OpenBoxes default line printer port
 openboxes.linePrinterTerminal.port = "LPT1"

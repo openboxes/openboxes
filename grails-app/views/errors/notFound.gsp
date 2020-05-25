@@ -26,7 +26,7 @@
 				</g:else>
 			</div>
 		</div>
-		<div id="doc" style="width: 25%; height: 400px">
+		<div id="doc" style="">
 			<div class="triangle-isosceles title">
 				<g:if test="${request?.exception?.message}">
 					${request?.exception?.message}
@@ -34,7 +34,10 @@
 
 				<warehouse:message code="errors.resourceNotFound.message" default="Sorry, that resource could not be found."/>
 			</div>
-			<img src="${createLinkTo(dir:'images',file:'jgreenspan-removebg-preview.png')}"/>
+			<div class="left">
+			<img src="${createLinkTo(dir:'images',file:'jgreenspan.png')}"/>
+
+			</div>
 		</div>
 	</div>
 </body>
