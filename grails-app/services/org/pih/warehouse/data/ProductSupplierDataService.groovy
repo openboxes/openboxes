@@ -98,11 +98,12 @@ class ProductSupplierDataService {
 
         Product product = Product.get(params.product.id)
         ProductSupplier productSupplier = new ProductSupplier()
+        productSupplier.code = params.productSupplier.id?:params.supplierCode
+        productSupplier.supplierCode = params.supplierCode
         productSupplier.name = params.supplierCode
         productSupplier.product = product
         productSupplier.manufacturer = Organization.get(params.manufacturer)
         productSupplier.manufacturerCode = params.manufacturerCode
-        productSupplier.code = params.supplierCode
         productSupplier.supplier = Organization.get(params.supplier.id)
 
         if (productSupplier.validate()) {
