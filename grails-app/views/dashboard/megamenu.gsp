@@ -356,6 +356,11 @@
                             <warehouse:message code="report.baselineQohReport.label" default="Baseline QoH Report"/>
                         </g:link>
                     </div>
+                    <div class="mm-menu-item">
+                        <g:link controller="report" action="showOrderReport">
+                            <warehouse:message code="report.orderReport.label" default="Order Report"/>
+                        </g:link>
+                    </div>
                 </div>
                 <div class="mm-content-section">
                     <h3><warehouse:message code="report.transactionReports.label" default="Transaction Reports" /></h3>
