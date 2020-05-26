@@ -2,6 +2,7 @@ package org.pih.warehouse.apitablero
 
 import grails.converters.JSON
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.order.Order
@@ -15,6 +16,7 @@ class ApitableroController {
 
     def numberDataService
     def indicatorDataService
+    def userService
 
     def getInventoryByLotAndBin = {
         Location location = Location.get(session?.warehouse?.id)
@@ -109,5 +111,21 @@ class ApitableroController {
         Location location = Location.get(session?.warehouse?.id)
         def productsWithNegativeInventory = numberDataService.getProductWithNegativeInventory(location)
         render (productsWithNegativeInventory as JSON)
+    }
+
+    def getUserConfig = {
+        def user = User.get(session.user.id)
+        if(user.dashboard_config!= null)
+        render (user.dashboard_config)
+        else
+        render ("dashboard config of this user null")
+    }
+
+    def updateUserConfig = {
+        def dashboard_config = request.reader.text
+        params.put('dashboard_config', dashboard_config)
+        def user = userService.updateUser(params.id, session.user.id, params)
+   
+        render (user as JSON)
     }
 }

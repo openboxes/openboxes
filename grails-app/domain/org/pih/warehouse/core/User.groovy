@@ -32,12 +32,16 @@ class User extends Person {
     byte[] photo                // profile photo
 
     List locationRoles
+
+    String dashboard_config
+
     static hasMany = [roles: Role, locationRoles: LocationRole]
     static mapping = {
         table "`user`"
         roles joinTable: [name: 'user_role', column: 'role_id', key: 'user_id'], cascade: "save-update"
         locationRoles cascade: "all-delete-orphan"
         id generator: 'uuid'
+        dashboard_config (sqlType: "longblob")
     }
     static transients = ["passwordConfirm"]
     static constraints = {
@@ -57,6 +61,7 @@ class User extends Person {
         manager(nullable: true)
         rememberLastLocation(nullable: true)
         photo(nullable: true, maxSize: 10485760) // 10 MBs
+        dashboard_config(nullable: true)
     }
 
 
@@ -115,7 +120,8 @@ class User extends Person {
                 "firstName": firstName,
                 "lastName" : (anonymize) ? lastInitial : lastName,
                 "email"    : anonymize ? StringUtil.mask(email) : email,
-                "username" : anonymize ? StringUtil.mask(username) : username
+                "username" : anonymize ? StringUtil.mask(username) : username,
+                "dashboard_config" : dashboard_config
         ]
     }
 
