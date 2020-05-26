@@ -30,7 +30,6 @@
 					<h2><warehouse:message code="default.edit.label" args="[entityName]" /></h2>
 					<table>
 						<tbody>
-						
 							<tr class="prop">
 								<td valign="top" class="name">
 								  <label for="product"><warehouse:message code="productSupplier.product.label" default="Product" /></label>
@@ -46,9 +45,7 @@
                                         <g:message code="default.show.label" args="[g.message(code:'product.label')]"/>
                                     </g:link>
                                 </td>
-
 							</tr>
-						
 							<tr class="prop">
 								<td valign="top" class="name">
 								  <label for="code"><warehouse:message code="productSupplier.code.label" default="Code" /></label>
@@ -57,7 +54,6 @@
 									<g:textField class="text" size="80" name="code" value="${productSupplierInstance?.code}" />
 								</td>
 							</tr>
-
                             <tr class="prop">
                                 <td class="name">
                                     <label for="name"><g:message code="default.name.label"/></label>
@@ -115,7 +111,6 @@
 									<g:textField class="text" size="80" name="upc" maxlength="255" value="${productSupplierInstance?.upc}" />
 								</td>
 							</tr>
-						
 							<tr class="prop">
 								<td valign="top" class="name">
 								  <label for="ndc"><warehouse:message code="productSupplier.ndc.label" default="Ndc" /></label>
@@ -124,7 +119,6 @@
 									<g:textField class="text" size="80" name="ndc" maxlength="255" value="${productSupplierInstance?.ndc}" />
 								</td>
 							</tr>
-						
 							<tr class="prop">
 								<td valign="top" class="name">
 								  <label for="supplier"><warehouse:message code="productSupplier.supplier.label" default="Supplier" /></label>
@@ -137,7 +131,6 @@
                                                           class="chzn-select-deselect"/>
 								</td>
 							</tr>
-						
 							<tr class="prop">
 								<td valign="top" class="name">
 								  <label for="supplierCode"><warehouse:message code="productSupplier.supplierCode.label" default="Supplier Code" /></label>
@@ -146,7 +139,6 @@
 									<g:textField class="text" size="80" name="supplierCode" maxlength="255" value="${productSupplierInstance?.supplierCode}" />
 								</td>
 							</tr>
-						
 							<tr class="prop">
 								<td valign="top" class="name">
 								  <label for="supplierName"><warehouse:message code="productSupplier.supplierName.label" default="Supplier Name" /></label>
@@ -155,7 +147,6 @@
 									<g:textField class="text" size="80" name="supplierName" maxlength="255" value="${productSupplierInstance?.supplierName}" />
 								</td>
 							</tr>
-						
 							<tr class="prop">
 								<td valign="top" class="name">
 								  <label for="modelNumber"><warehouse:message code="productSupplier.modelNumber.label" default="Model Number" /></label>
@@ -164,7 +155,6 @@
 									<g:textField class="text" size="80" name="modelNumber" maxlength="255" value="${productSupplierInstance?.modelNumber}" />
 								</td>
 							</tr>
-						
 							<tr class="prop">
 								<td valign="top" class="name">
 								  <label for="brandName"><warehouse:message code="productSupplier.brandName.label" default="Brand Name" /></label>
@@ -186,7 +176,6 @@
 
 								</td>
 							</tr>
-						
 							<tr class="prop">
 								<td valign="top" class="name">
 								  <label for="manufacturerCode"><warehouse:message code="productSupplier.manufacturerCode.label" default="Manufacturer Code" /></label>
@@ -195,7 +184,6 @@
 									<g:textField class="text" size="80" name="manufacturerCode" maxlength="255" value="${productSupplierInstance?.manufacturerCode}" />
 								</td>
 							</tr>
-						
 							<tr class="prop">
 								<td valign="top" class="name">
 								  <label for="manufacturerName"><warehouse:message code="productSupplier.manufacturerName.label" default="Manufacturer Name" /></label>
@@ -204,7 +192,6 @@
 									<g:textField class="text" size="80" name="manufacturerName" maxlength="255" value="${productSupplierInstance?.manufacturerName}" />
 								</td>
 							</tr>
-						
 							<tr class="prop">
 								<td valign="top" class="name">
 								  <label for="standardLeadTimeDays"><warehouse:message code="productSupplier.standardLeadTimeDays.label" default="Standard Lead Time Days" /></label>
@@ -213,19 +200,6 @@
 									<g:textField class="text" name="standardLeadTimeDays" value="${fieldValue(bean: productSupplierInstance, field: 'standardLeadTimeDays')}" />
 								</td>
 							</tr>
-
-								<tr class="prop">
-									<td valign="top" class="name">
-									  <label for="unitPrice"><warehouse:message code="productSupplier.unitPrice.label" default="Price Per Unit" /></label>
-									</td>
-									<td valign="top" class="value ${hasErrors(bean: productSupplierInstance, field: 'unitPrice', 'errors')}">
-										<g:hasRoleFinance>
-											<g:textField class="text" name="unitPrice" value="${fieldValue(bean: productSupplierInstance, field: 'unitPrice')}" />
-											${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-										</g:hasRoleFinance>
-									</td>
-								</tr>
-
 							<tr class="prop">
 								<td valign="top" class="name">
 								  <label for="minOrderQuantity"><warehouse:message code="productSupplier.minOrderQuantity.label" default="Min Order Quantity" /></label>
@@ -236,28 +210,12 @@
 							</tr>
 							<tr class="prop">
 								<td valign="top" class="name">
-									<label for="unitOfMeasure.id"><warehouse:message code="productSupplier.unitOfMeasure.label" default="Unit of Measure" /></label>
-								</td>
-								<td valign="top" class="value ${hasErrors(bean: productSupplierInstance, field: 'unitOfMeasure', 'errors')}">
-									<g:selectUnitOfMeasure name="unitOfMeasure.id"
-														   noSelection="['null':'']"
-														   value="${productSupplierInstance?.unitOfMeasure?.id}"
-														   class="chzn-select-deselect"/>
-
-								</td>
-							</tr>
-
-
-						
-							<tr class="prop">
-								<td valign="top" class="name">
 								  <label for="comments"><warehouse:message code="productSupplier.comments.label" default="Comments" /></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: productSupplierInstance, field: 'comments', 'errors')}">
 									<g:textArea name="comments" value="${productSupplierInstance?.comments}" />
 								</td>
 							</tr>
-						
 							<tr class="prop">
 								<td valign="top"></td>
 								<td valign="top left">
