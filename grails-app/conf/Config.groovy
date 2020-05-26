@@ -8,12 +8,12 @@
  * You must not remove this notice, or any other, from this software.
  **/
 
-import com.mchange.v2.c3p0.example.IsValidOnlyConnectionTester30
 import grails.util.GrailsUtil
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.IdentifierGeneratorTypeCode
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.core.UpdateUnitPriceMethodCode
 
 // Locations to search for config files that get merged into the main config
 // config files can either be Java properties files or ConfigSlurper scripts
@@ -546,6 +546,17 @@ openboxes.linePrinterTerminal.port = "LPT1"
 openboxes.purchasing.approval.enabled = false
 openboxes.purchasing.approval.minimumAmount = 0.00
 openboxes.purchasing.approval.defaultRoleTypes = [RoleType.ROLE_APPROVER]
+
+// Experimental feature that approximates a costing method to provide a crude unit price used
+// for inventory valuation.
+//
+// Possible values:
+//  * UpdateUnitPriceMethodCode.USER_DEFINED_PRICE (default)
+//  * UpdateUnitPriceMethodCode.AVERAGE_PURCHASE_PRICE
+//  * UpdateUnitPriceMethodCode.FIRST_PURCHASE_PRICE
+//  * UpdateUnitPriceMethodCode.LAST_PURCHASE_PRICE
+openboxes.purchasing.updateUnitPrice.enabled = false
+openboxes.purchasing.updateUnitPrice.method = UpdateUnitPriceMethodCode.USER_DEFINED_PRICE
 
 // OpenBoxes default uploads directory location
 openboxes.uploads.location = "uploads"
