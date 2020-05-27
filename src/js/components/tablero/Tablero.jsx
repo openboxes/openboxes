@@ -202,8 +202,14 @@ class Tablero extends Component {
       e.target.id = 'archive';
     }
     this.props.reorderIndicators({ oldIndex, newIndex }, e, type);
-    if (oldIndex !== newIndex) this.setState({ configModified: true });
-    this.setState({ isDragging: false });
+    if (oldIndex !== newIndex) {
+      this.setState({
+        configModified: true,
+        isDragging: false,
+      });
+    } else {
+      this.setState({ isDragging: false });
+    }
   };
 
   sortEndHandleNumber = ({ oldIndex, newIndex }, e) => {
