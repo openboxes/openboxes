@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
@@ -80,7 +81,6 @@ const ConfigurationsList = ({
   if (!configs) {
     return null;
   }
-
   return (
     <div className={`configs-left-nav ${!showNav ? 'hidden' : ''}`}>
       <button className="toggle-nav" onClick={toggleNav}>
@@ -102,7 +102,15 @@ const ConfigurationsList = ({
       </ul>
       {
         (activeConfig === 'personal' && configModified) ?
-          <button onClick={updateConfig} >Update config</button>
+
+          <div className="updateSection">
+            <div className="divisionLine" />
+            <span> <i className="fa fa-info-circle" aria-hidden="true" />The dashboard layout has been edited</span>
+            <button onClick={updateConfig} >
+              <i className="fa fa-floppy-o" aria-hidden="true" />
+              Save configuration
+            </button>
+          </div>
         : null
       }
     </div>
@@ -118,6 +126,7 @@ class Tablero extends Component {
       isDragging: false,
       showPopout: false,
       showNav: false,
+      configModified: false,
     };
   }
 
@@ -145,7 +154,6 @@ class Tablero extends Component {
 
   updateConfig = () => {
     const url = '/openboxes/apitablero/updateConfig';
-
     const payload = {
       number: {},
       graph: {},
@@ -193,6 +201,7 @@ class Tablero extends Component {
       e.target.id = 'archive';
     }
     this.props.reorderIndicators({ oldIndex, newIndex }, e, type);
+    if (oldIndex !== newIndex) this.setState({ configModified: true });
     this.setState({ isDragging: false });
   };
 
@@ -213,6 +222,7 @@ class Tablero extends Component {
 
   handleAdd = (index, type) => {
     this.props.addToIndicators(index, type);
+    this.setState({ configModified: true });
     const size = (this.props.indicatorsData.filter(data => data.archived).length
        + this.props.numberData.filter(data => data.archived).length) - 1;
     if (size) this.setState({ showPopout: true });
@@ -243,7 +253,7 @@ class Tablero extends Component {
           activeConfig={this.props.activeConfig}
           showNav={this.state.showNav}
           toggleNav={this.toggleNav}
-          configModified
+          configModified={this.state.configModified}
           updateConfig={this.updateConfig}
         />
         <div
@@ -296,19 +306,14 @@ Tablero.defaultProps = {
   currentLocation: '',
   indicatorsData: null,
   numberData: [],
+  configModified: false,
 };
 
 Tablero.propTypes = {
   fetchIndicators: PropTypes.func.isRequired,
   reorderIndicators: PropTypes.func.isRequired,
-  indicatorsData: PropTypes.arrayOf(PropTypes.shape({
-    archived: PropTypes.bool,
-    id: PropTypes.number,
-  })).isRequired,
-  numberData: PropTypes.arrayOf(PropTypes.shape({
-    archived: PropTypes.bool,
-    id: PropTypes.number,
-  })).isRequired,
+  indicatorsData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  numberData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   dashboardConfig: PropTypes.shape({
     enabled: PropTypes.bool,
     configurations: PropTypes.shape({}),
@@ -336,5 +341,5 @@ ConfigurationsList.propTypes = {
   showNav: PropTypes.bool.isRequired,
   toggleNav: PropTypes.func.isRequired,
   updateConfig: PropTypes.func.isRequired,
-  configModified: PropTypes.bool,
+  configModified: PropTypes.bool.isRequired,
 };

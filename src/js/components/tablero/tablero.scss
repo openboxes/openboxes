@@ -24,6 +24,33 @@
     top: unset;
   }
 
+  .updateSection{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.6em;
+    height: 20%;
+    color: #878787 !important;
+    i{
+      font-size: 1.4em;
+      margin-right: 6px;
+    }
+    .divisionLine{
+      border: 0.5px solid #d4d4d4;
+      width: 100%;
+      margin-bottom: 7%;
+    }
+    span{
+      margin-bottom: 7%;
+      width: 85%;
+    }
+    button{
+      background-color: #d9d9d9;
+      border: none;
+      height: 20%;
+    }
+  }
+
   &.hidden {
     margin-left: -200px;
   }

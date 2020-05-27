@@ -117,6 +117,7 @@ class User extends Person {
 
     def deserializeDashboardConfig() {
         def json = new JSON();
+        if(dashboardConfig == null) return null
         return json.parse(dashboardConfig)
     }
 
