@@ -352,38 +352,28 @@ class UserService {
         def userConfig = user.deserializeDashboardConfig()
 
         if (userConfig != null) {
-            userConfig["graph"].each { key, value ->
-                // Update order
-                config["endpoints"]["graph"][key]["order"] = value["order"]
-
-                // If the indicator should be archived but it currently isn't
-                if (value["archived"] && config["endpoints"]["graph"][key]["archived"].indexOf("personal") == -1) {
-                    config["endpoints"]["graph"][key]["archived"].add("personal")
-                }
-
-                // If the indicator shouldn't be archived but it currently is
-                if (!value["archived"] && config["endpoints"]["graph"][key]["archived"].indexOf("personal") != -1) {
-                    config["endpoints"]["graph"][key]["archived"].remove("personal")
-                }
-            }
-
-            userConfig["number"].each { key, value ->
-                // Update order
-                config["endpoints"]["number"][key]["order"] = value["order"]
-
-                // If the indicator should be archived but it currently isn't
-                if (value["archived"] && config["endpoints"]["number"][key]["archived"].indexOf("personal") == -1) {
-                    config["endpoints"]["number"][key]["archived"].add("personal")
-                }
-
-                // If the indicator shouldn't be archived but it currently is
-                if (!value["archived"] && config["endpoints"]["number"][key]["archived"].indexOf("personal") != -1) {
-                    config["endpoints"]["number"][key]["archived"].remove("personal")
-                }
-            }
+            updateConfig("graph", config, userConfig)
+            updateConfig("number", config, userConfig)
         }
 
         return config
+    }
+
+    private def updateConfig(type, config, customConfig) {
+        customConfig[type].each { key, value ->
+            // Update order
+            config["endpoints"][type][key]["order"] = value["order"]
+
+            // If the indicator should be archived but it currently isn't
+            if (value["archived"] && config["endpoints"][type][key]["archived"].indexOf("personal") == -1) {
+                config["endpoints"][type][key]["archived"].add("personal")
+            }
+
+            // If the indicator shouldn't be archived but it currently is
+            if (!value["archived"] && config["endpoints"][type][key]["archived"].indexOf("personal") != -1) {
+                config["endpoints"][type][key]["archived"].remove("personal")
+            }
+        }
     }
 
     def updateDashboardConfig(User user, Object config) {
