@@ -202,11 +202,13 @@ class StockMovementApiController {
 
         def lineItems = picklistItems.collect {
             [
-                    requisitionItemId: it?.requisitionItem?.id ?: "",
-                    lotNumber        : it?.inventoryItem?.lotNumber ?: "",
-                    expirationDate   : it?.inventoryItem?.expirationDate ? it.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
-                    binLocation      : it?.binLocation?.name ?: "",
-                    quantity         : it?.quantity ?: "",
+                    'Requisition item ID' : it?.requisitionItem?.id ?: "",
+                    'Product Code'        : it?.requisitionItem?.product?.productCode ?: "",
+                    'Product Name'        : it?.requisitionItem?.product?.name ?: "",
+                    'Lot Number'          : it?.inventoryItem?.lotNumber ?: "",
+                    'Expiration Date'     : it?.inventoryItem?.expirationDate ? it.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
+                    'Bin Location'        : it?.binLocation?.name ?: "",
+                    'Quantity'            : it?.quantity ?: "",
             ]
         }
         String csv = dataService.generateCsv(lineItems)
@@ -233,10 +235,10 @@ class StockMovementApiController {
             def settings = [separatorChar: ',', skipLines: 1]
             csv.toCsvReader(settings).eachLine { tokens ->
                 String requisitionItemId = tokens[0]
-                String lotNumber = tokens[1] ?: null
-                String expirationDate = tokens[2] ?: null
-                String binLocation = tokens[3] ?: null
-                Integer quantityPicked = tokens[4] ? tokens[4].toInteger() : null
+                String lotNumber = tokens[3] ?: null
+                String expirationDate = tokens[4] ?: null
+                String binLocation = tokens[5] ?: null
+                Integer quantityPicked = tokens[6] ? tokens[6].toInteger() : null
 
                 if (!requisitionItemId || quantityPicked == null) {
                     throw new IllegalArgumentException("Requisition item id and quantity picked are required")
