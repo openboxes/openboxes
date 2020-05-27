@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { defaults } from 'react-chartjs-2';
@@ -261,6 +260,8 @@ class Tablero extends Component {
         />
         <div
           className={`overlay ${this.state.showNav ? 'visible' : ''}`}
+          role="button"
+          tabIndex={0}
           onClick={this.toggleNav}
           onKeyPress={this.toggleNav}
         />

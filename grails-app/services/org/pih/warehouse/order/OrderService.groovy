@@ -17,6 +17,7 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductException
+import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentException
@@ -451,6 +452,67 @@ class OrderService {
         }
     }
 
+    void updateProductUnitPrice(OrderItem orderItem) {
+        Boolean enabled = ConfigurationHolder.config.openboxes.purchasing.updateUnitPrice.enabled
+        if (enabled) {
+            UpdateUnitPriceMethodCode method = ConfigurationHolder.config.openboxes.purchasing.updateUnitPrice.method
+            if (method == UpdateUnitPriceMethodCode.LAST_PURCHASE_PRICE) {
+                BigDecimal pricePerPackage = orderItem.unitPrice * orderItem?.order?.lookupCurrentExchangeRate()
+                BigDecimal pricePerUnit = pricePerPackage / orderItem?.quantityPerUom
+                orderItem.product.pricePerUnit = pricePerUnit
+                orderItem.product.save()
+            }
+            else {
+                log.warn("Cannot update unit price because method ${method} is not currently supported")
+            }
+        }
+    }
+
+    void updateProductPackage(OrderItem orderItem) {
+        // Convert package price to default currency
+        BigDecimal packagePrice = orderItem.unitPrice * orderItem?.order?.lookupCurrentExchangeRate()
+
+        // If there's no product package already we create a new one
+        if (!orderItem.productPackage) {
+            // Find an existing product package associated with a specific supplier
+            ProductPackage productPackage = orderItem?.productSupplier?.productPackages.find { ProductPackage productPackage ->
+                return productPackage.product == orderItem.product &&
+                        productPackage.uom == orderItem.quantityUom &&
+                        productPackage.quantity == orderItem.quantityPerUom
+
+                // If not found, then we look for a product package associated with the product
+                if (!productPackage) {
+                    orderItem.product.packages.find { ProductPackage productPackage1 ->
+                        return productPackage1.product == orderItem.product &&
+                                productPackage1.uom == orderItem.quantityUom &&
+                                productPackage1.quantity == orderItem.quantityPerUom
+                    }
+                }
+            }
+
+            // If we cannot find an existing product package, create a new one
+            if (!productPackage) {
+                productPackage = new ProductPackage()
+                productPackage.product = orderItem.product
+                productPackage.productSupplier = orderItem.productSupplier
+                productPackage.name = "${orderItem?.quantityUom?.code}/${orderItem?.quantityPerUom as Integer}"
+                productPackage.uom = orderItem.quantityUom
+                productPackage.quantity = orderItem.quantityPerUom as Integer
+                productPackage.price = packagePrice
+                productPackage.save()
+            }
+            // Otherwise update the price
+            else {
+                productPackage.price = packagePrice
+            }
+            // Associate product package with order item
+            orderItem.productPackage = productPackage
+        }
+        // Otherwise we update the existing price
+        else {
+            orderItem.productPackage.price = packagePrice
+        }
+    }
 
     /**
      * Import the order items into the order represented by the given order ID.
@@ -541,6 +603,20 @@ class OrderService {
      */
     boolean validateOrderItems(List orderItems) {
         return true
+    }
+
+    List<OrderItem> getPendingInboundOrderItems(Location destination) {
+        def orderItems = OrderItem.createCriteria().list() {
+            order {
+                eq("destination", destination)
+                eq("orderTypeCode", OrderTypeCode.PURCHASE_ORDER)
+                not {
+                    'in'("status", OrderStatus.PENDING)
+                }
+            }
+        }
+
+        return orderItems.findAll { !it.isCompletelyFulfilled() }
     }
 
     List<OrderItem> getPendingInboundOrderItems(Location destination, Product product) {

@@ -63,6 +63,7 @@ class JsonController {
     def inventorySnapshotService
     def forecastingService
     def translationService
+    def orderService
 
     def evaluateIndicator = {
         def indicator = Indicator.get(params.id)
@@ -1051,7 +1052,6 @@ class JsonController {
         items.unique { it.id }
         def json = items.collect { Product product ->
             def quantity = quantityMap[product] ?: 0
-            def color = product.productCatalogs.find { it.color }?.color
             quantity = " [" + quantity + " " + (product?.unitOfMeasure ?: "EA") + "]"
             def type = product.class.simpleName.toLowerCase()
             [
@@ -1060,7 +1060,7 @@ class JsonController {
                     url  : request.contextPath + "/" + type + "/redirect/" + product.id,
                     value: product.name,
                     label: product.productCode + " " + product.name + " " + quantity,
-                    color: color
+                    color: product.color
             ]
         }
         render json as JSON
@@ -1350,6 +1350,32 @@ class JsonController {
                     quantity      : quantity,
                     unitCost      : unitCost,
                     totalValue    : totalValue
+            ]
+        }
+        render(["aaData": data] as JSON)
+    }
+
+    def getDetailedOrderReport = {
+        def location = Location.get(session.warehouse.id)
+        def items = orderService.getPendingInboundOrderItems(location)
+        items += shipmentService.getPendingInboundShipmentItems(location)
+
+        def data = items.collect {
+            def isOrderItem = it instanceof OrderItem
+            [
+                    productCode  : it.product.productCode,
+                    productName  : it.product.name,
+                    qtyOrderedNotShipped : isOrderItem ? it.quantityRemaining : '',
+                    qtyShippedNotReceived : isOrderItem ? '' : it.quantityRemaining,
+                    orderNumber  : isOrderItem ? it.order.orderNumber : (it.shipment.isFromPurchaseOrder ? it.orderNumber : ''),
+                    orderDescription  : isOrderItem ? it.order.name : (it.shipment.isFromPurchaseOrder ? it.orderName : ''),
+                    supplierOrganization  : isOrderItem ? it.order?.origin?.organization?.name : it.shipment?.origin?.organization?.name,
+                    supplierLocation  : isOrderItem ? it.order.origin.name : it.shipment.origin.name,
+                    supplierLocationGroup  : isOrderItem ? it.order?.origin?.locationGroup?.name : it.shipment?.origin?.locationGroup?.name,
+                    estimatedGoodsReadyDate  : isOrderItem ? it.estimatedReadyDate?.format("MM/dd/yyyy") : '',
+                    shipmentNumber  : isOrderItem ? '' : it.shipment.shipmentNumber,
+                    shipDate  : isOrderItem ? '' : it.shipment.expectedShippingDate?.format("MM/dd/yyyy"),
+                    shipmentType  : isOrderItem ? '' : it.shipment.shipmentType.name
             ]
         }
         render(["aaData": data] as JSON)
@@ -1698,6 +1724,7 @@ class JsonController {
         productSuppliers = productSuppliers.collect {[
             id: it.id,
             code: it.code,
+            supplierCode: it.supplierCode,
             text: it.code,
             manufacturerCode: it.manufacturerCode,
             manufacturer: it.manufacturer?.id,
@@ -1712,7 +1739,7 @@ class JsonController {
         render([
                 unitPrice: productPackage?.price ? g.formatNumber(number: productPackage?.price) : null,
                 supplierCode: productSupplier?.supplierCode,
-                manufacturer: productSupplier?.manufacturer?.name,
+                manufacturer: productSupplier?.manufacturer,
                 manufacturerCode: productSupplier?.manufacturerCode,
                 minOrderQuantity: productSupplier?.minOrderQuantity,
                 quantityPerUom: productPackage?.quantity,

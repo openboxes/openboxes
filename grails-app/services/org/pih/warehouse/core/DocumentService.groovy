@@ -477,33 +477,22 @@ class DocumentService {
         timestampStyle.setAlignment(CellStyle.ALIGN_RIGHT)
         timestampStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER)
 
-        int counter = 0
-
-        if(shipmentInstance.isFromPurchaseOrder) {
-            sheet.setColumnWidth((short) counter++, (short) ((50 * 3) / ((double) 1 / 20)))
-        }
-        sheet.setColumnWidth((short) counter++, (short) ((50 * 3) / ((double) 1 / 20)))
-        sheet.setColumnWidth((short) counter++, (short) ((50 * 3) / ((double) 1 / 20)))
-        sheet.setColumnWidth((short) counter++, (short) ((50 * 3) / ((double) 1 / 20)))
-        sheet.setColumnWidth((short) counter++, (short) ((50 * 10) / ((double) 1 / 20)))
-        sheet.setColumnWidth((short) counter++, (short) ((50 * 5) / ((double) 1 / 20)))
-        sheet.setColumnWidth((short) counter++, (short) ((50 * 3) / ((double) 1 / 20)))
-        sheet.setColumnWidth((short) counter++, (short) ((50 * 3) / ((double) 1 / 20)))
-        sheet.setColumnWidth((short) counter++, (short) ((50 * 3) / ((double) 1 / 20)))
-        sheet.setColumnWidth((short) counter++, (short) ((50 * 5) / ((double) 1 / 20)))
+        sheet.setColumnWidth((short) 0, (short) ((50 * 3) / ((double) 1 / 20)))
+        sheet.setColumnWidth((short) 1, (short) ((50 * 3) / ((double) 1 / 20)))
+        sheet.setColumnWidth((short) 2, (short) ((50 * 3) / ((double) 1 / 20)))
+        sheet.setColumnWidth((short) 3, (short) ((50 * 10) / ((double) 1 / 20)))
+        sheet.setColumnWidth((short) 4, (short) ((50 * 5) / ((double) 1 / 20)))
+        sheet.setColumnWidth((short) 5, (short) ((50 * 3) / ((double) 1 / 20)))
+        sheet.setColumnWidth((short) 6, (short) ((50 * 3) / ((double) 1 / 20)))
+        sheet.setColumnWidth((short) 7, (short) ((50 * 3) / ((double) 1 / 20)))
+        sheet.setColumnWidth((short) 8, (short) ((50 * 5) / ((double) 1 / 20)))
 
         // SHIPMENT NAME
-        counter = 0
+        int counter = 0
         int CELL_INDEX = 0
 
         // ITEM TABLE HEADER
         Row row = sheet.createRow((short) counter++)
-
-        if(shipmentInstance.isFromPurchaseOrder) {
-            row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'order.orderNumber.label', default: 'PO number'))
-            row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle)
-        }
-
         row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'packLevel1.label', default: 'Pack level 1'))
         row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle)
 
@@ -537,11 +526,7 @@ class DocumentService {
             CELL_INDEX = 0
             log.debug "Adding item  to packing list " + itemInstance?.product?.name + " -> " + itemInstance?.container?.name
             row = sheet.createRow((short) counter++)
-
-            if(shipmentInstance.isFromPurchaseOrder) {
-                row.createCell(CELL_INDEX).setCellValue(itemInstance?.orderNumber)
-                row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle)
-            }
+            
             if (itemInstance?.container?.parentContainer) {
                 row.createCell(CELL_INDEX).setCellValue(itemInstance?.container?.parentContainer?.name)
                 row.getCell(CELL_INDEX++).setCellStyle(tableDataPalletStyle)
@@ -602,15 +587,21 @@ class DocumentService {
             Workbook workbook = new HSSFWorkbook()
             CreationHelper createHelper = workbook.getCreationHelper()
             Sheet sheet = workbook.createSheet()
-            sheet.setColumnWidth((short) 0, (short) ((50 * 5) / ((double) 1 / 20)))
-            sheet.setColumnWidth((short) 1, (short) ((50 * 5) / ((double) 1 / 20)))
-            sheet.setColumnWidth((short) 2, (short) ((50 * 3) / ((double) 1 / 20)))
-            sheet.setColumnWidth((short) 3, (short) ((50 * 12) / ((double) 1 / 20)))
-            sheet.setColumnWidth((short) 4, (short) ((50 * 5) / ((double) 1 / 20)))
-            sheet.setColumnWidth((short) 5, (short) ((50 * 4) / ((double) 1 / 20)))
-            sheet.setColumnWidth((short) 6, (short) ((50 * 3) / ((double) 1 / 20)))
-            sheet.setColumnWidth((short) 7, (short) ((50 * 3) / ((double) 1 / 20)))
-            sheet.setColumnWidth((short) 8, (short) ((50 * 5) / ((double) 1 / 20)))
+
+            int counter = 0
+
+            if(shipmentInstance.isFromPurchaseOrder) {
+                sheet.setColumnWidth((short) counter++, (short) ((50 * 5) / ((double) 1 / 20)))
+            }
+            sheet.setColumnWidth((short) counter++, (short) ((50 * 5) / ((double) 1 / 20)))
+            sheet.setColumnWidth((short) counter++, (short) ((50 * 5) / ((double) 1 / 20)))
+            sheet.setColumnWidth((short) counter++, (short) ((50 * 3) / ((double) 1 / 20)))
+            sheet.setColumnWidth((short) counter++, (short) ((50 * 12) / ((double) 1 / 20)))
+            sheet.setColumnWidth((short) counter++, (short) ((50 * 5) / ((double) 1 / 20)))
+            sheet.setColumnWidth((short) counter++, (short) ((50 * 4) / ((double) 1 / 20)))
+            sheet.setColumnWidth((short) counter++, (short) ((50 * 3) / ((double) 1 / 20)))
+            sheet.setColumnWidth((short) counter++, (short) ((50 * 3) / ((double) 1 / 20)))
+            sheet.setColumnWidth((short) counter++, (short) ((50 * 5) / ((double) 1 / 20)))
 
             // Bold font
             Font boldFont = workbook.createFont()
@@ -708,7 +699,7 @@ class DocumentService {
             timestampStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER)
 
             // SHIPMENT NAME
-            int counter = 0
+            counter = 0
             Row row = sheet.createRow((short) counter++)
             row.createCell(0).setCellValue("" + getMessageTagLib().message(code: 'shipping.name.label'))
             row.getCell(0).setCellStyle(labelStyle)
@@ -828,6 +819,11 @@ class DocumentService {
             row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'packLevel2.label', default: 'Pack level 2'))
             row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle)
 
+            if(shipmentInstance.isFromPurchaseOrder) {
+                row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'order.orderNumber.label', default: 'Order Number'))
+                row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle)
+            }
+
             row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'packingList.productCode.label', default: 'Code'))
             row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle)
 
@@ -896,6 +892,11 @@ class DocumentService {
                     }
                     row.createCell(CELL_INDEX).setCellValue("")
                     row.getCell(CELL_INDEX++).setCellStyle(tableDataPalletStyle)
+                }
+
+                if(shipmentInstance.isFromPurchaseOrder) {
+                    row.createCell(CELL_INDEX).setCellValue(itemInstance?.orderNumber)
+                    row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle)
                 }
 
                 row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.productCode)

@@ -12,7 +12,7 @@
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
-            <div class="list dialog">
+            <div class="dialog">
 
 				<div class="button-bar">
                     <g:link class="button" action="list">
@@ -39,7 +39,7 @@
 
                                 <g:sortableColumn property="code" title="${warehouse.message(code: 'productSupplier.sourceCode.label', default: 'Source Code')}" />
 
-                                <th><g:message code="productSupplier.product.label" default="Product" /></th>
+                                <th><g:message code="product.label" default="Product" /></th>
 
                                 <th><g:message code="productSupplier.sourceName.label" default="Source Name" /></th>
 
@@ -92,11 +92,11 @@
 
                                 <td>${fieldValue(bean: productSupplierInstance, field: "preferenceTypeCode")}</td>
 
-                                <td>${fieldValue(bean: productSupplierInstance, field: "unitOfMeasure")}</td>
+                                <td>${fieldValue(bean: productSupplierInstance?.defaultProductPackage, field: "unitOfMeasure")}</td>
 
                                 <td>
                                     <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: [g.message(code:'default.none.label')])}">
-                                        ${g.formatNumber(number: productSupplierInstance?.unitPrice?:0.0)}
+                                        ${g.formatNumber(number: productSupplierInstance?.defaultProductPackage?.unitPrice?:0.0)}
                                     </g:hasRoleFinance>
                                 </td>
 
@@ -119,10 +119,10 @@
                             <g:message code="default.none.label"/>
                         </div>
                     </g:unless>
+                    <div class="paginateButtons">
+                        <g:paginate total="${productSupplierInstanceTotal}" />
+                    </div>
                 </div>
-            </div>
-            <div class="paginateButtons">
-                <g:paginate total="${productSupplierInstanceTotal}" />
             </div>
         </div>
     </body>

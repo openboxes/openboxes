@@ -145,7 +145,7 @@ class InventoryController {
 
         def searchResults = products.collect { product ->
             def quantityOnHand = quantityList.find { it.p == product }?.quantityOnHand ?: 0
-            [product: product, quantityOnHand: quantityOnHand, color: product.productCatalogs.find { it.color }?.color]
+            [product: product, quantityOnHand: quantityOnHand, color: product?.color]
         }
         command.searchResults = searchResults
         command.totalCount = products.totalCount
