@@ -34,14 +34,14 @@ const Header = ({ username, isImpersonated }) => (
           </a>
         </div>
       </div> : null}
-    <div className="d-flex align-items-center justify-content-between">
+    <div className="d-flex align-items-center justify-content-between flex-wrap">
       <a
         href={dashboard.link}
         className="navbar-brand brand-name"
       >
         Openboxes
       </a>
-      <div className="d-flex">
+      <div className="d-flex flex-wrap">
         <GlobalSearch />
         <LocationChooser />
       </div>

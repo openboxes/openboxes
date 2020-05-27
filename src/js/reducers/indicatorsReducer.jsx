@@ -9,6 +9,7 @@ import {
   REORDER_INDICATORS,
   RESET_INDICATORS,
   FETCH_CONFIG,
+  SET_ACTIVE_CONFIG,
 } from '../actions/types';
 import { loadNumbersOptions } from '../consts/dataFormat/customGraphConfig';
 
@@ -35,6 +36,7 @@ const initialState = {
   data: [],
   numberData: [],
   config: {},
+  activeConfig: 'personal',
 };
 
 export default function (state = initialState, action) {
@@ -138,6 +140,11 @@ export default function (state = initialState, action) {
       return {
         ...state,
         config: action.payload.data,
+      };
+    case SET_ACTIVE_CONFIG:
+      return {
+        ...state,
+        activeConfig: action.payload.data,
       };
     default:
       return state;

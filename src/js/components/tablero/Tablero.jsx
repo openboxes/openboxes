@@ -72,6 +72,37 @@ const ArchiveIndicator = ({ hideArchive }) => (
 );
 
 
+const ConfigurationsList = ({
+  configs, activeConfig, loadConfigData, showNav, toggleNav,
+}) => {
+  if (!configs) {
+    return null;
+  }
+
+  return (
+    <div className={`configs-left-nav ${!showNav ? 'hidden' : ''}`}>
+      <button className="toggle-nav" onClick={toggleNav}>
+        {showNav ?
+          <i className="fa fa-chevron-left" aria-hidden="true" />
+        :
+          <i className="fa fa-chevron-right" aria-hidden="true" />
+        }
+      </button>
+      <ul className="configs-list">
+        {Object.entries(configs).map(([key, value]) => (
+          <li className={`configs-list-item ${activeConfig === key ? 'active' : ''}`} key={key}>
+            <button onClick={() => loadConfigData(key)}>
+              <i className="fa fa-bar-chart" aria-hidden="true" />
+              {value}
+            </button>
+          </li>
+          ))}
+      </ul>
+    </div>
+  );
+};
+
+
 class Tablero extends Component {
   constructor(props) {
     super(props);
@@ -79,6 +110,7 @@ class Tablero extends Component {
     this.state = {
       isDragging: false,
       showPopout: false,
+      showNav: false,
     };
   }
 
@@ -95,10 +127,10 @@ class Tablero extends Component {
   }
   dataFetched = false;
 
-  fetchData() {
+  fetchData = (config = 'personal') => {
     this.props.resetIndicators();
     if (this.props.dashboardConfig && this.props.dashboardConfig.endpoints) {
-      this.props.fetchIndicators(this.props.dashboardConfig);
+      this.props.fetchIndicators(this.props.dashboardConfig, config);
     } else {
       this.props.fetchConfigAndData();
     }
@@ -109,6 +141,10 @@ class Tablero extends Component {
       .filter(config => config.order === id)[0];
 
     this.props.reloadIndicator(indicatorConfig, params);
+  }
+
+  toggleNav = () => {
+    this.setState({ showNav: !this.state.showNav });
   }
 
   sortStartHandle = () => {
@@ -164,24 +200,40 @@ class Tablero extends Component {
     }
 
     return (
-      <div className="cards-container">
-        {numberCards}
-        <SortableCards
-          data={this.props.indicatorsData.filter(indicator => indicator)}
-          onSortStart={this.sortStartHandle}
-          onSortEnd={this.sortEndHandleGraph}
-          loadIndicator={this.loadIndicator}
-          axis="xy"
-          useDragHandle
+      <div className="dashboard-container">
+        <ConfigurationsList
+          configs={this.props.dashboardConfig.configurations || {}}
+          loadConfigData={this.fetchData}
+          activeConfig={this.props.activeConfig}
+          showNav={this.state.showNav}
+          toggleNav={this.toggleNav}
         />
-        <ArchiveIndicator hideArchive={!this.state.isDragging} />
-        <UnarchiveIndicators
-          graphData={this.props.indicatorsData}
-          numberData={this.props.numberData}
-          showPopout={this.state.showPopout}
-          unarchiveHandler={this.unarchiveHandler}
-          handleAdd={this.handleAdd}
+        <div
+          className={`overlay ${this.state.showNav ? 'visible' : ''}`}
+          role="button"
+          tabIndex={0}
+          onClick={this.toggleNav}
+          onKeyPress={this.toggleNav}
         />
+        <div className="cards-container">
+          {numberCards}
+          <SortableCards
+            data={this.props.indicatorsData.filter(indicator => indicator)}
+            onSortStart={this.sortStartHandle}
+            onSortEnd={this.sortEndHandleGraph}
+            loadIndicator={this.loadIndicator}
+            axis="xy"
+            useDragHandle
+          />
+          <ArchiveIndicator hideArchive={!this.state.isDragging} />
+          <UnarchiveIndicators
+            graphData={this.props.indicatorsData}
+            numberData={this.props.numberData}
+            showPopout={this.state.showPopout}
+            unarchiveHandler={this.unarchiveHandler}
+            handleAdd={this.handleAdd}
+          />
+        </div>
       </div>
     );
   }
@@ -191,6 +243,7 @@ const mapStateToProps = state => ({
   indicatorsData: state.indicators.data,
   numberData: state.indicators.numberData,
   dashboardConfig: state.indicators.config,
+  activeConfig: state.indicators.activeConfig,
   currentLocation: state.session.currentLocation.id,
 });
 
@@ -216,11 +269,13 @@ Tablero.propTypes = {
   numberData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   dashboardConfig: PropTypes.shape({
     enabled: PropTypes.bool,
+    configurations: PropTypes.shape({}),
     endpoints: PropTypes.shape({
       graph: PropTypes.shape({}),
       number: PropTypes.shape({}),
     }),
   }).isRequired,
+  activeConfig: PropTypes.string.isRequired,
   currentLocation: PropTypes.string.isRequired,
   addToIndicators: PropTypes.func.isRequired,
   reloadIndicator: PropTypes.func.isRequired,
@@ -230,4 +285,12 @@ Tablero.propTypes = {
 
 ArchiveIndicator.propTypes = {
   hideArchive: PropTypes.bool.isRequired,
+};
+
+ConfigurationsList.propTypes = {
+  configs: PropTypes.shape({}).isRequired,
+  activeConfig: PropTypes.string.isRequired,
+  loadConfigData: PropTypes.func.isRequired,
+  showNav: PropTypes.bool.isRequired,
+  toggleNav: PropTypes.func.isRequired,
 };

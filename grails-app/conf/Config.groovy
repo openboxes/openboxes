@@ -386,48 +386,52 @@ openboxes.dashboard.newsSummary.limit = 25
 openboxes {
     tablero {
         enabled = true
+        configurations {
+            personal = "My Dashboard"
+            warehouse = "Warehouse Management"
+        }
         endpoints {
             number {
                  inProgressPutaways {
                     endpoint = "/${appName}/apitablero/getInProgressPutaways"
-                    archived = false
+                    archived = ['warehouse']
                     order = 4
                 }
                 inventoryByLotAndBin {
                     endpoint = "/${appName}/apitablero/getInventoryByLotAndBin"
-                    archived = false
+                    archived = ['warehouse']
                     order = 1
                 }
                 inProgressShipments {
                     endpoint = "/${appName}/apitablero/getInProgressShipments"
-                    archived = false
+                    archived = []
                     order = 3
                 }
                 receivingBin {
                     endpoint = "/${appName}/apitablero/getReceivingBin"
-                    archived = false
+                    archived = ['warehouse']
                     order = 2
                 }
                 itemsInventoried {
                     endpoint = "/${appName}/apitablero/getItemsInventoried"
-                    archived = true
+                    archived = ['personal', 'warehouse']
                     order = 5
                 }
                 defaultBin {
                     endpoint = "/${appName}/apitablero/getDefaultBin"
-                    archived = true
+                    archived = ['personal']
                     order = 6
                 }
                 negativeInventory {
                     endpoint = "/${appName}/apitablero/getProductWithNegativeInventory"
-                    archived = true
+                    archived = ['personal']
                     order = 7
                 }
             }
             graph {
                 inventorySummary {
                     endpoint = "/${appName}/apitablero/getInventorySummary"
-                    archived = false
+                    archived = []
                     datalabel = true
                     order = 1
                     colors {
@@ -440,7 +444,7 @@ openboxes {
                 }
                 expirationSummary {
                     endpoint = "/${appName}/apitablero/getExpirationSummary"
-                    archived = false
+                    archived = ['warehouse']
                     order = 2
                     colors {
                         datasets {
@@ -453,14 +457,14 @@ openboxes {
                 }
                 sentStockMovements {
                     endpoint = "/${appName}/apitablero/getSentStockMovements"
-                    archived = true
+                    archived = ['personal']
                     stacked = true
                     datalabel = true
                     order = 9
                 }
                 outgoingStock {
                     endpoint = "/${appName}/apitablero/getOutgoingStock"
-                    archived = false
+                    archived = ['warehouse']
                     order = 4
                     colors {
                         datasets {
@@ -472,19 +476,19 @@ openboxes {
                 }
                 receivedStockMovements {
                     endpoint = "/${appName}/apitablero/getReceivedStockMovements"
-                    archived = true
+                    archived = ['personal']
                     stacked = true
                     datalabel = true
                     order = 7
                 }
                 discrepancy {
                     endpoint = "/${appName}/apitablero/getDiscrepancy"
-                    archived = false
+                    archived = []
                     order = 6
                 }
                 delayedShipments {
                     endpoint = "/${appName}/apitablero/getDelayedShipments"
-                    archived = false
+                    archived = ['warehouse']
                     order = 5
                      colors {
                         datasets {
@@ -494,14 +498,9 @@ openboxes {
                         }
                     }
                 }
-                fillRate {
-                    endpoint = "/${appName}/apitablero/getFillRate"
-                    archived = true
-                    order = 8
-                }
                 incomingStock {
                     endpoint = "/${appName}/apitablero/getIncomingStock"
-                    archived = false
+                    archived = ['warehouse']
                     order = 3
                     colors {
                         datasets {

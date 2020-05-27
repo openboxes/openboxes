@@ -1,8 +1,97 @@
 @import './ColorPalette.scss';
 
-.page-dashboard {
+.dashboard-container {
   background-color: #fbfbfb;
   user-select: none;
+  display: flex;
+  align-items: start;
+}
+
+.configs-left-nav {
+  position: sticky;
+  // height of the header (single line)
+  top: 108px;
+  background-color: #ededed;
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+  height: 100vh;
+  z-index: 2;
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.09);
+
+  @media (max-width: 1115px) {
+    position: fixed;
+    top: unset;
+  }
+
+  &.hidden {
+    margin-left: -200px;
+  }
+
+  .toggle-nav {
+    position: absolute;
+    top: 16px;
+    right: -25px;
+    width: 25px;
+    border: none;
+    background: #878787;
+    color: #ededed;
+    padding: 4px;
+    text-align: left;
+    border-top-right-radius: 100%;
+    border-bottom-right-radius: 100%;
+    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.09);
+    cursor: pointer;
+  }
+
+  .configs-list {
+    list-style: none;
+    padding: 0;
+
+    .configs-list-item {
+      margin: 16px 0;
+      padding: 8px 16px;
+      color: #878787;
+
+      &.active {
+        background-color: #d9d9d9;
+      }
+
+      button {
+        border: none;
+        background: none;
+        width: 100%;
+        text-align: start;
+        color: inherit;
+        display: flex;
+        align-items: center;
+
+        i {
+          margin-right: 16px;
+        }
+      }
+    }
+  }
+}
+
+.overlay {
+  display: none;
+
+  @media (max-width: 1115px) {
+    &.visible {
+      display: block;
+      background-color: rgba(135, 135, 135, 0.3);
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+  }
+
+}
+
+.cards-container {
+  flex: 1;
 }
 
 .archive-div {
@@ -133,7 +222,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  height: 350px;
+  height: 390px;
   width: 97%;
 
   >div {
@@ -195,6 +284,14 @@
           outline: none;
         }
       }
+    }
+
+    .graph-container {
+      position: relative;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
     }
 
     .table-card {
@@ -345,40 +442,40 @@
 
 @media (min-width: 630px) {
   .graph-card {
-    height: 420px;
+    height: 450px;
   }
 }
 
 @media (min-width: 730px) {
   .graph-card {
-    height: 470px;
+    height: 517px;
   }
 }
 
 @media (min-width: 868px) {
   .graph-card {
-    height: 320px;
+    height: 350px;
     width: 47%;
   }
 }
 
 @media (min-width: 1068px) {
   .graph-card {
-    height: 370px;
+    height: 390px;
     width: 47%;
   }
 }
 
 @media (min-width: 1268px) {
   .graph-card {
-    height: 420px;
+    height: 440px;
     width: 47%;
   }
 }
 
 @media (min-width: 1468px) {
   .graph-card {
-    height: 370px;
+    height: 490px;
     width: 30.6%;
   }
 }
