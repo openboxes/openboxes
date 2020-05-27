@@ -66,6 +66,7 @@ const FIELDS = {
           options: [],
           showValueTooltip: true,
           className: 'text-left',
+          optionRenderer: option => <strong style={{ color: option.color ? option.color : 'black' }}>{option.label}</strong>,
         },
         getDynamicAttr: ({
           fieldValue, debouncedProductsFetch,

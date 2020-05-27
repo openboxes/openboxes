@@ -591,7 +591,6 @@ class MigrationService {
         productSupplier.ndc = product.ndc
         productSupplier.brandName = product.brandName
         productSupplier.modelNumber = product.modelNumber
-        productSupplier.unitPrice = product.pricePerUnit
         productSupplier.ratingTypeCode = RatingTypeCode.NOT_RATED
         productSupplier.preferenceTypeCode = PreferenceTypeCode.NOT_PREFERRED
 

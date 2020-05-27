@@ -27,7 +27,7 @@ class GlobalSearch extends Component {
 
   render() {
     return (
-      <div className="global-search ">
+      <div className="global-search">
         <Select
           async
           placeholder="Search..."
@@ -46,6 +46,7 @@ class GlobalSearch extends Component {
           onEnterPress={() => {
             window.location = `/openboxes/dashboard/globalSearch?searchTerms=${this.state.inputValue}`;
           }}
+          optionRenderer={option => <strong style={{ color: option.color ? option.color : 'black' }}>{option.label}</strong>}
         />
       </div>);
   }

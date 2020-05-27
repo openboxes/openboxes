@@ -335,6 +335,19 @@ class ShipmentService {
         return shipmentItems
     }
 
+    List<ShipmentItem> getPendingInboundShipmentItems(Location destination) {
+        def shipmentItems = ShipmentItem.createCriteria().list() {
+            shipment {
+                eq("destination", destination)
+                not {
+                    'in'("currentStatus", [ShipmentStatusCode.RECEIVED, ShipmentStatusCode.PENDING])
+                }
+            }
+        }
+
+        return shipmentItems.findAll { !it.isFullyReceived() }
+    }
+
     List<ShipmentItem> getPendingInboundShipmentItems(Location destination, Product product) {
         def shipmentItems = ShipmentItem.createCriteria().list() {
             shipment {

@@ -70,6 +70,7 @@ export const debounceGlobalSearch = (waitTime, minSearchLength) =>
                   url: obj.url,
                 },
                 label: obj.label,
+                color: obj.color,
               }
             )),
           },
@@ -97,6 +98,7 @@ export const debounceProductsFetch = (waitTime, minSearchLength, locationId) =>
                   label: `${obj.productCode} - ${obj.name}`,
                 },
                 label: `${obj.productCode} - ${obj.name}`,
+                color: obj.color,
               }
             )),
           },
@@ -126,6 +128,7 @@ export const debounceAvailableItemsFetch = (waitTime, minSearchLength) =>
                   minExpirationDate: obj.minExpirationDate,
                 },
                 label: `${obj.productCode} - ${obj.name}`,
+                color: obj.color,
               }
             )),
           },
