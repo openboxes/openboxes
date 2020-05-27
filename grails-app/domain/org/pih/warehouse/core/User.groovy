@@ -42,7 +42,7 @@ class User extends Person {
         roles joinTable: [name: 'user_role', column: 'role_id', key: 'user_id'], cascade: "save-update"
         locationRoles cascade: "all-delete-orphan"
         id generator: 'uuid'
-        dashboardConfig (sqlType: "longblob")
+        dashboardConfig(sqlType: "longblob")
     }
     static transients = ["passwordConfirm"]
     static constraints = {
@@ -116,8 +116,9 @@ class User extends Person {
     }
 
     def deserializeDashboardConfig() {
+        if (dashboardConfig == null) return null
+        
         def json = new JSON();
-        if(dashboardConfig == null) return null
         return json.parse(dashboardConfig)
     }
 

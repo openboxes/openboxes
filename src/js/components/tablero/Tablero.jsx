@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
@@ -102,9 +101,8 @@ const ConfigurationsList = ({
       </ul>
       {
         (activeConfig === 'personal' && configModified) ?
-
-          <div className="updateSection">
-            <div className="divisionLine" />
+          <div className="update-section">
+            <div className="division-line" />
             <span> <i className="fa fa-info-circle" aria-hidden="true" />The dashboard layout has been edited</span>
             <button onClick={updateConfig} >
               <i className="fa fa-floppy-o" aria-hidden="true" />
@@ -154,21 +152,25 @@ class Tablero extends Component {
 
   updateConfig = () => {
     const url = '/openboxes/apitablero/updateConfig';
+
     const payload = {
       number: {},
       graph: {},
     };
 
-    Object.keys(this.props.dashboardConfig.endpoints.graph).forEach((key) => {
-      const index = this.props.indicatorsData.findIndex(data => data && data.id === this.props.dashboardConfig.endpoints.graph[key].order);
+    const configData = this.props.dashboardConfig.endpoints;
+    Object.keys(configData.graph).forEach((key) => {
+      const index = this.props.indicatorsData.findIndex(data => data &&
+        data.id === configData.graph[key].order);
       payload.graph[key] = {
         order: index + 1,
         archived: this.props.indicatorsData[index].archived,
       };
     });
 
-    Object.keys(this.props.dashboardConfig.endpoints.number).forEach((key) => {
-      const index = this.props.numberData.findIndex(data => data && data.id === this.props.dashboardConfig.endpoints.number[key].order);
+    Object.keys(configData.number).forEach((key) => {
+      const index = this.props.numberData.findIndex(data => data &&
+        data.id === configData.number[key].order);
       payload.number[key] = {
         order: index + 1,
         archived: this.props.numberData[index].archived,
@@ -176,8 +178,8 @@ class Tablero extends Component {
     });
 
     apiClient.post(url, payload).then(() => {
-      console.log('success');
-    }).catch(() => console.log('error'));
+      this.setState({ configModified: false });
+    });
   }
 
   loadIndicator = (id, params) => {
@@ -223,6 +225,7 @@ class Tablero extends Component {
   handleAdd = (index, type) => {
     this.props.addToIndicators(index, type);
     this.setState({ configModified: true });
+
     const size = (this.props.indicatorsData.filter(data => data.archived).length
        + this.props.numberData.filter(data => data.archived).length) - 1;
     if (size) this.setState({ showPopout: true });
@@ -312,8 +315,14 @@ Tablero.defaultProps = {
 Tablero.propTypes = {
   fetchIndicators: PropTypes.func.isRequired,
   reorderIndicators: PropTypes.func.isRequired,
-  indicatorsData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  numberData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  indicatorsData: PropTypes.arrayOf(PropTypes.shape({
+    archived: PropTypes.oneOfType([PropTypes.bool, PropTypes.number]),
+    id: PropTypes.number,
+  })).isRequired,
+  numberData: PropTypes.arrayOf(PropTypes.shape({
+    archived: PropTypes.oneOfType([PropTypes.bool, PropTypes.number]),
+    id: PropTypes.number,
+  })).isRequired,
   dashboardConfig: PropTypes.shape({
     enabled: PropTypes.bool,
     configurations: PropTypes.shape({}),
