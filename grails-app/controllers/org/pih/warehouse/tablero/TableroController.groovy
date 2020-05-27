@@ -4,14 +4,8 @@ import grails.converters.JSON
 
 class TableroController {
 
-    def index= {
+    def index = {
         render(template: "/common/react")
-    }
-
-    def config = {
-        render([
-                data: grailsApplication.config.openboxes.tablero,
-        ] as JSON)
     }
 
 }

@@ -346,4 +346,49 @@ class UserService {
         }
         return false
     }
+
+    def getDashboardConfig(User user) {
+        def config = grailsApplication.config.openboxes.tablero
+        def userConfig = user.deserializeDashboardConfig()
+
+        if (userConfig != null) {
+            userConfig["graph"].each { key, value ->
+                // Update order
+                config["endpoints"]["graph"][key]["order"] = value["order"]
+
+                // If the indicator should be archived but it currently isn't
+                if (value["archived"] && config["endpoints"]["graph"][key]["archived"].indexOf("personal") == -1) {
+                    config["endpoints"]["graph"][key]["archived"].add("personal")
+                }
+
+                // If the indicator shouldn't be archived but it currently is
+                if (!value["archived"] && config["endpoints"]["graph"][key]["archived"].indexOf("personal") != -1) {
+                    config["endpoints"]["graph"][key]["archived"].remove("personal")
+                }
+            }
+
+            userConfig["number"].each { key, value ->
+                // Update order
+                config["endpoints"]["number"][key]["order"] = value["order"]
+
+                // If the indicator should be archived but it currently isn't
+                if (value["archived"] && config["endpoints"]["number"][key]["archived"].indexOf("personal") == -1) {
+                    config["endpoints"]["number"][key]["archived"].add("personal")
+                }
+
+                // If the indicator shouldn't be archived but it currently is
+                if (!value["archived"] && config["endpoints"]["number"][key]["archived"].indexOf("personal") != -1) {
+                    config["endpoints"]["number"][key]["archived"].remove("personal")
+                }
+            }
+        }
+
+        return config
+    }
+
+    def updateDashboardConfig(User user, Object config) {
+        String stringConfig = user.serializeDashboardConfig(config)
+        user.dashboardConfig = stringConfig
+        return user.deserializeDashboardConfig()
+    }
 }

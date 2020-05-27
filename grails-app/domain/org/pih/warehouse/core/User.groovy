@@ -11,6 +11,7 @@ package org.pih.warehouse.core
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
 import util.StringUtil
+import grails.converters.JSON
 
 
 class User extends Person {
@@ -33,7 +34,7 @@ class User extends Person {
 
     List locationRoles
 
-    String dashboard_config
+    String dashboardConfig
 
     static hasMany = [roles: Role, locationRoles: LocationRole]
     static mapping = {
@@ -41,7 +42,7 @@ class User extends Person {
         roles joinTable: [name: 'user_role', column: 'role_id', key: 'user_id'], cascade: "save-update"
         locationRoles cascade: "all-delete-orphan"
         id generator: 'uuid'
-        dashboard_config (sqlType: "longblob")
+        dashboardConfig (sqlType: "longblob")
     }
     static transients = ["passwordConfirm"]
     static constraints = {
@@ -61,7 +62,7 @@ class User extends Person {
         manager(nullable: true)
         rememberLastLocation(nullable: true)
         photo(nullable: true, maxSize: 10485760) // 10 MBs
-        dashboard_config(nullable: true)
+        dashboardConfig(nullable: true)
     }
 
 
@@ -110,6 +111,15 @@ class User extends Person {
         roleArray?.join(" | ")
     }
 
+    def serializeDashboardConfig(Object config) {
+        return (config as JSON)
+    }
+
+    def deserializeDashboardConfig() {
+        def json = new JSON();
+        return json.parse(dashboardConfig)
+    }
+
 
     Map toJson() {
         boolean anonymize = CH.config.openboxes.anonymize.enabled
@@ -120,8 +130,7 @@ class User extends Person {
                 "firstName": firstName,
                 "lastName" : (anonymize) ? lastInitial : lastName,
                 "email"    : anonymize ? StringUtil.mask(email) : email,
-                "username" : anonymize ? StringUtil.mask(username) : username,
-                "dashboard_config" : dashboard_config
+                "username" : anonymize ? StringUtil.mask(username) : username
         ]
     }
 
