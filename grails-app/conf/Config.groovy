@@ -427,6 +427,11 @@ openboxes {
                     archived = ['personal']
                     order = 7
                 }
+                expiredStock {
+                    endpoint = "/${appName}/apitablero/getExpiredProductsInStock"
+                    archived = ['personal', 'warehouse']
+                    order = 8 
+                }
             }
             graph {
                 inventorySummary {

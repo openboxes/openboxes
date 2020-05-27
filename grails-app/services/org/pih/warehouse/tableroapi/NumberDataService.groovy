@@ -128,4 +128,24 @@ class NumberDataService {
         return new NumberData("Products with Negative Inventory", numberOfProducts, "Products",
                 "/openboxes/report/showBinLocationReport?location.id=" + location.id, tooltipData)
     }
+
+    NumberData getExpiredProductsInStock(def location) {
+        Date today = LocalDate.now().toDate();
+        Date tomorrow = LocalDate.now().plusDays(1).toDate();
+
+          def expiredProductsInStock = InventorySnapshot.executeQuery("""
+            SELECT Count(distinct i.product.id) FROM InventorySnapshot i
+            WHERE i.location = :location
+            AND i.quantityOnHand > 0
+            AND i.date = :tomorrow
+            AND i.inventoryItem.expirationDate < :today
+            """,
+                [
+                        'location': location,
+                        'tomorrow': tomorrow,
+                        'today' : today,
+                ]);
+
+        return new NumberData("Expired products in Stock", expiredProductsInStock[0], "Products", "/openboxes/inventory/listExpiredStock?status=expired")
+    }
 }
