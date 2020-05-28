@@ -79,7 +79,17 @@
                                         ${session?.warehouse?.name }
                                         <g:hiddenField name="destination.id" value="${session?.warehouse?.id}"/>
                                     </g:else>
-
+                                </td>
+                            </tr>
+                            <tr class='prop'>
+                                <td class='name middle'><label><warehouse:message code="order.purchasingOrganization.label"/></label></td>
+                                <td valign='top'
+                                    class='value ${hasErrors(bean:order,field:'purchasingOrganization','errors')}'>
+                                    <g:selectOrganization name="purchasingParty.id"
+                                                          id="purchasingParty.id"
+                                                          roleTypes="[org.pih.warehouse.core.RoleType.ROLE_PURCHASER]"
+                                                          noSelection="['':'']"
+                                                          class="select2" />
                                 </td>
                             </tr>
                             <tr class='prop'>
