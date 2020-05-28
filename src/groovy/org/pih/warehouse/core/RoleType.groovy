@@ -75,6 +75,7 @@ enum RoleType {
     ROLE_DONOR('Donor', 100),
     ROLE_SHIPPING_AGENT('Shipping Agent', 100),
     ROLE_CLEARING_AGENT('Clearing Agent', 100),
+    ROLE_PURCHASER('Purchaser', 100),
 
     // Customer role types
     ROLE_CUSTOMER('Customer', 102)
@@ -164,6 +165,7 @@ enum RoleType {
                 ROLE_SHIPPING_AGENT,
                 ROLE_CLEARING_AGENT,
                 ROLE_CUSTOMER,
+                ROLE_PURCHASER,
         ]
     }
 }
