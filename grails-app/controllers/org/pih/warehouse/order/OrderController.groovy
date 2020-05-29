@@ -662,7 +662,10 @@ class OrderController {
     def saveOrderItem = {
         Order order = Order.get(params.order.id)
         OrderItem orderItem = OrderItem.get(params.orderItem.id)
-        ProductSupplier productSupplier = productSupplierDataService.getOrCreateNew(params)
+        ProductSupplier productSupplier = null
+        if (params.productSupplier?.id || params.supplierCode) {
+            productSupplier = productSupplierDataService.getOrCreateNew(params)
+        }
         params.remove("productSupplier")
         params.remove("productSupplier.id")
 
@@ -684,7 +687,9 @@ class OrderController {
             }
         }
 
-        orderItem.productSupplier = productSupplier
+        if (productSupplier != null) {
+            orderItem.productSupplier = productSupplier
+        }
 
         try {
             if (!order.save(flush:true)) {
