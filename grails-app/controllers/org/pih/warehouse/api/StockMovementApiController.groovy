@@ -202,13 +202,13 @@ class StockMovementApiController {
 
         def lineItems = picklistItems.collect {
             [
-                    'Requisition item ID' : it?.requisitionItem?.id ?: "",
-                    'Product Code'        : it?.requisitionItem?.product?.productCode ?: "",
-                    'Product Name'        : it?.requisitionItem?.product?.name ?: "",
-                    'Lot Number'          : it?.inventoryItem?.lotNumber ?: "",
-                    'Expiration Date'     : it?.inventoryItem?.expirationDate ? it.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
-                    'Bin Location'        : it?.binLocation?.name ?: "",
-                    'Quantity'            : it?.quantity ?: "",
+                    "${g.message(code: 'default.id.label')}": it?.requisitionItem?.id ?: "",
+                    "${g.message(code: 'product.productCode.label')}": it?.requisitionItem?.product?.productCode ?: "",
+                    "${g.message(code: 'product.name.label')}": it?.requisitionItem?.product?.name ?: "",
+                    "${g.message(code: 'inventoryItem.lotNumber.label')}": it?.inventoryItem?.lotNumber ?: "",
+                    "${g.message(code: 'inventoryItem.expirationDate.label')}": it?.inventoryItem?.expirationDate ? it.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
+                    "${g.message(code: 'inventoryItem.binLocation.label')}": it?.binLocation?.name ?: "",
+                    "${g.message(code: 'default.quantity.label')}": it?.quantity ?: "",
             ]
         }
         String csv = dataService.generateCsv(lineItems)
