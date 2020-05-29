@@ -134,7 +134,7 @@ class NumberDataService {
         Date tomorrow = LocalDate.now().plusDays(1).toDate();
 
           def expiredProductsInStock = InventorySnapshot.executeQuery("""
-            SELECT Count(distinct i.product.id) FROM InventorySnapshot i
+            SELECT COUNT(distinct i.id) FROM InventorySnapshot i
             WHERE i.location = :location
             AND i.quantityOnHand > 0
             AND i.date = :tomorrow
