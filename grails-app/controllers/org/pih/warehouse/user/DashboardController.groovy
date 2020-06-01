@@ -144,6 +144,8 @@ class DashboardController {
                 tags                     : productService?.getPopularTags(50),
                 catalogs                 : productService?.getAllCatalogs()
         ]
+
+        render(template: "/common/react")
     }
 
 

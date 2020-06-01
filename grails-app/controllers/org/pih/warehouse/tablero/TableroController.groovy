@@ -5,7 +5,7 @@ import grails.converters.JSON
 class TableroController {
 
     def index= {
-        render(template: "/common/react")
+        render "This page will be deleted soon"
     }
 
     def config = {
