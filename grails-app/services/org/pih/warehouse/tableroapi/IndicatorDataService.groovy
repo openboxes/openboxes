@@ -10,6 +10,8 @@ import org.pih.warehouse.tablero.IndicatorDatasets
 import org.pih.warehouse.tablero.NumberTableData
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.core.Location
 import org.joda.time.LocalDate
@@ -264,7 +266,7 @@ class IndicatorDataService {
             }
         }
         List<IndicatorDatasets> datasets = (List<IndicatorDatasets>) listRes.values().toList();
-
+   
         IndicatorData indicatorData = new IndicatorData(datasets, listLabel);
 
         GraphData graphData = new GraphData(indicatorData, "Stock Movements Received by Month", "bar");
@@ -440,5 +442,138 @@ class IndicatorDataService {
         GraphData graphData = new GraphData(numberTableData, "Delayed Shipments", "numberTable");
 
         return graphData;
+    }
+
+    GraphData getLossCauseByExpiry(Location location) { 
+
+        def valuesRemovedBecauseExpiry = Transaction.executeQuery("""
+            select sum(te.inventoryItem.product.pricePerUnit * te.quantity), month(t.transactionDate), year(t.transactionDate)
+            from TransactionEntry te 
+            inner join te.transaction t
+            where t.inventory = :inventory
+            and t.transactionType.id = 4
+            group by month(t.transactionDate), year(t.transactionDate)
+        """,
+            [
+                'inventory' : location.inventory
+            ]);
+
+        def valuesNotExpiredLastDayOfMonth = InventorySnapshot.executeQuery("""
+            select sum(iis.quantityOnHand * p.pricePerUnit), month(iis.date), year(iis.date)
+            from InventorySnapshot as iis
+            inner join iis.product as p
+            inner join iis.inventoryItem as ii
+            where iis.location = :location
+            and iis.date = LAST_DAY(iis.date)
+            and ii.expirationDate > iis.date
+            group by month(iis.date), year(iis.date)
+        """,
+            [
+                'location' : location
+            ]);
+          
+        def valuesExpiredLastDayOfMonth = InventorySnapshot.executeQuery("""
+            select sum(iis.quantityOnHand * p.pricePerUnit), Month(iis.date), year(iis.date)
+            from InventorySnapshot as iis
+            inner join iis.product as p
+            inner join iis.inventoryItem as ii
+            where iis.location = :location
+            and iis.date = LAST_DAY(iis.date)
+            and ii.expirationDate <= iis.date
+            group by month(iis.date), year(iis.date)
+        """,
+            [
+                'location' : location
+            ]);
+        
+        // Getting the labels for each result
+        def labelValueRemovedBecauseExpiry = fillListLabel(valuesRemovedBecauseExpiry,1,2);
+        def labelValuesNotExpiredLastDayOfMonth = fillListLabel(valuesNotExpiredLastDayOfMonth,1,2);
+        def labelValuesExpiredLastDayOfMonth = fillListLabel(valuesExpiredLastDayOfMonth,1,2);
+
+        // Creation of the listLabels
+        def listLabels = [labelValuesNotExpiredLastDayOfMonth, labelValueRemovedBecauseExpiry, labelValuesExpiredLastDayOfMonth].sum().unique().sort{it};
+
+        // Fully filling all lists with missing labels
+        valuesRemovedBecauseExpiry = fullyFillList(valuesRemovedBecauseExpiry, labelValueRemovedBecauseExpiry, listLabels);
+        valuesNotExpiredLastDayOfMonth = fullyFillList(valuesNotExpiredLastDayOfMonth, labelValuesNotExpiredLastDayOfMonth, listLabels);
+        valuesExpiredLastDayOfMonth = fullyFillList(valuesExpiredLastDayOfMonth, labelValuesExpiredLastDayOfMonth, listLabels);
+
+        // Changing number month to labelMonth
+        listLabels.each{
+            it[0] = new java.text.DateFormatSymbols().months[it[0]];
+        }
+
+        // Cleaning of the lists
+        valuesRemovedBecauseExpiry = cleaningElementFromList(valuesRemovedBecauseExpiry, 0, false);
+        valuesNotExpiredLastDayOfMonth = cleaningElementFromList(valuesNotExpiredLastDayOfMonth, 0, false);
+        valuesExpiredLastDayOfMonth = cleaningElementFromList(valuesExpiredLastDayOfMonth, 0, false);
+
+        // Calcul of the percentage
+        def percentage = [];
+        for(int i = 0; i<listLabels.size(); i++) {
+            if(valuesRemovedBecauseExpiry[i] == 0) percentage.push(0);
+            else percentage.push(valuesRemovedBecauseExpiry[i]/(valuesRemovedBecauseExpiry[i] + valuesNotExpiredLastDayOfMonth[i] + valuesExpiredLastDayOfMonth[i]));
+        }
+
+        // Creation of datasets
+        List<IndicatorDatasets> datasets = [
+            new IndicatorDatasets('Percentage', percentage, null, 'line'),
+            new IndicatorDatasets('Inventory value removed due to expiry', valuesRemovedBecauseExpiry, null, 'bar'),
+            new IndicatorDatasets('Inventory value not expired last day of month', valuesNotExpiredLastDayOfMonth, null, 'bar'),
+            new IndicatorDatasets('Inventory Value expired last day of month', valuesExpiredLastDayOfMonth, null, 'bar'),
+        ];
+
+        // Concatenation of listLabels
+        listLabels = cleaningElementFromList(listLabels, 0, true);
+
+        IndicatorData indicatorData = new IndicatorData(datasets, listLabels);
+
+        GraphData graphData = new GraphData(indicatorData, "Loss caused by expiry", "bar");
+        
+        return graphData;
+    }
+
+    List fillListLabel(List listToFill, firstElement, secondElement) {
+        List filledList = [];
+
+        listToFill.each{
+            filledList.push([it[firstElement],it[secondElement]]);
+        }
+
+        return filledList;
+    }
+
+    List fullyFillList(List listToFill, List listLabelOfElement, List listLabel) {
+        def fullyFilledList = [];
+    
+        listLabel.each{
+            if(!listLabelOfElement.contains(it)) {
+                listToFill.push([0, it[0], it[1]])
+            }
+        }
+
+        listToFill.each{
+            fullyFilledList.push([it[0], "${it[1]} ${it[2]}"]);
+        }
+        
+        return fullyFilledList.sort{it[1]};
+    }
+
+    List cleaningElementFromList(List listToClean, int elementToKeep, boolean concatBoth) {
+        def cleanedList = [];
+
+        if(concatBoth){
+            listToClean.each{
+                cleanedList.push("${it[elementToKeep]} ${it[elementToKeep + 1]}");
+            }
+        }
+        else{
+            listToClean.each{
+                cleanedList.push(it[elementToKeep]);
+            }
+        }
+        
+        return cleanedList;
     }
 }

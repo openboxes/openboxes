@@ -135,12 +135,10 @@ function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', ma
       callbacks: {
         title: (tooltipItem, data) => {
           let title = data.datasets[tooltipItem[0].datasetIndex].label || '';
-
           if (title) {
             title += ': ';
           }
           title += data.datasets[tooltipItem[0].datasetIndex].data[tooltipItem[0].index];
-
           return title;
         },
         label: (tooltipItem, data) => data.labels[tooltipItem.index],

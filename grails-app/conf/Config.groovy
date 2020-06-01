@@ -437,6 +437,7 @@ openboxes {
                 inventorySummary {
                     endpoint = "/${appName}/apitablero/getInventorySummary"
                     archived = []
+                    filter= false
                     datalabel = true
                     order = 1
                     colors {
@@ -450,6 +451,7 @@ openboxes {
                 expirationSummary {
                     endpoint = "/${appName}/apitablero/getExpirationSummary"
                     archived = ['warehouse']
+                    filter=true
                     order = 2
                     colors {
                         datasets {
@@ -463,6 +465,7 @@ openboxes {
                 sentStockMovements {
                     endpoint = "/${appName}/apitablero/getSentStockMovements"
                     archived = ['personal']
+                    filter=true
                     stacked = true
                     datalabel = true
                     order = 9
@@ -470,6 +473,7 @@ openboxes {
                 outgoingStock {
                     endpoint = "/${appName}/apitablero/getOutgoingStock"
                     archived = ['warehouse']
+                    filter= false
                     order = 4
                     colors {
                         datasets {
@@ -482,18 +486,21 @@ openboxes {
                 receivedStockMovements {
                     endpoint = "/${appName}/apitablero/getReceivedStockMovements"
                     archived = ['personal']
+                    filter= true
                     stacked = true
                     datalabel = true
                     order = 7
                 }
                 discrepancy {
                     endpoint = "/${appName}/apitablero/getDiscrepancy"
+                    filter= true
                     archived = []
                     order = 6
                 }
                 delayedShipments {
                     endpoint = "/${appName}/apitablero/getDelayedShipments"
                     archived = ['warehouse']
+                    filter=false
                     order = 5
                      colors {
                         datasets {
@@ -506,6 +513,7 @@ openboxes {
                 incomingStock {
                     endpoint = "/${appName}/apitablero/getIncomingStock"
                     archived = ['warehouse']
+                    filter= false
                     order = 3
                     colors {
                         datasets {
@@ -514,6 +522,14 @@ openboxes {
                             state8 = ["third"]
                         }
                     }
+                }
+                lossCauseByExpiry {
+                    endpoint = "/${appName}/apitablero/getLossCauseByExpiry"
+                    filter= false
+                    archived = ['warehouse']
+                    stacked = true
+                    datalabel = true
+                    order = 10
                 }
             }
         }

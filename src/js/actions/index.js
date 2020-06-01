@@ -140,6 +140,7 @@ function fetchGraphIndicator(
         type: indicatorData.type,
         data: indicatorData.data,
         archived: indicatorConfig.archived,
+        filter: indicatorConfig.filter,
         link: indicatorData.link,
         config: {
           stacked: indicatorConfig.stacked,
