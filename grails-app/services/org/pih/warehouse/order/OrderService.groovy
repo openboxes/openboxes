@@ -227,7 +227,7 @@ class OrderService {
 
     String generatePurchaseOrderSequenceNumber(Order order) {
         try {
-            Integer sequenceNumber = getNextSequenceNumber(order.destinationParty.id)
+            Integer sequenceNumber = getNextSequenceNumber(order.purchasingParty.id)
             String sequenceNumberStr = identifierService.generateSequenceNumber(sequenceNumber.toString())
 
             // Properties to be used to get argument values for the template
