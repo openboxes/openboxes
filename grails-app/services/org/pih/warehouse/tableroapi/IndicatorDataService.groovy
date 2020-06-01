@@ -487,12 +487,12 @@ class IndicatorDataService {
             ]);
         
         // Getting the labels for each result
-        def labelValueRemovedBecauseExpiry = fillListLabel(valuesRemovedBecauseExpiry,1,2);
-        def labelValuesNotExpiredLastDayOfMonth = fillListLabel(valuesNotExpiredLastDayOfMonth,1,2);
-        def labelValuesExpiredLastDayOfMonth = fillListLabel(valuesExpiredLastDayOfMonth,1,2);
+        List labelValueRemovedBecauseExpiry = fillListLabel(valuesRemovedBecauseExpiry);
+        List labelValuesNotExpiredLastDayOfMonth = fillListLabel(valuesNotExpiredLastDayOfMonth);
+        List labelValuesExpiredLastDayOfMonth = fillListLabel(valuesExpiredLastDayOfMonth);
 
         // Creation of the listLabels
-        def listLabels = [labelValuesNotExpiredLastDayOfMonth, labelValueRemovedBecauseExpiry, labelValuesExpiredLastDayOfMonth].sum().unique().sort{it};
+        List listLabels = [labelValuesNotExpiredLastDayOfMonth, labelValueRemovedBecauseExpiry, labelValuesExpiredLastDayOfMonth].sum().unique().sort{it};
 
         // Fully filling all lists with missing labels
         valuesRemovedBecauseExpiry = fullyFillList(valuesRemovedBecauseExpiry, labelValueRemovedBecauseExpiry, listLabels);
@@ -504,13 +504,8 @@ class IndicatorDataService {
             it[0] = new java.text.DateFormatSymbols().months[it[0]];
         }
 
-        // Cleaning of the lists
-        valuesRemovedBecauseExpiry = cleaningElementFromList(valuesRemovedBecauseExpiry, 0, false);
-        valuesNotExpiredLastDayOfMonth = cleaningElementFromList(valuesNotExpiredLastDayOfMonth, 0, false);
-        valuesExpiredLastDayOfMonth = cleaningElementFromList(valuesExpiredLastDayOfMonth, 0, false);
-
         // Calcul of the percentage
-        def percentage = [];
+        List percentage = [];
         for(int i = 0; i<listLabels.size(); i++) {
             if(valuesRemovedBecauseExpiry[i] == 0) percentage.push(0);
             else percentage.push(valuesRemovedBecauseExpiry[i]/(valuesRemovedBecauseExpiry[i] + valuesNotExpiredLastDayOfMonth[i] + valuesExpiredLastDayOfMonth[i]));
@@ -525,7 +520,7 @@ class IndicatorDataService {
         ];
 
         // Concatenation of listLabels
-        listLabels = cleaningElementFromList(listLabels, 0, true);
+        listLabels = concatList(listLabels, 0);
 
         IndicatorData indicatorData = new IndicatorData(datasets, listLabels);
 
@@ -534,18 +529,19 @@ class IndicatorDataService {
         return graphData;
     }
 
-    List fillListLabel(List listToFill, firstElement, secondElement) {
+    List fillListLabel(List listToFill) {
         List filledList = [];
 
         listToFill.each{
-            filledList.push([it[firstElement],it[secondElement]]);
+            filledList.push([it[1],it[2]]);
         }
 
         return filledList;
     }
 
     List fullyFillList(List listToFill, List listLabelOfElement, List listLabel) {
-        def fullyFilledList = [];
+        List fullyFilledList = [];
+        List filledAndCleanList = [];
     
         listLabel.each{
             if(!listLabelOfElement.contains(it)) {
@@ -556,24 +552,24 @@ class IndicatorDataService {
         listToFill.each{
             fullyFilledList.push([it[0], "${it[1]} ${it[2]}"]);
         }
+
+        //Reordering 
+        fullyFilledList = fullyFilledList.sort{it[1]};
+
+        fullyFilledList.each {
+            filledAndCleanList.push(it[0])
+        }
         
-        return fullyFilledList.sort{it[1]};
+        return filledAndCleanList;
     }
 
-    List cleaningElementFromList(List listToClean, int elementToKeep, boolean concatBoth) {
-        def cleanedList = [];
+    List concatList(List listToClean, int elementToKeep) {
+        List concatList = [];
 
-        if(concatBoth){
             listToClean.each{
-                cleanedList.push("${it[elementToKeep]} ${it[elementToKeep + 1]}");
+                concatList.push("${it[elementToKeep]} ${it[elementToKeep + 1]}");
             }
-        }
-        else{
-            listToClean.each{
-                cleanedList.push(it[elementToKeep]);
-            }
-        }
         
-        return cleanedList;
+        return concatList;
     }
 }
