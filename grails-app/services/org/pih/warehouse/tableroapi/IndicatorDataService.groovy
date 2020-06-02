@@ -83,7 +83,7 @@ class IndicatorDataService {
 
         IndicatorData indicatorData = new IndicatorData(datasets, listLabels)
 
-        GraphData graphData = new GraphData(indicatorData, "Expiration summary", "line", "/openboxes/inventory/listExpiringStock")
+        GraphData graphData = new GraphData(indicatorData, "Expiration Summary", "line", "/openboxes/inventory/listExpiringStock")
 
         return graphData
     }
@@ -444,7 +444,7 @@ class IndicatorDataService {
         return graphData;
     }
 
-    GraphData getLossCauseByExpiry(Location location) { 
+    GraphData getLossCausedByExpiry(Location location) {
 
         def valuesRemovedBecauseExpiry = Transaction.executeQuery("""
             select sum(te.inventoryItem.product.pricePerUnit * te.quantity), month(t.transactionDate), year(t.transactionDate)
@@ -513,10 +513,10 @@ class IndicatorDataService {
 
         // Creation of datasets
         List<IndicatorDatasets> datasets = [
-            new IndicatorDatasets('Percentage', percentage, null, 'line'),
+            new IndicatorDatasets('Percentage removed due to expiry', percentage, null, 'line'),
             new IndicatorDatasets('Inventory value removed due to expiry', valuesRemovedBecauseExpiry, null, 'bar'),
             new IndicatorDatasets('Inventory value not expired last day of month', valuesNotExpiredLastDayOfMonth, null, 'bar'),
-            new IndicatorDatasets('Inventory Value expired last day of month', valuesExpiredLastDayOfMonth, null, 'bar'),
+            new IndicatorDatasets('Inventory value expired last day of month', valuesExpiredLastDayOfMonth, null, 'bar'),
         ];
 
         // Concatenation of listLabels
@@ -524,7 +524,7 @@ class IndicatorDataService {
 
         IndicatorData indicatorData = new IndicatorData(datasets, listLabels);
 
-        GraphData graphData = new GraphData(indicatorData, "Loss caused by expiry", "bar");
+        GraphData graphData = new GraphData(indicatorData, "Value of Stock Lost to Expiry", "bar");
         
         return graphData;
     }
