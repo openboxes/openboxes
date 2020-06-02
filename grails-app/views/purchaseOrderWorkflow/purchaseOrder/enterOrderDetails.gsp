@@ -59,11 +59,17 @@
                             </tr>
                             <tr class='prop'>
                                 <td class='name middle'><label for='origin.id'>
-                                    <warehouse:message code="order.orderedFrom.label"/></label>
+                                    <warehouse:message code="order.origin.label"/></label>
                                 </td>
                                 <td class='value ${hasErrors(bean:order,field:'origin','errors')}'>
-                                    <g:selectOrderSupplier name="origin.id" class="chzn-select-deselect"
-                                                           optionKey="id" value="${order?.origin?.id}" noSelection="['':'']"/>
+
+                                    <g:if test="${order.id}">
+                                        ${order?.origin?.name}
+                                    </g:if>
+                                    <g:else>
+                                        <g:selectOrderSupplier name="origin.id" class="chzn-select-deselect"
+                                                               optionKey="id" value="${order?.origin?.id}" noSelection="['':'']"/>
+                                    </g:else>
                                 </td>
                             </tr>
                             <tr class='prop'>
@@ -82,14 +88,20 @@
                                 </td>
                             </tr>
                             <tr class='prop'>
-                                <td class='name middle'><label><warehouse:message code="order.purchasingOrganization.label"/></label></td>
+                                <td class='name middle'><label><warehouse:message code="order.destinationParty.label"/></label></td>
                                 <td valign='top'
-                                    class='value ${hasErrors(bean:order,field:'purchasingOrganization','errors')}'>
-                                    <g:selectOrganization name="purchasingParty.id"
-                                                          id="purchasingParty.id"
-                                                          roleTypes="[org.pih.warehouse.core.RoleType.ROLE_PURCHASER]"
-                                                          noSelection="['':'']"
-                                                          class="select2" />
+                                    class='value ${hasErrors(bean:order,field:'destinationParty','errors')}'>
+
+                                    <g:if test="${order.id}">
+                                        ${order.destinationParty.name} (${order.destinationParty?.code})
+                                    </g:if>
+                                    <g:else>
+                                        <g:selectOrganization name="destinationParty.id"
+                                                              id="destinationParty.id" value="${order?.destinationParty?.id}"
+                                                              roleTypes="[org.pih.warehouse.core.RoleType.ROLE_BUYER]"
+                                                              noSelection="['':'']"
+                                                              class="chzn-select-deselect" />
+                                    </g:else>
                                 </td>
                             </tr>
                             <tr class='prop'>
@@ -122,23 +134,6 @@
                     <table>
                         <tbody>
                             <tr class='prop'>
-                                <td class='name middle'><label for='currencyCode'><warehouse:message code="order.currencyCode.label"/></label></td>
-                                <td valign='top'
-                                    class='value ${hasErrors(bean:order,field:'currency','errors')}'>
-                                    <g:selectCurrency name="currencyCode" class="chzn-select-deselect" value="${order?.currencyCode}" noSelection="['':'']"/>
-                                </td>
-                            </tr>
-                            <g:if test="${order?.currencyCode && order?.currencyCode!=grailsApplication.config.openboxes.locale.defaultCurrencyCode}">
-                                <tr class='prop'>
-                                    <td class='name middle'><label for='exchangeRate'><warehouse:message code="order.exchangeRate.label"/></label></td>
-                                    <td class='value ${hasErrors(bean:order,field:'exchangeRate','errors')}'>
-                                        <input type="text" id="exchangeRate" name='exchangeRate' value="${order?.exchangeRate}" class="text large"
-                                               placeholder="${warehouse.message(code:'order.exchangeRate.message')}"/>
-                                    </td>
-                                </tr>
-                            </g:if>
-
-                            <tr class='prop'>
                                 <td class='name middle'>
                                     <label for="paymentMethodType.id"><warehouse:message code="order.paymentMethodType.label"/></label>
                                 </td>
@@ -154,6 +149,22 @@
                                     <g:selectPaymentTerm name="paymentTerm.id" value="${order?.paymentTerm?.id}" class="chzn-select-deselect" noSelection="['':'']"/>
                                 </td>
                             </tr>
+                            <tr class='prop'>
+                                <td class='name middle'><label for='currencyCode'><warehouse:message code="order.currencyCode.label"/></label></td>
+                                <td valign='top'
+                                    class='value ${hasErrors(bean:order,field:'currency','errors')}'>
+                                    <g:selectCurrency name="currencyCode" class="chzn-select-deselect" value="${order?.currencyCode}" noSelection="['':'']"/>
+                                </td>
+                            </tr>
+                            <g:if test="${order?.currencyCode && order?.currencyCode!=grailsApplication.config.openboxes.locale.defaultCurrencyCode}">
+                                <tr class='prop'>
+                                    <td class='name middle'><label for='exchangeRate'><warehouse:message code="order.exchangeRate.label"/></label></td>
+                                    <td class='value ${hasErrors(bean:order,field:'exchangeRate','errors')}'>
+                                        <input type="text" id="exchangeRate" name='exchangeRate' value="${order?.exchangeRate}" class="text large"
+                                               placeholder="${warehouse.message(code:'order.exchangeRate.message')}"/>
+                                    </td>
+                                </tr>
+                            </g:if>
 
                         </tbody>
                     </table>

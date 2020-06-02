@@ -227,7 +227,7 @@ class OrderService {
 
     String generatePurchaseOrderSequenceNumber(Order order) {
         try {
-            Integer sequenceNumber = getNextSequenceNumber(order.purchasingParty.id)
+            Integer sequenceNumber = getNextSequenceNumber(order.destinationParty.id)
             String sequenceNumberStr = identifierService.generateSequenceNumber(sequenceNumber.toString())
 
             // Properties to be used to get argument values for the template
@@ -246,8 +246,13 @@ class OrderService {
         // update the status of the order before saving
         order.updateStatus()
 
-        order.originParty = order?.origin?.organization
-        order.destinationParty = order?.destination?.organization
+        if (!order.originParty) {
+            order.originParty = order?.origin?.organization
+        }
+
+        if (!order.destinationParty) {
+            order.destinationParty = order?.destination?.organization
+        }
 
         if (!order.orderNumber) {
             IdentifierGeneratorTypeCode identifierGeneratorTypeCode =

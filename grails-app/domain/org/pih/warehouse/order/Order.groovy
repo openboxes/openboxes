@@ -45,7 +45,6 @@ class Order implements Serializable {
 
     Location destination      // the customer location
     Party destinationParty
-    Party purchasingParty
 
     Person recipient
     Person approvedBy
@@ -126,7 +125,6 @@ class Order implements Serializable {
             return !destination?.organization ? ['validator.organization.required'] : true
         })
         destinationParty(nullable:true)
-        purchasingParty(nullable:false)
         recipient(nullable: true)
         orderedBy(nullable: false)
         dateOrdered(nullable: true)

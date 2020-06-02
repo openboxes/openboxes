@@ -430,7 +430,7 @@ openboxes {
                 expiredStock {
                     endpoint = "/${appName}/apitablero/getExpiredProductsInStock"
                     archived = ['personal', 'warehouse']
-                    order = 8 
+                    order = 8
                 }
             }
             graph {
@@ -540,8 +540,8 @@ openboxes.identifier.organization.minSize = 2
 openboxes.identifier.organization.maxSize = 3
 
 openboxes.identifier.purchaseOrder.generatorType = IdentifierGeneratorTypeCode.SEQUENCE
-openboxes.identifier.purchaseOrder.format = "PO-\${purchasingPartyCode}-\${sequenceNumber}"
-openboxes.identifier.purchaseOrder.properties = ["purchasingPartyCode":"purchasingParty.code"]
+openboxes.identifier.purchaseOrder.format = "PO-\${destinationPartyCode}-\${sequenceNumber}"
+openboxes.identifier.purchaseOrder.properties = ["destinationPartyCode":"destinationPartyCode.code"]
 
 // OpenBoxes default line printer port
 openboxes.linePrinterTerminal.port = "LPT1"
