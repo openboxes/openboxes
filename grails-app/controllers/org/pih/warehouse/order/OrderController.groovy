@@ -739,7 +739,7 @@ class OrderController {
             redirect(action: "list")
         } else {
             def date = new Date()
-            response.setHeader("Content-disposition", "attachment; filename=${orderInstance.orderNumber}-${date.format("MM-dd-yyyy")}.csv")
+            response.setHeader("Content-disposition", "attachment; filename=\"${orderInstance.orderNumber}-${date.format("MM-dd-yyyy")}.csv\"")
             response.contentType = "text/csv"
             def csv = ""
 
@@ -801,7 +801,7 @@ class OrderController {
                     redirect(action: "show", id: params.id)
                     return
                 }
-                List lineItems = orderService.parseOrderItems(multipartFile.inputStream)
+                List lineItems = orderService.parseOrderItems(multipartFile.inputStream.text)
                 log.info "Line items: " + lineItems
 
                 if (orderService.importOrderItems(params.id, params.supplierId, lineItems)) {

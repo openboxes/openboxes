@@ -34,6 +34,7 @@ class OrderService {
     def identifierService
     def inventoryService
     def productSupplierDataService
+    def personDataService
     def grailsApplication
 
     def getOrders(Order orderTemplate, Date dateOrderedFrom, Date dateOrderedTo, Map params) {
@@ -544,8 +545,7 @@ class OrderService {
                     def manufacturer = item["manufacturer"]
                     def manufacturerCode = item["manufacturerCode"]
                     def quantity = item["quantity"]
-                    def recipient = item["recipient"]
-                    String[] recipientNames = recipient.split(" ", 2)
+                    String recipient = item["recipient"]
                     def unitPrice = item["unitPrice"]
                     def unitOfMeasure = item["unitOfMeasure"]
                     def estimatedReadyDate = item["estimatedReadyDate"]
@@ -597,8 +597,7 @@ class OrderService {
 
                     orderItem.quantity = Integer.valueOf(quantity)
                     orderItem.unitPrice = BigDecimal.valueOf(Integer.valueOf(unitPrice))
-                    orderItem.recipient = recipientNames.length > 1 ?
-                            Person.findByFirstNameAndLastName(recipientNames[0], recipientNames[1]) : null
+                    orderItem.recipient = recipient ? personDataService.getPersonByNames(recipient) : null
                     orderItem.estimatedReadyDate = new Date(estimatedReadyDate)
 
                     order.addToOrderItems(orderItem)
@@ -627,13 +626,13 @@ class OrderService {
      * @param inputStream
      * @return
      */
-    List parseOrderItems(InputStream inputStream) {
+    List parseOrderItems(String text) {
 
         List orderItems = []
 
         try {
             def settings = [skipLines: 1]
-            def csvMapReader = new CSVMapReader(new StringReader(inputStream.getText()), settings)
+            def csvMapReader = new CSVMapReader(new StringReader(text), settings)
             csvMapReader.fieldKeys = [
                 'id',
                 'productCode',
@@ -654,9 +653,6 @@ class OrderService {
         } catch (Exception e) {
             throw new RuntimeException("Error parsing order item CSV: " + e.message, e)
 
-        }
-        finally {
-            if (inputStream) inputStream.close()
         }
 
         return orderItems
