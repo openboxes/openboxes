@@ -101,7 +101,7 @@ function loadDatalabel(context) {
   return '';
 }
 
-function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', maxValue = null) {
+function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', maxValue = null, minValue = null) {
   const options = {
     scales: {
       xAxes: [{
@@ -153,8 +153,15 @@ function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', ma
 
   if (hasDataLabel) {
     options.plugins.datalabels = {
-      anchor: 'end',
-      align: alignLabel,
+      anchor(context) {
+        const value = context.dataset.data[context.dataIndex];
+        return value >= 0 ? 'end' : 'start';
+      },
+      align(context) {
+        const value = context.dataset.data[context.dataIndex];
+        if (alignLabel === 'top') return value >= 0 ? 'top' : 'bottom';
+        return value >= 0 ? 'right' : 'left';
+      },
       offset: 5,
       color(context) {
         return context.dataset.backgroundColor;
@@ -167,16 +174,39 @@ function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', ma
 
     // Add Math.ceil(maxValue / maxTicks) to try to ensure an extra tick will be added
     // maxTicks = 11
-    if (alignLabel === 'right' && maxValue) {
-      options.scales.xAxes[0].ticks = {
-        suggestedMax: maxValue + Math.ceil(maxValue / 11),
-      };
+
+    if (alignLabel === 'right') {
+      if (maxValue && minValue) {
+        options.scales.xAxes[0].ticks = {
+          suggestedMax: maxValue + Math.ceil(maxValue / 1.5),
+          suggestedMin: minValue + Math.ceil(minValue / 1.5),
+        };
+      } else if (maxValue) {
+        options.scales.xAxes[0].ticks = {
+          suggestedMax: maxValue + Math.ceil(maxValue / 11),
+        };
+      } else if (minValue) {
+        options.scales.xAxes[0].ticks = {
+          suggestedMin: minValue + Math.ceil(minValue / 11),
+        };
+      }
     }
 
-    if (alignLabel === 'top' && maxValue) {
-      options.scales.yAxes[0].ticks = {
-        suggestedMax: maxValue + Math.ceil(maxValue / 11),
-      };
+    if (alignLabel === 'top') {
+      if (maxValue && minValue) {
+        options.scales.yAxes[0].ticks = {
+          suggestedMax: maxValue + Math.ceil(maxValue / 1.5),
+          suggestedMin: minValue + Math.ceil(minValue / 1.5),
+        };
+      } else if (maxValue) {
+        options.scales.yAxes[0].ticks = {
+          suggestedMax: maxValue + Math.ceil(maxValue / 11),
+        };
+      } else if (minValue) {
+        options.scales.yAxes[0].ticks = {
+          suggestedMin: minValue + Math.ceil(minValue / 11),
+        };
+      }
     }
   }
 
@@ -186,6 +216,7 @@ function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', ma
 function loadGraphOptions(payload) {
   let labelAlignment = null;
   let maxValue = null;
+  let minValue = null;
 
   if (payload.config.datalabel) {
     labelAlignment = (payload.type === 'horizontalBar') ? 'right' : 'top';
@@ -202,9 +233,17 @@ function loadGraphOptions(payload) {
       });
     }
     maxValue = Math.max(...sumDatasets);
+    if (Math.max(...sumDatasets) > 0) maxValue = Math.max(...sumDatasets);
+    if (Math.min(...sumDatasets) < 0) minValue = Math.min(...sumDatasets);
   }
 
-  return getOptions(payload.config.stacked, payload.config.datalabel, labelAlignment, maxValue);
+  return getOptions(
+    payload.config.stacked,
+    payload.config.datalabel,
+    labelAlignment,
+    maxValue,
+    minValue,
+  );
 }
 
 export { loadGraphColors, loadGraphOptions };
