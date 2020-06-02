@@ -79,7 +79,7 @@ hibernate {
 environments {
     development {
         dataSource {
-            //dbCreate = "update"
+            // dbCreate = "update"
             url = "jdbc:mysql://localhost:3306/openboxes_dev?autoReconnect=true&zeroDateTimeBehavior=convertToNull&sessionVariables=storage_engine=InnoDB"
             loggingSql = false
             format_sql = false
