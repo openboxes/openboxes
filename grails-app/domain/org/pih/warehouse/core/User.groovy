@@ -11,7 +11,6 @@ package org.pih.warehouse.core
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
 import util.StringUtil
-import grails.converters.JSON
 
 
 class User extends Person {
@@ -33,16 +32,12 @@ class User extends Person {
     byte[] photo                // profile photo
 
     List locationRoles
-
-    String dashboardConfig
-
     static hasMany = [roles: Role, locationRoles: LocationRole]
     static mapping = {
         table "`user`"
         roles joinTable: [name: 'user_role', column: 'role_id', key: 'user_id'], cascade: "save-update"
         locationRoles cascade: "all-delete-orphan"
         id generator: 'uuid'
-        dashboardConfig(sqlType: "longblob")
     }
     static transients = ["passwordConfirm"]
     static constraints = {
@@ -62,7 +57,6 @@ class User extends Person {
         manager(nullable: true)
         rememberLastLocation(nullable: true)
         photo(nullable: true, maxSize: 10485760) // 10 MBs
-        dashboardConfig(nullable: true)
     }
 
 
@@ -109,17 +103,6 @@ class User extends Person {
     def locationRolesDescription() {
         def roleArray = locationRoles.collect { "${it.location?.name}: ${it.role?.roleType?.name}" }
         roleArray?.join(" | ")
-    }
-
-    def serializeDashboardConfig(Object config) {
-        return (config as JSON)
-    }
-
-    def deserializeDashboardConfig() {
-        if (dashboardConfig == null) return null
-        
-        def json = new JSON();
-        return json.parse(dashboardConfig)
     }
 
 
