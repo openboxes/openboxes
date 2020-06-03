@@ -24,40 +24,6 @@
     top: unset;
   }
 
-  .update-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-size: 12px;
-    color: #878787 !important;
-
-    i {
-      font-size: 14px;
-      margin-right: 6px;
-    }
-
-    .division-line {
-      border: 0.5px solid #d4d4d4;
-      width: 100%;
-      margin-bottom: 7%;
-    }
-
-    span {
-      margin-bottom: 7%;
-      width: 85%;
-    }
-
-    button {
-      background-color: #fbfbfb;
-      border: none;
-      border-radius: 4px;
-      color: inherit;
-      height: 20%;
-      box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.09);
-      height: 36px;
-    }
-  }
-
   &.hidden {
     margin-left: -200px;
   }
@@ -388,6 +354,8 @@
 
     .loader-div {
       margin: auto;
+      position: relative;
+      padding: 10% 0 0 32%;
     }
 
     .gyr-indicator {

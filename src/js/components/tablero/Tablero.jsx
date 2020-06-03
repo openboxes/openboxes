@@ -17,7 +17,6 @@ import LoadingNumbers from './LoadingNumbers';
 import NumberCard from './NumberCard';
 import UnarchiveIndicators from './UnarchiveIndicators';
 import './tablero.scss';
-import apiClient from '../../utils/apiClient';
 
 // Disable charts legends by default.
 defaults.global.legend = false;
@@ -74,11 +73,12 @@ const ArchiveIndicator = ({ hideArchive }) => (
 
 
 const ConfigurationsList = ({
-  configs, activeConfig, loadConfigData, showNav, toggleNav, configModified, updateConfig,
+  configs, activeConfig, loadConfigData, showNav, toggleNav,
 }) => {
   if (!configs) {
     return null;
   }
+
   return (
     <div className={`configs-left-nav ${!showNav ? 'hidden' : ''}`}>
       <button className="toggle-nav" onClick={toggleNav}>
@@ -98,18 +98,6 @@ const ConfigurationsList = ({
           </li>
           ))}
       </ul>
-      {
-        (activeConfig === 'personal' && configModified) ?
-          <div className="update-section">
-            <div className="division-line" />
-            <span> <i className="fa fa-info-circle" aria-hidden="true" />The dashboard layout has been edited</span>
-            <button onClick={updateConfig} >
-              <i className="fa fa-floppy-o" aria-hidden="true" />
-              Save configuration
-            </button>
-          </div>
-        : null
-      }
     </div>
   );
 };
@@ -123,7 +111,6 @@ class Tablero extends Component {
       isDragging: false,
       showPopout: false,
       showNav: false,
-      configModified: false,
     };
   }
 
@@ -149,38 +136,6 @@ class Tablero extends Component {
     }
   }
 
-  updateConfig = () => {
-    const url = '/openboxes/apitablero/updateConfig';
-
-    const payload = {
-      number: {},
-      graph: {},
-    };
-
-    const configData = this.props.dashboardConfig.endpoints;
-    Object.keys(configData.graph).forEach((key) => {
-      const index = this.props.indicatorsData.findIndex(data => data &&
-        data.id === configData.graph[key].order);
-      payload.graph[key] = {
-        order: index + 1,
-        archived: this.props.indicatorsData[index].archived,
-      };
-    });
-
-    Object.keys(configData.number).forEach((key) => {
-      const index = this.props.numberData.findIndex(data => data &&
-        data.id === configData.number[key].order);
-      payload.number[key] = {
-        order: index + 1,
-        archived: this.props.numberData[index].archived,
-      };
-    });
-
-    apiClient.post(url, payload).then(() => {
-      this.setState({ configModified: false });
-    });
-  }
-
   loadIndicator = (id, params) => {
     const indicatorConfig = Object.values(this.props.dashboardConfig.endpoints.graph)
       .filter(config => config.order === id)[0];
@@ -202,14 +157,7 @@ class Tablero extends Component {
       e.target.id = 'archive';
     }
     this.props.reorderIndicators({ oldIndex, newIndex }, e, type);
-    if (oldIndex !== newIndex) {
-      this.setState({
-        configModified: true,
-        isDragging: false,
-      });
-    } else {
-      this.setState({ isDragging: false });
-    }
+    this.setState({ isDragging: false });
   };
 
   sortEndHandleNumber = ({ oldIndex, newIndex }, e) => {
@@ -229,8 +177,6 @@ class Tablero extends Component {
 
   handleAdd = (index, type) => {
     this.props.addToIndicators(index, type);
-    this.setState({ configModified: true });
-
     const size = (this.props.indicatorsData.filter(data => data.archived).length
        + this.props.numberData.filter(data => data.archived).length) - 1;
     if (size) this.setState({ showPopout: true });
@@ -261,8 +207,6 @@ class Tablero extends Component {
           activeConfig={this.props.activeConfig}
           showNav={this.state.showNav}
           toggleNav={this.toggleNav}
-          configModified={this.state.configModified}
-          updateConfig={this.updateConfig}
         />
         <div
           className={`overlay ${this.state.showNav ? 'visible' : ''}`}
@@ -316,20 +260,13 @@ Tablero.defaultProps = {
   currentLocation: '',
   indicatorsData: null,
   numberData: [],
-  configModified: false,
 };
 
 Tablero.propTypes = {
   fetchIndicators: PropTypes.func.isRequired,
   reorderIndicators: PropTypes.func.isRequired,
-  indicatorsData: PropTypes.arrayOf(PropTypes.shape({
-    archived: PropTypes.oneOfType([PropTypes.bool, PropTypes.number]),
-    id: PropTypes.number,
-  })).isRequired,
-  numberData: PropTypes.arrayOf(PropTypes.shape({
-    archived: PropTypes.oneOfType([PropTypes.bool, PropTypes.number]),
-    id: PropTypes.number,
-  })).isRequired,
+  indicatorsData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  numberData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   dashboardConfig: PropTypes.shape({
     enabled: PropTypes.bool,
     configurations: PropTypes.shape({}),
@@ -356,6 +293,4 @@ ConfigurationsList.propTypes = {
   loadConfigData: PropTypes.func.isRequired,
   showNav: PropTypes.bool.isRequired,
   toggleNav: PropTypes.func.isRequired,
-  updateConfig: PropTypes.func.isRequired,
-  configModified: PropTypes.bool.isRequired,
 };

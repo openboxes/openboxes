@@ -258,14 +258,14 @@ export function reorderIndicators({ oldIndex, newIndex }, e, type) {
 
 export function fetchConfigAndData() {
   return (dispatch) => {
-    apiClient.get('/openboxes/apitablero/config').then((res) => {
+    apiClient.get('/openboxes/tablero/config').then((res) => {
       dispatch({
         type: FETCH_CONFIG,
         payload: {
-          data: res.data,
+          data: res.data.data,
         },
       });
-      getData(dispatch, res.data);
+      getData(dispatch, res.data.data);
     });
   };
 }
