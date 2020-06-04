@@ -11,6 +11,9 @@ import org.pih.warehouse.tablero.NumberTableData
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.receiving.ReceiptItem
+import org.pih.warehouse.inventory.InventorySnapshot
+import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.core.Location
 import org.joda.time.LocalDate
 
@@ -440,5 +443,47 @@ class IndicatorDataService {
         GraphData graphData = new GraphData(numberTableData, "Delayed Shipments", "numberTable");
 
         return graphData;
+    }
+
+    GraphData getProductInventoried(Location location) {
+        List query = [3, 6, 9, 12, 0]
+        List listColorNumber = []
+
+        def productInStock = InventorySnapshot.executeQuery("""
+            SELECT COUNT(distinct i.product.id) FROM InventorySnapshot i
+            WHERE i.location = :location""",
+                [
+                                'location': location
+                        ]);
+
+        query.each {
+            def subtitle;
+            def percentage;
+            if(it != 0) subtitle = "> ${it} month"
+            else subtitle = "Ever"
+            Date period = LocalDate.now().minusMonths(it).toDate()
+            def inventoriedProducts = TransactionEntry.executeQuery("""
+                    SELECT COUNT(distinct ii.product.id) from TransactionEntry te
+                    INNER JOIN te.inventoryItem ii
+                    INNER JOIN te.transaction t
+                    WHERE t.inventory = :inventory
+                    AND t.transactionType.transactionCode = :transactionCode 
+                    AND t.transactionDate >= :period""",
+                        [
+                                inventory      : location?.inventory,
+                                transactionCode: TransactionCode.PRODUCT_INVENTORY,
+                                period   : period,
+                        ]);
+            percentage = inventoriedProducts[0]/productInStock[0] * 100;
+            ColorNumber colorNumber = new ColorNumber(percentage, subtitle);
+            colorNumber.getColor(it);
+            colorNumber.value = "${colorNumber.value.toDouble().round(1)} %"
+            listColorNumber.push(colorNumber);
+        }
+
+        NumberIndicator numberIndicator = new NumberIndicator(listColorNumber[0], listColorNumber[1], listColorNumber[2], listColorNumber[3], listColorNumber[4])
+        GraphData productInventoried = new GraphData(numberIndicator, "Product inventoried", "customGraph");
+
+        return productInventoried         
     }
 }

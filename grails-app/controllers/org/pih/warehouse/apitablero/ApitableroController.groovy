@@ -116,4 +116,10 @@ class ApitableroController {
         def productsWithNegativeInventory = numberDataService.getProductWithNegativeInventory(location)
         render (productsWithNegativeInventory as JSON)
     }
+
+     def getProductInventoried = {
+        Location location = Location.get(session?.warehouse?.id)
+        def productInventoried = indicatorDataService.getProductInventoried(location)
+        render (productInventoried.toJson() as JSON)
+    }
 }
