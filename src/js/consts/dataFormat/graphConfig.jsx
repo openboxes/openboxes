@@ -159,7 +159,9 @@ function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', ma
       },
       align(context) {
         const value = context.dataset.data[context.dataIndex];
-        if (alignLabel === 'top') return value >= 0 ? 'top' : 'bottom';
+        if (alignLabel === 'vertical') {
+          return value >= 0 ? 'top' : 'bottom';
+        }
         return value >= 0 ? 'right' : 'left';
       },
       offset: 5,
@@ -174,39 +176,25 @@ function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', ma
 
     // Add Math.ceil(maxValue / maxTicks) to try to ensure an extra tick will be added
     // maxTicks = 11
-
-    if (alignLabel === 'right') {
-      if (maxValue && minValue) {
-        options.scales.xAxes[0].ticks = {
-          suggestedMax: maxValue + Math.ceil(maxValue / 1.5),
-          suggestedMin: minValue + Math.ceil(minValue / 1.5),
-        };
-      } else if (maxValue) {
-        options.scales.xAxes[0].ticks = {
-          suggestedMax: maxValue + Math.ceil(maxValue / 11),
-        };
-      } else if (minValue) {
-        options.scales.xAxes[0].ticks = {
-          suggestedMin: minValue + Math.ceil(minValue / 11),
-        };
-      }
+    if (alignLabel === 'horizontal' && maxValue) {
+      options.scales.xAxes[0].ticks = {
+        suggestedMax: maxValue + Math.ceil(maxValue / 11),
+      };
     }
-
-    if (alignLabel === 'top') {
-      if (maxValue && minValue) {
-        options.scales.yAxes[0].ticks = {
-          suggestedMax: maxValue + Math.ceil(maxValue / 1.5),
-          suggestedMin: minValue + Math.ceil(minValue / 1.5),
-        };
-      } else if (maxValue) {
-        options.scales.yAxes[0].ticks = {
-          suggestedMax: maxValue + Math.ceil(maxValue / 11),
-        };
-      } else if (minValue) {
-        options.scales.yAxes[0].ticks = {
-          suggestedMin: minValue + Math.ceil(minValue / 11),
-        };
-      }
+    if (alignLabel === 'horizontal' && minValue) {
+      options.scales.xAxes[0].ticks = {
+        suggestedMin: minValue - Math.ceil(minValue / 11),
+      };
+    }
+    if (alignLabel === 'vertical' && maxValue) {
+      options.scales.yAxes[0].ticks = {
+        suggestedMax: maxValue + Math.ceil(maxValue / 11),
+      };
+    }
+    if (alignLabel === 'vertical' && minValue) {
+      options.scales.yAxes[0].ticks = {
+        suggestedMin: minValue - Math.ceil(minValue / 11),
+      };
     }
   }
 
@@ -219,7 +207,7 @@ function loadGraphOptions(payload) {
   let minValue = null;
 
   if (payload.config.datalabel) {
-    labelAlignment = (payload.type === 'horizontalBar') ? 'right' : 'top';
+    labelAlignment = (payload.type === 'horizontalBar') ? 'horizontal' : 'vertical';
 
     let sumDatasets = 0;
     if (!payload.config.stacked || payload.data.datasets.length === 1) {
@@ -232,9 +220,8 @@ function loadGraphOptions(payload) {
         return sum.map((s, index) => s + value.data[index]);
       });
     }
-    maxValue = Math.max(...sumDatasets);
-    if (Math.max(...sumDatasets) > 0) maxValue = Math.max(...sumDatasets);
-    if (Math.min(...sumDatasets) < 0) minValue = Math.min(...sumDatasets);
+    maxValue = Math.max(...sumDatasets) > 0 ? Math.max(...sumDatasets) : null;
+    minValue = Math.min(...sumDatasets) < 0 ? Math.min(...sumDatasets) : null;
   }
 
   return getOptions(

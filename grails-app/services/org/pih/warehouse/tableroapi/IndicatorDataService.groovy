@@ -83,7 +83,7 @@ class IndicatorDataService {
 
         IndicatorData indicatorData = new IndicatorData(datasets, listLabels)
 
-        GraphData graphData = new GraphData(indicatorData, "Expiration summary", "line", "/openboxes/inventory/listExpiringStock")
+        GraphData graphData = new GraphData(indicatorData, "Expiration Summary", "line", "/openboxes/inventory/listExpiringStock")
 
         return graphData
     }
@@ -520,15 +520,15 @@ class IndicatorDataService {
 
         // Creation of datasets
         List<IndicatorDatasets> datasets = [
-            new IndicatorDatasets('Percentage', percentage, null, 'line'),
+            new IndicatorDatasets('Percentage removed due to expiry', percentage, null, 'line'),
             new IndicatorDatasets('Inventory value removed due to expiry', filledValuesRemovedBecauseExpiry, null, 'bar'),
             new IndicatorDatasets('Inventory value not expired last day of month', filledValuesNotExpiredLastDayOfMonth, null, 'bar'),
-            new IndicatorDatasets('Inventory Value expired last day of month', filledValuesExpiredLastDayOfMonth, null, 'bar'),
+            new IndicatorDatasets('Inventory value expired last day of month', filledValuesExpiredLastDayOfMonth, null, 'bar'),
         ];
 
         IndicatorData indicatorData = new IndicatorData(datasets, listLabels);
 
-        GraphData graphData = new GraphData(indicatorData, "Loss caused by expiry", "bar");
+        GraphData graphData = new GraphData(indicatorData, "Value of Stock Lost to Expiry", "bar");
         
         return graphData;
     }
