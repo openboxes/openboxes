@@ -59,4 +59,9 @@ class Organization extends Party {
 
     }
 
+    Boolean hasRoleType(PartyRole partyRole) {
+        def partyRoles = [partyRole]
+        return roles.any { PartyRole role -> partyRoles.contains(role.roleType) }
+    }
+
 }

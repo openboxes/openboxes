@@ -21,6 +21,7 @@ class LocationController {
     def inventoryService
     def locationService
     def dataService
+    def organizationService
 
     /**
      * Controllers for managing other locations (besides warehouses)
@@ -79,6 +80,10 @@ class LocationController {
             }
 
             locationInstance.properties = params
+
+            if (locationInstance.id == null && locationInstance.organization == null) {
+                locationInstance.organization = organizationService.findOrCreateOrganizationFromLocation(locationInstance)
+            }
 
             if (locationInstance.validate() && !locationInstance.hasErrors()) {
                 try {
