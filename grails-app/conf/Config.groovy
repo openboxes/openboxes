@@ -525,7 +525,7 @@ openboxes {
                 }
                 lossCauseByExpiry {
                     endpoint = "/${appName}/apitablero/getLossCauseByExpiry"
-                    filter= false
+                    filter= true
                     archived = ['warehouse']
                     stacked = true
                     datalabel = true

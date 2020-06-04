@@ -119,7 +119,7 @@ class ApitableroController {
 
     def getLossCauseByExpiry = {
         Location location = Location.get(session?.warehouse?.id)
-        def lossCauseByExpiry = indicatorDataService.getLossCauseByExpiry(location)
+        def lossCauseByExpiry = indicatorDataService.getLossCauseByExpiry(location, params)
         render (lossCauseByExpiry.toJson() as JSON)
     }
 }

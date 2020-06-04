@@ -94,9 +94,9 @@ function loadDatalabel(context) {
     let sum = 0;
     datasets.map((dataset) => {
       sum += dataset.data[context.dataIndex] || 0;
-      return sum;
+      return sum > 0 && sum < 1 ? sum.toFixed(1) : sum;
     });
-    return sum;
+    return sum > 0 && sum < 1 ? sum.toFixed(1) : sum;
   }
   return '';
 }
