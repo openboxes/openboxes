@@ -444,7 +444,7 @@ class IndicatorDataService {
         return graphData;
     }
 
-    GraphData getLossCauseByExpiry(Location location, def params) { 
+    GraphData getLossCausedByExpiry(Location location, def params) { 
 
         Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
 
