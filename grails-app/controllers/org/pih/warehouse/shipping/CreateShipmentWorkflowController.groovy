@@ -1390,6 +1390,7 @@ class CreateShipmentWorkflowController {
                 shipment.shipmentMethod = new ShipmentMethod()
             }
             shipment.shipmentMethod.shipper = Shipper.get(params.shipperInput.id)
+            shipment.shipmentMethod.trackingNumber = params.trackingNumber
         } else {
             // if there is no input for shipper, we remove the *entire* shipment method
             // TODO: does this delete the underlying shipment method upon saving?
