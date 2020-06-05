@@ -81,8 +81,11 @@ class LocationController {
 
             locationInstance.properties = params
 
-            if (locationInstance.id == null && locationInstance.organization == null) {
-                locationInstance.organization = organizationService.findOrCreateOrganizationFromLocation(locationInstance)
+            if (!locationInstance.id && !locationInstance.organization) {
+                if (locationInstance?.locationType?.locationTypeCode == LocationTypeCode.SUPPLIER) {
+                    locationInstance.organization =
+                            organizationService.findOrCreateSupplierOrganization(locationInstance.name, locationInstance.locationNumber)
+                }
             }
 
             if (locationInstance.validate() && !locationInstance.hasErrors()) {

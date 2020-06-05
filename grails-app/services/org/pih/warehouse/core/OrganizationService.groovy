@@ -13,36 +13,24 @@ import grails.validation.ValidationException
 
 class OrganizationService {
 
-    def grailsApplication
     def identifierService
     boolean transactional = true
-    
-    Organization findOrCreateOrganizationFromLocation(Location locationInstance) {
-        Organization organization = Organization.findByName(locationInstance.name)
-        PartyRole supplier = PartyRole.findByRoleType(RoleType.ROLE_SUPPLIER)
-        PartyRole manufacturer = PartyRole.findByRoleType(RoleType.ROLE_MANUFACTURER)
 
-        if (organization == null) {
+    Organization findOrCreateSupplierOrganization(String name, String code) {
+        Organization organization = Organization.findByName(name)
+        if (!organization) {
             organization = new Organization()
-        } else if (locationInstance.locationType.locationTypeCode == LocationTypeCode.SUPPLIER) {
-            if (!organization.hasRoleType(supplier)) {
-                organization.addToRoles(supplier)
-            }
-            if (!organization.hasRoleType(manufacturer)) {
-                organization.addToRoles(manufacturer)
-            }
-            return organization.save(flush: true)
-        } else {
-            return organization
+            organization.name = name
+            organization.partyType = PartyType.findByPartyTypeCode(PartyTypeCode.ORGANIZATION)
+            organization.code = code?:identifierService.generateOrganizationIdentifier(name)
         }
 
-        organization.partyType = PartyType.findByName('Organization')
-        organization.name = locationInstance.name
-        organization.code = identifierService.generateOrganizationIdentifier(locationInstance.name)
+        if (!organization.hasRoleType(RoleType.ROLE_SUPPLIER)) {
+            organization.addToRoles(new PartyRole(roleType: RoleType.ROLE_SUPPLIER))
+        }
 
-        if (locationInstance.locationType.locationTypeCode == LocationTypeCode.SUPPLIER) {
-            organization.addToRoles(supplier)
-            organization.addToRoles(manufacturer)
+        if (!organization.hasRoleType(RoleType.ROLE_MANUFACTURER)) {
+            organization.addToRoles(new PartyRole(roleType: RoleType.ROLE_MANUFACTURER))
         }
 
         if (organization.validate() && !organization.hasErrors()) {
@@ -50,6 +38,7 @@ class OrganizationService {
         } else {
             throw new ValidationException("Organization is not valid", organization.errors)
         }
+        return organization
     }
 
 }
