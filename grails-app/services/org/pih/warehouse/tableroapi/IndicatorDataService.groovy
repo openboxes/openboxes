@@ -499,7 +499,7 @@ class IndicatorDataService {
             if (sum == 0) {
                 percentage.push(0)
             } else {
-                percentage.push(filledValuesRemovedDueToExpiry[i] / sum)
+                percentage.push(Math.round((filledValuesRemovedDueToExpiry[i] / sum) * 100) / 100)
             }
         }
 

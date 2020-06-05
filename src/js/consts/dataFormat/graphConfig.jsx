@@ -88,15 +88,16 @@ function loadGraphColors(payload) {
 
 function loadDatalabel(context) {
   const { datasets } = context.chart.data;
-
   // If this is the last visible dataset of the chart
   if (datasets.indexOf(context.dataset) === datasets.length - 1) {
     let sum = 0;
     datasets.map((dataset) => {
-      sum += dataset.data[context.dataIndex] || 0;
-      return sum > 0 && sum < 1 ? sum.toFixed(1) : sum;
+      if (dataset.type !== 'line') {
+        sum += dataset.data[context.dataIndex] || 0;
+      }
+      return sum;
     });
-    return sum > 0 && sum < 1 ? sum.toFixed(1) : sum;
+    return sum;
   }
   return '';
 }
