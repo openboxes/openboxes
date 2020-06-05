@@ -462,13 +462,19 @@ openboxes {
                         }
                     }
                 }
-                sentStockMovements {
-                    endpoint = "/${appName}/apitablero/getSentStockMovements"
-                    archived = ['personal', 'warehouse']
-                    filter = true
-                    stacked = true
-                    datalabel = true
-                    order = 8
+                incomingStock {
+                    endpoint = "/${appName}/apitablero/getIncomingStock"
+                    archived = []
+                    filter = false
+                    archived = []
+                    order = 3
+                    colors {
+                        datasets {
+                            state6 = ["first"]
+                            state7 = ["second"]
+                            state8 = ["third"]
+                        }
+                    }
                 }
                 outgoingStock {
                     endpoint = "/${appName}/apitablero/getOutgoingStock"
@@ -510,19 +516,13 @@ openboxes {
                         }
                     }
                 }
-                incomingStock {
-                    endpoint = "/${appName}/apitablero/getIncomingStock"
-                    archived = []
-                    filter = false
-                    archived = []
-                    order = 3
-                    colors {
-                        datasets {
-                            state6 = ["first"]
-                            state7 = ["second"]
-                            state8 = ["third"]
-                        }
-                    }
+                sentStockMovements {
+                    endpoint = "/${appName}/apitablero/getSentStockMovements"
+                    archived = ['personal', 'warehouse']
+                    filter = true
+                    stacked = true
+                    datalabel = true
+                    order = 8
                 }
                 lossCausedByExpiry {
                     endpoint = "/${appName}/apitablero/getLossCausedByExpiry"
