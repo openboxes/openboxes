@@ -1683,28 +1683,6 @@ class InventoryService implements ApplicationContextAware {
     }
 
     /**
-     * Get all transaction entries over list of products/inventory items.
-     *
-     * @param inventoryInstance
-     * @return
-     */
-    // Unused method that should be removed
-    List getTransactionEntriesByInventoryAndBinLocation(Inventory inventory, Location binLocation) {
-        def criteria = TransactionEntry.createCriteria()
-        def transactionEntries = criteria.list {
-            if (binLocation) {
-                eq("binLocation", binLocation)
-            }
-            transaction {
-                eq("inventory", inventory)
-                order("transactionDate", "asc")
-                order("dateCreated", "asc")
-            }
-        }
-        return transactionEntries
-    }
-    
-    /**
      * Adjusts the stock level by adding a new transaction entry with a
      * quantity change.
      *
