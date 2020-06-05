@@ -202,11 +202,13 @@ class StockMovementApiController {
 
         def lineItems = picklistItems.collect {
             [
-                    requisitionItemId: it?.requisitionItem?.id ?: "",
-                    lotNumber        : it?.inventoryItem?.lotNumber ?: "",
-                    expirationDate   : it?.inventoryItem?.expirationDate ? it.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
-                    binLocation      : it?.binLocation?.name ?: "",
-                    quantity         : it?.quantity ?: "",
+                    "${g.message(code: 'default.id.label')}": it?.requisitionItem?.id ?: "",
+                    "${g.message(code: 'product.productCode.label')}": it?.requisitionItem?.product?.productCode ?: "",
+                    "${g.message(code: 'product.name.label')}": it?.requisitionItem?.product?.name ?: "",
+                    "${g.message(code: 'inventoryItem.lotNumber.label')}": it?.inventoryItem?.lotNumber ?: "",
+                    "${g.message(code: 'inventoryItem.expirationDate.label')}": it?.inventoryItem?.expirationDate ? it.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
+                    "${g.message(code: 'inventoryItem.binLocation.label')}": it?.binLocation?.name ?: "",
+                    "${g.message(code: 'default.quantity.label')}": it?.quantity ?: "",
             ]
         }
         String csv = dataService.generateCsv(lineItems)
@@ -233,10 +235,10 @@ class StockMovementApiController {
             def settings = [separatorChar: ',', skipLines: 1]
             csv.toCsvReader(settings).eachLine { tokens ->
                 String requisitionItemId = tokens[0]
-                String lotNumber = tokens[1] ?: null
-                String expirationDate = tokens[2] ?: null
-                String binLocation = tokens[3] ?: null
-                Integer quantityPicked = tokens[4] ? tokens[4].toInteger() : null
+                String lotNumber = tokens[3] ?: null
+                String expirationDate = tokens[4] ?: null
+                String binLocation = tokens[5] ?: null
+                Integer quantityPicked = tokens[6] ? tokens[6].toInteger() : null
 
                 if (!requisitionItemId || quantityPicked == null) {
                     throw new IllegalArgumentException("Requisition item id and quantity picked are required")

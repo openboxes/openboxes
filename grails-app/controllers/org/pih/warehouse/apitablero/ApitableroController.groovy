@@ -68,6 +68,12 @@ class ApitableroController {
         render(numberData as JSON)
     }
 
+     def getExpiredProductsInStock = {
+        Location location = Location.get(session?.warehouse?.id)
+        NumberData numberData = numberDataService.getExpiredProductsInStock(location)
+        render (numberData as JSON)
+    }
+
     def getExpirationSummary = {
         Location location = Location.get(session?.warehouse?.id)
         def expirationSummary = indicatorDataService.getExpirationSummaryData(location, params)

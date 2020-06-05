@@ -9,6 +9,17 @@
     .non-editable { background-color: #e6e6e6; cursor: not-allowed }
     .non-editable.odd { background-color: #e1e1e1; }
     .items-table { table-layout: fixed; }
+    .import-template {
+        width: 0.1px;
+        height: 0.1px;
+        opacity: 0;
+        overflow: hidden;
+        position: absolute;
+        z-index: -1;
+    }
+    .import-template + label {
+        display: inline-block;
+    }
 </style>
 
 </head>
@@ -37,7 +48,18 @@
             <g:render template="/order/summary" model="[orderInstance:order,currentState:'addItems']"/>
 
             <div class="box">
-                <h2><warehouse:message code="order.wizard.addItems.label"/></h2>
+                <h2 style="display: flex; align-items: center; justify-content: space-between;">
+                    <warehouse:message code="order.wizard.addItems.label"/>
+                    <div class="button-group" style="margin-right: 5px;">
+                        <g:if test="${order?.status < OrderStatus.PLACED}">
+                            <input type="file" name="importTemplate" id="importTemplate" class="import-template" />
+                            <label for="importTemplate" class="button">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'disk_upload.png')}" />&nbsp;
+                                <warehouse:message code="default.importTemplate.label" default="Import template"/>
+                            </label>
+                        </g:if>
+                    </div>
+                </h2>
                 <g:form name="orderItemForm" action="purchaseOrder" method="post">
                     <g:hiddenField id="orderId" name="order.id" value="${order?.id }"></g:hiddenField>
                     <g:hiddenField id="orderItemId" name="orderItem.id" value="${orderItem?.id }"></g:hiddenField>
@@ -446,6 +468,41 @@
             modal: true,
             width: 600
           });
+
+          $("#importTemplate").change(function(){
+            var orderId = $("#orderId").val();
+            var supplierId = $("#supplierId").val();
+            var fileInput = document.getElementById('importTemplate');
+            if (orderId && fileInput.files && fileInput.files.length > 0) {
+              var file = fileInput.files[0];
+              var importData = new FormData();
+              importData.append('fileContents', file);
+              importData.append('id', orderId);
+              importData.append('supplierId', supplierId);
+              $.ajax({
+                type: 'POST',
+                url: '${g.createLink(controller:'order', action:'importOrderItems')}',
+                data: importData,
+                enctype: "multipart/form-data",
+                contentType: false,
+                processData: false,
+                success: function () {
+                  $("#importTemplate").val('');
+                  loadOrderItems();
+                  $.notify("Successfully added items", "success")
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                  $("#importTemplate").val('');
+                  if (jqXHR.responseText) {
+                    $.notify(jqXHR.responseText, "error");
+                  }
+                  else {
+                    $.notify("An error occurred", "error");
+                  }
+                }
+              });
+            }
+          });
         });
 
     </script>
@@ -470,11 +527,11 @@
 	    {{/if}}
 	</td>
 	<td class="center middle">
-        {{= manufacturerName || "None"  }}
+        {{= manufacturerName || ""  }}
 	</td>
 	<td class="center middle">
     	{{if productSupplier && productSupplier.manufacturerCode }}
-	    {{= productSupplier.manufacturerCode || "None" }}
+	    {{= productSupplier.manufacturerCode || "" }}
 	    {{/if}}
 	</td>
 	<td class="center middle">

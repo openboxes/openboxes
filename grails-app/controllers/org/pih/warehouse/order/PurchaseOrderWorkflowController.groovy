@@ -10,6 +10,7 @@
 package org.pih.warehouse.order
 
 import grails.validation.ValidationException
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.product.Product
@@ -29,7 +30,11 @@ class PurchaseOrderWorkflowController {
                 if (params.id) {
                     flow.order = Order.get(params.id)
                 } else {
+                    // Set defaults
                     def order = new Order()
+                    Location destination = Location.get(session.warehouse.id)
+                    order.destination = destination
+                    order.destinationParty = destination.organization
                     order.orderedBy = Person.get(session.user.id)
                     flow.order = order
                 }
