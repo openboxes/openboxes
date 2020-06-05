@@ -249,8 +249,13 @@ class OrderService {
         // update the status of the order before saving
         order.updateStatus()
 
-        order.originParty = order?.origin?.organization
-        order.destinationParty = order?.destination?.organization
+        if (!order.originParty) {
+            order.originParty = order?.origin?.organization
+        }
+
+        if (!order.destinationParty) {
+            order.destinationParty = order?.destination?.organization
+        }
 
         if (!order.orderNumber) {
             IdentifierGeneratorTypeCode identifierGeneratorTypeCode =
