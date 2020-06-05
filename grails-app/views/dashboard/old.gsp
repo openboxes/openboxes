@@ -1,5 +1,5 @@
 <html>
-    <head>
+<head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="custom" />
         <title>${warehouse.message(code: 'default.dashboard.label', default: 'Dashboard')}</title>
@@ -99,12 +99,10 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.25.3/moment.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-rss/4.3.0/jquery.rss.min.js"></script>
         <script type="text/javascript">
-
             $(window).load(function(){
                 $(".spinner").click(function() {
                     $(this).hide();
                 });
-
               $(".tagcloud a").tagcloud(
                 {
                 size: {
@@ -117,12 +115,8 @@
                   end: "#F52"//"#FS2"
                 }
               });
-
-
             });
-
         </script>
 
     </body>
 </html>
-
