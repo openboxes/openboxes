@@ -405,6 +405,51 @@
       }
     }
 
+    .big-gyr-indicator {
+      height: 100%;
+      display: flex;
+      align-items: center;
+
+      .number-indicator {
+        flex-grow: 1;
+        height: 80%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        user-select: none;
+        color: #282d32;
+
+        &:hover {
+          text-decoration: none;
+          color: #282d32;
+        }
+
+        &:not(:last-child) {
+          border-right: 1px solid #d8d8d8;
+        }
+
+        .circle {
+          width: 20px;
+          height: 20px;
+          margin-bottom: 40px;
+          border-radius: 100%;
+        }
+
+        .value {
+          font-size: 20px;
+          display: flex;
+          align-items: center;
+        }
+
+        .subtitle {
+          font-size: 12px;
+          color: #818181;
+          text-align: center;
+        }
+      }
+    }
+
     .numbers-table-card {
       display: flex;
       height: 100%;

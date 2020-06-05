@@ -465,7 +465,7 @@ openboxes {
                     archived = ['personal']
                     stacked = true
                     datalabel = true
-                    order = 9
+                    order = 8
                 }
                 outgoingStock {
                     endpoint = "/${appName}/apitablero/getOutgoingStock"
@@ -507,6 +507,18 @@ openboxes {
                     endpoint = "/${appName}/apitablero/getIncomingStock"
                     archived = ['warehouse']
                     order = 3
+                    colors {
+                        datasets {
+                            state6 = ["first"]
+                            state7 = ["second"]
+                            state8 = ["third"]
+                        }
+                    }
+                }
+                 productsInventoried {
+                    endpoint = "/${appName}/apitablero/getProductsInventoried"
+                    archived = ['warehouse', 'personal']
+                    order = 9
                     colors {
                         datasets {
                             state6 = ["first"]

@@ -61,6 +61,8 @@ const ArchivedGraph = (props) => {
     graph = <i className="fa fa-line-chart" style={{ color: getRandomColor() }} />;
   } else if (props.type === 'bar') {
     graph = <i className="fa fa-bar-chart" style={{ color: getRandomColor() }} />;
+  } else if (props.type === 'numbersCustomColors') {
+    graph = <i className="fa fa-bar-chart" style={{ color: getRandomColor() }} />;
   } else if (props.type === 'doughnut') {
     graph = <i className="fa fa-pie-chart" style={{ color: getRandomColor() }} />;
   } else if (props.type === 'horizontalBar') {

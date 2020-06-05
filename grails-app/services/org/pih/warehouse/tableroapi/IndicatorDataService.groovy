@@ -445,9 +445,10 @@ class IndicatorDataService {
         return graphData;
     }
 
-    GraphData getProductInventoried(Location location) {
+    GraphData getProductsInventoried(Location location) {
         List query = [3, 6, 9, 12, 0]
         List listColorNumber = []
+        def inventoriedProducts
 
         def productInStock = InventorySnapshot.executeQuery("""
             SELECT COUNT(distinct i.product.id) FROM InventorySnapshot i
@@ -459,10 +460,11 @@ class IndicatorDataService {
         query.each {
             def subtitle;
             def percentage;
-            if(it != 0) subtitle = "> ${it} month"
-            else subtitle = "Ever"
-            Date period = LocalDate.now().minusMonths(it).toDate()
-            def inventoriedProducts = TransactionEntry.executeQuery("""
+            if(it != 0) {
+                subtitle = "< ${it} month"
+                Date period = LocalDate.now().minusMonths(it).toDate()
+            
+                    inventoriedProducts = TransactionEntry.executeQuery("""
                     SELECT COUNT(distinct ii.product.id) from TransactionEntry te
                     INNER JOIN te.inventoryItem ii
                     INNER JOIN te.transaction t
@@ -474,6 +476,21 @@ class IndicatorDataService {
                                 transactionCode: TransactionCode.PRODUCT_INVENTORY,
                                 period   : period,
                         ]);
+            }
+            else {
+                subtitle = "Ever"
+                    inventoriedProducts = TransactionEntry.executeQuery("""
+                    SELECT COUNT(distinct ii.product.id) from TransactionEntry te
+                    INNER JOIN te.inventoryItem ii
+                    INNER JOIN te.transaction t
+                    WHERE t.inventory = :inventory
+                    AND t.transactionType.transactionCode = :transactionCode""",
+                        [
+                                inventory      : location?.inventory,
+                                transactionCode: TransactionCode.PRODUCT_INVENTORY,
+                        ]);
+            }
+            
             percentage = inventoriedProducts[0]/productInStock[0] * 100;
             ColorNumber colorNumber = new ColorNumber(percentage, subtitle);
             colorNumber.getColor(it);
@@ -482,8 +499,8 @@ class IndicatorDataService {
         }
 
         NumberIndicator numberIndicator = new NumberIndicator(listColorNumber[0], listColorNumber[1], listColorNumber[2], listColorNumber[3], listColorNumber[4])
-        GraphData productInventoried = new GraphData(numberIndicator, "Product inventoried", "customGraph");
+        GraphData productsInventoried = new GraphData(numberIndicator, "Product inventoried", "numbersCustomColors");
 
-        return productInventoried         
+        return productsInventoried         
     }
 }
