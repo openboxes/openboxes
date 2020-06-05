@@ -76,5 +76,6 @@
     <include file="0.8.x/changelog-2020-04-25-2156-insert-default-quantity-unit-of-measures.xml"/>
     <include file="0.8.x/changelog-2020-05-16-1233-alter-table-add-product-supplier-to-product-package.xml"/>
     <include file="0.8.x/changelog-2020-05-22-2235-create-table-organization-sequences.xml"/>
+    <include file="0.8.x/changelog-2020-06-04-2232-alter-table-add-column-dashboard-config.xml"/>
 
 </databaseChangeLog>
