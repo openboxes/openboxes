@@ -34,7 +34,6 @@ class PurchaseOrderWorkflowController {
                     def order = new Order()
                     Location destination = Location.get(session.warehouse.id)
                     order.destination = destination
-                    order.destinationParty = destination.organization
                     order.orderedBy = Person.get(session.user.id)
                     flow.order = order
                 }
