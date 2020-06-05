@@ -18,6 +18,7 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.product.ProductPackage
+import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentException
@@ -32,6 +33,8 @@ class OrderService {
     def shipmentService
     def identifierService
     def inventoryService
+    def productSupplierDataService
+    def personDataService
     def grailsApplication
 
     def getOrders(Order orderTemplate, Date dateOrderedFrom, Date dateOrderedTo, Map params) {
@@ -246,8 +249,13 @@ class OrderService {
         // update the status of the order before saving
         order.updateStatus()
 
-        order.originParty = order?.origin?.organization
-        order.destinationParty = order?.destination?.organization
+        if (!order.originParty) {
+            order.originParty = order?.origin?.organization
+        }
+
+        if (!order.destinationParty) {
+            order.destinationParty = order?.destination?.organization
+        }
 
         if (!order.orderNumber) {
             IdentifierGeneratorTypeCode identifierGeneratorTypeCode =
@@ -518,10 +526,11 @@ class OrderService {
      * Import the order items into the order represented by the given order ID.
      *
      * @param orderId
+     * @param supplierId
      * @param orderItems
      * @return
      */
-    boolean importOrderItems(String orderId, List orderItems) {
+    boolean importOrderItems(String orderId, String supplierId, List orderItems) {
 
         int count = 0
         try {
@@ -534,20 +543,70 @@ class OrderService {
                 orderItems.each { item ->
 
                     log.info "Order item: " + item
+                    def orderItemId = item["id"]
                     def productCode = item["productCode"]
+                    def sourceCode = item["sourceCode"]
+                    def supplierCode = item["supplierCode"]
+                    def manufacturer = item["manufacturer"]
+                    def manufacturerCode = item["manufacturerCode"]
                     def quantity = item["quantity"]
+                    String recipient = item["recipient"]
                     def unitPrice = item["unitPrice"]
+                    def unitOfMeasure = item["unitOfMeasure"]
+                    def estimatedReadyDate = item["estimatedReadyDate"]
 
+                    OrderItem orderItem
+                    if (orderItemId) {
+                        orderItem = OrderItem.get(orderItemId)
+                        if (orderItem.order.id != orderId) {
+                            throw new UnsupportedOperationException("You can not edit items from another order!")
+                        }
+                    } else {
+                        orderItem = new OrderItem()
+                    }
+
+                    Product product
                     if (productCode) {
-                        def product = Product.findByProductCode(productCode)
+                        product = Product.findByProductCode(productCode)
                         if (!product) {
                             throw new ProductException("Unable to locate product with product code ${productCode}")
                         }
-                        OrderItem orderItem = new OrderItem(product: product, quantity: quantity, unitPrice: unitPrice)
-                        order.addToOrderItems(orderItem)
-                        count++
+                        orderItem.product = product
                     }
 
+                    if (sourceCode) {
+                        orderItem.productSupplier = ProductSupplier.findByCode(sourceCode)
+                    } else if (supplierCode && manufacturer && manufacturerCode) {
+                        if (Organization.get(manufacturer)) {
+                            Organization supplier = Organization.get(supplierId)
+                            def supplierParams = [manufacturer: manufacturer,
+                                                  product: product,
+                                                  supplierCode: supplierCode,
+                                                  manufacturerCode: manufacturerCode,
+                                                  supplier: supplier]
+                            ProductSupplier productSupplier = productSupplierDataService.getOrCreateNew(supplierParams)
+                            orderItem.productSupplier = productSupplier
+                        }
+                    }
+
+                    if (unitOfMeasure) {
+                        String[] uomParts = unitOfMeasure.split("/")
+                        if (uomParts.length <= 1 || !UnitOfMeasure.findByName(uomParts[0])) {
+                            throw new IllegalArgumentException("Could not find provided Unit of Measure: ${unitOfMeasure}.")
+                        }
+                        UnitOfMeasure uom = uomParts.length > 1 ? UnitOfMeasure.findByName(uomParts[0]) : null
+                        BigDecimal qtyPerUom = uomParts.length > 1 ? BigDecimal.valueOf(Double.valueOf(uomParts[1])) : null
+                        orderItem.quantityUom = uom
+                        orderItem.quantityPerUom = qtyPerUom
+                    }
+
+                    orderItem.quantity = Integer.valueOf(quantity)
+                    orderItem.unitPrice = BigDecimal.valueOf(Integer.valueOf(unitPrice))
+                    orderItem.recipient = recipient ? personDataService.getPersonByNames(recipient) : null
+                    orderItem.estimatedReadyDate = new Date(estimatedReadyDate)
+
+                    order.addToOrderItems(orderItem)
+                    count++
                 }
 
                 if (count < orderItems?.size()) {
@@ -579,15 +638,26 @@ class OrderService {
         try {
             def settings = [skipLines: 1]
             def csvMapReader = new CSVMapReader(new StringReader(text), settings)
-            csvMapReader.fieldKeys = ['productCode', 'productName', 'vendorCode', 'quantity', 'unitOfMeasure', 'unitPrice']
+            csvMapReader.fieldKeys = [
+                'id',
+                'productCode',
+                'productName',
+                'sourceCode',
+                'supplierCode',
+                'manufacturer',
+                'manufacturerCode',
+                'quantity',
+                'unitOfMeasure',
+                'unitPrice',
+                'totalCost',
+                'recipient',
+                'estimatedReadyDate'
+            ]
             orderItems = csvMapReader.toList()
 
         } catch (Exception e) {
             throw new RuntimeException("Error parsing order item CSV: " + e.message, e)
 
-        }
-        finally {
-            if (inputStream) inputStream.close()
         }
 
         return orderItems

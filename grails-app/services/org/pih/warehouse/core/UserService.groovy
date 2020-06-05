@@ -346,4 +346,39 @@ class UserService {
         }
         return false
     }
+
+    def getDashboardConfig(User user) {
+        def config = grailsApplication.config.openboxes.tablero
+        def userConfig = user.deserializeDashboardConfig()
+
+        if (userConfig != null) {
+            updateConfig("graph", config, userConfig)
+            updateConfig("number", config, userConfig)
+        }
+
+        return config
+    }
+
+    private def updateConfig(type, config, customConfig) {
+        customConfig[type].each { key, value ->
+            // Update order
+            config["endpoints"][type][key]["order"] = value["order"]
+
+            // If the indicator should be archived but it currently isn't
+            if (value["archived"] && config["endpoints"][type][key]["archived"].indexOf("personal") == -1) {
+                config["endpoints"][type][key]["archived"].add("personal")
+            }
+
+            // If the indicator shouldn't be archived but it currently is
+            if (!value["archived"] && config["endpoints"][type][key]["archived"].indexOf("personal") != -1) {
+                config["endpoints"][type][key]["archived"].remove("personal")
+            }
+        }
+    }
+
+    def updateDashboardConfig(User user, Object config) {
+        String stringConfig = user.serializeDashboardConfig(config)
+        user.dashboardConfig = stringConfig
+        return user.deserializeDashboardConfig()
+    }
 }

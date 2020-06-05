@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.data
 
+import grails.validation.ValidationException
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.importer.ImportDataCommand
 import org.springframework.validation.BeanPropertyBindingResult
@@ -44,5 +45,34 @@ class PersonDataService {
             person.properties = params
         }
         return person
+    }
+
+    Person getPersonByNames(String[] names) {
+        return Person.findByFirstNameAndLastName(names[0], names[1])
+    }
+
+    Person getPersonByNames(String combinedNames) {
+        String[] names = extractNames(combinedNames)
+        return getPersonByNames(names)
+    }
+
+    Person getOrCreatePersonFromNames(String combinedNames) {
+        String[] names = extractNames(combinedNames)
+        Person person = getPersonByNames(names)
+        if (!person) {
+            person = new Person(firstName: names[0], lastName: names[1])
+            if (!person.save(flush: true)) {
+                throw new ValidationException("Cannot save recipient ${combinedNames} due to errors", person.errors)
+            }
+        }
+        return person
+    }
+
+    String[] extractNames(String combinedNames) {
+        String[] names = combinedNames.split(" ", 2)
+        if (names.length <= 1) {
+            throw new RuntimeException("Recipient ${combinedNames} must have at least two names (i.e. first name and last name)")
+        }
+        return names
     }
 }
