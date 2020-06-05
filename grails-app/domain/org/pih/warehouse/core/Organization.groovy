@@ -59,4 +59,8 @@ class Organization extends Party {
 
     }
 
+    Boolean hasRoleType(RoleType roleType) {
+        return roles.any { PartyRole role -> role.roleType == roleType }
+    }
+
 }
