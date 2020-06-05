@@ -541,7 +541,7 @@ openboxes.identifier.organization.maxSize = 3
 
 openboxes.identifier.purchaseOrder.generatorType = IdentifierGeneratorTypeCode.SEQUENCE
 openboxes.identifier.purchaseOrder.format = "PO-\${destinationPartyCode}-\${sequenceNumber}"
-openboxes.identifier.purchaseOrder.properties = ["destinationPartyCode":"destinationPartyCode.code"]
+openboxes.identifier.purchaseOrder.properties = ["destinationPartyCode":"destinationParty.code"]
 
 // OpenBoxes default line printer port
 openboxes.linePrinterTerminal.port = "LPT1"
