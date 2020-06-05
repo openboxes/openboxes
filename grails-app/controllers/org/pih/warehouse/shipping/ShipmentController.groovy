@@ -26,6 +26,7 @@ class ShipmentController {
     def shipmentService
     def userService
     def reportService
+    def identifierService
     def inventoryService
     MailService mailService
 
@@ -230,6 +231,22 @@ class ShipmentController {
             def shipmentWorkflow = shipmentService.getShipmentWorkflow(shipmentInstance)
             [shipmentInstance: shipmentInstance, shipmentWorkflow: shipmentWorkflow, shippingEventTypes: eventTypes]
         }
+    }
+
+    def showTracking = {
+        def shipmentInstance = Shipment.get(params.id)
+        def trackingUrl
+        def trackingUrlTemplate = shipmentInstance?.shipmentMethod?.shipper?.trackingUrl
+        def trackingNumber = shipmentInstance?.shipmentMethod?.trackingNumber
+        if (trackingNumber && trackingUrlTemplate?.contains("%s")) {
+            trackingUrl = String.format(trackingUrlTemplate, trackingNumber)
+        }
+        else {
+            trackingUrl =
+                    identifierService.renderTemplate(trackingUrlTemplate, [trackingNumber:trackingNumber])
+        }
+
+        render(template: "showTracking", model: [shipmentInstance: shipmentInstance, trackingUrl: trackingUrl])
     }
 
     def showTransactions = {
