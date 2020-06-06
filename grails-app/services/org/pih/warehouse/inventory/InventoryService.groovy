@@ -2040,20 +2040,9 @@ class InventoryService implements ApplicationContextAware {
         return mirroredTransaction
     }
 
-    /**
-     *
-     */
     def getQuantity(Product product, Location location, Date beforeDate) {
         def quantity = 0
         def transactionEntries = getTransactionEntriesBeforeDate(product, location, beforeDate)
-        quantity = adjustQuantity(quantity, transactionEntries)
-        return quantity
-    }
-
-
-    def getQuantity(InventoryItem inventoryItem, Location location, Date beforeDate) {
-        def quantity = 0
-        def transactionEntries = getTransactionEntriesBeforeDate(inventoryItem, location, beforeDate)
         quantity = adjustQuantity(quantity, transactionEntries)
         return quantity
     }
@@ -2157,35 +2146,6 @@ class InventoryService implements ApplicationContextAware {
      * @param endDate
      * @return
      */
-    def getTransactionEntriesBeforeDate(InventoryItem inventoryItem, Location location, Date beforeDate) {
-        def transactionEntries = []
-        if (beforeDate) {
-            def criteria = TransactionEntry.createCriteria()
-            transactionEntries = criteria.list {
-                and {
-                    inventoryItem {
-                        eq("product", inventoryItem.product)
-                    }
-                    transaction {
-                        // All transactions before given date
-                        lt("transactionDate", beforeDate)
-                        eq("inventory", location?.inventory)
-                        order("transactionDate", "asc")
-                        order("dateCreated", "asc")
-                    }
-                }
-            }
-        }
-        return transactionEntries
-    }
-
-    /**
-     *
-     * @param product
-     * @param startDate
-     * @param endDate
-     * @return
-     */
     def getTransactionEntriesBeforeDate(Product product, Location location, Date beforeDate) {
         def criteria = TransactionEntry.createCriteria()
         def transactionEntries = []
@@ -2206,18 +2166,9 @@ class InventoryService implements ApplicationContextAware {
         return transactionEntries
     }
 
-    /**
-     *
-     * @param location
-     * @param category
-     * @param startDate
-     * @param endDate
-     * @return
-     */
     def getTransactionEntries(Location location, Category category, Date startDate, Date endDate) {
         def matchCategories = getExplodedCategories([category])
         return getTransactionEntries(location, matchCategories, startDate, endDate)
-
     }
 
     def getTransactionEntries(Location location, List categories, Date startDate, Date endDate) {

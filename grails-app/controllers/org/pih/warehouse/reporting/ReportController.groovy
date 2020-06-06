@@ -278,15 +278,6 @@ class ReportController {
         render(template: "dataTableDialog", model: [url: url])
     }
 
-    def generateTransactionReport = { InventoryReportCommand command ->
-        // We always need to initialize the root category
-        command.rootCategory = productService.getRootCategory()
-        if (!command?.hasErrors()) {
-            reportService.generateTransactionReport(command)
-        }
-        render(view: 'showTransactionReport', model: [command: command])
-    }
-
     def showShippingReport = { ChecklistReportCommand command ->
         command.rootCategory = productService.getRootCategory()
         if (!command?.hasErrors()) {
