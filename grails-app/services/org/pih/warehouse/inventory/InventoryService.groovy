@@ -822,7 +822,7 @@ class InventoryService implements ApplicationContextAware {
         // Only show stock for inventory items added to shipment
         List inventoryItems = shipmentInstance?.shipmentItems*.inventoryItem.unique()
         inventoryItems.each { inventoryItem ->
-            binLocationMap[inventoryItem] = getItemQuantityByBinLocation(shipmentInstance?.origin, inventoryItem)
+            binLocationMap[inventoryItem] = getBinLocationsByInventoryItem(shipmentInstance?.origin, inventoryItem)
         }
         return binLocationMap
     }
@@ -878,19 +878,20 @@ class InventoryService implements ApplicationContextAware {
         return binLocations
     }
 
-    List getItemQuantityByBinLocation(Location location, List<InventoryItem> inventoryItems) {
+    List getBinLocationsByInventoryItems(Location location, List<InventoryItem> inventoryItems) {
         List products = inventoryItems.collect { it.product }
         List transactionEntries = getTransactionEntriesByInventoryAndProduct(location?.inventory, products)
         List binLocations = getQuantityByBinLocation(transactionEntries)
+        binLocations = binLocations.findAll { inventoryItems.contains(it.inventoryItem) }
         return binLocations
     }
 
-    List getItemQuantityByBinLocation(Location location, InventoryItem inventoryItem) {
+    List getBinLocationsByInventoryItem(Location location, InventoryItem inventoryItem) {
         List transactionEntries = getTransactionEntriesByInventoryAndProduct(location?.inventory, [inventoryItem.product])
         List binLocations = getQuantityByBinLocation(transactionEntries)
+        binLocations = binLocations.findAll { it.inventoryItem == inventoryItem }
         return binLocations
     }
-
 
     /**
      * Converts list of passed transactions entries into a list of bin locations.
