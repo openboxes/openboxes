@@ -2040,73 +2040,6 @@ class InventoryService implements ApplicationContextAware {
         return mirroredTransaction
     }
 
-    def getQuantity(Product product, Location location, Date beforeDate) {
-        def quantity = 0
-        def transactionEntries = getTransactionEntriesBeforeDate(product, location, beforeDate)
-        quantity = adjustQuantity(quantity, transactionEntries)
-        return quantity
-    }
-
-    /**
-     * Get the initial quantity of a product for the given location and date.
-     * If the date is null, then we assume that the answer is 0.
-     *
-     * @param product
-     * @param location
-     * @param date
-     * @return
-     */
-    def getInitialQuantity(Product product, Location location, Date date) {
-        return getQuantity(product, location, date ?: new Date())
-    }
-
-    /**
-     * Get the current quantity (as of the given date) or today's date if the
-     * given date is null.
-     *
-     * @param product
-     * @param location
-     * @param date
-     * @return
-     */
-    def getCurrentQuantity(Product product, Location location, Date date) {
-        return getQuantity(product, location, date ?: new Date())
-    }
-
-    /**
-     *
-     * @param initialQuantity
-     * @param transactionEntries
-     * @return
-     */
-    def adjustQuantity(Integer initialQuantity, List<Transaction> transactionEntries) {
-        def quantity = initialQuantity
-        transactionEntries.each { transactionEntry ->
-            quantity = adjustQuantity(quantity, transactionEntry)
-        }
-        return quantity
-    }
-
-    /**
-     *
-     * @param initialQuantity
-     * @param transactionEntry
-     * @return
-     */
-    def adjustQuantity(Integer initialQuantity, TransactionEntry transactionEntry) {
-        def quantity = initialQuantity
-
-        def code = transactionEntry?.transaction?.transactionType?.transactionCode
-        if (code == TransactionCode.INVENTORY || code == TransactionCode.PRODUCT_INVENTORY) {
-            quantity = transactionEntry.quantity
-        } else if (code == TransactionCode.DEBIT) {
-            quantity -= transactionEntry.quantity
-        } else if (code == TransactionCode.CREDIT) {
-            quantity += transactionEntry.quantity
-        }
-        return quantity
-    }
-
     /**
      *
      * @param product
@@ -3155,7 +3088,6 @@ class InventoryService implements ApplicationContextAware {
             map
         }
 
-
         // Assign status based on inventory level values
         genericProductMap.each { k, v ->
             genericProductMap[k].status = getStatusMessage(null, v.minQuantity, v.reorderQuantity, v.maxQuantity, v.currentQuantity)
@@ -3216,7 +3148,6 @@ class InventoryService implements ApplicationContextAware {
         return binLocationReport
     }
 
-
     List getBinLocationDetails(Location location) {
         List transactionEntries = getTransactionEntriesByLocation(location)
         return getQuantityByBinLocation(transactionEntries, true)
@@ -3248,7 +3179,6 @@ class InventoryService implements ApplicationContextAware {
         return results
     }
 
-
     List getTransactionEntriesByLocation(Location location) {
         def startTime = System.currentTimeMillis()
 
@@ -3269,7 +3199,6 @@ class InventoryService implements ApplicationContextAware {
 
         return transactions*.transactionEntries.flatten()
     }
-
 
     List<AvailableItem> getAvailableBinLocations(Location location, Product product) {
         return getAvailableBinLocations(location, product, false)

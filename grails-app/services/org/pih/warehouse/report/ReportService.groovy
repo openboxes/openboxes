@@ -53,26 +53,6 @@ class ReportService implements ApplicationContextAware {
         }
     }
 
-    void generateProductReport(ProductReportCommand command) {
-
-        command.inventoryItems = InventoryItem.findAllByProduct(command?.product)
-        command.quantityInitial = inventoryService.getInitialQuantity(command?.product, command?.location, command?.startDate)
-
-        def transactionEntries = inventoryService.getTransactionEntries(command?.product, command?.location, command?.startDate, command?.endDate)
-
-        // Calculate quantity at each transaction entry point.
-        def quantity = command?.quantityInitial
-        transactionEntries.each { transactionEntry ->
-            def productReportEntry = new ProductReportEntryCommand(transactionEntry: transactionEntry, balance: 0)
-            productReportEntry.balance = inventoryService.adjustQuantity(quantity, transactionEntry)
-            command.productReportEntryList << productReportEntry
-
-            // Need to keep track of the running total so we can adjust the balance as we go
-            quantity = productReportEntry.balance
-        }
-        command.quantityFinal = inventoryService.getCurrentQuantity(command?.product, command?.location, command?.endDate)
-    }
-
     TransactionEntry getEarliestTransactionEntry(Product product, Inventory inventory) {
         def list = TransactionEntry.createCriteria().list() {
             and {
