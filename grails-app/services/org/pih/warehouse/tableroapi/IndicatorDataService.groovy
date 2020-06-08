@@ -450,29 +450,30 @@ class IndicatorDataService {
         List query = [3, 6, 9, 12, 0]
         List listColorNumber = []
         Map listConditions = [
-            0 : [95, 75],
-            3 : [25, 18],
-            6 : [50, 36],
-            9 : [75, 54],
-            12 : [95, 75],
+                3 : [18, 25],
+                6 : [36, 50],
+                9 : [54, 75],
+                12: [75, 95],
+                0 : [75, 95],
         ]
-        def inventoriedProducts
 
         def productInStock = InventorySnapshot.executeQuery("""
             SELECT COUNT(distinct i.product.id) FROM InventorySnapshot i
             WHERE i.location = :location""",
                 [
-                                'location': location
-                        ]);
+                        'location': location
+                ])
 
         query.each {
-            def subtitle;
-            def percentage;
-            if(it != 0) {
-                subtitle = "< ${it} month"
+            def subtitle
+            def percentage
+            def inventoriedProducts
+
+            if (it != 0) {
+                subtitle = "< ${it} months"
                 Date period = LocalDate.now().minusMonths(it).toDate()
-            
-                    inventoriedProducts = TransactionEntry.executeQuery("""
+
+                inventoriedProducts = TransactionEntry.executeQuery("""
                     SELECT COUNT(distinct ii.product.id) from TransactionEntry te
                     INNER JOIN te.inventoryItem ii
                     INNER JOIN te.transaction t
@@ -482,12 +483,11 @@ class IndicatorDataService {
                         [
                                 inventory      : location?.inventory,
                                 transactionCode: TransactionCode.PRODUCT_INVENTORY,
-                                period   : period,
-                        ]);
-            }
-            else {
+                                period         : period,
+                        ])
+            } else {
                 subtitle = "Ever"
-                    inventoriedProducts = TransactionEntry.executeQuery("""
+                inventoriedProducts = TransactionEntry.executeQuery("""
                     SELECT COUNT(distinct ii.product.id) from TransactionEntry te
                     INNER JOIN te.inventoryItem ii
                     INNER JOIN te.transaction t
@@ -496,19 +496,17 @@ class IndicatorDataService {
                         [
                                 inventory      : location?.inventory,
                                 transactionCode: TransactionCode.PRODUCT_INVENTORY,
-                        ]);
+                        ])
             }
 
-            percentage = inventoriedProducts[0] / productInStock[0] * 100
-            ColorNumber colorNumber = new ColorNumber(percentage, subtitle)
-
-            colorNumber.getConditionalColors(listConditions.get(it))
-            colorNumber.value = "${colorNumber.value.toDouble().round(1)} %"
+            percentage = Math.round(inventoriedProducts[0] / productInStock[0] * 100)
+            ColorNumber colorNumber = new ColorNumber("${percentage}%", subtitle)
+            colorNumber.setConditionalColors(listConditions.get(it)[0], listConditions.get(it)[1])
             listColorNumber.push(colorNumber)
         }
         MultipleNumbersIndicator multipleNumbersIndicator = new MultipleNumbersIndicator(listColorNumber)
 
-        GraphData productsInventoried = new GraphData(multipleNumbersIndicator, 'Product inventoried', 'numbersCustomColors')
+        GraphData productsInventoried = new GraphData(multipleNumbersIndicator, 'Percent of Products Inventoried', 'numbersCustomColors')
 
         return productsInventoried
     }

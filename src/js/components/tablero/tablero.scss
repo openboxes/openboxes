@@ -440,38 +440,32 @@
     .big-gyr-indicator {
       height: 100%;
       display: flex;
-      align-items: center;
+      flex-wrap: wrap;
 
       .number-indicator {
         flex-grow: 1;
-        height: 80%;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        padding: 12px;
         user-select: none;
-        color: #282d32;
-
-        &:hover {
-          text-decoration: none;
-          color: #282d32;
-        }
 
         &:not(:last-child) {
           border-right: 1px solid #d8d8d8;
         }
 
-        .circle {
-          width: 20px;
-          height: 20px;
-          margin-bottom: 40px;
-          border-radius: 100%;
-        }
-
         .value {
-          font-size: 20px;
+          font-size: 36px;
           display: flex;
           align-items: center;
+
+          .circle {
+            width: 12px;
+            height: 12px;
+            border-radius: 100%;
+            margin-right: 12px;
+          }
         }
 
         .subtitle {
