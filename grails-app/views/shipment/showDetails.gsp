@@ -3,12 +3,12 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
 	<g:set var="entityName" value="${warehouse.message(code: 'shipping.shipment.label', default: 'Shipment').toLowerCase()}" />
-	<title><warehouse:message code="default.view.label" args="[entityName]" /></title>        
+	<title><warehouse:message code="default.view.label" args="[entityName]" /></title>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 	<content tag="pageTitle"><warehouse:message code="default.show.label" args="[entityName]" /></content>
 </head>
 
-<body>    
+<body>
 	<div class="body">
 
         <g:render template="summary"/>
@@ -323,6 +323,11 @@
                             <li>
                                 <a href="${request.contextPath}/shipment/showTransactions/${shipmentInstance?.id}">
                                     <warehouse:message code="transactions.label" default="Transactions"/>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="${request.contextPath}/shipment/showTracking/${shipmentInstance?.id}">
+                                    <warehouse:message code="shipping.tracking.label" default="Tracking"/>
                                 </a>
                             </li>
                         </ul>

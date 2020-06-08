@@ -52,13 +52,13 @@
                         <format:metadata obj="${shipmentInstance?.currentStatus}" />
                     </td>
 					<td class="middle center">
-						<g:link action="showDetails" id="${shipmentInstance.id}">
+						<g:link action="showDetails" id="${shipmentInstance.id}" params="['override':Boolean.TRUE]">
 							${fieldValue(bean: shipmentInstance, field: "shipmentNumber")}
 						</g:link>
 					</td>
 
 					<td class="middle left shipment-name">
-                        <g:link action="showDetails" id="${shipmentInstance.id}">
+                        <g:link action="showDetails" id="${shipmentInstance.id}" params="['override':Boolean.TRUE]">
 							${fieldValue(bean: shipmentInstance, field: "name")}
 						</g:link>
 					</td>

@@ -157,6 +157,7 @@ enum RoleType {
     static listOrganizationRoleTypes() {
         return [
                 ROLE_ORGANIZATION,
+                ROLE_BUYER,
                 ROLE_CARRIER,
                 ROLE_SUPPLIER,
                 ROLE_MANUFACTURER,
