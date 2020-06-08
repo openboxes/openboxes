@@ -269,3 +269,16 @@ export function fetchConfigAndData() {
     });
   };
 }
+
+export function fetchConfig() {
+  return (dispatch) => {
+    apiClient.get('/openboxes/apitablero/config').then((res) => {
+      dispatch({
+        type: FETCH_CONFIG,
+        payload: {
+          data: res.data,
+        },
+      });
+    });
+  };
+}
