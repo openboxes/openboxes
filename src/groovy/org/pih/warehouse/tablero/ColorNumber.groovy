@@ -15,48 +15,14 @@ class ColorNumber implements Serializable {
         this.color = color;
     }
 
-    def getColor(int period) {
-      if(period == 3) {
-          switch(this.value) {
-              case {it >= 25}:  this.color = '#689f38'; break;
-              case {it >= 18 && it < 25}: this.color = '#fbc02d'; break;
-              case {it < 18}: this.color = '#d32f2f'; break;
-              default : this.color =  null;
-          }
-      }
-       if(period == 6) {
-          switch(this.value) {
-              case {it >= 50}:  this.color = '#689f38'; break;
-              case {it >= 36 && it < 50}: this.color = '#fbc02d'; break;
-              case {it < 36}: this.color = '#d32f2f'; break;
-              default : this.color =  null;
-          }
-      }
-       if(period == 9) {
-          switch(this.value) {
-              case {it >= 75}:  this.color = '#689f38'; break;
-              case {it >= 54 && it < 75}: this.color = '#fbc02d'; break;
-              case {it < 54}: this.color = '#d32f2f'; break;
-              default : this.color =  null;
-          }
-      }
-       if(period == 12) {
-          switch(this.value) {
-              case {it >= 95}:  this.color = '#689f38'; break;
-              case {it >= 75 && it < 95}: this.color = '#fbc02d'; break;
-              case {it < 75}: this.color = '#d32f2f'; break;
-              default : this.color =  null;
-          }
-      }
-       if(period == 0) {
-          switch(this.value) {
-              case {it >= 95}:  this.color = '#689f38'; break;
-              case {it >= 75 && it < 95}: this.color = '#fbc02d'; break;
-              case {it < 75}: this.color = '#d32f2f'; break;
-              default : this.color =  null;
-          }
-      }
-    }
+    def getConditionalColors(List listConditions) {
+                switch(this.value) {
+                    case {it >= listConditions[0]}:  this.color = 'success'; break;
+                    case {it >= listConditions[1] && it < listConditions[0]}: this.color = 'warning'; break;
+                    case {it < listConditions[1]}: this.color = 'error'; break;
+                    default : this.color =  null;
+                    }
+        }
 
     Map toJson() {
         [

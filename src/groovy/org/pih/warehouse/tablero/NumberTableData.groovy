@@ -1,15 +1,15 @@
 package org.pih.warehouse.tablero
 
 import org.pih.warehouse.tablero.TableData
-import org.pih.warehouse.tablero.NumberIndicator
+import org.pih.warehouse.tablero.NumbersIndicator
 
 class NumberTableData implements Serializable {
 
     Table tableData;
-    NumberIndicator numberIndicator;
+    NumbersIndicator numbersIndicator;
 
-    NumberTableData(Table tableData, NumberIndicator numberIndicator) {
+    NumberTableData(Table tableData, NumbersIndicator numbersIndicator) {
         this.tableData = tableData;
-        this.numberIndicator = numberIndicator;
+        this.numbersIndicator = numbersIndicator;
     }
 }

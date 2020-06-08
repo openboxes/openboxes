@@ -4,8 +4,9 @@ import org.pih.warehouse.tablero.GraphData
 import org.pih.warehouse.tablero.TableData
 import org.pih.warehouse.tablero.Table
 import org.pih.warehouse.tablero.ColorNumber
+import org.pih.warehouse.tablero.MultipleNumbersIndicator
 import org.pih.warehouse.tablero.IndicatorData
-import org.pih.warehouse.tablero.NumberIndicator
+import org.pih.warehouse.tablero.NumbersIndicator
 import org.pih.warehouse.tablero.IndicatorDatasets
 import org.pih.warehouse.tablero.NumberTableData
 import org.pih.warehouse.requisition.Requisition
@@ -294,9 +295,9 @@ class IndicatorDataService {
         ColorNumber yellow = new ColorNumber(yellowData[0], 'Created > 4 days ago');
         ColorNumber red = new ColorNumber(redData[0], 'Created > 7 days ago');
 
-        NumberIndicator numberIndicator = new NumberIndicator(green, yellow, red)
+        NumbersIndicator numbersIndicator = new NumbersIndicator(green, yellow, red)
 
-        GraphData graphData = new GraphData(numberIndicator, "Outgoing Stock Movements in Progress", "numbers", "/openboxes/stockMovement/list?receiptStatusCode=PENDING");
+        GraphData graphData = new GraphData(numbersIndicator, "Outgoing Stock Movements in Progress", "numbers", "/openboxes/stockMovement/list?receiptStatusCode=PENDING");
 
         return graphData;
     }
@@ -322,9 +323,9 @@ class IndicatorDataService {
             }
         }
 
-        NumberIndicator numberIndicator = new NumberIndicator(pending, shipped, partiallyReceived)
+        NumbersIndicator numbersIndicator = new NumbersIndicator(pending, shipped, partiallyReceived)
 
-        GraphData graphData = new GraphData(numberIndicator, "Incoming Stock Movements By Status", "numbers", "/openboxes/stockMovement/list?direction=INBOUND");
+        GraphData graphData = new GraphData(numbersIndicator, "Incoming Stock Movements By Status", "numbers", "/openboxes/stockMovement/list?direction=INBOUND");
 
         return graphData;
     }
@@ -436,9 +437,9 @@ class IndicatorDataService {
         ColorNumber delayedShipmentBySea = new ColorNumber(numberDelayed['sea'], 'By sea')
         ColorNumber delayedShipmentByLand = new ColorNumber(numberDelayed['landAndSuitcase'], 'By land')
 
-        NumberIndicator numberIndicator = new NumberIndicator(delayedShipmentByAir, delayedShipmentBySea, delayedShipmentByLand)
+        NumbersIndicator numbersIndicator = new NumbersIndicator(delayedShipmentByAir, delayedShipmentBySea, delayedShipmentByLand)
 
-        NumberTableData numberTableData = new NumberTableData(table, numberIndicator)
+        NumberTableData numberTableData = new NumberTableData(table, numbersIndicator)
 
         GraphData graphData = new GraphData(numberTableData, "Delayed Shipments", "numberTable");
 
@@ -448,6 +449,13 @@ class IndicatorDataService {
     GraphData getProductsInventoried(Location location) {
         List query = [3, 6, 9, 12, 0]
         List listColorNumber = []
+        Map listConditions = [
+            0 : [95, 75],
+            3 : [25, 18],
+            6 : [50, 36],
+            9 : [75, 54],
+            12 : [95, 75],
+        ]
         def inventoriedProducts
 
         def productInStock = InventorySnapshot.executeQuery("""
@@ -490,17 +498,18 @@ class IndicatorDataService {
                                 transactionCode: TransactionCode.PRODUCT_INVENTORY,
                         ]);
             }
-            
-            percentage = inventoriedProducts[0]/productInStock[0] * 100;
-            ColorNumber colorNumber = new ColorNumber(percentage, subtitle);
-            colorNumber.getColor(it);
+
+            percentage = inventoriedProducts[0] / productInStock[0] * 100
+            ColorNumber colorNumber = new ColorNumber(percentage, subtitle)
+
+            colorNumber.getConditionalColors(listConditions.get(it))
             colorNumber.value = "${colorNumber.value.toDouble().round(1)} %"
-            listColorNumber.push(colorNumber);
+            listColorNumber.push(colorNumber)
         }
+        MultipleNumbersIndicator multipleNumbersIndicator = new MultipleNumbersIndicator(listColorNumber)
 
-        NumberIndicator numberIndicator = new NumberIndicator(listColorNumber[0], listColorNumber[1], listColorNumber[2], listColorNumber[3], listColorNumber[4])
-        GraphData productsInventoried = new GraphData(numberIndicator, "Product inventoried", "numbersCustomColors");
+        GraphData productsInventoried = new GraphData(multipleNumbersIndicator, 'Product inventoried', 'numbersCustomColors')
 
-        return productsInventoried         
+        return productsInventoried
     }
 }
