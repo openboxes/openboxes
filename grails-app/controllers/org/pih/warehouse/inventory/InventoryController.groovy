@@ -1043,7 +1043,7 @@ class InventoryController {
             if (productIds) {
                 products = Product.getAll(productIds)
             }
-            command.binLocations = inventoryService.getItemQuantityByBinLocation(warehouseInstance, inventoryItems)
+            command.binLocations = inventoryService.getBinLocationsByInventoryItems(warehouseInstance, inventoryItems)
         } else {
             throw new RuntimeException("You must select at least one product or inventory item")
         }

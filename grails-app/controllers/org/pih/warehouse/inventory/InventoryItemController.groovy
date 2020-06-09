@@ -45,17 +45,6 @@ class InventoryItemController {
     def index = {
         redirect(controller: "inventory", action: "browse")
     }
-    /**
-     *
-     */
-    def show = {
-        def itemInstance = InventoryItem.get(params.id)
-        def transactionEntryList = TransactionEntry.findAllByInventoryItem(itemInstance)
-        [
-                itemInstance        : itemInstance,
-                transactionEntryList: transactionEntryList
-        ]
-    }
 
     /**
      * Ajax method for the Record Inventory page.

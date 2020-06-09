@@ -17,12 +17,11 @@ import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.jobs.RefreshTransactionFactJob
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.report.ChecklistReportCommand
 import org.pih.warehouse.report.InventoryReportCommand
 import org.pih.warehouse.report.MultiLocationInventoryReportCommand
-import org.pih.warehouse.report.ProductReportCommand
+
 import org.quartz.JobKey
 import org.quartz.impl.StdScheduler
 import util.ReportUtil
@@ -240,16 +239,6 @@ class ReportController {
         [transactions: transactions]
     }
 
-
-    def showProductReport = { ProductReportCommand command ->
-        if (!command?.hasErrors()) {
-            reportService.generateProductReport(command)
-        }
-
-        [command: command]
-    }
-
-
     def showTransactionReport = {
         InventoryReportCommand command = new InventoryReportCommand()
         command.location = Location.get(session.warehouse.id)
@@ -276,15 +265,6 @@ class ReportController {
     def showTransactionReportDialog = {
         def url = createLink(controller: "json", action: "getTransactionReportDetails", params:params)
         render(template: "dataTableDialog", model: [url: url])
-    }
-
-    def generateTransactionReport = { InventoryReportCommand command ->
-        // We always need to initialize the root category
-        command.rootCategory = productService.getRootCategory()
-        if (!command?.hasErrors()) {
-            reportService.generateTransactionReport(command)
-        }
-        render(view: 'showTransactionReport', model: [command: command])
     }
 
     def showShippingReport = { ChecklistReportCommand command ->

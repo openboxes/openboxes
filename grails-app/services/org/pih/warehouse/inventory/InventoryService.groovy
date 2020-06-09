@@ -822,7 +822,7 @@ class InventoryService implements ApplicationContextAware {
         // Only show stock for inventory items added to shipment
         List inventoryItems = shipmentInstance?.shipmentItems*.inventoryItem.unique()
         inventoryItems.each { inventoryItem ->
-            binLocationMap[inventoryItem] = getItemQuantityByBinLocation(shipmentInstance?.origin, inventoryItem)
+            binLocationMap[inventoryItem] = getBinLocationsByInventoryItem(shipmentInstance?.origin, inventoryItem)
         }
         return binLocationMap
     }
@@ -878,18 +878,20 @@ class InventoryService implements ApplicationContextAware {
         return binLocations
     }
 
-    List getItemQuantityByBinLocation(Location location, List<InventoryItem> inventoryItems) {
-        List transactionEntries = getTransactionEntriesByInventoryAndInventoryItems(location?.inventory, inventoryItems)
+    List getBinLocationsByInventoryItems(Location location, List<InventoryItem> inventoryItems) {
+        List products = inventoryItems.collect { it.product }
+        List transactionEntries = getTransactionEntriesByInventoryAndProduct(location?.inventory, products)
         List binLocations = getQuantityByBinLocation(transactionEntries)
+        binLocations = binLocations.findAll { inventoryItems.contains(it.inventoryItem) }
         return binLocations
     }
 
-    List getItemQuantityByBinLocation(Location location, InventoryItem inventoryItem) {
-        List transactionEntries = getTransactionEntriesByInventoryAndInventoryItem(location?.inventory, inventoryItem)
+    List getBinLocationsByInventoryItem(Location location, InventoryItem inventoryItem) {
+        List transactionEntries = getTransactionEntriesByInventoryAndProduct(location?.inventory, [inventoryItem.product])
         List binLocations = getQuantityByBinLocation(transactionEntries)
+        binLocations = binLocations.findAll { it.inventoryItem == inventoryItem }
         return binLocations
     }
-
 
     /**
      * Converts list of passed transactions entries into a list of bin locations.
@@ -1153,7 +1155,7 @@ class InventoryService implements ApplicationContextAware {
             throw new RuntimeException("Inventory does not exist")
         }
 
-        def transactionEntries = getTransactionEntriesByInventoryAndInventoryItem(inventory, inventoryItem)
+        def transactionEntries = getTransactionEntriesByInventoryAndProduct(inventory, [inventoryItem.product])
         if (binLocation) {
             List binLocations = getQuantityByBinLocation(transactionEntries)
             def entry = binLocations.find {
@@ -1682,61 +1684,6 @@ class InventoryService implements ApplicationContextAware {
     }
 
     /**
-     * Get all transaction entries over list of products/inventory items.
-     *
-     * @param inventoryInstance
-     * @return
-     */
-    List getTransactionEntriesByInventoryAndBinLocation(Inventory inventory, Location binLocation) {
-        def criteria = TransactionEntry.createCriteria()
-        def transactionEntries = criteria.list {
-            if (binLocation) {
-                eq("binLocation", binLocation)
-            }
-            transaction {
-                eq("inventory", inventory)
-                order("transactionDate", "asc")
-                order("dateCreated", "asc")
-            }
-        }
-        return transactionEntries
-    }
-
-
-    /**
-     * Gets all transaction entries for a inventory item within an inventory
-     *
-     * @param inventoryItem
-     * @param inventory
-     */
-    List getTransactionEntriesByInventoryAndInventoryItem(Inventory inventory, InventoryItem item) {
-        return TransactionEntry.createCriteria().list() {
-            eq("inventoryItem", item)
-            inventoryItem {
-                eq("product", item?.product)
-            }
-            transaction {
-                eq("inventory", inventory)
-            }
-        }
-    }
-
-    /**
-     * Gets all transaction entries for a inventory item within an inventory
-     *
-     * @param inventoryItem
-     * @param inventory
-     */
-    List getTransactionEntriesByInventoryAndInventoryItems(Inventory inventory, List<InventoryItem> inventoryItems) {
-        return TransactionEntry.createCriteria().list() {
-            'in'("inventoryItem", inventoryItems)
-            transaction {
-                eq("inventory", inventory)
-            }
-        }
-    }
-
-    /**
      * Adjusts the stock level by adding a new transaction entry with a
      * quantity change.
      *
@@ -2095,84 +2042,6 @@ class InventoryService implements ApplicationContextAware {
 
     /**
      *
-     */
-    def getQuantity(Product product, Location location, Date beforeDate) {
-        def quantity = 0
-        def transactionEntries = getTransactionEntriesBeforeDate(product, location, beforeDate)
-        quantity = adjustQuantity(quantity, transactionEntries)
-        return quantity
-    }
-
-
-    def getQuantity(InventoryItem inventoryItem, Location location, Date beforeDate) {
-        def quantity = 0
-        def transactionEntries = getTransactionEntriesBeforeDate(inventoryItem, location, beforeDate)
-        quantity = adjustQuantity(quantity, transactionEntries)
-        return quantity
-    }
-
-    /**
-     * Get the initial quantity of a product for the given location and date.
-     * If the date is null, then we assume that the answer is 0.
-     *
-     * @param product
-     * @param location
-     * @param date
-     * @return
-     */
-    def getInitialQuantity(Product product, Location location, Date date) {
-        return getQuantity(product, location, date ?: new Date())
-    }
-
-    /**
-     * Get the current quantity (as of the given date) or today's date if the
-     * given date is null.
-     *
-     * @param product
-     * @param location
-     * @param date
-     * @return
-     */
-    def getCurrentQuantity(Product product, Location location, Date date) {
-        return getQuantity(product, location, date ?: new Date())
-    }
-
-    /**
-     *
-     * @param initialQuantity
-     * @param transactionEntries
-     * @return
-     */
-    def adjustQuantity(Integer initialQuantity, List<Transaction> transactionEntries) {
-        def quantity = initialQuantity
-        transactionEntries.each { transactionEntry ->
-            quantity = adjustQuantity(quantity, transactionEntry)
-        }
-        return quantity
-    }
-
-    /**
-     *
-     * @param initialQuantity
-     * @param transactionEntry
-     * @return
-     */
-    def adjustQuantity(Integer initialQuantity, TransactionEntry transactionEntry) {
-        def quantity = initialQuantity
-
-        def code = transactionEntry?.transaction?.transactionType?.transactionCode
-        if (code == TransactionCode.INVENTORY || code == TransactionCode.PRODUCT_INVENTORY) {
-            quantity = transactionEntry.quantity
-        } else if (code == TransactionCode.DEBIT) {
-            quantity -= transactionEntry.quantity
-        } else if (code == TransactionCode.CREDIT) {
-            quantity += transactionEntry.quantity
-        }
-        return quantity
-    }
-
-    /**
-     *
      * @param product
      * @param startDate
      * @param endDate
@@ -2210,33 +2079,6 @@ class InventoryService implements ApplicationContextAware {
      * @param endDate
      * @return
      */
-    def getTransactionEntriesBeforeDate(InventoryItem inventoryItem, Location location, Date beforeDate) {
-        def transactionEntries = []
-        if (beforeDate) {
-            def criteria = TransactionEntry.createCriteria()
-            transactionEntries = criteria.list {
-                and {
-                    eq("inventoryItem", inventoryItem)
-                    transaction {
-                        // All transactions before given date
-                        lt("transactionDate", beforeDate)
-                        eq("inventory", location?.inventory)
-                        order("transactionDate", "asc")
-                        order("dateCreated", "asc")
-                    }
-                }
-            }
-        }
-        return transactionEntries
-    }
-
-    /**
-     *
-     * @param product
-     * @param startDate
-     * @param endDate
-     * @return
-     */
     def getTransactionEntriesBeforeDate(Product product, Location location, Date beforeDate) {
         def criteria = TransactionEntry.createCriteria()
         def transactionEntries = []
@@ -2257,18 +2099,9 @@ class InventoryService implements ApplicationContextAware {
         return transactionEntries
     }
 
-    /**
-     *
-     * @param location
-     * @param category
-     * @param startDate
-     * @param endDate
-     * @return
-     */
     def getTransactionEntries(Location location, Category category, Date startDate, Date endDate) {
         def matchCategories = getExplodedCategories([category])
         return getTransactionEntries(location, matchCategories, startDate, endDate)
-
     }
 
     def getTransactionEntries(Location location, List categories, Date startDate, Date endDate) {
@@ -3255,7 +3088,6 @@ class InventoryService implements ApplicationContextAware {
             map
         }
 
-
         // Assign status based on inventory level values
         genericProductMap.each { k, v ->
             genericProductMap[k].status = getStatusMessage(null, v.minQuantity, v.reorderQuantity, v.maxQuantity, v.currentQuantity)
@@ -3316,7 +3148,6 @@ class InventoryService implements ApplicationContextAware {
         return binLocationReport
     }
 
-
     List getBinLocationDetails(Location location) {
         List transactionEntries = getTransactionEntriesByLocation(location)
         return getQuantityByBinLocation(transactionEntries, true)
@@ -3348,7 +3179,6 @@ class InventoryService implements ApplicationContextAware {
         return results
     }
 
-
     List getTransactionEntriesByLocation(Location location) {
         def startTime = System.currentTimeMillis()
 
@@ -3369,7 +3199,6 @@ class InventoryService implements ApplicationContextAware {
 
         return transactions*.transactionEntries.flatten()
     }
-
 
     List<AvailableItem> getAvailableBinLocations(Location location, Product product) {
         return getAvailableBinLocations(location, product, false)
