@@ -45,7 +45,7 @@ const GraphCard = SortableElement(({
   } else if (cardType === 'numbers') {
     graph = <Numbers data={data} options={options} />;
   } else if (cardType === 'numbersCustomColors') {
-    graph = <NumbersRAG data={data} options={options} />;
+    graph = <NumbersRAG data={data} />;
   } else if (cardType === 'table') {
     graph = <TableCard data={data} />;
   } else if (cardType === 'numberTable') {
