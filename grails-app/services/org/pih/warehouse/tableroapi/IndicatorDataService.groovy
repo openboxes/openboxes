@@ -4,8 +4,9 @@ import org.pih.warehouse.tablero.GraphData
 import org.pih.warehouse.tablero.TableData
 import org.pih.warehouse.tablero.Table
 import org.pih.warehouse.tablero.ColorNumber
+import org.pih.warehouse.tablero.MultipleNumbersIndicator
 import org.pih.warehouse.tablero.IndicatorData
-import org.pih.warehouse.tablero.NumberIndicator
+import org.pih.warehouse.tablero.NumbersIndicator
 import org.pih.warehouse.tablero.IndicatorDatasets
 import org.pih.warehouse.tablero.NumberTableData
 import org.pih.warehouse.requisition.Requisition
@@ -13,6 +14,9 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.receiving.ReceiptItem
+import org.pih.warehouse.inventory.InventorySnapshot
+import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.core.Location
 import org.joda.time.LocalDate
 
@@ -281,9 +285,9 @@ class IndicatorDataService {
         ColorNumber yellow = new ColorNumber(yellowData[0], 'Created > 4 days ago');
         ColorNumber red = new ColorNumber(redData[0], 'Created > 7 days ago');
 
-        NumberIndicator numberIndicator = new NumberIndicator(green, yellow, red)
+        NumbersIndicator numbersIndicator = new NumbersIndicator(green, yellow, red)
 
-        GraphData graphData = new GraphData(numberIndicator, "Outgoing Stock Movements in Progress", "numbers", "/openboxes/stockMovement/list?receiptStatusCode=PENDING");
+        GraphData graphData = new GraphData(numbersIndicator, "Outgoing Stock Movements in Progress", "numbers", "/openboxes/stockMovement/list?receiptStatusCode=PENDING");
 
         return graphData;
     }
@@ -309,9 +313,9 @@ class IndicatorDataService {
             }
         }
 
-        NumberIndicator numberIndicator = new NumberIndicator(pending, shipped, partiallyReceived)
+        NumbersIndicator numbersIndicator = new NumbersIndicator(pending, shipped, partiallyReceived)
 
-        GraphData graphData = new GraphData(numberIndicator, "Incoming Stock Movements By Status", "numbers", "/openboxes/stockMovement/list?direction=INBOUND");
+        GraphData graphData = new GraphData(numbersIndicator, "Incoming Stock Movements By Status", "numbers", "/openboxes/stockMovement/list?direction=INBOUND");
 
         return graphData;
     }
@@ -423,15 +427,80 @@ class IndicatorDataService {
         ColorNumber delayedShipmentBySea = new ColorNumber(numberDelayed['sea'], 'By sea')
         ColorNumber delayedShipmentByLand = new ColorNumber(numberDelayed['landAndSuitcase'], 'By land')
 
-        NumberIndicator numberIndicator = new NumberIndicator(delayedShipmentByAir, delayedShipmentBySea, delayedShipmentByLand)
+        NumbersIndicator numbersIndicator = new NumbersIndicator(delayedShipmentByAir, delayedShipmentBySea, delayedShipmentByLand)
 
-        NumberTableData numberTableData = new NumberTableData(table, numberIndicator)
+        NumberTableData numberTableData = new NumberTableData(table, numbersIndicator)
 
         GraphData graphData = new GraphData(numberTableData, "Delayed Shipments", "numberTable");
 
         return graphData;
     }
 
+    GraphData getProductsInventoried(Location location) {
+        List monthsCount = [3, 6, 9, 12, 0]
+        List listPercentageNumbers = []
+        Map listErrorSuccessIntervals = [
+                3 : [18, 25],
+                6 : [36, 50],
+                9 : [54, 75],
+                12: [75, 95],
+                0 : [75, 95],
+        ]
+
+        def productInStock = InventorySnapshot.executeQuery("""
+            SELECT COUNT(distinct i.product.id) FROM InventorySnapshot i
+            WHERE i.location = :location""",
+                [
+                        'location': location
+                ])
+
+        monthsCount.each {
+            def subtitle
+            def percentage
+            def inventoriedProducts
+
+            if (it != 0) {
+                subtitle = "< ${it} months"
+                Date period = LocalDate.now().minusMonths(it).toDate()
+
+                inventoriedProducts = TransactionEntry.executeQuery("""
+                    SELECT COUNT(distinct ii.product.id) from TransactionEntry te
+                    INNER JOIN te.inventoryItem ii
+                    INNER JOIN te.transaction t
+                    WHERE t.inventory = :inventory
+                    AND t.transactionType.transactionCode = :transactionCode 
+                    AND t.transactionDate >= :period""",
+                        [
+                                inventory      : location?.inventory,
+                                transactionCode: TransactionCode.PRODUCT_INVENTORY,
+                                period         : period,
+                        ])
+            } else {
+                subtitle = "Ever"
+                inventoriedProducts = TransactionEntry.executeQuery("""
+                    SELECT COUNT(distinct ii.product.id) from TransactionEntry te
+                    INNER JOIN te.inventoryItem ii
+                    INNER JOIN te.transaction t
+                    WHERE t.inventory = :inventory
+                    AND t.transactionType.transactionCode = :transactionCode""",
+                        [
+                                inventory      : location?.inventory,
+                                transactionCode: TransactionCode.PRODUCT_INVENTORY,
+                        ])
+            }
+
+            percentage = Math.round(inventoriedProducts[0] / productInStock[0] * 100)
+            ColorNumber colorNumber = new ColorNumber("${percentage}%", subtitle)
+            colorNumber.setConditionalColors(listErrorSuccessIntervals.get(it)[0], listErrorSuccessIntervals.get(it)[1])
+            listPercentageNumbers.push(colorNumber)
+        }
+        MultipleNumbersIndicator multipleNumbersIndicator = new MultipleNumbersIndicator(listPercentageNumbers)
+
+        GraphData productsInventoried = new GraphData(multipleNumbersIndicator, 'Percent of Products Inventoried', 'numbersCustomColors')
+
+        return productsInventoried
+    }
+    
     GraphData getLossCausedByExpiry(Location location, def params) {
 
         Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5

@@ -499,8 +499,8 @@ openboxes {
                 }
                 discrepancy {
                     endpoint = "/${appName}/apitablero/getDiscrepancy"
-                    filter = true
                     archived = []
+                    filter = true
                     order = 6
                 }
                 delayedShipments {
@@ -526,11 +526,24 @@ openboxes {
                 }
                 lossCausedByExpiry {
                     endpoint = "/${appName}/apitablero/getLossCausedByExpiry"
+                    archived = ['personal', 'warehouse']
                     filter = true
-                    archived = ['warehouse', 'personal']
                     stacked = true
                     datalabel = true
                     order = 9
+                }
+                productsInventoried {
+                    endpoint = "/${appName}/apitablero/getProductsInventoried"
+                    archived = ['personal', 'warehouse']
+                    filter= false
+                    order = 10
+                    colors {
+                        datasets {
+                            state6 = ["first"]
+                            state7 = ["second"]
+                            state8 = ["third"]
+                        }
+                    }
                 }
             }
         }

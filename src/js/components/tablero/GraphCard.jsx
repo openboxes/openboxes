@@ -8,6 +8,7 @@ import LoadingCard from './LoadingCard';
 import Numbers from './Numbers';
 import NumbersTableCard from './NumbersTableCard';
 import TableCard from './TableCard';
+import NumbersRAG from './NumbersRAG';
 
 const handleChartClick = (elements) => {
   const link = elements[0]._chart.data.datasets[0].links[elements[0]._index];
@@ -43,6 +44,8 @@ const GraphCard = SortableElement(({
     />);
   } else if (cardType === 'numbers') {
     graph = <Numbers data={data} options={options} />;
+  } else if (cardType === 'numbersCustomColors') {
+    graph = <NumbersRAG data={data} />;
   } else if (cardType === 'table') {
     graph = <TableCard data={data} />;
   } else if (cardType === 'numberTable') {
