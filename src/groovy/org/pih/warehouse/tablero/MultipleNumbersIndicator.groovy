@@ -11,7 +11,7 @@ class MultipleNumbersIndicator implements Serializable {
     }
 
     Map toJson() {
-        for (int i=0;i<listColorNumber.size();i++) {
+        for (int i=0; i<listColorNumber.size(); i++) {
             listColorNumber[i] = listColorNumber[i].toJson();
         }
             
