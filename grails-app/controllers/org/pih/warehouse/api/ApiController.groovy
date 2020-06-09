@@ -24,6 +24,7 @@ class ApiController {
     def dataSource
     def userService
     def localizationService
+    def megamenuService
     def grailsApplication
 
     def login = {
@@ -56,6 +57,12 @@ class ApiController {
         }
         session.user.locale = locale
         render([status: 200, text: "Current language is ${locale}"])
+    }
+
+    def getMenuConfig = {
+        Map menuConfig = grailsApplication.config.openboxes.megamenu
+        List translatedMenu = megamenuService.buildAndTranslateMenu(menuConfig)
+        render([data: [menuConfig: translatedMenu]] as JSON)
     }
 
     def getAppContext = {
