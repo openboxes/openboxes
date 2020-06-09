@@ -88,12 +88,13 @@ function loadGraphColors(payload) {
 
 function loadDatalabel(context) {
   const { datasets } = context.chart.data;
-
   // If this is the last visible dataset of the chart
   if (datasets.indexOf(context.dataset) === datasets.length - 1) {
     let sum = 0;
     datasets.map((dataset) => {
-      sum += dataset.data[context.dataIndex] || 0;
+      if (dataset.type !== 'line') {
+        sum += dataset.data[context.dataIndex] || 0;
+      }
       return sum;
     });
     return sum;
@@ -101,7 +102,7 @@ function loadDatalabel(context) {
   return '';
 }
 
-function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', maxValue = null) {
+function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', maxValue = null, minValue = null) {
   const options = {
     scales: {
       xAxes: [{
@@ -135,12 +136,10 @@ function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', ma
       callbacks: {
         title: (tooltipItem, data) => {
           let title = data.datasets[tooltipItem[0].datasetIndex].label || '';
-
           if (title) {
             title += ': ';
           }
           title += data.datasets[tooltipItem[0].datasetIndex].data[tooltipItem[0].index];
-
           return title;
         },
         label: (tooltipItem, data) => data.labels[tooltipItem.index],
@@ -155,8 +154,17 @@ function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', ma
 
   if (hasDataLabel) {
     options.plugins.datalabels = {
-      anchor: 'end',
-      align: alignLabel,
+      anchor(context) {
+        const value = context.dataset.data[context.dataIndex];
+        return value >= 0 ? 'end' : 'start';
+      },
+      align(context) {
+        const value = context.dataset.data[context.dataIndex];
+        if (alignLabel === 'vertical') {
+          return value >= 0 ? 'top' : 'bottom';
+        }
+        return value >= 0 ? 'right' : 'left';
+      },
       offset: 5,
       color(context) {
         return context.dataset.backgroundColor;
@@ -169,15 +177,24 @@ function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', ma
 
     // Add Math.ceil(maxValue / maxTicks) to try to ensure an extra tick will be added
     // maxTicks = 11
-    if (alignLabel === 'right' && maxValue) {
+    if (alignLabel === 'horizontal' && maxValue) {
       options.scales.xAxes[0].ticks = {
         suggestedMax: maxValue + Math.ceil(maxValue / 11),
       };
     }
-
-    if (alignLabel === 'top' && maxValue) {
+    if (alignLabel === 'horizontal' && minValue) {
+      options.scales.xAxes[0].ticks = {
+        suggestedMin: minValue - Math.ceil(minValue / 11),
+      };
+    }
+    if (alignLabel === 'vertical' && maxValue) {
       options.scales.yAxes[0].ticks = {
         suggestedMax: maxValue + Math.ceil(maxValue / 11),
+      };
+    }
+    if (alignLabel === 'vertical' && minValue) {
+      options.scales.yAxes[0].ticks = {
+        suggestedMin: minValue - Math.ceil(minValue / 11),
       };
     }
   }
@@ -188,9 +205,10 @@ function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', ma
 function loadGraphOptions(payload) {
   let labelAlignment = null;
   let maxValue = null;
+  let minValue = null;
 
   if (payload.config.datalabel) {
-    labelAlignment = (payload.type === 'horizontalBar') ? 'right' : 'top';
+    labelAlignment = (payload.type === 'horizontalBar') ? 'horizontal' : 'vertical';
 
     let sumDatasets = 0;
     if (!payload.config.stacked || payload.data.datasets.length === 1) {
@@ -203,10 +221,17 @@ function loadGraphOptions(payload) {
         return sum.map((s, index) => s + value.data[index]);
       });
     }
-    maxValue = Math.max(...sumDatasets);
+    maxValue = Math.max(...sumDatasets) > 0 ? Math.max(...sumDatasets) : null;
+    minValue = Math.min(...sumDatasets) < 0 ? Math.min(...sumDatasets) : null;
   }
 
-  return getOptions(payload.config.stacked, payload.config.datalabel, labelAlignment, maxValue);
+  return getOptions(
+    payload.config.stacked,
+    payload.config.datalabel,
+    labelAlignment,
+    maxValue,
+    minValue,
+  );
 }
 
 export { loadGraphColors, loadGraphOptions };

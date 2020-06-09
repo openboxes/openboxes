@@ -392,7 +392,7 @@ openboxes {
         }
         endpoints {
             number {
-                 inProgressPutaways {
+                inProgressPutaways {
                     endpoint = "/${appName}/apitablero/getInProgressPutaways"
                     archived = []
                     order = 4
@@ -437,6 +437,7 @@ openboxes {
                 inventorySummary {
                     endpoint = "/${appName}/apitablero/getInventorySummary"
                     archived = []
+                    filter = false
                     datalabel = true
                     order = 1
                     colors {
@@ -450,6 +451,7 @@ openboxes {
                 expirationSummary {
                     endpoint = "/${appName}/apitablero/getExpirationSummary"
                     archived = []
+                    filter = true
                     order = 2
                     colors {
                         datasets {
@@ -460,16 +462,24 @@ openboxes {
                         }
                     }
                 }
-                sentStockMovements {
-                    endpoint = "/${appName}/apitablero/getSentStockMovements"
-                    archived = ['personal', 'warehouse']
-                    stacked = true
-                    datalabel = true
-                    order = 9
+                incomingStock {
+                    endpoint = "/${appName}/apitablero/getIncomingStock"
+                    archived = []
+                    filter = false
+                    archived = []
+                    order = 3
+                    colors {
+                        datasets {
+                            state6 = ["first"]
+                            state7 = ["second"]
+                            state8 = ["third"]
+                        }
+                    }
                 }
                 outgoingStock {
                     endpoint = "/${appName}/apitablero/getOutgoingStock"
                     archived = []
+                    filter = false
                     order = 4
                     colors {
                         datasets {
@@ -482,20 +492,23 @@ openboxes {
                 receivedStockMovements {
                     endpoint = "/${appName}/apitablero/getReceivedStockMovements"
                     archived = ['personal', 'warehouse']
+                    filter = true
                     stacked = true
                     datalabel = true
                     order = 7
                 }
                 discrepancy {
                     endpoint = "/${appName}/apitablero/getDiscrepancy"
+                    filter = true
                     archived = []
                     order = 6
                 }
                 delayedShipments {
                     endpoint = "/${appName}/apitablero/getDelayedShipments"
                     archived = []
+                    filter = false
                     order = 5
-                     colors {
+                    colors {
                         datasets {
                             state5 = ["first"]
                             state4 = ["second"]
@@ -503,17 +516,21 @@ openboxes {
                         }
                     }
                 }
-                incomingStock {
-                    endpoint = "/${appName}/apitablero/getIncomingStock"
-                    archived = []
-                    order = 3
-                    colors {
-                        datasets {
-                            state6 = ["first"]
-                            state7 = ["second"]
-                            state8 = ["third"]
-                        }
-                    }
+                sentStockMovements {
+                    endpoint = "/${appName}/apitablero/getSentStockMovements"
+                    archived = ['personal', 'warehouse']
+                    filter = true
+                    stacked = true
+                    datalabel = true
+                    order = 8
+                }
+                lossCausedByExpiry {
+                    endpoint = "/${appName}/apitablero/getLossCausedByExpiry"
+                    filter = true
+                    archived = ['warehouse', 'personal']
+                    stacked = true
+                    datalabel = true
+                    order = 9
                 }
             }
         }
@@ -541,7 +558,7 @@ openboxes.identifier.organization.maxSize = 3
 
 openboxes.identifier.purchaseOrder.generatorType = IdentifierGeneratorTypeCode.SEQUENCE
 openboxes.identifier.purchaseOrder.format = "PO-\${destinationPartyCode}-\${sequenceNumber}"
-openboxes.identifier.purchaseOrder.properties = ["destinationPartyCode":"destinationParty.code"]
+openboxes.identifier.purchaseOrder.properties = ["destinationPartyCode": "destinationParty.code"]
 
 // OpenBoxes default line printer port
 openboxes.linePrinterTerminal.port = "LPT1"
@@ -739,7 +756,7 @@ openboxes.locale.supportedLocales = ['ar', 'en', 'fr', 'de', 'it', 'es', 'pt', '
 // Currency configuration
 openboxes.locale.defaultCurrencyCode = "USD"
 openboxes.locale.defaultCurrencySymbol = "\$"
-openboxes.locale.supportedCurrencyCodes = ["USD","CAD","EUR","GBP"]
+openboxes.locale.supportedCurrencyCodes = ["USD", "CAD", "EUR", "GBP"]
 
 // Currency API configuration
 openboxes.locale.currencyApi.url = "https://api.exchangeratesapi.io/latest?base=%s"
@@ -832,5 +849,5 @@ grails.gorm.default.mapping = {
 }
 
 grails.gorm.default.constraints = {
-    expirationDateConstraint(nullable:true, min: openboxes.expirationDate.minValue)
+    expirationDateConstraint(nullable: true, min: openboxes.expirationDate.minValue)
 }

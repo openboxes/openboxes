@@ -132,4 +132,10 @@ class ApitableroController {
         def productsWithNegativeInventory = numberDataService.getProductWithNegativeInventory(location)
         render(productsWithNegativeInventory as JSON)
     }
+
+    def getLossCausedByExpiry = {
+        Location location = Location.get(session?.warehouse?.id)
+        def lossCausedByExpiry = indicatorDataService.getLossCausedByExpiry(location, params)
+        render (lossCausedByExpiry.toJson() as JSON)
+    }
 }
