@@ -81,12 +81,12 @@
         <div class="report-summary" >
             <table>
                 <tr>
-                    <td colspan="2">
+                    <td colspan="3">
                         <h2>Summary</h2>
                     </td>
                 </tr>
                 <tr>
-                    <td width="50%">
+                    <td width="33%">
                         <table>
                             <tr>
                                 <td class="top left" width="25%">
@@ -111,7 +111,7 @@
 
 
                     </td>
-                    <td width="50%">
+                    <td width="33%">
                         <table>
                             <tr>
                                 <td class="top" width="25%">
@@ -139,6 +139,30 @@
                             </tr>
                         </table>
                     </td>
+                    <td width="34%">
+                        <table>
+                            <tr>
+                                <td class="top">
+                                    <label><warehouse:message code="order.paymentTerm.label" default="Payment Term"/></label>
+                                </td>
+                                <td class="top left">
+                                    <div>
+                                        ${orderInstance?.paymentTerm?.name }
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="top">
+                                    <label><warehouse:message code="order.paymentMethodType.label" default="Payment Method"/></label>
+                                </td>
+                                <td class="top left">
+                                    <div>
+                                        ${orderInstance?.paymentMethodType?.name }
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
                 </tr>
             </table>
         </div>
@@ -153,6 +177,7 @@
                     <td colspan="5">
                         <div class="list">
                             <g:set var="status" value="${0 }"/>
+                            <g:set var="columnsNumber" value="6"/>
                             <table class="order-items">
                                 <thead>
                                     <tr>
@@ -165,6 +190,24 @@
                                         <th class="bottom">
                                             <warehouse:message code="product.name.label"/>
                                         </th>
+                                        <g:if test="${orderInstance.orderItems.any { it.productSupplier?.supplierCode } }">
+                                            <g:set var="columnsNumber" value="${columnsNumber+1}"/>
+                                            <th class="center">
+                                                <warehouse:message code="product.supplierCode.label"/>
+                                            </th>
+                                        </g:if>
+                                        <g:if test="${orderInstance.orderItems.any { it.productSupplier?.manufacturerName } }">
+                                            <g:set var="columnsNumber" value="${columnsNumber+1}"/>
+                                            <th class="center">
+                                                <warehouse:message code="product.manufacturer.label"/>
+                                            </th>
+                                        </g:if>
+                                        <g:if test="${orderInstance.orderItems.any { it.productSupplier?.manufacturerCode } }">
+                                            <g:set var="columnsNumber" value="${columnsNumber+1}"/>
+                                            <th class="center">
+                                                <warehouse:message code="product.manufacturerCode.label"/>
+                                            </th>
+                                        </g:if>
                                         <th class="center bottom">
                                             <warehouse:message code="orderItem.quantity.label" default="Quantity"/>
                                         </th>
@@ -194,6 +237,21 @@
                                         <td>
                                             <format:product product="${orderItem?.product}"/>
                                         </td>
+                                        <g:if test="${orderInstance.orderItems.any { it.productSupplier?.supplierCode } }">
+                                            <td>
+                                                ${orderItem?.productSupplier?.supplierCode}
+                                            </td>
+                                        </g:if>
+                                        <g:if test="${orderInstance.orderItems.any { it.productSupplier?.manufacturerName } }">
+                                            <td>
+                                                ${orderItem?.productSupplier?.manufacturerName}
+                                            </td>
+                                        </g:if>
+                                        <g:if test="${orderInstance.orderItems.any { it.productSupplier?.manufacturerCode } }">
+                                            <td>
+                                                ${orderItem?.productSupplier?.manufacturerCode}
+                                            </td>
+                                        </g:if>
                                         <td class="right">
                                             ${orderItem?.quantity }
                                         </td>
@@ -212,7 +270,7 @@
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <th colspan="6" class="right">
+                                        <th colspan="${columnsNumber}" class="right">
                                             <warehouse:message code="default.subtotal.label" default="Subtotal"/>
                                         </th>
                                         <th class="right">
@@ -221,7 +279,7 @@
                                         </th>
                                     </tr>
                                     <tr>
-                                        <th colspan="6" class="right">
+                                        <th colspan="${columnsNumber}" class="right">
                                             <warehouse:message code="default.adjustments.label" default="Adjustments"/>
                                         </th>
                                         <th class="right">
@@ -230,7 +288,7 @@
                                         </th>
                                     </tr>
                                     <tr>
-                                        <th colspan="6" class="right">
+                                        <th colspan="${columnsNumber}" class="right">
                                             <warehouse:message code="default.total.label"/>
                                         </th>
                                         <th class="right">

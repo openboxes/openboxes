@@ -19,10 +19,9 @@ const handleChartClick = (elements) => {
 };
 
 const GraphCard = SortableElement(({
-  cardId, cardTitle, cardType, cardLink, data, options, loadIndicator,
+  cardId, cardTitle, cardType, cardLink, data, options, loadIndicator, filter,
 }) => {
   let graph;
-  let filter = 0;
   let label = 'Last';
   if (cardType === 'line') {
     graph = (
@@ -32,11 +31,9 @@ const GraphCard = SortableElement(({
         onElementsClick={elements => handleChartClick(elements)}
       />
     );
-    filter = 1;
     label = 'Next';
   } else if (cardType === 'bar') {
     graph = <Bar data={data} options={options} />;
-    filter = 1;
   } else if (cardType === 'doughnut') {
     graph = <Doughnut data={data} options={options} />;
   } else if (cardType === 'horizontalBar') {
@@ -51,7 +48,6 @@ const GraphCard = SortableElement(({
     graph = <NumbersRAG data={data} options={options} />;
   } else if (cardType === 'table') {
     graph = <TableCard data={data} />;
-    filter = 1;
   } else if (cardType === 'numberTable') {
     graph = <NumbersTableCard data={data} options={options} />;
   } else if (cardType === 'loading') {

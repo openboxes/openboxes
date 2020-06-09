@@ -613,12 +613,24 @@ class OrderService {
                         throw new IllegalArgumentException("Missing unit of measure.")
                     }
 
+                    if (quantity == "") {
+                        throw new IllegalArgumentException("Missing quantity.")
+                    }
                     Integer parsedQty = Integer.valueOf(quantity)
                     if (parsedQty <= 0) {
                         throw new IllegalArgumentException("Wrong quantity value: ${parsedQty}.")
                     }
 
-                    BigDecimal parsedUnitPrice = new BigDecimal(unitPrice).setScale(2, RoundingMode.FLOOR)
+                    if (unitPrice == "") {
+                        throw new IllegalArgumentException("Missing unit price.")
+                    }
+                    BigDecimal parsedUnitPrice
+                    try {
+                        parsedUnitPrice = new BigDecimal(unitPrice).setScale(2, RoundingMode.FLOOR)
+                    } catch (Exception e) {
+                        log.error("Unable to parse unit price: " + e.message, e)
+                        throw new IllegalArgumentException("Could not parse unit price with value: ${unitPrice}.")
+                    }
                     if (parsedUnitPrice < 0) {
                         throw new IllegalArgumentException("Wrong unit price value: ${parsedUnitPrice}.")
                     }

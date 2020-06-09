@@ -11,6 +11,8 @@ import org.pih.warehouse.tablero.IndicatorDatasets
 import org.pih.warehouse.tablero.NumberTableData
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.TransactionEntry
@@ -85,7 +87,7 @@ class IndicatorDataService {
 
         IndicatorData indicatorData = new IndicatorData(datasets, listLabels)
 
-        GraphData graphData = new GraphData(indicatorData, "Expiration summary", "line", "/openboxes/inventory/listExpiringStock")
+        GraphData graphData = new GraphData(indicatorData, "Expiration Summary", "line", "/openboxes/inventory/listExpiringStock")
 
         return graphData
     }
@@ -177,7 +179,7 @@ class IndicatorDataService {
         // queryData gives an array of arrays [[count, destination, month, year], ...] of sent stock
 
         Map listRes = [:]
-        List listLabel = []
+        List listLabel = fillLabels(querySize)
 
         for (item in queryData) {
             // item[0]: item total counted
@@ -201,12 +203,6 @@ class IndicatorDataService {
                     Integer value = item[0]
                     IndicatorDatasets locationDataset = listRes.get(itemLocation.name)
                     locationDataset.data[querySize - i] = value
-                }
-
-                // If the list of labels is incomplete, add the label
-                if (listLabel.size() <= querySize) {
-                    String monthLabel = new java.text.DateFormatSymbols().months[tmpDate.month].substring(0, 3)
-                    listLabel.push(monthLabel)
                 }
             }
         }
@@ -234,7 +230,7 @@ class IndicatorDataService {
                 ['location': location, 'limit': queryLimit])
 
         Map listRes = [:]
-        List listLabel = []
+        List listLabel = fillLabels(querySize)
 
         for (item in queryData) {
             // item[0]: item total counted
@@ -258,12 +254,6 @@ class IndicatorDataService {
                     Integer value = item[0]
                     IndicatorDatasets locationDataset = listRes.get(itemLocation.name)
                     locationDataset.data[querySize - i] = value
-                }
-
-                // If the list of labels is incomplete, add the label
-                if (listLabel.size() <= querySize) {
-                    String monthLabel = new java.text.DateFormatSymbols().months[tmpDate.month].substring(0, 3)
-                    listLabel.push(monthLabel)
                 }
             }
         }
@@ -509,5 +499,129 @@ class IndicatorDataService {
         GraphData productsInventoried = new GraphData(multipleNumbersIndicator, 'Percent of Products Inventoried', 'numbersCustomColors')
 
         return productsInventoried
+    }
+    
+    GraphData getLossCausedByExpiry(Location location, def params) {
+
+        Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
+        Date queryLimit = LocalDate.now().minusMonths(querySize).toDate()
+
+        def valuesRemovedDueToExpiry = Transaction.executeQuery("""
+            select sum(te.inventoryItem.product.pricePerUnit * te.quantity), month(t.transactionDate), year(t.transactionDate)
+            from TransactionEntry te 
+            inner join te.transaction t
+            where t.inventory = :inventory
+            and t.transactionDate > :limit
+            and t.transactionType.id = 4
+            group by month(t.transactionDate), year(t.transactionDate)
+        """,
+                [
+                        'inventory': location.inventory,
+                        'limit'    : queryLimit
+                ]);
+
+        def valuesNotExpiredLastDayOfMonth = InventorySnapshot.executeQuery("""
+            select sum(iis.quantityOnHand * p.pricePerUnit), month(iis.date), year(iis.date)
+            from InventorySnapshot as iis
+            inner join iis.product as p
+            inner join iis.inventoryItem as ii
+            where iis.location = :location
+            and iis.date > :limit
+            and iis.date = LAST_DAY(iis.date)
+            and ii.expirationDate > iis.date
+            group by month(iis.date), year(iis.date)
+        """,
+                [
+                        'location': location,
+                        'limit'   : queryLimit
+                ]);
+
+        def valuesExpiredLastDayOfMonth = InventorySnapshot.executeQuery("""
+            select sum(iis.quantityOnHand * p.pricePerUnit), month(iis.date), year(iis.date)
+            from InventorySnapshot as iis
+            inner join iis.product as p
+            inner join iis.inventoryItem as ii
+            where iis.location = :location
+            and iis.date > :limit
+            and iis.date = LAST_DAY(iis.date)
+            and ii.expirationDate <= iis.date
+            group by month(iis.date), year(iis.date)
+        """,
+                [
+                        'location': location,
+                        'limit'   : queryLimit
+                ]);
+
+        // Filling the labels
+        List listLabels = fillLabels(querySize)
+
+        // Filling the data lists
+        // Each data is an array of [value, month, year]
+        def filledValuesRemovedDueToExpiry = fillData(valuesRemovedDueToExpiry, querySize, 0, 1, 2)
+        def filledValuesNotExpiredLastDayOfMonth = fillData(valuesNotExpiredLastDayOfMonth, querySize, 0, 1, 2)
+        def filledValuesExpiredLastDayOfMonth = fillData(valuesExpiredLastDayOfMonth, querySize, 0, 1, 2)
+
+        // Calculating the percentage
+        List percentage = [];
+        for (int i = 0; i <= querySize; i++) {
+            def sum = filledValuesRemovedDueToExpiry[i] + filledValuesNotExpiredLastDayOfMonth[i] + filledValuesExpiredLastDayOfMonth[i]
+            if (sum == 0) {
+                percentage.push(0)
+            } else {
+                percentage.push(Math.round((filledValuesRemovedDueToExpiry[i] / sum) * 100) / 100)
+            }
+        }
+
+        List<IndicatorDatasets> datasets = [
+                new IndicatorDatasets('Percentage removed due to expiry', percentage, null, 'line'),
+                new IndicatorDatasets('Inventory value removed due to expiry', filledValuesRemovedDueToExpiry, null, 'bar'),
+                new IndicatorDatasets('Inventory value not expired last day of month', filledValuesNotExpiredLastDayOfMonth, null, 'bar'),
+                new IndicatorDatasets('Inventory value expired last day of month', filledValuesExpiredLastDayOfMonth, null, 'bar'),
+        ];
+
+        IndicatorData indicatorData = new IndicatorData(datasets, listLabels);
+
+        GraphData graphData = new GraphData(indicatorData, "Value of Stock Lost to Expiry", "bar");
+
+        return graphData;
+    }
+
+    private List fillLabels(int querySize) {
+        Date today = new Date()
+        today.clearTime()
+
+        List labels = []
+
+        for (int i = querySize; i >= 0; i--) {
+            Date tmpDate = today.clone()
+            tmpDate.set(month: today.month - i, date: 1)
+
+            String monthLabel = new java.text.DateFormatSymbols().months[tmpDate.month].substring(0, 3)
+            String yearLabel = tmpDate.year + 1900
+            labels.push("${monthLabel} ${yearLabel}")
+        }
+
+        return labels
+    }
+
+    private List fillData(List dataList, int querySize, int dataIndex, int monthIndex, int yearIndex) {
+        Date today = new Date()
+        today.clearTime()
+
+        List filledList = [0] * (querySize + 1)
+
+        dataList.each {
+            for (int i = querySize; i >= 0; i--) {
+                Date tmpDate = today.clone()
+                tmpDate.set(month: today.month - i, date: 1)
+
+                // If there is data, update the dataset in the proper position
+                if (tmpDate.month == it[monthIndex] - 1 && tmpDate.year + 1900 == it[yearIndex]) {
+                    filledList[querySize - i] = it[dataIndex]
+                }
+            }
+        }
+
+        return filledList;
     }
 }
