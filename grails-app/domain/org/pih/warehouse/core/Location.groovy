@@ -56,7 +56,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
     Date dateCreated
     Date lastUpdated
 
-    static belongsTo = [parentLocation: Location]
+    static belongsTo = [parentLocation: Location, organization: Organization]
     static hasMany = [locations: Location, supportedActivities: String, employees: User]
 
     static constraints = {

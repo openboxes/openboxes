@@ -19,9 +19,12 @@ class Organization extends Party {
     String code
     String name
     String description
+    Location defaultLocation
 
     Date dateCreated
     Date lastUpdated
+
+    static hasMany = [locations : Location]
 
     Map<IdentifierTypeCode, Integer> sequences
 
@@ -35,8 +38,8 @@ class Organization extends Party {
                 maxSize: ConfigurationHolder.config.openboxes.identifier.organization.maxSize)
         name(nullable: false, maxSize: 255)
         description(nullable: true, maxSize: 255)
+        defaultLocation(nullable: true)
     }
-
 
     String toString() {
         return name

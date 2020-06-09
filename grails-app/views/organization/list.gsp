@@ -15,7 +15,7 @@
             <div class="button-bar">
                 <g:link class="button" action="list">
                     <img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}" />&nbsp;
-                    <warehouse:message code="default.list.label" args="['organization']"/>
+                    <warehouse:message code="default.list.label" args="['organizations']"/>
                 </g:link>
                 <g:link class="button" action="create">
                     <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
@@ -40,6 +40,8 @@
 
                                     <g:sortableColumn property="name" title="${warehouse.message(code: 'organization.name.label', default: 'Name')}" />
 
+                                    <th><g:message code="organization.defaultLocation.label" default="Default Location"/></th>
+
                                     <th><g:message code="roles.label" default="Roles"/></th>
 
                                 </tr>
@@ -53,6 +55,8 @@
                                     <td><g:link action="edit" id="${organizationInstance.id}">${fieldValue(bean: organizationInstance, field: "code")}</g:link></td>
 
                                     <td><g:link action="edit" id="${organizationInstance.id}">${fieldValue(bean: organizationInstance, field: "name")}</g:link></td>
+
+                                    <td>${organizationInstance?.defaultLocation}</td>
 
                                     <td>${organizationInstance.roles.join(",")}</td>
 

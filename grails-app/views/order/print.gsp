@@ -44,6 +44,22 @@
                 <g:displayReportLogo/>
             </div>
         </div>
+        <div class="left">
+            <b>${orderInstance?.destinationParty?.name }</b>
+            <g:if test="${orderInstance?.destinationParty?.defaultLocation?.address}">
+                <br/>
+                ${orderInstance?.destinationParty?.defaultLocation?.address?.address}<br/>
+                <g:if test="${orderInstance?.destinationParty?.defaultLocation?.address?.address2}">
+                    ${orderInstance?.destinationParty?.defaultLocation?.address?.address2}<br/>
+                </g:if>
+                ${orderInstance?.destinationParty?.defaultLocation?.address?.city},
+                ${orderInstance?.destinationParty?.defaultLocation?.address?.stateOrProvince}
+                ${orderInstance?.destinationParty?.defaultLocation?.address?.postalCode}
+                <br/>
+                ${orderInstance?.destinationParty?.defaultLocation?.address?.country}<br/>
+            </g:if>
+
+        </div>
         <div class="right">
             <div class="title">
                 <warehouse:message code="enum.OrderTypeCode.${orderInstance?.orderTypeCode}"/>
@@ -101,9 +117,9 @@
                                             ${orderInstance?.origin?.address?.address2}<br/>
                                         </g:if>
                                         ${orderInstance?.origin?.address?.city},
-                                        ${orderInstance?.origin?.address?.stateOrProvince}<br/>
+                                        ${orderInstance?.origin?.address?.stateOrProvince}
+                                        ${orderInstance?.origin?.address?.postalCode}<br/>
                                         ${orderInstance?.origin?.address?.country}<br/>
-                                        ${orderInstance?.destination?.address?.description}
                                     </g:if>
                                 </td>
                             </tr>

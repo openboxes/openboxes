@@ -420,8 +420,17 @@ class SelectTagLib {
 
     def selectLocation = { attrs, body ->
 
-        ActivityCode activityCode = attrs.activityCode ?: null
-        attrs.from = locationService.getAllLocations().sort { it?.name?.toLowerCase() }
+        // If attrs.from is populated use that by default even if it's empty
+        if (!attrs.containsKey("from")) {
+            ActivityCode activityCode = attrs.activityCode ?: null
+            attrs.from = locationService.getAllLocations().sort { it?.name?.toLowerCase() }
+
+            // use sparingly - this is expensive since it requires multiple database queries
+            if (activityCode) {
+                attrs.from = attrs.from.findAll { it.supports(activityCode) }
+            }
+        }
+
         attrs.optionKey = 'id'
         attrs.groupBy = 'locationType'
         if (attrs.groupBy) {
@@ -430,9 +439,6 @@ class SelectTagLib {
             attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]" }
         }
 
-        if (activityCode) {
-            attrs.from = attrs.from.findAll { it.supports(activityCode) }
-        }
         out << g.select(attrs)
     }
 
