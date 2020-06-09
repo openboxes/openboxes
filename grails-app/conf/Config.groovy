@@ -812,7 +812,7 @@ openboxes {
             defaultLabel = "Inbound"
             subsections = [
                 [
-                    label: ".label",
+                    label: "stockMovement.label",
                     defaultLabel: "Stock Movement",
                     menuItems: [
                         [label: "inbound.create.label", defaultLabel: "Create Inbound Movement", href: "/${appName}/stockMovement/createInbound?direction=INBOUND"],
@@ -821,7 +821,7 @@ openboxes {
                     ]
                 ],
                 [
-                    label: ".label",
+                    label: "purchaseOrders.label",
                     defaultLabel: "Purchase Orders",
                     menuItems: [
                         [label: "order.create.label", defaultLabel: "Create Purchase Order", href: "/${appName}/purchaseOrderWorkflow/index"],
@@ -829,11 +829,11 @@ openboxes {
                     ]
                 ],
                 [
-                    label: ".label",
+                    label: "putAways.label",
                     defaultLabel: "Putaways",
                     menuItems: [
-                        [label: "react.putAway.createPutAway.label", defaultLabel: "Create Putaway", href: ""],
-                        [label: "react.putAway.list.label", defaultLabel: "List Putaways", href: ""]
+                        [label: "react.putAway.createPutAway.label", defaultLabel: "Create Putaway", href: "/${appName}/putAway/index"],
+                        [label: "react.putAway.list.label", defaultLabel: "List Putaways", href: "/${appName}/order/list?orderTypeCode=TRANSFER_ORDER&status=PENDING"]
                     ]
                 ]
             ]
@@ -859,7 +859,7 @@ openboxes {
             defaultLabel = "Reporting"
             subsections = [
                 [
-                    label: "",
+                    label: "report.inventoryReports.label",
                     defaultLabel: "Inventory Reports",
                     menuItems: [
                         [label: "report.inStockReport.label", defaultLabel: "In Stock Report", href: "/${appName}/inventory/listInStock"],
@@ -873,7 +873,7 @@ openboxes {
                     ]
                 ],
                 [
-                    label: "",
+                    label: "report.transactionReports.label",
                     defaultLabel: "Transaction Reports",
                     menuItems: [
                         [label: "report.showTransactionReport.label", defaultLabel: "Transaction Report", href: "/${appName}/report/showTransactionReport"],
@@ -881,8 +881,8 @@ openboxes {
                     ]
                 ],
                 [
-                    label: "",
-                    defaultLabel: "",
+                    label: "dataExports.label",
+                    defaultLabel: "Data Exports",
                     menuItems: [
                         [label: "product.exportAsCsv.label", defaultLabel: "Export products", href: "/${appName}/product/exportAsCsv"],
                         [label: "export.productSources.label", defaultLabel: "Export product sources", href: "/${appName}/productSupplier/export"],

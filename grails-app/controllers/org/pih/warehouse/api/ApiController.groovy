@@ -72,7 +72,6 @@ class ApiController {
         boolean isUserAdmin = userService.isUserAdmin(session?.user)
         def locale = localizationService.getCurrentLocale()
         def supportedActivities = location.supportedActivities ?: location.locationType.supportedActivities
-        def menuConfig = grailsApplication.config.openboxes.megamenu
         boolean isImpersonated = session.impersonateUserId ? true : false
         def buildNumber = grailsApplication.metadata.'app.revisionNumber'
         def buildDate = grailsApplication.metadata.'app.buildDate'
@@ -94,7 +93,6 @@ class ApiController {
                         isSuperuser          : isSuperuser,
                         isUserAdmin          : isUserAdmin,
                         supportedActivities  : supportedActivities,
-                        menuConfig           : menuConfig,
                         isImpersonated       : isImpersonated,
                         grailsVersion        : grailsVersion,
                         appVersion           : appVersion,
