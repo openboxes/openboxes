@@ -21,4 +21,13 @@
   <changeSet id="1580848680306-6" author="jmiranda" runAlways="true" failOnError="false">
     <sqlFile path="views/product-inventory-expiry-view.sql"/>
   </changeSet>
+  <changeSet id="1580848680306-7" author="jmiranda" runAlways="true" failOnError="false">
+    <sqlFile path="views/on-order-order-item-summary.sql"/>
+  </changeSet>
+  <changeSet id="1580848680306-8" author="jmiranda" runAlways="true" failOnError="false">
+    <sqlFile path="views/on-order-shipment-item-summary.sql"/>
+  </changeSet>
+  <changeSet id="1580848680306-9" author="jmiranda" runAlways="true" failOnError="false">
+    <sqlFile path="views/on-order-summary.sql"/>
+  </changeSet>
 </databaseChangeLog>
