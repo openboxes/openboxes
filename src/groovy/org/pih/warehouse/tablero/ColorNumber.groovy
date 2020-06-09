@@ -19,7 +19,7 @@ class ColorNumber implements Serializable {
             case { it >= successCondition }: this.color = 'success'; break;
             case { it >= errorCondition && it < successCondition }: this.color = 'warning'; break;
             case { it < errorCondition }: this.color = 'error'; break;
-            default: this.color = null;
+            default: this.color = 'state6';
         }
     }
 

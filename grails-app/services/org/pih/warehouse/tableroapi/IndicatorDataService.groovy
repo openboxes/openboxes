@@ -447,8 +447,8 @@ class IndicatorDataService {
     }
 
     GraphData getProductsInventoried(Location location) {
-        List query = [3, 6, 9, 12, 0]
-        List listColorNumber = []
+        List monthsCount = [3, 6, 9, 12, 0]
+        List listPercentageNumbers = []
         Map listConditions = [
                 3 : [18, 25],
                 6 : [36, 50],
@@ -464,7 +464,7 @@ class IndicatorDataService {
                         'location': location
                 ])
 
-        query.each {
+        monthsCount.each {
             def subtitle
             def percentage
             def inventoriedProducts
@@ -502,9 +502,9 @@ class IndicatorDataService {
             percentage = Math.round(inventoriedProducts[0] / productInStock[0] * 100)
             ColorNumber colorNumber = new ColorNumber("${percentage}%", subtitle)
             colorNumber.setConditionalColors(listConditions.get(it)[0], listConditions.get(it)[1])
-            listColorNumber.push(colorNumber)
+            listPercentageNumbers.push(colorNumber)
         }
-        MultipleNumbersIndicator multipleNumbersIndicator = new MultipleNumbersIndicator(listColorNumber)
+        MultipleNumbersIndicator multipleNumbersIndicator = new MultipleNumbersIndicator(listPercentageNumbers)
 
         GraphData productsInventoried = new GraphData(multipleNumbersIndicator, 'Percent of Products Inventoried', 'numbersCustomColors')
 
