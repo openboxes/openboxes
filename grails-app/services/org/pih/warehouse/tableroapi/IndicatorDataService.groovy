@@ -449,7 +449,7 @@ class IndicatorDataService {
     GraphData getProductsInventoried(Location location) {
         List monthsCount = [3, 6, 9, 12, 0]
         List listPercentageNumbers = []
-        Map listConditions = [
+        Map listErrorSuccessIntervals = [
                 3 : [18, 25],
                 6 : [36, 50],
                 9 : [54, 75],
@@ -501,7 +501,7 @@ class IndicatorDataService {
 
             percentage = Math.round(inventoriedProducts[0] / productInStock[0] * 100)
             ColorNumber colorNumber = new ColorNumber("${percentage}%", subtitle)
-            colorNumber.setConditionalColors(listConditions.get(it)[0], listConditions.get(it)[1])
+            colorNumber.setConditionalColors(listErrorSuccessIntervals.get(it)[0], listErrorSuccessIntervals.get(it)[1])
             listPercentageNumbers.push(colorNumber)
         }
         MultipleNumbersIndicator multipleNumbersIndicator = new MultipleNumbersIndicator(listPercentageNumbers)
