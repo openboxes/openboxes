@@ -143,11 +143,21 @@
                         <table>
                             <tr>
                                 <td class="top">
+                                    <label><warehouse:message code="purchaseOrder.buyer.label" default="Buyer"/></label>
+                                </td>
+                                <td class="top left">
+                                    <div>
+                                        ${orderInstance?.destinationParty}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="top">
                                     <label><warehouse:message code="order.paymentTerm.label" default="Payment Term"/></label>
                                 </td>
                                 <td class="top left">
                                     <div>
-                                        ${orderInstance?.paymentTerm?.name }
+                                        ${orderInstance?.paymentTerm?.name}
                                     </div>
                                 </td>
                             </tr>
@@ -157,7 +167,7 @@
                                 </td>
                                 <td class="top left">
                                     <div>
-                                        ${orderInstance?.paymentMethodType?.name }
+                                        ${orderInstance?.paymentMethodType?.name}
                                     </div>
                                 </td>
                             </tr>
@@ -176,7 +186,7 @@
                 <tr>
                     <td colspan="5">
                         <div class="list">
-                            <g:set var="status" value="${0 }"/>
+                            <g:set var="status" value="${0}"/>
                             <g:set var="columnsNumber" value="6"/>
                             <table class="order-items">
                                 <thead>
@@ -191,19 +201,19 @@
                                             <warehouse:message code="product.name.label"/>
                                         </th>
                                         <g:if test="${orderInstance.orderItems.any { it.productSupplier?.supplierCode } }">
-                                            <g:set var="columnsNumber" value="${columnsNumber+1}"/>
+                                            <g:set var="columnsNumber" value="${columnsNumber.toInteger() + 1}"/>
                                             <th class="center">
                                                 <warehouse:message code="product.supplierCode.label"/>
                                             </th>
                                         </g:if>
                                         <g:if test="${orderInstance.orderItems.any { it.productSupplier?.manufacturerName } }">
-                                            <g:set var="columnsNumber" value="${columnsNumber+1}"/>
+                                            <g:set var="columnsNumber" value="${columnsNumber.toInteger() + 1}"/>
                                             <th class="center">
                                                 <warehouse:message code="product.manufacturer.label"/>
                                             </th>
                                         </g:if>
                                         <g:if test="${orderInstance.orderItems.any { it.productSupplier?.manufacturerCode } }">
-                                            <g:set var="columnsNumber" value="${columnsNumber+1}"/>
+                                            <g:set var="columnsNumber" value="${columnsNumber.toInteger() + 1}"/>
                                             <th class="center">
                                                 <warehouse:message code="product.manufacturerCode.label"/>
                                             </th>
