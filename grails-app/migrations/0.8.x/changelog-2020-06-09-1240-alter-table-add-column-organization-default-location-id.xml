@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="jmiranda (generated)" id="1591722380153-1">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="party" columnName="default_location_id"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="party">
+      <column name="default_location_id" type="CHAR(38)"/>
+    </addColumn>
+  </changeSet>
+
+  <changeSet author="jmiranda (generated)" id="1591722380153-2">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="FK6581AE6D1DFC6D7"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="default_location_id" baseTableName="party"
+      constraintName="FK6581AE6D1DFC6D7" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="location"/>
+  </changeSet>
+
+
+</databaseChangeLog>

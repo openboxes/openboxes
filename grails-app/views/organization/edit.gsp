@@ -18,16 +18,16 @@
 	            </div>
             </g:hasErrors>
 
-			<div class="button-bar">
-				<g:link class="button" action="list">
-					<img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}" />&nbsp;
-					<warehouse:message code="default.list.label" args="['organization']"/>
-				</g:link>
-				<g:link class="button" action="create">
-					<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
-					<warehouse:message code="default.add.label" args="['organization']"/>
-				</g:link>
-			</div>
+            <div class="button-bar">
+                <g:link class="button" action="list">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}" />&nbsp;
+                    <warehouse:message code="default.list.label" args="[g.message(code:'organizations.label')]"/>
+                </g:link>
+                <g:link class="button" action="create">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
+                    <warehouse:message code="default.add.label" args="[g.message(code:'organization.label')]"/>
+                </g:link>
+            </div>
 
 			<g:form method="post" >
 				<g:hiddenField name="id" value="${organizationInstance?.id}" />
@@ -105,6 +105,20 @@
 
 								</td>
 							</tr>
+							<tr class="prop">
+								<td valign="top" class="name">
+									<label for="defaultLocation"><warehouse:message code="organization.defaultLocation.label" default="Default Location" /></label>
+								</td>
+								<td valign="top" class="value ${hasErrors(bean: organizationInstance, field: 'defaultLocation', 'errors')}">
+									<g:selectLocation name="defaultLocation"
+													  from="${organizationInstance?.locations}"
+													  class="chzn-select-deselect"
+													  value="${organizationInstance?.defaultLocation?.id}"
+													  noSelection="['':'']"
+									/>
+								</td>
+							</tr>
+
 						</tbody>
 						<tfoot>
 							<tr class="prop">
