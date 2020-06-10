@@ -15,11 +15,11 @@
             <div class="button-bar">
                 <g:link class="button" action="list">
                     <img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}" />&nbsp;
-                    <warehouse:message code="default.list.label" args="['organizations']"/>
+                    <warehouse:message code="default.list.label" args="[g.message(code:'organizations.label')]"/>
                 </g:link>
                 <g:link class="button" action="create">
                     <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
-                    <warehouse:message code="default.add.label" args="['organization']"/>
+                    <warehouse:message code="default.add.label" args="[g.message(code:'organization.label')]"/>
                 </g:link>
             </div>
 
