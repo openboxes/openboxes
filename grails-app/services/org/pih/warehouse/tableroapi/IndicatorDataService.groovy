@@ -490,8 +490,9 @@ class IndicatorDataService {
             }
 
             percentage = Math.round(inventoriedProducts[0] / productInStock[0] * 100)
-            ColorNumber colorNumber = new ColorNumber("${percentage}%", subtitle)
+            ColorNumber colorNumber = new ColorNumber(percentage, subtitle)
             colorNumber.setConditionalColors(listErrorSuccessIntervals.get(it)[0], listErrorSuccessIntervals.get(it)[1])
+            colorNumber.value = "${colorNumber.value} %"
             listPercentageNumbers.push(colorNumber)
         }
         MultipleNumbersIndicator multipleNumbersIndicator = new MultipleNumbersIndicator(listPercentageNumbers)
