@@ -530,8 +530,14 @@ openboxes {
                     archived = ['personal', 'warehouse', 'inventory']
                     filter = true
                     stacked = true
-                    datalabel = true
                     order = 9
+                    colors {
+                        datasets {
+                            success = ["Inventory value not expired last day of month"]
+                            warning = ["Inventory value expired last day of month"]
+                            error = ["Inventory value removed due to expiry"]
+                        }
+                    }
                 }
                 productsInventoried {
                     endpoint = "/${appName}/apitablero/getProductsInventoried"
