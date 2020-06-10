@@ -9,6 +9,7 @@
  **/
 
 import grails.util.GrailsUtil
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.IdentifierGeneratorTypeCode
 import org.pih.warehouse.core.ReasonCode
@@ -769,8 +770,7 @@ openboxes {
         }
         analytics {
             enabled = true
-            // TODO: Add adminOnly handling in MegamenuService
-            adminOnly = true
+            requiredRoles = [RoleType.ROLE_ADMIN]
             label = "analytics.label"
             defaultLabel = "Analytics"
             menuItems = [
@@ -784,15 +784,13 @@ openboxes {
             enabled = true
             label = "inventory.label"
             defaultLabel = "Inventory"
-            // TODO: Add supported activity handling in MegamenuService
-            activity = ["MANAGE_INVENTORY"]
+            requiredActivities = [ActivityCode.MANAGE_INVENTORY]
             subsections = [
                 [
                     label: "inventory.browse.label",
                     defaultLabel: "Browse Inventory",
                     menuItems: [
                         [label: "inventory.browse.label", defaultLabel: "Browse Inventory", href: "/${appName}/browse?resetSearch=true"],
-                        [label: "inventory.chemicals.label", defaultLabel: "Chemicals", href: "/${appName}/inventory/browse?subcategoryId=C0000&resetSearch=true&searchPerformed=true&showOutOfStockProducts=on"]
                         // TODO: (Future improvement) Probably further options should be generated dynamicaly (with item count in bracket)...
                     ],
                 ],

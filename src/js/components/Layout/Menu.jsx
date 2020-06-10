@@ -20,10 +20,7 @@ const Menu = ({ menuConfig }) => {
           {section.label}
         </a>
         <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-          <div style={{
-            maxHeight: '60vh', overflow: 'auto', overflowX: 'hidden', display: 'flex',
-          }}
-          >
+          <div className="dropdown-menu-subsections">
             {_.map(section.subsections, (subsection, subsectionKey) => (
               <div className="px-2 py-1" key={subsectionKey}>
                 <span className="subsection-title">{subsection.label}</span>

@@ -9,15 +9,20 @@
  **/
 package org.pih.warehouse.api
 
+import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.User
+
 class MegamenuService {
 
+    def userService
     def grailsApplication
 
     private getMessageTagLib() {
         return grailsApplication.mainContext.getBean('org.pih.warehouse.MessageTagLib')
     }
 
-    Map buildAndTranslateSections(section) {
+    Map buildAndTranslateSections(section, User user, Location location) {
         def label = getMessageTagLib().message(code: section.label, default: section.defaultLabel)
         def translatedSection
         if (section.href) {
@@ -26,61 +31,82 @@ class MegamenuService {
                     href: section.href
             ]
             return translatedSection
-        }
-        if (section.subsections) {
+        } else if (section.subsections) {
             translatedSection = [
                     label: label,
-                    subsections: buildAndTranslateSubsections(section.subsections)
+                    subsections: buildAndTranslateSubsections(section.subsections, user, location)
             ]
             return translatedSection
-        }
-        if (section.menuItems) {
+        } else if (section.menuItems) {
             translatedSection = [
                     label: label,
-                    menuItems: buildAndTranslateMenuItems(section.menuItems)
+                    menuItems: buildAndTranslateMenuItems(section.menuItems, user, location)
             ]
             return translatedSection
         }
         return [:]
     }
 
-    List buildAndTranslateSubsections(List subsections) {
+    List buildAndTranslateSubsections(List subsections, User user, Location location) {
         def builtSubsections = []
         subsections.each {
+            List roles = it.requiredRoles ?: []
+            if (roles && !userService.hasAnyRoles(user, roles)) {
+                return
+            }
+            ActivityCode[] activities = it.requiredActivities ?: []
+            if (activities && !location.supportsAny(activities)) {
+                return
+            }
             def label = getMessageTagLib().message(code: it.label, default: it.defaultLabel)
             builtSubsections << [
                 label: label,
-                menuItems: buildAndTranslateMenuItems(it.menuItems)
+                menuItems: buildAndTranslateMenuItems(it.menuItems, user, location)
             ]
         }
         return builtSubsections
     }
 
-    List buildAndTranslateMenuItems(List menuItems) {
+    List buildAndTranslateMenuItems(List menuItems, User user, Location location) {
         def builtMenuItems = []
         menuItems.each {
+            List roles = it.requiredRoles ?: []
+            if (roles && !userService.hasAnyRoles(user, roles)) {
+                return
+            }
+            ActivityCode[] activities = it.requiredActivities ?: []
+            if (activities && !location.supportsAny(activities)) {
+                return
+            }
             def label = getMessageTagLib().message(code: it.label, default: it.defaultLabel)
             if (it.href) {
                 builtMenuItems << [
                     label: label,
                     href: it.href
                 ]
-            }
-            if (it.subsections) {
+            } else if (it.subsections) {
                 builtMenuItems << [
                     label: label,
-                    subsections: buildAndTranslateSubsections(it.subsections)
+                    subsections: buildAndTranslateSubsections(it.subsections, user, location)
                 ]
             }
         }
         return builtMenuItems
     }
 
-    List buildAndTranslateMenu(Map menuConfig) {
+    ArrayList buildAndTranslateMenu(Map menuConfig, User user, Location location) {
         def parsedMenuConfig = []
         menuConfig.each { key, value ->
+            List roles = value.requiredRoles ?: []
+            if (roles && !userService.hasAnyRoles(user, roles)) {
+                return
+            }
+            ActivityCode[] activities = value.requiredActivities ?: []
+            if (activities && !location.supportsAny(activities)) {
+                return
+            }
             if (value.enabled) {
-                parsedMenuConfig << buildAndTranslateSections(value)
+                parsedMenuConfig << buildAndTranslateSections(value, user, location)
             }
         }
         return parsedMenuConfig
