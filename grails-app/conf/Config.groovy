@@ -389,7 +389,7 @@ openboxes {
         configurations {
             personal = "My Dashboard"
             warehouse = "Warehouse Management"
-            inventory= "Inventory Management"
+            inventory = "Inventory Management"
         }
         endpoints {
             number {
