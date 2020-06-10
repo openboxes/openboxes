@@ -574,9 +574,9 @@ class IndicatorDataService {
 
         List<IndicatorDatasets> datasets = [
                 new IndicatorDatasets('Percentage removed due to expiry', percentage, null, 'line'),
-                new IndicatorDatasets('Inventory value removed due to expiry', filledValuesRemovedDueToExpiry, null, 'bar'),
                 new IndicatorDatasets('Inventory value not expired last day of month', filledValuesNotExpiredLastDayOfMonth, null, 'bar'),
                 new IndicatorDatasets('Inventory value expired last day of month', filledValuesExpiredLastDayOfMonth, null, 'bar'),
+                new IndicatorDatasets('Inventory value removed due to expiry', filledValuesRemovedDueToExpiry, null, 'bar'),
         ];
 
         IndicatorData indicatorData = new IndicatorData(datasets, listLabels);

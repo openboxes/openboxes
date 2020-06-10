@@ -213,7 +213,7 @@ function loadGraphOptions(payload) {
     let sumDatasets = 0;
     if (!payload.config.stacked || payload.data.datasets.length === 1) {
       sumDatasets = payload.data.datasets[0].data;
-    } else {
+    } else if (payload.data.datasets.length) {
       sumDatasets = payload.data.datasets.reduce((sum, value) => {
         if (sum.data) {
           return sum.data.map((s, index) => s + value.data[index]);
