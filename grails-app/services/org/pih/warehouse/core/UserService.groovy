@@ -374,6 +374,21 @@ class UserService {
                 config["endpoints"][type][key]["archived"].remove("personal")
             }
         }
+
+        // Fix to ensure each order appears only once
+        for (int order = 1; order <= config["endpoints"][type].size(); order++) {
+            List indicators = config["endpoints"][type].findAll { key, value ->
+                value.order == order
+            }.collect { key, value ->
+                key
+            }
+
+            if (indicators.size() > 1) {
+                for (int i = 1; i < indicators.size(); i++) {
+                    config["endpoints"][type][indicators[i]]["order"] = order + i
+                }
+            }
+        }
     }
 
     def updateDashboardConfig(User user, Object config) {
