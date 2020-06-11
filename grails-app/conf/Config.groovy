@@ -391,54 +391,55 @@ openboxes {
             personal = "My Dashboard"
             warehouse = "Warehouse Management"
             inventory = "Inventory Management"
+            transaction = "Transaction History"
         }
         endpoints {
             number {
                 inProgressPutaways {
                     endpoint = "/${appName}/apitablero/getInProgressPutaways"
-                    archived = ['inventory']
+                    archived = ['inventory', 'transaction']
                     order = 4
                 }
                 inventoryByLotAndBin {
                     endpoint = "/${appName}/apitablero/getInventoryByLotAndBin"
-                    archived = ['inventory']
+                    archived = ['inventory', 'transaction']
                     order = 1
                 }
                 inProgressShipments {
                     endpoint = "/${appName}/apitablero/getInProgressShipments"
-                    archived = ['inventory']
+                    archived = ['inventory', 'transaction']
                     order = 3
                 }
                 receivingBin {
                     endpoint = "/${appName}/apitablero/getReceivingBin"
-                    archived = []
+                    archived = ['transaction']
                     order = 2
                 }
                 itemsInventoried {
                     endpoint = "/${appName}/apitablero/getItemsInventoried"
-                    archived = ['personal', 'warehouse']
+                    archived = ['personal', 'warehouse', 'transaction']
                     order = 5
                 }
                 defaultBin {
                     endpoint = "/${appName}/apitablero/getDefaultBin"
-                    archived = ['personal', 'warehouse']
+                    archived = ['personal', 'warehouse', 'transaction']
                     order = 6
                 }
                 negativeInventory {
                     endpoint = "/${appName}/apitablero/getProductWithNegativeInventory"
-                    archived = ['personal', 'warehouse']
+                    archived = ['personal', 'warehouse', 'transaction']
                     order = 7
                 }
                 expiredStock {
                     endpoint = "/${appName}/apitablero/getExpiredProductsInStock"
-                    archived = ['personal', 'warehouse']
+                    archived = ['personal', 'warehouse', 'transaction']
                     order = 8
                 }
             }
             graph {
                 inventorySummary {
                     endpoint = "/${appName}/apitablero/getInventorySummary"
-                    archived = ['inventory']
+                    archived = ['inventory', 'transaction']
                     filter = false
                     datalabel = true
                     order = 1
@@ -452,7 +453,7 @@ openboxes {
                 }
                 expirationSummary {
                     endpoint = "/${appName}/apitablero/getExpirationSummary"
-                    archived = ['inventory']
+                    archived = ['inventory', 'transaction']
                     filter = true
                     order = 2
                     colors {
@@ -466,7 +467,7 @@ openboxes {
                 }
                 incomingStock {
                     endpoint = "/${appName}/apitablero/getIncomingStock"
-                    archived = ['inventory']
+                    archived = ['inventory', 'transaction']
                     filter = false
                     archived = []
                     order = 3
@@ -480,7 +481,7 @@ openboxes {
                 }
                 outgoingStock {
                     endpoint = "/${appName}/apitablero/getOutgoingStock"
-                    archived = ['inventory']
+                    archived = ['inventory', 'transaction']
                     filter = false
                     order = 4
                     colors {
@@ -501,13 +502,13 @@ openboxes {
                 }
                 discrepancy {
                     endpoint = "/${appName}/apitablero/getDiscrepancy"
-                    archived = ['inventory']
+                    archived = ['inventory', 'transaction']
                     filter = true
                     order = 6
                 }
                 delayedShipments {
                     endpoint = "/${appName}/apitablero/getDelayedShipments"
-                    archived = []
+                    archived = ['transaction']
                     filter = false
                     order = 5
                     colors {
