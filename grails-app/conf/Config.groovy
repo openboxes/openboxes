@@ -1026,26 +1026,40 @@ openboxes {
 
         orders {
             enabled = false
+            label = "orders.label"
+            defaultLabel = "Orders"
         }
         stockRequest {
             enabled = false
+            label = "stockRequests.label"
+            defaultLabel = "Stock Requests"
         }
         stockMovement {
             enabled = false
+            label = "stockMovements.label"
+            defaultLabel = "Stock Movements"
         }
         putaways {
             enabled = false
+            label = "putaways.label"
+            defaultLabel = "Putaways"
         }
 
         // deprecated megamenu configuration
         requisitions {
             enabled = false
+            label = "requisitions.label"
+            defaultLabel = "Requisitions"
         }
         shipping {
             enabled = false
+            label = "shipping.label"
+            defaultLabel = "Shipping"
         }
         receiving {
             enabled = false
+            label = "receiving.label"
+            defaultLabel = "Receiving"
         }
     }
 }
