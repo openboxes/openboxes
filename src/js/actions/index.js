@@ -6,6 +6,7 @@ import {
   FETCH_USERS,
   FETCH_REASONCODES,
   FETCH_SESSION_INFO,
+  FETCH_MENU_CONFIG,
   CHANGE_CURRENT_LOCATION,
   TRANSLATIONS_FETCHED,
   CHANGE_CURRENT_LOCALE,
@@ -60,6 +61,16 @@ export function fetchSessionInfo() {
 
   return {
     type: FETCH_SESSION_INFO,
+    payload: request,
+  };
+}
+
+export function fetchMenuConfig() {
+  const url = '/openboxes/api/getMenuConfig';
+  const request = apiClient.get(url);
+
+  return {
+    type: FETCH_MENU_CONFIG,
     payload: request,
   };
 }

@@ -1,6 +1,12 @@
 import _ from 'lodash';
 
-import { FETCH_SESSION_INFO, CHANGE_CURRENT_LOCATION, TRANSLATIONS_FETCHED, CHANGE_CURRENT_LOCALE } from '../actions/types';
+import {
+  FETCH_SESSION_INFO,
+  CHANGE_CURRENT_LOCATION,
+  TRANSLATIONS_FETCHED,
+  CHANGE_CURRENT_LOCALE,
+  FETCH_MENU_CONFIG,
+} from '../actions/types';
 
 const initialState = {
   currentLocation: {
@@ -53,7 +59,6 @@ export default function (state = initialState, action) {
         isSuperuser: _.get(action, 'payload.data.data.isSuperuser'),
         isUserAdmin: _.get(action, 'payload.data.data.isUserAdmin'),
         supportedActivities: _.get(action, 'payload.data.data.supportedActivities'),
-        menuConfig: _.get(action, 'payload.data.data.menuConfig'),
         activeLanguage: _.get(action, 'payload.data.data.activeLanguage'),
         user: _.get(action, 'payload.data.data.user'),
         isImpersonated: _.get(action, 'payload.data.data.isImpersonated'),
@@ -68,6 +73,11 @@ export default function (state = initialState, action) {
         timezone: _.get(action, 'payload.data.data.timezone'),
         minimumExpirationDate: _.get(action, 'payload.data.data.minimumExpirationDate'),
         isPaginated: _.get(action, 'payload.data.data.isPaginated'),
+      };
+    case FETCH_MENU_CONFIG:
+      return {
+        ...state,
+        menuConfig: _.get(action, 'payload.data.data.menuConfig'),
       };
     case CHANGE_CURRENT_LOCATION:
       return { ...state, currentLocation: action.payload };
