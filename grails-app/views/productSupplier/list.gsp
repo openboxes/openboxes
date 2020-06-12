@@ -92,11 +92,13 @@
 
                                 <td>${fieldValue(bean: productSupplierInstance, field: "preferenceTypeCode")}</td>
 
-                                <td>${fieldValue(bean: productSupplierInstance?.defaultProductPackage, field: "unitOfMeasure")}</td>
+                                <td>
+                                    ${fieldValue(bean: productSupplierInstance?.defaultProductPackage?.uom, field: "code")}/${fieldValue(bean: productSupplierInstance?.defaultProductPackage, field: "quantity")}
+                                </td>
 
                                 <td>
                                     <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: [g.message(code:'default.none.label')])}">
-                                        ${g.formatNumber(number: productSupplierInstance?.defaultProductPackage?.unitPrice?:0.0)}
+                                        ${g.formatNumber(number: productSupplierInstance?.defaultProductPackage?.price?:0.0)}
                                     </g:hasRoleFinance>
                                 </td>
 
