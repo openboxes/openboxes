@@ -10,13 +10,16 @@
 package org.pih.warehouse.data
 
 import org.pih.warehouse.core.Organization
+import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.product.ProductSupplier
 import org.springframework.validation.BeanPropertyBindingResult
 
 class ProductSupplierDataService {
 
+    def uomService
     def identifierService
 
     Boolean validate(ImportDataCommand command) {
@@ -29,12 +32,14 @@ class ProductSupplierDataService {
             def supplierName = params.supplierName
             def manufacturerId = params.manufacturerId
             def manufacturerName = params.manufacturerName
+            def uomCode = params.defaultProductPackageUomCode
 
             if (id && !ProductSupplier.exists(id)) {
                 command.errors.reject("Row ${index + 1}: Product supplier with ID ${id} does not exist")
             }
 
-            if (!Product.findByProductCode(productCode)) {
+            def product = Product.findByProductCode(productCode)
+            if (productCode && !product) {
                 command.errors.reject("Row ${index + 1}: Product with productCode ${productCode} does not exist")
             }
 
@@ -46,6 +51,12 @@ class ProductSupplierDataService {
             def manufacturer = Organization.get(manufacturerId)
             if (manufacturer?.name != manufacturerName) {
                 command.errors.reject("Row ${index + 1}: Organization ${manufacturer?.name} with id ${manufacturer?.id} does not match ${manufacturerName}")
+            }
+
+            log.info("uomCode " + uomCode)
+            def unitOfMeasure = UnitOfMeasure.findByCode(uomCode)
+            if (uomCode && !unitOfMeasure) {
+                command.errors.reject("Row ${index + 1}: Unit of measure ${uomCode} does not exist")
             }
 
             def productSupplier = createOrUpdate(params)
@@ -71,6 +82,10 @@ class ProductSupplierDataService {
     def createOrUpdate(Map params) {
 
         log.info("params: ${params}")
+        Product product = Product.findByProductCode(params["productCode"])
+        UnitOfMeasure unitOfMeasure = UnitOfMeasure.findByCode(params.defaultProductPackageUomCode)
+        BigDecimal price = new BigDecimal(params.defaultProductPackagePrice)
+        Integer quantity = params.defaultProductPackageQuantity as Integer
 
         ProductSupplier productSupplier = ProductSupplier.findByIdOrCode(params["id"], params["code"])
         if (!productSupplier) {
@@ -80,9 +95,25 @@ class ProductSupplierDataService {
         }
         productSupplier.name = params["productName"]
         productSupplier.productCode = params["legacyProductCode"]
-        productSupplier.product = Product.findByProductCode(params["productCode"])
+        productSupplier.product = product
         productSupplier.supplier = Organization.get(params["supplierId"])
         productSupplier.manufacturer = Organization.get(params["manufacturerId"])
+
+        ProductPackage defaultProductPackage =
+                productSupplier.productPackages.find { it.uom == unitOfMeasure && it.quantity == quantity}
+
+        if (!defaultProductPackage) {
+            defaultProductPackage = new ProductPackage()
+            defaultProductPackage.name = "${unitOfMeasure.code}/${quantity}"
+            defaultProductPackage.description = "${unitOfMeasure.name} of ${quantity}"
+            defaultProductPackage.product = productSupplier.product
+            defaultProductPackage.uom = unitOfMeasure
+            defaultProductPackage.quantity = quantity
+            defaultProductPackage.price = price
+            productSupplier.addToProductPackages(defaultProductPackage)
+        } else {
+            defaultProductPackage.price = price
+        }
 
         if (!productSupplier.code) {
             String prefix = productSupplier?.product?.productCode

@@ -68,7 +68,7 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
 
     static transients = ["defaultProductPackage"]
 
-    static hasMany = [productPackages:ProductPackage]
+    static hasMany = [productPackages: ProductPackage]
 
     static mapping = {
         description type: 'text'
@@ -115,23 +115,26 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
     }
 
     static PROPERTIES = [
-            "id"                     : "id",
-            "code"                   : "code",
-            "productCode"            : "product.productCode",
-            "legacyProductCode"      : "productCode",
-            "productName"            : "name",
-            "description"            : "description",
-            "supplierId"             : "supplier.id",
-            "supplierName"           : "supplier.name",
-            "supplierCode"           : "supplierCode",
-            "supplierProductName"    : "supplierName",
-            "manufacturerId"         : "manufacturer.id",
-            "manufacturerName"       : "manufacturer.name",
-            "manufacturerCode"       : "manufacturerCode",
-            "manufacturerProductName": "manufacturerName",
-            "standardLeadTimeDays"   : "standardLeadTimeDays",
-            "preferenceTypeCode"     : "preferenceTypeCode",
-            "ratingTypeCode"         : "ratingTypeCode",
-            "comments"               : "comments"
+            "id"                           : "id",
+            "code"                         : "code",
+            "productCode"                  : "product.productCode",
+            "legacyProductCode"            : "productCode",
+            "productName"                  : "name",
+            "description"                  : "description",
+            "supplierId"                   : "supplier.id",
+            "supplierName"                 : "supplier.name",
+            "supplierCode"                 : "supplierCode",
+            "supplierProductName"          : "supplierName",
+            "manufacturerId"               : "manufacturer.id",
+            "manufacturerName"             : "manufacturer.name",
+            "manufacturerCode"             : "manufacturerCode",
+            "manufacturerProductName"      : "manufacturerName",
+            "defaultProductPackageUomCode" : "defaultProductPackage.uom.code",
+            "defaultProductPackageQuantity": "defaultProductPackage.quantity",
+            "defaultProductPackagePrice"   : "defaultProductPackage.price",
+            "standardLeadTimeDays"         : "standardLeadTimeDays",
+            "preferenceTypeCode"           : "preferenceTypeCode",
+            "ratingTypeCode"               : "ratingTypeCode",
+            "comments"                     : "comments"
     ]
 }
