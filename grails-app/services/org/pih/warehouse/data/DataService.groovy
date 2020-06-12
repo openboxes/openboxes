@@ -576,7 +576,7 @@ class DataService {
         return sw.toString()
     }
 
-    String exportInventoryLevels(List inventoryLevels) {
+    String exportInventoryLevels(Collection inventoryLevels) {
         def sw = new StringWriter()
         def csv = new CSVWriter(sw, {
             "Product Code" { it.productCode }
