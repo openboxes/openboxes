@@ -21,6 +21,7 @@ import org.pih.warehouse.importer.PersonExcelImporter
 import org.pih.warehouse.importer.ProductCatalogExcelImporter
 import org.pih.warehouse.importer.ProductCatalogItemExcelImporter
 import org.pih.warehouse.importer.ProductExcelImporter
+import org.pih.warehouse.importer.ProductPackageExcelImporter
 import org.pih.warehouse.importer.ProductSupplierExcelImporter
 import org.pih.warehouse.importer.TagExcelImporter
 import org.pih.warehouse.importer.UserExcelImporter
@@ -163,6 +164,9 @@ class BatchController {
                         case "productSupplier":
                             dataImporter = new ProductSupplierExcelImporter(command?.filename)
                             break
+                        case "productPackage":
+                            dataImporter = new ProductPackageExcelImporter(command?.filename)
+                            break
                         case "tag":
                             dataImporter = new TagExcelImporter(command?.filename)
                             break
@@ -208,11 +212,13 @@ class BatchController {
                 // If there are no errors and the user requests to import the data, we should execute the import
                 if (!command.hasErrors() && params.import) {
                     println "Data is about to be imported ..."
-                    dataImporter.importData(command)
+                    try {
+                        dataImporter.importData(command)
+                    } catch (Exception e) {
+                        command.errors.reject(e.message)
+                    }
 
-                    println "Finished importing data"
                     if (!command.errors.hasErrors()) {
-                        println "No errors"
                         flash.message = "${warehouse.message(code: 'inventoryItem.importSuccess.message', args: [localFile.getAbsolutePath()])}"
                         redirect(action: "importData")
                         return

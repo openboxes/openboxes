@@ -79,5 +79,16 @@ class ProductPackage implements Comparable<ProductPackage>, Serializable {
         return other.quantity <=> quantity
     }
 
+    static PROPERTIES = [
+            "id"                 : "id",
+            "productCode"        : "product.productCode",
+            "productSupplierCode": "productSupplier.code",
+            "name"               : "name",
+            "description"        : "description",
+            "gtin"               : "gtin",
+            "uomCode"            : "uom.code",
+            "quantity"           : "quantity",
+            "price"              : "price"
+    ]
 
 }

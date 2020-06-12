@@ -89,6 +89,15 @@
                     </div>
                     <div>
                         <label>
+                            <g:radio name="type" value="productPackage" checked="${params.type=='productPackage'}"/>
+                            ${g.message(code:'productPackages.label')}
+                        </label>
+                        <g:link controller="batch" action="downloadExcel" params="[type:'ProductPackage']">
+                            <warehouse:message code="default.download.label" args="[g.message(code:'default.template.label')]"/>
+                        </g:link>
+                    </div>
+                    <div>
+                        <label>
                             <g:radio name="type" value="tag" checked="${params.type=='tag'}"/>
                             <warehouse:message code="import.tag.label" default="Tag"/>
                         </label>
