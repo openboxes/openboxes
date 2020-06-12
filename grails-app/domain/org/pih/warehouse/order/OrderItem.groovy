@@ -91,7 +91,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     static constraints = {
         description(nullable: true)
         category(nullable: true)
-        product(nullable: true)
+        product(nullable: false)
         inventoryItem(nullable: true)
         requestedBy(nullable: true)
         quantity(nullable: false, min: 1)
