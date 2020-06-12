@@ -123,7 +123,7 @@
 
             $(".dataTable").dataTable({
                 "bJQueryUI": true,
-                "iDisplayLength": 50,
+                "iDisplayLength": 100,
                 "bScrollInfinite": true,
                 "bScrollCollapse": true,
                 "sScrollY": '50vh'

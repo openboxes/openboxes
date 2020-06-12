@@ -15,7 +15,7 @@
 			</table>
 		</div>
 	</div>
-</div>	
+</div>
 <script>
 
     $(function() {
@@ -27,7 +27,7 @@
         $('#recentActivity').dataTable( {
             "bProcessing": true,
             "sServerMethod": "GET",
-            "iDisplayLength": 25,
+            "iDisplayLength": 100,
             "bSort": false,
             "bSearch": false,
             "bScrollInfinite": true,

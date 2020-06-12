@@ -157,7 +157,7 @@
         $(window).load(function(){
             var options = {
                 "bProcessing": true,
-                "iDisplayLength": 25,
+                "iDisplayLength": 100,
                 "bSearch": false,
                 "bScrollCollapse": true,
                 "bJQueryUI": true,

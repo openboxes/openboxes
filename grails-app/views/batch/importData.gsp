@@ -10,12 +10,12 @@
     </head>
 	<body>
 		<div class="body">
-	
+
 			<g:if test="${flash.message}">
 				<div class="message">
 					${flash.message}
 				</div>
-			</g:if> 
+			</g:if>
 			<g:hasErrors bean="${commandInstance}">
 				<div class="errors">
                     <g:renderErrors bean="${commandInstance}" as="list" />
@@ -140,7 +140,7 @@
                     "sScrollY": 300,
                     "bScrollCollapse": true,
                     "bScrollInfinite": true,
-                    "iDisplayLength": 15,
+                    "iDisplayLength": 100,
                     "bSearch": false
                 });
             });
