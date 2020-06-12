@@ -9,6 +9,10 @@
  **/
 package org.pih.warehouse.core
 
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.product.Product
+import org.springframework.transaction.TransactionStatus
+
 class OrganizationController {
 
     def identifierService
@@ -83,6 +87,30 @@ class OrganizationController {
             redirect(action: "list")
         }
     }
+
+    def delete = {
+        if (Organization.exists(params.id)) {
+            try {
+                Organization.withTransaction { TransactionStatus status ->
+                    Organization organizationInstance = Organization.get(params.id);
+                    if(organizationInstance){
+                        organizationInstance.delete();
+                    }
+                }
+
+                flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'organizationInstance.label', default: 'Organization'), params.id])}"
+                redirect(controller: "organization", action: "list")
+            }
+            catch (org.springframework.dao.DataIntegrityViolationException e) {
+                flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'organizationInstance.label', default: 'Organization'), params.id])} (" + e.message + ")"
+                redirect(action: "edit", id: params.id)
+            }
+        } else {
+            flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'organizationInstance.label', default: 'Organization'), params.id])}"
+            redirect(action: "edit", id: params.id)
+        }
+    }
+
 
     def resetSequence = {
         IdentifierTypeCode identifierTypeCode = params.identifierTypeCode as IdentifierTypeCode
