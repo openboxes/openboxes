@@ -11,11 +11,11 @@ package org.pih.warehouse.inventory
 
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.product.Product
 
 class CycleCountController {
 
     def dataService
-    def reportService
     def inventoryService
 
     def exportAsCsv = {
@@ -26,13 +26,18 @@ class CycleCountController {
         Map additionalColumns = grailsApplication.config.openboxes.cycleCount.additionalColumns
 
         List rows = binLocations.collect { row ->
+
+            // Required in order to avoid lazy initialization exception that occurs because all
+            // of the querying / session work that was done above was executed in worker threads
+            Product product = Product.load(row?.product?.id)
+
             def latestInventoryDate = row?.product?.latestInventoryDate(location.id) ?: row?.product.earliestReceivingDate(location.id)
             Map dataRow = [
                     "Product code"       : StringEscapeUtils.escapeCsv(row?.product?.productCode),
                     "Product name"       : row?.product.name ?: "",
                     "Generic product"    : row?.genericProduct?.name ?: "",
                     "Category"           : StringEscapeUtils.escapeCsv(row?.category?.name ?: ""),
-                    "Formularies"        : row?.product.productCatalogs.join(", ") ?: "",
+                    "Formularies"        : product.productCatalogs.join(", ") ?: "",
                     "Lot number"         : StringEscapeUtils.escapeCsv(row?.inventoryItem.lotNumber ?: ""),
                     "Expiration date"    : row?.inventoryItem.expirationDate ? row?.inventoryItem.expirationDate.format("dd-MMM-yyyy") : "",
                     "ABC classification" : StringEscapeUtils.escapeCsv(row?.product.getAbcClassification(location.id) ?: ""),
