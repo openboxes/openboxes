@@ -23,6 +23,7 @@ import org.joda.time.LocalDate
 class IndicatorDataService {
 
     def dashboardService
+    def dataService
 
     GraphData getExpirationSummaryData(Location location, def params) {
         // querySize = value of the date filter (1 month, 3 months, etc.)
@@ -449,7 +450,8 @@ class IndicatorDataService {
 
         def productInStock = InventorySnapshot.executeQuery("""
             SELECT COUNT(distinct i.product.id) FROM InventorySnapshot i
-            WHERE i.location = :location""",
+            WHERE i.location = :location
+            AND i.quantityOnHand > 0""",
                 [
                         'location': location
                 ])
@@ -461,35 +463,41 @@ class IndicatorDataService {
 
             if (it != 0) {
                 subtitle = "< ${it} months"
-                Date period = LocalDate.now().minusMonths(it).toDate()
+                LocalDate period = LocalDate.now().minusMonths(it)
 
-                inventoriedProducts = TransactionEntry.executeQuery("""
-                    SELECT COUNT(distinct ii.product.id) from TransactionEntry te
-                    INNER JOIN te.inventoryItem ii
-                    INNER JOIN te.transaction t
-                    WHERE t.inventory = :inventory
-                    AND t.transactionType.transactionCode = :transactionCode 
-                    AND t.transactionDate >= :period""",
-                        [
-                                inventory      : location?.inventory,
-                                transactionCode: TransactionCode.PRODUCT_INVENTORY,
-                                period         : period,
-                        ])
+                inventoriedProducts = dataService.executeQuery(
+                    """
+                        SELECT count(distinct p.id)
+                        FROM transaction_entry te
+                        INNER JOIN inventory_item ii ON te.inventory_item_id = ii.id
+                        INNER JOIN product p ON ii.product_id = p.id
+                        INNER JOIN transaction t ON te.transaction_id = t.id
+                        INNER JOIN transaction_type tt ON t.transaction_type_id = tt.id
+                        LEFT JOIN location l ON t.inventory_id = l.inventory_id
+                        WHERE l.id = ${location.id}
+                        AND tt.transaction_code = '${TransactionCode.PRODUCT_INVENTORY}'
+                        AND t.transaction_date >= '${period}';
+                    """
+                )
             } else {
                 subtitle = "Ever"
-                inventoriedProducts = TransactionEntry.executeQuery("""
-                    SELECT COUNT(distinct ii.product.id) from TransactionEntry te
-                    INNER JOIN te.inventoryItem ii
-                    INNER JOIN te.transaction t
-                    WHERE t.inventory = :inventory
-                    AND t.transactionType.transactionCode = :transactionCode""",
-                        [
-                                inventory      : location?.inventory,
-                                transactionCode: TransactionCode.PRODUCT_INVENTORY,
-                        ])
+
+                inventoriedProducts = dataService.executeQuery(
+                        """
+                        SELECT count(distinct p.id)
+                        FROM transaction_entry te
+                        INNER JOIN inventory_item ii ON te.inventory_item_id = ii.id
+                        INNER JOIN product p ON ii.product_id = p.id
+                        INNER JOIN transaction t ON te.transaction_id = t.id
+                        INNER JOIN transaction_type tt ON t.transaction_type_id = tt.id
+                        LEFT JOIN location l ON t.inventory_id = l.inventory_id
+                        WHERE l.id = ${location.id}
+                        AND tt.transaction_code = '${TransactionCode.PRODUCT_INVENTORY}';
+                    """
+                )
             }
 
-            percentage = Math.round(inventoriedProducts[0] / productInStock[0] * 100)
+            percentage = Math.round(inventoriedProducts[0][0] / productInStock[0] * 100)
             ColorNumber colorNumber = new ColorNumber(percentage, subtitle)
             colorNumber.setConditionalColors(listErrorSuccessIntervals.get(it)[0], listErrorSuccessIntervals.get(it)[1])
             colorNumber.value = "${colorNumber.value}%"
@@ -505,21 +513,22 @@ class IndicatorDataService {
     GraphData getLossCausedByExpiry(Location location, def params) {
 
         Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
-        Date queryLimit = LocalDate.now().minusMonths(querySize).toDate()
+        LocalDate queryLimit = LocalDate.now().minusMonths(querySize).withDayOfMonth(1)
 
-        def valuesRemovedDueToExpiry = Transaction.executeQuery("""
-            select sum(te.inventoryItem.product.pricePerUnit * te.quantity), month(t.transactionDate), year(t.transactionDate)
-            from TransactionEntry te 
-            inner join te.transaction t
-            where t.inventory = :inventory
-            and t.transactionDate > :limit
-            and t.transactionType.id = 4
-            group by month(t.transactionDate), year(t.transactionDate)
-        """,
-                [
-                        'inventory': location.inventory,
-                        'limit'    : queryLimit
-                ]);
+        def valuesRemovedDueToExpiry = dataService.executeQuery(
+            """
+                SELECT sum(p.price_per_unit * te.quantity), month(t.transaction_date), year(t.transaction_date)
+                FROM transaction_entry te 
+                INNER JOIN transaction t ON te.transaction_id = t.id
+                INNER JOIN inventory_item ii ON te.inventory_item_id = ii.id
+                INNER JOIN product p ON ii.product_id = p.id
+                LEFT JOIN location l ON t.inventory_id = l.inventory_id
+                WHERE l.id = ${location.id}
+                AND t.transaction_date >= '${queryLimit}'
+                AND t.transaction_type_id = 4
+                GROUP BY month(t.transaction_date), year(t.transaction_date);
+            """
+        )
 
         def valuesNotExpiredLastDayOfMonth = InventorySnapshot.executeQuery("""
             select sum(iis.quantityOnHand * p.pricePerUnit), month(iis.date), year(iis.date)
@@ -527,14 +536,14 @@ class IndicatorDataService {
             inner join iis.product as p
             inner join iis.inventoryItem as ii
             where iis.location = :location
-            and iis.date > :limit
+            and iis.date >= :limit
             and iis.date = LAST_DAY(iis.date)
             and ii.expirationDate > iis.date
             group by month(iis.date), year(iis.date)
         """,
                 [
                         'location': location,
-                        'limit'   : queryLimit
+                        'limit'   : queryLimit.toDate()
                 ]);
 
         def valuesExpiredLastDayOfMonth = InventorySnapshot.executeQuery("""
@@ -543,14 +552,14 @@ class IndicatorDataService {
             inner join iis.product as p
             inner join iis.inventoryItem as ii
             where iis.location = :location
-            and iis.date > :limit
+            and iis.date >= :limit
             and iis.date = LAST_DAY(iis.date)
             and ii.expirationDate <= iis.date
             group by month(iis.date), year(iis.date)
         """,
                 [
                         'location': location,
-                        'limit'   : queryLimit
+                        'limit'   : queryLimit.toDate()
                 ]);
 
         // Filling the labels
