@@ -96,18 +96,21 @@
                         ${shipmentItem?.inventoryItem?.lotNumber}
                     </td>
                     <td class="center expirationDate">
-
-                        <g:if test="${shipmentItem?.inventoryItem?.expirationDate}">
+                        <g:if test="${shipmentItem?.requisitionItem?.expirationDate}">
+                            <span class="expirationDate">
+                                <g:formatDate date="${shipmentItem?.requisitionItem?.expirationDate}" format="d MMM yyyy"/>
+                            </span>
+                        </g:if>
+                        <g:elseif test="${shipmentItem?.inventoryItem?.expirationDate}">
                             <span class="expirationDate">
                                 <g:formatDate date="${shipmentItem?.inventoryItem?.expirationDate}" format="d MMM yyyy"/>
                             </span>
-                        </g:if>
+                        </g:elseif>
                         <g:else>
                             <span class="fade">
                                 ${warehouse.message(code: 'default.never.label')}
                             </span>
                         </g:else>
-
                     </td>
                     <td class="center quantity">
                         <g:formatNumber number="${shipmentItem?.quantity}" format="###,##0" />

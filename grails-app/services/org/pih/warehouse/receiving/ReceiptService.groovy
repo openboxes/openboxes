@@ -143,7 +143,7 @@ class ReceiptService {
             partialReceiptItem.binLocation = binLocation
         }
         partialReceiptItem.lotNumber = shipmentItem.inventoryItem?.lotNumber
-        partialReceiptItem.expirationDate = shipmentItem.inventoryItem?.expirationDate
+        partialReceiptItem.expirationDate = shipmentItem.requisitionItem?.expirationDate ?: shipmentItem.inventoryItem?.expirationDate
         partialReceiptItem.quantityShipped = shipmentItem?.quantity ?: 0
 
         return partialReceiptItem
