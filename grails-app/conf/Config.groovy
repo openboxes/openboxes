@@ -815,7 +815,7 @@ openboxes {
                     label: "inventory.browse.label",
                     defaultLabel: "Browse Inventory",
                     menuItems: [
-                        [label: "inventory.browse.label", defaultLabel: "Browse Inventory", href: "/${appName}/browse?resetSearch=true"],
+                        [label: "inventory.browse.label", defaultLabel: "Browse Inventory", href: "/${appName}/inventory/browse?resetSearch=true"],
                         // TODO: (Future improvement) Probably further options should be generated dynamicaly (with item count in bracket)...
                     ],
                 ],
