@@ -27,13 +27,16 @@ import org.pih.warehouse.product.CategoryEditor
 import org.pih.warehouse.product.ProductCatalog
 import org.springframework.beans.PropertyEditorRegistrar
 import org.springframework.beans.PropertyEditorRegistry
-import org.springframework.beans.propertyeditors.CustomDateEditor
 
 import java.text.SimpleDateFormat
 
 class CustomPropertyEditorRegistrar implements PropertyEditorRegistrar {
+
+    def grailsApplication
+
     void registerCustomEditors(PropertyEditorRegistry registry) {
-        registry.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("MM/dd/yyyy"), true))
+        registry.registerCustomEditor(Date.class,
+                new CustomDateEditor(grailsApplication.config.grails.databinding.dateFormats, true))
         registry.registerCustomEditor(Location.class, new LocationEditor())
         registry.registerCustomEditor(Person.class, new PersonEditor())
         registry.registerCustomEditor(User.class, new UserEditor())

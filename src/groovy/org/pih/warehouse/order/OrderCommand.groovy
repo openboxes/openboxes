@@ -19,6 +19,9 @@ import org.pih.warehouse.shipping.ShipmentType
 
 class OrderCommand implements Serializable {
 
+    Date statusStartDate
+    Date statusEndDate
+
     Order order
     Person recipient
     Date shippedOn
@@ -70,6 +73,8 @@ class OrderCommand implements Serializable {
         origin(nullable: true)
         destination(nullable: true)
         dateOrdered(nullable: true)
+        statusStartDate(nullable: true)
+        statusEndDate(nullable: true)
         orderedBy(nullable: true)
     }
 

@@ -39,6 +39,8 @@ class OrderController {
 
     def list = { OrderCommand command ->
 
+        log.info "Command " + command.statusStartDate
+
         // Parse date parameters
         Date statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
         Date statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null

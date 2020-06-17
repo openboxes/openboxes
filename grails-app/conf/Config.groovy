@@ -54,6 +54,19 @@ grails.exceptionresolver.params.exclude = ['password', 'passwordConfirm']
 //    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
 // }
 
+// Grails date formats
+grails.databinding.dateFormats = [
+        "MM/dd/yyyy",
+        "MM/dd/yyyy HH:mm:ss",
+        "MM/dd/yyyy HH:mm:ss z",
+        "dd/MM/yyyy",
+        "dd/MM/yyyy HH:mm:ss",
+        "yyyy-MM-dd HH:mm:ss.S",
+        "yyyy-MM-dd'T'hh:mm:ss'Z'",
+        "yyyy-MM-dd HH:mm:ss.S z",
+        "yyyy-MM-dd'T'HH:mm:ssX"
+]
+
 // Default mail settings
 grails {
     mail {

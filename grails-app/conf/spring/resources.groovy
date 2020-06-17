@@ -13,7 +13,9 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
 
 beans = {
 
-    customPropertyEditorRegistrar(util.CustomPropertyEditorRegistrar)
+    customPropertyEditorRegistrar(util.CustomPropertyEditorRegistrar) {
+        grailsApplication = ref('grailsApplication')
+    }
 
     /**
      * c3P0 pooled data source that allows 'DB keepalive' queries
