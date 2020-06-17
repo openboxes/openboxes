@@ -541,6 +541,19 @@ openboxes {
                         }
                     }
                 }
+                productsInventoried {
+                    endpoint = "/${appName}/apitablero/getProductsInventoried"
+                    archived = ['personal', 'warehouse', 'transaction']
+                    filter = false
+                    order = 10
+                    colors {
+                        datasets {
+                            state6 = ["first"]
+                            state7 = ["second"]
+                            state8 = ["third"]
+                        }
+                    }
+                }
             }
         }
     }
