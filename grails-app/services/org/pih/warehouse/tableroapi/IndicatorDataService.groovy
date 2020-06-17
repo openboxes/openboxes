@@ -474,7 +474,7 @@ class IndicatorDataService {
                         INNER JOIN transaction t ON te.transaction_id = t.id
                         INNER JOIN transaction_type tt ON t.transaction_type_id = tt.id
                         LEFT JOIN location l ON t.inventory_id = l.inventory_id
-                        WHERE l.id = ${location.id}
+                        WHERE l.id = '${location.id}'
                         AND tt.transaction_code = '${TransactionCode.PRODUCT_INVENTORY}'
                         AND t.transaction_date >= '${period}';
                     """
@@ -491,7 +491,7 @@ class IndicatorDataService {
                         INNER JOIN transaction t ON te.transaction_id = t.id
                         INNER JOIN transaction_type tt ON t.transaction_type_id = tt.id
                         LEFT JOIN location l ON t.inventory_id = l.inventory_id
-                        WHERE l.id = ${location.id}
+                        WHERE l.id = '${location.id}'
                         AND tt.transaction_code = '${TransactionCode.PRODUCT_INVENTORY}';
                     """
                 )
@@ -509,7 +509,7 @@ class IndicatorDataService {
 
         return productsInventoried
     }
-    
+
     GraphData getLossCausedByExpiry(Location location, def params) {
 
         Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
@@ -523,7 +523,7 @@ class IndicatorDataService {
                 INNER JOIN inventory_item ii ON te.inventory_item_id = ii.id
                 INNER JOIN product p ON ii.product_id = p.id
                 LEFT JOIN location l ON t.inventory_id = l.inventory_id
-                WHERE l.id = ${location.id}
+                WHERE l.id = '${location.id}'
                 AND t.transaction_date >= '${queryLimit}'
                 AND t.transaction_type_id = 4
                 GROUP BY month(t.transaction_date), year(t.transaction_date);
