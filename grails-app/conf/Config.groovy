@@ -860,7 +860,7 @@ openboxes {
                     label: "purchaseOrders.label",
                     defaultLabel: "Purchase Orders",
                     menuItems: [
-                        [label: "order.create.label", defaultLabel: "Create Purchase Order", href: "/${appName}/purchaseOrderWorkflow/index"],
+                        [label: "order.createPurchase.label", defaultLabel: "Create Purchase Order", href: "/${appName}/purchaseOrderWorkflow/index"],
                         [label: "order.listPurchase.label", defaultLabel: "List Purchase Orders", href: "/${appName}/order/list?orderTypeCode=PURCHASE_ORDER"]
                     ]
                 ],
@@ -1039,7 +1039,7 @@ openboxes {
                     label: "default.other.label",
                     defaultLabel: "Other",
                     menuItems: [
-                        [label: "containerTypes.label", defaultLabel: "Container Types", href: "${appName}/containerType/list"],
+                        [label: "containerTypes.label", defaultLabel: "Container Types", href: "/${appName}/containerType/list"],
                         [label: "documents.label", defaultLabel: "Documents", href: "/${appName}/document/list"],
                         [label: "documentTypes.label", defaultLabel: "Document Types", href: "/${appName}/documentType/list"],
                         [label: "eventTypes.label", defaultLabel: "Event Types", href: "/${appName}/eventType/list"],
