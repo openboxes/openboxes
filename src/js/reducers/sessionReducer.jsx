@@ -48,6 +48,7 @@ const initialState = {
   timezone: '',
   minimumExpirationDate: '',
   isPaginated: false,
+  logoLabel: '',
 };
 
 export default function (state = initialState, action) {
@@ -73,6 +74,7 @@ export default function (state = initialState, action) {
         timezone: _.get(action, 'payload.data.data.timezone'),
         minimumExpirationDate: _.get(action, 'payload.data.data.minimumExpirationDate'),
         isPaginated: _.get(action, 'payload.data.data.isPaginated'),
+        logoLabel: _.get(action, 'payload.data.data.logoLabel'),
       };
     case FETCH_MENU_CONFIG:
       return {

@@ -88,6 +88,7 @@ class ApiController {
         def tablero = grailsApplication.config.openboxes.tablero
         DateFormat dateFormat = new SimpleDateFormat("MM/DD/YYYY");
         String minimumExpirationDate = dateFormat.format(grailsApplication.config.openboxes.expirationDate.minValue)
+        def logoLabel = grailsApplication.config.openboxes.logo.label
         render([
                 data: [
                         user                 : user,
@@ -109,6 +110,7 @@ class ApiController {
                         minimumExpirationDate: minimumExpirationDate,
                         activeLanguage       : locale.language,
                         isPaginated          : isPaginated,
+                        logoLabel            : logoLabel,
                 ],
         ] as JSON)
     }

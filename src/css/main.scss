@@ -766,5 +766,17 @@ div.crossed-out .table-inner-row:before {
 ----------------------------*/
 
 .logo-header {
-  height: 40px;
+  height: 60px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  span {
+    background-color: red;
+    color: white;
+    font-size: 2em;
+    font-weight: bold;
+    border-radius: 5px;
+    padding: 0px 5px;
+  }
+  
 }
