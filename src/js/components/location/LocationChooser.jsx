@@ -19,6 +19,7 @@ class LocationChooser extends Component {
 
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
+    Modal.setAppElement('#root');
   }
 
   componentDidMount() {
