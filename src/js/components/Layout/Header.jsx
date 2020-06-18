@@ -39,7 +39,7 @@ const Header = ({ username, isImpersonated, currentLocationId }) => (
         href={dashboard.link}
         className="navbar-brand brand-name"
       >
-        <img className="logoHeader" alt="Openboxes" src={`/openboxes/location/viewLogo/${currentLocationId}`} onError={(e) => { e.target.onerror = null; e.target.src = 'https://openboxes.com/img/logo_30.png'; }} />
+        <img className="logo-header" alt="Openboxes" src={`/openboxes/location/viewLogo/${currentLocationId}`} onError={(e) => { e.target.onerror = null; e.target.src = 'https://openboxes.com/img/logo_30.png'; }} />
 
       </a>
       <div className="d-flex flex-wrap">
