@@ -371,7 +371,7 @@ class SendMovementPage extends Component {
         this.setState({
           values: {
             ...this.state.values,
-            tableItems: _.uniqBy(_.concat(this.state.values.tableItems, tableItemsData), 'shipmentItemId'),
+            tableItems: _.uniqBy(_.concat(this.state.values.tableItems, tableItemsData), 'id'),
           },
         });
       });
