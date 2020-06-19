@@ -927,7 +927,7 @@ openboxes {
                         [label: "export.requisitions.label", defaultLabel: "Export requisitions", href: "/${appName}/requisition/export"],
                         [label: "export.requisitionItems.label", defaultLabel: "Export requisition items", href: "/${appName}/requisitionItem/listCanceled"],
                         [label: "export.binLocations.label", defaultLabel: "Export bin locations", href: "/${appName}/report/exportBinLocation?downloadFormat=csv"],
-                        [label: "export.productDemand.label", defaultLabel: "Export product demand", href: "/${appName}/report/exportdemandReport?downloadFormat=csv"]
+                        [label: "export.productDemand.label", defaultLabel: "Export product demand", href: "/${appName}/report/exportDemandReport?downloadFormat=csv"]
                     ]
                 ]
             ]
