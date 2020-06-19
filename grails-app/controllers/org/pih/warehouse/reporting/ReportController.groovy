@@ -11,6 +11,7 @@ package org.pih.warehouse.reporting
 
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
+import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.api.StockMovement
@@ -18,6 +19,7 @@ import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.report.ChecklistReportCommand
 import org.pih.warehouse.report.InventoryReportCommand
 import org.pih.warehouse.report.MultiLocationInventoryReportCommand
@@ -28,6 +30,7 @@ import util.ReportUtil
 
 class ReportController {
 
+    def dataSource
     def dataService
     def documentService
     def inventoryService
@@ -474,6 +477,49 @@ class ReportController {
                             shipmentNumber  : isOrderItem ? '' : it.shipment.shipmentNumber,
                             shipDate  : isOrderItem ? '' : it.shipment.expectedShippingDate?.format("MM/dd/yyyy"),
                             shipmentType  : isOrderItem ? '' : it.shipment.shipmentType.name
+                    ]
+                }
+
+                response.setHeader("Content-disposition", "attachment; filename=\"Detailed-Order-Report-${new Date().format("MM/dd/yyyy")}.csv\"")
+                render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
+            }
+        } else if(params.downloadAction == "downloadSummaryOrderReport") {
+            def location = Location.get(session.warehouse.id)
+            String query = """
+            select oos.product_code as productCode, oos.name as productName, oos.quantity_ordered_not_shipped as qtyOrderedNotShipped,
+                   oos.quantity_shipped_not_received as qtyShippedNotReceived, ps.quantity_on_hand as qtyOnHand
+            from on_order_summary oos
+            left outer join product_snapshot ps on ps.product_code = oos.product_code and ps.location_id = oos.destination_id
+            where destination_id = :locationId
+            """
+            Sql sql = new Sql(dataSource)
+            def items = sql.rows(query,  [locationId: location.id])
+
+            if (items) {
+
+                def sw = new StringWriter()
+                def csv = new CSVWriter(sw, {
+                    "Code" { it.productCode }
+                    "Product" { it.productName }
+                    "Quantity Ordered Not Shipped" { it.qtyOrderedNotShipped }
+                    "Quantity Shipped Not Received" { it.qtyShippedNotReceived }
+                    "Total On Order" { it.totalOnOrder }
+                    "Total On Hand" { it.totalOnHand }
+                    "Total On Hand and On Order" { it.totalOnHandAndOnOrder }
+                })
+
+                items.sort { it[0] }.each {
+                    def qtyOnHand = it.qtyOnHand ? it.qtyOnHand.toInteger() : 0
+                    def qtyOrderedNotShipped = it.qtyOrderedNotShipped ? it.qtyOrderedNotShipped.toInteger() : 0
+                    def qtyShippedNotReceived = it.qtyShippedNotReceived ? it.qtyShippedNotReceived : 0
+                    csv << [
+                            productCode  : it.productCode,
+                            productName  : it.productName,
+                            qtyOrderedNotShipped : qtyOrderedNotShipped ?: '',
+                            qtyShippedNotReceived : qtyShippedNotReceived ?: '',
+                            totalOnOrder         : qtyOrderedNotShipped + qtyShippedNotReceived,
+                            totalOnHand          : qtyOnHand,
+                            totalOnHandAndOnOrder: qtyOrderedNotShipped + qtyShippedNotReceived + qtyOnHand,
                     ]
                 }
 

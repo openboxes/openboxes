@@ -24,10 +24,50 @@
                     <div class="filters">
                         <div class="buttons">
                             <span class="action-menu" style="margin-left: 15px">
-                                <button class="download-btn" data-download-action="downloadOrderReport">
-                                    <img src="${resource(dir: 'images/icons/silk', file: 'page_white_excel.png')}" />
-                                    <g:message code="default.download.label" args="[g.message(code: 'default.report.label', default: 'Report')]"/>
+                                <button class="action-btn button">
+                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'play_green.png')}" />
+                                    <g:message code="report.runReport.label"/>
+                                    <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
                                 </button>
+                                <div class="actions">
+                                    <div class="action-menu-item">
+                                        <a href="#" class="run-btn" data-run-action="summaryReport">
+                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'play_green.png')}" />
+                                            <g:message code="default.run.label"
+                                                       args="[g.message(code: 'default.detailedOrderReport.label', default: 'Summary On Hand and On Order')]"/>
+                                        </a>
+                                    </div>
+                                    <div class="action-menu-item">
+                                        <a href="#" class="run-btn" data-run-action="detailedReport">
+                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'play_green.png')}" />
+                                            <g:message code="default.run.label"
+                                                       args="[g.message(code: 'default.detailedOrderReport.label', default: 'Detailed Order Report')]"/>
+                                        </a>
+                                    </div>
+                                </div>
+                            </span>
+                            <span class="action-menu" style="margin-left: 15px">
+                                <button class="action-btn button">
+                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_excel.png')}" />&nbsp;
+                                    ${warehouse.message(code: 'default.button.download.label')}
+                                    <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
+                                </button>
+                                <div class="actions">
+                                    <div class="action-menu-item">
+                                        <a href="#" class="download-btn" data-download-action="downloadSummaryOrderReport">
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'page_white_excel.png')}" />
+                                            <g:message code="default.download.label"
+                                                       args="[g.message(code: 'default.detailedOrderReport.label', default: 'Summary On Hand and On Order')]"/>
+                                        </a>
+                                    </div>
+                                    <div class="action-menu-item">
+                                        <a href="#" class="download-btn" data-download-action="downloadOrderReport">
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'page_white_excel.png')}" />
+                                            <g:message code="default.download.label"
+                                                       args="[g.message(code: 'default.summaryOnHandAndOnOrder.label', default: 'Detailed Order Report')]"/>
+                                        </a>
+                                    </div>
+                                </div>
                             </span>
                         </div>
                     </div>
@@ -42,25 +82,36 @@
             </g:hasErrors>
             <div class="box">
                 <h2 class="middle">
-                    <g:message code="report.binLocationReport.label" default="Order Report"/>
+                    <g:message code="report.orderReport.label" default="Order Report"/>
                 </h2>
                 <div class="dialog">
                     <table id="orderReportTable">
                         <thead>
                             <tr class="prop">
-                                <th class="center"><g:message code="product.productCode.label"/></th>
-                                <th class="center"><g:message code="product.label"/></th>
-                                <th class="center"><g:message code="order.qtyOrderedNotShipped.label" default="Qty Ordered Not Shipped"/></th>
-                                <th class="center"><g:message code="order.qtyShippedNotReceived.label" default="Qty Shipped Not Received"/></th>
-                                <th class="center"><g:message code="order.purchaseOrderNumber.label" default="PO #"/></th>
-                                <th class="center"><g:message code="order.purchaseOrderDescription.label" default="PO Description"/></th>
-                                <th class="center"><g:message code="productSupplier.supplierOrganization.label" default="Supplier Organization"/></th>
-                                <th class="center"><g:message code="productSupplier.supplierLocation.label" default="Supplier Location"/></th>
-                                <th class="center"><g:message code="productSupplier.supplierLocationGroup.label" default="Supplier Location Group"/></th>
-                                <th class="center"><g:message code="orderItem.estimatedGoodsReadyDate.label" default="Estimated Goods Ready Date"/></th>
-                                <th class="center"><g:message code="shipping.shipmentNumber.label"/></th>
-                                <th class="center"><g:message code="shipping.shipDate.label"/></th>
-                                <th class="center"><g:message code="shipping.shipmentType.label"/></th>
+                                <g:if test="${params?.report == 'summaryReport'}">
+                                    <th class="center"><g:message code="product.productCode.label"/></th>
+                                    <th class="center"><g:message code="product.label"/></th>
+                                    <th class="center"><g:message code="product.qtyOrderedNotShipped.label" default="Qty Ordered Not Shipped"/></th>
+                                    <th class="center"><g:message code="product.qtyShippedNotReceived.label" default="Qty Shipped Not Received"/></th>
+                                    <th class="center"><g:message code="product.totalOnOrder.label" default="Total On Order"/></th>
+                                    <th class="center"><g:message code="product.totalOnHand.label" default="Total On Hand"/></th>
+                                    <th class="center"><g:message code="product.totalOnHandAndOnOrder.label" default="Total On Hand and On Order"/></th>
+                                </g:if>
+                                <g:else>
+                                    <th class="center"><g:message code="product.productCode.label"/></th>
+                                    <th class="center"><g:message code="product.label"/></th>
+                                    <th class="center"><g:message code="product.qtyOrderedNotShipped.label" default="Qty Ordered Not Shipped"/></th>
+                                    <th class="center"><g:message code="product.qtyShippedNotReceived.label" default="Qty Shipped Not Received"/></th>
+                                    <th class="center"><g:message code="order.purchaseOrderNumber.label" default="PO #"/></th>
+                                    <th class="center"><g:message code="order.purchaseOrderDescription.label" default="PO Description"/></th>
+                                    <th class="center"><g:message code="productSupplier.supplierOrganization.label" default="Supplier Organization"/></th>
+                                    <th class="center"><g:message code="productSupplier.supplierLocation.label" default="Supplier Location"/></th>
+                                    <th class="center"><g:message code="productSupplier.supplierLocationGroup.label" default="Supplier Location Group"/></th>
+                                    <th class="center"><g:message code="orderItem.estimatedGoodsReadyDate.label" default="Estimated Goods Ready Date"/></th>
+                                    <th class="center"><g:message code="shipping.shipmentNumber.label"/></th>
+                                    <th class="center"><g:message code="shipping.shipDate.label"/></th>
+                                    <th class="center"><g:message code="shipping.shipmentType.label"/></th>
+                                </g:else>
                             </tr>
                         </thead>
                     </table>
@@ -82,10 +133,12 @@
             "bScrollCollapse": true,
             "bScrollInfinite": true,
             "bJQueryUI": true,
-            "sScrollY": 500,
+            "sScrollY": 450,
             "bAutoWidth": true,
             "sPaginationType": "full_numbers",
-            "sAjaxSource": "${request.contextPath}/json/getDetailedOrderReport",
+            "sAjaxSource": ${params.report == 'summaryReport'} ?
+              "${request.contextPath}/json/getSummaryOrderReport" :
+              "${request.contextPath}/json/getDetailedOrderReport",
             "fnServerData": function ( sSource, aoData, fnCallback ) {
                 $.ajax( {
                     "dataType": 'json',
@@ -111,7 +164,17 @@
                 [5, 15, 25, 100, 1000, -1],
                 [5, 15, 25, 100, 1000, "All"]
             ],
-            "aoColumns": [
+            "aoColumns": ${params.report == 'summaryReport'} ?
+              [
+                { "mData": "productCode" },
+                { "mData": "productName", "sWidth": "20%" },
+                { "mData": "qtyOrderedNotShipped", "sClass": "center" },
+                { "mData": "qtyShippedNotReceived", "sClass": "center" },
+                { "mData": "totalOnOrder" },
+                { "mData": "totalOnHand" },
+                { "mData": "totalOnHandAndOnOrder"}
+            ] :
+              [
                 { "mData": "productCode" },
                 { "mData": "productName", "sWidth": "20%" },
                 { "mData": "qtyOrderedNotShipped", "sClass": "center" },
@@ -125,7 +188,8 @@
                 { "mData": "shipmentNumber"},
                 { "mData": "shipDate" },
                 { "mData": "shipmentType" }
-            ],
+              ]
+          ,
             "bUseRendered": false,
             "aaSorting": [[ 0, "asc" ]],
         });
@@ -152,6 +216,20 @@
         var formField = $("<input>").attr({id: "downloadActionInput", "type": "hidden", name: "downloadAction", value: action});
         $("form[name='showOrderReportForm']").append(formField).submit();
         $("#downloadActionInput").remove();
+
+      } finally {
+        $(".loading").hide();
+      }
+    });
+
+    $(".run-btn").click(function(event){
+      event.preventDefault();
+      $(".loading").show();
+      try {
+        var action = $(this).data("run-action");
+        var formField = $("<input>").attr({id: "runActionInput", "type": "hidden", name: "report", value: action});
+        $("form[name='showOrderReportForm']").append(formField).submit();
+        $("#runActionInput").remove();
 
       } finally {
         $(".loading").hide();

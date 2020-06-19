@@ -28,6 +28,11 @@
     <sqlFile path="views/on-order-shipment-item-summary.sql"/>
   </changeSet>
   <changeSet id="1580848680306-9" author="jmiranda" runAlways="true" failOnError="false">
+    <validCheckSum>4089fa1ea68cf49f7bdc1e6d7c2330a5</validCheckSum>
     <sqlFile path="views/on-order-summary.sql"/>
+  </changeSet>
+  <changeSet id="1580848680306-10" author="dhatala" runAlways="true" failOnError="false">
+    <validCheckSum>c9c41a3239c4b5be50dac5cc593e236</validCheckSum>
+    <sqlFile path="views/product-snapshot.sql"/>
   </changeSet>
 </databaseChangeLog>

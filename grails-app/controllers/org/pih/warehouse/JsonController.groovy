@@ -12,6 +12,7 @@ package org.pih.warehouse
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
+import groovy.sql.Sql
 import groovy.time.TimeCategory
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.core.ActivityCode
@@ -25,16 +26,19 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.jobs.CalculateHistoricalQuantityJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.product.ProductSupplier
+import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.pih.warehouse.reporting.Indicator
 import org.pih.warehouse.reporting.TransactionFact
 import org.pih.warehouse.requisition.Requisition
@@ -42,6 +46,8 @@ import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemSortByCode
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.util.LocalizationUtil
 
 import java.text.NumberFormat
@@ -1376,6 +1382,36 @@ class JsonController {
                     shipmentNumber  : isOrderItem ? '' : it.shipment.shipmentNumber,
                     shipDate  : isOrderItem ? '' : it.shipment.expectedShippingDate?.format("MM/dd/yyyy"),
                     shipmentType  : isOrderItem ? '' : it.shipment.shipmentType.name
+            ]
+        }
+        render(["aaData": data] as JSON)
+    }
+
+    def getSummaryOrderReport = {
+        def location = Location.get(session.warehouse.id)
+
+        String query = """
+            select oos.product_code as productCode, oos.name as productName, oos.quantity_ordered_not_shipped as qtyOrderedNotShipped,
+                   oos.quantity_shipped_not_received as qtyShippedNotReceived, ps.quantity_on_hand as qtyOnHand
+            from on_order_summary oos
+            left outer join product_snapshot ps on ps.product_code = oos.product_code and ps.location_id = oos.destination_id
+            where destination_id = :locationId
+            """
+        Sql sql = new Sql(dataSource)
+        def items = sql.rows(query,  [locationId: location.id])
+
+        def data = items.collect {
+            def qtyOnHand = it.qtyOnHand ? it.qtyOnHand.toInteger() : 0
+            def qtyOrderedNotShipped = it.qtyOrderedNotShipped ? it.qtyOrderedNotShipped.toInteger() : 0
+            def qtyShippedNotReceived = it.qtyShippedNotReceived ? it.qtyShippedNotReceived : 0
+            [
+                    productCode  : it.productCode,
+                    productName  : it.productName,
+                    qtyOrderedNotShipped : qtyOrderedNotShipped ?: '',
+                    qtyShippedNotReceived : qtyShippedNotReceived ?: '',
+                    totalOnOrder         : qtyOrderedNotShipped + qtyShippedNotReceived,
+                    totalOnHand          : qtyOnHand,
+                    totalOnHandAndOnOrder: qtyOrderedNotShipped + qtyShippedNotReceived + qtyOnHand,
             ]
         }
         render(["aaData": data] as JSON)
