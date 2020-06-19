@@ -19,7 +19,9 @@ function logoutImpersonatedUser() {
     });
 }
 
-const Header = ({ username, isImpersonated }) => (
+const Header = ({
+  username, isImpersonated, currentLocationId, logoLabel,
+}) => (
   <div className="w-100">
     {isImpersonated ?
       <div className="d-flex notice">
@@ -35,12 +37,15 @@ const Header = ({ username, isImpersonated }) => (
         </div>
       </div> : null}
     <div className="d-flex align-items-center justify-content-between flex-wrap">
-      <a
-        href={dashboard.link}
-        className="navbar-brand brand-name"
-      >
-        Openboxes
-      </a>
+      <div className="logo-header">
+        <a
+          href={dashboard.link}
+          className="navbar-brand brand-name"
+        >
+          <img alt="Openboxes" src={`/openboxes/location/viewLogo/${currentLocationId}`} onError={(e) => { e.target.onerror = null; e.target.src = 'https://openboxes.com/img/logo_30.png'; }} />
+        </a>
+        <span>{logoLabel} </span>
+      </div>
       <div className="d-flex flex-wrap">
         <GlobalSearch />
         <LocationChooser />
@@ -52,6 +57,8 @@ const Header = ({ username, isImpersonated }) => (
 const mapStateToProps = state => ({
   username: state.session.user.username,
   isImpersonated: state.session.isImpersonated,
+  currentLocationId: state.session.currentLocation.id,
+  logoLabel: state.session.logoLabel,
 });
 
 export default connect(mapStateToProps)(Header);
@@ -61,4 +68,8 @@ Header.propTypes = {
   username: PropTypes.string.isRequired,
   /** Indicator if active user is impersonated */
   isImpersonated: PropTypes.bool.isRequired,
+  /** Id of the current location */
+  currentLocationId: PropTypes.string.isRequired,
+  /** Id of the current location */
+  logoLabel: PropTypes.string.isRequired,
 };

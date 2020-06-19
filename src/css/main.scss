@@ -761,3 +761,22 @@ div.crossed-out .table-inner-row:before {
   border-bottom: 1px solid $gray-gamma;
   border-radius: 5px 5px 0 0;
 }
+
+/* LOGIN MODAL
+----------------------------*/
+
+.logo-header {
+  height: 60px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  span {
+    background-color: red;
+    color: white;
+    font-size: 2em;
+    font-weight: bold;
+    border-radius: 5px;
+    padding: 0px 5px;
+  }
+  
+}
