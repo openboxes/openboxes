@@ -434,8 +434,8 @@ class ReportController {
 
     }
 
-    def showOrderReport = {
-        if (params.downloadAction == "downloadOrderReport") {
+    def showOnOrderReport = {
+        if (params.downloadAction == "downloadOnOrderReport") {
             def location = Location.get(session.warehouse.id)
             def items = orderService.getPendingInboundOrderItems(location)
             items += shipmentService.getPendingInboundShipmentItems(location)
@@ -483,19 +483,10 @@ class ReportController {
                 response.setHeader("Content-disposition", "attachment; filename=\"Detailed-Order-Report-${new Date().format("MM/dd/yyyy")}.csv\"")
                 render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
             }
-        } else if(params.downloadAction == "downloadSummaryOrderReport") {
+        } else if(params.downloadAction == "downloadSummaryOnOrderReport") {
             def location = Location.get(session.warehouse.id)
-            String query = """
-            select oos.product_code as productCode, oos.name as productName, oos.quantity_ordered_not_shipped as qtyOrderedNotShipped,
-                   oos.quantity_shipped_not_received as qtyShippedNotReceived, ps.quantity_on_hand as qtyOnHand
-            from on_order_summary oos
-            left outer join product_snapshot ps on ps.product_code = oos.product_code and ps.location_id = oos.destination_id
-            where destination_id = :locationId
-            """
-            Sql sql = new Sql(dataSource)
-            def items = sql.rows(query,  [locationId: location.id])
-
-            if (items) {
+            def data = reportService.getOnOrderSummary(location)
+            if (data) {
 
                 def sw = new StringWriter()
                 def csv = new CSVWriter(sw, {
@@ -508,21 +499,8 @@ class ReportController {
                     "Total On Hand and On Order" { it.totalOnHandAndOnOrder }
                 })
 
-                items.sort { it[0] }.each {
-                    def qtyOnHand = it.qtyOnHand ? it.qtyOnHand.toInteger() : 0
-                    def qtyOrderedNotShipped = it.qtyOrderedNotShipped ? it.qtyOrderedNotShipped.toInteger() : 0
-                    def qtyShippedNotReceived = it.qtyShippedNotReceived ? it.qtyShippedNotReceived : 0
-                    csv << [
-                            productCode  : it.productCode,
-                            productName  : it.productName,
-                            qtyOrderedNotShipped : qtyOrderedNotShipped ?: '',
-                            qtyShippedNotReceived : qtyShippedNotReceived ?: '',
-                            totalOnOrder         : qtyOrderedNotShipped + qtyShippedNotReceived,
-                            totalOnHand          : qtyOnHand,
-                            totalOnHandAndOnOrder: qtyOrderedNotShipped + qtyShippedNotReceived + qtyOnHand,
-                    ]
-                }
-
+                data = data.sort { it.productCode }
+                csv.writeAll(data)
                 response.setHeader("Content-disposition", "attachment; filename=\"Detailed-Order-Report-${new Date().format("MM/dd/yyyy")}.csv\"")
                 render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
             }

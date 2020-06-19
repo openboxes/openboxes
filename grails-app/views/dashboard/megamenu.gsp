@@ -357,8 +357,8 @@
                         </g:link>
                     </div>
                     <div class="mm-menu-item">
-                        <g:link controller="report" action="showOrderReport">
-                            <warehouse:message code="report.orderReport.label" default="Order Report"/>
+                        <g:link controller="report" action="showOnOrderReport">
+                            <warehouse:message code="report.onOrderreport.label" default="On Order Report"/>
                         </g:link>
                     </div>
                 </div>

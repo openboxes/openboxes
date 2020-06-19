@@ -54,6 +54,10 @@ class DataService {
         return new Sql(dataSource).rows(query)
     }
 
+    List executeQuery(String query, Map params) {
+        return new Sql(dataSource).rows(query, params)
+    }
+
     void executeStatements(List statementList) {
         Sql sql = new Sql(dataSource)
         sql.withTransaction {

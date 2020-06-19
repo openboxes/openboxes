@@ -1390,30 +1390,8 @@ class JsonController {
     def getSummaryOrderReport = {
         def location = Location.get(session.warehouse.id)
 
-        String query = """
-            select oos.product_code as productCode, oos.name as productName, oos.quantity_ordered_not_shipped as qtyOrderedNotShipped,
-                   oos.quantity_shipped_not_received as qtyShippedNotReceived, ps.quantity_on_hand as qtyOnHand
-            from on_order_summary oos
-            left outer join product_snapshot ps on ps.product_code = oos.product_code and ps.location_id = oos.destination_id
-            where destination_id = :locationId
-            """
-        Sql sql = new Sql(dataSource)
-        def items = sql.rows(query,  [locationId: location.id])
+        def data = reportService.getOnOrderSummary(location)
 
-        def data = items.collect {
-            def qtyOnHand = it.qtyOnHand ? it.qtyOnHand.toInteger() : 0
-            def qtyOrderedNotShipped = it.qtyOrderedNotShipped ? it.qtyOrderedNotShipped.toInteger() : 0
-            def qtyShippedNotReceived = it.qtyShippedNotReceived ? it.qtyShippedNotReceived : 0
-            [
-                    productCode  : it.productCode,
-                    productName  : it.productName,
-                    qtyOrderedNotShipped : qtyOrderedNotShipped ?: '',
-                    qtyShippedNotReceived : qtyShippedNotReceived ?: '',
-                    totalOnOrder         : qtyOrderedNotShipped + qtyShippedNotReceived,
-                    totalOnHand          : qtyOnHand,
-                    totalOnHandAndOnOrder: qtyOrderedNotShipped + qtyShippedNotReceived + qtyOnHand,
-            ]
-        }
         render(["aaData": data] as JSON)
     }
 

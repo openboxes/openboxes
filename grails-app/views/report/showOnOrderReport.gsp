@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" defaultCodec="html" %>
 <html>
 <head>
-    <title><g:message code="report.orderReport.label" default="Order Report"/></title>
+    <title><g:message code="report.onOrderReport.label" default="Order Report"/></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="layout" content="custom" />
 </head>
@@ -20,7 +20,7 @@
         <div class="yui-u first">
             <div class="box">
                 <h2 class="middle"><g:message code="default.button.download.label" /></h2>
-                <g:form name="showOrderReportForm" controller="report" action="showOrderReport" method="GET">
+                <g:form name="showOnOrderReportForm" controller="report" action="showOnOrderReport" method="GET">
                     <div class="filters">
                         <div class="buttons">
                             <span class="action-menu" style="margin-left: 15px">
@@ -54,14 +54,14 @@
                                 </button>
                                 <div class="actions">
                                     <div class="action-menu-item">
-                                        <a href="#" class="download-btn" data-download-action="downloadSummaryOrderReport">
+                                        <a href="#" class="download-btn" data-download-action="downloadSummaryOnOrderReport">
                                             <img src="${resource(dir: 'images/icons/silk', file: 'page_white_excel.png')}" />
                                             <g:message code="default.download.label"
                                                        args="[g.message(code: 'default.detailedOrderReport.label', default: 'Summary On Hand and On Order')]"/>
                                         </a>
                                     </div>
                                     <div class="action-menu-item">
-                                        <a href="#" class="download-btn" data-download-action="downloadOrderReport">
+                                        <a href="#" class="download-btn" data-download-action="downloadOnOrderReport">
                                             <img src="${resource(dir: 'images/icons/silk', file: 'page_white_excel.png')}" />
                                             <g:message code="default.download.label"
                                                        args="[g.message(code: 'default.summaryOnHandAndOnOrder.label', default: 'Detailed Order Report')]"/>
@@ -214,7 +214,7 @@
       try {
         var action = $(this).data("download-action");
         var formField = $("<input>").attr({id: "downloadActionInput", "type": "hidden", name: "downloadAction", value: action});
-        $("form[name='showOrderReportForm']").append(formField).submit();
+        $("form[name='showOnOrderReportForm']").append(formField).submit();
         $("#downloadActionInput").remove();
 
       } finally {
@@ -228,7 +228,7 @@
       try {
         var action = $(this).data("run-action");
         var formField = $("<input>").attr({id: "runActionInput", "type": "hidden", name: "report", value: action});
-        $("form[name='showOrderReportForm']").append(formField).submit();
+        $("form[name='showOnOrderReportForm']").append(formField).submit();
         $("#runActionInput").remove();
 
       } finally {
