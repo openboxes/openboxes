@@ -11,6 +11,7 @@ package org.pih.warehouse.reporting
 
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
+import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.api.StockMovement
@@ -18,6 +19,7 @@ import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.report.ChecklistReportCommand
 import org.pih.warehouse.report.InventoryReportCommand
 import org.pih.warehouse.report.MultiLocationInventoryReportCommand
@@ -28,6 +30,7 @@ import util.ReportUtil
 
 class ReportController {
 
+    def dataSource
     def dataService
     def documentService
     def inventoryService
@@ -431,8 +434,8 @@ class ReportController {
 
     }
 
-    def showOrderReport = {
-        if (params.downloadAction == "downloadOrderReport") {
+    def showOnOrderReport = {
+        if (params.downloadAction == "downloadOnOrderReport") {
             def location = Location.get(session.warehouse.id)
             def items = orderService.getPendingInboundOrderItems(location)
             items += shipmentService.getPendingInboundShipmentItems(location)
@@ -477,6 +480,27 @@ class ReportController {
                     ]
                 }
 
+                response.setHeader("Content-disposition", "attachment; filename=\"Detailed-Order-Report-${new Date().format("MM/dd/yyyy")}.csv\"")
+                render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
+            }
+        } else if(params.downloadAction == "downloadSummaryOnOrderReport") {
+            def location = Location.get(session.warehouse.id)
+            def data = reportService.getOnOrderSummary(location)
+            if (data) {
+
+                def sw = new StringWriter()
+                def csv = new CSVWriter(sw, {
+                    "Code" { it.productCode }
+                    "Product" { it.productName }
+                    "Quantity Ordered Not Shipped" { it.qtyOrderedNotShipped }
+                    "Quantity Shipped Not Received" { it.qtyShippedNotReceived }
+                    "Total On Order" { it.totalOnOrder }
+                    "Total On Hand" { it.totalOnHand }
+                    "Total On Hand and On Order" { it.totalOnHandAndOnOrder }
+                })
+
+                data = data.sort { it.productCode }
+                csv.writeAll(data)
                 response.setHeader("Content-disposition", "attachment; filename=\"Detailed-Order-Report-${new Date().format("MM/dd/yyyy")}.csv\"")
                 render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
             }
