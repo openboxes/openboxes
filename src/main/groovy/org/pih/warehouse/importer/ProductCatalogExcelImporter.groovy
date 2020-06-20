@@ -26,7 +26,7 @@ class ProductCatalogExcelImporter extends AbstractExcelImporter {
                     'A': 'id',
                     'B': 'code',
                     'C': 'name',
-                    'C': 'description',
+                    'D': 'description',
 
             ]
     ]
@@ -34,8 +34,8 @@ class ProductCatalogExcelImporter extends AbstractExcelImporter {
     static Map propertyMap = [
             id         : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             code       : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            name       : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             description: ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
-            name       : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null])
     ]
 
 
@@ -50,7 +50,7 @@ class ProductCatalogExcelImporter extends AbstractExcelImporter {
     }
 
 
-    void validateData(ImportDataCommand command) {
+    Boolean validateData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
             ProductCatalog productCatalog = createOrUpdateProductCatalog(params)
             if (!productCatalog.validate()) {
@@ -58,6 +58,7 @@ class ProductCatalogExcelImporter extends AbstractExcelImporter {
                     command.errors.reject("Row ${index + 1}: Product catalog ${productCatalog.name} is invalid: ${error.getFieldError()}")
                 }
             }
+            productCatalog.discard()
         }
 
     }

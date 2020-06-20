@@ -34,6 +34,9 @@ class CategoryDataService {
                     command.errors.reject("Row ${index + 1}: Category ${category.name} is invalid: ${error.getFieldError()}")
                 }
             }
+
+            // Prevent auto flush
+            category.discard()
         }
     }
 
@@ -48,12 +51,12 @@ class CategoryDataService {
     }
 
     Category createOrUpdateCategory(Map params) {
-        Category category = Category.findByIdOrName(params.id, params.name)
+        Category category = Category.read(params.id, params.name)
         if (!category) {
             category = new Category()
         }
         category.name = params.name
-        if (params.parentCategoryId) {
+        if (params.parentCategoryId && category?.parentCategory?.id != params.parentCategoryId) {
             category.parentCategory = Category.get(params.parentCategoryId)
         }
         return category
