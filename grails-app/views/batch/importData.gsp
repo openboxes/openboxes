@@ -27,99 +27,100 @@
                 <g:form controller="batch" action="importData" method="POST">
                     <input name="location.id" type="hidden" value="${session.warehouse.id }"/>
                     <input name="importType" type="hidden" value="${params.importType }"/>
+                    <input name="importNow" type="hidden" value="${Boolean.TRUE }"/>
 
-                    <div class="box">
-                        <h2><warehouse:message code="default.import.label" args="[warehouse.message(code:'default.properties.label', default:'properties')]"/></h2>
-                        <table>
-                            <tr class="prop">
-                                <td class="name">
-                                    <label><warehouse:message code="location.label"/></label>
-                                </td>
-                                <td class="value">
-                                    ${commandInstance?.location}
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td class="name">
-                                    <label><warehouse:message code="default.type.label"/></label>
-                                </td>
-                                <td class="value">
-                                    ${commandInstance?.importType}
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td class="name">
-                                    <label><warehouse:message code="import.filename.label" default="Filename"/></label>
-                                </td>
-                                <td class="value">
-                                    ${commandInstance?.filename}
-                                </td>
-                            </tr>
-                            <g:if test="${commandInstance?.date}">
-                                <tr class="prop">
-                                    <td class="name">
-                                        <label><warehouse:message code="default.date.label"/></label>
-                                    </td>
-                                    <td class="value">
-                                        <g:jqueryDatePicker id="date" name="date" value="${commandInstance?.date}" format="MM/dd/yyyy" size="20"/>
-                                    </td>
-                                </tr>
-                            </g:if>
-                        </table>
-                    </div>
+                    <div class="yui-gf">
+                        <div class="yui-u first">
 
-                    <g:if test="${commandInstance?.data}">
-                        <div class="box">
-                            <h2>${g.message(code:'default.data.label')}</h2>
-                            <table id="dataTable">
-                                <thead>
-                                    <tr>
-                                        <g:each var="column" in="${commandInstance?.columnMap?.columnMap }" status="i">
-                                            <th>${column?.value}</th>
-                                        </g:each>
+                            <div class="box">
+                                <h2><warehouse:message code="default.import.label" args="[warehouse.message(code:'default.properties.label', default:'properties')]"/></h2>
+                                <table>
+                                    <tr class="prop">
+                                        <td class="name">
+                                            <label><warehouse:message code="location.label"/></label>
+                                        </td>
+                                        <td class="value">
+                                            ${commandInstance?.location}
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                <g:each var="row" in="${commandInstance?.data}" status="status">
-                                    <tr class="${status%2?'even':'odd' }">
-                                        <g:each var="column" in="${commandInstance?.columnMap?.columnMap }">
-                                            <td>${row[column.value] }</td>
-                                        </g:each>
-                                        <g:each var="prompt" in="${row?.prompts }">
-                                            <td class="center">
-                                                <select name="${prompt.key }">
-                                                    <g:each var="value" in="${prompt.value }">
-                                                        <option value="${value.id }">${value.name }</option>
-                                                    </g:each>
-                                                </select>
+                                    <tr class="prop">
+                                        <td class="name">
+                                            <label><warehouse:message code="default.type.label"/></label>
+                                        </td>
+                                        <td class="value">
+                                            ${commandInstance?.importType}
+                                        </td>
+                                    </tr>
+                                    <tr class="prop">
+                                        <td class="name">
+                                            <label><warehouse:message code="import.filename.label" default="Filename"/></label>
+                                        </td>
+                                        <td class="value">
+                                            ${commandInstance?.filename}
+                                        </td>
+                                    </tr>
+                                    <g:if test="${commandInstance?.date}">
+                                        <tr class="prop">
+                                            <td class="name">
+                                                <label><warehouse:message code="default.date.label"/></label>
                                             </td>
-                                        </g:each>
-                                    </tr>
-                                </g:each>
-                                </tbody>
-
-                            </table>
+                                            <td class="value">
+                                                <g:jqueryDatePicker id="date" name="date" value="${commandInstance?.date}" format="MM/dd/yyyy" size="20"/>
+                                            </td>
+                                        </tr>
+                                    </g:if>
+                                </table>
+                            </div>
                         </div>
-                    </g:if>
-
-                        <div class="buttons">
-                            <g:if test="${!commandInstance?.hasErrors()}">
-                                <button type="submit" name="import" value="true" class="button">
-                                    <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}"/>&nbsp;
-                                ${warehouse.message(code: 'default.button.finish.label')}
-                                </button>
+                        <div class="yui-u">
+                            <g:if test="${commandInstance?.data}">
+                                <div class="box">
+                                    <h2>${g.message(code:'default.data.label')}</h2>
+                                    <table id="dataTable">
+                                        <thead>
+                                            <tr>
+                                                <g:each var="column" in="${commandInstance?.columnMap?.columnMap }" status="i">
+                                                    <th>${column?.value}</th>
+                                                </g:each>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <g:each var="row" in="${commandInstance?.data}" status="status">
+                                                <tr class="${status%2?'even':'odd' }">
+                                                    <g:each var="column" in="${commandInstance?.columnMap?.columnMap }">
+                                                        <td>${row[column.value] }</td>
+                                                    </g:each>
+                                                    <g:each var="prompt" in="${row?.prompts }">
+                                                        <td class="center">
+                                                            <select name="${prompt.key }">
+                                                                <g:each var="value" in="${prompt.value }">
+                                                                    <option value="${value.id }">${value.name }</option>
+                                                                </g:each>
+                                                            </select>
+                                                        </td>
+                                                    </g:each>
+                                                </tr>
+                                            </g:each>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </g:if>
-
-                            <a href="${createLink(controller: "batch", action: "importData", params: params)}"
-                               class="button">
-                                <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}"/>&nbsp;
-                            <warehouse:message code="default.button.back.label" default="Back"/>
-                            </a>
-
-
+                            <div class="buttons center">
+                                <a href="${createLink(controller: 'batch', action: 'importData')}"
+                                   class="button">
+                                    <img src="${resource(dir: 'images/icons/silk', file: 'resultset_previous.png')}"/>&nbsp;
+                                    <warehouse:message code="default.button.back.label" default="Back"/>
+                                </a>
+                                <g:if test="${!commandInstance?.hasErrors()}">
+                                    <button type="submit" class="button">
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}"/>&nbsp;
+                                        ${warehouse.message(code: 'default.button.finish.label')}
+                                    </button>
+                                </g:if>
+                            </div>
                         </div>
-
                     </div>
+
                 </g:form>
             </g:if>
             <g:if test="${!commandInstance?.data}">
@@ -130,8 +131,6 @@
                     </div>
                 </div>
             </g:if>
-
-
 		</div>
         <script type="text/javascript">
             $(document).ready(function(){
