@@ -25,7 +25,7 @@
 
             <div class="yui-ga">
                 <div class="yui-u first">
-                    <table style="width:auto;">
+                    <table >
                         <tr>
                             <td>
                                 <fieldset>

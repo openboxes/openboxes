@@ -23,11 +23,11 @@
         </g:isUserAdmin>
     </div>
 
-    <div class="yui-gd">
+    <div class="yui-ga">
         <div class="yui-u first">
-            <h1><format:category category="${categoryInstance}"/></h1>
-            <g:form action="save" method="post" >
-                <fieldset>
+            <div class="box">
+                <h2><format:category category="${categoryInstance}"/></h2>
+                <g:form action="save" method="post" >
                     <table>
                         <tbody>
                         <tr class="prop">
@@ -35,10 +35,10 @@
                                 <label for="name" class="desc"><warehouse:message code="category.parent.label" default="Parent" /></label>
                             </td>
                             <td class="value">
-                                <select name="parentCategory.id" style="display: inline">
-                                    <option value="null"></option>
-                                    <g:render template="selectOptions" model="[category:rootCategory, level: 1, selected: categoryInstance]"/>
-                                </select>
+
+                                <g:selectCategory name="parentCategory.id"
+                                                  class="chzn-select-deselect" noSelection="['':'']"
+                                                  value="${categoryInstance?.parentCategory?.id}" />
                             </td>
                         </tr>
                         <tr class="prop">
@@ -58,9 +58,8 @@
                         </tr>
                         </tbody>
                     </table>
-                </fieldset>
-
-            </g:form>
+                </g:form>
+            </div>
         </div>
     </div>
 
