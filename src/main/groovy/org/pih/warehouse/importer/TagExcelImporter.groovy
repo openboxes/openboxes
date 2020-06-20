@@ -51,6 +51,7 @@ class TagExcelImporter extends AbstractExcelImporter {
                     command.errors.reject("Row ${index + 1}: Tag ${tag.tag} is invalid: ${error.getFieldError()}")
                 }
             }
+            tag.discard()
         }
     }
 
