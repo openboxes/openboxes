@@ -45,7 +45,7 @@
                         <tr>
                             <td>
                                 <label>
-                                    <g:radio name="type" value="category" checked="${params.type=='category'}"/>
+                                    <g:radio name="importType" value="category" checked="${params.importType=='category'}"/>
                                     <warehouse:message code="import.category.label" default="Category"/>
                                 </label>
                             </td>
@@ -61,7 +61,7 @@
                         <tr>
                             <td>
                                 <label>
-                                    <g:radio name="type" value="inventory" checked="${params.type=='inventory'}"/>
+                                    <g:radio name="importType" value="inventory" checked="${params.importType=='inventory'}"/>
                                     <warehouse:message code="inventory.label" default="Inventory"/>
                                 </label>
                             </td>
@@ -76,7 +76,7 @@
                         <tr>
                             <td>
                                 <label>
-                                    <g:radio name="type" value="inventoryLevel" checked="${params.type=='inventoryLevel'}"/>
+                                    <g:radio name="importType" value="inventoryLevel" checked="${params.importType=='inventoryLevel'}"/>
                                     <warehouse:message code="inventoryLevel.label" default="Inventory levels"/>
                                 </label>
                             </td>
@@ -91,7 +91,7 @@
                         <tr>
                             <td>
                                 <label>
-                                    <g:radio name="type" value="location" checked="${params.type=='location'}"/>
+                                    <g:radio name="importType" value="location" checked="${params.importType=='location'}"/>
                                     <warehouse:message code="locations.label" default="Locations"/>
                                 </label>
                             </td>
@@ -109,7 +109,7 @@
                         <tr>
                             <td>
                                 <label>
-                                    <g:radio name="type" value="person" checked="${params.type=='person'}"/>
+                                    <g:radio name="importType" value="person" checked="${params.importType=='person'}"/>
                                     <warehouse:message code="persons.label" default="People"/>
                                 </label>
                             </td>
@@ -124,7 +124,7 @@
                         <tr>
                             <td>
                                 <label>
-                                    <g:radio name="type" value="productAttribute" checked="${params.type=='productAttribute'}"/>
+                                    <g:radio name="importType" value="productAttribute" checked="${params.importType=='productAttribute'}"/>
                                     ${g.message(code:'productAttribute.label')}
                                 </label>
                             </td>
@@ -139,7 +139,7 @@
                         <tr>
                             <td>
                                 <label>
-                                    <g:radio name="type" value="productCatalog" checked="${params.type=='productCatalog'}"/>
+                                    <g:radio name="importType" value="productCatalog" checked="${params.importType=='productCatalog'}"/>
                                     ${g.message(code:'productCatalog.label')}
                                 </label>
                             </td>
@@ -154,7 +154,7 @@
                         <tr>
                             <td>
                                 <label>
-                                    <g:radio name="type" value="productCatalogItem" checked="${params.type=='productCatalogItem'}"/>
+                                    <g:radio name="importType" value="productCatalogItem" checked="${params.importType=='productCatalogItem'}"/>
                                     ${g.message(code:'productCatalogItem.label')}
                                 </label>
                             </td>
@@ -169,7 +169,7 @@
                         <tr>
                             <td>
                                 <label>
-                                    <g:radio name="type" value="productSupplier" checked="${params.type=='productSupplier'}"/>
+                                    <g:radio name="importType" value="productSupplier" checked="${params.importType=='productSupplier'}"/>
                                     ${g.message(code:'productSuppliers.label')}
                                 </label>
                             </td>
@@ -187,7 +187,7 @@
                         <tr>
                             <td>
                                 <label>
-                                    <g:radio name="type" value="productSupplierPreference" checked="${params.type=='productSupplierPreference'}"/>
+                                    <g:radio name="importType" value="productSupplierPreference" checked="${params.importType=='productSupplierPreference'}"/>
                                     ${g.message(code:'productSupplier.productSourcePreference.label')}
                                 </label>
                             </td>
@@ -202,7 +202,7 @@
                         <tr>
                             <td>
                                 <label>
-                                    <g:radio name="type" value="productSupplierAttribute" checked="${params.type=='productSupplierAttribute'}"/>
+                                    <g:radio name="importType" value="productSupplierAttribute" checked="${params.importType=='productSupplierAttribute'}"/>
                                     ${g.message(code:'productSupplier.productSourceAttribute.label')}
                                 </label>
                             </td>
@@ -217,7 +217,7 @@
                         <tr>
                             <td>
                                 <label>
-                                    <g:radio name="type" value="productPackage" checked="${params.type=='productPackage'}"/>
+                                    <g:radio name="importType" value="productPackage" checked="${params.importType=='productPackage'}"/>
                                     ${g.message(code:'productPackages.label')}
                                 </label>
                             </td>
@@ -268,7 +268,7 @@
                         <tr>
                             <td>
                                 <label>
-                                    <g:radio name="type" value="outboundStockMovement" checked="${params.type=='outboundStockMovement'}"/>
+                                    <g:radio name="importType" value="outboundStockMovement" checked="${params.importType=='outboundStockMovement'}"/>
                                     <warehouse:message code="import.outboundStockMovement.label" default="Stock Movements (Outbound)"/>
                                 </label>
                             </td>
@@ -284,7 +284,7 @@
                         <tr>
                             <td>
                                 <label>
-                                    <g:radio name="type" value="tag" checked="${params.type=='tag'}"/>
+                                    <g:radio name="importType" value="tag" checked="${params.importType=='tag'}"/>
                                     <warehouse:message code="import.tag.label" default="Tag"/>
                                 </label>
                             </td>
@@ -299,7 +299,7 @@
                         <tr>
                             <td>
                                 <label>
-                                    <g:radio name="type" value="user" checked="${params.type=='user'}"/>
+                                    <g:radio name="importType" value="user" checked="${params.importType=='user'}"/>
                                     <warehouse:message code="users.label" default="Users"/>
                                 </label>
                             </td>
@@ -314,7 +314,7 @@
                         <tr>
                             <td>
                                 <label>
-                                    <g:radio name="type" value="userLocation" checked="${params.type=='userLocation'}"/>
+                                    <g:radio name="importType" value="userLocation" checked="${params.importType=='userLocation'}"/>
                                     <warehouse:message code="userLocations.label" default="User Locations"/>
                                 </label>
                             </td>
