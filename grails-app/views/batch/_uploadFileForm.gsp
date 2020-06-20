@@ -26,6 +26,15 @@
                     </div>
                     <div>
                         <label>
+                            <g:radio name="importType" value="product" checked="${params.importType=='product'}"/>
+                            <warehouse:message code="import.product.label" default="Product"/>
+                        </label>
+                        <g:link controller="batch" action="downloadExcel" params="[type:'Product']">
+                            <warehouse:message code="default.download.label" args="[g.message(code:'default.template.label')]"/>
+                        </g:link>
+                    </div>
+                    <div>
+                        <label>
                             <g:radio name="importType" value="inventory" checked="${params.importType=='inventory'}"/>
                             <warehouse:message code="import.inventory.label" default="Inventory"/>
                         </label>
@@ -131,6 +140,7 @@
                         <g:link controller="batch" action="downloadTemplate" params="[template:'userLocations.xls']">
                             <warehouse:message code="default.download.label" args="[g.message(code:'default.template.label')]"/>
                         </g:link>
+                        </div>
                     </div>
                 </td>
             </tr>
@@ -143,7 +153,6 @@
                     <g:hiddenField name="location.id" value="${session.warehouse.id }"/>
                 </td>
             </tr>
-
             <tr class="prop">
                 <td class="name">
                     <label><warehouse:message code="default.date.label"/></label>
@@ -152,14 +161,19 @@
                     <g:jqueryDatePicker id="date" name="date" value="${new Date()}"/>
                 </td>
             </tr>
-            <tr class="prop">
-                <td class="name"></td>
-                <td class="value">
-                    <button type="submit" class="button icon approve">
-                        ${warehouse.message(code: 'default.button.upload.label', default: 'Upload')}</button>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td></td>
+                <td>
+                    <button type="submit" class="button">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}"/>&nbsp;
+                        ${warehouse.message(code: 'default.button.upload.label', default: 'Upload')}
+                    </button>
+
                 </td>
             </tr>
-        </tbody>
+        </tfoot>
     </table>
 </g:uploadForm>
 
