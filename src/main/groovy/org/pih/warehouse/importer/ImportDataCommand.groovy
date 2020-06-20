@@ -17,6 +17,7 @@ class ImportDataCommand implements Validateable {
     def filename
     MultipartFile importFile
     String importType
+    Boolean importNow = Boolean.FALSE
     Location location
     Date date
     def columnMap
@@ -31,10 +32,14 @@ class ImportDataCommand implements Validateable {
     static constraints = {
         date(nullable: true)
         filename(nullable: true)
+        importNow(nullable: true)
         importFile(nullable: true, validator: { val, obj ->
+
+            // Allow the import file to be null but not empty
             if ( val == null ) {
-                return false
+                return true
             }
+
             if ( val.isEmpty() ) {
                 return false
             }

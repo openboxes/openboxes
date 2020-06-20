@@ -32,6 +32,10 @@
                 <g:form controller="batch" action="importData" method="POST">
                     <input name="location.id" type="hidden" value="${session.warehouse.id }"/>
                     <input name="importType" type="hidden" value="${params.importType }"/>
+                    <input name="importNow" type="hidden" value="${Boolean.TRUE }"/>
+
+                    <div class="yui-gf">
+                        <div class="yui-u first">
 
                     <div class="box">
                         <h2><warehouse:message code="default.import.label" args="[warehouse.message(code:'default.properties.label', default:'properties')]"/></h2>
@@ -49,7 +53,7 @@
                                     <label><warehouse:message code="default.type.label"/></label>
                                 </td>
                                 <td class="value">
-                                    ${commandInstance?.type?.capitalize()}
+                                    ${commandInstance?.importType}
                                 </td>
                             </tr>
                             <tr class="prop">
@@ -60,7 +64,7 @@
                                     ${commandInstance?.filename}
                                 </td>
                             </tr>
-                            <g:if test="${commandInstance?.type == 'inventory'}">
+                            <g:if test="${commandInstance?.date}">
                                 <tr class="prop">
                                     <td class="name">
                                         <label><warehouse:message code="default.date.label"/></label>
@@ -92,10 +96,11 @@
                                                     (row.isNewExpirationDate && column.value == 'expirationDate') ? 'red;': 'black;'};
                                                     background-color: ${!row.quantity && row.quantity != 0 && column.value == 'quantity' ? '#ffcccb;': ''}">
                                                 ${row[column.value] }
-                                            </td>
-                                        </g:each>
-                                    </tr>
-                                </g:each>
+                                                        </td>
+                                                    </g:each>
+                                                </tr>
+                                            </g:each>
+                                        </tbody>
                                 </tbody>
 
                             </table>
@@ -119,8 +124,8 @@
 
 
                         </div>
-
                     </div>
+
                 </g:form>
             </g:if>
             <g:if test="${!commandInstance?.data}">
