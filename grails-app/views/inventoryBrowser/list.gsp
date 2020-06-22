@@ -45,7 +45,7 @@
 
 </div>
 
-<r:script disposition="defer">
+<g:javascript disposition="defer">
 
 
 
@@ -219,6 +219,6 @@
         }
         this.oApi._fnProcessingDisplay( oSettings, onoff );
     };
-</r:script>
+</g:javascript>
 
 </html>

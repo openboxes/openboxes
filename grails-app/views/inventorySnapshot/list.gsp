@@ -39,7 +39,7 @@
     </table>
 </div>
 
-<r:script disposition="defer">
+<g:javascript disposition="defer">
     $( document ).ready(function() {
 
         // Initialize datepicker
@@ -248,6 +248,6 @@
         });
     });
 
-</r:script>
+</g:javascript>
 
 </html>
