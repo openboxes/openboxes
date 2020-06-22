@@ -251,7 +251,7 @@ class ReportController {
         def model = [
                 command           : command,
                 locationKey       : locationKey,
-                transactionCount  : TransactionFact.countByLocationKey(locationKey),
+                transactionCount  : locationKey ? TransactionFact.countByLocationKey(locationKey) : 0,
                 productCount      : TransactionFact.countDistinctProducts(locationKey?.locationId).list(),
                 minTransactionDate: TransactionFact.minTransactionDate(locationKey?.locationId).list(),
                 maxTransactionDate: TransactionFact.maxTransactionDate(locationKey?.locationId).list(),
