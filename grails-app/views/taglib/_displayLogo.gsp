@@ -8,6 +8,6 @@
         <img src="${attrs?.logoUrl}" />
     </g:else>
     <g:if test="${attrs?.logoLabel && attrs.showLabel}">
-        ${attrs?.logoLabel}
+        <span class="logo-label">${attrs?.logoLabel}</span>
     </g:if>
 </div>

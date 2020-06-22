@@ -331,6 +331,7 @@ jqueryValidationUi {
 
 // Allow users to customize logo image url as well as label
 openboxes.logo.url = "https://openboxes.com/img/logo_30.png"
+openboxes.logo.label = ""
 openboxes.report.logo.url = "https://openboxes.com/img/logo_100.png"
 
 // Allow system to anonymize user data to prevent it from being accessed by unauthorized users
