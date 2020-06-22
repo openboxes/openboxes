@@ -451,7 +451,7 @@ class InventoryService implements ApplicationContextAware {
         def totalCount = !searchTerms || innerProductIds ? Product.createCriteria().count(searchProductsQuery) : 0
         def productIds = !searchTerms || innerProductIds ? Product.createCriteria().list(listPaginatedProductsQuery) : []
         def products = productIds ? Product.getAll(productIds*.id) : []
-        return new PagedResultList(products, totalCount)
+        return new PagedResultList(products, totalCount as int)
     }
 
     /**
