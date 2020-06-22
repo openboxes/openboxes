@@ -495,18 +495,14 @@ class DashboardService {
     }
 
     def getQuantityOnHandZero(Location location, List<Category> categories) {
-        long startTime = System.currentTimeMillis()
         def inventoryItems = getInventoryItems(location, categories)
 
         def stockOut = inventoryItems.findAll { it.quantity <= 0 }
-
-        log.info "Get quantity on hand zero: " + (System.currentTimeMillis() - startTime) + " ms"
         return stockOut
 
     }
 
     def getOutOfStock(Location location, String abcClass, List<Category> categories) {
-        long startTime = System.currentTimeMillis()
         def inventoryItems = getInventoryItems(location, categories)
 
         def stockOut = inventoryItems.findAll { inventoryItem ->
@@ -518,15 +514,11 @@ class DashboardService {
             else
                 inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity <= 0
         }
-
-        log.info "Get stock out: " + (System.currentTimeMillis() - startTime) + " ms"
         return stockOut
     }
 
     def getLowStock(Location location, List<Category> categories) {
-        long startTime = System.currentTimeMillis()
         def inventoryItems = getInventoryItems(location, categories)
-        log.info("getInventoryItems: " + (System.currentTimeMillis() - startTime) + " ms")
 
         def lowStock = inventoryItems.findAll { inventoryItem ->
             def quantity = inventoryItem.quantity
@@ -535,12 +527,10 @@ class DashboardService {
 
             inventoryLevel?.status >= InventoryStatus.SUPPORTED && minQuantity && quantity <= minQuantity
         }
-        log.info "Get low stock: " + (System.currentTimeMillis() - startTime) + " ms"
         return lowStock
     }
 
     def getReorderStock(Location location, List<Category> categories) {
-        long startTime = System.currentTimeMillis()
         def inventoryItems = getInventoryItems(location, categories)
 
         def reorderStock = inventoryItems.findAll { inventoryItem ->
@@ -550,7 +540,6 @@ class DashboardService {
 
             inventoryLevel?.status >= InventoryStatus.SUPPORTED && reorderQuantity && quantity <= reorderQuantity
         }
-        log.info "Get reorder stock: " + (System.currentTimeMillis() - startTime) + " ms"
         return reorderStock
     }
 
@@ -598,7 +587,6 @@ class DashboardService {
     }
 
     def getOverStock(Location location, List<Category> categories) {
-        long startTime = System.currentTimeMillis()
         def inventoryItems = getInventoryItems(location, categories)
 
         def overStock = inventoryItems.findAll { inventoryItem ->
@@ -608,12 +596,10 @@ class DashboardService {
 
             inventoryLevel?.status >= InventoryStatus.SUPPORTED && maxQuantity && quantity > maxQuantity
         }
-        log.info "Get over stock: " + (System.currentTimeMillis() - startTime) + " ms"
         return overStock
     }
 
     def getHealthyStock(Location location, List<Category> categories) {
-        long startTime = System.currentTimeMillis()
         def inventoryItems = getInventoryItems(location, categories)
 
         def healthyStock = inventoryItems.findAll { inventoryItem ->
@@ -624,7 +610,6 @@ class DashboardService {
 
             inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity > reorderQuantity && quantity <= maxQuantity
         }
-        log.info "Get healthy stock: " + (System.currentTimeMillis() - startTime) + " ms"
         return healthyStock
     }
 }
