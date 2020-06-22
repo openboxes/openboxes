@@ -152,8 +152,6 @@ class DashboardService {
         // Stock that has already expired
         def expiredStock = InventoryItem.findAllByExpirationDateLessThan(new Date(), [sort: 'expirationDate', order: 'desc'])
 
-        log.debug expiredStock
-
         Map<InventoryItem, Integer> quantityMap =
                 inventorySnapshotService.getQuantityOnHandByInventoryItem(location)
         expiredStock = expiredStock.findAll { quantityMap[it] > 0 }
