@@ -384,6 +384,9 @@ openboxes.dashboard.newsSummary.newsItems = []
 openboxes.dashboard.newsSummary.rssUrl = "https://openboxes.com/blog/index.xml"
 openboxes.dashboard.newsSummary.limit = 25
 
+// Configuration of the logoLabel
+openboxes.logo.label=""
+
 openboxes {
     tablero {
         enabled = true
