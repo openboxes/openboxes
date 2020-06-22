@@ -58,7 +58,7 @@
                                         ${tag.key.isActive}
                                     </td>
                                     <td>
-                                        <g:link controller="dashboard" action="hideTag" id="${tag.key}" params="[editTags:true]">
+                                        <g:link controller="dashboard" action="hideTag" id="${tag.key.id}" params="[editTags:true]">
                                             <img src="${resource(dir:'images/icons/silk',file:'bullet_cross.png')}"/></g:link>
                                     </td>
                                 </tr>
