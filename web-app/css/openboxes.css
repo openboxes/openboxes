@@ -1593,6 +1593,13 @@ h2 {
     vertical-align:middle;
 }
 
+.logo-label {
+    padding:5px;
+    -moz-border-radius:5px;
+    -webkit-border-radius:5px;
+    color: white;
+    background-color: red;
+}
 
 .title {
     font-size: 1.5em;
