@@ -138,7 +138,7 @@ class DashboardController {
 
     def hideCatalog() {
         ProductCatalog productCatalog = ProductCatalog.get(params.id)
-        productCatalog.isActive = false
+        productCatalog.active = false
         productCatalog.save(flush: true)
         redirect(controller: "dashboard", action: "index", params: [editCatalogs: true])
     }
