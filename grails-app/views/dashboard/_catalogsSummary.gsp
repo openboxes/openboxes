@@ -55,7 +55,7 @@
                                         ${catalog.count}
                                     </td>
                                     <td>
-                                        <g:link controller="dashboard" action="hideCatalog" id="${catalog}" params="[editCatalogs:true]">
+                                        <g:link controller="dashboard" action="hideCatalog" id="${catalog?.id}" params="[editCatalogs:true]">
                                             <img src="${resource(dir:'images/icons/silk',file:'bullet_cross.png')}"/></g:link>
                                     </td>
                                 </tr>
