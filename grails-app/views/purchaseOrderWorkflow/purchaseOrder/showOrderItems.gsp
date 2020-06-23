@@ -257,8 +257,12 @@
           $("#productSupplier").html("");
           clearSource();
           $("#quantityUom").val(null).trigger('change');
+
+          // Reset recipient to default recipient
           var defaultRecipient = $("#defaultRecipient").val();
-          $("#recipient").val(defaultRecipient).trigger("chosen:updated");
+          $("#recipient").val(defaultRecipient).trigger("change");
+
+          // Reset estimated ready date
           $("#estimatedReadyDate-datepicker").datepicker('setDate', null);
           disableEditing();
         }
