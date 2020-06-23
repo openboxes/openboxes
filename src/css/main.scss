@@ -107,7 +107,7 @@ body {
   white-space: pre;
 }
 
-.bradcrumbs-container {
+.breadcrumbs-container {
   padding-left: 10px;
   width: 100%;
   height: 34px;
@@ -124,12 +124,12 @@ body {
   }
 }
 
-.item-bradcrumbs {
+.item-breadcrumbs {
   margin-left: 10px;
 }
 
 @media (max-width: 600px) {
-  .item-bradcrumbs {
+  .item-breadcrumbs {
     font-size: 0.5em;
   }
 }
