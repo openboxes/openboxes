@@ -108,7 +108,7 @@
                             </g:if>
                             <g:else>
                                 <g:if test="${entry.value['type']=='Stock Movement'}">
-                                    <g:link controller="stockMovement" action="show" id="${item?.requisition.id}">
+                                    <g:link controller="stockMovement" action="show" id="${item?.id}">
                                         ${item?.shipmentNumber}
                                     </g:link>
                                 </g:if>
@@ -127,7 +127,7 @@
                             </g:if>
                             <g:else>
                                 <g:if test="${entry.value['type']=='Stock Movement'}">
-                                    <g:link controller="stockMovement" action="show" id="${item?.requisition.id}">
+                                    <g:link controller="stockMovement" action="show" id="${item?.id}">
                                         ${item?.name }
                                     </g:link>
                                 </g:if>

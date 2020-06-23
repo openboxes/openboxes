@@ -34,14 +34,14 @@
                                         <a href="#" class="run-btn" data-run-action="summaryReport">
                                             <img src="${createLinkTo(dir:'images/icons/silk',file:'play_green.png')}" />
                                             <g:message code="default.run.label"
-                                                       args="[g.message(code: 'default.detailedOrderReport.label', default: 'Summary On Hand and On Order')]"/>
+                                                       args="[g.message(code: 'report.onOrderReportSummary.label', default: 'On Order Report Summary')]"/>
                                         </a>
                                     </div>
                                     <div class="action-menu-item">
                                         <a href="#" class="run-btn" data-run-action="detailedReport">
                                             <img src="${createLinkTo(dir:'images/icons/silk',file:'play_green.png')}" />
                                             <g:message code="default.run.label"
-                                                       args="[g.message(code: 'default.detailedOrderReport.label', default: 'Detailed Order Report')]"/>
+                                                       args="[g.message(code: 'report.onOrderReportDetails.label', default: 'On Order Report Details')]"/>
                                         </a>
                                     </div>
                                 </div>
@@ -57,14 +57,14 @@
                                         <a href="#" class="download-btn" data-download-action="downloadSummaryOnOrderReport">
                                             <img src="${resource(dir: 'images/icons/silk', file: 'page_white_excel.png')}" />
                                             <g:message code="default.download.label"
-                                                       args="[g.message(code: 'default.detailedOrderReport.label', default: 'Summary On Hand and On Order')]"/>
+                                                       args="[g.message(code: 'report.onOrderReportSummary.label', default: 'On Order Report Summary')]"/>
                                         </a>
                                     </div>
                                     <div class="action-menu-item">
                                         <a href="#" class="download-btn" data-download-action="downloadOnOrderReport">
                                             <img src="${resource(dir: 'images/icons/silk', file: 'page_white_excel.png')}" />
                                             <g:message code="default.download.label"
-                                                       args="[g.message(code: 'default.summaryOnHandAndOnOrder.label', default: 'Detailed Order Report')]"/>
+                                                       args="[g.message(code: 'report.onOrderReportDetails.label', default: 'On Order Report Details')]"/>
                                         </a>
                                     </div>
                                 </div>
@@ -82,7 +82,8 @@
             </g:hasErrors>
             <div class="box">
                 <h2 class="middle">
-                    <g:message code="report.orderReport.label" default="Order Report"/>
+                    <g:message code="${params?.report == 'summaryReport' ? 'report.onOrderReportSummary.label' : 'report.onOrderReportDetails.label'}"
+                               default="${params?.report == 'summaryReport' ? 'On Order Report Summary' : 'On Order Report Details'}"/>
                 </h2>
                 <div class="dialog">
                     <table id="orderReportTable">
