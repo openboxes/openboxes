@@ -6,8 +6,7 @@ import {
   TRANSLATIONS_FETCHED,
   CHANGE_CURRENT_LOCALE,
   FETCH_MENU_CONFIG,
-  SHOW_MODAL,
-  HIDE_MODAL,
+  TOGGLE_MODAL,
 } from '../actions/types';
 
 const initialState = {
@@ -51,7 +50,7 @@ const initialState = {
   minimumExpirationDate: '',
   isPaginated: false,
   logoLabel: '',
-  modal: false,
+  isOpen: false,
 };
 
 export default function (state = initialState, action) {
@@ -93,15 +92,10 @@ export default function (state = initialState, action) {
         ...state,
         fetchedTranslations: { ...state.fetchedTranslations, [action.payload]: true },
       };
-    case SHOW_MODAL:
+    case TOGGLE_MODAL:
       return {
         ...state,
-        modal: true,
-      };
-    case HIDE_MODAL:
-      return {
-        ...state,
-        modal: false,
+        isOpen: action.payload,
       };
     default:
       return state;

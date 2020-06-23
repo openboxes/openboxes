@@ -70,7 +70,7 @@ class LocationChooser extends Component {
           {this.props.currentLocationName || 'Choose Location'}
         </button>
         <Modal
-          isOpen={this.props.modal}
+          isOpen={this.props.isOpen}
           onRequestClose={() => this.closeModal()}
           className="modal-content-custom"
           shouldCloseOnOverlayClick={false}
@@ -112,7 +112,7 @@ class LocationChooser extends Component {
 const mapStateToProps = state => ({
   currentLocationName: state.session.currentLocation.name,
   defaultTranslationsFetched: state.session.fetchedTranslations.default,
-  modal: state.session.modal,
+  isOpen: state.session.isOpen,
 });
 
 export default connect(mapStateToProps, {
@@ -125,7 +125,7 @@ LocationChooser.propTypes = {
   /** Function called to change the currently selected location */
   changeCurrentLocation: PropTypes.func.isRequired,
   // Boolean to show modal or not
-  modal: PropTypes.bool.isRequired,
+  isOpen: PropTypes.bool.isRequired,
   // Function to show the location modal
   showModal: PropTypes.func.isRequired,
   // Function to hide the location modal

@@ -1,8 +1,7 @@
 export const SHOW_SPINNER = 'SHOW_SPINNER';
 export const HIDE_SPINNER = 'HIDE_SPINNER';
 
-export const SHOW_MODAL = 'SHOW_MODAL';
-export const HIDE_MODAL = 'HIDE_MODAL';
+export const TOGGLE_MODAL = 'TOGGLE_MODAL';
 
 export const FETCH_REASONCODES = 'FETCH_REASONCODES';
 export const FETCH_USERS = 'FETCH_USERS';
