@@ -810,8 +810,8 @@ class InventoryController {
         if (!location.supports(ActivityCode.RECEIVE_STOCK)) {
             throw new UnsupportedOperationException("Location ${location.name} does not support receipt transactions")
         }
-        params.transactionType = TransactionType.get(Constants.TRANSFER_IN_TRANSACTION_TYPE_ID)
-        forward(action: "createTransaction", params: params)
+        params.transactionType = Constants.TRANSFER_IN_TRANSACTION_TYPE_ID
+        forward(action: "createTransaction")
     }
 
     def createOutboundTransfer() {
@@ -819,8 +819,8 @@ class InventoryController {
         if (!location.supports(ActivityCode.SEND_STOCK)) {
             throw new UnsupportedOperationException("Location ${location.name} does not support transfer transactions")
         }
-        params.transactionType = TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)
-        forward(action: "createTransaction", params: params)
+        params.transactionType = Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID
+        forward(action: "createTransaction")
     }
 
     def createAdjustment() {
@@ -828,8 +828,8 @@ class InventoryController {
         if (!location.supports(ActivityCode.ADJUST_INVENTORY)) {
             throw new UnsupportedOperationException("Location ${location.name} does not support adjustment transactions")
         }
-        params.transactionType = TransactionType.get(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID)
-        forward(action: "createTransaction", params: params)
+        params.transactionType = Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID
+        forward(action: "createTransaction")
     }
 
     def createConsumed() {
@@ -837,26 +837,24 @@ class InventoryController {
         if (!location.supports(ActivityCode.CONSUME_STOCK)) {
             throw new UnsupportedOperationException("Location ${location.name} does not support consumption transactions")
         }
-        params.transactionType = TransactionType.get(Constants.CONSUMPTION_TRANSACTION_TYPE_ID)
-        forward(action: "createTransaction", params: params)
+        params.transactionType = Constants.CONSUMPTION_TRANSACTION_TYPE_ID
+        forward(action: "createTransaction")
     }
 
     def createExpired() {
-        params.transactionType = TransactionType.get(Constants.EXPIRATION_TRANSACTION_TYPE_ID)
-        forward(action: "createTransaction", params: params)
+        params.transactionType = Constants.EXPIRATION_TRANSACTION_TYPE_ID
+        forward(action: "createTransaction")
     }
 
     def createDamaged() {
-        params.transactionType = TransactionType.get(Constants.DAMAGE_TRANSACTION_TYPE_ID)
-        forward(action: "createTransaction", params: params)
+        params.transactionType = Constants.DAMAGE_TRANSACTION_TYPE_ID
+        forward(action: "createTransaction")
     }
 
     def createTransaction() {
-        log.info("createTransaction: " + params)
         def command = new TransactionCommand()
         def warehouseInstance = Location.get(session?.warehouse?.id)
         def transactionInstance = new Transaction(params)
-
 
         def products = []
 
