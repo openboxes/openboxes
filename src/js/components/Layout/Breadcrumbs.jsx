@@ -21,10 +21,10 @@ class Breadcrumbs extends Component {
     const listItemFormatted = [];
     _.forEach(listItems, (name) => {
       // Put a space before each uppercase
-      let nameFormated = name.replace(/([A-Z])/g, ' $1').trim();
+      let nameFormatted = name.replace(/([A-Z])/g, ' $1').trim();
       // Put an uppercase at the beginning of each word
-      nameFormated = nameFormated.replace(/(^\w{1})|(\s{1}\w{1})/g, match => match.toUpperCase());
-      listItemFormatted.push(nameFormated);
+      nameFormatted = nameFormatted.replace(/(^\w{1})|(\s{1}\w{1})/g, match => match.toUpperCase());
+      listItemFormatted.push(nameFormatted);
     });
     const listToReturn = listItemFormatted.map((name, id) =>
       (name === 'Openboxes' || name === '' ? null : (
