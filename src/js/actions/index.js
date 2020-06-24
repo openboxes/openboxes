@@ -3,6 +3,7 @@ import { addTranslationForLanguage } from 'react-localize-redux';
 import {
   SHOW_SPINNER,
   HIDE_SPINNER,
+  TOGGLE_MODAL,
   FETCH_USERS,
   FETCH_REASONCODES,
   FETCH_SESSION_INFO,
@@ -31,6 +32,20 @@ export function showSpinner() {
 export function hideSpinner() {
   return {
     type: HIDE_SPINNER,
+    payload: false,
+  };
+}
+
+export function showModal() {
+  return {
+    type: TOGGLE_MODAL,
+    payload: true,
+  };
+}
+
+export function hideModal() {
+  return {
+    type: TOGGLE_MODAL,
     payload: false,
   };
 }
