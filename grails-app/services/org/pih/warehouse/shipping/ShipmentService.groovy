@@ -353,12 +353,7 @@ class ShipmentService {
         def shipmentItems = ShipmentItem.createCriteria().list() {
             shipment {
                 eq("destination", destination)
-                not {
-                    'in'("currentStatus", [ShipmentStatusCode.RECEIVED])
-                }
-                requisition {
-                    'in'("status", [RequisitionStatus.ISSUED])
-                }
+                'in'("currentStatus", [ShipmentStatusCode.SHIPPED, ShipmentStatusCode.PARTIALLY_RECEIVED])
             }
             eq("product", product)
         }
