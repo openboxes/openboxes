@@ -335,6 +335,12 @@ class StockMovementService {
                     eq("createdBy", criteria?.requestedBy)
                 }
             }
+            if(params.createdAfter) {
+                ge("dateCreated", params.createdAfter)
+            }
+            if(params.createdBefore) {
+                le("dateCreated", params.createdBefore)
+            }
 
             order("dateCreated", "desc")
         }
@@ -407,7 +413,12 @@ class StockMovementService {
             if (stockMovement.createdBy) {
                 eq("createdBy", stockMovement.createdBy)
             }
-
+            if(params.createdAfter) {
+                ge("dateCreated", params.createdAfter)
+            }
+            if(params.createdBefore) {
+                le("dateCreated", params.createdBefore)
+            }
             if (params.sort && params.order) {
                 order(params.sort, params.order)
             } else {
@@ -1547,7 +1558,7 @@ class StockMovementService {
         removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
         requisitionItem.undoChanges()
         requisitionItem.save(flush: true)
-        
+
         requisition.removeFromRequisitionItems(requisitionItem)
         requisitionItem.delete()
     }
