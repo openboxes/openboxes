@@ -454,9 +454,9 @@ openboxes:
         orders:
             enabled: true
         requisitions:
-            enabled: true
+            enabled: false
         shipping:
-            enabled: true
+            enabled: false
         stockMovement:
             enabled: true
         receiving:
@@ -464,6 +464,8 @@ openboxes:
         reporting:
             enabled: true
         products:
+            enabled: true
+        putaways:
             enabled: true
         configuration:
             enabled: true
