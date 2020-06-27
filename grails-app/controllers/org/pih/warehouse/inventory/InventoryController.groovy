@@ -469,10 +469,6 @@ class InventoryController {
         }
     }
 
-    def listTransactions() {
-        redirect(action: listAllTransactions)
-    }
-
     def listDailyTransactions() {
         def dateFormat = new SimpleDateFormat("dd/MM/yyyy")
         def dateSelected = (params.date) ? dateFormat.parse(params.date) : new Date()
@@ -890,8 +886,7 @@ class InventoryController {
 
     }
 
-
-    def listAllTransactions() {
+    def listTransactions() {
 
         Location location = Location.get(session.warehouse.id)
         def currentInventory = location.inventory
@@ -930,6 +925,9 @@ class InventoryController {
                                                  transactionCount       : transactions.totalCount, transactionTypeSelected: transactionType])
     }
 
+    def listAllTransactions() {
+        redirect(action: "listTransactions")
+    }
 
     def listPendingTransactions() {
         def transactions = Transaction.findAllByConfirmedOrConfirmedIsNull(Boolean.FALSE)
@@ -1047,7 +1045,7 @@ class InventoryController {
             transactionInstance?.dateConfirmed = new Date()
             flash.message = "${warehouse.message(code: 'inventory.transactionHasBeenConfirmed.message')}"
         }
-        redirect(action: "listAllTransactions")
+        redirect(action: "listTransactions")
     }
 
     def createInboundTransfer() {
@@ -1224,6 +1222,8 @@ class InventoryController {
         log.info("Saving debit transactions " + params)
         log.info("size: " + command?.transactionEntries?.size())
 
+        // Data binding not working properly for nested objects of command objects
+        command.transactionInstance = new Transaction(params.transactionInstance)
 
         // Get the products involved
         def productIds = params.list('product.id').collect { String.valueOf(it) }
@@ -1262,6 +1262,7 @@ class InventoryController {
                     transaction.save(failOnError: true)
                     flash.message = "Successfully saved transaction"
                     redirect(controller: "inventoryItem", action: "showStockCard", id: productIds[0])
+                    return
                 }
             } catch (ValidationException e) {
                 log.debug("caught validation exception " + e)
@@ -1291,8 +1292,8 @@ class InventoryController {
             command.warehouseInstance = warehouseInstance
             command.quantityMap = quantityMap
 
-            render(view: "createTransaction", model: [command: command])
         }
+        render(view: "createTransaction", model: [command: command])
     }
 
 
