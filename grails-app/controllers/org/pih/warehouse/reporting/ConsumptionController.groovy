@@ -486,8 +486,6 @@ class ShowConsumptionCommand implements Validateable {
     Boolean includeMonthlyBreakdown = Boolean.TRUE
     Boolean includeQuantityOnHand = Boolean.TRUE
 
-    def productDomain = new DefaultGrailsDomainClass(Product.class)
-
     def selectedProperties = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(String.class))
 
     // Payload
@@ -499,11 +497,14 @@ class ShowConsumptionCommand implements Validateable {
     def onHandQuantityMap = new TreeMap()
     def transferOutMap = [:]
 
+    static transients = ["numberOfDays", "numberOfWeeks", "numberOfMonths"]
+
     static constraints = {
         fromLocations(nullable: false)
         toLocations(nullable: true)
         fromDate(nullable: true)
         toDate(nullable: true)
+        parametersHash(nullable: true)
     }
 
     Boolean hasParameterChanged() {
@@ -517,7 +518,10 @@ class ShowConsumptionCommand implements Validateable {
     }
 
     Integer getNumberOfDays() {
-        return (toDate - fromDate)
+        if (toDate && fromDate) {
+            return (toDate - fromDate)
+        }
+        return 0
     }
 
     Float getNumberOfWeeks() {
@@ -590,7 +594,6 @@ class ShowConsumptionRowCommand implements Validateable {
             return 0.0
         }
     }
-
 
     String transferOutLocations(List<Location> locations) {
         String transferOutLocations = ""
