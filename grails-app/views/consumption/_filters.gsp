@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.core.Constants" %>
+<%@ page import="org.pih.warehouse.product.Product; org.pih.warehouse.core.Constants" %>
 <style>
 .chosen-container-multi .chosen-choices li.search-field input[type="text"] {
     height: 26px;
@@ -110,21 +110,19 @@
                 <div class="filter-list-item">
                     <label><warehouse:message code="consumption.additionalColumns.label" default="Additional columns (CSV only)"/></label>
                     <select name="selectedProperties" multiple="true" class="chzn-select-deselect">
-
                         <g:hasRoleFinance>
                             <g:set var="hasRoleFinance" value="${true}"/>
                         </g:hasRoleFinance>
-                        <g:each var="property" in="${command.productDomain.properties}">
-                            <g:if test="${!property.isAssociation() && property.typePropertyName != 'object'}">
-                                <g:set var="disabled" value="${'pricePerUnit'.equals(property?.name) && !hasRoleFinance}"/>
-                                <option value="${property.name}"
-                                    ${command.selectedProperties?.toList()?.contains(property.name)?'selected':''}
-                                    ${disabled?'disabled':''}>
-                                    ${property.naturalName} (${property.typePropertyName})
-                                </option>
-                            </g:if>
+                        <g:each var="propertyName" in="${command.availableProperties}">
+                            <g:set var="disabled" value="${'pricePerUnit'.equals(propertyName) && !hasRoleFinance}"/>
+                            <option value="${propertyName}"
+                                ${command.selectedProperties?.toList()?.contains(propertyName)?'selected':''}
+                                ${disabled?'disabled':''}>
+                                ${propertyName}
+                            </option>
                         </g:each>
                     </select>
+                    ${command.selectedProperties}
                 </div>
                 <div class="filter-list-item">
                     <label>
