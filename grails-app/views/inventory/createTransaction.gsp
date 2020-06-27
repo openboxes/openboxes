@@ -30,6 +30,14 @@
 					&nbsp;<warehouse:message code="dashboard.label"/>
 				</g:link>
 
+				<g:if test="${params['product.id']}">
+					<g:link controller='inventoryItem' action='showStockCard' id='${params.list("product.id")[0]}' class="button">
+						<img src="${resource(dir: 'images/icons/silk', file: 'clipboard.png')}" />&nbsp;
+						${warehouse.message(code: 'inventory.showStockCard.label', default: 'Show stock')}
+					</g:link>
+
+				</g:if>
+
 				<g:link controller="inventory" action="browse" class="button">
 					<img src="${resource(dir:'images/icons/silk',file:'application_form_magnify.png')}" alt="${warehouse.message(code: 'inventory.browse.label') }" />
 					&nbsp;<warehouse:message code="inventory.browse.label"/>
