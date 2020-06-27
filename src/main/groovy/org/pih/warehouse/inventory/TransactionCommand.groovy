@@ -33,7 +33,10 @@ class TransactionCommand implements Validateable {
 
 
     static constraints = {
-
+        transactionDate(nullable: true)
+        transactionType(nullable: true)
+        transactionInstance(nullable: true)
+        warehouseInstance(nullable: true)
     }
 
 }
