@@ -127,7 +127,7 @@ class SelectTagLib {
 
     //@Cacheable("selectTagsCache")
     def selectTags = { attrs, body ->
-        def tags = Tag.list(sort: "tag").collect {
+        def tags = Tag.list(sort: "tag", fetch: [products: "eager"]).collect {
             [id: it.id, name: it.tag, productCount: it?.products?.size()]
         }
         attrs.from = tags
