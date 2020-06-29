@@ -496,8 +496,8 @@ class IndicatorDataService {
                     """
                 )
             }
-
-            percentage = Math.round(inventoriedProducts[0][0] / productInStock[0] * 100)
+            
+            percentage = productInStock[0] == 0 ? 0 : Math.round(inventoriedProducts[0][0] / productInStock[0] * 100)
             ColorNumber colorNumber = new ColorNumber(percentage, subtitle)
             colorNumber.setConditionalColors(listErrorSuccessIntervals.get(it)[0], listErrorSuccessIntervals.get(it)[1])
             colorNumber.value = "${colorNumber.value}%"
