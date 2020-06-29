@@ -140,7 +140,6 @@
                             </option>
                         </g:each>
                     </select>
-                    ${command.selectedProperties}
                 </div>
                 <div class="filter-list-item">
                     <label>
