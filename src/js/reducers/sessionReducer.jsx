@@ -6,6 +6,7 @@ import {
   TRANSLATIONS_FETCHED,
   CHANGE_CURRENT_LOCALE,
   FETCH_MENU_CONFIG,
+  TOGGLE_MODAL,
 } from '../actions/types';
 
 const initialState = {
@@ -48,6 +49,8 @@ const initialState = {
   timezone: '',
   minimumExpirationDate: '',
   isPaginated: false,
+  logoLabel: '',
+  isOpen: false,
 };
 
 export default function (state = initialState, action) {
@@ -73,6 +76,7 @@ export default function (state = initialState, action) {
         timezone: _.get(action, 'payload.data.data.timezone'),
         minimumExpirationDate: _.get(action, 'payload.data.data.minimumExpirationDate'),
         isPaginated: _.get(action, 'payload.data.data.isPaginated'),
+        logoLabel: _.get(action, 'payload.data.data.logoLabel'),
       };
     case FETCH_MENU_CONFIG:
       return {
@@ -87,6 +91,11 @@ export default function (state = initialState, action) {
       return {
         ...state,
         fetchedTranslations: { ...state.fetchedTranslations, [action.payload]: true },
+      };
+    case TOGGLE_MODAL:
+      return {
+        ...state,
+        isOpen: action.payload,
       };
     default:
       return state;

@@ -1544,10 +1544,10 @@ class StockMovementService {
 
     void removeRequisitionItem(RequisitionItem requisitionItem) {
         Requisition requisition = requisitionItem.requisition
+        removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
         requisitionItem.undoChanges()
         requisitionItem.save(flush: true)
-
-        removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
+        
         requisition.removeFromRequisitionItems(requisitionItem)
         requisitionItem.delete()
     }

@@ -21,4 +21,20 @@
   <changeSet id="1580848680306-6" author="jmiranda" runAlways="true" failOnError="false">
     <sqlFile path="views/product-inventory-expiry-view.sql"/>
   </changeSet>
+  <changeSet id="1580848680306-7" author="jmiranda" runAlways="true" failOnError="false">
+    <validCheckSum>5668c88bf15d0ac488edf66e4ebda2d</validCheckSum>
+    <sqlFile path="views/on-order-order-item-summary.sql"/>
+  </changeSet>
+  <changeSet id="1580848680306-8" author="jmiranda" runAlways="true" failOnError="false">
+    <validCheckSum>a1564fade9553722fd8cb37caf3ebfa</validCheckSum>
+    <sqlFile path="views/on-order-shipment-item-summary.sql"/>
+  </changeSet>
+  <changeSet id="1580848680306-9" author="jmiranda" runAlways="true" failOnError="false">
+    <validCheckSum>d1eaa48222b813b14657d25f40ee3c18</validCheckSum>
+    <sqlFile path="views/on-order-summary.sql"/>
+  </changeSet>
+  <changeSet id="1580848680306-10" author="dhatala" runAlways="true" failOnError="false">
+    <validCheckSum>c9c41a3239c4b5be50dac5cc593e236</validCheckSum>
+    <sqlFile path="views/product-snapshot.sql"/>
+  </changeSet>
 </databaseChangeLog>

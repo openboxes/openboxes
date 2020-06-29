@@ -620,7 +620,7 @@ class OrderController {
                 csv += "${orderItem?.product?.productCode}," +
                         "${StringEscapeUtils.escapeCsv(orderItem?.product?.name)}," +
                         "${orderItem?.product?.vendorCode ?: ''}," +
-                        "${quantityString}," +
+                        "${StringEscapeUtils.escapeCsv(quantityString)}," +
                         "${orderItem?.unitOfMeasure}," +
                         "${StringEscapeUtils.escapeCsv(unitPriceString)}," +
                         "${StringEscapeUtils.escapeCsv(totalPriceString)}" +
@@ -780,7 +780,7 @@ class OrderController {
                         "${orderItem?.productSupplier?.supplierCode ?: ''}," +
                         "${orderItem?.productSupplier?.manufacturer?.name ?: ''}," +
                         "${orderItem?.productSupplier?.manufacturerCode ?: ''}," +
-                        "${quantityString}," +
+                        "${StringEscapeUtils.escapeCsv(quantityString)}," +
                         "${unitOfMeasure}," +
                         "${StringEscapeUtils.escapeCsv(unitPriceString)}," +
                         "${StringEscapeUtils.escapeCsv(totalPriceString)}," +

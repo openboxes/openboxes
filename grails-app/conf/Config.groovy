@@ -331,6 +331,7 @@ jqueryValidationUi {
 
 // Allow users to customize logo image url as well as label
 openboxes.logo.url = "https://openboxes.com/img/logo_30.png"
+openboxes.logo.label = ""
 openboxes.report.logo.url = "https://openboxes.com/img/logo_100.png"
 
 // Allow system to anonymize user data to prevent it from being accessed by unauthorized users
@@ -538,6 +539,19 @@ openboxes {
                             success = ["Inventory value not expired last day of month"]
                             warning = ["Inventory value expired last day of month"]
                             error = ["Inventory value removed due to expiry"]
+                        }
+                    }
+                }
+                productsInventoried {
+                    endpoint = "/${appName}/apitablero/getProductsInventoried"
+                    archived = ['personal', 'warehouse', 'transaction']
+                    filter = false
+                    order = 10
+                    colors {
+                        datasets {
+                            state6 = ["first"]
+                            state7 = ["second"]
+                            state8 = ["third"]
                         }
                     }
                 }
@@ -815,7 +829,7 @@ openboxes {
                     label: "inventory.browse.label",
                     defaultLabel: "Browse Inventory",
                     menuItems: [
-                        [label: "inventory.browse.label", defaultLabel: "Browse Inventory", href: "/${appName}/browse?resetSearch=true"],
+                        [label: "inventory.browse.label", defaultLabel: "Browse Inventory", href: "/${appName}/inventory/browse?resetSearch=true"],
                         // TODO: (Future improvement) Probably further options should be generated dynamicaly (with item count in bracket)...
                     ],
                 ],
@@ -839,15 +853,15 @@ openboxes {
                     defaultLabel: "Stock Movement",
                     menuItems: [
                         [label: "inbound.create.label", defaultLabel: "Create Inbound Movement", href: "/${appName}/stockMovement/createInbound?direction=INBOUND"],
-                        [label: "stockRequest.create.label", defaultLabel: "Create Stock Request", href: "/${appName}/stockMovement/list?direction=INBOUND"],
-                        [label: "inbound.list.label", defaultLabel: "List Inbound Movements", href: "/${appName}/stockMovement/createRequest"]
+                        [label: "stockRequest.create.label", defaultLabel: "Create Stock Request", href: "/${appName}/stockMovement/createRequest"],
+                        [label: "inbound.list.label", defaultLabel: "List Inbound Movements", href: "/${appName}/stockMovement/list?direction=INBOUND"]
                     ]
                 ],
                 [
                     label: "purchaseOrders.label",
                     defaultLabel: "Purchase Orders",
                     menuItems: [
-                        [label: "order.create.label", defaultLabel: "Create Purchase Order", href: "/${appName}/purchaseOrderWorkflow/index"],
+                        [label: "order.createPurchase.label", defaultLabel: "Create Purchase Order", href: "/${appName}/purchaseOrderWorkflow/index"],
                         [label: "order.listPurchase.label", defaultLabel: "List Purchase Orders", href: "/${appName}/order/list?orderTypeCode=PURCHASE_ORDER"]
                     ]
                 ],
@@ -892,7 +906,7 @@ openboxes {
                         [label: "report.inventoryByLocationReport.label", defaultLabel: "Inventory By Location Report", href: "/${appName}/report/showInventoryByLocationReport"],
                         [label: "report.cycleCount.label", defaultLabel: "Cycle Count Report", href: "/${appName}/cycleCount/exportAsCsv"],
                         [label: "report.baselineQoH.label", defaultLabel: "Baseline QoH Report", href: "/${appName}/inventory/show"],
-                        [label: "report.order.label", defaultLabel: "Order Report", href: "/${appName}/report/showOrderReport"]
+                        [label: "report.order.label", defaultLabel: "Order Report", href: "/${appName}/report/showOnOrderReport"]
                     ]
                 ],
                 [
@@ -914,7 +928,7 @@ openboxes {
                         [label: "export.requisitions.label", defaultLabel: "Export requisitions", href: "/${appName}/requisition/export"],
                         [label: "export.requisitionItems.label", defaultLabel: "Export requisition items", href: "/${appName}/requisitionItem/listCanceled"],
                         [label: "export.binLocations.label", defaultLabel: "Export bin locations", href: "/${appName}/report/exportBinLocation?downloadFormat=csv"],
-                        [label: "export.productDemand.label", defaultLabel: "Export product demand", href: "/${appName}/report/exportdemandReport?downloadFormat=csv"]
+                        [label: "export.productDemand.label", defaultLabel: "Export product demand", href: "/${appName}/report/exportDemandReport?downloadFormat=csv"]
                     ]
                 ]
             ]
@@ -1026,7 +1040,7 @@ openboxes {
                     label: "default.other.label",
                     defaultLabel: "Other",
                     menuItems: [
-                        [label: "containerTypes.label", defaultLabel: "Container Types", href: "${appName}/containerType/list"],
+                        [label: "containerTypes.label", defaultLabel: "Container Types", href: "/${appName}/containerType/list"],
                         [label: "documents.label", defaultLabel: "Documents", href: "/${appName}/document/list"],
                         [label: "documentTypes.label", defaultLabel: "Document Types", href: "/${appName}/documentType/list"],
                         [label: "eventTypes.label", defaultLabel: "Event Types", href: "/${appName}/eventType/list"],
@@ -1050,22 +1064,22 @@ openboxes {
         }
 
         orders {
-            enabled = false
+            enabled = true
             label = "orders.label"
             defaultLabel = "Orders"
         }
         stockRequest {
-            enabled = false
+            enabled = true
             label = "stockRequests.label"
             defaultLabel = "Stock Requests"
         }
         stockMovement {
-            enabled = false
+            enabled = true
             label = "stockMovements.label"
             defaultLabel = "Stock Movements"
         }
         putaways {
-            enabled = false
+            enabled = true
             label = "putaways.label"
             defaultLabel = "Putaways"
         }

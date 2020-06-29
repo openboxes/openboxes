@@ -1,4 +1,5 @@
 <%@ page import="org.pih.warehouse.order.OrderTypeCode" %>
+<%@ page import="org.pih.warehouse.order.OrderStatus" %>
 <g:if test="${orderInstance?.id }">
 	<span id="shipment-action-menu" class="action-menu">
 		<button class="action-btn">
@@ -57,7 +58,7 @@
 			</g:if>
 			<div class="action-menu-item">
 				<g:link target="_blank" controller="order" action="print" id="${orderInstance?.id}"
-						disabled="${orderInstance?.status < org.pih.warehouse.order.OrderStatus.PLACED}"
+						disabled="${orderInstance?.status < OrderStatus.PLACED}"
                         disabledMessage="Order must be placed in order to print.">
 					<img src="${createLinkTo(dir: 'images/icons', file: 'pdf.png')}" class="middle"/>&nbsp;
 					<warehouse:message code="order.print.label" default="Print order"/>
@@ -94,15 +95,17 @@
 						&nbsp;${warehouse.message(code: 'order.rollbackOrderStatus.label', default: "Rollback order status" )}
 					</g:link>
 				</div>
-				<div class="action-menu-item">
-					<g:link controller="order" action="remove" id="${orderInstance?.id}"
-							disabled="${orderInstance?.status != org.pih.warehouse.order.OrderStatus.PENDING}"
-							disabledMessage="${g.message(code:'order.errors.delete.message')}"
-							onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-						<img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}" />
-						&nbsp;${warehouse.message(code: 'order.deleteOrder.label')}
-					</g:link>
-				</div>
+				<g:if test="${!(orderInstance?.orderTypeCode == OrderTypeCode.TRANSFER_ORDER && orderInstance?.status == OrderStatus.COMPLETED)}">
+					<div class="action-menu-item">
+						<g:link controller="order" action="remove" id="${orderInstance?.id}"
+								disabled="${orderInstance?.status != OrderStatus.PENDING}"
+								disabledMessage="${g.message(code:'order.errors.delete.message')}"
+								onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+							<img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}" />
+							&nbsp;${warehouse.message(code: 'order.deleteOrder.label')}
+						</g:link>
+					</div>
+				</g:if>
 			</g:isSuperuser>
         </div>
 	</span>

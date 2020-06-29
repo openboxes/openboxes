@@ -1,6 +1,8 @@
 export const SHOW_SPINNER = 'SHOW_SPINNER';
 export const HIDE_SPINNER = 'HIDE_SPINNER';
 
+export const TOGGLE_MODAL = 'TOGGLE_MODAL';
+
 export const FETCH_REASONCODES = 'FETCH_REASONCODES';
 export const FETCH_USERS = 'FETCH_USERS';
 export const FETCH_SESSION_INFO = 'FETCH_SESSION_INFO';

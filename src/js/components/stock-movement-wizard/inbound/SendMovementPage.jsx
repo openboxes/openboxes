@@ -166,7 +166,7 @@ const SUPPLIER_FIELDS = {
         label: 'react.stockMovement.code.label',
         defaultMessage: 'Code',
       },
-      'product.name': {
+      productName: {
         type: LabelField,
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
@@ -360,10 +360,19 @@ class SendMovementPage extends Component {
     apiClient.get(url)
       .then((response) => {
         const { data } = response.data;
+        const tableItemsData = _.map(
+          data,
+          val => ({
+            ...val,
+            productName: val.productName ? val.productName : val.product.name,
+          }),
+        );
+        const uniqBy = this.state.values.origin.type === 'SUPPLIER' ? 'id' : 'shipmentItemId';
+
         this.setState({
           values: {
             ...this.state.values,
-            tableItems: _.uniq(_.concat(this.state.values.tableItems, data)),
+            tableItems: _.uniqBy(_.concat(this.state.values.tableItems, tableItemsData), uniqBy),
           },
         });
       });
