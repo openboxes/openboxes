@@ -9,8 +9,6 @@
  **/
 package org.pih.warehouse.core
 
-
-import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.auth.AuthService
 
 class UnitOfMeasure implements Serializable {

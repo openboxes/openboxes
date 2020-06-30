@@ -19,7 +19,6 @@ import org.apache.commons.lang.RandomStringUtils
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.WordUtils
 import org.apache.commons.text.StringSubstitutor
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.requisition.Requisition
@@ -160,8 +159,8 @@ class IdentifierService {
 
     // TODO: refactor this to sequence or sth else, because this way it will fail when more than 10 duplicates
     def generateOrganizationIdentifier(String name) {
-        Integer minSize = ConfigurationHolder.config.openboxes.identifier.organization.minSize
-        Integer maxSize = ConfigurationHolder.config.openboxes.identifier.organization.maxSize
+        Integer minSize = grailsApplication.config.openboxes.identifier.organization.minSize
+        Integer maxSize = grailsApplication.config.openboxes.identifier.organization.maxSize
 
         // Clean up string by removing everything after command
         name = name.split(",")[0].capitalize()
@@ -302,7 +301,7 @@ class IdentifierService {
     }
 
     def generateSequenceNumber(String sequenceNumber) {
-        String sequenceNumberFormat = ConfigurationHolder.config.openboxes.identifier.sequenceNumber.format
+        String sequenceNumberFormat = grailsApplication.config.openboxes.identifier.sequenceNumber.format
         return generateSequenceNumber(sequenceNumber, sequenceNumberFormat)
     }
 
