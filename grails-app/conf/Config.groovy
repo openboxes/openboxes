@@ -481,7 +481,6 @@ openboxes {
                     endpoint = "/${appName}/apitablero/getIncomingStock"
                     archived = ['inventory', 'transaction']
                     filter = false
-                    archived = []
                     order = 3
                     colors {
                         datasets {
