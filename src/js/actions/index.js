@@ -144,49 +144,62 @@ function fetchGraphIndicator(
   const id = indicatorConfig.order;
 
   const url = `${indicatorConfig.endpoint}?${params}`;
-
-  dispatch({
-    type: FETCH_GRAPHS,
-    payload: {
-      id,
-      title: 'Loading...',
-      type: 'loading',
-      data: [],
-      archived: indicatorConfig.archived,
-    },
-  });
-
-  apiClient.get(url).then((res) => {
-    const indicatorData = res.data;
+  if (!indicatorConfig.enabled) {
     dispatch({
       type: FETCH_GRAPHS,
       payload: {
         id,
-        title: indicatorData.title,
-        type: indicatorData.type,
-        data: indicatorData.data,
         archived: indicatorConfig.archived,
-        filter: indicatorConfig.filter,
-        link: indicatorData.link,
-        config: {
-          stacked: indicatorConfig.stacked,
-          datalabel: indicatorConfig.datalabel,
-          colors: indicatorConfig.colors,
-        },
+        enabled: indicatorConfig.enabled,
       },
     });
-  }, () => {
+  } else {
     dispatch({
       type: FETCH_GRAPHS,
       payload: {
         id,
-        title: 'Indicator could not be loaded',
-        type: 'error',
+        title: 'Loading...',
+        type: 'loading',
         data: [],
         archived: indicatorConfig.archived,
+        enabled: indicatorConfig.enabled,
       },
     });
-  });
+
+    apiClient.get(url).then((res) => {
+      const indicatorData = res.data;
+      dispatch({
+        type: FETCH_GRAPHS,
+        payload: {
+          id,
+          title: indicatorData.title,
+          type: indicatorData.type,
+          data: indicatorData.data,
+          archived: indicatorConfig.archived,
+          filter: indicatorConfig.filter,
+          link: indicatorData.link,
+          config: {
+            stacked: indicatorConfig.stacked,
+            datalabel: indicatorConfig.datalabel,
+            colors: indicatorConfig.colors,
+          },
+          enabled: indicatorConfig.enabled,
+        },
+      });
+    }, () => {
+      dispatch({
+        type: FETCH_GRAPHS,
+        payload: {
+          id,
+          title: 'Indicator could not be loaded',
+          type: 'error',
+          data: [],
+          archived: indicatorConfig.archived,
+          enabled: indicatorConfig.enabled,
+        },
+      });
+    });
+  }
 }
 
 function fetchNumberIndicator(
@@ -194,20 +207,30 @@ function fetchNumberIndicator(
   indicatorConfig,
 ) {
   const id = indicatorConfig.order;
-
   const url = indicatorConfig.endpoint;
 
-  apiClient.get(url).then((res) => {
-    const indicatorData = res.data;
+  if (!indicatorConfig.enabled) {
     dispatch({
       type: FETCH_NUMBERS,
       payload: {
-        ...indicatorData,
         id,
-        archived: indicatorConfig.archived,
+        enabled: indicatorConfig.enabled,
       },
     });
-  });
+  } else {
+    apiClient.get(url).then((res) => {
+      const indicatorData = res.data;
+      dispatch({
+        type: FETCH_NUMBERS,
+        payload: {
+          ...indicatorData,
+          id,
+          archived: indicatorConfig.archived,
+          enabled: indicatorConfig.enabled,
+        },
+      });
+    });
+  }
 }
 
 export function reloadIndicator(indicatorConfig, params) {
