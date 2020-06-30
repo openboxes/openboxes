@@ -96,6 +96,8 @@ class StockMovementController {
 
         def max = params.max ? params.max as int : 10
         def offset = params.offset ? params.offset as int : 0
+        Date createdAfter = params.createdAfter ? Date.parse("MM/dd/yyyy", params.createdAfter) : null
+        Date createdBefore = params.createdBefore ? Date.parse("MM/dd/yyyy", params.createdBefore) : null
         Location currentLocation = Location.get(session?.warehouse?.id)
 
         StockMovementType stockMovementType = params.direction ? params.direction as StockMovementType : null
@@ -151,7 +153,7 @@ class StockMovementController {
         def stockMovements
 
         try {
-            stockMovements = stockMovementService.getStockMovements(stockMovement, [max: max, offset: offset])
+            stockMovements = stockMovementService.getStockMovements(stockMovement, [max: max, offset: offset, createdAfter: createdAfter, createdBefore: createdBefore])
         } catch(Exception e) {
             flash.message = "${e.message}"
         }
