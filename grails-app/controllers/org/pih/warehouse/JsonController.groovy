@@ -52,7 +52,7 @@ import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemSortByCode
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.util.LocalizationUtil
+import org.pih.warehouse.LocalizationUtil
 
 import java.text.DateFormat
 import java.text.NumberFormat
