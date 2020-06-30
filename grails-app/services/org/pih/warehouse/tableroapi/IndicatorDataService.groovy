@@ -574,8 +574,11 @@ class IndicatorDataService {
         // Calculating the percentage
         List percentage = [];
         for (int i = 0; i <= querySize; i++) {
-            def sum = filledValuesRemovedDueToExpiry[i] + filledValuesNotExpiredLastDayOfMonth[i] + filledValuesExpiredLastDayOfMonth[i]
-            if (sum == 0) {
+            def sum = 0
+            sum = filledValuesRemovedDueToExpiry == null ? sum : sum + filledValuesRemovedDueToExpiry[i]
+            sum = filledValuesNotExpiredLastDayOfMonth == null ? sum : sum + filledValuesNotExpiredLastDayOfMonth[i]
+            sum = filledValuesExpiredLastDayOfMonth == null ? sum : sum + filledValuesExpiredLastDayOfMonth[i]
+            if (sum == 0 || filledValuesRemovedDueToExpiry == null) {
                 percentage.push(0)
             } else {
                 percentage.push(Math.round((filledValuesRemovedDueToExpiry[i] / sum) * 100) / 100)
