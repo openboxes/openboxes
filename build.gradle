@@ -132,6 +132,7 @@ dependencies {
     // Required by MailService (should replace with grails mail plugin)
     compile "commons-fileupload:commons-fileupload:1.4"
     compile "org.apache.commons:commons-email:1.2" // maybe 1.6-SNAPSHOT
+    compile "org.apache.commons:commons-text:1.3" // used to generate sequential identiifers
     compile "commons-beanutils:commons-beanutils:1.9.4"
     compile "commons-lang:commons-lang:2.6" // ok
     compile "org.jadira.usertype:usertype.jodatime:1.9" // maybe 2.1 (but the lates version is from 2012)
@@ -151,11 +152,12 @@ dependencies {
     compile "org.codehaus.jsr166-mirror:extra166y:1.7.0" // ??
 
     // Unknown
-//    build "org.jboss.tattletale:tattletale-ant:1.2.0.Beta2" { excludes "ant", "javassist" }
-//    compile "org.codehaus.groovy.modules.http-builder:http-builder:0.6" {
-//        excludes "xercesImpl", "groovy", "commons-lang", "commons-codec"
-//    }
-    compile "org.apache.httpcomponents:httpclient:4.5.10"
+    //    build "org.jboss.tattletale:tattletale-ant:1.2.0.Beta2" { excludes "ant", "javassist" }
+    //    compile "org.codehaus.groovy.modules.http-builder:http-builder:0.6" {
+    //        excludes "xercesImpl", "groovy", "commons-lang", "commons-codec"
+    //    }
+    // REST client (used by translation and currency services)
+    compile "org.apache.httpcomponents:httpclient:4.5.12"
 
     // Required by functionality (need to be upgraded or replaced)
     compile "org.grails.plugins:rendering:2.0.3" // was 0.4.4
