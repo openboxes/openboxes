@@ -13,7 +13,7 @@ import grails.orm.PagedResultList
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
-import grails.utils.Holders
+import grails.util.Holders
 import java.math.RoundingMode
 import grails.plugins.csv.CSVMapReader
 import org.hibernate.criterion.CriteriaSpecification
@@ -35,8 +35,12 @@ import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.UpdateUnitPriceMethodCode
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
+import org.pih.warehouse.data.DataService
+import org.pih.warehouse.data.PersonDataService
+import org.pih.warehouse.data.ProductSupplierDataService
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.jobs.RefreshOrderSummaryJob
 import org.pih.warehouse.product.Product
@@ -47,6 +51,8 @@ import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentException
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.shipping.ShipmentService
+import org.pih.warehouse.shipping.ShipmentType
 import util.ReportUtil
 import java.text.SimpleDateFormat
 
