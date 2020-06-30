@@ -351,15 +351,16 @@ openboxes:
         delay: 300
         minLength: 3
 
-    # Send stock alerts
+
     jobs:
+        # Send stock alerts
         sendStockAlertsJob:
             enabled: true
             skipOnEmpty: true
             daysUntilExpiry: 60
             cronExpression: "0 0 0 * * ?" # every day at midnight
 
-        # Refresh inventory snapshots
+        # Refresh inventory snapshots (triggered manually)
         refreshInventorySnapshotJob:
             enabled: true
             retryOnError: false
@@ -370,6 +371,7 @@ openboxes:
             enabled: true
             cronExpression: "0 0 0 * * ?" # every day at midnight
 
+        # Refresh demand fact table
         refreshDemandDataJob:
             enabled: true
             cronExpression: "0 0 1 * * ?" # at 01:00:00am every day
@@ -400,6 +402,10 @@ openboxes:
         dataMigrationJob:
             enabled: true
 
+        updateExchangeRatesJob:
+            enabled: false
+            cronExpression: "0 0 * * * ?" # every hour
+
     # LDAP configuration
     ldap:
         enabled: false
@@ -421,7 +427,7 @@ openboxes:
     # Examples: Stock out, Low stock, Expired, Damaged, Could not locate, Insufficient quantity reconditioned
     stockCard:
         consumption:
-            stouckout: &stockout 1
+            stockout: &stockout 1
             low_stock: &low_stock 2
             expired: &expired 3
             damaged: &damaged 4
@@ -438,6 +444,15 @@ openboxes:
         # Currency configuration
         defaultCurrencyCode: "USD"
         defaultCurrencySymbol: '\$'
+        supportedCurrencyCodes: ["USD", "CAD", "EUR", "GBP"]
+        currencyApi:
+            url: "https://api.exchangeratesapi.io/latest?base=%s"
+            apiKey: ""
+            password: ""
+        translationApi:
+            uri: "https://translate.yandex.net/api/v1.5/tr.json/translate?key=%s&text=%s&lang=%s&format=%s"
+            apiKey: ""
+            format: "plain"
 
     # Inventory snapshot configuration
     inventorySnapshot:
@@ -483,6 +498,7 @@ openboxes:
     # Allow users to customize logo image url as well as label
     logo:
         url: "https://openboxes.com/img/logo_30.png"
+        label: ""
     report:
         logo:
             url: "https://openboxes.com/img/logo_100.png"
@@ -524,7 +540,7 @@ openboxes:
 
     api:
         pagination:
-            enabled: false
+            enabled: true
 
 mail:
     error:
