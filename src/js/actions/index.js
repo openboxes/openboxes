@@ -98,7 +98,7 @@ export function fetchSessionInfo() {
 }
 
 export function fetchMenuConfig() {
-  const url = '/openboxes/api/getMenuConfig';
+  const url = '/api/getMenuConfig';
   const request = apiClient.get(url);
 
   return {
@@ -375,7 +375,7 @@ export function reorderIndicators({ oldIndex, newIndex }, e, type) {
 
 export function fetchConfigAndData(locationId, config = 'personal', filterSelected) {
   return (dispatch) => {
-    apiClient.get('/openboxes/apitablero/config').then((res) => {
+    apiClient.get('/apitablero/config').then((res) => {
       dispatch({
         type: FETCH_CONFIG,
         payload: {
@@ -389,7 +389,7 @@ export function fetchConfigAndData(locationId, config = 'personal', filterSelect
 
 export function fetchConfig() {
   return (dispatch) => {
-    apiClient.get('/openboxes/apitablero/config').then((res) => {
+    apiClient.get('/apitablero/config').then((res) => {
       dispatch({
         type: FETCH_CONFIG,
         payload: {
