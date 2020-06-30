@@ -52,7 +52,7 @@ import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
-import org.pih.warehouse.util.LocalizationUtil
+import org.pih.warehouse.LocalizationUtil
 import org.grails.plugins.csv.CSVWriter
 import org.apache.commons.lang.StringEscapeUtils
 import org.quartz.impl.StdScheduler

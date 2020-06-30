@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.core
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderTypeCode
 
@@ -34,8 +34,8 @@ class Organization extends Party {
 
     static constraints = {
         code(nullable: false, unique: true,
-                minSize: ConfigurationHolder.config.openboxes.identifier.organization.minSize,
-                maxSize: ConfigurationHolder.config.openboxes.identifier.organization.maxSize)
+                minSize: Holders.grailsApplication.config.openboxes.identifier.organization.minSize,
+                maxSize: Holders.grailsApplication.config.openboxes.identifier.organization.maxSize)
         name(nullable: false, maxSize: 255)
         description(nullable: true, maxSize: 255)
         defaultLocation(nullable: true)
