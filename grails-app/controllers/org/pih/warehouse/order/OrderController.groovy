@@ -10,13 +10,10 @@
 package org.pih.warehouse.order
 
 import grails.converters.JSON
+import grails.plugins.csv.CSVWriter
 import grails.validation.ValidationException
 import grails.gorm.transactions.Transactional
 import org.apache.commons.lang.StringEscapeUtils
-import org.grails.plugins.csv.CSVWriter
-import org.pih.warehouse.core.Comment
-import org.pih.warehouse.core.Constants
-import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.UomService
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.shipping.Shipment
@@ -24,8 +21,6 @@ import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.User
 import org.springframework.web.multipart.MultipartFile
 
 @Transactional

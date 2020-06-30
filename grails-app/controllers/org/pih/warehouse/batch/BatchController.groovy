@@ -13,7 +13,7 @@ import grails.core.GrailsApplication
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.*
-import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest
 
 class BatchController {
 
