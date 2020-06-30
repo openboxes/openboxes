@@ -12,11 +12,11 @@ buildscript {
     repositories {
         mavenLocal()
         //mavenCentral()
-        maven { url "http://repo1.maven.org/maven2" }
+        maven { url "https://repo1.maven.org/maven2" }
         //maven { url "https://repo.grails.org/grails/core" }
-        maven { url "http://repo.grails.org/grails/plugins/" }
-        maven { url "http://repo.grails.org/grails/plugins-releases/" }
-        maven { url "http://repo.grails.org/grails/core/" }
+        maven { url "https://repo.grails.org/grails/plugins/" }
+        maven { url "https://repo.grails.org/grails/plugins-releases/" }
+        maven { url "https://repo.grails.org/grails/core/" }
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
@@ -61,10 +61,10 @@ repositories {
     mavenLocal()
     //mavenCentral()
     //maven { url "https://repo.grails.org/grails/core" }
-    maven { url "http://repo1.maven.org/maven2" }
-    maven { url "http://repo.grails.org/grails/plugins/" }
-    maven { url "http://repo.grails.org/grails/plugins-releases/" }
-    maven { url "http://repo.grails.org/grails/core/" }
+    maven { url "https://repo1.maven.org/maven2" }
+    maven { url "https://repo.grails.org/grails/plugins/" }
+    maven { url "https://repo.grails.org/grails/plugins-releases/" }
+    maven { url "https://repo.grails.org/grails/core/" }
 //    grailsPlugins()
 //    grailsHome()
 //    grailsCentral()
