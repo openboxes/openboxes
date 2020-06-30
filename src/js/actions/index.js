@@ -82,7 +82,7 @@ export function fetchReasonCodes() {
 }
 
 export function fetchCurrencies() {
-  const url = '/openboxes/api/unitOfMeasure/currencies';
+  const url = '/api/unitOfMeasure/currencies';
   const request = apiClient.get(url);
 
   return {
@@ -92,7 +92,7 @@ export function fetchCurrencies() {
 }
 
 export function fetchOrganizations() {
-  const url = '/openboxes/api/organizations';
+  const url = '/api/organizations';
   const request = apiClient.get(url);
 
   return {
@@ -121,7 +121,7 @@ export function fetchSessionInfo() {
 }
 
 export function fetchMenuConfig() {
-  const url = '/openboxes/api/getMenuConfig';
+  const url = '/api/getMenuConfig';
   const request = apiClient.get(url);
 
   return {
@@ -379,7 +379,7 @@ export function reorderIndicators({ oldIndex, newIndex }, e, type) {
 
 export function fetchConfigAndData(locationId, config = 'personal', userId, filterSelected) {
   return (dispatch) => {
-    apiClient.get('/openboxes/api/dashboard/config').then((res) => {
+    apiClient.get('/api/dashboard/config').then((res) => {
       dispatch({
         type: FETCH_CONFIG_AND_SET_ACTIVE,
         payload: {
@@ -394,7 +394,7 @@ export function fetchConfigAndData(locationId, config = 'personal', userId, filt
 
 export function fetchConfig() {
   return (dispatch) => {
-    apiClient.get('/openboxes/api/dashboard/config').then((res) => {
+    apiClient.get('/api/dashboard/config').then((res) => {
       dispatch({
         type: FETCH_CONFIG,
         payload: {
@@ -432,7 +432,7 @@ export function updateBreadcrumbs(listBreadcrumbsStep = [
 
 export function fetchBreadcrumbsConfig() {
   return (dispatch) => {
-    apiClient.get('/openboxes/api/dashboard/breadcrumbsConfig').then((res) => {
+    apiClient.get('/api/dashboard/breadcrumbsConfig').then((res) => {
       dispatch({
         type: FETCH_BREADCRUMBS_CONFIG,
         payload: res.data,
