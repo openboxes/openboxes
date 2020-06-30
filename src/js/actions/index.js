@@ -144,13 +144,13 @@ function fetchGraphIndicator(
   const id = indicatorConfig.order;
 
   const url = `${indicatorConfig.endpoint}?${params}`;
-  if (indicatorConfig.enabled === false) {
+  if (!indicatorConfig.enabled) {
     dispatch({
       type: FETCH_GRAPHS,
       payload: {
         id,
         archived: indicatorConfig.archived,
-        enabled: false,
+        enabled: indicatorConfig.enabled,
       },
     });
   } else {
@@ -162,10 +162,9 @@ function fetchGraphIndicator(
         type: 'loading',
         data: [],
         archived: indicatorConfig.archived,
-        enabled: true,
+        enabled: indicatorConfig.enabled,
       },
     });
-
 
     apiClient.get(url).then((res) => {
       const indicatorData = res.data;
@@ -184,7 +183,7 @@ function fetchGraphIndicator(
             datalabel: indicatorConfig.datalabel,
             colors: indicatorConfig.colors,
           },
-          enabled: true,
+          enabled: indicatorConfig.enabled,
         },
       });
     }, () => {
@@ -196,7 +195,7 @@ function fetchGraphIndicator(
           type: 'error',
           data: [],
           archived: indicatorConfig.archived,
-          enabled: true,
+          enabled: indicatorConfig.enabled,
         },
       });
     });
@@ -208,9 +207,17 @@ function fetchNumberIndicator(
   indicatorConfig,
 ) {
   const id = indicatorConfig.order;
-
   const url = indicatorConfig.endpoint;
-  if (indicatorConfig.enabled) {
+
+  if (!indicatorConfig.enabled) {
+    dispatch({
+      type: FETCH_NUMBERS,
+      payload: {
+        id,
+        enabled: indicatorConfig.enabled,
+      },
+    });
+  } else {
     apiClient.get(url).then((res) => {
       const indicatorData = res.data;
       dispatch({
@@ -222,14 +229,6 @@ function fetchNumberIndicator(
           enabled: indicatorConfig.enabled,
         },
       });
-    });
-  } else {
-    dispatch({
-      type: FETCH_NUMBERS,
-      payload: {
-        id,
-        enabled: indicatorConfig.enabled,
-      },
     });
   }
 }

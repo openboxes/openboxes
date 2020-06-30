@@ -29,7 +29,7 @@ defaults.scale.ticks.beginAtZero = true;
 const SortableCards = SortableContainer(({ data, loadIndicator }) => (
   <div className="card-component">
     {data.map((value, index) =>
-      (value.archived || value.enabled === false ? null : (
+      (value.archived || !value.enabled ? null : (
         <GraphCard
           key={`item-${value.id}`}
           index={index}
@@ -50,7 +50,7 @@ const SortableCards = SortableContainer(({ data, loadIndicator }) => (
 const SortableNumberCards = SortableContainer(({ data }) => (
   <div className="card-component">
     {data.map((value, index) => (
-      (value.archived || value.enabled === false ? null : (
+      (value.archived || !value.enabled ? null : (
         <NumberCard
           key={`item-${value.id}`}
           index={index}
