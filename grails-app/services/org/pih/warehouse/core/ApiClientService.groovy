@@ -9,7 +9,6 @@
 **/
 package org.pih.warehouse.core
 
-import grails.plugin.springcache.annotations.Cacheable
 import org.apache.commons.io.IOUtils
 import org.apache.http.HttpResponse
 import org.apache.http.client.HttpClient
@@ -24,7 +23,7 @@ import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.message.BasicHeader
 import org.apache.http.protocol.HTTP
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 
 class ApiClientService {
 

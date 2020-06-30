@@ -11,16 +11,13 @@ package org.pih.warehouse.reporting
 
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
-import grails.plugin.springcache.annotations.CacheFlush
-import groovy.sql.Sql
+import grails.plugins.csv.CSVWriter
 import org.apache.commons.lang.StringEscapeUtils
-import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.OrderItem
-import org.pih.warehouse.product.Product
 import org.pih.warehouse.report.ChecklistReportCommand
 import org.pih.warehouse.report.InventoryReportCommand
 import org.pih.warehouse.report.MultiLocationInventoryReportCommand
