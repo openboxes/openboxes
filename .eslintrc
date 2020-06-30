@@ -6,6 +6,7 @@
   "parserOptions": {
     "ecmaVersion": 6,
     "sourceType": "module",
+    "allowImportExportEverywhere": true,
     "ecmaFeatures": {
       "jsx": true
     }
