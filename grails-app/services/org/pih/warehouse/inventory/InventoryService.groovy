@@ -2770,6 +2770,8 @@ class InventoryService implements ApplicationContextAware {
 
             transaction.addToTransactionEntries(transactionEntry)
         }
+        // Force refresh of inventory snapshot table
+        transaction.forceRefresh = Boolean.TRUE
         transaction.save(flush: true, failOnError: true)
         println "Transaction ${transaction?.transactionNumber} saved successfully! "
         println "Added ${transaction?.transactionEntries?.size()} transaction entries"
