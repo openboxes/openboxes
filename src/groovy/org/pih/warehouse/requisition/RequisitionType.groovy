@@ -41,6 +41,13 @@ enum RequisitionType {
         [STOCK]
     }
 
+    static listRequestTypes() {
+        [
+                STOCK,
+                ADHOC
+        ]
+    }
+
     String toString() {
         return name()
     }

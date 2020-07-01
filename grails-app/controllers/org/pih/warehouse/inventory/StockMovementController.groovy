@@ -149,6 +149,7 @@ class StockMovementController {
         stockMovement.destination = requisition.destination
         stockMovement.statusCode = requisition?.status ? requisition?.status.toString() : null
         stockMovement.receiptStatusCode = params?.receiptStatusCode ? params.receiptStatusCode as ShipmentStatusCode : null
+        stockMovement.requestType = requisition?.type
 
         def stockMovements
 

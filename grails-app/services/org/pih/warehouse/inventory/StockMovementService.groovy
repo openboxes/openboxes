@@ -413,6 +413,9 @@ class StockMovementService {
             if (stockMovement.createdBy) {
                 eq("createdBy", stockMovement.createdBy)
             }
+            if (stockMovement.requestType) {
+                eq("type", stockMovement.requestType)
+            }
             if(params.createdAfter) {
                 ge("dateCreated", params.createdAfter)
             }
@@ -1210,7 +1213,7 @@ class StockMovementService {
         if (!stockMovement.identifier && !requisition.requestNumber) {
             requisition.requestNumber = identifierService.generateRequisitionIdentifier()
         }
-        requisition.type = RequisitionType.DEFAULT
+        requisition.type = stockMovement.requestType
         requisition.requisitionTemplate = stockMovement.stocklist
         requisition.description = stockMovement.description
         requisition.destination = stockMovement.destination

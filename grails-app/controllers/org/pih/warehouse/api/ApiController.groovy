@@ -16,6 +16,7 @@ import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.requisition.RequisitionType
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -27,6 +28,7 @@ class ApiController {
     def localizationService
     def megamenuService
     def grailsApplication
+    def messageSource
 
     def login = {
         def username = request.JSON.username
@@ -141,5 +143,17 @@ class ApiController {
             databaseStatusMessage = "Error: " + e.message
         }
         render([status: "OK", database: [status: databaseStatus, message: databaseStatusMessage ?: ""]] as JSON)
+    }
+
+    def getRequestTypes = {
+        def requestTypes = []
+        Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale ?: "en")
+        Locale locale = session?.user?.locale ?: defaultLocale
+        RequisitionType.listRequestTypes().each {
+            def id = it.name()
+            def name = messageSource.getMessage("enum.RequisitionType.${it.name()}", null, null, locale)
+            requestTypes << [id: id, name: name]
+        }
+        render([data: requestTypes] as JSON)
     }
 }
