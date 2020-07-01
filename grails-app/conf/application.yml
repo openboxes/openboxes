@@ -67,6 +67,7 @@ management:
             mode: full
 
 server:
+    contextPath: "/openboxes"
     session:
         timeout: 3600
 ---
