@@ -13,6 +13,7 @@ import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.Location
 import grails.core.GrailsApplication
+import org.pih.warehouse.core.User
 
 @Transactional
 class LocationApiController extends BaseDomainApiController {
@@ -30,10 +31,11 @@ class LocationApiController extends BaseDomainApiController {
         }
 
         Location currentLocation = Location.get(session?.warehouse?.id)
+        User currentUser = User.get(session?.user?.id)
         boolean isSuperuser = userService.isSuperuser(session?.user)
         String direction = params?.direction
         def fields = params.fields ? params.fields.split(",") : null
-        def locations = locationService.getLocations(fields, params, isSuperuser, direction, currentLocation)
+        def locations = locationService.getLocations(fields, params, isSuperuser, direction, currentLocation, currentUser)
         render([data: locations] as JSON)
     }
 
