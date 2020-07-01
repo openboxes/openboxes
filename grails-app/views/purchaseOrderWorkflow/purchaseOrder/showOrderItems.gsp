@@ -166,6 +166,16 @@
           .val());
         });
 
+        $("#quantityUom").live('change', function() {
+          if($("#quantityUom option:selected").val() == 'EA') {
+            $("#quantityPerUom").val("1");
+            $("#quantityPerUom").attr("disabled", true);
+          } else {
+            $("#quantityPerUom").val("");
+            $("#quantityPerUom").removeAttr("disabled");
+          }
+        });
+
         function deleteOrderItem(id) {
           $.ajax({
             url: '${g.createLink(controller:'order', action:'removeOrderItem')}',
