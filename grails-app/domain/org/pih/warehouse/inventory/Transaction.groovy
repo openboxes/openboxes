@@ -52,7 +52,7 @@ class Transaction implements Comparable, Serializable {
     }
 
     def publishSaveEvent = {
-        publishEvent(new TransactionEvent(this))
+        publishEvent(new TransactionEvent(this, forceRefresh))
     }
 
     def publishDeleteEvent = {
@@ -100,6 +100,10 @@ class Transaction implements Comparable, Serializable {
     LocalTransfer outboundTransfer
     LocalTransfer inboundTransfer
 
+    // Transient property that allows each transaction to specify
+    // whether it requires an inventory snapshot refresh (e.g. deletes, imports)
+    Boolean forceRefresh = Boolean.FALSE
+
     // Association mapping
     static hasMany = [transactionEntries: TransactionEntry]
     static belongsTo = [LocalTransfer, Requisition, Shipment]
@@ -115,7 +119,7 @@ class Transaction implements Comparable, Serializable {
     }
 
     // Transient attributs
-    static transients = ['localTransfer']
+    static transients = ['localTransfer', 'forceRefresh']
 
 
     static namedQueries = {
