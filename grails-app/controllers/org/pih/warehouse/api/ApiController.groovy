@@ -67,7 +67,7 @@ class ApiController {
     }
 
     def getMenuConfig() {
-        Map menuConfig = grailsApplication.config.getProperty("openboxes.megamenu")
+        Map menuConfig = grailsApplication.config.openboxes.megamenu
         User user = User.get(session?.user?.id)
         Location location = Location.get(session.warehouse?.id)
         List translatedMenu = megamenuService.buildAndTranslateMenu(menuConfig, user, location)

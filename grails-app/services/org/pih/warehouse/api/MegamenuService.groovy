@@ -101,7 +101,8 @@ class MegamenuService {
             if (role && !userService.isUserInRole(user, role)) {
                 return
             }
-            ActivityCode[] activities = value.requiredActivities ?: []
+
+            ActivityCode[] activities = value?.requiredActivities?.empty ? value?.requiredActivities : []
             if (activities && !location.supportsAny(activities)) {
                 return
             }
