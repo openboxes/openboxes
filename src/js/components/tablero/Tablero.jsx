@@ -4,6 +4,7 @@ import { defaults } from 'react-chartjs-2';
 import { connect } from 'react-redux';
 import { SortableContainer } from 'react-sortable-hoc';
 import 'react-table/react-table.css';
+import 'react-confirm-alert/src/react-confirm-alert.css';
 import {
   addToIndicators,
   fetchIndicators,
