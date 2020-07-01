@@ -118,6 +118,7 @@ body {
   color: $gray-beta;
   border-bottom: solid 1px $gray-alpha;
   flex-wrap: wrap;
+
   a {
     text-decoration: none;
     color: $gray-zeta;
@@ -785,6 +786,7 @@ div.crossed-out .table-inner-row:before {
   display: flex;
   flex-direction: row;
   align-items: center;
+
   span {
     background-color: red;
     color: white;
@@ -793,5 +795,9 @@ div.crossed-out .table-inner-row:before {
     border-radius: 5px;
     padding: 0px 5px;
   }
-  
+
+  img {
+    height: 75%;
+  }
+
 }

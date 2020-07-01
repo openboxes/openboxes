@@ -13,14 +13,14 @@ import org.springframework.context.ApplicationEvent
 
 class TransactionEvent extends ApplicationEvent {
 
-    Boolean deleted = false
+    Boolean forceRefresh = false
 
     TransactionEvent(Transaction source) {
         super(source)
     }
 
-    TransactionEvent(Transaction source, Boolean deleted) {
+    TransactionEvent(Transaction source, Boolean forceRefresh) {
         super(source)
-        this.deleted = deleted
+        this.forceRefresh = forceRefresh
     }
 }

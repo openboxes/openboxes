@@ -105,7 +105,7 @@ const ArchivedGraph = (props) => {
 const ArchivedIndicators = props => (
   <div>
     {props.numberData.map((value, index) =>
-      (value.archived ? (
+      (value.archived && value.enabled ? (
         <ArchivedNumber
           key={`item-${value.id}`}
           index={index}
@@ -118,7 +118,7 @@ const ArchivedIndicators = props => (
         />
       ) : null))}
     {props.graphData.map((value, index) =>
-      (value.archived ? (
+      (value.archived && value.enabled ? (
         <ArchivedGraph
           key={`item-${value.id}`}
           index={index}
@@ -134,8 +134,8 @@ const ArchivedIndicators = props => (
 
 
 const UnarchiveIndicators = (props) => {
-  const size = props.graphData.filter(data => data.archived).length
-    + props.numberData.filter(data => data.archived).length;
+  const size = props.graphData.filter(data => data.archived && data.enabled).length
+    + props.numberData.filter(data => data.archived && data.enabled).length;
 
   return (
     <div

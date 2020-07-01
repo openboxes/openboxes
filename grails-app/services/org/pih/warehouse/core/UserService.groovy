@@ -363,12 +363,10 @@ class UserService {
         customConfig[type].each { key, value ->
             // Update order
             config["endpoints"][type][key]["order"] = value["order"]
-
+            
             // If the indicator should be archived but it currently isn't
-            boolean archivedInConfig = config["endpoints"][type][key]["archived"].findIndexOf {
-                it == "personal"
-            } != -1;
-            if (value["archived"] && archivedInConfig) {
+            boolean archivedInConfig = config["endpoints"][type][key]["archived"].indexOf("personal") != -1 
+            if (value["archived"] && !archivedInConfig) {
                 config["endpoints"][type][key]["archived"].add("personal")
             }
 

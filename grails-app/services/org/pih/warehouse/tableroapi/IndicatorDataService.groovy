@@ -496,8 +496,8 @@ class IndicatorDataService {
                     """
                 )
             }
-
-            percentage = Math.round(inventoriedProducts[0][0] / productInStock[0] * 100)
+            
+            percentage = productInStock[0] == 0 ? 0 : Math.round(inventoriedProducts[0][0] / productInStock[0] * 100)
             ColorNumber colorNumber = new ColorNumber(percentage, subtitle)
             colorNumber.setConditionalColors(listErrorSuccessIntervals.get(it)[0], listErrorSuccessIntervals.get(it)[1])
             colorNumber.value = "${colorNumber.value}%"
@@ -574,11 +574,14 @@ class IndicatorDataService {
         // Calculating the percentage
         List percentage = [];
         for (int i = 0; i <= querySize; i++) {
-            def sum = filledValuesRemovedDueToExpiry[i] + filledValuesNotExpiredLastDayOfMonth[i] + filledValuesExpiredLastDayOfMonth[i]
+            def removedDueToExpiry = filledValuesRemovedDueToExpiry == null ? 0 : filledValuesRemovedDueToExpiry[i]
+            def notExpiredLastDayOfMonth = filledValuesNotExpiredLastDayOfMonth == null ? 0 : filledValuesNotExpiredLastDayOfMonth[i]
+            def expiredLastDayOfMonth = filledValuesExpiredLastDayOfMonth == null ? 0 : filledValuesExpiredLastDayOfMonth[i]
+            def sum = removedDueToExpiry + notExpiredLastDayOfMonth + expiredLastDayOfMonth
             if (sum == 0) {
                 percentage.push(0)
             } else {
-                percentage.push(Math.round((filledValuesRemovedDueToExpiry[i] / sum) * 100) / 100)
+                percentage.push(Math.round((removedDueToExpiry / sum) * 100) / 100)
             }
         }
 

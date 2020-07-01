@@ -21,7 +21,7 @@ class NumberDataService {
     }
 
     NumberData getInProgressShipments(def user, def location) {
-        def shipments = Requisition.executeQuery("select count(*) from Requisition r where r.origin = :location and r.status <> 'ISSUED' and r.createdBy = :user",
+        def shipments = Requisition.executeQuery("select count(*) from Requisition r join r.shipments s where r.origin = :location and s.currentStatus = 'PENDING' and r.createdBy = :user",
                 ['location': location, 'user': user]);
 
         return new NumberData("Your in Progress Shipments", shipments[0], "Shipments", "/openboxes/stockMovement/list?receiptStatusCode=PENDING&origin.id=" + location.id + "&createdBy.id=" + user.id)
@@ -31,7 +31,7 @@ class NumberDataService {
         def incompletePutaways = Order.executeQuery("select count(o.id) from Order o where o.orderTypeCode = 'TRANSFER_ORDER' AND o.status = 'PENDING' AND o.orderedBy = :user AND o.destination = :location",
                 ['user': user, 'location': location]);
 
-        return new NumberData("Your in Progress Putaways", incompletePutaways[0], "Putaways", "/openboxes/order/list/listForm?orderedById=" + user.id)
+        return new NumberData("Your in Progress Putaways", incompletePutaways[0], "Putaways", "/openboxes/order/list?orderTypeCode=TRANSFER_ORDER&status=PENDING&orderedBy=" + user.id)
     }
 
     NumberData getReceivingBin(def location) {

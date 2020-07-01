@@ -4,6 +4,7 @@ import { defaults } from 'react-chartjs-2';
 import { connect } from 'react-redux';
 import { SortableContainer } from 'react-sortable-hoc';
 import 'react-table/react-table.css';
+import 'react-confirm-alert/src/react-confirm-alert.css';
 import {
   addToIndicators,
   fetchIndicators,
@@ -29,7 +30,7 @@ defaults.scale.ticks.beginAtZero = true;
 const SortableCards = SortableContainer(({ data, loadIndicator }) => (
   <div className="card-component">
     {data.map((value, index) =>
-      (value.archived ? null : (
+      (value.archived || !value.enabled ? null : (
         <GraphCard
           key={`item-${value.id}`}
           index={index}
@@ -50,7 +51,7 @@ const SortableCards = SortableContainer(({ data, loadIndicator }) => (
 const SortableNumberCards = SortableContainer(({ data }) => (
   <div className="card-component">
     {data.map((value, index) => (
-      (value.archived ? null : (
+      (value.archived || !value.enabled ? null : (
         <NumberCard
           key={`item-${value.id}`}
           index={index}
