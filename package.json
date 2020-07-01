@@ -13,7 +13,7 @@
     "test": "test"
   },
   "scripts": {
-    "watch": "webpack --watch --colors --progress --mode=development --env.REACT_APP_API_PATH=/",
+    "watch": "webpack --watch --colors --progress --mode=development --env.REACT_APP_API_PATH=/openboxes/",
     "bundle": "webpack --mode=production",
     "test": "jest",
     "styleguide": "styleguidist server",
