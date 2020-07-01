@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+  <changeSet author="jmiranda" id="1581561998260-1">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="order_item" columnName="product_supplier_id"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="order_item">
+      <column name="product_supplier_id" type="CHAR(38)">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+  <changeSet author="jmiranda" id="1581561998260-2">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="FK2D110D6429542386"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="product_supplier_id" baseTableName="order_item"
+      constraintName="FK2D110D6429542386" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="product_supplier"/>
+  </changeSet>
+</databaseChangeLog>
+

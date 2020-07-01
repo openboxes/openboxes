@@ -44,9 +44,25 @@
                 <g:displayReportLogo/>
             </div>
         </div>
+        <div class="left">
+            <b>${orderInstance?.destinationParty?.name }</b>
+            <g:if test="${orderInstance?.destinationParty?.defaultLocation?.address}">
+                <br/>
+                ${orderInstance?.destinationParty?.defaultLocation?.address?.address}<br/>
+                <g:if test="${orderInstance?.destinationParty?.defaultLocation?.address?.address2}">
+                    ${orderInstance?.destinationParty?.defaultLocation?.address?.address2}<br/>
+                </g:if>
+                ${orderInstance?.destinationParty?.defaultLocation?.address?.city},
+                ${orderInstance?.destinationParty?.defaultLocation?.address?.stateOrProvince}
+                ${orderInstance?.destinationParty?.defaultLocation?.address?.postalCode}
+                <br/>
+                ${orderInstance?.destinationParty?.defaultLocation?.address?.country}<br/>
+            </g:if>
+
+        </div>
         <div class="right">
             <div class="title">
-                <warehouse:message code="order.label"/>
+                <warehouse:message code="enum.OrderTypeCode.${orderInstance?.orderTypeCode}"/>
             </div>
             <table width="25%">
                 <tr>
@@ -81,12 +97,12 @@
         <div class="report-summary" >
             <table>
                 <tr>
-                    <td colspan="2">
+                    <td colspan="3">
                         <h2>Summary</h2>
                     </td>
                 </tr>
                 <tr>
-                    <td width="50%">
+                    <td width="33%">
                         <table>
                             <tr>
                                 <td class="top left" width="25%">
@@ -101,9 +117,9 @@
                                             ${orderInstance?.origin?.address?.address2}<br/>
                                         </g:if>
                                         ${orderInstance?.origin?.address?.city},
-                                        ${orderInstance?.origin?.address?.stateOrProvince}<br/>
+                                        ${orderInstance?.origin?.address?.stateOrProvince}
+                                        ${orderInstance?.origin?.address?.postalCode}<br/>
                                         ${orderInstance?.origin?.address?.country}<br/>
-                                        ${orderInstance?.destination?.address?.description}
                                     </g:if>
                                 </td>
                             </tr>
@@ -111,7 +127,7 @@
 
 
                     </td>
-                    <td width="50%">
+                    <td width="33%">
                         <table>
                             <tr>
                                 <td class="top" width="25%">
@@ -139,6 +155,40 @@
                             </tr>
                         </table>
                     </td>
+                    <td width="34%">
+                        <table>
+                            <tr>
+                                <td class="top">
+                                    <label><warehouse:message code="purchaseOrder.buyer.label" default="Buyer"/></label>
+                                </td>
+                                <td class="top left">
+                                    <div>
+                                        ${orderInstance?.destinationParty}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="top">
+                                    <label><warehouse:message code="order.paymentTerm.label" default="Payment Term"/></label>
+                                </td>
+                                <td class="top left">
+                                    <div>
+                                        ${orderInstance?.paymentTerm?.name}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="top">
+                                    <label><warehouse:message code="order.paymentMethodType.label" default="Payment Method"/></label>
+                                </td>
+                                <td class="top left">
+                                    <div>
+                                        ${orderInstance?.paymentMethodType?.name}
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
                 </tr>
             </table>
         </div>
@@ -152,7 +202,8 @@
                 <tr>
                     <td colspan="5">
                         <div class="list">
-                            <g:set var="status" value="${0 }"/>
+                            <g:set var="status" value="${0}"/>
+                            <g:set var="columnsNumber" value="6"/>
                             <table class="order-items">
                                 <thead>
                                     <tr>
@@ -165,6 +216,24 @@
                                         <th class="bottom">
                                             <warehouse:message code="product.name.label"/>
                                         </th>
+                                        <g:if test="${orderInstance.orderItems.any { it.productSupplier?.supplierCode } }">
+                                            <g:set var="columnsNumber" value="${columnsNumber.toInteger() + 1}"/>
+                                            <th class="center">
+                                                <warehouse:message code="product.supplierCode.label"/>
+                                            </th>
+                                        </g:if>
+                                        <g:if test="${orderInstance.orderItems.any { it.productSupplier?.manufacturerName } }">
+                                            <g:set var="columnsNumber" value="${columnsNumber.toInteger() + 1}"/>
+                                            <th class="center">
+                                                <warehouse:message code="product.manufacturer.label"/>
+                                            </th>
+                                        </g:if>
+                                        <g:if test="${orderInstance.orderItems.any { it.productSupplier?.manufacturerCode } }">
+                                            <g:set var="columnsNumber" value="${columnsNumber.toInteger() + 1}"/>
+                                            <th class="center">
+                                                <warehouse:message code="product.manufacturerCode.label"/>
+                                            </th>
+                                        </g:if>
                                         <th class="center bottom">
                                             <warehouse:message code="orderItem.quantity.label" default="Quantity"/>
                                         </th>
@@ -194,11 +263,26 @@
                                         <td>
                                             <format:product product="${orderItem?.product}"/>
                                         </td>
+                                        <g:if test="${orderInstance.orderItems.any { it.productSupplier?.supplierCode } }">
+                                            <td>
+                                                ${orderItem?.productSupplier?.supplierCode}
+                                            </td>
+                                        </g:if>
+                                        <g:if test="${orderInstance.orderItems.any { it.productSupplier?.manufacturerName } }">
+                                            <td>
+                                                ${orderItem?.productSupplier?.manufacturerName}
+                                            </td>
+                                        </g:if>
+                                        <g:if test="${orderInstance.orderItems.any { it.productSupplier?.manufacturerCode } }">
+                                            <td>
+                                                ${orderItem?.productSupplier?.manufacturerCode}
+                                            </td>
+                                        </g:if>
                                         <td class="right">
                                             ${orderItem?.quantity }
                                         </td>
                                         <td class="center">
-                                            ${orderItem?.product?.unitOfMeasure?:"EA"}
+                                            ${orderItem?.unitOfMeasure}
                                         </td>
                                         <td class="right">
                                             <g:formatNumber number="${orderItem?.unitPrice}" />
@@ -212,12 +296,30 @@
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <th colspan="6">
+                                        <th colspan="${columnsNumber}" class="right">
+                                            <warehouse:message code="default.subtotal.label" default="Subtotal"/>
+                                        </th>
+                                        <th class="right">
+                                            <g:formatNumber number="${orderInstance?.subtotal}"/>
+                                            ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th colspan="${columnsNumber}" class="right">
+                                            <warehouse:message code="default.adjustments.label" default="Adjustments"/>
+                                        </th>
+                                        <th class="right">
+                                            <g:formatNumber number="${orderInstance?.totalAdjustments}"/>
+                                            ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th colspan="${columnsNumber}" class="right">
                                             <warehouse:message code="default.total.label"/>
                                         </th>
                                         <th class="right">
-                                            <g:formatNumber number="${orderInstance?.totalPrice()}"/>
-                                            ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                            <g:formatNumber number="${orderInstance?.total}"/>
+                                            ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                         </th>
                                     </tr>
                                 </tfoot>

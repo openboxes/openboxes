@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="jmiranda (generated)" id="1591969413856-1">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <indexExists indexName="product_package_uniq_idx"/>
+      </not>
+    </preConditions>
+    <addUniqueConstraint constraintName="product_package_uniq_idx"
+      tableName="product_package"
+      columnNames="product_id, product_supplier_id, uom_id, quantity"/>
+  </changeSet>
+</databaseChangeLog>

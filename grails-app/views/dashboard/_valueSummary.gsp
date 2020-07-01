@@ -161,7 +161,7 @@
         var dataTable = $('#stockValueDetailsTable').dataTable({
             "bProcessing": true,
             "sServerMethod": "GET",
-            "iDisplayLength": 25,
+            "iDisplayLength": 100,
             "bSearch": false,
             "bJQueryUI": true,
             "bAutoWidth": true,

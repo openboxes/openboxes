@@ -4,13 +4,19 @@
         <thead>
             <tr>
                 <th><warehouse:message code="report.number.label"/></th>
+                <g:if test="${requisitionItems.find { it.requisition?.shipment?.shipmentItems?.any { it.container }}}">
+                    <th><warehouse:message code="packLevel1.label"/></th>
+                </g:if>
+                <g:if test="${requisitionItems.find { it.requisition?.shipment?.shipmentItems?.any { it.container && it.container?.parentContainer }}}">
+                    <th><warehouse:message code="packLevel2.label"/></th>
+                </g:if>
                 <th>${warehouse.message(code: 'product.productCode.label')}</th>
-                <th>${warehouse.message(code: 'product.label')}</th>
-                <th>${warehouse.message(code: 'requisitionItem.quantityRequested.label')}</th>
-                <th>${warehouse.message(code: 'requisitionItem.quantityDelivered.label', default: "Delivered")}</th>
+                <th class="left">${warehouse.message(code: 'product.label')}</th>
+                <th>${warehouse.message(code: 'deliveryNote.totalRequested.label', default: "Total Requested")}</th>
+                <th>${warehouse.message(code: 'deliveryNote.totalDelivered.label', default: "Total Delivered")}</th>
                 <th>${warehouse.message(code: 'inventoryItem.lotNumber.label')}</th>
                 <th>${warehouse.message(code: 'inventoryItem.expirationDate.label')}</th>
-                <th>${warehouse.message(code: 'requisitionItem.quantity.label', default: "Quantity")}</th>
+                <th>${warehouse.message(code: 'deliveryNote.deliveredByLot.label', default: "Delivered by Lot")}</th>
                 <th>${warehouse.message(code: 'requisitionItem.cancelReasonCode.label')}</th>
             </tr>
         </thead>
@@ -27,6 +33,7 @@
             <g:each in="${requisitionItems?.sort()}" status="i" var="requisitionItem">
                 <g:if test="${picklist}">
                     <g:set var="inventoryItemMap" value="${requisitionItem?.retrievePicklistItems()?.findAll { it.quantity > 0 }?.groupBy { it?.inventoryItem }}"/>
+                    <g:set var="shipmentItems" value="${requisitionItem?.requisition?.shipment?.shipmentItems?.findAll { it.requisitionItem == requisitionItem }}"/>
                     <g:set var="picklistItemsGroup" value="${inventoryItemMap?.values()?.toList()}"/>
                     <g:set var="numInventoryItem" value="${inventoryItemMap?.size() ?: 1}"/>
                 </g:if>
@@ -41,6 +48,29 @@
                             <td class="center middle" rowspan="${numInventoryItem}">
                                     ${i + 1}
                             </td>
+                            <g:if test="${requisitionItems.find { it.requisition?.shipment?.shipmentItems?.any { it.container }}}">
+                            <td class="middle center" rowspan="${numInventoryItem}">
+                                <g:each in="${shipmentItems}" var="shipmentItem">
+                                    <div>
+                                        ${shipmentItem.container?.parentContainer?.name ?: shipmentItem?.container?.name}
+                                    </div>
+                                </g:each>
+                            </td>
+                            </g:if>
+                            <g:if test="${requisitionItems.find { it.requisition?.shipment?.shipmentItems?.any { it.container }}}">
+                                <td class="center middle" rowspan="${numInventoryItem}">
+                                    <g:each in="${shipmentItems}" var="shipmentItem">
+                                        <div>
+                                            <g:if test="${shipmentItem?.container?.parentContainer && shipmentItem.container}">
+                                                ${shipmentItem.container?.name}
+                                            </g:if>
+                                            <g:elseif test="${shipmentItem?.container}">
+                                                -
+                                            </g:elseif>
+                                        </div>
+                                    </g:each>
+                                </td>
+                            </g:if>
                             <td class="center middle" rowspan="${numInventoryItem}">
                                 <g:if test="${requisitionItem?.parentRequisitionItem?.isSubstituted()}">
                                     <div class="canceled">
@@ -106,7 +136,8 @@
                                         ${warehouse.message(code:'requisitionItem.modified.label')}
                                     </g:elseif>
                                     <i>
-                                        ${warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.parentRequisitionItem?.cancelReasonCode)}
+                                        <g:set var="reasonCode" value="${requisitionItem?.parentRequisitionItem?.cancelReasonCode}"/>
+                                        ${warehouse.message(code:'enum.ReasonCode.' + (reasonCode?.contains("(") ? reasonCode?.split("\\(",2)[1].replace(")","") : reasonCode))}
                                     </i>
                                     <g:if test="${requisitionItem?.parentRequisitionItem?.cancelComments}">
                                         <blockquote>
@@ -126,6 +157,11 @@
                                             ${requisitionItem?.cancelComments}
                                         </blockquote>
                                     </g:if>
+                                </g:if>
+                                <g:if test="${requisitionItem?.pickReasonCode}">
+                                    <div>
+                                        ${warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.pickReasonCode)}
+                                    </div>
                                 </g:if>
                             </td>
                         </g:if>

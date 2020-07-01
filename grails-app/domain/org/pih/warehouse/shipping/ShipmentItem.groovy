@@ -13,7 +13,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.donation.Donor
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.order.OrderShipment
+import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
@@ -40,19 +40,22 @@ class ShipmentItem implements Comparable, Serializable {
     // that this will likely be a box that the item is
     // actually contained within.
 
+    Shipment shipment
     RequisitionItem requisitionItem
 
     Integer sortOrder
 
-    static belongsTo = [shipment: Shipment]
+    static belongsTo = [Shipment, OrderItem]
 
-    static hasMany = [orderShipments: OrderShipment, receiptItems: ReceiptItem]
+    static hasMany = [orderItems: OrderItem, receiptItems: ReceiptItem]
 
-    static transients = ["comments", "quantityReceivedAndCanceled", "quantityRemaining"]
+    static transients = ["comments", "orderItemId", "quantityReceivedAndCanceled", "quantityCanceled", "quantityReceived", "quantityRemaining",
+                         "orderNumber", "orderName"]
 
     static mapping = {
         id generator: 'uuid'
         cache true
+        orderItems joinTable: [name: 'order_shipment', key: 'shipment_item_id']
     }
 
     static constraints = {
@@ -89,11 +92,20 @@ class ShipmentItem implements Comparable, Serializable {
         return inventoryItem?.expirationDate ?: expirationDate
     }
 
-
-    def listOrderItems() {
-        return orderShipments.collect { it.orderItem }
+    String getOrderItemId() {
+        def orderItemIds = orderItems?.collect { OrderItem orderItem -> orderItem.id }?.unique()
+        return orderItemIds ? orderItemIds.first() : null
     }
 
+    String getOrderNumber() {
+        def orderNumbers = orderItems?.collect { OrderItem orderItem -> orderItem.order.orderNumber }?.unique()
+        return orderNumbers ? orderNumbers.first() : ''
+    }
+
+    String getOrderName() {
+        def orderNames = orderItems?.collect { OrderItem orderItem -> orderItem.order.name }?.unique()
+        return orderNames ? orderNames.first() : ''
+    }
 
     def totalQuantityShipped() {
         int totalQuantityShipped = 0
@@ -125,15 +137,30 @@ class ShipmentItem implements Comparable, Serializable {
         return totalQuantityReceived
     }
 
-
+    /**
+     * @deprecated
+     * @return
+     */
     Integer quantityReceived() {
+        return quantityReceived
+    }
+
+    Integer getQuantityReceived() {
         return (receiptItems) ? receiptItems.sum { ReceiptItem receiptItem ->
             ReceiptStatusCode.RECEIVED == receiptItem?.receipt?.receiptStatusCode && receiptItem?.product == product &&
                     receiptItem?.quantityReceived ? receiptItem.quantityReceived : 0
         } : 0
     }
 
+    /**
+     * @deprecated
+     * @return
+     */
     Integer quantityCanceled() {
+        return quantityCanceled
+    }
+
+    Integer getQuantityCanceled() {
         return (receiptItems) ? receiptItems.sum { ReceiptItem receiptItem ->
             ReceiptStatusCode.RECEIVED == receiptItem?.receipt?.receiptStatusCode && receiptItem?.product == product &&
                     receiptItem?.quantityCanceled ? receiptItem.quantityCanceled : 0
@@ -145,7 +172,7 @@ class ShipmentItem implements Comparable, Serializable {
     }
 
     Integer getQuantityReceivedAndCanceled() {
-        return quantityReceived() + quantityCanceled()
+        return quantityReceived + quantityCanceled
     }
 
 

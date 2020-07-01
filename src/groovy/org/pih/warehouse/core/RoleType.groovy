@@ -75,6 +75,7 @@ enum RoleType {
     ROLE_DONOR('Donor', 100),
     ROLE_SHIPPING_AGENT('Shipping Agent', 100),
     ROLE_CLEARING_AGENT('Clearing Agent', 100),
+    ROLE_PURCHASER('Purchaser', 100),
 
     // Customer role types
     ROLE_CUSTOMER('Customer', 102)
@@ -150,6 +151,22 @@ enum RoleType {
                 ROLE_MANAGER,
                 ROLE_ADMIN,
                 ROLE_SUPERUSER
+        ]
+    }
+
+    static listOrganizationRoleTypes() {
+        return [
+                ROLE_ORGANIZATION,
+                ROLE_BUYER,
+                ROLE_CARRIER,
+                ROLE_SUPPLIER,
+                ROLE_MANUFACTURER,
+                ROLE_DISTRIBUTOR,
+                ROLE_DONOR,
+                ROLE_SHIPPING_AGENT,
+                ROLE_CLEARING_AGENT,
+                ROLE_CUSTOMER,
+                ROLE_PURCHASER,
         ]
     }
 }

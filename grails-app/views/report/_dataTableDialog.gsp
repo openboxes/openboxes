@@ -32,7 +32,7 @@
         $('#dialogDataTable').dataTable({
             "bProcessing": true,
             "bSort": false,
-            "iDisplayLength": 25,
+            "iDisplayLength": 100,
             "bSearch": false,
             "bScrollCollapse": true,
             "bJQueryUI": true,

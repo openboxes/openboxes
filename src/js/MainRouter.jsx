@@ -10,7 +10,7 @@ import en from './en';
 import fr from './fr';
 import es from './es';
 import ar from './ar';
-import { fetchTranslations, fetchSessionInfo } from './actions';
+import { fetchTranslations, fetchSessionInfo, fetchMenuConfig } from './actions';
 
 const onMissingTranslation = ({ translationId }) => `${translationId}`;
 
@@ -26,6 +26,7 @@ class MainRouter extends React.Component {
         { name: 'German', code: 'de' },
         { name: 'Italian', code: 'it' },
         { name: 'Spanish', code: 'es' },
+        { name: 'Finnish', code: 'fi' },
         { name: 'Portuguese', code: 'pt' },
       ],
       options: {
@@ -41,10 +42,12 @@ class MainRouter extends React.Component {
     this.props.addTranslationForLanguage(en, 'it');
     this.props.addTranslationForLanguage(en, 'de');
     this.props.addTranslationForLanguage(ar, 'ar');
+    this.props.addTranslationForLanguage(en, 'fi');
   }
 
   componentDidMount() {
     this.props.fetchSessionInfo();
+    this.props.fetchMenuConfig();
     this.props.fetchTranslations('', 'default');
   }
 
@@ -53,6 +56,7 @@ class MainRouter extends React.Component {
       this.props.setActiveLanguage(nextProps.locale);
 
       if (this.props.locale) {
+        this.props.fetchMenuConfig();
         this.props.fetchTranslations(nextProps.locale, 'default');
       }
     }
@@ -70,7 +74,7 @@ const mapStateToProps = state => ({
 });
 
 export default withLocalize(connect(mapStateToProps, {
-  fetchTranslations, fetchSessionInfo,
+  fetchTranslations, fetchSessionInfo, fetchMenuConfig,
 })(MainRouter));
 
 MainRouter.propTypes = {
@@ -81,4 +85,5 @@ MainRouter.propTypes = {
   setActiveLanguage: PropTypes.func.isRequired,
   /** Function called to get the currently selected location */
   fetchSessionInfo: PropTypes.func.isRequired,
+  fetchMenuConfig: PropTypes.func.isRequired,
 };

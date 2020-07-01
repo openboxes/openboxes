@@ -72,20 +72,12 @@ const fr = {
       activity: ['PLACE_ORDER', 'FULFILL_ORDER'],
       subsections: {
         purchaseOrdersWorkflow: {
-          label: 'Créer',
+          label: 'Créer Purchase Order',
           link: '/openboxes/purchaseOrderWorkflow/index',
         },
         orders: {
-          label: 'Order',
+          label: 'List Purchase Order',
           link: '/openboxes/order/list?orderTypeCode=PURCHASE_ORDER',
-        },
-        completed: {
-          label: 'Completed',
-          link: '/openboxes/order/list?status=COMPLETED',
-        },
-        placed: {
-          label: 'Placed',
-          link: '/openboxes/order/list?status=PLACED',
         },
       },
     },
@@ -136,7 +128,7 @@ const fr = {
         create: {
           configName: 'stockMovement',
           label: 'Créer Inbound Stock Movement',
-          link: '/openboxes/stockMovement/create?direction=INBOUND',
+          link: '/openboxes/stockMovement/createInbound?direction=INBOUND',
         },
         list: {
           configName: 'stockMovement',
@@ -145,8 +137,8 @@ const fr = {
         },
         request: {
           configName: 'stockMovement',
-          label: 'Demande de stock',
-          link: '/openboxes/stockMovement/create?type=REQUEST',
+          label: 'Request Stock',
+          link: '/openboxes/stockMovement/createRequest',
         },
         createPutAway: {
           configName: 'stockMovement',
@@ -203,7 +195,7 @@ const fr = {
         create: {
           configName: 'stockMovement',
           label: 'Créer Outbound Stock Movement',
-          link: '/openboxes/stockMovement/create?direction=OUTBOUND',
+          link: '/openboxes/stockMovement/createOutbound?direction=OUTBOUND',
         },
         list: {
           configName: 'stockMovement',

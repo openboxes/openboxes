@@ -8,6 +8,9 @@
     <table>
         <tr>
             <th><warehouse:message code="shipping.container.label"/></th>
+            <g:if test="${shipmentInstance?.isFromPurchaseOrder}">
+                <th><warehouse:message code="order.orderNumber.label"/></th>
+            </g:if>
             <th><warehouse:message code="product.productCode.label"/></th>
             <th><warehouse:message code="product.label"/></th>
             <th class="left">
@@ -54,6 +57,11 @@
                                     </g:if>
                                 </div>
                             </g:if>
+                        </td>
+                    </g:if>
+                    <g:if test="${shipmentInstance?.isFromPurchaseOrder}">
+                        <td>
+                            ${shipmentItem?.orderNumber}
                         </td>
                     </g:if>
                     <td>

@@ -96,6 +96,13 @@ class LocationService {
             locations = locations.findAll { location -> user.hasPrimaryRole(location) }
         }
 
+        if (params.activityCodes) {
+            ActivityCode[] activityCodes = params.list("activityCodes") as ActivityCode[]
+            return locations.findAll {
+                it.supportsAll(activityCodes)
+            }
+        }
+
         if (!isSuperuser) {
             if (direction == "INBOUND") {
                 return locations.findAll {
@@ -106,6 +113,12 @@ class LocationService {
                 return locations.findAll {
                     (it.locationGroup == currentLocation.locationGroup) ||
                             (it.locationGroup != currentLocation.locationGroup && it.locationType.locationTypeCode == LocationTypeCode.DEPOT)
+                }
+            }
+        } else {
+            if (direction == "INBOUND") {
+                return locations.findAll {
+                    it.locationType.locationTypeCode == LocationTypeCode.SUPPLIER || !it.supports(ActivityCode.MANAGE_INVENTORY)
                 }
             }
         }

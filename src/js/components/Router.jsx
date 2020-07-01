@@ -12,8 +12,25 @@ import 'react-s-alert/dist/s-alert-css-effects/bouncyflip.css';
 import MainLayoutRoute from './Layout/MainLayoutRoute';
 import Loading from './Loading';
 
+// TODO: Fix entering Inbound SM from list
+
 const AsyncStockMovement = Loadable({
   loader: () => import('./stock-movement-wizard/StockMovement'),
+  loading: Loading,
+});
+
+const AsyncStockMovementInbound = Loadable({
+  loader: () => import('./stock-movement-wizard/StockMovementInbound'),
+  loading: Loading,
+});
+
+const AsyncStockMovementPurchaseOrders = Loadable({
+  loader: () => import('./stock-movement-wizard/StockMovementPurchaseOrders'),
+  loading: Loading,
+});
+
+const AsyncStockMovementRequest = Loadable({
+  loader: () => import('./stock-movement-wizard/StockMovementRequest'),
   loading: Loading,
 });
 
@@ -32,14 +49,24 @@ const AsyncManagement = Loadable({
   loading: Loading,
 });
 
+const AsyncTablero = Loadable({
+  loader: () => import('./tablero/Tablero'),
+  loading: Loading,
+});
+
 const Router = props => (
   <div>
     <BrowserRouter>
       <Switch>
         <MainLayoutRoute path="/**/putAway/create/:putAwayId?" component={AsyncPutAwayMainPage} />
+        <MainLayoutRoute path="/**/stockMovement/createOutbound/:stockMovementId?" component={AsyncStockMovement} />
+        <MainLayoutRoute path="/**/stockMovement/createInbound/:stockMovementId?" component={AsyncStockMovementInbound} />
+        <MainLayoutRoute path="/**/stockMovement/createPurchaseOrders/:stockMovementId?" component={AsyncStockMovementPurchaseOrders} />
+        <MainLayoutRoute path="/**/stockMovement/createRequest/:stockMovementId?" component={AsyncStockMovementRequest} />
         <MainLayoutRoute path="/**/stockMovement/create/:stockMovementId?" component={AsyncStockMovement} />
         <MainLayoutRoute path="/**/partialReceiving/create/:shipmentId" component={AsyncReceivingPage} />
         <MainLayoutRoute path="/**/stocklistManagement/index/:productId?" component={AsyncManagement} />
+        <MainLayoutRoute path="/**/" component={AsyncTablero} />
       </Switch>
     </BrowserRouter>
     <div className="spinner-container">

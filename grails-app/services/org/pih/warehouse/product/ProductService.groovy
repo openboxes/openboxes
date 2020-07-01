@@ -11,8 +11,10 @@ package org.pih.warehouse.product
 
 import grails.validation.ValidationException
 import groovy.xml.Namespace
+import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
@@ -820,7 +822,16 @@ class ProductService {
      * @return all tags
      */
     def getAllCatalogs() {
-        return ProductCatalog.findAllByActive(true)
+        return ProductCatalog.createCriteria().list {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            createAlias('productCatalogItems','productCatalogItems')
+            projections {
+                groupProperty("id", "id")
+                groupProperty("name", "name")
+                count("productCatalogItems.id", "count")
+            }
+            eq("active", Boolean.TRUE)
+        }
     }
 
     /**
@@ -1085,38 +1096,42 @@ class ProductService {
             if (categories) {
                 inList("category", categories)
             }
-
             if (terms) {
                 terms.each { term ->
+                    term = term + "%"
                     or {
-                        ilike("name", "%" + term + "%")
-                        ilike("productCode", "%" + term + "%")
-                        ilike("description", "%" + term + "%")
-                        ilike("brandName", "%" + term + "%")
-                        ilike("manufacturer", "%" + term + "%")
-                        ilike("manufacturerCode", "%" + term + "%")
-                        ilike("manufacturerName", "%" + term + "%")
-                        ilike("vendor", "%" + term + "%")
-                        ilike("vendorCode", "%" + term + "%")
-                        ilike("vendorName", "%" + term + "%")
-                        ilike("upc", "%" + term + "%")
-                        ilike("ndc", "%" + term + "%")
-                        ilike("unitOfMeasure", "%" + term + "%")
-
+                        ilike("name", term)
+                        ilike("productCode", term)
+                        ilike("description", "%" + term)
+                        ilike("brandName", term)
+                        ilike("manufacturer", term)
+                        ilike("manufacturerCode", term)
+                        ilike("manufacturerName", term)
+                        ilike("vendor", term)
+                        ilike("vendorCode", term)
+                        ilike("vendorName", term)
+                        ilike("upc", term)
+                        ilike("ndc", term)
+                        ilike("unitOfMeasure", term)
                         productSuppliers {
                             or {
-                                ilike("name", "%" + term + "%")
-                                ilike("code", "%" + term + "%")
-                                ilike("productCode", "%" + term + "%")
-                                ilike("manufacturerCode", "%" + term + "%")
-                                ilike("manufacturerName", "%" + term + "%")
-                                ilike("supplierCode", "%" + term + "%")
-                                ilike("supplierName", "%" + term + "%")
+                                ilike("name", term)
+                                ilike("code", term)
+                                ilike("productCode", term)
+                                ilike("manufacturerCode", term)
+                                ilike("manufacturerName", term)
+                                ilike("supplierCode", term)
+                                ilike("supplierName", term)
+                                manufacturer {
+                                    ilike("name", term)
+                                }
+                                supplier {
+                                    ilike("name", term)
+                                }
                             }
                         }
-
                         inventoryItems {
-                            ilike("lotNumber", "%" + term + "%")
+                            ilike("lotNumber", term)
                         }
                     }
                 }

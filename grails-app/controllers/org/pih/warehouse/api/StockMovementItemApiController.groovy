@@ -16,6 +16,8 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentItem
 
 class StockMovementItemApiController {
 
@@ -33,6 +35,11 @@ class StockMovementItemApiController {
     def read = {
         StockMovementItem stockMovementItem = stockMovementService.getStockMovementItem(params.id)
         render([data: stockMovementItem] as JSON)
+    }
+
+    def getStockMovementItems = {
+        List<StockMovementItem> stockMovementItems = stockMovementService.getStockMovementItems(params.id, params.stepNumber, params.max, params.offset)
+        render([data: stockMovementItems] as JSON)
     }
 
     def updatePicklist = {
@@ -163,10 +170,7 @@ class StockMovementItemApiController {
     }
 
     def removeItem = {
-        RequisitionItem requisitionItem = RequisitionItem.get(params.id)
-
-        stockMovementService.removeRequisitionItem(requisitionItem)
-
+        stockMovementService.removeStockMovementItem(params.id)
         render status: 204
     }
 

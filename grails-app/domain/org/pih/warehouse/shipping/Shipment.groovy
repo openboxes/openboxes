@@ -23,6 +23,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.donation.Donor
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.order.Order
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
 
@@ -107,7 +108,9 @@ class Shipment implements Comparable, Serializable {
             "recipients",
             "consignorAddress",
             "consigneeAddress",
-            "receipt"
+            "receipt",
+            "isFromPurchaseOrder",
+            "orders"
     ]
 
     static mappedBy = [
@@ -291,10 +294,13 @@ class Shipment implements Comparable, Serializable {
 
     }
 
+    List<Order> getOrders() {
+        return this.shipmentItems*.orderItems?.order?.flatten()?.unique()
+    }
+
     Boolean isPending() {
         return !this.hasShipped() && !this.wasReceived()
     }
-
 
     Boolean hasShipped() {
         return events.any { it.eventType?.eventCode == EventCode.SHIPPED }
@@ -306,6 +312,10 @@ class Shipment implements Comparable, Serializable {
 
     Boolean wasPartiallyReceived() {
         return events.any { it.eventType?.eventCode == EventCode.PARTIALLY_RECEIVED }
+    }
+
+    Boolean getIsFromPurchaseOrder() {
+        return !shipmentItems?.orderItems?.flatten()?.isEmpty()
     }
 
     Boolean isStockMovement() {
@@ -527,6 +537,21 @@ class Shipment implements Comparable, Serializable {
         }
 
         return shipmentItems.get(nextIndex)
+    }
+
+    ShipmentItem findOrCreateShipmentItem(String id) {
+        ShipmentItem shipmentItem
+        if (id) {
+            shipmentItem = shipmentItems.find { ShipmentItem si -> si.id == id }
+            if (!shipmentItem) {
+                throw new IllegalArgumentException("Could not find shipmente item with id ${id}")
+            }
+        }
+        if (!shipmentItem) {
+            shipmentItem = new ShipmentItem()
+            addToShipmentItems(shipmentItem)
+        }
+        return shipmentItem
     }
 
 

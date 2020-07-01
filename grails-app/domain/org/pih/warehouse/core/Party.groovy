@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.core
 
-class Party implements Comparable<Party> {
+class Party implements Serializable, Comparable<Party> {
 
     String id
     PartyType partyType

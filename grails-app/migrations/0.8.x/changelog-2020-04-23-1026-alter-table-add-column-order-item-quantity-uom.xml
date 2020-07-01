@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="jmiranda (generated)" id="1587655518026-1">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="order_item" columnName="product_package_id"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="order_item">
+      <column name="product_package_id" type="CHAR(38)"/>
+    </addColumn>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1587655518026-2">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="order_item" columnName="quantity_per_uom"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="order_item">
+      <column name="quantity_per_uom" type="DECIMAL(19,2)"/>
+    </addColumn>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1587655518026-3">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="order_item" columnName="quantity_uom_id"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="order_item">
+      <column name="quantity_uom_id" type="CHAR(38)"/>
+    </addColumn>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1587655518026-4">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="FK2D110D6429B2552E"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="product_package_id" baseTableName="order_item"
+      constraintName="FK2D110D6429B2552E" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="product_package"/>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1587655518026-5">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="FK2D110D645ED93B03"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="quantity_uom_id" baseTableName="order_item"
+      constraintName="FK2D110D645ED93B03" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="unit_of_measure"/>
+  </changeSet>
+</databaseChangeLog>

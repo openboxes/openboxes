@@ -9,27 +9,37 @@
  **/
 package org.pih.warehouse.core
 
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderTypeCode
+
 class Organization extends Party {
 
     String id
     String code
     String name
     String description
+    Location defaultLocation
 
     Date dateCreated
     Date lastUpdated
 
+    static hasMany = [locations : Location]
+
+    Map<IdentifierTypeCode, Integer> sequences
 
     static mapping = {
         id generator: 'uuid'
     }
 
     static constraints = {
-        code(nullable: true)
+        code(nullable: false, unique: true,
+                minSize: ConfigurationHolder.config.openboxes.identifier.organization.minSize,
+                maxSize: ConfigurationHolder.config.openboxes.identifier.organization.maxSize)
         name(nullable: false, maxSize: 255)
         description(nullable: true, maxSize: 255)
+        defaultLocation(nullable: true)
     }
-
 
     String toString() {
         return name
@@ -41,5 +51,19 @@ class Organization extends Party {
                         id <=> obj.id
     }
 
+    boolean hasPurchaseOrders() {
+        return Order.createCriteria().get {
+            projections {
+                count("id")
+            }
+            eq("orderTypeCode", OrderTypeCode.PURCHASE_ORDER)
+            eq("destinationParty", this)
+        }
+
+    }
+
+    Boolean hasRoleType(RoleType roleType) {
+        return roles.any { PartyRole role -> role.roleType == roleType }
+    }
 
 }

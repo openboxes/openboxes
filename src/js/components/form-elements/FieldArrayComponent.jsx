@@ -22,64 +22,89 @@ class FieldArrayComponent extends Component {
 
   focusField(index, fieldName) {
     const field = _.get(this.fieldRefs, `[${index}].${fieldName}`);
+    const fieldToScroll = _.get(this.fieldRefs, `[${index - 15 > 0 ? index - 15 : 0}].${fieldName}`);
 
     if (field) {
       field.focus();
+      if (fieldToScroll) {
+        fieldToScroll.scrollIntoView();
+      }
     }
   }
 
   copyDown(index, fieldName) {
     const field = _.get(this.fieldRefs, `[${index}].${fieldName}`);
+    const fieldToScroll = _.get(this.fieldRefs, `[${index - 15 > 0 ? index - 15 : 0}].${fieldName}`);
     const valueToCopy = _.get(this.fieldRefs, `[${index - 1}].${fieldName}.value`);
 
     if (field && valueToCopy && !field.disabled) {
       field.value = valueToCopy;
       field.focus();
+      if (fieldToScroll) {
+        fieldToScroll.scrollIntoView();
+      }
     }
   }
 
   render() {
-    const { fieldsConfig, properties, fields } = this.props;
+    const {
+      fieldsConfig, properties, fields, isPaginated,
+    } = this.props;
     const AddButton = fieldsConfig.addButton;
     const { maxTableHeight = 'calc(100vh - 400px)', virtualized } = fieldsConfig;
-    const addRow = (row = {}) => fields.push(row);
-    const TableBodyComponent = virtualized ? TableBodyVirtualized : TableBody;
+    const addRow = (row = {}, index = null) => {
+      if (index === null) {
+        fields.push(row);
+      } else if (typeof fields === 'object') {
+        fields.insert(index + 1, row);
+      } else {
+        fields.splice(index + 1, 0, row);
+      }
+    };
+    const TableBodyComponent = virtualized && isPaginated ? TableBodyVirtualized : TableBody;
 
     return (
       <div className="d-flex flex-column">
         <div className="text-center border">
           <div className="d-flex flex-row border-bottom font-weight-bold py-1 mr-3">
-            {_.map(fieldsConfig.fields, (config, name) => (
-              <div
-                key={name}
-                className="mx-1"
-                style={{
-                  flex: config.fixedWidth ? `0 1 ${config.fixedWidth}` : `${config.flexWidth || '12'} 1 0`,
-                  minWidth: 0,
-                  textAlign: config.headerAlign ? config.headerAlign : 'center',
-                }}
-              >
-                <Tooltip
-                  html={(config.label &&
-                    <div>{this.props.translate(config.label, config.defaultMessage)}</div>)}
-                  theme="transparent"
-                  arrow="true"
-                  delay="150"
-                  duration="250"
-                  hideDelay="50"
-                >
+            {_.map(fieldsConfig.fields, (config, name) => {
+              const dynamicAttr = config.getDynamicAttr ? config.getDynamicAttr(properties) : {};
+              const { hide } = dynamicAttr;
+              if (!hide) {
+                return (
                   <div
-                    className={`mx-1 text-truncate font-size-xs ${config.required ? 'required' : ''}`}
-                  >{config.label &&
-                    <Translate id={config.label} defaultMessage={config.defaultMessage} />}
-                  </div>
-                </Tooltip>
-              </div>))}
+                    key={name}
+                    className="mx-1"
+                    style={{
+                      flex: config.fixedWidth ? `0 1 ${config.fixedWidth}` : `${config.flexWidth || '12'} 1 0`,
+                      minWidth: 0,
+                      textAlign: config.headerAlign ? config.headerAlign : 'center',
+                    }}
+                  >
+                    <Tooltip
+                      html={(config.label &&
+                        <div>{this.props.translate(config.label, config.defaultMessage)}</div>)}
+                      theme="transparent"
+                      arrow="true"
+                      delay="150"
+                      duration="250"
+                      hideDelay="50"
+                    >
+                      <div
+                        className={`mx-1 text-truncate font-size-xs ${config.required ? 'required' : ''}`}
+                      >{config.label &&
+                      <Translate id={config.label} defaultMessage={config.defaultMessage} />}
+                      </div>
+                    </Tooltip>
+                  </div>);
+              }
+              return null;
+})}
           </div>
         </div>
         <div
           className="text-center border mb-1 flex-grow-1"
-          style={{ overflowY: virtualized ? 'hidden' : 'scroll', maxHeight: virtualized ? '450px' : maxTableHeight }}
+          style={{ overflowY: virtualized && isPaginated ? 'hidden' : 'scroll', maxHeight: virtualized && isPaginated ? window.innerHeight - 450 : maxTableHeight }}
         >
           <TableBodyComponent
             fields={fields}
@@ -115,6 +140,7 @@ class FieldArrayComponent extends Component {
 
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
+  isPaginated: state.session.isPaginated,
 });
 
 FieldArrayComponent.propTypes = {
@@ -125,6 +151,8 @@ FieldArrayComponent.propTypes = {
   ]).isRequired,
   properties: PropTypes.shape({}),
   translate: PropTypes.func.isRequired,
+  /** Return true if pagination is enabled */
+  isPaginated: PropTypes.bool.isRequired,
 };
 
 FieldArrayComponent.defaultProps = {

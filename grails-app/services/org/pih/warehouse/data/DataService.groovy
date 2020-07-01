@@ -54,6 +54,10 @@ class DataService {
         return new Sql(dataSource).rows(query)
     }
 
+    List executeQuery(String query, Map params) {
+        return new Sql(dataSource).rows(query, params)
+    }
+
     void executeStatements(List statementList) {
         Sql sql = new Sql(dataSource)
         sql.withTransaction {
@@ -576,7 +580,7 @@ class DataService {
         return sw.toString()
     }
 
-    String exportInventoryLevels(List inventoryLevels) {
+    String exportInventoryLevels(Collection inventoryLevels) {
         def sw = new StringWriter()
         def csv = new CSVWriter(sw, {
             "Product Code" { it.productCode }

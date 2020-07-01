@@ -1,5 +1,6 @@
 <%@ page import="org.pih.warehouse.order.Order" %>
 <%@ page import="org.pih.warehouse.order.OrderTypeCode" %>
+<%@ page import="org.pih.warehouse.order.OrderStatus" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -28,7 +29,7 @@
                     <div class="yui-u first">
                         <div id="details" class="box">
                             <h2>
-                                <label><warehouse:message code="order.orderHeader.label" default="Order Header"/></label>
+                                <warehouse:message code="order.orderHeader.label" default="Order Header"/>
                             </h2>
                             <table>
                                 <tbody>
@@ -45,7 +46,7 @@
                                         <label><warehouse:message code="default.status.label" /></label>
                                     </td>
                                     <td valign="top" id="status" class="value">
-                                        <format:metadata obj="${orderInstance?.status}"/>
+                                        <format:metadata obj="${orderInstance?.displayStatus}"/>
                                     </td>
                                 </tr>
                                 <tr class="prop">
@@ -56,9 +57,6 @@
                                         <format:metadata obj="${orderInstance?.orderTypeCode}"/>
                                     </td>
                                 </tr>
-
-
-
                                 <tr class="prop">
                                     <td valign="top" class="name">
                                         <label><warehouse:message code="order.destination.label"/></label>
@@ -78,18 +76,20 @@
 
                                 <tr class="prop">
                                     <td valign="top" class="name">
-                                        <label><warehouse:message code="order.dateOrdered.label"/></label>
+                                        <label><warehouse:message code="order.subtotal.label"/></label>
                                     </td>
                                     <td valign="top" class="value">
-                                        <format:date obj="${orderInstance?.dateOrdered}"/>
+                                        <g:formatNumber number="${orderInstance?.subtotal?:0 }"/>
+                                        ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                     </td>
                                 </tr>
                                 <tr class="prop">
                                     <td valign="top" class="name">
-                                            <label><warehouse:message code="order.orderedBy.label"/></label>
+                                        <label><warehouse:message code="orderAdjustments.label"/></label>
                                     </td>
                                     <td valign="top" class="value">
-                                        ${orderInstance?.orderedBy?.name }
+                                        <g:formatNumber number="${orderInstance?.totalAdjustments?:0 }"/>
+                                        ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                     </td>
                                 </tr>
                                 <tr class="prop">
@@ -97,12 +97,77 @@
                                         <label><warehouse:message code="order.totalPrice.label"/></label>
                                     </td>
                                     <td valign="top" class="value">
-                                        <g:formatNumber number="${orderInstance?.totalPrice()?:0 }"/>
-                                        ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                        <g:formatNumber number="${orderInstance?.total?:0 }"/>
+                                        ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                     </td>
                                 </tr>
 
                                 </tbody>
+                            </table>
+                        </div>
+                        <div class="box">
+                            <h2><g:message code="default.auditing.label"/></h2>
+                            <table>
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                        <label><warehouse:message code="order.orderedBy.label"/></label>
+                                    </td>
+                                    <td valign="top" class="value">
+                                        <g:if test="${orderInstance?.orderedBy}">
+                                            <div>${orderInstance?.orderedBy?.name }</div>
+                                            <small><format:date obj="${orderInstance?.dateOrdered}"/></small>
+                                        </g:if>
+                                        <g:else>
+                                            <g:message code="default.none.label"/>
+                                        </g:else>
+                                    </td>
+                                </tr>
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                        <label><warehouse:message code="order.approvedBy.label"/></label>
+                                    </td>
+                                    <td valign="top" class="value">
+                                        <g:if test="${orderInstance?.approvedBy}">
+                                            <div>${orderInstance?.approvedBy?.name }</div>
+                                            <small><format:date obj="${orderInstance?.dateApproved}"/></small>
+                                        </g:if>
+                                        <g:else>
+                                            <g:message code="default.none.label"/>
+                                        </g:else>
+                                    </td>
+                                </tr>
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                        <label><warehouse:message code="order.completedBy.label"/></label>
+                                    </td>
+                                    <td valign="top" class="value">
+                                        <g:if test="${orderInstance?.completedBy}">
+                                            <div>${orderInstance?.completedBy?.name }</div>
+                                            <small><format:date obj="${orderInstance?.dateCompleted}"/></small>
+                                        </g:if>
+                                        <g:else>
+                                            <g:message code="default.none.label"/>
+                                        </g:else>
+                                    </td>
+                                </tr>
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                        <label><warehouse:message code="order.createdBy.label"/></label>
+                                    </td>
+                                    <td valign="top" class="value">
+                                        <div>${orderInstance?.createdBy?.name }</div>
+                                        <small><format:date obj="${orderInstance?.dateCreated}"/></small>
+                                    </td>
+                                </tr>
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                            <label><warehouse:message code="default.updatedBy.label"/></label>
+                                    </td>
+                                    <td valign="top" class="value">
+                                        <div>${orderInstance?.updatedBy?.name }</div>
+                                        <small><format:date obj="${orderInstance?.lastUpdated}"/></small>
+                                    </td>
+                                </tr>
                             </table>
                         </div>
                     </div>
@@ -111,6 +176,7 @@
                             <ul>
                                 <li><a href="#tabs-items"><warehouse:message code="order.orderItems.label"/></a></li>
                                 <g:if test="${orderInstance.orderTypeCode == OrderTypeCode.PURCHASE_ORDER}">
+                                    <li><a href="#tabs-adjustments"><warehouse:message code="orderAdjustments.label"/></a></li>
                                     <li><a href="#tabs-shipments"><warehouse:message code="shipments.label"/></a></li>
                                 </g:if>
                                 <li><a href="#tabs-documents"><warehouse:message code="documents.label"/></a></li>
@@ -118,7 +184,7 @@
 
                             </ul>
                             <div id="tabs-items" class="ui-tabs-hide">
-                                <div class="box">
+                                <div id="tab-content" class="box">
                                     <h2>
                                         <warehouse:message code="order.orderItems.label"/>
                                     </h2>
@@ -131,9 +197,12 @@
                                                 </g:if>
                                                 <th><warehouse:message code="product.productCode.label" /></th>
                                                 <th><warehouse:message code="product.label" /></th>
-                                                <th><warehouse:message code="order.qtyOrdered.label" /></th>
+                                                <th class="center">${warehouse.message(code: 'product.unitOfMeasure.label')}</th>
+                                                <th class="right">${warehouse.message(code: 'orderItem.quantity.label')}</th>
                                                 <g:if test="${orderInstance.orderTypeCode==OrderTypeCode.PURCHASE_ORDER}">
-                                                    <th><warehouse:message code="order.qtyFulfilled.label" /></th>
+                                                    <th class="right">${warehouse.message(code: 'order.ordered.label')}</th>
+                                                    <th class="right">${warehouse.message(code: 'order.shipped.label')}</th>
+                                                    <th class="right">${warehouse.message(code: 'order.received.label')}</th>
                                                     <th><warehouse:message code="order.unitPrice.label" /></th>
                                                     <th><warehouse:message code="order.totalPrice.label" /></th>
                                                 </g:if>
@@ -167,22 +236,29 @@
                                                             ${orderItem?.description }
                                                         </g:else>
                                                     </td>
-                                                    <td class="order-item-quantity">
+                                                    <td class="center">
+                                                        ${orderItem?.unitOfMeasure}
+                                                    </td>
+                                                    <td class="order-item-quantity right">
                                                         ${orderItem?.quantity}
-                                                        ${orderItem?.product?.unitOfMeasure?:"EA"}
                                                     </td>
                                                     <g:if test="${orderInstance.orderTypeCode==OrderTypeCode.PURCHASE_ORDER}">
-                                                        <td class="order-item-fullfilled">
-                                                            ${orderItem?.quantityFulfilled()}
-                                                            ${orderItem?.product?.unitOfMeasure?:"EA"}
+                                                        <td class="order-item-ordered right">
+                                                            ${orderInstance.isPlaced()?orderItem?.quantity:0}
+                                                        </td>
+                                                        <td class="order-item-fullfilled right">
+                                                            ${orderItem?.quantityShipped}
+                                                        </td>
+                                                        <td class="order-item-received right">
+                                                            ${orderItem?.quantityReceived}
                                                         </td>
                                                         <td class="">
                                                             <g:formatNumber number="${orderItem?.unitPrice?:0}" />
-                                                            ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                                            ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                                         </td>
                                                         <td class="">
                                                             <g:formatNumber number="${orderItem?.totalPrice()?:0}" />
-                                                            ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                                            ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                                         </td>
                                                     </g:if>
                                                     <g:elseif test="${orderInstance.orderTypeCode==OrderTypeCode.TRANSFER_ORDER}">
@@ -205,12 +281,11 @@
                                             <g:if test="${orderInstance.orderTypeCode==OrderTypeCode.PURCHASE_ORDER}">
                                                 <tfoot>
                                                 <tr class="">
-                                                    <th colspan="5" class="left">
-                                                        <warehouse:message code="default.total.label"/>
+                                                    <th colspan="8" class="right">
                                                     </th>
                                                     <th colspan="1" class="left">
                                                         <g:formatNumber number="${orderInstance?.totalPrice()?:0.0 }"/>
-                                                        ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                                        ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                                     </th>
                                                 </tr>
                                                 </tfoot>
@@ -223,31 +298,163 @@
                                     </g:else>
                                 </div>
                             </div>
+                            <div id="tabs-adjustments" class="ui-tabs-hide">
+                                <div class="box">
+                                    <h2>
+                                        <warehouse:message code="orderAdjustments.label"/>
+                                    </h2>
+                                    <g:if test="${orderInstance?.orderAdjustments }">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                            <tr class="odd">
+                                                <th><warehouse:message code="order.orderItem.label"/></th>
+                                                <th><warehouse:message code="default.type.label"/></th>
+                                                <th><warehouse:message code="default.description.label"/></th>
+                                                <th><warehouse:message code="orderAdjustment.percentage.label"/></th>
+                                                <th><warehouse:message code="orderAdjustment.amount.label"/></th>
+                                                <th class="right"><g:message code="default.actions.label"/></th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <g:each var="orderAdjustment" in="${orderInstance.orderAdjustments}" status="status">
+                                                <tr class="${status%2==0?'odd':'even'}">
+                                                    <td>
+                                                        ${orderAdjustment?.orderItem?.product?:g.message(code:'default.all.label')}
+                                                    </td>
+                                                    <td>
+                                                        ${orderAdjustment?.orderAdjustmentType?.name}
+                                                    </td>
+                                                    <td>
+                                                        ${orderAdjustment.description}
+                                                    </td>
+                                                    <td>
+                                                        ${orderAdjustment.percentage}
+                                                    </td>
+                                                    <td>
+                                                        <g:if test="${orderAdjustment.amount}">
+                                                            ${orderAdjustment.amount}
+                                                        </g:if>
+                                                        <g:elseif test="${orderAdjustment.percentage}">
+                                                            <g:if test="${orderAdjustment.orderItem}">
+                                                                <g:formatNumber number="${orderAdjustment.orderItem.totalAdjustments}"/>
+                                                            </g:if>
+                                                            <g:else>
+                                                                <g:formatNumber number="${orderAdjustment.totalAdjustments}"/>
+                                                            </g:else>
+                                                        </g:elseif>
+                                                    </td>
+                                                    <td class="right">
+                                                        <g:hasRoleApprover>
+                                                            <g:set var="isApprover" value="${true}"/>
+                                                        </g:hasRoleApprover>
+                                                        <g:set var="canManageAdjustments" value="${orderInstance?.status >= OrderStatus.PLACED && isApprover
+                                                                || orderInstance?.status == OrderStatus.PENDING}"/>
+                                                        <g:link action="editAdjustment" id="${orderAdjustment.id}" params="['order.id':orderInstance?.id]" class="button"
+                                                                disabled="${!canManageAdjustments}"
+                                                                disabledMessage="${g.message(code:'errors.noPermissions.label')}">
+                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" />
+                                                            <g:message code="default.button.edit.label"/>
+                                                        </g:link>
+
+                                                        <g:link action="deleteAdjustment" id="${orderAdjustment.id}" params="['order.id':orderInstance?.id]" class="button"
+                                                                disabled="${!canManageAdjustments}"
+                                                                disabledMessage="${g.message(code:'errors.noPermissions.label')}"
+                                                                onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="Delete" />
+                                                            <g:message code="default.button.delete.label"/>
+                                                        </g:link>
+
+                                                    </td>
+                                                </tr>
+                                            </g:each>
+                                            </tbody>
+                                            <tfoot>
+                                            <tr>
+                                                <th colspan="4">
+                                                </th>
+                                                <th>
+                                                    <g:formatNumber number="${orderInstance.totalAdjustments}"/>
+                                                </th>
+                                                <th></th>
+                                            </tr>
+                                            </tfoot>
+                                        </table>
+                                    </g:if>
+                                    <g:else>
+                                        <div class="fade center empty"><warehouse:message code="default.noItems.label" /></div>
+                                    </g:else>
+
+                                </div>
+                            </div>
+
+
+
                             <g:if test="${orderInstance.orderTypeCode == OrderTypeCode.PURCHASE_ORDER}">
 
                                 <div id="tabs-shipments" class="ui-tabs-hide">
 
                                     <div class="box">
                                         <h2><warehouse:message code="shipments.label"/></h2>
-
-                                        <g:if test="${orderInstance?.listShipments() }">
+                                        <g:if test="${orderInstance?.orderItems?.shipmentItems }">
                                             <table>
                                                 <thead>
                                                 <tr class="odd">
+                                                    <th><warehouse:message code="order.orderItem.label"/></th>
+                                                    <th width="25%"><warehouse:message code="product.label"/></th>
+                                                    <th><warehouse:message code="shipment.label"/></th>
                                                     <th><warehouse:message code="default.type.label"/></th>
-                                                    <th><warehouse:message code="default.name.label"/></th>
+                                                    <th><warehouse:message code="default.status.label"/></th>
+                                                    <th><warehouse:message code="shipmentItem.packLevel.label" default="Pack Level"/></th>
+                                                    <th><warehouse:message code="inventoryItem.lotNumber.label"/></th>
+                                                    <th><warehouse:message code="inventoryItem.expirationDate.label"/></th>
+                                                    <th class="right"><warehouse:message code="default.quantity.label"/></th>
+                                                    <th class="center"><warehouse:message code="product.unitOfMeasure.label"/></th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <g:each var="shipmentInstance" in="${orderInstance?.listShipments()}" status="i">
-                                                    <tr>
+                                                <g:each var="orderItem" in="${orderInstance?.orderItems}" status="i">
+                                                    <g:each var="shipmentItem" in="${orderItem.shipmentItems}" status="j">
+                                                    <tr class="${i%2?'even':'odd'}">
                                                         <td>
-                                                            <format:metadata obj="${shipmentInstance?.shipmentType}"/>
+                                                            <g:if test="${!j}">
+                                                                ${i+1}
+                                                            </g:if>
                                                         </td>
                                                         <td>
-                                                            <g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id }">${shipmentInstance?.name }</g:link>
+                                                            <g:if test="${!j}">
+                                                                ${shipmentItem?.product?.productCode}
+                                                                <format:product product="${shipmentItem?.product}"/>
+                                                            </g:if>
+                                                        </td>
+                                                        <td>
+                                                            <g:link controller="stockMovement" action="show" id="${shipmentItem?.shipment?.id }">${shipmentItem?.shipment?.shipmentNumber} ${shipmentItem?.shipment?.name }</g:link>
+                                                        </td>
+                                                        <td>
+                                                            <format:metadata obj="${shipmentItem?.shipment?.shipmentType}"/>
+                                                        </td>
+                                                        <td>
+                                                            <format:metadata obj="${shipmentItem?.shipment?.currentStatus}"/>
+                                                        </td>
+                                                        <td class="center middle">
+                                                            <g:if test="${shipmentItem?.container?.parentContainer}">
+                                                                ${shipmentItem?.container?.parentContainer?.name} &rsaquo;
+                                                            </g:if>
+                                                            ${shipmentItem?.container?.name}
+                                                        </td>
+                                                        <td>
+                                                            ${shipmentItem?.inventoryItem?.lotNumber}
+                                                        </td>
+                                                        <td>
+                                                            <g:formatDate date="${shipmentItem?.inventoryItem?.expirationDate}" format="MMM yyyy"/>
+                                                        </td>
+                                                        <td class="right">
+                                                            ${shipmentItem?.quantity}
+                                                        </td>
+                                                        <td class="center">
+                                                            ${shipmentItem?.product?.unitOfMeasure}
                                                         </td>
                                                     </tr>
+                                                        </g:each>
                                                 </g:each>
                                                 </tbody>
                                             </table>

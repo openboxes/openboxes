@@ -21,6 +21,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.jobs.CalculateQuantityJob
+import org.pih.warehouse.jobs.RefreshInventorySnapshotJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
@@ -34,7 +35,6 @@ import java.text.SimpleDateFormat
 
 class DashboardController {
 
-    def orderService
     def shipmentService
     def inventoryService
     def dashboardService
@@ -117,7 +117,7 @@ class DashboardController {
         }
     }
 
-    def index = {
+    def old = {
 
         def startTime = System.currentTimeMillis()
         if (!session.warehouse) {
@@ -144,6 +144,10 @@ class DashboardController {
                 tags                     : productService?.getPopularTags(50),
                 catalogs                 : productService?.getAllCatalogs()
         ]
+    }
+
+    def index = {
+        render(template: "/common/react")
     }
 
 
@@ -180,7 +184,6 @@ class DashboardController {
         render results as JSON
     }
 
-    @Cacheable("megamenuCache")
     def megamenu = {
 
         def user = User.get(session?.user?.id)
@@ -227,8 +230,7 @@ class DashboardController {
                 outboundShipmentsCount: outboundShipmentsCount,
                 incomingOrders        : incomingOrders,
                 requisitionStatistics : requisitionStatistics,
-                quickCategories       : productService.getQuickCategories(),
-                tags                  : productService.getAllTags()
+                quickCategories       : productService.getQuickCategories()
         ]
     }
 
@@ -236,18 +238,8 @@ class DashboardController {
             "binLocationReportCache", "binLocationSummaryCache", "quantityOnHandCache", "selectTagCache",
             "selectTagsCache", "selectCategoryCache", "selectCatalogsCache"])
     def flushCache = {
-        flash.message = "All data caches have been flushed"
-        CalculateQuantityJob.triggerNow([locationId: session.warehouse.id, forceRefresh: true])
-        redirect(action: "index")
-    }
-
-    def triggerCalculateQuantityJob = {
-        CalculateQuantityJob.triggerNow([locationId: session.warehouse.id])
-    }
-
-    @CacheFlush(["megamenuCache"])
-    def flushMegamenu = {
-        flash.message = "${g.message(code: 'dashboard.cacheFlush.message', args: [g.message(code: 'dashboard.megamenu.label')])}"
+        flash.message = "Data caches have been flushed and inventory snapshot job was triggered"
+        RefreshInventorySnapshotJob.triggerNow([location: session.warehouse.id, user: session.user.id, forceRefresh: false])
         redirect(action: "index")
     }
 

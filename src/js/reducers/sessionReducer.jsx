@@ -1,12 +1,20 @@
 import _ from 'lodash';
 
-import { FETCH_SESSION_INFO, CHANGE_CURRENT_LOCATION, TRANSLATIONS_FETCHED, CHANGE_CURRENT_LOCALE } from '../actions/types';
+import {
+  FETCH_SESSION_INFO,
+  CHANGE_CURRENT_LOCATION,
+  TRANSLATIONS_FETCHED,
+  CHANGE_CURRENT_LOCALE,
+  FETCH_MENU_CONFIG,
+  TOGGLE_MODAL,
+} from '../actions/types';
 
 const initialState = {
   currentLocation: {
     id: '',
     name: '',
     hasBinLocationSupport: true,
+    hasPackingSupport: true,
     locationType: { description: '', locationTypeCode: '' },
   },
   isSuperuser: false,
@@ -40,6 +48,9 @@ const initialState = {
   hostname: '',
   timezone: '',
   minimumExpirationDate: '',
+  isPaginated: false,
+  logoLabel: '',
+  isOpen: false,
 };
 
 export default function (state = initialState, action) {
@@ -51,7 +62,6 @@ export default function (state = initialState, action) {
         isSuperuser: _.get(action, 'payload.data.data.isSuperuser'),
         isUserAdmin: _.get(action, 'payload.data.data.isUserAdmin'),
         supportedActivities: _.get(action, 'payload.data.data.supportedActivities'),
-        menuConfig: _.get(action, 'payload.data.data.menuConfig'),
         activeLanguage: _.get(action, 'payload.data.data.activeLanguage'),
         user: _.get(action, 'payload.data.data.user'),
         isImpersonated: _.get(action, 'payload.data.data.isImpersonated'),
@@ -65,6 +75,13 @@ export default function (state = initialState, action) {
         hostname: _.get(action, 'payload.data.data.hostname'),
         timezone: _.get(action, 'payload.data.data.timezone'),
         minimumExpirationDate: _.get(action, 'payload.data.data.minimumExpirationDate'),
+        isPaginated: _.get(action, 'payload.data.data.isPaginated'),
+        logoLabel: _.get(action, 'payload.data.data.logoLabel'),
+      };
+    case FETCH_MENU_CONFIG:
+      return {
+        ...state,
+        menuConfig: _.get(action, 'payload.data.data.menuConfig'),
       };
     case CHANGE_CURRENT_LOCATION:
       return { ...state, currentLocation: action.payload };
@@ -74,6 +91,11 @@ export default function (state = initialState, action) {
       return {
         ...state,
         fetchedTranslations: { ...state.fetchedTranslations, [action.payload]: true },
+      };
+    case TOGGLE_MODAL:
+      return {
+        ...state,
+        isOpen: action.payload,
       };
     default:
       return state;

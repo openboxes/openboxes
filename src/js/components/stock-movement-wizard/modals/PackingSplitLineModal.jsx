@@ -50,6 +50,9 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.binLocation.label',
         defaultMessage: 'Bin Location',
+        getDynamicAttr: ({ hasBinLocationSupport }) => ({
+          hide: !hasBinLocationSupport,
+        }),
       },
       quantityShipped: {
         type: TextField,
@@ -206,6 +209,7 @@ class PackingSplitLineModal extends Component {
         formProps={{
           lineItem: this.state.attr.lineItem,
           debouncedUsersFetch: this.debouncedUsersFetch,
+          hasBinLocationSupport: this.props.hasBinLocationSupport,
         }}
         validate={this.validate}
         renderBodyWithValues={PackingSplitLineModal.displayPackedSum}
@@ -223,6 +227,7 @@ class PackingSplitLineModal extends Component {
 const mapStateToProps = state => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
+  hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner })(PackingSplitLineModal);
@@ -240,4 +245,6 @@ PackingSplitLineModal.propTypes = {
   hideSpinner: PropTypes.func.isRequired,
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
+  /** Is true when currently selected location supports bins */
+  hasBinLocationSupport: PropTypes.bool.isRequired,
 };

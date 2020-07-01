@@ -35,14 +35,14 @@
 			            </div>
                         <div id="product-catalogs">
                             <g:each var="productCatalog" in="${productInstance?.productCatalogs }">
-								<g:link controller="productCatalog" action="edit" params="['id':productCatalog.id]">
+								<g:link controller="inventory" action="browse" params="['catalogs':productCatalog.id]">
                                 	<span class="tag tag-info" title="${g.message(code: 'productCatalog.label')}">${productCatalog.name }</span>
 								</g:link>
                             </g:each>
                         </div>
                         <div id="product-tags">
                             <g:each var="tag" in="${productInstance?.tags }">
-                                <g:link controller="inventory" action="browse" params="['tag':tag.tag,'max':params.max]">
+                                <g:link controller="inventory" action="browse" params="['tags':tag.id]">
                                     <span class="tag tag-success" title="${g.message(code: 'tag.label', default: 'Tag')}">${tag.tag }</span>
                                 </g:link>
                             </g:each>

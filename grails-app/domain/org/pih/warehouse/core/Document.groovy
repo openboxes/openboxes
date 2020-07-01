@@ -11,9 +11,9 @@ package org.pih.warehouse.core
 
 
 /**
- * A document is a file (e.g. document, image) that can be associated with an 
- * entity in the system.  Currently, users can only upload and link documents to 
- * shipments.  
+ * A document is a file (e.g. document, image) that can be associated with an
+ * entity in the system.  Currently, users can only upload and link documents to
+ * shipments.
  */
 class Document implements Serializable {
 

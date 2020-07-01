@@ -654,7 +654,6 @@ textarea, select {
     margin:0;
 }
 
-
 textarea, input.large {
     width: 100%;
 }
@@ -1128,7 +1127,6 @@ button.action-btn, button.previous, button.next {
 
 #product-details-box span.name {   }
 #product-details-box span.value { font-size: 1.0em; }
-#product-details-box span.name:after { content:":" }
 #product-details-box th { color: lightgrey; }
 #product-details-box fieldset table td { padding: 6px; }
 .product-details { height: 45px; line-height: 2px; }
@@ -1595,6 +1593,13 @@ h2 {
     vertical-align:middle;
 }
 
+.logo-label {
+    padding:5px;
+    -moz-border-radius:5px;
+    -webkit-border-radius:5px;
+    color: white;
+    background-color: red;
+}
 
 .title {
     font-size: 1.5em;
@@ -1753,7 +1758,7 @@ ul.treeList li ul li {
     position:relative;
     padding:15px;
     margin:1em 0 3em;
-    color:#000;
+    color:white;
     background:#f3961c;
 
     /* css3 */
@@ -1932,10 +1937,6 @@ div#dashboard li {
 
 .prop .label {
     width: 45%;
-}
-
-.label label:after {
-    content: ':';
 }
 
 .prop .value {
@@ -2503,6 +2504,7 @@ blockquote {
 .modified { color: red; }
 .approved { color: green; }
 .beta { background-color: #ffd351; display: inline-block; padding: 2px 5px 2px 5px; text-transform: uppercase; border-radius: 3px; color: #594300; font-weight: bold; line-height:99%; }
+.deprecated { background-color: #dc3545; display: inline-block; padding: 2px 5px 2px 5px; text-transform: uppercase; border-radius: 3px; border-color: #dc3545; color: white; font-weight: bold; line-height:99%; }
 .tooltip {
     position: absolute;
     width: 100px;

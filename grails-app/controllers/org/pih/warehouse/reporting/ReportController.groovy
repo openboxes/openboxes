@@ -11,22 +11,26 @@ package org.pih.warehouse.reporting
 
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
+import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
+import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.jobs.RefreshTransactionFactJob
+import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.report.ChecklistReportCommand
 import org.pih.warehouse.report.InventoryReportCommand
 import org.pih.warehouse.report.MultiLocationInventoryReportCommand
-import org.pih.warehouse.report.ProductReportCommand
+
 import org.quartz.JobKey
 import org.quartz.impl.StdScheduler
 import util.ReportUtil
 
 class ReportController {
 
+    def dataSource
     def dataService
     def documentService
     def inventoryService
@@ -36,6 +40,8 @@ class ReportController {
     def inventorySnapshotService
     def stockMovementService
     def forecastingService
+    def shipmentService
+    def orderService
     StdScheduler quartzScheduler
 
     def refreshTransactionFact = {
@@ -236,16 +242,6 @@ class ReportController {
         [transactions: transactions]
     }
 
-
-    def showProductReport = { ProductReportCommand command ->
-        if (!command?.hasErrors()) {
-            reportService.generateProductReport(command)
-        }
-
-        [command: command]
-    }
-
-
     def showTransactionReport = {
         InventoryReportCommand command = new InventoryReportCommand()
         command.location = Location.get(session.warehouse.id)
@@ -272,15 +268,6 @@ class ReportController {
     def showTransactionReportDialog = {
         def url = createLink(controller: "json", action: "getTransactionReportDetails", params:params)
         render(template: "dataTableDialog", model: [url: url])
-    }
-
-    def generateTransactionReport = { InventoryReportCommand command ->
-        // We always need to initialize the root category
-        command.rootCategory = productService.getRootCategory()
-        if (!command?.hasErrors()) {
-            reportService.generateTransactionReport(command)
-        }
-        render(view: 'showTransactionReport', model: [command: command])
     }
 
     def showShippingReport = { ChecklistReportCommand command ->
@@ -445,6 +432,79 @@ class ReportController {
                 statuses   : statuses
         ]
 
+    }
+
+    def showOnOrderReport = {
+        if (params.downloadAction == "downloadOnOrderReport") {
+            def location = Location.get(session.warehouse.id)
+            def items = orderService.getPendingInboundOrderItems(location)
+            items += shipmentService.getPendingInboundShipmentItems(location)
+
+            if (items) {
+
+                def sw = new StringWriter()
+                def csv = new CSVWriter(sw, {
+                    "Code" { it.productCode }
+                    "Product" { it.productName }
+                    "Quantity Ordered Not Shipped" { it.qtyOrderedNotShipped }
+                    "Quantity Shipped Not Received" { it.qtyShippedNotReceived }
+                    "PO Number" { it.orderNumber }
+                    "PO Description" { it.orderDescription }
+                    "Supplier Organization" { it.supplierOrganization }
+                    "Supplier Location" { it.supplierLocation }
+                    "Supplier Location Group" { it.supplierLocationGroup }
+                    "Estimated Goods Ready Date" { it.estimatedGoodsReadyDate }
+                    "Shipment Number" { it.shipmentNumber }
+                    "Ship Date" { it.shipDate }
+                    "Shipment Type" { it.shipmentType }
+                })
+
+                items.sort { a,b ->
+                    a.product.productCode <=> b.product.productCode
+                }.each {
+                    def isOrderItem = it instanceof OrderItem
+                    csv << [
+                            productCode  : it.product.productCode,
+                            productName  : it.product.name,
+                            qtyOrderedNotShipped : isOrderItem ? it.quantityRemaining : '',
+                            qtyShippedNotReceived : isOrderItem ? '' : it.quantityRemaining,
+                            orderNumber  : isOrderItem ? it.order.orderNumber : (it.shipment.isFromPurchaseOrder ? it.orderNumber : ''),
+                            orderDescription  : isOrderItem ? it.order.name : (it.shipment.isFromPurchaseOrder ? it.orderName : ''),
+                            supplierOrganization  : isOrderItem ? it.order?.origin?.organization?.name : it.shipment?.origin?.organization?.name,
+                            supplierLocation  : isOrderItem ? it.order.origin.name : it.shipment.origin.name,
+                            supplierLocationGroup  : isOrderItem ? it.order?.origin?.locationGroup?.name : it.shipment?.origin?.locationGroup?.name,
+                            estimatedGoodsReadyDate  : isOrderItem ? it.estimatedReadyDate?.format("MM/dd/yyyy") : '',
+                            shipmentNumber  : isOrderItem ? '' : it.shipment.shipmentNumber,
+                            shipDate  : isOrderItem ? '' : it.shipment.expectedShippingDate?.format("MM/dd/yyyy"),
+                            shipmentType  : isOrderItem ? '' : it.shipment.shipmentType.name
+                    ]
+                }
+
+                response.setHeader("Content-disposition", "attachment; filename=\"Detailed-Order-Report-${new Date().format("MM/dd/yyyy")}.csv\"")
+                render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
+            }
+        } else if(params.downloadAction == "downloadSummaryOnOrderReport") {
+            def location = Location.get(session.warehouse.id)
+            def data = reportService.getOnOrderSummary(location)
+            if (data) {
+
+                def sw = new StringWriter()
+                def csv = new CSVWriter(sw, {
+                    "Code" { it.productCode }
+                    "Product" { it.productName }
+                    "Quantity Ordered Not Shipped" { it.qtyOrderedNotShipped }
+                    "Quantity Shipped Not Received" { it.qtyShippedNotReceived }
+                    "Total On Order" { it.totalOnOrder }
+                    "Total On Hand" { it.totalOnHand }
+                    "Total On Hand and On Order" { it.totalOnHandAndOnOrder }
+                })
+
+                data = data.sort { it.productCode }
+                csv.writeAll(data)
+                response.setHeader("Content-disposition", "attachment; filename=\"Detailed-Order-Report-${new Date().format("MM/dd/yyyy")}.csv\"")
+                render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
+            }
+        }
     }
 
     def showInventoryByLocationReport = { MultiLocationInventoryReportCommand command ->

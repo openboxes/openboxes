@@ -24,6 +24,7 @@ class ApiController {
     def dataSource
     def userService
     def localizationService
+    def megamenuService
     def grailsApplication
 
     def login = {
@@ -58,6 +59,14 @@ class ApiController {
         render([status: 200, text: "Current language is ${locale}"])
     }
 
+    def getMenuConfig = {
+        Map menuConfig = grailsApplication.config.openboxes.megamenu
+        User user = User.get(session?.user?.id)
+        Location location = Location.get(session.warehouse?.id)
+        List translatedMenu = megamenuService.buildAndTranslateMenu(menuConfig, user, location)
+        render([data: [menuConfig: translatedMenu]] as JSON)
+    }
+
     def getAppContext = {
         User user = User.get(session?.user?.id)
         Location location = Location.get(session.warehouse?.id)
@@ -65,7 +74,6 @@ class ApiController {
         boolean isUserAdmin = userService.isUserAdmin(session?.user)
         def locale = localizationService.getCurrentLocale()
         def supportedActivities = location.supportedActivities ?: location.locationType.supportedActivities
-        def menuConfig = grailsApplication.config.openboxes.megamenu
         boolean isImpersonated = session.impersonateUserId ? true : false
         def buildNumber = grailsApplication.metadata.'app.revisionNumber'
         def buildDate = grailsApplication.metadata.'app.buildDate'
@@ -76,28 +84,34 @@ class ApiController {
         def ipAddress = request?.getRemoteAddr()
         def hostname = session.hostname ?: "Unknown"
         def timezone = session?.timezone?.ID
+        def isPaginated = grailsApplication.config.openboxes.api.pagination.enabled
+        def tablero = grailsApplication.config.openboxes.tablero
         DateFormat dateFormat = new SimpleDateFormat("MM/DD/YYYY");
         String minimumExpirationDate = dateFormat.format(grailsApplication.config.openboxes.expirationDate.minValue)
+        def logoLabel = grailsApplication.config.openboxes.logo.label
         render([
                 data: [
-                        user               : user,
-                        location           : location,
-                        isSuperuser        : isSuperuser,
-                        isUserAdmin        : isUserAdmin,
-                        supportedActivities: supportedActivities,
-                        menuConfig         : menuConfig,
-                        isImpersonated     : isImpersonated,
-                        grailsVersion      : grailsVersion,
-                        appVersion         : appVersion,
-                        branchName         : branchName,
-                        buildNumber        : buildNumber,
-                        environment        : environment,
-                        buildDate          : buildDate,
-                        ipAddress          : ipAddress,
-                        hostname           : hostname,
-                        timezone           : timezone,
-                        minimumExpirationDate : minimumExpirationDate,
-                        activeLanguage     : locale.language],
+                        user                 : user,
+                        location             : location,
+                        isSuperuser          : isSuperuser,
+                        isUserAdmin          : isUserAdmin,
+                        supportedActivities  : supportedActivities,
+                        isImpersonated       : isImpersonated,
+                        grailsVersion        : grailsVersion,
+                        appVersion           : appVersion,
+                        branchName           : branchName,
+                        buildNumber          : buildNumber,
+                        environment          : environment,
+                        buildDate            : buildDate,
+                        ipAddress            : ipAddress,
+                        hostname             : hostname,
+                        timezone             : timezone,
+                        tablero              : tablero,
+                        minimumExpirationDate: minimumExpirationDate,
+                        activeLanguage       : locale.language,
+                        isPaginated          : isPaginated,
+                        logoLabel            : logoLabel,
+                ],
         ] as JSON)
     }
 

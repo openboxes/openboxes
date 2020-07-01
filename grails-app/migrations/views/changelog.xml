@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet id="1580848680306-1" author="jmiranda" runAlways="true" failOnError="false">
+    <sqlFile path="views/product-demand-view.sql"/>
+  </changeSet>
+  <changeSet id="1580848680306-2" author="jmiranda" runAlways="true" failOnError="false">
+    <sqlFile path="views/product-inventory-snapshot-view.sql"/>
+  </changeSet>
+  <changeSet id="1580848680306-3" author="jmiranda" runAlways="true" failOnError="false">
+    <sqlFile path="views/product-inventory-extended-view.sql"/>
+  </changeSet>
+  <changeSet id="1580848680306-4" author="jmiranda" runAlways="true" failOnError="false">
+    <sqlFile path="views/product-inventory-pivot-view.sql"/>
+  </changeSet>
+  <changeSet id="1580848680306-5" author="jmiranda" runAlways="true" failOnError="false">
+    <sqlFile path="views/product-inventory-compare-view.sql"/>
+  </changeSet>
+  <changeSet id="1580848680306-6" author="jmiranda" runAlways="true" failOnError="false">
+    <sqlFile path="views/product-inventory-expiry-view.sql"/>
+  </changeSet>
+  <changeSet id="1580848680306-7" author="jmiranda" runAlways="true" failOnError="false">
+    <validCheckSum>5668c88bf15d0ac488edf66e4ebda2d</validCheckSum>
+    <sqlFile path="views/on-order-order-item-summary.sql"/>
+  </changeSet>
+  <changeSet id="1580848680306-8" author="jmiranda" runAlways="true" failOnError="false">
+    <validCheckSum>a1564fade9553722fd8cb37caf3ebfa</validCheckSum>
+    <sqlFile path="views/on-order-shipment-item-summary.sql"/>
+  </changeSet>
+  <changeSet id="1580848680306-9" author="jmiranda" runAlways="true" failOnError="false">
+    <validCheckSum>d1eaa48222b813b14657d25f40ee3c18</validCheckSum>
+    <sqlFile path="views/on-order-summary.sql"/>
+  </changeSet>
+  <changeSet id="1580848680306-10" author="dhatala" runAlways="true" failOnError="false">
+    <validCheckSum>c9c41a3239c4b5be50dac5cc593e236</validCheckSum>
+    <sqlFile path="views/product-snapshot.sql"/>
+  </changeSet>
+</databaseChangeLog>

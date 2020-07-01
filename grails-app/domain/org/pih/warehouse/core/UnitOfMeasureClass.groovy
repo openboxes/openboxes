@@ -12,7 +12,7 @@ package org.pih.warehouse.core
 
 import org.pih.warehouse.auth.AuthService
 
-class UnitOfMeasureClass {
+class UnitOfMeasureClass implements Serializable {
 
     def beforeInsert = {
         createdBy = AuthService.currentUser.get()
@@ -22,7 +22,7 @@ class UnitOfMeasureClass {
     }
 
     String id
-    String name                    // area, volume, length, weight, currency
+    String name
     String code
     String description
     Boolean active
@@ -41,12 +41,11 @@ class UnitOfMeasureClass {
 
     static constraints = {
         name(nullable: false)
-        code(nullable: false)
+        code(nullable: false, unique: true)
         description(nullable: true)
         active(nullable: true)
         type(nullable: false)
         baseUom(nullable: true)
-
         createdBy(nullable: true)
         updatedBy(nullable: true)
     }

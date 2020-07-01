@@ -146,10 +146,27 @@ class UserService {
         return false
     }
 
+    Boolean hasAllRoles(User user, List<RoleType> roleTypes) {
+        return getEffectiveRoles(user).all { Role role -> roleTypes.contains(role.roleType) }
+    }
+
+    Boolean hasAnyRoles(User user, List<RoleType> roleTypes) {
+        return getEffectiveRoles(user).any { Role role -> roleTypes.contains(role.roleType) }
+    }
+
     Boolean hasRoleFinance(User u) {
         if (u) {
             def user = User.get(u.id)
             def roleTypes = [RoleType.ROLE_FINANCE]
+            return getEffectiveRoles(user).any { Role role -> roleTypes.contains(role.roleType) }
+        }
+        return false
+    }
+
+    Boolean hasRoleApprover(User u) {
+        if (u) {
+            def user = User.get(u.id)
+            def roleTypes = [RoleType.ROLE_APPROVER]
             return getEffectiveRoles(user).any { Role role -> roleTypes.contains(role.roleType) }
         }
         return false
@@ -167,7 +184,7 @@ class UserService {
         User user = getUser(userId)
         return getEffectiveRoles(user).any { Role role ->
             boolean acceptedRoleType = acceptedRoleTypes.contains(role.roleType)
-            log.info "${role.name} ${role.roleType} = ${acceptedRoleType}"
+            log.info "Is role ${role.roleType} in ${acceptedRoleTypes} = ${acceptedRoleType}"
             return acceptedRoleType
         }
     }
@@ -328,5 +345,56 @@ class UserService {
             return (userInstance.password == password.encodeAsPassword() || userInstance.password == password)
         }
         return false
+    }
+
+    def getDashboardConfig(User user) {
+        def config = grailsApplication.config.openboxes.tablero
+        def userConfig = user.deserializeDashboardConfig()
+
+        if (userConfig != null) {
+            updateConfig("graph", config, userConfig)
+            updateConfig("number", config, userConfig)
+        }
+
+        return config
+    }
+
+    private def updateConfig(type, config, customConfig) {
+        customConfig[type].each { key, value ->
+            // Update order
+            config["endpoints"][type][key]["order"] = value["order"]
+            
+            // If the indicator should be archived but it currently isn't
+            boolean archivedInConfig = config["endpoints"][type][key]["archived"].indexOf("personal") != -1 
+            if (value["archived"] && !archivedInConfig) {
+                config["endpoints"][type][key]["archived"].add("personal")
+            }
+
+            // If the indicator shouldn't be archived but it currently is
+            if (!value["archived"] && archivedInConfig) {
+                config["endpoints"][type][key]["archived"].remove("personal")
+            }
+        }
+
+        // Fix to ensure each order appears only once
+        for (int order = 1; order <= config["endpoints"][type].size(); order++) {
+            List indicators = config["endpoints"][type].findAll { key, value ->
+                value.order == order
+            }.collect { key, value ->
+                key
+            }
+
+            if (indicators.size() > 1) {
+                for (int i = 1; i < indicators.size(); i++) {
+                    config["endpoints"][type][indicators[i]]["order"] = order + i
+                }
+            }
+        }
+    }
+
+    def updateDashboardConfig(User user, Object config) {
+        String stringConfig = user.serializeDashboardConfig(config)
+        user.dashboardConfig = stringConfig
+        return user.deserializeDashboardConfig()
     }
 }

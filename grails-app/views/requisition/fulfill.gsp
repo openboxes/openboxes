@@ -5,7 +5,7 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'request.label', default: 'Request')}" />
         <title><warehouse:message code="default.fulfill.label" default="Fulfill {0}" args="[entityName]" /></title>
-       
+
     </head>
     <body>
         <div class="body">
@@ -16,11 +16,11 @@
 				<div class="errors">
 					<g:renderErrors bean="${requestInstance}" as="list" />
 				</div>
-			</g:hasErrors>            
-            <div class="dialog">            
+			</g:hasErrors>
+            <div class="dialog">
             	<g:form action="fulfill" method="POST">
             		<g:hiddenField name="id" value="${requestInstance?.id }"/>
-            	
+
 	            	<fieldset>
 	            		<g:render template="summary" model="[requestInstance:requestInstance]"/>
 		                <table>
@@ -32,9 +32,9 @@
 										</td>
 										<td valign='top'>
 											<div class="ui-widget">
-												<g:select class="comboBox" name="shipment.id" from="${org.pih.warehouse.shipping.Shipment.list()}" 
+												<g:select class="comboBox" name="shipment.id" from="${org.pih.warehouse.shipping.Shipment.list()}"
 													optionKey="id" optionValue="name" value="" noSelection="['':'']" />
-											</div>									
+											</div>
 										</td>
 									</tr>
 								</g:each>
@@ -50,9 +50,8 @@
 		                    </tbody>
 		                </table>
 	               </fieldset>
-				</g:form>	               
+				</g:form>
             </div>
         </div>
-        <g:comboBox/>
     </body>
 </html>

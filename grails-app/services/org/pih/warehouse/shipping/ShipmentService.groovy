@@ -32,6 +32,10 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.order.ShipOrderCommand
+import org.pih.warehouse.order.ShipOrderItemCommand
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
@@ -53,6 +57,7 @@ class ShipmentService {
     def inventoryService
     def identifierService
     def documentService
+    def personDataService
     GrailsApplication grailsApplication
 
     /**
@@ -220,16 +225,29 @@ class ShipmentService {
     }
 
 
+    List<Shipment> getShipmentsByLocation(Location location) {
+        return getShipmentsByLocation(location, location, null)
+    }
+
     /**
      *
      * @param location
      * @return
      */
-    List<Shipment> getShipmentsByLocation(Location location) {
+    List<Shipment> getShipmentsByLocation(Location origin, Location destination, ShipmentStatusCode shipmentStatusCode) {
         return Shipment.withCriteria {
-            or {
-                eq("destination", location)
-                eq("origin", location)
+            and {
+                or {
+                    if (origin) {
+                        eq("origin", origin)
+                    }
+                    if (destination) {
+                        eq("destination", destination)
+                    }
+                }
+                if (shipmentStatusCode) {
+                    eq("currentStatus", shipmentStatusCode)
+                }
             }
         }
     }
@@ -318,16 +336,24 @@ class ShipmentService {
         return shipmentItems
     }
 
-    List<ShipmentItem> getPendingInboundShipmentItems(Location destination, Product product) {
+    List<ShipmentItem> getPendingInboundShipmentItems(Location destination) {
         def shipmentItems = ShipmentItem.createCriteria().list() {
             shipment {
                 eq("destination", destination)
                 not {
-                    'in'("currentStatus", [ShipmentStatusCode.RECEIVED])
+                    'in'("currentStatus", [ShipmentStatusCode.RECEIVED, ShipmentStatusCode.PENDING])
                 }
-                requisition {
-                    'in'("status", [RequisitionStatus.ISSUED])
-                }
+            }
+        }
+
+        return shipmentItems.findAll { !it.isFullyReceived() }
+    }
+
+    List<ShipmentItem> getPendingInboundShipmentItems(Location destination, Product product) {
+        def shipmentItems = ShipmentItem.createCriteria().list() {
+            shipment {
+                eq("destination", destination)
+                'in'("currentStatus", [ShipmentStatusCode.SHIPPED, ShipmentStatusCode.PARTIALLY_RECEIVED])
             }
             eq("product", product)
         }
@@ -680,13 +706,19 @@ class ShipmentService {
             // Check whether there's any stock in the bin location for the given inventory item
             def quantityOnHand = getQuantityOnHand(origin, shipmentItem.binLocation, shipmentItem.inventoryItem, binLocationRequired)
             def duplicatedShipmentItemsQuantity = getDuplicatedShipmentItemsQuantity(shipmentItem.shipment, shipmentItem.binLocation, shipmentItem.inventoryItem)
-            def allPendingShipmentsWithProduct = getPendingShipmentItemsWithProduct(origin, shipmentItem.product)
 
             log.info "Shipment item quantity ${shipmentItem.quantity} vs quantity on hand ${quantityOnHand} vs duplicated shipment items quantity ${duplicatedShipmentItemsQuantity}"
 
             log.info("Checking shipment item ${shipmentItem?.inventoryItem} quantity [" +
                     shipmentItem.quantity + "] <= quantity on hand [" + quantityOnHand + "]")
-            if (duplicatedShipmentItemsQuantity > quantityOnHand) {
+            if (duplicatedShipmentItemsQuantity > quantityOnHand && origin.supports(ActivityCode.MANAGE_INVENTORY)) {
+                String errorMessage = "Shipping quantity (${shipmentItem.quantity}) can not exceed on hand quantity (${quantityOnHand}) for " +
+                        "product code ''${shipmentItem.product.productCode}'' " +
+                        "and lot number ''${shipmentItem?.inventoryItem?.lotNumber}'' " +
+                        "at origin ''${origin.name}'' " +
+                        "bin ''${shipmentItem?.binLocation?.name ?: 'Default'}''. " +
+                        "This can occur if changes were made to inventory after this shipment was picked but before it shipped. " +
+                        "To move forward, please remove the lines above from the shipment or reduce to reflect current QOH."
                 shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedAvailableQuantity",
                         [
                                 shipmentItem.quantity + " " + shipmentItem?.product?.unitOfMeasure,
@@ -695,8 +727,7 @@ class ShipmentService {
                                 shipmentItem?.inventoryItem?.lotNumber,
                                 origin.name,
                                 shipmentItem?.binLocation?.name ?: 'Default'
-                        ].toArray(),
-                        "Shipping quantity cannot exceed on-hand quantity for product code " + shipmentItem.product.productCode + " " + allPendingShipmentsWithProduct.shipment.shipmentNumber.unique())
+                        ].toArray(), errorMessage)
                 throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
             }
         }
@@ -753,8 +784,13 @@ class ShipmentService {
      * @return
      */
     Integer getQuantityOnHand(Location location, Location binLocation, InventoryItem inventoryItem, boolean binLocationRequired) {
-        List transactionEntries = getTransactionEntries(location, binLocation, inventoryItem, binLocationRequired)
+        List transactionEntries = getTransactionEntries(location, inventoryItem?.product)
         List binLocations = inventoryService.getQuantityByBinLocation(transactionEntries)
+
+        // Filter by inventory item
+        if (inventoryItem) {
+            binLocations = binLocations.findAll { it.inventoryItem == inventoryItem }
+        }
 
         // Bin location validation is required when picking to ensure that we don't
         // pick from the Default bin if it doesn't have any stock
@@ -773,11 +809,12 @@ class ShipmentService {
      * @param inventoryInstance
      * @return
      */
-    List getTransactionEntries(Location location, Location binLocation, InventoryItem inventoryItem, boolean binLocationRequired) {
-        log.info "Get transaction entries by location=${location}, binLocation=${binLocation}, inventoryItem=${inventoryItem}"
+    List getTransactionEntries(Location location, Product product) {
         def criteria = TransactionEntry.createCriteria()
         def transactionEntries = criteria.list {
-            eq("inventoryItem", inventoryItem)
+            inventoryItem {
+                eq("product", product)
+            }
             transaction {
                 eq("inventory", location.inventory)
                 order("transactionDate", "asc")
@@ -794,7 +831,14 @@ class ShipmentService {
      * @param shipment
      */
     void deleteShipment(Shipment shipment) {
-        shipment.delete(flush: true)
+        shipment.shipmentItems.toArray().each { ShipmentItem shipmentItem ->
+            shipment.removeFromShipmentItems(shipmentItem)
+            shipmentItem.orderItems.toArray().flatten().each { OrderItem orderItem ->
+                orderItem.removeFromShipmentItems(shipmentItem)
+            }
+            shipmentItem.delete()
+        }
+        shipment.delete()
     }
 
 
@@ -897,7 +941,11 @@ class ShipmentService {
         if (shipmentItem) {
             def shipment = Shipment.get(shipmentItem.shipment.id)
             shipment.removeFromShipmentItems(shipmentItem)
-            shipmentItem.delete(flush: true)
+            shipmentItem.orderItems.toArray().each { OrderItem orderItem ->
+                orderItem.removeFromShipmentItems(shipmentItem)
+            }
+            //shipmentItem.delete()
+            shipment.save(flush:true)
         }
     }
 
@@ -1982,18 +2030,7 @@ class ShipmentService {
             }
             // Recipient string only includes name
             else {
-                String[] names = recipient.split(" ", 2)
-                if (names.length <= 1) {
-                    throw new RuntimeException("Recipient ${recipient} must have at least two names (i.e. first name and last name)")
-                }
-
-                person = Person.findByFirstNameAndLastName(names[0], names[1])
-                if (!person) {
-                    person = new Person(firstName: names[0], lastName: names[1])
-                    if (!person.save(flush: true)) {
-                        throw new ValidationException("Cannot save recipient ${recipient} due to errors", person.errors)
-                    }
-                }
+                person = personDataService.getOrCreatePersonFromNames(recipient)
             }
         }
         return person
@@ -2109,4 +2146,40 @@ class ShipmentService {
         return count
     }
 
+
+    void updateOrCreateOrderBasedShipmentItems(ShipOrderCommand command) {
+        Order order = command.order
+        Shipment shipment = command.shipment
+        shipment.name = order.name
+        shipment.description = order.orderNumber
+        shipment.origin = order.origin
+        shipment.destination = order.destination
+
+        command.shipOrderItems.each { ShipOrderItemCommand shipOrderItem ->
+
+            // Remove shipment item if quantity to ship is 0
+            if (!shipOrderItem.quantityToShip) {
+                if (shipOrderItem.shipmentItem) {
+                    deleteShipmentItem(shipOrderItem.shipmentItem)
+                }
+            // Otherwise create or update the shipment item
+            } else {
+                if (!shipOrderItem.shipmentItem) {
+                    ShipmentItem shipmentItem = new ShipmentItem(
+                            product: shipOrderItem.orderItem.product,
+                            recipient: shipOrderItem.orderItem.recipient,
+                            quantity: shipOrderItem.quantityToShip * shipOrderItem.orderItem.quantityPerUom
+                    )
+                    shipmentItem.addToOrderItems(shipOrderItem.orderItem)
+                    shipment.addToShipmentItems(shipmentItem)
+                } else {
+                    shipOrderItem.shipmentItem.quantity = shipOrderItem.quantityToShip * shipOrderItem.orderItem.quantityPerUom
+                }
+            }
+        }
+
+        if (shipment.hasErrors() || !shipment.save()) {
+            throw new ValidationException("Invalid shipment", shipment.errors)
+        }
+    }
 }

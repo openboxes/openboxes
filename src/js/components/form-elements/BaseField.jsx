@@ -40,11 +40,11 @@ class BaseField extends Component {
     };
 
     const onBlur = (value) => {
+      this.setState({ touched: true });
+
       if (attr.onBlur) {
         attr.onBlur(value);
       }
-
-      this.setState({ touched: true });
     };
 
     const attributes = {

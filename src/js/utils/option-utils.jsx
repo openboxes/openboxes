@@ -27,10 +27,12 @@ export const debounceUsersFetch = (waitTime, minSearchLength) =>
     }
   }, waitTime);
 
-export const debounceLocationsFetch = (waitTime, minSearchLength) =>
+export const debounceLocationsFetch = (waitTime, minSearchLength, activityCodes) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
-      apiClient.get(`/openboxes/api/locations?direction=${queryString.parse(window.location.search).direction}&name=${searchTerm}`)
+      const activityCodesParams = activityCodes ? activityCodes.map(activityCode => `&activityCodes=${activityCode}`).join('') : '';
+      const { direction } = queryString.parse(window.location.search);
+      apiClient.get(`/openboxes/api/locations?name=${searchTerm}${direction ? `&direction=${direction}` : ''}${activityCodesParams}`)
         .then(result => callback(
           null,
           {
@@ -68,6 +70,7 @@ export const debounceGlobalSearch = (waitTime, minSearchLength) =>
                   url: obj.url,
                 },
                 label: obj.label,
+                color: obj.color,
               }
             )),
           },
@@ -95,6 +98,7 @@ export const debounceProductsFetch = (waitTime, minSearchLength, locationId) =>
                   label: `${obj.productCode} - ${obj.name}`,
                 },
                 label: `${obj.productCode} - ${obj.name}`,
+                color: obj.color,
               }
             )),
           },
@@ -124,6 +128,7 @@ export const debounceAvailableItemsFetch = (waitTime, minSearchLength) =>
                   minExpirationDate: obj.minExpirationDate,
                 },
                 label: `${obj.productCode} - ${obj.name}`,
+                color: obj.color,
               }
             )),
           },

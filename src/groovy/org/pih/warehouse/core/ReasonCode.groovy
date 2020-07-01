@@ -62,6 +62,8 @@ enum ReasonCode {
     CORRECTION(30),
     SCRAPPED(31),
     REJECTED(32),
+    REQUEST_ERROR(33),
+    NOT_NEEDED_BASED_ON_CONSUMPTION(34),
     OTHER(100)
 
 
@@ -72,30 +74,33 @@ enum ReasonCode {
     }
 
     static list() {
-        [STOCKOUT,
-         LOW_STOCK,
-         EXPIRED,
-         DAMAGED,
-         SUBSTITUTION,
-         SUBSTITUTION_WITHIN_PRODUCT_GROUP,
-         PACKAGE_SIZE,
-         CLINICAL_OVERRIDE,
-         INSUFFICIENT_CONSUMPTION,
-         REPLACED_BY_FORMULARY_ITEM,
-         CANCELED_BY_REQUESTER,
-         NON_FORMULARY_NO_SUBSTITUTION,
-         NOT_STOCKED,
-         AVAILABLE_STOCK_RESERVED,
-         COULD_NOT_LOCATE,
-         DIFFERENT_LOCATION,
-         DATA_ENTRY_ERROR,
-         SUPPLY_MAX_QUANTITY,
-         NOT_ON_STOCK_LIST,
-         INSUFFICIENT_QUANTITY_RECONDITIONED,
-         SUPPLIED_BY_GOVERNMENT,
-         APPROVED_CHANGE,
-         EARLIER_EXPIRATION_DATE,
-         OTHER
+        [
+                STOCKOUT,
+                LOW_STOCK,
+                EXPIRED,
+                DAMAGED,
+                SUBSTITUTION,
+                SUBSTITUTION_WITHIN_PRODUCT_GROUP,
+                PACKAGE_SIZE,
+                CLINICAL_OVERRIDE,
+                INSUFFICIENT_CONSUMPTION,
+                REPLACED_BY_FORMULARY_ITEM,
+                CANCELED_BY_REQUESTER,
+                NON_FORMULARY_NO_SUBSTITUTION,
+                NOT_STOCKED,
+                AVAILABLE_STOCK_RESERVED,
+                COULD_NOT_LOCATE,
+                DIFFERENT_LOCATION,
+                DATA_ENTRY_ERROR,
+                SUPPLY_MAX_QUANTITY,
+                NOT_ON_STOCK_LIST,
+                INSUFFICIENT_QUANTITY_RECONDITIONED,
+                SUPPLIED_BY_GOVERNMENT,
+                APPROVED_CHANGE,
+                EARLIER_EXPIRATION_DATE,
+                REQUEST_ERROR,
+                NOT_NEEDED_BASED_ON_CONSUMPTION,
+                OTHER
         ]
     }
 
@@ -108,7 +113,8 @@ enum ReasonCode {
                 EARLIER_EXPIRATION_DATE,
                 SUPPLIED_BY_GOVERNMENT,
                 COULD_NOT_LOCATE,
-                SUBSTITUTION
+                REQUEST_ERROR,
+                NOT_NEEDED_BASED_ON_CONSUMPTION,
         ]
     }
 

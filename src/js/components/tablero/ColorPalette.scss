@@ -1,0 +1,112 @@
+$default : #8798ad;
+
+// Primary Colors
+$primary : #0ddbdd;
+$primary-dark : #08c6c8;
+$primary-light : #52e8e8;
+
+//Secondary Colors
+$secondary: #ea6227;
+$secondary-dark: #d05622;
+$secondary-light: #ff9c72;
+
+// Tertiary Colors
+$tertiary :#0c60e5;
+$tertiary-dark : #0a58d5;
+$tertiary-light: #186cf2;
+
+// State Colors
+$state-1 : #f57c00;
+$state-2 : #f2a365;
+$state-3 : #00796b;
+$state-4 : #116979;
+$state-5 : #0288d1;
+$state-6 : #303f9f;
+$state-7 : #7b1fa2;
+$state-8 : #b80d57;
+
+$dark-state-1 : #e65100;
+$dark-state-2 : #bc5b10;
+$dark-state-3 : #004d40;
+$dark-state-4 : #0a3a43;
+$dark-state-5 : #01579b;
+$dark-state-6 : #1a237e;
+$dark-state-7 : #4a148c;
+$dark-state-8 : #770838;
+
+$light-state-1 :#ffa726;
+$light-state-2 : #f7c6a1;
+$light-state-3 : #26a69a;
+$light-state-4 : #199cb3;
+$light-state-5 : #29b6f6;
+$light-state-6 : #5c6bc0;
+$light-state-7 : #ab47bc;
+$light-state-8 : #f0287f;
+
+// GYR colors
+$success : #689f38;
+$warning : #fbc02d;
+$error : #d32f2f;
+
+$dark-success : #33691e;
+$dark-warning : #f57f17;
+$dark-error : #b71c1c;
+
+$light-success : #9ccc65;
+$light-warning : #ffee58;
+$light-error : #ef5350;
+
+:export {
+  default: $default;
+
+  primary: $primary;
+  primaryDark: $primary-dark;
+  primaryLight: $primary-light;
+
+  secondary: $secondary;
+  secondaryDark: $secondary-dark;
+  secondaryLight: $secondary-light;
+
+  tertiary: $tertiary;
+  tertiaryDark: $tertiary-dark;
+  tertiaryLight: $tertiary-light;
+
+  state1: $state-1;
+  state2: $state-2;
+  state3: $state-3;
+  state4: $state-4;
+  state5: $state-5;
+  state6: $state-6;
+  state7: $state-7;
+  state8: $state-8;
+
+  darkState1: $dark-state-1;
+  darkState2: $dark-state-2;
+  darkState3: $dark-state-3;
+  darkState4: $dark-state-4;
+  darkState5: $dark-state-5;
+  darkState6: $dark-state-6;
+  darkState7: $dark-state-7;
+  darkState8: $dark-state-8;
+
+  lightState1: $light-state-1;
+  lightState2: $light-state-2;
+  lightState3: $light-state-3;
+  lightState4: $light-state-4;
+  lightState5: $light-state-5;
+  lightState6: $light-state-6;
+  lightState7: $light-state-7;
+  lightState8: $light-state-8;
+
+  success: $success;
+  warning: $warning;
+  error: $error;
+
+  darkSuccess: $dark-success;
+  darkWarning: $dark-warning;
+  darkError: $dark-error;
+
+  lightSuccess: $light-success;
+  lightWarning: $light-warning;
+  lightError: $light-error;
+}

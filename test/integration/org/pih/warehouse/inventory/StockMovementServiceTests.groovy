@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.inventory
 
 import grails.validation.ValidationException
@@ -111,21 +111,21 @@ class StockMovementServiceTests extends GroovyTestCase {
 	@Test
 	void test_updateRequisition_shouldThrowExceptionIfNoRequisition() {
 		shouldFail (ObjectNotFoundException) {
-			stockMovementService.updateRequisition(stockMovementEmpty)
+			stockMovementService.updateOutboundStockMovement(stockMovementEmpty)
 		}
 	}
 
 	@Test
 	void test_updateRequisition_shouldUpdateRequisition() {
 		stockMovement.description = "changed"
-		def updated = stockMovementService.updateRequisition(stockMovement)
+		def updated = stockMovementService.updateRequisitionBasedStockMovement(stockMovement)
 		assert updated.description == "changed"
 	}
 
 	@Test
 	void test_updateRequisitionWhenShipmentChanged_shouldThrowExceptionIfNoRequisitio() {
 		shouldFail (ObjectNotFoundException) {
-			stockMovementService.updateRequisitionWhenShipmentChanged(stockMovementEmpty)
+			stockMovementService.updateRequisitionOnShipmentChange(stockMovementEmpty)
 		}
 	}
 
@@ -158,27 +158,6 @@ class StockMovementServiceTests extends GroovyTestCase {
 	void test_clearPicklist_shouldClearPicklist() {
 		def item = stockMovementService.getStockMovementItem(requisitionItem1.id)
 		stockMovementService.clearPicklist(item)
-	}
-
-	@Test
-	void test_getEditPage_shouldGetEditPage() {
-		def editPage = stockMovementService.getEditPage(requisition.id)
-		assertNotNull editPage
-		assertNotNull editPage.editPageItems.size() == 2
-	}
-
-	@Test
-	void test_getPickPage_shouldGetPickPage() {
-		def pickPage = stockMovementService.getPickPage(requisition.id)
-		assertNotNull pickPage
-		assertNotNull pickPage.pickPageItems.size() == 2
-	}
-
-	@Test
-	void test_getPackPage_shouldGetPackPage() {
-		def packPage = stockMovementService.getPackPage(requisition.id)
-		assertNotNull packPage
-		assertNotNull packPage.packPageItems.size() == 2
 	}
 }
 

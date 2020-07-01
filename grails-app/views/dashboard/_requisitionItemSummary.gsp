@@ -50,7 +50,7 @@
         var dataTable = $('#fastMoversDataTable').dataTable( {
             "bProcessing": true,
             "sServerMethod": "GET",
-            "iDisplayLength": 25,
+            "iDisplayLength": 100,
             "bScrollInfinite": true,
             "bScrollCollapse": true,
             "sScrollY": 150,

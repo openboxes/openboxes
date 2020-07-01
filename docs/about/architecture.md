@@ -1,7 +1,7 @@
 
 ## Basic Architecture
 
-![Basic Architecture](../img/technology-soup.png)
+![Basic Architecture](https://docs.openboxes.com/en/latest/img/technology-soup.png)
 
 This diagram is an attempt to convey the following concepts about OpenBoxes: 
 

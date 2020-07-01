@@ -51,7 +51,7 @@ class InventoryItem implements Serializable {
     Date dateCreated
     Date lastUpdated
 
-    static transients = ['quantity', 'quantityOnHand', 'quantityAvailableToPromise']
+    static transients = ['quantity', 'quantityOnHand', 'quantityAvailableToPromise', 'expirationStatus']
 
     static belongsTo = [product: Product]
 
@@ -103,8 +103,6 @@ class InventoryItem implements Serializable {
 
     def getExpirationStatus() {
         def today = new Date()
-
-
         if (expirationDate) {
             def daysToExpiry = expirationDate - today
             if (daysToExpiry <= 0) {
@@ -125,6 +123,5 @@ class InventoryItem implements Serializable {
         }
         return "never"
     }
-
 
 }

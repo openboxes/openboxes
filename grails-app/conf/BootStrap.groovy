@@ -14,14 +14,11 @@ import grails.util.Environment
 import liquibase.Liquibase
 import liquibase.database.DatabaseFactory
 import org.pih.warehouse.api.AvailableItem
-import org.pih.warehouse.api.EditPage
 import org.pih.warehouse.api.EditPageItem
-import org.pih.warehouse.api.PackPage
 import org.pih.warehouse.api.PackPageItem
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptContainer
 import org.pih.warehouse.api.PartialReceiptItem
-import org.pih.warehouse.api.PickPage
 import org.pih.warehouse.api.PickPageItem
 import org.pih.warehouse.api.StockAdjustment
 import org.pih.warehouse.api.StockMovement
@@ -30,6 +27,7 @@ import org.pih.warehouse.api.Stocklist
 import org.pih.warehouse.api.StocklistItem
 import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
@@ -41,6 +39,8 @@ import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Category
@@ -148,8 +148,17 @@ class BootStrap {
                     parentLocation       : location.parentLocation,
                     locationType         : location.locationType,
                     sortOrder            : location.sortOrder,
-                    hasBinLocationSupport: location.hasBinLocationSupport()
+                    hasBinLocationSupport: location.hasBinLocationSupport(),
+                    hasPackingSupport    : location.supports(ActivityCode.PACK_SHIPMENT)
             ]
+        }
+
+        JSON.registerObjectMarshaller(Order) { Order order ->
+            return order.toJson()
+        }
+
+        JSON.registerObjectMarshaller(OrderItem) { OrderItem orderItem ->
+            return orderItem.toJson()
         }
 
         JSON.registerObjectMarshaller(Person) { Person person ->
@@ -190,12 +199,7 @@ class BootStrap {
 
 
         JSON.registerObjectMarshaller(Product) { Product product ->
-            [
-                    id         : product.id,
-                    productCode: product.productCode,
-                    name       : product.name,
-                    description: product.description
-            ]
+            return product.toJson()
         }
 
         JSON.registerObjectMarshaller(ProductAssociation) { ProductAssociation productAssociation ->
@@ -343,10 +347,6 @@ class BootStrap {
             return availableItem.toJson()
         }
 
-        JSON.registerObjectMarshaller(EditPage) { EditPage editPage ->
-            return editPage.toJson()
-        }
-
         JSON.registerObjectMarshaller(EditPageItem) { EditPageItem editPageItem ->
             return editPageItem.toJson()
         }
@@ -362,16 +362,8 @@ class BootStrap {
             return partialReceiptContainer.toJson()
         }
 
-        JSON.registerObjectMarshaller(PickPage) { PickPage pickPage ->
-            return pickPage.toJson()
-        }
-
         JSON.registerObjectMarshaller(PickPageItem) { PickPageItem pickPageItem ->
             return pickPageItem.toJson()
-        }
-
-        JSON.registerObjectMarshaller(PackPage) { PackPage packPage ->
-            return packPage.toJson()
         }
 
         JSON.registerObjectMarshaller(PackPageItem) { PackPageItem packPageItem ->

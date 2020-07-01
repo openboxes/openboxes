@@ -76,6 +76,7 @@ class Constants {
     // direct references to locations by primary key
     static final String WAREHOUSE_LOCATION_TYPE_ID = "2"
     static final String SUPPLIER_LOCATION_TYPE_ID = "4"
+    static final String RECEIVING_LOCATION_TYPE_ID = "ff8081816482352b01648249e8cc0001"
 
     // direct references to containers by primary key
     static final String DEFAULT_CONTAINER_TYPE_ID = "1"
@@ -111,10 +112,12 @@ class Constants {
     static final String DEFAULT_SHIPMENT_NUMBER_FORMAT = "NNNLLL"
     static final String DEFAULT_RECEIPT_NUMBER_FORMAT = "NNNLLL"
     static final String DEFAULT_TRANSACTION_NUMBER_FORMAT = "AAA-AAA-AAA"
+    static final String DEFAULT_ORGANIZATION_NUMBER_FORMAT = "AAA"
+    static final String DEFAULT_SEQUENCE_NUMBER_FORMAT = "000000"
 
     static final String TRACKING_NUMBER_TYPE_ID = "10"
 
     static final String DEFAULT_RECEIVING_LOCATION_PREFIX = "R"
 
-
+    static final String DEFAULT_DOCUMENT_TYPE_ID = "9"
 }

@@ -43,7 +43,7 @@
                     </div>
                     <g:if test="${productInstance?.packages }">
                         <g:each var="productPackage" in="${productInstance?.packages }">
-                            <g:if test="${productPackage?.uom?.code != 'EA' }">
+                            <g:if test="${productPackage?.uom?.code != 'EA' && productPackage?.quantity}">
                                 <div>
                                     <span class="fade">
                                         <g:set var="quantityPerPackage" value="${totalQuantity / productPackage?.quantity }"/>
@@ -344,9 +344,8 @@
                             <label>${productPackage?.uom }</label>
                         </td>
                         <td class="value">
-                            <span class="">
-                                ${productPackage?.uom?.code }/${productPackage?.quantity }
-                            </span>
+                            ${productPackage?.uom?.code }/${productPackage?.quantity }
+                            @ ${productPackage?.price } ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                         </td>
                     </tr>
                 </g:each>

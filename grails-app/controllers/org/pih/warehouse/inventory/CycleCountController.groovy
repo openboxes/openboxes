@@ -11,11 +11,11 @@ package org.pih.warehouse.inventory
 
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.product.Product
 
 class CycleCountController {
 
     def dataService
-    def reportService
     def inventoryService
 
     def exportAsCsv = {
@@ -23,30 +23,39 @@ class CycleCountController {
         List binLocations = inventoryService.getQuantityByBinLocation(location)
         log.info "Returned ${binLocations.size()} bin locations for location ${location}"
 
-        List rows = binLocations.collect {
-            def latestInventoryDate = it.product.latestInventoryDate(location.id)
-            [
-                    "Product code"                                                                                         : StringEscapeUtils.escapeCsv(it.product.productCode),
-                    "Product name"                                                                                         : it.product.name ?: "",
-                    "Generic product"                                                                                      : it.genericProduct?.name ?: "",
-                    "Category"                                                                                             : StringEscapeUtils.escapeCsv(it.category?.name ?: ""),
-                    "Formularies"                                                                                          : it.product.productCatalogs.join(", ") ?: "",
-                    "Lot number"                                                                                           : StringEscapeUtils.escapeCsv(it.inventoryItem.lotNumber ?: ""),
-                    "Expiration date"                                                                                      : it.inventoryItem.expirationDate ? it.inventoryItem.expirationDate.format("dd-MMM-yyyy") : "",
-                    "ABC classification"                                                                                   : StringEscapeUtils.escapeCsv(it.product.getAbcClassification(location.id) ?: ""),
-                    "Bin location"                                                                                         : StringEscapeUtils.escapeCsv(it?.binLocation?.name ?: ""),
-                    "Bin location old"                                                                                     : StringEscapeUtils.escapeCsv(it.product.getBinLocation(location.id) ?: ""),
-                    "Status"                                                                                               : g.message(code: "binLocationSummary.${it.status}.label"),
-                    "Last inventory date"                                                                                  : latestInventoryDate ? latestInventoryDate.format("dd-MMM-yyyy") : "",
-                    "Quantity on Hand"                                                                                     : it.quantity ?: 0,
-                    "Physical lot/serial number"                                                                           : "",
-                    "Physical bin location"                                                                                : "",
-                    "Physical expiration date"                                                                             : "",
-                    "Physical quantity"                                                                                    : "",
-                    "Was bin location updated in OpenBoxes?"                                                               : "",
-                    "${StringEscapeUtils.escapeCsv("Was quantity, lot/serial, and expiration date updated in OpenBoxes?")}": "",
-                    "Comment"                                                                                              : "",
+        Map additionalColumns = grailsApplication.config.openboxes.cycleCount.additionalColumns
+
+        List rows = binLocations.collect { row ->
+
+            // Required in order to avoid lazy initialization exception that occurs because all
+            // of the querying / session work that was done above was executed in worker threads
+            Product product = Product.load(row?.product?.id)
+
+            def latestInventoryDate = row?.product?.latestInventoryDate(location.id) ?: row?.product.earliestReceivingDate(location.id)
+            Map dataRow = [
+                    "Product code"       : StringEscapeUtils.escapeCsv(row?.product?.productCode),
+                    "Product name"       : row?.product.name ?: "",
+                    "Generic product"    : row?.genericProduct?.name ?: "",
+                    "Category"           : StringEscapeUtils.escapeCsv(row?.category?.name ?: ""),
+                    "Formularies"        : product.productCatalogs.join(", ") ?: "",
+                    "Lot number"         : StringEscapeUtils.escapeCsv(row?.inventoryItem.lotNumber ?: ""),
+                    "Expiration date"    : row?.inventoryItem.expirationDate ? row?.inventoryItem.expirationDate.format("dd-MMM-yyyy") : "",
+                    "ABC classification" : StringEscapeUtils.escapeCsv(row?.product.getAbcClassification(location.id) ?: ""),
+                    "Bin location"       : StringEscapeUtils.escapeCsv(row?.binLocation?.name ?: ""),
+                    "Bin location old"   : StringEscapeUtils.escapeCsv(row?.product?.getBinLocation(location.id) ?: ""),
+                    "Status"             : g.message(code: "binLocationSummary.${row?.status}.label"),
+                    "Last inventory date": latestInventoryDate ? latestInventoryDate.format("dd-MMM-yyyy") : "",
+                    "Quantity on Hand"   : row?.quantity ?: 0,
             ]
+
+            // Iterate over additional columns
+            additionalColumns.each { columnKey, Closure columnExpression ->
+                String columnValue = columnExpression ? columnExpression.call(row) : ""
+                dataRow << ["${StringEscapeUtils.escapeCsv(columnKey)}": StringEscapeUtils.escapeCsv(columnValue)]
+            }
+
+            return dataRow
+
         }
 
         String csv = dataService.generateCsv(rows)

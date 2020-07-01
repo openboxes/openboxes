@@ -14,7 +14,7 @@ import org.pih.warehouse.core.PreferenceTypeCode
 import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.UnitOfMeasure
 
-class ProductSupplier implements Comparable<ProductSupplier> {
+class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
 
     String id
 
@@ -33,13 +33,10 @@ class ProductSupplier implements Comparable<ProductSupplier> {
 
     // National drug code - http://en.wikipedia.org/wiki/National_Drug_Code
     String ndc
-
     String upc
 
     // Manufacturer
     Organization manufacturer
-
-    // Manufacturer details
     String manufacturerCode // Manufacturer's product code (e.g. catalog code)
     String manufacturerName // Manufacturer's product name
     String brandName        // Manufacturer's brand name
@@ -47,11 +44,8 @@ class ProductSupplier implements Comparable<ProductSupplier> {
 
     // Supplier
     Organization supplier
-
-    // Supplier details
     String supplierCode        // Supplier's product code
     String supplierName        // Supplier's alternative product name
-
 
     // Indicates whether the supplier product is preferred
     PreferenceTypeCode preferenceTypeCode
@@ -62,17 +56,8 @@ class ProductSupplier implements Comparable<ProductSupplier> {
     // Number of days between order and delivery
     BigDecimal standardLeadTimeDays
 
-    // Cost per unit
-    BigDecimal unitCost
-
-    // Price per unit
-    BigDecimal unitPrice
-
     // Minimum required to order
     BigDecimal minOrderQuantity
-
-    // Supplier's default unit of measure
-    UnitOfMeasure unitOfMeasure
 
     // Additional comments
     String comments
@@ -80,6 +65,10 @@ class ProductSupplier implements Comparable<ProductSupplier> {
     // Auditing fields
     Date dateCreated
     Date lastUpdated
+
+    static transients = ["defaultProductPackage"]
+
+    static hasMany = [productPackages: ProductPackage]
 
     static mapping = {
         description type: 'text'
@@ -106,15 +95,17 @@ class ProductSupplier implements Comparable<ProductSupplier> {
         manufacturerName(nullable: true, maxSize: 255)
 
         standardLeadTimeDays(nullable: true)
-        unitPrice(nullable: true)
-        unitCost(nullable: true)
         minOrderQuantity(nullable: true)
-        unitOfMeasure(nullable: true)
         ratingTypeCode(nullable: true)
         preferenceTypeCode(nullable: true)
         comments(nullable: true)
 
     }
+
+    ProductPackage getDefaultProductPackage() {
+        return productPackages ? productPackages.toArray()[0] : null
+    }
+
 
     int compareTo(ProductSupplier obj) {
         return preferenceTypeCode <=> obj.preferenceTypeCode ?:
@@ -124,24 +115,26 @@ class ProductSupplier implements Comparable<ProductSupplier> {
     }
 
     static PROPERTIES = [
-            "id"                     : "id",
-            "code"                   : "code",
-            "productCode"            : "product.productCode",
-            "legacyProductCode"      : "productCode",
-            "productName"            : "name",
-            "description"            : "description",
-            "supplierId"             : "supplier.id",
-            "supplierName"           : "supplier.name",
-            "supplierCode"           : "supplierCode",
-            "supplierProductName"    : "supplierName",
-            "manufacturerId"         : "manufacturer.id",
-            "manufacturerName"       : "manufacturer.name",
-            "manufacturerCode"       : "manufacturerCode",
-            "manufacturerProductName": "manufacturerName",
-            "unitPrice"              : "unitPrice",
-            "standardLeadTimeDays"   : "standardLeadTimeDays",
-            "preferenceTypeCode"     : "preferenceTypeCode",
-            "ratingTypeCode"         : "ratingTypeCode",
-            "comments"               : "comments"
+            "id"                           : "id",
+            "code"                         : "code",
+            "productCode"                  : "product.productCode",
+            "legacyProductCode"            : "productCode",
+            "productName"                  : "name",
+            "description"                  : "description",
+            "supplierId"                   : "supplier.id",
+            "supplierName"                 : "supplier.name",
+            "supplierCode"                 : "supplierCode",
+            "supplierProductName"          : "supplierName",
+            "manufacturerId"               : "manufacturer.id",
+            "manufacturerName"             : "manufacturer.name",
+            "manufacturerCode"             : "manufacturerCode",
+            "manufacturerProductName"      : "manufacturerName",
+            "defaultProductPackageUomCode" : "defaultProductPackage.uom.code",
+            "defaultProductPackageQuantity": "defaultProductPackage.quantity",
+            "defaultProductPackagePrice"   : "defaultProductPackage.price",
+            "standardLeadTimeDays"         : "standardLeadTimeDays",
+            "preferenceTypeCode"           : "preferenceTypeCode",
+            "ratingTypeCode"               : "ratingTypeCode",
+            "comments"                     : "comments"
     ]
 }
