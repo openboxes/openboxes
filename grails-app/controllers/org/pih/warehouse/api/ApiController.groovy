@@ -76,7 +76,7 @@ class ApiController {
             return
         }
 
-        Map menuConfig = grailsApplication.config.getProperty("openboxes.megamenu")
+        Map menuConfig = grailsApplication.config.openboxes.megamenu
         User user = User.get(session?.user?.id)
 
         if (userService.hasHighestRole(user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED)) {
