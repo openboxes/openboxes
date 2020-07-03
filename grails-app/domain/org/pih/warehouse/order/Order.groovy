@@ -305,7 +305,7 @@ class Order implements Serializable {
 
         // Otherwise find a suitable exchange rate from the UomConversion table (or default to 1.0)
         BigDecimal currentExchangeRate
-        String defaultCurrencyCode = ConfigurationHolder.config.openboxes.locale.defaultCurrencyCode
+        String defaultCurrencyCode = Holders.grailsApplication.config.openboxes.locale.defaultCurrencyCode
         if (currencyCode != defaultCurrencyCode) {
             currentExchangeRate = UnitOfMeasureConversion.conversionRateLookup(defaultCurrencyCode, currencyCode).list()
         }
