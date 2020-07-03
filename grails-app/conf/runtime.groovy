@@ -475,35 +475,6 @@ openboxes {
                     datalabel = true
                     order = 8
                 }
-                lossCausedByExpiry {
-                    enabled = false
-                    endpoint = "/apitablero/getLossCausedByExpiry"
-                    archived = ['personal', 'warehouse', 'inventory']
-                    filter = true
-                    stacked = true
-                    order = 9
-                    colors {
-                        datasets {
-                            success = ["Inventory value not expired last day of month"]
-                            warning = ["Inventory value expired last day of month"]
-                            error = ["Inventory value removed due to expiry"]
-                        }
-                    }
-                }
-                productsInventoried {
-                    enabled = false
-                    endpoint = "/apitablero/getProductsInventoried"
-                    archived = ['personal', 'warehouse', 'transaction']
-                    filter = false
-                    order = 10
-                    colors {
-                        datasets {
-                            state6 = ["first"]
-                            state7 = ["second"]
-                            state8 = ["third"]
-                        }
-                    }
-                }
             }
         }
     }
