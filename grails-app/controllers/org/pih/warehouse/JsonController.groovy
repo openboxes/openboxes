@@ -1019,7 +1019,6 @@ class JsonController {
         render json as JSON
     }
 
-
     def globalSearch = {
 
         def minLength = grailsApplication.config.openboxes.typeahead.minLength
@@ -1720,7 +1719,7 @@ class JsonController {
         render([aaData: forecastingService.getDemandSummary(location, product)] as JSON)
     }
 
-
+    @Cacheable("forecastCache")
     def getForecastingData = {
         Product product = Product.get(params.id)
         Location location = Location.get(session.warehouse.id)
