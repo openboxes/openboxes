@@ -17,6 +17,7 @@ class MegamenuService {
 
     def userService
     def grailsApplication
+    def grailsLinkGenerator
 
     private getMessageTagLib() {
         return grailsApplication.mainContext.getBean('org.pih.warehouse.MessageTagLib')
@@ -28,7 +29,7 @@ class MegamenuService {
         if (section.href) {
             translatedSection = [
                     label: label,
-                    href: section.href
+                    href: grailsLinkGenerator.link(uri: section.href)
             ]
             return translatedSection
         } else if (section.subsections) {
@@ -92,7 +93,7 @@ class MegamenuService {
             if (it.href) {
                 builtMenuItems << [
                     label: label,
-                    href: it.href
+                    href: grailsLinkGenerator.link(uri: it.href)
                 ]
             } else if (it.subsections) {
                 builtMenuItems << [
