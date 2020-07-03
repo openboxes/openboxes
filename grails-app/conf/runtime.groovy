@@ -476,6 +476,7 @@ openboxes {
                     order = 8
                 }
                 lossCausedByExpiry {
+                    enabled = false
                     endpoint = "/apitablero/getLossCausedByExpiry"
                     archived = ['personal', 'warehouse', 'inventory']
                     filter = true
@@ -490,6 +491,7 @@ openboxes {
                     }
                 }
                 productsInventoried {
+                    enabled = false
                     endpoint = "/apitablero/getProductsInventoried"
                     archived = ['personal', 'warehouse', 'transaction']
                     filter = false
