@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.plugin.springcache.annotations.Cacheable
 import grails.util.GrailsUtil
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Location
@@ -59,6 +60,7 @@ class ApiController {
         render([status: 200, text: "Current language is ${locale}"])
     }
 
+    @Cacheable("megamenuCache")
     def getMenuConfig = {
         Map menuConfig = grailsApplication.config.openboxes.megamenu
         User user = User.get(session?.user?.id)

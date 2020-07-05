@@ -50,13 +50,21 @@ class InventorySnapshotService {
         GParsPool.withPool {
             def depotLocations = locationService.getDepots()
             results = depotLocations.collectParallel { Location loc ->
+                def binLocations
                 def innerStartTime = System.currentTimeMillis()
                 persistenceInterceptor.init()
                 Location location = Location.get(loc.id)
-                Date lastUpdatedDate = InventorySnapshot.lastUpdatedDate(loc.id).list()
-                Integer transactionCount = Transaction.countByLocationAsOf(location, lastUpdatedDate).list()
-                Boolean skipCalculation = enableOptimization && transactionCount == 0
-                def binLocations = (!skipCalculation) ? calculateBinLocations(location, date) : []
+
+                // Recalculate inventory snapshot records only if there are new transactions
+                if (enableOptimization) {
+                    Date lastUpdatedDate = InventorySnapshot.lastUpdatedDate(loc.id).list()
+                    Integer transactionCount = Transaction.countByLocationAsOf(location, lastUpdatedDate).list()
+                    Boolean skipCalculation = transactionCount == 0
+                    binLocations = (!skipCalculation) ? calculateBinLocations(location, date) : []
+                }
+                else {
+                    binLocations = calculateBinLocations(location, date)
+                }
                 def readTime = (System.currentTimeMillis() - innerStartTime)
                 log.info "Read ${binLocations?.size()} inventory snapshots for location ${location} on date ${date.format("MMM-dd-yyyy")} in ${readTime}ms"
                 persistenceInterceptor.flush()

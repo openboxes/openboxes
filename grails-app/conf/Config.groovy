@@ -402,8 +402,8 @@ openboxes {
                     archived = ['inventory', 'transaction']
                     order = 4
                 }
-                inventoryByLotAndBin {        
-                    enabled = true            
+                inventoryByLotAndBin {
+                    enabled = true
                     endpoint = "/${appName}/apitablero/getInventoryByLotAndBin"
                     archived = ['inventory', 'transaction']
                     order = 1
@@ -544,7 +544,7 @@ openboxes {
                     order = 8
                 }
                 lossCausedByExpiry {
-                    enabled = true
+                    enabled = false
                     endpoint = "/${appName}/apitablero/getLossCausedByExpiry"
                     archived = ['personal', 'warehouse', 'inventory']
                     filter = true
@@ -559,7 +559,7 @@ openboxes {
                     }
                 }
                 productsInventoried {
-                    enabled = true
+                    enabled = false
                     endpoint = "/${appName}/apitablero/getProductsInventoried"
                     archived = ['personal', 'warehouse', 'transaction']
                     filter = false
