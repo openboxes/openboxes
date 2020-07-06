@@ -18,7 +18,8 @@
                commodityClass:params.commodityClass, status:params.status, direction: params?.direction,
                requestedDateRange:params.requestedDateRange, issuedDateRange:params.issuedDateRange, type:params.type,
                'createdBy.id':params?.createdBy?.id, sort:params?.sort, order:params?.order,
-               'requestedBy.id': params?.requestedBy?.id, receiptStatusCode: params.receiptStatusCode]"/>
+               'requestedBy.id': params?.requestedBy?.id, receiptStatusCode: params.receiptStatusCode,
+               'createdAfter': params?.createdAfter, 'createdBefore': params?.createdBefore]"/>
 
 <div class="body">
     <g:if test="${flash.message}">
@@ -147,7 +148,7 @@
                                                 placeholder="Select date"
                                                 size="40"
                                                 autocomplete="off"
-                                                value="${params.createdAfter}"
+                                                value="${params?.createdAfter}"
                                                 format="MM/dd/yyyy"/>
                         </div>
                         <div class="filter-list-item">
@@ -160,7 +161,7 @@
                                                 placeholder="Select date"
                                                 size="40"
                                                 autocomplete="off"
-                                                value="${params.createdBefore}"
+                                                value="${params?.createdBefore}"
                                                 format="MM/dd/yyyy"/>
                         </div>
                         <hr/>
