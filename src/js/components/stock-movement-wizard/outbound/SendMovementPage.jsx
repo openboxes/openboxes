@@ -77,6 +77,11 @@ const BASIC_FIELDS = {
     defaultMessage: 'Requested by',
     type: LabelField,
   },
+  'requestType.name': {
+    label: 'react.stockMovement.requestType.label',
+    defaultMessage: 'Request type',
+    type: LabelField,
+  },
   dateRequested: {
     label: 'react.stockMovement.dateRequested.label',
     defaultMessage: 'Date requested',

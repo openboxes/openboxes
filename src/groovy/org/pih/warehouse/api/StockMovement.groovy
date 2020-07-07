@@ -145,6 +145,7 @@ class StockMovement {
                 isReceived  : isReceived,
                 shipped     : isShipped,
                 received    : isReceived,
+                requestType : requestType,
         ]
     }
 
