@@ -139,13 +139,15 @@
                                               noSelection="['null':'']" class="chzn-select-deselect"/>
                             </p>
                         </div>
-                        <div class="filter-list-item">
-                            <label><warehouse:message code="stockMovement.requestType.label" default="Request type"/></label>
-                            <p>
-                                <g:select name="type" value="${params?.type}" from="${RequisitionType.listRequestTypes()}"
-                                          noSelection="['':'']" class="chzn-select-deselect"/>
-                            </p>
-                        </div>
+                        <g:if test="${!params.direction || params.direction as StockMovementType == StockMovementType.OUTBOUND}">
+                            <div class="filter-list-item">
+                                <label><warehouse:message code="stockMovement.requestType.label" default="Request type"/></label>
+                                <p>
+                                    <g:select name="type" value="${params?.type}" from="${RequisitionType.listRequestTypes()}"
+                                              noSelection="['':'']" class="chzn-select-deselect"/>
+                                </p>
+                            </div>
+                        </g:if>
                         <div class="filter-list-item">
                             <label>
                                 ${warehouse.message(code: 'default.createdAfter.label', default: 'Created after')}

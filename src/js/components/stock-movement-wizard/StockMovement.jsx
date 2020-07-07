@@ -182,6 +182,10 @@ class StockMovements extends Component {
               name: resp.requestedBy.name,
               label: resp.requestedBy.name,
             },
+            requestType: {
+              name: resp.requestType.name,
+              label: resp.requestType.name,
+            },
           };
 
           let currentPage = 1;
