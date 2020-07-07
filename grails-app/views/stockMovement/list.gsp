@@ -1,5 +1,6 @@
 <%@ page import="org.pih.warehouse.api.StockMovementType; org.pih.warehouse.requisition.RequisitionStatus" %>
 <%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode" %>
+<%@ page import="org.pih.warehouse.requisition.RequisitionType" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -136,6 +137,13 @@
                             <p>
                                 <g:selectUser name="updatedBy.id" value="${params?.updatedBy?.id}"
                                               noSelection="['null':'']" class="chzn-select-deselect"/>
+                            </p>
+                        </div>
+                        <div class="filter-list-item">
+                            <label><warehouse:message code="stockMovement.requestType.label" default="Request type"/></label>
+                            <p>
+                                <g:select name="type" value="${params?.type}" from="${RequisitionType.listRequestTypes()}"
+                                          noSelection="['':'']" class="chzn-select-deselect"/>
                             </p>
                         </div>
                         <div class="filter-list-item">
