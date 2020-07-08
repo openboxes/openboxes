@@ -10,6 +10,7 @@ import org.pih.warehouse.tablero.NumbersIndicator
 import org.pih.warehouse.tablero.IndicatorDatasets
 import org.pih.warehouse.tablero.NumberTableData
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.InventorySnapshot
@@ -596,6 +597,48 @@ class IndicatorDataService {
 
         GraphData graphData = new GraphData(indicatorData, "Value of Stock Lost to Expiry", "bar");
 
+        return graphData;
+    }
+
+    GraphData getPercentageAdHoc(Location location) {
+        Date today = new Date()
+        Integer previousMonth = today.month
+
+        // if previousMonth = december, we are in the previous year
+        Integer year = previousMonth == 11 ? today.year + 1899 : today.year + 1900
+
+        List<String> listLabels = []
+        List<Integer> listData = []
+        List<IndicatorDatasets> datasets = []
+       
+        def percentageAdHoc = Requisition.executeQuery("""
+            select count(r.id), r.type
+            from Requisition as r
+            where r.origin.id = :location
+            and MONTH(r.requestedDeliveryDate) = :previousMonth
+            and YEAR(r.requestedDeliveryDate) = :year
+            group by r.type
+        """,
+                [
+                        'location': location.id,
+                        'previousMonth'   : previousMonth,
+                        'year'    : year,
+                ]);
+
+        percentageAdHoc.each {
+            if (RequisitionType.listRequestTypes().contains(it[1])) {
+                listLabels.push(it[1].toString())
+                listData.push(it[0])
+            }     
+        }
+
+        IndicatorDatasets indicatorDatasets =  new IndicatorDatasets('Percentage', listData, null , 'doughnut')
+        datasets.push(indicatorDatasets)
+
+        IndicatorData indicatorData = new IndicatorData(datasets, listLabels)
+
+        GraphData graphData = new GraphData(indicatorData, 'Percentage Stock vs Ad Hoc Requests this Month', 'doughnut', '/openboxes/stockMovement/list?direction=OUTBOUND')
+       
         return graphData;
     }
 

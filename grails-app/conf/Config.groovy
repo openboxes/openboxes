@@ -572,6 +572,19 @@ openboxes {
                         }
                     }
                 }
+                percentageAdHoc {
+                    enabled = true
+                    endpoint = "/${appName}/apitablero/getPercentageAdHoc"
+                    archived = ['warehouse', 'transaction', 'inventory']
+                    filter = false
+                    order = 11
+                    colors {
+                        labels {
+                            success = ["STOCK"]
+                            error = ["ADHOC"]
+                        }
+                    }
+                }
             }
         }
     }

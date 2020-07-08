@@ -32,7 +32,8 @@ function loadColorDataset(index, data, type, subtype, colorConfig) {
     dataset.backgroundColor = getArrayOfColors(dataset.data.length, colorConfig);
     dataset.hoverBackgroundColor = getArrayOfColors(dataset.data.length, colorConfig, true);
   } if (type === 'doughnut') {
-    dataset.backgroundColor = getColor(index, colorConfig);
+    dataset.backgroundColor = getArrayOfColors(dataset.data.length, colorConfig);
+    dataset.hoverBackgroundColor = getArrayOfColors(dataset.data.length, colorConfig, true);
   }
 
   return dataset;
@@ -102,10 +103,17 @@ function loadDatalabel(context) {
   return '';
 }
 
-function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', maxValue = null, minValue = null) {
+function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', maxValue = null, minValue = null, displayGrid = true) {
   const options = {
+    legend: {
+      display: !displayGrid,
+      labels: {
+        fontSize: 12,
+      },
+    },
     scales: {
       xAxes: [{
+        display: displayGrid,
         gridLines: {
           color: 'transparent',
         },
@@ -117,6 +125,7 @@ function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', ma
         ticks: {
           precision: 0,
         },
+        display: displayGrid,
       }],
     },
     plugins: {
@@ -206,6 +215,7 @@ function loadGraphOptions(payload) {
   let labelAlignment = null;
   let maxValue = null;
   let minValue = null;
+  const displayGrid = payload.type !== 'doughnut';
 
   if (payload.config.datalabel) {
     labelAlignment = (payload.type === 'horizontalBar') ? 'horizontal' : 'vertical';
@@ -231,6 +241,7 @@ function loadGraphOptions(payload) {
     labelAlignment,
     maxValue,
     minValue,
+    displayGrid,
   );
 }
 
