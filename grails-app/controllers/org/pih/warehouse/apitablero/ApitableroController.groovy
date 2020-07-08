@@ -12,7 +12,6 @@ class ApitableroController {
     def indicatorDataService
     def userService
 
-    @Cacheable("dashboardCache")
     def config = {
         User user = User.get(session.user.id)
         def config = userService.getDashboardConfig(user)
