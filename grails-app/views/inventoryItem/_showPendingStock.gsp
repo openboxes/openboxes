@@ -8,6 +8,7 @@
         <table>
             <thead>
                 <tr class="odd">
+                    <th/>
                     <th>
                         <g:if test="${params.type=='OUTBOUND'}">
                             ${warehouse.message(code: 'requisition.date.label')}
@@ -89,9 +90,10 @@
             <tbody>
                 <g:each var="entry" in="${itemsMap}" status="status">
                     <g:set var="item" value="${entry.key }"/>
-
+                    <g:set var="shipmentType" value="${params.type=='INBOUND' ? item?.shipmentType : item?.shipment?.shipmentType}"/>
 
                     <tr class="${(status%2==0)?'even':'odd' } prop">
+                        <td><g:getShipmentTypeIcon shipmentType="${shipmentType}" /></td>
                         <td style="width: 10%;" nowrap="nowrap">
                             <g:if test="${params.type=='OUTBOUND'}">
                                 <g:if test="${item?.dateRequested }">
@@ -211,6 +213,7 @@
             </tbody>
             <tfoot>
             <tr>
+                <td/>
                 <td colspan="6">
                 </td>
                 <g:if test="${params.type=='OUTBOUND'}">
