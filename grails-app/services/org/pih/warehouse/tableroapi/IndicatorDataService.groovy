@@ -637,7 +637,7 @@ class IndicatorDataService {
 
         IndicatorData indicatorData = new IndicatorData(datasets, listLabels)
 
-        GraphData graphData = new GraphData(indicatorData, 'Percentage Stock vs Ad Hoc Requests this Month', 'doughnut', '/openboxes/shipment/list')
+        GraphData graphData = new GraphData(indicatorData, 'Percentage Stock vs Ad Hoc Requests this Month', 'doughnut', '/openboxes/stockMovement/list?direction=OUTBOUND')
        
         return graphData;
     }
