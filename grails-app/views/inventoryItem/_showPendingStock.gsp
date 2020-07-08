@@ -90,7 +90,10 @@
             <tbody>
                 <g:each var="entry" in="${itemsMap}" status="status">
                     <g:set var="item" value="${entry.key }"/>
-                    <g:set var="shipmentType" value="${params.type=='INBOUND' ? item?.shipmentType : item?.shipment?.shipmentType}"/>
+                    <g:set var="shipmentType" value="${params.type=='INBOUND' ?
+                        (entry.value.type=='Purchase Order' ? '' : item?.shipmentType) :
+                        item?.shipment?.shipmentType}"
+                    />
 
                     <tr class="${(status%2==0)?'even':'odd' } prop">
                         <td><g:getShipmentTypeIcon shipmentType="${shipmentType}" /></td>
