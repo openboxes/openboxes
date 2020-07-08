@@ -2,13 +2,13 @@ package org.pih.warehouse.tablero
 
 
 class IndicatorDatasets implements Serializable {
-
-    String label;
+    // Label can be a simple string or a list
+    def label;
     List<Integer> data;
     List<String> links;
     String type;
 
-    IndicatorDatasets(String label, List<Integer> data, List<String> links = null, String type = null) {
+    IndicatorDatasets(def label, List<Integer> data, List<String> links = null, String type = null) {
         this.label = label;
         this.data = data;
         this.links = links;
