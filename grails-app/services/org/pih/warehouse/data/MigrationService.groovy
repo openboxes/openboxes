@@ -47,6 +47,37 @@ class MigrationService {
 
     boolean transactional = true
 
+    def getStockMovementsWithoutShipmentItems() {
+        String query = """
+            select 
+                requisition.id, 
+                requisition.status,
+                requisition.request_number, 
+                requisition.date_created, 
+                location.name as origin, 
+                count(distinct(requisition_item.id)) as requested,
+                count(distinct(picklist_item.id)) as picked,
+                count(distinct(shipment_item.id)) as shipped,
+                count(distinct(transaction_entry.id)) as issued
+            from requisition 
+            join requisition_item on requisition_item.requisition_id = requisition.id
+            join location on location.id = requisition.origin_id
+            join location_type on location_type.id = location.location_type_id
+            join picklist_item on picklist_item.requisition_item_id = requisition_item.id
+            left outer join shipment on shipment.requisition_id = requisition.id
+            left outer join shipment_item on shipment_item.shipment_id = shipment.id
+            left outer join transaction on transaction.outgoing_shipment_id = shipment.id
+            left outer join transaction_entry on transaction_entry.transaction_id = transaction.id
+            where shipment_item.id is null 
+            and location_type.location_type_code = 'DEPOT'
+            and requisition.status = 'ISSUED'
+            group by requisition.id, requisition.request_number, requisition.date_created, location.name
+            order by requisition.date_created desc;"""
+        return dataService.executeQuery(query)
+
+    }
+
+
     def getReceiptsWithoutTransaction() {
         return Receipt.createCriteria().list() {
             eq("receiptStatusCode", ReceiptStatusCode.RECEIVED)
@@ -56,7 +87,7 @@ class MigrationService {
         }
     }
 
-    def getShipmentsWithoutTransaction() {
+    def getShipmentsWithoutTransactions() {
         return Shipment.createCriteria().list() {
             not {
                 'in'("currentStatus", [ShipmentStatusCode.PENDING])
