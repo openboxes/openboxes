@@ -109,11 +109,14 @@
                     </g:form>
                 </div>
                 <div id="add-adjustment" class="box">
+                    <g:set var="canManageAdjustments" value="${order?.status >= OrderStatus.PLACED && isApprover
+                            || order?.status == OrderStatus.PENDING}"/>
                     <h2 style="display: flex; align-items: center; justify-content: space-between;">
                         <warehouse:message code="default.add.label" args="[g.message(code: 'orderAdjustment.label')]"/>
                     </h2>
                     <g:form controller="order" action="saveAdjustment" onsubmit="return validateAdjustmentsForm();">
                         <g:hiddenField name="order.id" value="${order?.id}" />
+                        <input type="hidden" name="canManageAdjustments" id="canManageAdjustments" value="${canManageAdjustments}">
                         <table class="items-table">
                             <thead>
                             <tr class="odd">
@@ -158,11 +161,6 @@
                                         ${orderAdjustment.comments}
                                     </td>
                                     <td class="center">
-                                        <g:hasRoleApprover>
-                                            <g:set var="isApprover" value="${true}"/>
-                                        </g:hasRoleApprover>
-                                        <g:set var="canManageAdjustments" value="${order?.status >= OrderStatus.PLACED && isApprover
-                                                || order?.status == OrderStatus.PENDING}"/>
                                         <g:link controller="order" action="editAdjustment" id="${orderAdjustment.id}" params="['order.id':order?.id]" class="button"
                                                 disabled="${!canManageAdjustments}"
                                                 disabledMessage="${g.message(code:'errors.noPermissions.label')}">
@@ -208,7 +206,7 @@
                                     <g:textArea name="comments"/>
                                 </td>
                                 <td class="center middle">
-                                    <button type="submit" class="button" disabled="${!canManageAdjustments}">
+                                    <button type="submit" class="button">
                                         <img src="${resource(dir: 'images/icons/silk', file: 'tick.png')}" />&nbsp
                                         <warehouse:message code="default.button.save.label"/>
                                     </button>
@@ -359,18 +357,19 @@
         }
 
         function validateAdjustmentsForm() {
-
           var orderAdjustmentType = $("#orderAdjustmentType").val();
           var description = $("#description").val();
           var amount = $("#amount").val();
           var percentage = $("#percentage").val();
+          var canManageAdjustments = ($("#canManageAdjustments").val() === "true");
 
           if (!orderAdjustmentType) $("#orderAdjustmentType").notify("Required")
           if (!description) $("#description").notify("Required")
           if (!(percentage || amount)) $("#amount").notify("Amount or percentage required")
           if (!(percentage || amount)) $("#percentage").notify("Amount or percentage required")
+          if (!canManageAdjustments) $.notify("You do not have permissions to perform this action")
 
-          if (orderAdjustmentType && description && (amount || percentage)) {
+          if (orderAdjustmentType && description && canManageAdjustments && (amount || percentage)) {
             return true
           } else {
             return false
@@ -682,7 +681,8 @@
             {
               cookie: {
                 expires: 1
-              }
+              },
+              selected: 0
             }
           );
         });
