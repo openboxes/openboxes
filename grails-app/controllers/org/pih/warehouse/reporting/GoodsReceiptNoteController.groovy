@@ -26,15 +26,7 @@ class GoodsReceiptNoteController {
             throw new IllegalStateException("Unable to locate a shipment associated with stock movement ${params.id}")
         }
 
-        def binLocations = []
-        shipment?.shipmentItems?.sort()?.each { shipmentItem ->
-            shipmentItem.receiptItems.sort().each {
-                binLocations += it.binLocation
-            }
-        }
-
-
-        [shipment: shipment, binLocations: binLocations.unique(), currentLocation: currentLocation]
+        [shipment: shipment, currentLocation: currentLocation]
     }
 
 }
