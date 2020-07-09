@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { AutoSizer, InfiniteLoader, List } from 'react-virtualized';
 import _ from 'lodash';
+import { connect } from 'react-redux';
 
 import TableRow from './TableRow';
 
@@ -93,7 +94,7 @@ class TableBodyVirtualized extends Component {
             index={index}
             properties={{
               ...properties,
-              rowCount: totalCount || 50,
+              rowCount: totalCount,
             }}
             addRow={addRow}
             fieldsConfig={fieldsConfig}
@@ -117,15 +118,20 @@ class TableBodyVirtualized extends Component {
 
   render() {
     // eslint-disable-next-line max-len
-    const { properties } = this.props;
-    const { totalCount, loadMoreRows, isRowLoaded } = properties;
+    const { properties, pageSize } = this.props;
+    const {
+      totalCount, loadMoreRows, isRowLoaded, isFirstPageLoaded,
+    } = properties;
+
+    const loadPage = isFirstPageLoaded ? () => {} : loadMoreRows;
 
     return (
       <div>
         <InfiniteLoader
-          loadMoreRows={loadMoreRows}
+          loadMoreRows={loadPage}
           isRowLoaded={isRowLoaded}
-          rowCount={totalCount || 50}
+          rowCount={totalCount}
+          minimumBatchSize={pageSize}
         >
           {({ onRowsRendered }) => (
             <AutoSizer disableHeight>
@@ -134,7 +140,7 @@ class TableBodyVirtualized extends Component {
                   ref={this.bindListRef}
                   height={this.getHeight()}
                   onRowsRendered={onRowsRendered}
-                  rowCount={totalCount || 50}
+                  rowCount={totalCount}
                   rowHeight={this.getRowHeight}
                   rowRenderer={this.rowRenderer}
                   width={width}
@@ -149,7 +155,11 @@ class TableBodyVirtualized extends Component {
   }
 }
 
-export default TableBodyVirtualized;
+const mapStateToProps = state => ({
+  pageSize: state.session.pageSize,
+});
+
+export default connect(mapStateToProps, {})(TableBodyVirtualized);
 
 TableBodyVirtualized.propTypes = {
   fieldsConfig: PropTypes.shape({
@@ -162,6 +172,7 @@ TableBodyVirtualized.propTypes = {
   properties: PropTypes.shape({}).isRequired,
   addRow: PropTypes.func,
   tableRef: PropTypes.func,
+  pageSize: PropTypes.number.isRequired,
 };
 
 TableBodyVirtualized.defaultProps = {
