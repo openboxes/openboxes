@@ -212,12 +212,6 @@
                                 ${warehouse.message(code: 'order.wizard.placeOrder.label')}
                             </g:link>
                         </div>
-                        <div class="button-group">
-                            <g:link controller="order" action="addAdjustment" id="${orderInstance?.id}" class="button">
-                                <img src="${resource(dir: 'images/icons/silk', file: 'basket_put.png')}" />&nbsp;
-                                <warehouse:message code="default.add.label" args="[g.message(code: 'orderAdjustment.label')]"/>
-                            </g:link>
-                        </div>
                         <div class="button-group right">
                             <g:link controller="order" action="print" id="${orderInstance?.id}" class="button" target="_blank"
                                     disabled="${orderInstance?.status < org.pih.warehouse.order.OrderStatus.PLACED}"
@@ -246,14 +240,6 @@
                                     disabledMessage="Order must be placed in order to ship">
                                 <img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />&nbsp;
                                 <warehouse:message code="order.shipOrder.label" default="Ship Order"/>
-                            </g:link>
-                        </div>
-                        <div class="button-group">
-                            <g:link controller="order" action="addAdjustment" id="${orderInstance?.id}" class="button"
-                                    disabled="${!isApprover}"
-                                    disabledMessage="${g.message(code:'errors.noPermissions.label')}">
-                                <img src="${resource(dir: 'images/icons/silk', file: 'basket_put.png')}" />&nbsp;
-                                <warehouse:message code="default.add.label" args="[g.message(code: 'orderAdjustment.label')]"/>
                             </g:link>
                         </div>
                         <div class="button-group right">
