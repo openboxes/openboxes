@@ -2654,6 +2654,13 @@ class InventoryService implements ApplicationContextAware {
                     command.warnings[index] << "Inventory item for lot number '${lotNumber}' does not exist and will be created"
                 }
 
+                Location location = getCurrentLocation()
+                def binLocation = Location.findByParentLocationAndName(location, row.binLocation)
+                if (!binLocation) {
+                    command.errors.reject("error.product.notExists", "Row ${rowIndex}: Bin location '${row.binLocation.trim()}' does not exist in this depot")
+                    command.warnings[index] << "Bin location '${row.binLocation.trim()}' does not exist in this depot"
+                }
+
                 def expirationDate = null
                 try {
                     if (row.expirationDate) {
