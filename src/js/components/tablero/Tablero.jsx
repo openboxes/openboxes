@@ -131,13 +131,15 @@ class Tablero extends Component {
   }
 
   componentDidMount() {
-    this.fetchData();
+    if (this.props.currentLocation !== '') {
+      this.fetchData();
+    }
   }
 
   componentDidUpdate(prevProps) {
     const prevLocation = prevProps.currentLocation;
     const newLocation = this.props.currentLocation;
-    if (prevLocation !== '' && prevLocation !== newLocation) {
+    if (prevLocation !== newLocation) {
       this.fetchData();
     }
   }
