@@ -102,13 +102,13 @@
             <g:isUserAdmin>
                 <g:if test="${showRollbackLastReceiptButton}">
                     <g:link controller="partialReceiving" action="rollbackLastReceipt" id="${stockMovement?.shipment?.id}" class="button">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
+                        <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
                         <warehouse:message code="stockMovement.rollbackLastReceipt.label" />
                     </g:link>
                 </g:if>
                 <g:elseif test="${hasBeenIssued || (hasBeenPlaced && isFromOrder)}">
                     <g:link controller="stockMovement" action="rollback" id="${stockMovement.id}" class="button">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
+                        <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
                         <warehouse:message code="default.button.rollback.label" />
                     </g:link>
                 </g:elseif>
@@ -120,6 +120,15 @@
                     </g:link>
                 </g:if>
             </g:isUserAdmin>
+            <g:isSuperuser>
+                <a href="javascript:void(0);" class="button btn-show-dialog"
+                    data-height="600" data-width="1000"
+                   data-title="${g.message(code:'default.button.synchronize.label', default: 'Synchronize')}"
+                   data-url="${request.contextPath}/stockMovement/synchronizeDialog/${stockMovement?.id}">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'arrow_join.png')}" />&nbsp;
+                    <g:message code="default.button.synchronize.label" default="Synchronize"/>
+                </a>
+            </g:isSuperuser>
         </div>
     </div>
     <div class="yui-gf">
@@ -261,10 +270,12 @@
                                     </td>
                                     <td class="value">
                                         <g:each var="inboundTransaction" in="${stockMovement?.shipment?.incomingTransactions}">
-                                            <g:link controller="inventory" action="showTransaction" id="${inboundTransaction?.id}">
-                                                ${g.message(code:'default.view.label', args: [g.message(code: 'transaction.label')])}
-                                                ${inboundTransaction?.transactionNumber?:inboundTransaction?.id}
-                                            </g:link>
+                                            <div>
+                                                <g:link controller="inventory" action="showTransaction" id="${inboundTransaction?.id}">
+                                                    ${g.message(code:'default.view.label', args: [g.message(code: 'transaction.label')])}
+                                                    ${inboundTransaction?.transactionNumber?:inboundTransaction?.id}
+                                                </g:link>
+                                            </div>
                                         </g:each>
                                     </td>
                                 </tr>
@@ -276,10 +287,12 @@
                                     </td>
                                     <td class="value">
                                         <g:each var="outboundTransaction" in="${stockMovement?.shipment?.outgoingTransactions}">
-                                            <g:link controller="inventory" action="showTransaction" id="${outboundTransaction?.id}">
-                                                ${g.message(code:'default.view.label', args: [g.message(code: 'transaction.label')])}
-                                                ${outboundTransaction?.transactionNumber?:outboundTransaction?.id}
-                                            </g:link>
+                                            <div>
+                                                <g:link controller="inventory" action="showTransaction" id="${outboundTransaction?.id}">
+                                                    ${g.message(code:'default.view.label', args: [g.message(code: 'transaction.label')])}
+                                                    ${outboundTransaction?.transactionNumber?:outboundTransaction?.id}
+                                                </g:link>
+                                            </div>
                                         </g:each>
                                     </td>
                                 </tr>
