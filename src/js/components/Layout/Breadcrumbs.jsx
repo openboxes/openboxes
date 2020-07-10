@@ -13,7 +13,7 @@ class Breadcrumbs extends Component {
   }
 
   openModal() {
-    this.props.showModal();
+    this.props.showModal('locationChooser');
   }
 
   render() {

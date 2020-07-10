@@ -17,6 +17,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.RequisitionType
+import org.pih.warehouse.tablero.ActionMenuItem
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -72,8 +73,26 @@ class ApiController {
     }
 
     def getAppContext = {
+        ActionMenuItem localizationMode;
+        if (session.useDebugLocale) {
+            localizationMode = new ActionMenuItem('Disable localization mode', '/openboxes/images/icons/silk/bug_delete.png', '/openboxes/user/disableLocalizationMode')
+        }
+        else localizationMode = new ActionMenuItem('Enable localization mode', '/openboxes/images/icons/flags/png/ht.png', '/openboxes/user/enableLocalizationMode') 
+
+        List<ActionMenuItem> actionMenuItems = [
+            new ActionMenuItem('Edit Profile', '/openboxes/images/icons/silk/user.png', '/openboxes/user/edit'),
+            localizationMode,
+            new ActionMenuItem('Refresh caches', '/openboxes/images/icons/silk/database_wrench.png', '/openboxes/dashboard/flushCache'),
+            new ActionMenuItem('Logout', '/openboxes/images/icons/silk/door.png', '/openboxes/auth/logout')
+        ]
+
+        for (int i=0; i<actionMenuItems.size(); i++) {
+            actionMenuItems[i] = actionMenuItems[i].toJson();
+        }
+            
         User user = User.get(session?.user?.id)
         Location location = Location.get(session.warehouse?.id)
+        String highestRole = user.getHighestRole(location)
         boolean isSuperuser = userService.isSuperuser(session?.user)
         boolean isUserAdmin = userService.isUserAdmin(session?.user)
         def locale = localizationService.getCurrentLocale()
@@ -115,6 +134,8 @@ class ApiController {
                         activeLanguage       : locale.language,
                         isPaginated          : isPaginated,
                         logoLabel            : logoLabel,
+                        actionMenuItems      : actionMenuItems,
+                        highestRole          : highestRole,
                 ],
         ] as JSON)
     }

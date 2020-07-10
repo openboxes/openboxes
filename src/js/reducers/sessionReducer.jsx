@@ -6,7 +6,8 @@ import {
   TRANSLATIONS_FETCHED,
   CHANGE_CURRENT_LOCALE,
   FETCH_MENU_CONFIG,
-  TOGGLE_MODAL,
+  TOGGLE_LOCATION_CHOOSER,
+  TOGGLE_USER_ACTION_MENU,
 } from '../actions/types';
 
 const initialState = {
@@ -50,7 +51,10 @@ const initialState = {
   minimumExpirationDate: '',
   isPaginated: false,
   logoLabel: '',
-  isOpen: false,
+  actionMenuItems: [],
+  locationChooser: false,
+  userActionMenuOpen: false,
+  highestRole: '',
 };
 
 export default function (state = initialState, action) {
@@ -77,6 +81,8 @@ export default function (state = initialState, action) {
         minimumExpirationDate: _.get(action, 'payload.data.data.minimumExpirationDate'),
         isPaginated: _.get(action, 'payload.data.data.isPaginated'),
         logoLabel: _.get(action, 'payload.data.data.logoLabel'),
+        actionMenuItems: _.get(action, 'payload.data.data.actionMenuItems'),
+        highestRole: _.get(action, 'payload.data.data.highestRole'),
       };
     case FETCH_MENU_CONFIG:
       return {
@@ -92,10 +98,15 @@ export default function (state = initialState, action) {
         ...state,
         fetchedTranslations: { ...state.fetchedTranslations, [action.payload]: true },
       };
-    case TOGGLE_MODAL:
+    case TOGGLE_LOCATION_CHOOSER:
       return {
         ...state,
-        isOpen: action.payload,
+        locationChooser: action.payload,
+      };
+    case TOGGLE_USER_ACTION_MENU:
+      return {
+        ...state,
+        userActionMenuOpen: action.payload,
       };
     default:
       return state;

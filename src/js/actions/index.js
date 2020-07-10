@@ -3,7 +3,8 @@ import { addTranslationForLanguage } from 'react-localize-redux';
 import {
   SHOW_SPINNER,
   HIDE_SPINNER,
-  TOGGLE_MODAL,
+  TOGGLE_LOCATION_CHOOSER,
+  TOGGLE_USER_ACTION_MENU,
   FETCH_USERS,
   FETCH_REASONCODES,
   FETCH_SESSION_INFO,
@@ -36,16 +37,28 @@ export function hideSpinner() {
   };
 }
 
-export function showModal() {
+export function showModal(modalName) {
+  if (modalName === 'locationChooser') {
+    return {
+      type: TOGGLE_LOCATION_CHOOSER,
+      payload: true,
+    };
+  }
   return {
-    type: TOGGLE_MODAL,
+    type: TOGGLE_USER_ACTION_MENU,
     payload: true,
   };
 }
 
-export function hideModal() {
+export function hideModal(modalName) {
+  if (modalName === 'locationChooser') {
+    return {
+      type: TOGGLE_LOCATION_CHOOSER,
+      payload: false,
+    };
+  }
   return {
-    type: TOGGLE_MODAL,
+    type: TOGGLE_USER_ACTION_MENU,
     payload: false,
   };
 }

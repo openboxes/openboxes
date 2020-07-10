@@ -5,6 +5,7 @@ import Translate from '../../utils/Translate';
 import GlobalSearch from '../GlobalSearch';
 import LocationChooser from '../location/LocationChooser';
 import apiClient from '../../utils/apiClient';
+import UserActionMenu from '../user/UserActionMenu';
 
 /** Logs out impersonated user and redirects to dashboard */
 function logoutImpersonatedUser() {
@@ -45,6 +46,7 @@ const Header = ({
       </div>
       <div className="d-flex flex-wrap">
         <GlobalSearch />
+        <UserActionMenu />
         <LocationChooser />
       </div>
     </div>

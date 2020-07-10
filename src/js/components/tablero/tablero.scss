@@ -1,5 +1,34 @@
 @import './ColorPalette.scss';
 
+.user-action-menu {
+  z-index: 1;
+  ul {
+    background-color: white;
+    list-style-type: none;
+    position: fixed;
+    font-size: 12px;
+    padding: 0;
+    li {
+      padding-left: 7%;
+      padding-right: 7%;
+      cursor: pointer;
+      display: block;
+      a {
+        text-decoration: none;
+        color: black;
+        padding: 5px;
+        display:block;
+        img {
+          padding-right: 5%;
+        }
+      }
+      a:hover {
+        background-color: lightgrey;
+      }
+    }
+  }
+}
+
 .dashboard-container {
   background-color: #fbfbfb;
   user-select: none;
