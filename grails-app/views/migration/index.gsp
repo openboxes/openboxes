@@ -83,6 +83,7 @@
                             </td>
                             <td>
                                 <a href="javascript:void(0);" class="button btn-show-dialog"
+                                    data-height="300"
                                    data-title="${g.message(code:'default.dialog.label', default: 'Dialog')}"
                                    data-url="${request.contextPath}/migration/stockMovementsWithoutShipmentItems">
                                     <g:message code="default.button.list.label"/>

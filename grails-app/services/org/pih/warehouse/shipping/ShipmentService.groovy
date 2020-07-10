@@ -43,6 +43,7 @@ import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.Errors
+import org.springframework.validation.ObjectError
 
 import javax.mail.internet.InternetAddress
 import java.math.RoundingMode
@@ -1468,38 +1469,7 @@ class ShipmentService {
             debitTransaction.transactionDate = shipmentInstance.getActualShippingDate()
             debitTransaction.requisition = shipmentInstance.requisition
 
-            shipmentInstance.shipmentItems.each {
-                def inventoryItem =
-                        inventoryService.findInventoryItemByProductAndLotNumber(it.product, it.lotNumber)
-
-                // If the inventory item doesn't exist, we create a new one
-                if (!inventoryItem) {
-                    inventoryItem = new InventoryItem()
-                    inventoryItem.lotNumber = it.lotNumber
-                    inventoryItem.product = it.product
-                    if (!inventoryItem.hasErrors() && inventoryItem.save()) {
-                        // at this point we've saved the inventory item successfully
-                    } else {
-                        //
-                        inventoryItem.errors.allErrors.each { error ->
-                            def errorObj = [
-                                    inventoryItem,
-                                    error.getField(),
-                                    error.getRejectedValue()] as Object[]
-                            shipmentInstance.errors.reject("inventoryItem.invalid",
-                                    errorObj, "[${error.getField()} ${error.getRejectedValue()}] - ${error.defaultMessage} ")
-                        }
-                        return
-                    }
-                }
-
-                // Create a new transaction entry for each shipment item
-                def transactionEntry = new TransactionEntry()
-                transactionEntry.quantity = it.quantity
-                transactionEntry.inventoryItem = inventoryItem
-                transactionEntry.binLocation = it.binLocation
-                debitTransaction.addToTransactionEntries(transactionEntry)
-            }
+            addTransactionEntries(debitTransaction, shipmentInstance)
 
             if (!debitTransaction.save()) {
                 log.info "debit transaction errors " + debitTransaction.errors
@@ -1515,6 +1485,42 @@ class ShipmentService {
             throw e
         }
     }
+
+    def updateOutboundTransaction(Transaction outboundTransaction, Shipment shipment) {
+        addTransactionEntries(outboundTransaction, shipment)
+    }
+
+    def addTransactionEntries(Transaction transaction, Shipment shipment) {
+        shipment.shipmentItems.each { ShipmentItem shipmentItem ->
+            def inventoryItem =
+                    inventoryService.findInventoryItemByProductAndLotNumber(shipmentItem.product, shipmentItem.lotNumber)
+
+            // If the inventory item doesn't exist, we create a new one
+            if (!inventoryItem) {
+                inventoryItem = new InventoryItem()
+                inventoryItem.lotNumber = shipmentItem.lotNumber
+                inventoryItem.product = shipmentItem.product
+                if (!inventoryItem.hasErrors() && inventoryItem.save()) {
+                    // at this point we've saved the inventory item successfully
+                } else {
+                    //
+                    inventoryItem.errors.allErrors.each { error ->
+                        def errorObj = [inventoryItem, error.field, error.rejectedValue] as Object[]
+                        shipment.errors.reject("inventoryItem.invalid",
+                                errorObj, "[${error.field} ${error.rejectedValue}] - ${error.defaultMessage} ")
+                    }
+                    return
+                }
+            }
+
+            def transactionEntry = new TransactionEntry()
+            transactionEntry.quantity = shipmentItem.quantity
+            transactionEntry.inventoryItem = inventoryItem
+            transactionEntry.binLocation = shipmentItem.binLocation
+            transaction.addToTransactionEntries(transactionEntry)
+        }
+    }
+
 
 
     /**

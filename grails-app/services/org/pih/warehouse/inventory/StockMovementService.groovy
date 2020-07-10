@@ -29,6 +29,7 @@ import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCode
+import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
@@ -1547,7 +1548,7 @@ class StockMovementService {
         removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
         requisitionItem.undoChanges()
         requisitionItem.save(flush: true)
-        
+
         requisition.removeFromRequisitionItems(requisitionItem)
         requisitionItem.delete()
     }
@@ -1982,6 +1983,68 @@ class StockMovementService {
                 requisitionService.rollbackRequisition(requisition)
             }
         }
+    }
+
+    void synchronizeStockMovement(String id, Date dateShipped) {
+
+        StockMovement stockMovement = getStockMovement(id)
+
+        // Legacy requisition that needs a shipment
+        Requisition requisition = stockMovement.requisition
+        Shipment shipment = stockMovement?.requisition?.shipment ?: stockMovement?.shipment
+        Transaction outboundTransaction = stockMovement.requisition.transactions.find { it.transactionType?.transactionCode == TransactionCode.DEBIT }
+        if (requisition && outboundTransaction && !stockMovement?.shipment) {
+            shipment = createShipment(stockMovement)
+            shipment.expectedShippingDate = dateShipped
+            createMissingShipmentItems(requisition, shipment)
+            shipmentService.createShipmentEvent(shipment, dateShipped, EventCode.SHIPPED, stockMovement.origin)
+            outboundTransaction.outgoingShipment = shipment
+            return
+        }
+        // Outbound stock movement created through workflow
+        else {
+            // Otherwise we have a stock movement likely with an empty shipment and transaction
+            if (shipment?.outgoingTransactions?.size() > 1) {
+                throw new IllegalStateException("Cannot synchronize a stock movement that has more than 1 transactions")
+            }
+
+            if (!shipment) {
+                shipment = createShipment(stockMovement)
+                shipment.expectedShippingDate = dateShipped
+            }
+            createMissingShipmentItems(stockMovement)
+
+            if (!shipment.hasShipped()) {
+                shipmentService.createShipmentEvent(shipment, dateShipped, EventCode.SHIPPED, stockMovement.origin)
+            }
+
+            outboundTransaction = shipment.outgoingTransactions ?
+                    shipment.outgoingTransactions.iterator().next() : null
+            if (outboundTransaction) {
+                shipmentService.updateOutboundTransaction(outboundTransaction, shipment)
+            } else {
+                shipmentService.createOutboundTransaction(shipment)
+            }
+        }
+    }
+
+    Boolean isSynchronizationAuthorized(StockMovement stockMovement) {
+        if (!stockMovement?.requisition) {
+            throw new IllegalStateException("Stock movement ${stockMovement?.id} must be an outbound stock movement")
+        }
+        if(stockMovement.requisition?.status != RequisitionStatus.ISSUED) {
+            throw new IllegalStateException("Stock movement ${stockMovement?.id} has not been issued")
+        }
+        if (stockMovement?.requisition?.picklist?.picklistItems?.size() <= 0) {
+            throw new IllegalStateException("Stock movement ${stockMovement?.id} must have a picklist with more than 1 item")
+        }
+        if (stockMovement?.shipment?.shipmentItems?.size() > 0) {
+            throw new IllegalStateException("Stock movement ${stockMovement?.id} must not have any shipment items")
+        }
+        if (stockMovement?.shipment?.outgoingTransactions?.transactionEntries?.flatten()?.size() > 0) {
+            throw new IllegalStateException("Stock movement ${stockMovement?.id} must not have any transaction entries")
+        }
+        return true
     }
 
 

@@ -21,6 +21,12 @@
 </table>
 <g:javascript>
   $(document).ready(function() {
-        $(".dataTable").dataTable();
+        $(".dataTable").dataTable({
+                    "iDisplayLength": 10,
+                    "bSearch": true,
+                    "bJQueryUI": true,
+                    "bAutoWidth": true,
+                    "sPaginationType": "full_numbers"
+        });
     });
 </g:javascript>

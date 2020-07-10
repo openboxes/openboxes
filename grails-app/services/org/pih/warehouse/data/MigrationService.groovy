@@ -71,6 +71,7 @@ class MigrationService {
             where shipment_item.id is null 
             and location_type.location_type_code = 'DEPOT'
             and requisition.status = 'ISSUED'
+            and picklist_item.quantity > 0
             group by requisition.id, requisition.request_number, requisition.date_created, location.name
             order by requisition.date_created desc;"""
         return dataService.executeQuery(query)
