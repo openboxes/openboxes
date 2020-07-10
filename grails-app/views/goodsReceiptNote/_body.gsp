@@ -9,9 +9,9 @@
                 <th>${warehouse.message(code: 'inventoryItem.expirationDate.label')}</th>
                 <th>${warehouse.message(code: 'default.uom.label')}</th>
                 <th>${warehouse.message(code: 'shipmentItem.quantityShipped.label')}</th>
-                <g:each in="${binLocations}" var="binLocation">
+                <g:each in="${shipment?.receipts}" var="receipt">
                     <th>
-                        ${binLocation}
+                        ${warehouse.message(code: 'shipping.receipt.label')} ${receipt?.receiptNumber}
                     </th>
                 </g:each>
                 <th class="center">${warehouse.message(code: 'shipmentItem.discrepancy.label')}</th>
@@ -139,7 +139,7 @@
                                     ${receiptItem?.quantityShipped}
                                 </g:else>
                             </td>
-                            <g:each in="${binLocations}" var="binLocation">
+                            <g:each in="${shipment.receipts}" var="receipt">
                                 <td>
                                     <g:if test="${receiptItem?.isSplitItem}">
                                         <div>
@@ -148,8 +148,8 @@
                                     </g:if>
                                     <g:each in="${shipmentItem.receiptItems.sort()}" status="j" var="item">
                                         <g:set value="${shipmentItem.receiptItems.any { it.isSplitItem }}" var="isSplitItem"/>
-                                        <g:set value="${!isSplitItem && !shipmentItem.receiptItems.any { it.binLocation == binLocation} && j == 0}" var="noReceivedItems"/>
-                                        <g:if test="${item.binLocation == binLocation}">
+                                        <g:set value="${!isSplitItem && !shipmentItem.receiptItems.any { it.receipt == receipt} && j == 0}" var="noReceivedItems"/>
+                                        <g:if test="${item.receipt == receipt}">
                                             <div>
                                                 ${item?.quantityReceived}
                                             </div>
