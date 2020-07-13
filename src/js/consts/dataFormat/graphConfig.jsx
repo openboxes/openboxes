@@ -103,17 +103,17 @@ function loadDatalabel(context) {
   return '';
 }
 
-function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', maxValue = null, minValue = null, displayGrid = true) {
+function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', maxValue = null, minValue = null, isDoughnut = true) {
   const options = {
     legend: {
-      display: !displayGrid,
+      display: isDoughnut,
       labels: {
         fontSize: 12,
       },
     },
     scales: {
       xAxes: [{
-        display: displayGrid,
+        display: !isDoughnut,
         gridLines: {
           color: 'transparent',
         },
@@ -125,7 +125,7 @@ function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', ma
         ticks: {
           precision: 0,
         },
-        display: displayGrid,
+        display: !isDoughnut,
       }],
     },
     plugins: {
@@ -161,7 +161,7 @@ function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', ma
     options.scales.yAxes[0].stacked = true;
   }
 
-  if (hasDataLabel) {
+  if (hasDataLabel && !isDoughnut) {
     options.plugins.datalabels = {
       anchor(context) {
         const value = context.dataset.data[context.dataIndex];
@@ -208,6 +208,21 @@ function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', ma
     }
   }
 
+  if (hasDataLabel && isDoughnut) {
+    options.plugins.datalabels = {
+      formatter: (value, ctx) => {
+        let sum = 0;
+        const dataArr = ctx.chart.data.datasets[0].data;
+        dataArr.forEach((data) => {
+          sum += data;
+        });
+        const percentageValue = (value / sum) * 100;
+        return `${Math.round(percentageValue * 100) / 100}%`;
+      },
+      color: '#fff',
+    };
+  }
+
   return options;
 }
 
@@ -215,7 +230,7 @@ function loadGraphOptions(payload) {
   let labelAlignment = null;
   let maxValue = null;
   let minValue = null;
-  const displayGrid = payload.type !== 'doughnut';
+  const isDoughnut = payload.type === 'doughnut';
 
   if (payload.config.datalabel) {
     labelAlignment = (payload.type === 'horizontalBar') ? 'horizontal' : 'vertical';
@@ -241,7 +256,7 @@ function loadGraphOptions(payload) {
     labelAlignment,
     maxValue,
     minValue,
-    displayGrid,
+    isDoughnut,
   );
 }
 
