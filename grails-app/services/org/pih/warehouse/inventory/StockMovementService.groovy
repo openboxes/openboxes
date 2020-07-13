@@ -330,11 +330,11 @@ class StockMovementService {
             if (criteria.destination) eq("destination", criteria.destination)
             if (criteria.origin) eq("origin", criteria.origin)
             if (criteria.receiptStatusCode) eq("currentStatus", criteria.receiptStatusCode)
-            if (criteria.createdBy || criteria.requestedBy) {
-                or {
-                    eq("createdBy", criteria?.createdBy)
-                    eq("createdBy", criteria?.requestedBy)
-                }
+            if (criteria.createdBy) {
+                eq("createdBy", criteria?.createdBy)
+            }
+            if (criteria.requestedBy) {
+                eq("requestedBy", criteria?.requestedBy)
             }
             if(params.createdAfter) {
                 ge("dateCreated", params.createdAfter)
