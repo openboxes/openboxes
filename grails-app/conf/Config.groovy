@@ -575,13 +575,14 @@ openboxes {
                 percentageAdHoc {
                     enabled = true
                     endpoint = "/${appName}/apitablero/getPercentageAdHoc"
-                    archived = ['warehouse', 'transaction', 'inventory']
+                    archived = ['personal', 'warehouse', 'inventory']
                     filter = false
+                    datalabel = true
                     order = 11
                     colors {
                         labels {
-                            success = ["STOCK"]
-                            error = ["ADHOC"]
+                            state5 = ["STOCK"]
+                            state4 = ["ADHOC"]
                         }
                     }
                 }
