@@ -29,7 +29,7 @@ class MailService {
     }
 
     String getDefaultHost() {
-        return config.getProperty("rails.mail.host")
+        return config.getProperty("grails.mail.host")
     }
 
     Integer getDefaultPort() {

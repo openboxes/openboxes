@@ -41,11 +41,11 @@ class DocumentService {
     def userService
 
     private getMessageTagLib() {
-        return grailsApplication.mainContext.getBean('MessageTagLib')
+        return grailsApplication.mainContext.getBean('org.pih.warehouse.MessageTagLib')
     }
 
     private getFormatTagLib() {
-        return grailsApplication.mainContext.getBean('FormatTagLib')
+        return grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
     }
 
 
@@ -501,7 +501,7 @@ class DocumentService {
             CELL_INDEX = 0
             log.debug "Adding item  to packing list " + itemInstance?.product?.name + " -> " + itemInstance?.container?.name
             row = sheet.createRow((short) counter++)
-            
+
             if (itemInstance?.container?.parentContainer) {
                 row.createCell(CELL_INDEX).setCellValue(itemInstance?.container?.parentContainer?.name)
                 row.getCell(CELL_INDEX++).setCellStyle(tableDataPalletStyle)
@@ -904,7 +904,6 @@ class DocumentService {
             workbook.write(outputStream)
         }
         catch (Exception e) {
-            log.error e
             throw e
         }
     }
@@ -1234,7 +1233,6 @@ class DocumentService {
             workbook.write(outputStream)
         }
         catch (Exception e) {
-            log.error e
             throw e
         }
     }
@@ -1506,7 +1504,6 @@ class DocumentService {
             workbook.write(outputStream)
         }
         catch (Exception e) {
-            log.error e
             throw e
         }
     }
