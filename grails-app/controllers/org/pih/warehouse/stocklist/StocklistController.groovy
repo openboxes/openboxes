@@ -55,7 +55,6 @@ class StocklistController {
         response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
         response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
-        log.info response
         documentService.generateStocklistCsv(response.outputStream, stocklist)
     }
 
