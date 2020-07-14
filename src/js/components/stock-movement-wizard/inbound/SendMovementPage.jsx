@@ -322,7 +322,7 @@ class SendMovementPage extends Component {
    * @public
    */
   fetchShipmentTypes() {
-    const url = '/openboxes/api/generic/shipmentType';
+    const url = '/api/generic/shipmentType';
 
     return apiClient.get(url)
       .then((response) => {
@@ -341,7 +341,7 @@ class SendMovementPage extends Component {
 
 
   fetchStockMovementItems() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=6`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=6`;
     apiClient.get(url)
       .then((response) => {
         const { data } = response.data;
@@ -356,7 +356,7 @@ class SendMovementPage extends Component {
   }
 
   loadMoreRows({ startIndex, stopIndex }) {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${stopIndex - startIndex > 0 ? stopIndex - startIndex : 1}&stepNumber=6`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${stopIndex - startIndex > 0 ? stopIndex - startIndex : 1}&stepNumber=6`;
     apiClient.get(url)
       .then((response) => {
         const { data } = response.data;
@@ -387,7 +387,7 @@ class SendMovementPage extends Component {
    * @public
    */
   fetchStockMovementData() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=6`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=6`;
 
     return apiClient.get(url)
       .then((response) => {
@@ -449,7 +449,7 @@ class SendMovementPage extends Component {
    * @public
    */
   saveShipment(payload) {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateShipment`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/updateShipment`;
 
     return apiClient.post(url, payload);
   }
@@ -459,7 +459,7 @@ class SendMovementPage extends Component {
    * @public
    */
   stateTransitionToSent() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const payload = { status: 'DISPATCHED' };
 
     return apiClient.post(url, payload);
@@ -579,7 +579,7 @@ class SendMovementPage extends Component {
    */
   rollbackStockMovement(values) {
     this.props.showSpinner();
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const payload = { rollback: true };
 
     const isOrigin = this.props.currentLocationId === values.origin.id;

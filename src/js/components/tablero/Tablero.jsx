@@ -152,7 +152,7 @@ class Tablero extends Component {
   }
 
   updateConfig = () => {
-    const url = '/openboxes/apitablero/updateConfig';
+    const url = '/apitablero/updateConfig';
 
     const payload = {
       number: {},
