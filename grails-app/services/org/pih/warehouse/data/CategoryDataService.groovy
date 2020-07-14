@@ -51,10 +51,11 @@ class CategoryDataService {
     }
 
     Category createOrUpdateCategory(Map params) {
-        Category category = Category.read(params.id, params.name)
+        Category category = Category.findByIdOrName(params.id, params.name)
         if (!category) {
             category = new Category()
         }
+        category.id = params.id
         category.name = params.name
         if (params.parentCategoryId && category?.parentCategory?.id != params.parentCategoryId) {
             category.parentCategory = Category.get(params.parentCategoryId)
