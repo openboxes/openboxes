@@ -20,7 +20,6 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
-import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.StockMovementService
@@ -90,7 +89,20 @@ class StockMovementApiController {
     }
 
     def read() {
-        StockMovement stockMovement = stockMovementService.getStockMovement(params.id, params.stepNumber)
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        String stepNumber = params.stepNumber
+        def totalCount = stockMovement.lineItems.size()
+
+        // FIXME this should happen in the service
+        if (params.stepNumber == "4") {
+            totalCount = stockMovementService.getPickPageItems(params.id, null, null).size()
+        }
+        if (params.stepNumber == "5") {
+            totalCount = stockMovementService.getPackPageItems(params.id, null, null).size()
+        }
+        if (params.stepNumber == "6" && !stockMovement.origin.isSupplier() && stockMovement.origin.supports(ActivityCode.MANAGE_INVENTORY)) {
+            totalCount = stockMovementService.getPackPageItems(params.id, null, null).size()
+        }
 
         // FIXME Debugging
         JSONObject jsonObject = new JSONObject(stockMovement.toJson())
@@ -121,12 +133,7 @@ class StockMovementApiController {
     /**
      * @deprecated FIXME refactor to avoid using RPC-style endpoints
      */
-    def updateRequisition() {
-
-        JSONObject jsonObject = request.JSON
-        log.debug "update: " + jsonObject.toString(4)
-
-        // Bind all other properties to stock movement
+    def updateRequisition() { // FIXME Bind StockMovement stockMovement
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         bindStockMovement(stockMovement, request.JSON)
         stockMovementService.updateStockMovement(stockMovement)
@@ -136,15 +143,9 @@ class StockMovementApiController {
     /**
      * @deprecated FIXME refactor to avoid using RPC-style endpoints
      */
-    def updateShipment() {
-
-        JSONObject jsonObject = request.JSON
-        log.debug "update: " + jsonObject.toString(4)
-
-        // Bind all other properties to stock movement
+    def updateShipment() { // FIXME Bind StockMovement stockMovement
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-
-        bindStockMovement(stockMovement, jsonObject)
+        bindStockMovement(stockMovement, request.JSON)
         stockMovementService.updateShipment(stockMovement)
         render status: 200
     }
@@ -235,8 +236,6 @@ class StockMovementApiController {
      * Peforms a status update on the stock movement and forwards to the read action.
      */
     def updateStatus() {
-
-
         JSONObject jsonObject = request.JSON
         log.info "update status: " + jsonObject.toString(4)
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
