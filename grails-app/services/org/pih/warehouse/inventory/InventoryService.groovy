@@ -3316,6 +3316,7 @@ class InventoryService implements ApplicationContextAware {
         def transactions = Transaction.createCriteria().list {
             // eager fetch transaction and transaction type
             fetchMode("transactionType", org.hibernate.FetchMode.JOIN)
+            // FIXME OBGM-211
             //fetchMode("inboundTransfer", org.hibernate.FetchMode.JOIN)
             //fetchMode("outboundTransfer", org.hibernate.FetchMode.JOIN)
 
