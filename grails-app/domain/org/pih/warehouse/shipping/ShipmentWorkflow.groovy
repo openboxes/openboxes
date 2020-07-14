@@ -10,7 +10,6 @@
 package org.pih.warehouse.shipping
 
 import org.pih.warehouse.core.Document
-import org.pih.warehouse.core.Document
 
 class ShipmentWorkflow implements Serializable {
 
