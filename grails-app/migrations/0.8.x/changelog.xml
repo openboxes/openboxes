@@ -79,4 +79,5 @@
     <include file="0.8.x/changelog-2020-06-04-2232-alter-table-add-column-dashboard-config.xml"/>
     <include file="0.8.x/changelog-2020-06-09-1240-alter-table-add-column-organization-default-location-id.xml"/>
     <include file="0.8.x/changelog-2020-06-12-0842-add-unique-constraint-product-package.xml"/>
+    <include file="0.8.x/changelog-2020-07-13-1556-alter-table-inventory-snapshot-add-indexes.xml"/>
 </databaseChangeLog>

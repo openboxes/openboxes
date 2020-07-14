@@ -93,6 +93,7 @@ class ApiController {
         DateFormat dateFormat = new SimpleDateFormat("MM/DD/YYYY");
         String minimumExpirationDate = dateFormat.format(grailsApplication.config.openboxes.expirationDate.minValue)
         def logoLabel = grailsApplication.config.openboxes.logo.label
+        def pageSize = grailsApplication.config.openboxes.api.pagination.pageSize
         render([
                 data: [
                         user                 : user,
@@ -115,6 +116,7 @@ class ApiController {
                         activeLanguage       : locale.language,
                         isPaginated          : isPaginated,
                         logoLabel            : logoLabel,
+                        pageSize             : pageSize,
                 ],
         ] as JSON)
     }

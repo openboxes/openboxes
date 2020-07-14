@@ -1100,7 +1100,7 @@ class ProductService {
                 terms.each { term ->
                     term = term + "%"
                     or {
-                        ilike("name", term)
+                        ilike("name", "%" + term)
                         ilike("productCode", term)
                         ilike("description", "%" + term)
                         ilike("brandName", term)
@@ -1115,7 +1115,7 @@ class ProductService {
                         ilike("unitOfMeasure", term)
                         productSuppliers {
                             or {
-                                ilike("name", term)
+                                ilike("name", "%" + term)
                                 ilike("code", term)
                                 ilike("productCode", term)
                                 ilike("manufacturerCode", term)
