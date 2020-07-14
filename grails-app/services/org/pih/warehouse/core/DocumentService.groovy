@@ -65,11 +65,11 @@ class DocumentService {
     def userService
 
     private getMessageTagLib() {
-        return grailsApplication.mainContext.getBean('MessageTagLib')
+        return grailsApplication.mainContext.getBean('org.pih.warehouse.MessageTagLib')
     }
 
     private getFormatTagLib() {
-        return grailsApplication.mainContext.getBean('FormatTagLib')
+        return grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
     }
 
 
@@ -951,7 +951,6 @@ class DocumentService {
             workbook.write(outputStream)
         }
         catch (Exception e) {
-            log.error e
             throw e
         }
     }
@@ -1318,7 +1317,6 @@ class DocumentService {
             workbook.write(outputStream)
         }
         catch (Exception e) {
-            log.error e
             throw e
         }
     }
@@ -1590,7 +1588,6 @@ class DocumentService {
             workbook.write(outputStream)
         }
         catch (Exception e) {
-            log.error e
             throw e
         }
     }
