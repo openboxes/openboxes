@@ -150,6 +150,7 @@ const SUPPLIER_FIELDS = {
     totalCount: ({ totalCount }) => totalCount,
     isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
+    isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     fields: {
       palletName: {
         type: LabelField,
@@ -226,6 +227,7 @@ class SendMovementPage extends Component {
       files: [],
       values: { ...this.props.initialValues, tableItems: [] },
       totalCount: 0,
+      isFirstPageLoaded: false,
     };
     this.props.showSpinner();
     this.onDrop = this.onDrop.bind(this);
@@ -374,6 +376,14 @@ class SendMovementPage extends Component {
             ...this.state.values,
             tableItems: _.uniqBy(_.concat(this.state.values.tableItems, tableItemsData), uniqBy),
           },
+          isFirstPageLoaded: true,
+        }, () => {
+          if (this.state.values.tableItems.length < this.state.totalCount) {
+            this.loadMoreRows({
+              startIndex: stopIndex,
+              stopIndex: stopIndex + this.props.pageSize,
+            });
+          }
         });
       });
   }
@@ -721,6 +731,7 @@ class SendMovementPage extends Component {
                         loadMoreRows: this.loadMoreRows,
                         isRowLoaded: this.isRowLoaded,
                         isPaginated: this.props.isPaginated,
+                        isFirstPageLoaded: this.state.isFirstPageLoaded,
                       }))}
                 </div>
                 <button
@@ -766,6 +777,7 @@ const mapStateToProps = state => ({
   isUserAdmin: state.session.isUserAdmin,
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
   isPaginated: state.session.isPaginated,
+  pageSize: state.session.pageSize,
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner })(SendMovementPage);
@@ -792,4 +804,5 @@ SendMovementPage.propTypes = {
   hasBinLocationSupport: PropTypes.bool.isRequired,
   /** Return true if pagination is enabled */
   isPaginated: PropTypes.bool.isRequired,
+  pageSize: PropTypes.number.isRequired,
 };
