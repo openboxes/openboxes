@@ -203,6 +203,9 @@ dependencies {
     runtime 'org.xhtmlrenderer:core-renderer:R8'
     runtime 'com.lowagie:itext:2.1.0'
 
+    // Used by XLS rendering
+    compile ('org.apache.poi:poi:3.8')
+
 }
 
 sourceSets {
