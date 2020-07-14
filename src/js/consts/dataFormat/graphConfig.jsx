@@ -216,7 +216,7 @@ function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', ma
         dataArr.forEach((data) => {
           sum += data;
         });
-        const percentageValue = (value / sum) * 100;
+        const percentageValue = sum > 0 ? (value / sum) * 100 : 0;
         return `${Math.round(percentageValue * 100) / 100}%`;
       },
       color: '#fff',
