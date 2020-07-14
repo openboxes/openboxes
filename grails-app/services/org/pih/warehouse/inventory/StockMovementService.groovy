@@ -1284,6 +1284,7 @@ class StockMovementService {
             picklistItem.comment = comment
             picklistItem.sortOrder = requisitionItem.orderIndex
             picklistItem.disableRefresh = Boolean.TRUE
+            picklistItem.sortOrder = requisitionItem.orderIndex
         }
         picklist.save(flush: true)
 
