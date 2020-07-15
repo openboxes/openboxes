@@ -428,7 +428,7 @@ class ReportService implements ApplicationContextAware {
             dateDimension.monthName = date.format("MMMMM")
             dateDimension.monthYear = date.format("MM-yyyy")
             dateDimension.weekdayName = date.format("EEEEE")
-            dateDimension.save(flush: true)
+            dateDimension.save()
         }
     }
 

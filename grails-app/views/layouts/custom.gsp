@@ -325,6 +325,9 @@
             resizable: true,
             minHeight: height,
             position: position,
+            close: function(event, ui) {
+                location.reload();
+            },
             open: function(event, ui) {
                 $(this).html("Loading...");
                 $(this).load(url, function(response, status, xhr) {

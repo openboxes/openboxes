@@ -1721,8 +1721,8 @@ class JsonController {
 
     @Cacheable("forecastCache")
     def getForecastingData = {
-        Product product = Product.get(params.id)
-        Location location = Location.get(session.warehouse.id)
+        Product product = Product.get(params.product.id)
+        Location location = Location.get(params.location.id)
         def demandData = forecastingService.getDemand(location, product)
         render demandData as JSON
     }

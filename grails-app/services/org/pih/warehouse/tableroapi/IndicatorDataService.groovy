@@ -609,8 +609,7 @@ class IndicatorDataService {
 
         List<String> listLabels = []
         List<Integer> listData = []
-        List<IndicatorDatasets> datasets = []
-       
+
         def percentageAdHoc = Requisition.executeQuery("""
             select count(r.id), r.type
             from Requisition as r
@@ -632,12 +631,13 @@ class IndicatorDataService {
             }     
         }
 
-        IndicatorDatasets indicatorDatasets =  new IndicatorDatasets('Percentage', listData, null , 'doughnut')
-        datasets.push(indicatorDatasets)
+        List<IndicatorDatasets> datasets = [
+                new IndicatorDatasets('Number of requests', listData, null , 'doughnut')
+        ]
 
         IndicatorData indicatorData = new IndicatorData(datasets, listLabels)
 
-        GraphData graphData = new GraphData(indicatorData, 'Percentage Stock vs Ad Hoc Requests this Month', 'doughnut', '/openboxes/stockMovement/list?direction=OUTBOUND')
+        GraphData graphData = new GraphData(indicatorData, 'Stock vs ad-hoc requests last month', 'doughnut', '/openboxes/stockMovement/list?direction=OUTBOUND')
        
         return graphData;
     }

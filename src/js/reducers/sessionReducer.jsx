@@ -55,6 +55,8 @@ const initialState = {
   locationChooser: false,
   userActionMenuOpen: false,
   highestRole: '',
+  isOpen: false,
+  pageSize: 50,
 };
 
 export default function (state = initialState, action) {
@@ -83,6 +85,7 @@ export default function (state = initialState, action) {
         logoLabel: _.get(action, 'payload.data.data.logoLabel'),
         actionMenuItems: _.get(action, 'payload.data.data.actionMenuItems'),
         highestRole: _.get(action, 'payload.data.data.highestRole'),
+        pageSize: _.get(action, 'payload.data.data.pageSize'),
       };
     case FETCH_MENU_CONFIG:
       return {
