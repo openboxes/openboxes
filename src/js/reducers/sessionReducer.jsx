@@ -51,7 +51,7 @@ const initialState = {
   minimumExpirationDate: '',
   isPaginated: false,
   logoLabel: '',
-  actionMenuItems: [],
+  menuItems: [],
   locationChooser: false,
   userActionMenuOpen: false,
   highestRole: '',
@@ -83,7 +83,7 @@ export default function (state = initialState, action) {
         minimumExpirationDate: _.get(action, 'payload.data.data.minimumExpirationDate'),
         isPaginated: _.get(action, 'payload.data.data.isPaginated'),
         logoLabel: _.get(action, 'payload.data.data.logoLabel'),
-        actionMenuItems: _.get(action, 'payload.data.data.actionMenuItems'),
+        menuItems: _.get(action, 'payload.data.data.menuItems'),
         highestRole: _.get(action, 'payload.data.data.highestRole'),
         pageSize: _.get(action, 'payload.data.data.pageSize'),
       };

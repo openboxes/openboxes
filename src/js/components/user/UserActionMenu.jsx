@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { showModal, hideModal } from '../../actions';
+import { showUserActions, hideUserActions } from '../../actions';
 
 
 class UserActionMenu extends Component {
@@ -13,9 +13,9 @@ class UserActionMenu extends Component {
 
   toggleUserActionMenu() {
     if (this.props.userActionMenuOpen) {
-      this.props.hideModal('userActionMenu');
+      this.props.hideUserActions();
     } else {
-      this.props.showModal('userActionMenu');
+      this.props.showUserActions();
     }
   }
 
@@ -30,14 +30,14 @@ class UserActionMenu extends Component {
           className="btn btn-light ml-1"
           onClick={this.toggleUserActionMenu}
         >
-          {`${this.props.currentUser.username} - [${this.props.highestRole}]`}
+          {`${this.props.currentUser.username} [${this.props.highestRole}]`}
         </button>
 
         <ul
           className="dropdown"
           hidden={!this.props.userActionMenuOpen}
         >
-          {this.props.actionMenuItems.map(item => (
+          {this.props.menuItems.map(item => (
             <li key={item.label}>
               <a href={`${item.linkAction}/${this.props.currentUser.id}`}> <img alt={item.label} src={item.linkIcon} />{item.label}
               </a>
@@ -50,19 +50,19 @@ class UserActionMenu extends Component {
 
 const mapStateToProps = state => ({
   userActionMenuOpen: state.session.userActionMenuOpen,
-  actionMenuItems: state.session.actionMenuItems,
+  menuItems: state.session.menuItems,
   currentUser: state.session.user,
   highestRole: state.session.highestRole,
 });
 
 export default connect(mapStateToProps, {
-  showModal,
-  hideModal,
+  showUserActions,
+  hideUserActions,
 })(UserActionMenu);
 
 UserActionMenu.propTypes = {
   // List of action items for the user action menu
-  actionMenuItems: PropTypes.arrayOf(PropTypes.shape({
+  menuItems: PropTypes.arrayOf(PropTypes.shape({
     label: PropTypes.string.isRequired,
     linkIcon: PropTypes.string.isRequired,
     linkAction: PropTypes.string.isRequired,
@@ -75,9 +75,9 @@ UserActionMenu.propTypes = {
   // Boolean to show modal or not
   userActionMenuOpen: PropTypes.bool.isRequired,
   // Function to show the location modal
-  showModal: PropTypes.func.isRequired,
+  showUserActions: PropTypes.func.isRequired,
   // Function to hide the location modal
-  hideModal: PropTypes.func.isRequired,
+  hideUserActions: PropTypes.func.isRequired,
   // Highest role of the user for this location
   highestRole: PropTypes.string.isRequired,
 };

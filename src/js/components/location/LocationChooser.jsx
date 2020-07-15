@@ -5,7 +5,7 @@ import Modal from 'react-modal';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import PropTypes from 'prop-types';
 
-import { changeCurrentLocation, showModal, hideModal } from '../../actions';
+import { changeCurrentLocation, showLocationChooser, hideLocationChooser } from '../../actions';
 import apiClient from '../../utils/apiClient';
 
 class LocationChooser extends Component {
@@ -38,14 +38,14 @@ class LocationChooser extends Component {
   dataFetched = false;
 
   openModal() {
-    this.props.showModal('locationChooser');
+    this.props.showLocationChooser();
   }
 
   closeModal(location) {
     if (location) {
       this.props.changeCurrentLocation(location);
     }
-    this.props.hideModal('locationChooser');
+    this.props.hideLocationChooser();
   }
 
   fetchLocations() {
@@ -117,8 +117,8 @@ const mapStateToProps = state => ({
 
 export default connect(mapStateToProps, {
   changeCurrentLocation,
-  showModal,
-  hideModal,
+  showLocationChooser,
+  hideLocationChooser,
 })(LocationChooser);
 
 LocationChooser.propTypes = {
@@ -127,9 +127,9 @@ LocationChooser.propTypes = {
   // Boolean to show modal or not
   locationChooserOpen: PropTypes.bool.isRequired,
   // Function to show the location modal
-  showModal: PropTypes.func.isRequired,
+  showLocationChooser: PropTypes.func.isRequired,
   // Function to hide the location modal
-  hideModal: PropTypes.func.isRequired,
+  hideLocationChooser: PropTypes.func.isRequired,
   /** Name of the currently selected location */
   currentLocationName: PropTypes.string.isRequired,
   defaultTranslationsFetched: PropTypes.bool.isRequired,

@@ -17,7 +17,6 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.RequisitionType
-import org.pih.warehouse.tablero.ActionMenuItem
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -73,22 +72,39 @@ class ApiController {
     }
 
     def getAppContext = {
-        ActionMenuItem localizationMode;
+        def localizationMode
         if (session.useDebugLocale) {
-            localizationMode = new ActionMenuItem('Disable localization mode', '/openboxes/images/icons/silk/bug_delete.png', '/openboxes/user/disableLocalizationMode')
+            localizationMode = [
+                "label"      : "${warehouse.message(code:'localization.disable.label', default: 'Disable translation mode')}",
+                "linkIcon"   : "${request.contextPath}/images/icons/silk/bug_delete.png",
+                "linkAction" : "${request.contextPath}/user/disableLocalizationMode"
+            ]
         }
-        else localizationMode = new ActionMenuItem('Enable localization mode', '/openboxes/images/icons/flags/png/ht.png', '/openboxes/user/enableLocalizationMode') 
+        else 
+            localizationMode = [
+                "label"      : "${warehouse.message(code:'localization.enable.label', default: 'Enable translation mode')}",
+                "linkIcon"   : "${request.contextPath}/images/icons/flags/png/ht.png",
+                "linkAction" : "${request.contextPath}/user/enableLocalizationMode"
+            ]
 
-        List<ActionMenuItem> actionMenuItems = [
-            new ActionMenuItem('Edit Profile', '/openboxes/images/icons/silk/user.png', '/openboxes/user/edit'),
+        List<Map> menuItems = [
+            [
+                "label"      : "${warehouse.message(code:'default.edit.label', default: 'user.profile.label', args: [warehouse.message(code: 'user.profile.label')])}",
+                "linkIcon"   : "${request.contextPath}/images/icons/silk/user.png",
+                "linkAction" : "${request.contextPath}/user/edit",
+            ],
             localizationMode,
-            new ActionMenuItem('Refresh caches', '/openboxes/images/icons/silk/database_wrench.png', '/openboxes/dashboard/flushCache'),
-            new ActionMenuItem('Logout', '/openboxes/images/icons/silk/door.png', '/openboxes/auth/logout')
+            [
+                "label"      : "${warehouse.message(code:'cache.flush.label', default: 'Refresh caches')}",
+                "linkIcon"   : "${request.contextPath}/images/icons/silk/database_wrench.png",
+                "linkAction" : "${request.contextPath}/dashboard/flushCache",
+            ],
+            [
+                "label"      : "${warehouse.message(code:'default.logout.label')}",
+                "linkIcon"   : "${request.contextPath}/images/icons/silk/door.png",
+                "linkAction" : "${request.contextPath}/auth/logout",
+            ]
         ]
-
-        for (int i=0; i<actionMenuItems.size(); i++) {
-            actionMenuItems[i] = actionMenuItems[i].toJson();
-        }
             
         User user = User.get(session?.user?.id)
         Location location = Location.get(session.warehouse?.id)
@@ -135,7 +151,7 @@ class ApiController {
                         activeLanguage       : locale.language,
                         isPaginated          : isPaginated,
                         logoLabel            : logoLabel,
-                        actionMenuItems      : actionMenuItems,
+                        menuItems            : menuItems,
                         highestRole          : highestRole,
                         pageSize             : pageSize,
                 ],

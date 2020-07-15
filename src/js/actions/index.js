@@ -37,26 +37,28 @@ export function hideSpinner() {
   };
 }
 
-export function showModal(modalName) {
-  if (modalName === 'locationChooser') {
-    return {
-      type: TOGGLE_LOCATION_CHOOSER,
-      payload: true,
-    };
-  }
+export function showLocationChooser() {
+  return {
+    type: TOGGLE_LOCATION_CHOOSER,
+    payload: true,
+  };
+}
+
+export function showUserActions() {
   return {
     type: TOGGLE_USER_ACTION_MENU,
     payload: true,
   };
 }
 
-export function hideModal(modalName) {
-  if (modalName === 'locationChooser') {
-    return {
-      type: TOGGLE_LOCATION_CHOOSER,
-      payload: false,
-    };
-  }
+export function hideLocationChooser() {
+  return {
+    type: TOGGLE_LOCATION_CHOOSER,
+    payload: false,
+  };
+}
+
+export function hideUserActions() {
   return {
     type: TOGGLE_USER_ACTION_MENU,
     payload: false,
