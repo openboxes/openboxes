@@ -55,7 +55,6 @@ class CategoryDataService {
         if (!category) {
             category = new Category()
         }
-        category.id = params.id
         category.name = params.name
         if (params.parentCategoryId && category?.parentCategory?.id != params.parentCategoryId) {
             category.parentCategory = Category.get(params.parentCategoryId)
