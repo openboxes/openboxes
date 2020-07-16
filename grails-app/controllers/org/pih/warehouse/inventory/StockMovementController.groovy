@@ -214,6 +214,7 @@ class StockMovementController {
 
             response.setHeader("Content-disposition", "attachment; filename=\"StockMovements-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
             render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
+            return
         }
 
         if (params.submitted) {
