@@ -202,6 +202,7 @@ class OrderController {
 
             response.setHeader("Content-disposition", "attachment; filename=\"Orders-${new Date().format("MM/dd/yyyy")}.csv\"")
             render(contentType: "text/csv", text: csv.out.toString())
+            return
         }
 
         def totalPrice = orders?.sum { it.totalNormalized?:0.0 } ?:0.0
@@ -663,7 +664,7 @@ class OrderController {
 
             csv.printRecord(null, null, null, null, null, null, null, CSVUtils.formatCurrency(number: totalPrice, currencyCode: lastCurrencyCode), null)
             render(contentType: "text/csv", text: csv.out.toString())
-
+            return
         }
     }
 
