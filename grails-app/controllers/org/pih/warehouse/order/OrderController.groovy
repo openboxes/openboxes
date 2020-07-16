@@ -119,6 +119,7 @@ class OrderController {
 
             response.setHeader("Content-disposition", "attachment; filename=\"Orders-${new Date().format("MM/dd/yyyy")}.csv\"")
             render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
+            return
         }
 
         def totalPrice = orders?.sum { it.totalNormalized?:0.0 } ?:0.0
@@ -569,7 +570,7 @@ class OrderController {
             String totalPriceString = formatNumber(number: totalPrice, maxFractionDigits: 2, minFractionDigits: 2)
             csv += ",,,,,,${StringEscapeUtils.escapeCsv(totalPriceString)}\n"
             render csv
-
+            return
         }
     }
 
