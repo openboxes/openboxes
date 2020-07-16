@@ -28,16 +28,13 @@ class Doc4jController {
             throw new Exception("Unable to locate shipment with ID ${params.id}")
         }
 
-        // For some reason, this needs to be here or we get a File Not Found error (ERR_FILE_NOT_FOUND)
-        render ""
-
         def filename = "Packing List - " + shipmentInstance?.name?.trim() + ".xls"
         log.info("filename " + filename)
         response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
         response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
         documentService.generatePackingList(response.outputStream, shipmentInstance)
-        return
-
+        response.outputStream.flush()
+        response.outputStream.close()
     }
 
     def downloadCertificateOfDonation() {
