@@ -75,32 +75,32 @@ class ApiController {
         def localizationMode
         if (session.useDebugLocale) {
             localizationMode = [
-                "label"      : "${warehouse.message(code:'localization.disable.label', default: 'Disable translation mode')}",
+                "label"      : "${g.message(code:'localization.disable.label', default: 'Disable translation mode')}",
                 "linkIcon"   : "${request.contextPath}/images/icons/silk/bug_delete.png",
                 "linkAction" : "${request.contextPath}/user/disableLocalizationMode"
             ]
         }
         else 
             localizationMode = [
-                "label"      : "${warehouse.message(code:'localization.enable.label', default: 'Enable translation mode')}",
+                "label"      : "${g.message(code:'localization.enable.label', default: 'Enable translation mode')}",
                 "linkIcon"   : "${request.contextPath}/images/icons/flags/png/ht.png",
                 "linkAction" : "${request.contextPath}/user/enableLocalizationMode"
             ]
 
         List<Map> menuItems = [
             [
-                "label"      : "${warehouse.message(code:'default.edit.label', default: 'user.profile.label', args: [warehouse.message(code: 'user.profile.label')])}",
+                "label"      : "${g.message(code:'default.edit.label', default: 'user.profile.label', args: [warehouse.message(code: 'user.profile.label')])}",
                 "linkIcon"   : "${request.contextPath}/images/icons/silk/user.png",
-                "linkAction" : "${request.contextPath}/user/edit",
+                "linkAction" : "${request.contextPath}/user/edit/${session?.user?.id}",
             ],
             localizationMode,
             [
-                "label"      : "${warehouse.message(code:'cache.flush.label', default: 'Refresh caches')}",
+                "label"      : "${g.message(code:'cache.flush.label', default: 'Refresh caches')}",
                 "linkIcon"   : "${request.contextPath}/images/icons/silk/database_wrench.png",
                 "linkAction" : "${request.contextPath}/dashboard/flushCache",
             ],
             [
-                "label"      : "${warehouse.message(code:'default.logout.label')}",
+                "label"      : "${g.message(code:'default.logout.label')}",
                 "linkIcon"   : "${request.contextPath}/images/icons/silk/door.png",
                 "linkAction" : "${request.contextPath}/auth/logout",
             ]

@@ -39,7 +39,7 @@ class UserActionMenu extends Component {
         >
           {this.props.menuItems.map(item => (
             <li key={item.label}>
-              <a href={`${item.linkAction}/${this.props.currentUser.id}`}> <img alt={item.label} src={item.linkIcon} />{item.label}
+              <a href={item.linkAction}> <img alt={item.label} src={item.linkIcon} />{item.label}
               </a>
             </li>))}
         </ul>
@@ -69,7 +69,6 @@ UserActionMenu.propTypes = {
   }).isRequired).isRequired,
   // Current user
   currentUser: PropTypes.shape({
-    id: PropTypes.string.isRequired,
     username: PropTypes.string.isRequired,
   }).isRequired,
   // Boolean to show modal or not
