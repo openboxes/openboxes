@@ -1604,6 +1604,19 @@ class InventoryService implements ApplicationContextAware {
 
     }
 
+    // findOrCreateInventoryItem with option to reassign expiration date for existing records
+    InventoryItem findOrCreateInventoryItemDuringImport(Product product, String lotNumber, Date expirationDate) {
+        def inventoryItem = findInventoryItemByProductAndLotNumber(product, lotNumber)
+        if (!inventoryItem) {
+            inventoryItem = new InventoryItem()
+            inventoryItem.lotNumber = lotNumber
+            inventoryItem.product = product
+        }
+        inventoryItem.expirationDate = expirationDate
+
+        return inventoryItem.save(flush: true)
+    }
+
     /**
      * Get all inventory items for a given product within the given inventory.
      *
@@ -2632,18 +2645,6 @@ class InventoryService implements ApplicationContextAware {
                 command.errors.reject("error.product.notExists", "Row ${rowIndex}: Product '${row.productCode}' does not exist")
                 command.warnings[index] << "Product '${row.productCode}' does not exist"
             } else {
-                def manufacturerCode = row.manufacturerCode
-                if (manufacturerCode instanceof Double) {
-                    command.warnings[index] << "Manufacturer code '${manufacturerCode}' must be a string"
-                    manufacturerCode = manufacturerCode.toInteger().toString()
-                }
-                if (row.manufacturer && product.manufacturer && row.manufacturer != product.manufacturer) {
-                    command.warnings[index] << "Manufacturer [${row.manufacturer}] is not the same as in the database [${product.manufacturer}]"
-                }
-
-                if (row.manufacturerCode && product.manufacturerCode && row.manufacturerCode != product.manufacturerCode) {
-                    command.warnings[index] << "Manufacturer code [${row.manufacturerCode}] is not the same as in the database [${product.manufacturerCode}]"
-                }
                 def lotNumber = row.lotNumber
                 if (lotNumber instanceof Double) {
                     command.warnings[index] << "Lot number '${lotNumber}' must be a string"
@@ -2659,7 +2660,7 @@ class InventoryService implements ApplicationContextAware {
 
                 Location location = getCurrentLocation()
                 def binLocation = Location.findByParentLocationAndName(location, row.binLocation)
-                if (!binLocation) {
+                if (!binLocation && row.binLocation) {
                     command.errors.reject("error.product.notExists", "Row ${rowIndex}: Bin location '${row.binLocation.trim()}' does not exist in this depot")
                     command.warnings[index] << "Bin location '${row.binLocation.trim()}' does not exist in this depot"
                 }
@@ -2704,15 +2705,9 @@ class InventoryService implements ApplicationContextAware {
 
             }
 
-            if (!row.quantity) {
-                command.errors.reject("error.quantity.negative", "Row ${rowIndex}: Quantity for product '${row.productCode}' cannot be blank")
-            }
-
             if (row.quantity && (row.quantity as int) < 0) {
                 command.errors.reject("error.quantity.negative", "Row ${rowIndex}: Product '${row.productCode}' must have positive quantity")
             }
-
-
         }
     }
 
@@ -2738,6 +2733,10 @@ class InventoryService implements ApplicationContextAware {
         def calendar = Calendar.getInstance()
         command.data.eachWithIndex { row, index ->
             println "${index}: ${row}"
+            // ignore a line if physical qoh is empty
+            if (!row.quantity) {
+                return
+            }
             def transactionEntry = new TransactionEntry()
             transactionEntry.quantity = row.quantity.toInteger()
             transactionEntry.comments = row.comments
@@ -2771,7 +2770,7 @@ class InventoryService implements ApplicationContextAware {
             }
 
             // Find or create an inventory item
-            def inventoryItem = findOrCreateInventoryItem(product, lotNumber, expirationDate)
+            def inventoryItem = findOrCreateInventoryItemDuringImport(product, lotNumber, expirationDate)
             println "Inventory item: " + inventoryItem.id + " " + inventoryItem.dateCreated + " " + inventoryItem.lastUpdated
             transactionEntry.inventoryItem = inventoryItem
 

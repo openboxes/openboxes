@@ -18,21 +18,20 @@ class InventoryExcelImporter extends AbstractExcelImporter {
 
     def inventoryService
 
-    static Map cellMap = [sheet: 'Sheet1', startRow: 1, cellMap: []]
+    static Map cellMap = [sheet: 'Template', startRow: 1, cellMap: []]
 
     static Map columnMap = [
-            sheet    : 'Sheet1',
+            sheet    : 'Template',
             startRow : 1,
             columnMap: [
                     'A': 'productCode',
                     'B': 'product',
                     'C': 'lotNumber',
                     'D': 'expirationDate',
-                    'E': 'manufacturer',
-                    'F': 'manufacturerCode',
-                    'G': 'quantity',
-                    'H': 'binLocation',
-                    'I': 'comments'
+                    'E': 'binLocation',
+                    'F': 'quantityOnHand',  // OB QoH
+                    'G': 'quantity', // Physical QoH
+                    'H': 'comments'
             ]
     ]
 
@@ -41,10 +40,9 @@ class InventoryExcelImporter extends AbstractExcelImporter {
             product         : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
             lotNumber       : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
             expirationDate  : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            manufacturer    : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            manufacturerCode: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            quantity        : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
             binLocation     : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            quantityOnHand  : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            quantity        : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
             comments        : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null])
     ]
 
