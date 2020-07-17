@@ -202,7 +202,7 @@ class BatchController {
 
 
                 if (command?.data?.isEmpty()) {
-                    command.errors.reject("importFile", "${warehouse.message(code: 'inventoryItem.pleaseEnsureDate.message', args: [localFile.getAbsolutePath()])}")
+                    command.errors.reject("importFile", "${warehouse.message(code: 'inventoryItem.pleaseEnsureDate.message', args: [dataImporter.columnMap?.sheet?:'Sheet1', localFile.getAbsolutePath()])}")
                 }
 
                 if (command.type == 'inventory' && !command.date) {
