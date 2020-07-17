@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { showModal } from '../../actions';
+import { showLocationChooser } from '../../actions';
 
 class Breadcrumbs extends Component {
   constructor(props) {
@@ -13,7 +13,7 @@ class Breadcrumbs extends Component {
   }
 
   openModal() {
-    this.props.showModal();
+    this.props.showLocationChooser();
   }
 
   render() {
@@ -58,10 +58,10 @@ const mapStateToProps = state => ({
   currentLocationName: state.session.currentLocation.name,
 });
 
-export default connect(mapStateToProps, { showModal })(Breadcrumbs);
+export default connect(mapStateToProps, { showLocationChooser })(Breadcrumbs);
 
 Breadcrumbs.propTypes = {
   currentLocationName: PropTypes.string.isRequired,
   // Function called to show the location chooser modal
-  showModal: PropTypes.func.isRequired,
+  showLocationChooser: PropTypes.func.isRequired,
 };
