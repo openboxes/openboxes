@@ -21,6 +21,10 @@ class UrlMappings {
             action = "delete"
         }
 
+        "/stockMovement/$action/$id**?" {
+            controller = "stockMovement"
+        }
+
         "/$controller/$action?/$id?" {
             constraints {
                 // apply constraints here

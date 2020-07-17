@@ -278,18 +278,21 @@ class StockMovementController {
                     flash.message = "Unable to delete stock movement with ID ${params.id}: " + e.message
                 }
             } else {
-                flash.message = "You cannot delete this shipment"
+                flash.message = "You cannot delete a shipment with status ${stockMovement?.shipment?.currentStatus}"
             }
         }
         else {
-            flash.error = "You are not able to delete stock movement from your location."
+            flash.message = "You are not able to delete stock movement from your location."
             if (params.show) {
                 redirect(action: "show", id: params.id)
                 return
             }
         }
+        // We need to set the correct parameter so stock movement list is displayed properly
+        params.direction = (currentLocation == stockMovement.origin) ? StockMovementType.INBOUND :
+                (currentLocation == stockMovement.destination) ? StockMovementType.OUTBOUND : "ALL"
 
-        redirect(action: "list")
+        redirect(action: "list", params:params)
     }
 
     def requisition = {
