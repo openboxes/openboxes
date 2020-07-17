@@ -89,7 +89,7 @@ class ApiController {
 
         List<Map> menuItems = [
             [
-                "label"      : "${g.message(code:'default.edit.label', default: 'user.profile.label', args: [warehouse.message(code: 'user.profile.label')])}",
+                "label"      : "${g.message(code:'default.edit.label', default: 'user.profile.label', args: [g.message(code: 'user.profile.label')])}",
                 "linkIcon"   : "${request.contextPath}/images/icons/silk/user.png",
                 "linkAction" : "${request.contextPath}/user/edit/${session?.user?.id}",
             ],
