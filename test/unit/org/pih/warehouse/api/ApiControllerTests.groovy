@@ -16,6 +16,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.User
+import org.springframework.context.support.ReloadableResourceBundleMessageSource
 
 class ApiControllerTests extends ControllerUnitTestCase {
 
@@ -105,9 +106,11 @@ class ApiControllerTests extends ControllerUnitTestCase {
                 isSuperuser: { User user -> return false },
                 isUserAdmin: { User user -> return true }
         ]
-
         controller.localizationService = [
                 getCurrentLocale: { -> return localeEn }
+        ]
+        controller.messageSource = [
+                getMessage: { String code, Object[] args, String defaultMessage, Locale locale -> return "localized string" }
         ]
         controller.session.user = user
         controller.session.warehouse = location
