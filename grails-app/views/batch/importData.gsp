@@ -81,15 +81,10 @@
                                 <g:each var="row" in="${commandInstance?.data}" status="status">
                                     <tr class="${status%2?'even':'odd' }">
                                         <g:each var="column" in="${commandInstance?.columnMap?.columnMap }">
-                                            <td>${row[column.value] }</td>
-                                        </g:each>
-                                        <g:each var="prompt" in="${row?.prompts }">
-                                            <td class="center">
-                                                <select name="${prompt.key }">
-                                                    <g:each var="value" in="${prompt.value }">
-                                                        <option value="${value.id }">${value.name }</option>
-                                                    </g:each>
-                                                </select>
+                                            <td style="color: ${(row.isNewItem && column.value == 'lotNumber') ||
+                                                    (row.isNewExpirationDate && column.value == 'expirationDate') ? 'red;': 'black;'};
+                                                    background-color: ${!row.quantity && column.value == 'quantity' ? '#ffcccb;': ''}">
+                                                ${row[column.value] }
                                             </td>
                                         </g:each>
                                     </tr>
