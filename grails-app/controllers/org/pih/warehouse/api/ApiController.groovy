@@ -98,7 +98,7 @@ class ApiController {
                         [messageSource.getMessage('user.profile.label', emptyArgs, 'Profile', locale)] as Object[],
                         'Enable translation mode', locale),
                 "linkIcon"   : "${request.contextPath}/images/icons/silk/user.png",
-                "linkAction" : "${request.contextPath}/user/edit",
+                "linkAction" : "${request.contextPath}/user/edit/${session?.user?.id}",
             ],
             localizationMode,
             [
