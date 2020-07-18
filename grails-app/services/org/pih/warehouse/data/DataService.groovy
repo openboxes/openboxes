@@ -156,13 +156,11 @@ class DataService {
      * @return
      */
     def importInventoryLevel(location, row, index) {
-        println "Import inventory levels " + location + " row " + row + " index " + index
-        Product.withNewSession {
+        log.info "Import inventory levels " + location + " row " + row + " index " + index
+        def product = findProduct(row)
 
-            def product = findProduct(row)
-
-            // Modify product attributes (name, manufacturer, manufacturerCode, vendor, vendorCode, unitOfMeasure, etc)
-            updateProduct(product, row)
+        // Modify product attributes (name, manufacturer, manufacturerCode, vendor, vendorCode, unitOfMeasure, etc)
+        updateProduct(product, row)
 
             // Create inventory level for current location, include bin location
             if (location.inventory) {
@@ -181,21 +179,18 @@ class DataService {
                 addInventoryLevelToProduct(product, location.inventory, preferredBinLocation, row)
             }
 
-            // Create product package if UOM and quantity are provided
-            if (row.packageUom && row.packageSize) {
-                addProductPackageToProduct(product, row.packageUom, row.packageSize, row.pricePerPackage)
-            }
-
-            // Save product
-            product.save()
-
-            // Clean up session after 50 products
-            if (index % 50 == 0) {
-                cleanUpGorm()
-            }
-
+        // Create product package if UOM and quantity are provided
+        if (row.packageUom && row.packageSize) {
+            addProductPackageToProduct(product, row.packageUom, row.packageSize, row.pricePerPackage)
         }
 
+        // Save product
+        product.save()
+
+        // Clean up session after 50 products
+        if (index % 50 == 0) {
+            cleanUpGorm()
+        }
     }
 
     /**
