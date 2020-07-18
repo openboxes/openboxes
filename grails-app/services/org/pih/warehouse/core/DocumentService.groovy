@@ -425,7 +425,7 @@ class DocumentService {
 
         // Bold font
         Font boldFont = workbook.createFont()
-        boldFont.setBoldweight(Font.BOLDWEIGHT_BOLD)
+        boldFont.setBold(true)
 
         // Bold cell style
         CellStyle labelStyle = workbook.createCellStyle()
@@ -1016,7 +1016,7 @@ class DocumentService {
 
             // Bold font
             Font boldFont = workbook.createFont()
-            boldFont.setBoldweight(Font.BOLDWEIGHT_BOLD)
+            boldFont.setBold(true)
 
             // Bold cell style
             CellStyle labelStyle = workbook.createCellStyle()
@@ -1341,7 +1341,7 @@ class DocumentService {
 
             // Bold font
             Font boldFont = workbook.createFont()
-            boldFont.setBoldweight(Font.BOLDWEIGHT_BOLD)
+            boldFont.setBold(true)
 
             // Bold cell style
             CellStyle labelStyle = workbook.createCellStyle()
