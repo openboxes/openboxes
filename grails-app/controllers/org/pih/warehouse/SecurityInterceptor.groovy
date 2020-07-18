@@ -35,7 +35,7 @@ class SecurityInterceptor {
         AuthService.currentLocation.set(null)
     }
     boolean before() {
-        log.info "Security check [" + request.requestURI + "]"
+        log.debug "Security check [" + request.requestURI + "]"
 
         // Set the current user (if there's on in the session)
         if (session.user) {
