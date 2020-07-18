@@ -145,7 +145,6 @@ class JsonController {
             }
             json = [aaData: requisitionItems]
         }
-        log.info(json as JSON)
         render json as JSON
     }
 
