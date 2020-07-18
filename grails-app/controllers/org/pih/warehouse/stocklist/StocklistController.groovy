@@ -10,6 +10,7 @@
 package org.pih.warehouse.stocklist
 
 import grails.gorm.transactions.Transactional
+import grails.util.Holders
 import org.pih.warehouse.api.Stocklist
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.core.Location
@@ -47,15 +48,13 @@ class StocklistController {
 
     def generateCsv() {
         Stocklist stocklist = stocklistService.getStocklist(params.id)
-
-        render ""
-
         def filename = "Stocklist - " + stocklist?.requisition?.name + ".xls"
-
         response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
         response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-
         documentService.generateStocklistCsv(response.outputStream, stocklist)
+        response.outputStream.flush()
+        response.outputStream.close()
+        return
     }
 
     def sendMail() {
@@ -69,8 +68,13 @@ class StocklistController {
             redirect(controller: "requisitionTemplate", action: "sendMail", params: [id: params.id])
         } else {
             def emailBody = params.body + "\n\n" + "Sent by " + session.user.name
-            stocklistService.sendMail(params.id, params.subject, emailBody, [params.recipients], params.includePdf == "on", params.includeXls == "on")
-            flash.message = "${warehouse.message(code: 'email.sent.message')}"
+            if (Holders.config.grails.mail.enabled) {
+                stocklistService.sendMail(params.id, params.subject, emailBody, [params.recipients], params.includePdf == "on", params.includeXls == "on")
+                flash.message = "${warehouse.message(code: 'email.sent.message')}"
+            }
+            else {
+                flash.message = "${warehouse.message(code: 'email.disabled.message')}"
+            }
             redirect(controller: "requisitionTemplate", action: "show", params: [id: params.id])
         }
     }
