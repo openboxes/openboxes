@@ -15,7 +15,7 @@ class AccessLogInterceptor {
     }
 
     boolean before() {
-        log.info("${request.requestURI}: user:${session?.user?.username}, location:${session?.warehouse?.name}]")
+        log.debug("${request.requestURI} [user:${session?.user?.username}, location:${session?.warehouse?.name}]")
         return true;
     }
 }
