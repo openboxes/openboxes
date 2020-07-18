@@ -454,9 +454,11 @@
             }
         </style>
         <g:set var="currentYear" value="${new Date()[Calendar.YEAR]}"/>
-		<g:set var="minimumYear" value="${grailsApplication.config.openboxes.expirationDate.minValue[Calendar.YEAR]}"/>
+		<g:set var="minimumYear" value="${new Date(grailsApplication.config.openboxes.expirationDate.minValue)[Calendar.YEAR]}"/>
         <g:datePicker name="recordInventoryRows[{{= getIndex()}}].expirationDate"
-                      default="none" noSelection="['': '']" years="${minimumYear..currentYear + 20}"
+                      default="none"
+					  noSelection="['': '']"
+					  years="${currentYear + 20..minimumYear}"
                       precision="day"/>
 
     </td>
