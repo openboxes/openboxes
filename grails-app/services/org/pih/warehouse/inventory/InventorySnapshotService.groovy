@@ -678,7 +678,7 @@ class InventorySnapshotService {
                 'in'("transactionCode", transactionCodes)
             }
             transactionDateKey {
-                between("date", startDate, endDate+1)
+                between("date", startDate, endDate)
             }
             locationKey {
                 eq("locationId", location.id)

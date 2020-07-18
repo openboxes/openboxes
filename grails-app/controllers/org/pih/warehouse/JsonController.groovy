@@ -1461,7 +1461,7 @@ class JsonController {
 
         if (params.format == "text/csv") {
             String csv = dataService.generateCsv(data)
-            response.setHeader("Content-disposition", "attachment; filename=\"Transaction-Report-${startDate.format("yyyyMMdd")}-${endDate.format("yyyyMMdd")}.csv\"")
+            response.setHeader("Content-disposition", "attachment; filename=\"Transaction-Report-${startDate.format("yyyyMMdd")}-${(endDate - 1).format("yyyyMMdd")}.csv\"")
             render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
             return
         }
