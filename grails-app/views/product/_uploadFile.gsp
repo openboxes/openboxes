@@ -1,7 +1,7 @@
 <div id="upload-form" class="box">
 	<g:uploadForm controller="product" action="importAsCsv">
 		<input name="location.id" type="hidden" value="${session.warehouse.id }"/>
-		<input name="type" type="hidden" value="product"/>
+		<input name="importType" type="hidden" value="product"/>
 		<table>
 			<tbody>
 				<tr >
