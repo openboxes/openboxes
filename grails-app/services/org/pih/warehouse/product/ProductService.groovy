@@ -683,6 +683,8 @@ class ProductService {
             log.info "Import product code = " + productProperties.productCode + ", name = " + productProperties.name
             // Update existing
             def product = Product.findByIdOrProductCode(productProperties.id, productProperties.productCode)
+            def productTags = productProperties.remove("tags")
+
             if (product) {
                 product.properties = productProperties
             }
@@ -696,7 +698,7 @@ class ProductService {
             }
 
             addTagsToProduct(product, tags)
-            addTagsToProduct(product, productProperties.tags)
+            addTagsToProduct(product, productTags)
 
             if (!product.save(flush: true)) {
                 throw new ValidationException("Could not save product '" + product.name + "'", product.errors)

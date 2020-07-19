@@ -35,9 +35,9 @@
                     <div class="box">
                         <div id="upload-form" class="dialog">
                             <h2><g:message code="product.import.upload.label" default="Upload data file"/></h2>
-                            <g:uploadForm controller="product" action="uploadCsv" fragment="verify-data-tab">
+                            <g:uploadForm name="uploadCsv" controller="product" action="uploadCsv" fragment="verify-data-tab">
                                 <input name="location.id" type="hidden" value="${session.warehouse.id }"/>
-                                <input name="type" type="hidden" value="product"/>
+                                <input name="importType" type="hidden" value="product"/>
                                 <table>
                                     <tbody>
                                         <tr class="prop">
@@ -196,7 +196,7 @@
 
 
                         <g:if test="${command?.products && !productsHaveBeenImported}">
-                            <g:form controller="product" action="importCsv" method="POST">
+                            <g:form name="importCsv" controller="product" action="importCsv" method="POST">
 
                                 <input name="location.id" type="hidden" value="${session.warehouse.id }"/>
                                 <input name="type" type="hidden" value="product"/>
@@ -313,6 +313,9 @@
                     var selected = $(".tabs").tabs("option", "selected");
                     console.log(selected);
                     $(".tabs").tabs("option", "selected", selected + 1);
+                    if(selected==2) {
+                      $("#importCsv").submit();
+                    }
                 });
                 $(".prev").click(function() {
                     var selected = $(".tabs").tabs("option", "selected");
