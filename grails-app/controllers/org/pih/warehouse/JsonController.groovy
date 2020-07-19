@@ -124,7 +124,6 @@ class JsonController {
                 }
             }
         }
-        log.info(json as JSON)
         render json as JSON
     }
 
