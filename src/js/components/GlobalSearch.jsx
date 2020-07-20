@@ -44,7 +44,7 @@ class GlobalSearch extends Component {
           }}
           onInputChange={this.onInputChange}
           onEnterPress={() => {
-            window.location = `/dashboard/globalSearch?searchTerms=${this.state.inputValue}`;
+            window.location = `/openboxes/dashboard/globalSearch?searchTerms=${this.state.inputValue}`;
           }}
           optionRenderer={option => <strong style={{ color: option.color ? option.color : 'black' }}>{option.label}</strong>}
         />
