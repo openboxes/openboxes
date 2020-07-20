@@ -660,7 +660,7 @@
     });
 
     $(".use-default").change(function () {
-      if ($(this).is(':unchecked')) {
+      if ($(this).is(':not(:checked)')) {
         $("#supported-activities").prop("disabled", false).trigger("chosen:updated");
       } else {
         $("#supported-activities").prop("disabled", true).trigger("chosen:updated");
