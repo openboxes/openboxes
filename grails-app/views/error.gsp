@@ -109,7 +109,7 @@
                             </td>
                         </tr>
 
-                        <g:hiddenField name="stacktrace" value="${org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(exception)}"/>
+%{--                        <g:hiddenField name="stacktrace" value="${org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(exception)}"/>--}%
 
                         <tr class="prop">
                             <td class="name"></td>
