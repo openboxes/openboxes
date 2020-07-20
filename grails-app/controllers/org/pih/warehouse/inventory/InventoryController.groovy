@@ -1627,6 +1627,7 @@ class QuantityOnHandReportCommand implements Validateable {
                 validator: { value, obj -> !obj.endDate || value.before(obj.endDate) })
         endDate(nullable: false)
         frequency(nullable: false, blank: false)
+        tag(nullable: true)
     }
 }
 
