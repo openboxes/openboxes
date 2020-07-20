@@ -18,8 +18,8 @@ class Header extends Component {
   }
 
   componentDidUpdate(previousProps) {
-    if (previousProps.getLogo !== this.props.getLogo) {
-      this.setState({ logoUrl: this.props.getLogo });
+    if (previousProps.logoUrl !== this.props.logoUrl) {
+      this.setState({ logoUrl: this.props.logoUrl });
     }
   }
 
@@ -74,7 +74,7 @@ class Header extends Component {
 const mapStateToProps = state => ({
   username: state.session.user.username,
   isImpersonated: state.session.isImpersonated,
-  getLogo: state.session.getLogo,
+  logoUrl: state.session.logoUrl,
   logoLabel: state.session.logoLabel,
 });
 
@@ -86,7 +86,7 @@ Header.propTypes = {
   /** Indicator if active user is impersonated */
   isImpersonated: PropTypes.bool.isRequired,
   /** Id of the current location */
-  getLogo: PropTypes.string.isRequired,
+  logoUrl: PropTypes.string.isRequired,
   /** Id of the current location */
   logoLabel: PropTypes.string.isRequired,
 };
