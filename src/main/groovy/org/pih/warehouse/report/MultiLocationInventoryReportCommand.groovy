@@ -15,7 +15,7 @@ import org.pih.warehouse.product.Product
 
 class MultiLocationInventoryReportCommand implements Validateable {
 
-    Location[] locations
+    List<Location> locations = []
 
     Map<Product, Map<Location, Integer>> entries = [:]
 
