@@ -49,6 +49,8 @@
 
     <ga:trackPageview />
     <r:layoutResources/>
+
+    <script src="https://use.fontawesome.com/releases/v5.14.0/js/all.js" data-auto-replace-svg="nest"></script>
 </head>
 <body class="yui-skin-sam">
 
