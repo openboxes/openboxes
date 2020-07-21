@@ -23,6 +23,11 @@
 			</g:hasErrors>
 
             <g:if test="${commandInstance?.data}">
+                <g:if test="${commandInstance?.data?.any { !it.quantity || it.quantity == 0 }}">
+                    <div class="message">
+                        <warehouse:message code="import.blankQuantities.label" />
+                    </div>
+                </g:if>
 
                 <g:form controller="batch" action="importData" method="POST">
                     <input name="location.id" type="hidden" value="${session.warehouse.id }"/>
