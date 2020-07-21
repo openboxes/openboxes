@@ -1,4 +1,3 @@
-/* eslint-disable react/no-did-update-set-state */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -9,20 +8,6 @@ import UserActionMenu from '../user/UserActionMenu';
 
 
 class Header extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      logoUrl: '',
-    };
-  }
-
-  componentDidUpdate(previousProps) {
-    if (previousProps.logoUrl !== this.props.logoUrl) {
-      this.setState({ logoUrl: this.props.logoUrl });
-    }
-  }
-
   logoutImpersonatedUser() {
     const url = '/openboxes/api/logout';
 
@@ -54,8 +39,8 @@ class Header extends Component {
               href="/openboxes"
               className="navbar-brand brand-name"
             >
-              { this.state.logoUrl !== '' ?
-                <img alt="Openboxes" src={this.state.logoUrl} onError={(e) => { e.target.onerror = null; e.target.src = 'https://openboxes.com/img/logo_30.png'; }} /> : null
+              { this.props.logoUrl !== '' ?
+                <img alt="Openboxes" src={this.props.logoUrl} onError={(e) => { e.target.onerror = null; e.target.src = 'https://openboxes.com/img/logo_30.png'; }} /> : null
             }
             </a>
             { this.props.logoLabel.trim() !== '' ? <span>{this.props.logoLabel} </span> : null }
