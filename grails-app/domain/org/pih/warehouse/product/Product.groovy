@@ -12,6 +12,7 @@ package org.pih.warehouse.product
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.NotImplementedException
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.Inventory
@@ -584,6 +585,16 @@ class Product implements Comparable, Serializable {
         return this.productCatalogs?.find { it.color }?.color
     }
 
+    def getHandlingIcons() {
+        def g = ApplicationHolder.application.mainContext.getBean( 'org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib' )
+        def handlingIcons = []
+        if (this.coldChain) handlingIcons.add([icon: "fa-snowflake", color: "#3bafda", label: "${g.message(code: 'product.coldChain.label')}"])
+        if (this.controlledSubstance) handlingIcons.add([icon: "fa-exclamation-circle", color: "#db1919", label: "${g.message(code: 'product.controlledSubstance.label')}"])
+        if (this.hazardousMaterial) handlingIcons.add([icon: "fa-exclamation-triangle", color: "#ffa500", label: "${g.message(code: 'product.hazardousMaterial.label')}"])
+        if (this.reconditioned) handlingIcons.add([icon: "fa-prescription-bottle", label: "${g.message(code: 'product.reconditioned.label')}"])
+        return handlingIcons
+    }
+
     Map toJson() {
         [
                 id         : id,
@@ -595,7 +606,8 @@ class Product implements Comparable, Serializable {
                 pricePerUnit: pricePerUnit,
                 dateCreated: dateCreated,
                 lastUpdated: lastUpdated,
-                color: color
+                color: color,
+                handlingIcons: getHandlingIcons()
         ]
     }
 }
