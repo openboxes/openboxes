@@ -23,6 +23,7 @@ import { showSpinner, hideSpinner, fetchUsers } from '../../../actions';
 import apiClient from '../../../utils/apiClient';
 import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
 import { debounceProductsFetch } from '../../../utils/option-utils';
+import renderHandlingIcons from '../../../utils/product-handling-icons';
 
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
@@ -111,7 +112,18 @@ const VENDOR_FIELDS = {
           cache: false,
           options: [],
           showValueTooltip: true,
-          optionRenderer: option => <strong style={{ color: option.color ? option.color : 'black' }}>{option.label}</strong>,
+          optionRenderer: option => (
+            <strong style={{ color: option.color ? option.color : 'black' }} className="d-flex align-items-center">
+              {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
+              &nbsp;
+              {option.label}
+            </strong>
+          ),
+          valueRenderer: option => (
+            <span className="d-flex align-items-center">
+              {renderHandlingIcons(option ? option.handlingIcons : [])}&nbsp;{option.label}
+            </span>
+          ),
         },
         getDynamicAttr: ({
           debouncedProductsFetch, updateRow, rowIndex, values,

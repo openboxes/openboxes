@@ -96,6 +96,7 @@ export const debounceProductsFetch = (waitTime, minSearchLength, locationId) =>
                   name: obj.name,
                   productCode: obj.productCode,
                   label: `${obj.productCode} - ${obj.name}`,
+                  handlingIcons: obj.handlingIcons,
                 },
                 label: `${obj.productCode} - ${obj.name}`,
                 color: obj.color,
