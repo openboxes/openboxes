@@ -18,6 +18,10 @@
         #category_id_chosen {
             width: 100% !important;
         }
+        .handling-icon-2x > i > svg {
+            height: 2em !important;
+            width: auto !important;
+        }
         </style>
 
     </head>

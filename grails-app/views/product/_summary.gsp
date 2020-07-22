@@ -17,13 +17,10 @@
                     </g:else>
                 </td>
 
-				<g:if test="${productInstance?.coldChain }">
-					<td style="width: 1%;" class="top">
-						<img src="${resource(dir: 'images/icons', file: 'coldchain.gif')}"
-							 alt="" title="${warehouse.message(code:'product.coldChain.message') }" class="middle"/>
-					</td>
-				</g:if>
-				<td class="top">
+				<td style="width: 1%; white-space: nowrap;" class="middle handling-icon-2x">
+					<g:renderHandlingIcons product="${productInstance}" />
+				</td>
+				<td class="middle">
 
 					<div id="product-header" style="float: left;">
 			            <div id="product-title" class="title">
