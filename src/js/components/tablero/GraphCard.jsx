@@ -1,14 +1,93 @@
 /* eslint-disable no-underscore-dangle */
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { Component } from 'react';
 import { Bar, Doughnut, HorizontalBar, Line } from 'react-chartjs-2';
 import { SortableElement } from 'react-sortable-hoc';
+import { connect } from 'react-redux';
 import DragHandle from './DragHandle';
 import LoadingCard from './LoadingCard';
 import Numbers from './Numbers';
 import NumbersTableCard from './NumbersTableCard';
 import TableCard from './TableCard';
 import NumbersRAG from './NumbersRAG';
+
+
+class FilterComponent extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      timeFrame: this.props.timeFrame,
+      locationSelected: '',
+    };
+  }
+
+  handleChange = (element, cardId, loadIndicator) => {
+    const dropdown = element.target;
+    let params = '';
+    const timeFrameSelector = document.getElementById('timeFrameSelector');
+    const locationSelector = document.getElementById('locationSelector');
+
+    const timeFrame = timeFrameSelector !== null ? timeFrameSelector.value : null;
+    const location = locationSelector !== null ? locationSelector.value : null;
+
+    if (dropdown.id === 'locationSelector') {
+      params = timeFrame !== null ? `querySize=${timeFrame}&` : params;
+      params = `${params}destinationLocation=${dropdown.value}`;
+      const locationSelected = this.props.allLocations.find(value => value.id === dropdown.value);
+      this.setState({ locationSelected });
+    }
+    if (element.target.id === 'timeFrameSelector') {
+      params = `querySize=${dropdown.value}`;
+      params = location !== null ? `${params}&destinationLocation=${location}` : params;
+      this.setState({ timeFrame: dropdown.value });
+    }
+
+    if (params !== '') {
+      loadIndicator(cardId, params);
+    }
+
+    dropdown.size = 1;
+  };
+
+  render() {
+    return (
+      <div className="data-filter">
+        { this.props.locationFilter === true ?
+          <select
+            className="location-filter custom-select"
+            size="1"
+            onFocus={(e) => { e.target.size = 3; }}
+            onBlur={(e) => { e.target.size = 1; }}
+            onChange={e => this.handleChange(e, this.props.cardId, this.props.loadIndicator)}
+            disabled={!this.props.locationFilter}
+            value={this.state.locationSelected.id}
+            id="locationSelector"
+          >
+            { this.props.allLocations.map(value =>
+              <option key={value.id} value={value.id}> {value.name}</option>)}
+          </select>
+ : null }
+        { this.props.timeFilter === true ?
+          <select
+            className="time-filter custom-select"
+            onChange={e => this.handleChange(e, this.props.cardId, this.props.loadIndicator)}
+            disabled={!this.props.timeFilter}
+            defaultValue={this.state.timeFrame}
+            id="timeFrameSelector"
+          >
+            <option value="1">{this.props.label} Month</option>
+            <option value="3">{this.props.label} 3 Months</option>
+            <option value="6">{this.props.label} 6 Months</option>
+            <option value="12">{this.props.label} Year</option>
+            { this.props.timeLimit === 24 ? <option value="24">{this.props.label} 2 Years</option> : null }
+          </select> : null
+        }
+
+      </div>
+    );
+  }
+}
 
 const handleChartClick = (elements) => {
   const link = elements[0]._chart.data.datasets[0].links[elements[0]._index];
@@ -19,8 +98,23 @@ const handleChartClick = (elements) => {
 };
 
 const GraphCard = SortableElement(({
-  cardId, cardTitle, cardType, cardLink, data, options, loadIndicator, filter,
+  cardId,
+  cardTitle,
+  cardType,
+  cardLink,
+  data,
+  options,
+  loadIndicator,
+  timeFilter = false,
+  timeLimit = 24,
+  locationFilter = false,
+  allLocations = this.props.allLocations,
 }) => {
+  let timeFrame = 6;
+  if (data !== null) {
+    timeFrame = data.labels ? data.labels.length : 6;
+  }
+
   let graph;
   let label = 'Last';
   if (cardType === 'line') {
@@ -69,20 +163,18 @@ const GraphCard = SortableElement(({
         <DragHandle />
       </div>
       <div className="content-card">
-        <div className={filter ? 'data-filter' : 'data-filter disabled'}>
-          <select
-            className="custom-select"
-            onChange={e => loadIndicator(cardId, `querySize=${e.target.value}`)}
-            disabled={!filter}
-            defaultValue={data.labels ? data.labels.length : '6'}
-          >
-            <option value="1">{label} Month</option>
-            <option value="3">{label} 3 Months</option>
-            <option value="6">{label} 6 Months</option>
-            <option value="12">{label} Year</option>
-            <option value="24">{label} 2 Years</option>
-          </select>
-        </div>
+
+        <FilterComponent
+          cardId={cardId}
+          loadIndicator={loadIndicator}
+          allLocations={allLocations}
+          locationFilter={locationFilter}
+          timeLimit={timeLimit}
+          timeFilter={timeFilter}
+          timeFrame={timeFrame}
+          label={label}
+          data={data.length === 0 ? null : data}
+        />
         <div className="graph-container">
           {graph}
         </div>
@@ -91,9 +183,38 @@ const GraphCard = SortableElement(({
   );
 });
 
-export default GraphCard;
+const mapStateToProps = state => ({
+  allLocations: state.session.allLocations,
+});
+
+export default connect(mapStateToProps)(GraphCard);
 
 GraphCard.propTypes = {
   cardTitle: PropTypes.string,
   cardType: PropTypes.string.isRequired,
+  allLocations: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string,
+  })).isRequired,
+  timeLimit: PropTypes.number,
+  loadIndicator: PropTypes.func.isRequired,
+};
+
+FilterComponent.defaultProps = {
+  timeFilter: false,
+  locationFilter: false,
+};
+
+FilterComponent.propTypes = {
+  allLocations: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string,
+  })).isRequired,
+  locationFilter: PropTypes.bool,
+  timeFilter: PropTypes.bool,
+  timeLimit: PropTypes.number.isRequired,
+  timeFrame: PropTypes.number.isRequired,
+  label: PropTypes.string.isRequired,
+  cardId: PropTypes.number.isRequired,
+  loadIndicator: PropTypes.func.isRequired,
 };

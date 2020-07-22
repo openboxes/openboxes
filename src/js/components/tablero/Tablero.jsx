@@ -38,7 +38,9 @@ const SortableCards = SortableContainer(({ data, loadIndicator }) => (
           cardType={value.type}
           cardLink={value.link}
           data={value.data}
-          filter={value.filter}
+          timeFilter={value.timeFilter}
+          timeLimit={value.timeLimit}
+          locationFilter={value.locationFilter}
           options={value.options}
           loadIndicator={loadIndicator}
         />

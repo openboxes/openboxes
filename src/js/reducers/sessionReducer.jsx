@@ -58,6 +58,7 @@ const initialState = {
   isOpen: false,
   pageSize: 50,
   logoUrl: '',
+  allLocations: [],
 };
 
 export default function (state = initialState, action) {
@@ -88,6 +89,7 @@ export default function (state = initialState, action) {
         highestRole: _.get(action, 'payload.data.data.highestRole'),
         pageSize: _.get(action, 'payload.data.data.pageSize'),
         logoUrl: _.get(action, 'payload.data.data.logoUrl'),
+        allLocations: _.get(action, 'payload.data.data.allLocations'),
       };
     case FETCH_MENU_CONFIG:
       return {

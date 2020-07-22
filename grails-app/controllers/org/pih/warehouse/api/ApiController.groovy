@@ -26,6 +26,7 @@ class ApiController {
     def dataSource
     def userService
     def localizationService
+    def locationService
     def megamenuService
     def grailsApplication
     def messageSource
@@ -116,6 +117,7 @@ class ApiController {
         User user = User.get(session?.user?.id)
         Location location = Location.get(session.warehouse?.id)
         String highestRole = user.getHighestRole(location)
+        def allLocations = locationService.getAllLocations()
         boolean isSuperuser = userService.isSuperuser(session?.user)
         boolean isUserAdmin = userService.isUserAdmin(session?.user)
         def supportedActivities = location.supportedActivities ?: location.locationType.supportedActivities
@@ -162,6 +164,7 @@ class ApiController {
                         highestRole          : highestRole,
                         pageSize             : pageSize,
                         logoUrl              : logoUrl,
+                        allLocations         : allLocations,
                 ],
         ] as JSON)
     }

@@ -84,8 +84,10 @@ class ApitableroController {
 
     @Cacheable("dashboardCache")
     def getFillRate = {
-        def fillRate = indicatorDataService.getFillRate()
-        render(fillRate.toJson() as JSON)
+        Location location = Location.get(params.locationId)
+        Location destination = Location.get(params.destinationLocation)
+        def fillRate = indicatorDataService.getFillRate(location, destination, params)
+        render(fillRate.toJson() as JSON) 
     }
 
     @Cacheable("dashboardCache")

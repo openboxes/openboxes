@@ -301,8 +301,14 @@
       text-align: right;
       position: relative;
 
-      &.disabled {
-        display: none;
+      @media (max-width: 380px) {
+        .time-filter {
+          width: 45% !important;
+        }
+
+        .location-filter {
+          width: 55% !important;
+        }
       }
 
       .custom-select {
