@@ -2,6 +2,7 @@ package org.pih.warehouse.inventory
 
 import grails.converters.JSON
 import grails.test.ControllerUnitTestCase
+import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.forecasting.ForecastingService
 import org.pih.warehouse.product.Product
@@ -9,6 +10,9 @@ import org.pih.warehouse.product.Product
 class InventoryItemControllerTests extends ControllerUnitTestCase {
 
     void test_showRecordInventory() {
+
+        def productMock = mockFor(Product)
+        productMock.demand.static.getApplicationTagLib() { -> [:] }
 
         def inventory = new Inventory(id: "inventory1")
         def myLocation = new Location(id: "1234", inventory: inventory)
