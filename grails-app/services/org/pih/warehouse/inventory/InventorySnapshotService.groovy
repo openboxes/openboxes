@@ -49,7 +49,7 @@ class InventorySnapshotService {
         // Uses GPars to improve performance
         GParsPool.withPool {
             def depotLocations = locationService.getDepots()
-            results = depotLocations.collectParallel { Location loc ->
+            depotLocations.eachParallel { Location loc ->
                 def binLocations
                 def innerStartTime = System.currentTimeMillis()
                 persistenceInterceptor.init()
@@ -69,18 +69,10 @@ class InventorySnapshotService {
                 log.info "Read ${binLocations?.size()} inventory snapshots for location ${location} on date ${date.format("MMM-dd-yyyy")} in ${readTime}ms"
                 persistenceInterceptor.flush()
                 persistenceInterceptor.destroy()
-                return [binLocations: binLocations, location: location, date: date]
+                saveInventorySnapshots(date, location, binLocations)
             }
         }
-        log.info("Total read time: " + (System.currentTimeMillis() - startTime) + "ms")
-
-        // Write all inventory snapshots to the database synchronously
-        // Does not use GPars in order to avoid lock wait timeouts
-        startTime = System.currentTimeMillis()
-        for (result in results) {
-            saveInventorySnapshots(result.date, result.location, result.binLocations)
-        }
-        log.info("Total write time: " + (System.currentTimeMillis() - startTime) + "ms")
+        log.info("Total time: " + (System.currentTimeMillis() - startTime) + "ms")
     }
 
     def populateInventorySnapshots(Location location) {
@@ -193,14 +185,13 @@ class InventorySnapshotService {
         def startTime = System.currentTimeMillis()
         def batchSize = ConfigurationHolder.config.openboxes.inventorySnapshot.batchSize ?: 1000
         Sql sql = new Sql(dataSource)
-
-
         try {
             // Clear time in case caller did not
             date.clearTime()
             String dateString = date.format("yyyy-MM-dd HH:mm:ss")
             DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
+            sql.execute("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;")
             // Execute inventory snapshot insert/update in batches
             sql.withBatch(batchSize) { BatchingStatementWrapper stmt ->
                 binLocations.eachWithIndex { Map binLocationEntry, index ->
