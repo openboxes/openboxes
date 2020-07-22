@@ -120,39 +120,40 @@ class IndicatorDataService {
 
             def averageFillRate = dataService.executeQuery("""
             select avg(fr.fill_rate) FROM openboxes.fill_rate as fr
-            where fr.transaction_date <= :monthEnd and fr.transaction_date > :monthBegin and fr.destination = :destination and fr.origin = :origin
+            where fr.transaction_date <= :monthEnd and fr.transaction_date > :monthBegin and fr.destination_id = :destination and fr.origin_id = :origin
             GROUP BY MONTH(fr.transaction_date), YEAR(fr.transaction_date)
             """, [
                 'monthEnd'    : monthEnd,
                 'monthBegin'  : monthBegin,
-                'destination' : destination.toString(),
-                'origin'      : location.toString(),
+                'destination' : destination.id,
+                'origin'      : location.id,
             ]);
 
             averageFillRate[0] == null ? averageFillRateResult.push(0) : averageFillRateResult.push(averageFillRate[0][0])
             
             def requestLinesSubmitted = dataService.executeQuery("""
             select count(fr.id) FROM openboxes.fill_rate as fr
-            where fr.transaction_date <= :monthEnd and fr.transaction_date > :monthBegin and fr.destination = :destination and fr.origin = :origin
+            where fr.transaction_date <= :monthEnd and fr.transaction_date > :monthBegin and fr.destination_id = :destination and fr.origin_id = :origin
             GROUP BY MONTH(fr.transaction_date), YEAR(fr.transaction_date)
             """, [
                 'monthEnd'    : monthEnd,
                 'monthBegin'  : monthBegin,
-                'destination' : destination.toString(),
-                'origin'      : location.toString(),   
+                'destination' : destination.id,
+                'origin'      : location.id,   
             ]);
 
             requestLinesSubmitted[0] == null ? requestLinesSubmittedResult.push(0) : requestLinesSubmittedResult.push(requestLinesSubmitted[0][0])
-
+println(destination.id)
+println(location.id)
             def linesCancelledStockout = dataService.executeQuery("""
             select count(fr.id) FROM openboxes.fill_rate as fr
-            where fr.transaction_date <= :monthEnd and fr.transaction_date > :monthBegin and fr.destination = :destination and fr.origin = :origin and fr.fill_rate = 0
+            where fr.transaction_date <= :monthEnd and fr.transaction_date > :monthBegin and fr.destination_id = :destination and fr.origin_id = :origin and fr.fill_rate = 0
             GROUP BY MONTH(fr.transaction_date), YEAR(fr.transaction_date)
             """, [
                 'monthEnd'    : monthEnd,
                 'monthBegin'  : monthBegin,
-                'destination' : destination.toString(),
-                'origin'      : location.toString(),   
+                'destination' : destination.id,
+                'origin'      : location.id,   
             ]);
 
             linesCancelledStockout[0] == null ? linesCancelledStockoutResult.push(0) : linesCancelledStockoutResult.push(linesCancelledStockout[0][0])
@@ -164,7 +165,6 @@ class IndicatorDataService {
         // Loading the config of the legend
         Map legendConfig = [
             'pointStyle' : 'circle',
-            'radius'     : 3,
         ]
 
         List<IndicatorDatasets> datasets = [
