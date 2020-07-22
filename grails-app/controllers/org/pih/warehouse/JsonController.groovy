@@ -71,6 +71,25 @@ class JsonController {
     def translationService
     def orderService
 
+    def calculateBinLocations = {
+        Location location = Location.get(session.warehouse.id)
+        def results = inventorySnapshotService.calculateBinLocations(location)
+        render results as JSON
+    }
+
+    def binLocationDetails = {
+        Location location = Location.get(session.warehouse.id)
+        def results = inventoryService.getBinLocationDetails(location)
+        render ([results: results.size()] as JSON)
+    }
+
+    def getTransactionEntriesByLocation = {
+        Location location = Location.get(session.warehouse.id)
+        def results = inventoryService.getTransactionEntriesByLocation(location)
+        render ([results: results.size()] as JSON)
+    }
+
+
     def evaluateIndicator = {
         def indicator = Indicator.get(params.id)
         if (indicator) {

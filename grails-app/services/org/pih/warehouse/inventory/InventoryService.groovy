@@ -13,6 +13,7 @@ import grails.orm.PagedResultList
 import grails.validation.ValidationException
 import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringUtils
+import org.hibernate.FetchMode
 import org.hibernate.criterion.CriteriaSpecification
 import org.joda.time.LocalDate
 import org.pih.warehouse.api.AvailableItem
@@ -656,7 +657,7 @@ class InventoryService implements ApplicationContextAware {
      * @param entries
      * @return
      */
-    Map getQuantityByProductAndInventoryItemMap(List<TransactionEntry> entries, Boolean useBinLocation) {
+    Map getQuantityByProductAndInventoryItemMap(List<Map> entries, Boolean useBinLocation) {
         def startTime = System.currentTimeMillis()
         def quantityMap = [:]
 
@@ -677,10 +678,10 @@ class InventoryService implements ApplicationContextAware {
                 // There are cases where the transaction entry might be null, so we need to check for this edge case
                 if (transactionEntry) {
 
-                    def inventoryItem = transactionEntry.inventoryItem
-                    def product = inventoryItem.product
-                    def transaction = transactionEntry.transaction
-                    def binLocation = transactionEntry.binLocation
+                    def inventoryItem = transactionEntry.inventoryItemId
+                    def product = transactionEntry.productId
+                    def binLocation = transactionEntry.binLocationId
+                    def transaction = transactionEntry.transactionId
 
                     // first see if this is an entry we can skip (because we've already reached a product inventory transaction
                     // for this product, or a inventory transaction for this inventory item)
@@ -710,7 +711,7 @@ class InventoryService implements ApplicationContextAware {
                         }
 
                         // now update quantity as necessary
-                        def transactionCode = transactionEntry.transaction.transactionType.transactionCode
+                        def transactionCode = transactionEntry.transactionCode
                         if (transactionCode == TransactionCode.CREDIT) {
                             if (useBinLocation) {
                                 quantityMap[product][inventoryItem][binLocation] += transactionEntry.quantity
@@ -747,7 +748,7 @@ class InventoryService implements ApplicationContextAware {
                 }
             }
         }
-        log.debug "  * Get quantity by product and inventory item map: " + (System.currentTimeMillis() - startTime) + " ms"
+        log.info "  * Get quantity by product and inventory item map: " + (System.currentTimeMillis() - startTime) + " ms"
 
         return quantityMap
     }
@@ -907,19 +908,19 @@ class InventoryService implements ApplicationContextAware {
 
         // first get the quantity and inventory item map
         Map quantityBinLocationMap = getQuantityByProductAndInventoryItemMap(entries, true)
-        quantityBinLocationMap.keySet().each { Product product ->
+        quantityBinLocationMap.keySet().each { String product ->
             quantityBinLocationMap[product].keySet().each { inventoryItem ->
                 quantityBinLocationMap[product][inventoryItem].keySet().each { binLocation ->
                     def quantity = quantityBinLocationMap[product][inventoryItem][binLocation]
-                    def value = "Bin: " + binLocation?.name + ", Lot: " + (inventoryItem?.lotNumber ?: "") + ", Qty: " + quantity
+                    def value = "" //"""Bin: " + binLocation?.name + ", Lot: " + (inventoryItem?.lotNumber ?: "") + ", Qty: " + quantity
 
                     // Exclude bin locations with quantity 0 (include negative quantity for data quality purposes)
                     if (quantity != 0 || includeOutOfStock) {
                         binLocations << [
                                 id           : binLocation?.id,
-                                status       : status(quantity),
+                                status       : "", //status(quantity),
                                 value        : value,
-                                category     : product.category,
+                                category     : "", //product.category,
                                 product      : product,
                                 inventoryItem: inventoryItem,
                                 binLocation  : binLocation,
@@ -931,9 +932,9 @@ class InventoryService implements ApplicationContextAware {
         }
 
         // Sort by expiration date, then bin location
-        binLocations = binLocations.sort { a, b ->
-            a?.inventoryItem?.expirationDate <=> b?.inventoryItem?.expirationDate ?: a?.binLocation?.name <=> b.binLocation?.name
-        }
+        //binLocations = binLocations.sort { a, b ->
+        //    a?.inventoryItem?.expirationDate <=> b?.inventoryItem?.expirationDate ?: a?.binLocation?.name <=> b.binLocation?.name
+        //}
 
         return binLocations
     }
@@ -1684,6 +1685,8 @@ class InventoryService implements ApplicationContextAware {
     List getTransactionEntriesByInventoryAndProduct(Inventory inventory, List<Product> products) {
         def criteria = TransactionEntry.createCriteria()
         def transactionEntries = criteria.list {
+            createAlias("transaction.outboundTransfer", "outboundTransfer", CriteriaSpecification.LEFT_JOIN)
+            createAlias("transaction.inboundTransfer", "inboundTransfer", CriteriaSpecification.LEFT_JOIN)
             transaction {
                 eq("inventory", inventory)
                 order("transactionDate", "asc")
@@ -3197,24 +3200,39 @@ class InventoryService implements ApplicationContextAware {
     }
 
     List getTransactionEntriesByLocation(Location location) {
-        def startTime = System.currentTimeMillis()
 
         if (!location?.inventory) {
             throw new RuntimeException("Location must have an inventory")
         }
 
-        def transactions = Transaction.createCriteria().list {
-            // eager fetch transaction and transaction type
-            fetchMode("transactionType", org.hibernate.FetchMode.JOIN)
-            fetchMode("inboundTransfer", org.hibernate.FetchMode.JOIN)
-            fetchMode("outboundTransfer", org.hibernate.FetchMode.JOIN)
+        def transactionEntries = TransactionEntry.createCriteria().list {
+            resultTransformer CriteriaSpecification.ALIAS_TO_ENTITY_MAP
 
-            eq("inventory", location.inventory)
-            order("transactionDate", "asc")
-            order("dateCreated", "asc")
+            projections {
+                property "id", "id"
+                property "quantity", "quantity"
+                inventoryItem {
+                    property "id", "inventoryItemId"
+                    product {
+                        property "id", "productId"
+                    }
+                }
+                transaction {
+                    property "id", "transactionId"
+                    transactionType {
+                        property "transactionCode", "transactionCode"
+                    }
+                }
+            }
+
+            transaction {
+                eq("inventory", location.inventory)
+                order("transactionDate", "asc")
+                order("dateCreated", "asc")
+            }
         }
 
-        return transactions*.transactionEntries.flatten()
+        return transactionEntries
     }
 
     List<AvailableItem> getAvailableBinLocations(Location location, Product product) {
