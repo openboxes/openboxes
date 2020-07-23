@@ -24,12 +24,9 @@ class FilterComponent extends Component {
   handleChange = (element, cardId, loadIndicator) => {
     const dropdown = element.target;
     let params = '';
-    const timeFrameSelector = document.getElementById('timeFrameSelector');
-    const locationSelector = document.getElementById('locationSelector');
 
-    const timeFrame = timeFrameSelector !== null ? timeFrameSelector.value : null;
-    const location = locationSelector !== null ? locationSelector.value : null;
-
+    const timeFrame = this.state.timeFrame || null;
+    const location = this.state.locationSelected || null;
     if (dropdown.id === 'locationSelector') {
       params = timeFrame !== null ? `querySize=${timeFrame}&` : params;
       params = `${params}destinationLocation=${dropdown.value}`;
@@ -38,7 +35,7 @@ class FilterComponent extends Component {
     }
     if (element.target.id === 'timeFrameSelector') {
       params = `querySize=${dropdown.value}`;
-      params = location !== null ? `${params}&destinationLocation=${location}` : params;
+      params = location !== null ? `${params}&destinationLocation=${location.id}` : params;
       this.setState({ timeFrame: dropdown.value });
     }
 

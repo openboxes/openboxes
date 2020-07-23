@@ -143,6 +143,7 @@ function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', ma
           id: 'right-y-axis',
           ticks: {
             precision: 0,
+            max: 100,
             callback(value) {
               return `${value.toFixed(0)} %`; // convert it to percentage
             },
