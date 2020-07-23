@@ -153,7 +153,7 @@ class Tablero extends Component {
     if (this.props.dashboardConfig && this.props.dashboardConfig.endpoints) {
       this.props.fetchIndicators(this.props.dashboardConfig, config, this.props.currentLocation);
     } else {
-      this.props.fetchConfigAndData(this.props.currentLocation, this.config);
+      this.props.fetchConfigAndData(this.props.currentLocation, config);
     }
   }
 
