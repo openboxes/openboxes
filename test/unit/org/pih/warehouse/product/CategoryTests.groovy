@@ -90,8 +90,8 @@ class CategoryTests extends GrailsUnitTestCase {
         assertEquals 2, category.categories.size()
 
         println category.getChildren()
-        def expected = [category2, category3,category4,category5,category6,category7,category8].reverse()
-        assertEquals expected, category.getChildren()
+        def expected = [category2, category3,category4,category5,category6,category7,category8].sort()
+        assertEquals expected, category.getChildren().sort()
     }
 
     @Test

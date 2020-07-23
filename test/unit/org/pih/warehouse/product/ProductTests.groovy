@@ -18,9 +18,12 @@ import org.pih.warehouse.inventory.InventoryItem
 
 class ProductTests extends GrailsUnitTestCase {
 
-
     protected void setUp() {
         super.setUp()
+
+        def productMock = mockFor(Product)
+        productMock.demand.static.getApplicationTagLib() { -> [:] }
+
         Product product1 = new Product(id: "prod1", name: "product1")
         Product product2 = new Product(id: "prod2", name: "product2")
         Product product3 = new Product(id: "prod3", name: "product3")

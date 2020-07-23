@@ -167,7 +167,6 @@
                                                 <td align="center">
                                                     <g:link action="edit" id="${productInstance.id}">
                                                         <format:product product="${productInstance}"/>
-                                                        <g:renderHandlingIcons product="${productInstance}" />
                                                     </g:link>
                                                 </td>
                                                 <td align="center">
