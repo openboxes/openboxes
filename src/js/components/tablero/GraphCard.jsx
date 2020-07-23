@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { Bar, Doughnut, HorizontalBar, Line } from 'react-chartjs-2';
 import { SortableElement } from 'react-sortable-hoc';
-import { connect } from 'react-redux';
 import DragHandle from './DragHandle';
 import LoadingCard from './LoadingCard';
 import Numbers from './Numbers';
@@ -17,7 +16,7 @@ class FilterComponent extends Component {
     super(props);
 
     this.state = {
-      timeFrame: this.props.timeFrame,
+      timeFrame: 6,
       locationSelected: '',
     };
   }
@@ -108,13 +107,8 @@ const GraphCard = SortableElement(({
   timeFilter = false,
   timeLimit = 24,
   locationFilter = false,
-  allLocations = this.props.allLocations,
+  allLocations,
 }) => {
-  let timeFrame = 6;
-  if (data !== null) {
-    timeFrame = data.labels ? data.labels.length : 6;
-  }
-
   let graph;
   let label = 'Last';
   if (cardType === 'line') {
@@ -167,13 +161,12 @@ const GraphCard = SortableElement(({
         <FilterComponent
           cardId={cardId}
           loadIndicator={loadIndicator}
-          allLocations={allLocations}
           locationFilter={locationFilter}
           timeLimit={timeLimit}
           timeFilter={timeFilter}
-          timeFrame={timeFrame}
           label={label}
           data={data.length === 0 ? null : data}
+          allLocations={allLocations}
         />
         <div className="graph-container">
           {graph}
@@ -183,19 +176,10 @@ const GraphCard = SortableElement(({
   );
 });
 
-const mapStateToProps = state => ({
-  allLocations: state.session.allLocations,
-});
-
-export default connect(mapStateToProps)(GraphCard);
-
+export default GraphCard;
 GraphCard.propTypes = {
   cardTitle: PropTypes.string,
   cardType: PropTypes.string.isRequired,
-  allLocations: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string,
-  })).isRequired,
   timeLimit: PropTypes.number,
   loadIndicator: PropTypes.func.isRequired,
 };
@@ -206,15 +190,11 @@ FilterComponent.defaultProps = {
 };
 
 FilterComponent.propTypes = {
-  allLocations: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string,
-  })).isRequired,
   locationFilter: PropTypes.bool,
   timeFilter: PropTypes.bool,
   timeLimit: PropTypes.number.isRequired,
-  timeFrame: PropTypes.number.isRequired,
   label: PropTypes.string.isRequired,
   cardId: PropTypes.number.isRequired,
   loadIndicator: PropTypes.func.isRequired,
+  allLocations: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
 };

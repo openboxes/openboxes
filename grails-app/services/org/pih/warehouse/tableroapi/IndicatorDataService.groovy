@@ -143,8 +143,7 @@ class IndicatorDataService {
             ]);
 
             requestLinesSubmitted[0] == null ? requestLinesSubmittedResult.push(0) : requestLinesSubmittedResult.push(requestLinesSubmitted[0][0])
-println(destination.id)
-println(location.id)
+
             def linesCancelledStockout = dataService.executeQuery("""
             select count(fr.id) FROM openboxes.fill_rate as fr
             where fr.transaction_date <= :monthEnd and fr.transaction_date > :monthBegin and fr.destination_id = :destination and fr.origin_id = :origin and fr.fill_rate = 0
