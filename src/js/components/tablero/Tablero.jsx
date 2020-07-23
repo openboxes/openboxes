@@ -131,8 +131,7 @@ class Tablero extends Component {
   }
 
   componentDidMount() {
-    const param = sessionStorage.getItem('dashboardKey');
-    this.config = param !== null ? param : this.config;
+    this.config = sessionStorage.getItem('dashboardKey') || this.config;
     if (this.props.currentLocation !== '') {
       this.fetchData(this.config);
     }
