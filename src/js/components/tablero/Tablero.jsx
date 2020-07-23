@@ -150,7 +150,7 @@ class Tablero extends Component {
   dataFetched = false;
 
   fetchLocations() {
-    const url = '/openboxes/api/locations';
+    const url = '/openboxes/apitablero/getFillRateDestinations';
 
     return apiClient.get(url)
       .then((response) => {
