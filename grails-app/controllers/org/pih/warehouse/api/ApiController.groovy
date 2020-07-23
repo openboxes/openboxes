@@ -26,7 +26,6 @@ class ApiController {
     def dataSource
     def userService
     def localizationService
-    def locationService
     def megamenuService
     def grailsApplication
     def messageSource
