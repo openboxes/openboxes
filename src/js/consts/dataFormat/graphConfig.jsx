@@ -103,13 +103,21 @@ function loadDatalabel(context) {
   return '';
 }
 
-function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', maxValue = null, minValue = null, isDoughnut = true) {
+function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', maxValue = null, minValue = null, isDoughnut = false, legend = false, doubleAxeY = false) {
   const options = {
     legend: {
-      display: isDoughnut,
+      display: (isDoughnut || legend)
+      && (window.innerWidth > 1000 || (window.innerWidth < 865 && window.innerWidth > 590)),
       labels: {
         fontSize: 12,
+        usePointStyle: true,
       },
+    },
+    onResize(chart, size) {
+      if (size.width < 500) {
+        chart.options.legend.display = false;
+      } else chart.options.legend.display = legend === true;
+      chart.update();
     },
     scales: {
       xAxes: [{
@@ -121,12 +129,36 @@ function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', ma
           precision: 0,
         },
       }],
-      yAxes: [{
-        ticks: {
-          precision: 0,
+      yAxes: doubleAxeY === true ? [
+        {
+          position: 'left',
+          id: 'left-y-axis',
+          ticks: {
+            precision: 0,
+          },
+          display: !isDoughnut,
         },
-        display: !isDoughnut,
-      }],
+        {
+          position: 'right',
+          id: 'right-y-axis',
+          ticks: {
+            precision: 0,
+            max: 100,
+            callback(value) {
+              return `${value.toFixed(0)} %`; // convert it to percentage
+            },
+          },
+          display: !isDoughnut,
+        },
+      ] : [
+        {
+          position: 'left',
+          ticks: {
+            precision: 0,
+          },
+          display: !isDoughnut,
+        },
+      ],
     },
     plugins: {
       datalabels: {
@@ -222,7 +254,6 @@ function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', ma
       color: '#fff',
     };
   }
-
   return options;
 }
 
@@ -231,7 +262,8 @@ function loadGraphOptions(payload) {
   let maxValue = null;
   let minValue = null;
   const isDoughnut = payload.type === 'doughnut';
-
+  const legend = payload.legend === true;
+  const doubleAxeY = payload.doubleAxeY === true;
   if (payload.config.datalabel) {
     labelAlignment = (payload.type === 'horizontalBar') ? 'horizontal' : 'vertical';
 
@@ -257,6 +289,8 @@ function loadGraphOptions(payload) {
     maxValue,
     minValue,
     isDoughnut,
+    legend,
+    doubleAxeY,
   );
 }
 

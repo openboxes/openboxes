@@ -94,41 +94,118 @@ class IndicatorDataService {
         return graphData
     }
 
-    GraphData getFillRate() {
-        List listData = []
-        List bar2Data = []
+    GraphData getFillRate(Location location, def destination, def params) {
+        Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 7
+
         List listLabel = []
+
+
+        List averageFillRateResult = []
+        List requestLinesSubmittedResult = []
+        List linesCancelledStockoutResult = []
+        List averageTargetFillRate = [0.9]*querySize
+
         Date today = new Date()
         today.clearTime()
-        for (int i = 5; i >= 0; i--) {
+        for (int i = querySize; i >= 0; i--) {
             def monthBegin = today.clone()
             def monthEnd = today.clone()
             monthBegin.set(month: today.month - i, date: 1)
             monthEnd.set(month: today.month - i + 1, date: 1)
 
-            def query1 = Requisition.executeQuery("""select count(*) from RequisitionItem where dateCreated >= ? and dateCreated < ?""", [monthBegin, monthEnd]);
-
-            def query2 = Requisition.executeQuery("""select count(*) from RequisitionItem where dateCreated >= ? and dateCreated < ? and quantityCanceled > 0 and (cancelReasonCode = 'STOCKOUT' or cancelReasonCode = 'LOW_STOCK' or cancelReasonCode = 'COULD_NOT_LOCATE')""", [monthBegin, monthEnd]);
             String monthLabel = new java.text.DateFormatSymbols().months[monthBegin.month]
 
-            listLabel.push(monthLabel)
-            listData.push(query1[0])
-            bar2Data.push(query2[0])
+            listLabel.push("${monthLabel} ${monthBegin.year + 1900}")
+
+            def averageFillRate = dataService.executeQuery("""
+            select avg(fr.fill_rate) FROM fill_rate as fr
+            where fr.transaction_date <= :monthEnd 
+            and fr.transaction_date > :monthBegin 
+            and fr.origin_id = :origin
+            and (fr.destination_id = :destination OR :destination IS NULL)
+            GROUP BY MONTH(fr.transaction_date), YEAR(fr.transaction_date)
+            """, [
+                'monthEnd'    : monthEnd,
+                'monthBegin'  : monthBegin,
+                'destination' : destination?.id,
+                'origin'      : location.id,
+            ]);
+
+            averageFillRate[0] == null ? averageFillRateResult.push(0) : averageFillRateResult.push(averageFillRate[0][0])
+
+            def requestLinesSubmitted = dataService.executeQuery("""
+            select count(fr.id) FROM fill_rate as fr
+            where fr.transaction_date <= :monthEnd 
+            and fr.transaction_date > :monthBegin 
+            and (fr.destination_id = :destination OR :destination IS NULL) 
+            and fr.origin_id = :origin
+            GROUP BY MONTH(fr.transaction_date), YEAR(fr.transaction_date)
+            """, [
+                'monthEnd'    : monthEnd,
+                'monthBegin'  : monthBegin,
+                'destination' : destination?.id,
+                'origin'      : location.id,
+            ]);
+
+            requestLinesSubmitted[0] == null ? requestLinesSubmittedResult.push(0) : requestLinesSubmittedResult.push(requestLinesSubmitted[0][0])
+
+            def linesCancelledStockout = dataService.executeQuery("""
+            select count(fr.id) FROM fill_rate as fr
+            where fr.transaction_date <= :monthEnd and fr.transaction_date > :monthBegin 
+            and (fr.destination_id = :destination OR :destination IS NULL)
+            and fr.origin_id = :origin 
+            and fr.fill_rate = 0
+            GROUP BY MONTH(fr.transaction_date), YEAR(fr.transaction_date)
+            """, [
+                'monthEnd'    : monthEnd,
+                'monthBegin'  : monthBegin,
+                'destination' : destination?.id,
+                'origin'      : location.id,
+            ]);
+
+            linesCancelledStockout[0] == null ? linesCancelledStockoutResult.push(0) : linesCancelledStockoutResult.push(linesCancelledStockout[0][0])
         }
 
+            averageFillRateResult = averageFillRateResult.collect{ it * 100 }
+            averageTargetFillRate = averageTargetFillRate.collect{ it * 100 }
+
+        // Loading the config of the legend
+        Map legendConfig = [
+            'pointStyle' : 'circle',
+        ]
+
         List<IndicatorDatasets> datasets = [
-                new IndicatorDatasets('Line1 Dataset', listData, null, 'line'),
-                new IndicatorDatasets('Line2 Dataset', [15, 15, 15, 15, 15, 15], null, 'line'),
-                new IndicatorDatasets('Bar1 Dataset', listData),
-                new IndicatorDatasets('Bar2 Dataset', bar2Data),
+                new IndicatorDatasets('Request lines submitted', requestLinesSubmittedResult, null, 'bar', 'left-y-axis', legendConfig),
+                new IndicatorDatasets('Lines cancelled stock out', linesCancelledStockoutResult, null, 'bar', 'left-y-axis', legendConfig),
+                new IndicatorDatasets('Average Fill Rate', averageFillRateResult, null, 'line', 'right-y-axis', legendConfig),
+                new IndicatorDatasets('Average of target Fill Rate', averageTargetFillRate, null, 'line', 'right-y-axis', legendConfig),
         ];
 
         IndicatorData indicatorData = new IndicatorData(datasets, listLabel);
 
-        GraphData graphData = new GraphData(indicatorData, "Fill rate", "bar");
+        GraphData graphData = new GraphData(indicatorData, "Fill Rate Last 12 Months", "bar");
 
         return graphData;
     }
+
+    List getFillRateDestinations(Location origin) {
+        def destinations = dataService.executeQuery("""
+            select 
+                distinct(destination_id) as id, 
+                case when length(location.name) > 30 
+                    then concat(substring(location.name, 1, 30), '...')
+                    else location.name 
+                end as name
+            FROM fill_rate as fr
+            JOIN location on location.id = fr.destination_id
+            where fr.origin_id = :origin 
+            """, [
+                'origin': origin.id,
+        ]);
+
+        return destinations
+    }
+
 
     GraphData getInventorySummaryData(def location) {
         def inventorySummary = dashboardService.getDashboardAlerts(location);
@@ -497,7 +574,7 @@ class IndicatorDataService {
                     """
                 )
             }
-            
+
             percentage = productInStock[0] == 0 ? 0 : Math.round(inventoriedProducts[0][0] / productInStock[0] * 100)
             ColorNumber colorNumber = new ColorNumber(percentage, subtitle)
             colorNumber.setConditionalColors(listErrorSuccessIntervals.get(it)[0], listErrorSuccessIntervals.get(it)[1])
@@ -628,7 +705,7 @@ class IndicatorDataService {
             if (RequisitionType.listRequestTypes().contains(it[1])) {
                 listLabels.push(it[1].toString())
                 listData.push(it[0])
-            }     
+            }
         }
 
         List<IndicatorDatasets> datasets = [
@@ -638,7 +715,7 @@ class IndicatorDataService {
         IndicatorData indicatorData = new IndicatorData(datasets, listLabels)
 
         GraphData graphData = new GraphData(indicatorData, 'Stock vs ad-hoc requests last month', 'doughnut', '/openboxes/stockMovement/list?direction=OUTBOUND')
-       
+
         return graphData;
     }
 

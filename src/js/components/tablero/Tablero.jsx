@@ -26,7 +26,7 @@ defaults.scale.ticks.beginAtZero = true;
 
 
 // eslint-disable-next-line no-shadow
-const SortableCards = SortableContainer(({ data, loadIndicator }) => (
+const SortableCards = SortableContainer(({ data, loadIndicator, allLocations }) => (
   <div className="card-component">
     {data.map((value, index) =>
       (value.archived || !value.enabled ? null : (
@@ -38,9 +38,12 @@ const SortableCards = SortableContainer(({ data, loadIndicator }) => (
           cardType={value.type}
           cardLink={value.link}
           data={value.data}
-          filter={value.filter}
+          timeFilter={value.timeFilter}
+          timeLimit={value.timeLimit}
+          locationFilter={value.locationFilter}
           options={value.options}
           loadIndicator={loadIndicator}
+          allLocations={allLocations}
         />
       )))}
   </div>
@@ -126,7 +129,9 @@ class Tablero extends Component {
       showPopout: false,
       showNav: false,
       configModified: false,
+      allLocations: [],
     };
+    this.fetchLocations();
   }
 
   componentDidMount() {
@@ -143,6 +148,18 @@ class Tablero extends Component {
     }
   }
   dataFetched = false;
+
+  fetchLocations() {
+    const url = '/openboxes/apitablero/getFillRateDestinations';
+
+    return apiClient.get(url)
+      .then((response) => {
+        this.setState({
+          allLocations: response.data.data
+            .sort((a, b) => a.id.localeCompare(b.id)),
+        });
+      });
+  }
 
   fetchData = (config = 'personal') => {
     this.props.resetIndicators();
@@ -284,6 +301,7 @@ class Tablero extends Component {
         <div className="cards-container">
           {numberCards}
           <SortableCards
+            allLocations={this.state.allLocations}
             data={this.props.indicatorsData.filter(indicator => indicator)}
             onSortStart={this.sortStartHandle}
             onSortEnd={this.sortEndHandleGraph}
