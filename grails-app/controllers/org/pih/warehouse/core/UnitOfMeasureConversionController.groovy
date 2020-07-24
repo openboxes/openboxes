@@ -11,27 +11,27 @@ package org.pih.warehouse.core
 
 class UnitOfMeasureConversionController {
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [unitOfMeasureConversions: UnitOfMeasureConversion.list(params), unitOfMeasureConversionsTotal: UnitOfMeasureConversion.count()]
     }
 
-    def create = {
+    def create() {
         def unitOfMeasureConversion = new UnitOfMeasureConversion()
         unitOfMeasureConversion.properties = params
         return [unitOfMeasureConversion: unitOfMeasureConversion]
     }
 
-    def edit = {
+    def edit() {
         def unitOfMeasureConversion = UnitOfMeasureConversion.get(params.id)
         return [unitOfMeasureConversion: unitOfMeasureConversion]
     }
 
-    def save = {
+    def save() {
         def unitOfMeasureConversion = new UnitOfMeasureConversion(params)
         if (!unitOfMeasureConversion.hasErrors() && unitOfMeasureConversion.save(flush: true)) {
             def messageArgs = [warehouse.message(code: 'unitOfMeasureConversion.label', default: 'Unit of Measure conversion'), unitOfMeasureConversion.id]
@@ -42,7 +42,7 @@ class UnitOfMeasureConversionController {
         }
     }
 
-    def update = {
+    def update() {
         def unitOfMeasureConversion = UnitOfMeasureConversion.get(params.id)
         def messageArgs = [warehouse.message(code: 'unitOfMeasureConversion.label', default: 'Unit of Measure conversion'), params.id]
         if (unitOfMeasureConversion) {
@@ -59,7 +59,7 @@ class UnitOfMeasureConversionController {
         }
     }
 
-    def delete = {
+    def delete() {
         def unitOfMeasureConversion = UnitOfMeasureConversion.get(params.id)
         def messageArgs = [warehouse.message(code: 'unitOfMeasureConversion.label', default: 'Unit of Measure conversion'), params.id]
         if (unitOfMeasureConversion) {
