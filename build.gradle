@@ -165,9 +165,6 @@ dependencies {
         // excludes "poi-contrib", "poi-scratchpad"
     compile 'org.grails.plugins:external-config:1.4.0'
     runtime "org.grails.plugins:external-config-reload:1.4.1" // was 1.4.0
-
-    //compile "org.grails.plugins:quartz2:2.1.6.2" // this is latest, Grails version: 1.3.7 > *
-
     compile "org.grails.plugins:csv:1.0.1" // this is latest Grails version: 1.2 > *
 
     // Can probably be removed after migration
@@ -196,6 +193,9 @@ dependencies {
     // new plugins
     compile("org.grails.plugins:sentry:11.7.24")
     compile ('org.grails.plugins:quartz:2.0.13')
+    compile 'org.grails.plugins:quartz-monitor:1.3'
+    //compile "org.grails.plugins:quartz2:2.1.6.2" // this is latest, Grails version: 1.3.7 > *
+
 
     // Replacement for grails remote taglib
     compile ('org.grails.plugins:ajax-tags:1.0.0')

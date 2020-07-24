@@ -54,6 +54,11 @@ quartz:
     pluginEnabled: true
     jdbcStore: false
     autoStartup: false
+    monitor:
+        layout: custom
+        showTriggerNames: true
+        showCountdown: true
+        showTickingCloud: true
 
 # Spring Actuator Endpoints are Disabled by Default
 endpoints:
