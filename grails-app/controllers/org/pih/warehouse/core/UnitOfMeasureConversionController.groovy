@@ -11,6 +11,6 @@ package org.pih.warehouse.core
 
 class UnitOfMeasureConversionController {
 
-    def scaffold = UnitOfMeasureConversion
+    static scaffold = UnitOfMeasureConversion
 
 }
