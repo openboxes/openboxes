@@ -23,7 +23,7 @@
                     <img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}" />&nbsp;
                     <warehouse:message code="default.list.label" args="[g.message(code:'organizations.label')]"/>
                 </g:link>
-                <g:link class="button" action="create">
+                <g:link class="button" action="create" params="[partyType:'ORG']">
                     <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
                     <warehouse:message code="default.add.label" args="[g.message(code:'organization.label')]"/>
                 </g:link>
