@@ -4,36 +4,39 @@
         <title><g:if env="development">Grails Runtime Exception</g:if><g:else>Error</g:else></title>
         <meta name="layout" content="custom">
         <g:if env="development"><asset:stylesheet src="errors.css"/></g:if>
+        <asset:stylesheet src="main.css"/>
     </head>
     <body>
         <div class="body">
             <div class="button-container button-bar">
+                <g:link controller="dashboard" action="index" onClick="javascript:window.history.go(-1);" class="button">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'reverse_green.png')}" />&nbsp;
+                    <g:message code="default.ignoreError.label"/>&nbsp;
+                </g:link>
                 <button class="open-dialog button">
                     <img src="${resource(dir: 'images/icons/silk', file: 'bug.png')}" />&nbsp;
                     <warehouse:message code="default.reportAsBug.label"/>
                 </button>
-                <g:link controller="dashboard" action="index" onClick="javascript:window.history.go(-1);" class="button">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'decline.png')}" />&nbsp;
-                    <g:message code="default.ignoreError.label"/>&nbsp;
-                </g:link>
             </div>
 
             <div class="yui-ga">
                 <div class="yui-u first">
-                    <g:if test="${Throwable.isInstance(exception)}">
-                        <g:renderException exception="${exception}" />
-                    </g:if>
-                    <g:elseif test="${request.getAttribute('javax.servlet.error.exception')}">
-                        <g:renderException exception="${request.getAttribute('javax.servlet.error.exception')}" />
-                    </g:elseif>
-                    <g:else>
-                        <ul class="errors">
-                            <li>An error has occurred</li>
-                            <li>Exception: ${exception}</li>
-                            <li>Message: ${message}</li>
-                            <li>Path: ${path}</li>
-                        </ul>
-                    </g:else>
+                    <div class="box content">
+                        <g:if test="${Throwable.isInstance(exception)}">
+                            <g:renderException exception="${exception}" />
+                        </g:if>
+                        <g:elseif test="${request.getAttribute('javax.servlet.error.exception')}">
+                            <g:renderException exception="${request.getAttribute('javax.servlet.error.exception')}" />
+                        </g:elseif>
+                        <g:else>
+                            <ul class="errors">
+                                <li>An error has occurred</li>
+                                <li>Exception: ${exception}</li>
+                                <li>Message: ${message}</li>
+                                <li>Path: ${path}</li>
+                            </ul>
+                        </g:else>
+                    </div>
                 </div>
             </div>
         </div>
@@ -108,9 +111,6 @@
                                     placeholder="${warehouse.message(code:'error.details.message')}"></g:textArea>
                             </td>
                         </tr>
-
-%{--                        <g:hiddenField name="stacktrace" value="${org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(exception)}"/>--}%
-
                         <tr class="prop">
                             <td class="name"></td>
                             <td class="value">
