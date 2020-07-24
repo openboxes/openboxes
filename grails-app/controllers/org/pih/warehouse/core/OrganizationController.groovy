@@ -16,9 +16,14 @@ import org.springframework.transaction.TransactionStatus
 class OrganizationController {
 
     def identifierService
-    static scaffold = Organization
 
-    def search = {
+    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+
+    def index() {
+        redirect(action: "list", params: params)
+    }
+
+    def search() {
 
         List roleTypes = params.list("roleType").collect { it as RoleType }
 
@@ -42,7 +47,18 @@ class OrganizationController {
     }
 
 
-    def save = {
+    def list() {
+        params.max = Math.min(params.max ? params.int('max') : 10, 100)
+        [organizationInstanceList: Organization.list(params), organizationInstanceTotal: Organization.count()]
+    }
+
+    def create() {
+        def organizationInstance = new Organization()
+        organizationInstance.properties = params
+        return [organizationInstance: organizationInstance]
+    }
+
+    def save() {
         def organizationInstance = new Organization(params)
 
         if (!organizationInstance.code) {
@@ -58,7 +74,7 @@ class OrganizationController {
         }
     }
 
-    def update = {
+    def update() {
         def organizationInstance = Organization.get(params.id)
         if (organizationInstance) {
             if (params.version) {
@@ -88,7 +104,31 @@ class OrganizationController {
         }
     }
 
-    def delete = {
+
+
+    def show() {
+        def organizationInstance = Organization.get(params.id)
+        if (!organizationInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'organization.label', default: 'Organization'), params.id])}"
+            redirect(action: "list")
+        }
+        else {
+            [organizationInstance: organizationInstance]
+        }
+    }
+
+    def edit() {
+        def organizationInstance = Organization.get(params.id)
+        if (!organizationInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'organization.label', default: 'Organization'), params.id])}"
+            redirect(action: "list")
+        }
+        else {
+            return [organizationInstance: organizationInstance]
+        }
+    }
+
+    def delete() {
         if (Organization.exists(params.id)) {
             try {
                 Organization.withTransaction { TransactionStatus status ->
@@ -110,7 +150,6 @@ class OrganizationController {
             redirect(action: "edit", id: params.id)
         }
     }
-
 
     def resetSequence = {
         IdentifierTypeCode identifierTypeCode = params.identifierTypeCode as IdentifierTypeCode

@@ -12,56 +12,68 @@
             <g:if test="${flash.message}">
 	            <div class="message">${flash.message}</div>
             </g:if>
+
+            <div class="button-bar">
+                <g:link class="button" action="list">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}" />&nbsp;
+                    <warehouse:message code="default.list.label" args="[g.message(code:'organizations.label')]"/>
+                </g:link>
+                <g:link class="button" action="create" params="[partyType:'ORG']">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
+                    <warehouse:message code="default.add.label" args="[g.message(code:'organization.label')]"/>
+                </g:link>
+            </div>
+
             <div class="box">
                 <h2><warehouse:message code="default.show.label" args="[entityName]" /></h2>
                 <table>
                     <tbody>
-                    
+
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="organization.id.label" default="Id" /></td>
-                            
+
                             <td valign="top" class="value">${fieldValue(bean: organizationInstance, field: "id")}</td>
-                            
+
                         </tr>
-                    
+
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="organization.partyType.label" default="Party Type" /></td>
-                            
+
                             <td valign="top" class="value"><g:link controller="partyType" action="show" id="${organizationInstance?.partyType?.id}">${organizationInstance?.partyType?.encodeAsHTML()}</g:link></td>
-                            
+
                         </tr>
-                    
+
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="organization.name.label" default="Name" /></td>
-                            
+
                             <td valign="top" class="value">${fieldValue(bean: organizationInstance, field: "name")}</td>
-                            
+
                         </tr>
-                    
+
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="organization.description.label" default="Description" /></td>
-                            
+
                             <td valign="top" class="value">${fieldValue(bean: organizationInstance, field: "description")}</td>
-                            
+
                         </tr>
-                    
+
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="organization.dateCreated.label" default="Date Created" /></td>
-                            
+
                             <td valign="top" class="value"><format:datetime obj="${organizationInstance?.dateCreated}" /></td>
-                            
+
                         </tr>
-                    
+
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="organization.lastUpdated.label" default="Last Updated" /></td>
-                            
+
                             <td valign="top" class="value"><format:datetime obj="${organizationInstance?.lastUpdated}" /></td>
-                            
+
                         </tr>
-                    
+
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="organization.roles.label" default="Roles" /></td>
-                            
+
                             <td valign="top" style="text-align: left;" class="value">
                                 <ul>
                                 <g:each in="${organizationInstance.roles}" var="r">
@@ -69,13 +81,13 @@
                                 </g:each>
                                 </ul>
                             </td>
-                            
+
                         </tr>
-                    
-                    
+
+
 						<tr class="prop">
                         	<td valign="top"></td>
-                        	<td valign="top">                         
+                        	<td valign="top">
 					            <div class="buttons left">
 					                <g:form>
 					                    <g:hiddenField name="id" value="${organizationInstance?.id}" />
@@ -84,7 +96,7 @@
 					                </g:form>
 					            </div>
 							</td>
-						</tr>                    
+						</tr>
                     </tbody>
                 </table>
             </div>
