@@ -31,6 +31,7 @@ class Organization extends Party {
 
     static mapping = {
         id generator: 'uuid'
+        sequences joinTable: [key: 'sequences']
     }
 
     static constraints = {
