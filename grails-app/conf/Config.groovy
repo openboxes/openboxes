@@ -450,7 +450,6 @@ openboxes {
                     enabled = true
                     endpoint = "/${appName}/apitablero/getInventorySummary"
                     archived = ['inventory', 'transaction']
-                    filter = false
                     datalabel = true
                     order = 1
                     colors {
@@ -465,7 +464,7 @@ openboxes {
                     enabled = true
                     endpoint = "/${appName}/apitablero/getExpirationSummary"
                     archived = ['inventory', 'transaction']
-                    filter = true
+                    timeFilter = true
                     order = 2
                     colors {
                         datasets {
@@ -480,7 +479,6 @@ openboxes {
                     enabled = true
                     endpoint = "/${appName}/apitablero/getIncomingStock"
                     archived = ['inventory', 'transaction']
-                    filter = false
                     order = 3
                     colors {
                         datasets {
@@ -494,7 +492,6 @@ openboxes {
                     enabled = true
                     endpoint = "/${appName}/apitablero/getOutgoingStock"
                     archived = ['inventory', 'transaction']
-                    filter = false
                     order = 4
                     colors {
                         datasets {
@@ -508,7 +505,7 @@ openboxes {
                     enabled = true
                     endpoint = "/${appName}/apitablero/getReceivedStockMovements"
                     archived = ['personal', 'warehouse', 'inventory']
-                    filter = true
+                    timeFilter = true
                     stacked = true
                     datalabel = true
                     order = 7
@@ -517,14 +514,13 @@ openboxes {
                     enabled = true
                     endpoint = "/${appName}/apitablero/getDiscrepancy"
                     archived = ['inventory', 'transaction']
-                    filter = true
+                    timeFilter = true
                     order = 6
                 }
                 delayedShipments {
                     enabled = true
                     endpoint = "/${appName}/apitablero/getDelayedShipments"
                     archived = ['transaction']
-                    filter = false
                     order = 5
                     colors {
                         datasets {
@@ -538,7 +534,7 @@ openboxes {
                     enabled = true
                     endpoint = "/${appName}/apitablero/getSentStockMovements"
                     archived = ['personal', 'warehouse', 'inventory']
-                    filter = true
+                    timeFilter = true
                     stacked = true
                     datalabel = true
                     order = 8
@@ -547,7 +543,7 @@ openboxes {
                     enabled = false
                     endpoint = "/${appName}/apitablero/getLossCausedByExpiry"
                     archived = ['personal', 'warehouse', 'inventory']
-                    filter = true
+                    timeFilter = true
                     stacked = true
                     order = 9
                     colors {
@@ -562,7 +558,6 @@ openboxes {
                     enabled = false
                     endpoint = "/${appName}/apitablero/getProductsInventoried"
                     archived = ['personal', 'warehouse', 'transaction']
-                    filter = false
                     order = 10
                     colors {
                         datasets {
@@ -576,7 +571,7 @@ openboxes {
                     enabled = true
                     endpoint = "/${appName}/apitablero/getPercentageAdHoc"
                     archived = ['personal', 'warehouse', 'inventory']
-                    filter = false
+                    legend = true
                     datalabel = true
                     order = 11
                     colors {
@@ -585,6 +580,26 @@ openboxes {
                             state4 = ["ADHOC"]
                         }
                     }
+                }
+                fillRate {
+                    enabled = true
+                    legend = true
+                    endpoint = "/${appName}/apitablero/getFillRate"
+                    archived = ['personal', 'warehouse', 'inventory']
+                    timeFilter = true
+                    locationFilter = true
+                    timeLimit = 12
+                    doubleAxeY = true
+                    datalabel = false
+                    colors {
+                        datasets {
+                            state3 = ["Request lines submitted"]
+                            state6 = ["Lines cancelled stock out"]
+                            state2 = ["Average Fill Rate"]
+                            state8 = ["Average of target Fill Rate"]
+                        }
+                    }
+                    order = 12
                 }
             }
         }

@@ -11,6 +11,7 @@ class ApitableroController {
     def numberDataService
     def indicatorDataService
     def userService
+    def messageSource
 
     def config = {
         User user = User.get(session.user.id)
@@ -84,8 +85,20 @@ class ApitableroController {
 
     @Cacheable("dashboardCache")
     def getFillRate = {
-        def fillRate = indicatorDataService.getFillRate()
+        Location location = Location.get(params.locationId)
+        Location destination = Location.get(params.destinationLocation)
+        def fillRate = indicatorDataService.getFillRate(location, destination, params)
         render(fillRate.toJson() as JSON)
+    }
+
+    def getFillRateDestinations = {
+        Location location = Location.get(params.locationId?:session.warehouse.id)
+        def destinations = []
+        def defaultDestination = messageSource.getMessage("fillRate.allDestinations.label",
+                [] as Object[], "All Destinations", request.locale)
+        destinations << [id: "", name: "${defaultDestination}"]
+        destinations.addAll(indicatorDataService.getFillRateDestinations(location))
+        render([data: destinations] as JSON)
     }
 
     @Cacheable("dashboardCache")
@@ -157,7 +170,7 @@ class ApitableroController {
         def productsInventoried = indicatorDataService.getProductsInventoried(location)
         render (productsInventoried.toJson() as JSON)
      }
-    
+
     def getPercentageAdHoc = {
         Location location = Location.get(session?.warehouse?.id)
         def percentageAdHoc = indicatorDataService.getPercentageAdHoc(location)

@@ -37,4 +37,7 @@
     <validCheckSum>c9c41a3239c4b5be50dac5cc593e236</validCheckSum>
     <sqlFile path="views/product-snapshot.sql"/>
   </changeSet>
+  <changeSet id="1580848680306-11" author="jmiranda" runAlways="true" failOnError="false">
+    <sqlFile path="views/fill-rate.sql"/>
+  </changeSet>
 </databaseChangeLog>
