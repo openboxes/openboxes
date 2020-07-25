@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="layout" content="custom" />
-    <title><warehouse:message code="users.label" /></title>
+    <title><warehouse:message code="jobs.label" default="Jobs" /></title>
 </head>
 <body>
 <div class="body">
@@ -22,7 +22,7 @@
 
 
             <div class="box dialog">
-                <h2>${jobDetail.name}</h2>
+                <h2>${jobDetail.key}</h2>
                 <table>
                     <g:each in="${jobDetail.properties}" var="property">
                         <tr class="prop">
