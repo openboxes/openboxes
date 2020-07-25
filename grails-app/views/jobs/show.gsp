@@ -21,7 +21,7 @@
     <div class="yui-ga">
         <div class="yui-u first">
             <div class="box dialog">
-                <h2>${jobDetail.name}</h2>
+                <h2>${jobDetail.key}</h2>
                 <table>
                     <g:each in="${jobDetail.properties}" var="property">
                         <tr class="prop">

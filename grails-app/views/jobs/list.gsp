@@ -55,8 +55,8 @@
         </div>
         <div class="yui-u">
 
-            <div class="list box dialog">
-                <h2><warehouse:message code="users.label"/> (${jobKeys.size()} results)</h2>
+            <div class="box dialog">
+                <h2><warehouse:message code="jobs.label" default="Jobs"/> (${jobKeys.size()} results)</h2>
                 <table>
                     <thead>
                     <tr>
@@ -86,9 +86,9 @@
                     </g:unless>
                     </tbody>
                 </table>
-            </div>
-            <div class="paginateButtons">
-                <g:paginate total="${jobKeys}" params="${params}"/>
+                <div class="paginateButtons">
+                    <g:paginate total="${jobKeys}" params="${params}"/>
+                </div>
             </div>
         </div>
     </div>
