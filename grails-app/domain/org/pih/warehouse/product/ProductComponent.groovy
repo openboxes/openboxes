@@ -29,9 +29,9 @@ class ProductComponent {
     }
 
     static constraints = {
+        assemblyProduct(nullable: false)
         componentProduct(nullable: false)
         quantity(nullable: false)
         unitOfMeasure(nullable: false)
-        assemblyProduct(nullable: false)
     }
 }

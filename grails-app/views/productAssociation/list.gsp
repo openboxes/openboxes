@@ -13,7 +13,7 @@
             	<div class="message">${flash.message}</div>
             </g:if>
             <div>
-            
+
 				<div class="button-bar">
                     <g:link class="button" action="list">
                         <img src="${resource(dir: 'images/icons/silk', file: 'application_view_list.png')}" />&nbsp;
@@ -29,14 +29,11 @@
                     </g:link>
 	        	</div>
 
-
                 <div class="yui-gf">
                     <div class="yui-u first">
-
                         <div class="box">
                             <h2><warehouse:message code="filters.label" default="Filters"/></h2>
                             <g:form action="list" method="get">
-
                                 <div class="filters">
                                     <div class="filter-list-item">
                                         <label>${g.message(code:'product.label')}</label>
@@ -67,6 +64,7 @@
                         </div>
                     </div>
                     <div class="yui-u">
+
 
                         <div class="box">
                             <h2><warehouse:message code="default.list.label" args="[entityName]" /></h2>
@@ -124,7 +122,8 @@
                                 </tbody>
                             </table>
                             <div class="paginateButtons">
-                                <g:paginate total="${productAssociationInstanceTotal}" />
+                                <g:set var="pageParams" value="${pageScope.variables['params']}"/>
+                                <g:paginate total="${productAssociationInstanceTotal}" params="${pageParams}" />
                             </div>
                         </div>
 
