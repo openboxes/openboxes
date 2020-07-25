@@ -10,7 +10,6 @@
 package org.pih.warehouse.product
 
 import grails.gorm.transactions.Transactional
-import grails.orm.PagedResultList
 
 @Transactional
 class ProductAssociationController {
@@ -37,7 +36,7 @@ class ProductAssociationController {
             params.remove("offset")
         }
 
-        PagedResultList productAssociations = ProductAssociation.createCriteria().list(params) {
+        def productAssociations = ProductAssociation.createCriteria().list(params) {
             if (selectedTypes) {
                 'in'("code", selectedTypes)
             }
