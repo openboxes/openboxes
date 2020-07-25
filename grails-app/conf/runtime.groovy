@@ -1,3 +1,4 @@
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.IdentifierGeneratorTypeCode
 import org.pih.warehouse.core.RoleType
@@ -38,14 +39,14 @@ openboxes {
         }
         analytics {
             enabled = true
-            requiredRoles = [RoleType.ROLE_ADMIN]
+            requiredRoles = [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]
             label = "analytics.label"
             defaultLabel = "Analytics"
             menuItems = [
                 // TODO: Add option to include label 'beta'
-                [label: "inventory.browse.label", defaultLabel: "Browse Inventory", href: "/inventoryBrowser/index"],
-                [label: "inventory.snapshots.label", defaultLabel: "Inventory Snapshots", href: "/snapshot/list"],
-                [label: "report.consumption.label", defaultLabel: "Consumption Report", href: "/consumption/list"]
+                [label: "inventory.browse.label", defaultLabel: "Browse Inventory", href: "/inventoryBrowser"],
+                [label: "inventory.snapshots.label", defaultLabel: "Inventory Snapshots", href: "/snapshot"],
+                [label: "report.consumption.label", defaultLabel: "Consumption Report", href: "/consumption"]
             ]
         }
         inventory {
@@ -171,25 +172,25 @@ openboxes {
                     label: "", // No label
                     defaultLabel: "", // No label
                     menuItems: [
-                        [label: "attributes.label", defaultLabel: "Attributes", href: "/attribute/list"],
-                        [label: "catalogs.label", defaultLabel: "Catalogs", href: "/productCatalog/list"],
+                        [label: "attributes.label", defaultLabel: "Attributes", href: "/attribute"],
+                        [label: "catalogs.label", defaultLabel: "Catalogs", href: "/productCatalog"],
                         [label: "categories.label", defaultLabel: "Categories", href: "/category/tree"],
-                        [label: "components.label", defaultLabel: "Components", href: "/productComponent/list"],
-                        [label: "productGroups.label", defaultLabel: "Generic Products", href: "/productGroup/list"],
-                        [label: "inventoryLevels.label", defaultLabel: "Inventory Levels", href: "/inventoryLevel/list"]
+                        [label: "components.label", defaultLabel: "Components", href: "/productComponent"],
+                        [label: "productGroups.label", defaultLabel: "Generic Products", href: "/productGroup"],
+                        [label: "inventoryLevels.label", defaultLabel: "Inventory Levels", href: "/inventoryLevel"]
                     ]
                 ],
                 [
                     label: "", // No label
                     defaultLabel: "", // No label
                     menuItems: [
-                        [label: "products.label", defaultLabel: "Products", href: "/product/list"],
-                        [label: "productsSources.label", defaultLabel: "Products Sources", href: "/productSupplier/list"],
-                        [label: "productsAssociations.label", defaultLabel: "Products Associations", href: "/productAssociation/list"],
-                        [label: "tags.label", defaultLabel: "Tags", href: "/tag/list"],
-                        [label: "unitOfMeasure.label", defaultLabel: "Unit of Measure", href: "/unitOfMeasure/list"],
-                        [label: "unitOfMeasureClass.label", defaultLabel: "Uom Class", href: "/unitOfMeasureClass/list"],
-                        [label: "unitOfMeasureConversion.label", defaultLabel: "Uom Conversion", href: "/unitOfMeasureConversion/list"]
+                        [label: "products.label", defaultLabel: "Products", href: "/product"],
+                        [label: "productsSources.label", defaultLabel: "Products Sources", href: "/productSupplier"],
+                        [label: "productsAssociations.label", defaultLabel: "Products Associations", href: "/productAssociation"],
+                        [label: "tags.label", defaultLabel: "Tags", href: "/tag"],
+                        [label: "unitOfMeasure.label", defaultLabel: "Unit of Measure", href: "/unitOfMeasure"],
+                        [label: "unitOfMeasureClass.label", defaultLabel: "Uom Class", href: "/unitOfMeasureClass"],
+                        [label: "unitOfMeasureConversion.label", defaultLabel: "Uom Conversion", href: "/unitOfMeasureConversion"]
                     ]
                 ],
                 [
@@ -206,12 +207,12 @@ openboxes {
                 ]
             ]
         }
-        requisitionTemplate {
+        stocklists {
             enabled = true
             label = "stocklists.label"
             defaultLabel = "Stocklists"
             menuItems = [
-                [label: "requisitionTemplates.list.label", defaultLabel: "List stock lists", href: "/requisitionTemplate/list"],
+                [label: "requisitionTemplates.list.label", defaultLabel: "List stock lists", href: "/requisitionTemplate"],
                 [label: "requisitionTemplates.create.label", defaultLabel: "Create stock list", href: "/requisitionTemplate/create"],
             ]
         }
@@ -230,16 +231,16 @@ openboxes {
                         [label: "cache.label", defaultLabel: "Cache", href: "/admin/cache"],
                         [label: "email.label", defaultLabel: "Email", href: "/admin/sendMail"],
                         [label: "importData.label", defaultLabel: "Import Data", href: "/batch/importData"],
-                        [label: "localization.label", defaultLabel: "Localization", href: "/localization/list"]
+                        [label: "localization.label", defaultLabel: "Localization", href: "/localization"]
                     ]
                 ],
                 [
                     label: "locations.label",
                     defaultLabel: "Locations",
                     menuItems: [
-                        [label: "locations.label", defaultLabel: "Locations", href: "/location/list"],
-                        [label: "locationGroups.label", defaultLabel: "Location groups", href: "/locationGroup/list"],
-                        [label: "locationTypes.label", defaultLabel: "Location types", href: "/locationType/list"]
+                        [label: "locations.label", defaultLabel: "Locations", href: "/location"],
+                        [label: "locationGroups.label", defaultLabel: "Location Groups", href: "/locationGroup"],
+                        [label: "locationTypes.label", defaultLabel: "Location Types", href: "/locationType"]
                     ]
                 ],
                 [
@@ -257,26 +258,26 @@ openboxes {
                     label: "parties.label",
                     defaultLabel: "Parties",
                     menuItems: [
-                        [label: "partyTypes.label", defaultLabel: "Party types", href: "/partyType/list"],
-                        [label: "partyRoles.label", defaultLabel: "Party roles", href: "/partyRole/list"],
-                        [label: "organizations.label", defaultLabel: "Organizations", href: "/organization/list"],
-                        [label: "person.list.label", defaultLabel: "People", href: "/person/list"],
-                        [label: "users.label", defaultLabel: "Users", href: "/user/list"],
-                        [label: "roles.label", defaultLabel: "Roles", href: "/role/list"]
+                        [label: "partyTypes.label", defaultLabel: "Party types", href: "/partyType"],
+                        [label: "partyRoles.label", defaultLabel: "Party roles", href: "/partyRole"],
+                        [label: "organizations.label", defaultLabel: "Organizations", href: "/organization"],
+                        [label: "person.list.label", defaultLabel: "People", href: "/person"],
+                        [label: "users.label", defaultLabel: "Users", href: "/user"],
+                        [label: "roles.label", defaultLabel: "Roles", href: "/role"]
                     ]
                 ],
                 [
                     label: "default.other.label",
                     defaultLabel: "Other",
                     menuItems: [
-                        [label: "containerTypes.label", defaultLabel: "Container Types", href: "/containerType/list"],
-                        [label: "documents.label", defaultLabel: "Documents", href: "/document/list"],
-                        [label: "documentTypes.label", defaultLabel: "Document Types", href: "/documentType/list"],
-                        [label: "eventTypes.label", defaultLabel: "Event Types", href: "/eventType/list"],
-                        [label: "paymentMethodTypes.label", defaultLabel: "Payment Method Types", href: "/paymentMethodType/list"],
-                        [label: "paymentTerms.label", defaultLabel: "Payment Terms", href: "/paymentTerm/list"],
-                        [label: "shippers.label", defaultLabel: "Shippers", href: "/shipper/list"],
-                        [label: "shipmentWorkflows.label", defaultLabel: "Shipment Workflows", href: "/shipmentWorkflow/list"]
+                        [label: "containerTypes.label", defaultLabel: "Container Types", href: "/containerType"],
+                        [label: "documents.label", defaultLabel: "Documents", href: "/document"],
+                        [label: "documentTypes.label", defaultLabel: "Document Types", href: "/documentType"],
+                        [label: "eventTypes.label", defaultLabel: "Event Types", href: "/eventType"],
+                        [label: "paymentMethodTypes.label", defaultLabel: "Payment Method Types", href: "/paymentMethodType"],
+                        [label: "paymentTerms.label", defaultLabel: "Payment Terms", href: "/paymentTerm"],
+                        [label: "shippers.label", defaultLabel: "Shippers", href: "/shipper"],
+                        [label: "shipmentWorkflows.label", defaultLabel: "Shipment Workflows", href: "/shipmentWorkflow"]
                     ]
                 ]
             ]
@@ -291,7 +292,6 @@ openboxes {
                 [label: "tableroNuevo.label", defaultLabel: "Tablero Nuevo", href: "/tablero"],
             ]
         }
-
         orders {
             enabled = true
             label = "orders.label"
