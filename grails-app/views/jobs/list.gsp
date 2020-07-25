@@ -2,7 +2,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="layout" content="custom" />
-    <title><warehouse:message code="users.label" /></title>
+    <title><warehouse:message code="jobs.label" default="Job" /></title>
 </head>
 <body>
 <div class="body">
@@ -51,20 +51,20 @@
         </div>
         <div class="yui-u">
 
-            <div class="list box dialog">
-                <h2><warehouse:message code="users.label"/> (${jobKeys.size()} results)</h2>
+            <div class="box dialog">
+                <h2><warehouse:message code="jobs.label" default="Jobs"/> (${jobKeys.size()} results)</h2>
                 <table>
                     <thead>
                     <tr>
-                        <th>job key</th>
-                        <th></th>
+                        <th>Group</th>
+                        <th>Key</th>
                     </tr>
                     </thead>
                     <tbody>
                     <g:each in="${jobKeys}" status="i" var="jobKey">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                            <td><g:link controller="jobs" action="show" id="${jobKey.name}" >${jobKey.name}</g:link></td>
-                            <td>${jobKey.properties}</td>
+                            <td>${jobKey.group}</td>
+                            <td><g:link controller="jobs" action="show" id="${jobKey.name}" params="[group:jobKey.group]">${jobKey.name}</g:link></td>
                         </tr>
                     </g:each>
                     <g:unless test="${jobKeys}">
@@ -78,9 +78,9 @@
                     </g:unless>
                     </tbody>
                 </table>
-            </div>
-            <div class="paginateButtons">
-                <g:paginate total="${jobKeys}" params="${params}"/>
+                <div class="paginateButtons">
+                    <g:paginate total="${jobKeys}" params="${params}"/>
+                </div>
             </div>
         </div>
     </div>
