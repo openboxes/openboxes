@@ -10,40 +10,53 @@
 package org.pih.warehouse.jobs
 
 import grails.gorm.transactions.Transactional
+import grails.plugins.quartz.JobDescriptor
+import grails.plugins.quartz.JobManagerService
 import org.quartz.JobDetail
 import org.quartz.JobKey
+import org.quartz.Scheduler
+import org.quartz.SchedulerException
 import org.quartz.Trigger
 import org.quartz.TriggerKey
+import org.quartz.core.QuartzScheduler
 import org.quartz.impl.StdScheduler
+import org.quartz.impl.matchers.GroupMatcher
 
 import java.text.ParseException
 
 @Transactional
 class JobsController {
 
-    StdScheduler quartzScheduler
+    JobManagerService jobManagerService
+
+    Scheduler getQuartzScheduler() {
+        return jobManagerService.quartzScheduler
+    }
 
     def index() {
         redirect(action: "list", params: params)
     }
 
     def list() {
-        log.info "Jobs"
-
-        Set<JobKey> jobKeys = quartzScheduler.getJobKeys()
+        Set<JobKey> jobKeys = []
+        quartzScheduler.jobGroupNames.each { String groupName ->
+            jobKeys.addAll(quartzScheduler.getJobKeys(GroupMatcher.groupEquals(groupName)))
+        }
 
         [jobKeys: jobKeys]
     }
 
     def show() {
-        JobKey jobKey = JobKey.jobKey(params.id)
+        JobKey jobKey = new JobKey(params.id, params.group)
         JobDetail jobDetail = quartzScheduler.getJobDetail(jobKey)
-
-        log.info(jobKey)
-        log.info(jobDetail)
+        JobDescriptor jobDescriptor = (jobDetail) ? JobDescriptor.build(jobDetail, quartzScheduler) : null
+        if (!jobDescriptor) {
+            throw new SchedulerException("No Job Detail for key ${params.id}")
+        }
         def triggers = quartzScheduler.getTriggersOfJob(jobKey)
+        log.info "triggers " + triggers
 
-        [jobDetail: jobDetail, jobKey: jobKey, triggers: triggers]
+        [jobDescriptor: jobDescriptor, jobDetail: jobDetail, jobKey: jobKey, triggers: triggers]
     }
 
 
