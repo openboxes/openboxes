@@ -53,20 +53,21 @@ class UserService {
 
         // We need to cache current role and check edit privilege here because the roles association
         // may change once we merge user and request parameters
-        def currentUser = User.load(currentUserId)
-        def canEditRoles = canEditUserRoles(currentUser, userInstance)
+        if (params.updateRoles) {
+            def currentUser = User.load(currentUserId)
+            def canEditRoles = canEditUserRoles(currentUser, userInstance)
 
-        // Check to make sure the roles are dirty
-        def currentRoles = new HashSet(userInstance?.roles)
-        def updatedRoles = Role.findAllByIdInList(params.list("roles"))
-        def isRolesDirty = !ListUtils.isEqualList(updatedRoles, currentRoles) && params.updateRoles
-        log.info "User update: ${updatedRoles} vs ${currentRoles}: isDirty=${isRolesDirty}, canEditRoles=${canEditRoles}"
-        if (isRolesDirty && !canEditRoles) {
-            Object[] args = [currentUser.username, userInstance.username]
-            userInstance.errors.rejectValue("roles", "user.errors.cannotEditUserRoles.message", args, "User cannot edit user roles")
-            throw new ValidationException("user.errors.cannotEditUserRoles.message", userInstance.errors)
+            // Check to make sure the roles are dirty
+            def currentRoles = new HashSet(userInstance?.roles)
+            def updatedRoles = Role.findAllByIdInList(params.list("roles"))
+            def isRolesDirty = !ListUtils.isEqualList(updatedRoles, currentRoles)
+            log.info "User update: ${updatedRoles} vs ${currentRoles}: isDirty=${isRolesDirty}, canEditRoles=${canEditRoles}"
+            if (isRolesDirty && !canEditRoles) {
+                Object[] args = [currentUser.username, userInstance.username]
+                userInstance.errors.rejectValue("roles", "user.errors.cannotEditUserRoles.message", args, "User cannot edit user roles")
+                throw new ValidationException("user.errors.cannotEditUserRoles.message", userInstance.errors)
+            }
         }
-
         log.info "User has errors: ${userInstance.hasErrors()} ${userInstance.errors}"
         return userInstance.save(failOnError: true)
     }
