@@ -5,6 +5,16 @@
         <meta name="layout" content="custom">
         <g:if env="development"><asset:stylesheet src="errors.css"/></g:if>
         <asset:stylesheet src="main.css"/>
+        <style>
+            /* Fix for some CSS incompatibilities between openboxes and Grails */
+            h2 { vertical-align: bottom; line-height: 2.5em; margin: 0; margin-top: 1em;}
+            .snippet { margin: 0 }
+            .snippet .line { line-height: 1.5em }
+            .snippet > .line.error { padding: 0 }
+            .error { border: 0; margin: 0 }
+            .stack { margin: 0; height: 300px; }
+            .error-details { margin: 1em }
+        </style>
     </head>
     <body>
         <div class="body">
