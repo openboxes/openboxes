@@ -16,6 +16,11 @@
 				${flash.message}
 			</div>
 		</g:if>
+        <g:if test="${flash.error}">
+            <div class="errors">
+                ${flash.error}
+            </div>
+        </g:if>
 		<g:hasErrors bean="${order}">
 			<div class="errors">
 				<g:renderErrors bean="${order}" as="list" />
@@ -62,14 +67,8 @@
                                     <warehouse:message code="order.origin.label"/></label>
                                 </td>
                                 <td class='value ${hasErrors(bean:order,field:'origin','errors')}'>
-
-                                    <g:if test="${order.id}">
-                                        ${order?.origin?.name}
-                                    </g:if>
-                                    <g:else>
-                                        <g:selectOrderSupplier name="origin.id" class="chzn-select-deselect"
-                                                               optionKey="id" value="${order?.origin?.id}" noSelection="['':'']"/>
-                                    </g:else>
+                                    <g:selectOrderSupplier name="origin.id" class="chzn-select-deselect"
+                                                           optionKey="id" value="${order?.origin?.id}" noSelection="['':'']"/>
                                 </td>
                             </tr>
                             <tr class='prop'>

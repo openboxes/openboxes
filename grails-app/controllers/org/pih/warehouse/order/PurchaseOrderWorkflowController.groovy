@@ -54,13 +54,18 @@ class PurchaseOrderWorkflowController {
         enterOrderDetails {
             on("next") {
                 log.info "Save order details " + params
-                flow.order.properties = params
-                try {
-                    if (!orderService.saveOrder(flow.order)) {
+                if (flow.order.orderItems && flow.order.origin.id != params.origin.id) {
+                    flash.error = "Cannot change the supplier for a PO with item lines."
+                    return error()
+                } else {
+                    flow.order.properties = params
+                    try {
+                        if (!orderService.saveOrder(flow.order)) {
+                            return error()
+                        }
+                    } catch (ValidationException e) {
                         return error()
                     }
-                } catch (ValidationException e) {
-                    return error()
                 }
             }.to("showOrderItems")
             on("showOrderItems").to("showOrderItems")
