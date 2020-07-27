@@ -289,6 +289,7 @@ class AvailableItem {
         return [
                 "inventoryItem.id": inventoryItem?.id,
                 "product.name"    : inventoryItem?.product?.name,
+                "product"         : inventoryItem?.product,
                 "productCode"     : inventoryItem?.product?.productCode,
                 lotNumber         : inventoryItem?.lotNumber,
                 expirationDate    : inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
@@ -327,6 +328,8 @@ class SubstitutionItem {
     Integer quantityConsumed
     Integer sortOrder
 
+    Product product
+
     List availableItems
 
     Date getMinExpirationDate() {
@@ -346,6 +349,7 @@ class SubstitutionItem {
                 productId        : productId,
                 productCode      : productCode,
                 productName      : productName,
+                product          : product,
                 minExpirationDate: minExpirationDate?.format("MM/dd/yyyy"),
                 quantityAvailable: quantityAvailable,
                 quantityConsumed : quantityConsumed,
@@ -452,6 +456,7 @@ class EditPageItem {
                 productId             : productId,
                 productCode           : productCode,
                 productName           : productName,
+                product               : requisitionItem?.product,
                 minExpirationDate     : minExpirationDate?.format("MM/dd/yyyy"),
                 quantityRequested     : quantityRequested,
                 quantityRevised       : quantityRevised,
@@ -486,6 +491,7 @@ class PickPageItem {
                 "product.name"      : requisitionItem?.product?.name,
                 productCode         : requisitionItem?.product?.productCode,
                 productId           : requisitionItem?.product?.id,
+                product             : requisitionItem?.product,
                 reasonCode          : requisitionItem?.cancelReasonCode,
                 comments            : requisitionItem?.cancelComments,
                 quantityRequested   : requisitionItem.quantity,
@@ -568,6 +574,7 @@ class PackPageItem {
                 "product.id"   : shipmentItem?.product?.id,
                 productName    : shipmentItem?.product?.name,
                 productCode    : shipmentItem?.product?.productCode,
+                product        : shipmentItem?.product,
                 lotNumber      : shipmentItem?.lotNumber,
                 expirationDate : shipmentItem?.expirationDate?.format("MM/dd/yyyy"),
                 binLocationName: shipmentItem?.binLocation?.name,

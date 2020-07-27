@@ -22,6 +22,7 @@ import TableRowWithSubfields from '../../form-elements/TableRowWithSubfields';
 import { showSpinner, hideSpinner, fetchReasonCodes } from '../../../actions';
 import ButtonField from '../../form-elements/ButtonField';
 import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
+import renderHandlingIcons from '../../../utils/product-handling-icons';
 
 const BTN_CLASS_MAPPER = {
   YES: 'btn btn-outline-success',
@@ -57,11 +58,21 @@ const FIELDS = {
         label: 'react.stockMovement.code.label',
         defaultMessage: 'Code',
       },
-      productName: {
+      product: {
         type: LabelField,
         headerAlign: 'left',
         flexWidth: '3.5',
         label: 'react.stockMovement.productName.label',
+        attributes: {
+          formatValue: value => (
+            <span className="d-flex">
+              <span className="text-truncate">
+                {value.label || value.name}
+              </span>
+              {renderHandlingIcons(value ? value.handlingIcons : null)}
+            </span>
+          ),
+        },
         getDynamicAttr: ({ subfield }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
         }),
@@ -277,7 +288,6 @@ class EditItemsPage extends Component {
   setEditPageItems(response, stopIndex) {
     this.props.showSpinner();
     const { data } = response.data;
-
     const editPageItems = _.map(
       data,
       val => ({
