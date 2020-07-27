@@ -97,7 +97,7 @@ class IndicatorDataService {
     GraphData getFillRate(Location location, def destination, def params) {
         Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 7
 
-        List listLabel = []
+        List listLabels = []
 
 
         List averageFillRateResult = []
@@ -115,7 +115,7 @@ class IndicatorDataService {
 
             String monthLabel = new java.text.DateFormatSymbols().months[monthBegin.month]
 
-            listLabel.push("${monthLabel} ${monthBegin.year + 1900}")
+            listLabels.push("${monthLabel} ${monthBegin.year + 1900}")
 
             def averageFillRate = dataService.executeQuery("""
             select avg(fr.fill_rate) FROM fill_rate as fr
@@ -181,9 +181,57 @@ class IndicatorDataService {
                 new IndicatorDatasets('Average of target Fill Rate', averageTargetFillRate, null, 'line', 'right-y-axis', legendConfig),
         ];
 
-        IndicatorData indicatorData = new IndicatorData(datasets, listLabel);
+        IndicatorData indicatorData = new IndicatorData(datasets, listLabels);
 
         GraphData graphData = new GraphData(indicatorData, "Fill Rate Last 12 Months", "bar");
+
+        return graphData;
+    }
+
+    GraphData getFillRateSnapshot (Location origin) {
+        List averageFillRateResult = []
+        List listLabels = []
+        Date today = new Date()
+        today.clearTime()
+    
+        for (int i = 12; i >= 0; i--) {   
+            def monthBegin = today.clone()
+            def monthEnd = today.clone()     
+            monthBegin.set(month: today.month - i, date: 1)
+            monthEnd.set(month: today.month - i + 1, date: 1)
+            
+            String monthLabel = new java.text.DateFormatSymbols().months[monthBegin.month]
+            listLabels.push("${monthLabel} ${monthBegin.year + 1900}")
+
+            def averageFillRate = dataService.executeQuery("""
+            select avg(fr.fill_rate) FROM fill_rate as fr
+            where fr.transaction_date > :monthBegin
+            and fr.transaction_date <= :monthEnd
+            and fr.origin_id = :origin
+            GROUP BY MONTH(fr.transaction_date), YEAR(fr.transaction_date)
+            """, [
+                
+                'monthBegin'  : monthBegin,
+                'monthEnd'    : monthEnd,
+                'origin'      : origin.id,
+            ]);
+
+            averageFillRate[0] == null ? averageFillRateResult.push(0) : averageFillRateResult.push(averageFillRate[0][0])
+        }
+
+        List<IndicatorDatasets> datasets = [
+                new IndicatorDatasets('Average Fill Rate', averageFillRateResult, null, 'line'),
+        ];
+
+        averageFillRateResult = averageFillRateResult.collect{ it * 100 }
+
+        int averageLastMonth = averageFillRateResult[averageFillRateResult.size - 2]
+
+        IndicatorData indicatorData = new IndicatorData(datasets, listLabels);
+        
+        ColorNumber colorNumber = new ColorNumber(averageLastMonth, null, null, null, 90)
+        colorNumber.setConditionalColors(87, colorNumber.value2)
+        GraphData graphData = new GraphData(indicatorData, "Fill Rate Snapshot", "line", null, colorNumber);
 
         return graphData;
     }
@@ -233,7 +281,7 @@ class IndicatorDataService {
         List<IndicatorDatasets> datasets = [
                 new IndicatorDatasets('Inventory Summary', listData, links)
         ];
-
+        
         IndicatorData indicatorData = new IndicatorData(datasets, ['In stock', 'Above maximum', 'Below reorder', 'Below minimum', 'No longer in stock']);
 
         GraphData graphData = new GraphData(indicatorData, "Inventory Summary", "horizontalBar");
