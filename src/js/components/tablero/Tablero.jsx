@@ -131,12 +131,14 @@ class Tablero extends Component {
       configModified: false,
       allLocations: [],
     };
+    this.config = 'personal';
     this.fetchLocations();
   }
 
   componentDidMount() {
+    this.config = sessionStorage.getItem('dashboardKey') || this.config;
     if (this.props.currentLocation !== '') {
-      this.fetchData();
+      this.fetchData(this.config);
     }
   }
 
@@ -144,7 +146,7 @@ class Tablero extends Component {
     const prevLocation = prevProps.currentLocation;
     const newLocation = this.props.currentLocation;
     if (prevLocation !== newLocation) {
-      this.fetchData();
+      this.fetchData(this.config);
     }
   }
   dataFetched = false;
@@ -162,11 +164,12 @@ class Tablero extends Component {
   }
 
   fetchData = (config = 'personal') => {
+    sessionStorage.setItem('dashboardKey', config);
     this.props.resetIndicators();
     if (this.props.dashboardConfig && this.props.dashboardConfig.endpoints) {
       this.props.fetchIndicators(this.props.dashboardConfig, config, this.props.currentLocation);
     } else {
-      this.props.fetchConfigAndData(this.props.currentLocation);
+      this.props.fetchConfigAndData(this.props.currentLocation, config);
     }
   }
 
