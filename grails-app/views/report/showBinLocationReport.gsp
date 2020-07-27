@@ -191,7 +191,8 @@
             "aaSorting": [[ 3, "desc" ], [4, "desc"]],
             "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
                 $('td:eq(1)', nRow).html('<a href="${request.contextPath}/inventoryItem/showStockCard/' + aData["id"] + '">' + aData["productCode"] + '</a>');
-                $('td:eq(2)', nRow).html('<a href="${request.contextPath}/inventoryItem/showStockCard/' + aData["id"] + '">' + aData["productName"] + '</a>');
+                $('td:eq(2)', nRow).html('<a href="${request.contextPath}/inventoryItem/showStockCard/' + aData["id"] + '">' + aData["productName"] + ' ' +
+                  renderHandlingIcons(aData) +  '</a>');
                 return nRow;
             }
 
@@ -204,6 +205,15 @@
             dataTable.fnDraw();
         });
     });
+
+    function renderHandlingIcons(data) {
+      var iconElements = ""
+      $.each(data.handlingIcons, function( index, value ) {
+        var color = value?.color ? value.color : 'inherit';
+        iconElements += '<i class="fa ' + value.icon + '" ' + 'style="color:' + color + '" ></i>&nbsp;'
+      });
+      return iconElements
+    }
 
     function handleAjaxError( xhr, status, error ) {
         console.log("ajax error");
