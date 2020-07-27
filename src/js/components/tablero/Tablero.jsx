@@ -143,6 +143,7 @@ class Tablero extends Component {
   }
 
   componentDidUpdate(prevProps) {
+    this.config = sessionStorage.getItem('dashboardKey') || this.config;
     const prevLocation = prevProps.currentLocation;
     const newLocation = this.props.currentLocation;
     if (prevLocation !== newLocation) {
