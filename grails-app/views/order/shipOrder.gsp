@@ -42,11 +42,14 @@
 						<g:if test="${command.shipment}">
 							&rsaquo; ${command.shipment.shipmentNumber} ${command?.shipment?.name} (${command?.shipment?.status})
 						</g:if>
+						<button class="button" style="float: right; margin: 8px;" type="button" onclick="autofillQuantity()">
+							<g:message code="order.autofillQuantities.label" default="Autofill quantities"/>
+						</button>
 					</h2>
 					<g:hiddenField name="order.id" value="${command?.order?.id}" />
 					<g:hiddenField name="shipment.id" value="${command?.shipment?.id}" />
 
-					<table>
+					<table id="shipOrder">
 						<thead>
 							<tr>
 								<th><g:message code="product.label"/></th>
@@ -92,7 +95,7 @@
 												${orderItem?.quantityShipped}
 												</g:if>
 											</td>
-											<td class="center middle">
+											<td class="center middle" id="quantityRemaining${status}">
 												<g:if test="${!j}">
 													<g:if test="${orderItem.quantityRemaining>0}">
 														${orderItem?.quantityRemaining}
@@ -138,7 +141,7 @@
 													   name="shipOrderItems[${status}].quantityToShip"
 													   min="${shipOrderItem.quantityMinimum}"
 													   max="${shipOrderItem?.quantityMaximum}"
-													   value="${shipOrderItem.quantityToShip}"/>
+													   value=""/>
 												<a href="#" class="change-quantity"
 												   data-id="#orderItems-quantityToShip${status}"
 												   data-delta="-1"
@@ -207,6 +210,17 @@ $(document).ready(function() {
 		}
 	});
 });
+
+function autofillQuantity() {
+	var rowCount = document.getElementById('shipOrder').tBodies[0].rows.length;
+	for (var i=0; i<rowCount; i++) {
+		var quantityRemaining = parseInt($("#quantityRemaining" + i).text());
+		var quantityToShip = $("#orderItems-quantityToShip" + i);
+		if (!quantityToShip.val()) {
+			quantityToShip.val(quantityRemaining);
+		}
+	}
+}
 </script>
 </body>
 </html>
