@@ -173,8 +173,6 @@ class PurchaseOrderWorkflowController {
             redirect(controller: "order", action: "show", params: ["id": flow.order.id ?: ''])
         }
 
-        handleError() {
-            println "handling error"
-        }
+        handleError()
     }
 }
