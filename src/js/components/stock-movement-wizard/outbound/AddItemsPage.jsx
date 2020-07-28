@@ -23,6 +23,7 @@ import { showSpinner, hideSpinner, fetchUsers } from '../../../actions';
 import apiClient from '../../../utils/apiClient';
 import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
 import { debounceProductsFetch } from '../../../utils/option-utils';
+import renderHandlingIcons from '../../../utils/product-handling-icons';
 
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
@@ -88,7 +89,22 @@ const NO_STOCKLIST_FIELDS = {
           options: [],
           showValueTooltip: true,
           className: 'text-left',
-          optionRenderer: option => <strong style={{ color: option.color ? option.color : 'black' }}>{option.label}</strong>,
+          optionRenderer: option => (
+            <strong style={{ color: option.color ? option.color : 'black' }} className="d-flex align-items-center">
+              {option.label}
+              &nbsp;
+              {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
+            </strong>
+          ),
+          valueRenderer: option => (
+            <span className="d-flex align-items-center">
+              <span className="text-truncate">
+                {option.label}
+              </span>
+              &nbsp;
+              {renderHandlingIcons(option ? option.handlingIcons : [])}
+            </span>
+          ),
         },
         getDynamicAttr: ({
           fieldValue, debouncedProductsFetch, rowIndex, rowCount,
@@ -191,7 +207,22 @@ const STOCKLIST_FIELDS = {
           options: [],
           showValueTooltip: true,
           className: 'text-left',
-          optionRenderer: option => <strong style={{ color: option.color ? option.color : 'black' }}>{option.label}</strong>,
+          optionRenderer: option => (
+            <strong style={{ color: option.color ? option.color : 'black' }} className="d-flex align-items-center">
+              {option.label}
+              &nbsp;
+              {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
+            </strong>
+          ),
+          valueRenderer: option => (
+            <span className="d-flex align-items-center">
+              <span className="text-truncate">
+                {option.label}
+              </span>
+              &nbsp;
+              {renderHandlingIcons(option ? option.handlingIcons : [])}
+            </span>
+          ),
         },
         getDynamicAttr: ({
           fieldValue, debouncedProductsFetch, rowIndex, rowCount, newItem,
