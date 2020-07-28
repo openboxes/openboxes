@@ -47,7 +47,7 @@
                                 </div>
                             </td>
                             <td>
-                                <a href="javascript:void(0);" class="button btn-show-dialog"
+                                <a href="javascript:void(0);" class="button btn-show-dialog" data-reload="true"
                                    data-title="${g.message(code:'default.dialog.label', default: 'Dialog')}"
                                    data-url="${request.contextPath}/migration/receiptsWithoutTransaction">
                                     <g:message code="default.button.list.label"/>
@@ -65,7 +65,7 @@
                                 </div>
                             </td>
                             <td>
-                                <a href="javascript:void(0);" class="button btn-show-dialog"
+                                <a href="javascript:void(0);" class="button btn-show-dialog" data-reload="true"
                                    data-title="${g.message(code:'default.dialog.label', default: 'Dialog')}"
                                    data-url="${request.contextPath}/migration/shipmentsWithoutTransactions">
                                     <g:message code="default.button.list.label"/>
@@ -82,7 +82,7 @@
                                 </div>
                             </td>
                             <td>
-                                <a href="javascript:void(0);" class="button btn-show-dialog"
+                                <a href="javascript:void(0);" class="button btn-show-dialog" data-reload="true"
                                     data-height="300"
                                    data-title="${g.message(code:'default.dialog.label', default: 'Dialog')}"
                                    data-url="${request.contextPath}/migration/stockMovementsWithoutShipmentItems">
