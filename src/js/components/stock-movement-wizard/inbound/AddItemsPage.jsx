@@ -114,14 +114,14 @@ const VENDOR_FIELDS = {
           showValueTooltip: true,
           optionRenderer: option => (
             <strong style={{ color: option.color ? option.color : 'black' }} className="d-flex align-items-center">
-              {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
-              &nbsp;
               {option.label}
+              &nbsp;
+              {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
             </strong>
           ),
           valueRenderer: option => (
             <span className="d-flex align-items-center">
-              {renderHandlingIcons(option ? option.handlingIcons : [])}&nbsp;{option.label}
+              <span className="text-truncate">{option.label}</span>&nbsp;{renderHandlingIcons(option ? option.handlingIcons : [])}
             </span>
           ),
         },
