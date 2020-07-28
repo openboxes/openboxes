@@ -55,7 +55,7 @@ class PurchaseOrderWorkflowController {
             on("next") {
                 log.info "Save order details " + params
                 if (flow.order.orderItems && flow.order.origin.id != params.origin.id) {
-                    flash.error = "Cannot change the supplier for a PO with item lines."
+                    flow.order.errors.reject("Cannot change the supplier for a PO with item lines.")
                     return error()
                 } else {
                     flow.order.properties = params
@@ -173,6 +173,8 @@ class PurchaseOrderWorkflowController {
             redirect(controller: "order", action: "show", params: ["id": flow.order.id ?: ''])
         }
 
-        handleError()
+        handleError() {
+            println "handling error"
+        }
     }
 }
