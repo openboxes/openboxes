@@ -358,18 +358,16 @@
 
         function validateAdjustmentsForm() {
           var orderAdjustmentType = $("#orderAdjustmentType").val();
-          var description = $("#description").val();
           var amount = $("#amount").val();
           var percentage = $("#percentage").val();
           var canManageAdjustments = ($("#canManageAdjustments").val() === "true");
 
           if (!orderAdjustmentType) $("#orderAdjustmentType").notify("Required")
-          if (!description) $("#description").notify("Required")
           if (!(percentage || amount)) $("#amount").notify("Amount or percentage required")
           if (!(percentage || amount)) $("#percentage").notify("Amount or percentage required")
           if (!canManageAdjustments) $.notify("You do not have permissions to perform this action")
 
-          if (orderAdjustmentType && description && canManageAdjustments && (amount || percentage)) {
+          if (orderAdjustmentType && canManageAdjustments && (amount || percentage)) {
             return true
           } else {
             return false

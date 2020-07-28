@@ -201,9 +201,9 @@
                 </tr>
                 <tr>
                     <td colspan="5">
-                        <div class="list">
+                        <div class="dialog">
                             <g:set var="status" value="${0}"/>
-                            <g:set var="columnsNumber" value="6"/>
+                            <g:set var="columnsNumber" value="8"/>
                             <table class="order-items">
                                 <thead>
                                     <tr>
@@ -244,7 +244,13 @@
                                             <warehouse:message code="orderItem.unitPrice.label" default="Unit price"/>
                                         </th>
                                         <th class="center bottom">
-                                            <warehouse:message code="orderItem.totalPrice.label" default="Total amount"/>
+                                            <warehouse:message code="orderItem.subtotal.label" default="Subtotal"/>
+                                        </th>
+                                        <th class="center bottom">
+                                            <warehouse:message code="orderItem.adjustments.label" default="Adjustments"/>
+                                        </th>
+                                        <th class="center bottom">
+                                            <warehouse:message code="orderItem.total.label" default="Total"/>
                                         </th>
 
                                     </tr>
@@ -288,13 +294,17 @@
                                             <g:formatNumber number="${orderItem?.unitPrice}" />
                                         </td>
                                         <td class="right">
-                                            <g:formatNumber number="${orderItem?.totalPrice()}"/>
+                                            <g:formatNumber number="${orderItem?.subtotal}"/>
+                                        </td>
+                                        <td class="right">
+                                            <g:formatNumber number="${orderItem?.totalAdjustments}"/>
+                                        </td>
+                                        <td class="right">
+                                            <g:formatNumber number="${orderItem?.total}"/>
                                         </td>
                                     </tr>
 
                                 </g:each>
-                                </tbody>
-                                <tfoot>
                                     <tr>
                                         <th colspan="${columnsNumber}" class="right">
                                             <warehouse:message code="default.subtotal.label" default="Subtotal"/>
@@ -304,51 +314,25 @@
                                             ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                         </th>
                                     </tr>
-                                    <tr>
-                                        <th colspan="${columnsNumber+1}" class="center">
-                                            <warehouse:message code="default.adjustments.label" default="Adjustments"/>
-                                        </th>
-                                    </tr>
-                                    <g:if test="${orderInstance.orderAdjustments}">
+                                    <g:each var="orderAdjustment" in="${orderInstance?.orderAdjustments.findAll { !it.orderItem }.sort { it.totalAdjustments }.reverse() }">
                                         <tr>
-                                            <th></th>
-                                            <th class="center"><warehouse:message code="default.type.label"/></th>
-                                            <th class="center"><warehouse:message code="default.description.label"/></th>
-                                            <th class="center"><warehouse:message code="order.orderItem.label"/></th>
-                                            <th colspan="${columnsNumber-4}"></th>
-                                            <th class="center"><warehouse:message code="orderAdjustment.amount.label"/></th>
-                                        </tr>
-                                        <tr>
-                                        <g:each var="orderAdjustment" in="${orderInstance.orderAdjustments.sort { it.amount }.reverse() }" status="status">
-                                            <tr class="${status%2==0?'even':'odd'}">
-                                                <td></td>
-                                                <td>
-                                                    ${orderAdjustment?.orderAdjustmentType?.name}
-                                                </td>
-                                                <td>
+                                            <th colspan="${columnsNumber}" class="right">
+                                                <g:if test="${orderAdjustment.description}">
                                                     ${orderAdjustment.description}
-                                                </td>
-                                                <td>
-                                                    ${orderAdjustment?.orderItem?.product?:g.message(code:'default.all.label')}
-                                                </td>
-                                                <td colspan="${columnsNumber-4}"></td>
-                                                <td class="right">
-                                                    <g:if test="${orderAdjustment.amount}">
-                                                        ${orderAdjustment.amount}
+                                                </g:if>
+                                                <g:else>
+                                                    <format:metadata obj="${orderAdjustment.orderAdjustmentType}"/>
+                                                    <g:if test="${orderAdjustment.percentage}">
+                                                        (${orderAdjustment.percentage}%)
                                                     </g:if>
-                                                    <g:elseif test="${orderAdjustment.percentage}">
-                                                        <g:if test="${orderAdjustment.orderItem}">
-                                                            <g:formatNumber number="${orderAdjustment.orderItem.totalAdjustments}"/>
-                                                        </g:if>
-                                                        <g:else>
-                                                            <g:formatNumber number="${orderAdjustment.totalAdjustments}"/>
-                                                        </g:else>
-                                                    </g:elseif>
-                                                </td>
-                                            </tr>
-                                        </g:each>
+                                                </g:else>
+                                            </th>
+                                            <th class="right">
+                                                <g:formatNumber number="${orderAdjustment.totalAdjustments}"/>
+                                                ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                            </th>
                                         </tr>
-                                    </g:if>
+                                    </g:each>
                                     <tr>
                                         <th colspan="${columnsNumber}" class="right">
                                             <warehouse:message code="default.total.label"/>
@@ -358,7 +342,7 @@
                                             ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                         </th>
                                     </tr>
-                                </tfoot>
+                                </tbody>
                             </table>
                         </div>
                     </td>
