@@ -1147,7 +1147,7 @@ class StockMovementService {
         Shipment shipment = new Shipment()
         shipment.shipmentNumber = identifierService.generateShipmentIdentifier()
         shipment.expectedShippingDate = new Date()
-        shipment.name = order.name
+        shipment.name = order.name ?: order.orderNumber
         shipment.description = order.orderNumber
         shipment.origin = order.origin
         shipment.destination = order.destination
