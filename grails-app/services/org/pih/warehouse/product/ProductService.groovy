@@ -14,6 +14,7 @@ import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.xml.Namespace
 import org.hibernate.criterion.CriteriaSpecification
+import org.hibernate.sql.JoinType
 import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Organization
@@ -1096,6 +1097,10 @@ class ProductService {
      */
     List<Product> searchProducts(String[] terms, List<Category> categories) {
         def results = Product.createCriteria().list {
+            createAlias('productSuppliers', 'ps', JoinType.LEFT_OUTER_JOIN)
+            createAlias('productSuppliers.manufacturer', 'psm', JoinType.LEFT_OUTER_JOIN)
+            createAlias('productSuppliers.supplier', 'pss', JoinType.LEFT_OUTER_JOIN)
+            createAlias('inventoryItems', 'ii', JoinType.LEFT_OUTER_JOIN)
 
             eq("active", true)
             if (categories) {
@@ -1118,26 +1123,16 @@ class ProductService {
                         ilike("upc", term)
                         ilike("ndc", term)
                         ilike("unitOfMeasure", term)
-                        productSuppliers {
-                            or {
-                                ilike("name", "%" + term)
-                                ilike("code", term)
-                                ilike("productCode", term)
-                                ilike("manufacturerCode", term)
-                                ilike("manufacturerName", term)
-                                ilike("supplierCode", term)
-                                ilike("supplierName", term)
-                                manufacturer {
-                                    ilike("name", term)
-                                }
-                                supplier {
-                                    ilike("name", term)
-                                }
-                            }
-                        }
-                        inventoryItems {
-                            ilike("lotNumber", term)
-                        }
+                        ilike("ps.name", "%" + term)
+                        ilike("ps.code", term)
+                        ilike("ps.productCode", term)
+                        ilike("ps.manufacturerCode", term)
+                        ilike("ps.manufacturerName", term)
+                        ilike("ps.supplierCode", term)
+                        ilike("ps.supplierName", term)
+                        ilike("psm.name", term)
+                        ilike("pss.name", term)
+                        ilike("ii.lotNumber", term)
                     }
                 }
             }
