@@ -33,4 +33,6 @@ if (Environment.isDevelopmentMode() && targetDir != null) {
     }
     logger("StackTrace", ERROR, ['FULL_STACKTRACE'], false)
 }
+logger("grails.plugin.cache", DEBUG, ['STDOUT'], false)
+logger("grails.app.jobs", DEBUG, ['STDOUT'], false)
 root(INFO, ['STDOUT'])

@@ -2,12 +2,9 @@ package org.pih.warehouse.apitablero
 
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
+import grails.plugin.cache.Cacheable
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
-import org.pih.warehouse.inventory.InventorySnapshot
-import org.pih.warehouse.inventory.TransactionEntry
-import org.pih.warehouse.order.Order
-import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.tablero.NumberData
 
 @Transactional
@@ -30,19 +27,21 @@ class ApitableroController {
 
         render(config as JSON)
     }
-
+    @Cacheable("getInventoryByLotAndBin")
     def getInventoryByLotAndBin() {
         Location location = Location.get(session?.warehouse?.id)
         NumberData numberData = numberDataService.getInventoryByLotAndBin(location)
         render(numberData as JSON)
     }
 
+    @Cacheable("getInProgressShipments")
     def getInProgressShipments() {
         Location location = Location.get(session?.warehouse?.id)
         NumberData numberData = numberDataService.getInProgressShipments(session.user, location)
         render(numberData as JSON)
     }
 
+    @Cacheable("getInProgressPutaways")
     def getInProgressPutaways() {
         Location location = Location.get(session?.warehouse?.id)
         NumberData numberData = numberDataService.getInProgressPutaways(session.user, location)

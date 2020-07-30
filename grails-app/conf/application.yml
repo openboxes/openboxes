@@ -82,6 +82,9 @@ grails:
         minifyCss: false
         bundle: false
     #serverURL: "http://localhost:8080/${appName}"
+    cache:
+        enabled: true
+        clearAtStartup: false
     doc:
         title: "OpenBoxes"
         subtitle: ""
@@ -311,7 +314,7 @@ openboxes:
 
     # Forecasting feature
     forecasting:
-        enabled: false
+        enabled: true
         demandPeriod: 180
 
     # Bill of Materials feature
