@@ -19,8 +19,6 @@ import org.pih.warehouse.requisition.Requisition
 @Transactional
 class PicklistController {
 
-    static scaffold = Picklist
-
     def picklistService
     PdfRenderingService pdfRenderingService
 
