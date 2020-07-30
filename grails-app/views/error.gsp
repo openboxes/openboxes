@@ -1,9 +1,9 @@
 <!doctype html>
 <html>
     <head>
-        <title><g:if env="development">Grails Runtime Exception</g:if><g:else>Error</g:else></title>
+        <title>General Error</title>
         <meta name="layout" content="custom">
-        <g:if env="development"><asset:stylesheet src="errors.css"/></g:if>
+        <asset:stylesheet src="errors.css"/>
         <asset:stylesheet src="main.css"/>
         <style>
             /* Fix for some CSS incompatibilities between openboxes and Grails */
