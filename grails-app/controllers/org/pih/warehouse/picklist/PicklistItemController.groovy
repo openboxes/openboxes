@@ -14,10 +14,6 @@ import grails.gorm.transactions.Transactional
 @Transactional
 class PicklistItemController {
 
-    static scaffold = PicklistItem
-
-    def picklistService
-
     def delete() {
         def picklistItem = PicklistItem.get(params.id)
         if (picklistItem) {
