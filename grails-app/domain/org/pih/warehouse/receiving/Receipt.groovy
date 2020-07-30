@@ -35,11 +35,11 @@ class Receipt implements Serializable, Comparable<Receipt> {
 
     // Constraints
     static constraints = {
+        receiptNumber(nullable: true, blank: false)
+        receiptStatusCode(nullable: true)
         transaction(nullable: true)
         shipment(nullable: true)
         recipient(nullable: true)
-        receiptNumber(nullable: true, blank: false)
-        receiptStatusCode(nullable: true)
         expectedDeliveryDate(nullable: true)
         actualDeliveryDate(nullable: false,
                 validator: { value, obj ->

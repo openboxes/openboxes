@@ -502,7 +502,7 @@
                                 <warehouse:message code="unitOfMeasureClass.label"/></g:link>
                         </div>
                         <div class="mm-menu-item">
-                            <g:link controller="unitOfMeasureConversion" action="list" class="list">
+                            <g:link controller="unitOfMeasureConversion">
                                 <warehouse:message code="unitOfMeasureConversion.label" default="UoM Conversion"/></g:link>
                         </div>
                     </div>
