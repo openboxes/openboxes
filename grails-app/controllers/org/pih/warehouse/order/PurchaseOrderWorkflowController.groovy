@@ -54,7 +54,9 @@ class PurchaseOrderWorkflowController {
         enterOrderDetails {
             on("next") {
                 log.info "Save order details " + params
-                flow.order.refresh()
+                if (flow.order.id) {
+                    flow.order.refresh()
+                }
                 if (flow.order.orderItems && flow.order.origin.id != params.origin.id) {
                     flow.order.errors.reject("Cannot change the supplier for a PO with item lines.")
                     return error()
