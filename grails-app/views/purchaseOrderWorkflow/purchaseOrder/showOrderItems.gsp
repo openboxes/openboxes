@@ -130,7 +130,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <g:each var="orderAdjustment" in="${order.orderAdjustments}" status="status">
+                            <g:each var="orderAdjustment" in="${order.orderAdjustments.sort { it.dateCreated }}" status="status">
                                 <tr class="${status%2==0?'odd':'even'}">
                                     <td>
                                         ${orderAdjustment.orderAdjustmentType?.name}
@@ -184,13 +184,14 @@
                                 <td>
                                     <g:selectOrderAdjustmentTypes name="orderAdjustmentType.id"
                                                                   id="orderAdjustmentType"
-                                                                  class="chzn-select-deselect"
+                                                                  class="select2"
                                                                   noSelection="['':'']"/>
                                 </td>
                                 <td>
                                     <g:selectOrderItems name="orderItem.id"
+                                                        id="orderItems"
                                                         orderId="${order?.id}"
-                                                        class="chzn-select-deselect"
+                                                        class="select2"
                                                         noSelection="['':'']"/>
                                 </td>
                                 <td>
@@ -320,6 +321,7 @@
             success: function () {
               clearOrderItems();
               loadOrderItems();
+              $('#orderItems').html('<option></option>').trigger('change');
               $.notify("Successfully deleted item " + id, "success")
             },
             error: function (jqXHR, textStatus, errorThrown) {
@@ -454,6 +456,15 @@
 
                     // Style table rows
                     $("#orderItemsTable > tbody tr").removeClass("odd").filter(":odd").addClass("odd");
+
+                    // Update select for order items in add adjustments tab
+                    $('#orderItems').select2({
+                        data: data,
+                        placeholder: 'Select an option',
+                        width: '100%',
+                        allowClear: true,
+                        tokenSeparators: [","],
+                    });
                 }
             });
         }
@@ -680,7 +691,7 @@
               cookie: {
                 expires: 1
               },
-              selected: 0
+              selected: ${params.skipTo ==  'adjustments' ? 1 : 0}
             }
           );
         });

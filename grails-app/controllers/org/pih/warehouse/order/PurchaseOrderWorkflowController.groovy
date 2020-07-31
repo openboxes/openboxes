@@ -41,7 +41,7 @@ class PurchaseOrderWorkflowController {
 
                 if (params.skipTo) {
                     if (params.skipTo == 'details') return success()
-                    else if (params.skipTo == 'items') return showOrderItems()
+                    else if (params.skipTo == 'items' || params.skipTo == 'adjustments') return showOrderItems()
                 }
 
                 return success()
