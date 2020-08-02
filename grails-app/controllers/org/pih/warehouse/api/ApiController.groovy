@@ -83,7 +83,7 @@ class ApiController {
 
             localizationMode = [
                 "label"      : messageSource.getMessage('localization.disable.label', emptyArgs, 'Disable translation mode', locale),
-                "linkIcon"   : "${request.contextPath}/images/icons/silk/world_delete.png",
+                "linkIcon"   : "${request.contextPath}/static/images/icons/silk/world_delete.png",
                 "linkAction" : "${request.contextPath}/user/disableLocalizationMode"
             ]
         }
@@ -91,7 +91,7 @@ class ApiController {
 
             localizationMode = [
                     "label"     : messageSource.getMessage('localization.enable.label', emptyArgs, 'Enable translation mode', locale),
-                    "linkIcon"  : "${request.contextPath}/images/icons/silk/world_add.png",
+                    "linkIcon"  : "${request.contextPath}/static/images/icons/silk/world_add.png",
                     "linkAction": "${request.contextPath}/user/enableLocalizationMode"
             ]
         }
@@ -100,18 +100,18 @@ class ApiController {
                 "label"      : messageSource.getMessage('default.edit.label',
                         [messageSource.getMessage('user.profile.label', emptyArgs, 'Profile', locale)] as Object[],
                         'Enable translation mode', locale),
-                "linkIcon"   : "${request.contextPath}/images/icons/silk/user.png",
+                "linkIcon"   : "${request.contextPath}/static/images/icons/silk/user.png",
                 "linkAction" : "${request.contextPath}/user/edit/${session?.user?.id}",
             ],
             localizationMode,
             [
                 "label"      : messageSource.getMessage('cache.flush.label', emptyArgs, 'Refresh caches', locale),
-                "linkIcon"   : "${request.contextPath}/images/icons/silk/database_wrench.png",
+                "linkIcon"   : "${request.contextPath}/static/images/icons/silk/database_wrench.png",
                 "linkAction" : "${request.contextPath}/dashboard/flushCache",
             ],
             [
                 "label"      : messageSource.getMessage('default.logout.label', emptyArgs, 'Logout', locale),
-                "linkIcon"   : "${request.contextPath}/images/icons/silk/door.png",
+                "linkIcon"   : "${request.contextPath}/static/images/icons/silk/door.png",
                 "linkAction" : "${request.contextPath}/auth/logout",
             ]
         ]

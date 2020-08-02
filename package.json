@@ -114,6 +114,7 @@
     "eslint-plugin-react": "7.10.0",
     "extract-text-webpack-plugin": "3.0.2",
     "file-loader": "1.1.11",
+    "filemanager-webpack-plugin": "^2.0.5",
     "html-webpack-plugin": "3.2.0",
     "jest": "22.4.4",
     "jquery": "3.5.0",
