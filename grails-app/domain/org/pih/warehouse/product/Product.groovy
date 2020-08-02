@@ -14,6 +14,7 @@ import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.NotImplementedException
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.pih.warehouse.MessageTagLib
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Document
@@ -666,7 +667,7 @@ class Product implements Comparable, Serializable {
     }
 
     def getApplicationTagLib() {
-        return Holder.grailsApplication.mainContext.getBean( 'org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib' )
+        return Holders.grailsApplication.mainContext.getBean( ApplicationTagLib )
     }
 
     def getHandlingIcons() {
