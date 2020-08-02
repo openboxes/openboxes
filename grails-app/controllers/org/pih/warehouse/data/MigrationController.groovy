@@ -14,6 +14,7 @@ import grails.util.Holders
 import grails.gorm.transactions.Transactional
 import grails.validation.Validateable
 import grails.validation.ValidationException
+import org.grails.plugins.web.taglib.ValidationTagLib
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -92,7 +93,7 @@ class MigrationController {
     }
 
     def stockMovementsWithoutShipmentItems() {
-        def g = Holders.grailsApplication.mainContext.getBean( 'org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib' )
+        ValidationTagLib g = Holders.grailsApplication.mainContext.getBean(ValidationTagLib.class)
         def data = migrationService.stockMovementsWithoutShipmentItems
         // id, status, request_number, date_created, origin, requested, picked, shipped
         if ("count".equals(params.format)) {
@@ -234,7 +235,7 @@ class MigrationController {
 
 
     def receiptsWithoutTransaction() {
-        def g = ApplicationHolder.application.mainContext.getBean( 'org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib' )
+        def g = Holders.grailsApplication.mainContext.getBean(ApplicationTagLib.class)
         def data = migrationService.getReceiptsWithoutTransaction()
         if ("count".equals(params.format)) {
             render data.size()

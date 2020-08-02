@@ -31,9 +31,9 @@ class Breadcrumbs extends Component {
     return (
       <div className="breadcrumbs-container d-flex">
         <a className="item-breadcrumbs" href="/openboxes">
-          <img alt="Breadcrumbs" src="/openboxes/images/skin/house.png" />
+          <img alt="Breadcrumbs" src="/openboxes/static/images/skin/house.png" />
         </a>
-        <img className="item-breadcrumbs" alt="/" src="/openboxes/images/bc_separator.png" />
+        <img className="item-breadcrumbs" alt="/" src="/openboxes/static/images/bc_separator.png" />
         <a
           role="button"
           href="#"
@@ -41,7 +41,7 @@ class Breadcrumbs extends Component {
           className="item-breadcrumbs"
         > {this.props.currentLocationName}
         </a>
-        <img className="item-breadcrumbs" alt="/" src="/openboxes/images/bc_separator.png" />
+        <img className="item-breadcrumbs" alt="/" src="/openboxes/static/images/bc_separator.png" />
         { listToReturn }
       </div>
     );

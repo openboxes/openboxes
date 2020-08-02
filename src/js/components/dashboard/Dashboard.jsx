@@ -203,7 +203,7 @@ class Dashboard extends Component {
   }
 
   fetchLocations() {
-    const url = '/openboxes/api/dashboard/fillRateDestinations';
+    const url = '/api/dashboard/fillRateDestinations';
 
     return apiClient.get(url)
       .then((response) => {
@@ -245,7 +245,7 @@ class Dashboard extends Component {
       widgets.push({ widgetId: widgetData.widgetId, order: index + 1 });
     });
 
-    const url = '/openboxes/api/dashboard/config';
+    const url = '/api/dashboard/config';
     const payload = {
       ...this.props.dashboardConfig.dashboards,
       [this.props.activeConfig]: {
