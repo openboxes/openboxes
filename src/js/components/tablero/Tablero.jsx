@@ -153,7 +153,7 @@ class Tablero extends Component {
   dataFetched = false;
 
   fetchLocations() {
-    const url = '/openboxes/apitablero/getFillRateDestinations';
+    const url = '/apitablero/getFillRateDestinations';
 
     return apiClient.get(url)
       .then((response) => {
@@ -175,7 +175,7 @@ class Tablero extends Component {
   }
 
   updateConfig = () => {
-    const url = '/openboxes/apitablero/updateConfig';
+    const url = '/apitablero/updateConfig';
 
     const payload = {
       number: {},
