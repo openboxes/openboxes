@@ -130,7 +130,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <g:each var="orderAdjustment" in="${order.orderAdjustments.sort { it.dateCreated }}" status="status">
+                            <g:each var="orderAdjustment" in="${order.orderAdjustments ? order.orderAdjustments.sort { it.dateCreated } : []}" status="status">
                                 <tr class="${status%2==0?'odd':'even'}">
                                     <td>
                                         ${orderAdjustment.orderAdjustmentType?.name}
