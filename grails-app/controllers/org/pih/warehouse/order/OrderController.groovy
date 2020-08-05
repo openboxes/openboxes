@@ -907,4 +907,57 @@ class OrderController {
         def orderId = orderIds?.flatten().first()
         redirect(action: 'shipOrder', id: orderId)
     }
+
+
+    def exportTemplate = {
+        Order order = Order.get(params.order.id)
+        def orderItems = OrderItem.findAllByOrder(order)
+        if (orderItems) {
+            String csv = orderService.exportOrderItems(orderItems)
+            response.setHeader("Content-disposition",
+                    "attachment; filename=\"PO - ${order.id} - shipment import template.csv\"")
+            response.contentType = "text/csv"
+            render csv
+        } else {
+            render(text: 'No order items found', status: 404)
+        }
+    }
+
+
+    def importTemplate = {
+        def orderInstance = Order.get(params.id)
+        if (!orderInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
+            redirect(action: "list")
+        } else {
+            try {
+                MultipartFile multipartFile = request.getFile('fileContents')
+                if (multipartFile.empty) {
+                    flash.message = "File cannot be empty."
+                    render (status: 404, text: "File was empty")
+                    return
+                }
+                List importedLines = orderService.parseOrderItemsFromTemplateImport(multipartFile.inputStream.text)
+                if (orderService.validateItemsFromTemplateImport(orderInstance, importedLines)) {
+                    orderService.saveItemsInShipment(orderInstance, importedLines)
+                    flash.message = "Successfully saved ${importedLines?.size()} lines from imported template"
+                } else {
+                    String message = "Failed to import template due to validation errors:"
+                    importedLines.eachWithIndex { line, idx ->
+                        if (line.errors) {
+                            message += "<br>Row ${idx + 1}: ${line.errors.join(". ")}"
+                        }
+                    }
+                    flash.message = message
+                    render (status: 404, text: "Validation error")
+                    return
+                }
+            } catch (Exception e) {
+                log.warn("Failed to import template due to the following error: " + e.message, e)
+                render (status: 500, text: "Failed to import template due to the following error: " + e.message)
+                return
+            }
+        }
+        render (status: 200, text: "Successfully imported template")
+    }
 }

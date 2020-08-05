@@ -4,12 +4,24 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
 	<title><warehouse:message code="order.shipOrder.label" default="Ship Order" /></title>
+	<style>
+		.import-template {
+			width: 0.1px;
+			height: 0.1px;
+			opacity: 0;
+			overflow: hidden;
+			position: absolute;
+			z-index: -1;
+		}
+		.import-template + label {
+			display: inline-block;
+		}
+	</style>
 </head>
 
 <body>
 
 	<div class="body">
-
 		<g:if test="${flash.message}">
 			<div class="message">
 				${flash.message}
@@ -42,11 +54,20 @@
 						<g:if test="${command.shipment}">
 							&rsaquo; ${command.shipment.shipmentNumber} ${command?.shipment?.name} (${command?.shipment?.status})
 						</g:if>
-						<button class="button" style="float: right; margin: 8px;" type="button" onclick="autofillQuantity()">
-							<g:message code="order.autofillQuantities.label" default="Autofill quantities"/>
-						</button>
+						<div style="float: right; margin: 8px; display: flex;" class="button-group">
+							<g:link class="button" type="button" action="exportTemplate" params="['order.id':command?.order?.id]">
+								<g:message code="default.exportTemplate.label" default="Export Template"/>
+							</g:link>
+							<input class="import-template" type="file" name="importTemplate" id="importTemplate" accept=".csv" />
+							<label for="importTemplate" class="button">
+								<warehouse:message code="default.importTemplate.label" default="Import template"/>
+							</label>
+							<button class="button" type="button" onclick="autofillQuantity()">
+								<g:message code="order.autofillQuantities.label" default="Autofill quantities"/>
+							</button>
+						</div>
 					</h2>
-					<g:hiddenField name="order.id" value="${command?.order?.id}" />
+					<g:hiddenField id="orderId"  name="order.id" value="${command?.order?.id}" />
 					<g:hiddenField name="shipment.id" value="${command?.shipment?.id}" />
 
 					<table id="shipOrder">
@@ -141,7 +162,7 @@
 													   name="shipOrderItems[${status}].quantityToShip"
 													   min="${shipOrderItem.quantityMinimum}"
 													   max="${shipOrderItem?.quantityMaximum}"
-													   value=""/>
+													   value="${shipOrderItem?.quantityToShip ?: ''}"/>
 												<a href="#" class="change-quantity"
 												   data-id="#orderItems-quantityToShip${status}"
 												   data-delta="-1"
@@ -209,6 +230,40 @@ $(document).ready(function() {
 			$(id).val(newValue);
 		}
 	});
+
+  $("#importTemplate").change(function(){
+    var orderId = $("#orderId").val();
+    var fileInput = document.getElementById('importTemplate');
+    if (orderId && fileInput.files && fileInput.files.length > 0) {
+      var file = fileInput.files[0];
+      var importData = new FormData();
+      importData.append('fileContents', file);
+      importData.append('id', orderId);
+      $.ajax({
+        type: 'POST',
+        url: '${g.createLink(controller:'order', action:'importTemplate')}',
+        data: importData,
+        enctype: "multipart/form-data",
+        contentType: false,
+        processData: false,
+        success: function () {
+          $("#importTemplate").val('');
+          $.notify("Successfully uploaded template", "success");
+          location.reload();
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          $("#importTemplate").val('');
+          if (jqXHR.responseText) {
+            $.notify(jqXHR.responseText, "error");
+          }
+          else {
+            $.notify("An error occurred", "error");
+          }
+          location.reload();
+        }
+      });
+    }
+  });
 });
 
 function autofillQuantity() {
