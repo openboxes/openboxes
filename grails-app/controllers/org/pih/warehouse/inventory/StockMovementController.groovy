@@ -377,11 +377,14 @@ class StockMovementController {
 
             String csv = new String(importFile.bytes)
             def settings = [separatorChar: ',', skipLines: 1]
+            Integer sortOrder = 0
             csv.toCsvReader(settings).eachLine { tokens ->
 
                 StockMovementItem stockMovementItem = StockMovementItem.createFromTokens(tokens)
                 stockMovementItem.stockMovement = stockMovement
+                stockMovementItem.sortOrder = sortOrder
                 stockMovement.lineItems.add(stockMovementItem)
+                sortOrder += 100
             }
             stockMovementService.updateItems(stockMovement)
 
