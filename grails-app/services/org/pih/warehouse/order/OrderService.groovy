@@ -24,8 +24,11 @@ import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentException
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.shipping.ShipmentType
+import util.ReportUtil
 
 import java.math.RoundingMode
+import java.text.SimpleDateFormat
 
 class OrderService {
 
@@ -38,6 +41,7 @@ class OrderService {
     def inventoryService
     def productSupplierDataService
     def personDataService
+    def stockMovementService
     def grailsApplication
 
     def getOrders(Order orderTemplate, Date dateOrderedFrom, Date dateOrderedTo, Map params) {
@@ -709,6 +713,37 @@ class OrderService {
     }
 
     /**
+     * Parse the given text into a list of maps.
+     *
+     * @param inputStream
+     * @return
+     */
+    List parseOrderItemsFromTemplateImport(String text) {
+        List orderItems = []
+        try {
+            def settings = [skipLines: 1]
+            def csvMapReader = new CSVMapReader(new StringReader(text), settings)
+            csvMapReader.fieldKeys = [
+                'id',
+                'palletName', // pack level 1
+                'boxName', // pack level 2
+                'productCode',
+                'productName',
+                'unitOfMeasure',
+                'lotNumber',
+                'expiry',
+                'quantityToShip'
+            ]
+            orderItems = csvMapReader.toList()
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error parsing order item CSV: " + e.message, e)
+        }
+
+        return orderItems
+    }
+
+    /**
      * Validates whether the order item details are valid.
      *
      * TODO Need to implement the validation logic :)
@@ -754,5 +789,204 @@ class OrderService {
         def isApprover = userService.hasRoleApprover(user)
 
         return isPending?:isApprover
+    }
+
+    String exportOrderItems(List<OrderItem> orderItems) {
+        def rows = []
+        orderItems.each { orderItem ->
+            def row = [
+                    'Order Item ID'     : orderItem?.id,
+                    'Pack level 1'      : '',
+                    'Pack level 2'      : '',
+                    'Code'              : orderItem?.product?.productCode,
+                    'Product'           : orderItem?.product?.name,
+                    'UOM'               : orderItem?.unitOfMeasure,
+                    'Lot'               : '',
+                    'Expiry (dd/mm/yy)' : '',
+                    'Qty to ship'       : orderItem.quantityRemaining,
+            ]
+
+            rows << row
+        }
+        return ReportUtil.getCsvForListOfMapEntries(rows)}
+
+    boolean validateItemsFromTemplateImport(Order order, List lineItems) {
+        def valid = true
+        lineItems.each { line ->
+            line.errors = []
+
+            OrderItem orderItem = null
+            if (!line.id) {
+                def codes = lineItems.findAll { it.productCode == line.productCode }
+                if (codes.size() > 1) {
+                    line.errors << "Product code ${line.productCode} appears more than once on PO. Must specify order item id"
+                    valid = false
+                }
+                orderItem = order?.orderItems?.find { it.product.productCode == line.productCode }
+            } else {
+                orderItem = order?.orderItems?.find { it.id == line.id }
+            }
+            if (!orderItem) {
+                line.errors << "Order item does not exit"
+                valid = false
+            }
+
+            if (!line.productCode) {
+                line.errors << "Product code is required"
+                valid = false
+            }
+            Product product = Product.findByProductCode(line.productCode)
+            if (!product) {
+                line.errors << "Product does not exit"
+                valid = false
+            }
+            if (orderItem && product && orderItem.product != product) {
+                line.errors << "Product with code ${line.productCode} does not match product from order item"
+                valid = false
+            }
+
+            if (line.uom) {
+                String[] uomParts = line.uom.split("/")
+                UnitOfMeasure uom = UnitOfMeasure.findByName(uomParts[0])
+                if (uomParts.length <= 1 || !uom) {
+                    line.errors << "Could not find provided Unit of Measure: ${line.uom}."
+                    valid = false
+                }
+                if (uom && orderItem && orderItem.unitOfMeasure != uom) {
+                    line.errors << "UOM for product code ${line.productCode} does not match UOM on PO."
+                    valid = false
+                }
+            }
+
+            if (line.expiry) {
+                def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+                def expiry = null
+                try {
+                    expiry = dateFormat.parse(line.expiry)
+                } catch (Exception e) {
+                    line.errors << "Unable to parse expiry date: ${line.expiry}"
+                    valid = false
+                }
+                Date date = grailsApplication.config.openboxes.expirationDate.minValue
+                if (expiry && expiry < date) {
+                    line.errors << "Expiry date has wrong value"
+                    valid = false
+                }
+            }
+
+            if (!line.quantityToShip) {
+                line.errors << "Quantity To Ship is empty"
+                valid = false
+            } else {
+                def qtyParsed = null
+                try {
+                    qtyParsed = Integer.parseInt(line.quantityToShip.toString())
+                } catch (Exception e) {
+                    line.errors << "Quantity To Ship value: ${line.quantityToShip} can't be parsed properly"
+                    valid = false
+                }
+                if (qtyParsed) {
+                    def linesWithSameOrderItem = lineItems.findAll { it.id == line.id || (!it.id && it.productCode == line.productCode) }
+                    def qtyToShipTotal
+                    if (linesWithSameOrderItem.size() > 1) {
+                        linesWithSameOrderItem.each { it ->
+                            try {
+                                it.quantityToShip = Integer.parseInt(it.quantityToShip.toString())
+                            } catch (Exception e) {
+                                valid = false
+                            }
+                        }
+                        qtyToShipTotal = linesWithSameOrderItem.quantityToShip.sum()
+                    } else {
+                        qtyToShipTotal = qtyParsed
+                    }
+                    if (orderItem && qtyToShipTotal > orderItem.quantityRemaining) {
+                        line.errors << "Qty to ship for product ${line.productCode}, order item ${line.id} is greater than qty available to ship."
+                        valid = false
+                    }
+                }
+            }
+        }
+        return valid
+    }
+
+    def saveItemsInShipment(Order order, List importedLines) {
+        Shipment shipment = order.pendingShipment
+        if (!shipment) {
+            shipment = new Shipment()
+            shipment.shipmentNumber = identifierService.generateShipmentIdentifier()
+            shipment.expectedShippingDate = new Date()
+            shipment.name = order.name ?: order.orderNumber
+            shipment.description = order.orderNumber
+            shipment.origin = order.origin
+            shipment.destination = order.destination
+            shipment.createdBy = order.orderedBy
+            shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
+            shipment.save()
+        } else {
+            if (shipment.shipmentItems) {
+                shipment.shipmentItems.flatten().toArray().each { ShipmentItem shipmentItem ->
+                    shipmentItem.orderItems?.flatten()?.toArray()?.each { OrderItem orderItem ->
+                        orderItem.removeFromShipmentItems(shipmentItem)
+                        shipmentItem.removeFromOrderItems(orderItem)
+                    }
+                    shipment.removeFromShipmentItems(shipmentItem)
+                    shipmentItem.delete()
+                }
+            }
+        }
+
+        importedLines.each { line ->
+            if ((line.quantityToShip as int) > 0) {
+                OrderItem orderItem = order.orderItems.find { it.id == line.id }
+                Product product = line.productCode ? Product.findByProductCode(line.productCode) : orderItem.product
+
+                InventoryItem inventoryItem = null
+                def expiry = null
+                if (line.lotNumber && line.expiry) {
+                    def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+                    expiry = dateFormat.parse(line.expiry)
+                    inventoryItem = inventoryService.findOrCreateInventoryItem(product, line.lotNumber, expiry)
+                }
+
+                ShipmentItem shipmentItem = orderItem.shipmentItems.find { it.inventoryItem == inventoryItem }
+
+                if (shipmentItem) {
+                    shipmentItem.quantity += (Integer.parseInt(line.quantityToShip.toString()) ?: orderItem.quantityToShip) * orderItem.quantityPerUom
+                } else {
+                    shipmentItem = new ShipmentItem()
+                    shipmentItem.product = product
+                    shipmentItem.quantity = (Integer.parseInt(line.quantityToShip.toString()) ?: orderItem.quantityToShip) * orderItem.quantityPerUom
+                    shipmentItem.recipient = orderItem.recipient ?: order.orderedBy
+                    if (line.palletName) {
+                        shipmentItem.container = stockMovementService
+                                .createOrUpdateContainer(shipment, line.palletName, line.boxName)
+                    }
+                    if (inventoryItem) {
+                        shipmentItem.lotNumber = line.lotNumber
+                        shipmentItem.expirationDate = expiry
+                        shipmentItem.inventoryItem = inventoryItem
+                    }
+                    shipment.addToShipmentItems(shipmentItem)
+                    orderItem.addToShipmentItems(shipmentItem)
+                }
+
+                shipmentItem.save(flush: true)
+            }
+        }
+
+        if (!shipment?.shipmentItems || shipment.shipmentItems.size() == 0) {
+            shipment.errors.rejectValue("shipmentItems", "shipment.mustContainAtLeastOneShipmentItem.message", "Shipment must contain at least one shipment item.")
+        }
+
+        if (shipment.hasErrors() || !shipment.save(flush: true)) {
+            throw new ValidationException("Invalid shipment", shipment.errors)
+        }
+
+        if (order.hasErrors() || !order.save(flush: true)) {
+            throw new ValidationException("Invalid order", order.errors)
+        }
+
+        return shipment
     }
 }
