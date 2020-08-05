@@ -28,6 +28,7 @@ import org.pih.warehouse.shipping.ShipmentType
 import util.ReportUtil
 
 import java.math.RoundingMode
+import java.text.SimpleDateFormat
 
 class OrderService {
 
@@ -794,15 +795,15 @@ class OrderService {
         def rows = []
         orderItems.each { orderItem ->
             def row = [
-                    'Order Item ID' : orderItem?.id,
-                    'Pack level 1'  : '',
-                    'Pack level 2'  : '',
-                    Code            : orderItem?.product?.productCode,
-                    Product         : orderItem?.product?.name,
-                    UOM             : orderItem?.unitOfMeasure,
-                    Lot             : '',
-                    Expiry          : '',
-                    'Qty to ship'   : orderItem.quantityRemaining,
+                    'Order Item ID'     : orderItem?.id,
+                    'Pack level 1'      : '',
+                    'Pack level 2'      : '',
+                    'Code'              : orderItem?.product?.productCode,
+                    'Product'           : orderItem?.product?.name,
+                    'UOM'               : orderItem?.unitOfMeasure,
+                    'Lot'               : '',
+                    'Expiry (dd/mm/yy)' : '',
+                    'Qty to ship'       : orderItem.quantityRemaining,
             ]
 
             rows << row
@@ -858,9 +859,10 @@ class OrderService {
             }
 
             if (line.expiry) {
-                Date expiry = null
+                def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+                def expiry = null
                 try {
-                    expiry = new Date(line.expiry)
+                    expiry = dateFormat.parse(line.expiry)
                 } catch (Exception e) {
                     line.errors << "Unable to parse expiry date: ${line.expiry}"
                     valid = false
@@ -935,13 +937,16 @@ class OrderService {
         }
 
         importedLines.each { line ->
-            if (line.quantityToShip > 0) {
+            if ((line.quantityToShip as int) > 0) {
                 OrderItem orderItem = order.orderItems.find { it.id == line.id }
                 Product product = line.productCode ? Product.findByProductCode(line.productCode) : orderItem.product
 
                 InventoryItem inventoryItem = null
-                if (line.lotNumber && line.expiration) {
-                    inventoryItem = inventoryService.findOrCreateInventoryItem(product, line.lotNumber, line.expiration)
+                def expiry = null
+                if (line.lotNumber && line.expiry) {
+                    def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+                    expiry = dateFormat.parse(line.expiry)
+                    inventoryItem = inventoryService.findOrCreateInventoryItem(product, line.lotNumber, expiry)
                 }
 
                 ShipmentItem shipmentItem = orderItem.shipmentItems.find { it.inventoryItem == inventoryItem }
@@ -959,14 +964,14 @@ class OrderService {
                     }
                     if (inventoryItem) {
                         shipmentItem.lotNumber = line.lotNumber
-                        shipmentItem.expirationDate = line.expiration
+                        shipmentItem.expirationDate = expiry
                         shipmentItem.inventoryItem = inventoryItem
                     }
                     shipment.addToShipmentItems(shipmentItem)
                     orderItem.addToShipmentItems(shipmentItem)
                 }
 
-                shipmentItem.save()
+                shipmentItem.save(flush: true)
             }
         }
 

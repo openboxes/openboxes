@@ -172,7 +172,7 @@ class OrderController {
                             new ShipOrderItemCommand(
                                     orderItem: orderItem,
                                     quantityMinimum: 0,
-                                    quantityToShip: order.pendingShipment ? 0 : quantityRemaining,
+                                    quantityToShip: 0,
                                     quantityMaximum: quantityRemaining)
                     command.shipOrderItems.add(shipOrderItem)
             }
