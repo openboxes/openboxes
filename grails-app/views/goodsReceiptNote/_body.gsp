@@ -28,7 +28,7 @@
                     </td>
                 </tr>
             </g:unless>
-            <g:each in="${shipment?.shipmentItems?.findAll { it.receiptItems }?.sort()}" status="i" var="shipmentItem">
+            <g:each in="${shipment?.sortShipmentItemsBySortOrder()?.findAll { it.receiptItems }}" status="i" var="shipmentItem">
                 <g:each in="${shipmentItem.receiptItems.sort { !it.isSplitItem }}" var="receiptItem">
                     <g:if test="${previousReceiptItem?.shipmentItem != receiptItem.shipmentItem}">
                         <tr class="prop">
