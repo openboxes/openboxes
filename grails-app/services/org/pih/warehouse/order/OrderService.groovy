@@ -795,15 +795,15 @@ class OrderService {
         def rows = []
         orderItems.each { orderItem ->
             def row = [
-                    'Order Item ID'     : orderItem?.id,
-                    'Pack level 1'      : '',
-                    'Pack level 2'      : '',
-                    'Code'              : orderItem?.product?.productCode,
-                    'Product'           : orderItem?.product?.name,
-                    'UOM'               : orderItem?.unitOfMeasure,
-                    'Lot'               : '',
-                    'Expiry (dd/mm/yy)' : '',
-                    'Qty to ship'       : orderItem.quantityRemaining,
+                    'Order Item ID'       : orderItem?.id,
+                    'Pack level 1'        : '',
+                    'Pack level 2'        : '',
+                    'Code'                : orderItem?.product?.productCode,
+                    'Product'             : orderItem?.product?.name,
+                    'UOM'                 : orderItem?.unitOfMeasure,
+                    'Lot'                 : '',
+                    'Expiry (mm/dd/yyyy)' : '',
+                    'Qty to ship'         : orderItem.quantityRemaining,
             ]
 
             rows << row
@@ -845,14 +845,14 @@ class OrderService {
                 valid = false
             }
 
-            if (line.uom) {
-                String[] uomParts = line.uom.split("/")
-                UnitOfMeasure uom = UnitOfMeasure.findByName(uomParts[0])
+            if (line.unitOfMeasure) {
+                String[] uomParts = line.unitOfMeasure.split("/")
+                UnitOfMeasure uom = UnitOfMeasure.findByCode(uomParts[0])
                 if (uomParts.length <= 1 || !uom) {
-                    line.errors << "Could not find provided Unit of Measure: ${line.uom}."
+                    line.errors << "Could not find provided Unit of Measure: ${line.unitOfMeasure}."
                     valid = false
                 }
-                if (uom && orderItem && orderItem.unitOfMeasure != uom) {
+                if (uom && orderItem && orderItem.quantityUom != uom) {
                     line.errors << "UOM for product code ${line.productCode} does not match UOM on PO."
                     valid = false
                 }
@@ -943,9 +943,11 @@ class OrderService {
 
                 InventoryItem inventoryItem = null
                 def expiry = null
-                if (line.lotNumber && line.expiry) {
-                    def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
-                    expiry = dateFormat.parse(line.expiry)
+                if (line.lotNumber) {
+                    if (line.expiry) {
+                        def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+                        expiry = dateFormat.parse(line.expiry)
+                    }
                     inventoryItem = inventoryService.findOrCreateInventoryItem(product, line.lotNumber, expiry)
                 }
 
@@ -964,7 +966,7 @@ class OrderService {
                     }
                     if (inventoryItem) {
                         shipmentItem.lotNumber = line.lotNumber
-                        shipmentItem.expirationDate = expiry
+                        shipmentItem.expirationDate = expiry ?: inventoryItem.expirationDate
                         shipmentItem.inventoryItem = inventoryItem
                     }
                     shipment.addToShipmentItems(shipmentItem)
