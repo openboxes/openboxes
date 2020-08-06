@@ -758,6 +758,11 @@ openboxes.jobs.refreshInventorySnapshotJob.enabled = true
 openboxes.jobs.refreshInventorySnapshotJob.retryOnError = false
 openboxes.jobs.refreshInventorySnapshotJob.maxRetryAttempts = 3
 
+// Refresh inventory snapshots after transaction (only for transaction entries)
+openboxes.jobs.refreshInventorySnapshotAfterTransactionJob.enabled = true
+openboxes.jobs.refreshInventorySnapshotAfterTransactionJob.retryOnError = false
+openboxes.jobs.refreshInventorySnapshotAfterTransactionJob.maxRetryAttempts = 3
+
 // Refresh transaction fact table
 openboxes.jobs.refreshTransactionFactJob.enabled = true
 openboxes.jobs.refreshTransactionFactJob.cronExpression = "0 0 0 * * ?" // every day at midnight
