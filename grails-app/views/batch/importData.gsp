@@ -88,7 +88,7 @@
                                         <g:each var="column" in="${commandInstance?.columnMap?.columnMap }">
                                             <td style="color: ${(row.isNewItem && column.value == 'lotNumber') ||
                                                     (row.isNewExpirationDate && column.value == 'expirationDate') ? 'red;': 'black;'};
-                                                    background-color: ${!row.quantity && column.value == 'quantity' ? '#ffcccb;': ''}">
+                                                    background-color: ${!row.quantity && row.quantity != 0 && column.value == 'quantity' ? '#ffcccb;': ''}">
                                                 ${row[column.value] }
                                             </td>
                                         </g:each>
