@@ -389,6 +389,9 @@ class DocumentService {
             data.eachWithIndex { Map dataRow, index ->
                 createExcelRow(sheet, index + 1, dataRow)
             }
+            for (int i = 0; i <= data.get(0).size(); i++) {
+                sheet.autoSizeColumn(i)
+            }
             workbook.write(outputStream)
             outputStream.close()
         } catch (IOException e) {
