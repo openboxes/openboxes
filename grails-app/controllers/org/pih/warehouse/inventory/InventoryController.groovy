@@ -28,7 +28,6 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.util.DateUtil
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.commons.CommonsMultipartFile
-import util.ReportUtil
 
 import java.text.SimpleDateFormat
 
@@ -42,6 +41,7 @@ class InventoryController {
     def inventorySnapshotService
     def userService
     def uploadService
+    def documentService
 
     static allowedMethods = [show: "GET", search: "POST", download: "GET"]
 
@@ -1412,10 +1412,10 @@ class InventoryController {
 
             rows << row
         }
-        String csv = ReportUtil.getCsvForListOfMapEntries(rows)
         response.setHeader("Content-disposition", "attachment; filename=\"inventory.xls\"")
         response.setContentType("application/vnd.ms-excel")
-        render csv
+        documentService.generateExcel(response.outputStream, rows)
+        response.outputStream.flush()
     }
 
 }
