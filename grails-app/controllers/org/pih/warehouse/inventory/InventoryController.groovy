@@ -28,6 +28,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.util.DateUtil
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.commons.CommonsMultipartFile
+import util.ReportUtil
 
 import java.text.SimpleDateFormat
 
@@ -1391,6 +1392,30 @@ class InventoryController {
 
         [inventoryList: inventoryList]
 
+    }
+
+    def downloadTemplate = {
+        Location location = Location.load(session.warehouse.id)
+        List data = inventorySnapshotService.getQuantityOnHandByBinLocation(location)
+        def rows = []
+        data.each {
+            def row = [
+                    'Product code'    : it.product?.productCode,
+                    'Product name'    : it.product?.name,
+                    'Lot number'      : StringEscapeUtils.escapeCsv(it.inventoryItem?.lotNumber ?: ""),
+                    'Expiration date' : it.inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
+                    'Bin location'    : StringEscapeUtils.escapeCsv(it.binLocation?.name ?: ""),
+                    'OB QOH'          : it.quantity,
+                    'Physical QOH'    : '',
+                    'Comment'         : '',
+            ]
+
+            rows << row
+        }
+        String csv = ReportUtil.getCsvForListOfMapEntries(rows)
+        response.setHeader("Content-disposition", "attachment; filename=\"inventory.xls\"")
+        response.setContentType("application/vnd.ms-excel")
+        render csv
     }
 
 }
