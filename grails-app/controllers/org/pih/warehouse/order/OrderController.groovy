@@ -902,7 +902,7 @@ class OrderController {
     def redirectFromStockMovement = {
         // FIXME Need to clean this up a bit (move logic to Shipment or ShipmentItem)
         def stockMovement = stockMovementService.getStockMovement(params.id)
-        def shipmentItem = stockMovement?.shipment?.shipmentItems?.first()
+        def shipmentItem = stockMovement?.shipment?.shipmentItems?.find { it.orderItems }
         def orderIds = shipmentItem?.orderItems*.order*.id
         def orderId = orderIds?.flatten().first()
         redirect(action: 'shipOrder', id: orderId)
