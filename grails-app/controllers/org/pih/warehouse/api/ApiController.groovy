@@ -136,7 +136,7 @@ class ApiController {
         String minimumExpirationDate = dateFormat.format(new Date(minValue))
         def logoLabel = grailsApplication.config.openboxes.logo.label
         def pageSize = grailsApplication.config.openboxes.api.pagination.pageSize
-        def logoUrl = "/openboxes/location/viewLogo/${session.warehouse?.id}"
+        def logoUrl = "/openboxes/location/renderLogo/${session.warehouse?.id}"
         render([
                 data: [
                         user                 : user,
