@@ -10,8 +10,6 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import grails.plugin.springcache.annotations.CacheFlush
-import grails.plugin.springcache.annotations.Cacheable
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.util.Environment
@@ -139,7 +137,7 @@ class ApiController {
         String minimumExpirationDate = dateFormat.format(new Date(minValue))
         def logoLabel = grailsApplication.config.openboxes.logo.label
         def pageSize = grailsApplication.config.openboxes.api.pagination.pageSize
-        def logoUrl = "/openboxes/location/viewLogo/${session.warehouse?.id}"
+        def logoUrl = "/openboxes/location/renderLogo/${session.warehouse?.id}"
         def locales = grailsApplication.config.openboxes.locale.supportedLocales
         def supportedLocales = locales.collect {
             def name = new Locale(it).getDisplayName()
