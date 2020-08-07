@@ -13,7 +13,7 @@ class Header extends Component {
 
     this.apiClient.post(url)
       .then(() => {
-      window.location = '/dashboard/index';
+        window.location = '/dashboard/index';
       });
   }
 
