@@ -192,7 +192,7 @@
                         <g:if test="${params.type=='INBOUND'}">
                             <td>
                                 <g:if test="${entry.value['quantityPurchased']}">
-                                    ${entry.value['quantityPurchased']} ${product?.unitOfMeasure}
+                                    ${entry.value['quantityPurchased']} <warehouse:message code="default.ea.label" default="EACH"/>
                                 </g:if>
                             </td>
                             <td>
@@ -234,7 +234,7 @@
                 <td>
                 </td>
                 <td>
-                    ${itemsMap.values()["quantityPurchased"].sum()} ${product?.unitOfMeasure}
+                    ${itemsMap.values()["quantityPurchased"].sum()} <warehouse:message code="default.ea.label" default="EACH"/>
                 </td>
                 <td>
                     ${itemsMap.values()["quantityRemaining"].sum()} ${product?.unitOfMeasure}
