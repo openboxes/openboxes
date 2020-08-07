@@ -1739,7 +1739,7 @@ class JsonController {
             id: it.id,
             code: it.code,
             supplierCode: it.supplierCode,
-            text: it.code,
+            text: it.code + ' ' + it.name,
             manufacturerCode: it.manufacturerCode,
             manufacturer: it.manufacturer?.id,
         ]}
