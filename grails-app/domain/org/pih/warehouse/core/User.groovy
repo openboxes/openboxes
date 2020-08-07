@@ -124,15 +124,14 @@ class User extends Person {
 
 
     Map toJson() {
-        boolean anonymize = Holders.getConfig().getProperty("openboxes.anonymize.enabled")
-
+        boolean anonymize = Holders.config.getProperty("openboxes.anonymize.enabled", Boolean.class, Boolean.FALSE)
         return [
                 "id"       : id,
                 "name"     : name,
                 "firstName": firstName,
                 "lastName" : (anonymize) ? lastInitial : lastName,
                 "email"    : anonymize ? StringUtil.mask(email) : email,
-                "username" : anonymize ? StringUtil.mask(username) : username
+                "username" : anonymize ? StringUtil.mask(username) : username,
         ]
     }
 
