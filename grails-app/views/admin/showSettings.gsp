@@ -198,7 +198,7 @@
                                     ${grailsApplication.config.grails.config.locations }
                                 </td>
                             </tr>
-                            <g:each in="${externalConfigProperties }" var="externalProperty">
+                            <g:each in="${grailsApplication.config.toProperties().sort() }" var="externalProperty">
                                 <g:each var="property" in="${externalProperty }">
                                     <tr class="prop">
                                         <td class="name">
@@ -219,7 +219,7 @@
                     </div>
                     <div id="tabs-4">
                         <table>
-                            <g:each in="${systemProperties}" var="prop">
+                            <g:each in="${System.properties}" var="prop">
                                 <tr class="prop">
                                     <td class="name">
                                         ${prop.key }
