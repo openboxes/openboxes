@@ -185,20 +185,6 @@ class AdminController {
     }
 
     def showSettings() {
-        def externalConfigProperties = []
-        grailsApplication.config.grails.config.locations.each { filename ->
-            try {
-                // Hack to remove the file: protocol from the URL string
-                filename -= "file:"
-                def file = new File(filename)
-                def inputStream = new FileInputStream(file)
-                def properties = new Properties()
-                properties.load(inputStream)
-                externalConfigProperties << properties
-            } catch (FileNotFoundException e) {
-                log.warn("Properties file not found: " + e.message)
-            }
-        }
 
         PrintService[] printServices = PrinterJob.lookupPrintServices()
 
@@ -217,9 +203,6 @@ class AdminController {
                 quartzScheduler         : quartzScheduler,
                 printServices           : printServices,
                 caches                  : null, //caches,
-                externalConfigProperties: externalConfigProperties,
-                systemProperties        : System.properties,
-                env                     : Environment.current,
                 enabled                 : Boolean.valueOf(grailsApplication.config.grails.mail.enabled),
                 from                    : "${config.getProperty("grails.mail.from")}",
                 host                    : "${config.getProperty("grails.mail.host")}",
