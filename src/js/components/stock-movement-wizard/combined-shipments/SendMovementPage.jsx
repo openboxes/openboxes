@@ -352,7 +352,7 @@ class SendMovementPage extends Component {
 
 
   fetchStockMovementItems() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=6`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=6`;
     apiClient.get(url)
       .then((response) => {
         const { data } = response.data;
@@ -368,7 +368,7 @@ class SendMovementPage extends Component {
 
   loadMoreRows({ startIndex }) {
     if (this.state.totalCount) {
-      const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=6`;
+      const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=6`;
       apiClient.get(url)
         .then((response) => {
           const { data } = response.data;
@@ -406,7 +406,7 @@ class SendMovementPage extends Component {
    * @public
    */
   fetchStockMovementData() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=6`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=6`;
 
     return apiClient.get(url)
       .then((response) => {
@@ -459,7 +459,7 @@ class SendMovementPage extends Component {
    * @public
    */
   sendFile(file) {
-    const url = `/openboxes/stockMovement/uploadDocument/${this.state.values.stockMovementId}`;
+    const url = `/stockMovement/uploadDocument/${this.state.values.stockMovementId}`;
 
     const data = new FormData();
     data.append('fileContents', file);
@@ -489,7 +489,7 @@ class SendMovementPage extends Component {
    * @public
    */
   saveShipment(payload) {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateShipment`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/updateShipment`;
 
     return apiClient.post(url, payload);
   }
@@ -499,7 +499,7 @@ class SendMovementPage extends Component {
    * @public
    */
   stateTransitionToIssued() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const payload = { status: 'ISSUED' };
 
     return apiClient.post(url, payload);
@@ -565,7 +565,7 @@ class SendMovementPage extends Component {
         .then(() => {
           this.stateTransitionToIssued()
             .then(() => {
-              window.location = `/openboxes/stockMovement/show/${this.state.values.stockMovementId}`;
+              window.location = `/stockMovement/show/${this.state.values.stockMovementId}`;
             })
             .catch(() => this.props.hideSpinner());
         })
@@ -610,7 +610,7 @@ class SendMovementPage extends Component {
     if (_.isEmpty(errors)) {
       this.saveValues(values)
         .then(() => {
-          window.location = `/openboxes/stockMovement/show/${values.stockMovementId}`;
+          window.location = `/stockMovement/show/${values.stockMovementId}`;
         });
     } else {
       confirmAlert({
@@ -622,7 +622,7 @@ class SendMovementPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = `/openboxes/stockMovement/show/${values.stockMovementId}`; },
+            onClick: () => { window.location = `/stockMovement/show/${values.stockMovementId}`; },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),
@@ -638,7 +638,7 @@ class SendMovementPage extends Component {
    */
   rollbackStockMovement(values) {
     this.props.showSpinner();
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const payload = { rollback: true };
 
     const isOrigin = this.props.currentLocationId === values.origin.id;
