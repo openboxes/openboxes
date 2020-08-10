@@ -2746,10 +2746,10 @@ class InventoryService implements ApplicationContextAware {
                             expirationDate = row.expirationDate
                             command.warnings[index] << "Expiration date '${row.expirationDate}' has unknown format ${row?.expirationDate?.class}"
                         }
-                        def date = grailsApplication.config.openboxes.expirationDate.minValue
-                        if (date > expirationDate) {
-                            command.errors.reject("Expiration date for item ${row.productCode} is not valid. Please enter a date after ${date.getYear()+1900}.")
-
+                        // Minimum date is either configured or we use the epoch date
+                        Date minExpirationDate = (Date) grailsApplication.config.getProperty("openboxes.expirationDate.minValue", Date.class, new Date(0L))
+                        if (minExpirationDate > expirationDate) {
+                            command.errors.reject("Expiration date for item ${row.productCode} is not valid. Please enter a date after ${minExpirationDate.getYear()+1900}.")
                         }
 
                         row.isNewExpirationDate = inventoryItem?.expirationDate && expirationDate != inventoryItem.expirationDate
