@@ -172,7 +172,7 @@ class OrderController {
                             new ShipOrderItemCommand(
                                     orderItem: orderItem,
                                     quantityMinimum: 0,
-                                    quantityToShip: order.pendingShipment ? 0 : quantityRemaining,
+                                    quantityToShip: 0,
                                     quantityMaximum: quantityRemaining)
                     command.shipOrderItems.add(shipOrderItem)
             }
@@ -351,7 +351,7 @@ class OrderController {
                 orderAdjustment.properties = params
                 if (!orderAdjustment.hasErrors() && orderAdjustment.save(flush: true)) {
                     flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'orderAdjustment.label', default: 'Order Adjustment'), orderAdjustment.id])}"
-                    redirect(controller:"purchaseOrderWorkflow", action: "purchaseOrder", id: orderInstance.id, params:['skipTo': 'items'])
+                    redirect(controller:"purchaseOrderWorkflow", action: "purchaseOrder", id: orderInstance.id, params:['skipTo': 'adjustments'])
                 } else {
                     render(view: "editAdjustment", model: [orderInstance: orderInstance, orderAdjustment: orderAdjustment])
                 }
@@ -360,7 +360,7 @@ class OrderController {
                 orderInstance.addToOrderAdjustments(orderAdjustment)
                 if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
                     flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.id])}"
-                    redirect(controller:"purchaseOrderWorkflow", action: "purchaseOrder", id: orderInstance.id, params:['skipTo': 'items'])
+                    redirect(controller:"purchaseOrderWorkflow", action: "purchaseOrder", id: orderInstance.id, params:['skipTo': 'adjustments'])
                 } else {
                     render(view: "editAdjustment", model: [orderInstance: orderInstance, orderAdjustment: orderAdjustment])
                 }
@@ -387,7 +387,7 @@ class OrderController {
                 orderAdjustment.delete()
                 if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
                     flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.id])}"
-                    redirect(controller:"purchaseOrderWorkflow", action: "purchaseOrder", id: orderInstance.id, params:['skipTo': 'items'])
+                    redirect(controller:"purchaseOrderWorkflow", action: "purchaseOrder", id: orderInstance.id, params:['skipTo': 'adjustments'])
                 } else {
                     render(view: "show", model: [orderInstance: orderInstance])
                 }
@@ -651,7 +651,7 @@ class OrderController {
             Order order = orderItem.order
             order.removeFromOrderItems(orderItem)
             orderItem.delete()
-            order.save()
+            order.save(flush:true)
             render (status: 200, text: "Successfully deleted order item")
         }
         else {
@@ -681,7 +681,7 @@ class OrderController {
             orderItem.properties = params
             Shipment pendingShipment = order.pendingShipment
             if (pendingShipment) {
-                Set<ShipmentItem> itemsToUpdate = pendingShipment.shipmentItems.findAll { it.orderItemId == orderItem.id }
+                List<ShipmentItem> itemsToUpdate = pendingShipment.shipmentItems.findAll { it.orderItemId == orderItem.id }
                 itemsToUpdate.each { itemToUpdate ->
                     itemToUpdate.recipient = orderItem.recipient
                 }
@@ -730,7 +730,8 @@ class OrderController {
                     isOrderPending: it?.order?.status == OrderStatus.PENDING,
                     dateCreated: it.dateCreated,
                     canEdit: orderService.canOrderItemBeEdited(it, session.user),
-                    manufacturerName: it.productSupplier?.manufacturer?.name
+                    manufacturerName: it.productSupplier?.manufacturer?.name,
+                    text: it.toString()
             ]
         }
         orderItems = orderItems.sort { it.dateCreated }
@@ -901,9 +902,62 @@ class OrderController {
     def redirectFromStockMovement = {
         // FIXME Need to clean this up a bit (move logic to Shipment or ShipmentItem)
         def stockMovement = stockMovementService.getStockMovement(params.id)
-        def shipmentItem = stockMovement?.shipment?.shipmentItems?.first()
+        def shipmentItem = stockMovement?.shipment?.shipmentItems?.find { it.orderItems }
         def orderIds = shipmentItem?.orderItems*.order*.id
         def orderId = orderIds?.flatten().first()
         redirect(action: 'shipOrder', id: orderId)
+    }
+
+
+    def exportTemplate = {
+        Order order = Order.get(params.order.id)
+        def orderItems = OrderItem.findAllByOrder(order)
+        if (orderItems) {
+            String csv = orderService.exportOrderItems(orderItems)
+            response.setHeader("Content-disposition",
+                    "attachment; filename=\"PO - ${order.id} - shipment import template.csv\"")
+            response.contentType = "text/csv"
+            render csv
+        } else {
+            render(text: 'No order items found', status: 404)
+        }
+    }
+
+
+    def importTemplate = {
+        def orderInstance = Order.get(params.id)
+        if (!orderInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
+            redirect(action: "list")
+        } else {
+            try {
+                MultipartFile multipartFile = request.getFile('fileContents')
+                if (multipartFile.empty) {
+                    flash.message = "File cannot be empty."
+                    render (status: 404, text: "File was empty")
+                    return
+                }
+                List importedLines = orderService.parseOrderItemsFromTemplateImport(multipartFile.inputStream.text)
+                if (orderService.validateItemsFromTemplateImport(orderInstance, importedLines)) {
+                    orderService.saveItemsInShipment(orderInstance, importedLines)
+                    flash.message = "Successfully saved ${importedLines?.size()} lines from imported template"
+                } else {
+                    String message = "Failed to import template due to validation errors:"
+                    importedLines.eachWithIndex { line, idx ->
+                        if (line.errors) {
+                            message += "<br>Row ${idx + 1}: ${line.errors.join(". ")}"
+                        }
+                    }
+                    flash.message = message
+                    render (status: 404, text: "Validation error")
+                    return
+                }
+            } catch (Exception e) {
+                log.warn("Failed to import template due to the following error: " + e.message, e)
+                render (status: 500, text: "Failed to import template due to the following error: " + e.message)
+                return
+            }
+        }
+        render (status: 200, text: "Successfully imported template")
     }
 }

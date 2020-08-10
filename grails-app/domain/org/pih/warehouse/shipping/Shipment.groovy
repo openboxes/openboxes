@@ -94,7 +94,6 @@ class Shipment implements Comparable, Serializable {
     List comments
     List referenceNumbers
 
-    SortedSet shipmentItems
     SortedSet receipts
 
     static transients = [

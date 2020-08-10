@@ -11,13 +11,18 @@ const renderHandlingIcons = (handlingIcons) => {
 
   return (
     <span className="d-flex align-items-center">
-      {_.map(handlingIcons, handlingIcon => (
-        <FontAwesomeIcon
-          className="ml-1"
-          icon={getIcon(handlingIcon.icon)}
-          color={handlingIcon.color ? handlingIcon.color : 'inherit'}
-        />
-      ))}
+      {_.map(handlingIcons, (handlingIcon) => {
+        if (!handlingIcon || !getIcon(handlingIcon.icon)) {
+          return null;
+        }
+        return (
+          <FontAwesomeIcon
+            className="ml-1"
+            icon={getIcon(handlingIcon.icon)}
+            color={handlingIcon.color ? handlingIcon.color : 'inherit'}
+          />
+        );
+      })}
     </span>
   );
 };

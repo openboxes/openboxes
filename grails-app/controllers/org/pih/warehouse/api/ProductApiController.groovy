@@ -14,6 +14,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociation
 import org.pih.warehouse.product.ProductAssociationTypeCode
+import org.pih.warehouse.product.ProductAvailability
 
 class ProductApiController extends BaseDomainApiController {
 
@@ -33,14 +34,25 @@ class ProductApiController extends BaseDomainApiController {
         render([data: data] as JSON)
     }
 
-
     def demandSummary = {
         def product = Product.get(params.id)
         def location = Location.get(session.warehouse.id)
         def data = forecastingService.getDemandSummary(location, product)
-
         render([data: data] as JSON)
+    }
 
+    def productSummary = {
+        def product = Product.load(params.id)
+        def location = Location.load(session.warehouse.id)
+        def quantityOnHand = ProductAvailability.findAllByProductAndLocation(product, location).sum { it.quantityOnHand }
+        render([data: [product:[id: product.id], location: [id: location.id], quantityOnHand: quantityOnHand]] as JSON)
+    }
+
+    def productAvailability = {
+        def product = Product.load(params.id)
+        def location = Location.load(session.warehouse.id)
+        def data = ProductAvailability.findAllByProductAndLocation(product, location)
+        render([data: data] as JSON)
     }
 
     def list = {
@@ -63,6 +75,7 @@ class ProductApiController extends BaseDomainApiController {
                     productCode: k,
                     name: v[0].inventoryItem.product.name,
                     id: v[0].inventoryItem.product.id,
+                    product: v[0].inventoryItem.product,
                     quantityAvailable: v.sum { it.quantityAvailable },
                     minExpirationDate: v.findAll { it.inventoryItem.expirationDate != null }.collect {
                         it.inventoryItem?.expirationDate

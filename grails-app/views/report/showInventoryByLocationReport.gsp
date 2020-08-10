@@ -84,7 +84,7 @@
                                     ${product?.productCode}
                                 </td>
                                 <td>
-                                    ${product?.name}
+                                    ${product?.name}  <g:renderHandlingIcons product="${product}" />
                                 </td>
                                 <td>
                                     ${product?.category?.name}

@@ -41,6 +41,7 @@ class InventoryController {
     def inventorySnapshotService
     def userService
     def uploadService
+    def documentService
 
     static allowedMethods = [show: "GET", search: "POST", download: "GET"]
 
@@ -1391,6 +1392,30 @@ class InventoryController {
 
         [inventoryList: inventoryList]
 
+    }
+
+    def downloadTemplate = {
+        Location location = Location.load(session.warehouse.id)
+        List data = inventorySnapshotService.getQuantityOnHandByBinLocation(location)
+        def rows = []
+        data.each {
+            def row = [
+                    'Product code'    : it.product?.productCode,
+                    'Product name'    : it.product?.name,
+                    'Lot number'      : StringEscapeUtils.escapeCsv(it.inventoryItem?.lotNumber ?: ""),
+                    'Expiration date' : it.inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
+                    'Bin location'    : StringEscapeUtils.escapeCsv(it.binLocation?.name ?: ""),
+                    'OB QOH'          : it.quantity,
+                    'Physical QOH'    : '',
+                    'Comment'         : '',
+            ]
+
+            rows << row
+        }
+        response.setHeader("Content-disposition", "attachment; filename=\"inventory.xls\"")
+        response.setContentType("application/vnd.ms-excel")
+        documentService.generateExcel(response.outputStream, rows)
+        response.outputStream.flush()
     }
 
 }

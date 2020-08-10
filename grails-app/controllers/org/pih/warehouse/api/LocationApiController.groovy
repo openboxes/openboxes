@@ -10,8 +10,10 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import org.hibernate.Criteria
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
+import org.pih.warehouse.product.ProductAvailability
 
 class LocationApiController extends BaseDomainApiController {
 
@@ -35,4 +37,23 @@ class LocationApiController extends BaseDomainApiController {
         def locations = locationService.getLocations(fields, params, isSuperuser, direction, currentLocation, currentUser)
         render ([data:locations] as JSON)
      }
+
+
+    def productSummary = {
+        Location currentLocation = Location.load(session.warehouse.id)
+        def data = ProductAvailability.createCriteria().list {
+            resultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+            projections {
+                product {
+                    groupProperty("id", "productId")
+                    groupProperty("name", "productName")
+                    groupProperty("productCode", "productCode")
+                }
+                sum("quantityOnHand", "quantityOnHand")
+            }
+            eq("location", currentLocation)
+        }
+        render ([data:data] as JSON)
+
+    }
 }

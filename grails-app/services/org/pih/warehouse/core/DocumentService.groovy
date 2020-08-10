@@ -389,6 +389,9 @@ class DocumentService {
             data.eachWithIndex { Map dataRow, index ->
                 createExcelRow(sheet, index + 1, dataRow)
             }
+            for (int i = 0; i <= data.get(0).size(); i++) {
+                sheet.autoSizeColumn(i)
+            }
             workbook.write(outputStream)
             outputStream.close()
         } catch (IOException e) {
@@ -521,12 +524,12 @@ class DocumentService {
         row.getCell(CELL_INDEX++).setCellStyle(tableHeaderCenterStyle)
 
         def previousContainer = "", initialRowIndex = 0, finalRowIndex = 0
-        shipmentInstance.shipmentItems.sort().each { itemInstance ->
+        shipmentInstance.sortShipmentItemsBySortOrder().each { itemInstance ->
 
             CELL_INDEX = 0
             log.debug "Adding item  to packing list " + itemInstance?.product?.name + " -> " + itemInstance?.container?.name
             row = sheet.createRow((short) counter++)
-            
+
             if (itemInstance?.container?.parentContainer) {
                 row.createCell(CELL_INDEX).setCellValue(itemInstance?.container?.parentContainer?.name)
                 row.getCell(CELL_INDEX++).setCellStyle(tableDataPalletStyle)
@@ -846,10 +849,7 @@ class DocumentService {
             row.getCell(CELL_INDEX++).setCellStyle(tableHeaderCenterStyle)
 
             def previousContainer = "", previousParentContainer = "", packLevelOneInitialRowIndex = 0, packLevelOneFinalRowIndex = 0, packLevelTwoInitialRowIndex = 0, packLevelTwoFinalRowIndex = 0
-            shipmentInstance.shipmentItems.sort { a, b ->
-                a.container?.parentContainer && !b.container?.parentContainer ?
-                    a.container?.parentContainer <=> b.container :
-                        a.container?.parentContainer <=> b.container?.parentContainer }.each { itemInstance ->
+            shipmentInstance.sortShipmentItemsBySortOrder().each { itemInstance ->
 
                 CELL_INDEX = 0
                 log.debug "Adding item  to packing list " + itemInstance?.product?.name + " -> " + itemInstance?.container?.name
@@ -1094,7 +1094,7 @@ class DocumentService {
 
             def totalPrice = 0
             def previousContainer = "", initialRowIndex = 0, finalRowIndex = 0
-            shipmentInstance.shipmentItems.sort().each { itemInstance ->
+            shipmentInstance.sortShipmentItemsBySortOrder().each { itemInstance ->
 
                 CELL_INDEX = 0
                 row = sheet.createRow((short) counter++)

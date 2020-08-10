@@ -17,7 +17,7 @@
                     </g:else>
                 </td>
 
-				<td style="width: 1%; white-space: nowrap;" class="middle handling-icon-2x">
+				<td style="width: 1%; white-space: nowrap;" class="middle fa-2x">
 					<g:renderHandlingIcons product="${productInstance}" />
 				</td>
 				<td class="middle">

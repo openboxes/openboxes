@@ -62,14 +62,8 @@
                                     <warehouse:message code="order.origin.label"/></label>
                                 </td>
                                 <td class='value ${hasErrors(bean:order,field:'origin','errors')}'>
-
-                                    <g:if test="${order.id}">
-                                        ${order?.origin?.name}
-                                    </g:if>
-                                    <g:else>
-                                        <g:selectOrderSupplier name="origin.id" class="chzn-select-deselect"
-                                                               optionKey="id" value="${order?.origin?.id}" noSelection="['':'']"/>
-                                    </g:else>
+                                    <g:selectOrderSupplier name="origin.id" class="chzn-select-deselect"
+                                                           optionKey="id" value="${order?.origin?.id}" noSelection="['':'']"/>
                                 </td>
                             </tr>
                             <tr class='prop'>

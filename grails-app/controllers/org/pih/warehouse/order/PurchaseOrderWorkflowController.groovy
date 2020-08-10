@@ -41,7 +41,7 @@ class PurchaseOrderWorkflowController {
 
                 if (params.skipTo) {
                     if (params.skipTo == 'details') return success()
-                    else if (params.skipTo == 'items') return showOrderItems()
+                    else if (params.skipTo == 'items' || params.skipTo == 'adjustments') return showOrderItems()
                 }
 
                 return success()
@@ -54,13 +54,21 @@ class PurchaseOrderWorkflowController {
         enterOrderDetails {
             on("next") {
                 log.info "Save order details " + params
-                flow.order.properties = params
-                try {
-                    if (!orderService.saveOrder(flow.order)) {
+                if (flow.order.id) {
+                    flow.order.refresh()
+                }
+                if (flow.order.orderItems && flow.order.origin.id != params.origin.id) {
+                    flow.order.errors.reject("Cannot change the supplier for a PO with item lines.")
+                    return error()
+                } else {
+                    flow.order.properties = params
+                    try {
+                        if (!orderService.saveOrder(flow.order)) {
+                            return error()
+                        }
+                    } catch (ValidationException e) {
                         return error()
                     }
-                } catch (ValidationException e) {
-                    return error()
                 }
             }.to("showOrderItems")
             on("showOrderItems").to("showOrderItems")

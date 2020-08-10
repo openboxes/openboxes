@@ -78,7 +78,7 @@ class ReceiptService {
         Location defaultBinLocation = !shipment.destination.hasBinLocationSupport() ? null :
                 locationService.findInternalLocation(shipment.destination, receivingLocationNames)
 
-        def shipmentItemsByContainer = shipment.shipmentItems.groupBy { it.container }
+        def shipmentItemsByContainer = shipment.sortShipmentItemsBySortOrder().groupBy { it.container }
         shipmentItemsByContainer.collect { container, shipmentItems ->
 
             PartialReceiptContainer partialReceiptContainer = new PartialReceiptContainer(container: container)
@@ -110,7 +110,7 @@ class ReceiptService {
         Location defaultBinLocation = !receipt.shipment.destination.hasBinLocationSupport() ? null :
                 locationService.findInternalLocation(receipt.shipment.destination, receivingLocationNames)
 
-        def shipmentItemsByContainer = receipt.shipment.shipmentItems.groupBy { it.container }
+        def shipmentItemsByContainer = receipt.shipment.sortShipmentItemsBySortOrder().groupBy { it.container }
         shipmentItemsByContainer.collect { container, shipmentItems ->
 
             PartialReceiptContainer partialReceiptContainer = new PartialReceiptContainer(container: container)

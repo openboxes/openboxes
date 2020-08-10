@@ -912,6 +912,7 @@ class StockMovementService {
 
                 log.info "Available items for substitution ${associatedProduct}: ${availableItems}"
                 SubstitutionItem substitutionItem = new SubstitutionItem()
+                substitutionItem.product = associatedProduct
                 substitutionItem.productId = associatedProduct.id
                 substitutionItem.productName = associatedProduct.name
                 substitutionItem.productCode = associatedProduct.productCode
@@ -927,6 +928,7 @@ class StockMovementService {
             List<AvailableItem> availableItems = getAvailableBinLocations(location, item.product)
 
             SubstitutionItem substitutionItem = new SubstitutionItem()
+            substitutionItem.product = item?.product
             substitutionItem.productId = item?.product?.id
             substitutionItem.productName = item?.product?.name
             substitutionItem.productCode = item?.product?.productCode
@@ -1145,7 +1147,7 @@ class StockMovementService {
         Shipment shipment = new Shipment()
         shipment.shipmentNumber = identifierService.generateShipmentIdentifier()
         shipment.expectedShippingDate = new Date()
-        shipment.name = order.name
+        shipment.name = order.name ?: order.orderNumber
         shipment.description = order.orderNumber
         shipment.origin = order.origin
         shipment.destination = order.destination
