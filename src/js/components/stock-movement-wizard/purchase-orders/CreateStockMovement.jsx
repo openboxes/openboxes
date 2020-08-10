@@ -187,9 +187,9 @@ class CreateStockMovement extends Component {
 
       let stockMovementUrl = '';
       if (values.stockMovementId) {
-        stockMovementUrl = `/openboxes/api/stockMovements/${values.stockMovementId}/updateRequisition`;
+        stockMovementUrl = `/api/stockMovements/${values.stockMovementId}/updateRequisition`;
       } else {
-        stockMovementUrl = '/openboxes/api/stockMovements';
+        stockMovementUrl = '/api/stockMovements';
       }
 
       const payload = {
