@@ -91,20 +91,11 @@ class AdminController {
 
 
     def sendMail() {
-
-        println "sendMail: " + params
-
         if (request.method == "POST") {
             try {
                 withForm {
                     MultipartFile multipartFile = request.getFile('file')
                     if (!multipartFile.empty) {
-                        byte[] bytes = multipartFile.bytes
-
-                        println multipartFile.contentType
-                        println multipartFile.originalFilename
-                        println multipartFile.name
-
                         def emailMessageMap = [
                                 from          : session?.user?.email,
                                 to            : params.list("to"),
@@ -134,8 +125,7 @@ class AdminController {
                 flash.message = "Unable to send email due to error: " + e.message
             }
         }
-
-
+        render(view: "sendMail")
     }
 
 
