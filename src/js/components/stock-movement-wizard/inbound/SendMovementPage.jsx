@@ -345,7 +345,7 @@ class SendMovementPage extends Component {
 
 
   fetchStockMovementItems() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=6`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=6`;
     apiClient.get(url)
       .then((response) => {
         const { data } = response.data;
@@ -361,7 +361,7 @@ class SendMovementPage extends Component {
 
   loadMoreRows({ startIndex }) {
     if (this.state.totalCount) {
-      const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=6`;
+      const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=6`;
       apiClient.get(url)
         .then((response) => {
           const { data } = response.data;
