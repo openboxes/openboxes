@@ -74,7 +74,6 @@ class InventoryExcelImporter extends AbstractExcelImporter {
      */
     void importData(ImportDataCommand command) {
         inventoryService.importInventoryData(command)
-
     }
 
 }
