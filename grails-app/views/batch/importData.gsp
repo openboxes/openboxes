@@ -33,6 +33,7 @@
                     <input name="location.id" type="hidden" value="${session.warehouse.id }"/>
                     <input name="importType" type="hidden" value="${params.importType }"/>
                     <input name="importNow" type="hidden" value="${Boolean.TRUE }"/>
+                    <input name="importNow" type="hidden" value="${Boolean.TRUE }"/>
 
                     <div class="yui-gf">
                         <div class="yui-u first">
