@@ -113,7 +113,7 @@ export const debounceProductsFetch = (waitTime, minSearchLength, locationId) =>
 export const debounceAvailableItemsFetch = (waitTime, minSearchLength) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
-      apiClient.get(`/openboxes/api/products?name=${searchTerm}&productCode=${searchTerm}&availableItems=true`)
+      apiClient.get(`/api/products?name=${searchTerm}&productCode=${searchTerm}&availableItems=true`)
         .then(result => callback(
           null,
           {
