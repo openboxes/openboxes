@@ -91,9 +91,6 @@ class AdminController {
 
 
     def sendMail() {
-
-        println "sendMail: " + params
-
         if (request.method == "POST") {
             try {
                 withForm {
@@ -131,8 +128,7 @@ class AdminController {
                 flash.message = "Unable to send email due to error: " + e.message
             }
         }
-
-
+        render(view: "sendMail")
     }
 
 
