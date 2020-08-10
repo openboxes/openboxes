@@ -221,6 +221,7 @@ class BatchController {
                     try {
                         dataImporter.importData(command)
                     } catch(Exception e) {
+                        log.error("Unable to import data: " + e.message, e)
                         command.errors.reject(e.message)
                     }
                     if (!command.hasErrors()) {

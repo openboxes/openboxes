@@ -2783,18 +2783,14 @@ class InventoryService implements ApplicationContextAware {
      * @param command
      * @return
      */
-    def importInventoryData(ImportDataCommand command) {
+    void importInventoryData(ImportDataCommand command) {
         def dateFormatter = new SimpleDateFormat("yy-mm")
-        def importer = new InventoryExcelImporter(command.importFile.absolutePath)
-        def data = importer.data
-        assert data != null
-        log.info "Data to be imported: " + data
 
         def transaction = new Transaction()
         transaction.transactionDate = command.date
         transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
         transaction.transactionNumber = generateTransactionNumber()
-        transaction.comment = "Imported from ${command.importFile.name} on ${new Date()}"
+        transaction.comment = "Imported from ${command.filename} on ${new Date()}"
         transaction.inventory = command.location.inventory
 
         def calendar = Calendar.getInstance()
@@ -2855,9 +2851,8 @@ class InventoryService implements ApplicationContextAware {
         // Force refresh of inventory snapshot table
         transaction.forceRefresh = Boolean.TRUE
         transaction.save(flush: true, failOnError: true)
-        println "Transaction ${transaction?.transactionNumber} saved successfully! "
-        println "Added ${transaction?.transactionEntries?.size()} transaction entries"
-        return data
+        log.info "Transaction ${transaction?.transactionNumber} saved successfully! "
+        log.info "Added ${transaction?.transactionEntries?.size()} transaction entries"
     }
 
 
