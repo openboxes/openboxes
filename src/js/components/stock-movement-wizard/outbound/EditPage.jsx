@@ -314,7 +314,8 @@ class EditItemsPage extends Component {
       hasItemsLoaded: this.state.hasItemsLoaded
       || this.state.totalCount === _.uniqBy(_.concat(this.state.values.editPageItems, editPageItems), 'requisitionItemId').length,
     }, () => {
-      if (!_.isNull(stopIndex) && this.state.values.editPageItems.length < this.state.totalCount) {
+      // eslint-disable-next-line max-len
+      if (!_.isNull(stopIndex) && this.state.values.editPageItems.length !== this.state.totalCount) {
         this.loadMoreRows({ startIndex: stopIndex, stopIndex: stopIndex + this.props.pageSize });
       }
       this.props.hideSpinner();

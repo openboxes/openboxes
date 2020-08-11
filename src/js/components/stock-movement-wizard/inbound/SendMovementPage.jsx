@@ -387,7 +387,7 @@ class SendMovementPage extends Component {
           },
           isFirstPageLoaded: true,
         }, () => {
-          if (this.state.values.tableItems.length < this.state.totalCount) {
+          if (this.state.values.tableItems.length !== this.state.totalCount) {
             this.loadMoreRows({
               startIndex: stopIndex,
               stopIndex: stopIndex + this.props.pageSize,

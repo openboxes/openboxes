@@ -233,7 +233,8 @@ class PickPage extends Component {
       },
       sorted: false,
     }, () => {
-      if (!_.isNull(stopIndex) && this.state.values.pickPageItems.length < this.state.totalCount) {
+      // eslint-disable-next-line max-len
+      if (!_.isNull(stopIndex) && this.state.values.pickPageItems.length !== this.state.totalCount) {
         this.loadMoreRows({ startIndex: stopIndex, stopIndex: stopIndex + this.props.pageSize });
       }
     });
