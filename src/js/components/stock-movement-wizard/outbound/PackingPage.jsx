@@ -218,7 +218,8 @@ class PackingPage extends Component {
         packPageItems: _.uniqBy(_.concat(this.state.values.packPageItems, data), 'shipmentItemId'),
       },
     }, () => {
-      if (!_.isNull(stopIndex) && this.state.values.packPageItems.length < this.state.totalCount) {
+      // eslint-disable-next-line max-len
+      if (!_.isNull(stopIndex) && this.state.values.packPageItems.length !== this.state.totalCount) {
         this.loadMoreRows({ startIndex: stopIndex, stopIndex: stopIndex + this.props.pageSize });
       }
     });
