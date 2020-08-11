@@ -576,7 +576,9 @@ class AddItemsPage extends Component {
 
     return apiClient.get(url)
       .then((response) => {
-        this.setLineItems(response, null);
+        this.setState({
+          totalCount: response.data.data.length,
+        }, () => this.setLineItems(response, null));
       })
       .catch(err => err);
   }
