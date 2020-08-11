@@ -312,8 +312,6 @@ class AddItemsPage extends Component {
         lineItems: this.props.isPaginated ?
           _.uniqBy(_.concat(this.state.values.lineItems, lineItemsData), 'id') : lineItemsData,
       },
-      totalCount: lineItemsData.length > this.state.totalCount ?
-        lineItemsData.length : this.state.totalCount,
     }, () => this.props.hideSpinner());
   }
 

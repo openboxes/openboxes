@@ -358,8 +358,6 @@ class AddItemsPage extends Component {
           _.uniqBy(_.concat(this.state.values.lineItems, lineItemsData), 'id') : lineItemsData,
       },
       sortOrder,
-      totalCount: lineItemsData.length > this.state.totalCount ?
-        lineItemsData.length : this.state.totalCount,
     }, () => {
       if (!_.isNull(stopIndex) && this.state.values.lineItems.length !== this.state.totalCount) {
         this.loadMoreRows({ startIndex: stopIndex, stopIndex: stopIndex + this.props.pageSize });
