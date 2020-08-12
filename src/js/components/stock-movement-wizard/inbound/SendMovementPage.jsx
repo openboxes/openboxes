@@ -367,34 +367,36 @@ class SendMovementPage extends Component {
   }
 
   loadMoreRows({ startIndex, stopIndex }) {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${stopIndex - startIndex > 0 ? stopIndex - startIndex : 1}&stepNumber=6`;
-    apiClient.get(url)
-      .then((response) => {
-        const { data } = response.data;
-        const tableItemsData = _.map(
-          data,
-          val => ({
-            ...val,
-            productName: val.productName ? val.productName : val.product.name,
-          }),
-        );
-        const uniqBy = this.state.values.origin.type === 'SUPPLIER' ? 'id' : 'shipmentItemId';
+    if (this.state.totalCount) {
+      const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=6`;
+      apiClient.get(url)
+        .then((response) => {
+          const { data } = response.data;
+          const tableItemsData = _.map(
+            data,
+            val => ({
+              ...val,
+              productName: val.productName ? val.productName : val.product.name,
+            }),
+          );
+          const uniqBy = this.state.values.origin.type === 'SUPPLIER' ? 'id' : 'shipmentItemId';
 
-        this.setState({
-          values: {
-            ...this.state.values,
-            tableItems: _.uniqBy(_.concat(this.state.values.tableItems, tableItemsData), uniqBy),
-          },
-          isFirstPageLoaded: true,
-        }, () => {
-          if (this.state.values.tableItems.length !== this.state.totalCount) {
-            this.loadMoreRows({
-              startIndex: stopIndex,
-              stopIndex: stopIndex + this.props.pageSize,
-            });
-          }
+          this.setState({
+            values: {
+              ...this.state.values,
+              tableItems: _.uniqBy(_.concat(this.state.values.tableItems, tableItemsData), uniqBy),
+            },
+            isFirstPageLoaded: true,
+          }, () => {
+            if (this.state.values.tableItems.length !== this.state.totalCount) {
+              this.loadMoreRows({
+                startIndex: stopIndex,
+                stopIndex: stopIndex + this.props.pageSize,
+              });
+            }
+          });
         });
-      });
+    }
   }
 
   isRowLoaded({ index }) {

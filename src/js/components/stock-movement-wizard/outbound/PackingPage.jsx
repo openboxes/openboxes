@@ -254,14 +254,16 @@ class PackingPage extends Component {
   }
 
   loadMoreRows({ startIndex, stopIndex }) {
-    this.setState({
-      isFirstPageLoaded: true,
-    });
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${stopIndex - startIndex > 0 ? stopIndex - startIndex : 1}&stepNumber=5`;
-    apiClient.get(url)
-      .then((response) => {
-        this.setPackPageItems(response, stopIndex);
+    if (this.state.totalCount) {
+      this.setState({
+        isFirstPageLoaded: true,
       });
+      const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=5`;
+      apiClient.get(url)
+        .then((response) => {
+          this.setPackPageItems(response, stopIndex);
+        });
+    }
   }
 
   isRowLoaded({ index }) {
