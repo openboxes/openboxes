@@ -696,6 +696,9 @@ class OrderController {
             if (!order.save(flush:true)) {
                 throw new ValidationException("Order is invalid", order.errors)
             }
+            orderService.updateProductPackage(orderItem)
+            orderService.updateProductUnitPrice(orderItem)
+
         } catch (Exception e) {
             log.error("Error " + e.message, e)
             render(status: 500, text: "Not saved")
