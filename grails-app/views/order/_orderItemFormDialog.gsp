@@ -272,10 +272,10 @@
     $("#dlgQuantityUom").live('change', function() {
       if($("#dlgQuantityUom option:selected").val() == 'EA') {
         $("#dlgQuantityPerUom").val("1");
-        $("#dlgQuantityPerUom").attr("disabled", true);
+        $("#dlgQuantityPerUom").attr("readonly", true);
       } else {
         $("#dlgQuantityPerUom").val("");
-        $("#dlgQuantityPerUom").removeAttr("disabled");
+        $("#dlgQuantityPerUom").removeAttr("readonly");
       }
     });
 
@@ -329,7 +329,7 @@
 
         if($("#dlgQuantityUom option:selected").val() == 'EA') {
             $("#dlgQuantityPerUom").val("1");
-            $("#dlgQuantityPerUom").attr("disabled", true);
+            $("#dlgQuantityPerUom").attr("readonly", true);
         }
 
         $("#dlgProductSupplier")
