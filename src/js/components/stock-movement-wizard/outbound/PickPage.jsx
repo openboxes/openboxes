@@ -215,7 +215,7 @@ class PickPage extends Component {
     }
   }
 
-  setPickPageItems(response, stopIndex) {
+  setPickPageItems(response, startIndex) {
     const { data } = response.data;
     this.setState({
       values: {
@@ -234,8 +234,8 @@ class PickPage extends Component {
       sorted: false,
     }, () => {
       // eslint-disable-next-line max-len
-      if (!_.isNull(stopIndex) && this.state.values.pickPageItems.length !== this.state.totalCount) {
-        this.loadMoreRows({ startIndex: stopIndex, stopIndex: stopIndex + this.props.pageSize });
+      if (!_.isNull(startIndex) && this.state.values.pickPageItems.length !== this.state.totalCount) {
+        this.loadMoreRows({ startIndex: startIndex + this.props.pageSize });
       }
     });
   }
@@ -340,15 +340,17 @@ class PickPage extends Component {
       });
   }
 
-  loadMoreRows({ startIndex, stopIndex }) {
-    this.setState({
-      isFirstPageLoaded: true,
-    });
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${stopIndex - startIndex > 0 ? stopIndex - startIndex : 1}&stepNumber=4`;
-    apiClient.get(url)
-      .then((response) => {
-        this.setPickPageItems(response, stopIndex);
+  loadMoreRows({ startIndex }) {
+    if (this.state.totalCount) {
+      this.setState({
+        isFirstPageLoaded: true,
       });
+      const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=4`;
+      apiClient.get(url)
+        .then((response) => {
+          this.setPickPageItems(response, startIndex);
+        });
+    }
   }
 
   isRowLoaded({ index }) {

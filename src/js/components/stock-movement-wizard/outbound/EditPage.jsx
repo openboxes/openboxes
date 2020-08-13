@@ -285,7 +285,7 @@ class EditItemsPage extends Component {
     }
   }
 
-  setEditPageItems(response, stopIndex) {
+  setEditPageItems(response, startIndex) {
     this.props.showSpinner();
     const { data } = response.data;
     const editPageItems = _.map(
@@ -315,8 +315,8 @@ class EditItemsPage extends Component {
       || this.state.totalCount === _.uniqBy(_.concat(this.state.values.editPageItems, editPageItems), 'requisitionItemId').length,
     }, () => {
       // eslint-disable-next-line max-len
-      if (!_.isNull(stopIndex) && this.state.values.editPageItems.length !== this.state.totalCount) {
-        this.loadMoreRows({ startIndex: stopIndex, stopIndex: stopIndex + this.props.pageSize });
+      if (!_.isNull(startIndex) && this.state.values.editPageItems.length !== this.state.totalCount) {
+        this.loadMoreRows({ startIndex: startIndex + this.props.pageSize });
       }
       this.props.hideSpinner();
     });
@@ -395,15 +395,17 @@ class EditItemsPage extends Component {
       });
   }
 
-  loadMoreRows({ startIndex, stopIndex }) {
-    this.setState({
-      isFirstPageLoaded: true,
-    });
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${stopIndex - startIndex > 0 ? stopIndex - startIndex : 1}&stepNumber=3`;
-    apiClient.get(url)
-      .then((response) => {
-        this.setEditPageItems(response, stopIndex);
+  loadMoreRows({ startIndex }) {
+    if (this.state.totalCount) {
+      this.setState({
+        isFirstPageLoaded: true,
       });
+      const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=3`;
+      apiClient.get(url)
+        .then((response) => {
+          this.setEditPageItems(response, startIndex);
+        });
+    }
   }
 
   isRowLoaded({ index }) {

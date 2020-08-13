@@ -210,7 +210,7 @@ class PackingPage extends Component {
     }
   }
 
-  setPackPageItems(response, stopIndex) {
+  setPackPageItems(response, startIndex) {
     const { data } = response.data;
     this.setState({
       values: {
@@ -219,8 +219,8 @@ class PackingPage extends Component {
       },
     }, () => {
       // eslint-disable-next-line max-len
-      if (!_.isNull(stopIndex) && this.state.values.packPageItems.length !== this.state.totalCount) {
-        this.loadMoreRows({ startIndex: stopIndex, stopIndex: stopIndex + this.props.pageSize });
+      if (!_.isNull(startIndex) && this.state.values.packPageItems.length !== this.state.totalCount) {
+        this.loadMoreRows({ startIndex: startIndex + this.props.pageSize });
       }
     });
   }
@@ -253,7 +253,7 @@ class PackingPage extends Component {
     }
   }
 
-  loadMoreRows({ startIndex, stopIndex }) {
+  loadMoreRows({ startIndex }) {
     if (this.state.totalCount) {
       this.setState({
         isFirstPageLoaded: true,
@@ -261,7 +261,7 @@ class PackingPage extends Component {
       const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=5`;
       apiClient.get(url)
         .then((response) => {
-          this.setPackPageItems(response, stopIndex);
+          this.setPackPageItems(response, startIndex);
         });
     }
   }
