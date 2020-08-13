@@ -175,51 +175,7 @@ class SubstitutionsModal extends Component {
    * @public
    */
   onOpen() {
-    this.state.attr.onOpen();
-
-    let substitutions = _.map(
-      this.state.attr.lineItem.availableSubstitutions,
-      val => ({
-        ...val,
-        disabled: true,
-        product: {
-          label: `${val.productCode} - ${val.productName}`,
-          id: `${val.productId}`,
-          productCode: `${val.productCode}`,
-          name: `${val.productName}`,
-          minExpirationDate: `${val.minExpirationDate}`,
-          quantityAvailable: `${val.quantityAvailable}`,
-          handlingIcons: val.product.handlingIcons,
-        },
-      }),
-    );
-    let originalItem = null;
-
-    if (_.toInteger(this.state.attr.lineItem.quantityAvailable) > 0) {
-      originalItem = {
-        ...this.state.attr.lineItem,
-        originalItem: true,
-        product: {
-          label: `${this.state.attr.lineItem.productCode} - ${this.state.attr.lineItem.productName}`,
-          id: `${this.state.attr.lineItem.productId}`,
-          productCode: `${this.state.attr.lineItem.productCode}`,
-          name: `${this.state.attr.lineItem.productName}`,
-          minExpirationDate: this.state.attr.lineItem.minExpirationDate,
-          quantityAvailable: this.state.attr.lineItem.quantityAvailable,
-        },
-      };
-      substitutions = [
-        originalItem,
-        ...substitutions,
-      ];
-    }
-
-    this.setState({
-      formValues: {
-        substitutions,
-      },
-      originalItem,
-    });
+    this.state.attr.onOpen().then(() => this.fetchSubstitutions());
   }
 
   /** Sends all changes made by user in this modal to API and updates data.
@@ -258,6 +214,57 @@ class SubstitutionsModal extends Component {
     apiClient.post(url, payload)
       .then(() => { this.props.onResponse(); })
       .catch(() => { this.props.hideSpinner(); });
+  }
+
+  fetchSubstitutions() {
+    const url = `/openboxes/api/stockMovements/${this.state.attr.lineItem.requisitionItemId}/substitutionItems`;
+
+    return apiClient.get(url)
+      .then((resp) => {
+        let substitutions = _.map(
+          resp.data.data,
+          val => ({
+            ...val,
+            disabled: true,
+            product: {
+              label: `${val.productCode} - ${val.productName}`,
+              id: `${val.productId}`,
+              productCode: `${val.productCode}`,
+              name: `${val.productName}`,
+              minExpirationDate: `${val.minExpirationDate}`,
+              quantityAvailable: `${val.quantityAvailable}`,
+              handlingIcons: val.product.handlingIcons,
+            },
+          }),
+        );
+        let originalItem = null;
+
+        if (_.toInteger(this.state.attr.lineItem.quantityAvailable) > 0) {
+          originalItem = {
+            ...this.state.attr.lineItem,
+            originalItem: true,
+            product: {
+              label: `${this.state.attr.lineItem.productCode} - ${this.state.attr.lineItem.productName}`,
+              id: `${this.state.attr.lineItem.productId}`,
+              productCode: `${this.state.attr.lineItem.productCode}`,
+              name: `${this.state.attr.lineItem.productName}`,
+              minExpirationDate: this.state.attr.lineItem.minExpirationDate,
+              quantityAvailable: this.state.attr.lineItem.quantityAvailable,
+            },
+          };
+          substitutions = [
+            originalItem,
+            ...substitutions,
+          ];
+        }
+
+        this.setState({
+          formValues: {
+            substitutions,
+          },
+          originalItem,
+        });
+      }).catch(err => err);
   }
 
   validate(values) {
