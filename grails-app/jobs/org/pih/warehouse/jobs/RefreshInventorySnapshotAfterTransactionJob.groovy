@@ -46,31 +46,29 @@ class RefreshInventorySnapshotAfterTransactionJob {
             }
 
             boolean forceRefresh = context.mergedJobDataMap.getBoolean("forceRefresh")
+            boolean isDeleting = context.mergedJobDataMap.getBoolean("isDeleting")
             def startTime = System.currentTimeMillis()
             def userId = context.mergedJobDataMap.get('user')
             def startDate = context.mergedJobDataMap.get('startDate')
             String locationId = context.mergedJobDataMap.get('location')
-            String transactionId = context.mergedJobDataMap.get('transaction')?.id
-            Transaction transaction = Transaction.get(transactionId)
+            def productIds = context.mergedJobDataMap.get('productIds')
             Location location = Location.get(locationId)
 
             try {
                 log.info ("Refresh inventory snapshot " + retryCount + " out of " + maxRetryAttempts)
 
-                List productIds = transaction?.transactionEntries?.collect { it?.inventoryItem?.product?.id }?.unique()
+                def date = new Date() + 1
 
-                productIds.each { productId ->
+                productIds.each { String productId ->
                     Product product = Product.get(productId)
 
-                    // I feel like with this check, the inventory snapshot not always are properly populated (at least during the inventory import).
-                    // No inventory snapshots saves, despite it should be saved (for example two imports with quantities changed right after each other).
                     if (forceRefresh) {
                         inventorySnapshotService.deleteInventorySnapshots(location, product)
                     }
 
-                    // When I call this one (without any date passed) I am getting more transaction dates than I feel like I should.
-                    // I am not sure if this is just my local case and this behavior is expected.
-                    inventorySnapshotService.populateInventorySnapshots(location, product)
+                    if (!isDeleting) {
+                        inventorySnapshotService.populateInventorySnapshots(date, location, product)
+                    }
                 }
 
                 context.jobDetail.jobDataMap.putAsString("retryCount", 0)

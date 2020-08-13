@@ -20,17 +20,20 @@ class TransactionEventService implements ApplicationListener<TransactionEvent> {
         Transaction transaction = event?.source
         def transactionId = transaction?.id
         def transactionDate = transaction?.transactionDate
-        def locationId = transaction?.inventory?.warehouse?.id
-        def transactionEntriesCount = transaction?.transactionEntries?.size()
+        def locationId = event.associatedLocation
+        List productIds = event.associatedProducts
+
         log.info "Refresh inventory snapshot " +
             "date=$transactionDate, " +
             "location=$locationId, " +
             "transaction=$transactionId," +
-            "transactionEntries count=$transactionEntriesCount"
+            "productIds=$productIds"
+
         RefreshInventorySnapshotAfterTransactionJob.triggerNow([
             location: locationId,
             forceRefresh: event.forceRefresh,
-            transaction: transaction
+            isDeleting: event.isDeleting,
+            productIds: productIds
         ])
     }
 }
