@@ -389,9 +389,6 @@ class DocumentService {
             data.eachWithIndex { Map dataRow, index ->
                 createExcelRow(sheet, index + 1, dataRow)
             }
-            for (int i = 0; i <= data.get(0).size(); i++) {
-                sheet.autoSizeColumn(i)
-            }
             workbook.write(outputStream)
             outputStream.close()
         } catch (IOException e) {
@@ -931,6 +928,43 @@ class DocumentService {
         catch (Exception e) {
             log.error e
             throw e
+        }
+    }
+
+    void generateInventoryTemplate(OutputStream outputStream, List<Map> data) {
+        try {
+            Workbook workbook = new HSSFWorkbook()
+            CreationHelper createHelper = workbook.getCreationHelper()
+            HSSFSheet sheet = workbook.createSheet("Sheet1")
+            createExcelHeader(sheet, 0, data.get(0).keySet().toList())
+            data.eachWithIndex { Map dataRow, rowIndex ->
+                Row excelRow = sheet.createRow(rowIndex + 1)
+                dataRow.keySet().eachWithIndex { columnName, cellIndex ->
+                    def cellValue = dataRow.get(columnName) ?: ""
+                    // POI can't handle objects so we need to convert all objects to strings unless they are numeric
+                    if (!(cellValue instanceof Number)) {
+                        cellValue = cellValue.toString()
+                    }
+                    excelRow.createCell(cellIndex)
+                    if (columnName == 'Expiration date' && cellValue != '') {
+                        def formatter = new SimpleDateFormat("MM/dd/yyyy")
+                        Date date = formatter.parse(cellValue)
+                        CellStyle cellStyle = workbook.createCellStyle()
+                        cellStyle.setDataFormat(createHelper.createDataFormat().getFormat("MM/dd/yyyy"))
+                        excelRow.getCell(cellIndex).setCellValue(date)
+                        excelRow.getCell(cellIndex).setCellStyle(cellStyle)
+                    } else {
+                        excelRow.getCell(cellIndex).setCellValue(cellValue)
+                    }
+                }
+            }
+            for (int i = 0; i <= data.get(0).size(); i++) {
+                sheet.autoSizeColumn(i)
+            }
+            workbook.write(outputStream)
+            outputStream.close()
+        } catch (IOException e) {
+            log.error("IO exception while generating import template")
         }
     }
 
