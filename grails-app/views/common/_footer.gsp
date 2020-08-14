@@ -16,10 +16,11 @@
 		<g:each in="${grailsApplication.config.openboxes.locale.supportedLocales}" var="l">
 			<g:set var="locale" value="${new Locale(l)}"/>
 			<g:set var="selected" value="${locale == session?.user?.locale || locale == session?.locale }"/>
+            <g:set var="defaultLocale" value="${new Locale(grailsApplication.config.openboxes.locale.defaultLocale)}"/>
 			<a class="${selected?'selected':''}" href="${createLink(controller: 'user', action: 'updateAuthUserLocale',
 				params: ['locale':locale,'targetUri':targetUri,'lang':locale?.language])}">
 				<!-- fetch the display for locale based on the current locale -->
-				${locale?.getDisplayName(session?.user?.locale ?: new Locale(grailsApplication.config.openboxes.locale.defaultLocale))}
+				${locale?.getDisplayName(locale ?: defaultLocale)}
 			</a>
 		</g:each>
 		<g:isUserInRole roles="[RoleType.ROLE_ADMIN]">
