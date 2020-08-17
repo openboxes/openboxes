@@ -12,33 +12,42 @@ package org.pih.warehouse.core
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
 import org.springframework.transaction.TransactionStatus
+import org.grails.plugins.csv.CSVWriter
 
 class OrganizationController {
 
     def identifierService
+    def organizationService
     def scaffold = true
 
     def search = {
-
-        List roleTypes = params.list("roleType").collect { it as RoleType }
-
-        log.info "roleTypes " + roleTypes
-        def organizationInstanceList = Organization.createCriteria().list(params){
-            if (params.q) {
-                or {
-                    ilike("id", "${params.q}%")
-                    ilike("code", "${params.q}%")
-                    ilike("name", "${params.q}%")
-                    ilike("description", "${params.q}%")
-                }
-            }
-            if (roleTypes) {
-                roles {
-                    'in'("roleType", roleTypes)
-                }
-            }
-        }
+        def organizationInstanceList = organizationService.getOrganizations(params)
         render(view: "list", model: [organizationInstanceList:organizationInstanceList, organizationInstanceTotal:organizationInstanceList.totalCount])
+    }
+
+    def download = {
+        def organizationInstanceList = organizationService.getOrganizations(params)
+        def sw = new StringWriter()
+        def csv = new CSVWriter(sw, {
+            "Id" { it.id }
+            "Code" { it.code }
+            "Name" { it.name }
+            "Default location" { it.defaultLocation }
+            "Roles" { it.roles }
+        })
+
+        organizationInstanceList.each { organization ->
+            csv << [
+                    id              : organization.id,
+                    code            : organization.code,
+                    name            : organization.name,
+                    defaultLocation : organization.defaultLocation ?: '',
+                    roles           : organization.roles.join(","),
+            ]
+        }
+        response.setHeader("Content-disposition", "attachment; filename=\"Organizations-${new Date().format("MM/dd/yyyy")}.csv\"")
+        render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
+
     }
 
 
