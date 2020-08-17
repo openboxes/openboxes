@@ -91,6 +91,7 @@ class ApitableroController {
         render(fillRate.toJson() as JSON)
     }
 
+    @Cacheable("dashboardCache")
     def getFillRateSnapshot = {
         Location location = Location.get(params.locationId)
         def fillRateSnapshot = indicatorDataService.getFillRateSnapshot(location)
