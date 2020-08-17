@@ -404,7 +404,7 @@ class AddItemsPage extends Component {
     return this.state.sortOrder;
   }
 
-  setLineItems(response, stopIndex) {
+  setLineItems(response, startIndex) {
     const { data } = response.data;
     let lineItemsData;
 
@@ -434,11 +434,9 @@ class AddItemsPage extends Component {
           _.uniqBy(_.concat(this.state.values.lineItems, lineItemsData), 'id') : lineItemsData,
       },
       sortOrder,
-      totalCount: lineItemsData.length > this.state.totalCount ?
-        lineItemsData.length : this.state.totalCount,
     }, () => {
-      if (!_.isNull(stopIndex) && this.state.values.lineItems.length < this.state.totalCount) {
-        this.loadMoreRows({ startIndex: stopIndex, stopIndex: stopIndex + this.props.pageSize });
+      if (!_.isNull(startIndex) && this.state.values.lineItems.length !== this.state.totalCount) {
+        this.loadMoreRows({ startIndex: startIndex + this.props.pageSize });
       }
       this.props.hideSpinner();
     });
@@ -578,7 +576,9 @@ class AddItemsPage extends Component {
 
     return apiClient.get(url)
       .then((response) => {
-        this.setLineItems(response, null);
+        this.setState({
+          totalCount: response.data.data.length,
+        }, () => this.setLineItems(response, null));
       })
       .catch(err => err);
   }
@@ -609,14 +609,14 @@ class AddItemsPage extends Component {
       });
   }
 
-  loadMoreRows({ startIndex, stopIndex }) {
+  loadMoreRows({ startIndex }) {
     this.setState({
       isFirstPageLoaded: true,
     });
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${stopIndex - startIndex > 0 ? stopIndex - startIndex : 1}&stepNumber=2`;
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=2`;
     apiClient.get(url)
       .then((response) => {
-        this.setLineItems(response, stopIndex);
+        this.setLineItems(response, startIndex);
       });
   }
 

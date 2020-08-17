@@ -271,7 +271,7 @@ class InventoryItemController {
                 def quantityRequired = it instanceof Requisition ? itemsMap[it].sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityRequired() } : 0
                 def quantityPicked =  it instanceof Requisition ? itemsMap[it].sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityPicked() } : 0
                 def quantityRemaining = it instanceof Shipment ? itemsMap[it].sum() { ShipmentItem shipmentItem -> shipmentItem.quantityRemaining } : 0
-                def quantityPurchased = it instanceof Order ? itemsMap[it].sum() { OrderItem orderItem -> orderItem.quantityRemaining } : 0
+                Integer quantityPurchased = it instanceof Order ? itemsMap[it].sum() { OrderItem orderItem -> orderItem.quantityRemaining * orderItem.quantityPerUom } : 0
                 def type = it instanceof Order ? "Purchase Order" : "Stock Movement"
                 def quantityMap = [
                         quantityRequested: quantityRequested,

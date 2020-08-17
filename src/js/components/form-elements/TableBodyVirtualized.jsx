@@ -84,7 +84,7 @@ class TableBodyVirtualized extends Component {
     const field = `${fields.name}[${index}]`;
     const RowComponent = fieldsConfig.rowComponent || TableRow;
     const { totalCount } = properties;
-
+    const rowCount = totalCount || pageSize;
 
     if (fields.value[index]) {
       return (
@@ -94,7 +94,7 @@ class TableBodyVirtualized extends Component {
             index={index}
             properties={{
               ...properties,
-              rowCount: totalCount || pageSize,
+              rowCount,
             }}
             addRow={addRow}
             fieldsConfig={fieldsConfig}
@@ -124,13 +124,14 @@ class TableBodyVirtualized extends Component {
     } = properties;
 
     const loadPage = isFirstPageLoaded ? () => {} : loadMoreRows;
+    const rowCount = totalCount || pageSize;
 
     return (
       <div>
         <InfiniteLoader
           loadMoreRows={loadPage}
           isRowLoaded={isRowLoaded}
-          rowCount={totalCount || pageSize}
+          rowCount={rowCount}
           minimumBatchSize={pageSize}
         >
           {({ onRowsRendered }) => (
@@ -140,7 +141,7 @@ class TableBodyVirtualized extends Component {
                   ref={this.bindListRef}
                   height={this.getHeight()}
                   onRowsRendered={onRowsRendered}
-                  rowCount={totalCount || pageSize}
+                  rowCount={rowCount}
                   rowHeight={this.getRowHeight}
                   rowRenderer={this.rowRenderer}
                   width={width}

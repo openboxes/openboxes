@@ -4,6 +4,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
   <changeSet id="1580848680306-1" author="jmiranda" runAlways="true" failOnError="false">
+    <validCheckSum>d79fec3328bef742ff64a66970cabc</validCheckSum>
     <sqlFile path="views/product-demand-view.sql"/>
   </changeSet>
   <changeSet id="1580848680306-2" author="jmiranda" runAlways="true" failOnError="false">

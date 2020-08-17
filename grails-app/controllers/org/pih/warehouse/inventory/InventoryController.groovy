@@ -1398,13 +1398,13 @@ class InventoryController {
         Location location = Location.load(session.warehouse.id)
         List data = inventorySnapshotService.getQuantityOnHandByBinLocation(location)
         def rows = []
-        data.each {
+        data.findAll { it.quantity }.each {
             def row = [
                     'Product code'    : it.product?.productCode,
                     'Product name'    : it.product?.name,
-                    'Lot number'      : StringEscapeUtils.escapeCsv(it.inventoryItem?.lotNumber ?: ""),
+                    'Lot number'      : it.inventoryItem?.lotNumber,
                     'Expiration date' : it.inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
-                    'Bin location'    : StringEscapeUtils.escapeCsv(it.binLocation?.name ?: ""),
+                    'Bin location'    : it.binLocation?.name,
                     'OB QOH'          : it.quantity,
                     'Physical QOH'    : '',
                     'Comment'         : '',
@@ -1414,7 +1414,7 @@ class InventoryController {
         }
         response.setHeader("Content-disposition", "attachment; filename=\"inventory.xls\"")
         response.setContentType("application/vnd.ms-excel")
-        documentService.generateExcel(response.outputStream, rows)
+        documentService.generateInventoryTemplate(response.outputStream, rows)
         response.outputStream.flush()
     }
 

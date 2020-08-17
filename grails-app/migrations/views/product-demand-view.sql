@@ -21,8 +21,11 @@ SELECT
     quantity_canceled,
     quantity_approved,
     quantity_modified,
-    quantity_substituted,
     quantity_picked,
+    cancel_reason_code,
+    cancel_comments,
+    pick_reason_code,
+    request_item_status,
     reason_code_classification,
 
     -- request item status
@@ -36,20 +39,23 @@ SELECT
         WHEN quantity_requested != quantity_approved AND quantity_picked = quantity_approved
             THEN 'ITEM_MODIFIED'
         WHEN quantity_picked > 0 THEN 'ITEM_ISSUED'
-        ELSE  NULL
-    END as request_item_change_status,
+        ELSE NULL
+        END as request_item_change_status,
+
     -- quantity demand
     CASE
         WHEN request_item_status = 'SUBSTITUTION'
             THEN quantity_requested
         WHEN quantity_picked > quantity_requested
             THEN quantity_picked
-    WHEN quantity_picked < quantity_requested AND reason_code_classification IN (NULL, 'INSUFFICIENT_QUANTITY_AVAILABLE')
+        WHEN quantity_picked < quantity_requested AND
+             reason_code_classification IN (NULL, 'INSUFFICIENT_QUANTITY_AVAILABLE')
             THEN quantity_requested
-    WHEN quantity_picked < quantity_requested AND reason_code_classification IN ('CLINICAL_JUDGMENT')
+        WHEN quantity_picked < quantity_requested AND
+             reason_code_classification IN ('CLINICAL_JUDGMENT')
             THEN quantity_picked
-    ELSE quantity_requested
-    END as quantity_demand
+        ELSE quantity_requested
+        END as quantity_demand
 FROM (
          SELECT request_id,
                 request_item_id,
@@ -66,38 +72,31 @@ FROM (
                 product_code,
                 product_name,
                 quantity_requested,
-                IFNULL(quantity_canceled, 0)    AS quantity_canceled,
-                IFNULL(quantity_approved, 0)    AS quantity_approved,
-                IFNULL(quantity_modified, 0)    AS quantity_modified,
-                IFNULL(quantity_substituted, 0) AS quantity_substituted,
-                IFNULL(quantity_picked, 0)      AS quantity_picked,
+                IFNULL(quantity_canceled, 0) AS quantity_canceled,
+                IFNULL(quantity_approved, 0) AS quantity_approved,
+                IFNULL(quantity_modified, 0) AS quantity_modified,
+                IFNULL(quantity_picked, 0)   AS quantity_picked,
                 cancel_reason_code,
                 cancel_comments,
                 pick_reason_code,
                 reason_code_classification,
-                insufficient_quantity_available,
-                clinical_judgment,
-                request_item_type,
-                request_item_status,
-                request_item_products
+                request_item_status
          FROM (
-                  SELECT requisition.id                         as request_id,
-                         requisition_item.id                    as request_item_id,
-                         requisition.status                     AS request_status,
+                  SELECT requisition.id                      as request_id,
+                         requisition_item.id                 as request_item_id,
+                         requisition.status                  AS request_status,
                          requisition.request_number,
-                         requisition.date_created               as date_created,
-                         requisition.date_requested             AS date_requested,
-                         requisition_transaction.date_issued    AS date_issued,
-                         origin.id                              AS origin_id,
-                         origin.name                            AS origin_name,
-                         destination.id                         AS destination_id,
-                         destination.name                       AS destination_name,
-                         requisition_item.requisition_item_type as request_item_type,
-                         child_request_item.status              as request_item_status,
-                         child_request_item.products            as request_item_products,
-                         product.id                             AS product_id,
+                         requisition.date_created            as date_created,
+                         requisition.date_requested          AS date_requested,
+                         requisition_transaction.date_issued AS date_issued,
+                         origin.id                           AS origin_id,
+                         origin.name                         AS origin_name,
+                         destination.id                      AS destination_id,
+                         destination.name                    AS destination_name,
+                         child_request_item.status           as request_item_status,
+                         product.id                          AS product_id,
                          product.product_code,
-                         product.name                           AS product_name,
+                         product.name                        AS product_name,
                          cancel_reason_code,
                          -- FIXME converting from boolean to string does not strike me as a good idea here
                          CASE
@@ -105,12 +104,12 @@ FROM (
                                  THEN 'INSUFFICIENT_QUANTITY_AVAILABLE'
                              WHEN clinical_judgment = TRUE THEN 'CLINICAL_JUDGMENT'
                              ELSE NULL
-                             END                                as reason_code_classification,
+                             END                             as reason_code_classification,
                          insufficient_quantity_available,
                          clinical_judgment,
                          cancel_comments,
                          pick_reason_code,
-                         quantity                               AS quantity_requested,
+                         quantity                            AS quantity_requested,
                          quantity_canceled,
                          quantity_approved,
 
@@ -120,17 +119,7 @@ FROM (
                              FROM requisition_item child
                              WHERE child.parent_requisition_item_id = requisition_item.id
                                AND requisition_item_type = 'QUANTITY_CHANGE'
-                         )                                      AS quantity_modified,
-
-                         -- quantity substituted (FIXME make sure the cancel reason code is necessary)
-                         (
-                             SELECT SUM(quantity)
-                             FROM requisition_item child
-                             WHERE child.parent_requisition_item_id = requisition_item.id
-                               AND requisition_item_type = 'SUBSTITUTION'
-                               AND requisition_item.cancel_reason_code IN
-                                   ('STOCKOUT', 'LOW_STOCK', 'COULD_NOT_LOCATE')
-                         )                                      AS quantity_substituted,
+                         )                                   AS quantity_modified,
 
                          -- quantity picked
                          picked_items.quantity_picked
