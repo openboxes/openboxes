@@ -348,6 +348,9 @@ class OrderController {
         if (orderInstance) {
             def orderAdjustment = OrderAdjustment.get(params?.id)
             if (orderAdjustment) {
+                if (orderAdjustment.orderItem && !params.orderItem.id) {
+                    orderAdjustment.orderItem.removeFromOrderAdjustments(orderAdjustment)
+                }
                 orderAdjustment.properties = params
                 if (!orderAdjustment.hasErrors() && orderAdjustment.save(flush: true)) {
                     flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'orderAdjustment.label', default: 'Order Adjustment'), orderAdjustment.id])}"
