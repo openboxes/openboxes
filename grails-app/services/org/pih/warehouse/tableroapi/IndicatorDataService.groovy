@@ -219,19 +219,22 @@ class IndicatorDataService {
             averageFillRate[0] == null ? averageFillRateResult.push(0) : averageFillRateResult.push(averageFillRate[0][0])
         }
 
+        averageFillRateResult = averageFillRateResult.collect{ it * 100 }
+
         List<IndicatorDatasets> datasets = [
                 new IndicatorDatasets('Average Fill Rate', averageFillRateResult, null, 'line'),
         ];
 
-        averageFillRateResult = averageFillRateResult.collect{ it * 100 }
+        int averageLastMonth = averageFillRateResult[averageFillRateResult.size - 1]
 
-        int averageLastMonth = averageFillRateResult[averageFillRateResult.size - 2]
-
-        IndicatorData indicatorData = new IndicatorData(datasets, listLabels);
-        
-        ColorNumber colorNumber = new ColorNumber(averageLastMonth, null, null, null, 90)
+        ColorNumber colorNumber = new ColorNumber(averageLastMonth, 'Fill Rate Last Month', null, null, 90)
         colorNumber.setConditionalColors(87, colorNumber.value2)
-        GraphData graphData = new GraphData(indicatorData, "Fill Rate Snapshot", "line", null, colorNumber);
+        def variation = colorNumber.value - colorNumber.value2
+        colorNumber.value2 = variation > 0 ? "+${variation} %" : "${variation} %"
+        colorNumber.value = "${colorNumber.value}%"
+
+        IndicatorData indicatorData = new IndicatorData(datasets, listLabels, colorNumber);
+        GraphData graphData = new GraphData(indicatorData, "Fill Rate Last Month", "sparkline", null);
 
         return graphData;
     }
