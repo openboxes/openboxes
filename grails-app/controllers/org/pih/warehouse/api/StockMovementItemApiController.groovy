@@ -42,6 +42,13 @@ class StockMovementItemApiController {
         render([data: stockMovementItems] as JSON)
     }
 
+    def getSubstitutionItems = {
+        RequisitionItem requisitionItem = RequisitionItem.load(params.id)
+        def location = Location.get(session.warehouse.id)
+        List<SubstitutionItem> substitutionItems = stockMovementService.getAvailableSubstitutions(location, requisitionItem.product)
+        render([data: substitutionItems] as JSON)
+    }
+
     def updatePicklist = {
         JSONObject jsonObject = request.JSON
 
