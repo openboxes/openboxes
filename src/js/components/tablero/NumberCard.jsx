@@ -46,6 +46,27 @@ const options = {
   },
 };
 
+const NumberSparklineCard = ({
+  cardTitle, color, value, goalDifference, sparklineData,
+}) => (
+  <div className="number-div">
+    <div className="number-body">
+      <span className="title-card"> {cardTitle} </span>
+      <div className="result-part">
+        <span style={{ color: getColorByName(color, 'default') }}> {value}  </span>
+        <span className="goal-difference"> {goalDifference} </span>
+      </div>
+
+      <Line
+        data={sparklineData}
+        options={options}
+        height={25}
+      />
+    </div>
+    <DragHandle />
+  </div>
+);
+
 const NumberCard = SortableElement(({
   cardTitle,
   cardNumber,
@@ -78,22 +99,13 @@ const NumberCard = SortableElement(({
     </Tooltip>
   ) :
     (
-      <div className="number-div">
-        <div className="number-body">
-          <span className="title-card"> {cardTitle} </span>
-          <div className="result-part">
-            <span style={{ color: getColorByName(sparklineData.colorNumber.color, 'default') }}> {sparklineData.colorNumber.value}  </span>
-            <span className="goal-difference"> {sparklineData.colorNumber.value2} </span>
-          </div>
-
-          <Line
-            data={sparklineData}
-            options={options}
-            height={25}
-          />
-        </div>
-        <DragHandle />
-      </div>
+      <NumberSparklineCard
+        cardTitle={cardTitle}
+        color={sparklineData.colorNumber.color}
+        value={sparklineData.colorNumber.value}
+        goalDifference={sparklineData.colorNumber.value2}
+        sparklineData={sparklineData}
+      />
     );
 
   return (
@@ -108,4 +120,12 @@ NumberCard.propTypes = {
   cardSubtitle: PropTypes.string,
   cardLink: PropTypes.string,
   cardDataTooltip: PropTypes.string,
+};
+
+NumberSparklineCard.propTypes = {
+  cardTitle: PropTypes.string.isRequired,
+  color: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired,
+  goalDifference: PropTypes.string.isRequired,
+  sparklineData: PropTypes.shape({}).isRequired,
 };
