@@ -9,6 +9,43 @@ import './tablero.scss';
 
 /* global _ */
 
+const options = {
+  responsive: true,
+  maintainAspectRatio: true,
+  legend: {
+    display: false,
+  },
+  elements: {
+    line: {
+      borderColor: '#000000',
+      borderWidth: 1,
+    },
+    point: {
+      radius: 0,
+    },
+  },
+  tooltips: {
+    enabled: false,
+  },
+  scales: {
+    yAxes: [
+      {
+        display: false,
+      },
+    ],
+    xAxes: [
+      {
+        display: false,
+      },
+    ],
+  },
+  plugins: {
+    datalabels: {
+      display: false,
+    },
+  },
+};
+
 const NumberCard = SortableElement(({
   cardTitle,
   cardNumber,
@@ -23,42 +60,6 @@ const NumberCard = SortableElement(({
       isSparkline = true;
     }
   }
-  const options = {
-    responsive: true,
-    maintainAspectRatio: true,
-    legend: {
-      display: false,
-    },
-    elements: {
-      line: {
-        borderColor: '#000000',
-        borderWidth: 1,
-      },
-      point: {
-        radius: 0,
-      },
-    },
-    tooltips: {
-      enabled: false,
-    },
-    scales: {
-      yAxes: [
-        {
-          display: false,
-        },
-      ],
-      xAxes: [
-        {
-          display: false,
-        },
-      ],
-    },
-    plugins: {
-      datalabels: {
-        display: false,
-      },
-    },
-  };
   const card = !isSparkline ? (
     <Tooltip
       html={<p style={{ whiteSpace: 'pre' }}> {cardDataTooltip} </p>}
