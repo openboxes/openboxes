@@ -41,4 +41,25 @@ class OrganizationService {
         return organization
     }
 
+    List getOrganizations(Map params) {
+        List roleTypes = params.list("roleType").collect { it as RoleType }
+
+        log.info "roleTypes " + roleTypes
+        def organizations = Organization.createCriteria().list(params){
+            if (params.q) {
+                or {
+                    ilike("id", "${params.q}%")
+                    ilike("code", "${params.q}%")
+                    ilike("name", "${params.q}%")
+                    ilike("description", "${params.q}%")
+                }
+            }
+            if (roleTypes) {
+                roles {
+                    'in'("roleType", roleTypes)
+                }
+            }
+        }
+        return organizations
+    }
 }
