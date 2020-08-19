@@ -26,6 +26,7 @@ class OrganizationController {
     }
 
     def download = {
+        params.max = null
         def organizationInstanceList = organizationService.getOrganizations(params)
         def sw = new StringWriter()
         def csv = new CSVWriter(sw, {
