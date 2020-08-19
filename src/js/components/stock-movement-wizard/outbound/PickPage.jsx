@@ -308,7 +308,7 @@ class PickPage extends Component {
           totalCount,
           printPicksUrl: printPicks ? printPicks.uri : '/',
           sorted: false,
-        });
+        }, () => this.props.hideSpinner());
       })
       .catch(() => this.props.hideSpinner());
   }
