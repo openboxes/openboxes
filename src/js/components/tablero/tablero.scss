@@ -249,6 +249,11 @@
   }
 }
 
+.big-size {
+  height: 370px !important;
+  width: 100% !important;
+} 
+
 .graph-card {
   margin: 1%;
   box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.09);
@@ -519,19 +524,45 @@
   }
 }
 
+
+@media (min-width: 530px) {
+  .big-size {
+    height: 360px !important;
+    width: 90% !important;
+    margin-left: 5% !important;
+  } 
+}
+
 @media (min-width: 630px) {
+  .big-size {
+    height: 380px !important;
+    width: 80% !important;
+    margin-left: 10% !important;
+  }  
   .graph-card {
     height: 450px;
   }
 }
 
 @media (min-width: 730px) {
+  .big-size {
+    height: 400px !important;
+    width: 65% !important;
+    margin-left: 17.5% !important;
+  }
+  
   .graph-card {
     height: 517px;
   }
 }
 
 @media (min-width: 868px) {
+  .big-size {
+    height: 420px !important;
+    width: 55% !important;
+    margin-left: 22.5% !important;
+  }
+  
   .graph-card {
     height: 350px;
     width: 47%;
@@ -539,6 +570,12 @@
 }
 
 @media (min-width: 1068px) {
+  .big-size {
+    height: 500px !important;
+    width: 60% !important;
+    margin-left: 20% !important;
+  }
+  
   .graph-card {
     height: 390px;
     width: 47%;
@@ -546,6 +583,12 @@
 }
 
 @media (min-width: 1268px) {
+  .big-size {
+    height: 600px !important;
+    width: 60% !important;
+    margin-left: 20% !important;
+  }
+  
   .graph-card {
     height: 440px;
     width: 47%;
@@ -553,6 +596,12 @@
 }
 
 @media (min-width: 1468px) {
+  .big-size {
+    height: 670px !important;
+    width: 60% !important;
+    margin-left: 20% !important;
+  }
+  
   .graph-card {
     height: 490px;
     width: 30.6%;

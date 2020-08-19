@@ -103,18 +103,18 @@ function loadDatalabel(context) {
   return '';
 }
 
-function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', maxValue = null, minValue = null, isDoughnut = false, legend = false, doubleAxeY = false) {
+function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', maxValue = null, minValue = null, isDoughnut = false, legend = false, doubleAxeY = false, sizeGraph = null) {
   const options = {
     legend: {
       display: (isDoughnut || legend)
-      && (window.innerWidth > 1000 || (window.innerWidth < 865 && window.innerWidth > 590)),
+      && (window.innerWidth > 1000 || (window.innerWidth < 865 && window.innerWidth > 590) || (sizeGraph === 'big' && window.innerWidth > 500)),
       labels: {
         fontSize: 12,
         usePointStyle: true,
       },
     },
     onResize(chart, size) {
-      if (size.width < 500) {
+      if (size.width < 400) {
         chart.options.legend.display = false;
       } else chart.options.legend.display = legend === true;
       chart.update();
@@ -264,6 +264,8 @@ function loadGraphOptions(payload) {
   const isDoughnut = payload.type === 'doughnut';
   const legend = payload.legend === true;
   const doubleAxeY = payload.doubleAxeY === true;
+  const sizeGraph = payload.size;
+
   if (payload.config.datalabel) {
     labelAlignment = (payload.type === 'horizontalBar') ? 'horizontal' : 'vertical';
 
@@ -291,6 +293,7 @@ function loadGraphOptions(payload) {
     isDoughnut,
     legend,
     doubleAxeY,
+    sizeGraph,
   );
 }
 
