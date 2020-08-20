@@ -521,12 +521,12 @@ class OrderService {
             // Otherwise update the price
             else {
                 productPackage.price = packagePrice
-                if (orderItem.productSupplier.productPackages.find { it.id == productPackage.id }) {
-                    orderItem.productSupplier.addToProductPackages(productPackage)
-                }
             }
             // Associate product package with order item
             orderItem.productPackage = productPackage
+            if (!orderItem.productSupplier?.productPackages?.find { it.id == productPackage.id }) {
+                orderItem.productSupplier.addToProductPackages(productPackage)
+            }
         }
         // Otherwise we update the existing price
         else {
