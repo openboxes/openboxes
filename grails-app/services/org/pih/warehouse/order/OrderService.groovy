@@ -524,7 +524,7 @@ class OrderService {
             }
             // Associate product package with order item
             orderItem.productPackage = productPackage
-            if (!orderItem.productSupplier?.productPackages?.find { it.id == productPackage.id }) {
+            if (orderItem.productSupplier && !orderItem.productSupplier?.productPackages?.find { it.id == productPackage.id }) {
                 orderItem.productSupplier.addToProductPackages(productPackage)
             }
         }
