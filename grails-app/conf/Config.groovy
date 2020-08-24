@@ -444,6 +444,12 @@ openboxes {
                     archived = ['personal', 'warehouse', 'transaction']
                     order = 8
                 }
+                fillRateSnapshot {
+                    enabled = true
+                    endpoint = "/${appName}/apitablero/getFillRateSnapshot"
+                    archived = ['personal', 'warehouse', 'inventory']
+                    order = 9
+                }
             }
             graph {
                 inventorySummary {
