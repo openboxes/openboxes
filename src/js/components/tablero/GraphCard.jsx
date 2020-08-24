@@ -105,6 +105,7 @@ const GraphCard = SortableElement(({
   timeLimit = 24,
   locationFilter = false,
   allLocations,
+  size = null,
 }) => {
   let graph;
   let label = 'Last';
@@ -142,7 +143,7 @@ const GraphCard = SortableElement(({
   }
 
   return (
-    <div className={`graph-card ${cardType === 'error' ? 'error-card' : ''}`}>
+    <div className={`graph-card ${size === 'big' ? 'big-size' : ''} ${cardType === 'error' ? 'error-card' : ''}`}>
       <div className="header-card">
         {cardLink ?
           <a target="_blank" rel="noopener noreferrer" href={cardLink} className="title-link">
