@@ -47,4 +47,18 @@
   <changeSet id="1580848680306-13" author="jmiranda" runAlways="true" failOnError="false">
     <sqlFile path="views/product-summary.sql"/>
   </changeSet>
+  <changeSet id="1580848680306-14" author="dhatala" runAlways="true" failOnError="false">
+    <sqlFile path="views/product-stocklist.sql"/>
+  </changeSet>
+  <changeSet id="1580848680306-15" author="dhatala" runAlways="true" failOnError="false">
+    <validCheckSum>d679c62788f9d28c2fe1f32c3472d99</validCheckSum>
+    <sqlFile path="views/stock-movement-item.sql"/>
+  </changeSet>
+  <changeSet id="1580848680306-16" author="dhatala" runAlways="true" failOnError="false">
+    <sqlFile path="views/product-substitution-status.sql"/>
+  </changeSet>
+  <changeSet id="1580848680306-17" author="dhatala" runAlways="true" failOnError="false">
+    <validCheckSum>9a3720fdb1873032c43038779ca1464</validCheckSum>
+    <sqlFile path="views/edit-page-item.sql"/>
+  </changeSet>
 </databaseChangeLog>
