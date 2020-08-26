@@ -68,6 +68,7 @@ class StockMovementService {
     def inventoryService
     def inventorySnapshotService
     def locationService
+    def dataService
 
     boolean transactional = true
 
@@ -508,6 +509,10 @@ class StockMovementService {
         List<StockMovementItem> stockMovementItems = []
         List <RequisitionItem> requisitionItems = []
 
+        if (stepNumber == '3') {
+          return getEditPageItems(requisition, max, offset)
+        }
+
         if (max != null && offset != null) {
             requisitionItems = RequisitionItem.createCriteria().list(max: max.toInteger(), offset: offset.toInteger()) {
                 eq("requisition", requisition)
@@ -527,8 +532,6 @@ class StockMovementService {
         }
 
         switch(stepNumber) {
-            case "3":
-                return getEditPageItems(stockMovementItems, requisition.origin)
             case "4":
                 return getPickPageItems(id, max, offset)
             case "5":
@@ -542,13 +545,56 @@ class StockMovementService {
         }
     }
 
-    List<EditPageItem> getEditPageItems(List<StockMovementItem> stockMovementItems, Location origin) {
-        List<EditPageItem> editPageItems = []
-        Map monthlyStocklistQuantities = calculateMonthlyStockListQuantity(origin)
-        stockMovementItems.each { stockMovementItem ->
-            EditPageItem editPageItem = buildEditPageItem(stockMovementItem)
-            editPageItem.quantityConsumed = monthlyStocklistQuantities.get(stockMovementItem.product.id)
-            editPageItems.add(editPageItem)
+    List getEditPageItems(Requisition requisition, String max, String offset) {
+        def query = offset ?
+                """ select * FROM edit_page_item where requisition_id = :requisition and requisition_item_type = 'ORIGINAL' limit :offset, :max; """ :
+                """ select * FROM edit_page_item where requisition_id = :requisition and requisition_item_type = 'ORIGINAL' """
+        def data = dataService.executeQuery(query, [
+                'requisition': requisition.id,
+                'offset': offset ? offset.toInteger() : null,
+                'max': max ? max.toInteger() : null,
+        ]);
+
+        def editPageItems = data.collect {
+            def substitutionItems = dataService.executeQuery("""
+                    select 
+                       *
+                    FROM edit_page_item
+                    where parent_requisition_item_id = :id and requisition_item_type = 'SUBSTITUTION'
+                    """, [
+                    'id': it.id,
+            ]);
+
+            def statusCode = substitutionItems ? RequisitionItemStatus.SUBSTITUTED :
+                    it.quantity_revised ? RequisitionItemStatus.CHANGED : RequisitionItemStatus.APPROVED
+            [
+                    product : Product.get(it.product_id),
+                    productName : it.name,
+                    productCode : it.product_code,
+                    requisitionItemId: it.id,
+                    requisition_id: it.requisition_id,
+                    quantityRequested     : it.quantity,
+                    quantityRevised       : it.quantity_revised,
+                    quantityCanceled      : it.quantity_canceled,
+                    quantityConsumed      : it.quantity_demand,
+                    quantityAvailable     : it.quantity_on_hand,
+                    substitutionStatus    : it.substitution_status,
+                    sortOrder : it.sort_order,
+                    reasonCode : it.cancel_reason_code,
+                    statusCode: statusCode.name(),
+                    substitutionItems: substitutionItems.collect {
+                        [
+                                product : Product.get(it.product_id),
+                                productId        : it.product_id,
+                                productCode      : it.product_code,
+                                productName      : it.name,
+                                quantityAvailable: it.quantity_on_hand,
+                                quantityConsumed: it.quantity_demand,
+                                quantitySelected : it.quantity,
+                                quantityRequested: it.quantity
+                        ]
+                    },
+            ]
         }
         return editPageItems
     }
@@ -1001,43 +1047,6 @@ class StockMovementService {
 
         return monthlyStockListQuantity
     }
-
-    def calculateMonthlyStockListQuantity(Location location) {
-
-        List stocklistItems = RequisitionItem.createCriteria().list {
-            projections {
-                property("product.id")
-                property("quantity")
-                requisition {
-                    property("replenishmentPeriod")
-                }
-            }
-            requisition {
-                eq("isTemplate", Boolean.TRUE)
-                eq("isPublished", Boolean.TRUE)
-                eq("origin", location)
-            }
-        }
-
-        def monthlyStockListQuantities = stocklistItems.collect {
-            Float quantity = it[2] ? Math.ceil(((Double) it[1]) / it[2] * 30) : 0
-            [product: it[0], quantity: quantity]
-        }
-
-        // Get a map of monthly stocklist quantities with productId, quantities summed
-        monthlyStockListQuantities =
-                monthlyStockListQuantities.groupBy { it?.product }.
-                        collect { k, v -> [productId: k, quantity: v.quantity.sum()] }
-
-        // Rebuild list of maps as a map (productId: quantity]
-        monthlyStockListQuantities =
-                monthlyStockListQuantities.inject([:]) { map, col ->
-                    map << [(col.productId): col.quantity]
-                }
-
-        return monthlyStockListQuantities
-    }
-
 
     Float calculateMonthlyStockListQuantity(StockMovementItem stockMovementItem) {
         Integer monthlyStockListQuantity = 0

@@ -1,0 +1,25 @@
+CREATE OR REPLACE VIEW stock_movement_item AS
+        SELECT
+        requisition_item.id,
+        requisition_item.requisition_item_type,
+        requisition_item.parent_requisition_item_id,
+        requisition_item.requisition_id,
+        requisition.origin_id,
+        requisition.destination_id,
+		requisition_item.product_id,
+        product.product_code,
+        product.name,
+        requisition_item.quantity,
+        requisition_item.quantity_canceled,
+        requisition_item.order_index,
+        requisition_item.cancel_reason_code,
+        modification_item.quantity as quantity_revised
+    FROM
+        requisition_item
+            JOIN
+        requisition ON requisition_item.requisition_id = requisition.id
+			JOIN
+		product ON product.id = requisition_item.product_id
+            LEFT OUTER JOIN
+		requisition_item as modification_item ON modification_item.parent_requisition_item_id = requisition_item.id
+		 AND modification_item.requisition_item_type = 'QUANTITY_CHANGE';
