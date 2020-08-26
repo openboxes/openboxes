@@ -25,6 +25,7 @@ class NotificationService {
     def dataService
     def userService
     MailService mailService
+    def grailsApplication
 
     boolean transactional = false
 
@@ -121,6 +122,18 @@ class NotificationService {
         String subject = "Shipment ${shipmentInstance?.shipmentNumber} has been received"
         String template = "/email/shipmentReceived"
         sendShipmentNotifications(shipmentInstance, users, template, subject)
+    }
+
+    def sendShipmentItemsShippedNotification(Shipment shipmentInstance) {
+        def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        def recipientItems = shipmentInstance.shipmentItems.groupBy {it.recipient }
+        recipientItems.each {recipient, items ->
+            if (recipient) {
+                def subject = g.message(code: "email.yourItemShipped.message", args: [shipmentInstance.shipmentNumber])
+                def body = "${g.render(template: "/email/shipmentItemShipped", model: [shipmentInstance: shipmentInstance, shipmentItems: items])}"
+                mailService.sendHtmlMail(subject, body.toString(), recipient.email)
+            }
+        }
     }
 
     def sendShipmentNotifications(Shipment shipmentInstance, List<User> users, String template, String subject) {

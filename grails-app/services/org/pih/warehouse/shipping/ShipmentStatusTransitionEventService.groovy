@@ -36,6 +36,7 @@ class ShipmentStatusTransitionEventService implements ApplicationListener<Shipme
         else if(event.shipmentStatusCode == ShipmentStatusCode.SHIPPED) {
             notificationService.sendShipmentIssuedNotification(shipment, shipment.origin, outboundShippedRoleTypes)
             notificationService.sendShipmentIssuedNotification(shipment, shipment.destination, inboundShippedRoleTypes)
+            notificationService.sendShipmentItemsShippedNotification(shipment)
         }
         else if (event.shipmentStatusCode in [ShipmentStatusCode.RECEIVED, ShipmentStatusCode.PARTIALLY_RECEIVED]) {
             notificationService.sendShipmentReceiptNotification(shipment, shipment.origin, outboundReceivedRoleTypes)
