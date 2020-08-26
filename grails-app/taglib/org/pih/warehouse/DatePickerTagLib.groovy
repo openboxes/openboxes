@@ -36,7 +36,7 @@ class DatePickerTagLib {
         def maxDate = attrs.maxDate ? "new Date('${attrs.maxDate}')" : null
         def dataBind = attrs.dataBind ? "data-bind='${attrs.dataBind}'" : ""
         def placeholder = attrs.placeholder ?: ''
-        def autocomplete = attrs.autocomplete ?: 'on'
+        def autocomplete = attrs.autocomplete ?: 'off'
 
         if (value) {
             if (value instanceof Date) {

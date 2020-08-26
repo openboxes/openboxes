@@ -31,8 +31,6 @@ class TransactionEventService implements ApplicationListener<TransactionEvent> {
 
         RefreshInventorySnapshotAfterTransactionJob.triggerNow([
             location: locationId,
-            forceRefresh: event.forceRefresh,
-            isDeleting: event.isDeleting,
             productIds: productIds
         ])
     }

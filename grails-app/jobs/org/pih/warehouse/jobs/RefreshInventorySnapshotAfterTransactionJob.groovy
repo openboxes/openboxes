@@ -45,8 +45,6 @@ class RefreshInventorySnapshotAfterTransactionJob {
                 }
             }
 
-            boolean forceRefresh = context.mergedJobDataMap.getBoolean("forceRefresh")
-            boolean isDeleting = context.mergedJobDataMap.getBoolean("isDeleting")
             def startTime = System.currentTimeMillis()
             def userId = context.mergedJobDataMap.get('user')
             def startDate = context.mergedJobDataMap.get('startDate')
@@ -62,13 +60,9 @@ class RefreshInventorySnapshotAfterTransactionJob {
                 productIds.each { String productId ->
                     Product product = Product.get(productId)
 
-                    if (forceRefresh) {
-                        inventorySnapshotService.deleteInventorySnapshots(location, product)
-                    }
+                    inventorySnapshotService.deleteInventorySnapshots(location, product)
 
-                    if (!isDeleting) {
-                        inventorySnapshotService.populateInventorySnapshots(date, location, product)
-                    }
+                    inventorySnapshotService.populateInventorySnapshots(date, location, product)
                 }
 
                 context.jobDetail.jobDataMap.putAsString("retryCount", 0)
