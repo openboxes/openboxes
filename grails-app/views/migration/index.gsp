@@ -165,19 +165,12 @@
                         <tr>
                             <th>Table</th>
                             <th>Count</th>
-                            <th>Actions</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr class="prop">
                             <td class="name">Date Dimension</td>
                             <td class="value">${dateDimensionCount}</td>
-                            <td rowspan="4">
-                                <div class="button-group">
-                                    <g:link controller="report" action="buildDimensions" class="button">Build</g:link>
-                                    <g:link controller="report" action="truncateDimensions" class="button">Truncate</g:link>
-                                </div>
-                            </td>
                         </tr>
                         <tr class="prop">
                             <td class="name">Location Dimension</td>
@@ -192,6 +185,17 @@
                             <td class="value">${productDimensionCount}</td>
                         </tr>
                         </tbody>
+                        <tfoot>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <div class="button-container">
+                                    <g:link controller="report" action="truncateDimensions" class="button">Truncate</g:link>
+                                    <g:link controller="report" action="buildDimensions" class="button">Build</g:link>
+                                </div>
+                            </td>
+                        </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -203,25 +207,33 @@
                         <tr>
                             <th>Table</th>
                             <th>Count</th>
-                            <th>Actions</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr class="prop">
-                            <td class="name">Transaction Fact</td>
+                            <td class="name">Transaction Facts</td>
                             <td class="value">${transactionFactCount}</td>
-                            <td rowspan="2">
-                                <div class="button-group">
-                                    <g:link controller="report" action="buildFacts" class="button">Build</g:link>
+                        </tr>
+                        <tr class="prop">
+                            <td class="name">Consumption Facts</td>
+                            <td class="value">${consumptionFactCount}</td>
+                        </tr>
+                        <tr class="prop">
+                            <td class="name">Stockout Facts</td>
+                            <td class="value">${stockoutFactCount}</td>
+                        </tr>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <div class="button-container">
                                     <g:link controller="report" action="truncateFacts" class="button">Truncate</g:link>
+                                    <g:link controller="report" action="buildFacts" class="button">Build</g:link>
                                 </div>
                             </td>
                         </tr>
-                        <tr class="prop">
-                            <td class="name">Consumption Fact</td>
-                            <td class="value">${consumptionFactCount}</td>
-                        </tr>
-                        </tbody>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -231,7 +243,11 @@
 <g:javascript>
     $(document).ready(function() {
         $(".loading").hide();
-        $(".tabs").tabs();
+        $(".tabs").tabs({
+            cookie : {
+                expires : 1
+            }
+        });
         $(".indicator").each(function(index, object){
           $("#" + object.id).load('${request.contextPath}/migration/' + object.id + '?format=count');
         });

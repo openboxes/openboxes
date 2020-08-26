@@ -4,19 +4,6 @@
     width: 100%;
     overflow: hidden;
 }
-.galleryItem {
-    color: #797478;
-    font: 10px/1.5 Verdana, Helvetica, sans-serif;
-    float: left;
-    margin: 2px;
-}
-
-.galleryItem img {
-    max-width: 100%;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-}
 </style>
 
 <div id="product-details">
@@ -70,6 +57,14 @@
                         <label><warehouse:message code="forecasting.onHandMonths.label"/></label>
                     </td>
                     <td class="value" id="onHandMonths">
+                        <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td class="label">
+                        <label><warehouse:message code="forecasting.stockoutDays.label" default="Stockout Days (last 30 days)"/></label>
+                    </td>
+                    <td class="value" id="stockoutDays">
                         <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
                     </td>
                 </tr>
@@ -415,24 +410,36 @@
 		$(dialogId).dialog('close');
 	}
 
-    $(window).load(function(){
-      var ajaxTimeout = ${grailsApplication.config.openboxes.ajaxRequest.timeout?:0}
+	function fetchData(url, data, success) {
+	  var ajaxTimeout = ${grailsApplication.config.openboxes.ajaxRequest.timeout?:0}
       $.ajax({
         dataType: "json",
         timeout: ajaxTimeout,
-        url: "${request.contextPath}/json/getForecastingData",
-        data: {
-          "product.id": "${productInstance?.id}",
-          "location.id": $("#currentLocationId").val()
-        },
-        success: function (data) {
-          var onHandMonths = data.onHandMonths.toFixed(1);
-          var demand = data.monthlyDemand;
-
-          $('#onHandMonths').html(onHandMonths + " months");
-          $('#demand').html(demand + " per month");
-        },
+        url: url,
+        data: data,
+        success: success,
       });
+    }
+
+    $(window).load(function(){
+      var data = {
+        "product.id": "${productInstance?.id}",
+        "location.id": $("#currentLocationId").val()
+      };
+
+      fetchData("${request.contextPath}/json/getForecastingData", data,
+        function (data) {
+          $('#onHandMonths').html(data.onHandMonths.toFixed(1) + " months");
+          $('#demand').html(data.monthlyDemand + " per month");
+        }
+      );
+
+      fetchData("${request.contextPath}/json/getStockoutData", data,
+        function (data) {
+          $('#stockoutDays').html(data.stockoutDays + " days");
+        }
+      )
+
     });
 </script>
 
