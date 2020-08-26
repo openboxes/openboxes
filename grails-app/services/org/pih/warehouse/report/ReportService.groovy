@@ -16,10 +16,8 @@ import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.BasicResponseHandler
 import org.apache.http.impl.client.DefaultHttpClient
 import org.docx4j.org.xhtmlrenderer.pdf.ITextRenderer
-import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Inventory
-import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.product.Product
@@ -35,7 +33,6 @@ import java.text.NumberFormat
 class ReportService implements ApplicationContextAware {
 
     def dataService
-    def inventoryService
     def dashboardService
     def grailsApplication
     def userService
@@ -342,14 +339,17 @@ class ReportService implements ApplicationContextAware {
         truncateFacts()
         buildTransactionFact()
         buildConsumptionFact()
+        buildStockoutFact()
     }
 
     def truncateFacts() {
         dataService.executeStatements(["SET FOREIGN_KEY_CHECKS = 0",
                                        "delete from transaction_fact",
-                                       "alter table transaction_fact AUTO_INCREMENT = 1",
                                        "delete from consumption_fact",
+                                       "delete from stockout_fact",
+                                       "alter table transaction_fact AUTO_INCREMENT = 1",
                                        "alter table consumption_fact AUTO_INCREMENT = 1",
+                                       "alter table stockout_fact AUTO_INCREMENT = 1",
                                        "SET FOREIGN_KEY_CHECKS = 1"])
     }
 
@@ -357,14 +357,14 @@ class ReportService implements ApplicationContextAware {
         dataService.executeStatements([
                 "SET FOREIGN_KEY_CHECKS = 0",
                 "delete from date_dimension",
-                "alter table date_dimension AUTO_INCREMENT = 1",
                 "delete from location_dimension",
-                "alter table location_dimension AUTO_INCREMENT = 1",
                 "delete from lot_dimension",
-                "alter table lot_dimension AUTO_INCREMENT = 1",
                 "delete from product_dimension",
-                "alter table product_dimension AUTO_INCREMENT = 1",
                 "delete from transaction_type_dimension",
+                "alter table date_dimension AUTO_INCREMENT = 1",
+                "alter table location_dimension AUTO_INCREMENT = 1",
+                "alter table lot_dimension AUTO_INCREMENT = 1",
+                "alter table product_dimension AUTO_INCREMENT = 1",
                 "alter table transaction_type_dimension AUTO_INCREMENT = 1",
                 "SET FOREIGN_KEY_CHECKS = 1"])
     }
@@ -414,22 +414,25 @@ class ReportService implements ApplicationContextAware {
 
     void buildDateDimension() {
         def minTransactionDate = Transaction.minTransactionDate.list()
-        log.info("minTransactionDate: " + minTransactionDate)
         Date today = new Date()
         (minTransactionDate..today).each { Date date ->
-            date.clearTime()
-            DateDimension dateDimension = new DateDimension()
-            dateDimension.date = date
-            dateDimension.dayOfMonth = date[Calendar.DAY_OF_MONTH]
-            dateDimension.dayOfWeek = date[Calendar.DAY_OF_WEEK]
-            dateDimension.month = date[Calendar.MONTH] + 1
-            dateDimension.year = date[Calendar.YEAR]
-            dateDimension.week = date[Calendar.WEEK_OF_YEAR]
-            dateDimension.monthName = date.format("MMMMM")
-            dateDimension.monthYear = date.format("MM-yyyy")
-            dateDimension.weekdayName = date.format("EEEEE")
-            dateDimension.save()
+            saveDateDimension(date)
         }
+    }
+
+    def saveDateDimension(Date date) {
+        date.clearTime()
+        DateDimension dateDimension = new DateDimension()
+        dateDimension.date = date
+        dateDimension.dayOfMonth = date[Calendar.DAY_OF_MONTH]
+        dateDimension.dayOfWeek = date[Calendar.DAY_OF_WEEK]
+        dateDimension.month = date[Calendar.MONTH] + 1
+        dateDimension.year = date[Calendar.YEAR]
+        dateDimension.week = date[Calendar.WEEK_OF_YEAR]
+        dateDimension.monthName = date.format("MMMMM")
+        dateDimension.monthYear = date.format("MM-yyyy")
+        dateDimension.weekdayName = date.format("EEEEE")
+        dateDimension.save()
     }
 
     def buildTransactionFact() {
@@ -514,6 +517,79 @@ class ReportService implements ApplicationContextAware {
             WHERE transaction_type.transaction_code = 'DEBIT'
         """
         dataService.executeStatements([insertStatement])
+    }
+
+
+    def getStockoutData(Location location, Product product, int days) {
+        String query = """
+            SELECT count(*) as stockoutDays
+            FROM stockout_fact 
+            JOIN location_dimension ON location_dimension.id = stockout_fact.location_dimension_id
+            JOIN product_dimension ON product_dimension.id = stockout_fact.product_dimension_id
+            JOIN date_dimension ON date_dimension.id = stockout_fact.date_dimension_id
+            WHERE product_id = :productId
+            AND location_id = :locationId
+            AND date BETWEEN (CURDATE() - INTERVAL :days DAY) AND NOW();
+        """
+        return dataService.executeQuery(query, [locationId:location.id,productId:product.id, days: days])
+    }
+
+    void createStockoutFact() {
+
+        // No foreign keys because records in this table will reference
+        // dimension tables that need to be rebuilt nightly
+        String createTableStatement = """
+            CREATE TABLE IF NOT EXISTS stockout_fact (
+                date_dimension_id bigint(20),
+                location_dimension_id bigint(20),
+                product_dimension_id bigint(20),
+                quantity_on_hand smallint,                
+                primary key (date_dimension_id, location_dimension_id, product_dimension_id)
+            );
+            """
+        // We don't need to do this now, but perhaps at some point in the future if we need to
+        // modify the table
+        String dropTableStatement = """
+            DROP TABLE stockout_fact;
+            """
+
+        dataService.executeStatements([dropTableStatement, createTableStatement])
+    }
+
+    void buildStockoutFact() {
+        createStockoutFact()
+        deleteStockoutFact()
+        populateStockoutFact()
+    }
+
+    void deleteStockoutFact() {
+        String deleteStatement = "delete from stockout_fact"
+        dataService.executeStatement(deleteStatement)
+    }
+
+    void populateStockoutFact() {
+        String insertStatement = """
+            insert into stockout_fact (
+                date_dimension_id, 
+                location_dimension_id,
+                product_dimension_id,
+                quantity_on_hand)
+            select * from (
+                select 
+                    date_dimension.id as date_dimension_id, 
+                    location_dimension.id as location_dimension_id,
+                    product_dimension.id as product_dimension_id,
+                    sum(quantity_on_hand) as quantity_on_hand
+                from inventory_snapshot 
+                join date_dimension on inventory_snapshot.date = date_dimension.date 
+                join product_dimension on inventory_snapshot.product_id = product_dimension.product_id
+                join location_dimension on inventory_snapshot.location_id = location_dimension.location_id
+                group by product_dimension.id, location_dimension.id, date_dimension.id
+                having sum(quantity_on_hand) <= 0
+            ) as stockout_tmp
+            on duplicate key update stockout_fact.quantity_on_hand = stockout_tmp.quantity_on_hand 
+        """
+        dataService.executeStatement(insertStatement)
     }
 
     def refreshDemandData() {

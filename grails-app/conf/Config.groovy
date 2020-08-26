@@ -770,6 +770,10 @@ openboxes.jobs.refreshInventorySnapshotJob.maxRetryAttempts = 3
 openboxes.jobs.refreshTransactionFactJob.enabled = true
 openboxes.jobs.refreshTransactionFactJob.cronExpression = "0 0 0 * * ?" // every day at midnight
 
+// Refresh stockout data for yesterday
+openboxes.jobs.refreshStockoutDataJob.enabled = true
+openboxes.jobs.refreshStockoutDataJob.cronExpression = "0 0 1 * * ?" // at 01:00:00am every day
+
 // Refresh demand data snapshots
 openboxes.jobs.refreshDemandDataJob.enabled = true
 openboxes.jobs.refreshDemandDataJob.cronExpression = "0 0 1 * * ?" // at 01:00:00am every day

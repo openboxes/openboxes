@@ -50,6 +50,11 @@ class ReportController {
         render(success: true)
     }
 
+    def refreshStockoutFact = {
+        reportService.buildStockoutFact()
+        render([success: true] as JSON)
+    }
+
     def buildFacts = {
         def startTime = System.currentTimeMillis()
         def results = reportService.buildFacts()
