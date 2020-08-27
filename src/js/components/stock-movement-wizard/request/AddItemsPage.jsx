@@ -655,7 +655,7 @@ class AddItemsPage extends Component {
     this.props.showSpinner();
 
     const { movementNumber, stockMovementId } = formValues;
-    const url = `/openboxes/stockMovement/exportCsv/${stockMovementId}`;
+    const url = `/stockMovement/exportCsv/${stockMovementId}`;
     this.saveRequisitionItemsInCurrentStep(lineItems)
       .then(() => {
         apiClient.get(url, { responseType: 'blob' })
@@ -685,7 +685,7 @@ class AddItemsPage extends Component {
       },
     };
 
-    const url = `/openboxes/stockMovement/importCsv/${stockMovementId}`;
+    const url = `/stockMovement/importCsv/${stockMovementId}`;
 
     return apiClient.post(url, formData, config)
       .then(() => {
@@ -1003,7 +1003,7 @@ class AddItemsPage extends Component {
     if (!errors.length) {
       this.saveRequisitionItemsInCurrentStep(formValues.lineItems)
         .then(() => {
-          window.location = '/openboxes/stockMovement/list?direction=INBOUND';
+          window.location = `${window.CONTEXT_PATH}/stockMovement/list?direction=INBOUND`;
         });
     } else {
       confirmAlert({
@@ -1015,7 +1015,7 @@ class AddItemsPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = '/openboxes/stockMovement/list?direction=INBOUND'; },
+            onClick: () => { window.location = `${window.CONTEXT_PATH}/stockMovement/list?direction=INBOUND`; },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),
@@ -1118,7 +1118,7 @@ class AddItemsPage extends Component {
     if (this.state.values.statusCode === 'CREATED') {
       return apiClient.post(url, payload)
         .then(() => {
-          window.location = `/openboxes/stockMovement/list?direction=INBOUND&movementNumber=${movementNumber}&submitted=true`;
+          window.location = `${window.CONTEXT_PATH}/stockMovement/list?direction=INBOUND&movementNumber=${movementNumber}&submitted=true`;
         });
     }
     return Promise.resolve();

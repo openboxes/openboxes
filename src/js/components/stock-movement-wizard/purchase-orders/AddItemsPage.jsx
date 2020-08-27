@@ -654,7 +654,7 @@ class AddItemsPage extends Component {
     if (!errors.length) {
       this.saveRequisitionItemsInCurrentStep(formValues.lineItems)
         .then(() => {
-          window.location = `/openboxes/stockMovement/show/${formValues.stockMovementId}`;
+          window.location = `${window.CONTEXT_PATH}/stockMovement/show/${formValues.stockMovementId}`;
         });
     } else {
       confirmAlert({
@@ -666,7 +666,7 @@ class AddItemsPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = `/openboxes/stockMovement/show/${formValues.stockMovementId}`; },
+            onClick: () => { window.location = `${window.CONTEXT_PATH}/stockMovement/show/${formValues.stockMovementId}`; },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),
@@ -743,7 +743,7 @@ class AddItemsPage extends Component {
     if (!invalid) {
       this.saveRequisitionItemsInCurrentStep(values.lineItems)
         .then(() => {
-          window.location = `/openboxes/order/redirectFromStockMovement/${values.stockMovementId}`;
+          window.location = `${window.CONTEXT_PATH}/order/redirectFromStockMovement/${values.stockMovementId}`;
         }).catch(() => this.props.hideSpinner());
     } else {
       this.props.hideSpinner();
@@ -757,7 +757,7 @@ class AddItemsPage extends Component {
           {
             label: this.props.translate('react.stockMovement.confirmPreviousPage.continue.label', 'Continue (lose unsaved work)'),
             onClick: () => {
-              window.location = `/openboxes/order/redirectFromStockMovement/${values.stockMovementId}`;
+              window.location = `${window.CONTEXT_PATH}/order/redirectFromStockMovement/${values.stockMovementId}`;
             },
           },
         ],

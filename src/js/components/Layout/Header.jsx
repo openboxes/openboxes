@@ -36,7 +36,7 @@ class Header extends Component {
         <div className="d-flex align-items-center justify-content-between flex-wrap">
           <div className="logo-header">
             <a
-              href="/openboxes"
+              href={`${window.CONTEXT_PATH}`}
               className="navbar-brand brand-name"
             >
               { this.props.logoUrl !== '' ?
