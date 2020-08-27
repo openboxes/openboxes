@@ -3,7 +3,7 @@
 <style>
     #startDate-datePicker, #endDate-datePicker {
         min-width: 100px;
-        max-width: 100px;
+        width: auto;
         height: 28px;
     }
     #destination_id_chosen {
@@ -16,6 +16,13 @@
         border-radius: 5px;
         border: 1px solid #aaa;
     }
+    .filters-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        align-items: center;
+        margin: 10px 0;
+    }
 </style>
 
 <div id="demand-table">
@@ -26,7 +33,7 @@
     <g:formRemote name="demand" onLoading="showLoading()" onComplete="hideLoading()"
                   url="[controller: 'inventoryItem', action: 'showDemand', params: [id: commandInstance?.product?.id, from: 0]]"
                   update="demand-table" style="margin: 5px;">
-        <div style="display: flex; justify-content: flex-start; align-items: center; margin: 10px 0;" class="date-picker-width">
+        <div class="date-picker-width filters-container">
             <label class="name"><warehouse:message code="consumption.startDate.label"/></label>
             <g:jqueryDatePicker id="startDate" name="startDate" value="${params.startDate}" class="text middle" size="10" format="dd/MMM/yyyy" />
 
@@ -35,7 +42,8 @@
 
             <label for="destination.id" style="margin-left: 10px;"><warehouse:message code="requisition.destination.label" default="Destination Location" /></label>
             <g:selectLocation name="destination.id" value="${params.destination?.id ?: null}"
-                              class="chzn-select-deselect location-picker-width" noSelection="['null':'All']" />
+                              class="chzn-select-deselect location-picker-width" noSelection="['null':'All']"
+                              from="${destinations}" />
 
             <g:submitButton id="refresh-btn" name="Refresh data" value="Refresh data" class="apply-button" style="margin-left: 10px;" />
         </div>
@@ -181,15 +189,15 @@
                         </tr>
                     </g:else>
                 </g:each>
-                <tr class="prop">
-                    <td><warehouse:message code="default.monthly.label" default="Monthly"/></td>
-                    <td class="center"><g:formatNumber number="${totalQuantityRequested/numberOfMonths}" maxFractionDigits="0"/></td>
-                    <td class="center"><g:formatNumber number="${totalQuantityIssued/numberOfMonths}" maxFractionDigits="0"/></td>
-                    <td class="center"><g:formatNumber number="${totalQuantityDemand/numberOfMonths}" maxFractionDigits="0"/></td>
-                </tr>
             </tbody>
 
             <tfoot>
+                <tr>
+                    <th><warehouse:message code="default.monthly.label" default="Monthly"/></th>
+                    <th class="center"><g:formatNumber number="${totalQuantityRequested/numberOfMonths}" maxFractionDigits="0"/></th>
+                    <th class="center"><g:formatNumber number="${totalQuantityIssued/numberOfMonths}" maxFractionDigits="0"/></th>
+                    <th class="center"><g:formatNumber number="${totalQuantityDemand/numberOfMonths}" maxFractionDigits="0"/></th>
+                </tr>
                 <tr>
                     <th><warehouse:message code="default.total.label" default="Total"/></th>
                     <th class="center"><g:formatNumber number="${totalQuantityRequested}" maxFractionDigits="0"/></th>

@@ -140,6 +140,30 @@ class ForecastingService {
     }
 
 
+    def getAvailableDestinationsForDemandDetails(Location origin, Product product, Date startDate, Date endDate) {
+        List data = []
+        Map params = [startDate: startDate, endDate: endDate, productId: product.id, originId: origin.id]
+        String query = """
+            select 
+                destination_id as id,
+                destination_name as name
+            FROM product_demand_details
+            WHERE date_issued BETWEEN :startDate AND :endDate
+            AND product_id = :productId
+            AND origin_id = :originId
+            GROUP BY destination_name, destination_id
+            """
+        Sql sql = new Sql(dataSource)
+        try {
+            data = sql.rows(query, params)
+
+        } catch (Exception e) {
+            log.error("Unable to execute query: " + e.message, e)
+        }
+        return data
+    }
+
+
     def getDemandSummary(Location origin, Product product) {
         List data = []
         Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod?:180
