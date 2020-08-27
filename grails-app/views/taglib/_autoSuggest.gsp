@@ -36,7 +36,7 @@
                 $element.data( "jqXHR",
                     $.getJSON('${attrs.jsonUrl}', { term: req.term, warehouseId: currentLocationId }, function(data) {
                         var items = [];
-                            $.each(data, function(i, item) {
+                        $.each(data, function(i, item) {
                             items.push(item);
                         });
                         add(items);
@@ -92,7 +92,16 @@
                 $("#${attrs.id}-suggest").trigger("selected");
                 return false;
             }
-        })
+        }).data("autocomplete")._renderItem = function( ul, item ) {
+              var text = $("<a></a>").text(item.label);
+              if ('${attrs.showColor}') {
+                text.css("color", item.color);
+              }
+              return $("<li></li>")
+              .data("item.autocomplete", item)
+              .append(text)
+              .appendTo(ul);
+        };
     });
 
     function selectItem(hiddenField, textField, id, label) {
