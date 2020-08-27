@@ -72,7 +72,7 @@
     &nbsp;
     <div>
         ${warehouse.message(code: 'email.contactAdmin.message')}
-        <a href="${createLink(controller: 'stockMovement', action: 'show', id: shipmentInstance?.id)}">
+        <a href="${createLink(controller: 'stockMovement', action: 'show', id: shipmentInstance?.id, absolute: true)}">
             ${warehouse.message(code: 'email.thisLink.label')}.
         </a>
     </div>
