@@ -38,7 +38,9 @@ class MigrationController {
 
         def productSuppliers = migrationService.getProductsForMigration()
 
-        def stockoutFactCount = dataService.executeQuery("select count(*) as count from stockout_fact")[0]?.count?:0
+        def stockoutFactCount = dataService.executeQuery("select count(*) as count from stockout_fact")[0]?.count ?: 0
+        def productDemandCount = dataService.executeQuery("select count(*) as count from product_demand_details")[0]?.count ?: 0
+        def productAvailabilityCount = dataService.executeQuery("select count(*) as count from product_availability")[0]?.count ?: 0
 
         TransactionType inventoryTransactionType = TransactionType.load(Constants.INVENTORY_TRANSACTION_TYPE_ID)
         def inventoryTransactionCount = Transaction.countByTransactionType(inventoryTransactionType)
@@ -53,6 +55,8 @@ class MigrationController {
                 lotDimensionCount        : LotDimension.count(),
                 dateDimensionCount       : DateDimension.count(),
                 stockoutFactCount        : stockoutFactCount,
+                productDemandCount       : productDemandCount,
+                productAvailabilityCount : productAvailabilityCount
         ]
     }
 
