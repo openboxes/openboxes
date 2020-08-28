@@ -36,6 +36,7 @@ class ReceiptService {
     def locationService
     def identifierService
     def grailsApplication
+    def mailService
 
     PartialReceipt getPartialReceipt(String id, String stepNumber) {
         Shipment shipment = Shipment.get(id)
@@ -250,6 +251,19 @@ class ReceiptService {
 
         // Save shipment
         shipment.save(flush: true)
+        
+        // Send notification email on completed receiving
+        if (completed) {
+            def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+            def recipientItems = partialReceipt.partialReceiptItems.groupBy {it.recipient }
+            recipientItems.each {recipient, items ->
+                if (recipient) {
+                    def subject = g.message(code: "email.yourItemReceived.message", args: [shipment.shipmentNumber])
+                    def body = "${g.render(template: "/email/shipmentItemReceived", model: [shipmentInstance: shipment, receiptItems: items])}"
+                    mailService.sendHtmlMail(subject, body.toString(), recipient.email)
+                }
+            }
+        }
     }
 
     void saveAndCompletePartialReceipt(PartialReceipt partialReceipt) {

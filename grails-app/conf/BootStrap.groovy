@@ -39,6 +39,8 @@ import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.jobs.RefreshDemandDataJob
+import org.pih.warehouse.jobs.RefreshStockoutDataJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.picklist.Picklist
@@ -471,6 +473,12 @@ class BootStrap {
 
         // Create uploads directory if it doesn't already exist
         uploadService.findOrCreateUploadsDirectory()
+
+        // Refresh stock out data on startup to make sure the fact table is created
+        RefreshStockoutDataJob.triggerNow()
+
+        // Refresh demand data on startup to make sure the materialized views are created
+        RefreshDemandDataJob.triggerNow()
     }
 
 

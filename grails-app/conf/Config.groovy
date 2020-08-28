@@ -785,9 +785,21 @@ openboxes.jobs.refreshInventorySnapshotJob.enabled = true
 openboxes.jobs.refreshInventorySnapshotJob.retryOnError = false
 openboxes.jobs.refreshInventorySnapshotJob.maxRetryAttempts = 3
 
+// Refresh inventory snapshots after transaction (only for transaction entries)
+openboxes.jobs.refreshInventorySnapshotAfterTransactionJob.enabled = true
+openboxes.jobs.refreshInventorySnapshotAfterTransactionJob.retryOnError = false
+openboxes.jobs.refreshInventorySnapshotAfterTransactionJob.maxRetryAttempts = 3
+
+// Refresh product availability materialized view
+openboxes.jobs.refreshProductAvailabilityJob.enabled = true
+
 // Refresh transaction fact table
 openboxes.jobs.refreshTransactionFactJob.enabled = true
 openboxes.jobs.refreshTransactionFactJob.cronExpression = "0 0 0 * * ?" // every day at midnight
+
+// Refresh stockout data for yesterday
+openboxes.jobs.refreshStockoutDataJob.enabled = true
+openboxes.jobs.refreshStockoutDataJob.cronExpression = "0 0 1 * * ?" // at 01:00:00am every day
 
 // Refresh demand data snapshots
 openboxes.jobs.refreshDemandDataJob.enabled = true

@@ -44,10 +44,25 @@ class ReportController {
     def orderService
     StdScheduler quartzScheduler
 
+    def refreshProductDemand = {
+        reportService.refreshProductDemandData()
+        render([success: true] as JSON)
+    }
+
+    def refreshProductAvailability = {
+        reportService.refreshProductAvailabilityData()
+        render([success: true] as JSON)
+    }
+
     def refreshTransactionFact = {
         reportService.buildDimensions()
         reportService.buildFacts()
-        render(success: true)
+        render([success: true] as JSON)
+    }
+
+    def refreshStockoutFact = {
+        reportService.buildStockoutFact()
+        render([success: true] as JSON)
     }
 
     def buildFacts = {

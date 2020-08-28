@@ -74,7 +74,6 @@ class ForecastingService {
                     quantity_canceled,
                     quantity_approved,
                     quantity_modified,
-                    quantity_substituted,
                     quantity_picked,
                     quantity_demand,
                     reason_code_classification
@@ -101,6 +100,68 @@ class ForecastingService {
         return data
     }
 
+    def getDemandDetailsForDemandTab(Location origin, Location destination, Product product, Date startDate, Date endDate) {
+        List data = []
+        Map params = [startDate: startDate, endDate: endDate, productId: product.id, originId: origin.id]
+        String query = """
+            select 
+                request_id,
+                request_item_id,
+                request_status,
+                request_number,
+                date_requested,
+                date_issued,
+                origin_name,
+                destination_name,
+                product_code,
+                product_name,
+                quantity_requested,
+                quantity_demand,
+                reason_code_classification
+            FROM product_demand_details
+            WHERE date_issued BETWEEN :startDate AND :endDate
+            AND product_id = :productId
+            AND origin_id = :originId
+            """
+        if (destination) {
+            query += " AND destination_id = :destinationId"
+            params << [destinationId: destination.id]
+        }
+
+        Sql sql = new Sql(dataSource)
+        try {
+            data = sql.rows(query, params)
+
+        } catch (Exception e) {
+            log.error("Unable to execute query: " + e.message, e)
+        }
+        return data
+    }
+
+
+    def getAvailableDestinationsForDemandDetails(Location origin, Product product, Date startDate, Date endDate) {
+        List data = []
+        Map params = [startDate: startDate, endDate: endDate, productId: product.id, originId: origin.id]
+        String query = """
+            select 
+                destination_id as id,
+                destination_name as name
+            FROM product_demand_details
+            WHERE date_issued BETWEEN :startDate AND :endDate
+            AND product_id = :productId
+            AND origin_id = :originId
+            GROUP BY destination_name, destination_id
+            """
+        Sql sql = new Sql(dataSource)
+        try {
+            data = sql.rows(query, params)
+
+        } catch (Exception e) {
+            log.error("Unable to execute query: " + e.message, e)
+        }
+        return data
+    }
+
 
     def getDemandSummary(Location origin, Product product) {
         List data = []
@@ -117,7 +178,6 @@ class ForecastingService {
                     sum(quantity_canceled) as quantity_canceled,
                     sum(quantity_approved) as quantity_approved,
                     sum(quantity_modified) as quantity_modified,
-                    sum(quantity_substituted) as quantity_substituted,
                     sum(quantity_demand) as quantity_demand
                 FROM product_demand_details
                 WHERE product_id = :productId
