@@ -156,9 +156,11 @@ function fetchGraphIndicator(
   indicatorConfig,
   locationId = '',
   params = '',
+  categorySelected = '',
+  listValues = [],
 ) {
   const id = indicatorConfig.order;
-  const listParams = params === '' ? `locationId=${locationId}` : `${params}&locationId=${locationId}`;
+  const listParams = params === '' ? `locationId=${locationId}&categorySelected=${categorySelected}&listValues=${listValues}` : `${params}&locationId=${locationId}&categorySelected=${categorySelected}&listValues=${listValues}`;
   const url = `${indicatorConfig.endpoint}?${listParams}`;
   if (!indicatorConfig.enabled) {
     dispatch({
@@ -227,9 +229,11 @@ function fetchNumberIndicator(
   dispatch,
   indicatorConfig,
   locationId,
+  categorySelected,
+  listValues,
 ) {
   const id = indicatorConfig.order;
-  const url = `${indicatorConfig.endpoint}?locationId=${locationId}`;
+  const url = `${indicatorConfig.endpoint}?locationId=${locationId}&categorySelected=${categorySelected}&listValues=${listValues}`;
 
   if (!indicatorConfig.enabled) {
     dispatch({
@@ -264,32 +268,52 @@ export function reloadIndicator(indicatorConfig, params, locationId) {
   };
 }
 
-function getData(dispatch, configData, locationId, config = 'personal') {
+function getData(dispatch, configData, locationId, config = 'personal', categorySelected = '', listValues = []) {
   // new reference so that the original config is not modified
+
   const dataEndpoints = JSON.parse(JSON.stringify(configData.endpoints));
   if (configData.enabled) {
     Object.values(dataEndpoints.graph).forEach((indicatorConfig) => {
       indicatorConfig.archived = indicatorConfig.archived.includes(config);
-      fetchGraphIndicator(dispatch, indicatorConfig, locationId);
+
+      fetchGraphIndicator(dispatch, indicatorConfig, locationId, '', categorySelected, listValues);
     });
     Object.values(dataEndpoints.number).forEach((indicatorConfig) => {
       indicatorConfig.archived = indicatorConfig.archived.includes(config);
-      fetchNumberIndicator(dispatch, indicatorConfig, locationId);
+      fetchNumberIndicator(dispatch, indicatorConfig, locationId, categorySelected, listValues);
     });
   } else {
     Object.values(dataEndpoints.graph).forEach((indicatorConfig) => {
       indicatorConfig.archived = false;
       indicatorConfig.colors = undefined;
-      fetchGraphIndicator(dispatch, indicatorConfig, locationId);
+
+      fetchGraphIndicator(dispatch, indicatorConfig, locationId, '', categorySelected, listValues);
     });
     Object.values(dataEndpoints.number).forEach((indicatorConfig) => {
       indicatorConfig.archived = false;
-      fetchNumberIndicator(dispatch, indicatorConfig, locationId);
+      fetchNumberIndicator(dispatch, indicatorConfig, locationId, categorySelected, listValues);
     });
   }
 }
 
-export function fetchIndicators(configData, config, locationId) {
+function cleanCacheFilters(configurations) {
+  const allPages = Object.entries(configurations)
+    .map(([key, value]) => [key, value]);
+
+  allPages.forEach((page) => {
+    const filters = Object.entries(page[1].filters).map(([valueFilter]) => valueFilter);
+    filters.forEach(filter => sessionStorage.removeItem(filter));
+  });
+}
+
+export function fetchIndicators(
+  configData,
+  config,
+  locationId,
+  refreshFilter = false,
+  categorySelected,
+  listValues,
+) {
   return (dispatch) => {
     dispatch({
       type: SET_ACTIVE_CONFIG,
@@ -298,7 +322,9 @@ export function fetchIndicators(configData, config, locationId) {
       },
     });
 
-    getData(dispatch, configData, locationId, config);
+    if (refreshFilter === true) cleanCacheFilters(configData.configurations);
+
+    getData(dispatch, configData, locationId, config, categorySelected, listValues);
   };
 }
 
@@ -328,7 +354,7 @@ export function reorderIndicators({ oldIndex, newIndex }, e, type) {
   };
 }
 
-export function fetchConfigAndData(locationId, config = 'personal') {
+export function fetchConfigAndData(locationId, config = 'personal', categorySelected, listValues) {
   return (dispatch) => {
     apiClient.get('/openboxes/apitablero/config').then((res) => {
       dispatch({
@@ -337,7 +363,8 @@ export function fetchConfigAndData(locationId, config = 'personal') {
           data: res.data,
         },
       });
-      getData(dispatch, res.data, locationId, config);
+      cleanCacheFilters(res.data.configurations);
+      getData(dispatch, res.data, locationId, config, categorySelected, listValues);
     });
   };
 }
