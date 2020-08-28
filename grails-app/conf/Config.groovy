@@ -771,6 +771,9 @@ openboxes.jobs.refreshInventorySnapshotAfterTransactionJob.enabled = true
 openboxes.jobs.refreshInventorySnapshotAfterTransactionJob.retryOnError = false
 openboxes.jobs.refreshInventorySnapshotAfterTransactionJob.maxRetryAttempts = 3
 
+// Refresh product availability materialized view
+openboxes.jobs.refreshProductAvailabilityJob.enabled = true
+
 // Refresh transaction fact table
 openboxes.jobs.refreshTransactionFactJob.enabled = true
 openboxes.jobs.refreshTransactionFactJob.cronExpression = "0 0 0 * * ?" // every day at midnight

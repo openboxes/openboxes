@@ -74,7 +74,6 @@ class ForecastingService {
                     quantity_canceled,
                     quantity_approved,
                     quantity_modified,
-                    quantity_substituted,
                     quantity_picked,
                     quantity_demand,
                     reason_code_classification
@@ -179,7 +178,6 @@ class ForecastingService {
                     sum(quantity_canceled) as quantity_canceled,
                     sum(quantity_approved) as quantity_approved,
                     sum(quantity_modified) as quantity_modified,
-                    sum(quantity_substituted) as quantity_substituted,
                     sum(quantity_demand) as quantity_demand
                 FROM product_demand_details
                 WHERE product_id = :productId

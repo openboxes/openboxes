@@ -19,10 +19,11 @@
 
         <div class="tabs">
             <ul>
-                <li><a href="#tabs-1"><warehouse:message code="data.quality.label" default="Data Quality"/></a></li>
-                <li><a href="#tabs-2"><warehouse:message code="data.migration.label" default="Data Migration"/></a></li>
+                <li><a href="#tabs-1"><warehouse:message code="data.quality.label" default="Quality"/></a></li>
+                <li><a href="#tabs-2"><warehouse:message code="data.migration.label" default="Migration"/></a></li>
                 <li><a href="#tabs-3"><warehouse:message code="data.dimensions.label" default="Dimensions"/></a></li>
                 <li><a href="#tabs-4"><warehouse:message code="data.facts.label" default="Facts"/></a></li>
+                <li><a href="#tabs-5"><warehouse:message code="data.materializedViews.label" default="Materialized Views"/></a></li>
             </ul>
             <div id="tabs-1">
                 <div class="box">
@@ -234,6 +235,42 @@
                             </td>
                         </tr>
                         </tfoot>
+                    </table>
+                </div>
+            </div>
+            <div id="tabs-5">
+                <div class="box">
+                    <h2><g:message code="data.materializedViews.label" default="Materialized Views"/></h2>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Table</th>
+                            <th>Count</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr class="prop">
+                            <td class="name">Product Demand</td>
+                            <td class="value">
+                                ${productDemandCount}
+                            </td>
+                            <td>
+                                <g:remoteLink controller="report" action="refreshProductDemand" class="button"
+                                              onLoading="onLoading()" onComplete="onComplete()">Refresh</g:remoteLink>
+                            </td>
+                        </tr>
+                        <tr class="prop">
+                            <td class="name">Product Availability</td>
+                            <td class="value">
+                                ${productAvailabilityCount}
+                            </td>
+                            <td>
+                                <g:remoteLink controller="report" action="refreshProductAvailability" class="button"
+                                        onLoading="onLoading()" onComplete="onComplete()">Refresh</g:remoteLink>
+                            </td>
+                        </tr>
+                        </tbody>
                     </table>
                 </div>
             </div>

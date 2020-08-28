@@ -19,6 +19,7 @@ import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
+import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
@@ -210,6 +211,9 @@ class InventorySnapshotService {
                 stmt.executeBatch()
             }
             log.info "Saved ${binLocations?.size()} inventory snapshots for location ${location} on date ${date.format("MMM-dd-yyyy")} in ${System.currentTimeMillis() - startTime}ms"
+
+            // Refresh the product availability table for each location
+            RefreshProductAvailabilityJob.triggerNow([locationId:location.id])
 
         } catch (Exception e) {
             log.error("Error executing batch update for ${location.name}: " + e.message, e)
