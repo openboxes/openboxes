@@ -25,7 +25,6 @@
     <sqlFile path="views/on-order-order-item-summary.sql"/>
   </changeSet>
   <changeSet id="1580848680306-8" author="jmiranda" runOnChange="true" failOnError="false">
-    <validCheckSum>a1564fade9553722fd8cb37caf3ebfa</validCheckSum>
     <sqlFile path="views/on-order-shipment-item-summary.sql"/>
   </changeSet>
   <changeSet id="1580848680306-9" author="jmiranda" runOnChange="true" failOnError="false">
