@@ -88,7 +88,6 @@
             { "mData": "quantity_canceled", "sWidth": "0%" },
             { "mData": "quantity_approved", "sWidth": "0%" },
             { "mData": "quantity_modified", "sWidth": "0%" },
-            { "mData": "quantity_substituted", "sWidth": "0%" },
             { "mData": "quantity_picked", "sWidth": "0%" },
             { "mData": "quantity_demand", "sWidth": "0%" },
             { "mData": "reason_code_classification", "sWidth": "0%" }

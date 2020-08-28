@@ -592,7 +592,7 @@ class ReportService implements ApplicationContextAware {
         dataService.executeStatement(insertStatement)
     }
 
-    def refreshDemandData() {
+    def refreshProductDemandData() {
         List ddlStatements = [
                 "DROP TABLE IF EXISTS product_demand_details_tmp;",
                 """CREATE TABLE product_demand_details_tmp AS
@@ -615,7 +615,6 @@ class ReportService implements ApplicationContextAware {
                         quantity_canceled,
                         quantity_approved,
                         quantity_modified,
-                        quantity_substituted,
                         quantity_picked,
                         quantity_demand,
                         reason_code_classification
