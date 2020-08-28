@@ -660,4 +660,61 @@ class ReportService implements ApplicationContextAware {
         return data
     }
 
+    def refreshProductAvailabilityData() {
+        String truncateStatement = """DELETE FROM product_availability;"""
+        String populateStatement = """
+            INSERT INTO product_availability SELECT
+                uuid_short() as id,
+                location_id,
+                product_id,
+                bin_location_id,
+                inventory_item_id,
+                quantity_on_hand
+            FROM inventory_snapshot
+            WHERE date = date(now())+1;"""
+        dataService.executeStatements([truncateStatement, populateStatement])
+    }
+
+    def refreshProductAvailabilityData(Location location) {
+        String truncateStatement = """
+            DELETE FROM product_availability 
+            WHERE location_id = '${location?.id}'
+        """
+        String populateStatement = """
+            INSERT INTO product_availability SELECT
+                uuid_short() as id,
+                location_id,
+                product_id,
+                bin_location_id,
+                inventory_item_id,
+                quantity_on_hand
+            FROM inventory_snapshot
+            WHERE date = date(now())+1
+            AND location_id = '${location?.id}'
+        """
+        dataService.executeStatements([truncateStatement, populateStatement])
+    }
+
+    def refreshProductAvailabilityData(Location location, Product product) {
+        String truncateStatement = """
+            DELETE FROM product_availability 
+            WHERE product_id = '${product?.id}' 
+            AND location_id = '${location?.id}'
+        """
+        String populateStatement = """
+            INSERT INTO product_availability SELECT
+                uuid_short() as id,
+                location_id,
+                product_id,
+                bin_location_id,
+                inventory_item_id,
+                quantity_on_hand
+            FROM inventory_snapshot
+            WHERE date = date(now())+1
+            AND product_id = '${product?.id}' 
+            AND location_id = '${location?.id}'
+        """
+        dataService.executeStatements([truncateStatement, populateStatement])
+    }
+
 }

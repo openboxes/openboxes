@@ -3,62 +3,56 @@
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
-  <changeSet id="1580848680306-1" author="jmiranda" runAlways="true" failOnError="false">
-    <validCheckSum>d79fec3328bef742ff64a66970cabc</validCheckSum>
+  <changeSet id="1580848680306-1" author="jmiranda" runOnChange="true" failOnError="false">
     <sqlFile path="views/product-demand-view.sql"/>
   </changeSet>
-  <changeSet id="1580848680306-2" author="jmiranda" runAlways="true" failOnError="false">
+  <changeSet id="1580848680306-2" author="jmiranda" runOnChange="true" failOnError="false">
     <sqlFile path="views/product-inventory-snapshot-view.sql"/>
   </changeSet>
-  <changeSet id="1580848680306-3" author="jmiranda" runAlways="true" failOnError="false">
+  <changeSet id="1580848680306-3" author="jmiranda" runOnChange="true" failOnError="false">
     <sqlFile path="views/product-inventory-extended-view.sql"/>
   </changeSet>
-  <changeSet id="1580848680306-4" author="jmiranda" runAlways="true" failOnError="false">
+  <changeSet id="1580848680306-4" author="jmiranda" runOnChange="true" failOnError="false">
     <sqlFile path="views/product-inventory-pivot-view.sql"/>
   </changeSet>
-  <changeSet id="1580848680306-5" author="jmiranda" runAlways="true" failOnError="false">
+  <changeSet id="1580848680306-5" author="jmiranda" runOnChange="true" failOnError="false">
     <sqlFile path="views/product-inventory-compare-view.sql"/>
   </changeSet>
-  <changeSet id="1580848680306-6" author="jmiranda" runAlways="true" failOnError="false">
+  <changeSet id="1580848680306-6" author="jmiranda" runOnChange="true" failOnError="false">
     <sqlFile path="views/product-inventory-expiry-view.sql"/>
   </changeSet>
-  <changeSet id="1580848680306-7" author="jmiranda" runAlways="true" failOnError="false">
-    <validCheckSum>5668c88bf15d0ac488edf66e4ebda2d</validCheckSum>
+  <changeSet id="1580848680306-7" author="jmiranda" runOnChange="true" failOnError="false">
     <sqlFile path="views/on-order-order-item-summary.sql"/>
   </changeSet>
-  <changeSet id="1580848680306-8" author="jmiranda" runAlways="true" failOnError="false">
+  <changeSet id="1580848680306-8" author="jmiranda" runOnChange="true" failOnError="false">
     <validCheckSum>a1564fade9553722fd8cb37caf3ebfa</validCheckSum>
     <sqlFile path="views/on-order-shipment-item-summary.sql"/>
   </changeSet>
-  <changeSet id="1580848680306-9" author="jmiranda" runAlways="true" failOnError="false">
-    <validCheckSum>d1eaa48222b813b14657d25f40ee3c18</validCheckSum>
+  <changeSet id="1580848680306-9" author="jmiranda" runOnChange="true" failOnError="false">
     <sqlFile path="views/on-order-summary.sql"/>
   </changeSet>
-  <changeSet id="1580848680306-10" author="dhatala" runAlways="true" failOnError="false">
-    <validCheckSum>c9c41a3239c4b5be50dac5cc593e236</validCheckSum>
+  <changeSet id="1580848680306-10" author="dhatala" runOnChange="true" failOnError="false">
     <sqlFile path="views/product-snapshot.sql"/>
   </changeSet>
-  <changeSet id="1580848680306-11" author="jmiranda" runAlways="true" failOnError="false">
+  <changeSet id="1580848680306-11" author="jmiranda" runOnChange="true" failOnError="false">
     <sqlFile path="views/fill-rate.sql"/>
   </changeSet>
-  <changeSet id="1580848680306-12" author="jmiranda" runAlways="true" failOnError="false">
+  <changeSet id="1580848680306-12" author="jmiranda" runOnChange="true" failOnError="false">
     <sqlFile path="views/product-availability.sql"/>
   </changeSet>
-  <changeSet id="1580848680306-13" author="jmiranda" runAlways="true" failOnError="false">
+  <changeSet id="1580848680306-13" author="jmiranda" runOnChange="true" failOnError="false">
     <sqlFile path="views/product-summary.sql"/>
   </changeSet>
-  <changeSet id="1580848680306-14" author="dhatala" runAlways="true" failOnError="false">
+  <changeSet id="1580848680306-14" author="dhatala" runOnChange="true" failOnError="false">
     <sqlFile path="views/product-stocklist.sql"/>
   </changeSet>
-  <changeSet id="1580848680306-15" author="dhatala" runAlways="true" failOnError="false">
-    <validCheckSum>d679c62788f9d28c2fe1f32c3472d99</validCheckSum>
+  <changeSet id="1580848680306-15" author="dhatala" runOnChange="true" failOnError="false">
     <sqlFile path="views/stock-movement-item.sql"/>
   </changeSet>
-  <changeSet id="1580848680306-16" author="dhatala" runAlways="true" failOnError="false">
+  <changeSet id="1580848680306-16" author="dhatala" runOnChange="true" failOnError="false">
     <sqlFile path="views/product-substitution-status.sql"/>
   </changeSet>
-  <changeSet id="1580848680306-17" author="dhatala" runAlways="true" failOnError="false">
-    <validCheckSum>9a3720fdb1873032c43038779ca1464</validCheckSum>
+  <changeSet id="1580848680306-17" author="dhatala" runOnChange="true" failOnError="false">
     <sqlFile path="views/edit-page-item.sql"/>
   </changeSet>
 </databaseChangeLog>
