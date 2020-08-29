@@ -208,20 +208,33 @@
                         <tr>
                             <th>Table</th>
                             <th>Count</th>
+                            <th>Actions</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr class="prop">
                             <td class="name">Transaction Facts</td>
                             <td class="value">${transactionFactCount}</td>
+                            <td>
+                                <g:remoteLink controller="report" action="refreshTransactionFact" class="button"
+                                        onLoading="onLoading()" onComplete="onComplete()">Refresh</g:remoteLink>
+                            </td>
                         </tr>
                         <tr class="prop">
                             <td class="name">Consumption Facts</td>
                             <td class="value">${consumptionFactCount}</td>
+                            <td>
+                                <g:remoteLink controller="report" action="refreshConsumptionFact" class="button"
+                                        onLoading="onLoading()" onComplete="onComplete()">Refresh</g:remoteLink>
+                            </td>
                         </tr>
                         <tr class="prop">
                             <td class="name">Stockout Facts</td>
                             <td class="value">${stockoutFactCount}</td>
+                            <td>
+                                <g:remoteLink controller="report" action="refreshStockoutFact" class="button"
+                                        onLoading="onLoading()" onComplete="onComplete()">Refresh</g:remoteLink>
+                            </td>
                         </tr>
                         </tbody>
                         <tfoot>
@@ -233,6 +246,7 @@
                                     <g:link controller="report" action="buildFacts" class="button">Build</g:link>
                                 </div>
                             </td>
+                            <td></td>
                         </tr>
                         </tfoot>
                     </table>

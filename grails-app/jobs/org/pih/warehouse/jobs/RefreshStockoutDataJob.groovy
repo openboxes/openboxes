@@ -20,7 +20,8 @@ class RefreshStockoutDataJob {
         if (enabled) {
             def startTime = System.currentTimeMillis()
             log.info("Refreshing stockout data: " + context.mergedJobDataMap)
-            reportService.buildStockoutFact()
+            Date yesterday = new Date()-1
+            reportService.buildStockoutFact(yesterday)
             log.info "Refreshed stockout data in " + (System.currentTimeMillis() - startTime) + " ms"
         }
     }
