@@ -692,7 +692,7 @@ class ReportService implements ApplicationContextAware {
                 inventory_item_id,
                 quantity_on_hand
             FROM inventory_snapshot
-            WHERE date = date(now())+1;"""
+            WHERE date = DATE_ADD(date(now()), INTERVAL 1 DAY);"""
         dataService.executeStatements([truncateStatement, populateStatement])
     }
 
@@ -710,7 +710,7 @@ class ReportService implements ApplicationContextAware {
                 inventory_item_id,
                 quantity_on_hand
             FROM inventory_snapshot
-            WHERE date = date(now())+1
+            WHERE date = DATE_ADD(date(now()), INTERVAL 1 DAY)
             AND location_id = '${location?.id}'
         """
         dataService.executeStatements([truncateStatement, populateStatement])
@@ -731,7 +731,7 @@ class ReportService implements ApplicationContextAware {
                 inventory_item_id,
                 quantity_on_hand
             FROM inventory_snapshot
-            WHERE date = date(now())+1
+            WHERE date = DATE_ADD(date(now()), INTERVAL 1 DAY)
             AND product_id = '${product?.id}' 
             AND location_id = '${location?.id}'
         """
