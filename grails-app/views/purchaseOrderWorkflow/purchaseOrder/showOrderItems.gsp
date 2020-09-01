@@ -703,7 +703,7 @@
 	<td class="center middle">
     	{{= index }}
 	</td>
-	<td class="left middle">
+	<td class="left middle" style="color: {{= product.color }}">
         {{= product.productCode }}
         {{= product.name }}
 	</td>

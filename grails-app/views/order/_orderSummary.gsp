@@ -52,10 +52,10 @@
 
             <g:each var="orderItem" in="${orderInstance?.listOrderItems() }" status="i">
                 <tr class="order-item ${(i % 2) == 0 ? 'even' : 'odd'}">
-                    <td>
+                    <td style="color: ${orderItem?.product?.color}">
                         ${orderItem?.product?.productCode}
                     </td>
-                    <td>
+                    <td style="color: ${orderItem?.product?.color}">
                         <format:product product="${orderItem?.product}"/>
                     </td>
                     <g:if test="${orderInstance.orderItems.any { it.productSupplier?.supplierCode } }">
