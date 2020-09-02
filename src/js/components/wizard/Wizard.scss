@@ -1,0 +1,100 @@
+.content-wrap {
+    background-color: #f3f6f7;
+}
+
+// Wizard steps
+
+.steps-box {
+    padding: 24px 24px 48px 24px;
+    display: flex;
+    background-color: #fff;
+
+    .steps {
+        max-width: 80%;
+        margin: auto;
+        flex: 1;
+        justify-content: space-evenly;
+
+        .step-container {
+            display: flex;
+
+            &:not(:last-child) {
+                flex: 1;
+            }
+
+            .step {
+                border: none;
+                background: none;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                position: relative;
+
+                .step-text {
+                    position: absolute;
+                    top: 30px;
+                    font-size: small;
+                }
+            }
+        }
+
+        .step-container:not(:last-child)::after {
+            content: " ";
+            border-bottom: 1px dashed #e9ebeb;
+            flex: 1;
+            height: 18px;
+        }
+        
+    }
+
+}
+
+// Icons
+.fa {
+    font-size: 30px !important;
+}
+
+.fa-check-circle-o {
+    color: #50c146;
+}
+
+.fa-circle-o.disabled {
+    color: #e9ebeb;
+}
+
+.fa-circle-o {
+    color: #4f87ce;
+}
+
+// Wizard page
+.panel-body {
+    background-color: #fff;
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.09);
+
+    .wizard-form {
+        padding: 24px;
+        margin-bottom: 48px;
+        position: relative;
+
+        .form-group {
+            margin-top: 12px !important;
+
+            .col-form-label {
+                text-align: unset !important;
+                max-width: unset !important;
+                min-width: 100%;
+                padding: 6px 0 !important;
+            }
+        }
+
+        .submit-buttons {
+            position: absolute;
+            bottom: -48px;
+            right: 0;
+
+            button {
+                height: 32px;
+            }
+        }
+    }
+}

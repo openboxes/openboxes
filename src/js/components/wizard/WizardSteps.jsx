@@ -1,27 +1,31 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
+import './Wizard.scss';
 
 const WizardSteps = props => (
-  <div className="wizard-box container-fluid d-print-none">
-    <div className="row">
-      <div className="wizard-steps d-flex flex-wrap">
-        { _.map(props.steps, (step, index) => (
-          <div
-            key={index}
-            className={`
-              ${index + 1 === props.currentStep ? 'active-step' : ''} 
-              ${index + 1 < props.currentStep ? 'completed-step' : ''} 
-              ${index + 1 > props.currentStep || !props.stepsClickable ? 'disabled-step ' : ''}`
-            }
-          >
-            <a href="#" onClick={() => props.onClick(index + 1)}>
+  <div className="steps-box d-print-none">
+    <div className="steps d-flex flex-wrap">
+      { _.map(props.steps, (step, index) => (
+        <div
+          key={index}
+          className="step-container"
+        >
+          <button className="step" onClick={() => props.onClick(index + 1)} disabled={!props.stepsClickable}>
+            <i
+              className={`fa 
+                ${index + 1 === props.currentStep ? 'fa-circle-o' : ''} 
+                ${index + 1 < props.currentStep ? 'fa-check-circle-o' : ''} 
+                ${index + 1 > props.currentStep || (index + 1 !== props.currentStep && !props.stepsClickable) ? 'fa-circle-o disabled' : ''}`}
+              aria-hidden="true"
+            />
+            <span className="step-text">
               {step}
-            </a>
-          </div>
+            </span>
+          </button>
+        </div>
           ))
         }
-      </div>
     </div>
   </div>
 );
