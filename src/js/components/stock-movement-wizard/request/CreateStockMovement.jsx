@@ -265,6 +265,7 @@ class CreateStockMovement extends Component {
         'destination.id': values.destination.id,
         'requestedBy.id': values.requestedBy.id,
         'stocklist.id': _.get(values.stocklist, 'id') || '',
+        requestType: 'ADHOC',
       };
 
       apiClient.post(stockMovementUrl, payload)
