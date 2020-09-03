@@ -35,7 +35,7 @@ const FIELDS = {
   buttonsTop: {
     type: ({
       // eslint-disable-next-line react/prop-types
-      prevPage, onSave, saveDisabled, saveAndExit, cancelAllRemaining,
+      prevPage, onSave, saveDisabled, saveAndExit, cancelAllRemaining, hasPartialReceivingSupport,
     }) => (
       <div className="mb-1 text-center">
         <button type="button" className="btn btn-outline-primary float-left btn-form btn-xs" onClick={prevPage}>
@@ -62,13 +62,18 @@ const FIELDS = {
           disabled={saveDisabled}
         ><Translate id="react.partialReceiving.receiveShipment.label" defaultMessage="Receive shipment" />
         </button>
-        <button
-          type="button"
-          className="btn btn-outline-danger float-right btn-form btn-xs"
-          onClick={cancelAllRemaining}
-          disabled={saveDisabled}
-        ><Translate id="react.partialReceiving.cancelAllRemaining.label" defaultMessage="Cancel all remaining" />
-        </button>
+        {hasPartialReceivingSupport ?
+          <button
+            type="button"
+            className="btn btn-outline-danger float-right btn-form btn-xs"
+            onClick={cancelAllRemaining}
+            disabled={saveDisabled}
+          ><Translate
+            id="react.partialReceiving.cancelAllRemaining.label"
+            defaultMessage="Cancel all remaining"
+          />
+          </button>
+          : null}
       </div>),
   },
   containers: {
@@ -173,8 +178,8 @@ const FIELDS = {
         label: 'react.partialReceiving.cancelRemaining.label',
         defaultMessage: 'Cancel remaining',
         flexWidth: '1',
-        getDynamicAttr: ({ saveDisabled, fieldValue }) => ({
-          disabled: saveDisabled || _.toInteger(fieldValue) <= 0,
+        getDynamicAttr: ({ saveDisabled, fieldValue, hasPartialReceivingSuppport }) => ({
+          disabled: saveDisabled || _.toInteger(fieldValue) <= 0 || !hasPartialReceivingSuppport,
         }),
       },
       comment: {
@@ -189,7 +194,7 @@ const FIELDS = {
 
     type: ({
     // eslint-disable-next-line react/prop-types
-      prevPage, onSave, saveDisabled, saveAndExit, cancelAllRemaining,
+      prevPage, onSave, saveDisabled, saveAndExit, cancelAllRemaining, hasPartialReceivingSupport,
     }) => (
       <div className="my-1 text-center">
         <button type="button" className="btn btn-outline-primary float-left btn-form btn-xs" onClick={prevPage}>
@@ -216,13 +221,18 @@ const FIELDS = {
           disabled={saveDisabled}
         ><Translate id="react.partialReceiving.receiveShipment.label" defaultMessage="Receive shipment" />
         </button>
-        <button
-          type="button"
-          className="btn btn-outline-danger float-right btn-form btn-xs"
-          onClick={cancelAllRemaining}
-          disabled={saveDisabled}
-        ><Translate id="react.partialReceiving.cancelAllRemaining.label" defaultMessage="Cancel all remaining" />
-        </button>
+        {hasPartialReceivingSupport ?
+          <button
+            type="button"
+            className="btn btn-outline-danger float-right btn-form btn-xs"
+            onClick={cancelAllRemaining}
+            disabled={saveDisabled}
+          ><Translate
+            id="react.partialReceiving.cancelAllRemaining.label"
+            defaultMessage="Cancel all remaining"
+          />
+          </button>
+        : null}
       </div>),
   },
 };
@@ -285,6 +295,7 @@ class ReceivingCheckScreen extends Component {
             saveAndExit: this.onExit,
             hasBinLocationSupport: this.props.hasBinLocationSupport,
             cancelAllRemaining: this.cancelAllRemaining,
+            hasPartialReceivingSupport: this.props.hasPartialReceivingSupport,
           }))}
       </div>
     );
@@ -293,6 +304,7 @@ class ReceivingCheckScreen extends Component {
 
 const mapStateToProps = state => ({
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
+  hasPartialReceivingSupport: state.session.currentLocation.hasPartialReceivingSupport,
 });
 
 export default connect(mapStateToProps)(ReceivingCheckScreen);
@@ -314,6 +326,8 @@ ReceivingCheckScreen.propTypes = {
   hasBinLocationSupport: PropTypes.bool.isRequired,
   /** Function changing the value of a field in the Redux store */
   change: PropTypes.func.isRequired,
+  /** Is true when currently selected location supports partial receiving */
+  hasPartialReceivingSupport: PropTypes.bool.isRequired,
 };
 
 ReceivingCheckScreen.defaultProps = {
