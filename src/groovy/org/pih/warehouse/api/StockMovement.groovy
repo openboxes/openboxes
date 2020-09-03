@@ -209,8 +209,8 @@ class StockMovement {
 
     static StockMovement createFromShipment(Shipment shipment) {
 
-        String statusCode = (shipment.status.code == ShipmentStatusCode.SHIPPED) ?
-                RequisitionStatus.ISSUED.toString() : RequisitionStatus.PENDING.toString()
+        String statusCode = (shipment.status.code == ShipmentStatusCode.PENDING) ?
+                RequisitionStatus.PENDING.toString() : RequisitionStatus.ISSUED.toString()
 
         ReferenceNumber trackingNumber = shipment?.referenceNumbers?.find { ReferenceNumber rn ->
             rn.referenceNumberType.id == Constants.TRACKING_NUMBER_TYPE_ID
