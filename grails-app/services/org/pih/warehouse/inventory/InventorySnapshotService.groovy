@@ -24,6 +24,7 @@ import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.reporting.TransactionFact
+import org.pih.warehouse.util.LocalizationUtil
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -37,6 +38,7 @@ class InventorySnapshotService {
     def inventoryService
     def persistenceInterceptor
     def grailsApplication
+    def localizationService
 
     def populateInventorySnapshots(Date date) {
         populateInventorySnapshots(date, false)
@@ -705,7 +707,9 @@ class InventorySnapshotService {
 
         def transactionData = getTransactionReportData(location, startDate, endDate)
 
-        def transactionTypeNames = transactionData.collect { it.transactionTypeName }.unique().sort()
+        def transactionTypeNames = TransactionType.createCriteria().list {
+            'in'("transactionCode", [TransactionCode.DEBIT, TransactionCode.CREDIT])
+        }.collect { it.name }
 
         // Get starting balance
         def balanceOpeningMap = getQuantityOnHandByProduct(location, startDate)
@@ -760,11 +764,12 @@ class InventorySnapshotService {
             ]
             row.put("Opening", balanceOpening)
             transactionTypeNames.each { transactionTypeName ->
+                def localizedName = LocalizationUtil.getLocalizedString(transactionTypeName, localizationService.getCurrentLocale())
                 def quantity =
                         transactionData.find {
-                            it.productCode == product.productCode && it.transactionTypeName == transactionTypeName
+                            it.productCode == product.productCode && it.transactionTypeName == localizedName
                         }?.quantity?:0
-                row[transactionTypeName] = quantity
+                row[localizedName] = quantity
             }
 
             row.put("Adjustments", quantityAdjustments)
