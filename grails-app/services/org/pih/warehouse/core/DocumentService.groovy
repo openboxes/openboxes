@@ -846,11 +846,12 @@ class DocumentService {
             row.getCell(CELL_INDEX++).setCellStyle(tableHeaderCenterStyle)
 
             def previousContainer = "", previousParentContainer = "", packLevelOneInitialRowIndex = 0, packLevelOneFinalRowIndex = 0, packLevelTwoInitialRowIndex = 0, packLevelTwoFinalRowIndex = 0
-            shipmentInstance.sortShipmentItemsBySortOrder().each { itemInstance ->
+            shipmentInstance.sortShipmentItemsBySortOrder().eachWithIndex { itemInstance, index ->
 
                 CELL_INDEX = 0
                 log.debug "Adding item  to packing list " + itemInstance?.product?.name + " -> " + itemInstance?.container?.name
                 row = sheet.createRow((short) counter++)
+                boolean isLastItem = index == shipmentInstance.sortShipmentItemsBySortOrder().size() - 1
 
                 if ((itemInstance?.container?.parentContainer && previousParentContainer != itemInstance?.container?.parentContainer?.name)
                         || (!itemInstance?.container?.parentContainer && previousParentContainer != itemInstance?.container?.name)) {
@@ -865,7 +866,7 @@ class DocumentService {
                 } else {
                     packLevelOneFinalRowIndex = row.getRowNum()
                     // Merge columns if pack level one is same as previous one but it's the last element in array
-                    if (itemInstance == shipmentInstance.shipmentItems.last()) {
+                    if (isLastItem) {
                         sheet.addMergedRegion(CellRangeAddress.valueOf("A${packLevelOneInitialRowIndex + 1}:A${packLevelOneFinalRowIndex + 1}"))
                     }
                     row.createCell(CELL_INDEX).setCellValue("")
@@ -884,7 +885,7 @@ class DocumentService {
                 } else {
                     packLevelTwoFinalRowIndex = row.getRowNum()
                     // Merge columns if pack level two is same as previous one but it's the last element in array
-                    if (itemInstance == shipmentInstance.shipmentItems.last()) {
+                    if (isLastItem) {
                         sheet.addMergedRegion(CellRangeAddress.valueOf("B${packLevelTwoInitialRowIndex + 1}:B${packLevelTwoFinalRowIndex + 1}"))
                     }
                     row.createCell(CELL_INDEX).setCellValue("")
