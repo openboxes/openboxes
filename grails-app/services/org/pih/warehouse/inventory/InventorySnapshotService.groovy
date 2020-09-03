@@ -17,6 +17,7 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.hibernate.Criteria
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
@@ -38,7 +39,6 @@ class InventorySnapshotService {
     def inventoryService
     def persistenceInterceptor
     def grailsApplication
-    def localizationService
 
     def populateInventorySnapshots(Date date) {
         populateInventorySnapshots(date, false)
@@ -763,13 +763,15 @@ class InventorySnapshotService {
                     "Unit Cost"  : product.pricePerUnit ?: ''
             ]
             row.put("Opening", balanceOpening)
-            transactionTypeNames.each { transactionTypeName ->
-                def localizedName = LocalizationUtil.getLocalizedString(transactionTypeName, localizationService.getCurrentLocale())
+            transactionTypeNames.each { String transactionTypeName ->
+                if (transactionTypeName.contains(Constants.LOCALIZED_STRING_SEPARATOR)) {
+                    transactionTypeName = LocalizationUtil.getLocalizedString(transactionTypeName)
+                }
                 def quantity =
                         transactionData.find {
-                            it.productCode == product.productCode && it.transactionTypeName == localizedName
+                            it.productCode == product.productCode && it.transactionTypeName == transactionTypeName
                         }?.quantity?:0
-                row[localizedName] = quantity
+                row[transactionTypeName] = quantity
             }
 
             row.put("Adjustments", quantityAdjustments)
