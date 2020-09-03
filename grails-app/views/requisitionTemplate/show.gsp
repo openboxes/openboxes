@@ -66,11 +66,12 @@
                         <g:set var="requisitionItems" value='${requisition?."$sortByCode.methodName"}'/>
                         <g:each var="requisitionItem" in="${requisitionItems}" status="i">
                             <tr class="prop ${i%2?'even':'odd'}" id="requisitionItem_${requisitionItem?.id }" requisitionItem="${requisitionItem?.id}">
-                                <td>
+                                <td style="color: ${requisitionItem?.product?.color}">
                                     ${requisitionItem?.product?.productCode}
                                 </td>
                                 <td>
-                                    <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id}">
+                                    <g:link controller="inventoryItem" action="showStockCard"
+                                            style="color: ${requisitionItem?.product?.color}" id="${requisitionItem?.product?.id}">
                                         ${requisitionItem?.product?.name}
                                     </g:link>
                                 </td>

@@ -742,7 +742,8 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
                                             name: it.uom?.name
                                     ]
                             ]
-                        }
+                        },
+                        color       : product.color
                 ]
         ]
     }
