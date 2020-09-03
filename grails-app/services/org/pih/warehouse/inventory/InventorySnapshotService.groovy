@@ -762,18 +762,20 @@ class InventorySnapshotService {
                     "Unit Cost"  : product.pricePerUnit ?: ''
             ]
             row.put("Opening", balanceOpening)
+            def includeRow = balanceOpening || balanceClosing || quantityAdjustments
             transactionTypeNames.each { transactionTypeName ->
                 def quantity =
                         transactionData.find {
                             it.productCode == product.productCode && it.transactionTypeName == transactionTypeName
                         }?.quantity?:0
                 row[transactionTypeName] = quantity
+                includeRow = quantity != 0 ? true : includeRow
             }
 
             row.put("Adjustments", quantityAdjustments)
             row.put("Closing", balanceClosing)
 
-            if (balanceOpening || transactionTypeNames || quantityAdjustments || balanceClosing) {
+            if (includeRow) {
                 data << row
             }
         }
