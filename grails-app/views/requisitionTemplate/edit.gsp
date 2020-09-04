@@ -77,7 +77,7 @@
                                     <td></td>
                                     <td>
                                         <g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName?skipQuantity=true"
-                                                       width="100%" styleClass="text"/>
+                                                       width="100%" styleClass="text" showColor="true"/>
                                     </td>
                                     <td></td>
                                     <td class="center">
@@ -173,10 +173,11 @@
           "bUseRendered": false,
           "fnRowCallback": function( nRow, aData) {
 
-              $('td:eq(0)', nRow).addClass('center middle');
+              $('td:eq(0)', nRow).addClass('center middle').css('color', aData["product"].color);
 
               $('td:eq(1)', nRow).addClass('middle');
-              $('td:eq(1)', nRow).html('<a href="${request.contextPath}/inventoryItem/showStockCard/' + aData["product"].id + '" target="_blank">' + aData["product"].name + '</a>');
+              $('td:eq(1)', nRow).html('<a style="color: ' + aData["product"].color +
+                '" href="${request.contextPath}/inventoryItem/showStockCard/' + aData["product"].id + '" target="_blank">' + aData["product"].name + '</a>');
 
               $('td:eq(2)', nRow).addClass('middle dont-break-out');
 
