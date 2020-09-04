@@ -566,7 +566,7 @@ class StockMovementService {
             ]);
 
             def statusCode = substitutionItems ? RequisitionItemStatus.SUBSTITUTED :
-                    it.quantity_revised ? RequisitionItemStatus.CHANGED : RequisitionItemStatus.APPROVED
+                    it.quantity_revised != null ? RequisitionItemStatus.CHANGED : RequisitionItemStatus.APPROVED
             [
                     product : Product.get(it.product_id),
                     productName : it.name,
