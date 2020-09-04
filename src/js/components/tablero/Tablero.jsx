@@ -167,7 +167,7 @@ class Tablero extends Component {
       });
   }
 
-  fetchData = (config = 'personal', refreshFilter = false, categorySelected = '', listValues = []) => {
+  fetchData = (config = 'personal', refreshFilter = false, filterSelected = '', listValues = []) => {
     sessionStorage.setItem('dashboardKey', config);
     this.props.resetIndicators();
     if (this.props.dashboardConfig && this.props.dashboardConfig.endpoints) {
@@ -176,14 +176,14 @@ class Tablero extends Component {
         config,
         this.props.currentLocation,
         refreshFilter,
-        categorySelected,
+        filterSelected,
         listValues,
       );
     } else {
       this.props.fetchConfigAndData(
         this.props.currentLocation,
         config,
-        categorySelected,
+        filterSelected,
         listValues,
       );
     }
