@@ -151,7 +151,8 @@ class BootStrap {
                     locationType         : location.locationType,
                     sortOrder            : location.sortOrder,
                     hasBinLocationSupport: location.hasBinLocationSupport(),
-                    hasPackingSupport    : location.supports(ActivityCode.PACK_SHIPMENT)
+                    hasPackingSupport    : location.supports(ActivityCode.PACK_SHIPMENT),
+                    hasPartialReceivingSupport : location.supports(ActivityCode.PARTIAL_RECEIVING),
             ]
         }
 
