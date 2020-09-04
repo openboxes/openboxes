@@ -18,6 +18,7 @@ import GraphCard from './GraphCard';
 import LoadingNumbers from './LoadingNumbers';
 import NumberCard from './NumberCard';
 import UnarchiveIndicators from './UnarchiveIndicators';
+import Filter from './Filter';
 import './tablero.scss';
 import apiClient from '../../utils/apiClient';
 
@@ -98,9 +99,9 @@ const ConfigurationsList = ({
       <ul className="configs-list">
         {Object.entries(configs).map(([key, value]) => (
           <li className={`configs-list-item ${activeConfig === key ? 'active' : ''}`} key={key}>
-            <button onClick={() => loadConfigData(key)}>
+            <button onClick={() => loadConfigData(key, true)}>
               <i className="fa fa-bar-chart" aria-hidden="true" />
-              {value}
+              {value.name}
             </button>
           </li>
           ))}
@@ -166,13 +167,25 @@ class Tablero extends Component {
       });
   }
 
-  fetchData = (config = 'personal') => {
+  fetchData = (config = 'personal', refreshFilter = false, filterSelected = '', listValues = []) => {
     sessionStorage.setItem('dashboardKey', config);
     this.props.resetIndicators();
     if (this.props.dashboardConfig && this.props.dashboardConfig.endpoints) {
-      this.props.fetchIndicators(this.props.dashboardConfig, config, this.props.currentLocation);
+      this.props.fetchIndicators(
+        this.props.dashboardConfig,
+        config,
+        this.props.currentLocation,
+        refreshFilter,
+        filterSelected,
+        listValues,
+      );
     } else {
-      this.props.fetchConfigAndData(this.props.currentLocation, config);
+      this.props.fetchConfigAndData(
+        this.props.currentLocation,
+        config,
+        filterSelected,
+        listValues,
+      );
     }
   }
 
@@ -304,25 +317,33 @@ class Tablero extends Component {
           onClick={this.toggleNav}
           onKeyPress={this.toggleNav}
         />
-        <div className="cards-container">
-          {numberCards}
-          <SortableCards
-            allLocations={this.state.allLocations}
-            data={this.props.indicatorsData.filter(indicator => indicator)}
-            onSortStart={this.sortStartHandle}
-            onSortEnd={this.sortEndHandleGraph}
-            loadIndicator={this.loadIndicator}
-            axis="xy"
-            useDragHandle
+
+        <div className="filter-and-cards-container">
+          <Filter
+            configs={this.props.dashboardConfig.configurations || {}}
+            activeConfig={this.props.activeConfig}
+            fetchData={this.fetchData}
           />
-          <ArchiveIndicator hideArchive={!this.state.isDragging} />
-          <UnarchiveIndicators
-            graphData={this.props.indicatorsData}
-            numberData={this.props.numberData}
-            showPopout={this.state.showPopout}
-            unarchiveHandler={this.unarchiveHandler}
-            handleAdd={this.handleAdd}
-          />
+          <div className="cards-container">
+            {numberCards}
+            <SortableCards
+              allLocations={this.state.allLocations}
+              data={this.props.indicatorsData.filter(indicator => indicator)}
+              onSortStart={this.sortStartHandle}
+              onSortEnd={this.sortEndHandleGraph}
+              loadIndicator={this.loadIndicator}
+              axis="xy"
+              useDragHandle
+            />
+            <ArchiveIndicator hideArchive={!this.state.isDragging} />
+            <UnarchiveIndicators
+              graphData={this.props.indicatorsData}
+              numberData={this.props.numberData}
+              showPopout={this.state.showPopout}
+              unarchiveHandler={this.unarchiveHandler}
+              handleAdd={this.handleAdd}
+            />
+          </div>
         </div>
       </div>
     );

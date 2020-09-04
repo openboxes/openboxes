@@ -5,6 +5,108 @@
   user-select: none;
   display: flex;
   align-items: start;
+  .filter-and-cards-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    .category-filter {
+      display: flex;
+      flex-direction: row;
+      width: 70%;
+      flex-wrap: wrap;
+      margin-left: 6%;
+      margin-top: 20px;
+  
+      .add-category-btn {
+        width: 100px !important;
+        cursor: pointer;
+      }
+
+      .category-item {
+        background-color: #D6D6D6;
+        width: 20%;
+        height: 50px;
+        margin-top: 15px;
+        font-size: 0.8em;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 1.5%;
+        box-shadow:  2px 8px 10px rgba(0,0,0,.15);
+        border-radius: 5px;
+        .category-title {
+          margin-left: 10%;
+          width: 70%;
+          font-size: 0.7em;
+        }
+        .delete-button {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 30px;
+          width: 20%;
+          border-left: 1px solid #00000024;
+          cursor: pointer;
+        }
+      }
+      
+      .add-category-popup {
+        background-color: white;
+        box-shadow:  2px 8px 10px rgba(0,0,0,.15);
+        position: absolute;
+        z-index: 1;
+        width: 25%;
+        @media (max-width: 600px) {
+          width:60%
+        }
+        div {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          height: 40px;
+          margin-left: 5%;
+          font-weight: bold;
+          border-bottom:1px solid #9da1a426;
+          margin-bottom: 20px;
+          span {
+            margin-right: 25px;
+            cursor: pointer;
+          }
+        }
+        .filter-menu {
+          color: #9DA1A4;
+          background-color: white;
+          list-style-type: none;
+          font-size: 12px;
+          padding: 0;
+          margin-left: 5%;
+
+          .category-name-to-select {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 40px;
+            cursor: pointer;
+            span {
+              margin-right:25px;
+            }
+          }
+          .category-value-to-select {
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+          }
+        }
+        .scrollable {
+          max-height: 250px;
+          overflow: auto;
+        }
+      }
+      
+    }
+  }
+ 
 }
 
 .configs-left-nav {
@@ -605,7 +707,7 @@
 
 @media (min-width: 1468px) {
   .big-size {
-    height: 670px !important;
+    height: 700px !important;
     width: 60% !important;
   }
   

@@ -389,11 +389,30 @@ openboxes {
     tablero {
         enabled = true
         configurations {
-            personal    = "My Dashboard"
-            warehouse   = "Warehouse Management"
-            inventory   = "Inventory Management"
-            transaction = "Transaction History"
-            fillRate    = "Fill Rate"
+            personal {
+                name = "My Dashboard"
+                filters {}
+            }
+            warehouse {
+                name = "Warehouse Management"
+                filters {}
+            }
+            inventory {
+                name = "Inventory Management"
+                filters {}
+            }
+            transaction {
+                name = "Transaction Management"
+                filters {}
+            }
+            fillRate {
+                name = "Fill Rate" 
+                filters {
+                    category {
+                        endpoint = "/${appName}/categoryApi/list"
+                    }
+                }
+            }
         }
         endpoints {
             number {
