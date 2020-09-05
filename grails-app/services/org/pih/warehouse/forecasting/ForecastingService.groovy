@@ -29,31 +29,31 @@ class ForecastingService {
 
         boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
         if (forecastingEnabled) {
-            def numberFormat = NumberFormat.getIntegerInstance()
-            def rows = getDemandDetails(origin, product)
-            def startDate = rows.min { it.date_issued }?.date_issued
-            def endDate = new Date()
+            Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod?:365
+            def rows = getDemandDetails(origin, product, demandPeriod)
             def totalDemand = rows.sum { it.quantity_demand } ?: 0
-            def totalDays = (startDate && endDate) ? (endDate - startDate) : 1
-            def dailyDemand = (totalDemand && totalDays) ? (totalDemand / totalDays) : 0
-            def monthlyDemand = dailyDemand * 30
+            def dailyDemand = (totalDemand && demandPeriod) ? (totalDemand / demandPeriod) : 0
+            def monthlyDemand = totalDemand / Math.floor((demandPeriod / 30))
             def quantityOnHand = inventoryService.getQuantityOnHand(origin, product)
             def onHandMonths = monthlyDemand ? quantityOnHand / monthlyDemand : 0
 
             return [
-                    dateRange    : [startDate: startDate, endDate: endDate],
                     totalDemand  : totalDemand,
-                    totalDays    : totalDays,
+                    totalDays    : demandPeriod,
                     dailyDemand  : dailyDemand,
-                    monthlyDemand: "${numberFormat.format(monthlyDemand)}",
+                    monthlyDemand: "${NumberFormat.getIntegerInstance().format(monthlyDemand)}",
                     onHandMonths: onHandMonths
             ]
         }
     }
 
     def getDemandDetails(Location origin, Product product) {
+        Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod?:365
+        return getDemandDetails(origin, product, demandPeriod)
+    }
+
+    def getDemandDetails(Location origin, Product product, Integer demandPeriod) {
         List data = []
-        Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod?:180
         Map params = [demandPeriod: demandPeriod]
         boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
         if (forecastingEnabled) {
@@ -165,7 +165,7 @@ class ForecastingService {
 
     def getDemandSummary(Location origin, Product product) {
         List data = []
-        Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod?:180
+        Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod?:365
         boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
         if (forecastingEnabled) {
             String query = """

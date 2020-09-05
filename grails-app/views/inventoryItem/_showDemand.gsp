@@ -10,12 +10,7 @@
         min-width: 200px;
         max-width: 200px;
     }
-    #destination_id_chosen > a, .apply-button {
-        height: 28px !important;
-        cursor: pointer;
-        border-radius: 5px;
-        border: 1px solid #aaa;
-    }
+
     .filters-container {
         display: flex;
         flex-wrap: wrap;
@@ -35,17 +30,17 @@
                   update="demand-table" style="margin: 5px;">
         <div class="date-picker-width filters-container">
             <label class="name"><warehouse:message code="consumption.startDate.label"/></label>
-            <g:jqueryDatePicker id="startDate" name="startDate" value="${params.startDate}" class="text middle" size="10" format="dd/MMM/yyyy" />
+            <g:jqueryDatePicker id="startDate" name="startDate" value="${params.startDate}" class="text middle" size="12" format="dd/MMM/yyyy" />
 
             <label class="name" style="margin-left: 10px;"><warehouse:message code="consumption.endDate.label"/></label>
-            <g:jqueryDatePicker id="endDate" name="endDate" value="${params.endDate}" class="text middle" size="10" format="dd/MMM/yyyy" />
+            <g:jqueryDatePicker id="endDate" name="endDate" value="${params.endDate}" class="text middle" size="12" format="dd/MMM/yyyy" />
 
             <label for="destination.id" style="margin-left: 10px;"><warehouse:message code="requisition.destination.label" default="Destination Location" /></label>
             <g:selectLocation name="destination.id" value="${params.destination?.id ?: null}"
                               class="chzn-select-deselect location-picker-width" noSelection="['null':'All']"
                               from="${destinations}" />
 
-            <g:submitButton id="refresh-btn" name="Refresh data" value="Refresh data" class="apply-button" style="margin-left: 10px;" />
+            <g:submitButton id="refresh-btn" name="Refresh data" value="Refresh data" class="button" style="margin-left: 10px;" />
         </div>
     </g:formRemote>
     <div class="box">
