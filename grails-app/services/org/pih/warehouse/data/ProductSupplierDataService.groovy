@@ -33,6 +33,7 @@ class ProductSupplierDataService {
             def manufacturerId = params.manufacturerId
             def manufacturerName = params.manufacturerName
             def uomCode = params.defaultProductPackageUomCode
+            def packageQuantity = params.defaultProductPackageQuantity
 
             if (id && !ProductSupplier.exists(id)) {
                 command.errors.reject("Row ${index + 1}: Product supplier with ID ${id} does not exist")
@@ -45,18 +46,23 @@ class ProductSupplierDataService {
 
             def supplier = Organization.get(supplierId)
             if (supplier?.name != supplierName) {
-                command.errors.reject("Row ${index + 1}: Organization ${supplier?.name} with id ${supplier?.id} does not match ${supplierName}")
+                command.errors.reject("Row ${index + 1}: Supplier '${supplier?.name}' with id ${supplier?.id} does not match supplierName '${supplierName}'")
             }
 
             def manufacturer = Organization.get(manufacturerId)
             if (manufacturer?.name != manufacturerName) {
-                command.errors.reject("Row ${index + 1}: Organization ${manufacturer?.name} with id ${manufacturer?.id} does not match ${manufacturerName}")
+                command.errors.reject("Row ${index + 1}: Manufacturer '${manufacturer?.name}' with id ${manufacturer?.id} does not match manufacturerName '${manufacturerName}'")
             }
 
             log.info("uomCode " + uomCode)
-            def unitOfMeasure = UnitOfMeasure.findByCode(uomCode)
-            if (uomCode && !unitOfMeasure) {
-                command.errors.reject("Row ${index + 1}: Unit of measure ${uomCode} does not exist")
+            if (uomCode) {
+                def unitOfMeasure = UnitOfMeasure.findByCode(uomCode)
+                if (!unitOfMeasure) {
+                    command.errors.reject("Row ${index + 1}: Unit of measure ${uomCode} does not exist")
+                }
+                if (unitOfMeasure && !packageQuantity) {
+                    command.errors.reject("Row ${index + 1}: Unit of measure ${uomCode} requires a quantity")
+                }
             }
 
             def productSupplier = createOrUpdate(params)
@@ -83,8 +89,10 @@ class ProductSupplierDataService {
 
         log.info("params: ${params}")
         Product product = Product.findByProductCode(params["productCode"])
-        UnitOfMeasure unitOfMeasure = UnitOfMeasure.findByCode(params.defaultProductPackageUomCode)
-        BigDecimal price = new BigDecimal(params.defaultProductPackagePrice)
+        UnitOfMeasure unitOfMeasure = params.defaultProductPackageUomCode ?
+                UnitOfMeasure.findByCode(params.defaultProductPackageUomCode) : null
+        BigDecimal price = params.defaultProductPackagePrice ?
+                new BigDecimal(params.defaultProductPackagePrice) : null
         Integer quantity = params.defaultProductPackageQuantity as Integer
 
         ProductSupplier productSupplier = ProductSupplier.findByIdOrCode(params["id"], params["code"])
@@ -99,20 +107,22 @@ class ProductSupplierDataService {
         productSupplier.supplier = Organization.get(params["supplierId"])
         productSupplier.manufacturer = Organization.get(params["manufacturerId"])
 
-        ProductPackage defaultProductPackage =
-                productSupplier.productPackages.find { it.uom == unitOfMeasure && it.quantity == quantity}
+        if (unitOfMeasure && quantity) {
+            ProductPackage defaultProductPackage =
+                    productSupplier.productPackages.find { it.uom == unitOfMeasure && it.quantity == quantity }
 
-        if (!defaultProductPackage) {
-            defaultProductPackage = new ProductPackage()
-            defaultProductPackage.name = "${unitOfMeasure.code}/${quantity}"
-            defaultProductPackage.description = "${unitOfMeasure.name} of ${quantity}"
-            defaultProductPackage.product = productSupplier.product
-            defaultProductPackage.uom = unitOfMeasure
-            defaultProductPackage.quantity = quantity
-            defaultProductPackage.price = price
-            productSupplier.addToProductPackages(defaultProductPackage)
-        } else {
-            defaultProductPackage.price = price
+            if (!defaultProductPackage) {
+                defaultProductPackage = new ProductPackage()
+                defaultProductPackage.name = "${unitOfMeasure.code}/${quantity}"
+                defaultProductPackage.description = "${unitOfMeasure.name} of ${quantity}"
+                defaultProductPackage.product = productSupplier.product
+                defaultProductPackage.uom = unitOfMeasure
+                defaultProductPackage.quantity = quantity
+                defaultProductPackage.price = price
+                productSupplier.addToProductPackages(defaultProductPackage)
+            } else {
+                defaultProductPackage.price = price
+            }
         }
 
         if (!productSupplier.code) {
