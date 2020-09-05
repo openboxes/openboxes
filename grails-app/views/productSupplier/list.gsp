@@ -22,7 +22,7 @@
                         <img src="${createLinkTo(dir:'images/icons/silk', file:'add.png')}" />
                         <warehouse:message code="default.add.label" args="[g.message(code:'productSupplier.label')]"/></g:link>
 
-                    <g:link class="button" action="export">
+                    <g:link class="button" action="export" params="[format: 'xls']">
                         <img src="${createLinkTo(dir:'images/icons/silk', file:'page_excel.png')}" />
                         <warehouse:message code="default.export.label" args="[g.message(code:'productSuppliers.label')]"/></g:link>
 	        	</div>

@@ -12,6 +12,7 @@ package org.pih.warehouse.product
 class ProductSupplierController {
 
     def dataService
+    def documentService
     def identifierService
 
     static allowedMethods = [save: "POST", update: "POST", delete: ["GET", "POST"]]
@@ -149,9 +150,22 @@ class ProductSupplierController {
         def productSuppliers = params.list("productSupplier.id") ?
                 ProductSupplier.findAllByIdInList(params.list("productSupplier.id")) : ProductSupplier.list()
         def data = productSuppliers ? dataService.transformObjects(productSuppliers, ProductSupplier.PROPERTIES) : [[:]]
-        response.setHeader("Content-disposition",
-                "attachment; filename=\"ProductSuppliers-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
-        response.contentType = "text/csv"
-        render dataService.generateCsv(data)
+
+        switch(params.format) {
+            case "xls":
+                response.contentType = "application/vnd.ms-excel"
+                response.setHeader 'Content-disposition',
+                        "attachment; filename=\"ProductSuppliers-${new Date().format("yyyyMMdd-hhmmss")}.xls\""
+                documentService.generateExcel(response.outputStream, data)
+                response.outputStream.flush()
+                return;
+            default:
+                response.contentType = "text/csv"
+                response.setHeader("Content-disposition",
+                    "attachment; filename=\"ProductSuppliers-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
+                render dataService.generateCsv(data)
+                response.outputStream.flush()
+                return;
+        }
     }
 }
