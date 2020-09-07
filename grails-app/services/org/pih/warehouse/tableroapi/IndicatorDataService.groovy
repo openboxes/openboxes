@@ -213,7 +213,7 @@ class IndicatorDataService {
 
     GraphData getFillRateSnapshot (Location origin, def params) {
         String filterSelected = params.filterSelected
-        List<String> listValues = params.list('value').toList()
+        List listValues = params.list('value').toList()
         List averageFillRateResult = []
         List listLabels = []
         Date today = new Date()
