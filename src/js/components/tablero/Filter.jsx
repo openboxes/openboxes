@@ -51,12 +51,15 @@ class Filter extends Component {
     const listFilterToSend = JSON.parse(sessionStorage.getItem(nameCategory)) || [];
     listFilterToSend.push(valueCategory.id);
     sessionStorage.setItem(nameCategory, JSON.stringify(listFilterToSend));
+    if (!sessionStorage.getItem('currentCategory')) {
+      sessionStorage.setItem('currentCategory', nameCategory);
+    }
 
     this.toggleAddingFilter();
     this.toggleCategorySelected();
 
     // Refresh data
-    this.props.fetchData(this.props.activeConfig, false, nameCategory, listFilterToSend);
+    this.props.fetchData(this.props.activeConfig, false);
   }
 
   removeFilterFromList = (key) => {
@@ -72,8 +75,14 @@ class Filter extends Component {
     const newList = actualList.slice(0, key).concat(actualList.slice(key + 1, actualList.length));
     this.setState({ listFilterSelected: newList });
 
+    // Removing current category if no filter selected
+    if (JSON.parse(sessionStorage.getItem(elementToDelete[0])).length === 0) {
+      sessionStorage.removeItem('currentCategory');
+      sessionStorage.removeItem(elementToDelete[0]);
+    }
+
     // Refresh data
-    this.props.fetchData(this.props.activeConfig, false, elementToDelete[0], newFilterList);
+    this.props.fetchData(this.props.activeConfig, false);
   }
 
   render() {
