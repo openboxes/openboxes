@@ -323,8 +323,6 @@ class InventoryItemController {
                 params.endDate
         )
 
-        Date firstDateRequest = requisitionItemsDemandDetails.collect { it.date_requested }.min() ?: params.startDate
-
         requisitionItemsDemandDetails = requisitionItemsDemandDetails.collect {
             def quantityIssued = RequisitionItem.get(it?.request_item_id)?.getQuantityIssued()
             [
@@ -347,7 +345,7 @@ class InventoryItemController {
         }
 
         // Create list of months to display including all months between first requested date and selected end date
-        def monthKeys = (firstDateRequest..params.endDate).collect {
+        def monthKeys = (params.startDate..params.endDate).collect {
             monthFormat.format(it)
         }.unique()
 
