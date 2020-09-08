@@ -719,8 +719,8 @@ openboxes.hotjar.hjsv = 6
 //openboxes.feedback.enabled = false
 
 // Forecasting feature
-openboxes.forecasting.enabled = false
-openboxes.forecasting.demandPeriod = 180
+openboxes.forecasting.enabled = true
+openboxes.forecasting.demandPeriod = 365
 
 // Bill of Materials feature
 openboxes.bom.enabled = false
