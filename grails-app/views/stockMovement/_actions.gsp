@@ -1,4 +1,5 @@
 <%@ page import="org.pih.warehouse.requisition.RequisitionStatus"%>
+<%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode" %>
 
 <g:if test="${stockMovement?.id }">
     <span id="stockmovement-action-menu" class="action-menu">
@@ -21,13 +22,15 @@
                 </g:link>
             </div>
             <div class="action-menu-item">
-                <g:link controller="stockMovement" action="edit" id="${stockMovement?.id}">
+                <g:link controller="stockMovement" action="edit" id="${stockMovement?.id}"
+                        disabled="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.PARTIALLY_RECEIVED}"
+                        disabledMessage="${g.message(code:'stockMovement.cantEditPartiallyReceived.message')}">
                     <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />
                     &nbsp;${warehouse.message(code: 'default.edit.label', args:[warehouse.message(code:'stockMovement.label')])}
                 </g:link>
             </div>
             <g:isUserAdmin>
-                <g:if test="${stockMovement?.shipment?.currentStatus==org.pih.warehouse.shipping.ShipmentStatusCode.PENDING || !stockMovement?.shipment?.currentStatus}">
+                <g:if test="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.PENDING || !stockMovement?.shipment?.currentStatus}">
                     <hr/>
                     <div class="action-menu-item">
                         <g:link controller="stockMovement" action="remove" id="${stockMovement?.id}"
