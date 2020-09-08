@@ -547,8 +547,8 @@ class StockMovementService {
 
     List getEditPageItems(Requisition requisition, String max, String offset) {
         def query = offset ?
-                """ select * FROM edit_page_item where requisition_id = :requisition and requisition_item_type = 'ORIGINAL' ORDER BY sort_order limit :offset, :max; """ :
-                """ select * FROM edit_page_item where requisition_id = :requisition and requisition_item_type = 'ORIGINAL' ORDER BY sort_order """
+                """ select * FROM edit_page_item where requisition_id = :requisition and requisition_item_type = 'ORIGINAL' limit :offset, :max; """ :
+                """ select * FROM edit_page_item where requisition_id = :requisition and requisition_item_type = 'ORIGINAL' """
         def data = dataService.executeQuery(query, [
                 'requisition': requisition.id,
                 'offset': offset ? offset.toInteger() : null,

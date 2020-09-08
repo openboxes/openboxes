@@ -27,4 +27,5 @@ CREATE OR REPLACE VIEW edit_page_item AS
             AND product_summary.location_id = stock_movement_item.origin_id
 			LEFT OUTER JOIN
 		product_substitution_status ON product_substitution_status.product_id = stock_movement_item.product_id
-			AND product_substitution_status.location_id = stock_movement_item.origin_id;
+			AND product_substitution_status.location_id = stock_movement_item.origin_id
+			ORDER BY sort_order;
