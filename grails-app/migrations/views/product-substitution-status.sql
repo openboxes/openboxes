@@ -5,7 +5,7 @@ CREATE OR REPLACE VIEW product_substitution_status AS
     CASE WHEN MIN(original_min_date) > MIN(substitution_min_date) THEN 'EARLIER' ELSE CASE WHEN SUM(substitution_quantity_on_hand) THEN 'YES' ELSE 'NO' END END AS substitution_status
     FROM (
         SELECT
-            original_availability.location_id,
+            location.id as location_id,
             product.id,
             product.name,
             MIN(original_inventory_item.expiration_date) AS original_min_date,
@@ -24,5 +24,7 @@ CREATE OR REPLACE VIEW product_substitution_status AS
             inventory_item AS subsitution_inventory_item ON subsitution_inventory_item.id = substitution_availability.inventory_item_id
         LEFT OUTER JOIN
             inventory_item AS original_inventory_item ON original_inventory_item.id = original_availability.inventory_item_id
-        GROUP BY product.id, product_association.associated_product_id, original_availability.location_id) a
+		JOIN
+			location where location_type_id = 2
+        GROUP BY product.id, product_association.associated_product_id, location_id) a
     GROUP BY product_id, location_id;
