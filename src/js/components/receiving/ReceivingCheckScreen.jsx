@@ -178,8 +178,8 @@ const FIELDS = {
         label: 'react.partialReceiving.cancelRemaining.label',
         defaultMessage: 'Cancel remaining',
         flexWidth: '1',
-        getDynamicAttr: ({ saveDisabled, fieldValue, hasPartialReceivingSuppport }) => ({
-          disabled: saveDisabled || _.toInteger(fieldValue) <= 0 || !hasPartialReceivingSuppport,
+        getDynamicAttr: ({ saveDisabled, fieldValue, hasPartialReceivingSupport }) => ({
+          disabled: saveDisabled || _.toInteger(fieldValue) <= 0 || !hasPartialReceivingSupport,
         }),
       },
       comment: {

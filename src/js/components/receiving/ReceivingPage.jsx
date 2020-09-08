@@ -286,7 +286,7 @@ class ReceivingPage extends Component {
             ...container,
             shipmentItems: _.chain(container.shipmentItems)
               .map((item) => {
-                if (item.receiptItemId) {
+                if (item.receiptItemId && item.quantityRemaining) {
                   return {
                     ...item, cancelRemaining: true,
                   };
