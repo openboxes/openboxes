@@ -178,9 +178,17 @@ class ApitableroController {
         render (productsInventoried.toJson() as JSON)
      }
 
+    @Cacheable("dashboardCache")
     def getPercentageAdHoc = {
         Location location = Location.get(session?.warehouse?.id)
         def percentageAdHoc = indicatorDataService.getPercentageAdHoc(location)
         render (percentageAdHoc.toJson() as JSON)
+     }
+    
+    @Cacheable("dashboardCache")
+    def getStockOutLastMonth = {
+        Location location = Location.get(session?.warehouse?.id)
+        def stockOutLastMonth = indicatorDataService.getStockOutLastMonth(location)
+        render (stockOutLastMonth.toJson() as JSON)
      }
 }

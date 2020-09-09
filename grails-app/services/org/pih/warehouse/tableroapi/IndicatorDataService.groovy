@@ -804,6 +804,37 @@ class IndicatorDataService {
         return graphData;
     }
 
+    GraphData getStockOutLastMonth(Location location) {
+
+        List<String> listLabels = []
+        List<Integer> listData = []
+
+        def stockOutLastMonth = dataService.executeQuery("""
+            select count(ss.product_id), ss.stockout_status 
+            from stockout_status as ss
+            where ss.location_id = :location
+            group by ss.stockout_status
+        """,
+                [
+                        'location': location.id,
+                ]);
+
+        stockOutLastMonth.each {
+                listLabels.push(it[1].toString())
+                listData.push(it[0])
+        }
+       
+        List<IndicatorDatasets> datasets = [
+                new IndicatorDatasets('Number of stockout', listData, null , 'doughnut')
+        ]
+
+        IndicatorData indicatorData = new IndicatorData(datasets, listLabels)
+
+        GraphData graphData = new GraphData(indicatorData, 'Stock out last month', 'doughnut')
+
+        return graphData;
+    }
+
     private List fillLabels(int querySize) {
         Date today = new Date()
         today.clearTime()

@@ -628,6 +628,21 @@ openboxes {
                     }
                     order = 12
                 }
+                stockOutLastMonth {
+                    enabled = true
+                    endpoint = "/${appName}/apitablero/getStockOutLastMonth"
+                    archived = ['personal', 'warehouse', 'inventory', 'fillRate']
+                    legend = true
+                    datalabel = true
+                    order = 13
+                    colors {
+                        labels {
+                            success = ["Never"]
+                            warning = ["Stocked out <1 week", "Stocked out 1-2 weeks", "Stocked out 2-3 weeks"]
+                            error   = ["Stocked out 3-4 weeks"]
+                        }
+                    }
+                }
             }
         }
     }
