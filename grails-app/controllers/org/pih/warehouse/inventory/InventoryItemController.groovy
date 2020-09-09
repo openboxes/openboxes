@@ -27,6 +27,7 @@ import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentItemException
+import org.pih.warehouse.util.DateUtil
 import util.ConfigHelper
 
 import java.text.DateFormat
@@ -294,8 +295,9 @@ class InventoryItemController {
             DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy")
             // By default set last 12 months
             Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod?:365
-            params.startDate = params.startDate ? dateFormat.parse(params.startDate) : new Date() - demandPeriod.days
-            params.endDate = params.endDate ? dateFormat.parse(params.endDate) : new Date()
+            Map defaultDateRange = DateUtil.getDateRange(new Date(), -1)
+            params.startDate = params.startDate ? dateFormat.parse(params.startDate) : defaultDateRange.endDate - demandPeriod.days
+            params.endDate = params.endDate ? dateFormat.parse(params.endDate) : defaultDateRange.endDate
         }
 
         // add the current warehouse to the command object
@@ -348,10 +350,6 @@ class InventoryItemController {
         def monthKeys = (params.startDate..params.endDate).collect {
             monthFormat.format(it)
         }.unique()
-
-        // Remove the current month
-        def currentMonthKey = monthFormat.format(new Date())
-        monthKeys.remove(currentMonthKey)
 
         render(template: "showDemand",
                 model: [commandInstance : commandInstance,
