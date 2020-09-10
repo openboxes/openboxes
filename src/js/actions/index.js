@@ -156,10 +156,10 @@ function fetchGraphIndicator(
   indicatorConfig,
   locationId = '',
   params = '',
-  filterSelected = '',
-  listValues = [],
 ) {
   const id = indicatorConfig.order;
+  const filterSelected = sessionStorage.getItem('currentCategory');
+  const listValues = JSON.parse(sessionStorage.getItem(filterSelected)) || [];
 
   let listParams = params === '' ? `locationId=${locationId}&filterSelected=${filterSelected}` : `${params}&locationId=${locationId}&filterSelected=${filterSelected}`;
   listValues.forEach((value) => {
@@ -233,11 +233,11 @@ function fetchNumberIndicator(
   dispatch,
   indicatorConfig,
   locationId,
-  filterSelected,
-  listValues,
 ) {
   const id = indicatorConfig.order;
   let listParams = '';
+  const filterSelected = sessionStorage.getItem('currentCategory');
+  const listValues = JSON.parse(sessionStorage.getItem(filterSelected)) || [];
   listValues.forEach((value) => {
     listParams = `${listParams}&value=${value}`;
   });
