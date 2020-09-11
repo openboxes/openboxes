@@ -1,28 +1,30 @@
 CREATE OR REPLACE VIEW product_substitution_status AS
     SELECT
-    id AS product_id,
-    location_id,
-    CASE WHEN MIN(original_min_date) > MIN(substitution_min_date) THEN 'EARLIER' ELSE CASE WHEN SUM(substitution_quantity_on_hand) THEN 'YES' ELSE 'NO' END END AS substitution_status
+      product_id,
+      location_id,
+      CASE WHEN MIN(original_min_date) > MIN(substitution_min_date) THEN 'EARLIER' ELSE CASE WHEN SUM(substitution_quantity_on_hand) THEN 'YES' ELSE 'NO' END END AS substitution_status
     FROM (
         SELECT
-            original_availability.location_id,
-            product.id,
-            product.name,
+            p_a.product_id as product_id, -- original product
+            p_s.product_id as associated_product_id, -- substitution product
+            p_s.location_id as location_id, -- substitution product location
             MIN(original_inventory_item.expiration_date) AS original_min_date,
-            product_association.associated_product_id,
-            SUM(DISTINCT substitution_availability.quantity_on_hand) substitution_quantity_on_hand,
+            SUM(DISTINCT p_s.quantity_on_hand) substitution_quantity_on_hand,
             MIN(subsitution_inventory_item.expiration_date) AS substitution_min_date
-        FROM product
+        FROM product_association as p_a
+
+        -- product_summary join (used for getting substitute product location and substitution product qoh)
         LEFT OUTER JOIN
-            product_association ON product.id = product_association.product_id AND product_association.code = 'SUBSTITUTE'
+            product_summary AS p_s ON p_s.product_id = p_a.associated_product_id AND p_s.quantity_on_hand > '0'
+
+        -- inventory_item joins based on original and substitution products (used for original and substitution inventory items expiration date comparison)
         LEFT OUTER JOIN
-            product_availability AS original_availability ON original_availability.product_id = product.id
+            inventory_item AS subsitution_inventory_item ON subsitution_inventory_item.product_id = p_s.product_id
         LEFT OUTER JOIN
-            product_availability AS substitution_availability ON substitution_availability.product_id = product_association.associated_product_id
-            AND original_availability.location_id = substitution_availability.location_id
-        LEFT OUTER JOIN
-            inventory_item AS subsitution_inventory_item ON subsitution_inventory_item.id = substitution_availability.inventory_item_id
-        LEFT OUTER JOIN
-            inventory_item AS original_inventory_item ON original_inventory_item.id = original_availability.inventory_item_id
-        GROUP BY product.id, product_association.associated_product_id, original_availability.location_id) a
+            inventory_item AS original_inventory_item ON original_inventory_item.product_id = p_a.product_id
+
+        WHERE p_a.code = 'SUBSTITUTE'
+
+        GROUP BY product_id, associated_product_id, location_id) a
+    WHERE original_min_date > substitution_min_date or substitution_quantity_on_hand > '0'
     GROUP BY product_id, location_id;
