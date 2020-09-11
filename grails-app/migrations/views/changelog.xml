@@ -54,4 +54,7 @@
   <changeSet id="1580848680306-17" author="dhatala" runOnChange="true" failOnError="false">
     <sqlFile path="views/edit-page-item.sql"/>
   </changeSet>
+  <changeSet id="1580848680306-18" author="jmiranda" runOnChange="true" failOnError="false">
+    <sqlFile path="views/product-stockout.sql"/>
+  </changeSet>
 </databaseChangeLog>
