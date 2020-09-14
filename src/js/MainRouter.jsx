@@ -6,49 +6,24 @@ import connect from 'react-redux/es/connect/connect';
 
 import Router from './components/Router';
 
-import en from './en';
-import fr from './fr';
-import es from './es';
-import ar from './ar';
 import { fetchTranslations, fetchSessionInfo, fetchMenuConfig } from './actions';
 
 const onMissingTranslation = ({ translationId }) => `${translationId}`;
 
 class MainRouter extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.props.initialize({
-      languages: [
-        { name: 'Arabic', code: 'ar' },
-        { name: 'English', code: 'en' },
-        { name: 'French', code: 'fr' },
-        { name: 'German', code: 'de' },
-        { name: 'Italian', code: 'it' },
-        { name: 'Spanish', code: 'es' },
-        { name: 'Finnish', code: 'fi' },
-        { name: 'Portuguese', code: 'pt' },
-      ],
-      options: {
-        renderToStaticMarkup,
-        onMissingTranslation,
-      },
-    });
-
-    this.props.addTranslationForLanguage(en, 'en');
-    this.props.addTranslationForLanguage(fr, 'fr');
-    this.props.addTranslationForLanguage(es, 'es');
-    this.props.addTranslationForLanguage(en, 'pt');
-    this.props.addTranslationForLanguage(en, 'it');
-    this.props.addTranslationForLanguage(en, 'de');
-    this.props.addTranslationForLanguage(ar, 'ar');
-    this.props.addTranslationForLanguage(en, 'fi');
-  }
-
   componentDidMount() {
-    this.props.fetchSessionInfo();
-    this.props.fetchMenuConfig();
-    this.props.fetchTranslations('', 'default');
+    this.props.fetchSessionInfo().then(() => {
+      this.props.initialize({
+        languages: this.props.supportedLocales,
+        options: {
+          renderToStaticMarkup,
+          onMissingTranslation,
+        },
+      });
+      this.props.setActiveLanguage(this.props.locale);
+      this.props.fetchMenuConfig();
+      this.props.fetchTranslations('', 'default');
+    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -71,6 +46,7 @@ class MainRouter extends React.Component {
 
 const mapStateToProps = state => ({
   locale: state.session.activeLanguage,
+  supportedLocales: state.session.supportedLocales,
 });
 
 export default withLocalize(connect(mapStateToProps, {
@@ -79,11 +55,14 @@ export default withLocalize(connect(mapStateToProps, {
 
 MainRouter.propTypes = {
   initialize: PropTypes.func.isRequired,
-  addTranslationForLanguage: PropTypes.func.isRequired,
   locale: PropTypes.string.isRequired,
   fetchTranslations: PropTypes.func.isRequired,
   setActiveLanguage: PropTypes.func.isRequired,
   /** Function called to get the currently selected location */
   fetchSessionInfo: PropTypes.func.isRequired,
   fetchMenuConfig: PropTypes.func.isRequired,
+  supportedLocales: PropTypes.arrayOf(PropTypes.shape({
+    code: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+  }).isRequired).isRequired,
 };
