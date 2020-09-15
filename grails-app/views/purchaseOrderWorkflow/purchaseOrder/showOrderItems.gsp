@@ -337,6 +337,29 @@
           return false
         }
 
+        function changeOrderItemStatus(id, actionUrl) {
+          $.ajax({
+            url: actionUrl,
+            data: { id: id },
+            success: function () {
+              clearOrderItems();
+              loadOrderItems();
+              $('#orderItems').html('<option></option>').trigger('change');
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              if (jqXHR.responseText) {
+                let data = JSON.parse(jqXHR.responseText);
+                $.notify(data.errorMessage, "error");
+              }
+              else {
+                $.notify("Error changing order item status " + id, "error")
+              }
+            }
+          });
+          return false
+        }
+
+
         /**
          * @FIXME Didn't have time to make this pretty - should use required class on
          * fields instead of hardcoding the IDs.
@@ -636,6 +659,18 @@
             editOrderItem(id);
           });
 
+          $(".cancel-order-item").live("click", function (event) {
+              event.preventDefault();
+              var id = $(this).data("order-item-id");
+              changeOrderItemStatus(id, '${g.createLink(controller:'order', action:'cancelOrderItem')}');
+          });
+
+          $(".restore-order-item").live("click", function (event) {
+              event.preventDefault();
+              var id = $(this).data("order-item-id");
+              changeOrderItemStatus(id, '${g.createLink(controller:'order', action:'restoreOrderItem')}');
+          });
+
           $("#btnImportItems")
           .click(function (event) {
             $("#dlgImportItems")
@@ -752,18 +787,37 @@
                 <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}"/>
             </button>
             <div class="actions">
-                <div class="action-menu-item">
-                    <a href="javascript:void(-1);" class="edit-item" data-order-item-id="{{= id}}">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
-                        <warehouse:message code="default.button.edit.label"/>
-                    </a>
-                </div>
+                {{if orderItemStatusCode == "PENDING"}}
+                    <div class="action-menu-item">
+                        <a href="javascript:void(-1);" class="edit-item" data-order-item-id="{{= id}}">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
+                            <warehouse:message code="default.button.edit.label"/>
+                        </a>
+                    </div>
+                {{/if}}
                 <div class="action-menu-item">
                     <a href="javascript:void(-1);" class="delete-item" data-order-item-id="{{= id}}">
                         <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>
                         <warehouse:message code="default.button.delete.label"/>
                     </a>
                 </div>
+                {{if !hasShipmentAssociated}}
+                   {{if orderItemStatusCode == "PENDING"}}
+                        <div class="action-menu-item">
+                            <a href="javascript:void(-1);" class="cancel-order-item" data-order-item-id="{{= id}}">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}"/>
+                                <warehouse:message code="default.button.cancel.label"/>
+                            </a>
+                        </div>
+                    {{else orderItemStatusCode == "CANCELED"}}
+                        <div class="action-menu-item">
+                            <a href="javascript:void(-1);" class="restore-order-item" data-order-item-id="{{= id}}">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'tick.png')}"/>
+                                <warehouse:message code="default.button.uncancel.label"/>
+                            </a>
+                        </div>
+                    {{/if}}
+                {{/if}}
             </div>
         </div>
 	</td>
