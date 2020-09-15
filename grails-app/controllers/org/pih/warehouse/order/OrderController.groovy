@@ -141,7 +141,7 @@ class OrderController {
         ShipOrderCommand command = new ShipOrderCommand(order: order, shipment: order.pendingShipment)
 
         // Populate the line items from existing pending shipment
-        order.orderItems.each { OrderItem orderItem ->
+        order.listOrderItems().each { OrderItem orderItem ->
 
             // Find shipment item associated with given order item
             def shipmentItems =
@@ -195,7 +195,7 @@ class OrderController {
             }
 
             def shipOrderItemsByOrderItem = command.shipOrderItems.groupBy { ShipOrderItemCommand shipOrderItem -> shipOrderItem.orderItem }
-            order.orderItems.each { OrderItem orderItem ->
+            order.listOrderItems().each { OrderItem orderItem ->
                 List shipOrderItems = shipOrderItemsByOrderItem.get(orderItem)
                 BigDecimal totalQuantityToShip = shipOrderItems.sum { it?.quantityToShip?:0 }
                 if (totalQuantityToShip > orderItem.quantityRemaining) {
