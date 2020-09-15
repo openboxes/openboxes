@@ -100,7 +100,7 @@ class IndicatorDataService {
         List listValues = params.list('value').toList()
         String extraCondition = ''
         String conditionStarter = 'where'
-        
+
         if( filterSelected == 'category' && listValues.size > 0) {
             extraCondition = """
             join product as p on fr.product_id = p.id 
@@ -113,7 +113,7 @@ class IndicatorDataService {
             }
             conditionStarter = ') and'
         }
-        
+
         List listLabels = []
 
 
@@ -220,7 +220,7 @@ class IndicatorDataService {
         today.clearTime()
         String extraCondition = ''
         String conditionStarter = 'where'
-        
+
         if( filterSelected == 'category' && listValues.size > 0) {
             extraCondition = """
             join product as p on fr.product_id = p.id 
@@ -234,9 +234,9 @@ class IndicatorDataService {
             conditionStarter = ') and'
         }
 
-        for (int i = 12; i >= 0; i--) {   
+        for (int i = 12; i >= 0; i--) {
             def monthBegin = today.clone()
-            def monthEnd = today.clone()     
+            def monthEnd = today.clone()
             monthBegin.set(month: today.month - i, date: 1)
             monthEnd.set(month: today.month - i + 1, date: 1)
             String monthLabel = new java.text.DateFormatSymbols().months[monthBegin.month]
@@ -251,7 +251,7 @@ class IndicatorDataService {
             and fr.origin_id = :origin 
             GROUP BY MONTH(fr.transaction_date), YEAR(fr.transaction_date)
             """, [
-                
+
                 'monthBegin'  : monthBegin,
                 'monthEnd'    : monthEnd,
                 'origin'      : origin.id,
@@ -326,7 +326,7 @@ class IndicatorDataService {
         List<IndicatorDatasets> datasets = [
                 new IndicatorDatasets('Inventory Summary', listData, links)
         ];
-        
+
         IndicatorData indicatorData = new IndicatorData(datasets, ['In stock', 'Above maximum', 'Below reorder', 'Below minimum', 'No longer in stock']);
 
         GraphData graphData = new GraphData(indicatorData, "Inventory Summary", "horizontalBar");
@@ -818,10 +818,10 @@ class IndicatorDataService {
         List<Integer> listData = []
 
         def stockOutLastMonth = dataService.executeQuery("""
-            select count(ss.product_id), ss.stockout_status 
-            from stockout_status as ss
-            where ss.location_id = :location
-            group by ss.stockout_status
+            select count(pss.product_id), pss.stockout_status 
+            from product_stockout_status as pss
+            where pss.location_id = :location
+            group by pss.stockout_status
         """,
                 [
                         'location': location.id,
@@ -831,7 +831,7 @@ class IndicatorDataService {
                 listLabels.push(it[1].toString())
                 listData.push(it[0])
         }
-       
+
         List<IndicatorDatasets> datasets = [
                 new IndicatorDatasets('Number of stockout', listData, null , 'doughnut')
         ]
