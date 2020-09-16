@@ -19,6 +19,7 @@ import apiClient from '../../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../../actions';
 import { debounceUsersFetch, debounceLocationsFetch } from '../../../utils/option-utils';
 import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
+import '../../wizard/Wizard.scss';
 
 function validate(values) {
   const errors = {};
