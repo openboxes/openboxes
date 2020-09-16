@@ -1504,30 +1504,6 @@ class StockMovementService {
         RequisitionItem requisitionItem = stockMovementItem.requisitionItem
         Requisition requisition = requisitionItem.requisition
 
-        //this is for split line during substitution (if substituted item has available quantity it shows up in the substitutions list)
-        if (stockMovementItem.quantityRevised) {
-            Integer changedQuantity = requisitionItem.quantity - stockMovementItem.newQuantity?.intValueExact()
-            requisitionItem.quantity = changedQuantity > 0 && changedQuantity < requisitionItem.quantity ? changedQuantity : requisitionItem.quantity
-
-            RequisitionItem newItem = new RequisitionItem()
-            newItem.quantity = stockMovementItem.quantityRevised
-            newItem.quantityApproved = newItem.quantity
-            newItem.orderIndex = stockMovementItem.sortOrder
-            newItem.product = requisitionItem.product
-            newItem.recipient = requisitionItem.recipient
-            newItem.palletName = requisitionItem.palletName
-            newItem.boxName = requisitionItem.boxName
-            newItem.lotNumber = requisitionItem.lotNumber
-            newItem.expirationDate = requisitionItem.expirationDate
-            newItem.requisition = requisition
-            newItem.save()
-
-            requisition.addToRequisitionItems(newItem)
-
-            createMissingPicklistForStockMovementItem(StockMovementItem.createFromRequisitionItem(newItem))
-            createMissingShipmentItem(newItem)
-        }
-
         if (stockMovementItem.substitutionItems) {
             stockMovementItem.substitutionItems?.each { subItem ->
                 requisitionItem.chooseSubstitute(
