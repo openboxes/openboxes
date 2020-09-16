@@ -242,6 +242,7 @@ function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', ma
 
   if (hasDataLabel && isDoughnut) {
     options.plugins.datalabels = {
+      display: 'auto',
       formatter: (value, ctx) => {
         let sum = 0;
         const dataArr = ctx.chart.data.datasets[0].data;
