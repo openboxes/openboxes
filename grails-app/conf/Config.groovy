@@ -639,9 +639,9 @@ openboxes {
                         labels {
                             success = ["Never"]
                             warning = ["Stocked out <1 week"]
-                            state2 = ["Stocked out 1-2 weeks"]
-                            state1 = ["Stocked out 2-3 weeks"]
-                            error = ["Stocked out 3-4 weeks"]
+                            state2  = ["Stocked out 1-2 weeks"]
+                            state1  = ["Stocked out 2-3 weeks"]
+                            error   = ["Stocked out 3-4 weeks"]
                         }
                     }
                 }
