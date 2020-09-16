@@ -9,6 +9,23 @@ import apiClient from '../../utils/apiClient';
 
 
 class Header extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      logoUrl: '',
+    };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.logoUrl !== this.props.logoUrl) {
+      this.setLogoUrl(nextProps.logoUrl);
+    }
+  }
+
+  setLogoUrl(logoUrl) {
+    this.setState({ logoUrl });
+  }
+
   logoutImpersonatedUser = () => {
     const url = '/openboxes/api/logout';
 
@@ -40,8 +57,8 @@ class Header extends Component {
               href="/openboxes"
               className="navbar-brand brand-name"
             >
-              { this.props.logoUrl !== '' ?
-                <img alt="Openboxes" src={this.props.logoUrl} onError={(e) => { e.target.onerror = null; e.target.src = 'https://openboxes.com/img/logo_30.png'; }} /> : null
+              { this.state.logoUrl !== '' ?
+                <img alt="Openboxes" src={this.state.logoUrl} onError={(e) => { e.target.onerror = null; e.target.src = 'https://openboxes.com/img/logo_30.png'; }} /> : null
             }
             </a>
             { this.props.logoLabel.trim() !== '' ? <span>{this.props.logoLabel} </span> : null }
