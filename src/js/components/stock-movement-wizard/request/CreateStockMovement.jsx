@@ -34,6 +34,9 @@ function validate(values) {
   if (!values.requestedBy) {
     errors.requestedBy = 'react.default.error.requiredField.label';
   }
+  if (!values.requestType) {
+    errors.requestType = 'react.default.error.requiredField.label';
+  }
   if (!values.dateRequested) {
     errors.dateRequested = 'react.default.error.requiredField.label';
   } else {
