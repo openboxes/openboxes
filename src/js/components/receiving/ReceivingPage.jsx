@@ -281,6 +281,21 @@ class ReceivingPage extends Component {
     return apiClient.get(url)
       .then((response) => {
         const formData = parseResponse(response.data.data);
+        if (this.state.page === 1 && !this.props.hasPartialReceivingSupport) {
+          formData.containers = _.map(formData.containers, container => ({
+            ...container,
+            shipmentItems: _.chain(container.shipmentItems)
+              .map((item) => {
+                if (item.receiptItemId && _.toInteger(item.quantityRemaining) > 0) {
+                  return {
+                    ...item, cancelRemaining: true,
+                  };
+                }
+                return item;
+              })
+              .filter(item => !_.isNil(item.quantityReceiving) && item.quantityReceiving !== '').value(),
+          }));
+        }
         this.setState({
           formData: {},
           locationId: formData.destination.id,
@@ -350,6 +365,7 @@ const mapStateToProps = state => ({
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
   locale: state.session.activeLanguage,
   partialReceivingTranslationsFetched: state.session.fetchedTranslations.partialReceiving,
+  hasPartialReceivingSupport: state.session.currentLocation.hasPartialReceivingSupport,
 });
 
 export default connect(mapStateToProps, {
@@ -370,4 +386,6 @@ ReceivingPage.propTypes = {
   locale: PropTypes.string.isRequired,
   partialReceivingTranslationsFetched: PropTypes.bool.isRequired,
   fetchTranslations: PropTypes.func.isRequired,
+  /** Is true when currently selected location supports partial receiving */
+  hasPartialReceivingSupport: PropTypes.bool.isRequired,
 };

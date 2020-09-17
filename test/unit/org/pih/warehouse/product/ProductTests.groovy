@@ -6,12 +6,13 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.product
 
 import grails.test.*
 import org.junit.Ignore
 import org.junit.Test
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.Synonym
 import org.pih.warehouse.inventory.InventoryItem
 
@@ -21,8 +22,10 @@ class ProductTests extends GrailsUnitTestCase {
     protected void setUp() {
         super.setUp()
 
+
         def productMock = mockFor(Product)
         productMock.demand.static.getApplicationTagLib() { -> [:] }
+        Product.metaClass.getColor = { -> return "blue" }
 
         Product product1 = new Product(id: "prod1", name: "product1")
         Product product2 = new Product(id: "prod2", name: "product2")

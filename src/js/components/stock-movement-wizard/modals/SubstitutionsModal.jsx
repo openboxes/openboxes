@@ -186,22 +186,12 @@ class SubstitutionsModal extends Component {
     this.props.showSpinner();
 
     const substitutions = _.filter(values.substitutions, sub =>
-      sub.quantitySelected > 0 && !sub.originalItem);
-    const subQty = _.reduce(values.substitutions, (sum, val) =>
-      (sum + (!val.originalItem ? _.toInteger(val.quantitySelected) : 0)), 0);
+      sub.quantitySelected > 0);
     const originalItem = _.find(values.substitutions, sub => sub.originalItem)
       || this.state.attr.lineItem;
 
     const url = `/openboxes/api/stockMovementItems/${originalItem.requisitionItemId}/substituteItem`;
     const payload = {
-      newQuantity: originalItem.quantitySelected && originalItem.quantitySelected !== '0' ? originalItem.quantityRequested - subQty : '',
-      quantityRevised: originalItem.quantitySelected,
-      // Newly created substitution with the same product should have
-      // higher sort order than other substitution items
-      sortOrder: substitutions.length > 0 ?
-        _.toInteger(originalItem.sortOrder) + substitutions.length :
-        _.toInteger(originalItem.sortOrder) + 1,
-      reasonCode: values.reasonCode,
       substitutionItems: _.map(substitutions, (sub, key) => ({
         'newProduct.id': sub.product.id,
         newQuantity: sub.quantitySelected,
@@ -245,7 +235,7 @@ class SubstitutionsModal extends Component {
             originalItem: true,
             product: {
               label: `${this.state.attr.lineItem.productCode} - ${this.state.attr.lineItem.productName}`,
-              id: `${this.state.attr.lineItem.productId}`,
+              id: `${this.state.attr.lineItem.product.id}`,
               productCode: `${this.state.attr.lineItem.productCode}`,
               name: `${this.state.attr.lineItem.productName}`,
               minExpirationDate: this.state.attr.lineItem.minExpirationDate,

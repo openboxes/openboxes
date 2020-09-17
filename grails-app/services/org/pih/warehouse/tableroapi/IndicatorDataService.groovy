@@ -96,6 +96,23 @@ class IndicatorDataService {
 
     GraphData getFillRate(Location location, def destination, def params) {
         Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 7
+        String filterSelected = params.filterSelected
+        List listValues = params.list('value').toList()
+        String extraCondition = ''
+        String conditionStarter = 'where'
+
+        if( filterSelected == 'category' && listValues.size > 0) {
+            extraCondition = """
+            join product as p on fr.product_id = p.id 
+            join category as c on p.category_id = c.id
+            where (
+            """
+            for(int i = 0; i < listValues.size; i ++) {
+                extraCondition = "${extraCondition} c.id = '${listValues[i]}'"
+                extraCondition = i<listValues.size - 1 ? "${extraCondition} or" : extraCondition
+            }
+            conditionStarter = ') and'
+        }
 
         List listLabels = []
 
@@ -119,7 +136,9 @@ class IndicatorDataService {
 
             def averageFillRate = dataService.executeQuery("""
             select avg(fr.fill_rate) FROM fill_rate as fr
-            where fr.transaction_date <= :monthEnd 
+            ${extraCondition}
+            ${conditionStarter}
+            fr.transaction_date <= :monthEnd 
             and fr.transaction_date > :monthBegin 
             and fr.origin_id = :origin
             and (fr.destination_id = :destination OR :destination IS NULL)
@@ -135,7 +154,9 @@ class IndicatorDataService {
 
             def requestLinesSubmitted = dataService.executeQuery("""
             select count(fr.id) FROM fill_rate as fr
-            where fr.transaction_date <= :monthEnd 
+            ${extraCondition}
+            ${conditionStarter}
+            fr.transaction_date <= :monthEnd 
             and fr.transaction_date > :monthBegin 
             and (fr.destination_id = :destination OR :destination IS NULL) 
             and fr.origin_id = :origin
@@ -151,7 +172,9 @@ class IndicatorDataService {
 
             def linesCancelledStockout = dataService.executeQuery("""
             select count(fr.id) FROM fill_rate as fr
-            where fr.transaction_date <= :monthEnd and fr.transaction_date > :monthBegin 
+            ${extraCondition}
+            ${conditionStarter}
+            fr.transaction_date <= :monthEnd and fr.transaction_date > :monthBegin 
             and (fr.destination_id = :destination OR :destination IS NULL)
             and fr.origin_id = :origin 
             and fr.fill_rate = 0
@@ -188,32 +211,51 @@ class IndicatorDataService {
         return graphData;
     }
 
-    GraphData getFillRateSnapshot (Location origin) {
+    GraphData getFillRateSnapshot (Location origin, def params) {
+        String filterSelected = params.filterSelected
+        List listValues = params.list('value').toList()
         List averageFillRateResult = []
         List listLabels = []
         Date today = new Date()
         today.clearTime()
-    
-        for (int i = 12; i >= 0; i--) {   
+        String extraCondition = ''
+        String conditionStarter = 'where'
+
+        if( filterSelected == 'category' && listValues.size > 0) {
+            extraCondition = """
+            join product as p on fr.product_id = p.id 
+            join category as c on p.category_id = c.id
+            where (
+            """
+            for(int i = 0; i < listValues.size; i ++) {
+                extraCondition = "${extraCondition} c.id = '${listValues[i]}'"
+                extraCondition = i<listValues.size - 1 ? "${extraCondition} or" : extraCondition
+            }
+            conditionStarter = ') and'
+        }
+
+        for (int i = 12; i >= 0; i--) {
             def monthBegin = today.clone()
-            def monthEnd = today.clone()     
+            def monthEnd = today.clone()
             monthBegin.set(month: today.month - i, date: 1)
             monthEnd.set(month: today.month - i + 1, date: 1)
-            
             String monthLabel = new java.text.DateFormatSymbols().months[monthBegin.month]
             listLabels.push("${monthLabel} ${monthBegin.year + 1900}")
 
             def averageFillRate = dataService.executeQuery("""
             select avg(fr.fill_rate) FROM fill_rate as fr
-            where fr.transaction_date > :monthBegin
+            ${extraCondition}
+            ${conditionStarter} 
+            fr.transaction_date > :monthBegin
             and fr.transaction_date <= :monthEnd
-            and fr.origin_id = :origin
+            and fr.origin_id = :origin 
             GROUP BY MONTH(fr.transaction_date), YEAR(fr.transaction_date)
             """, [
-                
+
                 'monthBegin'  : monthBegin,
                 'monthEnd'    : monthEnd,
                 'origin'      : origin.id,
+                'listValues'  : listValues,
             ]);
 
             averageFillRate[0] == null ? averageFillRateResult.push(0) : averageFillRateResult.push(averageFillRate[0][0])
@@ -284,7 +326,7 @@ class IndicatorDataService {
         List<IndicatorDatasets> datasets = [
                 new IndicatorDatasets('Inventory Summary', listData, links)
         ];
-        
+
         IndicatorData indicatorData = new IndicatorData(datasets, ['In stock', 'Above maximum', 'Below reorder', 'Below minimum', 'No longer in stock']);
 
         GraphData graphData = new GraphData(indicatorData, "Inventory Summary", "horizontalBar");
@@ -766,6 +808,37 @@ class IndicatorDataService {
         IndicatorData indicatorData = new IndicatorData(datasets, listLabels)
 
         GraphData graphData = new GraphData(indicatorData, 'Stock vs ad-hoc requests last month', 'doughnut', '/openboxes/stockMovement/list?direction=OUTBOUND')
+
+        return graphData;
+    }
+
+    GraphData getStockOutLastMonth(Location location) {
+
+        List<String> listLabels = []
+        List<Integer> listData = []
+
+        def stockOutLastMonth = dataService.executeQuery("""
+            select count(pss.product_id), pss.stockout_status 
+            from product_stockout_status as pss
+            where pss.location_id = :location
+            group by pss.stockout_status
+        """,
+                [
+                        'location': location.id,
+                ]);
+
+        stockOutLastMonth.each {
+                listLabels.push(it[1].toString())
+                listData.push(it[0])
+        }
+
+        List<IndicatorDatasets> datasets = [
+                new IndicatorDatasets('Number of stockout', listData, null , 'doughnut')
+        ]
+
+        IndicatorData indicatorData = new IndicatorData(datasets, listLabels)
+
+        GraphData graphData = new GraphData(indicatorData, 'Stock out last month', 'doughnut')
 
         return graphData;
     }

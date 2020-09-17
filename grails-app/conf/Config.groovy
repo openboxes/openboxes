@@ -389,11 +389,30 @@ openboxes {
     tablero {
         enabled = true
         configurations {
-            personal    = "My Dashboard"
-            warehouse   = "Warehouse Management"
-            inventory   = "Inventory Management"
-            transaction = "Transaction History"
-            fillRate    = "Fill Rate"
+            personal {
+                name = "My Dashboard"
+                filters {}
+            }
+            warehouse {
+                name = "Warehouse Management"
+                filters {}
+            }
+            inventory {
+                name = "Inventory Management"
+                filters {}
+            }
+            transaction {
+                name = "Transaction Management"
+                filters {}
+            }
+            fillRate {
+                name = "Fill Rate" 
+                filters {
+                    category {
+                        endpoint = "/${appName}/categoryApi/list"
+                    }
+                }
+            }
         }
         endpoints {
             number {
@@ -608,6 +627,21 @@ openboxes {
                         }
                     }
                     order = 12
+                }
+                stockOutLastMonth {
+                    enabled = true
+                    endpoint = "/${appName}/apitablero/getStockOutLastMonth"
+                    archived = ['personal', 'warehouse', 'inventory', 'fillRate']
+                    legend = true
+                    datalabel = true
+                    order = 13
+                    colors {
+                        labels {
+                            success = ["Never"]
+                            warning = ["Stocked out <1 week", "Stocked out 1-2 weeks", "Stocked out 2-3 weeks"]
+                            error   = ["Stocked out 3-4 weeks"]
+                        }
+                    }
                 }
             }
         }

@@ -283,11 +283,11 @@ class Order implements Serializable {
         }?:0
     }
     def getTotalOrderItemAdjustments() {
-        return orderItems?.sum { it?.totalAdjustments }?:0
+        return listOrderItems()?.sum { it?.totalAdjustments }?:0
     }
 
     def getSubtotal() {
-        return orderItems?.sum { it?.subtotal } ?: 0
+        return listOrderItems()?.sum { it?.subtotal } ?: 0
     }
 
     def getTotal() {

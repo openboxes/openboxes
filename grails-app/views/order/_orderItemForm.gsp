@@ -10,7 +10,7 @@
     <td class="middle">
         <g:autoSuggest id="product" name="product"
                        jsonUrl="${request.contextPath }/json/findProductByName?skipQuantity=true&supplierId=${order?.originParty?.id}"
-                       styleClass="text large required"/>
+                       styleClass="text large required" showColor="true"/>
     </td>
     <td class="middle center">
         <g:selectProductSupplier id="productSupplier"
@@ -75,7 +75,7 @@
     $("#manufacturerCode").attr("disabled", true);
     $("#manufacturer").attr("disabled", true);
   }
-  
+
   function clearSource() {
     $("#supplierCode").val("");
     $("#manufacturer").val(null).trigger('change');

@@ -8,6 +8,7 @@
     .dlg { display: none; }
     .non-editable { background-color: #e6e6e6; cursor: not-allowed }
     .non-editable.odd { background-color: #e1e1e1; }
+    .canceled-item { background-color: #ffcccb; }
     .items-table { table-layout: fixed; }
     .import-template {
         width: 0.1px;
@@ -337,6 +338,29 @@
           return false
         }
 
+        function changeOrderItemStatus(id, actionUrl) {
+          $.ajax({
+            url: actionUrl,
+            data: { id: id },
+            success: function () {
+              clearOrderItems();
+              loadOrderItems();
+              $('#orderItems').html('<option></option>').trigger('change');
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              if (jqXHR.responseText) {
+                let data = JSON.parse(jqXHR.responseText);
+                $.notify(data.errorMessage, "error");
+              }
+              else {
+                $.notify("Error changing order item status " + id, "error")
+              }
+            }
+          });
+          return false
+        }
+
+
         /**
          * @FIXME Didn't have time to make this pretty - should use required class on
          * fields instead of hardcoding the IDs.
@@ -636,6 +660,18 @@
             editOrderItem(id);
           });
 
+          $(".cancel-order-item").live("click", function (event) {
+              event.preventDefault();
+              var id = $(this).data("order-item-id");
+              changeOrderItemStatus(id, '${g.createLink(controller:'order', action:'cancelOrderItem')}');
+          });
+
+          $(".restore-order-item").live("click", function (event) {
+              event.preventDefault();
+              var id = $(this).data("order-item-id");
+              changeOrderItemStatus(id, '${g.createLink(controller:'order', action:'restoreOrderItem')}');
+          });
+
           $("#btnImportItems")
           .click(function (event) {
             $("#dlgImportItems")
@@ -699,11 +735,11 @@
     </script>
 
 <script id="rowTemplate" type="x-jquery-tmpl">
-<tr id="{{= id}}" tabindex="{{= index}}" {{if !canEdit }} class="non-editable" {{/if}}>
+<tr id="{{= id}}" tabindex="{{= index}}" class="{{if orderItemStatusCode == "CANCELED" }} canceled-item {{else !canEdit }} non-editable {{/if}}">
 	<td class="center middle">
     	{{= index }}
 	</td>
-	<td class="left middle">
+	<td class="left middle" style="color: {{= product.color }}">
         {{= product.productCode }}
         {{= product.name }}
 	</td>
@@ -712,6 +748,7 @@
 	    {{= productSupplier.code }}
 	    {{/if}}
 	</td>
+	 {{if orderItemStatusCode == "PENDING"}}
 	<td class="center middle">
     	{{if productSupplier }}
 	    {{= productSupplier.supplierCode }}
@@ -726,7 +763,7 @@
 	    {{/if}}
 	</td>
 	<td class="center middle">
-	    {{= quantity }}
+        {{= quantity }}
 	</td>
 	<td class="center middle" colspan="2">
     	{{= unitOfMeasure }}
@@ -746,24 +783,47 @@
 	<td class="center middle">
 	    {{= estimatedReadyDate }}
 	</td>
+	{{else}}
+	<td colspan="10">
+	</td>
+	{{/if}}
 	<td class="center middle">
         <div class="action-menu">
             <button class="action-btn">
                 <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}"/>
             </button>
             <div class="actions">
-                <div class="action-menu-item">
-                    <a href="javascript:void(-1);" class="edit-item" data-order-item-id="{{= id}}">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
-                        <warehouse:message code="default.button.edit.label"/>
-                    </a>
-                </div>
+                {{if orderItemStatusCode == "PENDING"}}
+                    <div class="action-menu-item">
+                        <a href="javascript:void(-1);" class="edit-item" data-order-item-id="{{= id}}">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
+                            <warehouse:message code="default.button.edit.label"/>
+                        </a>
+                    </div>
+                {{/if}}
                 <div class="action-menu-item">
                     <a href="javascript:void(-1);" class="delete-item" data-order-item-id="{{= id}}">
                         <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>
                         <warehouse:message code="default.button.delete.label"/>
                     </a>
                 </div>
+                {{if !hasShipmentAssociated}}
+                   {{if orderItemStatusCode == "PENDING"}}
+                        <div class="action-menu-item">
+                            <a href="javascript:void(-1);" class="cancel-order-item" data-order-item-id="{{= id}}">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'cross.png')}"/>
+                                <warehouse:message code="default.button.cancel.label"/>
+                            </a>
+                        </div>
+                    {{else orderItemStatusCode == "CANCELED"}}
+                        <div class="action-menu-item">
+                            <a href="javascript:void(-1);" class="restore-order-item" data-order-item-id="{{= id}}">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'tick.png')}"/>
+                                <warehouse:message code="default.button.uncancel.label"/>
+                            </a>
+                        </div>
+                    {{/if}}
+                {{/if}}
             </div>
         </div>
 	</td>

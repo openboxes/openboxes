@@ -24,7 +24,7 @@
 
             <th><g:message code="productSupplier.ratingTypeCode.label" default="Rating Type" /></th>
 
-            <th><g:message code="unitOfMeasure.label" default="Unit of Measure" /></th>
+            <th><g:message code="package.packSize.label" default="Pack Size" /></th>
 
             <th><g:message code="productPackage.price.label" default="Price" /></th>
 
