@@ -66,6 +66,7 @@ class OrderController {
                 "PO Status" { it.status }
                 "Code" { it.code }
                 "Product" { it.productName }
+                "Item Status" {it.itemStatus}
                 "Source Code" { it.sourceCode }
                 "Supplier Code" { it.supplierCode }
                 "Manufacturer" { it.manufacturer }
@@ -90,6 +91,7 @@ class OrderController {
                         status       : orderItem?.order?.displayStatus,
                         code       : orderItem?.product?.productCode,
                         productName       : orderItem?.product?.name,
+                        itemStatus        : orderItem?.orderItemStatusCode.name(),
                         sourceCode       : orderItem?.productSupplier?.code ?: '',
                         supplierCode       : orderItem?.productSupplier?.supplierCode ?: '',
                         manufacturer       : orderItem?.productSupplier?.manufacturer?.name ?: '',
@@ -974,13 +976,23 @@ class OrderController {
     def cancelOrderItem = {
         OrderItem orderItem = OrderItem.get(params.id)
         orderItem.orderItemStatusCode = OrderItemStatusCode.CANCELED
-        render (status: 200, text: "Item canceled successfully")
+        def canEdit = orderService.canOrderItemBeEdited(orderItem, session.user)
+        if (canEdit) {
+            orderItem.orderItemStatusCode = OrderItemStatusCode.CANCELED
+            render (status: 200, text: "Item canceled successfully")
+        } else {
+            throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
+        }
     }
 
     def restoreOrderItem = {
         OrderItem orderItem = OrderItem.get(params.id)
-        orderItem.orderItemStatusCode = OrderItemStatusCode.PENDING
-        render (status: 200, text: "Item restored successfully")
+        def canEdit = orderService.canOrderItemBeEdited(orderItem, session.user)
+        if (canEdit) {
+            orderItem.orderItemStatusCode = OrderItemStatusCode.PENDING
+            render(status: 200, text: "Item restored successfully")
+        } else {
+            throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
+        }
     }
-
 }
