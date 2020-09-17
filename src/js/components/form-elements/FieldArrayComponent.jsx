@@ -65,7 +65,7 @@ class FieldArrayComponent extends Component {
 
     return (
       <div className="d-flex flex-column">
-        <div className="text-center border">
+        <div className="text-center border table-header">
           <div className="d-flex flex-row border-bottom font-weight-bold py-1 mr-3">
             {_.map(fieldsConfig.fields, (config, name) => {
               const dynamicAttr = config.getDynamicAttr ? config.getDynamicAttr(properties) : {};
@@ -103,7 +103,7 @@ class FieldArrayComponent extends Component {
           </div>
         </div>
         <div
-          className="text-center border mb-1 flex-grow-1"
+          className="text-center border mb-1 flex-grow-1 table-content"
           style={{ overflowY: virtualized && isPaginated ? 'hidden' : 'scroll', maxHeight: virtualized && isPaginated ? window.innerHeight - 450 : maxTableHeight }}
         >
           <TableBodyComponent
@@ -123,11 +123,11 @@ class FieldArrayComponent extends Component {
           />
         </div>
         { AddButton &&
-          <div className="text-center">
+          <div className="text-center add-button">
             {
               typeof AddButton === 'string' ?
                 <button type="button" className="btn btn-outline-success btn-xs" onClick={() => addRow()}>
-                  <Translate id={AddButton} />
+                  <span><i className="fa fa-plus pr-2" /><Translate id={AddButton} /></span>
                 </button>
                 : <AddButton {...properties} addRow={addRow} />
             }

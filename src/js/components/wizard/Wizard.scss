@@ -164,4 +164,70 @@
             }
         }
     }
+
+    // Add items
+
+    .buttons-container {
+        background-color: #f3f6f7;
+        padding: 6px 0;
+
+        .btn-xs {
+            background-color: #fff;
+            height: 32px;
+            border: none;
+            box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.09);
+            color: grey;
+            padding: 4px 8px;
+            margin-left: 0.5em !important;
+        }
+    }
+
+    .add-items-form {
+        box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.09);
+        position: relative;
+        margin-bottom: 0;
+
+        .table-header {
+            height: 48px;
+            box-shadow: 0 4px -4px 4px rgba(0, 0, 0, 0.09);
+
+            > div {
+                border-bottom: none !important;
+                height: inherit;
+                font-weight: 500 !important;
+
+                > div {
+                    display: flex;
+                    align-items: center;
+                }
+            }
+        }
+
+        .add-button {
+            position: absolute;
+            top: -40px;
+
+            button {
+                height: 32px;
+                background-color: #fff;
+                border: none;
+                box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.09);
+                color: #30a64a;
+                padding: 4px 8px;
+            }
+        }
+
+        .submit-buttons {
+            position: absolute;
+            bottom: -48px;
+            right: 0;
+            width: 100%;
+
+            button {
+                height: 32px;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+        }
+    }
 }
