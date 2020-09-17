@@ -975,7 +975,6 @@ class OrderController {
 
     def cancelOrderItem = {
         OrderItem orderItem = OrderItem.get(params.id)
-        orderItem.orderItemStatusCode = OrderItemStatusCode.CANCELED
         def canEdit = orderService.canOrderItemBeEdited(orderItem, session.user)
         if (canEdit) {
             orderItem.orderItemStatusCode = OrderItemStatusCode.CANCELED
