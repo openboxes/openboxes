@@ -483,7 +483,9 @@
 
                     // Update select for order items in add adjustments tab
                     $('#orderItems').select2({
-                        data: data,
+                        data: data.filter(function(data) {
+                          return data.orderItemStatusCode != 'CANCELED';
+                        }),
                         placeholder: 'Select an option',
                         width: '100%',
                         allowClear: true,
