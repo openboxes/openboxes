@@ -994,4 +994,9 @@ class OrderController {
             throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
         }
     }
+
+    def getTotalPrice = {
+        Order order = Order.get(params.id)
+        render order.total
+    }
 }

@@ -101,7 +101,9 @@
                             <tr class="">
                                 <th colspan="14" class="right">
                                     <warehouse:message code="default.total.label"/>
-                                    <g:formatNumber number="${order?.totalPrice()?:0.0 }"/>
+                                    <span id="totalPrice">
+                                        <g:formatNumber number="${order?.totalPrice()?:0.0 }"/>
+                                    </span>
                                     ${order?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                 </th>
                             </tr>
@@ -346,6 +348,7 @@
               clearOrderItems();
               loadOrderItems();
               $('#orderItems').html('<option></option>').trigger('change');
+              getTotalPrice();
             },
             error: function (jqXHR, textStatus, errorThrown) {
               if (jqXHR.responseText) {
@@ -360,6 +363,16 @@
           return false
         }
 
+        function getTotalPrice() {
+          var orderId = $("#orderId").val();
+          $.ajax({
+            url:'${g.createLink( controller:'order', action:'getTotalPrice')}',
+            data: { id: orderId },
+            success: function(data, textStatus){
+                $("#totalPrice").html(parseFloat(data).toFixed(2));
+            }
+          });
+        }
 
         /**
          * @FIXME Didn't have time to make this pretty - should use required class on
