@@ -818,10 +818,10 @@ class IndicatorDataService {
         List<Integer> listData = []
 
         def stockOutLastMonth = dataService.executeQuery("""
-            select count(pss.product_id), pss.stockout_status 
-            from product_stockout_status as pss
-            where pss.location_id = :location
-            group by pss.stockout_status
+            select count(ps.product_id), ps.stockout_status 
+            from product_stockout as ps
+            where ps.location_id = :location
+            group by ps.stockout_status
         """,
                 [
                         'location': location.id,
