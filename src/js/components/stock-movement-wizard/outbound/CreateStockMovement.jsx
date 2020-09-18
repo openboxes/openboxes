@@ -19,7 +19,6 @@ import apiClient from '../../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../../actions';
 import { debounceUsersFetch, debounceLocationsFetch } from '../../../utils/option-utils';
 import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
-import '../../wizard/Wizard.scss';
 
 function validate(values) {
   const errors = {};
@@ -388,23 +387,25 @@ class CreateStockMovement extends Component {
           },
         }}
         render={({ form: { mutators }, handleSubmit, values }) => (
-          <form className="wizard-form" onSubmit={handleSubmit}>
-            {_.map(
-              FIELDS,
-              (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-                stocklists: this.state.stocklists,
-                fetchStockLists: (origin, destination) =>
-                  this.fetchStockLists(origin, destination, mutators.clearStocklist),
-                origin: values.origin,
-                destination: values.destination,
-                isSuperuser: this.props.isSuperuser,
-                debouncedUsersFetch: this.debouncedUsersFetch,
-                debouncedLocationsFetch: this.debouncedLocationsFetch,
-                requestTypes: this.state.requestTypes,
-                setRequestType: this.setRequestType,
-                values,
-              }),
-            )}
+          <form onSubmit={handleSubmit}>
+            <div className="classic-form">
+              {_.map(
+                FIELDS,
+                (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
+                  stocklists: this.state.stocklists,
+                  fetchStockLists: (origin, destination) =>
+                    this.fetchStockLists(origin, destination, mutators.clearStocklist),
+                  origin: values.origin,
+                  destination: values.destination,
+                  isSuperuser: this.props.isSuperuser,
+                  debouncedUsersFetch: this.debouncedUsersFetch,
+                  debouncedLocationsFetch: this.debouncedLocationsFetch,
+                  requestTypes: this.state.requestTypes,
+                  setRequestType: this.setRequestType,
+                  values,
+                }),
+              )}
+            </div>
             <div className="submit-buttons">
               <button type="submit" className="btn btn-outline-primary float-right btn-xs">
                 <Translate id="react.default.button.next.label" defaultMessage="Next" />

@@ -72,21 +72,35 @@
     text-align: left !important;
     padding: 24px;
     box-shadow: 0 4px 2px -2px rgba(0, 0, 0, .09);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .shipment-status {
+        border-radius: 4px !important;
+        margin: 0 !important;
+    }
 }
 
 // Wizard page
 .panel-body {
-    background-color: #fff;
 
     // Create stock movement
-    .wizard-form {
+    .classic-form {
+        background-color: #fff;
         box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.09);
         padding: 24px;
-        margin-bottom: calc(48px + 1.5em);
+        margin-bottom: 32px;
         position: relative;
         display: flex;
         flex-wrap: wrap;
         justify-content: space-between;
+        width: 100%;
+
+        .form-title {
+            width: 100%;
+            font-size: larger;
+        }
 
         .form-group {
             margin-top: 12px !important;
@@ -153,23 +167,30 @@
                 padding-left: 0 !important;
             }
         }
-
-        .submit-buttons {
-            position: absolute;
-            bottom: -48px;
-            right: 0;
-
-            button {
-                height: 32px;
-            }
-        }
     }
 
     // Add items
 
+    .submit-buttons {
+        margin-bottom: 18px;
+        margin-top: 18px;
+        width: 100%;
+
+        > button {
+            height: 32px;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+
+            &:not(:first-child) {
+                margin-left: 1em !important;
+            }
+        }
+    }
+
     .buttons-container {
-        background-color: #f3f6f7;
         padding: 6px 0;
+        display: flex;
+        justify-content: flex-end;
 
         .btn-xs {
             background-color: #fff;
@@ -178,11 +199,45 @@
             box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.09);
             color: grey;
             padding: 4px 8px;
-            margin-left: 0.5em !important;
+            margin-left: 1em !important;
         }
     }
 
-    .add-items-form {
+    .classic-form-buttons {
+        position: absolute;
+        right: 26px;
+
+        .btn-xs {
+            background-color: #eee;
+            color: grey;
+            box-shadow: none !important;
+        }
+    }
+
+    .dropdown {
+        position: relative;
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 36px;
+            z-index: 1;
+
+            &.visible {
+                display: block;
+            }
+
+            a {
+                background-color: #eee;
+                border: none;
+                width: max-content;
+                font-size: smaller;
+            }
+        }
+    }
+
+    .table-form {
+        background-color: #fff;
         box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.09);
         position: relative;
         margin-bottom: 0;
@@ -191,14 +246,18 @@
             height: 48px;
             box-shadow: 0 4px -4px 4px rgba(0, 0, 0, 0.09);
 
-            > div {
+            >div {
                 border-bottom: none !important;
                 height: inherit;
                 font-weight: 500 !important;
 
-                > div {
+                >div {
                     display: flex;
                     align-items: center;
+
+                    >div {
+                        width: 100%;
+                    }
                 }
             }
         }
@@ -216,17 +275,29 @@
                 padding: 4px 8px;
             }
         }
+    }
 
-        .submit-buttons {
-            position: absolute;
-            bottom: -48px;
-            right: 0;
-            width: 100%;
+    #stockMovementInfo {
+        padding-top: 12px !important;
 
-            button {
-                height: 32px;
-                margin-left: 0 !important;
-                margin-right: 0 !important;
+        .form-group {
+            min-width: unset !important;
+            width: 24%;
+
+            .row {
+                label {
+                    text-transform: uppercase;
+                    color: grey;
+                }
+
+                >div {
+                    min-width: 100%;
+                    padding: 0 !important;
+
+                    #description {
+                        min-width: unset !important;
+                    }
+                }
             }
         }
     }

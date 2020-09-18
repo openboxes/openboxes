@@ -1063,8 +1063,9 @@ class AddItemsPage extends Component {
               >
                 <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.exit.label" defaultMessage="Exit" /></span>
               </button> }
-            <form onSubmit={handleSubmit} className="add-items-form">
-              {_.map(this.getFields(), (fieldConfig, fieldName) =>
+            <form onSubmit={handleSubmit}>
+              <div className="table-form">
+                {_.map(this.getFields(), (fieldConfig, fieldName) =>
                 renderFormField(fieldConfig, fieldName, {
                   stocklist: values.stocklist,
                   recipients: this.props.recipients,
@@ -1084,6 +1085,7 @@ class AddItemsPage extends Component {
                   values,
                   isFirstPageLoaded: this.state.isFirstPageLoaded,
                 }))}
+              </div>
               <div className="submit-buttons">
                 <button
                   type="submit"
