@@ -20,7 +20,7 @@ SELECT
         shipment_item ON order_shipment.shipment_item_id = shipment_item.id
     LEFT OUTER JOIN
         shipment ON shipment_item.shipment_id = shipment.id
-    WHERE `order`.order_type_code = 'PURCHASE_ORDER'
+    WHERE `order`.order_type_code = 'PURCHASE_ORDER' AND order_item.order_item_status_code != 'CANCELED'
     GROUP BY  product.product_code, order_item.id, product.name, `order`.destination_id ) a
 GROUP BY product_code, name, destination_id ) b
 LEFT OUTER JOIN
@@ -101,7 +101,7 @@ SELECT
         shipment_item ON order_shipment.shipment_item_id = shipment_item.id
     LEFT OUTER JOIN
         shipment ON shipment_item.shipment_id = shipment.id
-    WHERE `order`.order_type_code = 'PURCHASE_ORDER'
+    WHERE `order`.order_type_code = 'PURCHASE_ORDER' AND order_item.order_item_status_code != 'CANCELED'
     GROUP BY  product.product_code, order_item.id, product.name, `order`.destination_id ) a
 GROUP BY product_code, name, destination_id ) b
 ON d.product_code = b.product_code AND d.destination_id = b.destination_id)
