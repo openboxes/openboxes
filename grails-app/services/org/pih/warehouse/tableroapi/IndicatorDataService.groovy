@@ -20,6 +20,7 @@ import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.core.Location
 import org.joda.time.LocalDate
+import org.pih.warehouse.util.LocalizationUtil
 
 class IndicatorDataService {
 
@@ -561,7 +562,7 @@ class IndicatorDataService {
         Date twoMonthsAgo = LocalDate.now().minusMonths(2).toDate()
 
         def results = Shipment.executeQuery("""
-            select s.shipmentType.id, s.shipmentNumber, s.name, s.id
+            select s.shipmentType.id, s.shipmentType.name, s.shipmentNumber, s.name, s.id
             from Shipment as s
             inner join s.currentEvent as e
             where s.destination = :location
@@ -588,8 +589,9 @@ class IndicatorDataService {
             if (it[0] == '1') numberDelayed['air'] += 1
             else if (it[0] == '2') numberDelayed['sea'] += 1
             else numberDelayed['landAndSuitcase'] += 1
+            def shipmentType = LocalizationUtil.getLocalizedString(it[1], new Locale("en"))
 
-            TableData tableData = new TableData(it[1], it[2], null, '/openboxes/stockMovement/show/' + it[3])
+            TableData tableData = new TableData(it[2], it[3], null, '/openboxes/stockMovement/show/' + it[3], 'images/icons/shipmentType/ShipmentType' + shipmentType + '.png')
             return tableData
         }
 
