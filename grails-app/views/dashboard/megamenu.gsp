@@ -682,6 +682,11 @@
                         <div class="mm-content-section">
                             <h3><warehouse:message code="other.label" default="Other" /></h3>
                             <div class="mm-menu-item">
+                                <g:link controller="budgetCode" action="list">
+                                    <warehouse:message code="budgetCode.label" default="Budget Codes"/>
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
                                 <g:link controller="containerType" action="list">
                                     <warehouse:message code="containerTypes.label" default="Container Types"/>
                                 </g:link>

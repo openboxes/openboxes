@@ -9,6 +9,8 @@
 **/
 package org.pih.warehouse.order
 
+import org.pih.warehouse.core.BudgetCode
+
 class OrderAdjustment implements Serializable {
 
     String id
@@ -18,6 +20,8 @@ class OrderAdjustment implements Serializable {
     String comments
 
     OrderAdjustmentType orderAdjustmentType
+
+    BudgetCode budgetCode
 
     // Audit fields
     Date dateCreated
@@ -38,6 +42,7 @@ class OrderAdjustment implements Serializable {
         percentage(nullable:true)
         description(nullable:true)
         comments(nullable: true)
+        budgetCode(nullable: true)
     }
 
 

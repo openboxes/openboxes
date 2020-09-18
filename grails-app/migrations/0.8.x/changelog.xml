@@ -80,4 +80,7 @@
     <include file="0.8.x/changelog-2020-06-09-1240-alter-table-add-column-organization-default-location-id.xml"/>
     <include file="0.8.x/changelog-2020-06-12-0842-add-unique-constraint-product-package.xml"/>
     <include file="0.8.x/changelog-2020-07-13-1556-alter-table-inventory-snapshot-add-indexes.xml"/>
+    <include file="0.8.x/changelog-2020-09-18-1135-create-table-budget-code.xml"/>
+    <include file="0.8.x/changelog-2020-09-18-1150-alter-table-add-column-budget-code-order-adjustment.xml"/>
+    <include file="0.8.x/changelog-2020-09-18-1155-alter-table-add-column-budget-code-order-item.xml"/>
 </databaseChangeLog>
