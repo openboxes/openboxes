@@ -50,7 +50,7 @@ class InventorySnapshotService {
         // Uses GPars to improve performance
         GParsPool.withPool {
             def depotLocations = locationService.getDepots()
-            depotLocations.eachParallel { Location loc ->
+            results = depotLocations.collectParallel { Location loc ->
                 def binLocations
                 def innerStartTime = System.currentTimeMillis()
                 persistenceInterceptor.init()
@@ -70,7 +70,7 @@ class InventorySnapshotService {
                 log.info "Read ${binLocations?.size()} inventory snapshots for location ${location} on date ${date.format("MMM-dd-yyyy")} in ${readTime}ms"
                 persistenceInterceptor.flush()
                 persistenceInterceptor.destroy()
-                saveInventorySnapshots(date, location, binLocations)
+                return [binLocations: binLocations, location: location, date: date]
             }
         }
         log.info("Total read time: " + (System.currentTimeMillis() - startTime) + "ms")
@@ -195,15 +195,12 @@ class InventorySnapshotService {
         def batchSize = ConfigurationHolder.config.openboxes.inventorySnapshot.batchSize ?: 1000
         Sql sql = new Sql(dataSource)
 
-
         try {
             // Clear time in case caller did not
             date.clearTime()
             String dateString = date.format("yyyy-MM-dd HH:mm:ss")
             DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
-            // Set transaction isolation level
-            sql.execute("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;")
 
             // Execute inventory snapshot insert/update in batches
             sql.withBatch(batchSize) { BatchingStatementWrapper stmt ->

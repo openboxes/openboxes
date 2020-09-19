@@ -64,7 +64,6 @@ class DataService {
             try {
                 def startTime = System.currentTimeMillis()
                 log.info "Executing statement ${statement}"
-                sql.execute("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;")
                 sql.execute(statement)
                 log.info "Updated ${sql.updateCount} rows in " +  (System.currentTimeMillis() - startTime) + " ms"
                 sql.commit()
@@ -80,7 +79,6 @@ class DataService {
             executeStatement(statement)
         }
     }
-
 
     /**
      * Validate inventory levels
