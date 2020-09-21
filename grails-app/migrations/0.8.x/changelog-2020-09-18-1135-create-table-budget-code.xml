@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="awalkowiak" id="1809202011351-1">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="budget_code"/>
+      </not>
+    </preConditions>
+    <createTable tableName="budget_code">
+
+      <column name="id" type="CHAR(38)">
+        <constraints nullable="false" primaryKey="true"/>
+      </column>
+      <column name="code" type="LONGTEXT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="name" type="LONGTEXT"/>
+      <column name="description" type="LONGTEXT"/>
+      
+      <column name="organization_id" type="CHAR(38)"/>
+
+      <column name="date_created" type="DATETIME"/>
+      <column name="last_updated" type="DATETIME"/>
+      <column name="created_by_id" type="CHAR(38)"/>
+      <column name="updated_by_id" type="CHAR(38)"/>
+    </createTable>
+  </changeSet>
+
+  <changeSet author="awalkowiak" id="1809202011351-2">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_budget_code_organization"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="organization_id" baseTableName="budget_code"
+      constraintName="fk_budget_code_organization" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="party" />
+  </changeSet>
+
+  <changeSet author="awalkowiak" id="1809202011351-3">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_budget_code_created_by"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="created_by_id" baseTableName="budget_code"
+      constraintName="fk_budget_code_created_by" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="user" />
+  </changeSet>
+
+  <changeSet author="awalkowiak" id="1809202011351-4">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_budget_code_updated_by"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="updated_by_id" baseTableName="budget_code"
+      constraintName="fk_budget_code_updated_by" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="user" />
+  </changeSet>
+</databaseChangeLog>
