@@ -591,7 +591,7 @@ class IndicatorDataService {
             else numberDelayed['landAndSuitcase'] += 1
             def shipmentType = LocalizationUtil.getLocalizedString(it[1], new Locale("en"))
 
-            TableData tableData = new TableData(it[2], it[3], null, '/openboxes/stockMovement/show/' + it[3], 'images/icons/shipmentType/ShipmentType' + shipmentType + '.png')
+            TableData tableData = new TableData(it[2], it[3], null, '/openboxes/stockMovement/show/' + it[4], 'images/icons/shipmentType/ShipmentType' + shipmentType + '.png')
             return tableData
         }
 
