@@ -15,7 +15,7 @@ import apiClient from '../../utils/apiClient';
 import { showSpinner, hideSpinner, fetchTranslations } from '../../actions';
 import { translateWithDefaultMessage } from '../../utils/Translate';
 
-import './outbound/OutboundStockMovement.scss';
+import './StockMovement.scss';
 
 // TODO: check docs for SM wizard and Wizard related components
 

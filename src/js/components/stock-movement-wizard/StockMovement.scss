@@ -2,70 +2,6 @@
     background-color: #f3f6f7;
 }
 
-// Wizard steps
-
-.steps-box {
-    padding: 24px 24px 48px 24px;
-    display: flex;
-    background-color: #fff;
-
-    .steps {
-        max-width: 80%;
-        margin: auto;
-        flex: 1;
-        justify-content: space-evenly;
-
-        .step-container {
-            display: flex;
-
-            &:not(:last-child) {
-                flex: 1;
-            }
-
-            .step {
-                border: none;
-                background: none;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                position: relative;
-
-                // Icons
-                .fa {
-                    font-size: 30px !important;
-                }
-
-                .fa-check-circle-o {
-                    color: #50c146;
-                }
-
-                .fa-circle-o.disabled {
-                    color: #e9ebeb;
-                }
-
-                .fa-circle-o {
-                    color: #4f87ce;
-                }
-
-                .step-text {
-                    position: absolute;
-                    top: 30px;
-                    font-size: small;
-                }
-            }
-        }
-
-        .step-container:not(:last-child)::after {
-            content: " ";
-            border-bottom: 1px dashed #e9ebeb;
-            flex: 1;
-            height: 18px;
-        }
-
-    }
-
-}
-
 // Wizard title
 .panel-heading {
     background-color: #fff;
@@ -85,7 +21,7 @@
 // Wizard page
 .panel-body {
 
-    // Create stock movement
+    // Classic form
     .classic-form {
         background-color: #fff;
         box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.09);
@@ -169,8 +105,54 @@
         }
     }
 
-    // Add items
+    // Table form
+    .table-form {
+        background-color: #fff;
+        box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.09);
+        position: relative;
+        margin-bottom: 0;
 
+        .table-header {
+            height: 48px;
+            box-shadow: 0 4px -4px 4px rgba(0, 0, 0, 0.09);
+
+            >div {
+                border-bottom: none !important;
+                height: inherit;
+                font-weight: 500 !important;
+
+                >div {
+                    display: flex;
+                    align-items: center;
+
+                    >div {
+                        width: 100%;
+
+                        .text-truncate {
+                            // Do not truncate text
+                            white-space: pre-wrap !important;
+                        }
+                    }
+                }
+            }
+        }
+
+        .add-button {
+            position: absolute;
+            top: -40px;
+
+            button {
+                height: 32px;
+                background-color: #fff;
+                border: none;
+                box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.09);
+                color: #30a64a;
+                padding: 4px 8px;
+            }
+        }
+    }
+
+    // Buttons
     .submit-buttons {
         margin-bottom: 18px;
         margin-top: 18px;
@@ -236,46 +218,7 @@
         }
     }
 
-    .table-form {
-        background-color: #fff;
-        box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.09);
-        position: relative;
-        margin-bottom: 0;
-
-        .table-header {
-            height: 48px;
-            box-shadow: 0 4px -4px 4px rgba(0, 0, 0, 0.09);
-
-            >div {
-                border-bottom: none !important;
-                height: inherit;
-                font-weight: 500 !important;
-
-                >div {
-                    display: flex;
-                    align-items: center;
-
-                    >div {
-                        width: 100%;
-                    }
-                }
-            }
-        }
-
-        .add-button {
-            position: absolute;
-            top: -40px;
-
-            button {
-                height: 32px;
-                background-color: #fff;
-                border: none;
-                box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.09);
-                color: #30a64a;
-                padding: 4px 8px;
-            }
-        }
-    }
+    // Specific styles
 
     #stockMovementInfo {
         padding-top: 12px !important;
