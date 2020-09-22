@@ -20,6 +20,8 @@
 
 // Wizard page
 .panel-body {
+    display: flex;
+    flex-direction: column;
 
     // Classic form
     .classic-form {
@@ -41,7 +43,7 @@
         .form-group {
             margin-top: 12px !important;
             margin-right: 12px !important;
-            min-width: 40%;
+            min-width: 45%;
 
             .row {
                 margin-right: 0;
@@ -158,7 +160,7 @@
         margin-top: 18px;
         width: 100%;
 
-        > button {
+        >button {
             height: 32px;
             margin-left: 0 !important;
             margin-right: 0 !important;
@@ -236,6 +238,8 @@
                 >div {
                     min-width: 100%;
                     padding: 0 !important;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
 
                     #description {
                         min-width: unset !important;
