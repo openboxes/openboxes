@@ -119,6 +119,17 @@
                            value="${orderItem?.estimatedReadyDate?.format("MM/dd/yyyy")}" />
                 </td>
             </tr>
+            <tr class="prop">
+                <td valign="top" class="name">
+                    <label for="dlgBudgetCode"><warehouse:message code="orderItem.budgetCode.label"/></label>
+                </td>
+                <td valign="top" class="value" id="dlgBudgetCode">
+                    <g:selectBudgetCode name="budgetCode.id"
+                                        value="${orderItem.budgetCode?.id}"
+                                        class="chzn-select-deselect"
+                                        noSelection="['':'']"/>
+                </td>
+            </tr>
         </g:if>
         <g:elseif test="${canEdit && orderItem.hasShipmentAssociated()}">
             <tr class="prop">
@@ -188,6 +199,17 @@
                 </td>
                 <td valign="top" class="value">
                     <input class="text large datepicker" id="dlgActualReadyDate" name="actualReadyDate" value="${orderItem?.actualReadyDate?.format("MM/dd/yyyy")}" />
+                </td>
+            </tr>
+            <tr class="prop">
+                <td valign="top" class="name">
+                    <label for="dlgBudgetCode1"><warehouse:message code="orderItem.budgetCode.label"/></label>
+                </td>
+                <td valign="top" class="value" id="dlgBudgetCode1">
+                    <g:selectBudgetCode name="budgetCode.id"
+                                        value="${orderItem.budgetCode?.id}"
+                                        class="chzn-select-deselect"
+                                        noSelection="['':'']"/>
                 </td>
             </tr>
         </g:elseif>

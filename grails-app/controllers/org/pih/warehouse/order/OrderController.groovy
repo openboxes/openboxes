@@ -13,6 +13,7 @@ import grails.converters.JSON
 import grails.validation.ValidationException
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.plugins.csv.CSVWriter
+import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
@@ -354,6 +355,8 @@ class OrderController {
                     orderAdjustment.orderItem.removeFromOrderAdjustments(orderAdjustment)
                 }
                 orderAdjustment.properties = params
+                def budgetCode = BudgetCode.get(params.budgetCode?.id)
+                orderAdjustment.budgetCode = budgetCode
                 if (!orderAdjustment.hasErrors() && orderAdjustment.save(flush: true)) {
                     flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'orderAdjustment.label', default: 'Order Adjustment'), orderAdjustment.id])}"
                     redirect(controller:"purchaseOrderWorkflow", action: "purchaseOrder", id: orderInstance.id, params:['skipTo': 'adjustments'])
@@ -610,7 +613,8 @@ class OrderController {
                     "${warehouse.message(code: 'orderItem.quantity.label')}," +
                     "${warehouse.message(code: 'product.unitOfMeasure.label')}," +
                     "${warehouse.message(code: 'orderItem.unitPrice.label')}," +
-                    "${warehouse.message(code: 'orderItem.totalPrice.label')}" +
+                    "${warehouse.message(code: 'orderItem.totalPrice.label')}," +
+                    "${warehouse.message(code: 'orderItem.budgetCode.label')}" +
                     "\n"
 
             def totalPrice = 0.0
@@ -628,7 +632,8 @@ class OrderController {
                         "${StringEscapeUtils.escapeCsv(quantityString)}," +
                         "${orderItem?.unitOfMeasure}," +
                         "${StringEscapeUtils.escapeCsv(unitPriceString)}," +
-                        "${StringEscapeUtils.escapeCsv(totalPriceString)}" +
+                        "${StringEscapeUtils.escapeCsv(totalPriceString)}," +
+                        "${orderItem?.budgetCode?.code}," +
                         "\n"
             }
 
@@ -697,6 +702,9 @@ class OrderController {
             orderItem.productSupplier = productSupplier
         }
 
+        def budgetCode = BudgetCode.get(params.budgetCode?.id)
+        orderItem.budgetCode = budgetCode
+
         try {
             if (!order.save(flush:true)) {
                 throw new ValidationException("Order is invalid", order.errors)
@@ -743,7 +751,8 @@ class OrderController {
                     manufacturerName: it.productSupplier?.manufacturer?.name,
                     text: it.toString(),
                     orderItemStatusCode: it.orderItemStatusCode.name(),
-                    hasShipmentAssociated: it.hasShipmentAssociated()
+                    hasShipmentAssociated: it.hasShipmentAssociated(),
+                    budgetCode: it.budgetCode
             ]
         }
         orderItems = orderItems.sort { it.dateCreated }
@@ -775,6 +784,7 @@ class OrderController {
                     "${warehouse.message(code: 'orderItem.totalCost.label')}," + // total cost
                     "${warehouse.message(code: 'order.recipient.label')}," + // recipient
                     "${warehouse.message(code: 'orderItem.estimatedReadyDate.label')}," + // estimated ready date
+                    "${warehouse.message(code: 'orderItem.budgetCode.label')}," +
                     "\n"
 
             def totalPrice = 0.0
@@ -800,6 +810,7 @@ class OrderController {
                         "${StringEscapeUtils.escapeCsv(totalPriceString)}," +
                         "${orderItem?.recipient?.name ?: ''}," +
                         "${orderItem?.estimatedReadyDate?.format("MM/dd/yyyy") ?: ''}," +
+                        "${orderItem?.budgetCode?.code ?: ''}," +
                         "\n"
             }
             render csv

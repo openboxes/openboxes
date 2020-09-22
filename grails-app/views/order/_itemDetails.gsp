@@ -18,6 +18,7 @@
                 <th class="center"><warehouse:message code="orderItem.recipient.label"/></th>
                 <th class="center"><warehouse:message code="orderItem.estimatedReadyDate.label"/></th>
                 <th class="center"><warehouse:message code="orderItem.actualReadyDate.label"/></th>
+                <th class="center"><warehouse:message code="orderItem.budgetCode.label"/></th>
             </tr>
             </thead>
             <tbody>
@@ -56,6 +57,9 @@
                         </td>
                         <td class="center">
                             <g:formatDate date="${orderItem?.actualReadyDate}" format="dd/MMM/yyyy"/>
+                        </td>
+                        <td class="center">
+                            ${orderItem?.budgetCode?.code}
                         </td>
                     </g:if>
                     <g:else>
