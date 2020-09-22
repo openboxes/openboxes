@@ -1,4 +1,4 @@
-DROP TABLE product_availability;
+DROP TABLE IF EXISTS product_availability;
 CREATE TABLE product_availability AS
 SELECT
   uuid_short() as id,
