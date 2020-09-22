@@ -36,7 +36,7 @@
         </div>
 
         <div id="edit-budget-code">
-            <g:form method="post" >
+            <g:form method="post" action="update" >
                 <g:hiddenField name="id" value="${budgetCode?.id}" />
                 <div class="box">
                     <h2><warehouse:message code="default.edit.label" args="[entityName]" /></h2>
