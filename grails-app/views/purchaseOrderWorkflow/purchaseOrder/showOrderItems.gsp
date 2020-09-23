@@ -73,6 +73,9 @@
                         <g:hiddenField id="orderId" name="order.id" value="${order?.id }"></g:hiddenField>
                         <g:hiddenField id="orderItemId" name="orderItem.id" value="${orderItem?.id }"></g:hiddenField>
                         <g:hiddenField id="supplierId" name="supplier.id" value="${order?.originParty?.id }"></g:hiddenField>
+                        <g:hiddenField id="hasBudgetCodeSupport" name="hasBudgetCodeSupport"
+                                       value="${order?.destination?.supports(org.pih.warehouse.core.ActivityCode.BUDGET_CODE)}">
+                        </g:hiddenField>
                         <table id="orderItemsTable" class="items-table">
                             <thead>
                             <tr class="odd">
@@ -216,7 +219,8 @@
                                 </td>
                                 <td>
                                     <g:selectBudgetCode name="budgetCode.id"
-                                                        class="chzn-select-deselect"
+                                                        id="adjustmentBudgetCode"
+                                                        class="select2"
                                                         noSelection="['':'']"/>
                                 </td>
                                 <td class="center middle">
@@ -395,12 +399,18 @@
           var unitPrice = $("#unitPrice").val();
           var quantityUom = $("#quantityUom").val();
           var quantityPerUom = $("#quantityPerUom").val();
+          var budgetCode = $("#budgetCode").val();
+          var hasBudgetCodeSupport = ($("#hasBudgetCodeSupport").val() === "true");
 
           if (!product) $("#product-suggest").notify("Required")
           if (!quantity) $("#quantity").notify("Required")
           if (!unitPrice) $("#unitPrice").notify("Required")
           if (!quantityUom) $("#quantityUom_chosen").notify("Required")
           if (!quantityPerUom) $("#quantityPerUom").notify("Required")
+          if (!budgetCode && hasBudgetCodeSupport) {
+            $("#budgetCode").notify("Required")
+            return false
+          }
 
           return product && quantity && unitPrice && quantityPerUom && quantityUom
         }
@@ -410,11 +420,17 @@
           var amount = $("#amount").val();
           var percentage = $("#percentage").val();
           var canManageAdjustments = ($("#canManageAdjustments").val() === "true");
+          var budgetCode = $("#adjustmentBudgetCode").val();
+          var hasBudgetCodeSupport = ($("#hasBudgetCodeSupport").val() === "true");
 
           if (!orderAdjustmentType) $("#orderAdjustmentType").notify("Required")
           if (!(percentage || amount)) $("#amount").notify("Amount or percentage required")
           if (!(percentage || amount)) $("#percentage").notify("Amount or percentage required")
           if (!canManageAdjustments) $.notify("You do not have permissions to perform this action")
+          if (!budgetCode && hasBudgetCodeSupport) {
+            $("#adjustmentBudgetCode").notify("Required")
+            return false
+          }
 
           if (orderAdjustmentType && canManageAdjustments && (amount || percentage)) {
             return true

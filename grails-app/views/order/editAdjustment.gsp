@@ -29,9 +29,11 @@
 			<g:render template="summary" model="[orderInstance:orderInstance]" />
 			<div class="box">
 				<h2><warehouse:message code="order.orderAjustments.label" default="Order Adjustments"/></h2>
-				<g:form action="saveAdjustment">
+				<g:form action="saveAdjustment" onsubmit="return validateForm();">
 					<g:hiddenField name="id" value="${orderAdjustment?.id}" />
-
+					<g:hiddenField id="hasBudgetCodeSupport" name="hasBudgetCodeSupport"
+								   value="${orderInstance?.destination?.supports(org.pih.warehouse.core.ActivityCode.BUDGET_CODE)}">
+					</g:hiddenField>
 					<table>
 						<tbody>
 							<tr class="prop">
@@ -90,8 +92,9 @@
 								<td valign="top" class="name"><label><warehouse:message code="orderAdjustment.budgetCode.label"/></label></td>
 								<td valign="top" class="value">
 									<g:selectBudgetCode name="budgetCode.id"
+														id="budgetCode"
 														value="${orderAdjustment.budgetCode?.id}"
-														class="chzn-select-deselect"
+														class="select2"
 														noSelection="['':'']"/>
 								</td>
 							</tr>
@@ -108,5 +111,17 @@
 			</div>
 		</div>
 	</div>
+<script type="text/javascript">
+	function validateForm() {
+		var budgetCode = $("#budgetCode").val();
+		var hasBudgetCodeSupport = ($("#hasBudgetCodeSupport").val() === "true");
+		if (!budgetCode && hasBudgetCodeSupport) {
+			$("#budgetCode").notify("Required")
+			return false
+		} else {
+			return true
+		}
+	}
+</script>
 </body>
 </html>
