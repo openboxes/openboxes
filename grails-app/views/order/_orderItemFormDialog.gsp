@@ -15,7 +15,7 @@
                     <format:product product="${orderItem.product}"/>
                     <g:hiddenField id="dlgProduct" name="product.id" value="${orderItem?.product?.id}"/>
                     <g:hiddenField id="dlgSupplierId" name="supplier.id" value="${orderItem?.order?.originParty?.id }"></g:hiddenField>
-                    <g:hiddenField id="hasBudgetCodeSupport" name="hasBudgetCodeSupport"
+                    <g:hiddenField id="isBudgetCodeRequired" name="isBudgetCodeRequired"
                                    value="${orderItem?.order?.destination?.supports(org.pih.warehouse.core.ActivityCode.BUDGET_CODE)}">
                     </g:hiddenField>
                 </td>
@@ -250,8 +250,8 @@
 <script>
   function validateForm() {
     var budgetCode = $("#dlgBudgetCode").val();
-    var hasBudgetCodeSupport = ($("#hasBudgetCodeSupport").val() === "true");
-    if (!budgetCode && hasBudgetCodeSupport) {
+    var isBudgetCodeRequired = ($("#isBudgetCodeRequired").val() === "true");
+    if (!budgetCode && isBudgetCodeRequired) {
       $("#dlgBudgetCode").notify("Required")
       return false
     } else {

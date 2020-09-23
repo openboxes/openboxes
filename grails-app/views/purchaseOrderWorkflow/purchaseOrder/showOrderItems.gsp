@@ -73,7 +73,7 @@
                         <g:hiddenField id="orderId" name="order.id" value="${order?.id }"></g:hiddenField>
                         <g:hiddenField id="orderItemId" name="orderItem.id" value="${orderItem?.id }"></g:hiddenField>
                         <g:hiddenField id="supplierId" name="supplier.id" value="${order?.originParty?.id }"></g:hiddenField>
-                        <g:hiddenField id="hasBudgetCodeSupport" name="hasBudgetCodeSupport"
+                        <g:hiddenField id="isBudgetCodeRequired" name="isBudgetCodeRequired"
                                        value="${order?.destination?.supports(org.pih.warehouse.core.ActivityCode.BUDGET_CODE)}">
                         </g:hiddenField>
                         <table id="orderItemsTable" class="items-table">
@@ -400,14 +400,14 @@
           var quantityUom = $("#quantityUom").val();
           var quantityPerUom = $("#quantityPerUom").val();
           var budgetCode = $("#budgetCode").val();
-          var hasBudgetCodeSupport = ($("#hasBudgetCodeSupport").val() === "true");
+          var isBudgetCodeRequired = ($("#isBudgetCodeRequired").val() === "true");
 
           if (!product) $("#product-suggest").notify("Required")
           if (!quantity) $("#quantity").notify("Required")
           if (!unitPrice) $("#unitPrice").notify("Required")
           if (!quantityUom) $("#quantityUom_chosen").notify("Required")
           if (!quantityPerUom) $("#quantityPerUom").notify("Required")
-          if (!budgetCode && hasBudgetCodeSupport) {
+          if (!budgetCode && isBudgetCodeRequired) {
             $("#budgetCode").notify("Required")
             return false
           }
@@ -421,13 +421,13 @@
           var percentage = $("#percentage").val();
           var canManageAdjustments = ($("#canManageAdjustments").val() === "true");
           var budgetCode = $("#adjustmentBudgetCode").val();
-          var hasBudgetCodeSupport = ($("#hasBudgetCodeSupport").val() === "true");
+          var isBudgetCodeRequired = ($("#isBudgetCodeRequired").val() === "true");
 
           if (!orderAdjustmentType) $("#orderAdjustmentType").notify("Required")
           if (!(percentage || amount)) $("#amount").notify("Amount or percentage required")
           if (!(percentage || amount)) $("#percentage").notify("Amount or percentage required")
           if (!canManageAdjustments) $.notify("You do not have permissions to perform this action")
-          if (!budgetCode && hasBudgetCodeSupport) {
+          if (!budgetCode && isBudgetCodeRequired) {
             $("#adjustmentBudgetCode").notify("Required")
             return false
           }

@@ -31,7 +31,7 @@
 				<h2><warehouse:message code="order.orderAjustments.label" default="Order Adjustments"/></h2>
 				<g:form action="saveAdjustment" onsubmit="return validateForm();">
 					<g:hiddenField name="id" value="${orderAdjustment?.id}" />
-					<g:hiddenField id="hasBudgetCodeSupport" name="hasBudgetCodeSupport"
+					<g:hiddenField id="isBudgetCodeRequired" name="isBudgetCodeRequired"
 								   value="${orderInstance?.destination?.supports(org.pih.warehouse.core.ActivityCode.BUDGET_CODE)}">
 					</g:hiddenField>
 					<table>
@@ -114,8 +114,8 @@
 <script type="text/javascript">
 	function validateForm() {
 		var budgetCode = $("#budgetCode").val();
-		var hasBudgetCodeSupport = ($("#hasBudgetCodeSupport").val() === "true");
-		if (!budgetCode && hasBudgetCodeSupport) {
+		var isBudgetCodeRequired = ($("#isBudgetCodeRequired").val() === "true");
+		if (!budgetCode && isBudgetCodeRequired) {
 			$("#budgetCode").notify("Required")
 			return false
 		} else {
