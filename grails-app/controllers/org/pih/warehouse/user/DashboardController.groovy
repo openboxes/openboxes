@@ -236,7 +236,7 @@ class DashboardController {
 
     @CacheFlush(["dashboardCache", "megamenuCache", "inventoryBrowserCache", "fastMoversCache",
             "binLocationReportCache", "binLocationSummaryCache", "quantityOnHandCache", "selectTagCache",
-            "selectTagsCache", "selectCategoryCache", "selectCatalogsCache"])
+            "selectTagsCache", "selectCategoryCache", "selectCatalogsCache", "forecastCache"])
     def flushCache = {
         flash.message = "Data caches have been flushed and inventory snapshot job was triggered"
         RefreshInventorySnapshotJob.triggerNow([location: session.warehouse.id, user: session.user.id, forceRefresh: false])

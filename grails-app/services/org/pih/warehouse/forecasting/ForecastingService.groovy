@@ -10,8 +10,10 @@
 package org.pih.warehouse.forecasting
 
 import groovy.sql.Sql
+import groovy.time.TimeCategory
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.util.DateUtil
 
 import java.sql.Timestamp
 import java.text.DateFormatSymbols
@@ -28,35 +30,41 @@ class ForecastingService {
     def getDemand(Location origin, Product product) {
 
         boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
+        Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod ?: 365
         if (forecastingEnabled) {
-            def numberFormat = NumberFormat.getIntegerInstance()
-            def rows = getDemandDetails(origin, product)
-            def startDate = rows.min { it.date_issued }?.date_issued
-            def endDate = new Date()
+            Map defaultDateRange = DateUtil.getDateRange(new Date(), -1)
+            use(TimeCategory) {
+                defaultDateRange.startDate = defaultDateRange.endDate - demandPeriod.days
+            }
+
+            def rows = getDemandDetails(origin, product, defaultDateRange.startDate, defaultDateRange.endDate)
             def totalDemand = rows.sum { it.quantity_demand } ?: 0
-            def totalDays = (startDate && endDate) ? (endDate - startDate) : 1
-            def dailyDemand = (totalDemand && totalDays) ? (totalDemand / totalDays) : 0
-            def monthlyDemand = dailyDemand * 30
+            def dailyDemand = (totalDemand && demandPeriod) ? (totalDemand / demandPeriod) : 0
+            def monthlyDemand = totalDemand / Math.floor((demandPeriod / 30))
             def quantityOnHand = inventoryService.getQuantityOnHand(origin, product)
             def onHandMonths = monthlyDemand ? quantityOnHand / monthlyDemand : 0
 
             return [
-                    dateRange    : [startDate: startDate, endDate: endDate],
                     totalDemand  : totalDemand,
-                    totalDays    : totalDays,
+                    totalDays    : demandPeriod,
                     dailyDemand  : dailyDemand,
-                    monthlyDemand: "${numberFormat.format(monthlyDemand)}",
+                    monthlyDemand: "${NumberFormat.getIntegerInstance().format(monthlyDemand)}",
                     onHandMonths: onHandMonths
             ]
         }
     }
 
     def getDemandDetails(Location origin, Product product) {
+        Date today = new Date()
+        Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod?:365
+        return getDemandDetails(origin, product, today - demandPeriod, today)
+    }
+
+    def getDemandDetails(Location origin, Product product, Date startDate, Date endDate) {
         List data = []
-        Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod?:180
-        Map params = [demandPeriod: demandPeriod]
         boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
         if (forecastingEnabled) {
+            Map params = [startDate: startDate, endDate: endDate]
             String query = """
                 select 
                     request_status,
@@ -78,7 +86,7 @@ class ForecastingService {
                     quantity_demand,
                     reason_code_classification
                 FROM product_demand_details
-                WHERE date_issued BETWEEN DATE_SUB(now(), INTERVAL :demandPeriod DAY) AND now()
+                WHERE date_issued BETWEEN :startDate AND :endDate
                 """
             if (product) {
                 query += " AND product_id = :productId"
@@ -165,7 +173,7 @@ class ForecastingService {
 
     def getDemandSummary(Location origin, Product product) {
         List data = []
-        Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod?:180
+        Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod?:365
         boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
         if (forecastingEnabled) {
             String query = """

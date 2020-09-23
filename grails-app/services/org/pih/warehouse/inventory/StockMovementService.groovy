@@ -547,8 +547,8 @@ class StockMovementService {
 
     List getEditPageItems(Requisition requisition, String max, String offset) {
         def query = offset ?
-                """ select * FROM edit_page_item where requisition_id = :requisition and requisition_item_type = 'ORIGINAL' limit :offset, :max; """ :
-                """ select * FROM edit_page_item where requisition_id = :requisition and requisition_item_type = 'ORIGINAL' """
+                """ select * FROM edit_page_item where requisition_id = :requisition and requisition_item_type = 'ORIGINAL' ORDER BY sort_order limit :offset, :max; """ :
+                """ select * FROM edit_page_item where requisition_id = :requisition and requisition_item_type = 'ORIGINAL' ORDER BY sort_order """
         def data = dataService.executeQuery(query, [
                 'requisition': requisition.id,
                 'offset': offset ? offset.toInteger() : null,
@@ -566,7 +566,7 @@ class StockMovementService {
             ]);
 
             def statusCode = substitutionItems ? RequisitionItemStatus.SUBSTITUTED :
-                    it.quantity_revised ? RequisitionItemStatus.CHANGED : RequisitionItemStatus.APPROVED
+                    it.quantity_revised != null ? RequisitionItemStatus.CHANGED : RequisitionItemStatus.APPROVED
             [
                     product : Product.get(it.product_id),
                     productName : it.name,
@@ -1284,7 +1284,7 @@ class StockMovementService {
                 requisitionItem.orderIndex = orderIndex
                 requisition.addToRequisitionItems(requisitionItem)
 
-                orderIndex++
+                orderIndex += 100
             }
         }
     }

@@ -382,7 +382,7 @@
                             <warehouse:message code="product.exportAsCsv.label"/></g:link>
                     </div>
                     <div class="mm-menu-item">
-                        <g:link controller="productSupplier" action="export">
+                        <g:link controller="productSupplier" action="export" params="[format: 'xls']">
                             <warehouse:message code="default.export.label" args="[g.message(code: 'productSuppliers.label').toLowerCase()]"/></g:link>
                     </div>
                     <div class="mm-menu-item">

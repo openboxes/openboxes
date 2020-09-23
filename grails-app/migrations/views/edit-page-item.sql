@@ -16,7 +16,7 @@ CREATE OR REPLACE VIEW edit_page_item AS
         stock_movement_item.cancel_reason_code,
         product_summary.quantity_on_hand,
         product_stocklist.quantity_demand,
-        product_substitution_status.substitution_status
+        CASE WHEN product_substitution_status.substitution_status IS NULL THEN 'NO' ELSE product_substitution_status.substitution_status END AS substitution_status
     FROM
         stock_movement_item
             LEFT OUTER JOIN

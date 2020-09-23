@@ -63,11 +63,6 @@
             </g:link>
         </div>
         <div class="button-group">
-            <g:link controller="stockMovement" action="edit" id="${stockMovement?.id}" class="button">
-                <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
-                <warehouse:message code="default.button.edit.label" />
-            </g:link>
-
             <%-- TODO  Move status to stock movement; make consistent across all types --%>
             <g:set var="hasBeenIssued" value="${stockMovement?.requisition?.status==RequisitionStatus.ISSUED}"/>
             <g:set var="hasBeenReceived" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.RECEIVED}"/>
@@ -94,6 +89,11 @@
             <g:elseif test="${!isSameLocation}">
                 <g:set var="disabledMessage" value="${g.message(code:'stockMovement.isDifferentLocation.message')}"/>
             </g:elseif>
+            <g:link controller="stockMovement" action="edit" id="${stockMovement?.id}" class="button"
+                    disabled="${hasBeenPartiallyReceived}" disabledMessage="${g.message(code:'stockMovement.cantEditPartiallyReceived.message')}">
+                <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
+                <warehouse:message code="default.button.edit.label" />
+            </g:link>
             <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button"
                     disabled="${disableReceivingButton}" disabledMessage="${disabledMessage}">
                 <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;

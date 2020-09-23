@@ -336,7 +336,6 @@ class ReportService implements ApplicationContextAware {
     }
 
     void buildFacts() {
-        truncateFacts()
         buildTransactionFact()
         buildConsumptionFact()
         buildStockoutFact()
@@ -422,20 +421,25 @@ class ReportService implements ApplicationContextAware {
 
     def saveDateDimension(Date date) {
         date.clearTime()
-        DateDimension dateDimension = new DateDimension()
-        dateDimension.date = date
-        dateDimension.dayOfMonth = date[Calendar.DAY_OF_MONTH]
-        dateDimension.dayOfWeek = date[Calendar.DAY_OF_WEEK]
-        dateDimension.month = date[Calendar.MONTH] + 1
-        dateDimension.year = date[Calendar.YEAR]
-        dateDimension.week = date[Calendar.WEEK_OF_YEAR]
-        dateDimension.monthName = date.format("MMMMM")
-        dateDimension.monthYear = date.format("MM-yyyy")
-        dateDimension.weekdayName = date.format("EEEEE")
-        dateDimension.save()
+
+        DateDimension dateDimension = DateDimension.findByDate(date)
+        if (!dateDimension) {
+            dateDimension = new DateDimension()
+            dateDimension.date = date
+            dateDimension.dayOfMonth = date[Calendar.DAY_OF_MONTH]
+            dateDimension.dayOfWeek = date[Calendar.DAY_OF_WEEK]
+            dateDimension.month = date[Calendar.MONTH] + 1
+            dateDimension.year = date[Calendar.YEAR]
+            dateDimension.week = date[Calendar.WEEK_OF_YEAR]
+            dateDimension.monthName = date.format("MMMMM")
+            dateDimension.monthYear = date.format("MM-yyyy")
+            dateDimension.weekdayName = date.format("EEEEE")
+            dateDimension.save()
+        }
     }
 
     def buildTransactionFact() {
+        String deleteStatement = """delete from transaction_fact;"""
         String insertStatement = """
             insert into transaction_fact (version, 
                 transaction_number, 
@@ -471,11 +475,12 @@ class ReportService implements ApplicationContextAware {
             where transaction.order_id is null 
             or `order`.order_type_code not in ('TRANSFER_ORDER') ;
         """
-        dataService.executeStatements([insertStatement])
+        dataService.executeStatements([deleteStatement, insertStatement])
     }
 
 
     def buildConsumptionFact() {
+        String deleteStatement = """delete from consumption_fact;"""
         String insertStatement = """
             insert into consumption_fact (version, 
                 transaction_number, 
@@ -516,7 +521,7 @@ class ReportService implements ApplicationContextAware {
             join date_dimension transaction_date_dimension on transaction_date_dimension.date = date(transaction.transaction_date)
             WHERE transaction_type.transaction_code = 'DEBIT'
         """
-        dataService.executeStatements([insertStatement])
+        dataService.executeStatements([deleteStatement, insertStatement])
     }
 
 
@@ -547,27 +552,43 @@ class ReportService implements ApplicationContextAware {
                 primary key (date_dimension_id, location_dimension_id, product_dimension_id)
             );
             """
-        // We don't need to do this now, but perhaps at some point in the future if we need to
-        // modify the table
-        String dropTableStatement = """
-            DROP TABLE stockout_fact;
-            """
 
-        dataService.executeStatements([dropTableStatement, createTableStatement])
+        dataService.executeStatements([createTableStatement])
     }
 
     void buildStockoutFact() {
-        createStockoutFact()
-        deleteStockoutFact()
-        populateStockoutFact()
+        def yesterday = new Date()-1
+        def monthAgo = new Date()-30
+        (monthAgo .. yesterday).each { Date date ->
+            buildStockoutFact(date)
+        }
     }
 
-    void deleteStockoutFact() {
-        String deleteStatement = "delete from stockout_fact"
+    void buildStockoutFact(Date date) {
+        saveDateDimension(date)
+        createStockoutFact()
+        deleteStockoutFact(date)
+        populateStockoutFact(date)
+    }
+
+    void deleteStockoutFact(Date date) {
+
+        date.clearTime()
+        String dateParam = date.format("yyyy-MM-dd")
+
+        String deleteStatement = """
+            DELETE stockout_fact 
+            FROM stockout_fact 
+            JOIN date_dimension ON date_dimension.id = stockout_fact.date_dimension_id
+            WHERE date_dimension.date = '${dateParam}';
+        """
         dataService.executeStatement(deleteStatement)
     }
 
-    void populateStockoutFact() {
+    void populateStockoutFact(Date date) {
+        date.clearTime()
+        String dateParam = date.format("yyyy-MM-dd")
+
         String insertStatement = """
             insert into stockout_fact (
                 date_dimension_id, 
@@ -584,16 +605,17 @@ class ReportService implements ApplicationContextAware {
                 join date_dimension on inventory_snapshot.date = date_dimension.date 
                 join product_dimension on inventory_snapshot.product_id = product_dimension.product_id
                 join location_dimension on inventory_snapshot.location_id = location_dimension.location_id
+                where date_dimension.date = '${dateParam}'
                 group by product_dimension.id, location_dimension.id, date_dimension.id
                 having sum(quantity_on_hand) <= 0
             ) as stockout_tmp
-            on duplicate key update stockout_fact.quantity_on_hand = stockout_tmp.quantity_on_hand 
+            on duplicate key update stockout_fact.quantity_on_hand = stockout_tmp.quantity_on_hand;
         """
         dataService.executeStatement(insertStatement)
     }
 
     def refreshProductDemandData() {
-        List ddlStatements = [
+        List statements = [
                 "DROP TABLE IF EXISTS product_demand_details_tmp;",
                 """CREATE TABLE product_demand_details_tmp AS
                     SELECT 
@@ -624,7 +646,7 @@ class ReportService implements ApplicationContextAware {
                 "TRUNCATE product_demand_details;",
                 "INSERT INTO product_demand_details SELECT * FROM product_demand_details_tmp;"
         ]
-        dataService.executeStatements(ddlStatements)
+        dataService.executeStatements(statements)
     }
 
     List getOnOrderSummary(Location location) {
@@ -670,7 +692,7 @@ class ReportService implements ApplicationContextAware {
                 inventory_item_id,
                 quantity_on_hand
             FROM inventory_snapshot
-            WHERE date = date(now())+1;"""
+            WHERE date = DATE_ADD(date(now()), INTERVAL 1 DAY);"""
         dataService.executeStatements([truncateStatement, populateStatement])
     }
 
@@ -688,7 +710,7 @@ class ReportService implements ApplicationContextAware {
                 inventory_item_id,
                 quantity_on_hand
             FROM inventory_snapshot
-            WHERE date = date(now())+1
+            WHERE date = DATE_ADD(date(now()), INTERVAL 1 DAY)
             AND location_id = '${location?.id}'
         """
         dataService.executeStatements([truncateStatement, populateStatement])
@@ -709,7 +731,7 @@ class ReportService implements ApplicationContextAware {
                 inventory_item_id,
                 quantity_on_hand
             FROM inventory_snapshot
-            WHERE date = date(now())+1
+            WHERE date = DATE_ADD(date(now()), INTERVAL 1 DAY)
             AND product_id = '${product?.id}' 
             AND location_id = '${location?.id}'
         """

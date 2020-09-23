@@ -1,4 +1,4 @@
-DROP TABLE product_availability;
+DROP TABLE IF EXISTS product_availability;
 CREATE TABLE product_availability AS
 SELECT
   uuid_short() as id,
@@ -8,7 +8,7 @@ SELECT
   inventory_item_id,
   quantity_on_hand
 from inventory_snapshot
-WHERE date = date(now())+1;
+WHERE date = DATE_ADD(date(now()), INTERVAL 1 DAY);
 ALTER TABLE product_availability ADD PRIMARY KEY (id);
 ALTER TABLE product_availability ADD FOREIGN KEY (location_id) REFERENCES location (id);
 ALTER TABLE product_availability ADD FOREIGN KEY (bin_location_id) REFERENCES location (id);

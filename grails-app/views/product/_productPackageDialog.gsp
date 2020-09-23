@@ -20,6 +20,18 @@
 					<div class="fade">Descriptive package name i.e. Bottle of 100 or BTL/100</div>
 				</td>
 			</tr>
+			<tr class="prop">
+				<td valign="top" class="name">
+					<label for="name">${warehouse.message(code:'productSupplier.label')}</label>
+				</td>
+				<td valign="top" class="value ">
+					<g:select name="productSupplier.id" class="chzn-select-deselect" noSelection="[null:'']"
+							  from="${productInstance?.productSuppliers}"
+							  value="${packageInstance?.productSupplier?.id}"
+							  optionKey="id" optionValue="${{it?.code + ' ' + it.name + ' [' + it?.supplier?.name + ']'}}" />
+					<span><g.message code="me"></g.message></span>
+				</td>
+			</tr>
 
 			<tr class="prop">
 				<td class="name">
