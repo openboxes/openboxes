@@ -10,28 +10,70 @@ import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.tablero.NumberData
 
 class NumberDataService {
+    def messageService
 
     NumberData getInventoryByLotAndBin(def location) {
         Date tomorrow = LocalDate.now().plusDays(1).toDate();
 
         def binLocations = InventorySnapshot.executeQuery("select count(*) from InventorySnapshot i where i.location = :location and i.date = :tomorrow and i.quantityOnHand > 0",
                 ['location': location, 'tomorrow': tomorrow]);
+        
+        def title = [
+            code : "react.default.dashboard.numberData.inventoryByLotAndBin",
+            message : messageService.getMessage("react.default.dashboard.numberData.inventoryByLotAndBin")
+        ]
 
-        return new NumberData("Inventory Details by Lot and Bin", binLocations[0], "In stock", "/openboxes/report/showBinLocationReport?location.id=" + location.id + "&status=inStock")
+        def subTitle = [
+            code : "react.default.dashboard.subtitle.inStock",
+            message : messageService.getMessage("react.default.dashboard.subtitle.inStock")
+        ]
+
+        return new NumberData(
+            title,
+            binLocations[0],
+            subTitle, "/openboxes/report/showBinLocationReport?location.id=" + location.id + "&status=inStock"
+            )
     }
 
     NumberData getInProgressShipments(def user, def location) {
         def shipments = Requisition.executeQuery("select count(*) from Requisition r join r.shipments s where r.origin = :location and s.currentStatus = 'PENDING' and r.createdBy = :user",
                 ['location': location, 'user': user]);
+        
+        def title = [
+            code : "react.default.dashboard.numberData.inProgressShipments",
+            message : messageService.getMessage("react.default.dashboard.numberData.inProgressShipments")
+        ]
 
-        return new NumberData("Your in Progress Shipments", shipments[0], "Shipments", "/openboxes/stockMovement/list?receiptStatusCode=PENDING&origin.id=" + location.id + "&createdBy.id=" + user.id)
+        def subTitle = [
+            code : "react.default.dashboard.subtitle.shipments",
+            message : messageService.getMessage("react.default.dashboard.subtitle.shipments")
+        ]
+
+        return new NumberData(
+            title,
+            shipments[0],
+            subTitle, "/openboxes/stockMovement/list?receiptStatusCode=PENDING&origin.id=" + location.id + "&createdBy.id=" + user.id
+            )
     }
 
     NumberData getInProgressPutaways(def user, def location) {
         def incompletePutaways = Order.executeQuery("select count(o.id) from Order o where o.orderTypeCode = 'TRANSFER_ORDER' AND o.status = 'PENDING' AND o.orderedBy = :user AND o.destination = :location",
                 ['user': user, 'location': location]);
 
-        return new NumberData("Your in Progress Putaways", incompletePutaways[0], "Putaways", "/openboxes/order/list?orderTypeCode=TRANSFER_ORDER&status=PENDING&orderedBy=" + user.id)
+        def title = [
+            code : "react.default.dashboard.numberData.inProgressPutaways",
+            message : messageService.getMessage("react.default.dashboard.numberData.inProgressPutaways")
+        ]
+
+        def subTitle = [
+            code : "react.default.dashboard.subtitle.putaways",
+            message : messageService.getMessage("react.default.dashboard.subtitle.putaways")
+        ]
+        
+        return new NumberData(
+            title,
+            incompletePutaways[0],
+            subTitle, "/openboxes/order/list?orderTypeCode=TRANSFER_ORDER&status=PENDING&orderedBy=" + user.id)
     }
 
     NumberData getReceivingBin(def location) {
@@ -49,7 +91,21 @@ class NumberDataService {
                         'locationType': Constants.RECEIVING_LOCATION_TYPE_ID,
                 ]);
 
-        return new NumberData("Products in Receiving Bin", receivingBin[0], "Products", "/openboxes/report/showBinLocationReport?status=inStock")
+        def title = [
+            code : "react.default.dashboard.numberData.receivingBin",
+            message : messageService.getMessage("react.default.dashboard.numberData.receivingBin")
+        ]
+
+        def subTitle = [
+            code : "react.default.dashboard.subtitle.products",
+            message : messageService.getMessage("react.default.dashboard.subtitle.products")
+        ]
+        
+        return new NumberData(
+            title,
+            receivingBin[0],
+            subTitle, "/openboxes/report/showBinLocationReport?status=inStock"
+            )
     }
 
     NumberData getItemsInventoried(def location) {
@@ -68,7 +124,21 @@ class NumberDataService {
                         firstOfMonth   : firstOfMonth,
                 ]);
 
-        return new NumberData("Items Inventoried this Month", itemsInventoried[0], "Items");
+        def title = [
+            code : "react.default.dashboard.numberData.itemsInventoried",
+            message : messageService.getMessage("react.default.dashboard.numberData.itemsInventoried")
+        ]
+
+        def subTitle = [
+            code : "react.default.dashboard.subtitle.items",
+            message : messageService.getMessage("react.default.dashboard.subtitle.items")
+        ]
+
+        return new NumberData(
+            title,
+            itemsInventoried[0],
+            subTitle
+            )
     }
 
     NumberData getDefaultBin(def location) {
@@ -84,8 +154,22 @@ class NumberDataService {
                         'location': location,
                         'tomorrow': tomorrow
                 ]);
+        
+        def title = [
+            code : "react.default.dashboard.numberData.defaultBin",
+            message : messageService.getMessage("react.default.dashboard.numberData.defaultBin")
+        ]
 
-        return new NumberData("Products in Default Bin", productsInDefaultBin[0], "Products", "/openboxes/report/showBinLocationReport?location.id=" + location.id + "&status=inStock")
+        def subTitle = [
+            code : "react.default.dashboard.subtitle.products",
+            message : messageService.getMessage("react.default.dashboard.subtitle.products")
+        ]
+
+        return new NumberData(
+            title,
+            productsInDefaultBin[0],
+            subTitle, "/openboxes/report/showBinLocationReport?location.id=" + location.id + "&status=inStock"
+            )
     }
 
     NumberData getProductWithNegativeInventory(def location) {
@@ -125,8 +209,22 @@ class NumberDataService {
             tooltipData = tooltipData.stripIndent()
         }
 
-        return new NumberData("Products with Negative Inventory", numberOfProducts, "Products",
-                "/openboxes/report/showBinLocationReport?location.id=" + location.id, tooltipData)
+        def title = [
+            code : "react.default.dashboard.numberData.productWithNegativeInventory",
+            message : messageService.getMessage("react.default.dashboard.numberData.productWithNegativeInventory")
+        ]
+
+        def subTitle = [
+            code : "react.default.dashboard.subtitle.products",
+            message : messageService.getMessage("react.default.dashboard.subtitle.products")
+        ]
+
+        return new NumberData(
+            title,
+            numberOfProducts,
+            subTitle,
+            "/openboxes/report/showBinLocationReport?location.id=" + location.id, tooltipData
+            )
     }
 
     NumberData getExpiredProductsInStock(def location) {
@@ -146,6 +244,20 @@ class NumberDataService {
                         'today' : today,
                 ]);
 
-        return new NumberData("Expired products in Stock", expiredProductsInStock[0], "Products", "/openboxes/inventory/listExpiredStock?status=expired")
+        def title = [
+            code : "react.default.dashboard.numberData.expiredProductsInStock",
+            message : messageService.getMessage("react.default.dashboard.numberData.expiredProductsInStock")
+        ]
+
+        def subTitle = [
+            code : "react.default.dashboard.subtitle.products",
+            message : messageService.getMessage("react.default.dashboard.subtitle.products")
+        ]
+
+        return new NumberData(
+            title,
+            expiredProductsInStock[0],
+            subTitle, "/openboxes/inventory/listExpiredStock?status=expired"
+            )
     }
 }

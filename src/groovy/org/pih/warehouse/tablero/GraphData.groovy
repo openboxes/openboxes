@@ -5,11 +5,11 @@ import org.pih.warehouse.tablero.ColorNumber
 class GraphData implements Serializable {
 
     def data;
-    String title;
+    def title;
     String type;
     String link;
 
-    GraphData(data, String title, String type, String link = null) {
+    GraphData(data, def title, String type, String link = null) {
         this.data = data;
         this.title = title;
         this.type = type;

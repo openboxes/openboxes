@@ -1,6 +1,9 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable no-underscore-dangle */
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { getTranslate } from 'react-localize-redux';
 import { Bar, Doughnut, HorizontalBar, Line } from 'react-chartjs-2';
 import { SortableElement } from 'react-sortable-hoc';
 import DragHandle from './DragHandle';
@@ -9,6 +12,7 @@ import Numbers from './Numbers';
 import NumbersTableCard from './NumbersTableCard';
 import TableCard from './TableCard';
 import NumbersRAG from './NumbersRAG';
+import { translateWithDefaultMessage } from '../../utils/Translate';
 
 
 class FilterComponent extends Component {
@@ -72,11 +76,11 @@ class FilterComponent extends Component {
             defaultValue={this.state.timeFrame}
             id="timeFrameSelector"
           >
-            <option value="1">{this.props.label} Month</option>
-            <option value="3">{this.props.label} 3 Months</option>
-            <option value="6">{this.props.label} 6 Months</option>
-            <option value="12">{this.props.label} Year</option>
-            { this.props.timeLimit === 24 ? <option value="24">{this.props.label} 2 Years</option> : null }
+            <option value="1">{this.props.label} {this.props.translate('react.default.dashboard.timeFilter.month', 'Month')}</option>
+            <option value="3">{this.props.label} 3 {this.props.translate('react.default.dashboard.timeFilter.months', 'Months')}</option>
+            <option value="6">{this.props.label} 6 {this.props.translate('react.default.dashboard.timeFilter.months', 'Months')}</option>
+            <option value="12">{this.props.label} {this.props.translate('react.default.dashboard.timeFilter.year', 'Year')}</option>
+            { this.props.timeLimit === 24 ? <option value="24">{this.props.label} 2 {this.props.translate('react.default.dashboard.timeFilter.years', 'Years')}</option> : null }
           </select> : null
         }
 
@@ -106,10 +110,24 @@ const GraphCard = SortableElement(({
   locationFilter = false,
   allLocations,
   size = null,
+  translate,
 }) => {
   let graph;
   let label = 'Last';
+
+  const translateDataLabels = (listLabels) => {
+    const listTranslated = listLabels.map(labelToTranslate =>
+      translate(labelToTranslate.code, labelToTranslate.message));
+    return listTranslated;
+  };
+
   if (cardType === 'line') {
+    if (data.labels) {
+      // Checking if the list of labels sent is composed by code dans message
+      if (data.labels[0].code && data.labels[0].message) {
+        data.labels = translateDataLabels(data.labels);
+      }
+    }
     graph = (
       <Line
         data={data}
@@ -146,11 +164,19 @@ const GraphCard = SortableElement(({
     <div className={`graph-card ${size === 'big' ? 'big-size' : ''} ${cardType === 'error' ? 'error-card' : ''}`}>
       <div className="header-card">
         {cardLink ?
-          <a target="_blank" rel="noopener noreferrer" href={cardLink} className="title-link">
-            <span className="title-link"> {cardTitle} </span>
+          <a target="_blank" rel="noopener noreferrer" href={cardLink.code} className="title-link">
+            <span className="title-link">
+              {cardTitle.code ?
+              translate(cardTitle.code, cardTitle.message)
+             : cardTitle}
+            </span>
           </a>
           :
-          <span className="title-link"> {cardTitle} </span>
+          <span className="title-link">
+            {cardTitle.code ?
+            translate(cardTitle.code, cardTitle.message)
+           : cardTitle}
+          </span>
         }
         <DragHandle />
       </div>
@@ -165,6 +191,7 @@ const GraphCard = SortableElement(({
           label={label}
           data={data.length === 0 ? null : data}
           allLocations={allLocations}
+          translate={translate}
         />
         <div className="graph-container">
           {graph}
@@ -174,12 +201,25 @@ const GraphCard = SortableElement(({
   );
 });
 
-export default GraphCard;
+const mapStateToProps = state => ({
+  translate: translateWithDefaultMessage(getTranslate(state.localize)),
+});
+
+export default (connect(mapStateToProps)(GraphCard));
+
+
 GraphCard.propTypes = {
-  cardTitle: PropTypes.string,
+  cardTitle: PropTypes.oneOfType([
+    PropTypes.string.isRequired,
+    PropTypes.shape({
+      code: PropTypes.string.isRequired,
+      message: PropTypes.string.isRequired,
+    }).isRequired,
+  ]).isRequired,
   cardType: PropTypes.string.isRequired,
   timeLimit: PropTypes.number,
   loadIndicator: PropTypes.func.isRequired,
+  translate: PropTypes.func.isRequired,
 };
 
 FilterComponent.defaultProps = {
@@ -195,4 +235,5 @@ FilterComponent.propTypes = {
   cardId: PropTypes.number.isRequired,
   loadIndicator: PropTypes.func.isRequired,
   allLocations: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  translate: PropTypes.func.isRequired,
 };

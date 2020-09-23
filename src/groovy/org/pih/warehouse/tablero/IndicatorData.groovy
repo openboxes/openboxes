@@ -5,10 +5,11 @@ import org.pih.warehouse.tablero.IndicatorDatasets
 class IndicatorData implements Serializable {
     
     List<IndicatorDatasets> datasets;
-    List<String> labels;
+    // List of string or maps (code and message for translation) 
+    List labels;
     ColorNumber colorNumber;
 
-    IndicatorData(List<IndicatorDatasets> datasets, List<String> labels, ColorNumber colorNumber = null) {
+    IndicatorData(List<IndicatorDatasets> datasets, List labels, ColorNumber colorNumber = null) {
         this.labels = labels;
         this.datasets = datasets;
         this.colorNumber = colorNumber;
