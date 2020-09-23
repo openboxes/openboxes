@@ -494,6 +494,8 @@
 
           // Reset estimated ready date
           $("#estimatedReadyDate-datepicker").datepicker('setDate', null);
+
+          $("#budgetCode").val(null).trigger('change');
           disableEditing();
         }
 

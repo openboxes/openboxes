@@ -81,6 +81,7 @@ class OrderController {
                 "Recipient" { it.recipient}
                 "Estimated Ready Date" { it.estimatedReadyDate}
                 "Actual Ready Date" { it.actualReadyDate}
+                "Budget Code" { it.budgetCode }
             })
 
             orders*.orderItems*.each { orderItem ->
@@ -106,6 +107,7 @@ class OrderController {
                         recipient: orderItem.recipient ?: '',
                         estimatedReadyDate: orderItem.estimatedReadyDate?.format("MM/dd/yyyy") ?: '',
                         actualReadyDate: orderItem.actualReadyDate?.format("MM/dd/yyyy") ?: '',
+                        budgetCode: orderItem.budgetCode?.code ?: '',
                 ]
             }
 
@@ -354,8 +356,10 @@ class OrderController {
                 if (orderAdjustment.orderItem && !params.orderItem.id) {
                     orderAdjustment.orderItem.removeFromOrderAdjustments(orderAdjustment)
                 }
-                orderAdjustment.properties = params
                 def budgetCode = BudgetCode.get(params.budgetCode?.id)
+                params.remove("budgetCode.id")
+                params.remove("budgetCode")
+                orderAdjustment.properties = params
                 orderAdjustment.budgetCode = budgetCode
                 if (!orderAdjustment.hasErrors() && orderAdjustment.save(flush: true)) {
                     flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'orderAdjustment.label', default: 'Order Adjustment'), orderAdjustment.id])}"
@@ -676,9 +680,11 @@ class OrderController {
         if (params.productSupplier?.id || params.supplierCode) {
             productSupplier = productSupplierDataService.getOrCreateNew(params)
         }
+        def budgetCode = BudgetCode.get(params.budgetCode?.id)
         params.remove("productSupplier")
         params.remove("productSupplier.id")
-
+        params.remove("budgetCode.id")
+        params.remove("budgetCode")
 
         if (!orderItem) {
             orderItem = new OrderItem(params)
@@ -702,7 +708,6 @@ class OrderController {
             orderItem.productSupplier = productSupplier
         }
 
-        def budgetCode = BudgetCode.get(params.budgetCode?.id)
         orderItem.budgetCode = budgetCode
 
         try {
