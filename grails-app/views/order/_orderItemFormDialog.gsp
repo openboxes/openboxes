@@ -15,6 +15,9 @@
                     <format:product product="${orderItem.product}"/>
                     <g:hiddenField id="dlgProduct" name="product.id" value="${orderItem?.product?.id}"/>
                     <g:hiddenField id="dlgSupplierId" name="supplier.id" value="${orderItem?.order?.originParty?.id }"></g:hiddenField>
+                    <g:hiddenField id="isBudgetCodeRequired" name="isBudgetCodeRequired"
+                                   value="${orderItem?.order?.destination?.supports(org.pih.warehouse.core.ActivityCode.BUDGET_CODE)}">
+                    </g:hiddenField>
                 </td>
             </tr>
             <tr class="prop">
@@ -123,10 +126,11 @@
                 <td valign="top" class="name">
                     <label for="dlgBudgetCode"><warehouse:message code="orderItem.budgetCode.label"/></label>
                 </td>
-                <td valign="top" class="value" id="dlgBudgetCode">
+                <td valign="top" class="value">
                     <g:selectBudgetCode name="budgetCode.id"
+                                        id="dlgBudgetCode"
                                         value="${orderItem.budgetCode?.id}"
-                                        class="chzn-select-deselect"
+                                        class="select2"
                                         noSelection="['':'']"/>
                 </td>
             </tr>
@@ -203,12 +207,13 @@
             </tr>
             <tr class="prop">
                 <td valign="top" class="name">
-                    <label for="dlgBudgetCode1"><warehouse:message code="orderItem.budgetCode.label"/></label>
+                    <label for="dlgBudgetCode"><warehouse:message code="orderItem.budgetCode.label"/></label>
                 </td>
-                <td valign="top" class="value" id="dlgBudgetCode1">
+                <td valign="top" class="value">
                     <g:selectBudgetCode name="budgetCode.id"
+                                        id="dlgBudgetCode"
                                         value="${orderItem.budgetCode?.id}"
-                                        class="chzn-select-deselect"
+                                        class="select2"
                                         noSelection="['':'']"/>
                 </td>
             </tr>
@@ -243,6 +248,16 @@
     </table>
 </g:form>
 <script>
+  function validateForm() {
+    var budgetCode = $("#dlgBudgetCode").val();
+    var isBudgetCodeRequired = ($("#isBudgetCodeRequired").val() === "true");
+    if (!budgetCode && isBudgetCodeRequired) {
+      $("#dlgBudgetCode").notify("Required")
+      return false
+    } else {
+      return true
+    }
+  }
 
     function enableEditing() {
         $("#dlgSupplierCode").removeAttr("disabled");
@@ -304,25 +319,29 @@
     function saveOrderItemDialog() {
         var id = $("#dlgOrderItemId").val();
         var data = $("#editOrderItemForm").serialize();
-        $.ajax({
-          url: "${g.createLink(controller:'order', action:'saveOrderItem')}",
-          data: data,
-          success: function () {
-            $.notify("Saved order item successfully", "success");
-            $("#edit-item-dialog").dialog("close");
-            loadOrderItems();
-            applyFocus("#product-suggest");
-          },
-          error: function (jqXHR, textStatus, errorThrown) {
-            if (jqXHR.responseText) {
-              let data = JSON.parse(jqXHR.responseText);
-              $.notify(data.errorMessage, "error");
+        if(validateForm()) {
+          $.ajax({
+            url: "${g.createLink(controller:'order', action:'saveOrderItem')}",
+            data: data,
+            success: function () {
+              $.notify("Saved order item successfully", "success");
+              $("#edit-item-dialog")
+                .dialog("close");
+              loadOrderItems();
+              applyFocus("#product-suggest");
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              if (jqXHR.responseText) {
+                let data = JSON.parse(jqXHR.responseText);
+                $.notify(data.errorMessage, "error");
+              } else {
+                $.notify("An error occurred", "error");
+              }
             }
-            else {
-              $.notify("An error occurred", "error");
-            }
-          }
-        });
+          });
+        } else {
+          $.notify("Please enter a value for all required fields")
+        }
         return false
     }
 

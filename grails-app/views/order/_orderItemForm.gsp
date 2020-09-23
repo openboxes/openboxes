@@ -57,7 +57,8 @@
     </td>
     <td class="center middle">
         <g:selectBudgetCode name="budgetCode.id"
-                            class="chzn-select-deselect"
+                            id="budgetCode"
+                            class="select2"
                             noSelection="['':'']"/>
     </td>
     <td class="center middle">

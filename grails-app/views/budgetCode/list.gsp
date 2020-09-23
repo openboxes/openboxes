@@ -25,12 +25,12 @@
                     <img src="${resource(dir: 'images/icons/silk', file: 'table.png')}" />&nbsp;
                     <warehouse:message code="default.list.label" args="[entityName]"/>
                 </g:link>
-                <g:isSuperuser>
+                <g:isUserAdmin>
                     <g:link class="button" action="create">
                         <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
                         <warehouse:message code="default.add.label" args="[entityName]"/>
                     </g:link>
-                </g:isSuperuser>
+                </g:isUserAdmin>
             </div>
 
             <div class="box">

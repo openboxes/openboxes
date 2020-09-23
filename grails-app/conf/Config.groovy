@@ -406,7 +406,7 @@ openboxes {
                 filters {}
             }
             fillRate {
-                name = "Fill Rate" 
+                name = "Fill Rate"
                 filters {
                     category {
                         endpoint = "/${appName}/categoryApi/list"
@@ -1222,6 +1222,9 @@ openboxes.receiving.receivingLocation.prefix = Constants.DEFAULT_RECEIVING_LOCAT
 // Pagination
 openboxes.api.pagination.enabled = true
 openboxes.api.pagination.pageSize = 10
+
+// Budget code
+openboxes.budgetCode.enabled = false
 
 // Grails doc configuration
 grails.doc.title = "OpenBoxes"
