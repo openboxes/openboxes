@@ -16,7 +16,7 @@
                     <g:hiddenField id="dlgProduct" name="product.id" value="${orderItem?.product?.id}"/>
                     <g:hiddenField id="dlgSupplierId" name="supplier.id" value="${orderItem?.order?.originParty?.id }"></g:hiddenField>
                     <g:hiddenField id="isBudgetCodeRequired" name="isBudgetCodeRequired"
-                                   value="${orderItem?.order?.destination?.supports(org.pih.warehouse.core.ActivityCode.BUDGET_CODE)}">
+                                   value="${orderItem?.order?.destination?.isBudgetCodeRequired()}">
                     </g:hiddenField>
                 </td>
             </tr>

@@ -74,7 +74,7 @@
                         <g:hiddenField id="orderItemId" name="orderItem.id" value="${orderItem?.id }"></g:hiddenField>
                         <g:hiddenField id="supplierId" name="supplier.id" value="${order?.originParty?.id }"></g:hiddenField>
                         <g:hiddenField id="isBudgetCodeRequired" name="isBudgetCodeRequired"
-                                       value="${order?.destination?.supports(org.pih.warehouse.core.ActivityCode.BUDGET_CODE)}">
+                                       value="${order?.destination?.isBudgetCodeRequired()}">
                         </g:hiddenField>
                         <table id="orderItemsTable" class="items-table">
                             <thead>

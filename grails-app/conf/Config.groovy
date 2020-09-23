@@ -1224,7 +1224,7 @@ openboxes.api.pagination.enabled = true
 openboxes.api.pagination.pageSize = 10
 
 // Budget code
-openboxes.budgetCode.enabled = false
+openboxes.purchasing.budgetCode.enabled = true
 
 // Grails doc configuration
 grails.doc.title = "OpenBoxes"
