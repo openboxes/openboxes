@@ -91,7 +91,7 @@
 							<tr class="prop">
 								<td valign="top" class="name"><label><warehouse:message code="orderAdjustment.budgetCode.label"/></label></td>
 								<td valign="top" class="value">
-									<g:selectBudgetCode name="budgetCode.id"
+									<g:selectBudgetCode name="budgetCode"
 														id="budgetCode"
 														value="${orderAdjustment.budgetCode?.id}"
 														class="select2"

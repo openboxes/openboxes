@@ -127,7 +127,7 @@
                     <label for="dlgBudgetCode"><warehouse:message code="orderItem.budgetCode.label"/></label>
                 </td>
                 <td valign="top" class="value">
-                    <g:selectBudgetCode name="budgetCode.id"
+                    <g:selectBudgetCode name="budgetCode"
                                         id="dlgBudgetCode"
                                         value="${orderItem.budgetCode?.id}"
                                         class="select2"
@@ -210,7 +210,7 @@
                     <label for="dlgBudgetCode"><warehouse:message code="orderItem.budgetCode.label"/></label>
                 </td>
                 <td valign="top" class="value">
-                    <g:selectBudgetCode name="budgetCode.id"
+                    <g:selectBudgetCode name="budgetCode"
                                         id="dlgBudgetCode"
                                         value="${orderItem.budgetCode?.id}"
                                         class="select2"
