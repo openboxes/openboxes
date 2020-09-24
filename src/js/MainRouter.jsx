@@ -23,6 +23,7 @@ class MainRouter extends React.Component {
       this.props.setActiveLanguage(this.props.locale);
       this.props.fetchMenuConfig();
       this.props.fetchTranslations('', 'default');
+      this.props.fetchTranslations('', 'dashboard');
     });
   }
 
@@ -33,6 +34,7 @@ class MainRouter extends React.Component {
       if (this.props.locale) {
         this.props.fetchMenuConfig();
         this.props.fetchTranslations(nextProps.locale, 'default');
+        this.props.fetchTranslations(nextProps.locale, 'dashboard');
       }
     }
   }

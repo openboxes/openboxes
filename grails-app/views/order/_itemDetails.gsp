@@ -63,7 +63,7 @@
                         </td>
                     </g:if>
                     <g:else>
-                        <td colspan="8"></td>
+                        <td colspan="9"></td>
                     </g:else>
                 </tr>
             </g:each>
