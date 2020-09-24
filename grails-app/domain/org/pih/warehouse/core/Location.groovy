@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.core
 
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.Transaction
@@ -262,6 +263,10 @@ class Location implements Comparable<Location>, java.io.Serializable {
         }
         internalLocations = internalLocations.sort { a, b -> a.sortOrder <=> b.sortOrder ?: a.name <=> b.name }
         return internalLocations
+    }
+
+    Boolean isBudgetCodeRequired() {
+        return ConfigurationHolder.config.openboxes.purchasing.budgetCode.enabled && supports(ActivityCode.REQUIRE_BUDGET_CODE)
     }
 
 }

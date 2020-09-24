@@ -15,6 +15,9 @@
                     <format:product product="${orderItem.product}"/>
                     <g:hiddenField id="dlgProduct" name="product.id" value="${orderItem?.product?.id}"/>
                     <g:hiddenField id="dlgSupplierId" name="supplier.id" value="${orderItem?.order?.originParty?.id }"></g:hiddenField>
+                    <g:hiddenField id="isBudgetCodeRequired" name="isBudgetCodeRequired"
+                                   value="${orderItem?.order?.destination?.isBudgetCodeRequired()}">
+                    </g:hiddenField>
                 </td>
             </tr>
             <tr class="prop">
@@ -119,6 +122,18 @@
                            value="${orderItem?.estimatedReadyDate?.format("MM/dd/yyyy")}" />
                 </td>
             </tr>
+            <tr class="prop">
+                <td valign="top" class="name">
+                    <label for="dlgBudgetCode"><warehouse:message code="orderItem.budgetCode.label"/></label>
+                </td>
+                <td valign="top" class="value">
+                    <g:selectBudgetCode name="budgetCode.id"
+                                        id="dlgBudgetCode"
+                                        value="${orderItem.budgetCode?.id}"
+                                        class="select2"
+                                        noSelection="['':'']"/>
+                </td>
+            </tr>
         </g:if>
         <g:elseif test="${canEdit && orderItem.hasShipmentAssociated()}">
             <tr class="prop">
@@ -190,6 +205,18 @@
                     <input class="text large datepicker" id="dlgActualReadyDate" name="actualReadyDate" value="${orderItem?.actualReadyDate?.format("MM/dd/yyyy")}" />
                 </td>
             </tr>
+            <tr class="prop">
+                <td valign="top" class="name">
+                    <label for="dlgBudgetCode"><warehouse:message code="orderItem.budgetCode.label"/></label>
+                </td>
+                <td valign="top" class="value">
+                    <g:selectBudgetCode name="budgetCode.id"
+                                        id="dlgBudgetCode"
+                                        value="${orderItem.budgetCode?.id}"
+                                        class="select2"
+                                        noSelection="['':'']"/>
+                </td>
+            </tr>
         </g:elseif>
 
         </tbody>
@@ -221,6 +248,16 @@
     </table>
 </g:form>
 <script>
+  function validateForm() {
+    var budgetCode = $("#dlgBudgetCode").val();
+    var isBudgetCodeRequired = ($("#isBudgetCodeRequired").val() === "true");
+    if (!budgetCode && isBudgetCodeRequired) {
+      $("#dlgBudgetCode").notify("Required")
+      return false
+    } else {
+      return true
+    }
+  }
 
     function enableEditing() {
         $("#dlgSupplierCode").removeAttr("disabled");
@@ -282,25 +319,29 @@
     function saveOrderItemDialog() {
         var id = $("#dlgOrderItemId").val();
         var data = $("#editOrderItemForm").serialize();
-        $.ajax({
-          url: "${g.createLink(controller:'order', action:'saveOrderItem')}",
-          data: data,
-          success: function () {
-            $.notify("Saved order item successfully", "success");
-            $("#edit-item-dialog").dialog("close");
-            loadOrderItems();
-            applyFocus("#product-suggest");
-          },
-          error: function (jqXHR, textStatus, errorThrown) {
-            if (jqXHR.responseText) {
-              let data = JSON.parse(jqXHR.responseText);
-              $.notify(data.errorMessage, "error");
+        if(validateForm()) {
+          $.ajax({
+            url: "${g.createLink(controller:'order', action:'saveOrderItem')}",
+            data: data,
+            success: function () {
+              $.notify("Saved order item successfully", "success");
+              $("#edit-item-dialog")
+                .dialog("close");
+              loadOrderItems();
+              applyFocus("#product-suggest");
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              if (jqXHR.responseText) {
+                let data = JSON.parse(jqXHR.responseText);
+                $.notify(data.errorMessage, "error");
+              } else {
+                $.notify("An error occurred", "error");
+              }
             }
-            else {
-              $.notify("An error occurred", "error");
-            }
-          }
-        });
+          });
+        } else {
+          $.notify("Please enter a value for all required fields")
+        }
         return false
     }
 

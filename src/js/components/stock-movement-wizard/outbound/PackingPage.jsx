@@ -416,7 +416,7 @@ class PackingPage extends Component {
         render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
             { !showOnly ?
-              <span>
+              <span className="buttons-container">
                 <button
                   type="button"
                   onClick={() => this.refresh()}
@@ -455,19 +455,21 @@ class PackingPage extends Component {
                 <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>
               </button> }
             <form onSubmit={handleSubmit}>
-              {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-                onSave: this.saveSplitLines,
-                formValues: values,
-                debouncedUsersFetch: this.debouncedUsersFetch,
-                hasBinLocationSupport: this.props.hasBinLocationSupport,
-                totalCount: this.state.totalCount,
-                loadMoreRows: this.loadMoreRows,
-                isRowLoaded: this.isRowLoaded,
-                isPaginated: this.props.isPaginated,
-                isFirstPageLoaded: this.state.isFirstPageLoaded,
-                showOnly,
-              }))}
-              <div>
+              <div className="table-form">
+                {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
+                  onSave: this.saveSplitLines,
+                  formValues: values,
+                  debouncedUsersFetch: this.debouncedUsersFetch,
+                  hasBinLocationSupport: this.props.hasBinLocationSupport,
+                  totalCount: this.state.totalCount,
+                  loadMoreRows: this.loadMoreRows,
+                  isRowLoaded: this.isRowLoaded,
+                  isPaginated: this.props.isPaginated,
+                  isFirstPageLoaded: this.state.isFirstPageLoaded,
+                  showOnly,
+                }))}
+              </div>
+              <div className="submit-buttons">
                 <button
                   type="button"
                   className="btn btn-outline-primary btn-form btn-xs"

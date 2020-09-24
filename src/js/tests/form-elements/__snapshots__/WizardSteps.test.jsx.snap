@@ -2,79 +2,120 @@
 
 exports[`WizardSteps renders correctly 1`] = `
 <div
-  className="wizard-box container-fluid d-print-none"
+  className="steps-box d-print-none"
 >
   <div
-    className="row"
+    className="steps d-flex flex-wrap"
   >
     <div
-      className="wizard-steps d-flex flex-wrap"
+      className="step-container"
     >
-      <div
-        className="
-               
-              completed-step 
-              disabled-step "
+      <button
+        className="step"
+        disabled={true}
+        onClick={[Function]}
       >
-        <a
-          href="#"
-          onClick={[Function]}
+        <i
+          aria-hidden="true"
+          className="fa 
+                 
+                fa-check-circle-o 
+                fa-circle-o disabled"
+        />
+        <span
+          className="step-text"
         >
           Create
-        </a>
-      </div>
-      <div
-        className="
-              active-step 
-               
-              disabled-step "
+        </span>
+      </button>
+    </div>
+    <div
+      className="step-container"
+    >
+      <button
+        className="step"
+        disabled={true}
+        onClick={[Function]}
       >
-        <a
-          href="#"
-          onClick={[Function]}
+        <i
+          aria-hidden="true"
+          className="fa 
+                fa-circle-o 
+                 
+                "
+        />
+        <span
+          className="step-text"
         >
           Add items
-        </a>
-      </div>
-      <div
-        className="
-               
-               
-              disabled-step "
+        </span>
+      </button>
+    </div>
+    <div
+      className="step-container"
+    >
+      <button
+        className="step"
+        disabled={true}
+        onClick={[Function]}
       >
-        <a
-          href="#"
-          onClick={[Function]}
+        <i
+          aria-hidden="true"
+          className="fa 
+                 
+                 
+                fa-circle-o disabled"
+        />
+        <span
+          className="step-text"
         >
           Edit
-        </a>
-      </div>
-      <div
-        className="
-               
-               
-              disabled-step "
+        </span>
+      </button>
+    </div>
+    <div
+      className="step-container"
+    >
+      <button
+        className="step"
+        disabled={true}
+        onClick={[Function]}
       >
-        <a
-          href="#"
-          onClick={[Function]}
+        <i
+          aria-hidden="true"
+          className="fa 
+                 
+                 
+                fa-circle-o disabled"
+        />
+        <span
+          className="step-text"
         >
           Pick
-        </a>
-      </div>
-      <div
-        className="
-               
-               
-              disabled-step "
+        </span>
+      </button>
+    </div>
+    <div
+      className="step-container"
+    >
+      <button
+        className="step"
+        disabled={true}
+        onClick={[Function]}
       >
-        <a
-          href="#"
-          onClick={[Function]}
+        <i
+          aria-hidden="true"
+          className="fa 
+                 
+                 
+                fa-circle-o disabled"
+        />
+        <span
+          className="step-text"
         >
           Send
-        </a>
-      </div>
+        </span>
+      </button>
     </div>
   </div>
 </div>

@@ -61,12 +61,12 @@ export const renderFormFields = ({
             <label htmlFor={attr.id} className="col-md-2 col-7 col-form-label col-form-label-xs text-center text-md-right">{FieldLabel && <Translate id={FieldLabel} defaultMessage={defaultMessage} />}</label> :
             <FieldLabel />
         }
-        <div className="col-md-4 col-7">
+        <div className="col-md-4 col-7 form-element-container">
           {renderInput(input, attr)}
         </div>
       </div>
       <div className="row">
-        <div className="col-md-2" />
+        <div className="col-md-2 hidden" />
         <div className="help-block col-md-4" style={{ float: 'left' }}>
           { (error && touched) || (error && fieldTouched) ? translate(`${error}`) : '' }
         </div>

@@ -36,17 +36,28 @@ class BudgetCodeController {
 
     def save = {
         def budgetCode = new BudgetCode(params)
-
-        if (!budgetCode.code) {
-            flash.message = "${warehouse.message(code: 'budgetCode.codeRequired.label')}"
-            render(view: "create", model: [budgetCode: budgetCode])
-        }
-
         if (budgetCode.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'budgetCode.label', default: 'Budget Code'), budgetCode.id])}"
             redirect(controller: "budgetCode", action: "edit", id: budgetCode?.id)
         } else {
             render(view: "create", model: [budgetCode: budgetCode])
+        }
+    }
+
+    def update = {
+        def budgetCode = BudgetCode.get(params.id)
+        if (budgetCode) {
+            budgetCode.properties = params
+            if (!budgetCode.hasErrors() && budgetCode.save(flush: true)) {
+                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'budgetCode.label', default: 'Budget Code'), budgetCode.id])}"
+                redirect(action: "list")
+            } else {
+                def organization = budgetCode?.organization ? Organization.get(budgetCode.organization.id) : null
+                render(view: "edit", model: [budgetCode: budgetCode, organizationId: organization?.id])
+            }
+        } else {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'budgetCode.label', default: 'Budget Code'), params.id])}"
+            redirect(action: "list")
         }
     }
 

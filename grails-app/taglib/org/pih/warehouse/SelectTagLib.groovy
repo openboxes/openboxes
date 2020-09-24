@@ -12,6 +12,7 @@ package org.pih.warehouse
 import grails.plugin.springcache.annotations.Cacheable
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
@@ -245,6 +246,13 @@ class SelectTagLib {
         attrs.optionKey = 'id'
         attrs.value = attrs.value
         attrs.optionValue = { it.name }
+        out << g.select(attrs)
+    }
+
+    def selectBudgetCode = { attrs, body ->
+        attrs.from = BudgetCode.list()
+        attrs.optionKey = 'id'
+        attrs.optionValue = { it.code }
         out << g.select(attrs)
     }
 

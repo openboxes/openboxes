@@ -152,7 +152,7 @@ class ApitableroController {
     @Cacheable("dashboardCache")
     def getDelayedShipments = {
         Location location = Location.get(params.locationId)
-        def delayedShipments = indicatorDataService.getDelayedShipments(location)
+        def delayedShipments = indicatorDataService.getDelayedShipments(location, request.contextPath)
         render(delayedShipments as JSON)
     }
 
@@ -183,7 +183,7 @@ class ApitableroController {
         def percentageAdHoc = indicatorDataService.getPercentageAdHoc(location)
         render (percentageAdHoc.toJson() as JSON)
      }
-    
+
     @Cacheable("dashboardCache")
     def getStockOutLastMonth = {
         Location location = Location.get(session?.warehouse?.id)

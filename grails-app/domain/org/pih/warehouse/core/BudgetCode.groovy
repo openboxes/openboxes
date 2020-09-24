@@ -47,7 +47,7 @@ class BudgetCode implements Serializable {
     }
 
     static constraints = {
-        code(nullable: false, unique: true)
+        code(nullable: false, blank: false, unique: true)
         organization(nullable: true)
         name(nullable: true)
         description(nullable: true)

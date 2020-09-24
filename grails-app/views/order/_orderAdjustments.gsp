@@ -12,6 +12,7 @@
                 <th><warehouse:message code="default.description.label"/></th>
                 <th><warehouse:message code="orderAdjustment.percentage.label"/></th>
                 <th><warehouse:message code="orderAdjustment.amount.label"/></th>
+                <th><warehouse:message code="orderAdjustment.budgetCode.label"/></th>
                 <th class="right"><g:message code="default.actions.label"/></th>
             </tr>
             </thead>
@@ -43,6 +44,9 @@
                             </g:else>
                         </g:elseif>
                     </td>
+                    <td>
+                        ${orderAdjustment?.budgetCode?.code}
+                    </td>
                     <td class="right">
                         <g:hasRoleApprover>
                             <g:set var="isApprover" value="${true}"/>
@@ -70,7 +74,7 @@
             </tbody>
             <tfoot>
             <tr>
-                <th colspan="4">
+                <th colspan="5">
                 </th>
                 <th>
                     <g:formatNumber number="${orderInstance.totalAdjustments}"/>

@@ -406,7 +406,7 @@ openboxes {
                 filters {}
             }
             fillRate {
-                name = "Fill Rate" 
+                name = "Fill Rate"
                 filters {
                     category {
                         endpoint = "/${appName}/categoryApi/list"
@@ -1142,7 +1142,7 @@ openboxes {
                     label: "default.other.label",
                     defaultLabel: "Other",
                     menuItems: [
-                        [label: "budgetCode.label", defaultLabel: "Budget Code", href: "/${appName}/budgetCode/list", requiredRoles: [RoleType.ROLE_ADMIN]],
+                        [label: "budgetCode.label", defaultLabel: "Budget Code", href: "/${appName}/budgetCode/list", requiredRoles: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
                         [label: "containerTypes.label", defaultLabel: "Container Types", href: "/${appName}/containerType/list"],
                         [label: "documents.label", defaultLabel: "Documents", href: "/${appName}/document/list"],
                         [label: "documentTypes.label", defaultLabel: "Document Types", href: "/${appName}/documentType/list"],
@@ -1222,6 +1222,9 @@ openboxes.receiving.receivingLocation.prefix = Constants.DEFAULT_RECEIVING_LOCAT
 // Pagination
 openboxes.api.pagination.enabled = true
 openboxes.api.pagination.pageSize = 10
+
+// Budget code
+openboxes.purchasing.budgetCode.enabled = true
 
 // Grails doc configuration
 grails.doc.title = "OpenBoxes"
