@@ -81,6 +81,7 @@ class OrderController {
                 "Recipient" { it.recipient}
                 "Estimated Ready Date" { it.estimatedReadyDate}
                 "Actual Ready Date" { it.actualReadyDate}
+                "Budget Code" { it.budgetCode }
             })
 
             orders*.orderItems*.each { orderItem ->
@@ -106,6 +107,7 @@ class OrderController {
                         recipient: orderItem.recipient ?: '',
                         estimatedReadyDate: orderItem.estimatedReadyDate?.format("MM/dd/yyyy") ?: '',
                         actualReadyDate: orderItem.actualReadyDate?.format("MM/dd/yyyy") ?: '',
+                        budgetCode: orderItem.budgetCode?.code ?: '',
                 ]
             }
 
@@ -355,8 +357,6 @@ class OrderController {
                     orderAdjustment.orderItem.removeFromOrderAdjustments(orderAdjustment)
                 }
                 orderAdjustment.properties = params
-                def budgetCode = BudgetCode.get(params.budgetCode?.id)
-                orderAdjustment.budgetCode = budgetCode
                 if (!orderAdjustment.hasErrors() && orderAdjustment.save(flush: true)) {
                     flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'orderAdjustment.label', default: 'Order Adjustment'), orderAdjustment.id])}"
                     redirect(controller:"purchaseOrderWorkflow", action: "purchaseOrder", id: orderInstance.id, params:['skipTo': 'adjustments'])
@@ -679,7 +679,6 @@ class OrderController {
         params.remove("productSupplier")
         params.remove("productSupplier.id")
 
-
         if (!orderItem) {
             orderItem = new OrderItem(params)
             order.addToOrderItems(orderItem)
@@ -701,9 +700,6 @@ class OrderController {
         if (productSupplier != null) {
             orderItem.productSupplier = productSupplier
         }
-
-        def budgetCode = BudgetCode.get(params.budgetCode?.id)
-        orderItem.budgetCode = budgetCode
 
         try {
             if (!order.save(flush:true)) {

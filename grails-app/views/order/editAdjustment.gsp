@@ -32,7 +32,7 @@
 				<g:form action="saveAdjustment" onsubmit="return validateForm();">
 					<g:hiddenField name="id" value="${orderAdjustment?.id}" />
 					<g:hiddenField id="isBudgetCodeRequired" name="isBudgetCodeRequired"
-								   value="${orderInstance?.destination?.supports(org.pih.warehouse.core.ActivityCode.BUDGET_CODE)}">
+								   value="${orderInstance?.destination?.isBudgetCodeRequired()}">
 					</g:hiddenField>
 					<table>
 						<tbody>
