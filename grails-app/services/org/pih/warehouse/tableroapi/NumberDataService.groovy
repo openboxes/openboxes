@@ -19,13 +19,13 @@ class NumberDataService {
                 ['location': location, 'tomorrow': tomorrow]);
         
         def title = [
-            code : "react.dashboard.numberData.inventoryByLotAndBin",
-            message : messageService.getMessage("react.dashboard.numberData.inventoryByLotAndBin")
+            code : "react.dashboard.numberData.inventoryByLotAndBin.label",
+            message : messageService.getMessage("react.dashboard.numberData.inventoryByLotAndBin.label")
         ]
 
         def subTitle = [
-            code : "react.dashboard.subtitle.inStock",
-            message : messageService.getMessage("react.dashboard.subtitle.inStock")
+            code : "react.dashboard.subtitle.inStock.label",
+            message : messageService.getMessage("react.dashboard.subtitle.inStock.label")
         ]
 
         return new NumberData(
@@ -40,13 +40,13 @@ class NumberDataService {
                 ['location': location, 'user': user]);
         
         def title = [
-            code : "react.dashboard.numberData.inProgressShipments",
-            message : messageService.getMessage("react.dashboard.numberData.inProgressShipments")
+            code : "react.dashboard.numberData.inProgressShipments.label",
+            message : messageService.getMessage("react.dashboard.numberData.inProgressShipments.label")
         ]
 
         def subTitle = [
-            code : "react.dashboard.subtitle.shipments",
-            message : messageService.getMessage("react.dashboard.subtitle.shipments")
+            code : "react.dashboard.subtitle.shipments.label",
+            message : messageService.getMessage("react.dashboard.subtitle.shipments.label")
         ]
 
         return new NumberData(
@@ -61,13 +61,13 @@ class NumberDataService {
                 ['user': user, 'location': location]);
 
         def title = [
-            code : "react.dashboard.numberData.inProgressPutaways",
-            message : messageService.getMessage("react.dashboard.numberData.inProgressPutaways")
+            code : "react.dashboard.numberData.inProgressPutaways.label",
+            message : messageService.getMessage("react.dashboard.numberData.inProgressPutaways.label")
         ]
 
         def subTitle = [
-            code : "react.dashboard.subtitle.putaways",
-            message : messageService.getMessage("react.dashboard.subtitle.putaways")
+            code : "react.dashboard.subtitle.putaways.label",
+            message : messageService.getMessage("react.dashboard.subtitle.putaways.label")
         ]
         
         return new NumberData(
@@ -92,13 +92,13 @@ class NumberDataService {
                 ]);
 
         def title = [
-            code : "react.dashboard.numberData.receivingBin",
-            message : messageService.getMessage("react.dashboard.numberData.receivingBin")
+            code : "react.dashboard.numberData.receivingBin.label",
+            message : messageService.getMessage("react.dashboard.numberData.receivingBin.label")
         ]
 
         def subTitle = [
-            code : "react.dashboard.subtitle.products",
-            message : messageService.getMessage("react.dashboard.subtitle.products")
+            code : "react.dashboard.subtitle.products.label",
+            message : messageService.getMessage("react.dashboard.subtitle.products.label")
         ]
         
         return new NumberData(
@@ -125,13 +125,13 @@ class NumberDataService {
                 ]);
 
         def title = [
-            code : "react.dashboard.numberData.itemsInventoried",
-            message : messageService.getMessage("react.dashboard.numberData.itemsInventoried")
+            code : "react.dashboard.numberData.itemsInventoried.label",
+            message : messageService.getMessage("react.dashboard.numberData.itemsInventoried.label")
         ]
 
         def subTitle = [
-            code : "react.dashboard.subtitle.items",
-            message : messageService.getMessage("react.dashboard.subtitle.items")
+            code : "react.dashboard.subtitle.items.label",
+            message : messageService.getMessage("react.dashboard.subtitle.items.label")
         ]
 
         return new NumberData(
@@ -156,13 +156,13 @@ class NumberDataService {
                 ]);
         
         def title = [
-            code : "react.dashboard.numberData.defaultBin",
-            message : messageService.getMessage("react.dashboard.numberData.defaultBin")
+            code : "react.dashboard.numberData.defaultBin.label",
+            message : messageService.getMessage("react.dashboard.numberData.defaultBin.label")
         ]
 
         def subTitle = [
-            code : "react.dashboard.subtitle.products",
-            message : messageService.getMessage("react.dashboard.subtitle.products")
+            code : "react.dashboard.subtitle.products.label",
+            message : messageService.getMessage("react.dashboard.subtitle.products.label")
         ]
 
         return new NumberData(
@@ -210,13 +210,13 @@ class NumberDataService {
         }
 
         def title = [
-            code : "react.dashboard.numberData.productWithNegativeInventory",
-            message : messageService.getMessage("react.dashboard.numberData.productWithNegativeInventory")
+            code : "react.dashboard.numberData.productWithNegativeInventory.label",
+            message : messageService.getMessage("react.dashboard.numberData.productWithNegativeInventory.label")
         ]
 
         def subTitle = [
-            code : "react.dashboard.subtitle.products",
-            message : messageService.getMessage("react.dashboard.subtitle.products")
+            code : "react.dashboard.subtitle.products.label",
+            message : messageService.getMessage("react.dashboard.subtitle.products.label")
         ]
 
         return new NumberData(
@@ -245,13 +245,13 @@ class NumberDataService {
                 ]);
 
         def title = [
-            code : "react.dashboard.numberData.expiredProductsInStock",
-            message : messageService.getMessage("react.dashboard.numberData.expiredProductsInStock")
+            code : "react.dashboard.numberData.expiredProductsInStock.label",
+            message : messageService.getMessage("react.dashboard.numberData.expiredProductsInStock.label")
         ]
 
         def subTitle = [
-            code : "react.dashboard.subtitle.products",
-            message : messageService.getMessage("react.dashboard.subtitle.products")
+            code : "react.dashboard.subtitle.products.label",
+            message : messageService.getMessage("react.dashboard.subtitle.products.label")
         ]
 
         return new NumberData(

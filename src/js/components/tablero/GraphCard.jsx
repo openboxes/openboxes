@@ -85,12 +85,12 @@ class FilterComponent extends Component {
             defaultValue={this.state.timeFrame}
             id="timeFrameSelector"
           >
-            <option value="1">{this.props.translate(this.props.label[0], this.props.label[1])} {this.props.translate('react.dashboard.timeFilter.month', 'Month')}</option>
-            <option value="3">{this.props.translate(this.props.label[0], this.props.label[1])} 3 {this.props.translate('react.dashboard.timeFilter.months', 'Months')}</option>
-            <option value="6">{this.props.translate(this.props.label[0], this.props.label[1])} 6 {this.props.translate('react.dashboard.timeFilter.months', 'Months')}</option>
-            <option value="12">{this.props.translate(this.props.label[0], this.props.label[1])} {this.props.translate('react.dashboard.timeFilter.year', 'Year')}</option>
+            <option value="1">{this.props.translate(this.props.label[0], this.props.label[1])} {this.props.translate('react.dashboard.timeFilter.month.label', 'Month')}</option>
+            <option value="3">{this.props.translate(this.props.label[0], this.props.label[1])} 3 {this.props.translate('react.dashboard.timeFilter.months.label', 'Months')}</option>
+            <option value="6">{this.props.translate(this.props.label[0], this.props.label[1])} 6 {this.props.translate('react.dashboard.timeFilter.months.label', 'Months')}</option>
+            <option value="12">{this.props.translate(this.props.label[0], this.props.label[1])} {this.props.translate('react.dashboard.timeFilter.year.label', 'Year')}</option>
             { this.props.timeLimit === 24 ?
-              <option value="24">{this.props.translate(this.props.label[0], this.props.label[1])} 2 {this.props.translate('react.dashboard.timeFilter.years', 'Years')}</option>
+              <option value="24">{this.props.translate(this.props.label[0], this.props.label[1])} 2 {this.props.translate('react.dashboard.timeFilter.years.label', 'Years')}</option>
             : null }
           </select> : null
         }
@@ -124,7 +124,7 @@ const GraphCard = SortableElement(({
   translate,
 }) => {
   let graph;
-  let label = ['react.dashboard.timeFilter.last', 'last'];
+  let label = ['react.dashboard.timeFilter.last.label', 'last'];
 
   const translateDataLabels = (listLabels) => {
     const listTranslated = listLabels.map(labelToTranslate =>
@@ -146,7 +146,7 @@ const GraphCard = SortableElement(({
         onElementsClick={elements => handleChartClick(elements)}
       />
     );
-    label = ['react.dashboard.timeFilter.next', 'next'];
+    label = ['react.dashboard.timeFilter.next.label', 'next'];
   } else if (cardType === 'bar') {
     graph = <Bar data={data} options={options} />;
   } else if (cardType === 'doughnut') {
