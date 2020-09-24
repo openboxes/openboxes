@@ -251,7 +251,7 @@ class ReceiptService {
 
         // Save shipment
         shipment.save(flush: true)
-        
+
         // Send notification email on completed receiving
         if (completed) {
             def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
@@ -259,7 +259,7 @@ class ReceiptService {
             recipientItems.each {recipient, items ->
                 if (recipient) {
                     def subject = g.message(code: "email.yourItemReceived.message", args: [shipment.shipmentNumber])
-                    def body = "${g.render(template: "/email/shipmentItemReceived", model: [shipmentInstance: shipment, receiptItems: items])}"
+                    def body = "${g.render(template: "/email/shipmentItemReceived", model: [shipmentInstance: shipment, receiptItems: items, recipient: recipient])}"
                     mailService.sendHtmlMail(subject, body.toString(), recipient.email)
                 }
             }

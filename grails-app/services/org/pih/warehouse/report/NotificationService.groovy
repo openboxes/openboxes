@@ -130,7 +130,7 @@ class NotificationService {
         recipientItems.each {recipient, items ->
             if (recipient) {
                 def subject = g.message(code: "email.yourItemShipped.message", args: [shipmentInstance.shipmentNumber])
-                def body = "${g.render(template: "/email/shipmentItemShipped", model: [shipmentInstance: shipmentInstance, shipmentItems: items])}"
+                def body = "${g.render(template: "/email/shipmentItemShipped", model: [shipmentInstance: shipmentInstance, shipmentItems: items, recipient:recipient])}"
                 mailService.sendHtmlMail(subject, body.toString(), recipient.email)
             }
         }
