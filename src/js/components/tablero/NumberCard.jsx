@@ -136,29 +136,33 @@ const mapStateToProps = state => ({
 
 export default (connect(mapStateToProps)(NumberCard));
 
+NumberCard.defaultProps = {
+  cardSubtitle: {
+    code: '',
+    message: '',
+  },
+};
+
 NumberCard.propTypes = {
-  cardTitle: PropTypes.oneOfType([
-    PropTypes.string.isRequired,
-    PropTypes.shape({
-      code: PropTypes.string.isRequired,
-      message: PropTypes.string.isRequired,
-    }).isRequired,
-  ]).isRequired,
+  cardTitle: PropTypes.shape({
+    code: PropTypes.string.isRequired,
+    message: PropTypes.string.isRequired,
+  }).isRequired,
   cardNumber: PropTypes.number,
-  cardSubtitle: PropTypes.string,
+  cardSubtitle: PropTypes.shape({
+    code: PropTypes.string.isRequired,
+    message: PropTypes.string.isRequired,
+  }),
   cardLink: PropTypes.string,
   cardDataTooltip: PropTypes.string,
   translate: PropTypes.func.isRequired,
 };
 
 NumberSparklineCard.propTypes = {
-  cardTitle: PropTypes.oneOfType([
-    PropTypes.string.isRequired,
-    PropTypes.shape({
-      code: PropTypes.string.isRequired,
-      message: PropTypes.string.isRequired,
-    }).isRequired,
-  ]).isRequired,
+  cardTitle: PropTypes.shape({
+    code: PropTypes.string.isRequired,
+    message: PropTypes.string.isRequired,
+  }).isRequired,
   color: PropTypes.string.isRequired,
   value: PropTypes.string.isRequired,
   goalDifference: PropTypes.string.isRequired,

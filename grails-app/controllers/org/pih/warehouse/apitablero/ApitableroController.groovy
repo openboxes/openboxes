@@ -11,7 +11,7 @@ class ApitableroController {
     def numberDataService
     def indicatorDataService
     def userService
-    def messageSource
+    def messageService
 
     def config = {
         User user = User.get(session.user.id)
@@ -101,9 +101,8 @@ class ApitableroController {
     def getFillRateDestinations = {
         Location location = Location.get(params.locationId?:session.warehouse.id)
         def destinations = []
-        def defaultDestination = messageSource.getMessage("fillRate.allDestinations.label",
-                [] as Object[], "All Destinations", request.locale)
-        destinations << [id: "", name: "${defaultDestination}"]
+        def defaultDestination = [code : "react.dashboard.locationFilter.all", message : messageService.getMessage("react.dashboard.locationFilter.all")]
+        destinations << [id: "", name: defaultDestination]
         destinations.addAll(indicatorDataService.getFillRateDestinations(location))
         render([data: destinations] as JSON)
     }

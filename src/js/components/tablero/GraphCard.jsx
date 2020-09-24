@@ -64,8 +64,17 @@ class FilterComponent extends Component {
             value={this.state.locationSelected.id}
             id="locationSelector"
           >
-            { this.props.allLocations.map(value =>
-              <option key={value.id} value={value.id}> {value.name}</option>)}
+            { this.props.allLocations.map((value) => {
+              if (value.name.code && value.name.message) {
+                return (
+                  <option key={value.id} value={value.id}>
+                    {this.props.translate(value.name.code, value.name.message)}
+                  </option>
+                      );
+              }
+              return <option key={value.id} value={value.id}> {value.name}</option>;
+            })}
+
           </select>
  : null }
         { this.props.timeFilter === true ?
@@ -76,11 +85,13 @@ class FilterComponent extends Component {
             defaultValue={this.state.timeFrame}
             id="timeFrameSelector"
           >
-            <option value="1">{this.props.label} {this.props.translate('react.default.dashboard.timeFilter.month', 'Month')}</option>
-            <option value="3">{this.props.label} 3 {this.props.translate('react.default.dashboard.timeFilter.months', 'Months')}</option>
-            <option value="6">{this.props.label} 6 {this.props.translate('react.default.dashboard.timeFilter.months', 'Months')}</option>
-            <option value="12">{this.props.label} {this.props.translate('react.default.dashboard.timeFilter.year', 'Year')}</option>
-            { this.props.timeLimit === 24 ? <option value="24">{this.props.label} 2 {this.props.translate('react.default.dashboard.timeFilter.years', 'Years')}</option> : null }
+            <option value="1">{this.props.translate(this.props.label[0], this.props.label[1])} {this.props.translate('react.dashboard.timeFilter.month', 'Month')}</option>
+            <option value="3">{this.props.translate(this.props.label[0], this.props.label[1])} 3 {this.props.translate('react.dashboard.timeFilter.months', 'Months')}</option>
+            <option value="6">{this.props.translate(this.props.label[0], this.props.label[1])} 6 {this.props.translate('react.dashboard.timeFilter.months', 'Months')}</option>
+            <option value="12">{this.props.translate(this.props.label[0], this.props.label[1])} {this.props.translate('react.dashboard.timeFilter.year', 'Year')}</option>
+            { this.props.timeLimit === 24 ?
+              <option value="24">{this.props.translate(this.props.label[0], this.props.label[1])} 2 {this.props.translate('react.dashboard.timeFilter.years', 'Years')}</option>
+            : null }
           </select> : null
         }
 
@@ -113,7 +124,7 @@ const GraphCard = SortableElement(({
   translate,
 }) => {
   let graph;
-  let label = 'Last';
+  let label = ['react.dashboard.timeFilter.last', 'last'];
 
   const translateDataLabels = (listLabels) => {
     const listTranslated = listLabels.map(labelToTranslate =>
@@ -135,7 +146,7 @@ const GraphCard = SortableElement(({
         onElementsClick={elements => handleChartClick(elements)}
       />
     );
-    label = 'Next';
+    label = ['react.dashboard.timeFilter.next', 'next'];
   } else if (cardType === 'bar') {
     graph = <Bar data={data} options={options} />;
   } else if (cardType === 'doughnut') {
@@ -231,7 +242,7 @@ FilterComponent.propTypes = {
   locationFilter: PropTypes.bool,
   timeFilter: PropTypes.bool,
   timeLimit: PropTypes.number.isRequired,
-  label: PropTypes.string.isRequired,
+  label: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
   cardId: PropTypes.number.isRequired,
   loadIndicator: PropTypes.func.isRequired,
   allLocations: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
