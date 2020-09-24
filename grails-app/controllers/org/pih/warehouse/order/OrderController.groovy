@@ -356,11 +356,7 @@ class OrderController {
                 if (orderAdjustment.orderItem && !params.orderItem.id) {
                     orderAdjustment.orderItem.removeFromOrderAdjustments(orderAdjustment)
                 }
-                def budgetCode = BudgetCode.get(params.budgetCode?.id)
-                params.remove("budgetCode.id")
-                params.remove("budgetCode")
                 orderAdjustment.properties = params
-                orderAdjustment.budgetCode = budgetCode
                 if (!orderAdjustment.hasErrors() && orderAdjustment.save(flush: true)) {
                     flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'orderAdjustment.label', default: 'Order Adjustment'), orderAdjustment.id])}"
                     redirect(controller:"purchaseOrderWorkflow", action: "purchaseOrder", id: orderInstance.id, params:['skipTo': 'adjustments'])
@@ -680,11 +676,8 @@ class OrderController {
         if (params.productSupplier?.id || params.supplierCode) {
             productSupplier = productSupplierDataService.getOrCreateNew(params)
         }
-        def budgetCode = BudgetCode.get(params.budgetCode?.id)
         params.remove("productSupplier")
         params.remove("productSupplier.id")
-        params.remove("budgetCode.id")
-        params.remove("budgetCode")
 
         if (!orderItem) {
             orderItem = new OrderItem(params)
@@ -707,8 +700,6 @@ class OrderController {
         if (productSupplier != null) {
             orderItem.productSupplier = productSupplier
         }
-
-        orderItem.budgetCode = budgetCode
 
         try {
             if (!order.save(flush:true)) {
