@@ -538,7 +538,7 @@ class PickPage extends Component {
         render={({ handleSubmit, values }) => (
           <div className="d-flex flex-column">
             { !showOnly ?
-              <span>
+              <span className="buttons-container">
                 <label
                   htmlFor="csvInput"
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
@@ -603,23 +603,25 @@ class PickPage extends Component {
                 <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>
               </button> }
             <form onSubmit={handleSubmit} className="print-mt">
-              {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-                stockMovementId: values.stockMovementId,
-                updatePickPageItem: this.updatePickPageItem,
-                fetchAdjustedItems: this.fetchAdjustedItems,
-                revertUserPick: this.revertUserPick,
-                locationId: this.state.values.origin.id,
-                reasonCodes: this.props.reasonCodes,
-                translate: this.props.translate,
-                hasBinLocationSupport: this.props.hasBinLocationSupport,
-                totalCount: this.state.totalCount,
-                loadMoreRows: this.loadMoreRows,
-                isRowLoaded: this.isRowLoaded,
-                isPaginated: this.props.isPaginated,
-                showOnly,
-                isFirstPageLoaded: this.state.isFirstPageLoaded,
-              }))}
-              <div className="d-print-none">
+              <div className="table-form">
+                {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
+                  stockMovementId: values.stockMovementId,
+                  updatePickPageItem: this.updatePickPageItem,
+                  fetchAdjustedItems: this.fetchAdjustedItems,
+                  revertUserPick: this.revertUserPick,
+                  locationId: this.state.values.origin.id,
+                  reasonCodes: this.props.reasonCodes,
+                  translate: this.props.translate,
+                  hasBinLocationSupport: this.props.hasBinLocationSupport,
+                  totalCount: this.state.totalCount,
+                  loadMoreRows: this.loadMoreRows,
+                  isRowLoaded: this.isRowLoaded,
+                  isPaginated: this.props.isPaginated,
+                  showOnly,
+                  isFirstPageLoaded: this.state.isFirstPageLoaded,
+                }))}
+              </div>
+              <div className="d-print-none submit-buttons">
                 <button type="button" disabled={showOnly} className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.props.previousPage(values)}>
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>

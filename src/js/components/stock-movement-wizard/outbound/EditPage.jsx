@@ -720,7 +720,7 @@ class EditItemsPage extends Component {
         render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
             { !showOnly ?
-              <span>
+              <span className="buttons-container">
                 <button
                   type="button"
                   onClick={() => this.refresh()}
@@ -766,24 +766,26 @@ class EditItemsPage extends Component {
                 <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>
               </button> }
             <form onSubmit={handleSubmit}>
-              {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-                stockMovementId: values.stockMovementId,
-                hasStockList: !!_.get(values.stocklist, 'id'),
-                translate: this.props.translate,
-                reasonCodes: this.props.reasonCodes,
-                onResponse: this.fetchEditPageItems,
-                revertItem: this.revertItem,
-                reviseRequisitionItems: this.reviseRequisitionItems,
-                totalCount: this.state.totalCount,
-                loadMoreRows: this.loadMoreRows,
-                isRowLoaded: this.isRowLoaded,
-                isPaginated: this.props.isPaginated,
-                updateRow: this.updateRow,
-                isFirstPageLoaded: this.state.isFirstPageLoaded,
-                values,
-                showOnly,
-              }))}
-              <div>
+              <div className="table-form">
+                {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
+                  stockMovementId: values.stockMovementId,
+                  hasStockList: !!_.get(values.stocklist, 'id'),
+                  translate: this.props.translate,
+                  reasonCodes: this.props.reasonCodes,
+                  onResponse: this.fetchEditPageItems,
+                  revertItem: this.revertItem,
+                  reviseRequisitionItems: this.reviseRequisitionItems,
+                  totalCount: this.state.totalCount,
+                  loadMoreRows: this.loadMoreRows,
+                  isRowLoaded: this.isRowLoaded,
+                  isPaginated: this.props.isPaginated,
+                  updateRow: this.updateRow,
+                  isFirstPageLoaded: this.state.isFirstPageLoaded,
+                  values,
+                  showOnly,
+                }))}
+              </div>
+              <div className="submit-buttons">
                 <button
                   type="submit"
                   onClick={() => this.previousPage(values, invalid)}

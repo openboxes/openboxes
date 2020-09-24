@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 const WizardPage = (props) => {
   const Component = props.pageList[props.currentPage - 1];
   return (
-    <div className="panelBody px-1">
+    <div className="panel-body m-4">
       <Component
         initialValues={props.initialValues}
         nextPage={props.nextPage}
