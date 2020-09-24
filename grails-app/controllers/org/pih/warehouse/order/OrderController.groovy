@@ -352,6 +352,9 @@ class OrderController {
         def orderInstance = Order.get(params?.order?.id)
         if (orderInstance) {
             def orderAdjustment = OrderAdjustment.get(params?.id)
+            if (params.budgetCode) {
+                params.budgetCode = BudgetCode.get(params.budgetCode)
+            }
             if (orderAdjustment) {
                 if (orderAdjustment.orderItem && !params.orderItem.id) {
                     orderAdjustment.orderItem.removeFromOrderAdjustments(orderAdjustment)
@@ -678,7 +681,9 @@ class OrderController {
         }
         params.remove("productSupplier")
         params.remove("productSupplier.id")
-
+        if (params.budgetCode) {
+            params.budgetCode = BudgetCode.get(params.budgetCode)
+        }
         if (!orderItem) {
             orderItem = new OrderItem(params)
             order.addToOrderItems(orderItem)

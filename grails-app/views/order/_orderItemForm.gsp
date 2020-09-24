@@ -56,7 +56,7 @@
                             autocomplete="off" noSelection="['':'']"/>
     </td>
     <td class="center middle">
-        <g:selectBudgetCode name="budgetCode.id"
+        <g:selectBudgetCode name="budgetCode"
                             id="budgetCode"
                             class="select2"
                             noSelection="['':'']"/>

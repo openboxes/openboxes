@@ -218,7 +218,7 @@
                                     <g:textArea name="comments"/>
                                 </td>
                                 <td>
-                                    <g:selectBudgetCode name="budgetCode.id"
+                                    <g:selectBudgetCode name="budgetCode"
                                                         id="adjustmentBudgetCode"
                                                         class="select2"
                                                         noSelection="['':'']"/>
