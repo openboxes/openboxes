@@ -12,8 +12,8 @@ package org.pih.warehouse
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
-import groovy.sql.Sql
 import groovy.time.TimeCategory
+import org.apache.commons.lang.StringUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
@@ -1021,18 +1021,18 @@ class JsonController {
 
     def globalSearch = {
 
+        // Sanitize the user input
+        String[] terms = params?.term?.split(" ").findAll { String term -> StringUtils.isNotEmpty(term)}.toArray()
+
+        // If any search terms are less than minLength, we don't do the search
         def minLength = grailsApplication.config.openboxes.typeahead.minLength
-        if (params.term && params.term.size() < minLength) {
-            render([:] as JSON)
+        if (terms.any { term -> term.size() < minLength}) {
+            render([] as JSON)
             return
         }
 
-        def terms = params.term?.split(" ")
-
-        // FIXME Should replace this with an elasticsearch implementation
         // Get all products that match terms
         def products = productService.searchProducts(terms, [])
-
         products = products.unique()
 
         // Only calculate quantities if there are products - otherwise this will calculate quantities for all products in the system
