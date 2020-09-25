@@ -497,7 +497,13 @@ openboxes {
                             state6 = ["Expiration(s)"]
                         }
                         labels {
-                            state5 = ["today", "within 30 days", "within 90 days", "within 180 days", "within 360 days"]
+                            state5 = [
+                                [code : "react.dashboard.timeline.today.label", message : "today"],
+                                [code : "react.dashboard.timeline.within30Days.label", message : "within 30 days"],
+                                [code : "react.dashboard.timeline.within90Days.label", message : "within 90 days"],
+                                [code : "react.dashboard.timeline.within180Days.label", message : "within 180 days"],
+                                [code : "react.dashboard.timeline.within360Days.label", message : "within 360 days"]
+                            ]
                         }
                     }
                 }
