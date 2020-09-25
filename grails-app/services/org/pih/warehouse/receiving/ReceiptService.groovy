@@ -10,6 +10,7 @@
 package org.pih.warehouse.receiving
 
 import grails.validation.ValidationException
+import org.apache.commons.validator.EmailValidator
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptContainer
 import org.pih.warehouse.api.PartialReceiptItem
@@ -18,6 +19,7 @@ import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
@@ -251,13 +253,14 @@ class ReceiptService {
 
         // Save shipment
         shipment.save(flush: true)
-        
+
         // Send notification email on completed receiving
         if (completed) {
+            def emailValidator = EmailValidator.getInstance()
             def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
             def recipientItems = partialReceipt.partialReceiptItems.groupBy {it.recipient }
-            recipientItems.each {recipient, items ->
-                if (recipient) {
+            recipientItems.each { Person recipient, items ->
+                if (emailValidator.isValid(recipient?.email)) {
                     def subject = g.message(code: "email.yourItemReceived.message", args: [shipment.shipmentNumber])
                     def body = "${g.render(template: "/email/shipmentItemReceived", model: [shipmentInstance: shipment, receiptItems: items])}"
                     mailService.sendHtmlMail(subject, body.toString(), recipient.email)
