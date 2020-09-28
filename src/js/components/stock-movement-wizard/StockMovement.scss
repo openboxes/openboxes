@@ -4,18 +4,7 @@
 
 // Wizard title
 .panel-heading {
-    background-color: #fff;
-    text-align: left !important;
-    padding: 24px;
-    box-shadow: 0 4px 2px -2px rgba(0, 0, 0, .09);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    .shipment-status {
-        border-radius: 4px !important;
-        margin: 0 !important;
-    }
+    display: none;
 }
 
 // Wizard page
@@ -38,12 +27,35 @@
         .form-title {
             width: 100%;
             font-size: larger;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            .shipment-status {
+                border: 1px solid #a5d24a;
+                border-radius: 4px;
+                padding: 10px;
+                background: #cde69c;
+                color: #638421;
+                font-size: 15px;
+                margin: 0;
+            }
+        }
+
+        &.with-description {
+            .form-group:first-child {
+                width: 100%;
+            }
         }
 
         .form-group {
             margin-top: 12px !important;
             margin-right: 12px !important;
             min-width: 45%;
+
+            @media (max-width: 730px) {
+                min-width: 100% !important;
+            }
 
             .row {
                 margin-right: 0;
@@ -62,12 +74,6 @@
                 padding: 0;
                 max-width: unset !important;
                 flex-grow: 1;
-
-
-                #description {
-                    min-width: 90vw;
-                }
-
 
                 input {
                     height: 3em;
@@ -225,25 +231,27 @@
     #stockMovementInfo {
         padding-top: 12px !important;
 
+        &::after {
+            content: "";
+            width: calc(24% + 12px);
+
+            @media (max-width: 730px) {
+                width: calc(24% + 12px) !important;
+            }
+        }
+
         .form-group {
             min-width: unset !important;
             width: 24%;
+
+            @media (max-width: 730px) {
+                width: 45% !important;
+            }
 
             .row {
                 label {
                     text-transform: uppercase;
                     color: grey;
-                }
-
-                >div {
-                    min-width: 100%;
-                    padding: 0 !important;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-
-                    #description {
-                        min-width: unset !important;
-                    }
                 }
             }
         }

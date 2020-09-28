@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const Input = ({
-  fieldRef, onChange, className = '', arrowLeft, arrowUp, arrowRight, arrowDown, copyDown, onTabPress, ...props
+  fieldRef, onChange, className = '', arrowLeft, arrowUp, arrowRight, arrowDown, copyDown, onTabPress, disabled, ...props
 }) => {
   const handleChange = (event) => {
     const { value } = event.target;
@@ -69,6 +69,7 @@ const Input = ({
       onDragStart={(event) => {
         event.preventDefault();
       }}
+      disabled={disabled}
     />
   );
 };
@@ -85,6 +86,7 @@ Input.propTypes = {
   copyDown: PropTypes.func,
   fieldRef: PropTypes.func,
   onTabPress: PropTypes.func,
+  disabled: PropTypes.bool,
 };
 
 Input.defaultProps = {
@@ -97,4 +99,5 @@ Input.defaultProps = {
   copyDown: null,
   fieldRef: null,
   onTabPress: null,
+  disabled: false,
 };
