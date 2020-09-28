@@ -162,21 +162,25 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.packLevel1.label',
         defaultMessage: 'Pack level 1',
+        flexWidth: '3.5',
       },
       boxName: {
         type: LabelField,
         label: 'react.stockMovement.packLevel2.label',
         defaultMessage: 'Pack level 2',
+        flexWidth: '3.5',
       },
       productCode: {
         type: LabelField,
         label: 'react.stockMovement.code.label',
         defaultMessage: 'Code',
+        flexWidth: '3.5',
       },
       product: {
         type: LabelField,
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
+        flexWidth: '6',
         headerAlign: 'left',
         attributes: {
           className: 'text-left',
@@ -194,11 +198,13 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.lot.label',
         defaultMessage: 'Lot',
+        flexWidth: '3.5',
       },
       expirationDate: {
         type: LabelField,
         label: 'react.stockMovement.expiry.label',
         defaultMessage: 'Expiry',
+        flexWidth: '3.5',
       },
       quantityShipped: {
         type: LabelField,
@@ -209,6 +215,7 @@ const FIELDS = {
       binLocationName: {
         type: LabelField,
         label: 'react.stockMovement.binLocation.label',
+        flexWidth: '3.5',
         defaultMessage: 'Bin Location',
         getDynamicAttr: ({ hasBinLocationSupport }) => ({
           hide: !hasBinLocationSupport,
@@ -216,6 +223,7 @@ const FIELDS = {
       },
       'recipient.name': {
         type: LabelField,
+        flexWidth: '3.5',
         label: 'react.stockMovement.recipient.label',
         defaultMessage: 'Recipient',
       },

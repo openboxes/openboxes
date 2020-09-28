@@ -62,6 +62,7 @@ const NO_STOCKLIST_FIELDS = {
     }) => (
       <button
         type="button"
+        id="addButton"
         className="btn btn-outline-success btn-xs"
         disabled={showOnly}
         onClick={() => {
@@ -118,6 +119,7 @@ const NO_STOCKLIST_FIELDS = {
         type: TextField,
         label: 'react.stockMovement.quantity.label',
         defaultMessage: 'Quantity',
+        headerAlign: 'left',
         flexWidth: '2.5',
         attributes: {
           type: 'number',
@@ -133,6 +135,7 @@ const NO_STOCKLIST_FIELDS = {
       recipient: {
         type: SelectField,
         label: 'react.stockMovement.recipient.label',
+        headerAlign: 'left',
         defaultMessage: 'Recipient',
         flexWidth: '2.5',
         fieldKey: '',
@@ -181,6 +184,7 @@ const STOCKLIST_FIELDS = {
     }) => (
       <button
         type="button"
+        id="addButton"
         className="btn btn-outline-success btn-xs"
         onClick={() => {
           updateTotalCount(1);
@@ -1086,6 +1090,16 @@ class AddItemsPage extends Component {
                   isFirstPageLoaded: this.state.isFirstPageLoaded,
                 }))}
               </div>
+              <div className="text-center add-button">
+                <button
+                  type="button"
+                  className="btn btn-outline-success btn-xs"
+                  disabled={showOnly}
+                  onClick={() => { document.getElementById('addButton').click(); }
+        }
+                ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
+                </button>
+              </div>
               <div className="submit-buttons">
                 <button
                   type="submit"
@@ -1167,6 +1181,10 @@ AddItemsPage.propTypes = {
   /** Return true if pagination is enabled */
   isPaginated: PropTypes.bool.isRequired,
   /** Return true if show only */
-  showOnly: PropTypes.bool.isRequired,
+  showOnly: PropTypes.bool,
   pageSize: PropTypes.number.isRequired,
+};
+
+AddItemsPage.defaultProps = {
+  showOnly: false,
 };
