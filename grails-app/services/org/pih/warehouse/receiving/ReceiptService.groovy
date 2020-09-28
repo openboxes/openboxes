@@ -262,7 +262,7 @@ class ReceiptService {
             recipientItems.each { Person recipient, items ->
                 if (emailValidator.isValid(recipient?.email)) {
                     def subject = g.message(code: "email.yourItemReceived.message", args: [shipment.shipmentNumber])
-                    def body = "${g.render(template: "/email/shipmentItemReceived", model: [shipmentInstance: shipment, receiptItems: items])}"
+                    def body = "${g.render(template: "/email/shipmentItemReceived", model: [shipmentInstance: shipment, receiptItems: items, recipient: recipient])}"
                     mailService.sendHtmlMail(subject, body.toString(), recipient.email)
                 }
             }
