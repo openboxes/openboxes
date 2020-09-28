@@ -141,16 +141,23 @@
 
         .add-button {
             position: absolute;
+            margin-top: 0;
             top: -40px;
+        }
+    }
 
-            button {
-                height: 32px;
-                background-color: #fff;
-                border: none;
-                box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.09);
-                color: #30a64a;
-                padding: 4px 8px;
-            }
+    .add-button {
+        display: flex;
+        align-items: center;
+        margin-top: 10px;
+
+        button {
+            height: 32px;
+            background-color: #fff;
+            border: none;
+            box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.09);
+            color: #30a64a;
+            padding: 4px 8px;
         }
     }
 
@@ -193,7 +200,7 @@
 
         .btn-xs {
             background-color: #eee;
-            color: grey;
+            color: #28a745;
             box-shadow: none !important;
         }
     }

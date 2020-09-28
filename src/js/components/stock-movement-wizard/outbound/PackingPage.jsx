@@ -47,7 +47,7 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.productName.label',
         defaultMessage: 'Product Name',
-        flexWidth: '3',
+        flexWidth: '3.5',
         headerAlign: 'left',
         attributes: {
           className: 'text-left ml-1',
@@ -98,7 +98,8 @@ const FIELDS = {
         type: SelectField,
         label: 'react.stockMovement.recipient.label',
         defaultMessage: 'Recipient',
-        flexWidth: '2.5',
+        flexWidth: '2',
+        headerAlign: 'left',
         fieldKey: '',
         attributes: {
           async: true,

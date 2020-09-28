@@ -67,7 +67,7 @@ const FIELDS = {
           formatValue: value => (
             <span className="d-flex">
               <span className="text-truncate">
-                {value.label || value.name}
+                {value.name || ''}
               </span>
               {renderHandlingIcons(value ? value.handlingIcons : null)}
             </span>
@@ -158,6 +158,7 @@ const FIELDS = {
         type: TextField,
         fieldKey: 'statusCode',
         flexWidth: '1',
+        headerAlign: 'left',
         attributes: {
           type: 'number',
         },
