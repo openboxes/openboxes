@@ -67,7 +67,20 @@ function loadGraphColors(payload) {
 
       payload.data.labels.forEach((label, index) => {
         const labelColor = Object.keys(payload.config.colors.labels)
-          .find(key => payload.config.colors.labels[key].includes(label));
+          .find((key) => {
+            let response = false;
+            payload.config.colors.labels[key].forEach((labelConfig) => {
+              if (labelConfig.code && labelConfig.message && label.code && label.message) {
+                if (labelConfig.code === label.code && labelConfig.message === label.message) {
+                  response = true;
+                }
+                response = false;
+              }
+              // We shouldn't use that line one the config of all graphs color will be with map.
+              response = payload.config.colors.labels[key].includes(label);
+            });
+            return response;
+          });
         if (labelColor) {
           colorConfig.data.colorsArray[index] = labelColor;
         }

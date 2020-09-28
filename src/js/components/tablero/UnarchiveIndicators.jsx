@@ -1,7 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ReactLoading from 'react-loading';
+import { connect } from 'react-redux';
+import { getTranslate } from 'react-localize-redux';
 import { getRandomColor } from '../../consts/dataFormat/colorMapping';
+import { translateWithDefaultMessage } from '../../utils/Translate';
 
 /* global _ */
 
@@ -23,7 +26,12 @@ const PreviewIndicator = props => (
       <div className="row">
         <div className="col col-3 graph-preview">{props.children}</div>
         <div className="col col-6">
-          <span>{_.truncate(props.title, { length: 25, omission: '...' })}</span>
+          {
+          props.title.code ?
+            <span>{_.truncate(props.translate(props.title.code, props.title.message), { length: 25, omission: '...' }) }</span> :
+            <span>{_.truncate(props.title, { length: 25, omission: '...' }) }</span>
+          }
+
         </div>
         <div className="col col-3">
           <span
@@ -48,6 +56,7 @@ const ArchivedNumber = props => (
     index={props.index}
     handleAdd={props.handleAdd}
     type="number"
+    translate={props.translate}
   >
     <span>{_.random(3, 95)}</span>
   </PreviewIndicator>
@@ -95,6 +104,7 @@ const ArchivedGraph = (props) => {
       index={props.index}
       handleAdd={props.handleAdd}
       type="graph"
+      translate={props.translate}
     >
       {graph}
     </PreviewIndicator>
@@ -115,6 +125,7 @@ const ArchivedIndicators = props => (
           handleAdd={props.handleAdd}
           unarchiveHandler={props.unarchiveHandler}
           size={props.size}
+          translate={props.translate}
         />
       ) : null))}
     {props.graphData.map((value, index) =>
@@ -127,6 +138,7 @@ const ArchivedIndicators = props => (
           handleAdd={props.handleAdd}
           unarchiveHandler={props.unarchiveHandler}
           size={props.size}
+          translate={props.translate}
         />
       ) : null))}
   </div>
@@ -159,6 +171,7 @@ const UnarchiveIndicators = (props) => {
             handleAdd={props.handleAdd}
             unarchiveHandler={props.unarchiveHandler}
             size={size}
+            translate={props.translate}
           />
         </ul>
       </div>
@@ -166,7 +179,11 @@ const UnarchiveIndicators = (props) => {
   );
 };
 
-export default UnarchiveIndicators;
+const mapStateToProps = state => ({
+  translate: translateWithDefaultMessage(getTranslate(state.localize)),
+});
+
+export default (connect(mapStateToProps)(UnarchiveIndicators));
 
 UnarchiveIndicators.propTypes = {
   graphData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
@@ -174,27 +191,49 @@ UnarchiveIndicators.propTypes = {
   unarchiveHandler: PropTypes.func.isRequired,
   handleAdd: PropTypes.func.isRequired,
   showPopout: PropTypes.bool.isRequired,
+  translate: PropTypes.func.isRequired,
 };
 
 PreviewIndicator.propTypes = {
-  title: PropTypes.string.isRequired,
+  title: PropTypes.oneOfType([
+    PropTypes.string.isRequired,
+    PropTypes.shape({
+      code: PropTypes.string.isRequired,
+      message: PropTypes.string.isRequired,
+    }).isRequired,
+  ]).isRequired,
   index: PropTypes.number.isRequired,
   handleAdd: PropTypes.func.isRequired,
   type: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
+  translate: PropTypes.func.isRequired,
 };
 
 ArchivedGraph.propTypes = {
   type: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
+  title: PropTypes.oneOfType([
+    PropTypes.string.isRequired,
+    PropTypes.shape({
+      code: PropTypes.string.isRequired,
+      message: PropTypes.string.isRequired,
+    }).isRequired,
+  ]).isRequired,
   handleAdd: PropTypes.func.isRequired,
   index: PropTypes.number.isRequired,
+  translate: PropTypes.func.isRequired,
 };
 
 ArchivedNumber.propTypes = {
-  title: PropTypes.string.isRequired,
+  title: PropTypes.oneOfType([
+    PropTypes.string.isRequired,
+    PropTypes.shape({
+      code: PropTypes.string.isRequired,
+      message: PropTypes.string.isRequired,
+    }).isRequired,
+  ]).isRequired,
   handleAdd: PropTypes.func.isRequired,
   index: PropTypes.number.isRequired,
+  translate: PropTypes.func.isRequired,
 };
 
 ArchivedIndicators.propTypes = {
@@ -203,4 +242,5 @@ ArchivedIndicators.propTypes = {
   unarchiveHandler: PropTypes.func.isRequired,
   handleAdd: PropTypes.func.isRequired,
   size: PropTypes.number.isRequired,
+  translate: PropTypes.func.isRequired,
 };
