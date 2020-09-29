@@ -676,11 +676,10 @@ class OrderController {
         Order order = Order.get(params.order.id)
         OrderItem orderItem = OrderItem.get(params.orderItem.id)
         ProductSupplier productSupplier = null
-        if (params.productSupplier?.id || params.supplierCode) {
+        if (params.productSupplier || params.supplierCode) {
             productSupplier = productSupplierDataService.getOrCreateNew(params)
         }
         params.remove("productSupplier")
-        params.remove("productSupplier.id")
         if (params.budgetCode) {
             params.budgetCode = BudgetCode.get(params.budgetCode)
         }
@@ -776,6 +775,7 @@ class OrderController {
                     "${warehouse.message(code: 'product.productCode.label')}," + // Product
                     "${warehouse.message(code: 'product.name.label')}," + // Product
                     "${warehouse.message(code: 'product.sourceCode.label')}," + // source Code
+                    "${warehouse.message(code: 'product.sourceName.label')}," + // source name
                     "${warehouse.message(code: 'product.supplierCode.label')}," + // supplier code
                     "${warehouse.message(code: 'product.manufacturer.label')}," + // manufacturer
                     "${warehouse.message(code: 'product.manufacturerCode.label')}," + // manufacturer code
@@ -802,6 +802,7 @@ class OrderController {
                         "${orderItem?.product?.productCode}," +
                         "${StringEscapeUtils.escapeCsv(orderItem?.product?.name)}," +
                         "${orderItem?.productSupplier?.code ?: ''}," +
+                        "${orderItem?.productSupplier?.name ?: ''}," +
                         "${orderItem?.productSupplier?.supplierCode ?: ''}," +
                         "${orderItem?.productSupplier?.manufacturer?.name ?: ''}," +
                         "${orderItem?.productSupplier?.manufacturerCode ?: ''}," +

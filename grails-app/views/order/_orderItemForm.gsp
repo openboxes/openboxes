@@ -14,7 +14,7 @@
     </td>
     <td class="middle center">
         <g:selectProductSupplier id="productSupplier"
-                               name="productSupplier.id" class="select2withTag"
+                               name="productSupplier" class="select2withTag"
                                noSelection="['':'']" />
     </td>
     <td class="middle center">
