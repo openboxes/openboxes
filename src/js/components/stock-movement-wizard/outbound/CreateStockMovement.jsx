@@ -388,7 +388,7 @@ class CreateStockMovement extends Component {
         }}
         render={({ form: { mutators }, handleSubmit, values }) => (
           <form onSubmit={handleSubmit}>
-            <div className="classic-form">
+            <div className="classic-form with-description">
               {_.map(
                 FIELDS,
                 (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
