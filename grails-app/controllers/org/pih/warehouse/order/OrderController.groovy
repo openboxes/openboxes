@@ -802,7 +802,7 @@ class OrderController {
                         "${orderItem?.product?.productCode}," +
                         "${StringEscapeUtils.escapeCsv(orderItem?.product?.name)}," +
                         "${orderItem?.productSupplier?.code ?: ''}," +
-                        "${orderItem?.productSupplier?.name ?: ''}," +
+                        "${StringEscapeUtils.escapeCsv(orderItem?.productSupplier?.name)}," +
                         "${orderItem?.productSupplier?.supplierCode ?: ''}," +
                         "${orderItem?.productSupplier?.manufacturer?.name ?: ''}," +
                         "${orderItem?.productSupplier?.manufacturerCode ?: ''}," +
