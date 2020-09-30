@@ -485,14 +485,14 @@ class ReportController {
                     csv << [
                             productCode  : it.product.productCode,
                             productName  : it.product.name,
-                            qtyOrderedNotShipped : isOrderItem ? it.quantityRemaining : '',
+                            qtyOrderedNotShipped : isOrderItem ? it.quantityRemaining * it.quantityPerUom : '',
                             qtyShippedNotReceived : isOrderItem ? '' : it.quantityRemaining,
                             orderNumber  : isOrderItem ? it.order.orderNumber : (it.shipment.isFromPurchaseOrder ? it.orderNumber : ''),
                             orderDescription  : isOrderItem ? it.order.name : (it.shipment.isFromPurchaseOrder ? it.orderName : ''),
                             supplierOrganization  : isOrderItem ? it.order?.origin?.organization?.name : it.shipment?.origin?.organization?.name,
                             supplierLocation  : isOrderItem ? it.order.origin.name : it.shipment.origin.name,
                             supplierLocationGroup  : isOrderItem ? it.order?.origin?.locationGroup?.name : it.shipment?.origin?.locationGroup?.name,
-                            estimatedGoodsReadyDate  : isOrderItem ? it.estimatedReadyDate?.format("MM/dd/yyyy") : '',
+                            estimatedGoodsReadyDate  : isOrderItem ? it.actualReadyDate?.format("MM/dd/yyyy") : '',
                             shipmentNumber  : isOrderItem ? '' : it.shipment.shipmentNumber,
                             shipDate  : isOrderItem ? '' : it.shipment.expectedShippingDate?.format("MM/dd/yyyy"),
                             shipmentType  : isOrderItem ? '' : it.shipment.shipmentType.name

@@ -9,11 +9,13 @@
 **/
 package org.pih.warehouse.report
 
+import org.apache.commons.validator.EmailValidator
 import org.codehaus.groovy.grails.plugins.web.taglib.RenderTagLib
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.codehaus.groovy.grails.web.errors.GrailsWrappedRuntimeException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.MailService
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.shipping.Shipment
@@ -125,10 +127,11 @@ class NotificationService {
     }
 
     def sendShipmentItemsShippedNotification(Shipment shipmentInstance) {
+        def emailValidator = EmailValidator.getInstance()
         def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
         def recipientItems = shipmentInstance.shipmentItems.groupBy {it.recipient }
-        recipientItems.each {recipient, items ->
-            if (recipient) {
+        recipientItems.each { Person recipient, items ->
+            if (emailValidator.isValid(recipient?.email)) {
                 def subject = g.message(code: "email.yourItemShipped.message", args: [shipmentInstance.shipmentNumber])
                 def body = "${g.render(template: "/email/shipmentItemShipped", model: [shipmentInstance: shipmentInstance, shipmentItems: items, recipient:recipient])}"
                 mailService.sendHtmlMail(subject, body.toString(), recipient.email)
