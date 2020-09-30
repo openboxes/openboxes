@@ -6,7 +6,7 @@ SELECT
         product.name,
         order_item.id,
         `order`.destination_id,
-        sum(distinct case when `order`.status != 'PENDING' then order_item.quantity else 0 end) as quantity_ordered,
+        sum(distinct case when `order`.status != 'PENDING' then order_item.quantity * order_item.quantity_per_uom else 0 end) as quantity_ordered,
         sum(case when shipment_item.quantity then shipment_item.quantity else 0 end) as quantity_shipped,
         null as quantity_shipped_not_received
     FROM order_item
@@ -87,7 +87,7 @@ SELECT
         product.name,
         order_item.id,
         `order`.destination_id,
-        sum(distinct case when `order`.status != 'PENDING' then order_item.quantity else 0 end) as quantity_ordered,
+        sum(distinct case when `order`.status != 'PENDING' then order_item.quantity * order_item.quantity_per_uom else 0 end) as quantity_ordered,
         sum(case when shipment_item.quantity then shipment_item.quantity else 0 end) as quantity_shipped,
         null as quantity_shipped_not_received
     FROM order_item

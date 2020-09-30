@@ -1,9 +1,11 @@
 <%@ page contentType="text/html"%>
-<g:applyLayout name="email">
 <div>
+    <div class="header">
+        <g:render template="/email/header"/>
+    </div>
     <div>
         <div>
-            ${warehouse.message(code: 'email.user.label') },
+            ${warehouse.message(code: 'email.user.label', args: [recipient?.firstName]) },
         </div>
         <div>
             ${warehouse.message(code: 'email.shipmentItemReceived.label') }:
@@ -77,4 +79,3 @@
         </a>
     </div>
 </div>
-</g:applyLayout>

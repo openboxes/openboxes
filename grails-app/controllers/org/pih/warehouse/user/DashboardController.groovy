@@ -74,11 +74,7 @@ class DashboardController {
 
         def requisition = Requisition.findByRequestNumber(params.searchTerms)
         if (requisition) {
-            if (requisition.type == RequisitionType.DEFAULT) {
-                redirect(controller: "stockMovement", action: "show", id: requisition.id)
-            } else {
-                redirect(controller: "requisition", action: "show", id: requisition.id)
-            }
+            redirect(controller: "stockMovement", action: "show", id: requisition.id)
             return
         }
 
