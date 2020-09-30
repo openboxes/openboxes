@@ -20,6 +20,7 @@ import {
   REORDER_INDICATORS,
   FETCH_CONFIG,
   SET_ACTIVE_CONFIG,
+  UPDATE_BREADCRUMBS_PARAMS,
 } from './types';
 import apiClient, { parseResponse } from '../utils/apiClient';
 
@@ -386,5 +387,39 @@ export function fetchConfig() {
         },
       });
     });
+  };
+}
+
+function dispachBreadcrumbsParams(newData, dispatch) {
+  dispatch({
+    type: UPDATE_BREADCRUMBS_PARAMS,
+    payload: newData,
+  });
+}
+
+export function updateBreadcrumbs(
+  newLabel = null,
+  newDefaultLabel = null,
+  newUrl = null,
+  newDescription = null,
+  newId = null,
+) {
+  return (dispatch) => {
+    if (newLabel && newDefaultLabel && newUrl) {
+      const breadcrumbsParams = [
+        {
+          label: newLabel,
+          defaultLabel: newDefaultLabel,
+          url: newUrl,
+        },
+      ];
+      if (newDescription && newId) {
+        breadcrumbsParams.push({
+          label: newDescription,
+          url: `${newUrl}${newId}`,
+        });
+      }
+      dispachBreadcrumbsParams(breadcrumbsParams, dispatch);
+    }
   };
 }

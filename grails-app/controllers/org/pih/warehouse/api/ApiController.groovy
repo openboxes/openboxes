@@ -113,6 +113,24 @@ class ApiController {
             ]
         ]
 
+        Map<Map> breadcrumbsConfig = [
+            "inbound": [
+                "label" : "react.stockMovement.inbound.label",
+                "defaultLabel": "Inbound stock movement",
+                "url"   : "${request.contextPath}/stockMovement/createInbound/"
+            ],
+            "outbound": [
+                "label" : "react.stockMovement.outbound.label",
+                "defaultLabel": "Outbound stock movement",
+                "url"   : "${request.contextPath}/stockMovement/createOutbound/"
+            ],
+            "request": [
+                "label" : "react.stockMovement.request.label",
+                "defaultLabel": "Request stock movement",
+                "url"   : "${request.contextPath}/stockMovement/createRequest/"
+            ]
+        ]
+
         User user = User.get(session?.user?.id)
         Location location = Location.get(session.warehouse?.id)
         String highestRole = user.getHighestRole(location)
@@ -168,6 +186,7 @@ class ApiController {
                         pageSize             : pageSize,
                         logoUrl              : logoUrl,
                         supportedLocales     : supportedLocales,
+                        breadcrumbsConfig    : breadcrumbsConfig,
                 ],
         ] as JSON)
     }

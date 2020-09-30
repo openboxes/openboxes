@@ -8,7 +8,7 @@ import CreateStockMovement from './request/CreateStockMovement';
 import AddItemsPage from './request/AddItemsPage';
 import Wizard from '../wizard/Wizard';
 import apiClient from '../../utils/apiClient';
-import { showSpinner, hideSpinner, fetchTranslations } from '../../actions';
+import { showSpinner, hideSpinner, fetchTranslations, updateBreadcrumbs } from '../../actions';
 import { translateWithDefaultMessage } from '../../utils/Translate';
 
 // TODO: check docs for SM wizard and Wizard related components
@@ -34,6 +34,10 @@ class StockMovementsRequest extends Component {
 
       this.fetchInitialValues();
     }
+    const requestData = this.props.breadcrumbsConfig;
+    if (requestData) {
+      this.props.updateBreadcrumbs(requestData.label, requestData.defaultLabel, requestData.url);
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -45,6 +49,13 @@ class StockMovementsRequest extends Component {
       this.dataFetched = true;
 
       this.fetchInitialValues();
+    }
+
+    if (!this.props.breadcrumbsConfig) {
+      if (nextProps.breadcrumbsConfig) {
+        const requestData = nextProps.breadcrumbsConfig;
+        this.props.updateBreadcrumbs(requestData.label, requestData.defaultLabel, requestData.url);
+      }
     }
   }
 
@@ -90,6 +101,16 @@ class StockMovementsRequest extends Component {
 
   updateWizardValues(currentPage, values) {
     this.setState({ currentPage, values });
+    if (values.description && (values.id || values.stockMovementId)) {
+      const requestData = this.props.breadcrumbsConfig;
+      this.props.updateBreadcrumbs(
+        requestData.label,
+        requestData.defaultLabel,
+        requestData.url,
+        values.description,
+        values.id || values.stockMovementId,
+      );
+    }
   }
 
   /**
@@ -173,10 +194,11 @@ const mapStateToProps = state => ({
   locale: state.session.activeLanguage,
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
+  breadcrumbsConfig: state.session.breadcrumbsConfig.request,
 });
 
 export default connect(mapStateToProps, {
-  showSpinner, hideSpinner, fetchTranslations,
+  showSpinner, hideSpinner, fetchTranslations, updateBreadcrumbs,
 })(StockMovementsRequest);
 
 StockMovementsRequest.propTypes = {
@@ -196,8 +218,21 @@ StockMovementsRequest.propTypes = {
   stockMovementTranslationsFetched: PropTypes.bool.isRequired,
   fetchTranslations: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
+  // Labels and url with translation
+  breadcrumbsConfig: PropTypes.shape({
+    label: PropTypes.string.isRequired,
+    defaultLabel: PropTypes.string,
+    url: PropTypes.string.isRequired,
+  }),
+  // Method to update breadcrumbs data
+  updateBreadcrumbs: PropTypes.func.isRequired,
 };
 
 StockMovementsRequest.defaultProps = {
   initialValues: {},
+  breadcrumbsConfig: {
+    label: '',
+    defaultLabel: '',
+    url: '',
+  },
 };

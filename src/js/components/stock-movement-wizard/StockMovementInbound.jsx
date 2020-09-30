@@ -9,7 +9,7 @@ import AddItemsPage from './inbound/AddItemsPage';
 import SendMovementPage from './inbound/SendMovementPage';
 import Wizard from '../wizard/Wizard';
 import apiClient from '../../utils/apiClient';
-import { showSpinner, hideSpinner, fetchTranslations } from '../../actions';
+import { showSpinner, hideSpinner, fetchTranslations, updateBreadcrumbs } from '../../actions';
 import { translateWithDefaultMessage } from '../../utils/Translate';
 
 // TODO: Cleanup not required code
@@ -33,8 +33,11 @@ class StockMovements extends Component {
 
     if (this.props.stockMovementTranslationsFetched) {
       this.dataFetched = true;
-
       this.fetchInitialValues();
+    }
+    const inboundData = this.props.breadcrumbsConfig;
+    if (inboundData) {
+      this.props.updateBreadcrumbs(inboundData.label, inboundData.defaultLabel, inboundData.url);
     }
   }
 
@@ -45,8 +48,14 @@ class StockMovements extends Component {
 
     if (nextProps.stockMovementTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
-
       this.fetchInitialValues();
+    }
+
+    if (!this.props.breadcrumbsConfig) {
+      if (nextProps.breadcrumbsConfig) {
+        const inboundData = nextProps.breadcrumbsConfig;
+        this.props.updateBreadcrumbs(inboundData.label, inboundData.defaultLabel, inboundData.url);
+      }
     }
   }
 
@@ -92,6 +101,16 @@ class StockMovements extends Component {
 
   updateWizardValues(currentPage, values) {
     this.setState({ currentPage, values });
+    if (values.description && (values.id || values.stockMovementId)) {
+      const inboundData = this.props.breadcrumbsConfig;
+      this.props.updateBreadcrumbs(
+        inboundData.label,
+        inboundData.defaultLabel,
+        inboundData.url,
+        values.description,
+        values.id || values.stockMovementId,
+      );
+    }
   }
 
   /**
@@ -189,11 +208,12 @@ class StockMovements extends Component {
 const mapStateToProps = state => ({
   locale: state.session.activeLanguage,
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
+  breadcrumbsConfig: state.session.breadcrumbsConfig.inbound,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
 export default connect(mapStateToProps, {
-  showSpinner, hideSpinner, fetchTranslations,
+  showSpinner, hideSpinner, fetchTranslations, updateBreadcrumbs,
 })(StockMovements);
 
 StockMovements.propTypes = {
@@ -213,8 +233,21 @@ StockMovements.propTypes = {
   stockMovementTranslationsFetched: PropTypes.bool.isRequired,
   fetchTranslations: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
+  // Labels and url with translation
+  breadcrumbsConfig: PropTypes.shape({
+    label: PropTypes.string.isRequired,
+    defaultLabel: PropTypes.string,
+    url: PropTypes.string.isRequired,
+  }),
+  // Method to update breadcrumbs data
+  updateBreadcrumbs: PropTypes.func.isRequired,
 };
 
 StockMovements.defaultProps = {
   initialValues: {},
+  breadcrumbsConfig: {
+    label: '',
+    defaultLabel: '',
+    url: '',
+  },
 };
