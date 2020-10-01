@@ -77,9 +77,9 @@ const BASIC_FIELDS = {
       return <TextField {...params} disabled />;
     },
   },
-  'stocklist.name': {
-    label: 'react.stockMovement.stocklist.label',
-    defaultMessage: 'Stocklist',
+  name: {
+    label: 'react.stockMovement.shipmentName.label',
+    defaultMessage: 'Shipment name',
     type: params => <TextField {...params} disabled />,
   },
   'requestedBy.name': {
@@ -97,9 +97,9 @@ const BASIC_FIELDS = {
     defaultMessage: 'Date requested',
     type: params => <TextField {...params} disabled />,
   },
-  name: {
-    label: 'react.stockMovement.shipmentName.label',
-    defaultMessage: 'Shipment name',
+  'stocklist.name': {
+    label: 'react.stockMovement.stocklist.label',
+    defaultMessage: 'Stocklist',
     type: params => <TextField {...params} disabled />,
   },
 };
@@ -499,7 +499,7 @@ class PackingPage extends Component {
         render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
             <div className="d-flex">
-              <div id="stockMovementInfo" className="classic-form">
+              <div id="stockMovementInfo" className="classic-form classic-form-condensed">
                 <div className="form-title">{values.movementNumber}</div>
                 {_.map(BASIC_FIELDS, (fieldConfig, fieldName) =>
                   renderFormField(fieldConfig, fieldName, {
