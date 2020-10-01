@@ -128,6 +128,11 @@ class ApiController {
                 "label" : "react.stockMovement.request.label",
                 "defaultLabel": "Request stock movement",
                 "url"   : "${request.contextPath}/stockMovement/createRequest/"
+            ],
+            "putAway": [
+                "label" : "react.putAway.breadcrumbs.putAway.label",
+                "defaultLabel": "Putaway",
+                "url"   : "${request.contextPath}/putAway/create/"
             ]
         ]
 
