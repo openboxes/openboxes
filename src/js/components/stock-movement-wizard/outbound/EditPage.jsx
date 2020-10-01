@@ -144,6 +144,7 @@ const FIELDS = {
         headerAlign: 'left',
         flexWidth: '3.5',
         label: 'react.stockMovement.productName.label',
+        defaultMessage: 'Product name',
         attributes: {
           formatValue: value => (
             <span className="d-flex">
@@ -215,6 +216,7 @@ const FIELDS = {
         flexWidth: '1',
         attributes: {
           title: 'react.stockMovement.substitutes.label',
+          defaultTitleMessage: 'Substitutes',
         },
         getDynamicAttr: ({
           fieldValue, rowIndex, stockMovementId, onResponse,
