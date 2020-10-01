@@ -337,6 +337,7 @@ const FIELDS = {
           btnOpenDefaultText: 'Edit line',
           title: 'react.default.button.edit.label',
           className: 'btn btn-outline-primary',
+          defaultTitleMessage: 'Edit',
         },
         getDynamicAttr: ({
           fieldValue, saveEditLine, parentIndex, rowIndex, shipmentReceived,

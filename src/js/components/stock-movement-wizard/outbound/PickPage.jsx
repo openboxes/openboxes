@@ -198,6 +198,7 @@ const FIELDS = {
         flexWidth: '0.7',
         attributes: {
           title: 'react.stockMovement.editPick.label',
+          defaultTitleMessage: 'Edit Pick',
         },
         getDynamicAttr: ({
           fieldValue, subfield, stockMovementId, updatePickPageItem,

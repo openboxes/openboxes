@@ -38,6 +38,7 @@ class ModalWrapper extends Component {
 
   render() {
     const Title = this.props.title;
+    const { defaultTitleMessage } = this.props;
 
     return (
       <div>
@@ -59,7 +60,7 @@ class ModalWrapper extends Component {
           <div className={this.props.bodyContainerClassName} style={this.props.bodyContainerStyle}>
             {
             typeof Title === 'string' ?
-              <h5 className="text-center"> <Translate id={Title} /></h5> :
+              <h5 className="text-center"> <Translate id={Title} defaultMessage={defaultTitleMessage} /></h5> :
               <Title />
           }
             <hr />
@@ -137,6 +138,7 @@ ModalWrapper.propTypes = {
     PropTypes.string,
     PropTypes.func,
   ]).isRequired,
+  defaultTitleMessage: PropTypes.string.isRequired,
 
   /** Modal body container properties */
   children: PropTypes.element,
