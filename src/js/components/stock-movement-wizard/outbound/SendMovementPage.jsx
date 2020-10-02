@@ -463,6 +463,7 @@ class SendMovementPage extends Component {
               name: stockMovementData.requestType.name,
               label: stockMovementData.requestType.name,
             },
+            shipmentStatus: stockMovementData.shipmentStatus,
           },
         }, () => {
           this.props.nextPage(this.state.values);
@@ -669,7 +670,7 @@ class SendMovementPage extends Component {
             <form onSubmit={handleSubmit}>
               <div className="d-flex">
                 <div id="stockMovementInfo" className="classic-form classic-form-condensed">
-                  <div className="form-title">{values.movementNumber}<span className="shipment-status float-right">{values.shipmentStatus}</span></div>
+                  <div className="form-title">{values.movementNumber}{ values.shipmentStatus && <span className="shipment-status float-right">{values.shipmentStatus}</span> }</div>
                   {_.map(BASIC_FIELDS, (fieldConfig, fieldName) =>
                     renderFormField(fieldConfig, fieldName, {
                       canBeEdited: values.statusCode === 'DISPATCHED' && !values.received,
