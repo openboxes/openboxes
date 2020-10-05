@@ -16,7 +16,7 @@
     .classic-form {
         background-color: #fff;
         box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.09);
-        padding: 24px;
+        padding: 12px 24px 24px;
         margin-bottom: 32px;
         position: relative;
         display: flex;
@@ -34,7 +34,7 @@
             .shipment-status {
                 border: 1px solid #a5d24a;
                 border-radius: 4px;
-                padding: 10px;
+                padding: 8px;
                 background: #cde69c;
                 color: #638421;
                 font-size: 15px;
@@ -70,7 +70,7 @@
             }
 
             .form-element-container {
-                height: 3em;
+                height: 2.8em;
                 padding: 0;
                 max-width: unset !important;
                 flex-grow: 1;
@@ -109,6 +109,34 @@
 
             .help-block {
                 padding-left: 0 !important;
+            }
+        }
+    }
+
+    .classic-form-condensed {
+        &::after {
+            content: "";
+            width: calc(22% + 12px);
+
+            @media (max-width: 730px) {
+                width: calc(22% + 12px) !important;
+            }
+        }
+
+        .form-group {
+            min-width: unset !important;
+            width: 22%;
+            margin-right: 0 !important;
+
+            @media (max-width: 730px) {
+                width: 45% !important;
+            }
+
+            .row {
+                label {
+                    text-transform: uppercase;
+                    color: grey;
+                }
             }
         }
     }
@@ -201,7 +229,8 @@
 
     .classic-form-buttons {
         position: absolute;
-        right: 26px;
+        right: calc(24px - 8px);
+        padding: 0 !important;
 
         .btn-xs {
             background-color: #eee;
@@ -228,37 +257,6 @@
                 border: none;
                 width: max-content;
                 font-size: smaller;
-            }
-        }
-    }
-
-    // Specific styles
-
-    #stockMovementInfo {
-        padding-top: 12px !important;
-
-        &::after {
-            content: "";
-            width: calc(24% + 12px);
-
-            @media (max-width: 730px) {
-                width: calc(24% + 12px) !important;
-            }
-        }
-
-        .form-group {
-            min-width: unset !important;
-            width: 24%;
-
-            @media (max-width: 730px) {
-                width: 45% !important;
-            }
-
-            .row {
-                label {
-                    text-transform: uppercase;
-                    color: grey;
-                }
             }
         }
     }

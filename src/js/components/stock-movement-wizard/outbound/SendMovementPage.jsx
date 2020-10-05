@@ -78,9 +78,9 @@ const BASIC_FIELDS = {
       return <TextField {...params} disabled />;
     },
   },
-  'stocklist.name': {
-    label: 'react.stockMovement.stocklist.label',
-    defaultMessage: 'Stocklist',
+  name: {
+    label: 'react.stockMovement.shipmentName.label',
+    defaultMessage: 'Shipment name',
     type: params => <TextField {...params} disabled />,
   },
   'requestedBy.name': {
@@ -98,9 +98,9 @@ const BASIC_FIELDS = {
     defaultMessage: 'Date requested',
     type: params => <TextField {...params} disabled />,
   },
-  name: {
-    label: 'react.stockMovement.shipmentName.label',
-    defaultMessage: 'Shipment name',
+  'stocklist.name': {
+    label: 'react.stockMovement.stocklist.label',
+    defaultMessage: 'Stocklist',
     type: params => <TextField {...params} disabled />,
   },
 };
@@ -463,6 +463,7 @@ class SendMovementPage extends Component {
               name: stockMovementData.requestType.name,
               label: stockMovementData.requestType.name,
             },
+            shipmentStatus: stockMovementData.shipmentStatus,
           },
         }, () => {
           this.props.nextPage(this.state.values);
@@ -668,8 +669,8 @@ class SendMovementPage extends Component {
           render={({ handleSubmit, values, invalid }) => (
             <form onSubmit={handleSubmit}>
               <div className="d-flex">
-                <div id="stockMovementInfo" className="classic-form">
-                  <div className="form-title">{values.movementNumber}<span className="shipment-status float-right">{values.shipmentStatus}</span></div>
+                <div id="stockMovementInfo" className="classic-form classic-form-condensed">
+                  <div className="form-title">{values.movementNumber}{ values.shipmentStatus && <span className="shipment-status float-right">{values.shipmentStatus}</span> }</div>
                   {_.map(BASIC_FIELDS, (fieldConfig, fieldName) =>
                     renderFormField(fieldConfig, fieldName, {
                       canBeEdited: values.statusCode === 'DISPATCHED' && !values.received,
@@ -679,7 +680,7 @@ class SendMovementPage extends Component {
                     }))}
                 </div>
               </div>
-              <div className="classic-form">
+              <div className="classic-form classic-form-condensed">
                 <span className="buttons-container classic-form-buttons">
                   <div className="dropzone float-right mb-1 btn btn-outline-secondary align-self-end btn-xs">
                     <Dropzone

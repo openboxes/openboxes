@@ -1,5 +1,5 @@
 CREATE OR REPLACE VIEW on_order_shipment_item_summary AS (
-SELECT c.product_code, c.name, c.destination_id, (sum(c.quantity_shipped) - (sum(c.quantity_received) + sum(c.quantity_canceled))) as quantity_shipped_not_received
+SELECT c.product_code, c.name, c.destination_id, null as quantity_ordered_not_shipped, (sum(c.quantity_shipped) - (sum(c.quantity_received) + sum(c.quantity_canceled))) as quantity_shipped_not_received
 FROM (
 SELECT
 	product.product_code,
