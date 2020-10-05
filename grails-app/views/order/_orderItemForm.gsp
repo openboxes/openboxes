@@ -14,8 +14,8 @@
     </td>
     <td class="middle center">
         <g:selectProductSupplier id="productSupplier"
-                               name="productSupplier" class="select2withTag"
-                               noSelection="['':'']" />
+                                 name="productSupplier" class="select2"
+                                 noSelection="['':'']" disabled="${true}" />
     </td>
     <td class="middle center">
         <input type="text" id="supplierCode" name="supplierCode" class="text" placeholder="Supplier code" style="width: 100px" disabled />
@@ -69,19 +69,6 @@
     </td>
 </tr>
 <script>
-
-  function enableEditing() {
-    $("#supplierCode").removeAttr("disabled");
-    $("#manufacturerCode").removeAttr("disabled");
-    $("#manufacturer").removeAttr("disabled");
-  }
-
-  function disableEditing() {
-    $("#supplierCode").attr("disabled", true);
-    $("#manufacturerCode").attr("disabled", true);
-    $("#manufacturer").attr("disabled", true);
-  }
-
   function clearSource() {
     $("#supplierCode").val("");
     $("#manufacturer").val(null).trigger('change');
@@ -89,27 +76,17 @@
   }
 
   $('#productSupplier').on('select2:select', function (e) {
-    if (e.params.data.isNew) {
       clearSource();
-      enableEditing();
-      $("#supplierCode").val(e.params.data.id);
-    } else {
-      clearSource();
-      disableEditing();
       $("#supplierCode").val(e.params.data.supplierCode);
       $("#manufacturerCode").val(e.params.data.manufacturerCode);
       $("#manufacturer").val(e.params.data.manufacturer).trigger('change');
-    }
   });
 
   $('#productSupplier').on('select2:unselect', function (e) {
     clearSource();
-    disableEditing();
   });
 
   $('#productSupplier').on('select2:clear', function (e) {
     clearSource();
-    disableEditing();
   });
-
 </script>
