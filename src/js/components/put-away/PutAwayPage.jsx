@@ -58,9 +58,13 @@ class PutAwayPage extends Component {
       this.dataFetched = true;
       this.fetchPutAwayCandidates(this.props.locationId);
     }
-    const putAwayData = this.props.breadcrumbsConfig;
-    if (putAwayData) {
-      this.props.updateBreadcrumbs(putAwayData.label, putAwayData.defaultLabel, putAwayData.url);
+    const putAwayData = this.props.breadcrumbsConfig.putAway;
+    if (this.props.breadcrumbsConfig.actions) {
+      const { label, defaultLabel } = this.props.breadcrumbsConfig.actions.create;
+      this.props.updateBreadcrumbs([
+        putAwayData,
+        { label, defaultLabel, url: putAwayData.actionsUrl },
+      ]);
     }
   }
 
@@ -74,10 +78,15 @@ class PutAwayPage extends Component {
         this.fetchPutAwayCandidates(nextProps.locationId);
       }
     }
-    if (!this.props.breadcrumbsConfig) {
-      if (nextProps.breadcrumbsConfig) {
-        const putAwayData = nextProps.breadcrumbsConfig;
-        this.props.updateBreadcrumbs(putAwayData.label, putAwayData.defaultLabel, putAwayData.url);
+    if (nextProps.breadcrumbsConfig && !this.props.breadcrumbsConfig) {
+      const putAwayData = nextProps.breadcrumbsConfig.putAway;
+      if (nextProps.breadcrumbsConfig.actions) {
+        const { label, defaultLabel } = nextProps.breadcrumbsConfig.actions.create;
+
+        this.props.updateBreadcrumbs([
+          putAwayData,
+          { label, defaultLabel, url: putAwayData.actionUrl },
+        ]);
       }
     }
   }
@@ -226,14 +235,18 @@ class PutAwayPage extends Component {
 
         this.props.history.push(`/openboxes/putAway/create/${putAway.id}`);
         if (putAway.putawayNumber && putAway.id) {
-          const putAwayData = this.props.breadcrumbsConfig;
-          this.props.updateBreadcrumbs(
-            putAwayData.label,
-            putAwayData.defaultLabel,
-            putAwayData.url,
-            putAway.putawayNumber,
-            putAway.id,
-          );
+          const putAwayData = this.props.breadcrumbsConfig.putAway;
+          const { label, defaultLabel } = this.props.breadcrumbsConfig.actions.create;
+
+          this.props.updateBreadcrumbs([
+            putAwayData,
+            { label, defaultLabel, url: putAwayData.actionsUrl },
+            {
+              label: putAway.putawayNumber,
+              url: putAwayData.actionsUrl,
+              id: putAway.id,
+            },
+          ]);
         }
         this.props.nextPage({
           putAway,
@@ -500,7 +513,7 @@ class PutAwayPage extends Component {
 
 const mapStateToProps = state => ({
   putAwayTranslationsFetched: state.session.fetchedTranslations.putAway,
-  breadcrumbsConfig: state.session.breadcrumbsConfig.putAway,
+  breadcrumbsConfig: state.session.breadcrumbsConfig,
 });
 
 export default withRouter(connect(
@@ -521,20 +534,36 @@ PutAwayPage.propTypes = {
   history: PropTypes.shape({ push: PropTypes.func }).isRequired,
   putAwayTranslationsFetched: PropTypes.bool.isRequired,
   // Labels and url with translation
-  breadcrumbsConfig: PropTypes.shape({
-    label: PropTypes.string.isRequired,
-    defaultLabel: PropTypes.string,
-    url: PropTypes.string.isRequired,
-  }),
+  breadcrumbsConfig: PropTypes.shape(PropTypes.oneOf([
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      defaultLabel: PropTypes.string.isRequired,
+      url: PropTypes.string.isRequired,
+      actionsUrl: PropTypes.string.isRequired,
+    }),
+    PropTypes.shape(PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      defaultLabel: PropTypes.string.isRequired,
+    })),
+  ])),
   // Method to update breadcrumbs data
   updateBreadcrumbs: PropTypes.func.isRequired,
 };
 
 PutAwayPage.defaultProps = {
   breadcrumbsConfig: {
-    label: '',
-    defaultLabel: '',
-    url: '',
+    putAway: {
+      label: '',
+      defaultLabel: '',
+      url: '',
+      actionUrl: '',
+    },
+    actions: {
+      create: {
+        label: '',
+        defaultLabel: '',
+      },
+    },
   },
 };
 

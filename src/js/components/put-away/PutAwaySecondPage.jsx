@@ -67,15 +67,16 @@ class PutAwaySecondPage extends Component {
       this.fetchBins();
     }
 
-    if (nextProps.putAway && this.props.putAway !== nextProps.putAway) {
-      const putAwayData = this.props.breadcrumbsConfig;
-      this.props.updateBreadcrumbs(
-        putAwayData.label,
-        putAwayData.defaultLabel,
-        putAwayData.url,
-        nextProps.putAway.putawayNumber,
-        nextProps.putAway.id,
-      );
+    if (nextProps.breadcrumbsConfig && !this.props.breadcrumbsConfig) {
+      const putAwayData = nextProps.breadcrumbsConfig.putAway;
+      if (nextProps.breadcrumbsConfig.actions) {
+        const { label, defaultLabel } = nextProps.breadcrumbsConfig.actions.create;
+
+        this.props.updateBreadcrumbs([
+          putAwayData,
+          { label, defaultLabel, url: putAwayData.actionUrl },
+        ]);
+      }
     }
   }
 
@@ -580,11 +581,18 @@ PutAwaySecondPage.propTypes = {
   savePutAways: PropTypes.func.isRequired,
   putAwayTranslationsFetched: PropTypes.bool.isRequired,
   // Labels and url with translation
-  breadcrumbsConfig: PropTypes.shape({
-    label: PropTypes.string.isRequired,
-    defaultLabel: PropTypes.string,
-    url: PropTypes.string.isRequired,
-  }),
+  breadcrumbsConfig: PropTypes.shape(PropTypes.oneOf([
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      defaultLabel: PropTypes.string.isRequired,
+      url: PropTypes.string.isRequired,
+      actionsUrl: PropTypes.string.isRequired,
+    }),
+    PropTypes.shape(PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      defaultLabel: PropTypes.string.isRequired,
+    })),
+  ])),
   // Method to update breadcrumbs data
   updateBreadcrumbs: PropTypes.func.isRequired,
 };
@@ -594,8 +602,17 @@ PutAwaySecondPage.defaultProps = {
   pivotBy: ['stockMovement.name'],
   expanded: {},
   breadcrumbsConfig: {
-    label: '',
-    defaultLabel: '',
-    url: '',
+    putAway: {
+      label: '',
+      defaultLabel: '',
+      url: '',
+      actionUrl: '',
+    },
+    actions: {
+      create: {
+        label: '',
+        defaultLabel: '',
+      },
+    },
   },
 };

@@ -397,29 +397,20 @@ function dispachBreadcrumbsParams(newData, dispatch) {
   });
 }
 
-export function updateBreadcrumbs(
-  newLabel = null,
-  newDefaultLabel = null,
-  newUrl = null,
-  newDescription = null,
-  newId = null,
-) {
+export function updateBreadcrumbs(listBreadcrumbsStep = [
+  {
+    label: null, defaultLabel: null, url: null, id: null,
+  },
+]) {
   return (dispatch) => {
-    if (newLabel && newDefaultLabel && newUrl) {
-      const breadcrumbsParams = [
-        {
-          label: newLabel,
-          defaultLabel: newDefaultLabel,
-          url: newUrl,
-        },
-      ];
-      if (newDescription && newId) {
-        breadcrumbsParams.push({
-          label: newDescription,
-          url: `${newUrl}${newId}`,
-        });
-      }
-      dispachBreadcrumbsParams(breadcrumbsParams, dispatch);
-    }
+    const breadcrumbsParams = [];
+    listBreadcrumbsStep.forEach((step) => {
+      breadcrumbsParams.push({
+        label: step.label || '',
+        defaultLabel: step.defaultLabel,
+        url: step.id ? `${step.url}${step.id}` : step.url || '',
+      });
+    });
+    dispachBreadcrumbsParams(breadcrumbsParams, dispatch);
   };
 }

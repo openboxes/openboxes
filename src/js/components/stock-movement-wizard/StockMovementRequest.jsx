@@ -34,9 +34,13 @@ class StockMovementsRequest extends Component {
 
       this.fetchInitialValues();
     }
-    const requestData = this.props.breadcrumbsConfig;
-    if (requestData) {
-      this.props.updateBreadcrumbs(requestData.label, requestData.defaultLabel, requestData.url);
+    const requestData = this.props.breadcrumbsConfig.request;
+    if (this.props.breadcrumbsConfig.actions) {
+      const { label, defaultLabel } = this.props.breadcrumbsConfig.actions.create;
+      this.props.updateBreadcrumbs([
+        requestData,
+        { label, defaultLabel, url: requestData.actionsUrl },
+      ]);
     }
   }
 
@@ -51,10 +55,15 @@ class StockMovementsRequest extends Component {
       this.fetchInitialValues();
     }
 
-    if (!this.props.breadcrumbsConfig) {
-      if (nextProps.breadcrumbsConfig) {
-        const requestData = nextProps.breadcrumbsConfig;
-        this.props.updateBreadcrumbs(requestData.label, requestData.defaultLabel, requestData.url);
+    if (nextProps.breadcrumbsConfig.request && !this.props.breadcrumbsConfig.request) {
+      const requestData = nextProps.breadcrumbsConfig.request;
+      if (nextProps.breadcrumbsConfig.actions) {
+        const { label, defaultLabel } = nextProps.breadcrumbsConfig.actions.create;
+
+        this.props.updateBreadcrumbs([
+          requestData,
+          { label, defaultLabel, url: requestData.actionUrl },
+        ]);
       }
     }
   }
@@ -102,14 +111,18 @@ class StockMovementsRequest extends Component {
   updateWizardValues(currentPage, values) {
     this.setState({ currentPage, values });
     if (values.description && (values.id || values.stockMovementId)) {
-      const requestData = this.props.breadcrumbsConfig;
-      this.props.updateBreadcrumbs(
-        requestData.label,
-        requestData.defaultLabel,
-        requestData.url,
-        values.description,
-        values.id || values.stockMovementId,
-      );
+      const requestData = this.props.breadcrumbsConfig.request;
+      const { label, defaultLabel } = this.props.breadcrumbsConfig.actions.create;
+
+      this.props.updateBreadcrumbs([
+        requestData,
+        { label, defaultLabel, url: requestData.actionsUrl },
+        {
+          label: values.description,
+          url: requestData.actionsUrl,
+          id: values.id || values.stockMovementId,
+        },
+      ]);
     }
   }
 
@@ -194,7 +207,7 @@ const mapStateToProps = state => ({
   locale: state.session.activeLanguage,
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
-  breadcrumbsConfig: state.session.breadcrumbsConfig.request,
+  breadcrumbsConfig: state.session.breadcrumbsConfig,
 });
 
 export default connect(mapStateToProps, {
@@ -219,11 +232,18 @@ StockMovementsRequest.propTypes = {
   fetchTranslations: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
   // Labels and url with translation
-  breadcrumbsConfig: PropTypes.shape({
-    label: PropTypes.string.isRequired,
-    defaultLabel: PropTypes.string,
-    url: PropTypes.string.isRequired,
-  }),
+  breadcrumbsConfig: PropTypes.shape(PropTypes.oneOf([
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      defaultLabel: PropTypes.string.isRequired,
+      url: PropTypes.string.isRequired,
+      actionsUrl: PropTypes.string.isRequired,
+    }),
+    PropTypes.shape(PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      defaultLabel: PropTypes.string.isRequired,
+    })),
+  ])),
   // Method to update breadcrumbs data
   updateBreadcrumbs: PropTypes.func.isRequired,
 };
@@ -231,8 +251,17 @@ StockMovementsRequest.propTypes = {
 StockMovementsRequest.defaultProps = {
   initialValues: {},
   breadcrumbsConfig: {
-    label: '',
-    defaultLabel: '',
-    url: '',
+    request: {
+      label: '',
+      defaultLabel: '',
+      url: '',
+      actionUrl: '',
+    },
+    actions: {
+      create: {
+        label: '',
+        defaultLabel: '',
+      },
+    },
   },
 };

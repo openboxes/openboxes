@@ -115,24 +115,34 @@ class ApiController {
 
         Map<Map> breadcrumbsConfig = [
             "inbound": [
-                "label" : "react.stockMovement.inbound.label",
-                "defaultLabel": "Inbound stock movement",
-                "url"   : "${request.contextPath}/stockMovement/createInbound/"
-            ],
+                    "label" : "react.stockMovement.inbound.label",
+                    "defaultLabel": "Inbound stock movement",
+                    "url"   : "${request.contextPath}/stockMovement/list?direction=INBOUND",
+                    "actionsUrl": "${request.contextPath}/stockMovement/createInbound/",
+            ], 
             "outbound": [
-                "label" : "react.stockMovement.outbound.label",
-                "defaultLabel": "Outbound stock movement",
-                "url"   : "${request.contextPath}/stockMovement/createOutbound/"
+                    "label" : "react.stockMovement.outbound.label",
+                    "defaultLabel": "Outbound stock movement",
+                    "url"   : "${request.contextPath}/stockMovement/list?direction=OUTBOUND",
+                    "actionsUrl": "${request.contextPath}/stockMovement/createOutbound/", 
             ],
             "request": [
-                "label" : "react.stockMovement.request.label",
-                "defaultLabel": "Request stock movement",
-                "url"   : "${request.contextPath}/stockMovement/createRequest/"
+                    "label" : "react.stockMovement.request.label",
+                    "defaultLabel": "Request stock movement",
+                    "url"   : "${request.contextPath}/stockMovement/list?direction=INBOUND",
+                    "actionsUrl": "${request.contextPath}/stockMovement/createRequest",
             ],
             "putAway": [
                 "label" : "react.putAway.breadcrumbs.putAway.label",
                 "defaultLabel": "Putaway",
-                "url"   : "${request.contextPath}/putAway/create/"
+                "url"   : "${request.contextPath}/order/list?orderTypeCode=TRANSFER_ORDER&status=PENDING",
+                "actionsUrl": "${request.contextPath}/putAway/create/",
+            ],
+            "actions": [
+                "create": [
+                    "label" : "react.stockMovement.create.label",
+                    "defaultLabel": "Create",
+                ],
             ]
         ]
 
