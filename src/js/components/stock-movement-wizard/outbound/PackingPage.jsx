@@ -129,7 +129,6 @@ const FIELDS = {
         label: 'react.stockMovement.productName.label',
         defaultMessage: 'Product Name',
         flexWidth: '3.5',
-        headerAlign: 'left',
         attributes: {
           className: 'text-left ml-1',
           formatValue: value => (
@@ -180,7 +179,6 @@ const FIELDS = {
         label: 'react.stockMovement.recipient.label',
         defaultMessage: 'Recipient',
         flexWidth: '2',
-        headerAlign: 'left',
         fieldKey: '',
         attributes: {
           async: true,

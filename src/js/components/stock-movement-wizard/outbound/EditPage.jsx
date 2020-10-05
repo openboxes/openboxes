@@ -241,7 +241,6 @@ const FIELDS = {
         type: TextField,
         fieldKey: 'statusCode',
         flexWidth: '1',
-        headerAlign: 'left',
         attributes: {
           type: 'number',
         },
