@@ -357,8 +357,12 @@
             },
             error: function (jqXHR, textStatus, errorThrown) {
               if (jqXHR.responseText) {
-                let data = JSON.parse(jqXHR.responseText);
-                $.notify(data.errorMessage, "error");
+                try {
+                  let data = JSON.parse(jqXHR.responseText);
+                  $.notify(data.errorMessage, "error");
+                } catch (e) {
+                  $.notify(jqXHR.responseText, "error");
+                }
               } else {
                 $.notify("An error occurred", "error");
               }
