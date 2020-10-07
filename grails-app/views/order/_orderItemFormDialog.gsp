@@ -39,7 +39,7 @@
                     <label for="dlgSourceCode"><warehouse:message code="productSupplier.sourceCode.label"/></label>
                 </td>
                 <td>
-                    <input type="text" id="dlgSourceCode" name="sourceName" class="text" size="24" placeholder="Source Code" />
+                    <input type="text" id="dlgSourceCode" name="sourceCode" class="text" size="24" placeholder="Source Code" />
                 </td>
             </tr>
             <tr class="prop hidden" id="dlgSourceNameRow">
