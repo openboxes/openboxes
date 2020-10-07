@@ -701,6 +701,14 @@ class OrderController {
         Order order = Order.get(params.order.id)
         OrderItem orderItem = OrderItem.get(params.orderItem.id)
         ProductSupplier productSupplier = null
+        if (params.productSupplier == "Create New") {
+            Organization supplier = Organization.get(params.supplier.id)
+            productSupplier = ProductSupplier.findByCodeAndSupplier(params.sourceCode, supplier)
+            if (params.sourceCode && productSupplier) {
+                render(status: 500, text: "Product source with given code for your supplier already exists")
+                return
+            }
+        }
         if (params.productSupplier || params.supplierCode) {
             productSupplier = productSupplierDataService.getOrCreateNew(params)
         }
