@@ -666,7 +666,7 @@ class OrderController {
     def createProductSource = {
         Organization supplier = Organization.get(params.supplier.id)
         ProductSupplier productSupplier = ProductSupplier.findByCodeAndSupplier(params.sourceCode, supplier)
-        if (productSupplier) {
+        if (params.sourceCode && productSupplier) {
             render(status: 500, text: "Product source with given code for your supplier already exists")
             return
         }
