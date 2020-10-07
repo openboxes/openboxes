@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.data
 
+import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
@@ -144,7 +145,7 @@ class ProductSupplierDataService {
     def createProductSupplierWithoutPackage(Map params) {
         Product product = Product.get(params.product.id)
         ProductSupplier productSupplier = new ProductSupplier()
-        productSupplier.code = params.sourceCode?:params.supplierCode
+        productSupplier.code = params.sourceCode?:identifierService.generateProductSupplierIdentifier(product?.productCode)
         productSupplier.name = params.sourceName ?: product?.name
         productSupplier.supplier = Organization.get(params.supplier.id)
         productSupplier.supplierCode = params.supplierCode

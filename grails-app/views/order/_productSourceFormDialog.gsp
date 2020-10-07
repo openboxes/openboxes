@@ -91,45 +91,30 @@
     </table>
 </g:form>
 <script>
-    function validateForm() {
-        var sourceCode = $("#ps-dlgSourceCode").val();
-        if (!sourceCode) {
-            $("#ps-dlgSourceCode").notify("Required");
-            return false
-        } else {
-            return true
-        }
-    }
-
     function saveProductSourceDialog() {
         var data = $("#productSourceForm").serialize();
-        if(validateForm()) {
-            $.ajax({
-                url: "${g.createLink(controller:'order', action:'createProductSource')}",
-                data: data,
-                success: function (response) {
-                    $.notify("Product source created successfully", "success");
-                    $("#create-product-source-dialog").dialog("close");
+        $.ajax({
+            url: "${g.createLink(controller:'order', action:'createProductSource')}",
+            data: data,
+            success: function (response) {
+                $.notify("Product source created successfully", "success");
+                $("#create-product-source-dialog").dialog("close");
 
-                    // Reload product sources in orderItemForm to include newly created
-                    var productId = $("#product-id").val();
-                    var supplierId = $("#supplierId").val();
-                    clearSource();
-                    $('#productSupplier').html("");
-                    productChanged(productId, supplierId, response);
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    if (jqXHR.responseText) {
-                        $.notify(jqXHR.responseText, "error");
-                    } else {
-                        $.notify("An error occurred", "error");
-                    }
+                // Reload product sources in orderItemForm to include newly created
+                var productId = $("#product-id").val();
+                var supplierId = $("#supplierId").val();
+                clearSource();
+                $('#productSupplier').html("");
+                productChanged(productId, supplierId, response);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.responseText) {
+                    $.notify(jqXHR.responseText, "error");
+                } else {
+                    $.notify("An error occurred", "error");
                 }
-            });
-        } else {
-            $.notify("Please enter a value for all required fields")
-        }
-        return false
+            }
+        });
     }
 
     $(document).ready(function() {
