@@ -8,6 +8,8 @@ import {
   FETCH_MENU_CONFIG,
   TOGGLE_LOCATION_CHOOSER,
   TOGGLE_USER_ACTION_MENU,
+  UPDATE_BREADCRUMBS_PARAMS,
+  FETCH_BREADCRUMBS_CONFIG,
 } from '../actions/types';
 
 const initialState = {
@@ -60,6 +62,8 @@ const initialState = {
   pageSize: 50,
   logoUrl: '',
   supportedLocales: [],
+  breadcrumbsParams: [],
+  breadcrumbsConfig: [],
 };
 
 export default function (state = initialState, action) {
@@ -115,6 +119,16 @@ export default function (state = initialState, action) {
       return {
         ...state,
         userActionMenuOpen: action.payload,
+      };
+    case UPDATE_BREADCRUMBS_PARAMS:
+      return {
+        ...state,
+        breadcrumbsParams: action.payload,
+      };
+    case FETCH_BREADCRUMBS_CONFIG:
+      return {
+        ...state,
+        breadcrumbsConfig: action.payload,
       };
     default:
       return state;

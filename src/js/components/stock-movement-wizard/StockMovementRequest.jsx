@@ -8,7 +8,7 @@ import CreateStockMovement from './request/CreateStockMovement';
 import AddItemsPage from './request/AddItemsPage';
 import Wizard from '../wizard/Wizard';
 import apiClient from '../../utils/apiClient';
-import { showSpinner, hideSpinner, fetchTranslations } from '../../actions';
+import { showSpinner, hideSpinner, fetchTranslations, updateBreadcrumbs, fetchBreadcrumbsConfig } from '../../actions';
 import { translateWithDefaultMessage } from '../../utils/Translate';
 
 // TODO: check docs for SM wizard and Wizard related components
@@ -27,6 +27,7 @@ class StockMovementsRequest extends Component {
   }
 
   componentDidMount() {
+    this.props.fetchBreadcrumbsConfig();
     this.props.fetchTranslations('', 'stockMovement');
 
     if (this.props.stockMovementTranslationsFetched) {
@@ -34,6 +35,14 @@ class StockMovementsRequest extends Component {
 
       this.fetchInitialValues();
     }
+
+    const {
+      actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
+    } = this.props.breadcrumbsConfig;
+    this.props.updateBreadcrumbs([
+      { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
+      { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
+    ]);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -45,6 +54,18 @@ class StockMovementsRequest extends Component {
       this.dataFetched = true;
 
       this.fetchInitialValues();
+    }
+
+    if (nextProps.breadcrumbsConfig &&
+      nextProps.breadcrumbsConfig !== this.props.breadcrumbsConfig) {
+      const {
+        actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
+      } = nextProps.breadcrumbsConfig;
+
+      this.props.updateBreadcrumbs([
+        { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
+        { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
+      ]);
     }
   }
 
@@ -90,6 +111,16 @@ class StockMovementsRequest extends Component {
 
   updateWizardValues(currentPage, values) {
     this.setState({ currentPage, values });
+    if (values.movementNumber && (values.id || values.stockMovementId)) {
+      const {
+        actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
+      } = this.props.breadcrumbsConfig;
+      this.props.updateBreadcrumbs([
+        { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
+        { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
+        { label: values.movementNumber, url: actionUrl, id: values.id || values.stockMovementId },
+      ]);
+    }
   }
 
   /**
@@ -173,10 +204,11 @@ const mapStateToProps = state => ({
   locale: state.session.activeLanguage,
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
+  breadcrumbsConfig: state.session.breadcrumbsConfig.request,
 });
 
 export default connect(mapStateToProps, {
-  showSpinner, hideSpinner, fetchTranslations,
+  showSpinner, hideSpinner, fetchTranslations, updateBreadcrumbs, fetchBreadcrumbsConfig,
 })(StockMovementsRequest);
 
 StockMovementsRequest.propTypes = {
@@ -196,8 +228,28 @@ StockMovementsRequest.propTypes = {
   stockMovementTranslationsFetched: PropTypes.bool.isRequired,
   fetchTranslations: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
+  // Labels and url with translation
+  breadcrumbsConfig: PropTypes.shape({
+    actionLabel: PropTypes.string.isRequired,
+    defaultActionLabel: PropTypes.string.isRequired,
+    listLabel: PropTypes.string.isRequired,
+    defaultListLabel: PropTypes.string.isRequired,
+    listUrl: PropTypes.string.isRequired,
+    actionUrl: PropTypes.string.isRequired,
+  }),
+  // Method to update breadcrumbs data
+  updateBreadcrumbs: PropTypes.func.isRequired,
+  fetchBreadcrumbsConfig: PropTypes.func.isRequired,
 };
 
 StockMovementsRequest.defaultProps = {
   initialValues: {},
+  breadcrumbsConfig: {
+    actionLabel: '',
+    defaultActionLabel: '',
+    listLabel: '',
+    defaultListLabel: '',
+    listUrl: '',
+    actionUrl: '',
+  },
 };

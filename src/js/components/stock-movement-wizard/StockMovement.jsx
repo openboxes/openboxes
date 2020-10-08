@@ -12,7 +12,7 @@ import PackingPage from './outbound/PackingPage';
 import SendMovementPage from './outbound/SendMovementPage';
 import Wizard from '../wizard/Wizard';
 import apiClient from '../../utils/apiClient';
-import { showSpinner, hideSpinner, fetchTranslations } from '../../actions';
+import { showSpinner, hideSpinner, fetchTranslations, updateBreadcrumbs, fetchBreadcrumbsConfig } from '../../actions';
 import { translateWithDefaultMessage } from '../../utils/Translate';
 
 import './StockMovement.scss';
@@ -33,6 +33,7 @@ class StockMovements extends Component {
   }
 
   componentDidMount() {
+    this.props.fetchBreadcrumbsConfig();
     this.props.fetchTranslations('', 'stockMovement');
 
     if (this.props.stockMovementTranslationsFetched) {
@@ -40,6 +41,14 @@ class StockMovements extends Component {
 
       this.fetchInitialValues();
     }
+
+    const {
+      actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
+    } = this.props.breadcrumbsConfig;
+    this.props.updateBreadcrumbs([
+      { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
+      { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
+    ]);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -51,6 +60,18 @@ class StockMovements extends Component {
       this.dataFetched = true;
 
       this.fetchInitialValues();
+    }
+
+    if (nextProps.breadcrumbsConfig &&
+      nextProps.breadcrumbsConfig !== this.props.breadcrumbsConfig) {
+      const {
+        actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
+      } = nextProps.breadcrumbsConfig;
+
+      this.props.updateBreadcrumbs([
+        { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
+        { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
+      ]);
     }
   }
 
@@ -146,6 +167,16 @@ class StockMovements extends Component {
 
   updateWizardValues(currentPage, values) {
     this.setState({ currentPage, values });
+    if (values.movementNumber && (values.id || values.stockMovementId)) {
+      const {
+        actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
+      } = this.props.breadcrumbsConfig;
+      this.props.updateBreadcrumbs([
+        { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
+        { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
+        { label: values.movementNumber, url: actionUrl, id: values.id || values.stockMovementId },
+      ]);
+    }
   }
 
   dataFetched = false;
@@ -252,10 +283,11 @@ const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   hasPackingSupport: state.session.currentLocation.hasPackingSupport,
   currentLocation: state.session.currentLocation,
+  breadcrumbsConfig: state.session.breadcrumbsConfig.outbound,
 });
 
 export default connect(mapStateToProps, {
-  showSpinner, hideSpinner, fetchTranslations,
+  showSpinner, hideSpinner, fetchTranslations, updateBreadcrumbs, fetchBreadcrumbsConfig,
 })(StockMovements);
 
 StockMovements.propTypes = {
@@ -280,8 +312,28 @@ StockMovements.propTypes = {
   initialValues: PropTypes.shape({
     shipmentStatus: PropTypes.string,
   }),
+  // Labels and url with translation
+  breadcrumbsConfig: PropTypes.shape({
+    actionLabel: PropTypes.string.isRequired,
+    defaultActionLabel: PropTypes.string.isRequired,
+    listLabel: PropTypes.string.isRequired,
+    defaultListLabel: PropTypes.string.isRequired,
+    listUrl: PropTypes.string.isRequired,
+    actionUrl: PropTypes.string.isRequired,
+  }),
+  // Method to update breadcrumbs data
+  updateBreadcrumbs: PropTypes.func.isRequired,
+  fetchBreadcrumbsConfig: PropTypes.func.isRequired,
 };
 
 StockMovements.defaultProps = {
   initialValues: {},
+  breadcrumbsConfig: {
+    actionLabel: '',
+    defaultActionLabel: '',
+    listLabel: '',
+    defaultListLabel: '',
+    listUrl: '',
+    actionUrl: '',
+  },
 };
