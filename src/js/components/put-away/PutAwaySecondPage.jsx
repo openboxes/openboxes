@@ -15,7 +15,7 @@ import customTreeTableHOC from '../../utils/CustomTreeTable';
 import Select from '../../utils/Select';
 import SplitLineModal from './SplitLineModal';
 import apiClient, { parseResponse, flattenRequest } from '../../utils/apiClient';
-import { showSpinner, hideSpinner, updateBreadcrumbs } from '../../actions';
+import { showSpinner, hideSpinner, updateBreadcrumbs, fetchBreadcrumbsConfig } from '../../actions';
 import Filter from '../../utils/Filter';
 import showLocationChangedAlert from '../../utils/location-change-alert';
 import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
@@ -47,6 +47,7 @@ class PutAwaySecondPage extends Component {
   }
 
   componentDidMount() {
+    this.props.fetchBreadcrumbsConfig();
     if (this.props.putAwayTranslationsFetched) {
       this.dataFetched = true;
       this.fetchBins();
@@ -67,16 +68,22 @@ class PutAwaySecondPage extends Component {
       this.fetchBins();
     }
 
-    if (nextProps.breadcrumbsConfig && !this.props.breadcrumbsConfig) {
-      const putAwayData = nextProps.breadcrumbsConfig.putAway;
-      if (nextProps.breadcrumbsConfig.actions) {
-        const { label, defaultLabel } = nextProps.breadcrumbsConfig.actions.create;
+    if (nextProps.breadcrumbsConfig &&
+       nextProps.putAway &&
+       (
+         this.props.breadcrumbsConfig !== nextProps.breadcrumbsConfig ||
+        this.props.putAway !== nextProps.putAway)
+    ) {
+      const {
+        actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
+      } = nextProps.breadcrumbsConfig;
+      const { id, putawayNumber } = nextProps.putAway;
 
-        this.props.updateBreadcrumbs([
-          putAwayData,
-          { label, defaultLabel, url: putAwayData.actionUrl },
-        ]);
-      }
+      this.props.updateBreadcrumbs([
+        { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
+        { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
+        { label: putawayNumber, url: actionUrl, id },
+      ]);
     }
   }
 
@@ -549,7 +556,9 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { showSpinner, hideSpinner, updateBreadcrumbs },
+  {
+    showSpinner, hideSpinner, updateBreadcrumbs, fetchBreadcrumbsConfig,
+  },
 )(PutAwaySecondPage);
 
 PutAwaySecondPage.propTypes = {
@@ -581,20 +590,17 @@ PutAwaySecondPage.propTypes = {
   savePutAways: PropTypes.func.isRequired,
   putAwayTranslationsFetched: PropTypes.bool.isRequired,
   // Labels and url with translation
-  breadcrumbsConfig: PropTypes.shape(PropTypes.oneOf([
-    PropTypes.shape({
-      label: PropTypes.string.isRequired,
-      defaultLabel: PropTypes.string.isRequired,
-      url: PropTypes.string.isRequired,
-      actionsUrl: PropTypes.string.isRequired,
-    }),
-    PropTypes.shape(PropTypes.shape({
-      label: PropTypes.string.isRequired,
-      defaultLabel: PropTypes.string.isRequired,
-    })),
-  ])),
+  breadcrumbsConfig: PropTypes.shape({
+    actionLabel: PropTypes.string.isRequired,
+    defaultActionLabel: PropTypes.string.isRequired,
+    listLabel: PropTypes.string.isRequired,
+    defaultListLabel: PropTypes.string.isRequired,
+    listUrl: PropTypes.string.isRequired,
+    actionUrl: PropTypes.string.isRequired,
+  }),
   // Method to update breadcrumbs data
   updateBreadcrumbs: PropTypes.func.isRequired,
+  fetchBreadcrumbsConfig: PropTypes.func.isRequired,
 };
 
 PutAwaySecondPage.defaultProps = {
@@ -602,17 +608,11 @@ PutAwaySecondPage.defaultProps = {
   pivotBy: ['stockMovement.name'],
   expanded: {},
   breadcrumbsConfig: {
-    putAway: {
-      label: '',
-      defaultLabel: '',
-      url: '',
-      actionUrl: '',
-    },
-    actions: {
-      create: {
-        label: '',
-        defaultLabel: '',
-      },
-    },
+    actionLabel: '',
+    defaultActionLabel: '',
+    listLabel: '',
+    defaultListLabel: '',
+    listUrl: '',
+    actionUrl: '',
   },
 };

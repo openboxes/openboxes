@@ -656,6 +656,42 @@ openboxes {
     }
 }
 
+//Breadcrumbs configuration 
+breadcrumbsConfig {
+        inbound {
+            actionLabel = "react.stockMovement.inbound.create.label"
+            defaultActionLabel = "Create Inbound"
+            listLabel = "react.stockMovement.label"
+            defaultListLabel = "Stock Movement"
+            actionUrl = "/${appName}/stockMovement/createInbound/"
+            listUrl   = "/${appName}/stockMovement/list?direction=INBOUND"
+        }
+        outbound {
+            actionLabel = "react.stockMovement.outbound.create.label"
+            defaultActionLabel = "Create Outbound"
+            listLabel = "react.stockMovement.label"
+            defaultListLabel = "Stock Movement"
+            actionUrl = "/${appName}/stockMovement/createOutbound/"
+            listUrl = "/${appName}/stockMovement/list?direction=OUTBOUND"
+        }
+        request {
+            actionLabel = "react.stockMovement.request.create.label"
+            defaultActionLabel = "Create Request"
+            listLabel = "react.stockMovement.label"
+            defaultListLabel = "Stock Movement"
+            actionUrl = "/${appName}/stockMovement/createRequest"
+            listUrl = "/${appName}/stockMovement/list?direction=INBOUND"
+        }
+        putAway {
+            actionLabel = "react.putAway.createPutAway.label"
+            defaultActionLabel = "Create Putaway"
+            listLabel = "react.putAway.list.label"
+            defaultListLabel = "Order"
+            actionUrl = "/${appName}/putAway/create/"
+            listUrl = "/${appName}/order/list?orderTypeCode=TRANSFER_ORDER&status=PENDING"
+        }
+}
+
 // OpenBoxes identifier config
 openboxes.identifier.separator = Constants.DEFAULT_IDENTIFIER_SEPARATOR
 openboxes.identifier.numeric = Constants.RANDOM_IDENTIFIER_NUMERIC_CHARACTERS

@@ -12,6 +12,7 @@ class ApitableroController {
     def indicatorDataService
     def userService
     def messageService
+    def grailsApplication
 
     def config = {
         User user = User.get(session.user.id)
@@ -25,6 +26,11 @@ class ApitableroController {
         def config = userService.updateDashboardConfig(user, request.JSON)
 
         render(config as JSON)
+    }
+    
+    @Cacheable("dashboardCache")
+    def breadcrumbsConfig = {
+        render(grailsApplication.config.breadcrumbsConfig as JSON)
     }
 
     @Cacheable("dashboardCache")

@@ -21,6 +21,7 @@ import {
   FETCH_CONFIG,
   SET_ACTIVE_CONFIG,
   UPDATE_BREADCRUMBS_PARAMS,
+  FETCH_BREADCRUMBS_CONFIG,
 } from './types';
 import apiClient, { parseResponse } from '../utils/apiClient';
 
@@ -412,5 +413,16 @@ export function updateBreadcrumbs(listBreadcrumbsStep = [
       });
     });
     dispachBreadcrumbsParams(breadcrumbsParams, dispatch);
+  };
+}
+
+export function fetchBreadcrumbsConfig() {
+  return (dispatch) => {
+    apiClient.get('/openboxes/apitablero/breadcrumbsConfig').then((res) => {
+      dispatch({
+        type: FETCH_BREADCRUMBS_CONFIG,
+        payload: res.data,
+      });
+    });
   };
 }
