@@ -875,7 +875,7 @@ openboxes {
         }
         analytics {
             enabled = true
-            requiredRoles = [RoleType.ROLE_ADMIN]
+            requiredRoles = [RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN]
             label = "analytics.label"
             defaultLabel = "Analytics"
             menuItems = [
@@ -1054,6 +1054,7 @@ openboxes {
         }
         configuration {
             enabled = true
+            requiredRoles = [RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN]
             label = "configuration.label"
             defaultLabel = "Configuration"
             subsections = [
