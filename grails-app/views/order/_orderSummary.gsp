@@ -57,8 +57,11 @@
                     <td style="color: ${orderItem?.product?.color}">
                         ${orderItem?.product?.productCode}
                     </td>
-                    <td style="color: ${orderItem?.product?.color}">
-                        <format:product product="${orderItem?.product}"/>
+                    <td>
+                        <g:link controller="inventoryItem" action="showStockCard"
+                                style="color: ${orderItem?.product?.color}"  params="['product.id':orderItem?.product?.id]">
+                            <format:product product="${orderItem?.product}"/>
+                        </g:link>
                     </td>
                     <g:if test="${!isItemCanceled}">
                         <g:if test="${orderInstance.orderItems.any { it.productSupplier?.supplierCode } }">
