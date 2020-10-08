@@ -12,23 +12,18 @@ package org.pih.warehouse.inventory
 import grails.converters.JSON
 import grails.validation.ValidationException
 import groovy.time.TimeCategory
-import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
-import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductException
-import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
-import org.pih.warehouse.requisition.RequisitionItemStatus
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentItemException
 import org.pih.warehouse.util.DateUtil
-import util.ConfigHelper
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -242,54 +237,65 @@ class InventoryItemController {
     }
 
 
-    def showPending = {
+    def showPendingInbound = {
 
         Product product = Product.get(params.id)
         Location location = Location.get(session?.warehouse?.id)
-        StockMovementType stockMovementType = params.type as StockMovementType
-        def itemsMap, requisitionItems, shipmentItems, orderItems = []
+        def itemsMap = [:]
+        def shipmentItems, orderItems = []
 
-        if (!stockMovementType) {
-            throw new IllegalArgumentException("Stock movement type is required")
+        shipmentItems = shipmentService.getPendingInboundShipmentItems(location, product)
+        shipmentItems.sort { it.shipment.currentStatus }.groupBy { it.shipment }.collect { k, v ->
+            itemsMap.put(k, [
+                    quantityRemaining: v.quantityRemaining.sum(),
+                    quantityPurchased: 0,
+                    shipDate: k.expectedShippingDate,
+                    type: 'Stock Movement'
+            ]
+            )
         }
-
-        Location origin = stockMovementType == StockMovementType.INBOUND ? null : location
-        Location destination = stockMovementType == StockMovementType.OUTBOUND ? null : location
-
-        if (origin) {
-            requisitionItems = requisitionService.getPendingRequisitionItems(origin, product)
-            itemsMap = requisitionItems.groupBy { it.requisition }
-        } else if (destination) {
-            shipmentItems = shipmentService.getPendingInboundShipmentItems(destination, product)
-            itemsMap = shipmentItems.sort { it.shipment.currentStatus }.groupBy { it.shipment }
-            orderItems = orderService.getPendingInboundOrderItems(destination, product)
-            itemsMap += orderItems.groupBy { it.order }
-        }
-
-        log.info "itemsMap: " + itemsMap
-        if (itemsMap) {
-            itemsMap.keySet().each {
-                def quantityRequested = it instanceof Requisition ? itemsMap[it].sum() { RequisitionItem requisitionItem -> requisitionItem.quantity } : 0
-                def quantityRequired = it instanceof Requisition ? itemsMap[it].sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityRequired() } : 0
-                def quantityPicked =  it instanceof Requisition ? itemsMap[it].sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityPicked() } : 0
-                def quantityRemaining = it instanceof Shipment ? itemsMap[it].sum() { ShipmentItem shipmentItem -> shipmentItem.quantityRemaining } : 0
-                Integer quantityPurchased = it instanceof Order ? itemsMap[it].sum() { OrderItem orderItem -> orderItem.quantityRemaining * orderItem.quantityPerUom } : 0
-                def shipDate = it instanceof Order ? itemsMap[it].first().actualReadyDate : it.expectedShippingDate
-                def type = it instanceof Order ? "Purchase Order" : "Stock Movement"
-                def quantityMap = [
-                        quantityRequested: quantityRequested,
-                        quantityRequired : quantityRequired,
-                        quantityPicked   : quantityPicked,
-                        quantityRemaining: quantityRemaining,
-                        quantityPurchased: quantityPurchased,
-                        type             : type,
-                        shipDate         : shipDate
+        orderItems = orderService.getPendingInboundOrderItems(location, product)
+        orderItems.collect {
+            def existingItem = itemsMap.find {k, v -> k instanceof OrderItem && k.actualReadyDate == it.actualReadyDate && k.order == it.order}
+            if (!existingItem) {
+                itemsMap.put(it, [
+                        quantityRemaining: 0,
+                        quantityPurchased: (it.quantityRemaining * it.quantityPerUom).toInteger(),
+                        shipDate         : it.actualReadyDate,
+                        type             : 'Purchase Order',
                 ]
-                itemsMap.put(it, quantityMap)
+                )
+            } else {
+                itemsMap[existingItem.getKey()].quantityPurchased += (it.quantityRemaining * it.quantityPerUom).toInteger()
             }
         }
 
-        render(template: "showPendingStock", model: [product: product, itemsMap: itemsMap])
+
+        log.info "itemsMap: " + itemsMap
+
+        render(template: "showPendingInboundStock", model: [product: product, itemsMap: itemsMap])
+    }
+
+    def showPendingOutbound = {
+        Product product = Product.get(params.id)
+        Location location = Location.get(session?.warehouse?.id)
+        def itemsMap = [:]
+        def requisitionItems
+
+        requisitionItems = requisitionService.getPendingRequisitionItems(location, product)
+        requisitionItems.groupBy { it.requisition }.collect { k, v ->
+            itemsMap.put(k, [
+                    quantityRequested: v.quantity.sum(),
+                    quantityRequired: v.sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityRequired() },
+                    quantityPicked: v.sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityPicked() },
+            ]
+            )
+        }
+
+
+        log.info "itemsMap: " + itemsMap
+
+        render(template: "showPendingOutboundStock", model: [product: product, itemsMap: itemsMap])
     }
 
     def showDemand = { StockCardCommand cmd ->
