@@ -172,13 +172,13 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.packLevel1.label',
         defaultMessage: 'Pack level 1',
-        flexWidth: '3.5',
+        flexWidth: '3',
       },
       boxName: {
         type: LabelField,
         label: 'react.stockMovement.packLevel2.label',
         defaultMessage: 'Pack level 2',
-        flexWidth: '3.5',
+        flexWidth: '3',
       },
       productCode: {
         type: LabelField,
@@ -190,7 +190,7 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
-        flexWidth: '6',
+        flexWidth: '7',
         attributes: {
           className: 'text-left',
           formatValue: value => (
