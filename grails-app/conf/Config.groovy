@@ -679,16 +679,24 @@ breadcrumbsConfig {
             defaultActionLabel = "Create Request"
             listLabel = "react.stockMovement.label"
             defaultListLabel = "Stock Movement"
-            actionUrl = "/${appName}/stockMovement/createRequest"
+            actionUrl = "/${appName}/stockMovement/createRequest/"
             listUrl = "/${appName}/stockMovement/list?direction=INBOUND"
         }
         putAway {
             actionLabel = "react.putAway.createPutAway.label"
             defaultActionLabel = "Create Putaway"
-            listLabel = "react.putAway.list.label"
+            listLabel = "react.breadcrumbs.order.label"
             defaultListLabel = "Order"
             actionUrl = "/${appName}/putAway/create/"
             listUrl = "/${appName}/order/list?orderTypeCode=TRANSFER_ORDER&status=PENDING"
+        }
+        purchase {
+            actionLabel = "react.stockMovement.purchase.create.label"
+            defaultActionLabel = "Ship Order"
+            listLabel = "react.breadcrumbs.order.label"
+            defaultListLabel = "Order"
+            actionUrl = "/${appName}/stockMovement/createPurchaseOrders/"
+            listUrl = "/${appName}/order/list?orderTypeCode=PURCHASE_ORDER"
         }
 }
 
