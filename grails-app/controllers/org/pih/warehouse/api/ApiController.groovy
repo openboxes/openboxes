@@ -62,7 +62,6 @@ class ApiController {
         render([status: 200, text: "Current language is ${locale}"])
     }
 
-    @Cacheable("megamenuCache")
     def getMenuConfig = {
         Map menuConfig = grailsApplication.config.openboxes.megamenu
         User user = User.get(session?.user?.id)
