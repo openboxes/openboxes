@@ -736,14 +736,14 @@
                 <warehouse:message code="customLinks.label" default="Custom Links" />
             </a>
             <div class="mm-item-content">
-                <g:each var="link" in="${megamenuConfig.customLinks.content}">
+                <g:each var="item" in="${megamenuConfig.customLinks.menuItems}">
                     <div class="mm-menu-item">
-                        <a href="${link.href}" target="${link.target}">
-                            ${link.label}
+                        <a href="${item.href}" target="${item.target}">
+                            <warehouse:message code="${item.label}" default="${item.defaultLabel}" />
                         </a>
                     </div>
                 </g:each>
-                <g:unless test="${megamenuConfig.customLinks.content}">
+                <g:unless test="${megamenuConfig.customLinks.menuItems}">
                     <div class="mm-menu-item">
                         <a href="#">There are no custom links</a>
                     </div>
