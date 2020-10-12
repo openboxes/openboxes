@@ -155,6 +155,7 @@
             >div {
                 border-bottom: none !important;
                 height: inherit;
+                margin-right: 0 !important;
 
                 >div {
                     display: flex;
@@ -166,6 +167,7 @@
                         .text-truncate {
                             // Do not truncate text
                             white-space: pre-wrap !important;
+                            margin-right: 0 !important;
                         }
                     }
                 }
