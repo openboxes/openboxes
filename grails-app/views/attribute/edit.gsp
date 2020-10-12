@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.product.Attribute" %>
+<%@ page import="org.pih.warehouse.core.UnitOfMeasureType; org.pih.warehouse.product.Attribute" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -36,15 +36,6 @@
 						<tbody>
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="active"><g:message code="default.active.label" default="Active" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: attributeInstance, field: 'active', 'errors')}">
-                                    <g:checkBox name="active" value="${attributeInstance?.active}" />
-                                </td>
-                            </tr>
-
-                            <tr class="prop">
-                                <td valign="top" class="name">
                                     <label for="name"><g:message code="default.code.label" default="Code" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: attributeInstance, field: 'code', 'errors')}">
@@ -69,9 +60,18 @@
 									<g:textArea name="description" value="${attributeInstance?.description}" class="text" />
 								</td>
 							</tr>
-
-
-
+							<tr class="prop">
+								<td valign="top" class="name">
+									<label for="unitOfMeasureClass"><g:message code="unitOfMeasureClass.label" default="Unit of Measure Class" /></label>
+								</td>
+								<td valign="top" class="value ${hasErrors(bean: attributeInstance, field: 'unitOfMeasureClass', 'errors')}">
+									<g:select name="unitOfMeasureClass.id" from="${org.pih.warehouse.core.UnitOfMeasureClass.list()}"
+                                              value="${attributeInstance?.unitOfMeasureClass?.id}"
+                                              class="chzn-select-deselect" noSelection="['':'']" optionKey="id"
+                                        optionValue="${{it.name + ': ' + it?.baseUom?.name?:'No Default'}}"
+                                    />
+								</td>
+							</tr>
 							<tr class="prop">
 								<td valign="top" class="name">
 								  <label for="option"><g:message code="attribute.options.label" default="Options" /></label>
@@ -94,6 +94,14 @@
                                     </a>
 								</td>
 							</tr>
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="active"><g:message code="default.active.label" default="Active" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: attributeInstance, field: 'active', 'errors')}">
+                                    <g:checkBox name="active" value="${attributeInstance?.active}" />
+                                </td>
+                            </tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="required"><g:message code="default.required.label" default="Required" /></label>
@@ -142,9 +150,6 @@
                     addOption('${option}');
                 </g:each>
             </g:if>
-            <g:else>
-                addOption('');
-            </g:else>
 
             $("input[name='option']").bind('paste', function(event) {
                 // Prevent full text from being pasted into field
