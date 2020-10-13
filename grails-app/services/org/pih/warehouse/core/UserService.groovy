@@ -350,10 +350,14 @@ class UserService {
     def getDashboardConfig(User user) {
         def config = grailsApplication.config.openboxes.tablero
         def userConfig = user.deserializeDashboardConfig()
-
+        
         if (userConfig != null) {
-            updateConfig("graph", config, userConfig)
-            updateConfig("number", config, userConfig)
+            int userConfigSize = userConfig.graph.size() + userConfig.number.size()
+            int configSize = config.endpoints.number.size() + config.endpoints.graph.size()
+            if (userConfigSize == configSize) {
+                updateConfig("graph", config, userConfig)
+                updateConfig("number", config, userConfig)
+            }
         }
 
         return config
