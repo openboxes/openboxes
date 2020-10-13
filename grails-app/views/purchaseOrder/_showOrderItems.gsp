@@ -69,7 +69,7 @@
                             </g:if>
                         </div>
                     </h2>
-                    <g:form name="orderItemForm" action="purchaseOrder" method="post">
+                    <g:form name="orderItemForm" action="create" method="post">
                         <g:hiddenField id="orderId" name="order.id" value="${order?.id }"></g:hiddenField>
                         <g:hiddenField id="orderItemId" name="orderItem.id" value="${orderItem?.id }"></g:hiddenField>
                         <g:hiddenField id="supplierId" name="supplier.id" value="${order?.originParty?.id }"></g:hiddenField>
@@ -243,11 +243,10 @@
             </div>
             <div class="buttons">
                 <div class="left">
-                    <g:link controller="purchaseOrderWorkflow"
-                            action="purchaseOrder"
+                    <g:link controller="purchaseOrder"
+                            action="edit"
                             id="${order?.id}"
-                            event="enterOrderDetails"
-                            params="[skipTo:'details']"
+                            params="[id:order?.id]"
                             class="button">
                         <img src="${resource(dir: 'images/icons/silk', file: 'resultset_previous.png')}" />&nbsp;
                         <warehouse:message code="default.back.label" default="Back"/>

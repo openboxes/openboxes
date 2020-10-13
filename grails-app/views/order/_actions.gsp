@@ -38,13 +38,13 @@
 			</div>
 			<g:if test="${orderInstance?.isPending() && orderInstance?.orderTypeCode == OrderTypeCode.PURCHASE_ORDER}">
 				<div class="action-menu-item">
-					<g:link controller="purchaseOrderWorkflow" action="purchaseOrder" id="${orderInstance?.id}">
+					<g:link controller="purchaseOrder" action="edit" id="${orderInstance?.id}" params="[id:orderInstance?.id]">
 						<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" style="vertical-align: middle" />
 						&nbsp;${warehouse.message(code: 'order.editDetails.label')}
 					</g:link>
 				</div>
 				<div class="action-menu-item">
-					<g:link controller="purchaseOrderWorkflow" action="purchaseOrder" id="${orderInstance?.id}" params="['skipTo': 'items']">
+					<g:link controller="purchaseOrder" action="addItems" id="${orderInstance?.id}">
 						<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add" style="vertical-align: middle" />
 						&nbsp;${warehouse.message(code: 'order.editItems.label')}
 					</g:link>

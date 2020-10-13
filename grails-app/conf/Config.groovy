@@ -1013,7 +1013,7 @@ openboxes {
                     label: "purchaseOrders.label",
                     defaultLabel: "Purchase Orders",
                     menuItems: [
-                        [label: "order.createPurchase.label", defaultLabel: "Create Purchase Order", href: "/${appName}/purchaseOrderWorkflow/index"],
+                        [label: "order.createPurchase.label", defaultLabel: "Create Purchase Order", href: "/${appName}/purchaseOrder/index"],
                         [label: "order.listPurchase.label", defaultLabel: "List Purchase Orders", href: "/${appName}/order/list?orderTypeCode=PURCHASE_ORDER"]
                     ]
                 ],

@@ -136,7 +136,7 @@ class OrderController {
     }
 
     def create = {
-        redirect(controller: 'purchaseOrderWorkflow', action: 'index')
+        redirect(controller: 'purchaseOrder', action: 'index')
     }
 
 
@@ -364,7 +364,7 @@ class OrderController {
                 orderAdjustment.properties = params
                 if (!orderAdjustment.hasErrors() && orderAdjustment.save(flush: true)) {
                     flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'orderAdjustment.label', default: 'Order Adjustment'), orderAdjustment.id])}"
-                    redirect(controller:"purchaseOrderWorkflow", action: "purchaseOrder", id: orderInstance.id, params:['skipTo': 'adjustments'])
+                    redirect(controller:"purchaseOrder", action: "addItems", id: orderInstance.id, params:['skipTo': 'adjustments'])
                 } else {
                     render(view: "editAdjustment", model: [orderInstance: orderInstance, orderAdjustment: orderAdjustment])
                 }
@@ -373,7 +373,7 @@ class OrderController {
                 orderInstance.addToOrderAdjustments(orderAdjustment)
                 if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
                     flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.id])}"
-                    redirect(controller:"purchaseOrderWorkflow", action: "purchaseOrder", id: orderInstance.id, params:['skipTo': 'adjustments'])
+                    redirect(controller:"purchaseOrder", action: "addItems", id: orderInstance.id, params:['skipTo': 'adjustments'])
                 } else {
                     render(view: "editAdjustment", model: [orderInstance: orderInstance, orderAdjustment: orderAdjustment])
                 }
@@ -400,7 +400,7 @@ class OrderController {
                 orderAdjustment.delete()
                 if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
                     flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.id])}"
-                    redirect(controller:"purchaseOrderWorkflow", action: "purchaseOrder", id: orderInstance.id, params:['skipTo': 'adjustments'])
+                    redirect(controller:"purchaseOrder", action: "addItems", id: orderInstance.id, params:['skipTo': 'adjustments'])
                 } else {
                     render(view: "show", model: [orderInstance: orderInstance])
                 }
