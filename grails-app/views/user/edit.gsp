@@ -31,16 +31,14 @@
                         <li><a href="#details-tab"><warehouse:message code="user.details.label" default="User Details"/></a></li>
                         <li><a href="#password-tab"><warehouse:message code="user.changePassword.label" default="Change Password"/></a></li>
                         <li><a href="#authorization-tab"><warehouse:message code="user.authorization.label" default="Authorization"/></a></li>
+                        <li><a href="#config-tab"><warehouse:message code="user.dashboardConfig.label" default="Dashboard Config"/></a></li>
                     </ul>
                     <div id="details-tab">
-
                         <div class="box">
                             <h2><warehouse:message code="user.details.label" default="Details"/></h2>
-
                             <g:form method="post" >
                                 <g:hiddenField name="id" value="${userInstance?.id}" />
                                 <g:hiddenField name="version" value="${userInstance?.version}" />
-
                                 <table>
                                     <tbody>
                                         <tr class="prop">
@@ -126,7 +124,6 @@
                     <div id="password-tab">
                         <div class="box">
                             <h2><g:message code="user.changePassword.label" default="Change Password"/></h2>
-
                             <g:form method="post">
                                 <g:hiddenField name="id" value="${userInstance?.id}" />
                                 <g:hiddenField name="version" value="${userInstance?.version}" />
@@ -143,7 +140,6 @@
                                                 <g:passwordField name="password" value="${userInstance?.password}" class="text" size="40"/>
                                             </td>
                                         </tr>
-
                                         <tr class="prop">
                                             <td valign="top" class="name">
                                                 <label for="password"><warehouse:message code="user.confirmPassword.label" /></label>
@@ -152,7 +148,6 @@
                                                 <g:passwordField name="passwordConfirm" value="" class="text" size="40"/>
                                             </td>
                                         </tr>
-
                                     </tbody>
                                     <tfoot>
                                     <tr>

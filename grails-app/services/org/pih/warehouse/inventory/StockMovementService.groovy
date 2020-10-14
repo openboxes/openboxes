@@ -2120,6 +2120,12 @@ class StockMovementService {
         return true
     }
 
+    void removeDocument(Shipment shipment, Document document) {
+        log.info "Remove document " + document.name + " from " + shipment.name
+        shipment.removeFromDocuments(document)
+        document.delete()
+        shipment.save()
+    }
 
     List<Map> getDocuments(StockMovement stockMovement) {
         def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
@@ -2216,6 +2222,7 @@ class StockMovementService {
             stockMovement?.shipment?.documents.each { Document document ->
                 def action = document.documentType?.documentCode == DocumentCode.SHIPPING_TEMPLATE ? "render" : "download"
                 documentList << [
+                        id          : document?.id,
                         name        : document?.name,
                         documentType: document?.documentType?.name,
                         contentType : document?.contentType,

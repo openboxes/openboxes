@@ -44,7 +44,14 @@
                             <td>${document.name}</td>
                             <td>${document.documentType}</td>
                             <td>${document.contentType}</td>
-                            <td>
+                            <td class="right">
+                                <g:if test="${document.id}">
+                                    <g:link controller="stockMovement" action="removeDocument" id="${stockMovement?.id}" params="['document.id':document?.id]"
+                                            onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
+                                            class="button">
+                                        <warehouse:message code="default.button.delete.label"/>
+                                    </g:link>
+                                </g:if>
                                 <g:link url="${document.uri}" target="_blank" class="button">
                                     <warehouse:message code="default.button.download.label"/>
                                 </g:link>

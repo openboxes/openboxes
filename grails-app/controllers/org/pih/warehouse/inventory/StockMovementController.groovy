@@ -337,9 +337,7 @@ class StockMovementController {
     }
 
     def addDocument = {
-        log.info params
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-
         Shipment shipmentInstance = stockMovement.shipment
         def documentInstance = Document.get(params?.document?.id)
         if (!documentInstance) {
@@ -350,6 +348,22 @@ class StockMovementController {
             redirect(action: "list")
         }
         render(view: "addDocument", model: [shipmentInstance: shipmentInstance, documentInstance: documentInstance])
+    }
+
+    def removeDocument = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        Shipment shipmentInstance = Shipment.get(stockMovement?.shipment?.id)
+        Document documentInstance = Document.get(params?.document?.id)
+        if (!shipmentInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
+        }
+        else if (!documentInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label', default: 'Document'), params.id])}"
+        }
+        else {
+            stockMovementService.removeDocument(shipmentInstance, documentInstance)
+        }
+        redirect(action: "show", id: params.id)
     }
 
     def exportCsv = {

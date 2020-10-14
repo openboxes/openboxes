@@ -30,6 +30,8 @@ class Document implements Serializable {
     String documentNumber        // Document reference number
     DocumentType documentType    // Type of document
 
+    //static belongsTo = [order: Order, shipment: Shipment, product: Product]
+
     // Documents should exist on their own in case we want to tie them to other objects.
     // Shipment (and other entities) should create a join table for documents.
     static mapping = {
@@ -49,6 +51,9 @@ class Document implements Serializable {
         fileContents(nullable: true, maxSize: 10485760) // 10 MBs
         documentNumber(nullable: true, maxSize: 255)
         documentType(nullable: true)
+//        shipment(nullable:true)
+//        product(nullable:true)
+//        order(nullable:true)
     }
 
     String toString() { return "$name" }
