@@ -148,7 +148,7 @@ class StockMovements extends Component {
       newName = `${origin.name}.${destination.name}.${dateReq}.${stocklistPart}${trackingNumber}.${description}`;
       newName.replace(/ /gi, '');
     }
-    return values.movementNumber;
+    return `${values.movementNumber} - ${newName}`;
   }
 
   getAdditionalWizardTitle() {
