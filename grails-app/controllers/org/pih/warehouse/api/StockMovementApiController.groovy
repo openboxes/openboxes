@@ -89,6 +89,14 @@ class StockMovementApiController {
         render([data: newStockMovement] as JSON)
     }
 
+    // TODO Remove it later once all inbound types are shipment
+    // and then use endpoint above to create combined shipments
+    def createCombinedShipments = { StockMovement stockMovement ->
+        StockMovement newStockMovement = stockMovementService.createShipmentBasedStockMovement(stockMovement)
+        response.status = 201
+        render([data: newStockMovement] as JSON)
+    }
+
     /**
      * @deprecated FIXME refactor to avoid using RPC-style endpoints
      */

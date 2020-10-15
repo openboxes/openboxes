@@ -656,7 +656,7 @@ openboxes {
     }
 }
 
-//Breadcrumbs configuration 
+//Breadcrumbs configuration
 breadcrumbsConfig {
         inbound {
             actionLabel = "react.stockMovement.inbound.create.label"
@@ -697,6 +697,14 @@ breadcrumbsConfig {
             defaultListLabel = "Order"
             actionUrl = "/${appName}/stockMovement/createPurchaseOrders/"
             listUrl = "/${appName}/order/list?orderTypeCode=PURCHASE_ORDER"
+        }
+        combinedShipments {
+            actionLabel = "createShipmentFromPo.label"
+            defaultActionLabel = "Create Shipment from PO"
+            listLabel = "react.stockMovement.label"
+            defaultListLabel = "Stock Movement"
+            actionUrl = "/${appName}/stockMovement/createCombinedShipments/"
+            listUrl   = "/${appName}/stockMovement/list?direction=INBOUND"
         }
 }
 
@@ -1014,6 +1022,7 @@ openboxes {
                     defaultLabel: "Purchase Orders",
                     menuItems: [
                         [label: "order.createPurchase.label", defaultLabel: "Create Purchase Order", href: "/${appName}/purchaseOrderWorkflow/index"],
+                        [label: "createShipmentFromPo.label", defaultLabel: "Create Shipment from PO", href: "/${appName}/stockMovement/createCombinedShipments?direction=INBOUND"],
                         [label: "order.listPurchase.label", defaultLabel: "List Purchase Orders", href: "/${appName}/order/list?orderTypeCode=PURCHASE_ORDER"]
                     ]
                 ],

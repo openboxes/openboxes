@@ -201,6 +201,11 @@
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">
+                                <g:link controller="stockMovement" action="createCombinedShipments" params="[direction:'INBOUND']">
+                                    <warehouse:message code="default.create.label" args="[warehouse.message(code: 'shipmentFromPO.label')]"/>
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
                                 <g:link controller="order" action="list" params="[orderTypeCode:OrderTypeCode.PURCHASE_ORDER]" class="list">
                                     <warehouse:message code="order.listPurchase.label" default="List Purchase Orders" />
                                 </g:link>
