@@ -152,6 +152,12 @@ class UrlMappings {
             action = [POST: "updateAdjustedItems"]
         }
 
+        // TODO Remove it later once all inbound types are shipment
+        "/api/stockMovements/createCombinedShipments"(parseRequest: true) {
+            controller = "stockMovementApi"
+            action = [POST: "createCombinedShipments"]
+        }
+
         // Partial Receiving API
 
         "/api/partialReceiving"(parseRequest: true) {

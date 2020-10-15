@@ -163,6 +163,32 @@
         </g:authorize>
     </g:if>
 
+    <g:if test="${megamenuConfig.purchasing.enabled}">
+        <li class="mm-item">
+            <a href="javascript:void(0)" class="mm-item-link">
+                <warehouse:message code="order.purchasing.label" />
+            </a>
+            <div class="mm-item-content">
+                <div class="mm-menu-item">
+                    <g:link controller="purchaseOrderWorkflow" action="index" class="create">
+                        <warehouse:message code="default.create.label" args="[warehouse.message(code:'purchaseOrder.label')]"/>
+                    </g:link>
+                </div>
+                <div class="mm-menu-item">
+                    <g:link controller="order" action="list" params="[orderTypeCode:OrderTypeCode.PURCHASE_ORDER]" class="list">
+                        <warehouse:message code="order.listPurchase.label" default="List Purchase Orders" />
+                    </g:link>
+                </div>
+                <div class="mm-menu-item">
+                    <g:link controller="stockMovement" action="createCombinedShipments" params="[direction:'INBOUND']">
+                        <warehouse:message code="shipment.shipfromPO.label"/>
+                    </g:link>
+                </div>
+            </div>
+        </li>
+        </a>
+    </g:if>
+
     <g:if test="${megamenuConfig.inbound.enabled}">
         <g:authorize activity="[ActivityCode.RECEIVE_STOCK]">
             <li class="mm-item">
@@ -188,21 +214,6 @@
                             <div class="mm-menu-item">
                                 <g:link controller="stockMovement" action="list" params="[direction:'INBOUND']">
                                     <warehouse:message code="default.list.label" args="[warehouse.message(code: 'stockMovements.inbound.label')]"/>
-                                </g:link>
-                            </div>
-                        </div>
-                    </g:if>
-                    <g:if test="${megamenuConfig.orders.enabled}">
-                        <div class="mm-content-section">
-                            <h3><warehouse:message code="purchaseOrders.label" default="Purchase Orders"/></h3>
-                            <div class="mm-menu-item">
-                                <g:link controller="purchaseOrder" action="index" class="create">
-                                    <warehouse:message code="default.create.label" args="[warehouse.message(code:'purchaseOrder.label')]"/>
-                                </g:link>
-                            </div>
-                            <div class="mm-menu-item">
-                                <g:link controller="order" action="list" params="[orderTypeCode:OrderTypeCode.PURCHASE_ORDER]" class="list">
-                                    <warehouse:message code="order.listPurchase.label" default="List Purchase Orders" />
                                 </g:link>
                             </div>
                         </div>
