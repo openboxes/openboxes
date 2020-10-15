@@ -155,7 +155,8 @@ class StockMovements extends Component {
     const { currentPage, values } = this.state;
     const shipped = values.shipped ? 'SHIPPED' : '';
     const received = values.received ? 'RECEIVED' : '';
-    if ((this.props.hasPackingSupport && currentPage === 6) || currentPage === 5) {
+    if ((this.props.hasPackingSupport && currentPage === 6) ||
+      (!this.props.hasPackingSupport && currentPage === 5)) {
       return (
         <span className="shipment-status float-right">
           {`${shipped || received || 'PENDING'}`}
