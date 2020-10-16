@@ -196,7 +196,7 @@
                         <div class="mm-content-section">
                             <h3><warehouse:message code="purchaseOrders.label" default="Purchase Orders"/></h3>
                             <div class="mm-menu-item">
-                                <g:link controller="purchaseOrderWorkflow" action="index" class="create">
+                                <g:link controller="purchaseOrder" action="index" class="create">
                                     <warehouse:message code="default.create.label" args="[warehouse.message(code:'purchaseOrder.label')]"/>
                                 </g:link>
                             </div>

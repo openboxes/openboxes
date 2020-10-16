@@ -113,8 +113,7 @@
                     </g:link>
                     <g:if test="${orderInstance?.status == OrderStatus.PENDING}">
                         <div class="button-group">
-                            <g:link controller="purchaseOrderWorkflow" action="purchaseOrder"
-                                    id="${orderInstance?.id}" event="showOrderItems" params="[skipTo:'items']" class="button">
+                            <g:link controller="purchaseOrder" action="addItems" id="${orderInstance?.id}" class="button">
                                 <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
                                 <warehouse:message code="order.wizard.editOrder.label" default="Edit"/>
                             </g:link>
@@ -154,8 +153,7 @@
                     </g:if>
                     <g:elseif test="${orderInstance?.status > OrderStatus.PENDING}">
                         <div class="button-group">
-                            <g:link controller="purchaseOrderWorkflow" action="purchaseOrder"
-                                    id="${orderInstance?.id}" event="showOrderItems" params="[skipTo:'items']" class="button">
+                            <g:link controller="purchaseOrder" action="addItems" id="${orderInstance?.id}" class="button">
                                 <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
                                 <warehouse:message code="order.wizard.editOrder.label" default="Edit"/>
                             </g:link>
@@ -270,8 +268,7 @@
                             <img src="${resource(dir: 'images/icons/silk', file: 'cart_magnify.png')}" />&nbsp;
                             <warehouse:message code="order.wizard.showOrder.label" default="Show Order"/>
                         </g:link>
-                        <g:link controller="purchaseOrderWorkflow" action="purchaseOrder"
-                                id="${orderInstance?.id}" event="showOrderItems" params="[skipTo:'items']" class="button">
+                        <g:link controller="purchaseOrder" action="addItems" id="${orderInstance?.id}" class="button">
                             <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
                             <warehouse:message code="order.wizard.editOrder.label" default="Edit"/>
                         </g:link>
