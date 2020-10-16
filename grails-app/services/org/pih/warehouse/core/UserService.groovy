@@ -350,10 +350,33 @@ class UserService {
     def getDashboardConfig(User user) {
         def config = grailsApplication.config.openboxes.tablero
         def userConfig = user.deserializeDashboardConfig()
-
+        Boolean configChanged = false
+        
         if (userConfig != null) {
-            updateConfig("graph", config, userConfig)
-            updateConfig("number", config, userConfig)
+            int userConfigSize = userConfig.graph.size() + userConfig.number.size()
+            int configSize = config.endpoints.number.size() + config.endpoints.graph.size()
+            // If the size is different, that mean that the config has changed
+            if (userConfigSize != configSize) {
+                return config
+            }
+            // Checking all keys in number to know if one changed
+            config.endpoints.number.each { element -> 
+                if (userConfig.number.find { it.key == element.key} == null) {
+                    configChanged = true
+                } 
+            }
+            if(!configChanged) updateConfig("number", config, userConfig)
+
+            // Reset configChanged to false to check the other part of the config
+            configChanged = false
+            
+            // Checking all keys in graph
+            config.endpoints.graph.each { element -> 
+                if (userConfig.graph.find { it.key == element.key} == null) {
+                    configChanged = true
+                }
+            }
+            if(!configChanged) updateConfig("graph", config, userConfig)
         }
 
         return config
