@@ -111,7 +111,7 @@ class InventorySnapshotService {
 
     def populateInventorySnapshots(Date date, Location location, Product product) {
         def binLocations = calculateBinLocations(location, product)
-        saveInventorySnapshots(date, location, binLocations)
+        saveInventorySnapshots(date, location, product, binLocations)
     }
 
     def calculateBinLocations(Location location, Date date) {
@@ -191,6 +191,10 @@ class InventorySnapshotService {
     }
 
     def saveInventorySnapshots(Date date, Location location, List binLocations) {
+        saveInventorySnapshots(date, location, null, binLocations)
+    }
+
+    def saveInventorySnapshots(Date date, Location location, Product product, List binLocations) {
         def startTime = System.currentTimeMillis()
         def batchSize = ConfigurationHolder.config.openboxes.inventorySnapshot.batchSize ?: 1000
         Sql sql = new Sql(dataSource)
@@ -200,7 +204,6 @@ class InventorySnapshotService {
             date.clearTime()
             String dateString = date.format("yyyy-MM-dd HH:mm:ss")
             DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-
 
             // Execute inventory snapshot insert/update in batches
             sql.withBatch(batchSize) { BatchingStatementWrapper stmt ->
@@ -212,13 +215,16 @@ class InventorySnapshotService {
             }
             log.info "Saved ${binLocations?.size()} inventory snapshots for location ${location} on date ${date.format("MMM-dd-yyyy")} in ${System.currentTimeMillis() - startTime}ms"
 
-            // Refresh the product availability table for each location
-            RefreshProductAvailabilityJob.triggerNow([locationId:location.id])
+            // Refresh the product availability table for the location
+            def productIds = product?.id ? [product?.id] : null
+            RefreshProductAvailabilityJob.triggerNow([locationId:location.id, productIds: productIds])
 
         } catch (Exception e) {
             log.error("Error executing batch update for ${location.name}: " + e.message, e)
             publishEvent(new ApplicationExceptionEvent(e, location))
             throw e;
+        } finally {
+            sql.close()
         }
     }
 
