@@ -13,7 +13,7 @@
     justify-content: space-between;
     line-height: 24px !important;
     font-size: 22px !important;
-    
+
     .shipment-status {
         border-radius: 4px !important;
         margin: 0 !important;
@@ -168,7 +168,7 @@
         margin-bottom: 0;
 
         .table-header {
-            height: 48px;
+            height: 36px;
             box-shadow: 0 4px -4px 4px rgba(0, 0, 0, 0.09);
 
             >div {
@@ -190,6 +190,13 @@
                         }
                     }
                 }
+            }
+        }
+
+
+        @media (min-height: 730px) {
+            .table-content {
+                max-height: 36vh !important;
             }
         }
 
@@ -217,7 +224,6 @@
 
     // Buttons
     .submit-buttons {
-        margin-bottom: 18px;
         margin-top: 18px;
         width: 100%;
 
@@ -281,4 +287,10 @@
             }
         }
     }
+}
+
+
+// Hide first line of footer
+.footer>div:first-child {
+    display: none !important;
 }
