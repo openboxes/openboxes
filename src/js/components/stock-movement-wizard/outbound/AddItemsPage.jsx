@@ -1089,16 +1089,6 @@ class AddItemsPage extends Component {
                   isFirstPageLoaded: this.state.isFirstPageLoaded,
                 }))}
               </div>
-              <div className="text-center add-button">
-                <button
-                  type="button"
-                  className="btn btn-outline-success btn-xs"
-                  disabled={showOnly}
-                  onClick={() => { document.getElementById('addButton').click(); }
-        }
-                ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
-                </button>
-              </div>
               <div className="submit-buttons">
                 <button
                   type="submit"
