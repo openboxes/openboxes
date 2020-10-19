@@ -76,6 +76,9 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
             "quantityReceivedInStandardUom",
             "quantityShipped",
             "quantityShippedInStandardUom",
+            "quantityInShipments",
+            "quantityInShipmentsInStandardUom",
+            "quantityRemainingToShip",
             "total",
             "shippedShipmentItems",
             "subtotal",
@@ -152,6 +155,12 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         }?:0
     }
 
+    Integer getQuantityInShipmentsInStandardUom() {
+        return shipmentItems?.sum { ShipmentItem shipmentItem ->
+            shipmentItem?.quantity
+        }?:0
+    }
+
     Integer getQuantityReceivedInStandardUom() {
         return shippedShipmentItems?.sum { ShipmentItem shipmentItem ->
             shipmentItem?.quantityReceived
@@ -164,6 +173,10 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
 
     Integer getQuantityReceived() {
         return quantityReceivedInStandardUom / quantityPerUom
+    }
+
+    Integer getQuantityInShipments() {
+        return quantityInShipmentsInStandardUom / quantityPerUom
     }
 
     String getOrderItemType() {
@@ -180,6 +193,12 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
 
     Integer getQuantityRemaining() {
         def quantityRemaining = quantity - quantityShipped
+        return quantityRemaining > 0 ? quantityRemaining : 0
+    }
+
+    // quantityAvailable for combined shipments
+    def getQuantityRemainingToShip() {
+        def quantityRemaining = quantity - quantityInShipments
         return quantityRemaining > 0 ? quantityRemaining : 0
     }
 
@@ -249,7 +268,6 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
                                         id <=> orderItem?.id
         return sortOrder
     }
-
 
     Map toJson() {
         return [

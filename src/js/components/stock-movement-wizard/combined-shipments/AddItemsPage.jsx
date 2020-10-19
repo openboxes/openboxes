@@ -67,6 +67,7 @@ const FIELDS = {
         destination={values.destination.id}
         onResponse={onResponse}
         btnOpenText="react.default.button.addLines.label"
+        btnOpenDefaultText="Add lines"
       >
         <Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
       </CombinedShipmentItemsModal>
