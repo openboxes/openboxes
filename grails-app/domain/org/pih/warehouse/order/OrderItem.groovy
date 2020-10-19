@@ -199,6 +199,12 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         return quantityRemaining > 0 ? quantityRemaining : 0
     }
 
+    // quantityAvailable for combined shipments
+    def getQuantityRemainingToShip() {
+        def quantityRemaining = quantity - quantityInShipments
+        return quantityRemaining > 0 ? quantityRemaining : 0
+    }
+
     Boolean isPartiallyFulfilled() {
         return quantityShipped > 0 && quantityShipped < quantity
     }
