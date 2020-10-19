@@ -387,7 +387,7 @@ class StockMovementApiController {
         List<StockMovementItem> stockMovementItems = new ArrayList<StockMovementItem>()
         lineItems.each { lineItem ->
             StockMovementItem stockMovementItem = new StockMovementItem()
-            stockMovementItem.id = lineItem.id
+            stockMovementItem.id = !isNull(lineItem["id"]) ? lineItem["id"] : null
             stockMovementItem.stockMovement = stockMovement
 
             // Required properties
