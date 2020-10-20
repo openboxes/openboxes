@@ -71,7 +71,7 @@ const VENDOR_FIELDS = {
             sortOrder: getSortOrder(),
           });
         }}
-      ><Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
+      ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
       </button>
     ),
     fields: {
@@ -899,7 +899,7 @@ class AddItemsPage extends Component {
         initialValues={this.state.values}
         render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
-            <span>
+            <span className="buttons-container">
               <label
                 htmlFor="csvInput"
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
@@ -957,7 +957,8 @@ class AddItemsPage extends Component {
               </button>
             </span>
             <form onSubmit={handleSubmit}>
-              {_.map(VENDOR_FIELDS, (fieldConfig, fieldName) =>
+              <div className="table-form">
+                {_.map(VENDOR_FIELDS, (fieldConfig, fieldName) =>
                 renderFormField(fieldConfig, fieldName, {
                   stocklist: values.stocklist,
                   recipients: this.props.recipients,
@@ -976,7 +977,8 @@ class AddItemsPage extends Component {
                   values,
                   isFirstPageLoaded: this.state.isFirstPageLoaded,
                 }))}
-              <div>
+              </div>
+              <div className="submit-buttons">
                 <button
                   type="submit"
                   disabled={invalid}
