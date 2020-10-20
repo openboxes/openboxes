@@ -12,6 +12,8 @@ import apiClient from '../../utils/apiClient';
 import { showSpinner, hideSpinner, fetchTranslations, updateBreadcrumbs, fetchBreadcrumbsConfig } from '../../actions';
 import { translateWithDefaultMessage } from '../../utils/Translate';
 
+import './StockMovement.scss';
+
 // TODO: Cleanup not required code
 // TODO: Revise docs
 
