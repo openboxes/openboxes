@@ -112,16 +112,18 @@ function validate(values) {
   return errors;
 }
 
+const INITIAL_STATE = {
+  orderNumberOptions: [],
+  selectedOrders: [],
+  selectedProductId: '',
+  selectedOrderItems: {},
+  formValues: { orderItems: [] },
+};
+
 class CombinedShipmentItemsModal extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      orderNumberOptions: [],
-      selectedOrders: [],
-      selectedProductId: '',
-      selectedOrderItems: {},
-      formValues: { orderItems: [] },
-    };
+    this.state = INITIAL_STATE;
 
     this.onOpen = this.onOpen.bind(this);
     this.onSave = this.onSave.bind(this);
@@ -136,12 +138,7 @@ class CombinedShipmentItemsModal extends Component {
   }
 
   onOpen() {
-    this.setState({
-      orderNumberOptions: [],
-      selectedOrders: {},
-      selectedProductId: '',
-      formValues: { orderItems: [] },
-    });
+    this.setState(INITIAL_STATE);
     this.getOrderNumberOptions();
     this.fetchOrderItems();
   }
@@ -164,8 +161,10 @@ class CombinedShipmentItemsModal extends Component {
 
     apiClient.post(url, payload)
       .then(() => {
-        this.props.hideSpinner();
-        this.props.onResponse();
+        this.setState(INITIAL_STATE, () => {
+          this.props.hideSpinner();
+          this.props.onResponse();
+        });
       })
       .catch(() => this.props.hideSpinner());
   }
