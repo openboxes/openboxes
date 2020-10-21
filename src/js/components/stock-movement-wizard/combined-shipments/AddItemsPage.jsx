@@ -307,7 +307,7 @@ class AddItemsPage extends Component {
     this.setState({
       values: {
         ...this.state.values,
-        lineItems: this.props.isPaginated ?
+        lineItems: this.props.isPaginated && !_.isNull(startIndex) ?
           _.uniqBy(_.concat(this.state.values.lineItems, lineItemsData), 'id') : lineItemsData,
       },
     }, () => {
