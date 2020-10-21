@@ -199,18 +199,18 @@
 
                 .expand-trigger>div,
                 &>div:first-child>div:first-child>div:first-child {
-                    height: 35vh !important;
+                    max-height: 35vh !important;
                 }
             }
         }
 
         @media (min-height: 900px) {
             .table-content {
-                max-height: 40h !important;
+                max-height: 40vh !important;
 
                 .expand-trigger>div,
                 &>div:first-child>div:first-child>div:first-child {
-                    height: 40vh !important;
+                    max-height: 40vh !important;
                 }
             }
         }

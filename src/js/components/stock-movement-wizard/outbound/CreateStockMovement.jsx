@@ -327,7 +327,10 @@ class CreateStockMovement extends Component {
               movementNumber: resp.identifier,
               name: resp.name,
               stocklist: resp.stocklist,
-              requestType: resp.requestType,
+              requestType: {
+                name: resp.requestType.name,
+                label: resp.requestType.name,
+              },
             });
           }
         })
