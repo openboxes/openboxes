@@ -168,7 +168,7 @@
         margin-bottom: 0;
 
         .table-header {
-            height: 36px;
+            height: 48px;
             box-shadow: 0 4px -4px 4px rgba(0, 0, 0, 0.09);
 
             >div {
@@ -193,9 +193,25 @@
             }
         }
 
-        @media (min-height: 730px) {
+        @media (min-height: 730px) and (max-height: 899px) {
             .table-content {
-                max-height: 36vh !important;
+                max-height: 35vh !important;
+
+                .expand-trigger>div,
+                &>div:first-child>div:first-child>div:first-child {
+                    max-height: 35vh !important;
+                }
+            }
+        }
+
+        @media (min-height: 900px) {
+            .table-content {
+                max-height: 40vh !important;
+
+                .expand-trigger>div,
+                &>div:first-child>div:first-child>div:first-child {
+                    max-height: 40vh !important;
+                }
             }
         }
 
