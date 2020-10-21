@@ -81,7 +81,7 @@ const FIELDS = {
         getDynamicAttr: ({
           updateRow, values, rowIndex,
         }) => ({
-          onBlur: () => updateRow(values, rowIndex),
+          onChange: () => updateRow(values, rowIndex),
         }),
       },
       uom: {
@@ -229,17 +229,16 @@ class CombinedShipmentItemsModal extends Component {
   updateRow(values, index) {
     const { selectedOrderItems } = this.state;
     const item = values.orderItems[index];
-    if (item.checked) {
-      this.setState({
-        formValues: update(values, {
-          orderItems: { [index]: { $set: item } },
-        }),
-        selectedOrderItems: {
-          ...selectedOrderItems,
-          [item.orderItemId]: item.quantityToShip,
-        },
-      });
-    }
+    item.checked = true;
+    this.setState({
+      formValues: update(values, {
+        orderItems: { [index]: { $set: item } },
+      }),
+      selectedOrderItems: {
+        ...selectedOrderItems,
+        [item.orderItemId]: item.quantityToShip,
+      },
+    });
   }
 
   render() {
