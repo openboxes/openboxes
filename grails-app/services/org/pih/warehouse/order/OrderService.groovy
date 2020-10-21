@@ -103,6 +103,22 @@ class OrderService {
         return Order.findAllByOrigin(location)
     }
 
+
+    /**
+     * @param origin (vendor)
+     * @param destination
+     * @return a list of purchase orders with given origin and destination
+     */
+    List<Order> getOrdersForCombinedShipment(Location origin, Location destination) {
+        return Order.createCriteria().list() {
+            and {
+                eq("origin", origin)
+                eq("destination", destination)
+                eq("orderTypeCode", OrderTypeCode.PURCHASE_ORDER)
+            }
+        }
+    }
+
     /**
      * @return a list of suppliers
      */
