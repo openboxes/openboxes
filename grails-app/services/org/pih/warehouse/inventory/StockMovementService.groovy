@@ -510,17 +510,15 @@ class StockMovementService {
 
     def getStockMovementItems(String id, String stepNumber, String max, String offset) {
         // FIXME should get stock movement instead of requisition
-        Shipment shipment = Shipment.get(id)
         Requisition requisition = Requisition.get(id)
         List<StockMovementItem> stockMovementItems = []
-        List <RequisitionItem> requisitionItems = []
-        List <ShipmentItem> shipmentItems = []
 
         if (stepNumber == '3') {
           return getEditPageItems(requisition, max, offset)
         }
 
         if (requisition) {
+            List <RequisitionItem> requisitionItems = []
             if (max != null && offset != null) {
                 requisitionItems = RequisitionItem.createCriteria().list(max: max.toInteger(), offset: offset.toInteger()) {
                     eq("requisition", requisition)
@@ -539,6 +537,8 @@ class StockMovementService {
                 stockMovementItems.add(stockMovementItem)
             }
         } else {
+            Shipment shipment = Shipment.get(id)
+            List <ShipmentItem> shipmentItems = []
             if (max != null && offset != null) {
                 shipmentItems = ShipmentItem.createCriteria().list(max: max.toInteger(), offset: offset.toInteger()) {
                     eq("shipment", shipment)
