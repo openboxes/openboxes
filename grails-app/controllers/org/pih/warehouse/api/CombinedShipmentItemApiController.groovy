@@ -14,16 +14,19 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
 class CombinedShipmentItemApiController {
 
+    def orderService
+
     def getOrderOptions = {
         def vendor = Location.get(params.vendor)
         def destination = Location.get(params.destination)
-        List<Order> orders = Order.findAllByOriginAndDestination(vendor, destination)
+        List<Order> orders = orderService.getOrdersForCombinedShipment(vendor, destination)
         render([data: orders.findAll{ it.orderItems.any { item -> item.getQuantityRemainingToShip() > 0 } }.collect {
             [
                 value: it.id,
@@ -39,7 +42,7 @@ class CombinedShipmentItemApiController {
         } else {
             def vendor = Location.get(params.vendor)
             def destination = Location.get(params.destination)
-            orders = Order.findAllByOriginAndDestination(vendor, destination)
+            orders = orderService.getOrdersForCombinedShipment(vendor, destination)
         }
         Product product = Product.get(params.productId)
 
@@ -85,9 +88,7 @@ class CombinedShipmentItemApiController {
                 shipmentItem.quantity = orderItem.quantity
                 shipmentItem.recipient = orderItem.recipient
                 shipmentItem.quantity = it.quantityToShip * orderItem.quantityPerUom
-                shipmentItem.save()
                 orderItem.addToShipmentItems(shipmentItem)
-                orderItem.save()
                 shipment.addToShipmentItems(shipmentItem)
             }
             shipment.save()

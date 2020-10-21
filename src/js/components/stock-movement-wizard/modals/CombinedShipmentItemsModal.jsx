@@ -138,9 +138,10 @@ class CombinedShipmentItemsModal extends Component {
   }
 
   onOpen() {
-    this.setState(INITIAL_STATE);
-    this.getOrderNumberOptions();
-    this.fetchOrderItems();
+    this.setState(INITIAL_STATE, () => {
+      this.getOrderNumberOptions();
+      this.fetchOrderItems();
+    });
   }
 
   onSave() {
