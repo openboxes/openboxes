@@ -20,6 +20,7 @@ import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.product.ProductSupplier
+import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
 
@@ -75,6 +76,9 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
             "quantityReceivedInStandardUom",
             "quantityShipped",
             "quantityShippedInStandardUom",
+            "quantityInShipments",
+            "quantityInShipmentsInStandardUom",
+            "quantityRemainingToShip",
             "total",
             "shippedShipmentItems",
             "subtotal",
@@ -85,6 +89,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
             "completelyFulfilled",
             "completelyReceived",
             "pending",
+            "quantityRemainingToShip",
     ]
 
     static belongsTo = [order: Order, parentOrderItem: OrderItem]
@@ -150,6 +155,12 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         }?:0
     }
 
+    Integer getQuantityInShipmentsInStandardUom() {
+        return shipmentItems?.sum { ShipmentItem shipmentItem ->
+            shipmentItem?.quantity
+        }?:0
+    }
+
     Integer getQuantityReceivedInStandardUom() {
         return shippedShipmentItems?.sum { ShipmentItem shipmentItem ->
             shipmentItem?.quantityReceived
@@ -164,12 +175,30 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         return quantityReceivedInStandardUom / quantityPerUom
     }
 
+    Integer getQuantityInShipments() {
+        return quantityInShipmentsInStandardUom / quantityPerUom
+    }
+
     String getOrderItemType() {
         return "Product"
     }
 
+    Integer getQuantityRemainingToShip(Shipment shipment) {
+        def quantityInOtherShipments = shipmentItems?.findAll { it.shipment != shipment}?.sum { ShipmentItem shipmentItem ->
+            shipmentItem?.quantity
+        }
+        def quantityRemaining = quantityInOtherShipments ? quantity - quantityInOtherShipments : quantity
+        return quantityRemaining > 0 ? quantityRemaining * quantityPerUom : 0
+    }
+
     Integer getQuantityRemaining() {
         def quantityRemaining = quantity - quantityShipped
+        return quantityRemaining > 0 ? quantityRemaining : 0
+    }
+
+    // quantityAvailable for combined shipments
+    def getQuantityRemainingToShip() {
+        def quantityRemaining = quantity - quantityInShipments
         return quantityRemaining > 0 ? quantityRemaining : 0
     }
 
@@ -239,7 +268,6 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
                                         id <=> orderItem?.id
         return sortOrder
     }
-
 
     Map toJson() {
         return [

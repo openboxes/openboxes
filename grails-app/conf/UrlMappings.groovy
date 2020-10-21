@@ -213,6 +213,23 @@ class UrlMappings {
             action = [DELETE: "removingItem"]
         }
 
+        // Combined shipments
+
+        "/api/orderNumberOptions"(parseRequest: true) {
+            controller = "combinedShipmentItemApi"
+            action = [GET: "getOrderOptions"]
+        }
+
+        "/api/combinedShipmentItems/findOrderItems"(parseRequest: true) {
+            controller = "combinedShipmentItemApi"
+            action = [POST:"findOrderItems"]
+        }
+
+        "/api/combinedShipmentItems/addToShipment/$id"(parseRequest: true) {
+            controller = "combinedShipmentItemApi"
+            action = [POST:"addItemsToShipment"]
+        }
+
         // Standard REST APIs
 
         "/api/${resource}s"(parseRequest: true) {
