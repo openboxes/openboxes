@@ -141,7 +141,7 @@ class InventoryController {
         def products = inventoryService.searchProducts(command)
 
         // Calculate quantity for all products
-        Date date = DateUtil.clearTime(new Date())
+        Date date = DateUtil.clearTime(new Date()+1)
         def quantityList = products ? inventorySnapshotService.getQuantityOnHand(products, command.location, date) : []
 
         def searchResults = products.collect { product ->
