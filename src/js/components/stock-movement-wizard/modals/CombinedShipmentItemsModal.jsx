@@ -138,9 +138,11 @@ class CombinedShipmentItemsModal extends Component {
   }
 
   onOpen() {
-    this.setState(INITIAL_STATE, () => {
-      this.getOrderNumberOptions();
-      this.fetchOrderItems();
+    this.props.onOpen().then(() => {
+      this.setState(INITIAL_STATE, () => {
+        this.getOrderNumberOptions();
+        this.fetchOrderItems();
+      });
     });
   }
 
@@ -245,7 +247,9 @@ class CombinedShipmentItemsModal extends Component {
     const {
       orderNumberOptions, selectedOrders, formValues,
     } = this.state;
-    const { btnOpenText, btnOpenDefaultText, translate } = this.props;
+    const {
+      btnOpenText, btnOpenDefaultText, translate, btnOpenDisabled,
+    } = this.props;
 
     return (
       <ModalWrapper
@@ -264,6 +268,7 @@ class CombinedShipmentItemsModal extends Component {
         btnSaveDefaultText="Add items to shipment"
         btnOpenText={btnOpenText}
         btnOpenDefaultText={btnOpenDefaultText}
+        btnOpenDisabled={btnOpenDisabled}
       >
         <div className="d-flex mb-3 justify-content-start align-items-center w-100 combined-shipment-filter">
           <Select
@@ -331,11 +336,14 @@ CombinedShipmentItemsModal.propTypes = {
   minSearchLength: PropTypes.number.isRequired,
   translate: PropTypes.func.isRequired,
   onResponse: PropTypes.func.isRequired,
+  onOpen: PropTypes.func.isRequired,
   btnOpenText: PropTypes.string,
   btnOpenDefaultText: PropTypes.string,
+  btnOpenDisabled: PropTypes.bool,
 };
 
 CombinedShipmentItemsModal.defaultProps = {
   btnOpenText: '',
   btnOpenDefaultText: '',
+  btnOpenDisabled: false,
 };
