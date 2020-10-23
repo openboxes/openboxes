@@ -14,6 +14,7 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
@@ -54,7 +55,7 @@ class CombinedShipmentItemApiController {
             orderItems = OrderItem.findAllByOrderInList(orders)
         }
 
-        render([orderItems: orderItems.findAll{ it.getQuantityRemainingToShip() > 0 }.collect {
+        render([orderItems: orderItems.findAll{ it.orderItemStatusCode != OrderItemStatusCode.CANCELED && it.getQuantityRemainingToShip() > 0 }.collect {
             [
                 orderId: it.order.id,
                 orderItemId: it.id,
