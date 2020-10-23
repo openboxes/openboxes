@@ -105,36 +105,6 @@ const FIELDS = {
       },
     }),
   },
-  stocklist: {
-    label: 'react.stockMovement.stocklist.label',
-    defaultMessage: 'Stocklist',
-    type: SelectField,
-    getDynamicAttr: ({
-      origin, destination, stocklists, setRequestType, values,
-    }) => ({
-      disabled: !(origin && destination && origin.id && destination.id),
-      options: stocklists,
-      showValueTooltip: true,
-      objectValue: true,
-      onChange: (value) => {
-        if (value) {
-          setRequestType(values, value);
-        }
-      },
-    }),
-  },
-  requestType: {
-    type: SelectField,
-    label: 'react.stockMovement.requestType.label',
-    defaultMessage: 'Request type',
-    attributes: {
-      required: true,
-      showValueTooltip: true,
-    },
-    getDynamicAttr: ({ requestTypes }) => ({
-      options: requestTypes,
-    }),
-  },
   requestedBy: {
     type: SelectField,
     label: 'react.stockMovement.requestedBy.label',
@@ -163,6 +133,36 @@ const FIELDS = {
       dateFormat: 'MM/DD/YYYY',
       autoComplete: 'off',
     },
+  },
+  requestType: {
+    type: SelectField,
+    label: 'react.stockMovement.requestType.label',
+    defaultMessage: 'Request type',
+    attributes: {
+      required: true,
+      showValueTooltip: true,
+    },
+    getDynamicAttr: ({ requestTypes }) => ({
+      options: requestTypes,
+    }),
+  },
+  stocklist: {
+    label: 'react.stockMovement.stocklist.label',
+    defaultMessage: 'Stocklist',
+    type: SelectField,
+    getDynamicAttr: ({
+      origin, destination, stocklists, setRequestType, values,
+    }) => ({
+      disabled: !(origin && destination && origin.id && destination.id),
+      options: stocklists,
+      showValueTooltip: true,
+      objectValue: true,
+      onChange: (value) => {
+        if (value) {
+          setRequestType(values, value);
+        }
+      },
+    }),
   },
 };
 
