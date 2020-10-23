@@ -1,7 +1,9 @@
 .steps-box {
-padding: 12px 24px 24px;
+    padding: 12px 24px 24px;
     display: flex;
     background-color: #fff;
+    margin: 0.5rem 1.5rem 0;
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.09);
 
     .steps {
         max-width: 80%;
