@@ -59,7 +59,7 @@ const FIELDS = {
     // eslint-disable-next-line react/prop-types
     addButton: ({
       // eslint-disable-next-line react/prop-types
-      values, onResponse,
+      values, onResponse, saveItems, invalid,
     }) => (
       <CombinedShipmentItemsModal
         shipment={values.stockMovementId}
@@ -68,6 +68,8 @@ const FIELDS = {
         onResponse={onResponse}
         btnOpenText="react.default.button.addLines.label"
         btnOpenDefaultText="Add lines"
+        onOpen={() => saveItems(values.lineItems)}
+        btnOpenDisabled={invalid}
       >
         <Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
       </CombinedShipmentItemsModal>
@@ -242,6 +244,7 @@ class AddItemsPage extends Component {
     this.updateRow = this.updateRow.bind(this);
     this.removeItem = this.removeItem.bind(this);
     this.fetchLineItems = this.fetchLineItems.bind(this);
+    this.saveRequisitionItemsInCurrentStep = this.saveRequisitionItemsInCurrentStep.bind(this);
 
     this.debouncedProductsFetch = debounceProductsFetch(
       this.props.debounceTime,
@@ -775,6 +778,8 @@ class AddItemsPage extends Component {
                     isFirstPageLoaded: this.state.isFirstPageLoaded,
                     removeItem: this.removeItem,
                     onResponse: this.fetchLineItems,
+                    saveItems: this.saveRequisitionItemsInCurrentStep,
+                    invalid,
                   }))}
               </div>
               <div className="submit-buttons">
