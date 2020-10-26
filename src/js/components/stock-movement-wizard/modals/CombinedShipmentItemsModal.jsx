@@ -13,7 +13,7 @@ import TextField from '../../form-elements/TextField';
 import Checkbox from '../../../utils/Checkbox';
 import apiClient from '../../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../../actions';
-import { debounceProductsFetch } from '../../../utils/option-utils';
+import { debounceProductsInOrders } from '../../../utils/option-utils';
 import renderHandlingIcons from '../../../utils/product-handling-icons';
 import { translateWithDefaultMessage } from '../../../utils/Translate';
 
@@ -116,8 +116,9 @@ const INITIAL_STATE = {
   orderNumberOptions: [],
   selectedOrders: [],
   selectedProductId: '',
-  selectedOrderItems: {},
+  selectedOrderItems: [],
   formValues: { orderItems: [] },
+  sortOrder: 0,
 };
 
 class CombinedShipmentItemsModal extends Component {
@@ -130,10 +131,11 @@ class CombinedShipmentItemsModal extends Component {
     this.selectRow = this.selectRow.bind(this);
     this.updateRow = this.updateRow.bind(this);
 
-    this.debouncedProductsFetch = debounceProductsFetch(
+    this.debounceProductsInOrders = debounceProductsInOrders(
       this.props.debounceTime,
       this.props.minSearchLength,
-      '',
+      this.props.vendor,
+      this.props.destination,
     );
   }
 
@@ -151,13 +153,11 @@ class CombinedShipmentItemsModal extends Component {
     const { shipment } = this.props;
     const { selectedOrderItems } = this.state;
 
-    Object.keys(selectedOrderItems).forEach(key =>
-      !selectedOrderItems[key] && delete selectedOrderItems[key]);
-
     const payload = {
-      itemsToAdd: _.map(selectedOrderItems, (quantityToShip, orderItemId) => ({
-        orderItemId,
-        quantityToShip: _.toInteger(quantityToShip),
+      itemsToAdd: _.map(selectedOrderItems, (item, key) => ({
+        orderItemId: key,
+        quantityToShip: _.toInteger(item.quantityToShip),
+        sortOrder: _.toInteger(item.sortOrder),
       })),
     };
     const url = `/openboxes/api/combinedShipmentItems/addToShipment/${shipment}`;
@@ -170,6 +170,14 @@ class CombinedShipmentItemsModal extends Component {
         });
       })
       .catch(() => this.props.hideSpinner());
+  }
+
+  getSortOrder() {
+    this.setState({
+      sortOrder: this.state.sortOrder + 100,
+    });
+
+    return this.state.sortOrder;
   }
 
   getOrderNumberOptions() {
@@ -208,6 +216,7 @@ class CombinedShipmentItemsModal extends Component {
 
   selectRow(value, rowIndex) {
     const { formValues, selectedOrderItems } = this.state;
+    const sortOrder = this.getSortOrder();
     this.setState({
       formValues: {
         orderItems: _.map(formValues.orderItems, (item, idx) => {
@@ -216,6 +225,7 @@ class CombinedShipmentItemsModal extends Component {
               ...item,
               checked: value,
               quantityToShip: value ? item.quantityAvailable : '',
+              sortOrder,
             };
           }
           return { ...item };
@@ -223,7 +233,10 @@ class CombinedShipmentItemsModal extends Component {
       },
       selectedOrderItems: {
         ...selectedOrderItems,
-        [formValues.orderItems[rowIndex].orderItemId]: value ? formValues.orderItems[rowIndex].quantityAvailable : '',
+        [formValues.orderItems[rowIndex].orderItemId]: {
+          quantityToShip: value ? formValues.orderItems[rowIndex].quantityAvailable : '',
+          sortOrder,
+        },
       },
     });
   }
@@ -238,7 +251,7 @@ class CombinedShipmentItemsModal extends Component {
       }),
       selectedOrderItems: {
         ...selectedOrderItems,
-        [item.orderItemId]: item.quantityToShip,
+        [item.orderItemId]: { quantityToShip: item.quantityToShip, sortOrder: item.sortOrder },
       },
     });
   }
@@ -269,6 +282,7 @@ class CombinedShipmentItemsModal extends Component {
         btnOpenText={btnOpenText}
         btnOpenDefaultText={btnOpenDefaultText}
         btnOpenDisabled={btnOpenDisabled}
+        btnSaveDisabled={!_.find(formValues.orderItems, item => item.checked)}
       >
         <div className="d-flex mb-3 justify-content-start align-items-center w-100 combined-shipment-filter">
           <Select
@@ -289,7 +303,7 @@ class CombinedShipmentItemsModal extends Component {
             options={[]}
             classes=""
             showValueTooltip
-            loadOptions={this.debouncedProductsFetch}
+            loadOptions={this.debounceProductsInOrders}
             onChange={value => this.setSelectedProduct(value)}
             openOnClick={false}
             autoload={false}

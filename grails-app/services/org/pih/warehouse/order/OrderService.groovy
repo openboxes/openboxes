@@ -827,6 +827,30 @@ class OrderService {
         return orderItems.findAll { !it.isCompletelyFulfilled() }
     }
 
+    def getProductsInOrders(String[] terms, Location destination, Location vendor) {
+        return OrderItem.createCriteria().list {
+            not {
+                'in'("orderItemStatusCode", OrderItemStatusCode.CANCELED)
+            }
+            order {
+                eq("destination", destination)
+                eq("origin", vendor)
+            }
+            product {
+                if (terms) {
+                    terms.each { term ->
+                        term = term + "%"
+                        or {
+                            ilike("name", "%" + term)
+                            ilike("productCode", term)
+                            ilike("description", "%" + term)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     def canOrderItemBeEdited(OrderItem orderItem, User user) {
         def isPending = orderItem?.order?.status == OrderStatus.PENDING
         def isApprover = userService.hasRoleApprover(user)
