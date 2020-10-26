@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { withRouter } from 'react-router-dom';
 import { getTranslate } from 'react-localize-redux';
+import queryString from 'query-string';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -15,6 +16,8 @@ import apiClient from '../../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../../actions';
 import { debounceLocationsFetch } from '../../../utils/option-utils';
 import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
+
+const { orderId } = queryString.parse(window.location.search);
 
 function validate(values) {
   const errors = {};
@@ -93,24 +96,51 @@ class CreateStockMovement extends Component {
       debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength);
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (!this.props.match.params.stockMovementId && this.state.setInitialValues
-      && nextProps.location.id) {
-      this.setInitialValues(nextProps.location);
+  componentDidMount() {
+    if (orderId) {
+      const url = `/openboxes/api/combineShipments/${orderId}`;
+      apiClient.get(url)
+        .then((resp) => {
+          const { data } = resp.data;
+          this.setInitialValues(data.origin, data.destination);
+        })
+        .catch(err => err);
     }
   }
 
-  setInitialValues(location) {
-    const { id, locationType, name } = location;
-    const values = {
-      destination: {
-        id,
-        type: locationType ? locationType.locationTypeCode : null,
-        name,
-        label: `${name} [${locationType ? locationType.description : null}]`,
+  componentWillReceiveProps(nextProps) {
+    if (!this.props.match.params.stockMovementId && this.state.setInitialValues
+      && nextProps.location.id && !orderId) {
+      this.setInitialValues(null, nextProps.location);
+    }
+  }
+
+  setInitialValues(origin, destination) {
+    let originLocation = [];
+    let destinationLocation = [];
+    if (origin) {
+      originLocation = {
+        id: origin.id,
+        type: origin.locationType ? origin.locationType.locationTypeCode : null,
+        name: origin.name,
+        label: `${origin.name} [${origin.locationType ? origin.locationType.description : null}]`,
+      };
+    }
+    if (destination) {
+      destinationLocation = {
+        id: destination.id,
+        type: destination.locationType ? destination.locationType.locationTypeCode : null,
+        name: destination.name,
+        label: `${destination.name} [${destination.locationType ? destination.locationType.description : null}]`,
+      };
+    }
+    this.setState({
+      values: {
+        destination: destinationLocation,
+        origin: originLocation,
       },
-    };
-    this.setState({ values, setInitialValues: false });
+      setInitialValues: false,
+    });
   }
 
   /**

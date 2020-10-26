@@ -699,8 +699,8 @@ breadcrumbsConfig {
             listUrl = "/${appName}/order/list?orderTypeCode=PURCHASE_ORDER"
         }
         combinedShipments {
-            actionLabel = "createShipmentFromPo.label"
-            defaultActionLabel = "Create Shipment from PO"
+            actionLabel = "shipmentFromPO.label"
+            defaultActionLabel = "Ship from PO"
             listLabel = "react.stockMovement.label"
             defaultListLabel = "Stock Movement"
             actionUrl = "/${appName}/stockMovement/createCombinedShipments/"
@@ -1008,15 +1008,15 @@ openboxes {
             label = "order.purchasing.label"
             defaultLabel = "Purchasing"
             subsections = [
-                    [
-                            label: "",
-                            defaultLabel: "Purchasing",
-                            menuItems: [
-                                    [label: "order.createPurchase.label", defaultLabel: "Create Purchase Order", href: "/${appName}/purchaseOrderWorkflow/index"],
-                                    [label: "order.listPurchase.label", defaultLabel: "List Purchase Orders", href: "/${appName}/order/list?orderTypeCode=PURCHASE_ORDER"],
-                                    [label: "shipment.shipfromPO.label", defaultLabel: "Ship from Purchase Order", href: "/${appName}/stockMovement/createCombinedShipments?direction=INBOUND"]
-                            ]
+                [
+                    label: "",
+                    defaultLabel: "Purchasing",
+                    menuItems: [
+                            [label: "order.createPurchase.label", defaultLabel: "Create Purchase Order", href: "/${appName}/purchaseOrderWorkflow/index"],
+                            [label: "order.listPurchase.label", defaultLabel: "List Purchase Orders", href: "/${appName}/order/list?orderTypeCode=PURCHASE_ORDER"],
+                            [label: "shipment.shipfromPO.label", defaultLabel: "Ship from Purchase Order", href: "/${appName}/stockMovement/createCombinedShipments?direction=INBOUND"]
                     ]
+                ]
             ]
         }
         inbound {
