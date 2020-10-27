@@ -99,8 +99,8 @@
                             <div class="filter-list-item">
                                 <label><warehouse:message code="stockMovement.receiptStatus.label" default="Receipt Status"/></label>
                                 <p>
-                                    <g:select name="receiptStatusCode" value="${params?.receiptStatusCode}" from="${ShipmentStatusCode.list()}"
-                                                               noSelection="['':'']" class="chzn-select-deselect"/>
+                                    <g:select name="receiptStatusCode" value="${params?.list('receiptStatusCode')}" from="${ShipmentStatusCode.list()}"
+                                     keys="${org.pih.warehouse.shipping.ShipmentStatusCode.values()*.name()}"  noSelection="['':'']" class="chzn-select-deselect" multiple="true"/>
                                 </p>
                             </div>
                         </g:if>

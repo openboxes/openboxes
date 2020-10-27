@@ -346,7 +346,7 @@ class StockMovementService {
             }
             if (criteria.destination) eq("destination", criteria.destination)
             if (criteria.origin) eq("origin", criteria.origin)
-            if (criteria.receiptStatusCode) eq("currentStatus", criteria.receiptStatusCode)
+            if (criteria.receiptStatusCodes) 'in'("currentStatus", criteria.receiptStatusCodes)
             if (criteria.createdBy) {
                 eq("createdBy", criteria?.createdBy)
             }

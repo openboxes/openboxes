@@ -57,6 +57,7 @@ class StockMovement {
 
     ShipmentType shipmentType
     ShipmentStatusCode receiptStatusCode
+    List<ShipmentStatusCode> receiptStatusCodes
     String trackingNumber
     String driverName
     String comments
