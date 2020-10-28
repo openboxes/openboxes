@@ -742,6 +742,7 @@ class OrderService {
      * @param inputStream
      * @return
      */
+    // TODO remove after combined shipment feature is finished
     List parseOrderItemsFromTemplateImport(String text) {
         List orderItems = []
         try {
@@ -837,6 +838,7 @@ class OrderService {
         }
         return ReportUtil.getCsvForListOfMapEntries(rows)}
 
+    // TODO remove after combined shipment feature is finished
     boolean validateItemsFromTemplateImport(Order order, List lineItems) {
         def valid = true
         lineItems.each { line ->
@@ -937,6 +939,7 @@ class OrderService {
         return valid
     }
 
+    // TODO remove after combined shipment feature is finished
     def saveItemsInShipment(Order order, List importedLines) {
         Shipment shipment = order.pendingShipment
         if (!shipment) {
