@@ -245,6 +245,7 @@ class AddItemsPage extends Component {
     this.removeItem = this.removeItem.bind(this);
     this.fetchLineItems = this.fetchLineItems.bind(this);
     this.saveRequisitionItemsInCurrentStep = this.saveRequisitionItemsInCurrentStep.bind(this);
+    this.importTemplate = this.importTemplate.bind(this);
 
     this.debouncedProductsFetch = debounceProductsFetch(
       this.props.debounceTime,
@@ -726,6 +727,44 @@ class AddItemsPage extends Component {
     }
   }
 
+  /**
+   * Imports chosen file to backend and then fetches line items.
+   * @param {object} event
+   * @public
+   */
+  importTemplate(event) {
+    this.props.showSpinner();
+    const formData = new FormData();
+    const file = event.target.files[0];
+    const { stockMovementId } = this.state.values;
+
+    formData.append('importFile', file.slice(0, file.size, 'text/csv'));
+    const config = {
+      headers: {
+        'content-type': 'multipart/form-data',
+      },
+    };
+
+    const url = `/openboxes/api/combinedShipmentItems/importTemplate/${stockMovementId}`;
+
+    return apiClient.post(url, formData, config)
+      .then(() => {
+        this.fetchLineItems();
+        if (_.isNil(_.last(this.state.values.lineItems).product)) {
+          this.setState({
+            values: {
+              ...this.state.values,
+              lineItems: [],
+            },
+          });
+        }
+      })
+      .catch(() => {
+        this.props.hideSpinner();
+      });
+  }
+
+
   render() {
     return (
       <Form
@@ -736,6 +775,23 @@ class AddItemsPage extends Component {
         render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
             <span className="buttons-container">
+              <label
+                htmlFor="csvInput"
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+              >
+                <span><i className="fa fa-download pr-2" /><Translate id="react.default.button.importTemplate.label" defaultMessage="Import template" /></span>
+                <input
+                  id="csvInput"
+                  type="file"
+                  style={{ display: 'none' }}
+                  onChange={this.importTemplate}
+                  onClick={(event) => {
+                    // eslint-disable-next-line no-param-reassign
+                    event.target.value = null;
+                  }}
+                  accept=".csv"
+                />
+              </label>
               <button
                 type="button"
                 onClick={() => this.refresh()}
