@@ -9,6 +9,7 @@ import arrayMutators from 'final-form-arrays';
 import { getTranslate } from 'react-localize-redux';
 import { confirmAlert } from 'react-confirm-alert';
 
+import moment from 'moment';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
 import { renderFormField } from '../../../utils/form-utils';
@@ -546,18 +547,43 @@ class SendMovementPage extends Component {
         'Please populate shipment type before continuing',
       ));
       this.props.hideSpinner();
+    } else if (moment().startOf('day').diff(values.dateShipped) > 0) {
+      confirmAlert({
+        title: this.props.translate('react.stockMovement.message.confirmSend.label', 'Confirm send'),
+        message: this.props.translate(
+          'react.stockMovement.alert.sendWithPastDate.message.label',
+          'You are sending a shipment with a ship date in the past. Would you like to update the ship date to today?',
+        ),
+        buttons: [
+          {
+            label: this.props.translate('react.default.yes.label', 'Yes'),
+            onClick: () => {
+              payload.dateShipped = moment(new Date()).format('MM/DD/YYYY HH:mm Z');
+              this.saveAndTransitionToIssued(payload);
+            },
+          },
+          {
+            label: this.props.translate('react.default.no.label', 'No'),
+            onClick: () => this.saveAndTransitionToIssued(payload),
+          },
+        ],
+      });
     } else {
-      this.saveShipment(payload)
-        .then(() => {
-          this.stateTransitionToIssued()
-            .then(() => {
-              // redirect to requisition list
-              window.location = `/openboxes/stockMovement/show/${this.state.values.stockMovementId}`;
-            })
-            .catch(() => this.props.hideSpinner());
-        })
-        .catch(() => this.props.hideSpinner());
+      this.saveAndTransitionToIssued(payload);
     }
+  }
+
+  saveAndTransitionToIssued(payload) {
+    this.saveShipment(payload)
+      .then(() => {
+        this.stateTransitionToIssued()
+          .then(() => {
+            // redirect to requisition list
+            window.location = `/openboxes/stockMovement/show/${this.state.values.stockMovementId}`;
+          })
+          .catch(() => this.props.hideSpinner());
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   /**
