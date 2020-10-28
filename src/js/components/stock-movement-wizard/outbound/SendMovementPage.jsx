@@ -25,18 +25,7 @@ import Translate, { translateWithDefaultMessage } from '../../../utils/Translate
 import ArrayField from '../../form-elements/ArrayField';
 import renderHandlingIcons from '../../../utils/product-handling-icons';
 
-const BASIC_FIELDS = {
-  description: {
-    label: 'react.stockMovement.description.label',
-    defaultMessage: 'Description',
-    type: (params) => {
-      if (params.issued) {
-        return <TextField {...params} />;
-      }
-
-      return <TextField {...params} disabled />;
-    },
-  },
+const SHIPMENT_FIELDS = {
   'origin.name': {
     label: 'react.stockMovement.origin.label',
     defaultMessage: 'Origin',
@@ -79,34 +68,6 @@ const BASIC_FIELDS = {
       return <TextField {...params} disabled />;
     },
   },
-  name: {
-    label: 'react.stockMovement.shipmentName.label',
-    defaultMessage: 'Shipment name',
-    type: params => <TextField {...params} disabled />,
-  },
-  'requestedBy.name': {
-    label: 'react.stockMovement.requestedBy.label',
-    defaultMessage: 'Requested by',
-    type: params => <TextField {...params} disabled />,
-  },
-  'requestType.name': {
-    label: 'react.stockMovement.requestType.label',
-    defaultMessage: 'Request type',
-    type: params => <TextField {...params} disabled />,
-  },
-  dateRequested: {
-    label: 'react.stockMovement.dateRequested.label',
-    defaultMessage: 'Date requested',
-    type: params => <TextField {...params} disabled />,
-  },
-  'stocklist.name': {
-    label: 'react.stockMovement.stocklist.label',
-    defaultMessage: 'Stocklist',
-    type: params => <TextField {...params} disabled />,
-  },
-};
-
-const SHIPMENT_FIELDS = {
   dateShipped: {
     type: DateField,
     label: 'react.stockMovement.shipDate.label',
@@ -693,17 +654,6 @@ class SendMovementPage extends Component {
           initialValues={this.state.values}
           render={({ handleSubmit, values, invalid }) => (
             <form onSubmit={handleSubmit}>
-              <div className="d-flex">
-                <div id="stockMovementInfo" className="classic-form classic-form-condensed">
-                  {_.map(BASIC_FIELDS, (fieldConfig, fieldName) =>
-                    renderFormField(fieldConfig, fieldName, {
-                      canBeEdited: values.statusCode === 'DISPATCHED' && !values.received,
-                      issued: values.statusCode === 'DISPATCHED',
-                      hasStockList: !!_.get(values.stocklist, 'id'),
-                      debouncedLocationsFetch: this.debouncedLocationsFetch,
-                    }))}
-                </div>
-              </div>
               <div className="classic-form classic-form-condensed">
                 <span className="buttons-container classic-form-buttons">
                   <div className="dropzone float-right mb-1 btn btn-outline-secondary align-self-end btn-xs">
