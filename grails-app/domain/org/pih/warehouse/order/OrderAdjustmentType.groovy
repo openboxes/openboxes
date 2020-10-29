@@ -9,6 +9,8 @@
 **/
 package org.pih.warehouse.order
 
+import org.pih.warehouse.core.GlAccount
+
 class OrderAdjustmentType implements Serializable {
 
     String id
@@ -16,6 +18,8 @@ class OrderAdjustmentType implements Serializable {
     String description
 
     OrderAdjustmentTypeCode code
+
+    GlAccount glAccount
 
     // Audit fields
     Date dateCreated
@@ -25,6 +29,7 @@ class OrderAdjustmentType implements Serializable {
         name(nullable: false)
         code(nullable: false)
         description(nullable: true)
+        glAccount(nullable: true)
     }
 }
 
