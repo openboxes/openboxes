@@ -230,6 +230,11 @@ class UrlMappings {
             action = [POST:"addItemsToShipment"]
         }
 
+        "/api/combinedShipmentItems/importTemplate/$id"(parseRequest: true) {
+            controller = "combinedShipmentItemApi"
+            action = [POST:"importTemplate"]
+        }
+
         // Standard REST APIs
 
         "/api/${resource}s"(parseRequest: true) {
