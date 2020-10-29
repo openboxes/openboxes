@@ -35,7 +35,7 @@
             </g:link>
         </div>
 
-        <div id="edit-budget-code">
+        <div id="edit-gl-account">
             <g:form method="post" action="update" >
                 <g:hiddenField name="id" value="${glAccount?.id}" />
                 <div class="box">
