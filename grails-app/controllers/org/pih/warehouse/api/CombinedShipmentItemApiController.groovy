@@ -26,6 +26,21 @@ class CombinedShipmentItemApiController {
     def orderService
     def combinedShipmentService
 
+    def getProductsInOrders = {
+        def minLength = grailsApplication.config.openboxes.typeahead.minLength
+        def vendor = Location.get(params.vendor)
+        def destination = Location.get(params.destination)
+        String[] terms = params?.name?.split(",| ")?.findAll { it }
+        if (params.name && params.name.size() < minLength) {
+            render([data: []])
+            return
+        }
+        def orderItems = orderService.getProductsInOrders(terms, destination, vendor)
+        def products = orderItems*.findAll{ it.getQuantityRemainingToShip() > 0 }.flatten().toArray().collect { it.product }.unique()
+
+        render([data: products] as JSON)
+    }
+
     def getOrderOptions = {
         def vendor = Location.get(params.vendor)
         def destination = Location.get(params.destination)
@@ -91,6 +106,7 @@ class CombinedShipmentItemApiController {
                 shipmentItem.quantity = orderItem.quantity
                 shipmentItem.recipient = orderItem.recipient
                 shipmentItem.quantity = it.quantityToShip * orderItem.quantityPerUom
+                shipmentItem.sortOrder = it.sortOrder
                 orderItem.addToShipmentItems(shipmentItem)
                 shipment.addToShipmentItems(shipmentItem)
             }
