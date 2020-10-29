@@ -23,6 +23,7 @@ class CombinedShipmentService {
 
     def stockMovementService
     def grailsApplication
+    def inventoryService
 
     /**
      * Parse the given text into a list of maps.
@@ -125,7 +126,7 @@ class CombinedShipmentService {
                     valid = false
                 }
                 if (qtyParsed) {
-                    def linesWithSameOrderItem = lineItems.findAll { it.id == line.id ||
+                    def linesWithSameOrderItem = lineItems.findAll { it.id && it.id == line.id ||
                             (!it.id && it.productCode == line.productCode && it.orderId == line.orderId) }
                     def qtyToShipTotal
                     if (linesWithSameOrderItem.size() > 1) {
