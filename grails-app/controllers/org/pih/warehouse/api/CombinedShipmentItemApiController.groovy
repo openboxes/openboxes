@@ -19,6 +19,7 @@ import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
+import javax.xml.bind.ValidationException
 
 class CombinedShipmentItemApiController {
 
@@ -100,35 +101,26 @@ class CombinedShipmentItemApiController {
 
     def importTemplate = { ImportDataCommand command ->
         Shipment shipment = Shipment.get(params.id)
-        try {
-            def importFile = command.importFile
-            if (importFile.isEmpty()) {
-                throw new IllegalArgumentException("File cannot be empty")
-            }
+        def importFile = command.importFile
+        if (importFile.isEmpty()) {
+            throw new IllegalArgumentException("File cannot be empty")
+        }
 
-            if (importFile.fileItem.contentType != "text/csv") {
-                throw new IllegalArgumentException("File must be in CSV format")
-            }
-            String csv = new String(importFile.bytes)
-            List importedLines = combinedShipmentService.parseOrderItemsFromTemplateImport(csv)
-            if (combinedShipmentService.validateItemsFromTemplateImport(shipment, importedLines)) {
-                combinedShipmentService.addItemsToShipment(shipment, importedLines)
-                flash.message = "Successfully saved ${importedLines?.size()} lines from imported template"
-            } else {
-                String message = "Failed to import template due to validation errors:"
-                importedLines.eachWithIndex { line, idx ->
-                    if (line.errors) {
-                        message += "<br>Row ${idx + 1}: ${line.errors.join(". ")}"
-                    }
+        if (importFile.fileItem.contentType != "text/csv") {
+            throw new IllegalArgumentException("File must be in CSV format")
+        }
+        String csv = new String(importFile.bytes)
+        List importedLines = combinedShipmentService.parseOrderItemsFromTemplateImport(csv)
+        if (combinedShipmentService.validateItemsFromTemplateImport(shipment, importedLines)) {
+            combinedShipmentService.addItemsToShipment(shipment, importedLines)
+        } else {
+            String message = "Failed to import template due to validation errors:"
+            importedLines.eachWithIndex { line, idx ->
+                if (line.errors) {
+                    message += "<br>Row ${idx + 1}: ${line.errors.join("; ")}"
                 }
-                flash.message = message
-                render (status: 404, text: "Validation error")
-                return
             }
-        } catch (Exception e) {
-            log.warn("Failed to import template due to the following error: " + e.message, e)
-            render (status: 500, text: "Failed to import template due to the following error: " + e.message)
-            return
+            throw new ValidationException(message)
         }
         render (status: 200, text: "Successfully imported template")
     }

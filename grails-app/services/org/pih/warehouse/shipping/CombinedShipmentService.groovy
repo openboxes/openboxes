@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat
 class CombinedShipmentService {
 
     def stockMovementService
+    def grailsApplication
 
     /**
      * Parse the given text into a list of maps.
@@ -65,7 +66,7 @@ class CombinedShipmentService {
             }
             Order order = Order.findByOrderNumber(line.orderNumber)
 
-            if (order && order.origin != shipment.origin || order.destination != shipment.destination) {
+            if (order && (order.origin != shipment.origin || order.destination != shipment.destination)) {
                 line.errors << "Order must be from the same origin and destination as shipment"
                 valid = false
             }
@@ -140,7 +141,7 @@ class CombinedShipmentService {
                         qtyToShipTotal = qtyParsed
                     }
                     if (orderItem && qtyToShipTotal > orderItem.getQuantityRemainingToShip()) {
-                        line.errors << "Qty to ship for product ${line.productCode}, order item ${line.id} is greater than qty available to ship."
+                        line.errors << "Qty to ship for product ${line.productCode}, order ${line.orderNumber} is greater than qty available to ship(${orderItem.getQuantityRemainingToShip()})."
                         valid = false
                     }
                 }
