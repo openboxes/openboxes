@@ -2,6 +2,7 @@
 <g:form name="editOrderItemForm" action="purchaseOrder" method="post">
     <g:hiddenField id="dlgOrderId" name="order.id" value="${orderItem?.order?.id}" />
     <g:hiddenField id ="dlgOrderItemId" name="orderItem.id" value="${orderItem?.id}"/>
+    <g:hiddenField id ="dlgQuantityInShipments" name="quantityInShipments" value="${orderItem?.quantityInShipmentsInStandardUom}"/>
     <table>
         <tbody>
 
@@ -159,6 +160,11 @@
                 <td valign="top" class="value">
                     <format:metadata obj="${orderItem?.product?.productCode}"/>
                     <format:product product="${orderItem.product}"/>
+                    <g:hiddenField id="dlgProduct" name="product.id" value="${orderItem?.product?.id}"/>
+                    <g:hiddenField id="dlgSupplierId" name="supplier.id" value="${orderItem?.order?.originParty?.id }"></g:hiddenField>
+                    <g:hiddenField id="isBudgetCodeRequired" name="isBudgetCodeRequired"
+                                   value="${orderItem?.order?.destination?.isBudgetCodeRequired()}">
+                    </g:hiddenField>
                 </td>
             </tr>
             <tr class="prop">
@@ -166,7 +172,59 @@
                     <label for="dlgProductSupplier"><warehouse:message code="productSupplier.label"/></label>
                 </td>
                 <td valign="top" class="value">
-                    ${orderItem?.productSupplier?.code?:"NONE"}
+                    <g:selectProductSupplier id="dlgProductSupplier"
+                                             name="productSupplier"
+                                             product="${orderItem.product}"
+                                             supplier="${orderItem?.order?.originParty}"
+                                             value="${orderItem?.productSupplier?.id}"
+                                             class="select2"
+                                             noSelection="['':'']" />
+                </td>
+            </tr>
+            <tr class="prop hidden" id="dlgSourceCodeRow">
+                <td valign="top" class="name">
+                    <label for="dlgSourceCode"><warehouse:message code="productSupplier.sourceCode.label"/></label>
+                </td>
+                <td>
+                    <input type="text" id="dlgSourceCode" name="sourceCode" class="text" size="24" placeholder="Source Code" />
+                </td>
+            </tr>
+            <tr class="prop hidden" id="dlgSourceNameRow">
+                <td valign="top" class="name">
+                    <label for="dlgSourceName"><warehouse:message code="productSupplier.sourceName.label"/></label>
+                </td>
+                <td>
+                    <input type="text" id="dlgSourceName" name="sourceName" class="text" size="24" placeholder="Source Name" />
+                </td>
+            </tr>
+            <tr class="prop hidden" id="dlgSupplierCodeRow">
+                <td valign="top" class="name">
+                    <label for="dlgSupplierCode"><warehouse:message code="product.supplierCode.label"/></label>
+                </td>
+                <td>
+                    <input type="text" id="dlgSupplierCode" name="supplierCode" class="text" placeholder="Supplier code" style="width: 100px" disabled />
+                </td>
+            </tr>
+            <tr class="prop hidden" id="dlgManufacturerRow">
+                <td valign="top" class="name">
+                    <label for="dlgManufacturer"><warehouse:message code="product.manufacturer.label"/></label>
+                </td>
+                <td>
+                    <g:selectOrganization name="manufacturer"
+                                          id="dlgManufacturer"
+                                          value="${manufacturer?.id}"
+                                          roleTypes="[org.pih.warehouse.core.RoleType.ROLE_MANUFACTURER]"
+                                          noSelection="['':'']"
+                                          class="select2"
+                                          disabled="${true}" />
+                </td>
+            </tr>
+            <tr class="prop hidden" id="dlgManufacturerCodeRow">
+                <td valign="top" class="name">
+                    <label for="dlgManufacturerCode"><warehouse:message code="product.manufacturerCode.label"/></label>
+                </td>
+                <td>
+                    <input type="text" id="dlgManufacturerCode" name="manufacturerCode" class="text" placeholder="Manufacturer code" style="width: 100px" disabled />
                 </td>
             </tr>
             <tr class="prop">
@@ -174,7 +232,14 @@
                     <label for="dlgQuantity"><warehouse:message code="default.quantity.label"/></label>
                 </td>
                 <td valign="top" class="value">
-                    ${orderItem.quantity}
+                    <input type="text" id="dlgQuantity" name="quantity" value="${orderItem.quantity}" size="10" class="text" />
+                </td>
+            </tr>
+            <tr class="prop">
+                <td valign="top" class="name">
+                    <label><warehouse:message code="orderItem.quantityUom.label"/></label>
+                </td>
+                <td valign="top" class="value">
                     ${orderItem?.unitOfMeasure}
                 </td>
             </tr>
@@ -210,7 +275,8 @@
                     <label for="dlgEstimatedReadyDate"><warehouse:message code="orderItem.estimatedReadyDate.label"/></label>
                 </td>
                 <td valign="top" class="value">
-                    ${orderItem?.estimatedReadyDate?.format("MM/dd/yyyy")}
+                    <input class="text large datepicker" id="dlgEstimatedReadyDate" name="estimatedReadyDate"
+                           value="${orderItem?.estimatedReadyDate?.format("MM/dd/yyyy")}" />
                 </td>
             </tr>
             <tr class="prop">
@@ -268,6 +334,12 @@
 
   function validateForm() {
     var budgetCode = $("#dlgBudgetCode").val();
+    var quantity = parseInt($("#dlgQuantity").val());
+    var quantityInShipments = parseInt($("#dlgQuantityInShipments").val())
+    if (quantity < quantityInShipments) {
+        $("#dlgQuantity").notify("Must enter a quantity greater than or equal to the quantity in shipments(" + quantityInShipments + ")")
+        return false
+    }
     var isBudgetCodeRequired = ($("#isBudgetCodeRequired").val() === "true");
     if (!budgetCode && isBudgetCodeRequired) {
       $("#dlgBudgetCode").notify("Required")
@@ -369,7 +441,7 @@
             }
           });
         } else {
-          $.notify("Please enter a value for all required fields")
+          $.notify("Please enter a proper value for all required fields")
         }
         return false
     }
