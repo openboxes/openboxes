@@ -708,6 +708,16 @@
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">
+                                <g:link controller="glAccountType" action="list">
+                                    <warehouse:message code="glAccountType.label" default="GL Account Type"/>
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
+                                <g:link controller="glAccount" action="list">
+                                    <warehouse:message code="glAccount.label" default="GL Account"/>
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
                                 <g:link controller="paymentMethodType" action="list">
                                     <warehouse:message code="paymentMethodTypes.label" />
                                 </g:link>

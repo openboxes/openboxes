@@ -83,4 +83,7 @@
     <include file="0.8.x/changelog-2020-09-18-1135-create-table-budget-code.xml"/>
     <include file="0.8.x/changelog-2020-09-18-1150-alter-table-add-column-budget-code-order-adjustment.xml"/>
     <include file="0.8.x/changelog-2020-09-18-1155-alter-table-add-column-budget-code-order-item.xml"/>
+    <include file="0.8.x/changelog-2020-10-28-1419-create-table-gl-account-type.xml"/>
+    <include file="0.8.x/changelog-2020-10-28-1420-create-table-gl-account.xml"/>
+    <include file="0.8.x/changelog-2020-10-28-1421-alter-tables-add-column-gl-account.xml"/>
 </databaseChangeLog>

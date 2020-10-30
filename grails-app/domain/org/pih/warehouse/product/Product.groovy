@@ -216,6 +216,8 @@ class Product implements Comparable, Serializable {
     // List of product components - bill of materials
     List productComponents
 
+    GlAccount glAccount
+
     // Auditing
     Date dateCreated
     Date lastUpdated
@@ -291,6 +293,7 @@ class Product implements Comparable, Serializable {
         costPerUnit(nullable: true)
         createdBy(nullable: true)
         updatedBy(nullable: true)
+        glAccount(nullable: true)
     }
 
     /**

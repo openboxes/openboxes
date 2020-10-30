@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="awalkowiak" id="2810202014210-0">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="category" columnName="gl_account_id"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="category">
+      <column name="gl_account_id" type="CHAR(38)"/>
+    </addColumn>
+  </changeSet>
+  <changeSet author="awalkowiak" id="2810202014210-1">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_category_gl_account"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="gl_account_id" baseTableName="category"
+      constraintName="fk_category_gl_account" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="gl_account"/>
+  </changeSet>
+
+  <changeSet author="awalkowiak" id="2810202014210-2">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="product" columnName="gl_account_id"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="product">
+      <column name="gl_account_id" type="CHAR(38)"/>
+    </addColumn>
+  </changeSet>
+  <changeSet author="awalkowiak" id="2810202014210-3">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_product_gl_account"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="gl_account_id" baseTableName="product"
+      constraintName="fk_product_gl_account" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="gl_account"/>
+  </changeSet>
+
+  <changeSet author="awalkowiak" id="2810202014210-4">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="order_item" columnName="gl_account_id"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="order_item">
+      <column name="gl_account_id" type="CHAR(38)"/>
+    </addColumn>
+  </changeSet>
+  <changeSet author="awalkowiak" id="2810202014210-5">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_order_item_gl_account"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="gl_account_id" baseTableName="order_item"
+      constraintName="fk_order_item_gl_account" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="gl_account"/>
+  </changeSet>
+
+  <changeSet author="awalkowiak" id="2810202014210-6">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="order_adjustment_type" columnName="gl_account_id"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="order_adjustment_type">
+      <column name="gl_account_id" type="CHAR(38)"/>
+    </addColumn>
+  </changeSet>
+  <changeSet author="awalkowiak" id="2810202014210-7">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_order_adjustment_type_gl_account"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="gl_account_id" baseTableName="order_adjustment_type"
+      constraintName="fk_order_adjustment_type_gl_account" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="gl_account"/>
+  </changeSet>
+
+  <changeSet author="awalkowiak" id="2810202014210-8">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="order_adjustment" columnName="gl_account_id"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="order_adjustment">
+      <column name="gl_account_id" type="CHAR(38)"/>
+    </addColumn>
+  </changeSet>
+  <changeSet author="awalkowiak" id="2810202014210-9">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_order_adjustment_gl_account"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="gl_account_id" baseTableName="order_adjustment"
+      constraintName="fk_order_adjustment_gl_account" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="gl_account"/>
+  </changeSet>
+
+</databaseChangeLog>
