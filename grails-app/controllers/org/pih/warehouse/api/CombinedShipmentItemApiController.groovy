@@ -97,7 +97,7 @@ class CombinedShipmentItemApiController {
         }
         List itemsToAdd = jsonObject.itemsToAdd
         if (itemsToAdd) {
-            itemsToAdd.each {
+            itemsToAdd.sort { it.sortOrder }.each {
                 OrderItem orderItem = OrderItem.get(it.orderItemId)
                 ShipmentItem shipmentItem = new ShipmentItem()
                 shipmentItem.product = orderItem.product
@@ -106,7 +106,7 @@ class CombinedShipmentItemApiController {
                 shipmentItem.quantity = orderItem.quantity
                 shipmentItem.recipient = orderItem.recipient
                 shipmentItem.quantity = it.quantityToShip * orderItem.quantityPerUom
-                shipmentItem.sortOrder = it.sortOrder
+                shipmentItem.sortOrder = shipment.shipmentItems ? shipment.shipmentItems.size() * 100 : 0
                 orderItem.addToShipmentItems(shipmentItem)
                 shipment.addToShipmentItems(shipmentItem)
             }

@@ -174,7 +174,7 @@ class CombinedShipmentItemsModal extends Component {
 
   getSortOrder() {
     this.setState({
-      sortOrder: this.state.sortOrder + 100,
+      sortOrder: this.state.sortOrder + 1,
     });
 
     return this.state.sortOrder;
@@ -209,6 +209,7 @@ class CombinedShipmentItemsModal extends Component {
           ...item,
           checked: !!selectedOrderItems[item.orderItemId],
           quantityToShip: selectedOrderItems[item.orderItemId] ? selectedOrderItems[item.orderItemId] : '',
+          sortOrder: this.getSortOrder(),
         })),
       },
     }));
@@ -216,7 +217,6 @@ class CombinedShipmentItemsModal extends Component {
 
   selectRow(value, rowIndex) {
     const { formValues, selectedOrderItems } = this.state;
-    const sortOrder = this.getSortOrder();
     this.setState({
       formValues: {
         orderItems: _.map(formValues.orderItems, (item, idx) => {
@@ -225,7 +225,7 @@ class CombinedShipmentItemsModal extends Component {
               ...item,
               checked: value,
               quantityToShip: value ? item.quantityAvailable : '',
-              sortOrder,
+              sortOrder: value ? item.sortOrder : '',
             };
           }
           return { ...item };
@@ -235,7 +235,7 @@ class CombinedShipmentItemsModal extends Component {
         ...selectedOrderItems,
         [formValues.orderItems[rowIndex].orderItemId]: {
           quantityToShip: value ? formValues.orderItems[rowIndex].quantityAvailable : '',
-          sortOrder,
+          sortOrder: value ? formValues.orderItems[rowIndex].sortOrder : '',
         },
       },
     });
