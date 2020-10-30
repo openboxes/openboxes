@@ -207,6 +207,7 @@ class InventoryService implements ApplicationContextAware {
 
         // Only search if there are search terms otherwise the list of product IDs includes all products
         def innerProductIds = !searchTerms ? [] : Product.createCriteria().list {
+            eq("active", true)
             projections {
                 distinct 'id'
             }
@@ -223,6 +224,7 @@ class InventoryService implements ApplicationContextAware {
         }
 
         def searchProductsQuery = {
+            eq("active", true)
             and {
                 if (categories) {
                     'in'("category", categories)
