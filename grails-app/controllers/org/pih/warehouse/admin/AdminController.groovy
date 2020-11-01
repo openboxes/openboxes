@@ -125,7 +125,7 @@ class AdminController {
                         mailService.sendHtmlMailWithAttachment(emailMessageMap)
                         flash.message = "Multipart email with subject ${params.subject} and attachment ${multipartFile.originalFilename} has been sent to ${params.to}"
                     } else {
-                        if (params.includeHtml) {
+                        if (params.includesHtml) {
                             mailService.sendHtmlMail(params.subject, params.message, params.to)
                             flash.message = "HTML email with subject ${params.subject} has been sent to ${params.to}"
                         } else {
