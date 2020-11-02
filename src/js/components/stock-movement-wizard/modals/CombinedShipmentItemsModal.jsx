@@ -208,7 +208,7 @@ class CombinedShipmentItemsModal extends Component {
         orderItems: _.map(resp.data.orderItems, item => ({
           ...item,
           checked: !!selectedOrderItems[item.orderItemId],
-          quantityToShip: selectedOrderItems[item.orderItemId] ? selectedOrderItems[item.orderItemId] : '',
+          quantityToShip: selectedOrderItems[item.orderItemId] ? selectedOrderItems[item.orderItemId].quantityToShip : '',
           sortOrder: this.getSortOrder(),
         })),
       },
@@ -217,7 +217,7 @@ class CombinedShipmentItemsModal extends Component {
 
   selectRow(value, rowIndex) {
     const { formValues, selectedOrderItems } = this.state;
-    this.setState({
+    let newState = {
       formValues: {
         orderItems: _.map(formValues.orderItems, (item, idx) => {
           if (rowIndex === idx) {
@@ -231,14 +231,26 @@ class CombinedShipmentItemsModal extends Component {
           return { ...item };
         }),
       },
-      selectedOrderItems: {
-        ...selectedOrderItems,
-        [formValues.orderItems[rowIndex].orderItemId]: {
-          quantityToShip: value ? formValues.orderItems[rowIndex].quantityAvailable : '',
-          sortOrder: value ? formValues.orderItems[rowIndex].sortOrder : '',
+    };
+    if (!value) {
+      delete selectedOrderItems[formValues.orderItems[rowIndex].orderItemId];
+      newState = {
+        ...newState,
+        selectedOrderItems,
+      };
+    } else {
+      newState = {
+        ...newState,
+        selectedOrderItems: {
+          ...selectedOrderItems,
+          [formValues.orderItems[rowIndex].orderItemId]: {
+            quantityToShip: value ? formValues.orderItems[rowIndex].quantityAvailable : '',
+            sortOrder: value ? formValues.orderItems[rowIndex].sortOrder : '',
+          },
         },
-      },
-    });
+      };
+    }
+    this.setState(newState);
   }
 
   updateRow(values, index) {
