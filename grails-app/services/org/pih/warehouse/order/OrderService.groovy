@@ -567,6 +567,7 @@ class OrderService {
                     def unitPrice = item["unitPrice"]
                     def unitOfMeasure = item["unitOfMeasure"]
                     def estimatedReadyDate = item["estimatedReadyDate"]
+                    def code = item["budgetCode"]
 
                     OrderItem orderItem
                     if (orderItemId) {
@@ -661,6 +662,16 @@ class OrderService {
                     }
                     orderItem.estimatedReadyDate = estReadyDate
 
+                    if (order.destination.isBudgetCodeRequired() && !code) {
+                        throw new IllegalArgumentException("Budget code is required.")
+                    }
+                    BudgetCode budgetCode = BudgetCode.findByCode(code)
+                    if (code && !budgetCode) {
+                        throw new IllegalArgumentException("Could not find budget code with code: ${code}.")
+
+                    }
+                    orderItem.budgetCode = budgetCode
+
                     order.addToOrderItems(orderItem)
                     count++
                 }
@@ -708,7 +719,8 @@ class OrderService {
                 'unitPrice',
                 'totalCost',
                 'recipient',
-                'estimatedReadyDate'
+                'estimatedReadyDate',
+                'budgetCode'
             ]
             orderItems = csvMapReader.toList()
 
