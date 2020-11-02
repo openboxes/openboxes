@@ -11,8 +11,6 @@ package org.pih.warehouse.core
 
 class GlAccountTypeController {
 
-    def scaffold = GlAccountType
-
     def index = {
         redirect(action: "list", params: params)
     }

@@ -31,8 +31,8 @@
 				<h2><warehouse:message code="order.orderAjustments.label" default="Order Adjustments"/></h2>
 				<g:form action="saveAdjustment" onsubmit="return validateForm();">
 					<g:hiddenField name="id" value="${orderAdjustment?.id}" />
-					<g:hiddenField id="isBudgetCodeRequired" name="isBudgetCodeRequired"
-								   value="${orderInstance?.destination?.isBudgetCodeRequired()}">
+					<g:hiddenField id="isAccountingRequired" name="isAccountingRequired"
+								   value="${orderInstance?.destination?.isAccountingRequired()}">
 					</g:hiddenField>
 					<table>
 						<tbody>
@@ -114,8 +114,8 @@
 <script type="text/javascript">
 	function validateForm() {
 		var budgetCode = $("#budgetCode").val();
-		var isBudgetCodeRequired = ($("#isBudgetCodeRequired").val() === "true");
-		if (!budgetCode && isBudgetCodeRequired) {
+		var isAccountingRequired = ($("#isAccountingRequired").val() === "true");
+		if (!budgetCode && isAccountingRequired) {
 			$("#budgetCode").notify("Required")
 			return false
 		} else {

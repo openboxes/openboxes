@@ -265,8 +265,8 @@ class Location implements Comparable<Location>, java.io.Serializable {
         return internalLocations
     }
 
-    Boolean isBudgetCodeRequired() {
-        return ConfigurationHolder.config.openboxes.purchasing.budgetCode.enabled && supports(ActivityCode.REQUIRE_BUDGET_CODE)
+    Boolean isAccountingRequired() {
+        return ConfigurationHolder.config.openboxes.accounting.enabled && supports(ActivityCode.REQUIRE_ACCOUNTING)
     }
 
 }

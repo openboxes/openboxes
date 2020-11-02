@@ -662,7 +662,7 @@ class OrderService {
                     }
                     orderItem.estimatedReadyDate = estReadyDate
 
-                    if (order.destination.isBudgetCodeRequired() && !code) {
+                    if (order.destination.isAccountingRequired() && !code) {
                         throw new IllegalArgumentException("Budget code is required.")
                     }
                     BudgetCode budgetCode = BudgetCode.findByCode(code)
