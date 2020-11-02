@@ -69,10 +69,11 @@
 					</ul>
 					<div id="tabs-details" class="ui-tabs-hide">
                         <g:set var="formAction"><g:if test="${productInstance?.id}">update</g:if><g:else>save</g:else></g:set>
-                        <g:form action="${formAction}" method="post">
+                        <g:form action="${formAction}" onsubmit="return validateForm();">
                             <g:hiddenField name="id" value="${productInstance?.id}" />
                             <g:hiddenField name="version" value="${productInstance?.version}" />
                             <g:hiddenField name="categoryId" value="${params?.category?.id }"/>
+                            <g:hiddenField id="isAccountingRequired" name="isAccountingRequired" value="${session.warehouse?.isAccountingRequired()}"/>
                             <!--  So we know which category to show on browse page after submit -->
 
                             <div class="box" >
@@ -373,10 +374,10 @@
                                         </td>
                                     </tr>
                                     <tr class="prop">
-                                        <td class="name middle"><label for="glAccount.id"><warehouse:message code="product.glAccount.label"/></label></td>
+                                        <td class="name middle"><label id="glAccountLabel" for="glAccount.id"><warehouse:message code="product.glAccount.label"/></label></td>
                                         <td class="value middle ${hasErrors(bean: productInstance, field: 'glAccount', 'errors')}">
                                             <g:selectGlAccount name="glAccount.id"
-                                                               id="glAccount.id"
+                                                               id="glAccount"
                                                                value="${productInstance?.glAccount?.id}"
                                                                noSelection="['null':'']"
                                                                class="chzn-select-deselect" />
@@ -470,6 +471,17 @@
         </g:each>
 
 		<script type="text/javascript">
+
+            function validateForm()  {
+                var glAccount = $("#glAccount").val();
+                var isAccountingRequired = ($("#isAccountingRequired").val() === "true");
+                if (isAccountingRequired && (!glAccount || glAccount === "null")) {
+                    $("#glAccountLabel").notify("Required");
+                    return false;
+                } else {
+                    return true;
+                }
+            }
 
 
             function updateSynonymTable(data) {
