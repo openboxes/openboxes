@@ -128,6 +128,7 @@ const FIELDS = {
         required: true,
         attributes: {
           type: 'number',
+          showError: true,
         },
         getDynamicAttr: ({ rowIndex, values, updateRow }) => ({
           onBlur: () => updateRow(values, rowIndex),
