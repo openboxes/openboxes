@@ -564,7 +564,7 @@ class AddItemsPage extends Component {
           const { lineItems } = resp.data.data;
 
           const lineItemsBackendData = _.map(
-            lineItems,
+            _.sortBy(lineItems, ['sortOrder']),
             val => ({
               ...val,
               product: {
