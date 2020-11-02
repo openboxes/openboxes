@@ -656,7 +656,7 @@ openboxes {
     }
 }
 
-//Breadcrumbs configuration 
+//Breadcrumbs configuration
 breadcrumbsConfig {
         inbound {
             actionLabel = "react.stockMovement.inbound.create.label"
@@ -926,7 +926,7 @@ openboxes.stockCard.consumption.reasonCodes = [ReasonCode.STOCKOUT, ReasonCode.L
 // Localization configuration - default and supported locales
 openboxes.locale.custom.enabled = false
 openboxes.locale.defaultLocale = 'en'
-openboxes.locale.supportedLocales = ['ar', 'de', 'en', 'es', 'fr',  'it',  'pt', 'fi', 'zh']
+openboxes.locale.supportedLocales = ['ar','de','en','es','fr','it','pt','fi','zh']
 
 // Currency configuration
 openboxes.locale.defaultCurrencyCode = "USD"
