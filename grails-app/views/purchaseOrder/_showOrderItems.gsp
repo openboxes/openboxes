@@ -467,7 +467,11 @@
                         $.notify("Successfully saved new item", "success")
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                      $.notify("Error saving your item");
+                      if (jqXHR.responseText) {
+                        $.notify(jqXHR.responseText, "error");
+                      } else {
+                        $.notify("Error saving your item");
+                      }
                     }
                 });
             }
