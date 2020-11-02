@@ -2,7 +2,7 @@
 <g:form name="editOrderItemForm" action="purchaseOrder" method="post">
     <g:hiddenField id="dlgOrderId" name="order.id" value="${orderItem?.order?.id}" />
     <g:hiddenField id ="dlgOrderItemId" name="orderItem.id" value="${orderItem?.id}"/>
-    <g:hiddenField id ="dlgQuantityInShipments" name="quantityInShipments" value="${orderItem?.quantityInShipmentsInStandardUom}"/>
+    <g:hiddenField id ="dlgQuantityInShipments" name="quantityInShipments" value="${orderItem?.quantityInShipments}"/>
     <table>
         <tbody>
 
