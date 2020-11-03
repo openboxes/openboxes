@@ -1348,18 +1348,23 @@ class StockMovementService {
 
             stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
                 ShipmentItem shipmentItem = findOrCreateShipmentItem(shipment, stockMovementItem.id)
-                shipmentItem.lotNumber = stockMovementItem.lotNumber
-                shipmentItem.expirationDate = stockMovementItem.expirationDate
-                shipmentItem.product = stockMovementItem.product
-                shipmentItem.inventoryItem = stockMovementItem.inventoryItem
-                shipmentItem.quantity = stockMovementItem.quantityRequested
-                shipmentItem.recipient = stockMovementItem.recipient
-                shipmentItem.sortOrder = stockMovementItem.sortOrder
-                shipmentItem.container = createOrUpdateContainer(shipment, stockMovementItem.palletName, stockMovementItem.boxName)
+                if (!stockMovementItem.quantityRequested) {
+                    shipment.removeFromShipmentItems(shipmentItem)
+                    shipmentItem.delete(flush: true)
+                } else {
+                    shipmentItem.lotNumber = stockMovementItem.lotNumber
+                    shipmentItem.expirationDate = stockMovementItem.expirationDate
+                    shipmentItem.product = stockMovementItem.product
+                    shipmentItem.inventoryItem = stockMovementItem.inventoryItem
+                    shipmentItem.quantity = stockMovementItem.quantityRequested
+                    shipmentItem.recipient = stockMovementItem.recipient
+                    shipmentItem.sortOrder = stockMovementItem.sortOrder
+                    shipmentItem.container = createOrUpdateContainer(shipment, stockMovementItem.palletName, stockMovementItem.boxName)
 
-                if (stockMovementItem.orderItemId) {
-                    OrderItem orderItem = OrderItem.get(stockMovementItem.orderItemId)
-                    shipmentItem.addToOrderItems(orderItem)
+                    if (stockMovementItem.orderItemId) {
+                        OrderItem orderItem = OrderItem.get(stockMovementItem.orderItemId)
+                        shipmentItem.addToOrderItems(orderItem)
+                    }
                 }
             }
         }
