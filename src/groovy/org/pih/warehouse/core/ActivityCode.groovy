@@ -47,8 +47,8 @@ enum ActivityCode {
     // Receiving
     PARTIAL_RECEIVING('PARTIAL_RECEIVING'),
 
-    // Budget code
-    REQUIRE_BUDGET_CODE('REQUIRE_BUDGET_CODE')
+    // Accounting (Budget Code, GL Account)
+    REQUIRE_ACCOUNTING('REQUIRE_ACCOUNTING')
 
     final String id
 
@@ -74,7 +74,7 @@ enum ActivityCode {
                 ENABLE_NOTIFICATIONS,
                 PACK_SHIPMENT,
                 PARTIAL_RECEIVING,
-                REQUIRE_BUDGET_CODE,
+                REQUIRE_ACCOUNTING,
         ]
     }
 }

@@ -73,8 +73,8 @@
                         <g:hiddenField id="orderId" name="order.id" value="${order?.id }"></g:hiddenField>
                         <g:hiddenField id="orderItemId" name="orderItem.id" value="${orderItem?.id }"></g:hiddenField>
                         <g:hiddenField id="supplierId" name="supplier.id" value="${order?.originParty?.id }"></g:hiddenField>
-                        <g:hiddenField id="isBudgetCodeRequired" name="isBudgetCodeRequired"
-                                       value="${order?.destination?.isBudgetCodeRequired()}">
+                        <g:hiddenField id="isAccountingRequired" name="isAccountingRequired"
+                                       value="${order?.destination?.isAccountingRequired()}">
                         </g:hiddenField>
                         <table id="orderItemsTable" class="items-table">
                             <thead>
@@ -406,14 +406,14 @@
           var quantityUom = $("#quantityUom").val();
           var quantityPerUom = $("#quantityPerUom").val();
           var budgetCode = $("#budgetCode").val();
-          var isBudgetCodeRequired = ($("#isBudgetCodeRequired").val() === "true");
+          var isAccountingRequired = ($("#isAccountingRequired").val() === "true");
 
           if (!product) $("#product-suggest").notify("Required")
           if (!quantity) $("#quantity").notify("Required")
           if (!unitPrice) $("#unitPrice").notify("Required")
           if (!quantityUom) $("#quantityUom_chosen").notify("Required")
           if (!quantityPerUom) $("#quantityPerUom").notify("Required")
-          if (!budgetCode && isBudgetCodeRequired) {
+          if (!budgetCode && isAccountingRequired) {
             $("#budgetCode").notify("Required")
             return false
           }
@@ -427,13 +427,13 @@
           var percentage = $("#percentage").val();
           var canManageAdjustments = ($("#canManageAdjustments").val() === "true");
           var budgetCode = $("#adjustmentBudgetCode").val();
-          var isBudgetCodeRequired = ($("#isBudgetCodeRequired").val() === "true");
+          var isAccountingRequired = ($("#isAccountingRequired").val() === "true");
 
           if (!orderAdjustmentType) $("#orderAdjustmentType").notify("Required")
           if (!(percentage || amount)) $("#amount").notify("Amount or percentage required")
           if (!(percentage || amount)) $("#percentage").notify("Amount or percentage required")
           if (!canManageAdjustments) $.notify("You do not have permissions to perform this action")
-          if (!budgetCode && isBudgetCodeRequired) {
+          if (!budgetCode && isAccountingRequired) {
             $("#adjustmentBudgetCode").notify("Required")
             return false
           }
@@ -467,7 +467,11 @@
                         $.notify("Successfully saved new item", "success")
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                      $.notify("Error saving your item");
+                      if (jqXHR.responseText) {
+                        $.notify(jqXHR.responseText, "error");
+                      } else {
+                        $.notify("Error saving your item");
+                      }
                     }
                 });
             }

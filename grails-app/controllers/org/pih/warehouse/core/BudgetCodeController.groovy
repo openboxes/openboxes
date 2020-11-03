@@ -11,8 +11,6 @@ package org.pih.warehouse.core
 
 class BudgetCodeController {
 
-    def scaffold = BudgetCode
-
     def index = {
         redirect(action: "list", params: params)
     }

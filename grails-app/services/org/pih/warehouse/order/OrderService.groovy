@@ -585,6 +585,9 @@ class OrderService {
                         if (!product) {
                             throw new ProductException("Unable to locate product with product code ${productCode}")
                         }
+                        if (order.destination.isAccountingRequired() && !product.glAccount) {
+                            throw new ProductException("Product ${productCode}: Cannot add order item without a valid general ledger code")
+                        }
                         orderItem.product = product
                     } else {
                         throw new ProductException("No product code specified")
@@ -662,7 +665,7 @@ class OrderService {
                     }
                     orderItem.estimatedReadyDate = estReadyDate
 
-                    if (order.destination.isBudgetCodeRequired() && !code) {
+                    if (order.destination.isAccountingRequired() && !code) {
                         throw new IllegalArgumentException("Budget code is required.")
                     }
                     BudgetCode budgetCode = BudgetCode.findByCode(code)

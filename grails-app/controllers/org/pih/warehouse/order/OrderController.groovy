@@ -716,6 +716,13 @@ class OrderController {
         if (params.budgetCode) {
             params.budgetCode = BudgetCode.get(params.budgetCode)
         }
+        if (order.destination.isAccountingRequired()) {
+            Product product = Product.get(params.product.id)
+            if (!product.glAccount) {
+                render(status: 500, text: "${warehouse.message(code: 'orderItem.missingGlAccount.label')}")
+                return
+            }
+        }
         if (!orderItem) {
             orderItem = new OrderItem(params)
             order.addToOrderItems(orderItem)

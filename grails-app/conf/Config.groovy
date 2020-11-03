@@ -1275,8 +1275,8 @@ openboxes.receiving.receivingLocation.prefix = Constants.DEFAULT_RECEIVING_LOCAT
 openboxes.api.pagination.enabled = true
 openboxes.api.pagination.pageSize = 10
 
-// Budget code
-openboxes.purchasing.budgetCode.enabled = true
+// Accounting (Budget Code, GL Account)
+openboxes.accounting.enabled = true
 
 // Grails doc configuration
 grails.doc.title = "OpenBoxes"
