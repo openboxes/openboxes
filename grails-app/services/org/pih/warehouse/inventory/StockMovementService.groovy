@@ -1361,6 +1361,7 @@ class StockMovementService {
                     OrderItem orderItem = OrderItem.get(stockMovementItem.orderItemId)
                     shipmentItem.addToOrderItems(orderItem)
                 }
+                shipmentItem.save()
             }
         }
 
