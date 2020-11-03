@@ -656,7 +656,7 @@ openboxes {
     }
 }
 
-//Breadcrumbs configuration 
+//Breadcrumbs configuration
 breadcrumbsConfig {
         inbound {
             actionLabel = "react.stockMovement.inbound.create.label"
@@ -1157,12 +1157,18 @@ openboxes {
                     ]
                 ],
                 [
-                    label: "locations.label",
+                    label: "parties.label",
                     defaultLabel: "Locations",
                     menuItems: [
                         [label: "locations.label", defaultLabel: "Locations", href: "/${appName}/location/list"],
                         [label: "locationGroups.label", defaultLabel: "Location groups", href: "/${appName}/locationGroup/list"],
-                        [label: "locationTypes.label", defaultLabel: "Location types", href: "/${appName}/locationType/list"]
+                        [label: "locationTypes.label", defaultLabel: "Location types", href: "/${appName}/locationType/list"],
+                        [label: "organizations.label", defaultLabel: "Organizations", href: "/${appName}/organization/list"],
+                        [label: "partyRoles.label", defaultLabel: "Party roles", href: "/${appName}/partyRole/list"],
+                        [label: "partyTypes.label", defaultLabel: "Party types", href: "/${appName}/partyType/list"],
+                        [label: "person.list.label", defaultLabel: "People", href: "/${appName}/person/list"],
+                        [label: "roles.label", defaultLabel: "Roles", href: "/${appName}/role/list"],
+                        [label: "users.label", defaultLabel: "Users", href: "/${appName}/user/list"],
                     ]
                 ],
                 [
@@ -1174,18 +1180,6 @@ openboxes {
                         [label: "transaction.add.label", defaultLabel: "Add transaction", href: "/${appName}/inventory/editTransaction"],
                         [label: "importInventory.label", defaultLabel: "Import Inventory", href: "/${appName}/batch/importData?type=inventory"],
                         [label: "importInventoryLevel.label", defaultLabel: "Import Inventory Level", href: "/${appName}/batch/importData?type=inventoryLevel"]
-                    ]
-                ],
-                [
-                    label: "parties.label",
-                    defaultLabel: "Parties",
-                    menuItems: [
-                        [label: "partyTypes.label", defaultLabel: "Party types", href: "/${appName}/partyType/list"],
-                        [label: "partyRoles.label", defaultLabel: "Party roles", href: "/${appName}/partyRole/list"],
-                        [label: "organizations.label", defaultLabel: "Organizations", href: "/${appName}/organization/list"],
-                        [label: "person.list.label", defaultLabel: "People", href: "/${appName}/person/list"],
-                        [label: "users.label", defaultLabel: "Users", href: "/${appName}/user/list"],
-                        [label: "roles.label", defaultLabel: "Roles", href: "/${appName}/role/list"]
                     ]
                 ],
                 [

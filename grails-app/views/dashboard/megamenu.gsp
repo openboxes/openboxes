@@ -594,7 +594,7 @@
                             </div>
                         </div>
                         <div class="mm-content-section">
-                            <h3><warehouse:message code="locations.label" default="Locations" /></h3>
+                            <h3><warehouse:message code="parties.label" default="Parties" /></h3>
                             <div class="mm-menu-item">
                                 <g:link controller="location" action="list" class="location">
                                     <warehouse:message code="locations.label" />
@@ -611,8 +611,37 @@
                                     <warehouse:message code="location.locationTypes.label" default="Location Types" />
                                 </g:link>
                             </div>
+                            <div class="mm-menu-item">
+                                <g:link controller="organization" action="list">
+                                    <warehouse:message code="organizations.label" default="Organizations" />
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
+                                <g:link controller="partyRole" action="list">
+                                    <warehouse:message code="partyRoles.label" default="Party Roles" />
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
+                                <g:link controller="partyType" action="list">
+                                    <warehouse:message code="partyTypes.label" default="Party Types" />
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
+                                <g:link controller="person" action="list" class="people">
+                                    <warehouse:message code="person.list.label" />
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
+                                <g:link controller="role" action="list" class="role">
+                                    <warehouse:message code="roles.label" />
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
+                                <g:link controller="user" action="list" class="user">
+                                    <warehouse:message code="users.label" />
+                                </g:link>
+                            </div>
                         </div>
-
                         <div class="mm-content-section">
                             <h3><warehouse:message code="transactions.label" default="Transasctions" /></h3>
                             <div class="mm-menu-item">
@@ -644,41 +673,7 @@
 
                         </div>
 
-                        <div class="mm-content-section">
-                            <h3><warehouse:message code="parties.label" default="Parties" /></h3>
 
-                            <div class="mm-menu-item">
-                                <g:link controller="partyType" action="list">
-                                    <warehouse:message code="partyTypes.label" default="Party Types" />
-                                </g:link>
-                            </div>
-                            <div class="mm-menu-item">
-                                <g:link controller="partyRole" action="list">
-                                    <warehouse:message code="partyRoles.label" default="Party Roles" />
-                                </g:link>
-                            </div>
-                            <div class="mm-menu-item">
-                                <g:link controller="organization" action="list">
-                                    <warehouse:message code="organizations.label" default="Organizations" />
-                                </g:link>
-                            </div>
-
-                            <div class="mm-menu-item">
-                                <g:link controller="person" action="list" class="people">
-                                    <warehouse:message code="person.list.label" />
-                                </g:link>
-                            </div>
-                            <div class="mm-menu-item">
-                                <g:link controller="user" action="list" class="user">
-                                    <warehouse:message code="users.label" />
-                                </g:link>
-                            </div>
-                            <div class="mm-menu-item">
-                                <g:link controller="role" action="list" class="role">
-                                    <warehouse:message code="roles.label" />
-                                </g:link>
-                            </div>
-                        </div>
                         <div class="mm-content-section">
                             <h3><warehouse:message code="other.label" default="Other" /></h3>
                             <div class="mm-menu-item">
