@@ -260,7 +260,7 @@ class IndicatorDataService {
             conditionStarter = ') and'
         }
 
-        for (int i = 12; i >= 0; i--) {
+        for (int i = 12; i > 0; i--) {
             def monthBegin = today.clone()
             def monthEnd = today.clone()
             monthBegin.set(month: today.month - i, date: 1)
