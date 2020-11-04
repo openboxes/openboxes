@@ -1,5 +1,6 @@
 package org.pih.warehouse.tableroapi
 
+import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.tablero.GraphData
 import org.pih.warehouse.tablero.TableData
 import org.pih.warehouse.tablero.Table
@@ -503,22 +504,25 @@ class IndicatorDataService {
 
     GraphData getOutgoingStock(Location location) {
         Date today = new Date()
-        today.clearTime();
-        def m4 = today - 4;
-        def m7 = today - 7;
+        today.clearTime()
+        def m4 = today - 4
+        def m7 = today - 7
 
         def greenData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated > :day and r.origin = :location and r.status <> 'ISSUED'""",
-                ['day': m4, 'location': location]);
+                ['day': m4, 'location': location])
 
         def yellowData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated >= :dayOne and r.dateCreated <= :dayTwo and r.origin = :location and r.status <> 'ISSUED'""",
-                ['dayOne': m7, 'dayTwo': m4, 'location': location]);
+                ['dayOne': m7, 'dayTwo': m4, 'location': location])
 
         def redData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated < :day and r.origin = :location and r.status <> 'ISSUED'""",
-                ['day': m7, 'location': location]);
+                ['day': m7, 'location': location])
 
-        ColorNumber green = new ColorNumber(greenData[0], 'Created < 4 days ago');
-        ColorNumber yellow = new ColorNumber(yellowData[0], 'Created > 4 days ago');
-        ColorNumber red = new ColorNumber(redData[0], 'Created > 7 days ago');
+        def baseUrl = '/openboxes/stockMovement/list?direction=OUTBOUND'
+        def status = '&status=' + RequisitionStatus.listPending().join('&status=')
+
+        ColorNumber green = new ColorNumber(greenData[0], 'Created < 4 days ago', baseUrl + status + "&createdAfter=${m4.format("MM/dd/yyyy")}")
+        ColorNumber yellow = new ColorNumber(yellowData[0], 'Created > 4 days ago', baseUrl + status + "&createdAfter=${m7.format("MM/dd/yyyy")}&createdBefore=${m4.format("MM/dd/yyyy")}")
+        ColorNumber red = new ColorNumber(redData[0], 'Created > 7 days ago', baseUrl + status + "&createdBefore=${m7.format("MM/dd/yyyy")}")
 
         NumbersIndicator numbersIndicator = new NumbersIndicator(green, yellow, red)
 
