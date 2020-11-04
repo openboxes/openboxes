@@ -57,7 +57,8 @@ class StockMovement {
 
     ShipmentType shipmentType
     ShipmentStatusCode receiptStatusCode
-    List<ShipmentStatusCode> receiptStatusCodes
+    List<ShipmentStatusCode> receiptStatusCodes // For filtering
+    List<RequisitionStatus> requisitionStatusCodes // For filtering
     String trackingNumber
     String driverName
     String comments

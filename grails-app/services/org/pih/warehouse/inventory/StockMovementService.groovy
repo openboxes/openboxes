@@ -424,8 +424,8 @@ class StockMovementService {
                     eq("origin", stockMovement.origin)
                 }
             }
-            if (stockMovement.statusCode) {
-                eq("status", RequisitionStatus.valueOf(stockMovement.statusCode))
+            if (stockMovement.requisitionStatusCodes) {
+                'in'("status", stockMovement.requisitionStatusCodes)
             }
             if (stockMovement.requestedBy) {
                 eq("requestedBy", stockMovement.requestedBy)
