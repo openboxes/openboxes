@@ -72,9 +72,9 @@
                         <g:form action="${formAction}" onsubmit="return validateForm();">
                             <g:hiddenField name="id" value="${productInstance?.id}" />
                             <g:hiddenField name="version" value="${productInstance?.version}" />
-                            <g:hiddenField name="categoryId" value="${params?.category?.id }"/>
-                            <g:hiddenField id="isAccountingRequired" name="isAccountingRequired" value="${session.warehouse?.isAccountingRequired()}"/>
                             <!--  So we know which category to show on browse page after submit -->
+                            <g:hiddenField name="categoryId" value="${params?.category?.id }"/>
+                            <g:hiddenField id="isAccountingRequired" name="isAccountingRequired" value="${locationInstance?.isAccountingRequired()}"/>
 
                             <div class="box" >
                                 <h2>
