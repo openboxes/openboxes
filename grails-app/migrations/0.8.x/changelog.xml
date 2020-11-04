@@ -86,4 +86,5 @@
     <include file="0.8.x/changelog-2020-10-28-1419-create-table-gl-account-type.xml"/>
     <include file="0.8.x/changelog-2020-10-28-1420-create-table-gl-account.xml"/>
     <include file="0.8.x/changelog-2020-10-28-1421-alter-tables-add-column-gl-account.xml"/>
+    <include file="0.8.x/changelog-2020-11-03-2246-create-table-product-availability.xml"/>
 </databaseChangeLog>

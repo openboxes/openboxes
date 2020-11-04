@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <!--
+      Need to remove all views that reference the product availability table. These will be
+      recreated during the migration process.
+  -->
+  <changeSet author="jmiranda (generated)" id="1604435954142-1">
+    <sql>
+      DROP VIEW IF EXISTS product_substitution_status;
+      DROP VIEW IF EXISTS product_stocklist;
+      DROP VIEW IF EXISTS product_stockout_status;
+      DROP VIEW IF EXISTS product_summary;
+      DROP VIEW IF EXISTS edit_page_item;
+    </sql>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1604435954142-2">
+    <preConditions onFail="MARK_RAN" onError="WARN">
+      <tableExists tableName="product_availability"/>
+    </preConditions>
+    <dropTable tableName="product_availability"/>
+  </changeSet>
+
+  <changeSet author="jmiranda (generated)" id="1604435954142-3">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <tableExists tableName="product_availability"/>
+      </not>
+    </preConditions>
+    <createTable tableName="product_availability">
+      <column name="id" type="CHAR(38)">
+        <constraints nullable="false" primaryKey="true"/>
+      </column>
+      <column name="version" type="INT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="bin_location_id" type="CHAR(38)"/>
+      <column name="inventory_item_id" type="CHAR(38)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="location_id" type="CHAR(38)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="product_id" type="CHAR(38)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="product_code" type="VARCHAR(100)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="lot_number" type="VARCHAR(100)" defaultValue="DEFAULT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="bin_location_name" type="VARCHAR(100)" defaultValue="DEFAULT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="quantity_allocated" type="INT"/>
+      <column name="quantity_on_hand" type="INT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="date_created" type="DATETIME">
+        <constraints nullable="false"/>
+      </column>
+      <column name="last_updated" type="DATETIME">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1604435954142-4">
+    <addForeignKeyConstraint baseColumnNames="bin_location_id" baseTableName="product_availability"
+      constraintName="FKD3FC6EAB69DB749D" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="location"/>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1604435954142-5">
+    <addForeignKeyConstraint baseColumnNames="inventory_item_id"
+      baseTableName="product_availability" constraintName="FKD3FC6EABAA992CED" deferrable="false"
+      initiallyDeferred="false" referencedColumnNames="id" referencedTableName="inventory_item"/>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1604435954142-6">
+    <addForeignKeyConstraint baseColumnNames="location_id" baseTableName="product_availability"
+      constraintName="FKD3FC6EAB8ABEBD5" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="location"/>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1604435954142-7">
+    <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="product_availability"
+      constraintName="FKD3FC6EABDED5FAE7" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="product"/>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1604435954142-8">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="product_availability_uniq_idx"/>
+            </not>
+        </preConditions>
+        <addUniqueConstraint constraintName="product_availability_uniq_idx"
+                             tableName="product_availability"
+                             columnNames="location_id, product_code, lot_number, bin_location_name"/>
+    </changeSet>
+</databaseChangeLog>
