@@ -142,7 +142,7 @@ class IndicatorDataService {
 
         Date today = new Date()
         today.clearTime()
-        for (int i = querySize; i >= 0; i--) {
+        for (int i = querySize; i > 0; i--) {
             def monthBegin = today.clone()
             def monthEnd = today.clone()
             monthBegin.set(month: today.month - i, date: 1)
