@@ -464,6 +464,9 @@
                         clearOrderItemForm();
                         loadOrderItems();
                         applyFocus("#product-suggest");
+                        $('#supplierCode').text('');
+                        $('#manufacturerCode').text('');
+                        $('#manufacturer').text('');
                         $.notify("Successfully saved new item", "success")
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
