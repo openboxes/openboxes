@@ -54,6 +54,8 @@ class FieldArrayComponent extends Component {
     const { maxTableHeight = 'calc(100vh - 400px)', virtualized } = fieldsConfig;
     const addRow = (row = {}, index = null) => {
       if (index === null) {
+        const table = document.querySelectorAll('[role="rowgroup"]')[0];
+        table.scrollIntoView({ block: 'end' });
         fields.push(row);
       } else if (typeof fields === 'object') {
         fields.insert(index + 1, row);
