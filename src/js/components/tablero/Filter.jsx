@@ -178,7 +178,7 @@ class Filter extends Component {
                              role="button"
                              tabIndex={0}
                              onClick={() =>
-                           this.toggleCategorySelected(nameCategory, categoryData)}
+                            this.toggleCategorySelected(nameCategory, categoryData)}
                              onKeyPress={() =>
                             this.toggleCategorySelected(nameCategory, categoryData)}
                            >
