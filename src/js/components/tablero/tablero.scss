@@ -37,7 +37,6 @@
         .category-title {
           margin-left: 10%;
           width: 70%;
-          font-size: 0.7em;
         }
         .delete-button {
           display: flex;
@@ -81,15 +80,11 @@
           padding: 0;
           margin-left: 5%;
 
-          .category-name-to-select {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            height: 40px;
+          div {
             cursor: pointer;
-            span {
-              margin-right:25px;
-            }
+            font-weight: normal;
+            border-bottom: 0;
+            margin-left: 0;
           }
           .category-value-to-select {
             height: 40px;
