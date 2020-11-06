@@ -173,17 +173,19 @@ class Filter extends Component {
                        Object.entries(value.filters).map(([nameCategory, categoryData]) => (
                          <li
                            key={categoryData.endpoint}
-                           className="category-name-to-select"
-                         > {nameCategory}
-                           <span
+                         >
+                           <div
                              role="button"
                              tabIndex={0}
                              onClick={() =>
-                              this.toggleCategorySelected(nameCategory, categoryData)}
+                            this.toggleCategorySelected(nameCategory, categoryData)}
                              onKeyPress={() =>
-                               this.toggleCategorySelected(nameCategory, categoryData)}
-                           > {'>'}
-                           </span>
+                            this.toggleCategorySelected(nameCategory, categoryData)}
+                           >
+                             {nameCategory}
+                             <span > {'>'}
+                             </span>
+                           </div>
                          </li>
                        )) : null
                       )) :
@@ -192,28 +194,30 @@ class Filter extends Component {
                         // Find in all filters available the one selected
                         category[1][0] === this.state.categorySelected ?
                         // category[1][0] --> name of the category
-                        Object.entries(this.state.listCategoryData).map(categoryData => (
-                          <li
-                            key={categoryData[1].id}
-                          >
-                            <span
-                              className="category-value-to-select"
-                              role="button"
-                              tabIndex={0}
-                              onClick={
+                        Object.entries(this.state.listCategoryData
+                          .sort((a, b) => a.name.localeCompare(b.name)))
+                          .map(categoryData => (
+                            <li
+                              key={categoryData[1].id}
+                            >
+                              <span
+                                className="category-value-to-select"
+                                role="button"
+                                tabIndex={0}
+                                onClick={
                                 () => this.addFilterToTheList(
                                   this.state.categorySelected,
                                    categoryData[1],
                                   )}
-                              onKeyPress={
+                                onKeyPress={
                                 () => this.addFilterToTheList(
                                   this.state.categorySelected,
                                   categoryData[1],
                                   )}
-                            >
-                              {categoryData[1].name}
-                            </span>
-                          </li>
+                              >
+                                {categoryData[1].name}
+                              </span>
+                            </li>
                         )) : null
                       ))
                     }
