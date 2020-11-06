@@ -11,6 +11,8 @@ import apiClient from '../../utils/apiClient';
 import { showSpinner, hideSpinner, fetchTranslations, updateBreadcrumbs, fetchBreadcrumbsConfig } from '../../actions';
 import { translateWithDefaultMessage } from '../../utils/Translate';
 
+import './StockMovement.scss';
+
 // TODO: check docs for SM wizard and Wizard related components
 
 /** Main outbound stock movement form's wizard component. */
