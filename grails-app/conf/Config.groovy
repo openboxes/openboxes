@@ -961,14 +961,14 @@ openboxes {
         }
         analytics {
             enabled = true
-            requiredRoles = [RoleType.ROLE_ADMIN]
+            requiredRoles = [RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN]
             label = "analytics.label"
             defaultLabel = "Analytics"
             menuItems = [
                 // TODO: Add option to include label 'beta'
                 [label: "inventory.browse.label", defaultLabel: "Browse Inventory", href: "/${appName}/inventoryBrowser/index"],
-                [label: "inventory.snapshots.label", defaultLabel: "Inventory Snapshots", href: "/${appName}/snapshot/list"],
-                [label: "report.consumption.label", defaultLabel: "Consumption Report", href: "/${appName}/consumption/list"]
+                [label: "inventory.snapshot.label", defaultLabel: "Inventory Snapshots", href: "/${appName}/snapshot/list"],
+                [label: "consumption.report.label", defaultLabel: "Consumption Report", href: "/${appName}/consumption/list"]
             ]
         }
         inventory {
@@ -997,12 +997,12 @@ openboxes {
         }
         inbound {
             enabled = true
-            label = "inbound.label"
+            label = "default.inbound.label"
             defaultLabel = "Inbound"
             subsections = [
                 [
-                    label: "stockMovement.label",
-                    defaultLabel: "Stock Movement",
+                    label: "stockMovements.label",
+                    defaultLabel: "Stock Movements",
                     menuItems: [
                         [label: "inbound.create.label", defaultLabel: "Create Inbound Movement", href: "/${appName}/stockMovement/createInbound?direction=INBOUND"],
                         [label: "stockRequest.create.label", defaultLabel: "Create Stock Request", href: "/${appName}/stockMovement/createRequest"],
@@ -1052,13 +1052,13 @@ openboxes {
                     defaultLabel: "Inventory Reports",
                     menuItems: [
                         [label: "report.inStockReport.label", defaultLabel: "In Stock Report", href: "/${appName}/inventory/listInStock"],
-                        [label: "report.binLocation.label", defaultLabel: "Bin Location Report", href: "/${appName}/report/showBinLocationReport"],
+                        [label: "report.binLocationReport.label", defaultLabel: "Bin Location Report", href: "/${appName}/report/showBinLocationReport"],
                         [label: "report.expiredStockReport.label", defaultLabel: "Expired Stock Report", href: "/${appName}/inventory/listExpiredStock"],
                         [label: "report.expiringStockReport.label", defaultLabel: "Expiring Stock Report", href: "/${appName}/inventory/listExpiringStock"],
                         [label: "report.inventoryByLocationReport.label", defaultLabel: "Inventory By Location Report", href: "/${appName}/report/showInventoryByLocationReport"],
                         [label: "report.cycleCount.label", defaultLabel: "Cycle Count Report", href: "/${appName}/cycleCount/exportAsCsv"],
-                        [label: "report.baselineQoH.label", defaultLabel: "Baseline QoH Report", href: "/${appName}/inventory/show"],
-                        [label: "report.order.label", defaultLabel: "Order Report", href: "/${appName}/report/showOnOrderReport"]
+                        [label: "report.baselineQohReport.label", defaultLabel: "Baseline QoH Report", href: "/${appName}/inventory/show"],
+                        [label: "report.onOrderReport.label", defaultLabel: "Order Report", href: "/${appName}/report/showOnOrderReport"]
                     ]
                 ],
                 [
@@ -1095,9 +1095,9 @@ openboxes {
                     defaultLabel: "", // No label
                     menuItems: [
                         [label: "attributes.label", defaultLabel: "Attributes", href: "/${appName}/attribute/list"],
-                        [label: "catalogs.label", defaultLabel: "Catalogs", href: "/${appName}/productCatalog/list"],
+                        [label: "product.catalogs.label", defaultLabel: "Catalogs", href: "/${appName}/productCatalog/list"],
                         [label: "categories.label", defaultLabel: "Categories", href: "/${appName}/category/tree"],
-                        [label: "components.label", defaultLabel: "Components", href: "/${appName}/productComponent/list"],
+                        [label: "product.components.label", defaultLabel: "Components", href: "/${appName}/productComponent/list"],
                         [label: "productGroups.label", defaultLabel: "Generic Products", href: "/${appName}/productGroup/list"],
                         [label: "inventoryLevels.label", defaultLabel: "Inventory Levels", href: "/${appName}/inventoryLevel/list"]
                     ]
@@ -1107,9 +1107,9 @@ openboxes {
                     defaultLabel: "", // No label
                     menuItems: [
                         [label: "products.label", defaultLabel: "Products", href: "/${appName}/product/list"],
-                        [label: "productsSources.label", defaultLabel: "Products Sources", href: "/${appName}/productSupplier/list"],
-                        [label: "productsAssociations.label", defaultLabel: "Products Associations", href: "/${appName}/productAssociation/list"],
-                        [label: "tags.label", defaultLabel: "Tags", href: "/${appName}/tag/list"],
+                        [label: "productSuppliers.label", defaultLabel: "Products Sources", href: "/${appName}/productSupplier/list"],
+                        [label: "product.associations.label", defaultLabel: "Products Associations", href: "/${appName}/productAssociation/list"],
+                        [label: "product.tags.label", defaultLabel: "Tags", href: "/${appName}/tag/list"],
                         [label: "unitOfMeasure.label", defaultLabel: "Unit of Measure", href: "/${appName}/unitOfMeasure/list"],
                         [label: "unitOfMeasureClass.label", defaultLabel: "Uom Class", href: "/${appName}/unitOfMeasureClass/list"],
                         [label: "unitOfMeasureConversion.label", defaultLabel: "Uom Conversion", href: "/${appName}/unitOfMeasureConversion/list"]
@@ -1119,9 +1119,9 @@ openboxes {
                     label: "", // No label
                     defaultLabel: "", // No label
                     menuItems: [
-                        [label: "createProduct.label", defaultLabel: "Create new product", href: "/${appName}/product/create"],
+                        [label: "product.create.label", defaultLabel: "Create new product", href: "/${appName}/product/create"],
                         [label: "product.batchEdit.label", defaultLabel: "Batch edit product", href: "/${appName}/product/batchEdit"],
-                        [label: "product.import.label", defaultLabel: "Import products", href: "/${appName}/product/importAsCsv"],
+                        [label: "product.importAsCsv.label", defaultLabel: "Import products", href: "/${appName}/product/importAsCsv"],
                         [label: "product.exportAsCsv.label", defaultLabel: "Export products", href: "/${appName}/product/exportAsCsv"],
                         [label: "import.inventory.label", defaultLabel: "Import Inventory", href: "/${appName}/batch/importData?type=inventory"],
                         [label: "import.inventoryLevel.label", defaultLabel: "Import Inventory Level", href: "/${appName}/batch/importData?type=inventoryLevel"]
@@ -1131,8 +1131,8 @@ openboxes {
         }
         requisitionTemplate {
             enabled = true
-            label = "stocklists.label"
-            defaultLabel = "Stocklists"
+            label = "requisitionTemplates.label"
+            defaultLabel = "Stock Lists"
             menuItems = [
                 [label: "requisitionTemplates.list.label", defaultLabel: "List stock lists", href: "/${appName}/requisitionTemplate/list"],
                 [label: "requisitionTemplates.create.label", defaultLabel: "Create stock list", href: "/${appName}/requisitionTemplate/create"],
@@ -1140,6 +1140,7 @@ openboxes {
         }
         configuration {
             enabled = true
+            requiredRoles = [RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN]
             label = "configuration.label"
             defaultLabel = "Configuration"
             subsections = [
@@ -1178,8 +1179,8 @@ openboxes {
                         [label: "transactionsTypes.label", defaultLabel: "Transactions Types", href: "/${appName}/transactionType"],
                         [label: "transactions.label", defaultLabel: "Transactions", href: "/${appName}/inventory/listAllTransactions"],
                         [label: "transaction.add.label", defaultLabel: "Add transaction", href: "/${appName}/inventory/editTransaction"],
-                        [label: "importInventory.label", defaultLabel: "Import Inventory", href: "/${appName}/batch/importData?type=inventory"],
-                        [label: "importInventoryLevel.label", defaultLabel: "Import Inventory Level", href: "/${appName}/batch/importData?type=inventoryLevel"]
+                        [label: "import.inventory.label", defaultLabel: "Import Inventory", href: "/${appName}/batch/importData?type=inventory"],
+                        [label: "import.inventoryLevel.label", defaultLabel: "Import Inventory Level", href: "/${appName}/batch/importData?type=inventoryLevel"]
                     ]
                 ],
                 [
@@ -1202,13 +1203,11 @@ openboxes {
             ]
         }
         customLinks {
-            enabled = false
+            enabled = true
             label = "customLinks.label"
             defaultLabel = "Custom Links"
             menuItems = [
-                [label: "requestItemCreation.label", defaultLabel: "Request Item Creation", href: "", target: "_blank"], // Fill in href
-                [label: "trainingVideos.label", defaultLabel: "Training Videos", href: "", target: "_blank"], // Fill in href
-                [label: "tableroNuevo.label", defaultLabel: "Tablero Nuevo", href: "/${appName}/tablero"],
+                    //[label: "requestItemCreation.label", defaultLabel: "Request Item Creation", href: "", target: "_blank"],
             ]
         }
 

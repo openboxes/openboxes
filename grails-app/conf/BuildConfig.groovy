@@ -60,7 +60,7 @@ grails.project.dependency.resolution = {
         compile 'com.google.zxing:javase:2.0'
 
         // Required by MailService (should replace with grails mail plugin)
-        compile 'org.apache.commons:commons-email:1.2'
+        compile 'org.apache.commons:commons-email:1.3'
         compile 'org.apache.commons:commons-text:1.3'
         compile 'commons-lang:commons-lang:2.6'
         compile "org.jadira.usertype:usertype.jodatime:1.9"

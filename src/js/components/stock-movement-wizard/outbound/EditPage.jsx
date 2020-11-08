@@ -224,7 +224,8 @@ function validateForSave(values) {
         quantityRevised: 'react.stockMovement.errors.sameRevisedQty.label',
       };
     }
-    if (!_.isEmpty(item.quantityRevised) && (item.quantityRevised > item.quantityAvailable)) {
+    if (!_.isEmpty(item.quantityRevised) && item.quantityAvailable >= 0 &&
+      (item.quantityRevised > item.quantityAvailable)) {
       errors.editPageItems[key] = { quantityRevised: 'react.stockMovement.errors.higherQty.label' };
     }
     if (!_.isEmpty(item.quantityRevised) && (item.quantityRevised < 0)) {
