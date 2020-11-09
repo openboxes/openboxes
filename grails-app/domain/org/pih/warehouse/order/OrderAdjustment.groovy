@@ -30,6 +30,8 @@ class OrderAdjustment implements Serializable {
     Date dateCreated
     Date lastUpdated
 
+    Boolean canceled = Boolean.FALSE
+
     static transients = ['totalAdjustments']
 
     static belongsTo = [order: Order, orderItem: OrderItem]
@@ -47,6 +49,7 @@ class OrderAdjustment implements Serializable {
         comments(nullable: true)
         budgetCode(nullable: true)
         glAccount(nullable: true)
+        canceled(nullable: true)
     }
 
 

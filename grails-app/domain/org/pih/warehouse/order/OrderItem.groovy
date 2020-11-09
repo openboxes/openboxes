@@ -230,7 +230,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     }
 
     def getTotalAdjustments() {
-        return orderAdjustments?.sum {
+        return orderAdjustments?.findAll {!it.canceled }.sum {
             return it.amount ?: it.percentage ? (it.percentage/100) * subtotal : 0
         }?:0
     }
