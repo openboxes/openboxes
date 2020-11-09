@@ -724,6 +724,11 @@
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">
+                                <g:link controller="orderAdjustmentType" action="list">
+                                    <warehouse:message code="orderAdjustmentType.label" default="Order Adjustment Type"/>
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
                                 <g:link controller="paymentMethodType" action="list">
                                     <warehouse:message code="paymentMethodTypes.label" />
                                 </g:link>
