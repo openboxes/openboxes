@@ -170,7 +170,7 @@
             </a>
             <div class="mm-item-content">
                 <div class="mm-menu-item">
-                    <g:link controller="purchaseOrderWorkflow" action="index" class="create">
+                    <g:link controller="purchaseOrder" action="index" class="create">
                         <warehouse:message code="default.create.label" args="[warehouse.message(code:'purchaseOrder.label')]"/>
                     </g:link>
                 </div>
