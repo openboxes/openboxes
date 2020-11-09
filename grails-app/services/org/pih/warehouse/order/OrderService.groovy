@@ -103,6 +103,22 @@ class OrderService {
         return Order.findAllByOrigin(location)
     }
 
+
+    /**
+     * @param origin (vendor)
+     * @param destination
+     * @return a list of purchase orders with given origin and destination
+     */
+    List<Order> getOrdersForCombinedShipment(Location origin, Location destination) {
+        return Order.createCriteria().list() {
+            and {
+                eq("origin", origin)
+                eq("destination", destination)
+                eq("orderTypeCode", OrderTypeCode.PURCHASE_ORDER)
+            }
+        }
+    }
+
     /**
      * @return a list of suppliers
      */
@@ -741,6 +757,7 @@ class OrderService {
      * @param inputStream
      * @return
      */
+    // TODO remove after combined shipment feature is finished
     List parseOrderItemsFromTemplateImport(String text) {
         List orderItems = []
         try {
@@ -810,6 +827,30 @@ class OrderService {
         return orderItems.findAll { !it.isCompletelyFulfilled() }
     }
 
+    def getProductsInOrders(String[] terms, Location destination, Location vendor) {
+        return OrderItem.createCriteria().list {
+            not {
+                'in'("orderItemStatusCode", OrderItemStatusCode.CANCELED)
+            }
+            order {
+                eq("destination", destination)
+                eq("origin", vendor)
+            }
+            product {
+                if (terms) {
+                    terms.each { term ->
+                        term = term + "%"
+                        or {
+                            ilike("name", "%" + term)
+                            ilike("productCode", term)
+                            ilike("description", "%" + term)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     def canOrderItemBeEdited(OrderItem orderItem, User user) {
         def isPending = orderItem?.order?.status == OrderStatus.PENDING
         def isApprover = userService.hasRoleApprover(user)
@@ -836,6 +877,7 @@ class OrderService {
         }
         return ReportUtil.getCsvForListOfMapEntries(rows)}
 
+    // TODO remove after combined shipment feature is finished
     boolean validateItemsFromTemplateImport(Order order, List lineItems) {
         def valid = true
         lineItems.each { line ->
@@ -936,6 +978,7 @@ class OrderService {
         return valid
     }
 
+    // TODO remove after combined shipment feature is finished
     def saveItemsInShipment(Order order, List importedLines) {
         Shipment shipment = order.pendingShipment
         if (!shipment) {

@@ -67,6 +67,12 @@
                 <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
                 <warehouse:message code="default.create.label" args="[warehouse.message(code: 'stockMovement.label')]" />
             </g:link>
+            <g:if test="${params.direction as StockMovementType == StockMovementType.INBOUND}">
+                <g:link controller="stockMovement" action="createCombinedShipments" class="button" params="[direction:'INBOUND']">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
+                    <warehouse:message code="default.create.label" args="[warehouse.message(code: 'shipmentFromPO.label')]"/>
+                </g:link>
+            </g:if>
         </div>
 
 

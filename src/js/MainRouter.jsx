@@ -24,6 +24,7 @@ class MainRouter extends React.Component {
       this.props.fetchMenuConfig();
       this.props.fetchTranslations('', 'default');
       this.props.fetchTranslations('', 'dashboard');
+      this.props.fetchTranslations('', 'combinedShipments');
     });
   }
 
@@ -35,6 +36,7 @@ class MainRouter extends React.Component {
         this.props.fetchMenuConfig();
         this.props.fetchTranslations(nextProps.locale, 'default');
         this.props.fetchTranslations(nextProps.locale, 'dashboard');
+        this.props.fetchTranslations('', 'combinedShipments');
       }
     }
   }
