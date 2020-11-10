@@ -353,6 +353,13 @@ class OrderController {
     def saveAdjustment = {
         def orderInstance = Order.get(params?.order?.id)
         if (orderInstance) {
+            if (orderInstance.destination.isAccountingRequired()) {
+                OrderAdjustmentType orderAdjustmentType = OrderAdjustmentType.get(params.orderAdjustmentType.id)
+                if (!orderAdjustmentType.glAccount) {
+                    render(status: 500, text: "${warehouse.message(code: 'orderAdjustment.missingGlAccount.label')}")
+                    return
+                }
+            }
             def orderAdjustment = OrderAdjustment.get(params?.id)
             if (params.budgetCode) {
                 params.budgetCode = BudgetCode.get(params.budgetCode)
