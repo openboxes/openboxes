@@ -787,6 +787,20 @@
             editOrderItem(id);
           });
 
+          $('.edit-adjustment')
+            .live("click", function (event) {
+              event.preventDefault();
+              var id = $(this).data("order-adjustment-id");
+              var orderId = $("#orderId").val();
+              var canManageAdjustments = ($("#canManageAdjustments").val() === "true");
+
+              if (canManageAdjustments) {
+                window.location.href = '${request.contextPath}/order/editAdjustment/' + id + '?order.id=' + orderId;
+              } else {
+                $.notify("You do not have permissions to perform this action", "error");
+              }
+            });
+
           $(".cancel-order-item").live("click", function (event) {
               event.preventDefault();
               var id = $(this).data("order-item-id");
@@ -1015,7 +1029,7 @@
             <div class="actions">
                 {{if !isCanceled }}
                     <div class="action-menu-item">
-                        <a href="${request.contextPath}/order/editAdjustment/{{= id}}?order.id={{= order.id}}">
+                        <a href="javascript:void(-1);" class="edit-adjustment" data-order-adjustment-id="{{= id}}">
                             <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>
                             <warehouse:message code="default.button.edit.label"/>
                         </a>
