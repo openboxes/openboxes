@@ -121,7 +121,7 @@
                     <h2 style="display: flex; align-items: center; justify-content: space-between;">
                         <warehouse:message code="default.add.label" args="[g.message(code: 'orderAdjustment.label')]"/>
                     </h2>
-                    <g:form controller="order" action="saveAdjustment" onsubmit="return validateAdjustmentsForm();">
+                    <g:form name="orderAdjustmentForm" controller="order" action="saveAdjustment">
                         <g:hiddenField name="order.id" value="${order?.id}" />
                         <input type="hidden" name="canManageAdjustments" id="canManageAdjustments" value="${canManageAdjustments}">
                         <table id="orderAdjustmentsTable" class="items-table">
@@ -164,7 +164,7 @@
                                     <g:textField name="amount" id="amount" class="large text"/>
                                 </td>
                                 <td>
-                                    <g:textArea name="comments"/>
+                                    <g:textArea name="comments" id="comments"/>
                                 </td>
                                 <td>
                                     <g:selectBudgetCode name="budgetCode"
@@ -173,7 +173,7 @@
                                                         noSelection="['':'']"/>
                                 </td>
                                 <td class="center middle">
-                                    <button type="submit" class="button">
+                                    <button type="button" class="button" onclick="saveOrderAdjustment()">
                                         <img src="${resource(dir: 'images/icons/silk', file: 'tick.png')}" />&nbsp
                                         <warehouse:message code="default.button.save.label"/>
                                     </button>
@@ -493,6 +493,32 @@
             return false
         }
 
+        function saveOrderAdjustment() {
+            var data = $("#orderAdjustmentForm").serialize();
+            if (validateAdjustmentsForm()) {
+                $.ajax({
+                    url:'${g.createLink(controller:'order', action:'saveAdjustment')}',
+                    data: data,
+                    success: function() {
+                        clearOrderAdjustments();
+                        loadOrderAdjustments();
+                        clearOrderAdjustmentForm();
+                        $.notify("Successfully saved new adjustment", "success");
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        if (jqXHR.responseText) {
+                            $.notify(jqXHR.responseText, "error");
+                        } else {
+                            $.notify("Error saving adjustment");
+                        }
+                    }
+                });
+            } else {
+                $.notify("Please enter a value for all required fields");
+            }
+            return false;
+        }
+
         function initializeTable() {
             loadOrderItems();
             loadOrderAdjustments();
@@ -519,6 +545,17 @@
           $("#estimatedReadyDate-datepicker").datepicker('setDate', null);
 
           $("#budgetCode").val(null).trigger('change');
+        }
+
+        function clearOrderAdjustmentForm() {
+            $("#orderAdjustmentForm")[0].reset();
+            $("#orderAdjustmentType").val(null).trigger('change');
+            $("#orderItems").val(null).trigger('change');
+            $("#description").val("");
+            $("#percentage").val("");
+            $("#amount").val("");
+            $("#comments").val("");
+            $("#adjustmentBudgetCode").val(null).trigger('change');
         }
 
         function clearOrderItems() {

@@ -1210,6 +1210,7 @@ openboxes {
                         [label: "eventTypes.label", defaultLabel: "Event Types", href: "/${appName}/eventType/list"],
                         [label: "glAccountType.label", defaultLabel: "GL Account Type", href: "/${appName}/glAccountType/list", requiredRoles: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
                         [label: "glAccount.label", defaultLabel: "GL Account", href: "/${appName}/glAccount/list", requiredRoles: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
+                        [label: "orderAdjustmentType.label", defaultLabel: "Order Adjustment Type", href: "/${appName}/orderAdjustmentType/list", requiredRoles: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
                         [label: "paymentMethodTypes.label", defaultLabel: "Payment Method Types", href: "/${appName}/paymentMethodType/list"],
                         [label: "paymentTerms.label", defaultLabel: "Payment Terms", href: "/${appName}/paymentTerm/list"],
                         [label: "shippers.label", defaultLabel: "Shippers", href: "/${appName}/shipper/list"],
