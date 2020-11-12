@@ -314,7 +314,7 @@
                                             ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                         </th>
                                     </tr>
-                                    <g:each var="orderAdjustment" in="${orderInstance?.orderAdjustments.findAll { !it.orderItem }.sort { it.totalAdjustments }.reverse() }">
+                                    <g:each var="orderAdjustment" in="${orderInstance?.orderAdjustments.findAll { !(it.orderItem || it.canceled) }.sort { it.totalAdjustments }.reverse() }">
                                         <tr>
                                             <th colspan="${columnsNumber}" class="right">
                                                 <g:if test="${orderAdjustment.description}">
