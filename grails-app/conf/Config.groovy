@@ -1082,7 +1082,8 @@ openboxes {
                     defaultLabel: "Transaction Reports",
                     menuItems: [
                         [label: "report.showTransactionReport.label", defaultLabel: "Transaction Report", href: "/${appName}/report/showTransactionReport"],
-                        [label: "report.consumption.label", defaultLabel: "Consumption Report", href: "/${appName}/consumption/show"]
+                        [label: "report.consumption.label", defaultLabel: "Consumption Report", href: "/${appName}/consumption/show"],
+                        [label: "report.requestDetailReport.label", defaultLabel: "Request Detail Report", href: "/${appName}/report/showRequestDetailReport"]
                     ]
                 ],
                 [
@@ -1094,7 +1095,6 @@ openboxes {
                         [label: "export.latestInventory.label", defaultLabel: "Export latest inventory date", href: "/${appName}/inventory/exportLatestInventoryDate"],
                         [label: "export.inventoryLevels.label", defaultLabel: "Export inventory levels", href: "/${appName}/inventoryLevel/export"],
                         [label: "export.requisitions.label", defaultLabel: "Export requisitions", href: "/${appName}/requisition/export"],
-                        [label: "export.requisitionItems.label", defaultLabel: "Export requisition items", href: "/${appName}/requisitionItem/listCanceled"],
                         [label: "export.binLocations.label", defaultLabel: "Export bin locations", href: "/${appName}/report/exportBinLocation?downloadFormat=csv"],
                         [label: "export.productDemand.label", defaultLabel: "Export product demand", href: "/${appName}/report/exportDemandReport?downloadFormat=csv"]
                     ]

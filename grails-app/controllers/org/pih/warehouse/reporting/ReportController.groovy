@@ -582,4 +582,10 @@ class ReportController {
         render(view: 'showInventoryByLocationReport', model: [command: command])
     }
 
+    def showRequestDetailReport = {
+        def origin = Location.get(session.warehouse.id)
+        params.origin = origin.id
+        render(view: 'showRequestDetailReport', params: params)
+    }
+
 }

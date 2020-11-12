@@ -385,6 +385,11 @@
                             <warehouse:message code="report.consumption.label" default="Consumption Report"/>
                         </g:link>
                     </div>
+                    <div class="mm-menu-item">
+                        <g:link controller="report" action="showRequestDetailReport">
+                            <warehouse:message code="report.requestDetailReport.label" default="Request Detail Report"/>
+                        </g:link>
+                    </div>
                 </div>
                 <div class="mm-content-section">
                     <h3><warehouse:message code="dataExports.label" default="Data Exports" /></h3>
@@ -409,11 +414,6 @@
                     <div class="mm-menu-item">
                         <g:link controller="requisition" action="export" class="list">
                             <warehouse:message code="default.export.label" default="Export {0}" args="${['requisitions'] }"/>
-                        </g:link>
-                    </div>
-                    <div class="mm-menu-item">
-                        <g:link controller="requisitionItem" action="listCanceled" class="">
-                            <warehouse:message code="requisitionItem.listCanceled.label" default="Export requisition items"/>
                         </g:link>
                     </div>
                     <div class="mm-menu-item">
