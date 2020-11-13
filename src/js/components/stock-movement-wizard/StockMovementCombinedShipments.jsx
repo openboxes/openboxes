@@ -67,6 +67,27 @@ class StockMovementCombinedShipments extends Component {
     }
   }
 
+  getWizardTitle() {
+    const { values } = this.state;
+    let newName = '';
+    if (!values.movementNumber && !values.trackingNumber) {
+      return '';
+    }
+    if (values.movementNumber && values.name && !values.trackingNumber) {
+      newName = values.description;
+    }
+    if (values.trackingNumber) {
+      const {
+        origin, destination, dateRequested, stocklist, trackingNumber, description,
+      } = values;
+      const stocklistPart = stocklist && stocklist.name ? `${stocklist.name}.` : '';
+      const dateReq = moment(dateRequested, 'MM/DD/YYYY').format('DDMMMYYYY');
+      newName = `${origin.name}.${destination.name}.${dateReq}.${stocklistPart}${trackingNumber}.${description}`;
+      newName.replace(/ /gi, '');
+    }
+    return `${values.movementNumber} - ${newName}`;
+  }
+
   getAdditionalWizardTitle() {
     const { currentPage, values } = this.state;
     const shipped = values.shipped ? 'SHIPPED' : '';
@@ -163,6 +184,7 @@ class StockMovementCombinedShipments extends Component {
 
   render() {
     const { values, currentPage } = this.state;
+    const title = this.getWizardTitle();
     const additionalTitle = this.getAdditionalWizardTitle();
 
     return (
@@ -170,7 +192,7 @@ class StockMovementCombinedShipments extends Component {
         pageList={this.pageList}
         stepList={this.stepList}
         initialValues={values}
-        title={values.movementNumber || ''}
+        title={title}
         additionalTitle={additionalTitle}
         currentPage={currentPage}
         prevPage={currentPage === 1 ? 1 : currentPage - 1}
