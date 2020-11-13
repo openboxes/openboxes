@@ -12,6 +12,7 @@ class Filter extends Component {
       listCategoryData: [],
       listCategoryDataFiltered: [],
       titlePopup: 'Add filter',
+      searchTerm: '',
       categorySelected: '',
     };
   }
@@ -40,8 +41,11 @@ class Filter extends Component {
     const filteredList = this.state.listCategoryData
       .filter(categoryData => categoryData.name
         .toLowerCase()
-        .includes(event.target.value));
-    this.setState({ listCategoryDataFiltered: filteredList });
+        .includes(event.target.value.toLowerCase()));
+    this.setState({
+      listCategoryDataFiltered: filteredList,
+      searchTerm: event.target.value,
+    });
   }
 
   toggleAddingFilter = () => {
@@ -54,7 +58,7 @@ class Filter extends Component {
     this.setState({ titlePopup: nameCategory || 'Add Filter' });
     this.setState({ categorySelected: nameCategory || '' });
     // Value in the searchBar removed
-    document.getElementById('searchBar').value = '';
+    this.setState({ searchTerm: '' });
     // Popup filterSelection show up or close
     this.setState({ filterCategorySelected: !this.state.filterCategorySelected });
   }
@@ -184,7 +188,7 @@ class Filter extends Component {
                 placeholder="search..."
                 onChange={this.searchOnChange}
                 hidden={!this.state.filterCategorySelected}
-                id="searchBar"
+                value={this.state.searchTerm}
               />
               <ul className={`filter-menu ${this.state.filterCategorySelected ? 'scrollable' : ''}`}>
                 {
