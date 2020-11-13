@@ -27,8 +27,8 @@
                             <div class="filter-list-item">
                                 <label><warehouse:message code="requisition.dateIssuedBetween.label" default="Date Issued Between"/></label>
                                 <div>
-                                    <g:jqueryDatePicker name="dateIssuedFrom" value="${params.dateIssuedFrom}" autocomplete="off"/>
-                                    <g:jqueryDatePicker name="dateIssuedTo" value="${params.dateIssuedTo}" autocomplete="off"/>
+                                    <g:jqueryDatePicker name="startDate" value="${params.startDate}" autocomplete="off" format="dd/MMM/yyyy" />
+                                    <g:jqueryDatePicker name="endDate" value="${params.endDate}" autocomplete="off" format="dd/MMM/yyyy" />
                                 </div>
                             </div>
 
@@ -41,40 +41,9 @@
                                 </p>
                             </div>
                             <div class="filter-list-item">
-                                <label><warehouse:message code="category.label"/></label>
-                                <p>
-                                    <g:selectCategory id="category"
-                                                      class="chzn-select-deselect filter"
-                                                      data-placeholder="Select a category"
-                                                      name="category"
-                                                      noSelection="['':'']"
-                                                      value="${params?.category}"/>
-                                </p>
-                            </div>
-                            <div class="filter-list-item">
-                                <label><warehouse:message code="catalogs.name.label"/></label>
-                                <p>
-                                    <g:selectCatalogs id="catalogs"
-                                                      name="catalogs" noSelection="['null':'']"
-                                                      value="${params?.catalogs}"
-                                                      style="width:100%;"
-                                                      class="chzn-select-deselect"/>
-                                </p>
-                            </div>
-                            <div class="filter-list-item">
-                                <label><warehouse:message code="tag.label"/></label>
-                                <p>
-                                    <g:selectTags name="tags"
-                                                  id="tags"
-                                                  value="${params?.tags}"
-                                                  multiple="true"
-                                                  class="chzn-select-deselect"/>
-                                </p>
-                            </div>
-                            <div class="filter-list-item">
                                 <label><warehouse:message code="requisitionItem.cancelReasonCode.label"/></label>
                                 <p>
-                                    <g:selectReasonCode name="reasonCode"
+                                    <g:selectRequestReasonCode name="reasonCode"
                                                         id="reasonCode"
                                                         noSelection="['':'']"
                                                         value="${params?.reasonCode}"
@@ -131,14 +100,16 @@
                             </tr>
                         </thead>
                         <tfoot>
-                        <tr>
-                            <th colspan="10"/>
-                            <th><g:message code="report.totalDemand.label"/></th>
-                        </tr>
-                        <tr>
-                            <th colspan="10"/>
-                            <th><g:message code="report.averageMonthlyDemand.label"/></th>
-                        </tr>
+                            <tr>
+                                <th colspan="9"/>
+                                <th><g:message code="report.totalDemand.label"/></th>
+                                <th id="totalDemand"></th>
+                            </tr>
+                            <tr>
+                                <th colspan="9"/>
+                                <th><g:message code="report.averageMonthlyDemand.label"/></th>
+                                <th id="averageMonthlyDemand"></th>
+                            </tr>
                         </tfoot>
                     </table>
                 </div>
@@ -147,6 +118,7 @@
     </div>
 </div>
 <div class="loading">Loading...</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.25.3/moment.min.js"></script>
 <script type="text/javascript" charset="utf8" src="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/jquery.dataTables.js"></script>
 <script>
     function initializeDataTable() {
@@ -163,14 +135,11 @@
         "sPaginationType": "two_button",
         "sAjaxSource": "${request.contextPath}/json/getRequestDetailReport",
         "fnServerParams": function ( data ) {
-          data.push({ name: "destination.id", value: $("#destinationId").val() });
-          data.push({ name: "origin.id", value: $("#originId").val() });
-          data.push({ name: "dateIssuedFrom", value: $("#dateIssuedFrom").val() });
-          data.push({ name: "dateIssuedTo", value: $("#dateIssuedTo").val() });
-          data.push({ name: "category", value: $("#category").val() });
-          data.push({ name: "tags", value: $("#tags").val() });
-          data.push({ name: "catalogs", value: $("#catalogs").val() });
-          data.push({ name: "product", value: $("#product").val() });
+          data.push({ name: "destinationId", value: $("#destinationId").val() });
+          data.push({ name: "originId", value: $("#origin").val() });
+          data.push({ name: "startDate", value: $("#startDate").val() });
+          data.push({ name: "endDate", value: $("#endDate").val() });
+          data.push({ name: "productId", value: $("#product-id").val() });
           data.push({ name: "reasonCode", value: $("#reasonCode").val() });
         },
         "fnServerData": function ( sSource, aoData, fnCallback ) {
@@ -190,6 +159,18 @@
             },
           } );
         },
+        "fnFooterCallback": function (nRow, aaData, iStart, iEnd) {
+          var totalDemand = 0;
+          for (var i = iStart; i < iEnd; i++) {
+            totalDemand += aaData[i].quantityDemand;
+          }
+          nRow.getElementsByTagName('th')[2].innerHTML = totalDemand;
+          var secondRow = $(nRow).next()[0];
+          var startDate = moment($('#startDate').val());
+          var endDate = moment($('#endDate').val());
+          var monthsDifference = endDate.diff(startDate, 'months');
+          secondRow.getElementsByTagName('th')[2].innerHTML = Math.round(totalDemand / (monthsDifference * 30));
+        },
         "oLanguage": {
           "sZeroRecords": "No records found",
           "sProcessing": "Loading <img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> Loading... "
@@ -207,10 +188,10 @@
             { "mData": "destination" },
             { "mData": "productCode" },
             { "mData": "productName" },
-            { "mData": "qtyRequested"},
-            { "mData": "qtyIssued"},
-            { "mData": "reasonCodes"},
-            { "mData": "qtyDemand"},
+            { "mData": "quantityRequested"},
+            { "mData": "quantityIssued"},
+            { "mData": "reasonCode"},
+            { "mData": "quantityDemand"},
           ],
         "dom": '<"top"i>rt<"bottom"flp><"clear">',
         "aaSorting": [[ 0, "asc" ]],
@@ -238,14 +219,11 @@
         $(".download-button").click(function(event) {
           event.preventDefault();
           var params = {
-            "destination.id": $("#destinationId").val(),
-            "origin.id": $("#originId").val(),
-            dateIssuedFrom: $("#dateIssuedFrom").val(),
-            dateIssuedTo: $("#dateIssuedTo").val(),
-            category: $("#category").val(),
-            tags: $("#tags").val(),
-            catalogs: $("#catalogs").val(),
-            product: $("#product").val(),
+            destinationId: $("#destinationId").val(),
+            originId: $("#origin").val(),
+            startDate: $("#startDate").val(),
+            endDate: $("#endDate").val(),
+            productId: $("#product-id").val(),
             reasonCode: $("#reasonCode").val(),
             format: "text/csv"
           };
@@ -255,20 +233,20 @@
 
       $(".submit-button").click(function(event){
         event.preventDefault();
-        var originId = $("#originId").val();
-        var dateIssuedFrom = $("#dateIssuedFrom").val();
-        var dateIssuedTo = $("#dateIssuedTo").val();
+        var originId = $("#origin").val();
+        var startDate = $("#startDate").val();
+        var endDate = $("#endDate").val();
         var validated = true;
 
-        if (!dateIssuedTo || !dateIssuedFrom || !originId) {
+        if (!endDate || !startDate || !originId) {
           $.notify("All report parameters fields are required", "error");
           validated = false
         }
 
-        dateIssuedFrom = Date.parse(dateIssuedFrom);
-        dateIssuedTo = Date.parse(dateIssuedTo);
+        startDate = Date.parse(startDate);
+        endDate = Date.parse(endDate);
 
-        if (dateIssuedFrom > dateIssuedTo) {
+        if (startDate > endDate) {
           $.notify("Start date must occur before end date", "error");
           validated = false
         }

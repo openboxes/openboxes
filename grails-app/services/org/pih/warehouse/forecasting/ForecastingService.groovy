@@ -13,6 +13,7 @@ import groovy.sql.Sql
 import groovy.time.TimeCategory
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.util.DateUtil
 
 import java.sql.Timestamp
@@ -258,6 +259,62 @@ class ForecastingService {
         return (startDate..endDate).collect {
             [year: it[Calendar.YEAR], month: it[Calendar.MONTH] + 1]
         }.unique()
+    }
+
+    def getRequestDetailReport(Map params) {
+        List data = []
+        String query = """
+            select 
+                request_number,
+                request_item_id,
+                DATE_FORMAT(date_requested, '%d/%b/%Y') as date_requested,
+                DATE_FORMAT(date_issued, '%d/%b/%Y') as date_issued,
+                origin_name,
+                destination_name,
+                product_code,
+                product_name,
+                quantity_requested,
+                quantity_picked,
+                reason_code_classification,
+                quantity_demand
+            FROM product_demand_details
+            WHERE date_issued BETWEEN :startDate AND :endDate
+            AND origin_id = :originId
+            """
+        if (params.destinationId) {
+            query += " AND destination_id = :destinationId"
+        }
+        if (params.productId) {
+            query += " AND product_id = :productId"
+        }
+        if (params.reasonCode) {
+            query += " AND reason_code_classification = :reasonCode"
+        }
+
+        Sql sql = new Sql(dataSource)
+        try {
+            data = sql.rows(query, params)
+
+        } catch (Exception e) {
+            log.error("Unable to execute query: " + e.message, e)
+        }
+
+        data = data.collect {
+            [
+                    productCode      : it?.product_code,
+                    productName      : it?.product_name,
+                    origin           : it?.origin_name,
+                    requestNumber    : it?.request_number,
+                    destination      : it?.destination_name,
+                    dateIssued       : it?.date_issued,
+                    dateRequested    : it?.date_requested,
+                    quantityRequested: it?.quantity_requested ?: 0,
+                    quantityIssued   : it.quantity_picked ?: 0,
+                    quantityDemand   : it?.quantity_demand ?: 0,
+                    reasonCode       : it?.reason_code_classification,
+            ]
+        }
+        return data
     }
 
 }
