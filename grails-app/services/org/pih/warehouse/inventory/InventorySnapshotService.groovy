@@ -36,9 +36,8 @@ class InventorySnapshotService {
 
     def dataSource
     def locationService
-    def inventoryService
+    def productAvailabilityService
     def persistenceInterceptor
-    def grailsApplication
 
     def populateInventorySnapshots(Date date) {
         populateInventorySnapshots(date, false)
@@ -63,10 +62,10 @@ class InventorySnapshotService {
                     Date lastUpdatedDate = InventorySnapshot.lastUpdatedDate(loc.id).list()
                     Integer transactionCount = Transaction.countByLocationAsOf(location, lastUpdatedDate).list()
                     Boolean skipCalculation = transactionCount == 0
-                    binLocations = (!skipCalculation) ? calculateBinLocations(location, date) : []
+                    binLocations = (!skipCalculation) ? productAvailabilityService.calculateBinLocations(location, date) : []
                 }
                 else {
-                    binLocations = calculateBinLocations(location, date)
+                    binLocations = productAvailabilityService.calculateBinLocations(location, date)
                 }
                 def readTime = (System.currentTimeMillis() - innerStartTime)
                 log.info "Read ${binLocations?.size()} inventory snapshots for location ${location} on date ${date.format("MMM-dd-yyyy")} in ${readTime}ms"
@@ -93,10 +92,8 @@ class InventorySnapshotService {
     }
 
     def populateInventorySnapshots(Date date, Location location) {
-
-        // Calculate current stock for given location
         def startTime = System.currentTimeMillis()
-        def binLocations = calculateBinLocations(location, date)
+        def binLocations = productAvailabilityService.calculateBinLocations(location, date)
         def readTime = (System.currentTimeMillis() - startTime)
         log.info "Read ${binLocations?.size()} inventory snapshots for location ${location} on date ${date.format("MMM-dd-yyyy")} in ${readTime}ms"
 
@@ -112,26 +109,8 @@ class InventorySnapshotService {
     }
 
     def populateInventorySnapshots(Date date, Location location, Product product) {
-        def binLocations = calculateBinLocations(location, product)
+        def binLocations = productAvailabilityService.calculateBinLocations(location, product)
         saveInventorySnapshots(date, location, binLocations)
-    }
-
-    def calculateBinLocations(Location location, Date date) {
-        def binLocations = inventoryService.getBinLocationDetails(location, date)
-        binLocations = transformBinLocations(binLocations)
-        return binLocations
-    }
-
-    def calculateBinLocations(Location location) {
-        def binLocations = inventoryService.getBinLocationDetails(location)
-        binLocations = transformBinLocations(binLocations)
-        return binLocations
-    }
-
-    def calculateBinLocations(Location location, Product product) {
-        def binLocations = inventoryService.getProductQuantityByBinLocation(location, product)
-        binLocations = transformBinLocations(binLocations)
-        return binLocations
     }
 
     def deleteInventorySnapshots(Date date) {
@@ -172,26 +151,6 @@ class InventorySnapshotService {
         log.info "Deleted ${results} inventory snapshots for date ${date}, location ${location}, product ${product}"
     }
 
-    def transformBinLocations(List binLocations) {
-        def binLocationsTransformed = binLocations.collect {
-            [
-                    product      : [id: it?.product?.id, productCode: it?.product?.productCode, name: it?.product?.name],
-                    inventoryItem: [id: it?.inventoryItem?.id, lotNumber: it?.inventoryItem?.lotNumber, expirationDate: it?.inventoryItem?.expirationDate],
-                    binLocation  : [id: it?.binLocation?.id, name: it?.binLocation?.name],
-                    quantity     : it.quantity
-            ]
-        }
-
-        // Attempting to prevent deadlock due to gap locks
-        binLocationsTransformed = binLocationsTransformed.sort { a, b ->
-            a?.binLocation?.name <=> b?.binLocation?.name ?:
-                    a?.product?.productCode <=> b?.product?.productCode ?:
-                            a?.inventoryItem?.lotNumber <=> b?.inventoryItem?.lotNumber
-        }
-
-        return binLocationsTransformed
-    }
-
     def saveInventorySnapshots(Date date, Location location, List binLocations) {
         def startTime = System.currentTimeMillis()
         def batchSize = ConfigurationHolder.config.openboxes.inventorySnapshot.batchSize ?: 1000
@@ -206,7 +165,7 @@ class InventorySnapshotService {
             // Execute inventory snapshot insert/update in batches
             sql.withBatch(batchSize) { BatchingStatementWrapper stmt ->
                 binLocations.eachWithIndex { Map binLocationEntry, index ->
-                    String insertStatement = generateInsertInventorySnapshotStatement(location, binLocationEntry)
+                    String insertStatement = generateInsertInventorySnapshotStatement(location, dateString, DATE_FORMAT, binLocationEntry)
                     stmt.addBatch(insertStatement)
                 }
                 stmt.executeBatch()
@@ -214,7 +173,7 @@ class InventorySnapshotService {
             log.info "Saved ${binLocations?.size()} inventory snapshots for location ${location} on date ${date.format("MMM-dd-yyyy")} in ${System.currentTimeMillis() - startTime}ms"
 
             // Refresh the product availability table for each location
-            //RefreshProductAvailabilityJob.triggerNow([locationId:location.id])
+            RefreshProductAvailabilityJob.triggerNow([locationId:location.id])
 
         } catch (Exception e) {
             log.error("Error executing batch update for ${location.name}: " + e.message, e)
@@ -223,12 +182,14 @@ class InventorySnapshotService {
         }
     }
 
-    String generateInsertInventorySnapshotStatement(Location location, Map entry) {
+    String generateInsertInventorySnapshotStatement(Location location, String dateString, DateFormat DATE_FORMAT, Map entry) {
         def onHandQuantity = entry.quantity
         String productId = "${StringEscapeUtils.escapeSql(entry.product?.id)}"
         String productCode = "${StringEscapeUtils.escapeSql(entry.product?.productCode)}"
         String lotNumber = entry?.inventoryItem?.lotNumber ?
                 "'${StringEscapeUtils.escapeSql(entry?.inventoryItem?.lotNumber)}'" : "'DEFAULT'"
+        String expirationDate = entry?.inventoryItem?.expirationDate ?
+                "'${DATE_FORMAT.format(entry?.inventoryItem?.expirationDate)}'" : "NULL"
         String inventoryItemId = entry?.inventoryItem?.id ?
                 "'${StringEscapeUtils.escapeSql(entry?.inventoryItem?.id)}'" : "NULL"
         String binLocationId = entry?.binLocation?.id ?
@@ -237,12 +198,12 @@ class InventorySnapshotService {
                 "'${StringEscapeUtils.escapeSql(entry?.binLocation?.name)}'" : "'DEFAULT'"
 
         def insertStatement =
-                "INSERT INTO product_availability (id, version, location_id, product_id, product_code, " +
-                        "inventory_item_id, lot_number, bin_location_id, bin_location_name, " +
+                "INSERT INTO inventory_snapshot (id, version, date, location_id, product_id, product_code, " +
+                        "inventory_item_id, lot_number, expiration_date, bin_location_id, bin_location_name, " +
                         "quantity_on_hand, date_created, last_updated) " +
-                        "values ('${UUID.randomUUID().toString()}', 0, '${location?.id}', " +
+                        "values ('${UUID.randomUUID().toString()}', 0, '${dateString}', '${location?.id}', " +
                         "'${productId}', '${productCode}', " +
-                        "${inventoryItemId}, ${lotNumber}, " +
+                        "${inventoryItemId}, ${lotNumber}, ${expirationDate}, " +
                         "${binLocationId}, ${binLocationName}, ${onHandQuantity}, now(), now()) " +
                         "ON DUPLICATE KEY UPDATE quantity_on_hand=${onHandQuantity}, version=version+1, last_updated=now()"
         return insertStatement

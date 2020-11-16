@@ -38,6 +38,7 @@ class ReportController {
     def reportService
     def messageService
     def inventorySnapshotService
+    def productAvailabilityService
     def stockMovementService
     def forecastingService
     def shipmentService
@@ -50,7 +51,7 @@ class ReportController {
     }
 
     def refreshProductAvailability = {
-        reportService.refreshProductAvailabilityData()
+        productAvailabilityService.refreshProductAvailability(Boolean.TRUE)
         render([success: true] as JSON)
     }
 

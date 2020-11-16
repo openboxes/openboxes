@@ -13,7 +13,7 @@ import grails.converters.JSON
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.data.DataService
-import org.pih.warehouse.jobs.CalculateQuantityJob
+import org.pih.warehouse.jobs.RefreshInventorySnapshotJob
 import org.pih.warehouse.product.Product
 
 import java.text.DateFormat
@@ -35,13 +35,12 @@ class InventorySnapshotController {
     def edit = {}
 
     def update = {
-        println "Update inventory snapshot " + params
         try {
             def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
             def date = dateFormat.parse(params.date)
             date.clearTime()
 
-            def results = CalculateQuantityJob.triggerNow([locationId: params.location.id, date: date])
+            def results = RefreshInventorySnapshotJob.triggerNow([location: params.location.id, startDate: date])
             render([results: results] as JSON)
 
         }
@@ -51,12 +50,11 @@ class InventorySnapshotController {
         }
     }
 
-    def triggerCalculateQuantityOnHandJob = {
-        def results = CalculateQuantityJob.triggerNow(
+    def triggerRefreshInventorySnapshotJob = {
+        def results = RefreshInventorySnapshotJob.triggerNow(
                 [
                         productId      : params.product.id,
                         locationId     : params.location.id,
-                        includeAllDates: false,
                         forceRefresh   : true
                 ]
         )
@@ -71,7 +69,7 @@ class InventorySnapshotController {
             DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy")
             Date date = (params.date) ? dateFormat.parse(params.date) : new Date()
 
-            CalculateQuantityJob.triggerNow([date: date, productId: params.product?.id, locationId: location?.id, userId: user?.id])
+            RefreshInventorySnapshotJob.triggerNow([date: date, productId: params.product?.id, locationId: location?.id, userId: user?.id])
         } catch (Exception e) {
             log.error("An error occurred " + e.message, e)
             render([message: "An error occurred: " + e.message] as JSON)

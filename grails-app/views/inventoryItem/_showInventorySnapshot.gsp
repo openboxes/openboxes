@@ -118,7 +118,7 @@
 <div class="buttons">
     <g:isSuperuser>
         <g:remoteLink class="button"
-                      controller="inventorySnapshot" action="triggerCalculateQuantityOnHandJob"
+                      controller="inventorySnapshot" action="triggerRefreshInventorySnapshotJob"
                       params="['product.id':product.id,'location.id':session.warehouse.id]" onSuccess="javascript:refreshPage();">
             <img src="${createLinkTo(dir:'images/icons/silk',file:'reload.png')}" />&nbsp;
             ${g.message(code: "default.reload.label", args: [g.message(code: "default.data.label")])}

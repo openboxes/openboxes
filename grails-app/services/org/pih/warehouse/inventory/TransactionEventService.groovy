@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.inventory
 
-import org.pih.warehouse.jobs.RefreshInventorySnapshotAfterTransactionJob
+import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.springframework.context.ApplicationListener
 class TransactionEventService implements ApplicationListener<TransactionEvent> {
 
@@ -29,8 +29,8 @@ class TransactionEventService implements ApplicationListener<TransactionEvent> {
             "transaction=$transactionId," +
             "productIds=$productIds"
 
-        RefreshInventorySnapshotAfterTransactionJob.triggerNow([
-            location: locationId,
+        RefreshProductAvailabilityJob.triggerNow([
+            locationId: locationId,
             productIds: productIds
         ])
     }

@@ -859,6 +859,7 @@ openboxes.jobs.refreshInventorySnapshotAfterTransactionJob.maxRetryAttempts = 3
 
 // Refresh product availability materialized view
 openboxes.jobs.refreshProductAvailabilityJob.enabled = true
+openboxes.jobs.refreshProductAvailabilityJob.cronExpression = "0 0 0/2 * * ?" // every two hours starting at midnight
 
 // Refresh transaction fact table
 openboxes.jobs.refreshTransactionFactJob.enabled = true
@@ -878,7 +879,7 @@ openboxes.jobs.assignIdentifierJob.cronExpression = "0 * * * * ?" // every minut
 
 // Calculate current quantity on hand
 openboxes.jobs.calculateQuantityJob.enabled = true
-openboxes.jobs.calculateQuantityJob.cronExpression = "0 0 0/2 * * ?" // every two hours starting at midnight
+openboxes.jobs.calculateQuantityJob.cronExpression = "0 0 0/12 * * ?" // every twelve hours starting at midnight
 openboxes.jobs.calculateQuantityJob.enableOptimization = false
 
 // Calculate historical quantity on hand
@@ -1148,11 +1149,11 @@ openboxes {
                     defaultLabel: "Administration",
                     menuItems: [
                         [label: "default.settings.label", defaultLabel: "Settings", href: "/${appName}/admin/showSettings"],
-                        [label: "dataMigration.label", defaultLabel: "Data Migration", href: "/${appName}/migration/index"],
-                        [label: "console.label", defaultLabel: "Console", href: "/${appName}/console/index"],
                         [label: "cache.label", defaultLabel: "Cache", href: "/${appName}/admin/cache"],
+                        [label: "console.label", defaultLabel: "Console", href: "/${appName}/console/index"],
+                        [label: "dataImport.label", defaultLabel: "Data Import", href: "/${appName}/batch/importData"],
+                        [label: "dataMigration.label", defaultLabel: "Data Migration", href: "/${appName}/migration/index"],
                         [label: "email.label", defaultLabel: "Email", href: "/${appName}/admin/sendMail"],
-                        [label: "importData.label", defaultLabel: "Import Data", href: "/${appName}/batch/importData"],
                         [label: "localization.label", defaultLabel: "Localization", href: "/${appName}/localization/list"]
                     ]
                 ],

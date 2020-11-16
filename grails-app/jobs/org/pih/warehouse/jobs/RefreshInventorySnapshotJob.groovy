@@ -11,6 +11,7 @@ package org.pih.warehouse.jobs
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.product.Product
 import org.quartz.DisallowConcurrentExecution
 import org.quartz.JobExecutionContext
 import org.quartz.JobExecutionException
@@ -19,7 +20,6 @@ import org.quartz.JobExecutionException
 class RefreshInventorySnapshotJob {
 
     def concurrent = false
-    def grailsApplication
     def inventorySnapshotService
 
     // Should never be triggered on a schedule - should only be triggered by persistence event listener
@@ -49,16 +49,23 @@ class RefreshInventorySnapshotJob {
             def userId = context.mergedJobDataMap.get('user')
             def startDate = context.mergedJobDataMap.get('startDate')
             def locationId = context.mergedJobDataMap.get('location')
-            Location location = Location.get(locationId)
-
+            Location location = Location.load(locationId)
+            def productId = context.mergedJobDataMap.get('product')
+            Product product = Product.load(productId)
             try {
-                log.info ("Refresh inventory snapshot " + retryCount + " out of " + maxRetryAttempts)
-                if (forceRefresh) {
-                    inventorySnapshotService.deleteInventorySnapshots(location)
+                log.info("Refresh inventory snapshot " + retryCount + " out of " + maxRetryAttempts)
+                if (product && location) {
+                    if (forceRefresh) {
+                        inventorySnapshotService.deleteInventorySnapshots(location, product)
+                    }
+                    inventorySnapshotService.populateInventorySnapshots(location, product)
                 }
-
-                // Refresh inventory snapshot for tomorrow
-                inventorySnapshotService.populateInventorySnapshots(location)
+                else if (location) {
+                    if (forceRefresh) {
+                        inventorySnapshotService.deleteInventorySnapshots(location)
+                    }
+                    inventorySnapshotService.populateInventorySnapshots(location)
+                }
 
                 // Reset retry count to 0
                 context.jobDetail.jobDataMap.putAsString("retryCount", 0);
