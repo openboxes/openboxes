@@ -1,16 +1,15 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import moment from 'moment';
 import PropTypes from 'prop-types';
+import React, { Component } from 'react';
 import { getTranslate } from 'react-localize-redux';
-
-import CreateStockMovement from './combined-shipments/CreateStockMovement';
-import AddItemsPage from './combined-shipments/AddItemsPage';
-import SendMovementPage from './combined-shipments/SendMovementPage';
-import Wizard from '../wizard/Wizard';
+import { connect } from 'react-redux';
+import { fetchBreadcrumbsConfig, fetchTranslations, hideSpinner, showSpinner, updateBreadcrumbs } from '../../actions';
 import apiClient from '../../utils/apiClient';
-import { showSpinner, hideSpinner, fetchTranslations, updateBreadcrumbs, fetchBreadcrumbsConfig } from '../../actions';
 import { translateWithDefaultMessage } from '../../utils/Translate';
-
+import Wizard from '../wizard/Wizard';
+import AddItemsPage from './combined-shipments/AddItemsPage';
+import CreateStockMovement from './combined-shipments/CreateStockMovement';
+import SendMovementPage from './combined-shipments/SendMovementPage';
 import './StockMovement.scss';
 
 /** Main combined shipments stock movement form's wizard component. */
