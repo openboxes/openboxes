@@ -178,6 +178,9 @@ class UserService {
         return isSuperuser(currentUser) || (currentUser.getHighestRole(location) >= otherUser.getHighestRole(location))
     }
 
+    Boolean isUserInRole(User user, RoleType roleType) {
+        return isUserInRole(user.id, [roleType])
+    }
 
     Boolean isUserInRole(String userId, Collection roleTypes) {
         Collection acceptedRoleTypes = RoleType.expand(roleTypes)
@@ -351,7 +354,7 @@ class UserService {
         def config = grailsApplication.config.openboxes.tablero
         def userConfig = user.deserializeDashboardConfig()
         Boolean configChanged = false
-        
+
         if (userConfig != null) {
             int userConfigSize = userConfig.graph.size() + userConfig.number.size()
             int configSize = config.endpoints.number.size() + config.endpoints.graph.size()
@@ -360,18 +363,18 @@ class UserService {
                 return config
             }
             // Checking all keys in number to know if one changed
-            config.endpoints.number.each { element -> 
+            config.endpoints.number.each { element ->
                 if (userConfig.number.find { it.key == element.key} == null) {
                     configChanged = true
-                } 
+                }
             }
             if(!configChanged) updateConfig("number", config, userConfig)
 
             // Reset configChanged to false to check the other part of the config
             configChanged = false
-            
+
             // Checking all keys in graph
-            config.endpoints.graph.each { element -> 
+            config.endpoints.graph.each { element ->
                 if (userConfig.graph.find { it.key == element.key} == null) {
                     configChanged = true
                 }
@@ -386,9 +389,9 @@ class UserService {
         customConfig[type].each { key, value ->
             // Update order
             config["endpoints"][type][key]["order"] = value["order"]
-            
+
             // If the indicator should be archived but it currently isn't
-            boolean archivedInConfig = config["endpoints"][type][key]["archived"].indexOf("personal") != -1 
+            boolean archivedInConfig = config["endpoints"][type][key]["archived"].indexOf("personal") != -1
             if (value["archived"] && !archivedInConfig) {
                 config["endpoints"][type][key]["archived"].add("personal")
             }

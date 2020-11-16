@@ -969,7 +969,7 @@ openboxes {
         }
         analytics {
             enabled = true
-            requiredRoles = [RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN]
+            requiredRole = RoleType.ROLE_ADMIN
             label = "analytics.label"
             defaultLabel = "Analytics"
             menuItems = [
@@ -1156,7 +1156,7 @@ openboxes {
         }
         configuration {
             enabled = true
-            requiredRoles = [RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN]
+            requiredRole = RoleType.ROLE_ADMIN
             label = "configuration.label"
             defaultLabel = "Configuration"
             subsections = [
@@ -1203,14 +1203,14 @@ openboxes {
                     label: "default.other.label",
                     defaultLabel: "Other",
                     menuItems: [
-                        [label: "budgetCode.label", defaultLabel: "Budget Code", href: "/${appName}/budgetCode/list", requiredRoles: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
+                        [label: "budgetCode.label", defaultLabel: "Budget Code", href: "/${appName}/budgetCode/list", requiredRole: RoleType.ROLE_ADMIN],
                         [label: "containerTypes.label", defaultLabel: "Container Types", href: "/${appName}/containerType/list"],
                         [label: "documents.label", defaultLabel: "Documents", href: "/${appName}/document/list"],
                         [label: "documentTypes.label", defaultLabel: "Document Types", href: "/${appName}/documentType/list"],
                         [label: "eventTypes.label", defaultLabel: "Event Types", href: "/${appName}/eventType/list"],
-                        [label: "glAccountType.label", defaultLabel: "GL Account Type", href: "/${appName}/glAccountType/list", requiredRoles: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
-                        [label: "glAccount.label", defaultLabel: "GL Account", href: "/${appName}/glAccount/list", requiredRoles: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
-                        [label: "orderAdjustmentType.label", defaultLabel: "Order Adjustment Type", href: "/${appName}/orderAdjustmentType/list", requiredRoles: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
+                        [label: "glAccountType.label", defaultLabel: "GL Account Type", href: "/${appName}/glAccountType/list", requiredRole: RoleType.ROLE_ADMIN],
+                        [label: "glAccount.label", defaultLabel: "GL Account", href: "/${appName}/glAccount/list", requiredRole: RoleType.ROLE_ADMIN],
+                        [label: "orderAdjustmentType.label", defaultLabel: "Order Adjustment Type", href: "/${appName}/orderAdjustmentType/list", requiredRole: RoleType.ROLE_ADMIN],
                         [label: "paymentMethodTypes.label", defaultLabel: "Payment Method Types", href: "/${appName}/paymentMethodType/list"],
                         [label: "paymentTerms.label", defaultLabel: "Payment Terms", href: "/${appName}/paymentTerm/list"],
                         [label: "shippers.label", defaultLabel: "Shippers", href: "/${appName}/shipper/list"],
