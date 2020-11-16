@@ -24,18 +24,7 @@ import { debounceLocationsFetch } from '../../../utils/option-utils';
 import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
 import ArrayField from '../../form-elements/ArrayField';
 
-const BASIC_FIELDS = {
-  description: {
-    label: 'react.stockMovement.description.label',
-    defaultMessage: 'Description',
-    type: (params) => {
-      if (params.issued) {
-        return <TextField {...params} />;
-      }
-
-      return <TextField {...params} disabled />;
-    },
-  },
+const SHIPMENT_FIELDS = {
   'origin.name': {
     label: 'react.stockMovement.origin.label',
     defaultMessage: 'Origin',
@@ -78,14 +67,6 @@ const BASIC_FIELDS = {
       return <TextField {...params} disabled />;
     },
   },
-  name: {
-    label: 'react.stockMovement.shipmentName.label',
-    defaultMessage: 'Shipment name',
-    type: params => <TextField {...params} disabled />,
-  },
-};
-
-const SHIPMENT_FIELDS = {
   dateShipped: {
     type: DateField,
     label: 'react.stockMovement.shipDate.label',
@@ -634,7 +615,6 @@ class SendMovementPage extends Component {
   render() {
     return (
       <div>
-        <hr />
         <Form
           onSubmit={() => {}}
           validate={validate}
@@ -642,18 +622,6 @@ class SendMovementPage extends Component {
           initialValues={this.state.values}
           render={({ handleSubmit, values, invalid }) => (
             <form onSubmit={handleSubmit}>
-              <div className="d-flex">
-                <div id="stockMovementInfo" className="classic-form classic-form-condensed">
-                  <div className="form-title">{values.movementNumber}{ values.shipmentStatus && <span className="shipment-status float-right">{values.shipmentStatus}</span> }</div>
-                  {_.map(BASIC_FIELDS, (fieldConfig, fieldName) =>
-                    renderFormField(fieldConfig, fieldName, {
-                      canBeEdited: values.statusCode === 'ISSUED' && !values.received,
-                      issued: values.statusCode === 'ISSUED',
-                      hasStockList: !!_.get(values.stocklist, 'id'),
-                      debouncedLocationsFetch: this.debouncedLocationsFetch,
-                    }))}
-                </div>
-              </div>
               <div className="classic-form classic-form-condensed">
                 <span className="buttons-container classic-form-buttons">
                   <div className="dropzone float-right mb-1 btn btn-outline-secondary align-self-end btn-xs">
