@@ -77,10 +77,10 @@ class StockMovementCombinedShipments extends Component {
     }
     if (values.trackingNumber) {
       const {
-        origin, destination, dateRequested, stocklist, trackingNumber, description,
+        origin, destination, dateShipped, stocklist, trackingNumber, description,
       } = values;
       const stocklistPart = stocklist && stocklist.name ? `${stocklist.name}.` : '';
-      const dateReq = moment(dateRequested, 'MM/DD/YYYY').format('DDMMMYYYY');
+      const dateReq = moment(dateShipped, 'MM/DD/YYYY').format('DDMMMYYYY');
       newName = `${origin.name}.${destination.name}.${dateReq}.${stocklistPart}${trackingNumber}.${description}`;
       newName.replace(/ /gi, '');
     }
