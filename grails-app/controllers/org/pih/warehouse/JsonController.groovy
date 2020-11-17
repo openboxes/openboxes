@@ -1769,6 +1769,12 @@ class JsonController {
                 unitOfMeasure: productPackage?.uom,
         ] as JSON)
     }
+
+    def getRequestDetailReport = {
+        // TODO in another ticket
+        log.info params
+        render([aaData: []] as JSON)
+    }
 }
 
 

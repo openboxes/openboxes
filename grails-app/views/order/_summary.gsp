@@ -163,7 +163,7 @@
                                 <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
                                 ${warehouse.message(code: 'default.button.rollback.label')}
                             </g:link>
-                            <g:link controller="order" action="shipOrder" id="${orderInstance?.id}" class="button"
+                            <g:link controller="stockMovement" action="createCombinedShipments" params="[direction:'INBOUND', orderId: orderInstance?.id]" class="button"
                                     disabled="${orderInstance?.status < OrderStatus.PLACED}"
                                     disabledMessage="Order must be placed in order to ship">
                                 <img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />&nbsp;
@@ -233,7 +233,7 @@
                                 <img src="${resource(dir: 'images/icons/silk', file: 'cart_magnify.png')}" />&nbsp;
                                 <warehouse:message code="default.button.saveAndExit.label" default="Save and Exit"/>
                             </g:link>
-                            <g:link controller="order" action="shipOrder" id="${orderInstance?.id}" class="button"
+                            <g:link controller="stockMovement" action="createCombinedShipments" params="[direction:'INBOUND', orderId: orderInstance?.id]" class="button"
                                     disabled="${orderInstance?.status < OrderStatus.PLACED}"
                                     disabledMessage="Order must be placed in order to ship">
                                 <img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />&nbsp;

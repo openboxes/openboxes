@@ -163,6 +163,32 @@
         </g:authorize>
     </g:if>
 
+    <g:if test="${megamenuConfig.purchasing.enabled}">
+        <li class="mm-item">
+            <a href="javascript:void(0)" class="mm-item-link">
+                <warehouse:message code="order.purchasing.label" />
+            </a>
+            <div class="mm-item-content">
+                <div class="mm-menu-item">
+                    <g:link controller="purchaseOrder" action="index" class="create">
+                        <warehouse:message code="default.create.label" args="[warehouse.message(code:'purchaseOrder.label')]"/>
+                    </g:link>
+                </div>
+                <div class="mm-menu-item">
+                    <g:link controller="order" action="list" params="[orderTypeCode:OrderTypeCode.PURCHASE_ORDER]" class="list">
+                        <warehouse:message code="order.listPurchase.label" default="List Purchase Orders" />
+                    </g:link>
+                </div>
+                <div class="mm-menu-item">
+                    <g:link controller="stockMovement" action="createCombinedShipments" params="[direction:'INBOUND']">
+                        <warehouse:message code="shipment.shipfromPO.label"/>
+                    </g:link>
+                </div>
+            </div>
+        </li>
+        </a>
+    </g:if>
+
     <g:if test="${megamenuConfig.inbound.enabled}">
         <g:authorize activity="[ActivityCode.RECEIVE_STOCK]">
             <li class="mm-item">
@@ -188,21 +214,6 @@
                             <div class="mm-menu-item">
                                 <g:link controller="stockMovement" action="list" params="[direction:'INBOUND']">
                                     <warehouse:message code="default.list.label" args="[warehouse.message(code: 'stockMovements.inbound.label')]"/>
-                                </g:link>
-                            </div>
-                        </div>
-                    </g:if>
-                    <g:if test="${megamenuConfig.orders.enabled}">
-                        <div class="mm-content-section">
-                            <h3><warehouse:message code="purchaseOrders.label" default="Purchase Orders"/></h3>
-                            <div class="mm-menu-item">
-                                <g:link controller="purchaseOrder" action="index" class="create">
-                                    <warehouse:message code="default.create.label" args="[warehouse.message(code:'purchaseOrder.label')]"/>
-                                </g:link>
-                            </div>
-                            <div class="mm-menu-item">
-                                <g:link controller="order" action="list" params="[orderTypeCode:OrderTypeCode.PURCHASE_ORDER]" class="list">
-                                    <warehouse:message code="order.listPurchase.label" default="List Purchase Orders" />
                                 </g:link>
                             </div>
                         </div>
@@ -358,7 +369,7 @@
                     </div>
                     <div class="mm-menu-item">
                         <g:link controller="report" action="showOnOrderReport">
-                            <warehouse:message code="report.onOrderreport.label" default="On Order Report"/>
+                            <warehouse:message code="report.onOrderReport.label" default="On Order Report"/>
                         </g:link>
                     </div>
                 </div>
@@ -372,6 +383,11 @@
                     <div class="mm-menu-item">
                         <g:link controller="consumption" action="show">
                             <warehouse:message code="report.consumption.label" default="Consumption Report"/>
+                        </g:link>
+                    </div>
+                    <div class="mm-menu-item">
+                        <g:link controller="report" action="showRequestDetailReport">
+                            <warehouse:message code="report.requestDetailReport.label" default="Request Detail Report"/>
                         </g:link>
                     </div>
                 </div>
@@ -398,11 +414,6 @@
                     <div class="mm-menu-item">
                         <g:link controller="requisition" action="export" class="list">
                             <warehouse:message code="default.export.label" default="Export {0}" args="${['requisitions'] }"/>
-                        </g:link>
-                    </div>
-                    <div class="mm-menu-item">
-                        <g:link controller="requisitionItem" action="listCanceled" class="">
-                            <warehouse:message code="requisitionItem.listCanceled.label" default="Export requisition items"/>
                         </g:link>
                     </div>
                     <div class="mm-menu-item">
@@ -713,6 +724,11 @@
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">
+                                <g:link controller="orderAdjustmentType" action="list">
+                                    <warehouse:message code="orderAdjustmentType.label" default="Order Adjustment Type"/>
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
                                 <g:link controller="paymentMethodType" action="list">
                                     <warehouse:message code="paymentMethodTypes.label" />
                                 </g:link>
@@ -746,14 +762,14 @@
                 <warehouse:message code="customLinks.label" default="Custom Links" />
             </a>
             <div class="mm-item-content">
-                <g:each var="link" in="${megamenuConfig.customLinks.content}">
+                <g:each var="item" in="${megamenuConfig.customLinks.menuItems}">
                     <div class="mm-menu-item">
-                        <a href="${link.href}" target="${link.target}">
-                            ${link.label}
+                        <a href="${item.href}" target="${item.target}">
+                            <warehouse:message code="${item.label}" default="${item.defaultLabel}" />
                         </a>
                     </div>
                 </g:each>
-                <g:unless test="${megamenuConfig.customLinks.content}">
+                <g:unless test="${megamenuConfig.customLinks.menuItems}">
                     <div class="mm-menu-item">
                         <a href="#">There are no custom links</a>
                     </div>

@@ -108,6 +108,7 @@
 															<g:link controller="inventoryItem" action="showStockCard" id="${searchResult?.product?.id}" style="color: ${searchResult.color}">
 																${searchResult?.product?.productCode}
 																${searchResult?.product?.name}
+																<g:renderHandlingIcons product="${searchResult?.product}" />
 														   	</g:link>
 														</td>
 														<td>

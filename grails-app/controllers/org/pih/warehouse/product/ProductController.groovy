@@ -178,19 +178,19 @@ class ProductController {
         def startTime = System.currentTimeMillis()
         def productInstance = new Product(params)
         def rootCategory = productService.getRootCategory()
+        def location = Location.get(session?.warehouse?.id)
 
         println "Create product: " + (System.currentTimeMillis() - startTime) + " ms"
 
-		render(view: "edit", model: [productInstance : productInstance, rootCategory: rootCategory])
+		render(view: "edit", model: [productInstance : productInstance, rootCategory: rootCategory, locationInstance: location])
         println "After render create.gsp for product: " + (System.currentTimeMillis() - startTime) + " ms"
     }
 
     def save = {
         println "Save product: " + params
-
-
         def productInstance = new Product()
         productInstance.properties = params
+        def location = Location.get(session?.warehouse?.id)
 
         updateTags(productInstance, params)
 
@@ -210,7 +210,7 @@ class ProductController {
             sendProductCreatedNotification(productInstance)
         }
 
-        render(view: "edit", model: [productInstance: productInstance, rootCategory: productService.getRootCategory()])
+        render(view: "edit", model: [productInstance: productInstance, rootCategory: productService.getRootCategory(), locationInstance: location])
     }
 
 

@@ -38,7 +38,7 @@ class ReceiptService {
     def locationService
     def identifierService
     def grailsApplication
-    def mailService
+    def notificationService
 
     PartialReceipt getPartialReceipt(String id, String stepNumber) {
         Shipment shipment = Shipment.get(id)
@@ -252,29 +252,24 @@ class ReceiptService {
         }
 
         // Save shipment
-        shipment.save(flush: true)
-
-        // Send notification email on completed receiving
-        if (completed) {
-            def emailValidator = EmailValidator.getInstance()
-            def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
-            def recipientItems = partialReceipt.partialReceiptItems.groupBy {it.recipient }
-            recipientItems.each { Person recipient, items ->
-                if (emailValidator.isValid(recipient?.email)) {
-                    def subject = g.message(code: "email.yourItemReceived.message", args: [shipment.shipmentNumber])
-                    def body = "${g.render(template: "/email/shipmentItemReceived", model: [shipmentInstance: shipment, receiptItems: items, recipient: recipient])}"
-                    mailService.sendHtmlMail(subject, body.toString(), recipient.email)
-                }
-            }
-        }
+        shipment.save()
     }
 
     void saveAndCompletePartialReceipt(PartialReceipt partialReceipt) {
-        savePartialReceipt(partialReceipt, true)
-        savePartialReceiptEvent(partialReceipt)
-        saveInboundTransaction(partialReceipt)
+        Receipt.withTransaction { status ->
+            try {
+                // Create receipt, event, and transaction
+                savePartialReceipt(partialReceipt, true)
+                savePartialReceiptEvent(partialReceipt)
+                saveInboundTransaction(partialReceipt)
+                // Send notification email on completed receiving
+                notificationService.sendReceiptNotifications(partialReceipt)
+            } catch (Exception e) {
+                log.error "An unexpected error occurred during receipt: " + e.message, e
+                throw e;
+            }
+        }
     }
-
 
     void savePartialReceiptEvent(PartialReceipt partialReceipt) {
         Shipment shipment = partialReceipt.shipment

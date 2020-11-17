@@ -17,18 +17,11 @@
                                  name="productSupplier" class="select2"
                                  noSelection="['':'']" disabled="${true}" />
     </td>
-    <td class="middle center">
-        <input type="text" id="supplierCode" name="supplierCode" class="text" placeholder="Supplier code" style="width: 100px" disabled />
+    <td class="middle center" style="width: 100px; word-wrap: break-word;" id="supplierCode">
     </td>
-    <td class="middle center">
-        <g:selectOrganization name="manufacturer"
-                              id="manufacturer"
-                              roleTypes="[org.pih.warehouse.core.RoleType.ROLE_MANUFACTURER]"
-                              noSelection="['':'']"
-                              class="select2" disabled="${true}" />
+    <td class="middle center" style="width: 100px; word-wrap: break-word;" id="manufacturer">
     </td>
-    <td class="middle center">
-        <input type="text" id="manufacturerCode" name="manufacturerCode" class="text" placeholder="Manufacturer code" style="width: 100px" disabled />
+    <td class="middle center" style="width: 100px; word-wrap: break-word;" id="manufacturerCode">
     </td>
     <td class="middle center">
         <input type="number" id="quantity" name="quantity" class="text" placeholder="Quantity" style="width: 100px"/>

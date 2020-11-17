@@ -19,6 +19,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.UomService
+import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.shipping.Shipment
@@ -139,8 +140,7 @@ class OrderController {
         redirect(controller: 'purchaseOrder', action: 'index')
     }
 
-
-
+    // TODO remove after combined shipment feature is finished
     def shipOrder = {
         Order order = Order.get(params.id)
 
@@ -187,6 +187,7 @@ class OrderController {
         [command: command]
     }
 
+    // TODO remove after combined shipment feature is finished
     def saveShipmentItems = { ShipOrderCommand command ->
         if (!command.validate() || command.hasErrors()) {
             render(view: "shipOrderItems", model: [orderInstance: command.order, command: command])
@@ -353,6 +354,13 @@ class OrderController {
     def saveAdjustment = {
         def orderInstance = Order.get(params?.order?.id)
         if (orderInstance) {
+            if (orderInstance.destination.isAccountingRequired()) {
+                OrderAdjustmentType orderAdjustmentType = OrderAdjustmentType.get(params.orderAdjustmentType.id)
+                if (!orderAdjustmentType.glAccount) {
+                    render(status: 500, text: "${warehouse.message(code: 'orderAdjustment.missingGlAccount.label')}")
+                    return
+                }
+            }
             def orderAdjustment = OrderAdjustment.get(params?.id)
             if (params.budgetCode) {
                 params.budgetCode = BudgetCode.get(params.budgetCode)
@@ -391,19 +399,25 @@ class OrderController {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.order.id])}"
             redirect(action: "list")
         } else {
-            def orderAdjustment = OrderAdjustment.get(params?.id)
-            if (!orderAdjustment) {
-                flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'orderAdjustment.label', default: 'Order Adjustment'), params.id])}"
-                redirect(action: "show", id: orderInstance?.id)
-            } else {
-                orderInstance.removeFromOrderAdjustments(orderAdjustment)
-                orderAdjustment.delete()
-                if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
-                    flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.id])}"
-                    redirect(controller:"purchaseOrder", action: "addItems", id: orderInstance.id, params:['skipTo': 'adjustments'])
+            User user = User.get(session?.user?.id)
+            def canEdit = orderService.canManageAdjustments(orderInstance, user)
+            if(canEdit) {
+                def orderAdjustment = OrderAdjustment.get(params?.id)
+                if (!orderAdjustment) {
+                    flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'orderAdjustment.label', default: 'Order Adjustment'), params.id])}"
+                    redirect(action: "show", id: orderInstance?.id)
                 } else {
-                    render(view: "show", model: [orderInstance: orderInstance])
+                    orderInstance.removeFromOrderAdjustments(orderAdjustment)
+                    orderAdjustment.delete()
+                    if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
+                        flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.id])}"
+                        redirect(controller:"purchaseOrder", action: "addItems", id: orderInstance.id, params:['skipTo': 'adjustments'])
+                    } else {
+                        render(view: "show", model: [orderInstance: orderInstance])
+                    }
                 }
+            } else {
+                throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
             }
         }
     }
@@ -963,7 +977,7 @@ class OrderController {
 
     }
 
-
+    // TODO remove after combined shipment feature is finished
     def redirectFromStockMovement = {
         // FIXME Need to clean this up a bit (move logic to Shipment or ShipmentItem)
         def stockMovement = stockMovementService.getStockMovement(params.id)
@@ -972,7 +986,6 @@ class OrderController {
         def orderId = orderIds?.flatten().first()
         redirect(action: 'shipOrder', id: orderId)
     }
-
 
     def exportTemplate = {
         Order order = Order.get(params.order.id)
@@ -988,7 +1001,7 @@ class OrderController {
         }
     }
 
-
+    // TODO remove after combined shipment feature is finished
     def importTemplate = {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
@@ -1051,5 +1064,54 @@ class OrderController {
     def getTotalPrice = {
         Order order = Order.get(params.id)
         render order.total
+    }
+
+    def cancelOrderAdjustment = {
+        OrderAdjustment orderAdjustment = OrderAdjustment.get(params.id)
+        User user = User.get(session?.user?.id)
+        def canEdit = orderService.canManageAdjustments(orderAdjustment.order, user)
+        if(canEdit) {
+            orderAdjustment.canceled = true
+            render (status: 200, text: "Adjustment canceled successfully")
+        } else {
+            throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
+        }
+    }
+
+    def restoreOrderAdjustment = {
+        OrderAdjustment orderAdjustment = OrderAdjustment.get(params.id)
+        User user = User.get(session?.user?.id)
+        def canEdit = orderService.canManageAdjustments(orderAdjustment.order, user)
+        if(canEdit) {
+            orderAdjustment.canceled = false
+            render(status: 200, text: "Adjustment restored successfully")
+        } else {
+            throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
+        }
+    }
+
+    def getOrderAdjustments = {
+        def orderInstance = Order.get(params.id)
+        def orderAdjustments = orderInstance.orderAdjustments.sort { it.dateCreated }.collect {
+
+            [
+                    id: it.id,
+                    type: it.orderAdjustmentType,
+                    description: it.description,
+                    orderItem: it.orderItem,
+                    percentage: it.percentage,
+                    comments: it.comments,
+                    budgetCode: it.budgetCode,
+                    amount: it.amount ? it.amount : it.percentage ? it.orderItem ? it.orderItem.totalAdjustments : it.totalAdjustments : 0,
+                    isCanceled: it.canceled,
+                    order: it.order,
+            ]
+        }
+        render orderAdjustments as JSON
+    }
+
+    def getTotalAdjustments = {
+        Order order = Order.get(params.id)
+        render order.totalAdjustments
     }
 }

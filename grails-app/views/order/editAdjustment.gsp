@@ -29,7 +29,7 @@
 			<g:render template="summary" model="[orderInstance:orderInstance]" />
 			<div class="box">
 				<h2><warehouse:message code="order.orderAjustments.label" default="Order Adjustments"/></h2>
-				<g:form action="saveAdjustment" onsubmit="return validateForm();">
+				<g:form name="orderAdjustmentForm" action="saveAdjustment">
 					<g:hiddenField name="id" value="${orderAdjustment?.id}" />
 					<g:hiddenField id="isAccountingRequired" name="isAccountingRequired"
 								   value="${orderInstance?.destination?.isAccountingRequired()}">
@@ -39,7 +39,7 @@
 							<tr class="prop">
 								<td valign="top" class="name"><label><g:message code="order.label"/></label></td>
 								<td valign="top" class="value ${hasErrors(bean: orderAdjustment, field: 'order', 'errors')}">
-									<g:hiddenField name="order.id" value="${orderInstance?.id}" />
+									<g:hiddenField id="orderId" name="order.id" value="${orderInstance?.id}" />
 									${orderInstance?.orderNumber}
 									${orderInstance?.name}
 
@@ -101,7 +101,7 @@
 						</tbody>
 					</table>
 					<div class="buttons">
-						<button type="submit" class="button icon approve">
+						<button type="button" class="button icon approve" onclick="saveOrderAdjustment()">
 							<warehouse:message code="default.button.save.label"/></button>
 						<g:link controller="order" action="show" id="${orderInstance?.id}" class="button icon trash">
 							<warehouse:message code="default.button.cancel.label"/></g:link>
@@ -121,6 +121,30 @@
 		} else {
 			return true
 		}
+	}
+
+	function saveOrderAdjustment() {
+		var data = $("#orderAdjustmentForm").serialize();
+		if (validateForm()) {
+			$.ajax({
+				url:'${g.createLink(controller:'order', action:'saveAdjustment')}',
+				data: data,
+				success: function() {
+					$.notify("Successfully saved new adjustment", "success");
+					window.location = '${g.createLink(controller: 'purchaseOrder', action: 'addItems', params: [id: orderInstance?.id, skipTo: 'adjustments'])}';
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					if (jqXHR.responseText) {
+						$.notify(jqXHR.responseText, "error");
+					} else {
+						$.notify("Error saving adjustment");
+					}
+				}
+			});
+		} else {
+			$.notify("Please enter a value for all required fields");
+		}
+		return false;
 	}
 </script>
 </body>

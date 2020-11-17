@@ -10,11 +10,12 @@ class Filter extends Component {
       filterCategorySelected: false,
       listFilterSelected: [],
       listCategoryData: [],
+      listCategoryDataFiltered: [],
       titlePopup: 'Add filter',
+      searchTerm: '',
       categorySelected: '',
     };
   }
-
 
   getCategoryRows = (endpoint) => {
     apiClient.get(endpoint)
@@ -25,9 +26,26 @@ class Filter extends Component {
         newListCategoryData = newListCategoryData.filter(categoryData =>
           !this.state.listFilterSelected
             .some(filterSelected => filterSelected[1].id === categoryData.id));
-        this.setState({ listCategoryData: newListCategoryData });
+        this.setState({
+          listCategoryData: newListCategoryData,
+          listCategoryDataFiltered: newListCategoryData,
+        });
       })
-      .catch(() => this.setState({ listCategoryData: [] }));
+      .catch(() => this.setState({
+        listCategoryData: [],
+        listCategoryDataFiltered: [],
+      }));
+  }
+
+  searchOnChange = (event) => {
+    const filteredList = this.state.listCategoryData
+      .filter(categoryData => categoryData.name
+        .toLowerCase()
+        .includes(event.target.value.toLowerCase()));
+    this.setState({
+      listCategoryDataFiltered: filteredList,
+      searchTerm: event.target.value,
+    });
   }
 
   toggleAddingFilter = () => {
@@ -39,6 +57,8 @@ class Filter extends Component {
     if (categoryData) this.getCategoryRows(categoryData.endpoint);
     this.setState({ titlePopup: nameCategory || 'Add Filter' });
     this.setState({ categorySelected: nameCategory || '' });
+    // Value in the searchBar removed
+    this.setState({ searchTerm: '' });
     // Popup filterSelection show up or close
     this.setState({ filterCategorySelected: !this.state.filterCategorySelected });
   }
@@ -163,6 +183,13 @@ class Filter extends Component {
                 > X
                 </span>
               </div>
+              <input
+                type="text"
+                placeholder="search..."
+                onChange={this.searchOnChange}
+                hidden={!this.state.filterCategorySelected}
+                value={this.state.searchTerm}
+              />
               <ul className={`filter-menu ${this.state.filterCategorySelected ? 'scrollable' : ''}`}>
                 {
                   // If filter not selected
@@ -173,17 +200,19 @@ class Filter extends Component {
                        Object.entries(value.filters).map(([nameCategory, categoryData]) => (
                          <li
                            key={categoryData.endpoint}
-                           className="category-name-to-select"
-                         > {nameCategory}
-                           <span
+                         >
+                           <div
                              role="button"
                              tabIndex={0}
                              onClick={() =>
-                              this.toggleCategorySelected(nameCategory, categoryData)}
+                            this.toggleCategorySelected(nameCategory, categoryData)}
                              onKeyPress={() =>
-                               this.toggleCategorySelected(nameCategory, categoryData)}
-                           > {'>'}
-                           </span>
+                            this.toggleCategorySelected(nameCategory, categoryData)}
+                           >
+                             {nameCategory}
+                             <span > {'>'}
+                             </span>
+                           </div>
                          </li>
                        )) : null
                       )) :
@@ -192,28 +221,30 @@ class Filter extends Component {
                         // Find in all filters available the one selected
                         category[1][0] === this.state.categorySelected ?
                         // category[1][0] --> name of the category
-                        Object.entries(this.state.listCategoryData).map(categoryData => (
-                          <li
-                            key={categoryData[1].id}
-                          >
-                            <span
-                              className="category-value-to-select"
-                              role="button"
-                              tabIndex={0}
-                              onClick={
+                        Object.entries(this.state.listCategoryDataFiltered
+                          .sort((a, b) => a.name.localeCompare(b.name)))
+                          .map(categoryData => (
+                            <li
+                              key={categoryData[1].id}
+                            >
+                              <span
+                                className="category-value-to-select"
+                                role="button"
+                                tabIndex={0}
+                                onClick={
                                 () => this.addFilterToTheList(
                                   this.state.categorySelected,
                                    categoryData[1],
                                   )}
-                              onKeyPress={
+                                onKeyPress={
                                 () => this.addFilterToTheList(
                                   this.state.categorySelected,
                                   categoryData[1],
                                   )}
-                            >
-                              {categoryData[1].name}
-                            </span>
-                          </li>
+                              >
+                                {categoryData[1].name}
+                              </span>
+                            </li>
                         )) : null
                       ))
                     }

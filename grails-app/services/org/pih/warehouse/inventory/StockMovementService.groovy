@@ -500,35 +500,60 @@ class StockMovementService {
 
     void removeStockMovementItem(String id) {
         RequisitionItem requisitionItem = RequisitionItem.get(id)
-        removeRequisitionItem(requisitionItem)
+        ShipmentItem shipmentItem = ShipmentItem.get(id)
+        if (requisitionItem) {
+            removeRequisitionItem(requisitionItem)
+        } else {
+            removeShipmentItem(shipmentItem)
+        }
     }
 
     def getStockMovementItems(String id, String stepNumber, String max, String offset) {
         // FIXME should get stock movement instead of requisition
         Requisition requisition = Requisition.get(id)
         List<StockMovementItem> stockMovementItems = []
-        List <RequisitionItem> requisitionItems = []
 
         if (stepNumber == '3') {
           return getEditPageItems(requisition, max, offset)
         }
 
-        if (max != null && offset != null) {
-            requisitionItems = RequisitionItem.createCriteria().list(max: max.toInteger(), offset: offset.toInteger()) {
-                eq("requisition", requisition)
-                isNull("parentRequisitionItem")
-                order("orderIndex", 'asc')
+        if (requisition) {
+            List <RequisitionItem> requisitionItems = []
+            if (max != null && offset != null) {
+                requisitionItems = RequisitionItem.createCriteria().list(max: max.toInteger(), offset: offset.toInteger()) {
+                    eq("requisition", requisition)
+                    isNull("parentRequisitionItem")
+                    order("orderIndex", 'asc')
+                }
+            } else {
+                requisitionItems = RequisitionItem.createCriteria().list() {
+                    eq("requisition", requisition)
+                    isNull("parentRequisitionItem")
+                    order("orderIndex", 'asc')
+                }
+            }
+            requisitionItems.each { requisitionItem ->
+                StockMovementItem stockMovementItem = StockMovementItem.createFromRequisitionItem(requisitionItem)
+                stockMovementItems.add(stockMovementItem)
             }
         } else {
-            requisitionItems = RequisitionItem.createCriteria().list() {
-                eq("requisition", requisition)
-                isNull("parentRequisitionItem")
-                order("orderIndex", 'asc')
+            Shipment shipment = Shipment.get(id)
+            List <ShipmentItem> shipmentItems = []
+            if (max != null && offset != null) {
+                shipmentItems = ShipmentItem.createCriteria().list(max: max.toInteger(), offset: offset.toInteger()) {
+                    eq("shipment", shipment)
+                    order("sortOrder", 'asc')
+                }
+            } else {
+                shipmentItems = ShipmentItem.createCriteria().list() {
+                    eq("shipment", shipment)
+                    order("sortOrder", 'asc')
+                }
             }
-        }
-        requisitionItems.each { requisitionItem ->
-            StockMovementItem stockMovementItem = StockMovementItem.createFromRequisitionItem(requisitionItem)
-            stockMovementItems.add(stockMovementItem)
+            shipmentItems.each { shipmentItem ->
+                StockMovementItem stockMovementItem = StockMovementItem.createFromShipmentItem(shipmentItem)
+                stockMovementItems.add(stockMovementItem)
+            }
         }
 
         switch(stepNumber) {
@@ -537,7 +562,7 @@ class StockMovementService {
             case "5":
                 return getPackPageItems(id, max, offset)
             case "6":
-                if (!requisition.origin.isSupplier() && requisition.origin.supports(ActivityCode.MANAGE_INVENTORY)) {
+                if (requisition && !requisition.origin.isSupplier() && requisition.origin.supports(ActivityCode.MANAGE_INVENTORY)) {
                     return getPackPageItems(id, max, offset)
                 }
             default:
@@ -1323,19 +1348,25 @@ class StockMovementService {
 
             stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
                 ShipmentItem shipmentItem = findOrCreateShipmentItem(shipment, stockMovementItem.id)
-                shipmentItem.lotNumber = stockMovementItem.lotNumber
-                shipmentItem.expirationDate = stockMovementItem.expirationDate
-                shipmentItem.product = stockMovementItem.product
-                shipmentItem.inventoryItem = stockMovementItem.inventoryItem
-                shipmentItem.quantity = stockMovementItem.quantityRequested
-                shipmentItem.recipient = stockMovementItem.recipient
-                shipmentItem.sortOrder = stockMovementItem.sortOrder
-                shipmentItem.container = createOrUpdateContainer(shipment, stockMovementItem.palletName, stockMovementItem.boxName)
+                if (!stockMovementItem.quantityRequested) {
+                    shipment.removeFromShipmentItems(shipmentItem)
+                    shipmentItem.delete(flush: true)
+                } else {
+                    shipmentItem.lotNumber = stockMovementItem.lotNumber
+                    shipmentItem.expirationDate = stockMovementItem.expirationDate
+                    shipmentItem.product = stockMovementItem.product
+                    shipmentItem.inventoryItem = stockMovementItem.inventoryItem
+                    shipmentItem.quantity = stockMovementItem.quantityRequested
+                    shipmentItem.recipient = stockMovementItem.recipient
+                    shipmentItem.sortOrder = stockMovementItem.sortOrder
+                    shipmentItem.container = createOrUpdateContainer(shipment, stockMovementItem.palletName, stockMovementItem.boxName)
 
-                if (stockMovement.isFromOrder) {
-                    OrderItem orderItem = OrderItem.get(stockMovementItem.orderItemId)
-                    shipmentItem.addToOrderItems(orderItem)
+                    if (stockMovementItem.orderItemId) {
+                        OrderItem orderItem = OrderItem.get(stockMovementItem.orderItemId)
+                        shipmentItem.addToOrderItems(orderItem)
+                    }
                 }
+                shipmentItem.save()
             }
         }
 
@@ -1572,6 +1603,15 @@ class StockMovementService {
         requisitionItem.delete()
     }
 
+    void removeShipmentItem(ShipmentItem shipmentItem) {
+        Shipment shipment = shipmentItem.shipment
+        OrderItem orderItem = OrderItem.get(shipmentItem.orderItemId)
+        if (orderItem) {
+            orderItem.removeFromShipmentItems(shipmentItem)
+        }
+        shipment.removeFromShipmentItems(shipmentItem)
+        shipmentItem.delete()
+    }
 
     void removeShipmentItemsForModifiedRequisitionItem(StockMovementItem stockMovementItem) {
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem?.id)

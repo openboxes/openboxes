@@ -278,7 +278,7 @@ class Order implements Serializable {
     }
 
     def getTotalOrderAdjustments() {
-        return orderAdjustments?.findAll { !it.orderItem } ?.sum {
+        return orderAdjustments?.findAll { !(it.orderItem || it.canceled) } ?.sum {
             return it.amount ?: it.percentage ? (it.percentage/100) * subtotal : 0
         }?:0
     }

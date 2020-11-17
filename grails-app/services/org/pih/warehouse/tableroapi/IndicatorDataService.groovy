@@ -142,7 +142,7 @@ class IndicatorDataService {
 
         Date today = new Date()
         today.clearTime()
-        for (int i = querySize; i >= 0; i--) {
+        for (int i = querySize; i > 0; i--) {
             def monthBegin = today.clone()
             def monthEnd = today.clone()
             monthBegin.set(month: today.month - i, date: 1)
@@ -581,7 +581,7 @@ class IndicatorDataService {
     GraphData getDiscrepancy(Location location, def params) {
         Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
 
-        Date date = LocalDate.now().minusMonths(querySize).toDate()
+        LocalDate queryLimit = LocalDate.now().minusMonths(querySize).withDayOfMonth(1)
 
         def results = ReceiptItem.executeQuery("""
             select 
@@ -599,10 +599,13 @@ class IndicatorDataService {
             where 
                 s.currentStatus = 'RECEIVED'
                 and s.destination = :location 
-                and r.actualDeliveryDate > :date 
+                and r.actualDeliveryDate > :limit 
             group by s.shipmentNumber, s.id, si.id, si.quantity
             having si.quantity <> sum(ri.quantityReceived)
-        """, ['location': location, 'date': date])
+        """ , [
+                        'location': location,
+                        'limit'   : queryLimit.toDate(),
+                ])
 
         // Transform to map
         results = results.collect {

@@ -151,6 +151,17 @@
                                         noSelection="['':'']"/>
                 </td>
             </tr>
+            <g:if test="${orderItem?.order?.status >= OrderStatus.PLACED}">
+                <tr class="prop">
+                    <td valign="top" class="name">
+                        <label><warehouse:message code="orderItem.actualReadyDate.label"/></label>
+                    </td>
+                    <td valign="top" class="value">
+                        <input class="text large datepicker" name="actualReadyDate"
+                               value="${orderItem?.actualReadyDate?.format("MM/dd/yyyy")}" />
+                    </td>
+                </tr>
+            </g:if>
         </g:if>
         <g:elseif test="${canEdit && orderItem.hasShipmentAssociated()}">
             <tr class="prop">

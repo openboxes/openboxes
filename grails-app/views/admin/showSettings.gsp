@@ -135,28 +135,27 @@
                                     </label>
                                 </td>
                                 <td class="value">
+                                    <ul>
                                     <g:each in="${grailsApplication.config.openboxes.locale.supportedLocales}" var="l">
+                                        <li>
                                         <g:set var="locale" value="${new Locale(l)}"/>
+                                        <g:set var="defaultLocale" value="${new Locale(grailsApplication.config.openboxes.locale.defaultLocale)}"/>
                                         <g:if test="${session?.user?.locale==locale}">
-                                            ${locale?.getDisplayName(session?.user?.locale ?: new Locale(grailsApplication.config.openboxes.locale.defaultLocale))}
+                                            ${locale?.getDisplayName(locale ?: defaultLocale)}
                                         </g:if>
                                         <g:else>
                                             <a href="${createLink(controller: 'user', action: 'updateAuthUserLocale', params: ['locale':locale,'returnUrl':request.forwardURI])}">
                                                 <!-- fetch the display for locale based on the current locale -->
-                                                ${locale?.getDisplayName(session?.user?.locale ?: new Locale(grailsApplication.config.openboxes.locale.defaultLocale))}
+                                                ${locale?.getDisplayName(locale?:defaultLocale)} (${locale?.getDisplayLanguage(session.user.locale)})
                                             </a>
                                         </g:else>
-                                        &nbsp;|&nbsp;
+                                        </li>
                                     </g:each>
+                                    </ul>
                                     <g:isUserInRole roles="[RoleType.ROLE_ADMIN,RoleType.ROLE_BROWSER]">
-                                        <g:if test="${session?.user?.locale==new Locale('debug')}">
-                                            Debug
-                                        </g:if>
-                                        <g:else>
-                                            <a href="${createLink(controller: 'user', action: 'updateAuthUserLocale', params: ['locale':'debug','returnUrl':request.forwardURI])}">
-                                                Debug
-                                            </a>
-                                        </g:else>
+                                        <a href="${createLink(controller: 'user', action: 'updateAuthUserLocale', params: ['locale':'debug','returnUrl':request.forwardURI])}" class="button">
+                                            <g:message code="default.customize.label" default="Customize"/>
+                                        </a>
                                     </g:isUserInRole>
                                 </td>
                             <tr>
