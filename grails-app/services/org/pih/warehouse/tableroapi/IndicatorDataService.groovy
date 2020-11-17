@@ -1,5 +1,6 @@
 package org.pih.warehouse.tableroapi
 
+import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.tablero.GraphData
 import org.pih.warehouse.tablero.TableData
@@ -727,10 +728,10 @@ class IndicatorDataService {
                 0 : [75, 95],
         ]
 
-        def productInStock = InventorySnapshot.executeQuery("""
-            SELECT COUNT(distinct i.product.id) FROM InventorySnapshot i
-            WHERE i.location = :location
-            AND i.quantityOnHand > 0""",
+        def productInStock = ProductAvailability.executeQuery("""
+            SELECT COUNT(distinct pa.product.id) FROM ProductAvailability pa
+            WHERE pa.location = :location
+            AND pa.quantityOnHand > 0""",
                 [
                         'location': location
                 ])

@@ -23,7 +23,9 @@ import org.pih.warehouse.core.Tag
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.product.ProductCatalog
+import org.pih.warehouse.product.ProductSummary
 import org.pih.warehouse.reporting.TransactionFact
 import org.pih.warehouse.util.LocalizationUtil
 
@@ -290,61 +292,6 @@ class InventorySnapshotService {
         return data
     }
 
-    List<AvailableItem> getAvailableBinLocations(Location location, Product product) {
-        return getAvailableBinLocations(location, product, false)
-    }
-
-    List<AvailableItem> getAvailableBinLocations(Location location, Product product, boolean excludeOutOfStock) {
-        return getAvailableBinLocations(location, [product], excludeOutOfStock)
-    }
-
-    List<AvailableItem> getAvailableBinLocations(Location location, List products, boolean excludeOutOfStock = false) {
-        def startTime = System.currentTimeMillis()
-        def availableBinLocations = getQuantityOnHandByBinLocation(location, products)
-
-        List<AvailableItem> availableItems = availableBinLocations.collect {
-            return new AvailableItem(
-                    inventoryItem: it?.inventoryItem,
-                    binLocation: it?.binLocation,
-                    quantityAvailable: it.quantity
-            )
-        }
-
-        availableItems = sortAvailableItems(availableItems)
-        log.info("getAvailableItems(): ${System.currentTimeMillis() - startTime} ms")
-        return availableItems
-    }
-
-    List<AvailableItem> sortAvailableItems(List<AvailableItem> availableItems) {
-        availableItems = availableItems.findAll { it.quantityAvailable > 0 }
-
-        // Sort bins  by available quantity
-        availableItems = availableItems.sort { a, b ->
-            a?.quantityAvailable <=> b?.quantityAvailable
-        }
-
-        // Sort empty expiration dates last
-        availableItems = availableItems.sort { a, b ->
-            !a?.inventoryItem?.expirationDate ?
-                    !b?.inventoryItem?.expirationDate ? 0 : 1 :
-                    !b?.inventoryItem?.expirationDate ? -1 :
-                            a?.inventoryItem?.expirationDate <=> b?.inventoryItem?.expirationDate
-        }
-
-        return availableItems
-    }
-
-
-    /**
-     * FIXME Remove once I've replaced all references with method below.
-     *
-     * @param location
-     * @return
-     */
-    Map<Product, Integer> getCurrentInventory(Location location) {
-        return getQuantityOnHandByProduct(location)
-    }
-
     /**
      * Get the most recent date in the inventory snapshot table.
      *
@@ -361,19 +308,6 @@ class InventorySnapshotService {
      */
     Date getLastUpdatedInventorySnapshotDate() {
         return InventorySnapshot.executeQuery('select max(lastUpdated) from InventorySnapshot')[0]
-    }
-
-
-    /**
-     * Get the quantity on hand by product for the given location.
-     *
-     * @param location
-     * @return
-     */
-    Map<Product, Integer> getQuantityOnHandByProduct(Location location) {
-        Date date = getMostRecentInventorySnapshotDate()
-
-        return getQuantityOnHandByProduct(location, date)
     }
 
     /**
@@ -400,118 +334,6 @@ class InventorySnapshotService {
         }
 
         return quantityMap
-    }
-
-    /**
-     * Get quantity on hand by product for the given locations.
-     *
-     * @param location
-     * @return
-     */
-    Map<Product, Map<Location, Integer>> getQuantityOnHandByProduct(Location[] locations) {
-        def quantityMap = [:]
-        if (locations) {
-            Date date = getMostRecentInventorySnapshotDate()
-            def results = InventorySnapshot.executeQuery("""
-						select i.date, product, i.location, category.name, sum(i.quantityOnHand)
-						from InventorySnapshot i, Product product, Category category
-						where i.location in (:locations)
-						and i.date = :date
-						and i.product = product
-						and i.product.category = category
-						group by i.date, product, i.location, category.name
-						""", [locations: locations, date: date])
-
-            results.each {
-                if (!quantityMap[it[1]]) {
-                    quantityMap[it[1]] = [:]
-                }
-                quantityMap[it[1]][it[2]?.id] = it[4]
-            }
-        }
-
-        return quantityMap
-    }
-
-
-    /**
-     * Get quantity on hand by inventory item for the given location and date.
-     *
-     * @param location
-     * @return
-     */
-    Map<InventoryItem, Integer> getQuantityOnHandByInventoryItem(Location location) {
-        def quantityMap = [:]
-        Date date = getMostRecentInventorySnapshotDate()
-        if (location && date) {
-            def results = InventorySnapshot.executeQuery("""
-						select ii, sum(iis.quantityOnHand)
-						from InventorySnapshot iis, InventoryItem ii
-						where iis.location = :location
-						and iis.date = :date
-						and iis.inventoryItem = ii
-						group by ii
-						""", [location: location, date: date])
-
-            results.each {
-                quantityMap[it[0]] = it[1]
-            }
-        }
-        return quantityMap
-    }
-
-    List getQuantityOnHandByBinLocation(Location location) {
-        Date date = getMostRecentInventorySnapshotDate()
-        return getQuantityOnHandByBinLocation(location, date)
-    }
-
-    List getQuantityOnHandByBinLocation(Location location, Date date) {
-        def data = []
-
-        if (location) {
-            def results = InventorySnapshot.executeQuery("""
-						select 
-						    iis.product, 
-						    iis.inventoryItem,
-						    iis.binLocation,
-						    sum(iis.quantityOnHand)
-						from InventorySnapshot iis
-						left outer join iis.inventoryItem ii
-						left outer join iis.binLocation bl
-						where iis.location = :location
-						and iis.date = :date
-						group by iis.product, iis.inventoryItem, iis.binLocation
-						""", [location: location, date: date])
-
-            def getStatus = { quantity -> quantity > 0 ? "inStock" : "outOfStock" }
-
-            data = results.collect {
-                Product product = it[0]
-                InventoryItem inventoryItem = it[1]
-                Location binLocation = it[2]
-                BigDecimal quantity = it[3]?:0.0
-                BigDecimal unitCost = product.pricePerUnit?:0.0
-                BigDecimal totalValue = quantity * unitCost
-
-                [
-                        status       : getStatus(quantity),
-                        product      : product,
-                        inventoryItem: inventoryItem,
-                        binLocation  : binLocation,
-                        quantity     : quantity,
-                        unitCost     : unitCost,
-                        totalValue   : totalValue
-
-                ]
-            }
-        }
-        return data
-    }
-
-    List getQuantityOnHandByBinLocation(Location location, List<Product> products) {
-        Date date = getMostRecentInventorySnapshotDate()
-
-        return getQuantityOnHandByBinLocation(location, date, products)
     }
 
     List getQuantityOnHandByBinLocation(Location location, Date date, List<Product> products) {
@@ -561,20 +383,6 @@ class InventorySnapshotService {
             eq("location", location)
             between("date", startDate, endDate)
             order("date", "asc")
-        }
-    }
-
-    def getQuantityOnHand(List<Product> products, Location location, Date date) {
-        return InventorySnapshot.createCriteria().list {
-            resultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
-            projections {
-                // Need to use alias other than product to prevent conflict
-                groupProperty("product", "p")
-                sum("quantityOnHand", "quantityOnHand")
-            }
-            eq("location", location)
-            eq("date", date)
-            'in'("product", products)
         }
     }
 

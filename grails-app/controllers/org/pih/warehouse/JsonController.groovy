@@ -15,6 +15,7 @@ import grails.plugin.springcache.annotations.Cacheable
 import groovy.time.TimeCategory
 import org.apache.commons.lang.StringUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.hibernate.Criteria
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Localization
@@ -37,6 +38,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.product.ProductPackage
+import org.pih.warehouse.product.ProductSummary
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.pih.warehouse.reporting.Indicator
@@ -67,6 +69,7 @@ class JsonController {
     def consoleService
     def userService
     def inventorySnapshotService
+    def productAvailabilityService
     def forecastingService
     def translationService
     def orderService
@@ -1038,7 +1041,7 @@ class JsonController {
 
         // Only calculate quantities if there are products - otherwise this will calculate quantities for all products in the system
         def location = Location.get(session.warehouse.id)
-        def quantityMap = inventorySnapshotService.getQuantityOnHandByProduct(location)
+        def quantityMap = productAvailabilityService.getQuantityOnHandByProduct(location)
 
         if (terms) {
             products = products.sort() {
@@ -1319,7 +1322,7 @@ class JsonController {
     def getBinLocationSummary = {
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
-        def binLocations = inventorySnapshotService.getQuantityOnHandByBinLocation(location)
+        def binLocations = productAvailabilityService.getQuantityOnHandByBinLocation(location)
 
         def data = inventoryService.getBinLocationSummary(binLocations)
         render(data as JSON)
@@ -1329,7 +1332,7 @@ class JsonController {
         log.info "binLocationReport: " + params
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
-        def data = inventorySnapshotService.getQuantityOnHandByBinLocation(location)
+        def data = productAvailabilityService.getQuantityOnHandByBinLocation(location)
 
         if (params.status) {
             data = data.findAll { it.status == params.status }
