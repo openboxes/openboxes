@@ -36,9 +36,8 @@ class InventorySnapshotService {
 
     def dataSource
     def locationService
-    def inventoryService
+    def productAvailabilityService
     def persistenceInterceptor
-    def grailsApplication
 
     def populateInventorySnapshots(Date date) {
         populateInventorySnapshots(date, false)
@@ -63,10 +62,10 @@ class InventorySnapshotService {
                     Date lastUpdatedDate = InventorySnapshot.lastUpdatedDate(loc.id).list()
                     Integer transactionCount = Transaction.countByLocationAsOf(location, lastUpdatedDate).list()
                     Boolean skipCalculation = transactionCount == 0
-                    binLocations = (!skipCalculation) ? calculateBinLocations(location, date) : []
+                    binLocations = (!skipCalculation) ? productAvailabilityService.calculateBinLocations(location, date) : []
                 }
                 else {
-                    binLocations = calculateBinLocations(location, date)
+                    binLocations = productAvailabilityService.calculateBinLocations(location, date)
                 }
                 def readTime = (System.currentTimeMillis() - innerStartTime)
                 log.info "Read ${binLocations?.size()} inventory snapshots for location ${location} on date ${date.format("MMM-dd-yyyy")} in ${readTime}ms"
@@ -93,10 +92,8 @@ class InventorySnapshotService {
     }
 
     def populateInventorySnapshots(Date date, Location location) {
-
-        // Calculate current stock for given location
         def startTime = System.currentTimeMillis()
-        def binLocations = calculateBinLocations(location, date)
+        def binLocations = productAvailabilityService.calculateBinLocations(location, date)
         def readTime = (System.currentTimeMillis() - startTime)
         log.info "Read ${binLocations?.size()} inventory snapshots for location ${location} on date ${date.format("MMM-dd-yyyy")} in ${readTime}ms"
 
@@ -112,26 +109,8 @@ class InventorySnapshotService {
     }
 
     def populateInventorySnapshots(Date date, Location location, Product product) {
-        def binLocations = calculateBinLocations(location, product)
-        saveInventorySnapshots(date, location, product, binLocations)
-    }
-
-    def calculateBinLocations(Location location, Date date) {
-        def binLocations = inventoryService.getBinLocationDetails(location, date)
-        binLocations = transformBinLocations(binLocations)
-        return binLocations
-    }
-
-    def calculateBinLocations(Location location) {
-        def binLocations = inventoryService.getBinLocationDetails(location)
-        binLocations = transformBinLocations(binLocations)
-        return binLocations
-    }
-
-    def calculateBinLocations(Location location, Product product) {
-        def binLocations = inventoryService.getProductQuantityByBinLocation(location, product)
-        binLocations = transformBinLocations(binLocations)
-        return binLocations
+        def binLocations = productAvailabilityService.calculateBinLocations(location, product)
+        saveInventorySnapshots(date, location, binLocations)
     }
 
     def deleteInventorySnapshots(Date date) {
@@ -170,26 +149,6 @@ class InventorySnapshotService {
 
         def results = InventorySnapshot.executeUpdate(deleteStmt, params)
         log.info "Deleted ${results} inventory snapshots for date ${date}, location ${location}, product ${product}"
-    }
-
-    def transformBinLocations(List binLocations) {
-        def binLocationsTransformed = binLocations.collect {
-            [
-                    product      : [id: it?.product?.id, productCode: it?.product?.productCode, name: it?.product?.name],
-                    inventoryItem: [id: it?.inventoryItem?.id, lotNumber: it?.inventoryItem?.lotNumber, expirationDate: it?.inventoryItem?.expirationDate],
-                    binLocation  : [id: it?.binLocation?.id, name: it?.binLocation?.name],
-                    quantity     : it.quantity
-            ]
-        }
-
-        // Attempting to prevent deadlock due to gap locks
-        binLocationsTransformed = binLocationsTransformed.sort { a, b ->
-            a?.binLocation?.name <=> b?.binLocation?.name ?:
-                    a?.product?.productCode <=> b?.product?.productCode ?:
-                            a?.inventoryItem?.lotNumber <=> b?.inventoryItem?.lotNumber
-        }
-
-        return binLocationsTransformed
     }
 
     def saveInventorySnapshots(Date date, Location location, List binLocations) {

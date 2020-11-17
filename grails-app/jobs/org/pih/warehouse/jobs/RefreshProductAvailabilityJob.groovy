@@ -11,6 +11,7 @@ package org.pih.warehouse.jobs
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.product.Product
 import org.quartz.DisallowConcurrentExecution
 import org.quartz.JobExecutionContext
 import org.quartz.JobExecutionException
@@ -20,7 +21,7 @@ class RefreshProductAvailabilityJob {
 
     def concurrent = false
     def grailsApplication
-    def reportService
+    def productAvailabilityService
 
     // Should never be triggered on a schedule - should only be triggered by persistence event listener
     static triggers = {}
@@ -30,17 +31,25 @@ class RefreshProductAvailabilityJob {
         if (enabled) {
             def startTime = System.currentTimeMillis()
             log.info("Refreshing product availability data: " + context.mergedJobDataMap)
+            boolean forceRefresh = context.mergedJobDataMap.getBoolean("forceRefresh")?:false
             Object productIds = context.mergedJobDataMap.get("productIds")
             String locationId = context.mergedJobDataMap.get("locationId")
+
+            // Calculate product availability for a single location/product, or all products within a single location
             if (locationId) {
                 if (productIds && locationId) {
                     productIds.each { productId ->
-                        reportService.refreshProductAvailabilityData(locationId, productId)
+                        Product product = Product.load(productId)
+                        productAvailabilityService.refreshProductAvailability(location, product, forceRefresh)
                     }
                 }
                 else {
-                    reportService.refreshProductAvailabilityData(locationId)
+                    productAvailabilityService.refreshProductAvailability(location, forceRefresh)
                 }
+            }
+            // Calculate product availability for all products within all locations
+            else {
+                productAvailabilityService.refreshProductAvailability(forceRefresh)
             }
             log.info "Finished refreshing product availability data in " + (System.currentTimeMillis() - startTime) + " ms"
         }

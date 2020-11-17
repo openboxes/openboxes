@@ -11,7 +11,6 @@ package org.pih.warehouse.user
 
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
-import grails.plugin.springcache.annotations.Cacheable
 import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.Comment
@@ -20,15 +19,14 @@ import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.jobs.CalculateQuantityJob
 import org.pih.warehouse.jobs.RefreshInventorySnapshotJob
+import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
-import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Shipment
 
 import java.text.SimpleDateFormat
@@ -235,7 +233,7 @@ class DashboardController {
             "selectTagsCache", "selectCategoryCache", "selectCatalogsCache", "forecastCache"])
     def flushCache = {
         flash.message = "Data caches have been flushed and inventory snapshot job was triggered"
-        RefreshInventorySnapshotJob.triggerNow([location: session.warehouse.id, user: session.user.id, forceRefresh: false])
+        RefreshProductAvailabilityJob.triggerNow([locationId: session.warehouse.id, forceRefresh: false])
         redirect(action: "index")
     }
 
