@@ -95,8 +95,8 @@
                                 <th class="center"><g:message code="product.label"/></th>
                                 <th class="center"><g:message code="requisition.qtyRequested.label"/></th>
                                 <th class="center"><g:message code="requisition.qtyIssued.label"/></th>
-                                <th class="center"><g:message code="requisitionItem.reasonCodes.label"/></th>
                                 <th class="center"><g:message code="requisition.qtyDemand.label"/></th>
+                                <th class="center"><g:message code="requisitionItem.reasonCodes.label"/></th>
                             </tr>
                         </thead>
                         <tfoot>
@@ -169,7 +169,7 @@
           var startDate = moment($('#startDate').val());
           var endDate = moment($('#endDate').val());
           var monthsDifference = endDate.diff(startDate, 'months');
-          secondRow.getElementsByTagName('th')[2].innerHTML = Math.round(totalDemand / (monthsDifference * 30));
+          secondRow.getElementsByTagName('th')[2].innerHTML = Math.round(totalDemand / monthsDifference);
         },
         "oLanguage": {
           "sZeroRecords": "No records found",
@@ -190,8 +190,8 @@
             { "mData": "productName" },
             { "mData": "quantityRequested"},
             { "mData": "quantityIssued"},
-            { "mData": "reasonCode"},
             { "mData": "quantityDemand"},
+            { "mData": "reasonCode"},
           ],
         "dom": '<"top"i>rt<"bottom"flp><"clear">',
         "aaSorting": [[ 0, "asc" ]],
@@ -218,21 +218,29 @@
         $('#requestDetailReportTable').dataTable({"bJQueryUI": true});
         $(".download-button").click(function(event) {
           event.preventDefault();
-          var params = {
-            destinationId: $("#destinationId").val(),
-            originId: $("#origin").val(),
-            startDate: $("#startDate").val(),
-            endDate: $("#endDate").val(),
-            productId: $("#product-id").val(),
-            reasonCode: $("#reasonCode").val(),
-            format: "text/csv"
-          };
-          var queryString = $.param(params, true);
-          window.location.href = '${request.contextPath}/json/getRequestDetailReport?' + queryString;
+          if (validate()) {
+              var params = {
+                destinationId: $("#destinationId").val(),
+                originId: $("#origin").val(),
+                startDate: $("#startDate").val(),
+                endDate: $("#endDate").val(),
+                productId: $("#product-id").val(),
+                reasonCode: $("#reasonCode").val(),
+                format: "text/csv"
+              };
+              var queryString = $.param(params, true);
+              window.location.href = '${request.contextPath}/json/getRequestDetailReport?' + queryString;
+          }
         });
 
       $(".submit-button").click(function(event){
         event.preventDefault();
+        if (validate()) {
+          initializeDataTable();
+        }
+      });
+
+      function validate() {
         var originId = $("#origin").val();
         var startDate = $("#startDate").val();
         var endDate = $("#endDate").val();
@@ -250,11 +258,8 @@
           $.notify("Start date must occur before end date", "error");
           validated = false
         }
-
-        if (validated) {
-          initializeDataTable();
-        }
-      });
+        return validated
+      }
   });
 
 </script>
