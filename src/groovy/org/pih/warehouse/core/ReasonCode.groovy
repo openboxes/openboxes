@@ -64,6 +64,8 @@ enum ReasonCode {
     REJECTED(32),
     REQUEST_ERROR(33),
     NOT_NEEDED_BASED_ON_CONSUMPTION(34),
+    CLINICAL_JUDGMENT(35),
+    INSUFFICIENT_QUANTITY_AVAILABLE(36),
     OTHER(100)
 
 
@@ -190,6 +192,13 @@ enum ReasonCode {
                 INSUFFICIENT_QUANTITY_RECONDITIONED,
                 SUPPLIED_BY_GOVERNMENT,
                 OTHER
+        ]
+    }
+
+    static listRequestReasonCodes() {
+        [
+                CLINICAL_JUDGMENT,
+                INSUFFICIENT_QUANTITY_AVAILABLE,
         ]
     }
 }
