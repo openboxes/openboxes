@@ -1777,48 +1777,52 @@ class JsonController {
     }
 
     def getRequestDetailReport = {
-        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy")
-        params.startDate = dateFormat.parse(params.startDate)
-        params.endDate = dateFormat.parse(params.endDate)
-        def data = forecastingService.getRequestDetailReport(params)
-        if (params.format == "text/csv") {
-            def sw = new StringWriter()
+        if (params.startDate && params.endDate) {
+            DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+            params.startDate = dateFormat.parse(params.startDate)
+            params.endDate = dateFormat.parse(params.endDate)
+            def data = forecastingService.getRequestDetailReport(params)
+            if (params.format == "text/csv") {
+                def sw = new StringWriter()
 
-            def csv = new CSVWriter(sw, {
-                "Request Number" { it.requestNumber }
-                "Date Requested" { it.dateRequested }
-                "Date Issued" { it.dateIssued }
-                "Origin" { it.origin }
-                "Destination" { it.destination }
-                "Product Code" { it.productCode }
-                "Product Name" { it.productName }
-                "Quantity Requested" { it.qtyRequested }
-                "Quantity Issued" { it.qtyIssued }
-                "Reason Code" { it.reasonCode }
-                "Quantity Demand" { it.qtyDemand }
-            })
+                def csv = new CSVWriter(sw, {
+                    "Request Number" { it.requestNumber }
+                    "Date Requested" { it.dateRequested }
+                    "Date Issued" { it.dateIssued }
+                    "Origin" { it.origin }
+                    "Destination" { it.destination }
+                    "Product Code" { it.productCode }
+                    "Product Name" { it.productName }
+                    "Quantity Requested" { it.qtyRequested }
+                    "Quantity Issued" { it.qtyIssued }
+                    "Quantity Demand" { it.qtyDemand }
+                    "Reason Code" { it.reasonCode }
+                })
 
-            data.each {
-                csv << [
-                        requestNumber  : it.requestNumber,
-                        dateRequested  : it.dateRequested,
-                        dateIssued  : it.dateIssued,
-                        origin    : StringEscapeUtils.escapeCsv(it.origin),
-                        destination: StringEscapeUtils.escapeCsv(it.destination),
-                        productCode  : it.productCode,
-                        productName  : StringEscapeUtils.escapeCsv(it.productName),
-                        qtyRequested     : it.quantityRequested,
-                        qtyIssued     : it.quantityIssued,
-                        reasonCode     : it.reasonCode,
-                        qtyDemand     : it.quantityDemand,
-                ]
+                data.each {
+                    csv << [
+                            requestNumber: it.requestNumber,
+                            dateRequested: it.dateRequested,
+                            dateIssued   : it.dateIssued,
+                            origin       : StringEscapeUtils.escapeCsv(it.origin),
+                            destination  : StringEscapeUtils.escapeCsv(it.destination),
+                            productCode  : it.productCode,
+                            productName  : StringEscapeUtils.escapeCsv(it.productName),
+                            qtyRequested : it.quantityRequested,
+                            qtyIssued    : it.quantityIssued,
+                            qtyDemand    : it.quantityDemand,
+                            reasonCode   : it.reasonCode,
+                    ]
+                }
+
+                response.setHeader("Content-disposition", "attachment; filename=\"Request-Detail-Report.csv\"")
+                render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
+                return
             }
-
-            response.setHeader("Content-disposition", "attachment; filename=\"Request-Detail-Report.csv\"")
-            render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
-            return
+            render([aaData: data] as JSON)
+        } else {
+            throw new IllegalArgumentException("Start and end date are required")
         }
-        render([aaData: data] as JSON)
     }
 }
 
