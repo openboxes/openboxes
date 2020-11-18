@@ -66,7 +66,7 @@ class StockMovementService {
     def requisitionService
     def shipmentService
     def inventoryService
-    def inventorySnapshotService
+    def productAvailabilityService
     def locationService
     def dataService
 
@@ -812,7 +812,7 @@ class StockMovementService {
 
         if (quantityRequired) {
             // Retrieve all available items and then calculate suggested
-            List<AvailableItem> availableItems = inventorySnapshotService.getAvailableBinLocations(location, product)
+            List<AvailableItem> availableItems = productAvailabilityService.getAvailableBinLocations(location, product)
             log.info "Available items: ${availableItems}"
             List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
             log.info "Suggested items " + suggestedItems
@@ -1012,7 +1012,7 @@ class StockMovementService {
     }
 
     List<AvailableItem> getAvailableBinLocations(Location location, Product product) {
-        List availableBinLocations = inventorySnapshotService.getQuantityOnHandByBinLocation(location, [product])
+        List availableBinLocations = productAvailabilityService.getQuantityOnHandByBinLocation(location, [product])
         List<AvailableItem> availableItems = availableBinLocations.collect {
             return new AvailableItem(
                     inventoryItem: it?.inventoryItem,
@@ -1099,7 +1099,7 @@ class StockMovementService {
         Location location = requisitionItem?.requisition?.origin
 
         // Qty Available
-        List<AvailableItem> availableItems = inventorySnapshotService.getAvailableBinLocations(location, requisitionItem.product)
+        List<AvailableItem> availableItems = productAvailabilityService.getAvailableBinLocations(location, requisitionItem.product)
 
         // Substitution
         List<SubstitutionItem> availableSubstitutions = getAvailableSubstitutions(location, requisitionItem.product)
@@ -1133,7 +1133,7 @@ class StockMovementService {
                 picklistItems: requisitionItem.picklistItems)
         Location location = requisitionItem?.requisition?.origin
 
-        List<AvailableItem> availableItems = inventorySnapshotService.getAvailableBinLocations(location, requisitionItem.product)
+        List<AvailableItem> availableItems = productAvailabilityService.getAvailableBinLocations(location, requisitionItem.product)
         Integer quantityRequired = requisitionItem?.calculateQuantityRequired()
         List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
         pickPageItem.availableItems = availableItems

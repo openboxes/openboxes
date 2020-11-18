@@ -14,6 +14,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.product.Category
+import org.pih.warehouse.product.ProductAvailability
 
 class BrowseInventoryController {
 
@@ -33,7 +34,7 @@ class BrowseInventoryController {
         if (!location) {
             throw new Exception("Location is required")
         }
-        def inventorySnapshots = InventorySnapshot.createCriteria().list(max: params.max ?: 10, offset: params.offset ?: 0) {
+        def inventorySnapshots = ProductAvailability.createCriteria().list(max: params.max ?: 10, offset: params.offset ?: 0) {
             and {
                 eq("location", location)
                 if (category) {

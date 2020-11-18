@@ -14,6 +14,8 @@ import groovy.sql.Sql
 import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.hibernate.Criteria
+import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationService
@@ -261,4 +263,209 @@ class ProductAvailabilityService {
         dataService.executeStatement(updateStatement)
     }
 
+    def getQuantityOnHand(Location location) {
+        def productAvailability = ProductAvailability.createCriteria().list {
+            resultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+            projections {
+                // Need to use alias other than product to prevent conflict
+                groupProperty("product", "p")
+                sum("quantityOnHand", "quantityOnHand")
+            }
+            eq("location", location)
+        }
+
+        return productAvailability
+    }
+
+    def getQuantityOnHand(List<Product> products, Location location) {
+        def productAvailability = ProductAvailability.createCriteria().list {
+            resultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+            projections {
+                // Need to use alias other than product to prevent conflict
+                groupProperty("product", "p")
+                sum("quantityOnHand", "quantityOnHand")
+            }
+            eq("location", location)
+            'in'("product", products)
+        }
+
+        return productAvailability
+    }
+
+    Map<Product, Integer> getCurrentInventory(Location location) {
+        return getQuantityOnHandByProduct(location)
+    }
+
+    Map<Product, Integer> getQuantityOnHandByProduct(Location location) {
+        def quantityMap = [:]
+        if (location) {
+            def results = ProductAvailability.executeQuery("""
+						select pa.product, sum(pa.quantityOnHand)
+						from ProductAvailability pa
+						inner join pa.product
+						where pa.location = :location
+						group by pa.product
+						""", [location: location])
+            results.each {
+                quantityMap[it[0]] = it[1]
+            }
+        }
+
+        return quantityMap
+    }
+
+    Map<Product, Map<Location, Integer>> getQuantityOnHandByProduct(Location[] locations) {
+        def quantityMap = [:]
+        if (locations) {
+            def results = ProductAvailability.executeQuery("""
+						select product, pa.location, category.name, sum(pa.quantityOnHand)
+						from ProductAvailability pa, Product product, Category category
+						where pa.location in (:locations)
+						and pa.product = product
+						and pa.product.category = category
+						group by product, pa.location, category.name
+						""", [locations: locations])
+
+            results.each {
+                if (!quantityMap[it[0]]) {
+                    quantityMap[it[0]] = [:]
+                }
+                quantityMap[it[0]][it[1]?.id] = it[3]
+            }
+        }
+
+        return quantityMap
+    }
+
+    List getQuantityOnHandByBinLocation(Location location) {
+        def data = []
+
+        if (location) {
+            def results = ProductAvailability.executeQuery("""
+						select 
+						    pa.product, 
+						    pa.inventoryItem,
+						    pa.binLocation,
+						    sum(pa.quantityOnHand)
+						from ProductAvailability pa
+						left outer join pa.inventoryItem ii
+						left outer join pa.binLocation bl
+						where pa.location = :location
+						group by pa.product, pa.inventoryItem, pa.binLocation
+						""", [location: location])
+
+            def getStatus = { quantity -> quantity > 0 ? "inStock" : "outOfStock" }
+
+            data = results.collect {
+                Product product = it[0]
+                InventoryItem inventoryItem = it[1]
+                Location binLocation = it[2]
+                BigDecimal quantity = it[3]?:0.0
+                BigDecimal unitCost = product.pricePerUnit?:0.0
+                BigDecimal totalValue = quantity * unitCost
+
+                [
+                        status       : getStatus(quantity),
+                        product      : product,
+                        inventoryItem: inventoryItem,
+                        binLocation  : binLocation,
+                        quantity     : quantity,
+                        unitCost     : unitCost,
+                        totalValue   : totalValue
+
+                ]
+            }
+        }
+        return data
+    }
+
+    List getQuantityOnHandByBinLocation(Location location, List<Product> products) {
+        log.info("getQuantityOnHandByBinLocation: location=${location} product=${products}")
+        def data = []
+        if (location) {
+            def results = ProductAvailability.executeQuery("""
+						select 
+						    pa.product, 
+						    ii,
+						    pa.binLocation,
+						    pa.quantityOnHand
+						from ProductAvailability pa
+						left outer join pa.inventoryItem ii
+						left outer join pa.binLocation bl
+						where pa.location = :location
+						and pa.product in (:products)
+						""", [location: location, products: products])
+            def status = { quantity -> quantity > 0 ? "inStock" : "outOfStock" }
+            data = results.collect {
+                def inventoryItem = it[1]
+                def binLocation = it[2]
+                def quantity = it[3]
+
+                [
+                        status       : status(quantity),
+                        product      : it[0],
+                        inventoryItem: inventoryItem,
+                        binLocation  : binLocation,
+                        quantity     : quantity
+                ]
+            }
+        }
+        return data
+    }
+
+    Map<InventoryItem, Integer> getQuantityOnHandByInventoryItem(Location location) {
+        def quantityMap = [:]
+        if (location) {
+            def results = ProductAvailability.executeQuery("""
+						select ii, sum(pa.quantityOnHand)
+						from ProductAvailability pa, InventoryItem ii
+						where pa.location = :location
+						and pa.inventoryItem = ii
+						group by ii
+						""", [location: location])
+
+            results.each {
+                quantityMap[it[0]] = it[1]
+            }
+        }
+        return quantityMap
+    }
+
+    List<AvailableItem> getAvailableBinLocations(Location location, Product product) {
+        return getAvailableBinLocations(location, [product])
+    }
+
+    List<AvailableItem> getAvailableBinLocations(Location location, List products) {
+        def availableBinLocations = getQuantityOnHandByBinLocation(location, products)
+
+        List<AvailableItem> availableItems = availableBinLocations.collect {
+            return new AvailableItem(
+                    inventoryItem: it?.inventoryItem,
+                    binLocation: it?.binLocation,
+                    quantityAvailable: it.quantity
+            )
+        }
+
+        availableItems = sortAvailableItems(availableItems)
+        return availableItems
+    }
+
+    List<AvailableItem> sortAvailableItems(List<AvailableItem> availableItems) {
+        availableItems = availableItems.findAll { it.quantityAvailable > 0 }
+
+        // Sort bins  by available quantity
+        availableItems = availableItems.sort { a, b ->
+            a?.quantityAvailable <=> b?.quantityAvailable
+        }
+
+        // Sort empty expiration dates last
+        availableItems = availableItems.sort { a, b ->
+            !a?.inventoryItem?.expirationDate ?
+                    !b?.inventoryItem?.expirationDate ? 0 : 1 :
+                    !b?.inventoryItem?.expirationDate ? -1 :
+                            a?.inventoryItem?.expirationDate <=> b?.inventoryItem?.expirationDate
+        }
+
+        return availableItems
+    }
 }

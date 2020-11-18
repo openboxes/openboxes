@@ -25,6 +25,7 @@ class DashboardService {
     boolean transactional = true
 
     def inventorySnapshotService
+    def productAvailabilityService
 
     /**
      * Get fast moving items based on requisition data.
@@ -60,7 +61,7 @@ class DashboardService {
                 }
             }
 
-            def quantityMap = inventorySnapshotService.getCurrentInventory(location)
+            def quantityMap = productAvailabilityService.getCurrentInventory(location)
 
             def count = 1
             data.results = results.collect {
@@ -121,7 +122,7 @@ class DashboardService {
 
         def expirationAlerts = []
         def today = new Date()
-        def quantityMap = inventorySnapshotService.getQuantityOnHandByInventoryItem(location)
+        def quantityMap = productAvailabilityService.getQuantityOnHandByInventoryItem(location)
         quantityMap.each { key, value ->
             if (value > 0) {
                 def daysToExpiry = key.expirationDate ? (key.expirationDate - today) : null
@@ -155,7 +156,7 @@ class DashboardService {
         log.debug expiredStock
 
         Map<InventoryItem, Integer> quantityMap =
-                inventorySnapshotService.getQuantityOnHandByInventoryItem(location)
+                productAvailabilityService.getQuantityOnHandByInventoryItem(location)
         expiredStock = expiredStock.findAll { quantityMap[it] > 0 }
 
         // FIXME poor man's filter
@@ -182,7 +183,7 @@ class DashboardService {
         today.clearTime()
         // Get all stock expiring ever (we'll filter later)
         def expiringStock = InventoryItem.findAllByExpirationDateGreaterThanEquals(today + 1, [sort: 'expirationDate', order: 'asc'])
-        def quantityMap = inventorySnapshotService.getQuantityOnHandByInventoryItem(location)
+        def quantityMap = productAvailabilityService.getQuantityOnHandByInventoryItem(location)
         expiringStock = expiringStock.findAll { quantityMap[it] > 0 }
         if (category) {
             expiringStock = expiringStock.findAll { item -> item?.product?.category == category }
@@ -215,7 +216,7 @@ class DashboardService {
 
     def getReconditionedStock(Location location) {
         long startTime = System.currentTimeMillis()
-        def quantityMap = inventorySnapshotService.getCurrentInventory(location)
+        def quantityMap = productAvailabilityService.getCurrentInventory(location)
         def reconditionedStock = quantityMap.findAll { it.key.reconditioned }
         log.debug "Get reconditioned stock: " + (System.currentTimeMillis() - startTime) + " ms"
         return reconditionedStock
@@ -224,14 +225,14 @@ class DashboardService {
 
     def getTotalStock(Location location) {
         long startTime = System.currentTimeMillis()
-        def quantityMap = inventorySnapshotService.getCurrentInventory(location)
+        def quantityMap = productAvailabilityService.getCurrentInventory(location)
         log.debug "Get total stock: " + (System.currentTimeMillis() - startTime) + " ms"
         return quantityMap
     }
 
     def getInStock(Location location) {
         long startTime = System.currentTimeMillis()
-        def quantityMap = inventorySnapshotService.getCurrentInventory(location)
+        def quantityMap = productAvailabilityService.getCurrentInventory(location)
         def inStock = quantityMap.findAll { it.value > 0 }
         log.debug "Get in stock: " + (System.currentTimeMillis() - startTime) + " ms"
         return inStock
@@ -245,7 +246,7 @@ class DashboardService {
         def totalStockValue = 0.0
         def stockValueByProduct = [:]
         if (location.inventory) {
-            def quantityMap = inventorySnapshotService.getCurrentInventory(location)
+            def quantityMap = productAvailabilityService.getCurrentInventory(location)
             quantityMap.each { product, quantity ->
                 if (product.pricePerUnit) {
                     def stockValueForProduct = product.pricePerUnit * quantity
@@ -327,7 +328,7 @@ class DashboardService {
         log.info "Dashboard alerts for ${location}"
 
         long startTime = System.currentTimeMillis()
-        def quantityMap = inventorySnapshotService.getCurrentInventory(location)
+        def quantityMap = productAvailabilityService.getCurrentInventory(location)
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy {
             it.product
         }
@@ -431,7 +432,7 @@ class DashboardService {
     }
 
     def getInventoryStatus(Location location) {
-        def quantityMap = inventorySnapshotService.getCurrentInventory(location)
+        def quantityMap = productAvailabilityService.getCurrentInventory(location)
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy {
             it.product
         }
@@ -455,7 +456,7 @@ class DashboardService {
      * @return
      */
     def getInventoryStatusAndLevel(Location location) {
-        def quantityMap = inventorySnapshotService.getCurrentInventory(location)
+        def quantityMap = productAvailabilityService.getCurrentInventory(location)
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy {
             it.product
         }
@@ -470,7 +471,7 @@ class DashboardService {
 
     def getQuantityOnHandZero(Location location) {
         long startTime = System.currentTimeMillis()
-        def quantityMap = inventorySnapshotService.getCurrentInventory(location)
+        def quantityMap = productAvailabilityService.getCurrentInventory(location)
 
         def stockOut = quantityMap.findAll { product, quantity ->
             quantity <= 0
@@ -483,7 +484,7 @@ class DashboardService {
 
     def getOutOfStock(Location location, String abcClass) {
         long startTime = System.currentTimeMillis()
-        def quantityMap = inventorySnapshotService.getCurrentInventory(location)
+        def quantityMap = productAvailabilityService.getCurrentInventory(location)
 
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy {
             it.product
@@ -502,7 +503,7 @@ class DashboardService {
 
     def getLowStock(Location location) {
         long startTime = System.currentTimeMillis()
-        def quantityMap = inventorySnapshotService.getCurrentInventory(location)
+        def quantityMap = productAvailabilityService.getCurrentInventory(location)
         log.info("getQuantityByProductMap: " + (System.currentTimeMillis() - startTime) + " ms")
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy {
             it.product
@@ -520,7 +521,7 @@ class DashboardService {
 
     def getReorderStock(Location location) {
         long startTime = System.currentTimeMillis()
-        def quantityMap = inventorySnapshotService.getCurrentInventory(location)
+        def quantityMap = productAvailabilityService.getCurrentInventory(location)
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy {
             it.product
         }
@@ -535,7 +536,7 @@ class DashboardService {
 
     def getOverStock(Location location) {
         long startTime = System.currentTimeMillis()
-        def quantityMap = inventorySnapshotService.getCurrentInventory(location)
+        def quantityMap = productAvailabilityService.getCurrentInventory(location)
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy {
             it.product
         }
@@ -550,7 +551,7 @@ class DashboardService {
 
     def getHealthyStock(Location location) {
         long startTime = System.currentTimeMillis()
-        def quantityMap = inventorySnapshotService.getCurrentInventory(location)
+        def quantityMap = productAvailabilityService.getCurrentInventory(location)
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy {
             it.product
         }

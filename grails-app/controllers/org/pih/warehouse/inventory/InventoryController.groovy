@@ -39,6 +39,7 @@ class InventoryController {
     def inventoryService
     def requisitionService
     def inventorySnapshotService
+    def productAvailabilityService
     def userService
     def uploadService
     def documentService
@@ -55,14 +56,14 @@ class InventoryController {
 
     def binLocations = {
         Location location = Location.load(session.warehouse.id)
-        List binLocations = inventorySnapshotService.getQuantityOnHandByBinLocation(location)
+        List binLocations = productAvailabilityService.getQuantityOnHandByBinLocation(location)
 
         def data = binLocations.collect {
             [
-                    it?.inventoryItem.product?.productCode,
-                    it?.inventoryItem.product?.name,
+                    it?.inventoryItem?.product?.productCode,
+                    it?.inventoryItem?.product?.name,
                     it?.binLocation?.name,
-                    it?.inventoryItem.lotNumber,
+                    it?.inventoryItem?.lotNumber,
                     it?.inventoryItem?.expirationDate ? Constants.EXPIRATION_DATE_FORMATTER.format(it?.inventoryItem?.expirationDate) : null,
                     it?.quantity,
                     it?.quantity,
@@ -140,9 +141,8 @@ class InventoryController {
 
         def products = inventoryService.searchProducts(command)
 
-        // Calculate quantity for all products
-        Date date = DateUtil.clearTime(new Date()+1)
-        def quantityList = products ? inventorySnapshotService.getQuantityOnHand(products, command.location, date) : []
+        // Get quantity for all products
+        def quantityList = products ? productAvailabilityService.getQuantityOnHand(products, command.location) : []
 
         def searchResults = products.collect { product ->
             def quantityOnHand = quantityList.find { it.p == product }?.quantityOnHand ?: 0
@@ -473,7 +473,7 @@ class InventoryController {
     def list = {
         println "List " + params
         def location = Location.get(session.warehouse.id)
-        def quantityMap = inventorySnapshotService.getCurrentInventory(location)
+        def quantityMap = productAvailabilityService.getCurrentInventory(location)
         def statusMap = dashboardService.getInventoryStatus(location)
         if (params.format == "csv") {
             def filename = "${location.name} - ${status}.csv"
@@ -620,7 +620,7 @@ class InventoryController {
         def categorySelected = (params.category) ? Category.get(params.category) : null
         def inventoryItems = dashboardService.getExpiredStock(categorySelected, location)
         def categories = inventoryItems?.collect { it.product.category }?.unique()
-        def quantityMap = inventorySnapshotService.getQuantityOnHandByInventoryItem(location)
+        def quantityMap = productAvailabilityService.getQuantityOnHandByInventoryItem(location)
         def expiredStockMap = [:]
         inventoryItems.each { inventoryItem ->
             expiredStockMap[inventoryItem] = quantityMap[inventoryItem]
@@ -644,7 +644,7 @@ class InventoryController {
         def categories = inventoryItems?.collect { it?.product?.category }?.unique().sort {
             it.name
         }
-        def quantityMap = inventorySnapshotService.getQuantityOnHandByInventoryItem(location)
+        def quantityMap = productAvailabilityService.getQuantityOnHandByInventoryItem(location)
         def expiringStockMap = [:]
         inventoryItems.each { inventoryItem ->
             expiringStockMap[inventoryItem] = quantityMap[inventoryItem]
@@ -1396,7 +1396,7 @@ class InventoryController {
 
     def downloadTemplate = {
         Location location = Location.load(session.warehouse.id)
-        List data = inventorySnapshotService.getQuantityOnHandByBinLocation(location)
+        List data = productAvailabilityService.getQuantityOnHandByBinLocation(location)
         def rows = []
         data.findAll { it.quantity }.each {
             def row = [

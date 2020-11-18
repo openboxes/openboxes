@@ -408,8 +408,7 @@ class ReportController {
 
         try {
             if (params.downloadAction == "downloadStockReport") {
-
-                def binLocations = inventorySnapshotService.getQuantityOnHandByBinLocation(location)
+                def binLocations = productAvailabilityService.getQuantityOnHandByBinLocation(location)
 
                 // Filter on status
                 if (params.status) {
@@ -425,7 +424,7 @@ class ReportController {
             else if (params.downloadAction == "downloadStockMovement") {
 
                 StockMovement stockMovement = new StockMovement()
-                def entries = inventorySnapshotService.getQuantityOnHandByBinLocation(location)
+                def entries = productAvailabilityService.getQuantityOnHandByBinLocation(location)
                 entries = entries.findAll { entry -> entry.quantity > 0 }
                 entries = entries.groupBy { it.product }
                 entries.each { k, v ->
@@ -528,7 +527,7 @@ class ReportController {
     }
 
     def showInventoryByLocationReport = { MultiLocationInventoryReportCommand command ->
-        command.entries = inventorySnapshotService.getQuantityOnHandByProduct(command.locations)
+        command.entries = productAvailabilityService.getQuantityOnHandByProduct(command.locations)
 
         if (params.button == "download") {
             def sw = new StringWriter()

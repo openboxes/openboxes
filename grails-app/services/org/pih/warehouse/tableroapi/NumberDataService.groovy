@@ -6,6 +6,7 @@ import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.tablero.NumberData
 
@@ -13,10 +14,8 @@ class NumberDataService {
     def messageService
 
     NumberData getInventoryByLotAndBin(def location) {
-        Date tomorrow = LocalDate.now().plusDays(1).toDate();
-
-        def binLocations = InventorySnapshot.executeQuery("select count(*) from InventorySnapshot i where i.location = :location and i.date = :tomorrow and i.quantityOnHand > 0",
-                ['location': location, 'tomorrow': tomorrow]);
+        def binLocations = ProductAvailability.executeQuery("select count(*) from ProductAvailability pa where pa.location = :location and pa.quantityOnHand > 0",
+                ['location': location])
         
         def title = [
             code : "react.dashboard.numberData.inventoryByLotAndBin.label",
@@ -77,19 +76,16 @@ class NumberDataService {
     }
 
     NumberData getReceivingBin(def location) {
-        Date tomorrow = LocalDate.now().plusDays(1).toDate();
-
-        def receivingBin = InventorySnapshot.executeQuery("""
-            SELECT COUNT(distinct i.product.id) from InventorySnapshot i 
-            LEFT JOIN i.location l 
-            LEFT JOIN i.binLocation bl
-            WHERE l = :location AND i.quantityOnHand > 0 
-            AND i.date = :tomorrow AND bl.locationType.id = :locationType""",
+        def receivingBin = ProductAvailability.executeQuery("""
+            SELECT COUNT(distinct pa.product.id) from ProductAvailability pa 
+            LEFT JOIN pa.location l 
+            LEFT JOIN pa.binLocation bl
+            WHERE l = :location AND pa.quantityOnHand > 0 
+            AND bl.locationType.id = :locationType""",
                 [
-                        'location'    : location,
-                        'tomorrow'    : tomorrow,
-                        'locationType': Constants.RECEIVING_LOCATION_TYPE_ID,
-                ]);
+                    'location'    : location,
+                    'locationType': Constants.RECEIVING_LOCATION_TYPE_ID,
+                ])
 
         def title = [
             code : "react.dashboard.numberData.receivingBin.label",
@@ -142,18 +138,15 @@ class NumberDataService {
     }
 
     NumberData getDefaultBin(def location) {
-        Date tomorrow = LocalDate.now().plusDays(1).toDate();
-
-        def productsInDefaultBin = InventorySnapshot.executeQuery("""
-            SELECT COUNT(distinct i.product.id) FROM InventorySnapshot i
-            WHERE i.location = :location
-            AND i.quantityOnHand > 0
-            AND i.binLocationName = 'DEFAULT'
-            AND i.date = :tomorrow""",
+        def productsInDefaultBin = ProductAvailability.executeQuery("""
+            SELECT COUNT(distinct pa.product.id) FROM ProductAvailability pa
+            LEFT JOIN pa.binLocation bl
+            WHERE pa.location = :location
+            AND pa.quantityOnHand > 0
+            AND bl.name = 'DEFAULT'""",
                 [
-                        'location': location,
-                        'tomorrow': tomorrow
-                ]);
+                    'location': location
+                ])
         
         def title = [
             code : "react.dashboard.numberData.defaultBin.label",
@@ -228,21 +221,17 @@ class NumberDataService {
     }
 
     NumberData getExpiredProductsInStock(def location) {
-        Date today = LocalDate.now().toDate();
-        Date tomorrow = LocalDate.now().plusDays(1).toDate();
-
-          def expiredProductsInStock = InventorySnapshot.executeQuery("""
-            SELECT COUNT(distinct i.id) FROM InventorySnapshot i
-            WHERE i.location = :location
-            AND i.quantityOnHand > 0
-            AND i.date = :tomorrow
-            AND i.inventoryItem.expirationDate < :today
+        Date today = LocalDate.now().toDate()
+        def expiredProductsInStock = ProductAvailability.executeQuery("""
+            SELECT COUNT(distinct pa.id) FROM ProductAvailability pa
+            WHERE pa.location = :location
+            AND pa.quantityOnHand > 0
+            AND pa.inventoryItem.expirationDate < :today
             """,
                 [
-                        'location': location,
-                        'tomorrow': tomorrow,
-                        'today' : today,
-                ]);
+                    'location': location,
+                    'today' : today,
+                ])
 
         def title = [
             code : "react.dashboard.numberData.expiredProductsInStock.label",
