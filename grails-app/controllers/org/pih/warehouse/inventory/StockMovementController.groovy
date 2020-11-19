@@ -324,6 +324,16 @@ class StockMovementController {
         render(template: "receipts", model: [receiptItems: receiptItems])
     }
 
+    def events = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        render(template: "events", model: [stockMovement: stockMovement])
+    }
+
+    def tracking = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        render(template: "tracking", model: [stockMovement: stockMovement])
+    }
+
 
     def uploadDocument = { DocumentCommand command ->
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)

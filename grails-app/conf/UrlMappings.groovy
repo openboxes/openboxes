@@ -33,6 +33,16 @@ class UrlMappings {
 
         // REST APIs with complex resource names or subresources
 
+        "/api/gps"(parseRequest: true) {
+            controller = { "gpsApi" }
+            action = [GET: "index"]
+        }
+
+        "/api/gps/route/$id"(parseRequest: true) {
+            controller = { "gpsApi" }
+            action = [GET: "route"]
+        }
+
         "/api/categories"(parseRequest: true) {
             controller = { "categoryApi" }
             action = [GET: "list", POST: "save"]

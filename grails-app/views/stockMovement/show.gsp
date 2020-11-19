@@ -8,6 +8,9 @@
     <title>
         <warehouse:message code="stockMovement.label"/>
     </title>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css' rel='stylesheet' />
+
 </head>
 <body>
 
@@ -447,7 +450,21 @@
                             <warehouse:message code="documents.label" default="Documents"/>
                         </a>
                     </li>
+                    <li>
+                        <a href="${request.contextPath}/stockMovement/events/${stockMovement?.id}">
+                            <warehouse:message code="events.label" default="Events"/>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#tracking"><g:message code="tracking.label" default="Tracking"/></a>
+%{--                        <a href="${request.contextPath}/stockMovement/tracking/${stockMovement?.id}">--}%
+%{--                            <warehouse:message code="tracking.label" default="Tracking"/>--}%
+%{--                        </a>--}%
+                    </li>
                 </ul>
+                <div id="tracking" class="ui-tabs-hide">
+                    <g:render template="tracking"/>
+                </div>
             </div>
         </div>
     </div>
@@ -455,12 +472,73 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        $(".tabs").tabs({
-            cookie : {
-                expires : 1
-            },
-            selected: ${stockMovement?.shipment?.currentStatus >= ShipmentStatusCode.SHIPPED} ? 1 : 0
+      $(".tabs")
+      .tabs({
+        cookie: {
+          expires: 1
+        },
+        //selected: ${stockMovement?.shipment?.currentStatus >= ShipmentStatusCode.SHIPPED} ? 1 : 0
+      });
+      mapboxgl.accessToken = 'pk.eyJ1Ijoiam1pcmFuZGE2MiIsImEiOiJja2hvYmQ1anAwa25vMnlrODZ5Y3M3emRsIn0.ZMJJ2idFQjV6frs6Kkvx0Q';
+      var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: [-87.878855, 43.089109],
+        zoom: 13
+      });
+      var route = {
+        "type": "Feature",
+        'properties': {},
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              [
+                -87.878855,
+                43.089109
+              ],
+              [
+                -87.879264,
+                43.088892
+              ],
+
+            ]
+          ]
+        }
+      }
+
+
+      map.on("load", function () {
+
+        map.addSource('route', {
+          type: 'geojson',
+          data: 'https://openboxes.ngrok.io/openboxes/api/gps/route/${stockMovement?.id}'
         });
+
+        map.addLayer({
+          'id': 'route',
+          'type': 'line',
+          'source': 'route',
+          'layout': {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+          'paint': {
+            'line-color': '#888',
+            'line-width': 8
+          }
+        });
+        // map.addLayer({
+        //   'id': 'milwaukee',
+        //   'type': 'fill',
+        //   'source': 'milwaukee',
+        //   'layout': {},
+        //   'paint': {
+        //     'fill-color': '#088',
+        //     'fill-opacity': 0.8
+        //   }
+        //});
+      })
     });
 </script>
 
