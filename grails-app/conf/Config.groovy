@@ -690,14 +690,6 @@ breadcrumbsConfig {
             actionUrl = "/${appName}/putAway/create/"
             listUrl = "/${appName}/order/list?orderTypeCode=TRANSFER_ORDER&status=PENDING"
         }
-        purchase {
-            actionLabel = "react.stockMovement.purchase.create.label"
-            defaultActionLabel = "Ship Order"
-            listLabel = "react.breadcrumbs.order.label"
-            defaultListLabel = "Order"
-            actionUrl = "/${appName}/stockMovement/createPurchaseOrders/"
-            listUrl = "/${appName}/order/list?orderTypeCode=PURCHASE_ORDER"
-        }
         combinedShipments {
             actionLabel = "shipmentFromPO.label"
             defaultActionLabel = "Ship from PO"
