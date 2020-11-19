@@ -477,42 +477,20 @@
         cookie: {
           expires: 1
         },
-        //selected: ${stockMovement?.shipment?.currentStatus >= ShipmentStatusCode.SHIPPED} ? 1 : 0
       });
-      mapboxgl.accessToken = 'pk.eyJ1Ijoiam1pcmFuZGE2MiIsImEiOiJja2hvYmQ1anAwa25vMnlrODZ5Y3M3emRsIn0.ZMJJ2idFQjV6frs6Kkvx0Q';
+      mapboxgl.accessToken = "${grailsApplication.config.openboxes.mapbox.accessToken}"
       var map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/streets-v11',
-        center: [-87.878855, 43.089109],
-        zoom: 13
+        center: ${grailsApplication.config.openboxes.mapbox.center},
+        zoom: ${grailsApplication.config.openboxes.mapbox.zoom}
       });
-      var route = {
-        "type": "Feature",
-        'properties': {},
-        "geometry": {
-          "type": "LineString",
-          "coordinates": [
-            [
-              [
-                -87.878855,
-                43.089109
-              ],
-              [
-                -87.879264,
-                43.088892
-              ],
-
-            ]
-          ]
-        }
-      }
-
 
       map.on("load", function () {
 
         map.addSource('route', {
           type: 'geojson',
-          data: 'https://openboxes.ngrok.io/openboxes/api/gps/route/${stockMovement?.id}'
+          data: '${request.contextPath}/api/gps/route/${stockMovement?.id}'
         });
 
         map.addLayer({
@@ -528,16 +506,6 @@
             'line-width': 8
           }
         });
-        // map.addLayer({
-        //   'id': 'milwaukee',
-        //   'type': 'fill',
-        //   'source': 'milwaukee',
-        //   'layout': {},
-        //   'paint': {
-        //     'fill-color': '#088',
-        //     'fill-opacity': 0.8
-        //   }
-        //});
       })
     });
 </script>

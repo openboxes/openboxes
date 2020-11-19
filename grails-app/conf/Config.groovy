@@ -958,6 +958,13 @@ openboxes.inventorySnapshot.batchSize = 500
 // Minimum date for expiration date
 openboxes.expirationDate.minValue = new Date("01/01/2000")
 
+// Mapbox access token (default public token used for demo purposes)
+openboxes.mapbox.accessToken = "pk.eyJ1Ijoiam1pcmFuZGE2MiIsImEiOiJja2hvYmQ1anAwa25vMnlrODZ5Y3M3emRsIn0.ZMJJ2idFQjV6frs6Kkvx0Q"
+
+// Mapbox default config (real implementation would get this from the available data)
+openboxes.mapbox.center = [-87.878855, 43.089109]
+openboxes.mapbox.zoom = 12
+
 // Global megamenu configuration
 // TODO: Clean up and add all missing message.properties
 openboxes {
