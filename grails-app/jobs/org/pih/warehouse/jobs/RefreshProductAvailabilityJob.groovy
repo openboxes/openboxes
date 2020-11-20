@@ -37,6 +37,7 @@ class RefreshProductAvailabilityJob {
 
             // Calculate product availability for a single location/product, or all products within a single location
             if (locationId) {
+                Location location = Location.load(locationId)
                 if (productIds && locationId) {
                     productIds.each { productId ->
                         Product product = Product.load(productId)
