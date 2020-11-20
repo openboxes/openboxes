@@ -10,6 +10,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionStatus
@@ -303,6 +304,27 @@ class StockMovement {
                 }
             }
         }
+        return stockMovement
+    }
+
+    static StockMovement createFromOrder(Order order) {
+        StockMovement stockMovement = new StockMovement(
+                destination: order.destination,
+                origin: order.origin,
+                dateRequested: new Date(),
+                requestedBy: order.orderedBy,
+                description: order.orderNumber + ' ' + order.name,
+                statusCode:"CREATED"
+        )
+
+        if (order.orderItems) {
+            order.orderItems.findAll{ it.orderItemStatusCode != OrderItemStatusCode.CANCELED && it.getQuantityRemainingToShip() > 0 }.each { orderItem ->
+                StockMovementItem stockMovementItem = StockMovementItem.createFromOrderItem(orderItem)
+                stockMovementItem.sortOrder = stockMovement.lineItems ? stockMovement.lineItems.size() * 100 : 0
+                stockMovement.lineItems.add(stockMovementItem)
+            }
+        }
+
         return stockMovement
     }
 
