@@ -140,99 +140,6 @@ class OrderController {
         redirect(controller: 'purchaseOrder', action: 'index')
     }
 
-    // TODO remove after combined shipment feature is finished
-    def shipOrder = {
-        Order order = Order.get(params.id)
-
-        // Use command populated on saveShipmentItems (probably contains errors) OR create a new one
-        ShipOrderCommand command = new ShipOrderCommand(order: order, shipment: order.pendingShipment)
-
-        // Populate the line items from existing pending shipment
-        order.listOrderItems().each { OrderItem orderItem ->
-
-            // Find shipment item associated with given order item
-            def shipmentItems =
-                    order?.pendingShipment?.shipmentItems?.findAll { ShipmentItem shipmentItem ->
-                        return shipmentItem.orderItems.any { it == orderItem }
-            }
-
-            if (shipmentItems) {
-                shipmentItems.each { ShipmentItem shipmentItem ->
-                    ShipOrderItemCommand shipOrderItem =
-                            new ShipOrderItemCommand(
-                                    lotNumber: shipmentItem?.inventoryItem?.lotNumber,
-                                    expirationDate: shipmentItem?.inventoryItem?.expirationDate,
-                                    orderItem: orderItem,
-                                    shipmentItem: shipmentItem,
-                                    quantityMinimum: 0,
-                                    quantityToShip: (shipmentItem.quantity / orderItem?.quantityPerUom) as int,
-                                    quantityMaximum: orderItem.quantityRemaining
-
-                            )
-                    command.shipOrderItems.add(shipOrderItem)
-                }
-            }
-            // Or populate line items from quantity remaining on order item
-            else {
-                def quantityRemaining = orderItem?.quantityRemaining
-                ShipOrderItemCommand shipOrderItem =
-                            new ShipOrderItemCommand(
-                                    orderItem: orderItem,
-                                    quantityMinimum: 0,
-                                    quantityToShip: 0,
-                                    quantityMaximum: quantityRemaining)
-                    command.shipOrderItems.add(shipOrderItem)
-            }
-        }
-        [command: command]
-    }
-
-    // TODO remove after combined shipment feature is finished
-    def saveShipmentItems = { ShipOrderCommand command ->
-        if (!command.validate() || command.hasErrors()) {
-            render(view: "shipOrderItems", model: [orderInstance: command.order, command: command])
-            return
-        }
-        try {
-            Order order = Order.get(command?.order?.id)
-
-            boolean hasAtLeastOneItem = command.shipOrderItems.any { ShipOrderItemCommand shipOrderItem -> shipOrderItem.quantityToShip > 0 }
-            if (!hasAtLeastOneItem) {
-                order.errors.reject("Must specify at least one item to ship")
-                throw new ValidationException("Invalid order", order.errors)
-            }
-
-            def shipOrderItemsByOrderItem = command.shipOrderItems.groupBy { ShipOrderItemCommand shipOrderItem -> shipOrderItem.orderItem }
-            order.listOrderItems().each { OrderItem orderItem ->
-                List shipOrderItems = shipOrderItemsByOrderItem.get(orderItem)
-                BigDecimal totalQuantityToShip = shipOrderItems.sum { it?.quantityToShip?:0 }
-                if (totalQuantityToShip > orderItem.quantityRemaining) {
-                    orderItem.errors.reject("Sum of quantity to ship (${totalQuantityToShip}) " +
-                            "cannot be greater than remaining quantity (${orderItem.quantityRemaining}) " +
-                            "for order item '${orderItem.product.productCode} ${orderItem.product.name}'"
-                    )
-                    throw new ValidationException("Invalid order item", orderItem.errors)
-                }
-            }
-
-            if (order?.pendingShipment) {
-                command.shipment = order.pendingShipment
-                shipmentService.updateOrCreateOrderBasedShipmentItems(command)
-                redirect(controller: 'stockMovement', action: 'createPurchaseOrders', params: [id: order?.pendingShipment?.id])
-                return
-            }
-            Shipment shipment = stockMovementService.createInboundShipment(command)
-            if (shipment) {
-                redirect(controller: 'stockMovement', action: 'createPurchaseOrders', params: [id: shipment.id])
-                return
-            }
-        } catch (ValidationException e) {
-            log.error("Validation error: " + e.message, e)
-            flash.errors = e.errors
-        }
-        redirect (action: "shipOrder", id: command.order.id)
-    }
-
     def save = {
         def orderInstance = new Order(params)
         if (orderInstance.save(flush: true)) {
@@ -977,16 +884,6 @@ class OrderController {
 
     }
 
-    // TODO remove after combined shipment feature is finished
-    def redirectFromStockMovement = {
-        // FIXME Need to clean this up a bit (move logic to Shipment or ShipmentItem)
-        def stockMovement = stockMovementService.getStockMovement(params.id)
-        def shipmentItem = stockMovement?.shipment?.shipmentItems?.find { it.orderItems }
-        def orderIds = shipmentItem?.orderItems*.order*.id
-        def orderId = orderIds?.flatten().first()
-        redirect(action: 'shipOrder', id: orderId)
-    }
-
     def exportTemplate = {
         Order order = Order.get(params.order.id)
         def orderItems = OrderItem.findAllByOrder(order)
@@ -999,44 +896,6 @@ class OrderController {
         } else {
             render(text: 'No order items found', status: 404)
         }
-    }
-
-    // TODO remove after combined shipment feature is finished
-    def importTemplate = {
-        def orderInstance = Order.get(params.id)
-        if (!orderInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
-            redirect(action: "list")
-        } else {
-            try {
-                MultipartFile multipartFile = request.getFile('fileContents')
-                if (multipartFile.empty) {
-                    flash.message = "File cannot be empty."
-                    render (status: 404, text: "File was empty")
-                    return
-                }
-                List importedLines = orderService.parseOrderItemsFromTemplateImport(multipartFile.inputStream.text)
-                if (orderService.validateItemsFromTemplateImport(orderInstance, importedLines)) {
-                    orderService.saveItemsInShipment(orderInstance, importedLines)
-                    flash.message = "Successfully saved ${importedLines?.size()} lines from imported template"
-                } else {
-                    String message = "Failed to import template due to validation errors:"
-                    importedLines.eachWithIndex { line, idx ->
-                        if (line.errors) {
-                            message += "<br>Row ${idx + 1}: ${line.errors.join(". ")}"
-                        }
-                    }
-                    flash.message = message
-                    render (status: 404, text: "Validation error")
-                    return
-                }
-            } catch (Exception e) {
-                log.warn("Failed to import template due to the following error: " + e.message, e)
-                render (status: 500, text: "Failed to import template due to the following error: " + e.message)
-                return
-            }
-        }
-        render (status: 200, text: "Successfully imported template")
     }
 
     def cancelOrderItem = {

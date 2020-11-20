@@ -589,7 +589,7 @@ class SendMovementPage extends Component {
     const isDestination = this.props.currentLocationId === values.destination.id;
 
     if ((values.hasManageInventory && isOrigin) || (!values.hasManageInventory && isDestination)) {
-      apiClient.post(url, payload)
+      apiClient.delete(url, payload)
         .then(() => {
           this.props.hideSpinner();
           window.location.reload();
