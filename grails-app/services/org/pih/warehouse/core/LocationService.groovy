@@ -188,14 +188,17 @@ class LocationService {
             locations = locations.findAll { Location location -> user.hasPrimaryRole(location) }
             locations = locations.collect { Location location ->
                 [
-                        id           : location?.id,
-                        name         : location?.name,
-                        locationType : location.locationType?.name,
-                        locationGroup: location?.locationGroup?.name,
+                        id              : location?.id,
+                        name            : location?.name,
+                        foregroundColor : location.fgColor,
+                        backgroundColor : location?.bgColor,
+                        organizationName: location?.organization?.name,
+                        locationType    : location.locationType?.name,
+                        locationGroup   : location?.locationGroup?.name,
 
                 ]
             }
-            locationMap = locations.groupBy { it?.locationGroup }
+            locationMap = locations.groupBy { it?.organizationName }
             locationMap = locationMap.sort { a, b -> nullHigh.compare(a?.key, b?.key) }
         }
         return locationMap
