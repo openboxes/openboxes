@@ -99,7 +99,7 @@ const ConfigurationsList = ({
       <ul className="configs-list">
         {Object.entries(configs).map(([key, value]) => (
           <li className={`configs-list-item ${activeConfig === key ? 'active' : ''}`} key={key}>
-            <button onClick={() => loadConfigData(key, true)}>
+            <button onClick={() => loadConfigData(key)}>
               <i className="fa fa-bar-chart" aria-hidden="true" />
               {value.name}
             </button>
@@ -133,6 +133,7 @@ class Tablero extends Component {
       showNav: false,
       configModified: false,
       allLocations: [],
+      pageFilters: [],
     };
     this.config = 'personal';
     this.fetchLocations();
@@ -143,6 +144,7 @@ class Tablero extends Component {
     if (this.props.currentLocation !== '') {
       this.fetchData(this.config);
     }
+    this.loadPageFilters(this.props.activeConfig);
   }
 
   componentDidUpdate(prevProps) {
@@ -152,8 +154,33 @@ class Tablero extends Component {
     if (prevLocation !== newLocation) {
       this.fetchData(this.config);
     }
+    if (prevProps.dashboardConfig.configurations !== this.props.dashboardConfig.configurations) {
+      this.loadPageFilters(this.props.activeConfig);
+    }
   }
   dataFetched = false;
+
+  loadPageFilters(config = '') {
+    let pageFilters = [];
+    if (this.props.dashboardConfig.configurations) {
+      const allPages = Object.entries(this.props.dashboardConfig.configurations)
+        .map(([key, value]) => [key, value]);
+      allPages.forEach((page) => {
+        const filters = Object.entries(page[1].filters)
+          .map(([keyFilter, valueFilter]) => {
+            const filter = {
+              name: keyFilter,
+              endpoint: valueFilter.endpoint,
+            };
+            return filter;
+          });
+        if (filters.length > 0 && page[0] === config) {
+          pageFilters = filters;
+        }
+      });
+    }
+    this.setState({ pageFilters });
+  }
 
   fetchLocations() {
     const url = '/openboxes/apitablero/getFillRateDestinations';
@@ -167,7 +194,7 @@ class Tablero extends Component {
       });
   }
 
-  fetchData = (config = 'personal', refreshFilter = false) => {
+  fetchData = (config = 'personal') => {
     sessionStorage.setItem('dashboardKey', config);
     this.props.resetIndicators();
     if (this.props.dashboardConfig && this.props.dashboardConfig.endpoints) {
@@ -175,8 +202,8 @@ class Tablero extends Component {
         this.props.dashboardConfig,
         config,
         this.props.currentLocation,
-        refreshFilter,
       );
+      this.loadPageFilters(config);
     } else {
       this.props.fetchConfigAndData(
         this.props.currentLocation,
@@ -319,6 +346,7 @@ class Tablero extends Component {
             configs={this.props.dashboardConfig.configurations || {}}
             activeConfig={this.props.activeConfig}
             fetchData={this.fetchData}
+            pageFilters={this.state.pageFilters}
           />
           <div className="cards-container">
             {numberCards}
