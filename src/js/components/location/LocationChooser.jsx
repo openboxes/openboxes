@@ -19,6 +19,7 @@ class LocationChooser extends Component {
 
     this.state = {
       locations: {},
+      locationGroups: [],
     };
 
     this.openModal = this.openModal.bind(this);
@@ -59,9 +60,14 @@ class LocationChooser extends Component {
 
     return apiClient.get(url)
       .then((response) => {
-        const locations = _.groupBy(response.data.data, location => _.get(location, 'locationGroup.name') || 'No location group');
-
-        this.setState({ locations });
+        const locations = _.groupBy(response.data.data, location => _.get(location, 'organizationName'));
+        const locationGroups = _.keys(_.groupBy(response.data.data, location => _.get(location, 'locationGroup.name'))).sort();
+        const sortedLocations = Object.keys(locations)
+          .sort()
+          .reduce((acc, key) => ({
+            ...acc, [key]: locations[key],
+          }), {});
+        this.setState({ locations: sortedLocations, locationGroups });
       });
   }
 
@@ -78,7 +84,7 @@ class LocationChooser extends Component {
         <Modal
           isOpen={this.props.locationChooserOpen}
           onRequestClose={() => this.closeModal()}
-          className="modal-content-custom"
+          className="location-modal"
           shouldCloseOnOverlayClick={false}
         >
           <div>
@@ -91,21 +97,54 @@ class LocationChooser extends Component {
             <hr />
             <Tabs>
               <TabList>
-                { _.map(this.state.locations, (locations, groupName) =>
-                  <Tab key={groupName}>{groupName}</Tab>) }
+                { _.map(this.state.locations, (locations, organizationName) =>
+                  <Tab key={organizationName}>{organizationName !== 'null' ? organizationName : 'No organization'}</Tab>) }
               </TabList>
               <div className="tabs-panel-container">
-                { _.map(this.state.locations, (locations, groupName) => (
-                  <TabPanel key={`tab-${groupName}`}>
-                    { _.map(locations, location => (
-                      <button
-                        key={`${groupName}-${location.name}`}
-                        onClick={() => this.closeModal(location)}
-                        className="btn btn-light m-2"
-                      ><span><i className="fa fa-map-marker pr-2" />{location.name}</span>
-                      </button>))}
-                  </TabPanel>
-                )) }
+                { _.map(this.state.locations, (locations, organizationName) => {
+                  // eslint-disable-next-line max-len
+                  const isLocationWithNoGroup = _.find(locations, location => !location.locationGroup);
+                  return (
+                    <TabPanel key={`tab-${organizationName}`}>
+                      {
+                        _.map(this.state.locationGroups, (locationGroup) => {
+                          const hasLocations = _.find(locations, location => _.get(location, 'locationGroup.name') === locationGroup);
+                          return (
+                            <div className={hasLocations ? 'header-border rounded' : ''}>
+                              {hasLocations ? <h6 className="heading"><span>{locationGroup}</span></h6> : null}
+                              {_.map(_.filter(locations, location => _.get(location, 'locationGroup.name') === locationGroup), location => (
+                                <button
+                                  key={`${organizationName}-${location.name}`}
+                                  onClick={() => this.closeModal(location)}
+                                  className="btn btn-light m-2"
+                                  style={{ backgroundColor: location.backgroundColor }}
+                                ><span><i className="fa fa-map-marker pr-2" />{location.name}</span>
+                                </button>
+                              ))
+                              }
+                            </div>);
+                        })
+                      }
+                      { isLocationWithNoGroup ?
+                        <div className="header-border rounded">
+                          <h6 className="heading"><span>No location group</span></h6>
+                          {/* eslint-disable-next-line max-len */}
+                          {_.map(_.filter(locations, location => !location.locationGroup), location => (
+                            <div>
+                              <button
+                                key={`${organizationName}-${location.name}`}
+                                onClick={() => this.closeModal(location)}
+                                className="btn btn-light m-2"
+                                style={{ backgroundColor: location.backgroundColor }}
+                              ><span><i className="fa fa-map-marker pr-2" />{location.name}</span>
+                              </button>
+                            </div>
+                        ))
+                        }
+                        </div> : null
+                      }
+                    </TabPanel>);
+                }) }
               </div>
             </Tabs>
           </div>
