@@ -20,6 +20,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import javax.xml.bind.ValidationException
+import org.grails.plugins.csv.CSVWriter
 
 class CombinedShipmentItemApiController {
 
@@ -139,5 +140,49 @@ class CombinedShipmentItemApiController {
             throw new ValidationException(message)
         }
         render (status: 200, text: "Successfully imported template")
+    }
+
+    def exportTemplate = {
+        def sw = new StringWriter()
+
+        def csv = new CSVWriter(sw, {
+            "Order number" { it.orderNumber }
+            "Order Item id" { it.id }
+            "Product code" { it.productCode }
+            "Product name" { it.productName }
+            "Lot number" { it.lotNumber }
+            "Expiry" { it.expiry }
+            "Quantity to ship" { it.quantityToShip }
+            "Pack level 1" { it.palletName }
+            "Pack level 2" { it.boxName }
+            "Recipient" { it.recipient }
+        })
+
+        if (params.blank) {
+            csv << [orderNumber: "", id: "", productCode: "", productName: "", lotNumber: "", expiry: "", quantityToShip: "", palletName: "", boxName: "", recipient: ""]
+        } else {
+            def vendor = Location.get(params.vendor)
+            def destination = Location.get(params.destination)
+            def orders = orderService.getOrdersForCombinedShipment(vendor, destination)
+            def orderItems = OrderItem.findAllByOrderInList(orders)
+            orderItems.findAll{ it.orderItemStatusCode != OrderItemStatusCode.CANCELED && it.getQuantityRemainingToShip() > 0 }.each {orderItem ->
+                csv << [
+                        orderNumber         : orderItem.order.orderNumber,
+                        id                  : orderItem.id,
+                        productCode         : orderItem.product.productCode,
+                        productName         : orderItem.product.name,
+                        lotNumber           : '',
+                        expiry              : '',
+                        quantityToShip      : orderItem.getQuantityRemainingToShip(),
+                        palletName          : '',
+                        boxName             : '',
+                        recipient           : orderItem.recipient ?: '',
+                ]
+            }
+        }
+
+        response.setHeader("Content-disposition", "attachment; filename=\"Order-items-template.csv\"")
+        render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
+        return
     }
 }

@@ -9,6 +9,7 @@ import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
 import moment from 'moment';
 import update from 'immutability-helper';
+import fileDownload from 'js-file-download';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -247,6 +248,7 @@ class AddItemsPage extends Component {
     this.fetchLineItems = this.fetchLineItems.bind(this);
     this.saveRequisitionItemsInCurrentStep = this.saveRequisitionItemsInCurrentStep.bind(this);
     this.importTemplate = this.importTemplate.bind(this);
+    this.toggleDropdown = this.toggleDropdown.bind(this);
 
     this.debouncedProductsFetch = debounceProductsFetch(
       this.props.debounceTime,
@@ -765,6 +767,24 @@ class AddItemsPage extends Component {
       });
   }
 
+  exportTemplate(blank) {
+    const url = `/openboxes/api/combinedShipmentItems/exportTemplate?vendor=${this.state.values.origin.id}&destination=${this.state.values.destination.id}${blank ? '&blank=true' : ''}`;
+    apiClient.get(url, { responseType: 'blob' })
+      .then((response) => {
+        fileDownload(response.data, 'Order-items-template.csv', 'text/csv');
+        this.props.hideSpinner();
+      })
+      .catch(() => this.props.hideSpinner());
+  }
+
+  /**
+   * Toggle the downloadable files
+   */
+  toggleDropdown() {
+    this.setState({
+      isDropdownVisible: !this.state.isDropdownVisible,
+    });
+  }
 
   render() {
     return (
@@ -793,6 +813,33 @@ class AddItemsPage extends Component {
                   accept=".csv"
                 />
               </label>
+              <div className="dropdown">
+                <button
+                  type="button"
+                  onClick={this.toggleDropdown}
+                  className="dropdown-button float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+                >
+                  <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.download.label" defaultMessage="Download" /></span>
+                </button>
+                <div className={`dropdown-content print-buttons-container col-md-3 flex-grow-1 
+                        ${this.state.isDropdownVisible ? 'visible' : ''}`}
+                >
+                  <a
+                    href="#"
+                    className="py-1 mb-1 btn btn-outline-secondary"
+                    onClick={() => { this.exportTemplate(false); }}
+                  >
+                    <span><i className="pr-2 fa fa-download" /><Translate id="react.combinedShipments.availableItems.label" defaultMessage="Available order items" /></span>
+                  </a>
+                  <a
+                    href="#"
+                    className="py-1 mb-1 btn btn-outline-secondary"
+                    onClick={() => { this.exportTemplate(true); }}
+                  >
+                    <span><i className="pr-2 fa fa-download" /><Translate id="react.combinedShipments.blankTemplate.label" defaultMessage="Blank import template" /></span>
+                  </a>
+                </div>
+              </div>
               <button
                 type="button"
                 onClick={() => this.refresh()}
