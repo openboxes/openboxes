@@ -153,7 +153,7 @@ export function changeCurrentLocale(locale) {
 
 // New Dashboard
 
-function fillParameterList(params = '', locationId = '') {
+function getParameterList(params = '', locationId = '') {
   const listFiltersSelected = [];
   const listValues = [];
 
@@ -161,14 +161,14 @@ function fillParameterList(params = '', locationId = '') {
 
   const pageConfig = JSON.parse(sessionStorage.getItem('pageConfig')) || {};
 
-  if (!pageConfig[`${dashboardKey}`]) { pageConfig[`${dashboardKey}`] = {}; }
+  if (!pageConfig[dashboardKey]) { pageConfig[dashboardKey] = {}; }
 
   let listParams = params === '' ? `locationId=${locationId}` : `${params}&locationId=${locationId}`;
 
   // List of filter and category
   // filter[0] is the category
   // filter[1] represent the values
-  Object.entries(pageConfig[`${dashboardKey}`]).forEach((filter) => {
+  Object.entries(pageConfig[dashboardKey]).forEach((filter) => {
     listFiltersSelected.push(filter[0]);
     filter[1].forEach(value => listValues.push(value));
   });
@@ -191,7 +191,7 @@ function fetchGraphIndicator(
 ) {
   const id = indicatorConfig.order;
 
-  const listParams = fillParameterList(params, locationId);
+  const listParams = getParameterList(params, locationId);
   const url = `${indicatorConfig.endpoint}?${listParams}`;
 
   if (!indicatorConfig.enabled) {
@@ -264,7 +264,7 @@ function fetchNumberIndicator(
 ) {
   const id = indicatorConfig.order;
 
-  const listParams = fillParameterList('', locationId);
+  const listParams = getParameterList('', locationId);
 
   const url = `${indicatorConfig.endpoint}?${listParams}`;
   if (!indicatorConfig.enabled) {
