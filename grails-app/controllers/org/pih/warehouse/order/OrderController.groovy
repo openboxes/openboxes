@@ -13,6 +13,7 @@ import grails.converters.JSON
 import grails.validation.ValidationException
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.plugins.csv.CSVWriter
+import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
@@ -972,5 +973,12 @@ class OrderController {
     def getTotalAdjustments = {
         Order order = Order.get(params.id)
         render order.totalAdjustments
+    }
+
+    def createCombinedShipment = {
+        def orderInstance = Order.get(params.orderId)
+        StockMovement stockMovement = StockMovement.createFromOrder(orderInstance);
+        stockMovement = stockMovementService.createShipmentBasedStockMovement(stockMovement)
+        redirect(controller: 'stockMovement', action: "createCombinedShipments", params: [direction: 'INBOUND', id: stockMovement.id])
     }
 }

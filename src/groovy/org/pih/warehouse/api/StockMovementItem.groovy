@@ -210,8 +210,10 @@ class StockMovementItem {
                 productCode: orderItem?.product?.productCode,
                 product: orderItem?.product,
                 inventoryItem: orderItem?.inventoryItem,
-                quantityRequested: orderItem.quantityRemaining,
-                recipient: orderItem.requestedBy
+                quantityRequested: orderItem.quantityRemainingToShip * orderItem.quantityPerUom,
+                recipient: orderItem.recipient,
+                orderItemId: orderItem.id,
+                orderNumber: orderItem.order.orderNumber,
         )
     }
 
