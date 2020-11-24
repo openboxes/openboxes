@@ -1223,15 +1223,14 @@ a:hover {
 }
 
 #chooseLocation {
-    width: 800px;
     position: absolute;
-    top: 100px;
+    width: 50%;
+    top: 10%;
     left: 50%;
-    margin-left: -400px;
+    margin-left: -25%;
 }
 #chooseLocationSelect {
     max-height: 400px;
-    overflow: auto;
     margin-bottom: 5px
 }
 

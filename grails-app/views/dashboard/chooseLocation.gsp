@@ -4,11 +4,11 @@
         <meta name="layout" content="custom" />
         <title>${warehouse.message(code: 'dashboard.chooseLocation.label')}</title>
     </head>
-    <body>        
+    <body>
 		<div class="body">
             <div id="chooseLocation">
 				<g:if test="${flash.message}">
-			    	<div class="message">${warehouse.message(code:flash.message,default:flash.message)}</div>  
+			    	<div class="message">${warehouse.message(code:flash.message,default:flash.message)}</div>
 			    	<!-- we wrap this in a message tag since we can't call it directly from with the SecurityFilter -->
 				</g:if>
 				<g:form controller="dashboard" action="chooseLocation">
@@ -31,7 +31,7 @@
                             </g:link>
                         </div>
 					</div>
-				</g:form>				
+				</g:form>
 			</div>
 		</div>
     </body>

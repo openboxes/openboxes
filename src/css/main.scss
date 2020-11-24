@@ -1,9 +1,9 @@
 $white-alpha: #EFECEC;
 
-$gray-alpha: #CCC;
+$gray-alpha: #cccccc;
 $gray-beta: #999;
-$gray-gamma: #888;
-$gray-delta: #777;
+$gray-gamma: #888888;
+$gray-delta: #777777;
 $gray-epsilon: #737373;
 $gray-zeta: #666;
 $gray-eta: #EEE;
@@ -742,7 +742,7 @@ div.crossed-out .table-inner-row:before {
     background-color: $gray-alpha;
 
     &--selected {
-      background-color: white;
+      background-color: #ffffff;
       border-color: white;
     }
 
@@ -765,7 +765,7 @@ div.crossed-out .table-inner-row:before {
   border: 1px solid $gray-gamma;
   border-radius: 0 5px 5px 0;
   border-left: none;
-  padding: 6px 12px;
+  padding: 10px 12px;
   flex: 1 1 auto;
 }
 
@@ -789,6 +789,37 @@ div.crossed-out .table-inner-row:before {
 
 .w-space-normal {
   white-space: normal !important;
+}
+
+.header-border {
+  width: 100%;
+  margin-bottom: 10px;
+  border: 1px solid $gray-gamma;
+
+  .heading {
+    margin-left: 20px;
+    margin-top: -10px;
+  }
+  .heading > span {
+    background-color: white;
+  }
+}
+.location-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  border: 1px solid $gray-alpha;
+  background: white;
+  overflow: auto;
+  border-radius: 4px;
+  outline: none;
+  padding: 20px;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  width: 50vw;
+  max-height: 60vh;
 }
 
 /* LOGIN MODAL
