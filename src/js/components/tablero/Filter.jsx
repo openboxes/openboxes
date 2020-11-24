@@ -67,12 +67,14 @@ class Filter extends Component {
 
   toggleCategorySelected = (nameCategory, categoryData) => {
     if (categoryData) this.getCategoryRows(categoryData.endpoint);
-    this.setState({ titlePopup: nameCategory || 'Add Filter' });
-    this.setState({ categorySelected: nameCategory || '' });
-    // Value in the searchBar removed
-    this.setState({ searchTerm: '' });
-    // Popup filterSelection show up or close
-    this.setState({ filterCategorySelected: !this.state.filterCategorySelected });
+    this.setState({
+      titlePopup: nameCategory || 'Add Filter',
+      categorySelected: nameCategory || '',
+      // Value in the searchBar removed
+      searchTerm: '',
+      // Popup filterSelection show up or close
+      filterCategorySelected: !this.state.filterCategorySelected,
+    });
   }
 
   loadStoredFilters = () => {
@@ -99,8 +101,7 @@ class Filter extends Component {
           listFilterSelected.push(filter);
         });
       });
-      this.setState({ listFilterSelected });
-      this.setState({ filterAvailable: true });
+      this.setState({ listFilterSelected, filterAvailable: true });
     } else { this.setState({ filterAvailable: false }); }
   }
 
