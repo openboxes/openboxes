@@ -49,6 +49,7 @@
     margin-top: 10px;
     border: 1px solid #888;
     border-radius: 4px;
+    display: inline-block;
 }
 .header-border .heading {
     margin-left: 20px;
