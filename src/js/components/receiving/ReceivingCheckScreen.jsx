@@ -344,7 +344,7 @@ class ReceivingCheckScreen extends Component {
                     disabled={this.state.completed || !_.size(this.state.values.containers)}
                   ><Translate id="react.default.button.save.label" defaultMessage="Save" />
                   </button>
-                  {!this.state.values.hasPartialReceivingSupport ?
+                  {this.state.values.hasPartialReceivingSupport ?
                     <button
                       type="button"
                       className="btn btn-outline-danger float-right btn-form btn-xs"

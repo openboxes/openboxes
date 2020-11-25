@@ -360,7 +360,6 @@ class PartialReceivingPage extends Component {
     this.saveAndExit = this.saveAndExit.bind(this);
     this.saveValues = this.saveValues.bind(this);
     this.onSave = this.onSave.bind(this);
-    this.onExit = this.onExit.bind(this);
     this.saveEditLine = this.saveEditLine.bind(this);
     this.exportTemplate = this.exportTemplate.bind(this);
     this.importTemplate = this.importTemplate.bind(this);
@@ -385,14 +384,6 @@ class PartialReceivingPage extends Component {
 
   onSave() {
     this.save(this.state.values);
-  }
-
-  /**
-   * Calls save and exit method.
-   * @public
-   */
-  onExit() {
-    this.saveAndExit(this.state.values);
   }
 
   onSubmit(formValues) {
@@ -697,7 +688,7 @@ class PartialReceivingPage extends Component {
                   }))}
                 </div>
                 <div className="submit-buttons">
-                  <button type="submit" className="btn btn-outline-primary btn-form float-right btn-xs" disabled={!isAnyItemSelected(values.containers) || values.shipmentStatus === 'RECEIVED'} onClick={() => this.onExit()}>
+                  <button type="submit" className="btn btn-outline-primary btn-form float-right btn-xs" disabled={!isAnyItemSelected(values.containers) || values.shipmentStatus === 'RECEIVED'}>
                     <Translate id="react.default.button.next.label" defaultMessage="Next" />
                   </button>
                 </div>
