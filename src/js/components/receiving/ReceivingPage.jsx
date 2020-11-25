@@ -57,7 +57,7 @@ class ReceivingPage extends Component {
 
   getStepList() {
     const stepList = [this.props.translate('react.receiving.partialReceiving.label', 'Receiving'),
-      this.props.translate('react.receiving.receivingCheckScreen.label', 'CheckScreen')];
+      this.props.translate('react.receiving.receivingCheckScreen.label', 'Check')];
 
     return stepList;
   }

@@ -254,6 +254,7 @@ class ReceivingCheckScreen extends Component {
     this.saveValues(formValues)
       .then(() => {
         const { requisition, shipmentId } = formValues;
+
         window.location = `/openboxes/stockMovement/show/${requisition || shipmentId}`;
       })
       .catch(() => this.props.hideSpinner());
