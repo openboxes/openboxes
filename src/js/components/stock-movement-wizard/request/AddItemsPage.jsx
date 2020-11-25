@@ -210,6 +210,15 @@ const STOCKLIST_FIELDS = {
           type: 'number',
         },
       },
+      quantityOnHand: {
+        type: LabelField,
+        label: 'react.stockMovement.quantityOnHand.label',
+        defaultMessage: 'QoH',
+        flexWidth: '1.7',
+        attributes: {
+          type: 'number',
+        },
+      },
       quantityRequested: {
         type: TextField,
         label: 'react.stockMovement.neededQuantity.label',
@@ -235,6 +244,12 @@ const STOCKLIST_FIELDS = {
           } : null,
           onBlur: () => updateRow(values, rowIndex),
         }),
+      },
+      comments: {
+        type: TextField,
+        label: 'react.stockMovement.comments.label',
+        defaultMessage: 'Comments',
+        flexWidth: '1.7',
       },
       deleteButton: DELETE_BUTTON_FIELD,
     },
@@ -494,36 +509,12 @@ class AddItemsPage extends Component {
         )
       ) {
         lineItemsToBeUpdated.push(item);
-      } else if (newQty !== oldQty || newRecipient !== oldRecipient) {
+      } else if (newQty !== oldQty || !item.quantityRequested ||
+        newRecipient !== oldRecipient ||
+        oldItem.comments !== item.comments) {
         lineItemsToBeUpdated.push(item);
       }
     });
-
-    if (this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory) {
-      return [].concat(
-        _.map(lineItemsToBeAdded, item => ({
-          'product.id': item.product.id,
-          quantityRequested: item.quantityRequested,
-          palletName: item.palletName,
-          boxName: item.boxName,
-          lotNumber: item.lotNumber,
-          expirationDate: item.expirationDate,
-          'recipient.id': _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '',
-          sortOrder: item.sortOrder,
-        })),
-        _.map(lineItemsToBeUpdated, item => ({
-          id: item.id,
-          'product.id': item.product.id,
-          quantityRequested: item.quantityRequested,
-          palletName: item.palletName,
-          boxName: item.boxName,
-          lotNumber: item.lotNumber,
-          expirationDate: item.expirationDate,
-          'recipient.id': _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '',
-          sortOrder: item.sortOrder,
-        })),
-      );
-    }
 
     return [].concat(
       _.map(lineItemsToBeAdded, item => ({
@@ -538,6 +529,7 @@ class AddItemsPage extends Component {
         quantityRequested: item.quantityRequested,
         'recipient.id': _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '',
         sortOrder: item.sortOrder,
+        comments: item.comments,
       })),
     );
   }
@@ -612,7 +604,8 @@ class AddItemsPage extends Component {
     const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
 
     _.forEach(values.lineItems, (item, key) => {
-      if (!_.isNil(item.product) && (!item.quantityRequested || item.quantityRequested < 0)) {
+      if (!_.isNil(item.product) && (_.isNil(item.quantityRequested)
+        || item.quantityRequested < 0)) {
         errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.enterQuantity.label' };
       }
       if (!_.isEmpty(item.boxName) && _.isEmpty(item.palletName)) {
@@ -963,6 +956,10 @@ class AddItemsPage extends Component {
                 ...val.product,
                 label: `${val.productCode} ${val.product.name}`,
               },
+              quantityOnHand: _.find(
+                this.state.values.lineItems,
+                lineItem => lineItem.id === val.id,
+              ).quantityOnHand,
             }),
           );
 

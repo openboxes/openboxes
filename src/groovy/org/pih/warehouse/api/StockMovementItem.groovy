@@ -191,7 +191,7 @@ class StockMovementItem {
                 quantityPicked: requisitionItem?.totalQuantityPicked(),
                 substitutionItems: substitutionItems,
                 reasonCode: requisitionItem.cancelReasonCode,
-                comments: requisitionItem.cancelComments,
+                comments: requisitionItem.comment,
                 recipient: requisitionItem.recipient ?: requisitionItem?.parentRequisitionItem?.recipient,
                 palletName: requisitionItem?.palletName ?: "",
                 boxName: requisitionItem?.boxName ?: "",

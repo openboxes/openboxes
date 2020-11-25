@@ -277,6 +277,19 @@ class ProductAvailabilityService {
         return productAvailability
     }
 
+    Integer getQuantityOnHand(Product product, Location location) {
+        def productAvailability = ProductAvailability.createCriteria().list {
+            resultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+            projections {
+                sum("quantityOnHand", "quantityOnHand")
+            }
+            eq("location", location)
+            eq("product", product)
+        }
+
+        return productAvailability?.get(0)?.quantityOnHand ?: 0
+    }
+
     def getQuantityOnHand(List<Product> products, Location location) {
         def productAvailability = ProductAvailability.createCriteria().list {
             resultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
