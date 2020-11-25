@@ -1,7 +1,7 @@
 @import './ColorPalette.scss';
 
 .dashboard-container {
-  background-color: #fbfbfb;
+  background-color: #f1f1f1;
   user-select: none;
   display: flex;
   align-items: start;
@@ -12,11 +12,9 @@
     .category-filter {
       display: flex;
       flex-direction: row;
-      width: 70%;
+      width: 100%;
       flex-wrap: wrap;
-      margin-left: 6%;
-      margin-top: 20px;
-  
+      margin: 10px 6%;
       .add-category-btn {
         width: 100px !important;
         cursor: pointer;
@@ -24,9 +22,9 @@
 
       .category-item {
         background-color: #D6D6D6;
-        width: 20%;
+        width: 30%;
         height: 50px;
-        margin-top: 15px;
+        margin-top: 10px;
         font-size: 0.8em;
         display: flex;
         justify-content: center;
@@ -34,6 +32,15 @@
         margin-right: 1.5%;
         box-shadow:  2px 8px 10px rgba(0,0,0,.15);
         border-radius: 5px;
+        @media (min-width: 750px) {
+          width: 20% !important;  
+        }
+        @media (min-width: 1050px) {
+          width: 13% !important;
+        }
+        @media (min-width: 1450px) {
+          width: 8% !important;
+        }
         .category-title {
           margin-left: 10%;
           width: 70%;
@@ -264,7 +271,6 @@
 }
 
 .card-component {
-  margin-top: 20px;
   margin-left: 2%;
   display: flex;
   flex-direction: row;
@@ -280,8 +286,8 @@
 .number-card {
   position: relative;
   width: 97%;
-  margin: 1%;
-  padding: 25px;
+  margin: 3.5px 1%;
+  padding: 14.7px;
   box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.09);
   background-color: white;
   display: flex;
@@ -378,18 +384,18 @@
 }
 
 .big-size {
-  height: 370px !important;
-  width: 100% !important;
+  height: 320px !important;
+  width: 97% !important;
 } 
 
 .graph-card {
-  margin: 1%;
+  margin: 3.5px 1%;
   box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.09);
   background-color: white;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  height: 390px;
+  height: 300px;
   width: 97%;
 
   >div {
@@ -653,28 +659,34 @@
   }
 }
 
+@media (min-width: 460px) {
+  .graph-card {
+    height: 335px;
+  }
+}
 
 @media (min-width: 530px) {
+  .graph-card {
+    height: 380px;
+  }
   .big-size {
-    height: 360px !important;
-    width: 90% !important;
+    height: 440px !important;
+    width: 97% !important;
   } 
 }
 
 @media (min-width: 630px) {
   .big-size {
-    height: 380px !important;
-    width: 80% !important;
+    height: 480px !important;
   }  
   .graph-card {
-    height: 450px;
+    height: 420px;
   }
 }
 
 @media (min-width: 730px) {
   .big-size {
-    height: 400px !important;
-    width: 65% !important;
+    height: 550px !important;
   }
   
   .graph-card {
@@ -684,48 +696,56 @@
 
 @media (min-width: 868px) {
   .big-size {
-    height: 420px !important;
+    height: 430px !important;
     width: 55% !important;
   }
   
   .graph-card {
-    height: 350px;
+    height: 335px;
     width: 47%;
   }
 }
 
 @media (min-width: 1068px) {
   .big-size {
-    height: 500px !important;
+    height: 515px !important;
     width: 60% !important;
   }
   
   .graph-card {
-    height: 390px;
+    height: 380px;
     width: 47%;
   }
 }
 
 @media (min-width: 1268px) {
   .big-size {
-    height: 600px !important;
+    height: 570px !important;
     width: 60% !important;
   }
   
   .graph-card {
-    height: 440px;
+    height: 425px;
     width: 47%;
   }
 }
 
 @media (min-width: 1468px) {
   .big-size {
-    height: 700px !important;
+    height: 640px !important;
     width: 60% !important;
   }
   
   .graph-card {
-    height: 490px;
+    height: 340px;
+    width: 30.6%;
+  }
+}
+
+@media (min-width: 1635px) {
+
+  .graph-card {
+    height: 370px;
     width: 30.6%;
   }
 }
