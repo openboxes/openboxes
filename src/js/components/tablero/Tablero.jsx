@@ -130,7 +130,8 @@ class Tablero extends Component {
     this.state = {
       isDragging: false,
       showPopout: false,
-      showNav: false,
+      // Not showing if screen too small
+      showNav: window.innerWidth > 1115,
       configModified: false,
       allLocations: [],
       pageFilters: [],

@@ -188,53 +188,52 @@ class Filter extends Component {
               ))
               }
 
-          <div>
-            <div
-              className="category-item add-category-btn"
-              role="button"
-              tabIndex={0}
-              onClick={this.toggleAddingFilter}
-              onKeyPress={this.toggleAddingFilter}
-              hidden={this.state.addingFilter}
-            >
+          <div
+            className="category-item add-category-btn"
+            role="button"
+            tabIndex={0}
+            onClick={this.toggleAddingFilter}
+            onKeyPress={this.toggleAddingFilter}
+            hidden={this.state.addingFilter}
+          >
               + Add filter
-            </div>
-            <div
-              className="add-category-popup"
-              hidden={!this.state.addingFilter}
-            >
-              <div>
-                <span
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => this.toggleCategorySelected()}
-                  onKeyPress={() => this.toggleCategorySelected()}
-                  hidden={!this.state.filterCategorySelected}
-                > {'<'}
-                </span> {this.state.titlePopup}
-                <span
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => {
+          </div>
+          <div
+            className="add-category-popup"
+            hidden={!this.state.addingFilter}
+          >
+            <div>
+              <span
+                role="button"
+                tabIndex={0}
+                onClick={() => this.toggleCategorySelected()}
+                onKeyPress={() => this.toggleCategorySelected()}
+                hidden={!this.state.filterCategorySelected}
+              > {'<'}
+              </span> {this.state.titlePopup}
+              <span
+                role="button"
+                tabIndex={0}
+                onClick={() => {
                     this.toggleAddingFilter();
                     this.setState({ filterCategorySelected: false });
                     }}
-                  onKeyPress={() => {
+                onKeyPress={() => {
                     this.toggleAddingFilter();
                     this.setState({ filterCategorySelected: false });
                   }}
-                > X
-                </span>
-              </div>
-              <input
-                type="text"
-                placeholder="search..."
-                onChange={this.searchOnChange}
-                hidden={!this.state.filterCategorySelected}
-                value={this.state.searchTerm}
-              />
-              <ul className={`filter-menu ${this.state.filterCategorySelected ? 'scrollable' : ''}`}>
-                {
+              > X
+              </span>
+            </div>
+            <input
+              type="text"
+              placeholder="search..."
+              onChange={this.searchOnChange}
+              hidden={!this.state.filterCategorySelected}
+              value={this.state.searchTerm}
+            />
+            <ul className={`filter-menu ${this.state.filterCategorySelected ? 'scrollable' : ''}`}>
+              {
                   // If filter not selected
                   !this.state.filterCategorySelected ?
                    Object.entries(this.props.configs).map(([key, value]) => (
@@ -291,8 +290,7 @@ class Filter extends Component {
                         )) : null
                       ))
                     }
-              </ul>
-            </div>
+            </ul>
           </div>
         </div> : null
     );
