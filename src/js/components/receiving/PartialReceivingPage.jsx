@@ -175,12 +175,12 @@ const TABLE_FIELDS = {
       lotNumber: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.lotSerialNo.label',
-        defaultMessage: 'Lot',
+        defaultMessage: 'Lot/Serial No.',
       },
       expirationDate: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.expirationDate.label',
-        defaultMessage: 'Expiry',
+        defaultMessage: 'Expiration date',
       },
       binLocation: {
         type: params => (
@@ -359,7 +359,6 @@ class PartialReceivingPage extends Component {
     this.save = this.save.bind(this);
     this.saveAndExit = this.saveAndExit.bind(this);
     this.saveValues = this.saveValues.bind(this);
-    this.onSave = this.onSave.bind(this);
     this.saveEditLine = this.saveEditLine.bind(this);
     this.exportTemplate = this.exportTemplate.bind(this);
     this.importTemplate = this.importTemplate.bind(this);
@@ -380,10 +379,6 @@ class PartialReceivingPage extends Component {
 
       this.props.fetchUsers();
     }
-  }
-
-  onSave() {
-    this.save(this.state.values);
   }
 
   onSubmit(formValues) {
@@ -635,7 +630,7 @@ class PartialReceivingPage extends Component {
                     <button type="button" className="btn btn-outline-secondary float-right btn-form btn-xs" disabled={!isAnyItemSelected(values.containers) || values.shipmentStatus === 'RECEIVED'} onClick={() => this.saveAndExit(this.state.values)}>
                       <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
                     </button>
-                    <button type="button" className="btn btn-outline-secondary float-right btn-form btn-xs" disabled={!isAnyItemSelected(values.containers) || values.shipmentStatus === 'RECEIVED'} onClick={() => this.onSave(this.state.values)}>
+                    <button type="button" className="btn btn-outline-secondary float-right btn-form btn-xs" disabled={!isAnyItemSelected(values.containers) || values.shipmentStatus === 'RECEIVED'} onClick={() => this.save(this.state.values)}>
                       <Translate id="react.default.button.save.label" defaultMessage="Save" />
                     </button>
                     <button

@@ -89,12 +89,12 @@ const TABLE_FIELDS = {
       lotNumber: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.lotSerialNo.label',
-        defaultMessage: 'Lot',
+        defaultMessage: 'Lot/Serial No.',
       },
       expirationDate: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.expirationDate.label',
-        defaultMessage: 'Expiry',
+        defaultMessage: 'Expiration date',
       },
       'binLocation.name': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
