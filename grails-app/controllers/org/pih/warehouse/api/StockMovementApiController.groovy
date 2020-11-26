@@ -24,6 +24,7 @@ import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
 
@@ -84,6 +85,7 @@ class StockMovementApiController {
 
         stockMovement.stockMovementType = stockMovementType
         stockMovement.requestType = params.requestType
+        stockMovement.sourceType = params.sourceType as RequisitionSourceType
         StockMovement newStockMovement = stockMovementService.createStockMovement(stockMovement)
         response.status = 201
         render([data: newStockMovement] as JSON)
