@@ -48,6 +48,7 @@ import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemSortByCode
 import org.pih.warehouse.requisition.RequisitionItemStatus
 import org.pih.warehouse.requisition.RequisitionItemType
+import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Container
@@ -557,6 +558,26 @@ class StockMovementService {
         }
 
         switch(stepNumber) {
+            case "2":
+                if (requisition && requisition.sourceType == RequisitionSourceType.ELECTRONIC && requisition.requisitionTemplate) {
+                    stockMovementItems = stockMovementItems.collect {stockMovementItem ->
+                        def quantityOnHand = productAvailabilityService.getQuantityOnHand(stockMovementItem.product, requisition.destination)
+                        def quantityRequested = stockMovementItem.quantityAllowed == stockMovementItem.quantityRequested && quantityOnHand ?
+                                (stockMovementItem.quantityAllowed - quantityOnHand > 0 ? stockMovementItem.quantityAllowed - quantityOnHand : 0) : stockMovementItem.quantityRequested
+                        [
+                                id: stockMovementItem.id,
+                                product: stockMovementItem.product,
+                                productCode: stockMovementItem.productCode,
+                                quantityOnHand: quantityOnHand ?: 0,
+                                quantityAllowed: stockMovementItem.quantityAllowed,
+                                comments: stockMovementItem.comments,
+                                quantityRequested: quantityRequested,
+                                statusCode: stockMovementItem.statusCode,
+                                sortOrder: stockMovementItem.sortOrder,
+                        ]
+                    }
+                }
+                return stockMovementItems
             case "4":
                 return getPickPageItems(id, max, offset)
             case "5":
@@ -1449,6 +1470,7 @@ class StockMovementService {
                         requisitionItem.boxName = stockMovementItem.boxName
                         requisitionItem.lotNumber = stockMovementItem.lotNumber
                         requisitionItem.expirationDate = stockMovementItem.expirationDate
+                        requisitionItem.comment = stockMovementItem.comments
                     }
                 }
                 // Otherwise we create a new one
@@ -1468,6 +1490,7 @@ class StockMovementService {
                     requisitionItem.lotNumber = stockMovementItem.lotNumber
                     requisitionItem.expirationDate = stockMovementItem.expirationDate
                     requisitionItem.orderIndex = stockMovementItem.sortOrder
+                    requisitionItem.comment = stockMovementItem.comments
                     requisition.addToRequisitionItems(requisitionItem)
                 }
             }
