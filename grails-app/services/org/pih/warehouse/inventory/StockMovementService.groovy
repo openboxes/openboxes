@@ -70,6 +70,7 @@ class StockMovementService {
     def productAvailabilityService
     def locationService
     def dataService
+    def forecastingService
 
     boolean transactional = true
 
@@ -238,8 +239,6 @@ class StockMovementService {
 
 
     StockMovement updateRequisitionBasedStockMovement(StockMovement stockMovement) {
-        log.info "Update stock movement " + new JSONObject(stockMovement.toJson()).toString(4)
-
         Requisition requisition = Requisition.get(stockMovement.id)
         if (!requisition) {
             throw new ObjectNotFoundException(stockMovement.id, StockMovement.class.toString())
@@ -559,22 +558,38 @@ class StockMovementService {
 
         switch(stepNumber) {
             case "2":
-                if (requisition && requisition.sourceType == RequisitionSourceType.ELECTRONIC && requisition.requisitionTemplate) {
-                    stockMovementItems = stockMovementItems.collect {stockMovementItem ->
+                if (requisition && requisition.sourceType == RequisitionSourceType.ELECTRONIC) {
+                    stockMovementItems = stockMovementItems.collect { stockMovementItem ->
                         def quantityOnHand = productAvailabilityService.getQuantityOnHand(stockMovementItem.product, requisition.destination)
-                        def quantityRequested = stockMovementItem.quantityAllowed == stockMovementItem.quantityRequested && quantityOnHand ?
-                                (stockMovementItem.quantityAllowed - quantityOnHand > 0 ? stockMovementItem.quantityAllowed - quantityOnHand : 0) : stockMovementItem.quantityRequested
-                        [
-                                id: stockMovementItem.id,
-                                product: stockMovementItem.product,
-                                productCode: stockMovementItem.productCode,
-                                quantityOnHand: quantityOnHand ?: 0,
-                                quantityAllowed: stockMovementItem.quantityAllowed,
-                                comments: stockMovementItem.comments,
-                                quantityRequested: quantityRequested,
-                                statusCode: stockMovementItem.statusCode,
-                                sortOrder: stockMovementItem.sortOrder,
-                        ]
+                        if (requisition.requisitionTemplate) {
+                            def quantityRequested = stockMovementItem.quantityAllowed == stockMovementItem.quantityRequested && quantityOnHand ?
+                                    (stockMovementItem.quantityAllowed - quantityOnHand > 0 ? stockMovementItem.quantityAllowed - quantityOnHand : 0) : stockMovementItem.quantityRequested
+                            [
+                                    id               : stockMovementItem.id,
+                                    product          : stockMovementItem.product,
+                                    productCode      : stockMovementItem.productCode,
+                                    quantityOnHand   : quantityOnHand ?: 0,
+                                    quantityAllowed  : stockMovementItem.quantityAllowed,
+                                    comments         : stockMovementItem.comments,
+                                    quantityRequested: quantityRequested,
+                                    statusCode       : stockMovementItem.statusCode,
+                                    sortOrder        : stockMovementItem.sortOrder,
+                            ]
+                        } else {
+                            def demand = forecastingService.getDemand(requisition.destination, stockMovementItem.product)
+                            [
+                                    id               : stockMovementItem.id,
+                                    product          : stockMovementItem.product,
+                                    productCode      : stockMovementItem.productCode,
+                                    quantityOnHand   : quantityOnHand ?: 0,
+                                    quantityAllowed  : stockMovementItem.quantityAllowed,
+                                    comments         : stockMovementItem.comments,
+                                    quantityRequested: stockMovementItem.quantityRequested,
+                                    statusCode       : stockMovementItem.statusCode,
+                                    sortOrder        : stockMovementItem.sortOrder,
+                                    monthlyDemand    : demand.monthlyDemand,
+                            ]
+                        }
                     }
                 }
                 return stockMovementItems
@@ -1858,8 +1873,6 @@ class StockMovementService {
     }
 
     Shipment updateShipmentOnRequisitionChange(StockMovement stockMovement) {
-        log.info "update shipment " + (new JSONObject(stockMovement.toJson())).toString(4)
-
         Shipment shipment = Shipment.findByRequisition(stockMovement.requisition)
 
         if (!shipment) {
