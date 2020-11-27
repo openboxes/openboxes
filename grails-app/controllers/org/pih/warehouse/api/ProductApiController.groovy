@@ -22,6 +22,7 @@ class ProductApiController extends BaseDomainApiController {
     def inventoryService
     def forecastingService
     def grailsApplication
+    def productAvailabilityService
 
     def demand = {
         def product = Product.get(params.id)
@@ -199,5 +200,12 @@ class ProductApiController extends BaseDomainApiController {
         ]] as JSON)
     }
 
+    def productAvailabilityAndDemand = {
+        Product product = Product.get(params.id)
+        Location location = Location.get(params.locationId)
+        def quantityOnHand = productAvailabilityService.getQuantityOnHand(product, location)
+        def demand = forecastingService.getDemand(location, product)
+        render([monthlyDemand: demand.monthlyDemand, quantityOnHand: quantityOnHand] as JSON)
+    }
 
 }

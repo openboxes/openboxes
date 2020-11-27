@@ -25,6 +25,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
@@ -80,6 +81,13 @@ class StockMovementController {
         else if (stockMovementType == StockMovementType.INBOUND) {
             if (stockMovement.isFromOrder) {
                 redirect(action: "createCombinedShipments", params: params)
+            } else if (stockMovement.requisition.sourceType == RequisitionSourceType.ELECTRONIC) {
+                if (stockMovement.requisition?.status == RequisitionStatus.CREATED) {
+                    redirect(action: "createRequest", params: params)
+                } else {
+                    // TODO change to new workflow once its added
+                    redirect(action: "createOutbound", params: params)
+                }
             } else {
                 redirect(action: "createInbound", params: params)
             }
