@@ -21,22 +21,34 @@ const SHIPMENT_FIELDS = {
   'origin.name': {
     label: 'react.partialReceiving.origin.label',
     defaultMessage: 'Origin',
-    type: params => <TextField {...params} disabled />,
+    type: params => <TextField {...params} />,
+    attributes: {
+      disabled: true,
+    },
   },
   'destination.name': {
     label: 'react.partialReceiving.destination.label',
     defaultMessage: 'Destination',
-    type: params => <TextField {...params} disabled />,
+    type: params => <TextField {...params} />,
+    attributes: {
+      disabled: true,
+    },
   },
   dateShipped: {
     label: 'react.partialReceiving.shippedOn.label',
     defaultMessage: 'Shipped on',
-    type: params => <DateField {...params} disabled />,
+    type: params => <DateField {...params} />,
+    attributes: {
+      disabled: true,
+    },
   },
   dateDelivered: {
     label: 'react.partialReceiving.deliveredOn.label',
     defaultMessage: 'Delivered on',
-    type: params => <DateField {...params} disabled />,
+    type: params => <DateField {...params} />,
+    attributes: {
+      disabled: true,
+    },
   },
 };
 

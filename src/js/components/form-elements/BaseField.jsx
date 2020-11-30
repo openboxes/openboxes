@@ -47,14 +47,11 @@ class BaseField extends Component {
       }
     };
 
-    const { disabled } = this.props;
-
     const attributes = {
       ...attr,
       value: input.value,
       onChange,
       onBlur,
-      disabled,
     };
 
     return this.props.renderInput(attributes);
@@ -146,7 +143,6 @@ BaseField.propTypes = {
   fieldRef: PropTypes.func,
   focusThis: PropTypes.string,
   arrowsNavigation: PropTypes.bool,
-  disabled: PropTypes.bool,
 };
 
 BaseField.defaultProps = {
@@ -155,5 +151,4 @@ BaseField.defaultProps = {
   fieldRef: null,
   focusThis: null,
   arrowsNavigation: false,
-  disabled: false,
 };
