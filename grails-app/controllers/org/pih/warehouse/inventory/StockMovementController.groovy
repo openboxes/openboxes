@@ -63,6 +63,10 @@ class StockMovementController {
         render(template: "/common/react", params: params)
     }
 
+    def verifyRequest = {
+        render(template: "/common/react", params: params)
+    }
+
     def createCombinedShipments = {
         render(template: "/common/react", params: params)
     }
@@ -75,8 +79,8 @@ class StockMovementController {
                 StockMovementType.OUTBOUND : currentLocation == stockMovement.destination ?
                         StockMovementType.INBOUND : null
 
-        if (stockMovementType == StockMovementType.OUTBOUND) {
-            redirect(action: "createOutbound", params: params)
+        if (stockMovementType == StockMovementType.OUTBOUND && stockMovement.requisition.sourceType == RequisitionSourceType.ELECTRONIC) {
+            redirect(action: "verifyRequest", params: params)
         }
         else if (stockMovementType == StockMovementType.INBOUND) {
             if (stockMovement.isFromOrder) {
@@ -85,8 +89,7 @@ class StockMovementController {
                 if (stockMovement.requisition?.status == RequisitionStatus.CREATED) {
                     redirect(action: "createRequest", params: params)
                 } else {
-                    // TODO change to new workflow once its added
-                    redirect(action: "createOutbound", params: params)
+                    redirect(action: "verifyRequest", params: params)
                 }
             } else {
                 redirect(action: "createInbound", params: params)

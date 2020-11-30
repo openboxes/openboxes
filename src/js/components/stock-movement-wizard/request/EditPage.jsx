@@ -31,7 +31,7 @@ const BTN_CLASS_MAPPER = {
   HIDDEN: 'btn invisible',
 };
 
-const FIELDS = {
+const AD_HOCK_FIELDS = {
   editPageItems: {
     type: ArrayField,
     arrowsNavigation: true,
@@ -78,6 +78,24 @@ const FIELDS = {
           className: subfield ? 'text-center' : 'text-left ml-1',
         }),
       },
+      quantityOnHandRequesting: {
+        type: LabelField,
+        label: 'react.stockMovement.quantityOnHand.label',
+        defaultMessage: 'QOH Requesting',
+        flexWidth: '1.1',
+        attributes: {
+          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+        },
+      },
+      quantityDemand: {
+        type: LabelField,
+        label: 'react.stockMovement.quantityDemand.label',
+        defaultMessage: 'Demand',
+        flexWidth: '1.1',
+        attributes: {
+          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+        },
+      },
       quantityRequested: {
         type: LabelField,
         label: 'react.stockMovement.quantityRequested.label',
@@ -89,8 +107,204 @@ const FIELDS = {
       },
       quantityAvailable: {
         type: LabelField,
-        label: 'react.stockMovement.quantityAvailable.label',
-        defaultMessage: 'Qty available',
+        label: 'react.stockMovement.quantityOnHand.label',
+        defaultMessage: 'QOH Available',
+        flexWidth: '1',
+        fieldKey: '',
+        getDynamicAttr: ({ fieldValue }) => {
+          let className = '';
+          if (fieldValue && (!fieldValue.quantityAvailable ||
+              fieldValue.quantityAvailable < fieldValue.quantityRequested)) {
+            className = 'text-danger';
+          }
+          return {
+            className,
+          };
+        },
+        attributes: {
+          formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
+        },
+      },
+      quantityConsumed: {
+        type: LabelField,
+        label: 'react.stockMovement.monthlyQuantity.label',
+        defaultMessage: 'Monthly stocklist qty',
+        flexWidth: '1.5',
+        getDynamicAttr: ({ hasStockList, translate, subfield }) => ({
+          formatValue: (value) => {
+            if (value && value !== '0') {
+              return value.toLocaleString('en-US');
+            } else if (hasStockList && !subfield) {
+              return translate('react.stockMovement.replenishmentPeriodNotFound.label', 'Replenishment period not found');
+            } else if (subfield) {
+              return '';
+            }
+
+            return '0';
+          },
+          showValueTooltip: true,
+        }),
+      },
+      substituteButton: {
+        label: 'react.stockMovement.substitution.label',
+        defaultMessage: 'Substitution',
+        type: SubstitutionsModal,
+        fieldKey: '',
+        flexWidth: '1',
+        attributes: {
+          title: 'react.stockMovement.substitutes.label',
+          defaultTitleMessage: 'Substitutes',
+        },
+        getDynamicAttr: ({
+          fieldValue, rowIndex, stockMovementId, onResponse,
+          reviseRequisitionItems, values, reasonCodes, showOnly,
+        }) => ({
+          onOpen: () => reviseRequisitionItems(values),
+          productCode: fieldValue && fieldValue.productCode,
+          btnOpenText: `react.stockMovement.${fieldValue && fieldValue.substitutionStatus}.label`,
+          btnOpenDefaultText: `${fieldValue && fieldValue.substitutionStatus}`,
+          btnOpenDisabled: (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') || showOnly,
+          btnOpenClassName: BTN_CLASS_MAPPER[(fieldValue && fieldValue.substitutionStatus) || 'HIDDEN'],
+          rowIndex,
+          lineItem: fieldValue,
+          stockMovementId,
+          onResponse,
+          reasonCodes,
+        }),
+      },
+      quantityRevised: {
+        label: 'react.stockMovement.quantityRevised.label',
+        defaultMessage: 'Qty revised',
+        type: TextField,
+        fieldKey: 'statusCode',
+        flexWidth: '1',
+        attributes: {
+          type: 'number',
+        },
+        getDynamicAttr: ({
+          fieldValue, subfield, showOnly, updateRow, values, rowIndex,
+        }) => ({
+          disabled: (fieldValue && fieldValue === 'SUBSTITUTED') || subfield || showOnly,
+          onBlur: () => updateRow(values, rowIndex),
+        }),
+      },
+      reasonCode: {
+        type: SelectField,
+        label: 'react.stockMovement.reasonCode.label',
+        defaultMessage: 'Reason code',
+        flexWidth: '1.4',
+        fieldKey: 'quantityRevised',
+        getDynamicAttr: ({
+          fieldValue, subfield, reasonCodes, updateRow, values, rowIndex, showOnly,
+        }) => ({
+          disabled: !fieldValue || subfield || showOnly,
+          options: reasonCodes,
+          showValueTooltip: true,
+          onBlur: () => updateRow(values, rowIndex),
+        }),
+      },
+      revert: {
+        type: ButtonField,
+        label: 'react.default.button.undo.label',
+        defaultMessage: 'Undo',
+        flexWidth: '1',
+        fieldKey: '',
+        buttonLabel: 'react.default.button.undo.label',
+        buttonDefaultMessage: 'Undo',
+        getDynamicAttr: ({
+          fieldValue, revertItem, values, showOnly,
+        }) => ({
+          onClick: fieldValue && fieldValue.requisitionItemId ?
+            () => revertItem(values, fieldValue.requisitionItemId) : () => null,
+          hidden: fieldValue && fieldValue.statusCode ? !_.includes(['CHANGED', 'CANCELED'], fieldValue.statusCode) : false,
+          disabled: showOnly,
+        }),
+        attributes: {
+          className: 'btn btn-outline-danger',
+        },
+      },
+    },
+  },
+};
+
+const STOCKLIST_FILEDS = {
+  editPageItems: {
+    type: ArrayField,
+    arrowsNavigation: true,
+    virtualized: true,
+    totalCount: ({ totalCount }) => totalCount,
+    isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
+    isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
+    loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
+    rowComponent: TableRowWithSubfields,
+    getDynamicRowAttr: ({ rowValues, subfield }) => {
+      let className = rowValues.statusCode === 'SUBSTITUTED' ? 'crossed-out ' : '';
+      if (!subfield) { className += 'font-weight-bold'; }
+      return { className };
+    },
+    subfieldKey: 'substitutionItems',
+    fields: {
+      productCode: {
+        type: LabelField,
+        headerAlign: 'left',
+        flexWidth: '0.6',
+        getDynamicAttr: ({ subfield }) => ({
+          className: subfield ? 'text-center' : 'text-left ml-1',
+        }),
+        label: 'react.stockMovement.code.label',
+        defaultMessage: 'Code',
+      },
+      product: {
+        type: LabelField,
+        headerAlign: 'left',
+        flexWidth: '3.5',
+        label: 'react.stockMovement.productName.label',
+        defaultMessage: 'Product name',
+        attributes: {
+          formatValue: value => (
+            <span className="d-flex">
+              <span className="text-truncate">
+                {value.name || ''}
+              </span>
+              {renderHandlingIcons(value ? value.handlingIcons : null)}
+            </span>
+          ),
+        },
+        getDynamicAttr: ({ subfield }) => ({
+          className: subfield ? 'text-center' : 'text-left ml-1',
+        }),
+      },
+      quantityOnStocklist: {
+        type: LabelField,
+        label: 'react.stockMovement.quantityOnStocklist.label',
+        defaultMessage: 'Stocklist QTY',
+        flexWidth: '1.1',
+        attributes: {
+          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+        },
+      },
+      quantityOnHandRequesting: {
+        type: LabelField,
+        label: 'react.stockMovement.quantityOnHand.label',
+        defaultMessage: 'QOH Requesting',
+        flexWidth: '1.1',
+        attributes: {
+          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+        },
+      },
+      quantityRequested: {
+        type: LabelField,
+        label: 'react.stockMovement.quantityRequested.label',
+        defaultMessage: 'Qty requested',
+        flexWidth: '1.1',
+        attributes: {
+          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+        },
+      },
+      quantityAvailable: {
+        type: LabelField,
+        label: 'react.stockMovement.quantityOnHand.label',
+        defaultMessage: 'QOH Available',
         flexWidth: '1',
         fieldKey: '',
         getDynamicAttr: ({ fieldValue }) => {
@@ -177,9 +391,9 @@ const FIELDS = {
         flexWidth: '1.4',
         fieldKey: 'quantityRevised',
         getDynamicAttr: ({
-          fieldValue, subfield, reasonCodes, updateRow, values, rowIndex,
+          fieldValue, subfield, reasonCodes, updateRow, values, rowIndex, showOnly,
         }) => ({
-          disabled: !fieldValue || subfield,
+          disabled: !fieldValue || subfield || showOnly,
           options: reasonCodes,
           showValueTooltip: true,
           onBlur: () => updateRow(values, rowIndex),
@@ -247,8 +461,9 @@ function validate(values) {
 }
 
 /**
- * The third step of stock movement(for movements from a depot) where user can see the
+ * The third step of stock movement(for stock requests) where user can see the
  * stock available and adjust quantities or make substitutions based on that information.
+ * or validate the current status of a request
  */
 class EditItemsPage extends Component {
   constructor(props) {
@@ -329,6 +544,10 @@ class EditItemsPage extends Component {
     });
   }
 
+  getFields() {
+    return _.get(this.state.values.stocklist, 'id') ? STOCKLIST_FILEDS : AD_HOCK_FIELDS;
+  }
+
   dataFetched = false;
 
   /**
@@ -371,10 +590,6 @@ class EditItemsPage extends Component {
       });
   }
 
-  /**
-   * Saves changes made in subsitution modal and updates data.
-   * @public
-   */
   fetchEditPageItems() {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=3`;
     apiClient.get(url)
@@ -762,7 +977,7 @@ class EditItemsPage extends Component {
               <button
                 type="button"
                 onClick={() => {
-                  window.location = '/openboxes/stockMovement/list?direction=OUTBOUND';
+                  window.location = '/openboxes/stockMovement/list?direction=INBOUND';
                 }}
                 className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
               >
@@ -770,22 +985,23 @@ class EditItemsPage extends Component {
               </button> }
             <form onSubmit={handleSubmit}>
               <div className="table-form">
-                {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-                  stockMovementId: values.stockMovementId,
-                  hasStockList: !!_.get(values.stocklist, 'id'),
-                  translate: this.props.translate,
-                  reasonCodes: this.props.reasonCodes,
-                  onResponse: this.fetchEditPageItems,
-                  revertItem: this.revertItem,
-                  reviseRequisitionItems: this.reviseRequisitionItems,
-                  totalCount: this.state.totalCount,
-                  loadMoreRows: this.loadMoreRows,
-                  isRowLoaded: this.isRowLoaded,
-                  isPaginated: this.props.isPaginated,
-                  updateRow: this.updateRow,
-                  isFirstPageLoaded: this.state.isFirstPageLoaded,
-                  values,
-                  showOnly,
+                {_.map(this.getFields(), (fieldConfig, fieldName) =>
+                  renderFormField(fieldConfig, fieldName, {
+                    stockMovementId: values.stockMovementId,
+                    hasStockList: !!_.get(values.stocklist, 'id'),
+                    translate: this.props.translate,
+                    reasonCodes: this.props.reasonCodes,
+                    onResponse: this.fetchEditPageItems,
+                    revertItem: this.revertItem,
+                    reviseRequisitionItems: this.reviseRequisitionItems,
+                    totalCount: this.state.totalCount,
+                    loadMoreRows: this.loadMoreRows,
+                    isRowLoaded: this.isRowLoaded,
+                    isPaginated: this.props.isPaginated,
+                    updateRow: this.updateRow,
+                    isFirstPageLoaded: this.state.isFirstPageLoaded,
+                    values,
+                    showOnly,
                 }))}
               </div>
               <div className="submit-buttons">

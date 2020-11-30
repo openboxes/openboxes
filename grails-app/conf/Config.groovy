@@ -682,6 +682,14 @@ breadcrumbsConfig {
             actionUrl = "/${appName}/stockMovement/createRequest/"
             listUrl = "/${appName}/stockMovement/list?direction=INBOUND"
         }
+        verifyRequest {
+            actionLabel = "react.stockMovement.request.verify.label"
+            defaultActionLabel = "Verify Request"
+            listLabel = "react.stockMovement.label"
+            defaultListLabel = "Stock Movement"
+            actionUrl = "/${appName}/stockMovement/list"
+            listUrl = "/${appName}/stockMovement/list"
+        }
         putAway {
             actionLabel = "react.putAway.createPutAway.label"
             defaultActionLabel = "Create Putaway"
