@@ -4,8 +4,6 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import { getTranslate } from 'react-localize-redux';
 
-import CreateStockMovement from './outbound/CreateStockMovement';
-import AddItemsPage from './outbound/AddItemsPage';
 import EditPage from './request/EditPage';
 import PickPage from './outbound/PickPage';
 import PackingPage from './outbound/PackingPage';
@@ -80,16 +78,12 @@ class StockMovementsVerifyRequest extends Component {
   getStepList() {
     let stepList = [];
     if (this.props.hasPackingSupport) {
-      stepList = [this.props.translate('react.stockMovement.create.label', 'Create'),
-        this.props.translate('react.stockMovement.addItems.label', 'Add items'),
-        this.props.translate('react.stockMovement.edit.label', 'Edit'),
+      stepList = [this.props.translate('react.stockMovement.edit.label', 'Edit'),
         this.props.translate('react.stockMovement.pick.label', 'Pick'),
         this.props.translate('react.stockMovement.pack.label', 'Pack'),
         this.props.translate('react.stockMovement.send.label', 'Send')];
     } else {
-      stepList = [this.props.translate('react.stockMovement.create.label', 'Create'),
-        this.props.translate('react.stockMovement.addItems.label', 'Add items'),
-        this.props.translate('react.stockMovement.edit.label', 'Edit'),
+      stepList = [this.props.translate('react.stockMovement.edit.label', 'Edit'),
         this.props.translate('react.stockMovement.pick.label', 'Pick'),
         this.props.translate('react.stockMovement.send.label', 'Send')];
     }
@@ -104,8 +98,6 @@ class StockMovementsVerifyRequest extends Component {
     let formList = [];
     if (this.props.hasPackingSupport) {
       formList = [
-        CreateStockMovement,
-        AddItemsPage,
         EditPage,
         PickPage,
         PackingPage,
@@ -113,8 +105,6 @@ class StockMovementsVerifyRequest extends Component {
       ];
     } else {
       formList = [
-        CreateStockMovement,
-        AddItemsPage,
         EditPage,
         PickPage,
         SendMovementPage,
@@ -153,8 +143,8 @@ class StockMovementsVerifyRequest extends Component {
     const { currentPage, values } = this.state;
     const shipped = values.shipped ? 'SHIPPED' : '';
     const received = values.received ? 'RECEIVED' : '';
-    if ((this.props.hasPackingSupport && currentPage === 6) ||
-      (!this.props.hasPackingSupport && currentPage === 5)) {
+    if ((this.props.hasPackingSupport && currentPage === 4) ||
+      (!this.props.hasPackingSupport && currentPage === 3)) {
       return (
         <span className="shipment-status float-right">
           {`${shipped || received || 'PENDING'}`}
@@ -222,26 +212,19 @@ class StockMovementsVerifyRequest extends Component {
 
           let currentPage = 1;
           switch (values.statusCode) {
-            case 'NEW':
-              break;
-            case 'CREATED':
-            case 'REQUESTING':
-              currentPage = 2;
-              break;
             case 'REQUESTED':
             case 'VALIDATING':
-              currentPage = 3;
               break;
             case 'VALIDATED':
             case 'PICKING':
-              currentPage = 4;
+              currentPage = 2;
               break;
             case 'PICKED':
             case 'PACKING':
-              currentPage = 5;
+              currentPage = 3;
               break;
             default:
-              currentPage = this.props.hasPackingSupport ? 6 : 5;
+              currentPage = this.props.hasPackingSupport ? 4 : 3;
               break;
           }
 
@@ -260,19 +243,22 @@ class StockMovementsVerifyRequest extends Component {
     const stepList = this.getStepList();
     const showOnly = values.origin && values.origin.id !== currentLocation.id;
 
-    return (
-      <Wizard
-        pageList={pageList}
-        stepList={stepList}
-        initialValues={values}
-        title={title}
-        additionalTitle={additionalTitle}
-        currentPage={currentPage}
-        prevPage={currentPage === 1 ? 1 : currentPage - 1}
-        updateWizardValues={this.updateWizardValues}
-        additionalProps={{ showOnly }}
-      />
-    );
+    if (values.stockMovementId) {
+      return (
+        <Wizard
+          pageList={pageList}
+          stepList={stepList}
+          initialValues={values}
+          title={title}
+          additionalTitle={additionalTitle}
+          currentPage={currentPage}
+          prevPage={currentPage === 1 ? 1 : currentPage - 1}
+          updateWizardValues={this.updateWizardValues}
+          additionalProps={{ showOnly }}
+        />
+      );
+    }
+    return null;
   }
 }
 

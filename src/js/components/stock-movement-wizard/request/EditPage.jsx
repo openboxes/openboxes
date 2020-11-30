@@ -900,33 +900,6 @@ class EditItemsPage extends Component {
       });
   }
 
-  /**
-   * Saves changes made by user in this step and go back to previous page
-   * @param {object} values
-   * @param {boolean} invalid
-   * @public
-   */
-  previousPage(values, invalid) {
-    if (!invalid) {
-      this.reviseRequisitionItems(values)
-        .then(() => this.props.previousPage(values));
-    } else {
-      confirmAlert({
-        title: this.props.translate('react.stockMovement.confirmPreviousPage.label', 'Validation error'),
-        message: this.props.translate('react.stockMovement.confirmPreviousPage.message.label', 'Cannot save due to validation error on page'),
-        buttons: [
-          {
-            label: this.props.translate('react.stockMovement.confirmPreviousPage.correctError.label', 'Correct error'),
-          },
-          {
-            label: this.props.translate('react.stockMovement.confirmPreviousPage.continue.label', 'Continue (lose unsaved work)'),
-            onClick: () => this.props.previousPage(values),
-          },
-        ],
-      });
-    }
-  }
-
   render() {
     const { showOnly } = this.props;
     return (
@@ -1007,14 +980,6 @@ class EditItemsPage extends Component {
               <div className="submit-buttons">
                 <button
                   type="submit"
-                  onClick={() => this.previousPage(values, invalid)}
-                  disabled={showOnly}
-                  className="btn btn-outline-primary btn-form btn-xs"
-                >
-                  <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
-                </button>
-                <button
-                  type="submit"
                   disabled={!this.state.hasItemsLoaded || showOnly}
                   onClick={() => {
                     if (!invalid) {
@@ -1050,8 +1015,6 @@ export default connect(mapStateToProps, {
 EditItemsPage.propTypes = {
   /** Initial component's data */
   initialValues: PropTypes.shape({}).isRequired,
-  /** Function returning user to the previous page */
-  previousPage: PropTypes.func.isRequired,
   /**
    * Function called with the form data when the handleSubmit()
    * is fired from within the form component.
