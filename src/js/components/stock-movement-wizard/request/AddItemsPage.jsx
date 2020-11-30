@@ -370,7 +370,7 @@ class AddItemsPage extends Component {
       ) {
         lineItemsToBeUpdated.push(item);
       } else if (newQty !== oldQty || !item.quantityRequested ||
-        oldItem.comments !== item.comments) {
+        (oldItem.comments !== item.comments && !_.isNil(item.comments))) {
         lineItemsToBeUpdated.push(item);
       }
     });
@@ -380,14 +380,14 @@ class AddItemsPage extends Component {
         'product.id': item.product.id,
         quantityRequested: item.quantityRequested,
         sortOrder: item.sortOrder,
-        comments: item.comments,
+        comments: !_.isNil(item.comments) ? item.comments : '',
       })),
       _.map(lineItemsToBeUpdated, item => ({
         id: item.id,
         'product.id': item.product.id,
         quantityRequested: item.quantityRequested,
         sortOrder: item.sortOrder,
-        comments: item.comments,
+        comments: !_.isNil(item.comments) ? item.comments : '',
       })),
     );
   }
@@ -812,8 +812,12 @@ class AddItemsPage extends Component {
               },
               quantityOnHand: _.find(
                 this.state.values.lineItems,
-                lineItem => lineItem.id === val.id,
+                lineItem => lineItem.sortOrder === val.sortOrder,
               ).quantityOnHand,
+              monthlyDemand: _.find(
+                this.state.values.lineItems,
+                lineItem => lineItem.sortOrder === val.sortOrder,
+              ).monthlyDemand,
             }),
           );
 
@@ -821,9 +825,6 @@ class AddItemsPage extends Component {
             values:
               { ...this.state.values, lineItems: lineItemsBackendData },
             totalCount: lineItems.length,
-          });
-
-          this.setState({
             currentLineItems: lineItemsBackendData,
           });
         })

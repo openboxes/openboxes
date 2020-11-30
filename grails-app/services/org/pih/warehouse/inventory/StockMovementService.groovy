@@ -562,8 +562,6 @@ class StockMovementService {
                     stockMovementItems = stockMovementItems.collect { stockMovementItem ->
                         def quantityOnHand = productAvailabilityService.getQuantityOnHand(stockMovementItem.product, requisition.destination)
                         if (requisition.requisitionTemplate) {
-                            def quantityRequested = stockMovementItem.quantityAllowed == stockMovementItem.quantityRequested && quantityOnHand ?
-                                    (stockMovementItem.quantityAllowed - quantityOnHand > 0 ? stockMovementItem.quantityAllowed - quantityOnHand : 0) : stockMovementItem.quantityRequested
                             [
                                     id               : stockMovementItem.id,
                                     product          : stockMovementItem.product,
@@ -571,7 +569,7 @@ class StockMovementService {
                                     quantityOnHand   : quantityOnHand ?: 0,
                                     quantityAllowed  : stockMovementItem.quantityAllowed,
                                     comments         : stockMovementItem.comments,
-                                    quantityRequested: quantityRequested,
+                                    quantityRequested: stockMovementItem.quantityRequested,
                                     statusCode       : stockMovementItem.statusCode,
                                     sortOrder        : stockMovementItem.sortOrder,
                             ]
@@ -1348,8 +1346,15 @@ class StockMovementService {
             stockMovement.stocklist."${sortByCode.methodName}".each { stocklistItem ->
                 RequisitionItem requisitionItem = new RequisitionItem()
                 requisitionItem.product = stocklistItem.product
-                requisitionItem.quantity = stocklistItem.quantity
-                requisitionItem.quantityApproved = stocklistItem.quantity
+                if (requisition.sourceType == RequisitionSourceType.ELECTRONIC) {
+                    def quantityOnHand = productAvailabilityService.getQuantityOnHand(stocklistItem.product, requisition.destination)
+                    def quantityRequested = quantityOnHand ? (stocklistItem.quantity - quantityOnHand > 0 ? stocklistItem.quantity - quantityOnHand : 0) : stocklistItem.quantity
+                    requisitionItem.quantity = quantityRequested
+                    requisitionItem.quantityApproved = quantityRequested
+                } else {
+                    requisitionItem.quantity = stocklistItem.quantity
+                    requisitionItem.quantityApproved = stocklistItem.quantity
+                }
                 requisitionItem.orderIndex = orderIndex
                 requisition.addToRequisitionItems(requisitionItem)
 
@@ -1647,6 +1652,7 @@ class StockMovementService {
 
         requisition.removeFromRequisitionItems(requisitionItem)
         requisitionItem.delete()
+        requisition.save(flush: true)
     }
 
     void removeShipmentItem(ShipmentItem shipmentItem) {
