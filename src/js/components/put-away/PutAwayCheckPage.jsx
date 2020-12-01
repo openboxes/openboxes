@@ -51,16 +51,23 @@ class PutAwayCheckPage extends Component {
   constructor(props) {
     super(props);
     const columns = this.getColumns();
+
+    const {
+      initialValues:
+      {
+        putAway, pivotBy, expanded,
+      },
+    } = this.props;
     this.state = {
       putAway: {
-        ...this.props.initialValues.putAway,
+        ...putAway,
         putawayItems: PutAwayCheckPage
-          .processSplitLines(this.props.initialValues.putAway.putawayItems),
+          .processSplitLines(putAway.putawayItems),
       },
-      completed: this.props.initialValues.putAway.putawayStatus === 'COMPLETED',
+      completed: putAway.putawayStatus === 'COMPLETED',
       columns,
-      pivotBy: this.props.initialValues.pivotBy,
-      expanded: this.props.initialValues.expanded,
+      pivotBy,
+      expanded,
       location: this.props.location,
     };
 
@@ -215,11 +222,6 @@ class PutAwayCheckPage extends Component {
     }
   }
 
-  firstPage() {
-    this.props.history.push('/openboxes/putAway/create');
-    window.location = '/openboxes/putAway/create';
-  }
-
   save() {
     this.props.showSpinner();
     const url = `/openboxes/api/putaways?location.id=${this.state.location.id}`;
@@ -242,7 +244,7 @@ class PutAwayCheckPage extends Component {
 
         Alert.success(this.props.translate('react.putAway.alert.putAwayCompleted.label', 'Putaway was successfully completed!'), { timeout: 3000 });
 
-        this.firstPage();
+        this.props.goToPage(1, this.props.initialValues);
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -330,7 +332,7 @@ class PutAwayCheckPage extends Component {
               <button
                 type="button"
                 className="btn btn-outline-secondary btn-xs mr-3"
-                onClick={() => this.firstPage()}
+                onClick={() => this.props.goToPage(1, this.props.initialValues)}
               ><Translate id="react.putAway.goBack.label" defaultMessage="Go back to putaway list" />
               </button> :
               <div>
@@ -376,7 +378,7 @@ class PutAwayCheckPage extends Component {
               <button
                 type="button"
                 className="btn btn-outline-primary btn-form btn-xs"
-                onClick={() => this.firstPage()}
+                onClick={() => this.props.goToPage(1, this.props.initialValues)}
               ><Translate id="react.putAway.goBack.label" defaultMessage="Go back to putaway list" />
               </button> :
               <div className="submit-buttons">
@@ -429,6 +431,7 @@ PutAwayCheckPage.propTypes = {
   }).isRequired,
   translate: PropTypes.func.isRequired,
   previousPage: PropTypes.func.isRequired,
+  goToPage: PropTypes.func.isRequired,
 };
 
 PutAwayCheckPage.defaultProps = {};

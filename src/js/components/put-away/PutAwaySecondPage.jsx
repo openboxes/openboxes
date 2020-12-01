@@ -34,14 +34,21 @@ class PutAwaySecondPage extends Component {
     this.editItem = this.editItem.bind(this);
     const columns = this.getColumns();
 
+    const {
+      initialValues:
+      {
+        putAway, pivotBy, expanded,
+      },
+    } = this.props;
+
     this.state = {
-      putAway: this.props.initialValues.putAway,
+      putAway,
       columns,
-      pivotBy: this.props.initialValues.pivotBy,
-      expanded: this.props.initialValues.expanded,
+      pivotBy,
+      expanded,
       bins: [],
       location: this.props.location,
-      sortBy: this.props.initialValues.putAway.sortBy,
+      sortBy: putAway.sortBy,
     };
   }
 
