@@ -1338,6 +1338,7 @@ class InventoryService implements ApplicationContextAware {
             transaction.inventory = cmd.inventory
             transaction.comment = cmd.comment
             transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
+            transaction.transactionNumber = generateTransactionNumber()
 
             // Process each row added to the record inventory page
             cmd.recordInventoryRows.each { row ->
@@ -1729,6 +1730,7 @@ class InventoryService implements ApplicationContextAware {
                     TransactionType.get(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID)
             transaction.inventory = inventory
             transaction.comment = command.comment
+            transaction.transactionNumber = generateTransactionNumber()
 
             // Add transaction entry to transaction
             def transactionEntry = new TransactionEntry()
@@ -2043,6 +2045,7 @@ class InventoryService implements ApplicationContextAware {
         mirroredTransaction.order = baseTransaction.order
         mirroredTransaction.requisition = baseTransaction.requisition
         mirroredTransaction.transactionDate = baseTransaction.transactionDate
+        mirroredTransaction.transactionNumber = baseTransaction.transactionNumber
 
         // create the transaction entries based on the base transaction
         baseTransaction.transactionEntries.each {
