@@ -21,6 +21,10 @@ import TextField from '../form-elements/TextField';
 import EditLineModal from './modals/EditLineModal';
 
 const isReceived = (subfield, fieldValue) => {
+  if (!fieldValue) {
+    return false;
+  }
+
   if (fieldValue && subfield) {
     return (_.toInteger(fieldValue.quantityReceived) + _.toInteger(fieldValue.quantityCanceled)) >=
       _.toInteger(fieldValue.quantityShipped);
@@ -31,7 +35,8 @@ const isReceived = (subfield, fieldValue) => {
   }
 
   return _.every(fieldValue && fieldValue.shipmentItems, item =>
-    _.toInteger(item.quantityReceived) >= _.toInteger(item.quantityShipped));
+    _.toInteger(item.quantityReceived) + _.toInteger(item.quantityCanceled) >=
+      _.toInteger(item.quantityShipped));
 };
 
 const isReceiving = (subfield, fieldValue) => {
@@ -127,6 +132,7 @@ const TABLE_FIELDS = {
       autofillLine: {
         fieldKey: '',
         label: '',
+        flexWidth: '0.1',
         type: ({
           // eslint-disable-next-line react/prop-types
           subfield, parentIndex, rowIndex, autofillLines, fieldValue, shipmentReceived,
@@ -150,8 +156,10 @@ const TABLE_FIELDS = {
         type: params => (!params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.packLevel1.label',
         defaultMessage: 'Pack level 1',
+        flexWidth: '0.8',
         attributes: {
           formatValue: fieldValue => (_.get(fieldValue, 'parentContainer.name') || _.get(fieldValue, 'container.name') || 'Unpacked'),
+          showValueTooltip: true,
         },
       },
       'container.name': {
@@ -159,6 +167,7 @@ const TABLE_FIELDS = {
         type: params => (!params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.packLevel2.label',
         defaultMessage: 'Pack level 2',
+        flexWidth: '0.8',
         attributes: {
           formatValue: fieldValue => (_.get(fieldValue, 'parentContainer.name') ? _.get(fieldValue, 'container.name') || '' : ''),
         },
@@ -167,32 +176,34 @@ const TABLE_FIELDS = {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.code.label',
         defaultMessage: 'Code',
+        headerAlign: 'left',
+        flexWidth: '0.8',
+        attributes: {
+          className: 'text-left ml-1',
+        },
       },
       'product.name': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.product.label',
         defaultMessage: 'Product',
         headerAlign: 'left',
+        flexWidth: '3.3',
         attributes: {
-          className: 'text-left',
-          formatValue: value => (
-            <span className="d-flex">
-              <span className="text-truncate">
-                {value}
-              </span>
-            </span>
-          ),
+          className: 'text-left ml-1',
+          showValueTooltip: true,
         },
       },
       lotNumber: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.lotSerialNo.label',
         defaultMessage: 'Lot/Serial No.',
+        flexWidth: '1',
       },
       expirationDate: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.expirationDate.label',
         defaultMessage: 'Expiration date',
+        flexWidth: '1.5',
       },
       binLocation: {
         type: params => (
@@ -207,6 +218,7 @@ const TABLE_FIELDS = {
               className="select-xs"
             />),
         fieldKey: '',
+        flexWidth: '1.7',
         label: 'react.partialReceiving.binLocation.label',
         defaultMessage: 'Bin Location',
         getDynamicAttr: ({
@@ -223,6 +235,7 @@ const TABLE_FIELDS = {
       'recipient.id': {
         type: params => (params.subfield ? <SelectField {...params} /> : null),
         fieldKey: '',
+        flexWidth: '1.5',
         label: 'react.partialReceiving.recipient.label',
         defaultMessage: 'Recipient',
         getDynamicAttr: ({ users, shipmentReceived, fieldValue }) => ({
@@ -234,6 +247,7 @@ const TABLE_FIELDS = {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.shipped.label',
         defaultMessage: 'Shipped',
+        flexWidth: '0.8',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
         },
@@ -242,6 +256,7 @@ const TABLE_FIELDS = {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.received.label',
         defaultMessage: 'Received',
+        flexWidth: '0.8',
         attributes: {
           formatValue: value => (value ? value.toLocaleString('en-US') : '0'),
         },
@@ -251,6 +266,7 @@ const TABLE_FIELDS = {
         label: 'react.partialReceiving.toReceive.label',
         defaultMessage: 'To receive',
         fieldKey: '',
+        flexWidth: '0.8',
         getDynamicAttr: ({ fieldValue, shipmentReceived }) => ({
           className: _.toInteger(fieldValue &&
             fieldValue.quantityRemaining) < 0 && !shipmentReceived
@@ -274,6 +290,7 @@ const TABLE_FIELDS = {
         fieldKey: '',
         label: 'react.partialReceiving.receivingNow.label',
         defaultMessage: 'Receiving now',
+        flexWidth: '1',
         attributes: {
           autoComplete: 'off',
         },
@@ -284,6 +301,7 @@ const TABLE_FIELDS = {
       edit: {
         type: params => (params.subfield ? <EditLineModal {...params} /> : null),
         fieldKey: '',
+        flexWidth: '1',
         label: '',
         attributes: {
           btnOpenText: 'react.default.button.edit.label',
@@ -305,11 +323,15 @@ const TABLE_FIELDS = {
       comment: {
         type: params => (params.subfield ? <TextField {...params} /> : null),
         fieldKey: '',
+        flexWidth: '1.3',
         label: 'react.partialReceiving.comment.label',
         defaultMessage: 'Comment',
         attributes: {
           autoComplete: 'off',
         },
+        getDynamicAttr: ({ shipmentReceived, fieldValue }) => ({
+          disabled: shipmentReceived || isReceived(true, fieldValue),
+        }),
       },
     },
   },
@@ -364,7 +386,7 @@ class PartialReceivingPage extends Component {
     super(props);
 
     this.state = {
-      values: { ...this.props.initialValues },
+      values: {},
     };
     this.autofillLines = this.autofillLines.bind(this);
     this.setLocation = this.setLocation.bind(this);
@@ -377,6 +399,7 @@ class PartialReceivingPage extends Component {
   }
 
   componentDidMount() {
+    this.fetchPartialReceiptCandidates();
     if (this.props.partialReceivingTranslationsFetched && !this.props.usersFetched) {
       this.dataFetched = true;
       this.props.fetchUsers();
@@ -439,6 +462,23 @@ class PartialReceivingPage extends Component {
 
       window.setFormValue('containers', containers);
     }
+  }
+
+  /**
+   * Fetches available receipts from API.
+   * @public
+   */
+  fetchPartialReceiptCandidates() {
+    this.props.showSpinner();
+    const url = `/openboxes/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=1`;
+
+    return apiClient.get(url)
+      .then((response) => {
+        this.setState({ values: {} }, () => {
+          this.setState({ values: parseResponse(response.data.data) });
+        });
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   saveValues(formValues) {
@@ -598,18 +638,31 @@ class PartialReceivingPage extends Component {
       });
   }
 
-  transitionToNextStep() {
+  transitionToNextStep(formValues) {
     const url = `/openboxes/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=1`;
     const payload = {
       receiptStatus: 'CHECKING',
+      ...formValues,
+      containers: _.map(formValues.containers, container => ({
+        ...container,
+        shipmentItems: _.map(container.shipmentItems, (item) => {
+          if (!_.get(item, 'recipient.id')) {
+            return {
+              ...item, recipient: '',
+            };
+          }
+
+          return item;
+        }),
+      })),
     };
 
-    return apiClient.post(url, payload);
+    return apiClient.post(url, flattenRequest(payload));
   }
 
   nextPage(formValues) {
     this.props.showSpinner();
-    this.transitionToNextStep()
+    this.transitionToNextStep(formValues)
       .then(() => this.props.nextPage(formValues))
       .then(() => this.props.hideSpinner())
       .catch(() => this.props.hideSpinner());
@@ -621,6 +674,7 @@ class PartialReceivingPage extends Component {
         <Form
           onSubmit={values => this.onSubmit(values)}
           validate={validate}
+          autofillLines={this.autofillLines}
           mutators={{
             ...arrayMutators,
             setValue: ([field, value], state, { changeValue }) => {
@@ -687,6 +741,9 @@ class PartialReceivingPage extends Component {
                 <div className="my-2 table-form">
                   {_.map(TABLE_FIELDS, (fieldConfig, fieldName) =>
                   renderFormField(fieldConfig, fieldName, {
+                    autofillLines: this.autofillLines,
+                    saveEditLine: this.saveEditLine,
+                    setLocation: this.setLocation,
                     bins: this.props.bins,
                     users: this.props.users,
                     hasBinLocationSupport: this.props.hasBinLocationSupport,
