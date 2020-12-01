@@ -3,13 +3,17 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
+import { getTranslate } from 'react-localize-redux';
 
 import PutAwayPage from './PutAwayPage';
 import PutAwaySecondPage from './PutAwaySecondPage';
 import PutAwayCheckPage from './PutAwayCheckPage';
-import apiClient, { parseResponse, flattenRequest } from '../../utils/apiClient';
+import Wizard from '../wizard/Wizard';
+import apiClient, { parseResponse } from '../../utils/apiClient';
 import { showSpinner, hideSpinner, fetchTranslations } from '../../actions';
+import { translateWithDefaultMessage } from '../../utils/Translate';
 
+import './PutAway.scss';
 /** Main put-away form's component. */
 class PutAwayMainPage extends Component {
   constructor(props) {
@@ -17,14 +21,10 @@ class PutAwayMainPage extends Component {
 
     this.state = {
       page: props.match.params.putAwayId ? 1 : 0,
-      props: { putAway: {} },
+      putAway: {},
     };
 
-    this.nextPage = this.nextPage.bind(this);
-    this.prevPage = this.prevPage.bind(this);
-    this.firstPage = this.firstPage.bind(this);
-    this.changePutAway = this.changePutAway.bind(this);
-    this.savePutAways = this.savePutAways.bind(this);
+    this.updateWizardValues = this.updateWizardValues.bind(this);
   }
 
   componentDidMount() {
@@ -50,32 +50,28 @@ class PutAwayMainPage extends Component {
   }
 
   /**
-   * Returns array of form's components.
    * @public
    */
-  getFormList(location) {
-    return [
-      <PutAwayPage
-        nextPage={this.nextPage}
-        locationId={location.id}
-      />,
-      <PutAwaySecondPage
-        {...this.state.props}
-        nextPage={this.nextPage}
-        location={location}
-        changePutAway={this.changePutAway}
-        savePutAways={this.savePutAways}
-      />,
-      <PutAwayCheckPage
-        {...this.state.props}
-        prevPage={this.prevPage}
-        firstPage={this.firstPage}
-        location={location}
-      />,
+  getStepList() {
+    const stepList = [this.props.translate('react.putAway.createPutAway.label', 'Create Putaway'),
+      this.props.translate('react.putAway.startPutAway.label', 'Start Putaway'),
+      this.props.translate('react.putAway.completePutAway.label', 'Complete Putaway'),
     ];
+    return stepList;
+  }
+
+  getWizardTitle() {
+    const { putAway } = this.state;
+    const newName = putAway.putAway ? `Putaway - ${putAway.putAway.putawayNumber}` : '';
+    return newName;
+  }
+
+  updateWizardValues(page, putAway) {
+    this.setState({ page, putAway });
   }
 
   dataFetched = false;
+
 
   fetchPutAway() {
     if (this.props.match.params.putAwayId) {
@@ -89,77 +85,36 @@ class PutAwayMainPage extends Component {
 
           this.props.hideSpinner();
 
-          this.setState({ props: { putAway }, page: putAway.putawayStatus === 'COMPLETED' ? 2 : 1 });
+          this.setState({ putAway, page: putAway.putawayStatus === 'COMPLETED' ? 2 : 1 });
         })
         .catch(() => this.props.hideSpinner());
     }
   }
 
-  changePutAway(putAway) {
-    this.setState({ props: { putAway } });
-  }
-
-  /**
-   * Sends all changes made by user in this step of put-away to API and updates data.
-   * @public
-   */
-  savePutAways(putAwayToSave, callback) {
-    this.props.showSpinner();
-    const url = `/openboxes/api/putaways?location.id=${this.props.location.id}`;
-
-    return apiClient.post(url, flattenRequest(putAwayToSave))
-      .then((response) => {
-        const putAway = parseResponse(response.data.data);
-
-        this.setState({ props: { putAway } }, () => {
-          this.props.hideSpinner();
-
-          if (callback) {
-            callback(putAway);
-          }
-        });
-      })
-      .catch(() => this.props.hideSpinner());
-  }
-
-  /**
-   * Takes user to the next page of put-away.
-   * @param {object} props
-   * @public
-   */
-  nextPage(props) {
-    this.setState({ page: this.state.page + 1, props });
-  }
-
-  /**
-   * Returns user to the previous page of put-away.
-   * @param {object} props
-   * @public
-   */
-  prevPage(props) {
-    this.setState({ page: this.state.page - 1, props });
-  }
-
-  /**
-   * Takes user to the first page of put-away.
-   * @public
-   */
-  firstPage() {
-    this.props.history.push('/openboxes/putAway/create');
-    this.setState({ page: 0, props: null });
-  }
-
   render() {
-    const { page } = this.state;
-    const { location } = this.props;
+    const { page, putAway } = this.state;
+    const { location, history, match } = this.props;
+    const locationId = location.id;
+    const title = this.getWizardTitle();
+    const additionalTitle = null;
+    const pageList = [PutAwayPage, PutAwaySecondPage, PutAwayCheckPage];
+    const stepList = this.getStepList();
 
     if (_.get(location, 'id')) {
-      const formList = this.getFormList(location);
-
       return (
-        <div>
-          {formList[page]}
-        </div>
+        <Wizard
+          pageList={pageList}
+          stepList={stepList}
+          initialValues={putAway}
+          title={title}
+          additionalTitle={additionalTitle}
+          currentPage={page}
+          prevPage={page === 1 ? 1 : page - 1}
+          updateWizardValues={this.updateWizardValues}
+          additionalProps={{
+            locationId, location, history, match,
+          }}
+        />
       );
     }
 
@@ -171,6 +126,7 @@ const mapStateToProps = state => ({
   location: state.session.currentLocation,
   locale: state.session.activeLanguage,
   putAwayTranslationsFetched: state.session.fetchedTranslations.putAway,
+  translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
 export default withRouter(connect(mapStateToProps, {
@@ -184,6 +140,7 @@ PutAwayMainPage.propTypes = {
   locale: PropTypes.string.isRequired,
   putAwayTranslationsFetched: PropTypes.bool.isRequired,
   fetchTranslations: PropTypes.func.isRequired,
+  translate: PropTypes.func.isRequired,
   /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */

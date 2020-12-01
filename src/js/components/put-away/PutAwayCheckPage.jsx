@@ -50,20 +50,18 @@ class PutAwayCheckPage extends Component {
 
   constructor(props) {
     super(props);
-    const {
-      putAway, pivotBy, expanded, location,
-    } = this.props;
     const columns = this.getColumns();
     this.state = {
       putAway: {
-        ...putAway,
-        putawayItems: PutAwayCheckPage.processSplitLines(putAway.putawayItems),
+        ...this.props.initialValues.putAway,
+        putawayItems: PutAwayCheckPage
+          .processSplitLines(this.props.initialValues.putAway.putawayItems),
       },
-      completed: putAway.putawayStatus === 'COMPLETED',
+      completed: this.props.initialValues.putAway.putawayStatus === 'COMPLETED',
       columns,
-      pivotBy,
-      expanded,
-      location,
+      pivotBy: this.props.initialValues.pivotBy,
+      expanded: this.props.initialValues.expanded,
+      location: this.props.location,
     };
 
     this.confirmEmptyBin = this.confirmEmptyBin.bind(this);
@@ -80,10 +78,11 @@ class PutAwayCheckPage extends Component {
     const location = this.state.location.id ? this.state.location : nextProps.location;
     this.setState({
       putAway: {
-        ...nextProps.putAway,
-        putawayItems: PutAwayCheckPage.processSplitLines(nextProps.putAway.putawayItems),
+        ...nextProps.initialValues.putAway,
+        putawayItems: PutAwayCheckPage
+          .processSplitLines(nextProps.initialValues.putAway.putawayItems),
       },
-      completed: nextProps.putAway.putawayStatus === 'COMPLETED',
+      completed: nextProps.initialValues.putAway.putawayStatus === 'COMPLETED',
       location,
     });
   }
@@ -199,11 +198,11 @@ class PutAwayCheckPage extends Component {
    * @public
    */
   completePutAway() {
-    const isBinLocationChosen = !_.some(this.props.putAway.putawayItems, putAwayItem =>
+    const isBinLocationChosen = !_.some(this.state.putAway.putawayItems, putAwayItem =>
       _.isNull(putAwayItem.putawayLocation.id) && _.isEmpty(putAwayItem.splitItems));
 
     const itemsWithLowerQuantity = _.filter(
-      this.props.putAway.putawayItems,
+      this.state.putAway.putawayItems,
       putAwayItem => putAwayItem.quantity < putAwayItem.quantityAvailable,
     );
 
@@ -216,13 +215,18 @@ class PutAwayCheckPage extends Component {
     }
   }
 
+  firstPage() {
+    this.props.history.push('/openboxes/putAway/create');
+    window.location = '/openboxes/putAway/create';
+  }
+
   save() {
     this.props.showSpinner();
     const url = `/openboxes/api/putaways?location.id=${this.state.location.id}`;
     const payload = {
-      ...this.props.putAway,
+      ...this.state.putAway,
       putawayStatus: 'COMPLETED',
-      putawayItems: _.map(this.props.putAway.putawayItems, item => ({
+      putawayItems: _.map(this.state.putAway.putawayItems, item => ({
         ...item,
         putawayStatus: 'COMPLETED',
         splitItems: _.map(item.splitItems, splitItem => ({
@@ -238,7 +242,7 @@ class PutAwayCheckPage extends Component {
 
         Alert.success(this.props.translate('react.putAway.alert.putAwayCompleted.label', 'Putaway was successfully completed!'), { timeout: 3000 });
 
-        this.props.firstPage();
+        this.firstPage();
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -306,9 +310,8 @@ class PutAwayCheckPage extends Component {
       };
 
     return (
-      <div className="putaway-wrap">
-        <h1><Translate id="react.putAway.putAway.label" defaultMessage="Putaway -" /> {this.state.putAway.putawayNumber}</h1>
-        <div className="d-flex justify-content-between mb-2">
+      <div className="putaway">
+        <div className="d-flex justify-content-between mb-2 putaway-buttons">
           <div>
             <Translate id="react.putAway.showBy.label" defaultMessage="Show by" />:
             <button
@@ -322,32 +325,34 @@ class PutAwayCheckPage extends Component {
                     : <Translate id="react.putAway.product.label" defaultMessage="Product" /> }
             </button>
           </div>
-          {this.state.completed ?
-            <button
-              type="button"
-              className="btn btn-outline-primary float-right mb-2 btn-xs"
-              onClick={() => this.props.firstPage()}
-            ><Translate id="react.putAway.goBack.label" defaultMessage="Go back to putaway list" />
-            </button> :
-            <div>
+          <span className="buttons-container classic-form-buttons">
+            {this.state.completed ?
               <button
                 type="button"
-                onClick={() => this.props.prevPage({
-                  putAway: this.props.putAway,
-                  pivotBy: this.state.pivotBy,
-                  expanded: this.state.expanded,
-                })}
-                className="btn btn-outline-primary mb-2 btn-xs mr-2"
-              ><Translate id="react.default.button.edit.label" defaultMessage="Edit" />
-              </button>
-              <button
-                type="button"
-                onClick={() => this.completePutAway()}
-                className="btn btn-outline-primary float-right mb-2 btn-xs"
-              ><Translate id="react.putAway.completePutAway.label" defaultMessage="Complete Putaway" />
-              </button>
-            </div>
-          }
+                className="btn btn-outline-secondary btn-xs mr-3"
+                onClick={() => this.firstPage()}
+              ><Translate id="react.putAway.goBack.label" defaultMessage="Go back to putaway list" />
+              </button> :
+              <div>
+                <button
+                  type="button"
+                  onClick={() => this.props.previousPage({
+                    putAway: this.state.putAway,
+                    pivotBy: this.state.pivotBy,
+                    expanded: this.state.expanded,
+                  })}
+                  className="btn btn-outline-secondary btn-xs mr-3"
+                ><Translate id="react.default.button.edit.label" defaultMessage="Edit" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => this.completePutAway()}
+                  className="btn btn-outline-secondary btn-xs mr-3"
+                ><Translate id="react.putAway.completePutAway.label" defaultMessage="Complete Putaway" />
+                </button>
+              </div>
+            }
+          </span>
         </div>
         {
           putAway.putawayItems ?
@@ -365,33 +370,35 @@ class PutAwayCheckPage extends Component {
             />
             : null
         }
-        {
-          this.state.completed ?
-            <button
-              type="button"
-              className="btn btn-outline-primary float-right my-2 btn-xs"
-              onClick={() => this.props.firstPage()}
-            ><Translate id="react.putAway.goBack.label" defaultMessage="Go back to putaway list" />
-            </button> :
-            <div>
+        <div className="submit-buttons">
+          {
+            this.state.completed ?
               <button
                 type="button"
-                onClick={() => this.completePutAway()}
-                className="btn btn-outline-primary float-right my-2 btn-xs"
-              ><Translate id="react.putAway.completePutAway.label" defaultMessage="Complete Putaway" />
-              </button>
-              <button
-                type="button"
-                onClick={() => this.props.prevPage({
-                  putAway: this.props.putAway,
-                  pivotBy: this.state.pivotBy,
-                  expanded: this.state.expanded,
-                })}
-                className="btn btn-outline-primary float-right mr-2 my-2 btn-xs"
-              ><Translate id="react.default.button.edit.label" defaultMessage="Edit" />
-              </button>
-            </div>
-        }
+                className="btn btn-outline-primary btn-form btn-xs"
+                onClick={() => this.firstPage()}
+              ><Translate id="react.putAway.goBack.label" defaultMessage="Go back to putaway list" />
+              </button> :
+              <div className="submit-buttons">
+                <button
+                  type="button"
+                  onClick={() => this.completePutAway()}
+                  className="btn btn-outline-primary btn-form float-right btn-xs"
+                ><Translate id="react.putAway.completePutAway.label" defaultMessage="Complete Putaway" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => this.props.previousPage({
+                    putAway: this.state.putAway,
+                    pivotBy: this.state.pivotBy,
+                    expanded: this.state.expanded,
+                  })}
+                  className="btn btn-outline-primary btn-form btn-xs"
+                ><Translate id="react.default.button.edit.label" defaultMessage="Edit" />
+                </button>
+              </div>
+          }
+        </div>
       </div>
     );
   }
@@ -404,34 +411,24 @@ const mapStateToProps = state => ({
 export default connect(mapStateToProps, { showSpinner, hideSpinner })(PutAwayCheckPage);
 
 PutAwayCheckPage.propTypes = {
+  initialValues: PropTypes.shape({
+    putAway: PropTypes.arrayOf(PropTypes.shape({})),
+    pivotBy: PropTypes.arrayOf(PropTypes.shape({})),
+    expanded: PropTypes.arrayOf(PropTypes.shape({})),
+  }).isRequired,
   /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
-  /** Function returning user to the previous page */
-  prevPage: PropTypes.func.isRequired,
-  /** Function taking user to the first page */
-  firstPage: PropTypes.func.isRequired,
-  /** All put-away's data */
-  putAway: PropTypes.shape({
-    /** An array of all put-away's items */
-    putawayItems: PropTypes.arrayOf(PropTypes.shape({})),
-    /** Status of the put-away */
-    putawayStatus: PropTypes.string,
-  }),
-  /** An array of available attributes after which a put-away can be sorted by */
-  pivotBy: PropTypes.arrayOf(PropTypes.string),
-  /** List of currently expanded put-away's items */
-  expanded: PropTypes.shape({}),
   /** Location (currently chosen). To be used in internalLocations and putaways requests. */
   location: PropTypes.shape({
     id: PropTypes.string,
   }).isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func,
+  }).isRequired,
   translate: PropTypes.func.isRequired,
+  previousPage: PropTypes.func.isRequired,
 };
 
-PutAwayCheckPage.defaultProps = {
-  putAway: {},
-  pivotBy: ['stockMovement.name'],
-  expanded: {},
-};
+PutAwayCheckPage.defaultProps = {};
