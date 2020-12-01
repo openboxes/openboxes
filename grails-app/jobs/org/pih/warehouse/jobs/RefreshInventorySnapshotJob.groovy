@@ -44,16 +44,16 @@ class RefreshInventorySnapshotJob {
                 }
             }
 
-            boolean forceRefresh = context.mergedJobDataMap.getBoolean("forceRefresh")
             def startTime = System.currentTimeMillis()
             def userId = context.mergedJobDataMap.get('user')
             def startDate = context.mergedJobDataMap.get('startDate')
-            def locationId = context.mergedJobDataMap.get('location')
-            Location location = Location.load(locationId)
-            def productId = context.mergedJobDataMap.get('product')
-            Product product = Product.load(productId)
+            def locationId = context.mergedJobDataMap.get('locationId')
+            def productId = context.mergedJobDataMap.get('productId')
+            boolean forceRefresh = context.mergedJobDataMap.getBoolean("forceRefresh")
             try {
                 log.info("Refresh inventory snapshot " + retryCount + " out of " + maxRetryAttempts)
+                Product product = Product.load(productId)
+                Location location = Location.load(locationId)
                 if (product && location) {
                     if (forceRefresh) {
                         inventorySnapshotService.deleteInventorySnapshots(location, product)

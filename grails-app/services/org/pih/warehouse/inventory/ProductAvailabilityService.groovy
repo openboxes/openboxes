@@ -50,25 +50,27 @@ class ProductAvailabilityService {
     }
 
     def refreshProductAvailability(Location location, Boolean forceRefresh) {
+        log.info "Refreshing product availability location (${location}), forceRefresh (${forceRefresh}) ..."
         def startTime = System.currentTimeMillis()
         List binLocations = calculateBinLocations(location)
         if (forceRefresh) {
             deleteProductAvailability(location)
         }
         saveProductAvailability(location, binLocations)
-        refreshInventorySnapshot(location, forceRefresh)
-        log.info "Refreshed product availability for location ${location} in ${System.currentTimeMillis() - startTime}ms"
+        log.info "Refreshed product availability for location (${location}) in ${System.currentTimeMillis() - startTime}ms"
     }
 
     def refreshProductAvailability(Location location, Product product, Boolean forceRefresh) {
+        log.info "Refreshing product availability location ${location}, product ${product}, forceRefresh ${forceRefresh}..."
         def startTime = System.currentTimeMillis()
         List binLocations = calculateBinLocations(location, product)
         if (forceRefresh) {
-            deleteProductAvailability(location, product)
+            ProductAvailability.withTransaction {
+                deleteProductAvailability(location, product)
+            }
         }
         saveProductAvailability(location, binLocations)
-        refreshInventorySnapshot(location, product, forceRefresh)
-        log.info "Refreshed product availability for product ${product} and location ${location} in ${System.currentTimeMillis() - startTime}ms"
+        log.info "Refreshed product availability for product (${product}) and location (${location}) in ${System.currentTimeMillis() - startTime}ms"
     }
 
     def calculateBinLocations(Location location, Date date) {
@@ -89,13 +91,18 @@ class ProductAvailabilityService {
         return binLocations
     }
 
-
     def saveProductAvailability(Location location, List binLocations) {
         def batchSize = ConfigurationHolder.config.openboxes.inventorySnapshot.batchSize ?: 1000
         def startTime = System.currentTimeMillis()
+
+        // Execute inventory snapshot insert/update in batches
+        println "\n\nBefore"
+        println "Global: " + dataService.executeQuery("SELECT @@GLOBAL.transaction_isolation, @@GLOBAL.transaction_read_only, @@GLOBAL.innodb_lock_wait_timeout;")
+        println "Session: " + dataService.executeQuery("SELECT @@SESSION.transaction_isolation, @@SESSION.transaction_read_only, @@SESSION.innodb_lock_wait_timeout;")
+
         try {
             Sql sql = new Sql(dataSource)
-            // Execute inventory snapshot insert/update in batches
+            sql.execute("SET SESSION innodb_lock_wait_timeout = 10;")
             sql.execute("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;")
             sql.withBatch(batchSize) { BatchingStatementWrapper stmt ->
                 binLocations.eachWithIndex { Map binLocationEntry, index ->
@@ -105,12 +112,20 @@ class ProductAvailabilityService {
                 stmt.executeBatch()
             }
             log.info "Saved ${binLocations?.size()} records for location ${location} in ${System.currentTimeMillis() - startTime}ms"
+            // Refresh inventory snapshot
+            //RefreshInventorySnapshotJob.triggerNow([locationId: location?.id, productIds: binLocations*.product?.id, forceRefresh: forceRefresh])
 
         } catch (Exception e) {
             log.error("Error executing batch update for ${location.name}: " + e.message, e)
             publishEvent(new ApplicationExceptionEvent(e, location))
             throw e;
         }
+
+        println "\n\nAfter "
+        println "Global: " + dataService.executeQuery("SELECT @@GLOBAL.transaction_isolation, @@GLOBAL.transaction_read_only, @@GLOBAL.innodb_lock_wait_timeout;")[0]
+        println "Session: " +  dataService.executeQuery("SELECT @@SESSION.transaction_isolation, @@SESSION.transaction_read_only, @@SESSION.innodb_lock_wait_timeout;")[0]
+
+
     }
 
     String generateInsertStatement(Location location, Map entry) {
@@ -169,7 +184,7 @@ class ProductAvailabilityService {
     def deleteProductAvailability(Location location, Product product) {
         Map params = [:]
 
-        String deleteStmt = """delete from ProductAvailability pa where 1=1"""
+        String deleteStmt = """update ProductAvailability pa set quantityOnHand=0 where 1=1"""
 
         if (location) {
             deleteStmt += " and pa.location = :location"
@@ -180,9 +195,8 @@ class ProductAvailabilityService {
             deleteStmt += " and pa.product = :product"
             params.put("product", product)
         }
-
         def results = ProductAvailability.executeUpdate(deleteStmt, params)
-        log.info "Deleted ${results} records for location ${location}, product ${product}"
+        log.info "Updated ${results} records for location ${location}, product ${product}"
     }
 
     def refreshInventorySnapshot(Location location, Product product, Boolean forceRefresh) {
