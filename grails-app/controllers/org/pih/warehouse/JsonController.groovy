@@ -1727,7 +1727,6 @@ class JsonController {
         render([aaData: forecastingService.getDemandSummary(location, product)] as JSON)
     }
 
-    @Cacheable("forecastCache")
     def getForecastingData = {
         Product product = Product.get(params.product.id)
         Location location = Location.get(params.location.id)
