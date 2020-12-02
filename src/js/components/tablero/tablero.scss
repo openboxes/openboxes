@@ -33,7 +33,7 @@
         box-shadow:  2px 8px 10px rgba(0,0,0,.15);
         border-radius: 5px;
         @media (min-width: 750px) {
-          width: 20% !important;  
+          width: 20% !important;
         }
         @media (min-width: 1050px) {
           width: 13% !important;
@@ -55,7 +55,7 @@
           cursor: pointer;
         }
       }
-      
+
       .add-category-popup {
         background-color: white;
         box-shadow:  2px 8px 10px rgba(0,0,0,.15);
@@ -123,10 +123,10 @@
           overflow: auto;
         }
       }
-      
+
     }
   }
- 
+
 }
 
 .configs-left-nav {
@@ -286,7 +286,7 @@
 .number-card {
   position: relative;
   width: 97%;
-  margin: 3.5px 1%;
+  margin: 1%;
   padding: 14.7px;
   box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.09);
   background-color: white;
@@ -386,10 +386,10 @@
 .big-size {
   height: 320px !important;
   width: 97% !important;
-} 
+}
 
 .graph-card {
-  margin: 3.5px 1%;
+  margin: 1%;
   box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.09);
   background-color: white;
   display: flex;
@@ -672,13 +672,13 @@
   .big-size {
     height: 440px !important;
     width: 97% !important;
-  } 
+  }
 }
 
 @media (min-width: 630px) {
   .big-size {
     height: 480px !important;
-  }  
+  }
   .graph-card {
     height: 420px;
   }
@@ -688,7 +688,7 @@
   .big-size {
     height: 550px !important;
   }
-  
+
   .graph-card {
     height: 517px;
   }
@@ -699,7 +699,7 @@
     height: 430px !important;
     width: 55% !important;
   }
-  
+
   .graph-card {
     height: 335px;
     width: 47%;
@@ -711,7 +711,7 @@
     height: 515px !important;
     width: 60% !important;
   }
-  
+
   .graph-card {
     height: 380px;
     width: 47%;
@@ -723,7 +723,7 @@
     height: 570px !important;
     width: 60% !important;
   }
-  
+
   .graph-card {
     height: 425px;
     width: 47%;
@@ -735,7 +735,7 @@
     height: 640px !important;
     width: 60% !important;
   }
-  
+
   .graph-card {
     height: 340px;
     width: 30.6%;
