@@ -42,13 +42,13 @@ class PutAwaySecondPage extends Component {
     } = this.props;
 
     this.state = {
-      putAway,
+      putAway: putAway || {},
       columns,
       pivotBy,
       expanded,
       bins: [],
       location: this.props.location,
-      sortBy: putAway.sortBy,
+      sortBy: putAway && putAway.sortBy,
     };
   }
 

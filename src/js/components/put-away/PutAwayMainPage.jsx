@@ -20,7 +20,7 @@ class PutAwayMainPage extends Component {
     super(props);
 
     this.state = {
-      page: props.match.params.putAwayId ? 1 : 0,
+      page: props.match.params.putAwayId ? 2 : 1,
       putAway: {},
     };
 
@@ -62,7 +62,7 @@ class PutAwayMainPage extends Component {
 
   getWizardTitle() {
     const { putAway } = this.state;
-    const newName = putAway.putAway ? `Putaway - ${putAway.putAway.putawayNumber}` : '';
+    const newName = putAway && putAway.putAway ? `Putaway - ${putAway.putAway.putawayNumber}` : '';
     return newName;
   }
 
@@ -85,7 +85,7 @@ class PutAwayMainPage extends Component {
 
           this.props.hideSpinner();
 
-          this.setState({ putAway, page: putAway.putawayStatus === 'COMPLETED' ? 2 : 1 });
+          this.setState({ putAway, page: putAway.putawayStatus === 'COMPLETED' ? 3 : 2 });
         })
         .catch(() => this.props.hideSpinner());
     }

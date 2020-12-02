@@ -442,6 +442,13 @@ class PutAwayPage extends Component {
               />
             </div>
           </div>
+          <button
+            type="button"
+            disabled={this.state.selection.size < 1}
+            onClick={() => this.createPutAway()}
+            className="btn btn-outline-primary btn-form float-right btn-xs"
+          ><Translate id="react.putAway.startPutAway.label" defaultMessage="Start Putaway" />
+          </button>
         </div>
         {
           putawayItems ?
