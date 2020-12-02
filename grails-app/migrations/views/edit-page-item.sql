@@ -14,6 +14,7 @@ CREATE OR REPLACE VIEW edit_page_item AS
         stock_movement_item.quantity_revised,
         stock_movement_item.order_index as sort_order,
         stock_movement_item.cancel_reason_code,
+        stock_movement_item.comments,
         product_summary.quantity_on_hand,
         product_stocklist.quantity_demand,
         CASE WHEN product_substitution_status.substitution_status IS NULL THEN 'NO' ELSE product_substitution_status.substitution_status END AS substitution_status

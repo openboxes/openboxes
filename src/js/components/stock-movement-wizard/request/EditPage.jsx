@@ -8,6 +8,7 @@ import Alert from 'react-s-alert';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
 import update from 'immutability-helper';
+import { Tooltip } from 'react-tippy';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -97,9 +98,34 @@ const AD_HOCK_FIELDS = {
         },
       },
       quantityRequested: {
-        type: LabelField,
-        label: 'react.stockMovement.quantityRequested.label',
-        defaultMessage: 'Qty requested',
+        type: (params) => {
+          const { fieldName, values } = params;
+          const fieldNameParts = _.split(fieldName, '.');
+          if (fieldNameParts.length === 2) {
+            const rowIdx = fieldNameParts[0];
+            const rowValues = _.get(values, rowIdx);
+            if (rowValues.comments) {
+              return (
+                <div className="d-flex">
+                  {/* flex: 1 to center qty label, marginLeft: 14px to mitigate icon font size */}
+                  <div style={{ flex: 1, marginLeft: '14px' }}><LabelField {...params} /></div>
+                  <Tooltip
+                    html={rowValues.comments}
+                    theme="transparent"
+                    delay="150"
+                    duration="250"
+                    hideDelay="50"
+                  >
+                    <i className="fa fa-sticky-note" />
+                  </Tooltip>
+                </div>
+              );
+            }
+          }
+          return <LabelField {...params} />;
+        },
+        label: 'react.verifyRequest.quantityRequested.label',
+        defaultMessage: 'Qty Requested',
         flexWidth: '1.1',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
@@ -293,9 +319,34 @@ const STOCKLIST_FILEDS = {
         },
       },
       quantityRequested: {
-        type: LabelField,
-        label: 'react.stockMovement.quantityRequested.label',
-        defaultMessage: 'Qty requested',
+        type: (params) => {
+          const { fieldName, values } = params;
+          const fieldNameParts = _.split(fieldName, '.');
+          if (fieldNameParts.length === 2) {
+            const rowIdx = fieldNameParts[0];
+            const rowValues = _.get(values, rowIdx);
+            if (rowValues.comments) {
+              return (
+                <div className="d-flex">
+                  {/* flex: 1 to center qty label, marginLeft: 14px to mitigate icon font size */}
+                  <div style={{ flex: 1, marginLeft: '14px' }}><LabelField {...params} /></div>
+                  <Tooltip
+                    html={rowValues.comments}
+                    theme="transparent"
+                    delay="150"
+                    duration="250"
+                    hideDelay="50"
+                  >
+                    <i className="fa fa-sticky-note" />
+                  </Tooltip>
+                </div>
+              );
+            }
+          }
+          return <LabelField {...params} />;
+        },
+        label: 'react.verifyRequest.quantityRequested.label',
+        defaultMessage: 'Qty Requested',
         flexWidth: '1.1',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
