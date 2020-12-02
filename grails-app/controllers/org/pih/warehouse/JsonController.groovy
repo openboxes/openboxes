@@ -1457,10 +1457,9 @@ class JsonController {
         }
 
         if (command.refreshBalances) {
-            log.info "Refreshing inventory snapshot for ${startDate} and location ${location}"
-            inventorySnapshotService.populateInventorySnapshots(startDate, command.location)
-            log.info "Refreshing inventory snapshot for ${endDate} and location ${location}"
-            inventorySnapshotService.populateInventorySnapshots(endDate, command.location)
+            log.info "Refreshing inventory snapshot for startDate=${startDate}, endDate=${endDate}, and location=${location}"
+            inventorySnapshotService.populateInventorySnapshots(startDate, command.location, false)
+            inventorySnapshotService.populateInventorySnapshots(endDate, command.location, false)
         }
 
         def data = (params.format == "text/csv") ?

@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.inventory
 
+import groovy.time.TimeCategory
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.springframework.context.ApplicationListener
 class TransactionEventService implements ApplicationListener<TransactionEvent> {
@@ -22,16 +23,36 @@ class TransactionEventService implements ApplicationListener<TransactionEvent> {
         def transactionDate = transaction?.transactionDate
         def locationId = event.associatedLocation
         List productIds = event.associatedProducts
+        Boolean forceRefresh = event.forceRefresh
 
-        log.info "Refresh inventory snapshot " +
-            "date=$transactionDate, " +
-            "location=$locationId, " +
-            "transaction=$transactionId," +
-            "productIds=$productIds"
+        log.info "Refresh product availability in 10 seconds " +
+                "date=$transactionDate, " +
+                "location=$locationId, " +
+                "transaction=$transactionId," +
+                "productIds=$productIds, " +
+                "forceRefresh=$forceRefresh"
 
-        RefreshProductAvailabilityJob.triggerNow([
-            locationId: locationId,
-            productIds: productIds
-        ])
+        // FIXME Hack to allow the transaction to be persisted to the database. Otherwise, the
+        // RefreshProductAvailabilityJob calculates product availability on all transactions
+        // except this one, which defeats the purpose of running this job. I'm still at a loss
+        // for why the transaction is not being returned in the query because the Hibernate
+        // sessions should not be shared between the thread associated with the request and
+        // the thread running the background job.
+        //
+        // The preferred approach would be to trigger the job now.
+        //RefreshProductAvailabilityJob.triggerNow([
+        //        locationId  : locationId,
+        //        productIds  : productIds,
+        //        forceRefresh: forceRefresh
+        //])
+        use(TimeCategory) {
+            Date runAt = new Date() + 500.milliseconds
+            RefreshProductAvailabilityJob.schedule(runAt, [
+                    locationId  : locationId,
+                    productIds  : productIds,
+                    forceRefresh: forceRefresh
+            ])
+        }
+
     }
 }

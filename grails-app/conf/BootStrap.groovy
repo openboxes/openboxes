@@ -485,7 +485,7 @@ class BootStrap {
         RefreshDemandDataJob.triggerNow()
 
         // Refresh inventory snapshot data
-        RefreshProductAvailabilityJob.triggerNow();
+        RefreshProductAvailabilityJob.triggerNow([forceRefresh: Boolean.TRUE]);
     }
 
 
