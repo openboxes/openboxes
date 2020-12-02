@@ -882,6 +882,7 @@ class EditItemsPage extends Component {
         editPageItems: update(values.editPageItems, {
           [editPageItemIndex]: {
             $set: {
+              ...values.editPageItems[editPageItemIndex],
               ...editPageItem,
               quantityAvailable: editPageItem.quantityAvailable || 0,
               substitutionItems: _.map(editPageItem.substitutionItems, sub => ({
