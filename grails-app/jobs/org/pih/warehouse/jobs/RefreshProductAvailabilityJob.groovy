@@ -41,7 +41,7 @@ class RefreshProductAvailabilityJob {
                 if (productIds && locationId) {
                     productIds.each { productId ->
                         Product product = Product.load(productId)
-                        productAvailabilityService.refreshProductAvailability(location, product, true)
+                        productAvailabilityService.refreshProductAvailability(location, product, forceRefresh)
                     }
                 }
                 else {
