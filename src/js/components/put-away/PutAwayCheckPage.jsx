@@ -61,8 +61,7 @@ class PutAwayCheckPage extends Component {
     this.state = {
       putAway: {
         ...putAway,
-        putawayItems: PutAwayCheckPage
-          .processSplitLines(putAway.putawayItems),
+        putawayItems: PutAwayCheckPage.processSplitLines(putAway.putawayItems),
       },
       completed: putAway.putawayStatus === 'COMPLETED',
       columns,
@@ -205,11 +204,14 @@ class PutAwayCheckPage extends Component {
    * @public
    */
   completePutAway() {
-    const isBinLocationChosen = !_.some(this.state.putAway.putawayItems, putAwayItem =>
-      _.isNull(putAwayItem.putawayLocation.id) && _.isEmpty(putAwayItem.splitItems));
+    const isBinLocationChosen = !_.some(
+      this.props.initialValues.putAway.putawayItems,
+      putAwayItem =>
+        _.isNull(putAwayItem.putawayLocation.id) && _.isEmpty(putAwayItem.splitItems),
+    );
 
     const itemsWithLowerQuantity = _.filter(
-      this.state.putAway.putawayItems,
+      this.props.initialValues.putAway.putawayItems,
       putAwayItem => putAwayItem.quantity < putAwayItem.quantityAvailable,
     );
 
@@ -244,11 +246,15 @@ class PutAwayCheckPage extends Component {
 
         Alert.success(this.props.translate('react.putAway.alert.putAwayCompleted.label', 'Putaway was successfully completed!'), { timeout: 3000 });
 
-        this.props.goToPage(1, this.props.initialValues);
+        this.goToFirstPage();
       })
       .catch(() => this.props.hideSpinner());
   }
 
+  goToFirstPage() {
+    this.props.history.push('/openboxes/putAway/create');
+    this.props.goToPage(1, null);
+  }
 
   /**
    * Shows confirmation dialog on complete if there are items with empty bin location.
@@ -332,7 +338,7 @@ class PutAwayCheckPage extends Component {
               <button
                 type="button"
                 className="btn btn-outline-secondary btn-xs mr-3"
-                onClick={() => this.props.goToPage(1, this.props.initialValues)}
+                onClick={() => this.goToFirstPage()}
               ><Translate id="react.putAway.goBack.label" defaultMessage="Go back to putaway list" />
               </button> :
               <div>
@@ -378,7 +384,7 @@ class PutAwayCheckPage extends Component {
               <button
                 type="button"
                 className="btn btn-outline-primary btn-form btn-xs"
-                onClick={() => this.props.goToPage(1, this.props.initialValues)}
+                onClick={() => this.goToFirstPage()}
               ><Translate id="react.putAway.goBack.label" defaultMessage="Go back to putaway list" />
               </button> :
               <div className="submit-buttons">
