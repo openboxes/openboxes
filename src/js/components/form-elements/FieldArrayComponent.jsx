@@ -55,7 +55,9 @@ class FieldArrayComponent extends Component {
     const addRow = (row = {}, index = null) => {
       if (index === null) {
         const table = document.querySelectorAll('[role="rowgroup"]')[0];
-        table.scrollIntoView({ block: 'end' });
+        if (table) {
+          table.scrollIntoView({ block: 'end' });
+        }
         fields.push(row);
       } else if (typeof fields === 'object') {
         fields.insert(index + 1, row);
