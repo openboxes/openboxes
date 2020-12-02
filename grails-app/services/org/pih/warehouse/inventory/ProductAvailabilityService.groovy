@@ -35,7 +35,7 @@ class ProductAvailabilityService {
 
     def refreshProductAvailability(Boolean forceRefresh) {
         // Compute bin locations from transaction entries for all products over all depot locations
-        // Uses GPars to improve performance
+        // Uses GPars to improve performance (OBNAV Benchmark: 5 minutes without, 45 seconds with)
         def startTime = System.currentTimeMillis()
         GParsPool.withPool {
             locationService.depots.eachParallel { Location loc ->
@@ -53,10 +53,7 @@ class ProductAvailabilityService {
         log.info "Refreshing product availability location (${location}), forceRefresh (${forceRefresh}) ..."
         def startTime = System.currentTimeMillis()
         List binLocations = calculateBinLocations(location)
-        if (forceRefresh) {
-            deleteProductAvailability(location)
-        }
-        saveProductAvailability(location, binLocations)
+        saveProductAvailability(location, null, binLocations, forceRefresh)
         log.info "Refreshed product availability for location (${location}) in ${System.currentTimeMillis() - startTime}ms"
     }
 
@@ -64,12 +61,7 @@ class ProductAvailabilityService {
         log.info "Refreshing product availability location ${location}, product ${product}, forceRefresh ${forceRefresh}..."
         def startTime = System.currentTimeMillis()
         List binLocations = calculateBinLocations(location, product)
-        if (forceRefresh) {
-            ProductAvailability.withTransaction {
-                deleteProductAvailability(location, product)
-            }
-        }
-        saveProductAvailability(location, binLocations)
+        saveProductAvailability(location, product, binLocations, forceRefresh)
         log.info "Refreshed product availability for product (${product}) and location (${location}) in ${System.currentTimeMillis() - startTime}ms"
     }
 
@@ -86,25 +78,38 @@ class ProductAvailabilityService {
     }
 
     def calculateBinLocations(Location location, Product product) {
-        def binLocations = inventoryService.getProductQuantityByBinLocation(location, product)
+        def binLocations = inventoryService.getProductQuantityByBinLocation(location, product, Boolean.TRUE)
         binLocations = transformBinLocations(binLocations)
         return binLocations
     }
 
-    def saveProductAvailability(Location location, List binLocations) {
+    def saveProductAvailability(Location location, Product product, List binLocations, Boolean forceRefresh) {
+        log.info "Saving product availability for product=${product?.productCode}, location=${location}"
         def batchSize = ConfigurationHolder.config.openboxes.inventorySnapshot.batchSize ?: 1000
         def startTime = System.currentTimeMillis()
 
-        // Execute inventory snapshot insert/update in batches
-        println "\n\nBefore"
-        println "Global: " + dataService.executeQuery("SELECT @@GLOBAL.transaction_isolation, @@GLOBAL.transaction_read_only, @@GLOBAL.innodb_lock_wait_timeout;")
-        println "Session: " + dataService.executeQuery("SELECT @@SESSION.transaction_isolation, @@SESSION.transaction_read_only, @@SESSION.innodb_lock_wait_timeout;")
-
         try {
             Sql sql = new Sql(dataSource)
-            sql.execute("SET SESSION innodb_lock_wait_timeout = 10;")
+
+            // Used to avoid deadlocks when running refresh using GPars-enabled
             sql.execute("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;")
+
+            // Execute SQL in batches
             sql.withBatch(batchSize) { BatchingStatementWrapper stmt ->
+                // If we need to force refresh then we want to set quantity on hand for all
+                // matching records to 0.
+                if (forceRefresh) {
+                    // Allows the SQL IFNULL to work properly
+                    //   IFNULL(null, product_id)
+                    //   IFNULL('10003', product_id)
+                    String productId = product?.id?"'${product?.id}'":null
+                    String forceRefreshStatement = String.format(
+                            "delete from product_availability " +
+                                    "where location_id = '${location.id}' " +
+                                    "and product_id = IFNULL(%s, product_id);", productId)
+                    stmt.addBatch(forceRefreshStatement)
+
+                }
                 binLocations.eachWithIndex { Map binLocationEntry, index ->
                     String insertStatement = generateInsertStatement(location, binLocationEntry)
                     stmt.addBatch(insertStatement)
@@ -112,20 +117,17 @@ class ProductAvailabilityService {
                 stmt.executeBatch()
             }
             log.info "Saved ${binLocations?.size()} records for location ${location} in ${System.currentTimeMillis() - startTime}ms"
+
             // Refresh inventory snapshot
-            //RefreshInventorySnapshotJob.triggerNow([locationId: location?.id, productIds: binLocations*.product?.id, forceRefresh: forceRefresh])
+            refreshInventorySnapshot(location, product, forceRefresh)
+
+            //RefreshInventorySnapshotJob.triggerNow([locationId: location?.id, productId: product?.id, forceRefresh: forceRefresh])
 
         } catch (Exception e) {
             log.error("Error executing batch update for ${location.name}: " + e.message, e)
             publishEvent(new ApplicationExceptionEvent(e, location))
             throw e;
         }
-
-        println "\n\nAfter "
-        println "Global: " + dataService.executeQuery("SELECT @@GLOBAL.transaction_isolation, @@GLOBAL.transaction_read_only, @@GLOBAL.innodb_lock_wait_timeout;")[0]
-        println "Session: " +  dataService.executeQuery("SELECT @@SESSION.transaction_isolation, @@SESSION.transaction_read_only, @@SESSION.innodb_lock_wait_timeout;")[0]
-
-
     }
 
     String generateInsertStatement(Location location, Map entry) {
@@ -142,14 +144,14 @@ class ProductAvailabilityService {
                 "'${StringEscapeUtils.escapeSql(entry?.binLocation?.name)}'" : "'DEFAULT'"
 
         def insertStatement =
-                "REPLACE product_availability (id, version, location_id, product_id, product_code, " +
+                "INSERT INTO product_availability (id, version, location_id, product_id, product_code, " +
                         "inventory_item_id, lot_number, bin_location_id, bin_location_name, " +
                         "quantity_on_hand, date_created, last_updated) " +
                         "values ('${UUID.randomUUID().toString()}', 0, '${location?.id}', " +
                         "'${productId}', '${productCode}', " +
                         "${inventoryItemId}, ${lotNumber}, " +
-                        "${binLocationId}, ${binLocationName}, ${onHandQuantity}, now(), now()) "
-                        //"ON DUPLICATE KEY UPDATE quantity_on_hand=${onHandQuantity}, version=version+1, last_updated=now()"
+                        "${binLocationId}, ${binLocationName}, ${onHandQuantity}, now(), now()) " +
+                        "ON DUPLICATE KEY UPDATE quantity_on_hand=${onHandQuantity}, version=version+1, last_updated=now()"
         return insertStatement
     }
 
@@ -184,7 +186,7 @@ class ProductAvailabilityService {
     def deleteProductAvailability(Location location, Product product) {
         Map params = [:]
 
-        String deleteStmt = """update ProductAvailability pa set quantityOnHand=0 where 1=1"""
+        String deleteStmt = """delete from ProductAvailability pa where 1=1"""
 
         if (location) {
             deleteStmt += " and pa.location = :location"
@@ -195,17 +197,22 @@ class ProductAvailabilityService {
             deleteStmt += " and pa.product = :product"
             params.put("product", product)
         }
+
         def results = ProductAvailability.executeUpdate(deleteStmt, params)
-        log.info "Updated ${results} records for location ${location}, product ${product}"
+        log.info "Deleted ${results} records for location ${location}, product ${product}"
     }
 
     def refreshInventorySnapshot(Location location, Product product, Boolean forceRefresh) {
-        String deleteStatement = """
-            DELETE FROM inventory_snapshot 
-            WHERE date = DATE_ADD(CURDATE(),INTERVAL 1 DAY)
-            AND location_id = '${location.id}' 
-            AND product_id = '${product.id}'
-        """
+        String productId = product ? "'${product?.id}'" : null
+        if (forceRefresh) {
+            String forceRefreshStatement = """
+                DELETE FROM inventory_snapshot 
+                WHERE date = DATE_ADD(CURDATE(),INTERVAL 1 DAY)
+                AND location_id = '${location.id}' 
+                AND product_id = IFNULL(${productId}, product_id);
+            """
+            dataService.executeStatement(forceRefreshStatement)
+        }
         String updateStatement = """
             REPLACE INTO inventory_snapshot 
             (
@@ -219,61 +226,8 @@ class ProductAvailabilityService {
                 quantity_on_hand, date_created, last_updated 
             FROM product_availability 
             WHERE location_id = '${location.id}' 
-            AND product_id = '${product.id}'
+            AND product_id = IFNULL(${productId}, product_id);
         """
-        if (forceRefresh) {
-            dataService.executeStatement(deleteStatement)
-        }
-        dataService.executeStatement(updateStatement)
-    }
-
-    def refreshInventorySnapshot(Location location, Boolean forceRefresh) {
-        String deleteStatement = """
-            DELETE FROM inventory_snapshot 
-            WHERE date = DATE_ADD(CURDATE(),INTERVAL 1 DAY)
-            AND location_id = '${location.id}'
-        """
-        String updateStatement = """
-            REPLACE INTO inventory_snapshot 
-            (
-                id, version, date, location_id, product_id, product_code, 
-                inventory_item_id, lot_number, bin_location_id, bin_location_name, 
-                quantity_on_hand, date_created, last_updated
-            ) 
-            SELECT 
-                id, version, DATE_ADD(CURDATE(),INTERVAL 1 DAY), location_id, product_id, product_code, 
-                inventory_item_id, lot_number, bin_location_id, bin_location_name,
-                quantity_on_hand, date_created, last_updated 
-            FROM product_availability 
-            WHERE location_id = '${location.id}' 
-        """
-        if (forceRefresh) {
-            dataService.executeStatement(deleteStatement)
-        }
-        dataService.executeStatement(updateStatement)
-    }
-
-    def refreshInventorySnapshot(Boolean forceRefresh) {
-        String deleteStatement = """
-            DELETE FROM inventory_snapshot 
-            WHERE date = DATE_ADD(CURDATE(),INTERVAL 1 DAY)
-        """
-        String updateStatement = """
-            REPLACE INTO inventory_snapshot 
-            (
-                id, version, date, location_id, product_id, product_code, 
-                inventory_item_id, lot_number, bin_location_id, bin_location_name, 
-                quantity_on_hand, date_created, last_updated
-            ) 
-            SELECT 
-                id, version, DATE_ADD(CURDATE(),INTERVAL 1 DAY), location_id, product_id, product_code, 
-                inventory_item_id, lot_number, bin_location_id, bin_location_name,
-                quantity_on_hand, date_created, last_updated 
-            FROM product_availability 
-        """
-        if (forceRefresh) {
-            dataService.executeStatement(deleteStatement)
-        }
         dataService.executeStatement(updateStatement)
     }
 

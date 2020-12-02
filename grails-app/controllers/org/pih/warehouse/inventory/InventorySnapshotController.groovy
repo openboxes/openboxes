@@ -40,7 +40,7 @@ class InventorySnapshotController {
             def date = dateFormat.parse(params.date)
             date.clearTime()
 
-            def results = RefreshInventorySnapshotJob.triggerNow([location: params.location.id, startDate: date])
+            def results = RefreshInventorySnapshotJob.triggerNow([locationId: params.location.id, date: date])
             render([results: results] as JSON)
 
         }
