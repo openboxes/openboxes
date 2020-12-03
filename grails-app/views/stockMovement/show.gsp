@@ -90,7 +90,7 @@
                 <g:set var="disabledMessage" value="${g.message(code:'stockMovement.isDifferentLocation.message')}"/>
             </g:elseif>
             <g:link controller="stockMovement" action="edit" id="${stockMovement?.id}" class="button"
-                    disabled="${hasBeenPartiallyReceived}" disabledMessage="${g.message(code:'stockMovement.cantEditPartiallyReceived.message')}">
+                    disabled="${hasBeenPartiallyReceived || hasBeenReceived}" disabledMessage="${g.message(code:'stockMovement.cantEditReceived.message')}">
                 <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
                 <warehouse:message code="default.button.edit.label" />
             </g:link>
