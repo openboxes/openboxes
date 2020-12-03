@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.order.OrderItemStatusCode" %>
+<%@ page import="org.pih.warehouse.order.OrderTypeCode; org.pih.warehouse.order.OrderItemStatusCode" %>
 <div class="box">
     <h2>
         <warehouse:message code="default.summary.label"/>
@@ -53,52 +53,53 @@
 
             <g:each var="orderItem" in="${orderInstance?.orderItems?.sort { it.dateCreated }}" status="i">
                 <g:set var="isItemCanceled" value="${orderItem.orderItemStatusCode == OrderItemStatusCode.CANCELED}"/>
-                <tr class="order-item ${(i % 2) == 0 ? 'even' : 'odd'}" style="${isItemCanceled ? 'background-color: #ffcccb;' : ''}">
-                    <td style="color: ${orderItem?.product?.color}">
-                        ${orderItem?.product?.productCode}
-                    </td>
-                    <td>
-                        <g:link controller="inventoryItem" action="showStockCard"
-                                style="color: ${orderItem?.product?.color}"  params="['product.id':orderItem?.product?.id]">
-                            <format:product product="${orderItem?.product}"/>
-                        </g:link>
-                    </td>
-                    <g:if test="${!isItemCanceled}">
-                        <g:if test="${orderInstance.orderItems.any { it.productSupplier?.supplierCode } }">
+                <g:if test="${!isItemCanceled || orderInstance?.orderTypeCode==OrderTypeCode.PURCHASE_ORDER}">
+                    <tr class="order-item ${(i % 2) == 0 ? 'even' : 'odd'}" style="${isItemCanceled ? 'background-color: #ffcccb;' : ''}">
+                        <td style="color: ${orderItem?.product?.color}">
+                            ${orderItem?.product?.productCode}
+                        </td>
+                        <td>
+                            <g:link controller="inventoryItem" action="showStockCard"
+                                    style="color: ${orderItem?.product?.color}"  params="['product.id':orderItem?.product?.id]">
+                                <format:product product="${orderItem?.product}"/>
+                            </g:link>
+                        </td>
+                        <g:if test="${!isItemCanceled}">
+                            <g:if test="${orderInstance.orderItems.any { it.productSupplier?.supplierCode } }">
+                                <td class="center">
+                                    ${orderItem?.productSupplier?.supplierCode}
+                                </td>
+                            </g:if>
+                            <g:if test="${orderInstance.orderItems.any { it.productSupplier?.manufacturerName } }">
+                                <td class="center">
+                                    ${orderItem?.productSupplier?.manufacturerName}
+                                </td>
+                            </g:if>
+                            <g:if test="${orderInstance.orderItems.any { it.productSupplier?.manufacturerCode } }">
+                                <td class="center">
+                                    ${orderItem?.productSupplier?.manufacturerCode}
+                                </td>
+                            </g:if>
                             <td class="center">
-                                ${orderItem?.productSupplier?.supplierCode}
+                                ${orderItem?.quantity }
+                            </td>
+                            <td class="center">
+                                ${orderItem?.unitOfMeasure}
+                            </td>
+                            <td class="right">
+                                <g:formatNumber number="${orderItem?.unitPrice}" />
+                                ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                            </td>
+                            <td class="right">
+                                <g:formatNumber number="${orderItem?.totalPrice()}"/>
+                                ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                             </td>
                         </g:if>
-                        <g:if test="${orderInstance.orderItems.any { it.productSupplier?.manufacturerName } }">
-                            <td class="center">
-                                ${orderItem?.productSupplier?.manufacturerName}
-                            </td>
-                        </g:if>
-                        <g:if test="${orderInstance.orderItems.any { it.productSupplier?.manufacturerCode } }">
-                            <td class="center">
-                                ${orderItem?.productSupplier?.manufacturerCode}
-                            </td>
-                        </g:if>
-                        <td class="center">
-                            ${orderItem?.quantity }
-                        </td>
-                        <td class="center">
-                            ${orderItem?.unitOfMeasure}
-                        </td>
-                        <td class="right">
-                            <g:formatNumber number="${orderItem?.unitPrice}" />
-                            ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-                        </td>
-                        <td class="right">
-                            <g:formatNumber number="${orderItem?.totalPrice()}"/>
-                            ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-                        </td>
-                    </g:if>
-                    <g:else>
-                        <td colspan="${columnsNumber}"></td>
-                    </g:else>
-                </tr>
-
+                        <g:else>
+                            <td colspan="${columnsNumber}"></td>
+                        </g:else>
+                    </tr>
+                </g:if>
             </g:each>
             </tbody>
             <tfoot>
