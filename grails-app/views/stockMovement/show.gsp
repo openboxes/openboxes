@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.requisition.RequisitionStatus" %>
+<%@ page import="org.pih.warehouse.requisition.RequisitionSourceType; org.pih.warehouse.requisition.RequisitionStatus" %>
 <%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode" %>
 <html>
 <head>
@@ -71,8 +71,12 @@
             <g:set var="hasBeenPending" value="${stockMovement?.shipment?.currentStatus==ShipmentStatusCode.PENDING}"/>
             <g:set var="hasBeenPlaced" value="${hasBeenShipped || hasBeenPartiallyReceived}"/>
             <g:set var="isFromOrder" value="${stockMovement?.isFromOrder}"/>
-            <g:set var="isSameLocation" value="${stockMovement?.destination?.id==session.warehouse.id}"/>
-            <g:set var="disableReceivingButton" value="${!(hasBeenIssued || (hasBeenPlaced && isFromOrder)) || !isSameLocation || !hasBeenPlaced || hasBeenReceived}"/>
+            <g:set var="isSameDestination" value="${stockMovement?.destination?.id==session.warehouse.id}"/>
+            <g:set var="isSameOrigin" value="${stockMovement?.origin?.id==session.warehouse.id}"/>
+            <g:set var="disableReceivingButton" value="${!(hasBeenIssued || (hasBeenPlaced && isFromOrder)) || !isSameDestination || !hasBeenPlaced || hasBeenReceived}"/>
+            <g:set var="isElectronicType" value="${stockMovement?.requisition?.sourceType == RequisitionSourceType.ELECTRONIC}"/>
+            <g:set var="disableEditButton"
+                   value="${hasBeenReceived || hasBeenPartiallyReceived || (!isSameOrigin && stockMovement?.origin?.isDepot() && hasBeenPending && !isElectronicType)}"/>
             <g:set var="showRollbackLastReceiptButton" value="${hasBeenReceived || hasBeenPartiallyReceived}"/>
             <g:if test="${hasBeenReceived}">
                 <g:set var="disabledMessage" value="${g.message(code:'stockMovement.hasAlreadyBeenReceived.message', args: [stockMovement?.identifier])}"/>
@@ -86,11 +90,17 @@
             <g:elseif test="${!hasBeenIssued}">
                 <g:set var="disabledMessage" value="${g.message(code:'stockMovement.hasNotBeenIssued.message', args: [stockMovement?.identifier])}"/>
             </g:elseif>
-            <g:elseif test="${!isSameLocation}">
+            <g:elseif test="${!isSameDestination}">
                 <g:set var="disabledMessage" value="${g.message(code:'stockMovement.isDifferentLocation.message')}"/>
             </g:elseif>
+            <g:if test="${hasBeenReceived || hasBeenPartiallyReceived}">
+                <g:set var="disabledEditMessage" value="${g.message(code:'stockMovement.cantEditReceived.message')}"/>
+            </g:if>
+            <g:elseif test="${!isSameOrigin && stockMovement?.origin?.isDepot() && hasBeenPending && !isElectronicType}">
+                <g:set var="disabledEditMessage" value="${g.message(code:'stockMovement.isDifferentOrigin.message')}"/>
+            </g:elseif>
             <g:link controller="stockMovement" action="edit" id="${stockMovement?.id}" class="button"
-                    disabled="${hasBeenPartiallyReceived || hasBeenReceived}" disabledMessage="${g.message(code:'stockMovement.cantEditReceived.message')}">
+                    disabled="${disableEditButton}" disabledMessage="${disabledEditMessage}">
                 <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
                 <warehouse:message code="default.button.edit.label" />
             </g:link>
@@ -112,7 +122,7 @@
                         <warehouse:message code="default.button.rollback.label" />
                     </g:link>
                 </g:elseif>
-                <g:if test="${hasBeenPending || !stockMovement?.shipment?.currentStatus}">
+                <g:if test="${(hasBeenPending || !stockMovement?.shipment?.currentStatus) && (isSameOrigin || !stockMovement?.origin?.isDepot())}">
                     <g:link controller="stockMovement" action="remove" id="${stockMovement.id}" params="[show:true]" class="button"
                             onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
                         <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />&nbsp;
