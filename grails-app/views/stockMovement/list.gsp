@@ -85,6 +85,7 @@
                 <g:form action="list" method="GET">
                     <g:hiddenField name="max" value="${params.max?:10}"/>
                     <g:hiddenField name="offset" value="${0}"/>
+                    <g:hiddenField name="sourceType" value="${params?.sourceType}" />
                     <div class="filter-list">
                         <div class="filter-list-item">
                             <label><warehouse:message code="default.search.label"/></label>

@@ -380,8 +380,6 @@ class StockMovementService {
     }
 
     def getOutboundStockMovements(StockMovement stockMovement, Map params) {
-        log.info "Get stock movements: " + stockMovement.toJson()
-
         log.info "Stock movement: ${stockMovement?.shipmentStatusCode}"
 
         def requisitions = Requisition.createCriteria().list(max: params.max, offset: params.offset) {
@@ -435,6 +433,14 @@ class StockMovementService {
             }
             if (stockMovement.requestType) {
                 eq("type", stockMovement.requestType)
+            }
+            if (stockMovement.sourceType) {
+                eq ('sourceType', stockMovement.sourceType)
+                if (stockMovement.sourceType == RequisitionSourceType.ELECTRONIC) {
+                    not {
+                        'in'("status", [RequisitionStatus.CREATED, RequisitionStatus.ISSUED, RequisitionStatus.CANCELED])
+                    }
+                }
             }
             if(params.createdAfter) {
                 ge("dateCreated", params.createdAfter)
