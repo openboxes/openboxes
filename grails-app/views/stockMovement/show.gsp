@@ -74,9 +74,9 @@
             <g:set var="isSameDestination" value="${stockMovement?.destination?.id==session.warehouse.id}"/>
             <g:set var="isSameOrigin" value="${stockMovement?.origin?.id==session.warehouse.id}"/>
             <g:set var="disableReceivingButton" value="${!(hasBeenIssued || (hasBeenPlaced && isFromOrder)) || !isSameDestination || !hasBeenPlaced || hasBeenReceived}"/>
-            <g:set var="disableEditButton" value="${hasBeenReceived || hasBeenPartiallyReceived ||
-                    (!isSameOrigin && stockMovement?.origin?.isDepot() && hasBeenPending &&
-                    stockMovement?.requisition?.sourceType != RequisitionSourceType.ELECTRONIC)}"/>
+            <g:set var="isElectronicType" value="${stockMovement?.requisition?.sourceType == RequisitionSourceType.ELECTRONIC}"/>
+            <g:set var="disableEditButton"
+                   value="${hasBeenReceived || hasBeenPartiallyReceived || (!isSameOrigin && stockMovement?.origin?.isDepot() && hasBeenPending && !isElectronicType)}"/>
             <g:set var="showRollbackLastReceiptButton" value="${hasBeenReceived || hasBeenPartiallyReceived}"/>
             <g:if test="${hasBeenReceived}">
                 <g:set var="disabledMessage" value="${g.message(code:'stockMovement.hasAlreadyBeenReceived.message', args: [stockMovement?.identifier])}"/>
@@ -96,7 +96,7 @@
             <g:if test="${hasBeenReceived || hasBeenPartiallyReceived}">
                 <g:set var="disabledEditMessage" value="${g.message(code:'stockMovement.cantEditReceived.message')}"/>
             </g:if>
-            <g:elseif test="${!isSameOrigin && hasBeenPending && stockMovement?.requisition?.sourceType != RequisitionSourceType.ELECTRONIC}">
+            <g:elseif test="${!isSameOrigin && stockMovement?.origin?.isDepot() && hasBeenPending && !isElectronicType}">
                 <g:set var="disabledEditMessage" value="${g.message(code:'stockMovement.isDifferentOrigin.message')}"/>
             </g:elseif>
             <g:link controller="stockMovement" action="edit" id="${stockMovement?.id}" class="button"
