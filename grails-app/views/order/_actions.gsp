@@ -36,42 +36,52 @@
 					&nbsp;${warehouse.message(code: 'order.addDocument.label')}
 				</g:link>
 			</div>
-			<g:if test="${orderInstance?.isPending() && orderInstance?.orderTypeCode == OrderTypeCode.PURCHASE_ORDER}">
+			<g:if test="${orderInstance?.orderTypeCode == OrderTypeCode.PURCHASE_ORDER}">
+				<g:if test="${orderInstance?.isPending()}">
+					<div class="action-menu-item">
+						<g:link controller="purchaseOrder" action="edit" id="${orderInstance?.id}" params="[id:orderInstance?.id]">
+							<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" style="vertical-align: middle" />
+							&nbsp;${warehouse.message(code: 'order.editDetails.label')}
+						</g:link>
+					</div>
+					<div class="action-menu-item">
+						<g:link controller="purchaseOrder" action="addItems" id="${orderInstance?.id}">
+							<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add" style="vertical-align: middle" />
+							&nbsp;${warehouse.message(code: 'order.editItems.label')}
+						</g:link>
+					</div>
+					<div class="action-menu-item">
+						<g:link controller="order" action="placeOrder" id="${orderInstance?.id}">
+							<img src="${resource(dir: 'images/icons/silk', file: 'cart.png')}" />
+							&nbsp;${warehouse.message(code: 'order.placeOrder.label')}
+						</g:link>
+					</div>
+				</g:if>
 				<div class="action-menu-item">
-					<g:link controller="purchaseOrder" action="edit" id="${orderInstance?.id}" params="[id:orderInstance?.id]">
-						<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" style="vertical-align: middle" />
-						&nbsp;${warehouse.message(code: 'order.editDetails.label')}
+					<g:link target="_blank" controller="order" action="print" id="${orderInstance?.id}"
+							disabled="${orderInstance?.status < OrderStatus.PLACED}"
+							disabledMessage="Order must be placed in order to print.">
+						<img src="${createLinkTo(dir: 'images/icons', file: 'pdf.png')}" class="middle"/>&nbsp;
+						<warehouse:message code="order.print.label" default="Print order"/>
 					</g:link>
 				</div>
-				<div class="action-menu-item">
-					<g:link controller="purchaseOrder" action="addItems" id="${orderInstance?.id}">
-						<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" alt="Add" style="vertical-align: middle" />
-						&nbsp;${warehouse.message(code: 'order.editItems.label')}
-					</g:link>
-				</div>
-				<div class="action-menu-item">
-					<g:link controller="order" action="placeOrder" id="${orderInstance?.id}">
-						<img src="${resource(dir: 'images/icons/silk', file: 'cart.png')}" />
-						&nbsp;${warehouse.message(code: 'order.placeOrder.label')}
-					</g:link>
-				</div>
+				<g:if test="${orderInstance?.isPlaced()}">
+					<div class="action-menu-item">
+						<g:link controller="order" action="withdraw" id="${orderInstance?.id}" onclick="alert('${warehouse.message(code: 'default.button.notSupported.message', default: 'This feature is not currently supported.')}'); return false;">
+							<img src="${resource(dir: 'images/icons/silk', file: 'cart_delete.png')}" />
+							&nbsp;${warehouse.message(code: 'order.cancelOrder.label')}
+						</g:link>
+					</div>
+				</g:if>
 			</g:if>
-			<div class="action-menu-item">
-				<g:link target="_blank" controller="order" action="print" id="${orderInstance?.id}"
-						disabled="${orderInstance?.status < OrderStatus.PLACED}"
-                        disabledMessage="Order must be placed in order to print.">
-					<img src="${createLinkTo(dir: 'images/icons', file: 'pdf.png')}" class="middle"/>&nbsp;
-					<warehouse:message code="order.print.label" default="Print order"/>
-				</g:link>
-			</div>
-			<g:if test="${orderInstance?.isPlaced() && orderInstance?.orderTypeCode == OrderTypeCode.PURCHASE_ORDER}">
+			<g:elseif test="${orderInstance?.orderTypeCode == OrderTypeCode.TRANSFER_ORDER}">
 				<div class="action-menu-item">
-					<g:link controller="order" action="withdraw" id="${orderInstance?.id}" onclick="alert('${warehouse.message(code: 'default.button.notSupported.message', default: 'This feature is not currently supported.')}'); return false;">
-						<img src="${resource(dir: 'images/icons/silk', file: 'cart_delete.png')}" />
-						&nbsp;${warehouse.message(code: 'order.cancelOrder.label')}
+					<g:link controller="putAway" action="generatePdf" id="${orderInstance?.id}" target="_blank">
+						<img src="${resource(dir: 'images/icons', file: 'pdf.png')}" class="middle"/>
+						<warehouse:message code="putaway.generatePutawayList.label" default="Generate Putaway List"/>
 					</g:link>
 				</div>
-			</g:if>
+			</g:elseif>
 			<g:isSuperuser>
 				<div class="action-menu-item">
 					<hr/>
@@ -87,13 +97,15 @@
 					<g:elseif test="${orderInstance?.shipments}">
 						<g:set var="disabledMessage" value="${g.message(code:'order.errors.rollback.message')}"/>
 					</g:elseif>
-					<g:link controller="order" action="rollbackOrderStatus" id="${orderInstance?.id}"
-							onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
-							disabled="${orderInstance?.shipments || !isApprover}"
-							disabledMessage="${disabledMessage}">
-						<img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />
-						&nbsp;${warehouse.message(code: 'order.rollbackOrderStatus.label', default: "Rollback order status" )}
-					</g:link>
+					<g:if test="${orderInstance?.isPlaced() && orderInstance?.orderTypeCode == OrderTypeCode.PURCHASE_ORDER}">
+							<g:link controller="order" action="rollbackOrderStatus" id="${orderInstance?.id}"
+									onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
+									disabled="${orderInstance?.shipments || !isApprover}"
+									disabledMessage="${disabledMessage}">
+								<img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />
+								&nbsp;${warehouse.message(code: 'order.rollbackOrderStatus.label', default: "Rollback order status" )}
+							</g:link>
+					</g:if>
 				</div>
 				<g:if test="${!(orderInstance?.orderTypeCode == OrderTypeCode.TRANSFER_ORDER && orderInstance?.status == OrderStatus.COMPLETED)}">
 					<div class="action-menu-item">
