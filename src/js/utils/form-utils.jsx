@@ -69,7 +69,7 @@ export const renderFormFields = ({
       </div>
       <div className="row">
         <div className="col-md-2 hidden" />
-        <div className="help-block col-md-4" style={{ float: 'left' }}>
+        <div className="help-block" style={{ float: 'left' }}>
           { (error && (touched || fieldTouched || showError)) ? translate(`${error}`) : '' }
         </div>
       </div>
