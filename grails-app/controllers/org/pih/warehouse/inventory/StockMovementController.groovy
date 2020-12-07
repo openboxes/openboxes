@@ -164,6 +164,7 @@ class StockMovementController {
         stockMovement.receiptStatusCodes = params?.list("receiptStatusCode") ? params?.list("receiptStatusCode") as ShipmentStatusCode[] : null
         stockMovement.requisitionStatusCodes = params?.list("status") ? params?.list("status") as RequisitionStatus[] : null
         stockMovement.requestType = requisition?.type
+        stockMovement.sourceType = requisition?.sourceType
 
         def stockMovements
 

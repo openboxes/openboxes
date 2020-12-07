@@ -281,6 +281,11 @@
                         <div class="mm-content-section">
                             <h3><warehouse:message code="stockMovements.label" default="Stock Movements" /></h3>
                             <div class="mm-menu-item">
+                                <g:link controller="stockMovement" action="list" params="[direction:'OUTBOUND', sourceType: 'ELECTRONIC']">
+                                    <warehouse:message code="default.open.label" args="[warehouse.message(code: 'requests.label')]"/>
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
                                 <g:link controller="stockMovement" action="createOutbound" params="[direction:'OUTBOUND']">
                                     <warehouse:message code="default.create.label" args="[warehouse.message(code: 'stockMovement.outbound.label')]"/>
                                 </g:link>
