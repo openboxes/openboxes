@@ -7,7 +7,13 @@
     <meta name="layout" content="custom" />
     <g:set var="entityName" value="${warehouse.message(code: 'stockMovements.label', default: 'Stock Movements')}" />
     <title>
-        ${entityName} &rsaquo; <warehouse:message code="enum.StockMovementType.${params.direction}"/>
+        ${entityName}
+        <g:if test="${params.sourceType}">
+            &rsaquo; <warehouse:message code="requests.label"/>
+        </g:if>
+        <g:elseif test="${params.direction}">
+            &rsaquo; <warehouse:message code="enum.StockMovementType.${params.direction}"/>
+        </g:elseif>
     </title>
     <content tag="pageTitle">${entityName}</content>
     <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/jquery-date-range-picker/0.16.1/daterangepicker.min.css" />
@@ -33,9 +39,12 @@
     <div class="summary">
         <div class="title">
             ${entityName}
-            <g:if test="${params.direction}">
-                &rsaquo; <warehouse:message code="enum.StockMovementType.${params.direction}"/>
+            <g:if test="${params.sourceType}">
+                &rsaquo; <warehouse:message code="requests.label"/>
             </g:if>
+            <g:elseif test="${params.direction}">
+                &rsaquo; <warehouse:message code="enum.StockMovementType.${params.direction}"/>
+            </g:elseif>
         </div>
     </div>
 
@@ -63,6 +72,12 @@
                 <img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}" />&nbsp;
                 <warehouse:message code="default.list.label" args="[warehouse.message(code: 'stockMovement.label')]"/>
             </g:link>
+            <g:if test="${params.direction as StockMovementType == StockMovementType.OUTBOUND}">
+                <g:link controller="stockMovement" action="list" class="button" params="[direction:'OUTBOUND', sourceType: 'ELECTRONIC']">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}" />&nbsp;
+                    <warehouse:message code="default.open.label" args="[warehouse.message(code: 'requests.label')]"/>
+                </g:link>
+            </g:if>
             <g:link controller="stockMovement" action="create" class="button" params="[direction:params.direction]">
                 <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
                 <warehouse:message code="default.create.label" args="[warehouse.message(code: 'stockMovement.label')]" />

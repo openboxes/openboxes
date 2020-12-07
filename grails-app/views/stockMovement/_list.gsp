@@ -2,7 +2,12 @@
 <div class="box">
     <h2>
         ${entityName} &rsaquo;
-        <warehouse:message code="enum.StockMovementType.${params.direction}"/>
+        <g:if test="${params.sourceType}">
+            <warehouse:message code="requests.label"/>
+        </g:if>
+        <g:elseif test="${params.direction}">
+            <warehouse:message code="enum.StockMovementType.${params.direction}"/>
+        </g:elseif>
         (${totalCount?:0})
     </h2>
     <table>

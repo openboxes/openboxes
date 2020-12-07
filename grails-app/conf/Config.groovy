@@ -1053,7 +1053,6 @@ openboxes {
                     label: "",
                     defaultLabel: "Stock Movement",
                     menuItems: [
-                        [label: "requests.openRequests.label", defaultLabel: "Open Requests", href: "/${appName}/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC"],
                         [label: "outbound.create.label", defaultLabel: "Create Outbound Movements", href: "/${appName}/stockMovement/createOutbound?direction=OUTBOUND"],
                         [label: "outbound.list.label", defaultLabel: "List Outbound Movements", href: "/${appName}/stockMovement/list?direction=OUTBOUND"]
                     ]
