@@ -26,7 +26,7 @@
                requestedDateRange:params.requestedDateRange, issuedDateRange:params.issuedDateRange, type:params.type,
                'createdBy.id':params?.createdBy?.id, sort:params?.sort, order:params?.order,
                'requestedBy.id': params?.requestedBy?.id, receiptStatusCode: params.receiptStatusCode,
-               'createdAfter': params?.createdAfter, 'createdBefore': params?.createdBefore]"/>
+               'createdAfter': params?.createdAfter, 'createdBefore': params?.createdBefore, 'sourceType': params?.sourceType]"/>
 
 <div class="body">
     <g:if test="${flash.message}">
