@@ -37,12 +37,13 @@ class TableRow extends Component {
         <div className="d-flex flex-row border-bottom table-inner-row">
           {_.map(fieldsConfig.fields, (config, name) => {
             const dynamicAttr = config.getDynamicAttr ? config.getDynamicAttr(properties) : {};
+            const { attributes } = config;
             const { hide } = dynamicAttr;
             if (!hide) {
               return (
                 <div
                   key={`${field}.${name}`}
-                  className="align-self-center mx-1"
+                  className={`align-self-center ${attributes && attributes.cellClassName ? attributes.cellClassName : ''}`}
                   style={{
                     flex: config.fixedWidth ? `0 1 ${config.fixedWidth}` : `${config.flexWidth || '12'} 1 0`,
                     minWidth: 0,

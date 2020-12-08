@@ -69,8 +69,31 @@ class FieldArrayComponent extends Component {
 
     return (
       <div className="d-flex flex-column">
+        {/* Additional headers, that act as a 'colspan'. Dev should provide either
+            fixedWith or flexWidth which will show which table columns should be
+            grouped under a specific header. Total value of grouping headers width
+            (fixed or flex) should be the same as it is on the table columns. */}
+        {fieldsConfig.headerGroupings && (
+          <div className="text-center border table-additional-header">
+            <div className="d-flex flex-row border-bottom font-weight-bold">
+              {_.map(fieldsConfig.headerGroupings, (config, name) => (
+                <div
+                  className="text-truncate font-size-xs"
+                  key={name}
+                  style={{
+                    flex: config.fixedWidth ? `0 1 ${config.fixedWidth}` : `${config.flexWidth || '12'} 1 0`,
+                    minWidth: 0,
+                    textAlign: config.headerAlign ? config.headerAlign : 'center',
+                  }}
+                >
+                  {config.label && <span className="w-100 mx-1"><Translate id={config.label} defaultMessage={config.defaultLabel} /></span>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         <div className="text-center border table-header">
-          <div className="d-flex flex-row border-bottom font-weight-bold py-1 mr-3">
+          <div className="d-flex flex-row border-bottom font-weight-bold">
             {_.map(fieldsConfig.fields, (config, name) => {
               const dynamicAttr = config.getDynamicAttr ? config.getDynamicAttr(properties) : {};
               const { hide } = dynamicAttr;
@@ -78,7 +101,7 @@ class FieldArrayComponent extends Component {
                 return (
                   <div
                     key={name}
-                    className="mx-1"
+                    className={`${config.headerClassName ? config.headerClassName : ''}`}
                     style={{
                       flex: config.fixedWidth ? `0 1 ${config.fixedWidth}` : `${config.flexWidth || '12'} 1 0`,
                       minWidth: 0,
@@ -95,7 +118,7 @@ class FieldArrayComponent extends Component {
                       hideDelay="50"
                     >
                       <div
-                        className={`mx-1 text-truncate font-size-xs ${config.required ? 'required' : ''}`}
+                        className={`mx-2 text-truncate font-size-xs ${config.required ? 'required' : ''}`}
                       >{config.label &&
                       <Translate id={config.label} defaultMessage={config.defaultMessage} />}
                       </div>

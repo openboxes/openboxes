@@ -21,6 +21,10 @@ const LabelField = (props) => {
   } = attr;
   const className = `text-truncate ${otherAttr.className ? otherAttr.className : ''}`;
 
+  if (otherAttr.cellClassName) {
+    delete otherAttr.cellClassName;
+  }
+
   const renderField = ({ input: { value } }) => (
     <div className="form-group my-0">
       <div className="row">
