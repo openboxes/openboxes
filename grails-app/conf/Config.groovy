@@ -845,6 +845,13 @@ openboxes.mail.errors.recipients = ["errors@openboxes.com"]
 // Barcode scanner (disabled by default)
 openboxes.scannerDetection.enabled = false
 
+// Print barcode labels via USB
+openboxes.barcode.printer.name = "printer-thermalprinter"
+
+// Print barcode labels via RAW
+openboxes.barcode.printer.ipAddress = "127.0.0.1"
+openboxes.barcode.printer.port = 9100
+
 // Default delay and min length for typeahead components
 openboxes.typeahead.delay = 300
 openboxes.typeahead.minLength = 3

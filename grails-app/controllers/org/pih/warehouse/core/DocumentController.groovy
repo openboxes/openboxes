@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.core
 
+import fr.w3blog.zpl.utils.ZebraUtils
 import groovyx.net.http.HTTPBuilder
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
@@ -411,24 +412,32 @@ class DocumentController {
         Location location = Location.load(session.warehouse.id)
         InventoryItem inventoryItem = InventoryItem.load(params?.inventoryItem?.id)
 
-        String lptPort = grailsApplication.config.openboxes.linePrinterTerminal.port
-
         Map model = [document: document, inventoryItem: inventoryItem, location: location]
         String renderedContent = templateService.renderTemplate(document, model)
 
         try {
-            FileOutputStream os = new FileOutputStream(lptPort)
-            PrintStream ps = new PrintStream(os)
-            ps.println(renderedContent)
-            ps.print("\f")
-            ps.close()
+            if (params.protocol=="usb") {
+                String printerName = grailsApplication.config.openboxes.barcode.printer.name
+                log.info "Printing ZPL to ${printerName}: ${renderedContent} "
+                ZebraUtils.printZpl(renderedContent, "printer_thermalprinter")
+            }
+            else if (params.protocol == "raw") {
+                String ipAddress = grailsApplication.config.openboxes.barcode.printer.ipAddress
+                Integer port = grailsApplication.config.openboxes.barcode.printer.port
+                log.info "Printing ${renderedContent} to ${ipAddress}:${port}"
+                ZebraUtils.printZpl(renderedContent, ipAddress, port)
+            }
+            else {
+                throw new IllegalArgumentException("Must specify printing protocol or configure default")
+            }
+
             flash.message = "Label printed successfully"
         }
         catch (Exception e) {
             flash.message = e.message
         }
 
-        redirect(controller: "inventoryItem", action: "showStockCard", id: inventoryItem?.id)
+        redirect(controller: "inventoryItem", action: "showStockCard", id: inventoryItem?.product?.id)
     }
 
     def buildZebraTemplate = {
@@ -442,7 +451,6 @@ class DocumentController {
     }
 
     def renderZebraTemplate = {
-
         Document document = Document.load(params.id)
         InventoryItem inventoryItem = InventoryItem.load(params.inventoryItem?.id)
         Location location = Location.load(session.warehouse.id)
