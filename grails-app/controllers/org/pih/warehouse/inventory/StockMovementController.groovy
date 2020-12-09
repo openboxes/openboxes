@@ -16,6 +16,7 @@ import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.BulkDocumentCommand
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCommand
@@ -348,6 +349,26 @@ class StockMovementController {
         shipment.save()
 
         render([data: "Document was uploaded successfully"] as JSON)
+    }
+
+
+    def uploadDocuments = { BulkDocumentCommand command ->
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        Shipment shipment = stockMovement.shipment
+
+        command.filesContents.each { fileContent ->
+            Document document = new Document()
+            document.fileContents = fileContent.bytes
+            document.contentType = fileContent.fileItem.contentType
+            document.name = fileContent.fileItem.name
+            document.filename = fileContent.fileItem.name
+            document.documentType = DocumentType.get(Constants.DEFAULT_DOCUMENT_TYPE_ID)
+
+            shipment.addToDocuments(document)
+        }
+        shipment.save()
+
+        render([data: "Documents were uploaded successfully"] as JSON)
     }
 
     def addDocument = {
