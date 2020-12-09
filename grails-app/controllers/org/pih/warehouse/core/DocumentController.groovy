@@ -495,6 +495,18 @@ class DocumentCommand {
         name(nullable: true)
         fileContents(nullable: false)
     }
+}
 
+/**
+ * Command object (for bulk upload)
+ */
+class BulkDocumentCommand extends DocumentCommand {
+    List<MultipartFile> filesContents
+
+    static constraints = {
+        name(nullable: true)
+        fileContents(nullable: true)
+        filesContents(nullable: false)
+    }
 }
 
