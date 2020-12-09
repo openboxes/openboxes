@@ -498,31 +498,31 @@ class SendMovementPage extends Component {
    * @param {object} values
    * @public
    */
-  submitStockMovement(values) {
+  sendFilesAndSave(values) {
     this.props.showSpinner();
     const { files } = this.state;
     if (files.length > 1) {
       this.sendFiles(files)
         .then(() => {
-          Alert.success(this.props.translate('react.stockMovement.alert.fileSuccess.label', 'File uploaded successfuly!'), { timeout: 3000 });
+          Alert.success(this.props.translate('react.stockMovement.alert.filesSuccess.label', 'Files uploaded successfuly!'), { timeout: 3000 });
           this.removeFiles(_.map(files, file => file.name));
-          this.prepareRequestAndSave(values);
+          this.prepareRequestAndSubmitStockMovement(values);
         })
-        .catch(() => Alert.error(this.props.translate('react.stockMovement.alert.fileError.label', 'Error occured during file upload!')));
+        .catch(() => Alert.error(this.props.translate('react.stockMovement.alert.filesError.label', 'Error occured during files upload!')));
     } else if (files.length === 1) {
       this.sendFile(files[0])
         .then(() => {
           Alert.success(this.props.translate('react.stockMovement.alert.fileSuccess.label', 'File uploaded successfuly!'), { timeout: 3000 });
           this.removeFile(files[0].name);
-          this.prepareRequestAndSave(values);
+          this.prepareRequestAndSubmitStockMovement(values);
         })
         .catch(() => Alert.error(this.props.translate('react.stockMovement.alert.fileError.label', 'Error occured during file upload!')));
     } else {
-      this.prepareRequestAndSave(values);
+      this.prepareRequestAndSubmitStockMovement(values);
     }
   }
 
-  prepareRequestAndSave(values) {
+  prepareRequestAndSubmitStockMovement(values) {
     const payload = {
       dateShipped: values.dateShipped,
       'shipmentType.id': values.shipmentType,
@@ -771,7 +771,7 @@ class SendMovementPage extends Component {
                   </button>
                   <button
                     type="submit"
-                    onClick={() => { this.submitStockMovement(values); }}
+                    onClick={() => { this.sendFilesAndSave(values); }}
                     className={`${values.shipped ? 'btn btn-outline-secondary' : 'btn btn-outline-success'} float-right btn-form btn-xs`}
                     disabled={invalid || values.statusCode === 'ISSUED'}
                   ><Translate id="react.stockMovement.sendShipment.label" defaultMessage="Send shipment" />
