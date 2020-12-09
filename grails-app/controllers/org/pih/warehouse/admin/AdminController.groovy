@@ -179,32 +179,6 @@ class AdminController {
         chain(action: "showUpgrade", model: [command: command])
     }
 
-
-    def testZebraPrinter = {
-        try {
-
-            PrintService[] printServices = PrinterJob.lookupPrintServices()
-            //PrinterJob
-            DocPrintJob job = psZebra.createPrintJob()
-
-            String s = "N" + "\n" +
-                    "q305" + "\n" +
-                    "Q203,26" + "\n" +
-                    "B55,26,0,1,2,2,152,B,\"" + code + "\"" + "\n" +
-                    "P1,1"
-
-            InputStream inputStream = new ByteArrayInputStream(s.getBytes())
-            DocFlavor flavor = DocFlavor.INPUT_STREAM.AUTOSENSE
-            Doc doc = new SimpleDoc(inputStream, flavor, null)
-
-            job.print(doc, null)
-            inputStream.close()
-        } catch (IOException e) {
-            e.printStackTrace()
-        }
-    }
-
-
     def showDatabaseStatus = {
         def results = dataService.executeQuery("show engine innodb status")
         render "<pre>${results.Status[0]}</pre>"
