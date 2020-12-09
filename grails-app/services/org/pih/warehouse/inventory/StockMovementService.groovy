@@ -547,12 +547,24 @@ class StockMovementService {
                 requisitionItems = RequisitionItem.createCriteria().list(max: max.toInteger(), offset: offset.toInteger()) {
                     eq("requisition", requisition)
                     isNull("parentRequisitionItem")
+                    if (requisition.sortByCode == RequisitionItemSortByCode.CATEGORY) {
+                        product {
+                            order("category", "asc")
+                            order("name", "asc")
+                        }
+                    }
                     order("orderIndex", 'asc')
                 }
             } else {
                 requisitionItems = RequisitionItem.createCriteria().list() {
                     eq("requisition", requisition)
                     isNull("parentRequisitionItem")
+                    if (requisition.sortByCode == RequisitionItemSortByCode.CATEGORY) {
+                        product {
+                            order("category", "asc")
+                            order("name", "asc")
+                        }
+                    }
                     order("orderIndex", 'asc')
                 }
             }
@@ -629,8 +641,9 @@ class StockMovementService {
     }
 
     List getEditPageItems(Requisition requisition, String max, String offset) {
-        def query = offset ?
-                """ select * FROM edit_page_item where requisition_id = :requisition and requisition_item_type = 'ORIGINAL' ORDER BY sort_order limit :offset, :max; """ :
+        def query = offset ? (requisition.sortByCode == RequisitionItemSortByCode.CATEGORY ?
+                """ select * FROM edit_page_item where requisition_id = :requisition and requisition_item_type = 'ORIGINAL' ORDER BY category, name, sort_order limit :offset, :max; """ :
+                """ select * FROM edit_page_item where requisition_id = :requisition and requisition_item_type = 'ORIGINAL' ORDER BY sort_order limit :offset, :max; """) :
                 """ select * FROM edit_page_item where requisition_id = :requisition and requisition_item_type = 'ORIGINAL' ORDER BY sort_order """
         def data = dataService.executeQuery(query, [
                 'requisition': requisition.id,
@@ -1365,7 +1378,7 @@ class StockMovementService {
         // If the user specified a stocklist then we should automatically clone it as long as there are no
         // requisition items already added to the requisition
         RequisitionItemSortByCode sortByCode = stockMovement.stocklist?.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX
-        def orderIndex = 0
+        requisition.sortByCode = stockMovement.stocklist.sortByCode
 
         if (stockMovement.stocklist && !requisition.requisitionItems) {
             stockMovement.stocklist."${sortByCode.methodName}".each { stocklistItem ->
@@ -1380,10 +1393,8 @@ class StockMovementService {
                     requisitionItem.quantity = stocklistItem.quantity
                     requisitionItem.quantityApproved = stocklistItem.quantity
                 }
-                requisitionItem.orderIndex = orderIndex
+                requisitionItem.orderIndex = stocklistItem.orderIndex * 100
                 requisition.addToRequisitionItems(requisitionItem)
-
-                orderIndex += 100
             }
         }
     }

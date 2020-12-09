@@ -9,6 +9,7 @@ CREATE OR REPLACE VIEW stock_movement_item AS
 		requisition_item.product_id,
         product.product_code,
         product.name,
+        category.name as category,
         requisition_item.quantity,
         requisition_item.quantity_canceled,
         requisition_item.order_index,
@@ -25,6 +26,8 @@ CREATE OR REPLACE VIEW stock_movement_item AS
         requisition ON requisition_item.requisition_id = requisition.id
 			JOIN
 		product ON product.id = requisition_item.product_id
+        	JOIN
+		category ON category.id = product.category_id
             LEFT OUTER JOIN
 		requisition_item as modification_item ON modification_item.parent_requisition_item_id = requisition_item.id
 		 AND modification_item.requisition_item_type = 'QUANTITY_CHANGE';
