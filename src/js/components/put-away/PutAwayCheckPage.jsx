@@ -232,7 +232,7 @@ class PutAwayCheckPage extends Component {
       putawayStatus: 'COMPLETED',
       putawayItems: _.map(this.props.initialValues.putAway.putawayItems, item => ({
         ...item,
-        putawayStatus: 'CANCELLED',
+        putawayStatus: item.splitItems.length ? 'CANCELLED' : 'COMPLETED',
         splitItems: _.map(item.splitItems, splitItem => ({
           ...splitItem,
           putawayStatus: 'COMPLETED',
