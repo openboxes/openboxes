@@ -8,6 +8,8 @@ import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionSourceType
+import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.tablero.NumberData
 
 class NumberDataService {
@@ -16,7 +18,7 @@ class NumberDataService {
     NumberData getInventoryByLotAndBin(def location) {
         def binLocations = ProductAvailability.executeQuery("select count(*) from ProductAvailability pa where pa.location = :location and pa.quantityOnHand > 0",
                 ['location': location])
-        
+
         def title = [
             code : "react.dashboard.numberData.inventoryByLotAndBin.label",
             message : messageService.getMessage("react.dashboard.numberData.inventoryByLotAndBin.label")
@@ -37,7 +39,7 @@ class NumberDataService {
     NumberData getInProgressShipments(def user, def location) {
         def shipments = Requisition.executeQuery("select count(*) from Requisition r join r.shipments s where r.origin = :location and s.currentStatus = 'PENDING' and r.createdBy = :user",
                 ['location': location, 'user': user]);
-        
+
         def title = [
             code : "react.dashboard.numberData.inProgressShipments.label",
             message : messageService.getMessage("react.dashboard.numberData.inProgressShipments.label")
@@ -68,7 +70,7 @@ class NumberDataService {
             code : "react.dashboard.subtitle.putaways.label",
             message : messageService.getMessage("react.dashboard.subtitle.putaways.label")
         ]
-        
+
         return new NumberData(
             title,
             incompletePutaways[0],
@@ -96,7 +98,7 @@ class NumberDataService {
             code : "react.dashboard.subtitle.products.label",
             message : messageService.getMessage("react.dashboard.subtitle.products.label")
         ]
-        
+
         return new NumberData(
             title,
             receivingBin[0],
@@ -147,7 +149,7 @@ class NumberDataService {
                 [
                     'location': location
                 ])
-        
+
         def title = [
             code : "react.dashboard.numberData.defaultBin.label",
             message : messageService.getMessage("react.dashboard.numberData.defaultBin.label")
@@ -248,5 +250,35 @@ class NumberDataService {
             expiredProductsInStock[0],
             subTitle, "/openboxes/inventory/listExpiredStock?status=expired"
             )
+    }
+
+    NumberData getOpenStockRequests(def location) {
+        def openStockRequests = Requisition.executeQuery("""
+            SELECT COUNT(distinct r.id) FROM Requisition r
+            WHERE r.origin = :location
+            AND r.sourceType = :sourceType
+            AND r.status NOT IN (:statuses)
+            """,
+                [
+                        'location': location,
+                        'sourceType' : RequisitionSourceType.ELECTRONIC,
+                        'statuses' : [RequisitionStatus.CREATED, RequisitionStatus.ISSUED, RequisitionStatus.CANCELED],
+                ])
+
+        def title = [
+                code : "react.dashboard.numberData.openStockRequests.label",
+                message : messageService.getMessage("react.dashboard.numberData.openStockRequests.label")
+        ]
+
+        def subTitle = [
+                code : "react.dashboard.subtitle.requests.label",
+                message : messageService.getMessage("react.dashboard.subtitle.requests.label")
+        ]
+
+        return new NumberData(
+                title,
+                openStockRequests[0],
+                subTitle, "/openboxes/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC"
+        )
     }
 }

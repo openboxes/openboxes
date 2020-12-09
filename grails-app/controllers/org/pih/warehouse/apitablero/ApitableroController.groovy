@@ -27,7 +27,7 @@ class ApitableroController {
 
         render(config as JSON)
     }
-    
+
     @Cacheable("dashboardCache")
     def breadcrumbsConfig = {
         render(grailsApplication.config.breadcrumbsConfig as JSON)
@@ -196,4 +196,11 @@ class ApitableroController {
         def stockOutLastMonth = indicatorDataService.getStockOutLastMonth(location)
         render (stockOutLastMonth.toJson() as JSON)
      }
+
+    @Cacheable("dashboardCache")
+    def getOpenStockRequests = {
+        Location location = Location.get(params.locationId)
+        NumberData numberData = numberDataService.getOpenStockRequests(location)
+        render (numberData as JSON)
+    }
 }
