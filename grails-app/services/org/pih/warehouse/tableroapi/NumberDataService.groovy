@@ -266,13 +266,13 @@ class NumberDataService {
                 ])
 
         def title = [
-                code : "react.dashboard.numberData.openStockRequests.label",
-                message : messageService.getMessage("react.dashboard.numberData.openStockRequests.label")
+                code : "react.dashboard.openStockRequests.title.label",
+                message : messageService.getMessage("react.dashboard.openStockRequests.title.label")
         ]
 
         def subTitle = [
-                code : "react.dashboard.subtitle.requests.label",
-                message : messageService.getMessage("react.dashboard.subtitle.requests.label")
+                code : "react.dashboard.requests.subtitle.label",
+                message : messageService.getMessage("react.dashboard.requests.subtitle.label")
         ]
 
         return new NumberData(
