@@ -305,6 +305,7 @@ class Product implements Comparable, Serializable {
         createdBy(nullable: true)
         updatedBy(nullable: true)
         glAccount(nullable: true)
+        productColor(nullable: true)
     }
 
     /**
