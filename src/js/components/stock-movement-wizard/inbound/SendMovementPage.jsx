@@ -750,6 +750,7 @@ class SendMovementPage extends Component {
                     shipmentTypes: this.state.shipmentTypes,
                     issued: values.statusCode === 'DISPATCHED',
                     received: values.received,
+                    canBeEdited: !values.received,
                   }))}
               </div>
               <div>
