@@ -1378,9 +1378,9 @@ class StockMovementService {
         // If the user specified a stocklist then we should automatically clone it as long as there are no
         // requisition items already added to the requisition
         RequisitionItemSortByCode sortByCode = stockMovement.stocklist?.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX
-        requisition.sortByCode = stockMovement.stocklist.sortByCode
 
         if (stockMovement.stocklist && !requisition.requisitionItems) {
+            requisition.sortByCode = stockMovement.stocklist.sortByCode
             stockMovement.stocklist."${sortByCode.methodName}".each { stocklistItem ->
                 RequisitionItem requisitionItem = new RequisitionItem()
                 requisitionItem.product = stocklistItem.product
