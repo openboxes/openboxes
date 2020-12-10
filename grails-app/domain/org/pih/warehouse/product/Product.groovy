@@ -68,7 +68,6 @@ class Product implements Comparable, Serializable {
     def afterDelete = publishPersistenceEvent
 
 
-
     // Base product information
     String id
 
@@ -224,8 +223,19 @@ class Product implements Comparable, Serializable {
     User createdBy
     User updatedBy
 
-    // "inventoryLevels"
-    static transients = ["rootCategory", "categoriesList", "images", "genericProduct", "thumbnail", "binLocation", "substitutions", "color"]
+    String productColor
+
+    static transients = ["rootCategory",
+                         "categoriesList",
+                         "images",
+                         "genericProduct",
+                         "thumbnail",
+                         "binLocation",
+                         "substitutions",
+                         "color",
+                         "applicationTagLib",
+                         "handlingIcons"
+    ]
 
     static hasMany = [
             categories         : Category,
@@ -253,6 +263,7 @@ class Product implements Comparable, Serializable {
         synonyms cascade: 'all-delete-orphan', sort: 'name'
         productSuppliers cascade: 'all-delete-orphan'//, sort: 'dateCreated'
         productComponents cascade: "all-delete-orphan"
+        productColor(formula: '(select max(pc.color) from product_catalog_item pci left outer join product_catalog pc on pci.product_catalog_id = pc.id where pci.product_id = id group by pci.product_id)')
     }
 
     static mappedBy = [productComponents: "assemblyProduct"]
@@ -294,6 +305,7 @@ class Product implements Comparable, Serializable {
         createdBy(nullable: true)
         updatedBy(nullable: true)
         glAccount(nullable: true)
+        productColor(nullable: true)
     }
 
     /**
@@ -478,15 +490,15 @@ class Product implements Comparable, Serializable {
     }
 
 /**
-     * Get the first receiving date for this inventory item in given bin location at the given location.
-     *
-     * @param locationId
-     * @return
-     */
+ * Get the first receiving date for this inventory item in given bin location at the given location.
+ *
+ * @param locationId
+ * @return
+ */
     Date earliestTransactionDate(String locationId, List<TransactionCode> transactionCodes) {
         Inventory inventory = Location.get(locationId).inventory
         def date
-            date = TransactionEntry.executeQuery("""
+        date = TransactionEntry.executeQuery("""
                 select 
                   min(t.transactionDate)
                 from TransactionEntry as te
@@ -529,7 +541,7 @@ class Product implements Comparable, Serializable {
 
     Boolean hasOneOfTags(List<Tag> tagsInput) {
         return tagsInput.find { tag ->
-           tags?.contains(tag)
+            tags?.contains(tag)
         }
     }
 
@@ -589,12 +601,12 @@ class Product implements Comparable, Serializable {
         def results = ProductCatalogItem.executeQuery("select pci.productCatalog.color " +
                 " from ProductCatalogItem pci where pci.product = :product " +
                 " AND pci.productCatalog.color is not null",
-                [product:this, max:1])
+                [product: this, max: 1])
         return results ? results[0] : null
     }
 
     def getApplicationTagLib() {
-        return ApplicationHolder.application.mainContext.getBean( 'org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib' )
+        return ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
     }
 
     def getHandlingIcons() {
@@ -609,17 +621,17 @@ class Product implements Comparable, Serializable {
 
     Map toJson() {
         [
-                id         : id,
-                productCode: productCode,
-                name       : name,
-                description: description,
-                category   : category?.toJson(),
+                id           : id,
+                productCode  : productCode,
+                name         : name,
+                description  : description,
+                category     : category?.toJson(),
                 unitOfMeasure: unitOfMeasure,
-                pricePerUnit: pricePerUnit,
-                dateCreated: dateCreated,
-                lastUpdated: lastUpdated,
-                color: color,
-                handlingIcons: getHandlingIcons()
+                pricePerUnit : pricePerUnit,
+                dateCreated  : dateCreated,
+                lastUpdated  : lastUpdated,
+                color        : productColor,
+                handlingIcons: handlingIcons
         ]
     }
 }
