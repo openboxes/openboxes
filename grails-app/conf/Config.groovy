@@ -966,7 +966,7 @@ openboxes.locale.translationApi.apiKey = ""
 openboxes.locale.translationApi.format = "plain"
 
 // Inventory snapshot configuration
-openboxes.inventorySnapshot.batchSize = 500
+openboxes.inventorySnapshot.batchSize = 100
 
 // Minimum date for expiration date
 openboxes.expirationDate.minValue = new Date("01/01/2000")

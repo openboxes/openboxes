@@ -108,7 +108,6 @@ class ProductAvailabilityService {
                                     "where location_id = '${location.id}' " +
                                     "and product_id = IFNULL(%s, product_id);", productId)
                     stmt.addBatch(forceRefreshStatement)
-
                 }
                 binLocations.eachWithIndex { Map binLocationEntry, index ->
                     String insertStatement = generateInsertStatement(location, binLocationEntry)
@@ -120,8 +119,6 @@ class ProductAvailabilityService {
 
             // Refresh inventory snapshot
             refreshInventorySnapshot(location, product, forceRefresh)
-
-            //RefreshInventorySnapshotJob.triggerNow([locationId: location?.id, productId: product?.id, forceRefresh: forceRefresh])
 
         } catch (Exception e) {
             log.error("Error executing batch update for ${location.name}: " + e.message, e)
