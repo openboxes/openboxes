@@ -166,9 +166,9 @@
           }
           nRow.getElementsByTagName('th')[2].innerHTML = totalDemand;
           var secondRow = $(nRow).next()[0];
-          var startDate = moment($('#startDate').val());
-          var endDate = moment($('#endDate').val());
-          var monthsDifference = endDate.diff(startDate, 'months');
+          var startDate = moment($('#startDate').val()).startOf('month');
+          var endDate = moment($('#endDate').val()).startOf('month');
+          var monthsDifference = endDate.diff(startDate, 'months', true) + 1;
           secondRow.getElementsByTagName('th')[2].innerHTML = Math.round(totalDemand / monthsDifference);
         },
         "oLanguage": {
