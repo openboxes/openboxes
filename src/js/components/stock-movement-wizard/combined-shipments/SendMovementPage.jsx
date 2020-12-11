@@ -758,6 +758,7 @@ class SendMovementPage extends Component {
                     issued: values.statusCode === 'ISSUED',
                     received: values.received,
                     canBeEdited: !values.received,
+                    debouncedLocationsFetch: this.debouncedLocationsFetch,
                   }))}
               </div>
               <div>

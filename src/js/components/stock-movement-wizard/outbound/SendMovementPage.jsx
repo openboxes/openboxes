@@ -804,6 +804,9 @@ class SendMovementPage extends Component {
                     issued: values.statusCode === 'DISPATCHED',
                     received: values.received,
                     showOnly,
+                    canBeEdited: !values.received,
+                    debouncedLocationsFetch: this.debouncedLocationsFetch,
+                    hasStockList: !!_.get(values.stocklist, 'id'),
                   }))}
               </div>
               <div>
