@@ -420,13 +420,13 @@ openboxes {
                     enabled = true
                     endpoint = "/${appName}/apitablero/getInProgressPutaways"
                     archived = ['inventory', 'transaction', 'fillRate']
-                    order = 4
+                    order = 1
                 }
                 inventoryByLotAndBin {
                     enabled = true
                     endpoint = "/${appName}/apitablero/getInventoryByLotAndBin"
                     archived = ['inventory', 'transaction', 'fillRate']
-                    order = 1
+                    order = 2
                 }
                 inProgressShipments {
                     enabled = true
@@ -438,7 +438,7 @@ openboxes {
                     enabled = true
                     endpoint = "/${appName}/apitablero/getReceivingBin"
                     archived = ['transaction', 'fillRate']
-                    order = 2
+                    order = 4
                 }
                 itemsInventoried {
                     enabled = true
@@ -483,7 +483,7 @@ openboxes {
                     endpoint = "/${appName}/apitablero/getInventorySummary"
                     archived = ['inventory', 'transaction', 'fillRate']
                     datalabel = true
-                    order = 1
+                    order = 10
                     colors {
                         labels {
                             success = ["In stock"]
@@ -497,7 +497,7 @@ openboxes {
                     endpoint = "/${appName}/apitablero/getExpirationSummary"
                     archived = ['inventory', 'transaction', 'fillRate']
                     timeFilter = true
-                    order = 2
+                    order = 11
                     colors {
                         datasets {
                             state6 = ["Expiration(s)"]
@@ -517,7 +517,7 @@ openboxes {
                     enabled = true
                     endpoint = "/${appName}/apitablero/getIncomingStock"
                     archived = ['inventory', 'transaction', 'fillRate']
-                    order = 3
+                    order = 12
                     colors {
                         datasets {
                             state6 = ["first"]
@@ -530,7 +530,7 @@ openboxes {
                     enabled = true
                     endpoint = "/${appName}/apitablero/getOutgoingStock"
                     archived = ['inventory', 'transaction', 'fillRate']
-                    order = 4
+                    order = 13
                     colors {
                         datasets {
                             success = ["first"]
@@ -546,20 +546,20 @@ openboxes {
                     timeFilter = true
                     stacked = true
                     datalabel = true
-                    order = 7
+                    order = 14
                 }
                 discrepancy {
                     enabled = true
                     endpoint = "/${appName}/apitablero/getDiscrepancy"
                     archived = ['inventory', 'transaction', 'fillRate']
                     timeFilter = true
-                    order = 6
+                    order = 15
                 }
                 delayedShipments {
                     enabled = true
                     endpoint = "/${appName}/apitablero/getDelayedShipments"
                     archived = ['transaction', 'fillRate']
-                    order = 5
+                    order = 16
                     colors {
                         datasets {
                             state5 = ["first"]
@@ -575,7 +575,7 @@ openboxes {
                     timeFilter = true
                     stacked = true
                     datalabel = true
-                    order = 8
+                    order = 17
                 }
                 lossCausedByExpiry {
                     enabled = false
@@ -583,7 +583,7 @@ openboxes {
                     archived = ['personal', 'warehouse', 'inventory', 'fillRate']
                     timeFilter = true
                     stacked = true
-                    order = 9
+                    order = 18
                     colors {
                         datasets {
                             success = ["Inventory value not expired last day of month"]
@@ -596,7 +596,7 @@ openboxes {
                     enabled = false
                     endpoint = "/${appName}/apitablero/getProductsInventoried"
                     archived = ['personal', 'warehouse', 'transaction', 'fillRate']
-                    order = 10
+                    order = 19
                     colors {
                         datasets {
                             state6 = ["first"]
@@ -611,7 +611,7 @@ openboxes {
                     archived = ['personal', 'warehouse', 'inventory', 'fillRate']
                     legend = true
                     datalabel = true
-                    order = 11
+                    order = 20
                     colors {
                         labels {
                             state5 = ["STOCK"]
@@ -638,7 +638,7 @@ openboxes {
                             state8 = ["Average of target Fill Rate"]
                         }
                     }
-                    order = 12
+                    order = 21
                 }
                 stockOutLastMonth {
                     enabled = true
@@ -646,7 +646,7 @@ openboxes {
                     archived = ['personal', 'warehouse', 'inventory', 'fillRate']
                     legend = true
                     datalabel = true
-                    order = 13
+                    order = 22
                     colors {
                         labels {
                             success = ["Never"]

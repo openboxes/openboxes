@@ -5,7 +5,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { getTranslate } from 'react-localize-redux';
 import { Bar, Doughnut, HorizontalBar, Line } from 'react-chartjs-2';
-import { SortableElement } from 'react-sortable-hoc';
 import DragHandle from './DragHandle';
 import LoadingCard from './LoadingCard';
 import Numbers from './Numbers';
@@ -108,7 +107,7 @@ const handleChartClick = (elements) => {
   }
 };
 
-const GraphCard = SortableElement(({
+const GraphCard = ({
   cardId,
   cardTitle,
   cardType,
@@ -165,7 +164,7 @@ const GraphCard = SortableElement(({
     graph = <TableCard data={data} />;
   } else if (cardType === 'numberTable') {
     graph = <NumbersTableCard data={data} options={options} />;
-  } else if (cardType === 'loading') {
+  } else if (cardType === 'loadingGraph') {
     graph = <LoadingCard />;
   } else if (cardType === 'error') {
     graph = <button onClick={() => loadIndicator(cardId)} ><i className="fa fa-repeat" /></button>;
@@ -210,7 +209,7 @@ const GraphCard = SortableElement(({
       </div>
     </div>
   );
-});
+};
 
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
@@ -218,8 +217,17 @@ const mapStateToProps = state => ({
 
 export default (connect(mapStateToProps)(GraphCard));
 
+GraphCard.defaultProps = {
+  cardLink: '',
+  options: {},
+  timeFilter: false,
+  timeLimit: 24,
+  size: null,
+  locationFilter: false,
+};
 
 GraphCard.propTypes = {
+  cardId: PropTypes.number.isRequired,
   cardTitle: PropTypes.oneOfType([
     PropTypes.string.isRequired,
     PropTypes.shape({
@@ -228,8 +236,15 @@ GraphCard.propTypes = {
     }).isRequired,
   ]).isRequired,
   cardType: PropTypes.string.isRequired,
-  timeLimit: PropTypes.number,
+  cardLink: PropTypes.string,
+  data: PropTypes.shape({}).isRequired,
+  options: PropTypes.shape({}),
   loadIndicator: PropTypes.func.isRequired,
+  timeFilter: PropTypes.bool,
+  timeLimit: PropTypes.number,
+  locationFilter: PropTypes.bool,
+  allLocations: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  size: PropTypes.string,
   translate: PropTypes.func.isRequired,
 };
 

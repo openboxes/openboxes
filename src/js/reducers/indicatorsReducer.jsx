@@ -33,8 +33,7 @@ function findInArray(id, array = []) {
 }
 
 const initialState = {
-  data: [],
-  numberData: [],
+  allData: [],
   config: {},
   activeConfig: sessionStorage.getItem('dashboardKey') || 'personal',
 };
@@ -52,89 +51,57 @@ export default function (state = initialState, action) {
         payload.options = loadGraphOptions(payload);
       }
       // new reference to array so the component is re-rendered when value changes
-      const newState = [].concat(state.data);
-      const index = findInArray(payload.id, state.data);
+      const newData = [].concat(state.allData);
+      const index = findInArray(payload.id, state.allData);
       if (index === false) {
-        newState[action.payload.id - 1] = action.payload;
+        newData[action.payload.id - 1] = action.payload;
       } else {
-        newState[index] = payload;
+        newData[index] = payload;
       }
       return {
         ...state,
-        data: newState,
+        allData: newData,
       };
     }
     case FETCH_NUMBERS: {
       // new reference to array so the component is re-rendered when value changes
-      const newState = [].concat(state.numberData);
-      const index = findInArray(action.payload.id, state.numberData);
+      const newData = [].concat(state.allData);
+      const index = findInArray(action.payload.id, state.allData);
       if (index === false) {
-        newState[action.payload.id - 1] = action.payload;
+        newData[action.payload.id - 1] = action.payload;
       } else {
-        newState[index] = action.payload;
+        newData[index] = action.payload;
       }
       return {
         ...state,
-        numberData: newState,
+        allData: newData,
       };
     }
     case RESET_INDICATORS:
       return {
         ...state,
-        data: [],
-        numberData: [],
+        allData: [],
       };
     case REORDER_INDICATORS: {
-      if (action.payload.type === 'graph') {
-        return {
-          ...state,
-          data: arrayMove(
-            state.data,
-            action.payload.oldIndex,
-            action.payload.newIndex,
-          ),
-        };
-      }
-      if (action.payload.type === 'number') {
-        return {
-          ...state,
-          numberData: arrayMove(
-            state.numberData,
-            action.payload.oldIndex,
-            action.payload.newIndex,
-          ),
-        };
-      }
-      return state;
+      return {
+        ...state,
+        allData: arrayMove(
+          state.allData,
+          action.payload.oldIndex,
+          action.payload.newIndex,
+        ),
+      };
     }
     case ADD_TO_INDICATORS:
-      if (action.payload.type === 'graph') {
-        return {
-          ...state,
-          data: arrayUnarchive(state.data, action.payload.index),
-        };
-      }
-      if (action.payload.type === 'number') {
-        return {
-          ...state,
-          numberData: arrayUnarchive(state.numberData, action.payload.index),
-        };
-      }
-      return state;
+      return {
+        ...state,
+        allData: arrayUnarchive(state.allData, action.payload.index),
+      };
     case REMOVE_FROM_INDICATORS: {
-      if (action.payload.type === 'graph') {
-        return {
-          ...state,
-          data: arrayArchive(state.data, action.payload.index),
-        };
-      }
-      if (action.payload.type === 'number') {
-        return {
-          ...state,
-          numberData: arrayArchive(state.numberData, action.payload.index),
-        };
-      }
-      return state;
+      return {
+        ...state,
+        allData: arrayArchive(state.allData, action.payload.index),
+      };
     }
     case FETCH_CONFIG:
       return {

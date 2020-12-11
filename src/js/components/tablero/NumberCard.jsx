@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { SortableElement } from 'react-sortable-hoc';
 import { Line } from 'react-chartjs-2';
 import { connect } from 'react-redux';
 import { getTranslate } from 'react-localize-redux';
 import { Tooltip } from 'react-tippy';
 import DragHandle from './DragHandle';
 import { getColorByName } from '../../consts/dataFormat/colorMapping';
+import LoadingCard from './LoadingCard';
 import './tablero.scss';
 import { translateWithDefaultMessage } from '../../utils/Translate';
 
@@ -74,15 +74,19 @@ const NumberSparklineCard = ({
   </div>
 );
 
-const NumberCard = SortableElement(({
+const NumberCard = ({
   cardTitle,
   cardNumber,
   cardSubtitle,
   cardLink,
   cardDataTooltip,
   sparklineData = null,
+  cardType,
   translate,
 }) => {
+  if (cardType === 'loadingNumber') {
+    return <LoadingCard />;
+  }
   let isSparkline = false;
   if (sparklineData != null) {
     if (sparklineData.colorNumber != null) {
@@ -128,7 +132,7 @@ const NumberCard = SortableElement(({
   return (
     cardLink ? <a target="_blank" rel="noopener noreferrer" href={cardLink} className="number-card">{card}</a> : <div className="number-card">{card}</div>
   );
-});
+};
 
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
@@ -141,20 +145,30 @@ NumberCard.defaultProps = {
     code: '',
     message: '',
   },
+  cardLink: '',
+  cardDataTooltip: '',
+  cardType: '',
+  sparklineData: {},
+  cardNumber: null,
 };
 
 NumberCard.propTypes = {
-  cardTitle: PropTypes.shape({
-    code: PropTypes.string.isRequired,
-    message: PropTypes.string.isRequired,
-  }).isRequired,
+  cardTitle: PropTypes.oneOfType([
+    PropTypes.shape({
+      code: PropTypes.string.isRequired,
+      message: PropTypes.string.isRequired,
+    }).isRequired,
+    PropTypes.string.isRequired,
+  ]).isRequired,
   cardNumber: PropTypes.number,
   cardSubtitle: PropTypes.shape({
     code: PropTypes.string.isRequired,
     message: PropTypes.string.isRequired,
-  }),
+  }).isRequired,
   cardLink: PropTypes.string,
   cardDataTooltip: PropTypes.string,
+  cardType: PropTypes.string.isRequired,
+  sparklineData: PropTypes.shape({}),
   translate: PropTypes.func.isRequired,
 };
 

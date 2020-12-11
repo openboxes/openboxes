@@ -209,8 +209,8 @@ function fetchGraphIndicator(
       payload: {
         id,
         title: 'Loading...',
-        type: 'loading',
-        data: [],
+        type: 'loadingGraph',
+        data: {},
         archived: indicatorConfig.archived,
         enabled: indicatorConfig.enabled,
       },
@@ -276,19 +276,29 @@ function fetchNumberIndicator(
       },
     });
   } else {
-    apiClient.get(url).then((res) => {
-      const indicatorData = res.data;
-      dispatch({
-        type: FETCH_NUMBERS,
-        payload: {
-          ...indicatorData,
-          id,
-          archived: indicatorConfig.archived,
-          enabled: indicatorConfig.enabled,
-        },
-      });
+    dispatch({
+      type: FETCH_NUMBERS,
+      payload: {
+        id,
+        title: 'Loading...',
+        type: 'loadingNumber',
+        archived: indicatorConfig.archived,
+        enabled: indicatorConfig.enabled,
+      },
     });
   }
+  apiClient.get(url).then((res) => {
+    const indicatorData = res.data;
+    dispatch({
+      type: FETCH_NUMBERS,
+      payload: {
+        ...indicatorData,
+        id,
+        archived: indicatorConfig.archived,
+        enabled: indicatorConfig.enabled,
+      },
+    });
+  });
 }
 
 export function reloadIndicator(indicatorConfig, params, locationId) {

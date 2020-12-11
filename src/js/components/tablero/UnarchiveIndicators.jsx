@@ -83,7 +83,7 @@ const ArchivedGraph = (props) => {
     );
   } else if (props.type === 'numbers') {
     graph = <Numbers />;
-  } else if (props.type === 'loading') {
+  } else if (props.type === 'loading' || 'loadingNumber') {
     graph = (
       <ReactLoading
         type="bubbles"
@@ -114,40 +114,47 @@ const ArchivedGraph = (props) => {
 
 const ArchivedIndicators = props => (
   <div>
-    {props.numberData.map((value, index) =>
-      (value.archived && value.enabled ? (
-        <ArchivedNumber
-          key={`item-${value.id}`}
-          index={index}
-          title={value.title}
-          type={value.type}
-          data={value.data}
-          handleAdd={props.handleAdd}
-          unarchiveHandler={props.unarchiveHandler}
-          size={props.size}
-          translate={props.translate}
-        />
-      ) : null))}
-    {props.graphData.map((value, index) =>
-      (value.archived && value.enabled ? (
-        <ArchivedGraph
-          key={`item-${value.id}`}
-          index={index}
-          title={value.title}
-          type={value.type}
-          handleAdd={props.handleAdd}
-          unarchiveHandler={props.unarchiveHandler}
-          size={props.size}
-          translate={props.translate}
-        />
-      ) : null))}
+    {props.allData.map((value, index) => {
+        if (value.type === 'number' || value.type === 'sparkline') {
+          if (value.archived && value.enabled) {
+            return (
+              <ArchivedNumber
+                key={`item-${value.id}`}
+                index={index}
+                title={value.title}
+                type={value.type}
+                data={value.data}
+                handleAdd={props.handleAdd}
+                unarchiveHandler={props.unarchiveHandler}
+                size={props.size}
+                translate={props.translate}
+              />
+            );
+          }
+          return null;
+        }
+        if (value.archived && value.enabled) {
+          return (
+            <ArchivedGraph
+              key={`item-${value.id}`}
+              index={index}
+              title={value.title}
+              type={value.type}
+              handleAdd={props.handleAdd}
+              unarchiveHandler={props.unarchiveHandler}
+              size={props.size}
+              translate={props.translate}
+            />
+          );
+        }
+        return null;
+      })}
   </div>
 );
 
 
 const UnarchiveIndicators = (props) => {
-  const size = props.graphData.filter(data => data.archived && data.enabled).length
-    + props.numberData.filter(data => data.archived && data.enabled).length;
+  const size = props.allData.filter(data => data && data.archived && data.enabled).length;
 
   return (
     <div
@@ -166,8 +173,7 @@ const UnarchiveIndicators = (props) => {
         </span>
         <ul className="unarchived-list">
           <ArchivedIndicators
-            graphData={props.graphData}
-            numberData={props.numberData}
+            allData={props.allData}
             handleAdd={props.handleAdd}
             unarchiveHandler={props.unarchiveHandler}
             size={size}
@@ -186,8 +192,7 @@ const mapStateToProps = state => ({
 export default (connect(mapStateToProps)(UnarchiveIndicators));
 
 UnarchiveIndicators.propTypes = {
-  graphData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  numberData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  allData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   unarchiveHandler: PropTypes.func.isRequired,
   handleAdd: PropTypes.func.isRequired,
   showPopout: PropTypes.bool.isRequired,
@@ -237,10 +242,5 @@ ArchivedNumber.propTypes = {
 };
 
 ArchivedIndicators.propTypes = {
-  graphData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  numberData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  unarchiveHandler: PropTypes.func.isRequired,
-  handleAdd: PropTypes.func.isRequired,
-  size: PropTypes.number.isRequired,
-  translate: PropTypes.func.isRequired,
+  allData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
 };

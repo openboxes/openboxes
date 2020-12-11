@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { defaults } from 'react-chartjs-2';
 import { connect } from 'react-redux';
-import { SortableContainer } from 'react-sortable-hoc';
+import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import 'react-table/react-table.css';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import {
@@ -15,7 +15,6 @@ import {
   fetchConfig,
 } from '../../actions';
 import GraphCard from './GraphCard';
-import LoadingNumbers from './LoadingNumbers';
 import NumberCard from './NumberCard';
 import UnarchiveIndicators from './UnarchiveIndicators';
 import Filter from './Filter';
@@ -25,52 +24,61 @@ import apiClient from '../../utils/apiClient';
 // Disable charts legends by default.
 defaults.scale.ticks.beginAtZero = true;
 
+const SortableIndicatorElement = SortableElement(({
+  value, loadIndicator, allLocations, index,
+}) => {
+  if (value.type === 'number' || value.type === 'loadingNumber') {
+    return (<NumberCard
+      key={`item-${value.id}`}
+      index={index}
+      cardTitle={value.title}
+      cardNumber={value.number}
+      cardSubtitle={value.subtitle}
+      cardLink={value.link}
+      cardDataTooltip={value.tooltipData}
+      sparklineData={value.data}
+      cardType={value.type}
+    />);
+  }
+  return (<GraphCard
+    key={`item-${value.id}`}
+    index={index}
+    cardId={value.id}
+    cardTitle={value.title}
+    cardType={value.type}
+    cardLink={value.link}
+    data={value.data}
+    timeFilter={value.timeFilter}
+    timeLimit={value.timeLimit}
+    locationFilter={value.locationFilter}
+    options={value.options}
+    loadIndicator={loadIndicator}
+    allLocations={allLocations}
+    size={value.size}
+  />);
+});
 
-// eslint-disable-next-line no-shadow
-const SortableCards = SortableContainer(({ data, loadIndicator, allLocations }) => (
+const SortableIndicatorsContainer = SortableContainer(({
+  allData,
+  loadIndicator,
+  allLocations,
+}) => (
   <div className="card-component">
-    {data.map((value, index) =>
-      (value.archived || !value.enabled ? null : (
-        <GraphCard
-          key={`item-${value.id}`}
-          index={index}
-          cardId={value.id}
-          cardTitle={value.title}
-          cardType={value.type}
-          cardLink={value.link}
-          data={value.data}
-          timeFilter={value.timeFilter}
-          timeLimit={value.timeLimit}
-          locationFilter={value.locationFilter}
-          options={value.options}
-          loadIndicator={loadIndicator}
-          allLocations={allLocations}
-          size={value.size}
-        />
-      )))}
+    {allData.map((value, index) => {
+        if ((value.archived || !value.enabled)) {
+          return null;
+        }
+          return (<SortableIndicatorElement
+            key={`${value.id} - ${value.type}`}
+            value={value}
+            loadIndicator={loadIndicator}
+            allLocations={allLocations}
+            index={index}
+          />);
+      })}
+
   </div>
 ));
-
-
-const SortableNumberCards = SortableContainer(({ data }) => (
-  <div className="card-component">
-    {data.map((value, index) => (
-      (value.archived || !value.enabled ? null : (
-        <NumberCard
-          key={`item-${value.id}`}
-          index={index}
-          cardTitle={value.title}
-          cardNumber={value.number}
-          cardSubtitle={value.subtitle}
-          cardLink={value.link}
-          cardDataTooltip={value.tooltipData}
-          sparklineData={value.data}
-        />
-      ))
-    ))}
-  </div>
-));
-
 
 const ArchiveIndicator = ({ hideArchive }) => (
   <div className={hideArchive ? 'archive-div hide-archive' : 'archive-div'}>
@@ -223,20 +231,19 @@ class Tablero extends Component {
 
     const configData = this.props.dashboardConfig.endpoints;
     Object.keys(configData.graph).forEach((key) => {
-      const index = this.props.indicatorsData.findIndex(data => data &&
+      const index = this.props.allData.findIndex(data => data &&
         data.id === configData.graph[key].order);
       payload.graph[key] = {
         order: index + 1,
-        archived: this.props.indicatorsData[index].archived,
+        archived: this.props.allData[index].archived,
       };
     });
-
     Object.keys(configData.number).forEach((key) => {
-      const index = this.props.numberData.findIndex(data => data &&
+      const index = this.props.allData.findIndex(data => data &&
         data.id === configData.number[key].order);
       payload.number[key] = {
         order: index + 1,
-        archived: this.props.numberData[index].archived,
+        archived: this.props.allData[index].archived,
       };
     });
 
@@ -260,7 +267,14 @@ class Tablero extends Component {
     this.setState({ isDragging: true });
   };
 
-  sortEndHandle = ({ oldIndex, newIndex }, e, type) => {
+  sortEndHandle = ({ oldIndex, newIndex }, e) => {
+    let type = null;
+    let elementMoving = null;
+    this.props.allData.forEach((value, key) => {
+      if (key === oldIndex && !elementMoving) elementMoving = value;
+    });
+    if (elementMoving.type === 'number' || elementMoving.type === 'sparkline') type = 'number';
+    else type = 'graph';
     const maxHeight = window.innerHeight - (((6 * window.innerHeight) / 100) + 80);
     if (e.clientY > maxHeight) {
       e.target.id = 'archive';
@@ -276,17 +290,8 @@ class Tablero extends Component {
     }
   };
 
-  sortEndHandleNumber = ({ oldIndex, newIndex }, e) => {
-    this.sortEndHandle({ oldIndex, newIndex }, e, 'number');
-  };
-
-  sortEndHandleGraph = ({ oldIndex, newIndex }, e) => {
-    this.sortEndHandle({ oldIndex, newIndex }, e, 'graph');
-  };
-
   unarchiveHandler = () => {
-    const size = this.props.indicatorsData.filter(data => data.archived).length
-      + this.props.numberData.filter(data => data.archived).length;
+    const size = this.props.allData.filter(data => data.archived).length;
     if (size) this.setState({ showPopout: !this.state.showPopout });
     else this.setState({ showPopout: false });
   };
@@ -294,8 +299,7 @@ class Tablero extends Component {
   handleAdd = (index, type) => {
     this.props.addToIndicators(index, type);
 
-    const size = (this.props.indicatorsData.filter(data => data.archived).length
-       + this.props.numberData.filter(data => data.archived).length) - 1;
+    const size = this.props.allData.filter(data => data.archived).length - 1;
 
     if (this.props.activeConfig === 'personal') {
       this.setState({
@@ -308,21 +312,6 @@ class Tablero extends Component {
   };
 
   render() {
-    let numberCards;
-    if (this.props.numberData.length) {
-      numberCards = (
-        <SortableNumberCards
-          data={this.props.numberData}
-          onSortStart={this.sortStartHandle}
-          onSortEnd={this.sortEndHandleNumber}
-          axis="xy"
-          useDragHandle
-        />
-      );
-    } else {
-      numberCards = <LoadingNumbers />;
-    }
-
     return (
       <div className="dashboard-container">
         <ConfigurationsList
@@ -350,20 +339,18 @@ class Tablero extends Component {
             pageFilters={this.state.pageFilters}
           />
           <div className="cards-container">
-            {numberCards}
-            <SortableCards
+            <SortableIndicatorsContainer
               allLocations={this.state.allLocations}
-              data={this.props.indicatorsData.filter(indicator => indicator)}
+              allData={this.props.allData}
               onSortStart={this.sortStartHandle}
-              onSortEnd={this.sortEndHandleGraph}
+              onSortEnd={this.sortEndHandle}
               loadIndicator={this.loadIndicator}
               axis="xy"
               useDragHandle
             />
             <ArchiveIndicator hideArchive={!this.state.isDragging} />
             <UnarchiveIndicators
-              graphData={this.props.indicatorsData}
-              numberData={this.props.numberData}
+              allData={this.props.allData}
               showPopout={this.state.showPopout}
               unarchiveHandler={this.unarchiveHandler}
               handleAdd={this.handleAdd}
@@ -376,6 +363,7 @@ class Tablero extends Component {
 }
 
 const mapStateToProps = state => ({
+  allData: state.indicators.allData,
   indicatorsData: state.indicators.data,
   numberData: state.indicators.numberData,
   dashboardConfig: state.indicators.config,
@@ -395,22 +383,17 @@ export default connect(mapStateToProps, {
 
 Tablero.defaultProps = {
   currentLocation: '',
-  indicatorsData: null,
-  numberData: [],
+  allData: [],
   configModified: false,
 };
 
 Tablero.propTypes = {
   fetchIndicators: PropTypes.func.isRequired,
   reorderIndicators: PropTypes.func.isRequired,
-  indicatorsData: PropTypes.arrayOf(PropTypes.shape({
+  allData: PropTypes.arrayOf(PropTypes.shape({
     archived: PropTypes.oneOfType([PropTypes.bool, PropTypes.number]),
     id: PropTypes.number,
-  })).isRequired,
-  numberData: PropTypes.arrayOf(PropTypes.shape({
-    archived: PropTypes.oneOfType([PropTypes.bool, PropTypes.number]),
-    id: PropTypes.number,
-  })).isRequired,
+  })),
   dashboardConfig: PropTypes.shape({
     enabled: PropTypes.bool,
     configurations: PropTypes.shape({}),
