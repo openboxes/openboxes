@@ -18,6 +18,7 @@ import org.pih.warehouse.importer.InventoryExcelImporter
 import org.pih.warehouse.importer.InventoryLevelExcelImporter
 import org.pih.warehouse.importer.LocationExcelImporter
 import org.pih.warehouse.importer.PersonExcelImporter
+import org.pih.warehouse.importer.ProductAttributeExcelImporter
 import org.pih.warehouse.importer.ProductCatalogExcelImporter
 import org.pih.warehouse.importer.ProductCatalogItemExcelImporter
 import org.pih.warehouse.importer.ProductExcelImporter
@@ -155,6 +156,9 @@ class BatchController {
                         case "product":
                             dataImporter = new ProductExcelImporter(command?.filename)
                             break
+                        case "productAttribute":
+                            dataImporter = new ProductAttributeExcelImporter(command?.filename)
+                            break
                         case "productCatalog":
                             dataImporter = new ProductCatalogExcelImporter(command?.filename)
                             break
@@ -223,7 +227,7 @@ class BatchController {
                         redirect(action: "importData")
                         return
                     }
-                    println "There were errors"
+                    log.info "There were errors: " + command.errors
                 } else if (!command.hasErrors()) {
                     flash.message = "${warehouse.message(code: 'inventoryItem.dataReadyToBeImported.message')}"
                 }
