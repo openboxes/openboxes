@@ -286,19 +286,19 @@ function fetchNumberIndicator(
         enabled: indicatorConfig.enabled,
       },
     });
-  }
-  apiClient.get(url).then((res) => {
-    const indicatorData = res.data;
-    dispatch({
-      type: FETCH_NUMBERS,
-      payload: {
-        ...indicatorData,
-        id,
-        archived: indicatorConfig.archived,
-        enabled: indicatorConfig.enabled,
-      },
+    apiClient.get(url).then((res) => {
+      const indicatorData = res.data;
+      dispatch({
+        type: FETCH_NUMBERS,
+        payload: {
+          ...indicatorData,
+          id,
+          archived: indicatorConfig.archived,
+          enabled: indicatorConfig.enabled,
+        },
+      });
     });
-  });
+  }
 }
 
 export function reloadIndicator(indicatorConfig, params, locationId) {
