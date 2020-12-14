@@ -365,6 +365,9 @@ class AddItemsPage extends Component {
       if (moment().startOf('day').diff(dateRequested) > 0) {
         errors.lineItems[key] = { expirationDate: 'react.stockMovement.error.pastDate.label' };
       }
+      if (item.expirationDate && (_.isNil(item.lotNumber) || _.isEmpty(item.lotNumber))) {
+        errors.lineItems[key] = { lotNumber: 'react.stockMovement.error.expiryWithoutLot.label' };
+      }
       const splitItems = _.filter(values.lineItems, lineItem =>
         lineItem.referenceId === item.referenceId);
       if (!item.id) {
@@ -903,8 +906,7 @@ class AddItemsPage extends Component {
                     }
                   }}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
-                  disabled={!_.some(values.lineItems, item => !_.isEmpty(item))
-                  || invalid}
+                  disabled={!_.some(values.lineItems, item => !_.isEmpty(item))}
                 ><Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>

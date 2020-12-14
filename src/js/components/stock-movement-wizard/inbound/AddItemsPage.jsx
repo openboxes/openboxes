@@ -400,6 +400,9 @@ class AddItemsPage extends Component {
       if (date.diff(dateRequested) > 0) {
         errors.lineItems[key] = { expirationDate: 'react.stockMovement.error.invalidDate.label' };
       }
+      if (item.expirationDate && (_.isNil(item.lotNumber) || _.isEmpty(item.lotNumber))) {
+        errors.lineItems[key] = { lotNumber: 'react.stockMovement.error.expiryWithoutLot.label' };
+      }
     });
     return errors;
   }
@@ -995,8 +998,7 @@ class AddItemsPage extends Component {
                     }
                   }}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
-                  disabled={!_.some(values.lineItems, item => !_.isEmpty(item))
-                    || invalid}
+                  disabled={!_.some(values.lineItems, item => !_.isEmpty(item))}
                 ><Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>
