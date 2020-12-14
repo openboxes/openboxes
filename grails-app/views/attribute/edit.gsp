@@ -68,7 +68,7 @@
 									<g:select name="unitOfMeasureClass.id" from="${org.pih.warehouse.core.UnitOfMeasureClass.list()}"
                                               value="${attributeInstance?.unitOfMeasureClass?.id}"
                                               class="chzn-select-deselect" noSelection="['':'']" optionKey="id"
-                                        optionValue="${{it.name + ': ' + it?.baseUom?.name?:'No Default'}}"
+                                        optionValue="${{it.name + ' (default=' + it?.baseUom?.name + ')'?:'No Default'}}"
                                     />
 								</td>
 							</tr>
