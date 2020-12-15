@@ -465,6 +465,7 @@
 
         function saveOrderItem() {
             var data = $("#orderItemForm").serialize();
+            data += '&orderIndex=' + $("#orderItemsTable tbody tr").length;
             if (validateItemsForm()) {
                 $.ajax({
                     url:'${g.createLink(controller:'order', action:'saveOrderItem')}',

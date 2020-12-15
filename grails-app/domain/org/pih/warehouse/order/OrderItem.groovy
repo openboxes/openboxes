@@ -62,6 +62,8 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
 
     GlAccount glAccount
 
+    Integer orderIndex = 0
+
     // Audit fields
     Date dateCreated
     Date lastUpdated
@@ -124,6 +126,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         actualDeliveryDate(nullable: true)
         budgetCode(nullable: true)
         glAccount(nullable: true)
+        orderIndex(nullable: true)
     }
 
     String getUnitOfMeasure() {
