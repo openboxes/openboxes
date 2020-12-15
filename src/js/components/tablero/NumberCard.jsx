@@ -50,7 +50,7 @@ const options = {
 };
 
 const NumberSparklineCard = ({
-  cardTitle, color, value, goalDifference, sparklineData, translate,
+  cardTitle, cardInfo, color, value, goalDifference, sparklineData, translate,
 }) => (
   <div className="number-div">
     <div className="number-body">
@@ -70,6 +70,18 @@ const NumberSparklineCard = ({
         height={25}
       />
     </div>
+    <div className="number-infos">
+      <Tooltip
+        html={
+          <p> {cardInfo.code ? translate(cardInfo.code, cardInfo.message) : cardInfo.message} </p>
+        }
+        theme="transparent"
+        arrow="true"
+        disabled={!cardInfo}
+      >
+        <i className="fa fa-info-circle" />
+      </Tooltip>
+    </div>
     <DragHandle />
   </div>
 );
@@ -80,6 +92,7 @@ const NumberCard = SortableElement(({
   cardSubtitle,
   cardLink,
   cardDataTooltip,
+  cardInfo,
   sparklineData = null,
   translate,
 }) => {
@@ -110,6 +123,22 @@ const NumberCard = SortableElement(({
              : _.truncate(cardSubtitle, { length: 22 })}
           </span>
         </div>
+        {
+          cardInfo ?
+            <div className="number-infos">
+              <Tooltip
+                html={
+                  <p>
+                    {cardInfo.code ? translate(cardInfo.code, cardInfo.message) : cardInfo.message}
+                  </p>
+                }
+                theme="transparent"
+                arrow="true"
+              >
+                <i className="fa fa-info-circle" />
+              </Tooltip>
+            </div>
+        : null}
         <DragHandle />
       </div>
     </Tooltip>
@@ -117,6 +146,7 @@ const NumberCard = SortableElement(({
     (
       <NumberSparklineCard
         cardTitle={cardTitle}
+        cardInfo={cardInfo}
         color={sparklineData.colorNumber.color}
         value={sparklineData.colorNumber.value}
         goalDifference={sparklineData.colorNumber.value2}
@@ -155,11 +185,19 @@ NumberCard.propTypes = {
   }),
   cardLink: PropTypes.string,
   cardDataTooltip: PropTypes.string,
+  cardInfo: PropTypes.shape({
+    code: PropTypes.string.isRequired,
+    message: PropTypes.string.isRequired,
+  }).isRequired,
   translate: PropTypes.func.isRequired,
 };
 
 NumberSparklineCard.propTypes = {
   cardTitle: PropTypes.shape({
+    code: PropTypes.string.isRequired,
+    message: PropTypes.string.isRequired,
+  }).isRequired,
+  cardInfo: PropTypes.shape({
     code: PropTypes.string.isRequired,
     message: PropTypes.string.isRequired,
   }).isRequired,
