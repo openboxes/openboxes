@@ -171,6 +171,9 @@ class EditLineModal extends Component {
       if (date.diff(dateRequested) > 0) {
         errors.lines[key] = { expirationDate: 'react.partialReceiving.error.invalidDate.label' };
       }
+      if (line.expirationDate && (_.isNil(line.lotNumber) || _.isEmpty(line.lotNumber))) {
+        errors.lines[key] = { lotNumber: 'react.partialReceiving.error.expiryWithoutLot.label' };
+      }
     });
 
     return errors;
