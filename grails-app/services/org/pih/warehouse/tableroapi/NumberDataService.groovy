@@ -142,10 +142,9 @@ class NumberDataService {
     NumberData getDefaultBin(def location) {
         def productsInDefaultBin = ProductAvailability.executeQuery("""
             SELECT COUNT(distinct pa.product.id) FROM ProductAvailability pa
-            LEFT JOIN pa.binLocation bl
             WHERE pa.location = :location
             AND pa.quantityOnHand > 0
-            AND bl.name = 'DEFAULT'""",
+            AND pa.binLocation is null""",
                 [
                     'location': location
                 ])
