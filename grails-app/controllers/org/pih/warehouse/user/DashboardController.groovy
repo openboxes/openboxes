@@ -279,7 +279,7 @@ class DashboardController {
             return
         }
 
-        [savedLocations: [user.warehouse], loginLocationsMap: locationService.getLoginLocationsMap(user, warehouse)]
+        [savedLocations: user.warehouse ? [user.warehouse] : null, loginLocationsMap: locationService.getLoginLocationsMap(user, warehouse)]
     }
 
 
