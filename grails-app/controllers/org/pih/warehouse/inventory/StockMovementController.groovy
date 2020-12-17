@@ -166,6 +166,7 @@ class StockMovementController {
         stockMovement.requisitionStatusCodes = params?.list("status") ? params?.list("status") as RequisitionStatus[] : null
         stockMovement.requestType = requisition?.type
         stockMovement.sourceType = requisition?.sourceType
+        stockMovement.updatedBy = requisition?.updatedBy
 
         def stockMovements
 
