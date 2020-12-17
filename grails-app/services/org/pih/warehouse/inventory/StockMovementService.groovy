@@ -355,6 +355,9 @@ class StockMovementService {
                     eq("requestedBy", criteria?.requestedBy)
                 }
             }
+            if (criteria.updatedBy) {
+                eq("updatedBy", criteria.updatedBy)
+            }
             if(params.createdAfter) {
                 ge("dateCreated", params.createdAfter)
             }
@@ -430,6 +433,9 @@ class StockMovementService {
             }
             if (stockMovement.createdBy) {
                 eq("createdBy", stockMovement.createdBy)
+            }
+            if (stockMovement.updatedBy) {
+                eq("updatedBy", stockMovement.updatedBy)
             }
             if (stockMovement.requestType) {
                 eq("type", stockMovement.requestType)
