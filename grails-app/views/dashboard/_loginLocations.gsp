@@ -72,7 +72,9 @@
 <g:if test="${loginLocationsMap && !loginLocationsMap.isEmpty() }">
     <div id="tabs-left" class="tabs">
         <ul>
-            <li><a href="#saved-locations"><g:message code="user.savedLocations.label"/></a></li>
+             <g:if test="${savedLocations}">
+                <li><a href="#saved-locations"><g:message code="user.savedLocations.label"/></a></li>
+             </g:if>
             <g:each var="organizationName" in="${loginLocationsMap.keySet()}" status="i">
                 <li><a href="#organization-${i}">${organizationName?:'No organization'}</a></li>
             </g:each>
