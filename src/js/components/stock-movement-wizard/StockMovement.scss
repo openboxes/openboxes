@@ -184,12 +184,6 @@
 
                     >div {
                         width: 100%;
-
-                        .text-truncate {
-                            // Do not truncate text
-                            white-space: pre-wrap !important;
-                            margin-right: 0 !important;
-                        }
                     }
                 }
             }
