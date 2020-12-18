@@ -530,13 +530,17 @@ class StockMovementService {
             if (requisition && requisition.sourceType == RequisitionSourceType.ELECTRONIC) {
                 editPageItems = editPageItems.collect { editPageItem ->
                     // origin = fulfilling, destination = requesting
+                    RequisitionItemSortByCode sortByCode = requisition.requisitionTemplate?.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX
                     def quantityOnHandRequesting = productAvailabilityService.getQuantityOnHand(editPageItem.product, requisition.destination)
                     editPageItem << [quantityOnHandRequesting: quantityOnHandRequesting]
                     if (requisition.requisitionTemplate) {
                         def stocklist = Requisition.get(requisition.requisitionTemplate.id)
-                        def quantityOnStocklist = stocklist.requisitionItems?.find {
-                            it.product == editPageItem.product && (it.orderIndex * 100 == editPageItem.sortOrder || it.orderIndex == editPageItem.sortOrder)
-                        }?.quantity?:0
+                        def quantityOnStocklist = 0
+                        stocklist."${sortByCode.methodName}"?.eachWithIndex { item, index ->
+                            if (item.product == editPageItem.product && (index * 100 == editPageItem.sortOrder || index == editPageItem.sortOrder)) {
+                                quantityOnStocklist = item.quantity
+                            }
+                        }
                         editPageItem << [quantityOnStocklist: quantityOnStocklist]
                     } else {
                         def quantityDemand = forecastingService.getDemand(requisition.destination, editPageItem.product)?.monthlyDemand?:0
@@ -553,24 +557,12 @@ class StockMovementService {
                 requisitionItems = RequisitionItem.createCriteria().list(max: max.toInteger(), offset: offset.toInteger()) {
                     eq("requisition", requisition)
                     isNull("parentRequisitionItem")
-                    if (requisition.sortByCode == RequisitionItemSortByCode.CATEGORY) {
-                        product {
-                            order("category", "asc")
-                            order("name", "asc")
-                        }
-                    }
                     order("orderIndex", 'asc')
                 }
             } else {
                 requisitionItems = RequisitionItem.createCriteria().list() {
                     eq("requisition", requisition)
                     isNull("parentRequisitionItem")
-                    if (requisition.sortByCode == RequisitionItemSortByCode.CATEGORY) {
-                        product {
-                            order("category", "asc")
-                            order("name", "asc")
-                        }
-                    }
                     order("orderIndex", 'asc')
                 }
             }
@@ -647,9 +639,8 @@ class StockMovementService {
     }
 
     List getEditPageItems(Requisition requisition, String max, String offset) {
-        def query = offset ? (requisition.sortByCode == RequisitionItemSortByCode.CATEGORY ?
-                """ select * FROM edit_page_item where requisition_id = :requisition and requisition_item_type = 'ORIGINAL' ORDER BY category, name, sort_order limit :offset, :max; """ :
-                """ select * FROM edit_page_item where requisition_id = :requisition and requisition_item_type = 'ORIGINAL' ORDER BY sort_order limit :offset, :max; """) :
+        def query = offset ?
+                """ select * FROM edit_page_item where requisition_id = :requisition and requisition_item_type = 'ORIGINAL' ORDER BY sort_order limit :offset, :max; """ :
                 """ select * FROM edit_page_item where requisition_id = :requisition and requisition_item_type = 'ORIGINAL' ORDER BY sort_order """
         def data = dataService.executeQuery(query, [
                 'requisition': requisition.id,
@@ -1384,9 +1375,8 @@ class StockMovementService {
         // If the user specified a stocklist then we should automatically clone it as long as there are no
         // requisition items already added to the requisition
         RequisitionItemSortByCode sortByCode = stockMovement.stocklist?.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX
-
+        Integer orderIndex = 0
         if (stockMovement.stocklist && !requisition.requisitionItems) {
-            requisition.sortByCode = stockMovement.stocklist.sortByCode
             stockMovement.stocklist."${sortByCode.methodName}".each { stocklistItem ->
                 RequisitionItem requisitionItem = new RequisitionItem()
                 requisitionItem.product = stocklistItem.product
@@ -1399,7 +1389,8 @@ class StockMovementService {
                     requisitionItem.quantity = stocklistItem.quantity
                     requisitionItem.quantityApproved = stocklistItem.quantity
                 }
-                requisitionItem.orderIndex = stocklistItem.orderIndex * 100
+                requisitionItem.orderIndex = orderIndex
+                orderIndex += 100
                 requisition.addToRequisitionItems(requisitionItem)
             }
         }
