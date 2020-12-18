@@ -19,6 +19,13 @@ jobs:
         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
         restore-keys: |
           ${{ runner.os }}-node-
+    - name: Cache .ivy2
+      uses: actions/cache@v1
+      with:
+        path: /home/runner/.ivy2
+        key: ${{ runner.os }}-ivy2-${{ hashFiles('**/grails-app/conf/BuildConfig.groovy') }}
+        restore-keys: |
+          ${{ runner.os }}-ivy2-
     - name: Cache .grails
       uses: actions/cache@v1
       with:
