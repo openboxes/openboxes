@@ -77,6 +77,7 @@ const NumberSparklineCard = ({
 const NumberCard = SortableElement(({
   cardTitle,
   cardNumber,
+  cardNumberType,
   cardSubtitle,
   cardLink,
   cardDataTooltip,
@@ -103,7 +104,7 @@ const NumberCard = SortableElement(({
               translate(cardTitle.code, cardTitle.message)
              : cardTitle}
           </span>
-          <span className="result-card"> {cardNumber.toLocaleString()} </span>
+          <span className="result-card"> {cardNumberType === 'number' ? cardNumber.toLocaleString() : `${cardNumber.toLocaleString()}USD`} </span>
           <span className="subtitle-card">
             {cardSubtitle.code ?
           _.truncate(translate(cardSubtitle.code, cardSubtitle.message), { length: 22 })
@@ -149,6 +150,7 @@ NumberCard.propTypes = {
     message: PropTypes.string.isRequired,
   }).isRequired,
   cardNumber: PropTypes.number,
+  cardNumberType: PropTypes.string,
   cardSubtitle: PropTypes.shape({
     code: PropTypes.string.isRequired,
     message: PropTypes.string.isRequired,
