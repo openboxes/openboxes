@@ -9,7 +9,6 @@ CREATE OR REPLACE VIEW edit_page_item AS
         stock_movement_item.product_id,
         stock_movement_item.product_code,
         stock_movement_item.name,
-        stock_movement_item.category,
         stock_movement_item.quantity,
         stock_movement_item.quantity_canceled,
         stock_movement_item.quantity_revised,
