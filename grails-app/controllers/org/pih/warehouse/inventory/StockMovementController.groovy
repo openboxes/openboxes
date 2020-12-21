@@ -162,8 +162,8 @@ class StockMovementController {
         stockMovement.origin = requisition.origin
         stockMovement.destination = requisition.destination
         stockMovement.statusCode = requisition?.status ? requisition?.status.toString() : null
-        stockMovement.receiptStatusCodes = params?.list("receiptStatusCode") ? params?.list("receiptStatusCode") as ShipmentStatusCode[] : null
-        stockMovement.requisitionStatusCodes = params?.list("status") ? params?.list("status") as RequisitionStatus[] : null
+        stockMovement.receiptStatusCodes = params.receiptStatusCode ? params?.list("receiptStatusCode") as ShipmentStatusCode[] : null
+        stockMovement.requisitionStatusCodes = params.status ? params?.list("status") as RequisitionStatus[] : null
         stockMovement.requestType = requisition?.type
         stockMovement.sourceType = requisition?.sourceType
         stockMovement.updatedBy = requisition?.updatedBy
