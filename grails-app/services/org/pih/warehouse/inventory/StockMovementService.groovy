@@ -1168,7 +1168,7 @@ class StockMovementService {
         Location location = requisitionItem?.requisition?.origin
 
         // Qty Available
-        List<AvailableItem> availableItems = productAvailabilityService.getAvailableBinLocations(location, requisitionItem.product)
+        List<AvailableItem> availableItems = productAvailabilityService.getAllAvailableBinLocations(location, requisitionItem.product)
 
         // Substitution
         List<SubstitutionItem> availableSubstitutions = getAvailableSubstitutions(location, requisitionItem.product)

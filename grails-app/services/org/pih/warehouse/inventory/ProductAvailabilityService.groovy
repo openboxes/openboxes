@@ -413,6 +413,10 @@ class ProductAvailabilityService {
         return getAvailableBinLocations(location, [product])
     }
 
+    List<AvailableItem> getAllAvailableBinLocations(Location location, Product product) {
+        return getAllAvailableBinLocations(location, [product])
+    }
+
     List<AvailableItem> getAvailableBinLocations(Location location, List products) {
         def availableBinLocations = getQuantityOnHandByBinLocation(location, products)
 
@@ -425,6 +429,21 @@ class ProductAvailabilityService {
         }
 
         availableItems = sortAvailableItems(availableItems)
+        return availableItems
+    }
+
+    // Include also bin locations with negative qty (needed for edit page items)
+    List<AvailableItem> getAllAvailableBinLocations(Location location, List products) {
+        def availableBinLocations = getQuantityOnHandByBinLocation(location, products)
+
+        List<AvailableItem> availableItems = availableBinLocations.collect {
+            return new AvailableItem(
+                    inventoryItem: it?.inventoryItem,
+                    binLocation: it?.binLocation,
+                    quantityAvailable: it.quantity
+            )
+        }
+
         return availableItems
     }
 
