@@ -58,7 +58,7 @@
                                 </g:link>
                             </g:if>
                             <g:else>
-                                <g:link controller="order" action="show" id="${item?.id}">
+                                <g:link controller="order" action="show" id="${item?.order?.id}">
                                     ${item?.order?.orderNumber}
                                 </g:link>
                             </g:else>
@@ -70,7 +70,7 @@
                                 </g:link>
                             </g:if>
                             <g:else>
-                                <g:link controller="order" action="show" id="${item?.id}">
+                                <g:link controller="order" action="show" id="${item?.order?.id}">
                                     ${item?.order?.name}
                                 </g:link>
                             </g:else>
