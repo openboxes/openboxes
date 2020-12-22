@@ -52,7 +52,7 @@ class NumberDataService {
         ]
 
         def info = [
-            code: "react.dashboard.inProgessShipments.info.label",
+            code: "react.dashboard.inProgressShipments.info.label",
             message: messageService.getMessage("react.dashboard.inProgressShipments.info.label")
         ]
 
@@ -79,7 +79,7 @@ class NumberDataService {
         ]
         
         def info = [
-            code: "react.dashboard.inProgessPutaways.info.label",
+            code: "react.dashboard.inProgressPutaways.info.label",
             message: messageService.getMessage("react.dashboard.inProgressPutaways.info.label")
         ]
 
@@ -277,6 +277,11 @@ class NumberDataService {
             message : messageService.getMessage("react.dashboard.expiredProductsInStock.title.label")
         ]
 
+        def info = [
+            code : "react.dashboard.expiredProductsInStock.info.label",
+            message : messageService.getMessage("react.dashboard.expiredProductsInStock.info.label")
+        ]
+
         def subTitle = [
             code : "react.dashboard.subtitle.products.label",
             message : messageService.getMessage("react.dashboard.subtitle.products.label")
@@ -284,7 +289,7 @@ class NumberDataService {
 
         return new NumberData(
             title,
-            null,
+            info,
             expiredProductsInStock[0],
             subTitle, "/openboxes/inventory/listExpiredStock?status=expired"
             )

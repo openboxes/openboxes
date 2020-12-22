@@ -693,10 +693,15 @@ class IndicatorDataService {
             message : messageService.getMessage("react.dashboard.discrepancy.title.label")
         ]
 
+        def info = [
+            code : "react.dashboard.discrepancy.info.label",
+            message : messageService.getMessage("react.dashboard.discrepancy.info.label")
+        ]
+
         GraphData graphData = new GraphData(
             tableData,
             title,
-            null,
+            info,
             "table"
             )
 
@@ -1043,10 +1048,15 @@ class IndicatorDataService {
             message : messageService.getMessage("react.dashboard.stockOutLastMonth.title.label")
         ]
 
+        def info = [
+            code : "react.dashboard.stockOutLastMonth.info.label",
+            message : messageService.getMessage("react.dashboard.stockOutLastMonth.info.label")
+        ]
+
         GraphData graphData = new GraphData(
             indicatorData,
             title,
-            null,
+            info,
             'doughnut'
             )
 
