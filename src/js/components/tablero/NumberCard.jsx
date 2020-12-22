@@ -83,6 +83,7 @@ const NumberCard = SortableElement(({
   cardDataTooltip,
   sparklineData = null,
   translate,
+  currencyCode,
 }) => {
   let isSparkline = false;
   if (sparklineData != null) {
@@ -104,7 +105,7 @@ const NumberCard = SortableElement(({
               translate(cardTitle.code, cardTitle.message)
              : cardTitle}
           </span>
-          <span className="result-card"> {cardNumberType === 'number' ? cardNumber.toLocaleString() : `${cardNumber.toLocaleString()}USD`} </span>
+          <span className="result-card"> {cardNumberType === 'number' ? cardNumber.toLocaleString() : `${cardNumber.toLocaleString()} ${currencyCode}`} </span>
           <span className="subtitle-card">
             {cardSubtitle.code ?
           _.truncate(translate(cardSubtitle.code, cardSubtitle.message), { length: 22 })
@@ -133,6 +134,7 @@ const NumberCard = SortableElement(({
 
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
+  currencyCode: state.session.currencyCode,
 });
 
 export default (connect(mapStateToProps)(NumberCard));
@@ -158,6 +160,7 @@ NumberCard.propTypes = {
   cardLink: PropTypes.string,
   cardDataTooltip: PropTypes.string,
   translate: PropTypes.func.isRequired,
+  currencyCode: PropTypes.string.isRequired,
 };
 
 NumberSparklineCard.propTypes = {
