@@ -153,6 +153,7 @@ NumberCard.defaultProps = {
   cardType: '',
   sparklineData: {},
   cardNumber: null,
+  cardNumberType: '',
 };
 
 NumberCard.propTypes = {
