@@ -159,9 +159,9 @@
             },
           } );
         },
-        "fnFooterCallback": function (nRow, aaData, iStart, iEnd) {
+        "fnFooterCallback": function (nRow, aaData) {
           var totalDemand = 0;
-          for (var i = iStart; i < iEnd; i++) {
+          for (var i = 0; i < aaData.length; i++) {
             totalDemand += aaData[i].quantityDemand;
           }
           nRow.getElementsByTagName('th')[2].innerHTML = totalDemand;

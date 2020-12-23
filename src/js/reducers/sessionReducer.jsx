@@ -64,6 +64,7 @@ const initialState = {
   supportedLocales: [],
   breadcrumbsParams: [],
   breadcrumbsConfig: [],
+  currencyCode: '',
 };
 
 export default function (state = initialState, action) {
@@ -95,6 +96,7 @@ export default function (state = initialState, action) {
         pageSize: _.get(action, 'payload.data.data.pageSize'),
         logoUrl: _.get(action, 'payload.data.data.logoUrl'),
         supportedLocales: _.get(action, 'payload.data.data.supportedLocales'),
+        currencyCode: _.get(action, 'payload.data.data.currencyCode'),
       };
     case FETCH_MENU_CONFIG:
       return {
