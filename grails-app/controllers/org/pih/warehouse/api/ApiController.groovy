@@ -142,6 +142,7 @@ class ApiController {
             def name = new Locale(it).getDisplayName()
             [code: it, name: name]
         }
+        String currencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode
         render([
                 data: [
                         user                 : user,
@@ -169,6 +170,7 @@ class ApiController {
                         pageSize             : pageSize,
                         logoUrl              : logoUrl,
                         supportedLocales     : supportedLocales,
+                        currencyCode         : currencyCode,
                 ],
         ] as JSON)
     }

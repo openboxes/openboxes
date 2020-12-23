@@ -1347,6 +1347,11 @@ class InventoryService implements ApplicationContextAware {
             cmd.recordInventoryRows.each { row ->
 
                 if (row) {
+                    if (row.expirationDate && !row.lotNumber) {
+                        cmd.errors.reject("inventoryItem.invalid", "Items with an expiry date must also have a lot number")
+                        row.error = true
+                        return cmd
+                    }
                     // 1. Find an existing inventory item for the given lot number and product and description
                     def inventoryItem =
                             findInventoryItemByProductAndLotNumber(cmd.product, row.lotNumber)
@@ -2640,7 +2645,7 @@ class InventoryService implements ApplicationContextAware {
         def dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
         def calendar = Calendar.getInstance()
         command.data.eachWithIndex { row, index ->
-            def rowIndex = index + 2
+            def rowIndex = index + 1
 
             if (!command.warnings[index]) {
                 command.warnings[index] = []
@@ -2672,6 +2677,10 @@ class InventoryService implements ApplicationContextAware {
                 if (!binLocation && row.binLocation) {
                     command.errors.reject("error.product.notExists", "Row ${rowIndex}: Bin location '${row.binLocation.trim()}' does not exist in this depot")
                     command.warnings[index] << "Bin location '${row.binLocation.trim()}' does not exist in this depot"
+                }
+
+                if (row.expirationDate && !row.lotNumber) {
+                    command.errors.reject("error.lotNumber.notExists", "Row ${rowIndex}: Items with an expiry date must also have a lot number")
                 }
 
                 def expirationDate = null

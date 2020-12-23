@@ -23,6 +23,7 @@ class RecordInventoryRowCommand {
     Integer oldQuantity
     Integer newQuantity
     String comment
+    Boolean error
 
     static constraints = {
         id(nullable: true)
@@ -34,6 +35,7 @@ class RecordInventoryRowCommand {
         oldQuantity(nullable: false)
         newQuantity(nullable: false)
         comment(nullable: true)
+        error(nullable: true)
     }
 
 }

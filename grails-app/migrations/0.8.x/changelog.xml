@@ -89,4 +89,6 @@
     <include file="0.8.x/changelog-2020-11-03-2246-create-table-product-availability.xml"/>
     <include file="0.8.x/changelog-2020-11-09-1517-alter-table-order-adjustment-add-column-canceled.xml"/>
     <include file="0.8.x/changelog-2020-11-25-1430-alter-table-requisition-add-column-source-type.xml"/>
+    <include file="0.8.x/changelog-2020-12-11-1500-alter-table-order-item-add-column-order-index.xml"/>
+    <include file="0.8.x/changelog-2020-12-13-2243-alter-table-add-uom-to-product-attributes.xml"/>
 </databaseChangeLog>

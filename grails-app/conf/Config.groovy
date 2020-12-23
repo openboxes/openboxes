@@ -476,6 +476,12 @@ openboxes {
                     archived = ['personal', 'warehouse', 'transaction', 'fillRate']
                     order = 10
                 }
+                inventoryValue {
+                    enabled = true
+                    endpoint = "/${appName}/apitablero/getInventoryValue"
+                    archived = ['personal', 'warehouse', 'inventory', 'transaction', 'fillRate']
+                    order = 11
+                }
             }
             graph {
                 inventorySummary {

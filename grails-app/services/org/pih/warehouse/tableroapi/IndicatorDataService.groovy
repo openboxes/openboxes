@@ -114,7 +114,7 @@ class IndicatorDataService {
     }
 
     GraphData getFillRate(Location location, def destination, def params) {
-        Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 7
+        Integer querySize = params.querySize ? params.querySize.toInteger() : 6
         List listFiltersSelected = params.list('listFiltersSelected').toList()
         List listValues = params.list('value').toList()
         String extraCondition = ''
