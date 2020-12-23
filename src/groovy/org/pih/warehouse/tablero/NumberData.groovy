@@ -8,16 +8,18 @@ class NumberData implements Serializable {
      def subtitle;
      String link;
      String tooltipData;
+     String type;
      // Either 'number' or 'dollars'
      String numberType;
 
-    NumberData(Map title, Double number, def subtitle, String link = '', tooltipData = null, numberType = 'number') {
+    NumberData(Map title, Double number, def subtitle, String link = '', tooltipData = null, String type = 'number', numberType = 'number') {
 
         this.title = title;
         this.number = number;
         this.subtitle = subtitle;
         this.link = link;
         this.tooltipData = tooltipData;
+        this.type  = type;
         this.numberType  = numberType;
     }
 }
