@@ -90,6 +90,13 @@
             <column name="last_updated" valueDate="2011-02-17T00:00:00.0"/>
         </insert>
         <insert tableName="inventory">
+            <column name="id" value="2"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="last_inventory_date"/>
+            <column name="date_created" valueDate="2011-02-17T00:00:00.0"/>
+            <column name="last_updated" valueDate="2011-02-17T00:00:00.0"/>
+        </insert>
+        <insert tableName="inventory">
             <column name="id" value="ff8081813a512a91013a512f140a0001"/>
             <column name="version" valueNumeric="0"/>
             <column name="last_inventory_date"/>
@@ -376,8 +383,8 @@
             <column name="date_read"/>
             <column name="date_sent"/>
             <column name="last_updated" valueDate="2010-08-25T00:00:00.0"/>
-            <column name="recipient_id" value="3"/>
-            <column name="sender_id" value="3"/>
+            <column name="recipient_id" value="2"/>
+            <column name="sender_id" value="1"/>
         </insert>
         <insert tableName="comment">
             <column name="id" value="2"/>
@@ -387,8 +394,8 @@
             <column name="date_read"/>
             <column name="date_sent"/>
             <column name="last_updated" valueDate="2010-08-25T00:00:00.0"/>
-            <column name="recipient_id" value="3"/>
-            <column name="sender_id" value="2"/>
+            <column name="recipient_id" value="2"/>
+            <column name="sender_id" value="1"/>
         </insert>
         <insert tableName="comment">
             <column name="id" value="3"/>
@@ -398,7 +405,7 @@
             <column name="date_read"/>
             <column name="date_sent"/>
             <column name="last_updated" valueDate="2010-08-25T00:00:00.0"/>
-            <column name="recipient_id" value="3"/>
+            <column name="recipient_id" value="2"/>
             <column name="sender_id" value="1"/>
         </insert>
     </changeSet>
@@ -816,14 +823,6 @@
             <column name="user_id" value="2"/>
             <column name="role_id" value="2"/>
         </insert>
-        <insert tableName="user_role">
-            <column name="user_id" value="3"/>
-            <column name="role_id" value="3"/>
-        </insert>
-        <insert tableName="user_role">
-            <column name="user_id" value="4"/>
-            <column name="role_id" value="3"/>
-        </insert>
     </changeSet>
     <changeSet author="adminuser (generated)" id="1351271139350-14">
         <insert tableName="event_type">
@@ -978,30 +977,6 @@
             <column name="locale"/>
             <column name="remember_last_location"/>
         </insert>
-        <insert tableName="user">
-            <column name="id" value="3"/>
-            <column name="active" valueBoolean="true"/>
-            <column name="last_login_date"/>
-            <column name="manager_id" value="2"/>
-            <column name="password" value="password"/>
-            <column name="username" value="jmiranda"/>
-            <column name="warehouse_id" value="1"/>
-            <column name="photo"/>
-            <column name="locale"/>
-            <column name="remember_last_location"/>
-        </insert>
-        <insert tableName="user">
-            <column name="id" value="4"/>
-            <column name="active" valueBoolean="false"/>
-            <column name="last_login_date"/>
-            <column name="manager_id" value="2"/>
-            <column name="password" value="password"/>
-            <column name="username" value="inactive"/>
-            <column name="warehouse_id" value="1"/>
-            <column name="photo"/>
-            <column name="locale"/>
-            <column name="remember_last_location"/>
-        </insert>
     </changeSet>
     <changeSet author="adminuser (generated)" id="1351271139350-19">
         <insert tableName="shipment_workflow_reference_number_type">
@@ -1052,69 +1027,8 @@
             <column name="address_id" value="1"/>
             <column name="date_created" valueDate="2010-08-25T00:00:00.0"/>
             <column name="last_updated" valueDate="2010-08-25T00:00:00.0"/>
-            <column name="logo_url" value="http://a3.twimg.com/profile_images/134665083/BOS_Red_Sox_normal.PNG"/>
-            <column name="name" value="Boston Headquarters"/>
+            <column name="name" value="Main Warehouse"/>
             <column name="inventory_id" value="1"/>
-            <column name="manager_id" value="2"/>
-            <column name="logo"/>
-            <column name="managed_locally" valueBoolean="true"/>
-            <column name="active" valueBoolean="true"/>
-            <column name="location_type_id" value="2"/>
-            <column name="parent_location_id"/>
-            <column name="local" valueBoolean="true"/>
-            <column name="bg_color"/>
-            <column name="fg_color"/>
-            <column name="location_group_id"/>
-        </insert>
-        <insert tableName="location">
-            <column name="id" value="2"/>
-            <column name="version" valueNumeric="0"/>
-            <column name="address_id" value="2"/>
-            <column name="date_created" valueDate="2010-08-25T00:00:00.0"/>
-            <column name="last_updated" valueDate="2010-08-25T00:00:00.0"/>
-            <column name="logo_url" value="http://pihemr.files.wordpress.com/2008/01/pih-hands.jpg"/>
-            <column name="name" value="Miami Warehouse"/>
-            <column name="inventory_id"/>
-            <column name="manager_id" value="2"/>
-            <column name="logo"/>
-            <column name="managed_locally" valueBoolean="true"/>
-            <column name="active" valueBoolean="true"/>
-            <column name="location_type_id" value="2"/>
-            <column name="parent_location_id"/>
-            <column name="local" valueBoolean="true"/>
-            <column name="bg_color"/>
-            <column name="fg_color"/>
-            <column name="location_group_id"/>
-        </insert>
-        <insert tableName="location">
-            <column name="id" value="3"/>
-            <column name="version" valueNumeric="0"/>
-            <column name="address_id" value="3"/>
-            <column name="date_created" valueDate="2010-08-25T00:00:00.0"/>
-            <column name="last_updated" valueDate="2010-08-25T00:00:00.0"/>
-            <column name="logo_url" value="http://pihemr.files.wordpress.com/2008/01/pih-hands.jpg"/>
-            <column name="name" value="Tabarre Depot"/>
-            <column name="inventory_id"/>
-            <column name="manager_id" value="2"/>
-            <column name="logo"/>
-            <column name="managed_locally" valueBoolean="true"/>
-            <column name="active" valueBoolean="true"/>
-            <column name="location_type_id" value="2"/>
-            <column name="parent_location_id"/>
-            <column name="local" valueBoolean="true"/>
-            <column name="bg_color"/>
-            <column name="fg_color"/>
-            <column name="location_group_id"/>
-        </insert>
-        <insert tableName="location">
-            <column name="id" value="4"/>
-            <column name="version" valueNumeric="1"/>
-            <column name="address_id" value="4"/>
-            <column name="date_created" valueDate="2010-08-25T00:00:00.0"/>
-            <column name="last_updated" valueDate="2012-10-11T14:56:10.0"/>
-            <column name="logo_url" value="http://pihemr.files.wordpress.com/2008/01/pih-hands.jpg"/>
-            <column name="name" value="ZZZ Supply Company"/>
-            <column name="inventory_id" value="ff8081813a512a91013a512f140a0001"/>
             <column name="manager_id" value="2"/>
             <column name="logo"/>
             <column name="managed_locally" valueBoolean="true"/>
@@ -1132,7 +1046,7 @@
             <column name="id" value="1"/>
             <column name="version" valueNumeric="1"/>
             <column name="date_created" valueDate="2010-08-25T00:00:00.0"/>
-            <column name="email" value="admin@pih.org"/>
+            <column name="email" value="admin@openboxes.com"/>
             <column name="first_name" value="Miss"/>
             <column name="last_name" value="Administrator"/>
             <column name="last_updated" valueDate="2010-08-25T00:00:00.0"/>
@@ -1142,29 +1056,9 @@
             <column name="id" value="2"/>
             <column name="version" valueNumeric="5"/>
             <column name="date_created" valueDate="2010-08-25T00:00:00.0"/>
-            <column name="email" value="manager@pih.org"/>
+            <column name="email" value="manager@openboxes.org"/>
             <column name="first_name" value="Mister"/>
             <column name="last_name" value="Manager"/>
-            <column name="last_updated" valueDate="2010-08-25T00:00:00.0"/>
-            <column name="phone_number"/>
-        </insert>
-        <insert tableName="person">
-            <column name="id" value="3"/>
-            <column name="version" valueNumeric="1"/>
-            <column name="date_created" valueDate="2010-08-25T00:00:00.0"/>
-            <column name="email" value="jmiranda@pih.org"/>
-            <column name="first_name" value="Justin"/>
-            <column name="last_name" value="Miranda"/>
-            <column name="last_updated" valueDate="2010-08-25T00:00:00.0"/>
-            <column name="phone_number"/>
-        </insert>
-        <insert tableName="person">
-            <column name="id" value="4"/>
-            <column name="version" valueNumeric="1"/>
-            <column name="date_created" valueDate="2010-08-25T00:00:00.0"/>
-            <column name="email" value="inactive@pih.org"/>
-            <column name="first_name" value="In"/>
-            <column name="last_name" value="Active"/>
             <column name="last_updated" valueDate="2010-08-25T00:00:00.0"/>
             <column name="phone_number"/>
         </insert>

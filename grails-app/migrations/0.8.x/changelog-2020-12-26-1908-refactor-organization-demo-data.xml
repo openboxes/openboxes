@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="jmiranda" id="1609031643715-1">
+    <preConditions onFail="MARK_RAN">
+      <sqlCheck expectedResult="0">
+        SELECT count(*)
+        FROM party
+        WHERE id = "1";
+      </sqlCheck>
+    </preConditions>
+    <insert tableName="party">
+      <column name="id" value="1"/>
+      <column name="code" value="MAIN"/>
+      <column name="name" value="Main Corporation"/>
+      <column name="party_type_id" value="1"/>
+      <column name="version" valueNumeric="0"/>
+      <column name="class" value="org.pih.warehouse.core.Organization"/>
+      <column name="date_created" valueDate="2020-12-26T00:00:00.0"/>
+      <column name="last_updated" valueDate="2020-12-26T00:00:00.0"/>
+    </insert>
+  </changeSet>
+  <changeSet author="jmiranda" id="1609031643715-2">
+    <preConditions onFail="MARK_RAN">
+      <sqlCheck expectedResult="0">
+        SELECT count(*)
+        FROM party_role
+        WHERE party_id = "1"
+        AND role_type = "ROLE_ORGANIZATION";
+      </sqlCheck>
+    </preConditions>
+    <insert tableName="party_role">
+      <column name="id" value="1"/>
+      <column name="party_id" value="1"/>
+      <column name="role_type" value="ROLE_ORGANIZATION"/>
+      <column name="version" valueNumeric="0"/>
+    </insert>
+  </changeSet>
+</databaseChangeLog>
