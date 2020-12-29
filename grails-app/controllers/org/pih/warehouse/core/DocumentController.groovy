@@ -419,7 +419,7 @@ class DocumentController {
             if (params.protocol=="usb") {
                 String printerName = grailsApplication.config.openboxes.barcode.printer.name
                 log.info "Printing ZPL to ${printerName}: ${renderedContent} "
-                ZebraUtils.printZpl(renderedContent, "printer_thermalprinter")
+                ZebraUtils.printZpl(renderedContent, printerName)
             }
             else if (params.protocol == "raw") {
                 String ipAddress = grailsApplication.config.openboxes.barcode.printer.ipAddress
@@ -458,7 +458,7 @@ class DocumentController {
         String body = templateService.renderTemplate(document, model)
         String contentType = "image/png"
 
-        def http = new HTTPBuilder("http://api.labelary.com/v1/printers/8dpmm/labels/4x6/0/".toString())
+        def http = new HTTPBuilder("http://api.labelary.com/v1/printers/8dpmm/labels/2x1/0/".toString())
         def html = http.post(body: body)
 
         response.contentType = contentType
