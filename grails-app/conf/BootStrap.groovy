@@ -28,17 +28,12 @@ import org.pih.warehouse.api.StocklistItem
 import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.core.ActivityCode
-import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.InventorySnapshot
-import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.inventory.TransactionEntry
-import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.jobs.RefreshDemandDataJob
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.jobs.RefreshStockoutDataJob
@@ -49,7 +44,6 @@ import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociation
-import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.requisition.Requisition
@@ -459,22 +453,6 @@ class BootStrap {
         }
         log.info("Finished running liquibase changelog(s)!")
 
-        def enableFixtures = Boolean.valueOf(grailsApplication.config.openboxes.fixtures.enabled ?: true)
-        log.info("Insert test fixtures?  " + enableFixtures)
-        if (enableFixtures) {
-            log.info("Inserting test fixtures ...")
-            insertTestFixture()
-        }
-
-        // Debug logging used to figure out what log4j properties are ruining it for the rest of us
-        getClass().getClassLoader().getResources("log4j.properties").each {
-            log.info "log4j.properties => " + it
-        }
-
-        getClass().getClassLoader().getResources("log4j.xml").each {
-            log.info "log4j.xml => " + it
-        }
-
         // Create uploads directory if it doesn't already exist
         uploadService.findOrCreateUploadsDirectory()
 
@@ -492,160 +470,5 @@ class BootStrap {
     def destroy = {
 
     }
-
-
-    static String TestFixure = "Test-Fixture"
-
-
-    def insertTestFixture() {
-        if (Environment.current != Environment.DEVELOPMENT && Environment.current != Environment.TEST && Environment.current.name != "loadtest")
-            return
-
-        log.info("Setup test fixture...")
-
-        createSupplierLocation()
-        def medicines = Category.findByName("Medicines")
-        def suppliers = Category.findByName("Supplies")
-
-        assert medicines != null
-        assert suppliers != null
-        def testData = [
-                ['expiration': new Date().plus(3), 'productGroup': 'PainKiller', 'quantity': 10000, 'product': new Product(category: medicines, name: "Advil 200mg", manufacturer: "ABC", productCode: "00001", manufacturerCode: "9001")]
-                , ['expiration': new Date().plus(20), 'productGroup': 'PainKiller', 'quantity': 10000, 'product': new Product(category: medicines, name: "Tylenol 325mg", manufacturer: "MedicalGait", productCode: "00002", manufacturerCode: "9002")]
-                , ['expiration': new Date().plus(120), 'productGroup': 'PainKiller', 'quantity': 10000, 'product': new Product(category: medicines, name: "Aspirin 20mg", manufacturer: "ABC", productCode: "00003", manufacturerCode: "9001")]
-                , ['expiration': new Date().plus(200), 'productGroup': 'PainKiller', 'quantity': 10000, 'product': new Product(category: medicines, name: "General Pain Reliever", manufacturer: "MedicalGait", productCode: "00004", manufacturerCode: "9002")]
-                , ['expiration': new Date().minus(1), 'productGroup': 'Iron', 'quantity': 10000, 'product': new Product(category: medicines, name: "Similac Advance low iron 400g", manufacturer: "ABC", productCode: "00005", manufacturerCode: "9001")]
-                , ['expiration': new Date().minus(30), 'productGroup': 'Iron', 'quantity': 10000, 'product': new Product(category: medicines, name: "Similac Advance + iron 365g", manufacturer: "MedicalGait", productCode: "00006", manufacturerCode: "9002")]
-                , ['expiration': new Date().plus(1000), 'productGroup': 'Laptop', 'quantity': 10000, 'product': new Product(category: suppliers, name: "MacBook Pro 8G", manufacturer: "Apple", productCode: "00007", manufacturerCode: "9003")]
-                , ['expiration': null, 'productGroup': 'Paper', 'quantity': 10000, 'product': new Product(category: suppliers, name: "Print Paper A4", manufacturer: "DSC", productCode: "00008", manufacturerCode: "9004")]
-        ]
-
-
-        if (Environment.current == Environment.TEST)
-            deleteTestFixture(testData)
-
-        createTestFixtureIfNotExist(testData)
-        if (Environment.current.name == "loadtest")
-            createLoadtestData()
-
-        log.info("Created test fixture.")
-    }
-
-    def createLoadtestData() {
-        def medicines = Category.findByName("Medicines")
-        def numberOfProducts = Integer.parseInt(System.getenv()["load"] ?: "5000")
-        if (Product.count() >= numberOfProducts) return
-        def nameSeeds = ["foo", "jing", "moon", "mountain", "evening", "smooth", "train", "paper", "sharp", "see", "ocean", "apple"]
-        def data = []
-        for (i in 0..numberOfProducts) {
-            def nameSeed = nameSeeds[i % nameSeeds.size()]
-            data.add(['expiration': new Date().plus(500), 'quantity': (i + 1) * 10, 'product': new Product(category: medicines, name: nameSeed + i, manufacturer: "ABC", productCode: "00001", manufacturerCode: "9001")])
-        }
-        createTestFixtureIfNotExist(data)
-        log.info("load test data created.")
-    }
-
-    def createSupplierLocation() {
-        def name = "Test Supplier"
-        if (Location.findByName(name)) return
-        def locationType = LocationType.get("4")
-        def supplierLocation = new Location(name: name, locationType: locationType)
-        supplierLocation.save(flush: true, failOnError: true)
-    }
-
-    def deleteTestFixture(List<Map<String, Object>> testData) {
-        deleteRequisitions()
-        deleteInventorySnapshots()
-        testData.each { deleteProductAndInventoryItems(it) }
-        Transaction.findByComment(TestFixure).each { it.delete() }
-    }
-
-    def createTestFixtureIfNotExist(List<Map<String, Object>> testData) {
-        testData.each { addProductAndInventoryItemIfNotExist(it) }
-    }
-
-    private def deleteRequisitions() {
-        Picklist.list().each { it.delete(failOnError: true, flush: true) }
-        Requisition.list().each { it.delete(failOnError: true, flush: true) }
-    }
-
-    private deleteInventorySnapshots() {
-        InventorySnapshot.executeUpdate("delete from InventorySnapshot")
-    }
-
-    private def deleteProductAndInventoryItems(Map<String, Object> inventoryItemInfo) {
-        def product = Product.findByName(inventoryItemInfo.product.name)
-        if (!product) return
-        def shipmentItems = ShipmentItem.findAllByProduct(product)
-
-        for (shipmentItem in shipmentItems) {
-            shipmentItem.delete(failOnError: true, flush: true)
-        }
-
-        def inventoryItems = InventoryItem.findAllByProduct(product)
-        for (item in inventoryItems) {
-            for (entry in TransactionEntry.findAllByInventoryItem(item)) {
-                entry.delete(failOnError: true, flush: true)
-            }
-
-            item.delete(failOnError: true, flush: true)
-        }
-        product.delete(failOnError: true, flush: true)
-
-    }
-
-    private def addProductAndInventoryItemIfNotExist(Map<String, Object> inventoryItemInfo) {
-        def productGroup = null
-        if (inventoryItemInfo.productGroup) {
-            productGroup = ProductGroup.findByName(inventoryItemInfo.productGroup)
-            if (!productGroup) {
-                productGroup = new ProductGroup(name: inventoryItemInfo.productGroup)
-                productGroup.category = inventoryItemInfo.product.category
-                productGroup.save(failOnError: true, flush: true)
-            }
-        }
-        Product product = Product.findByName(inventoryItemInfo.product.name)
-
-        if (!product) {
-            log.info("creating product ${inventoryItemInfo.product.name}")
-            product = inventoryItemInfo.product
-            product.save(failOnError: true, flush: true)
-            if (inventoryItemInfo.productGroup) {
-                productGroup.addToProducts(product)
-                productGroup.save(failOnError: true, flush: true)
-                product.addToProductGroups(productGroup)
-                product.save(failOnError: true, flush: true)
-            }
-            addInventoryItem(product, inventoryItemInfo.expiration, inventoryItemInfo.quantity)
-        }
-    }
-
-
-    private def addInventoryItem(product, expirationDate, quantity) {
-
-        InventoryItem item = new InventoryItem()
-        item.product = product
-        item.lotNumber = "lot57"
-        item.expirationDate = expirationDate
-        item.save(failOnError: true, flush: true)
-
-        Location boston = Location.findByName("Boston Headquarters")
-        assert boston != null
-
-        Transaction transaction = new Transaction()
-        transaction.createdBy = User.get(2)
-        transaction.comment = TestFixure
-        transaction.transactionDate = new Date().minus(1)
-        transaction.inventory = boston.inventory
-        transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
-
-        TransactionEntry transactionEntry = new TransactionEntry()
-        transactionEntry.quantity = quantity
-        transactionEntry.inventoryItem = item
-
-        transaction.addToTransactionEntries(transactionEntry)
-        transaction.save(failOnError: true, flush: true)
-    }
-
 
 }

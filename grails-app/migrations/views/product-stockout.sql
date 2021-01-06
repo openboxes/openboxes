@@ -1,3 +1,12 @@
+CREATE TABLE IF NOT EXISTS stockout_fact
+(
+    date_dimension_id     bigint(20),
+    location_dimension_id bigint(20),
+    product_dimension_id  bigint(20),
+    quantity_on_hand      smallint,
+    primary key (date_dimension_id, location_dimension_id, product_dimension_id)
+);
+
 CREATE OR REPLACE VIEW product_stockout AS
 (
 select stockout_fact_tmp.product_id,
