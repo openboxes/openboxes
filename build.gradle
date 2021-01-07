@@ -24,12 +24,15 @@ buildscript {
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.15.1"
         classpath "gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:2.2.0"
         classpath 'org.grails.plugins:database-migration:3.1.0.RC1'
+        classpath "gradle.plugin.com.virgo47.gradle:ClasspathJar:1.0.0"
+
     }
 }
 
 //include gradle-node plugin
 plugins {
     id "com.moowork.node" version "0.12"
+    id "com.virgo47.ClasspathJar" version "1.0.0"
 }
 
 //grails.project.class.dir = "target/classes"
@@ -290,3 +293,4 @@ buildProperties.doLast {
         properties.store(it,null)
     }
 }
+apply plugin: "com.virgo47.ClasspathJar"
