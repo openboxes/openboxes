@@ -60,6 +60,7 @@ const SortableNumberCards = SortableContainer(({ data }) => (
           key={`item-${value.id}`}
           index={index}
           cardTitle={value.title}
+          cardNumberType={value.numberType}
           cardNumber={value.number}
           cardSubtitle={value.subtitle}
           cardLink={value.link}
