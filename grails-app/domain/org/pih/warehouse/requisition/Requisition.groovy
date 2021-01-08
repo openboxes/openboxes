@@ -173,6 +173,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         requisitionTemplate(nullable: true)
         replenishmentPeriod(nullable: true)
         sortByCode(nullable: true)
+        statusSortOrder(nullable: true)
     }
 
     def getRequisitionItemCount() {
