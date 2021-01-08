@@ -114,6 +114,8 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
     Integer replenishmentPeriod = 0
 
+    Integer statusSortOrder
+
     // Removed comments, documents, events for the time being.
     static transients = ["sortedStocklistItems", "requisitionItemsByDateCreated", "requisitionItemsByOrderIndex", "requisitionItemsByCategory", "shipment", "totalCost"]
     static hasOne = [picklist: Picklist]
@@ -122,6 +124,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         id generator: 'uuid'
         requisitionItems cascade: "all-delete-orphan", sort: "orderIndex", order: 'asc', batchSize: 100
 
+        statusSortOrder formula: RequisitionStatus.getStatusSortOrderFormula("status")
         monthRequested formula: "date_format(date_requested, '%M %Y')"
     }
 
