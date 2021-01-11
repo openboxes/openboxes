@@ -16,7 +16,7 @@
                 <th><warehouse:message code="default.actions.label"/></th>
                 <th><warehouse:message code="inventoryLevel.status.label"/></th>
                 <th><warehouse:message code="inventory.label"/></th>
-                <th><warehouse:message code="inventoryLevel.binLocation.label"/></th>
+                <th><warehouse:message code="product.preferredBin.label"/></th>
                 <th class="center"><warehouse:message code="inventoryLevel.abcClass.label" default="ABC Class"/></th>
                 <th class="center"><warehouse:message code="inventoryLevel.minQuantity.label"/></th>
                 <th class="center"><warehouse:message code="inventoryLevel.reorderQuantity.label"/></th>
@@ -61,7 +61,7 @@
                         ${inventoryLevelInstance?.inventory?.warehouse?.name }
                     </td>
                     <td>
-                        ${inventoryLevelInstance?.binLocation}
+                        ${inventoryLevelInstance?.preferredBinLocation}
                     </td>
                     <td class="center">
                         ${inventoryLevelInstance?.abcClass?:warehouse.message(code:'default.none.label')}

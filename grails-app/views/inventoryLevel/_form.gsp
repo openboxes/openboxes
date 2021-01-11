@@ -32,10 +32,8 @@
                     <label for="location.id"><warehouse:message code="location.label" /></label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'inventory', 'errors')}">
-                    <g:selectLocation name="location.id"
-                                      class="chzn-select-deselect"
-                                      value="${inventoryLevelInstance?.inventory?.warehouse?.id ?: session?.warehouse?.id}"
-                                      activityCode="${org.pih.warehouse.core.ActivityCode.MANAGE_INVENTORY}"/>
+                    ${inventoryLevelInstance?.inventory?.warehouse?.name ?: session?.warehouse?.name}
+                    <g:hiddenField name="location.id" value="${inventoryLevelInstance?.inventory?.warehouse?.id ?: session?.warehouse?.id}"/>
                 </td>
             </tr>
             <tr class="prop">
@@ -53,10 +51,10 @@
             </tr>
             <tr class="prop">
                 <td valign="top" class="name">
-                    <label for="binLocation"><warehouse:message code="inventoryLevel.binLocation.label" default="Bin location" /></label>
+                    <label for="binLocation"><warehouse:message code="product.preferredBin.label" default="Preferred bin location"/></label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'binLocation', 'errors')}">
-                    <g:textField name="binLocation" value="${inventoryLevelInstance?.binLocation }" class="text large"/>
+                    <g:selectBinLocation name="preferredBinLocation" value="${inventoryLevelInstance?.preferredBinLocation?.id}" noSelection="['':'']" class="chzn-select-deselect"/>
                 </td>
             </tr>
             <tr class="prop">

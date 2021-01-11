@@ -143,13 +143,13 @@
                         </td>
                     </tr>
                 </g:if>
-                <g:if test="${inventoryLevel?.binLocation}">
+                <g:if test="${inventoryLevel?.preferredBinLocation}">
                     <tr class="prop">
                         <td class="label">
                             <label><warehouse:message code="product.preferredBin.label"/></label>
                         </td>
                         <td class="value middle">
-                            ${inventoryLevel?.binLocation ?: warehouse.message(code:'default.none.label')}
+                            ${inventoryLevel?.preferredBinLocation ?: warehouse.message(code:'default.none.label')}
                         </td>
                     </tr>
                 </g:if>
