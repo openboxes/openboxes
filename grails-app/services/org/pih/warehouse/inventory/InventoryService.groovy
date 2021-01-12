@@ -2054,7 +2054,6 @@ class InventoryService implements ApplicationContextAware {
         mirroredTransaction.order = baseTransaction.order
         mirroredTransaction.requisition = baseTransaction.requisition
         mirroredTransaction.transactionDate = baseTransaction.transactionDate
-        mirroredTransaction.transactionNumber = baseTransaction.transactionNumber
 
         // create the transaction entries based on the base transaction
         baseTransaction.transactionEntries.each {
