@@ -29,7 +29,7 @@ class IndicatorDataService {
     def dashboardService
     def dataService
     def messageService
-    
+
     GraphData getExpirationSummaryData(Location location, def params) {
         // querySize = value of the date filter (1 month, 3 months, etc.)
         // Here it represents the last month we want to show
@@ -41,7 +41,7 @@ class IndicatorDataService {
         List expirationSummary = [0] * querySize
 
         List linksExpirationSummary = [""] * querySize
-        
+
         List listLabels = []
 
         // Fill labels and links
@@ -616,7 +616,7 @@ class IndicatorDataService {
             code : "react.dashboard.incomingStock.info.label",
             message : messageService.getMessage("react.dashboard.incomingStock.info.label")
         ]
-        
+
         GraphData graphData = new GraphData(
             numbersIndicator,
             title,
@@ -758,8 +758,8 @@ class IndicatorDataService {
         NumberTableData numberTableData = new NumberTableData(table, numbersIndicator)
 
         def title = [
-            code : "react.dashboard.delayedShipments.label",
-            message : messageService.getMessage("react.dashboard.delayedShipments.label")
+            code : "react.dashboard.delayedShipments.title.label",
+            message : messageService.getMessage("react.dashboard.delayedShipments.title.label")
         ]
 
         def info = [
