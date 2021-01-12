@@ -77,7 +77,7 @@ class NumberDataService {
             code : "react.dashboard.inProgressPutaways.title.label",
             message : messageService.getMessage("react.dashboard.inProgressPutaways.title.label")
         ]
-        
+
         def info = [
             code: "react.dashboard.inProgressPutaways.info.label",
             message: messageService.getMessage("react.dashboard.inProgressPutaways.info.label")
@@ -185,6 +185,11 @@ class NumberDataService {
             message : messageService.getMessage("react.dashboard.defaultBin.title.label")
         ]
 
+        def info = [
+            code: "react.dashboard.defaultBin.info.label",
+            message: messageService.getMessage("react.dashboard.defaultBin.info.label")
+        ]
+
         def subTitle = [
             code : "react.dashboard.subtitle.products.label",
             message : messageService.getMessage("react.dashboard.subtitle.products.label")
@@ -192,7 +197,7 @@ class NumberDataService {
 
         return new NumberData(
             title,
-            null,
+            info,
             productsInDefaultBin[0],
             subTitle, "/openboxes/report/showBinLocationReport?location.id=" + location.id + "&status=inStock"
             )
@@ -335,9 +340,9 @@ class NumberDataService {
         def inventoryValue = ProductAvailability.executeQuery("""select sum (pa.quantityOnHand * p.pricePerUnit) 
                 from ProductAvailability as pa
                 inner join pa.product as p 
-                where pa.location = :location""", 
+                where pa.location = :location""",
                 ['location': location])
-            
+
         def title = [
                 code : "react.dashboard.inventoryValue.title.label",
                 message : messageService.getMessage("react.dashboard.inventoryValue.title.label")
@@ -350,6 +355,7 @@ class NumberDataService {
 
         return new NumberData(
                 title,
+                null,
                 inventoryValue[0],
                 subTitle,
                 "/openboxes/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC",
