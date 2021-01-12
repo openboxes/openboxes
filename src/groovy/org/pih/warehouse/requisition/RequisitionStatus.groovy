@@ -104,8 +104,8 @@ enum RequisitionStatus {
         }
     }
 
-    static getStatusSortOrderFormula(String fieldName) {
-        return "(case ${fieldName} " +
+    static getStatusSortOrderFormula() {
+        return "(case status " +
             "when '${CREATED}' then ${CREATED.sortOrder} " +
             "when '${EDITING}' then ${EDITING.sortOrder} " +
             "when '${VERIFYING}' then ${VERIFYING.sortOrder} " +
@@ -122,7 +122,5 @@ enum RequisitionStatus {
     }
 
     String toString() { return name() }
-
-
 
 }

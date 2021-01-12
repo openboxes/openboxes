@@ -124,7 +124,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         id generator: 'uuid'
         requisitionItems cascade: "all-delete-orphan", sort: "orderIndex", order: 'asc', batchSize: 100
 
-        statusSortOrder formula: RequisitionStatus.getStatusSortOrderFormula("status")
+        statusSortOrder formula: RequisitionStatus.getStatusSortOrderFormula()
         monthRequested formula: "date_format(date_requested, '%M %Y')"
     }
 
