@@ -2016,7 +2016,7 @@ class InventoryService implements ApplicationContextAware {
 
         // save the local transfer
         if (!transfer.save(flush: true)) {
-            throw new RuntimeException("Unable to save local transfer " + transfer?.id)
+            throw new ValidationException("Unable to save local transfer ", transfer.errors)
         }
 
         // delete the old transaction
@@ -2054,6 +2054,7 @@ class InventoryService implements ApplicationContextAware {
         mirroredTransaction.order = baseTransaction.order
         mirroredTransaction.requisition = baseTransaction.requisition
         mirroredTransaction.transactionDate = baseTransaction.transactionDate
+        mirroredTransaction.transactionNumber = generateTransactionNumber()
 
         // create the transaction entries based on the base transaction
         baseTransaction.transactionEntries.each {
