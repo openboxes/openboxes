@@ -201,7 +201,7 @@ class PutAwaySecondPage extends Component {
       Filter,
     }, {
       Header: <Translate id="react.putAway.preferredBin.label" defaultMessage="Preferred bin" />,
-      accessor: 'preferredBin',
+      accessor: 'preferredBin.name',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
@@ -300,9 +300,20 @@ class PutAwaySecondPage extends Component {
         .then((response) => {
           const putAway = parseResponse(response.data.data);
 
+          const putawayItems = _.map(
+            putAway.putawayItems,
+            val => ({
+              ...val,
+              putawayLocation: {
+                id: val.putawayLocation.id ? val.putawayLocation.id : val.preferredBin.id,
+                name: val.putawayLocation.name ? val.putawayLocation.name : val.preferredBin.name,
+              },
+            }),
+          );
+
           this.props.hideSpinner();
 
-          this.setState({ putAway: { ...putAway } });
+          this.setState({ putAway: { ...putAway, putawayItems } });
         })
         .catch(() => this.props.hideSpinner());
     }
@@ -503,10 +514,20 @@ class PutAwaySecondPage extends Component {
     const url = `/openboxes/api/putaways/${this.state.putAway.id}?sortBy=${sortBy}`;
     return apiClient.get(url)
       .then((response) => {
+        const putawayItems = _.map(
+          parseResponse(response.data.data.putawayItems),
+          val => ({
+            ...val,
+            putawayLocation: {
+              id: val.putawayLocation.id ? val.putawayLocation.id : val.preferredBin.id,
+              name: val.putawayLocation.name ? val.putawayLocation.name : val.preferredBin.name,
+            },
+          }),
+        );
         this.changePutAway({
           ...this.state.putAway,
           sortBy,
-          putawayItems: parseResponse(response.data.data.putawayItems),
+          putawayItems,
         });
       })
       .catch(() => this.props.hideSpinner());

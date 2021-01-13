@@ -148,7 +148,7 @@ class PutAwayCheckPage extends Component {
       Filter,
     }, {
       Header: <Translate id="react.putAway.preferredBin.label" defaultMessage="Preferred bin" />,
-      accessor: 'preferredBin',
+      accessor: 'preferredBin.name',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
