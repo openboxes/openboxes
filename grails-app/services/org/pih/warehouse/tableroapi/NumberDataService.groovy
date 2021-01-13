@@ -285,9 +285,9 @@ class NumberDataService {
         def inventoryValue = ProductAvailability.executeQuery("""select sum (pa.quantityOnHand * p.pricePerUnit) 
                 from ProductAvailability as pa
                 inner join pa.product as p 
-                where pa.location = :location""", 
+                where pa.location = :location""",
                 ['location': location])
-            
+
         def title = [
                 code : "react.dashboard.inventoryValue.title.label",
                 message : messageService.getMessage("react.dashboard.inventoryValue.title.label")
@@ -302,7 +302,7 @@ class NumberDataService {
                 title,
                 inventoryValue[0],
                 subTitle,
-                "/openboxes/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC",
+                null,
                 null,
                 'dollars'
         )
