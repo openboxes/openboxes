@@ -18,8 +18,6 @@ import org.hibernate.Criteria
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.LocationService
-import org.pih.warehouse.data.DataService
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAvailability
 
@@ -29,9 +27,9 @@ class ProductAvailabilityService {
 
     def dataSource
     def persistenceInterceptor
-    LocationService locationService
-    InventoryService inventoryService
-    DataService dataService
+    def locationService
+    def inventoryService
+    def dataService
 
     def refreshProductAvailability(Boolean forceRefresh) {
         // Compute bin locations from transaction entries for all products over all depot locations
@@ -315,7 +313,7 @@ class ProductAvailabilityService {
         return quantityMap
     }
 
-    List getQuantityOnHandByBinLocation(Location location) {
+    List getQuantityOnHandByBinLocation(Location location, Boolean includeOutOfStock=Boolean.TRUE) {
         def data = []
 
         if (location) {
@@ -352,6 +350,11 @@ class ProductAvailabilityService {
                         totalValue   : totalValue
 
                 ]
+            }
+
+            // Exclude out of stock
+            if (!includeOutOfStock) {
+                data = data.findAll { it.quantity > 0 }
             }
         }
         return data

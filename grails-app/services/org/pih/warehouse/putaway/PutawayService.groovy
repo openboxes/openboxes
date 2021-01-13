@@ -16,9 +16,7 @@ import org.pih.warehouse.api.PutawayItem
 import org.pih.warehouse.api.PutawayStatus
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransferStockCommand
 import org.pih.warehouse.order.Order
@@ -29,8 +27,9 @@ import org.pih.warehouse.order.OrderTypeCode
 
 class PutawayService {
 
-    LocationService locationService
-    InventoryService inventoryService
+    def locationService
+    def inventoryService
+    def productAvailabilityService
 
     boolean transactional = true
 
@@ -39,9 +38,7 @@ class PutawayService {
         List<Location> internalLocations = locationService.getInternalLocations(location,
                 [ActivityCode.RECEIVE_STOCK] as ActivityCode[])
 
-        List binLocationEntries = inventoryService.getQuantityByBinLocation(location)
-
-        log.info "internalLocations " + internalLocations
+        List binLocationEntries = productAvailabilityService.getQuantityOnHandByBinLocation(location, false)
         internalLocations.each { internalLocation ->
             List putawayItemsTemp = binLocationEntries.findAll {
                 it.binLocation == internalLocation
