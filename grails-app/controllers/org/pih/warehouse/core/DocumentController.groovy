@@ -178,7 +178,7 @@ class DocumentController {
 
         // file must not be empty and must be less than 10MB
         // FIXME The size limit needs to go somewhere
-        if (file?.isEmpty()) {
+        if (!(file?.size || command.fileUri)) {
             flash.message = "${warehouse.message(code: 'document.documentTooLarge.message')}"
         } else if (file.size < 10 * 1024 * 1000) {
             log.info "Creating new document "
@@ -189,6 +189,7 @@ class DocumentController {
                     name: command.name ?: file.originalFilename,
                     filename: file.originalFilename,
                     fileContents: command.fileContents.bytes,
+                    fileUri: command.fileUri,
                     contentType: file.contentType,
                     extension: FileUtil.getExtension(file.originalFilename),
                     documentNumber: command.documentNumber,
@@ -490,10 +491,11 @@ class DocumentCommand {
     String shipmentId
     String documentNumber
     MultipartFile fileContents
+    String fileUri
 
     static constraints = {
         name(nullable: true)
-        fileContents(nullable: false)
+        fileContents(nullable: true)
     }
 }
 
