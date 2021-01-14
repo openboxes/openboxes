@@ -38,6 +38,7 @@ const SortableCards = SortableContainer(({ data, loadIndicator, allLocations }) 
           cardTitle={value.title}
           cardType={value.type}
           cardLink={value.link}
+          cardInfo={value.info}
           data={value.data}
           timeFilter={value.timeFilter}
           timeLimit={value.timeLimit}
@@ -65,6 +66,7 @@ const SortableNumberCards = SortableContainer(({ data }) => (
           cardSubtitle={value.subtitle}
           cardLink={value.link}
           cardDataTooltip={value.tooltipData}
+          cardInfo={value.info}
           sparklineData={value.data}
         />
       ))
