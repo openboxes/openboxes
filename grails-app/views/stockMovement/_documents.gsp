@@ -14,7 +14,7 @@
                 <th></th>
             </tr>
             <tbody>
-                <g:each var="document" in="${stockMovement.documents}">
+                <g:each var="document" in="${stockMovement.documents.findAll { !it.fileUri } }">
                     <g:if test ="${!document.hidden}">
                         <tr>
                             <td>
@@ -62,4 +62,51 @@
             </tbody>
         </table>
     </div>
+    <g:if test="${stockMovement.documents.find { it.fileUri } }">
+        <div class="box">
+            <h2>
+                <img src="${createLinkTo(dir:'images/icons/silk',file:'application_link.png')}" />
+                <warehouse:message code="links.label" default="Links"/>
+            </h2>
+            <table class="zebra">
+                <tr>
+                    <th style="width:3%"></th>
+                    <th><g:message code="default.name.label"/></th>
+                    <th><warehouse:message code="document.url.label" default="URL" /></th>
+                    <th colspan="5"></th>
+                </tr>
+                <tbody>
+                <g:each var="document" in="${stockMovement.documents.findAll { it.fileUri } }">
+                    <g:if test ="${!document.hidden}">
+                        <tr>
+                            <td>
+                                <img src="${createLinkTo(dir:'images/icons/silk',file:'link.png')}"/>
+                            </td>
+                            <td>
+                                <a href="${document.fileUri}">
+                                    ${document.name}
+                                </a>
+                            </td>
+                            <td>
+                                <a href="${document.fileUri}">
+                                    ${document.fileUri}
+                                </a>
+                            </td>
+                            <td colspan="4"></td>
+                            <td class="right">
+                                <g:if test="${document.id}">
+                                    <g:link controller="shipment" action="deleteDocument" id="${document.id}" params="[shipmentId:stockMovement?.shipment?.id]"
+                                            onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
+                                            class="button">
+                                        <warehouse:message code="default.button.delete.label"/>
+                                    </g:link>
+                                </g:if>
+                            </td>
+                        </tr>
+                    </g:if>
+                </g:each>
+                </tbody>
+            </table>
+        </div>
+    </g:if>
 </div>

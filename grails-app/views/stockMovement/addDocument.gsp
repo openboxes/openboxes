@@ -53,6 +53,14 @@
 						<input name="fileContents" type="file" />
 					</td>
 				</tr>
+				<tr class="prop">
+					<td valign="top" class="name">
+						<label><warehouse:message code="document.url.label" default="URL" /></label>
+					</td>
+					<td valign="top" class="value ${hasErrors(bean: documentInstance, field: 'fileUri', 'errors')}">
+						<g:textField class="text" size="100" name="fileUri" value="${documentInstance?.fileUri}" />
+					</td>
+				</tr>
 				</tbody>
 				<tfoot>
 				<tr>
