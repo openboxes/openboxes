@@ -1,6 +1,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.core.GrailsApplication
 import grails.plugin.cache.Cacheable
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
@@ -15,7 +16,7 @@ class DashboardApiController {
     def indicatorDataService
     def userService
     def messageService
-    def grailsApplication
+    GrailsApplication grailsApplication
 
     def config() {
         User user = User.get(session.user.id)

@@ -15,7 +15,7 @@
 				<g:form controller="dashboard" action="chooseLocation">
 					<div class="box">
                         <h2>
-                            <img src="${createLinkTo(dir:'images/icons/silk',file:'map.png')}" class="middle"/>
+                            <img src="${resource(dir:'images/icons/silk',file:'map.png')}" class="middle"/>
                             ${warehouse.message(code: 'dashboard.chooseLocation.label')}
                         </h2>
                         <div class="message">

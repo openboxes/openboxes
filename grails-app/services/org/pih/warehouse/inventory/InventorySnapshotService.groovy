@@ -28,7 +28,7 @@ import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductSummary
 import org.pih.warehouse.reporting.TransactionFact
-import org.pih.warehouse.util.LocalizationUtil
+import org.pih.warehouse.LocalizationUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationEventPublisher
 

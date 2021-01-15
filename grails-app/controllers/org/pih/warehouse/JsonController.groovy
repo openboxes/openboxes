@@ -17,7 +17,7 @@ import groovy.time.TimeCategory
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.StringUtils
 import org.grails.web.json.JSONObject
-import org.grails.plugins.csv.CSVWriter
+import grails.plugins.csv.CSVWriter
 import org.hibernate.Criteria
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.ApiException

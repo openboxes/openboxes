@@ -120,7 +120,7 @@
 %{--        <g:remoteLink class="button"--}%
 %{--                      controller="inventorySnapshot" action="triggerRefreshInventorySnapshotJob"--}%
 %{--                      params="['product.id':product.id,'location.id':session.warehouse.id]" onSuccess="javascript:refreshPage();">--}%
-%{--            <img src="${createLinkTo(dir:'images/icons/silk',file:'reload.png')}" />&nbsp;--}%
+%{--            <img src="${resource(dir:'images/icons/silk',file:'reload.png')}" />&nbsp;--}%
 %{--            ${g.message(code: "default.reload.label", args: [g.message(code: "default.data.label")])}--}%
 %{--        </g:remoteLink>--}%
 %{--    </g:isSuperuser>--}%
@@ -129,7 +129,7 @@
         <a href class="button btn-show-dialog"
             data-title="${g.message(code: 'default.edit.label', args: [g.message(code:'inventoryLevel.label')])}"
             data-url="${request.contextPath}/inventoryLevel/dialog/${inventoryLevel?.id}?redirectUrl=${redirectUrl}">
-            <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" />&nbsp;
+            <img src="${resource(dir:'images/icons/silk',file:'pencil.png')}" />&nbsp;
             ${g.message(code: 'default.edit.label', args: [g.message(code:'inventoryLevel.label')])}
         </a>
     </g:if>

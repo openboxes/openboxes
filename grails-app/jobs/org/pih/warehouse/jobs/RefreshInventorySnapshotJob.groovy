@@ -10,7 +10,7 @@
 package org.pih.warehouse.jobs
 
 import grails.core.GrailsApplication
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import org.quartz.DisallowConcurrentExecution

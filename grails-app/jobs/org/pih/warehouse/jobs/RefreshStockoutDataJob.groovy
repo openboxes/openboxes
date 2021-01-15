@@ -1,18 +1,19 @@
 package org.pih.warehouse.jobs
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.core.GrailsApplication
+import grails.util.Holders
 import org.quartz.DisallowConcurrentExecution
 import org.quartz.JobExecutionContext
 
 @DisallowConcurrentExecution
 class RefreshStockoutDataJob {
 
-    def grailsApplication
+    GrailsApplication grailsApplication
     def reportService
 
     static triggers = {
         cron name: 'refreshProductStockoutDataJobCronTrigger',
-                cronExpression: ConfigurationHolder.config.openboxes.jobs.refreshStockoutDataJob.cronExpression
+                cronExpression: Holders.config.openboxes.jobs.refreshStockoutDataJob.cronExpression
     }
 
     def execute(JobExecutionContext context) {

@@ -9,11 +9,12 @@
 **/
 package org.pih.warehouse.core
 
+import grails.core.GrailsApplication
 import org.grails.web.json.JSONObject
 
 class CurrencyService {
 
-    def grailsApplication
+    GrailsApplication grailsApplication
     def apiClientService
 
     def getExchangeRates() {
