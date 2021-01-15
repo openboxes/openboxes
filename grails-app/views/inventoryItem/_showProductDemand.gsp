@@ -36,7 +36,7 @@
     <div class="buttons center">
         <g:link controller="inventoryItem" action="showProductDemand"
                 id="${product?.id}" class="button" params="['format':'csv']">
-            <img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" />&nbsp;
+            <img src="${resource(dir:'images/icons/silk',file:'page_excel.png')}" />&nbsp;
             <g:message code="default.button.download.label"/>
         </g:link>
     </div>

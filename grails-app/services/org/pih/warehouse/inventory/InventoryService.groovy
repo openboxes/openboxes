@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovyx.gpars.GParsPool
@@ -46,7 +47,7 @@ class InventoryService implements ApplicationContextAware {
 
     def sessionFactory
     def persistenceInterceptor
-    def grailsApplication
+    GrailsApplication grailsApplication
 
     def dataService
     def productService

@@ -204,7 +204,7 @@ class CombinedShipmentItemsModal extends Component {
         sortOrder: _.toInteger(item.sortOrder),
       })),
     };
-    const url = `/openboxes/api/combinedShipmentItems/addToShipment/${shipment}`;
+    const url = `/api/combinedShipmentItems/addToShipment/${shipment}`;
 
     apiClient.post(url, payload)
       .then(() => {
@@ -226,7 +226,7 @@ class CombinedShipmentItemsModal extends Component {
 
   getOrderNumberOptions() {
     const { vendor, destination } = this.props;
-    const url = `/openboxes/api/orderNumberOptions?vendor=${vendor}&destination=${destination}`;
+    const url = `/api/orderNumberOptions?vendor=${vendor}&destination=${destination}`;
     apiClient.get(url).then(resp => this.setState({ orderNumberOptions: resp.data.data }));
   }
 
@@ -243,7 +243,7 @@ class CombinedShipmentItemsModal extends Component {
   fetchOrderItems() {
     const { selectedOrders, selectedProductId, selectedOrderItems } = this.state;
     const { vendor, destination } = this.props;
-    const url = '/openboxes/api/combinedShipmentItems/findOrderItems';
+    const url = '/api/combinedShipmentItems/findOrderItems';
     const payload = {
       orderIds: _.map(selectedOrders, o => o.id), productId: selectedProductId, vendor, destination,
     };

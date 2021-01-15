@@ -9,7 +9,8 @@
  **/
 package org.pih.warehouse.shipping
 
-import org.grails.plugins.csv.CSVMapReader
+import grails.core.GrailsApplication
+import grails.plugins.csv.CSVMapReader
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.inventory.InventoryItem
@@ -23,7 +24,7 @@ import java.text.SimpleDateFormat
 class CombinedShipmentService {
 
     def stockMovementService
-    def grailsApplication
+    GrailsApplication grailsApplication
     def inventoryService
     def messageService
     def localizationService

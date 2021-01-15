@@ -14,7 +14,7 @@ import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.core.Location
 import org.joda.time.LocalDate
-import org.pih.warehouse.util.LocalizationUtil
+import org.pih.warehouse.LocalizationUtil
 
 @Transactional
 class IndicatorDataService {
@@ -51,16 +51,16 @@ class IndicatorDataService {
 
             // Expired items
             if (i == 0) {
-                linksExpirationSummary[0] = "/openboxes/inventory/listExpiredStock?status=expired"
+                linksExpirationSummary[0] = "/inventory/listExpiredStock?status=expired"
             }
 
             // 1, 3 and 6 months
             if (i == 1 || i == 3 || i == 6) {
-                linksExpirationSummary[i] = "/openboxes/inventory/listExpiringStock?status=within" + daysCounter + "Days"
+                linksExpirationSummary[i] = "/inventory/listExpiringStock?status=within" + daysCounter + "Days"
             }
             // 12 month will be 360 days but will link to 365 in the report
             if (i == 12) {
-                linksExpirationSummary[i] = "/openboxes/inventory/listExpiringStock?status=within365Days"
+                linksExpirationSummary[i] = "/inventory/listExpiringStock?status=within365Days"
             }
         }
 
@@ -92,7 +92,7 @@ class IndicatorDataService {
 
         IndicatorData indicatorData = new IndicatorData(datasets, listLabels)
 
-        GraphData graphData = new GraphData(indicatorData, "/openboxes/inventory/listExpiringStock")
+        GraphData graphData = new GraphData(indicatorData, "/inventory/listExpiringStock")
 
         return graphData
     }
@@ -321,11 +321,11 @@ class IndicatorDataService {
         }
 
         List<String> links = [
-                "/openboxes/inventory/listInStock",
-                "/openboxes/inventory/listOverStock",
-                "/openboxes/inventory/listReorderStock",
-                "/openboxes/inventory/listLowStock",
-                "/openboxes/inventory/listQuantityOnHandZero"]
+                "/inventory/listInStock",
+                "/inventory/listOverStock",
+                "/inventory/listReorderStock",
+                "/inventory/listLowStock",
+                "/inventory/listQuantityOnHandZero"]
 
         List<IndicatorDatasets> datasets = [
                 new IndicatorDatasets('Inventory Summary', listData, links)
@@ -590,7 +590,7 @@ class IndicatorDataService {
             ['day': sevenDaysAgo, 'location': location, 'orderType': returnOrderType]).get(0)
 
 
-        String baseUrl = '/openboxes/stockMovement/list?direction=OUTBOUND'
+        String baseUrl = '/stockMovement/list?direction=OUTBOUND'
         String statusQuery = RequisitionStatus.listPending().collect { "&requisitionStatusCode=$it" }.join('')
         String dateFormat = "MM/dd/yyyy"
 
@@ -604,7 +604,7 @@ class IndicatorDataService {
 
         NumbersIndicator numbersIndicator = new NumbersIndicator(green, yellow, red)
 
-        GraphData graphData = new GraphData(numbersIndicator, "/openboxes/stockMovement/list?receiptStatusCode=PENDING")
+        GraphData graphData = new GraphData(numbersIndicator, "/stockMovement/list?receiptStatusCode=PENDING")
 
         return graphData
     }
@@ -615,9 +615,9 @@ class IndicatorDataService {
                 ['location': location]);
 
         // Initial state
-        ColorNumber pending = new ColorNumber(0, 'Pending', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=PENDING');
-        ColorNumber shipped = new ColorNumber(0, 'Shipped', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=SHIPPED');
-        ColorNumber partiallyReceived = new ColorNumber(0, 'Partially Received', '/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=PARTIALLY_RECEIVED');
+        ColorNumber pending = new ColorNumber(0, 'Pending', '/stockMovement/list?direction=INBOUND&receiptStatusCode=PENDING');
+        ColorNumber shipped = new ColorNumber(0, 'Shipped', '/stockMovement/list?direction=INBOUND&receiptStatusCode=SHIPPED');
+        ColorNumber partiallyReceived = new ColorNumber(0, 'Partially Received', '/stockMovement/list?direction=INBOUND&receiptStatusCode=PARTIALLY_RECEIVED');
 
         // Changes each ColorNumber if found in query
         query.each {
@@ -632,7 +632,7 @@ class IndicatorDataService {
 
         NumbersIndicator numbersIndicator = new NumbersIndicator(pending, shipped, partiallyReceived)
 
-        GraphData graphData = new GraphData(numbersIndicator, "/openboxes/stockMovement/list?direction=INBOUND")
+        GraphData graphData = new GraphData(numbersIndicator, "/stockMovement/list?direction=INBOUND")
 
         return graphData
     }
@@ -692,7 +692,7 @@ class IndicatorDataService {
             return new TableData(row.shipmentNumber,
                     row.shipmentName,
                     row.count.toString(),
-                    "/openboxes/stockMovement/show/${row.shipmentId}"
+                    "/stockMovement/show/${row.shipmentId}"
             )
         }
 
@@ -738,7 +738,7 @@ class IndicatorDataService {
             else numberDelayed['landAndSuitcase'] += 1
             def shipmentType = LocalizationUtil.getLocalizedString(it[1], new Locale("en"))
 
-            TableData tableData = new TableData(it[2], it[3], null, '/openboxes/stockMovement/show/' + it[4], "${contextPath}/images/icons/shipmentType/ShipmentType" + shipmentType + '.png')
+            TableData tableData = new TableData(it[2], it[3], null, '/stockMovement/show/' + it[4], "${contextPath}/static/images/icons/shipmentType/ShipmentType" + shipmentType + '.png')
             return tableData
         }
 
@@ -964,7 +964,7 @@ class IndicatorDataService {
 
         IndicatorData indicatorData = new IndicatorData(datasets, listLabels)
 
-        GraphData graphData = new GraphData(indicatorData, '/openboxes/stockMovement/list?direction=OUTBOUND')
+        GraphData graphData = new GraphData(indicatorData, '/stockMovement/list?direction=OUTBOUND')
 
         return graphData
     }

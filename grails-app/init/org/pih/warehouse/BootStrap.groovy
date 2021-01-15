@@ -46,6 +46,9 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.jobs.RefreshDemandDataJob
+import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
+import org.pih.warehouse.jobs.RefreshStockoutDataJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.picklist.Picklist
@@ -239,7 +242,10 @@ class BootStrap {
                     locationType         : location.locationType,
                     sortOrder            : location.sortOrder,
                     hasBinLocationSupport: location.hasBinLocationSupport(),
-                    hasPackingSupport    : location.supports(ActivityCode.PACK_SHIPMENT)
+                    hasPackingSupport    : location.supports(ActivityCode.PACK_SHIPMENT),
+                    hasPartialReceivingSupport : location.supports(ActivityCode.PARTIAL_RECEIVING),
+                    organizationName     : location?.organization?.name,
+                    backgroundColor : location?.bgColor,
             ]
         }
 
@@ -289,12 +295,7 @@ class BootStrap {
 
 
         JSON.registerObjectMarshaller(Product) { Product product ->
-            [
-                    id         : product.id,
-                    productCode: product.productCode,
-                    name       : product.name,
-                    description: product.description
-            ]
+            return product.toJson()
         }
 
         JSON.registerObjectMarshaller(ProductAssociation) { ProductAssociation productAssociation ->

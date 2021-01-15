@@ -41,7 +41,7 @@
         },
         "teaserImageUrlOrDefault": function(entry, tokens) {
           if (!tokens.teaserImageUrl) {
-            return "${createLinkTo(dir:'images/icons/silk',file:'newspaper.png')}"
+            return "${resource(dir:'images/icons/silk',file:'newspaper.png')}"
           }
           else {
             return tokens.teaserImageUrl

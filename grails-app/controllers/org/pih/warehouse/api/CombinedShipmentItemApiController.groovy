@@ -9,8 +9,9 @@
  **/
 package org.pih.warehouse.api
 
+import grails.plugins.csv.CSVWriter
 import grails.converters.JSON
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.order.Order
@@ -20,7 +21,6 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import javax.xml.bind.ValidationException
-import org.grails.plugins.csv.CSVWriter
 import org.apache.commons.lang.StringEscapeUtils
 
 class CombinedShipmentItemApiController {
