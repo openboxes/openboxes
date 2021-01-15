@@ -264,62 +264,6 @@ class InventoryController {
 
     }
 
-    def mergeQuantityMap(oldQuantityMap, newQuantityMap) {
-        oldQuantityMap.each { product, oldQuantity ->
-            def newQuantity = newQuantityMap[product] ?: 0
-            oldQuantityMap[product] = newQuantity + oldQuantity
-
-        }
-        return oldQuantityMap
-    }
-
-
-    def getDatesBetween(startDate, endDate, frequency) {
-
-        def count = 0
-        def dates = []
-        if (startDate.before(endDate)) {
-            def date = startDate
-            def end = endDate
-            use(TimeCategory) {
-                end = endDate.plus(1.day)
-            }
-            while (date.before(end)) {
-                println "Start date = " + date + " endDate = " + endDate
-
-                dates << date
-                if (params.frequency in ['Daily']) {
-                    use(TimeCategory) {
-                        date = date.plus(1.day)
-                    }
-                } else if (params.frequency in ['Weekly']) {
-                    use(TimeCategory) {
-                        date = date.plus(1.week)
-                    }
-                } else if (params.frequency in ['Monthly']) {
-                    use(TimeCategory) {
-                        date = date.plus(1.month)
-                    }
-                } else if (params.frequency in ['Quarterly']) {
-                    use(TimeCategory) {
-                        date = date.plus(3.month)
-                    }
-                } else if (params.frequency in ['Annually']) {
-                    use(TimeCategory) {
-                        date = date.plus(1.year)
-                    }
-                } else {
-                    use(TimeCategory) {
-                        date = date.plus(1.day)
-                    }
-
-                }
-                count++
-            }
-        }
-        return dates
-    }
-
 
     def download(QuantityOnHandReportCommand command) {
 
@@ -1623,7 +1567,7 @@ class InventoryController {
         return csv
     }
 
-    private def getCsvForProductMap(map, statusMap) {
+    private def getCsvForProductMap(inventoryItems) {
         def hasRoleFinance = userService.hasRoleFinance(session.user)
 
         def csv = ""
@@ -1640,15 +1584,19 @@ class InventoryController {
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.maxQuantity.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.forecastQuantity.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.currentQuantity.label', default: 'Current quantity')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'default.quantityAvailableToPromise.label', default: 'Quantity ATP')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.pricePerUnit.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.totalValue.label')}" + '"'
         csv += "\n"
 
-        map.sort().each { product, quantity ->
-            InventoryLevel inventoryLevel = product?.getInventoryLevel(session.warehouse.id)
-            def status = statusMap[product]
+        inventoryItems.each { inventoryItem ->
+            Product product = inventoryItem.product
+            def quantity = inventoryItem.quantity
+            InventoryLevel inventoryLevel = inventoryItem.inventoryLevel
+            def status = inventoryItem.status
             def totalValue = (product?.pricePerUnit ?: 0) * (quantity ?: 0)
             def statusMessage = "${warehouse.message(code: 'enum.InventoryLevelStatusCsv.' + status)}"
+
             csv += '"' + (statusMessage ?: "") + '"' + ","
             csv += '"' + (product.productCode ?: "") + '"' + ","
             csv += StringEscapeUtils.escapeCsv(product?.name) + ","
@@ -1662,6 +1610,7 @@ class InventoryController {
             csv += (inventoryLevel?.maxQuantity ?: "") + ","
             csv += (inventoryLevel?.forecastQuantity ?: "") + ","
             csv += (quantity ?: "0") + ","
+            csv += (inventoryItem.quantityAvailableToPromise ?: "0") + ","
             csv += (hasRoleFinance ? (product?.pricePerUnit ?: "") : "") + ","
             csv += (hasRoleFinance ? (totalValue ?: "") : "")
             csv += "\n"

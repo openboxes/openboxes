@@ -22,7 +22,7 @@ import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.reporting.TransactionFact
-import org.pih.warehouse.util.LocalizationUtil
+import org.pih.warehouse.LocalizationUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationEventPublisher
 

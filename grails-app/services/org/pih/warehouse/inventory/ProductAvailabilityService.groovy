@@ -13,7 +13,7 @@ import grails.orm.PagedResultList
 import groovy.sql.BatchingStatementWrapper
 import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.hibernate.Criteria
 import org.hibernate.criterion.DetachedCriteria
 import org.hibernate.criterion.Projections
@@ -186,7 +186,7 @@ class ProductAvailabilityService {
 
     boolean saveProductAvailability(Location location, Product product, List binLocations, Boolean forceRefresh) {
         log.info "Saving product availability for product=${product?.productCode}, location=${location}"
-        def batchSize = ConfigurationHolder.config.openboxes.inventorySnapshot.batchSize ?: 1000
+        def batchSize = Holders.config.openboxes.inventorySnapshot.batchSize ?: 1000
         def startTime = System.currentTimeMillis()
 
         try {

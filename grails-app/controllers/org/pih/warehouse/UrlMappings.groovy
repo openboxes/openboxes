@@ -23,6 +23,10 @@ class UrlMappings {
             action = "delete"
         }
 
+        "/stockMovement/$action/$id**?" {
+            controller = "stockMovement"
+        }
+
         "/$controller/$action?/$id?" {
             constraints {
                 // apply constraints here
@@ -41,6 +45,9 @@ class UrlMappings {
         }
         "/api/products/$id/$action" {
             controller = { "productApi" }
+        }
+        "/api/locations/$id/$action" {
+            controller = { "locationApi" }
         }
 
         // Stock Movement Item API
@@ -95,6 +102,11 @@ class UrlMappings {
             action = [GET: "getStockMovementItems"]
         }
 
+        "/api/stockMovements/$id/substitutionItems"(parseRequest: true) {
+            controller = "stockMovementItemApi"
+            action = [GET: "getSubstitutionItems"]
+        }
+
         // Stock Movement API
 
         "/api/stockMovements/$id/removeAllItems"(parseRequest: true) {
@@ -110,6 +122,11 @@ class UrlMappings {
         "/api/stockMovements/$id/updateItems"(parseRequest: true) {
             controller = "stockMovementApi"
             action = [POST: "updateItems"]
+        }
+
+        "/api/stockMovements/$id/updateInventoryItems"(parseRequest: true) {
+            controller = "stockMovementApi"
+            action = [POST: "updateInventoryItems"]
         }
 
         "/api/stockMovements/$id/updateShipmentItems"(parseRequest: true) {
@@ -140,6 +157,12 @@ class UrlMappings {
         "/api/stockMovements/$id/updateAdjustedItems"(parseRequest: true) {
             controller = "stockMovementApi"
             action = [POST: "updateAdjustedItems"]
+        }
+
+        // TODO Remove it later once all inbound types are shipment
+        "/api/stockMovements/createCombinedShipments"(parseRequest: true) {
+            controller = "stockMovementApi"
+            action = [POST: "createCombinedShipments"]
         }
 
         // Partial Receiving API
@@ -195,6 +218,38 @@ class UrlMappings {
         "/api/putawayItems/$id"(parseRequest: true) {
             controller = "putawayItemApi"
             action = [DELETE: "removingItem"]
+        }
+
+        // Combined shipments
+
+        "/api/orderNumberOptions"(parseRequest: true) {
+            controller = "combinedShipmentItemApi"
+            action = [GET: "getOrderOptions"]
+        }
+
+        "/api/combinedShipmentItems/findOrderItems"(parseRequest: true) {
+            controller = "combinedShipmentItemApi"
+            action = [POST:"findOrderItems"]
+        }
+
+        "/api/combinedShipmentItems/addToShipment/$id"(parseRequest: true) {
+            controller = "combinedShipmentItemApi"
+            action = [POST:"addItemsToShipment"]
+        }
+
+        "/api/combinedShipmentItems/importTemplate/$id"(parseRequest: true) {
+            controller = "combinedShipmentItemApi"
+            action = [POST:"importTemplate"]
+        }
+
+        "/api/combinedShipmentItems/getProductsInOrders"(parseRequest: true) {
+            controller = "combinedShipmentItemApi"
+            action = [GET:"getProductsInOrders"]
+        }
+
+        "/api/combinedShipmentItems/exportTemplate"(parseRequest: true) {
+            controller = "combinedShipmentItemApi"
+            action = [GET:"exportTemplate"]
         }
 
         // Standard REST APIs

@@ -9,11 +9,12 @@
 **/
 package org.pih.warehouse.core
 
+import grails.core.GrailsApplication
 import org.grails.web.json.JSONObject
 
 class TranslationService {
 
-    def grailsApplication
+    GrailsApplication grailsApplication
     def apiClientService
 
     def getTranslation(String text, String source, String destination) {

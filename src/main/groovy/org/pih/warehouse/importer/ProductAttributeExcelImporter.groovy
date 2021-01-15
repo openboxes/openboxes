@@ -9,7 +9,8 @@
  **/
 package org.pih.warehouse.importer
 
-import org.grails.plugins.excelimport.ExcelImportUtils
+import org.grails.plugins.excelimport.AbstractExcelImporter
+import org.grails.plugins.excelimport.ExpectedPropertyType
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.product.Attribute
 import org.pih.warehouse.product.Product
@@ -30,10 +31,10 @@ class ProductAttributeExcelImporter extends AbstractExcelImporter {
     ]
 
     static Map propertyMap = [
-            productCode   : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            attributeCode : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            attributeValue: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            unitOfMeasureCode: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            productCode   : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            attributeCode : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            attributeValue: ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            unitOfMeasureCode: ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
     ]
 
 
