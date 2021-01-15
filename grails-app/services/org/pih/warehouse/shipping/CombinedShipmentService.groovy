@@ -11,6 +11,7 @@ package org.pih.warehouse.shipping
 
 import org.grails.plugins.csv.CSVMapReader
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
@@ -153,6 +154,20 @@ class CombinedShipmentService {
                         line.errors << "Qty to ship for product ${line.productCode}, order ${line.orderNumber} is greater than qty available to ship(${orderItem.getQuantityRemainingToShip()})."
                         valid = false
                     }
+                }
+            }
+
+            if (line.unitOfMeasure) {
+                String[] uomParts = line.unitOfMeasure.split("/")
+                UnitOfMeasure uom = UnitOfMeasure.findByCode(uomParts[0])
+                def quantityPerUom = uomParts[1]
+                if (uomParts.length <= 1 || !uom) {
+                    line.errors << "Could not find provided Unit of Measure: ${line.unitOfMeasure}."
+                    valid = false
+                }
+                if (uom && orderItem && (orderItem.quantityUom != uom || orderItem.quantityPerUom.intValue().toString() != quantityPerUom)) {
+                    line.errors << "UOM for product code ${line.productCode} does not match UOM on PO."
+                    valid = false
                 }
             }
         }
