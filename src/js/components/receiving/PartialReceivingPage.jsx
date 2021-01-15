@@ -475,7 +475,7 @@ class PartialReceivingPage extends Component {
    */
   fetchPartialReceiptCandidates() {
     this.props.showSpinner();
-    const url = `/openboxes/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=1`;
+    const url = `/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=1`;
 
     return apiClient.get(url)
       .then((response) => {
@@ -488,7 +488,7 @@ class PartialReceivingPage extends Component {
 
   saveValues(formValues) {
     this.props.showSpinner();
-    const url = `/openboxes/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=1`;
+    const url = `/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=1`;
 
     const payload = {
       ...formValues,
@@ -501,7 +501,7 @@ class PartialReceivingPage extends Component {
     this.saveValues(formValues)
       .then(() => {
         const { requisition, shipmentId } = formValues;
-        window.location = `/openboxes/stockMovement/show/${requisition || shipmentId}`;
+        window.location = `/stockMovement/show/${requisition || shipmentId}`;
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -642,7 +642,7 @@ class PartialReceivingPage extends Component {
   }
 
   transitionToNextStep(formValues) {
-    const url = `/openboxes/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=1`;
+    const url = `/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=1`;
     const payload = {
       receiptStatus: 'CHECKING',
       ...formValues,

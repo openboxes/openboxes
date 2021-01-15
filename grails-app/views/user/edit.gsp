@@ -289,7 +289,7 @@
                                                                        class="button btn-show-dialog"
                                                                        data-title="${g.message(code:'default.add.label', args: [g.message(code: 'user.locationRoles.label')])}"
                                                                        data-url="${request.contextPath}/user/createLocationRoles?user.id=${userInstance?.id}">
-                                                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}"/>&nbsp;
+                                                                        <img src="${resource(dir:'images/icons/silk',file:'add.png')}"/>&nbsp;
                                                                         <g:message code="default.add.label" args="[g.message(code: 'user.locationRoles.label')]"/>
                                                                     </a>
                                                                 </td>

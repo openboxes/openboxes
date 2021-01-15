@@ -24,7 +24,7 @@
                         <td>${documentInstance?.lastUpdated}</td>
                         <td class="right" align="right">
                             <g:link action="editDocument" id="${documentInstance.id}" params="['order.id':orderInstance?.id]">
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit" />
+                                <img src="${resource(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit" />
                             </g:link>
 
                             <g:link controller="order" action="deleteDocument" id="${documentInstance.id}"
@@ -32,7 +32,7 @@
                                     onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
                                     disabledMessage="You do not have minimum required role to perform this action"
                             >
-                                <img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" />
+                                <img src="${resource(dir:'images/icons',file:'trash.png')}" alt="Delete" />
                             </g:link>
                         </td>
                     </tr>
@@ -47,7 +47,7 @@
                         <td>${documentTemplate?.lastUpdated}</td>
                         <td class="right" align="right">
                             <g:link action="editDocument" id="${documentTemplate.id}" params="['order.id':orderInstance?.id]">
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" />
+                                <img src="${resource(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" />
                             </g:link>
                             <g:each var="output" in="[[format:'PDF', icon: 'page_white_acrobat.png'],
                                                       [format:'XHTML', icon: 'xhtml.png'],
@@ -92,7 +92,7 @@
                         </td>
                         <td class="right">
                             <g:link action="editDocument" id="${documentInstance.id}" params="['order.id':orderInstance?.id]">
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit" />
+                                <img src="${resource(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit" />
                             </g:link>
 
                             <g:link controller="order" action="deleteDocument" id="${documentInstance.id}"
@@ -100,7 +100,7 @@
                                     onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
                                     disabledMessage="You do not have minimum required role to perform this action"
                             >
-                                <img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" />
+                                <img src="${resource(dir:'images/icons',file:'trash.png')}" alt="Delete" />
                             </g:link>
                         </td>
                     </tr>

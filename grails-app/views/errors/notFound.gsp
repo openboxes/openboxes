@@ -16,7 +16,7 @@
 		</g:if>
 		<div class="summary">
 			<div class="title middle">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'error.png')}" style="vertical-align: middle"/>
+				<img src="${resource(dir:'images/icons/silk',file:'error.png')}" style="vertical-align: middle"/>
 				<g:if test="${params.id}">
 					<warehouse:message code="errors.resourceWithIdNotFound.title"
 									   default="Sorry, a resource with ID {0} could not be found." args="[params.id]"/>

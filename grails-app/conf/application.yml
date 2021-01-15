@@ -255,8 +255,9 @@ openboxes:
 
         # Column 3
         newsSummary:
-            enabled: false
+            enabled: true
             newsItems: []
+            limit: 25
         activitySummary:
             enabled: true
         valueSummary:
@@ -285,6 +286,8 @@ openboxes:
             format: "NNNLLL"
         shipment:
             format: "NNNLLL"
+        sequenceNumber:
+            format: "00000"
 
     # OpenBoxes default line printer port
     linePrinterTerminal:
@@ -311,12 +314,16 @@ openboxes:
 
     # Forecasting feature
     forecasting:
-        enabled: false
-        demandPeriod: 180
+        enabled: true
+        demandPeriod: 365
 
     # Bill of Materials feature
     bom:
         enabled: false
+
+    # User signup
+    signup:
+        enabled: true
 
     # UserVoice widget
     uservoice:
@@ -351,6 +358,13 @@ openboxes:
     scannerDetection:
         enabled: false
 
+    barcode:
+        printer:
+            # Print barcode labels via USB
+            name: "printer-thermalprinter"
+            #  Print barcode labels via RAW
+            ipAddress: "127.0.0.1"
+            port: 9100
 
     # Default delay and min length for typeahead components
     typeahead:
@@ -372,10 +386,26 @@ openboxes:
             retryOnError: false
             maxRetryAttempts: 3
 
+        # Refresh inventory snapshots after transaction (only for transaction entries)
+        refreshInventorySnapshotAfterTransactionJob:
+            enabled: true
+            retryOnError: false
+            maxRetryAttempts: 3
+
+        # Refresh product availability materialized view
+        refreshProductAvailabilityJob:
+            enabled: true
+            cronExpression: "0 0 0/2 * * ?" # every two hours
+
         # Refresh transaction fact table
         refreshTransactionFactJob:
             enabled: true
             cronExpression: "0 0 0 * * ?" # every day at midnight
+
+        # Refresh stockout data for yesterday
+        refreshStockoutDataJob:
+            enabled: true
+            cronExpression: "0 0 1 * * ?" # at 01:00:00am every day
 
         # Refresh demand fact table
         refreshDemandDataJob:
@@ -390,7 +420,7 @@ openboxes:
         # Calculate current quantity on hand
         calculateQuantityJob:
             enabled: true
-            cronExpression: "0 0 0/2 * * ?" # every two hours starting at midnight
+            cronExpression: "0 0 0/12 * * ?" # every twelve hours starting at midnight
             enableOptimization: false
 
         # Calculate historical quantity on hand
@@ -460,9 +490,13 @@ openboxes:
             apiKey: ""
             format: "plain"
 
+    # Accounting (Budget Code, GL Account)
+    accounting:
+        enabled: true
+
     # Inventory snapshot configuration
     inventorySnapshot:
-        batchSize: 1500
+        batchSize: 100
 
     # Global megamenu configuration
     megamenu:
@@ -547,6 +581,7 @@ openboxes:
     api:
         pagination:
             enabled: true
+            pageSize: 10
 
 mail:
     error:

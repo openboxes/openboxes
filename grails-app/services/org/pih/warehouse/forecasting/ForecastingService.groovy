@@ -16,8 +16,8 @@ import groovy.time.TimeCategory
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.util.DateUtil
-import org.pih.warehouse.util.LocalizationUtil
+import org.pih.warehouse.DateUtil
+import org.pih.warehouse.LocalizationUtil
 
 import java.math.RoundingMode
 import java.sql.Timestamp

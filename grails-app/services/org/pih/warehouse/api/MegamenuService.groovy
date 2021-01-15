@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.api
 
+import grails.core.GrailsApplication
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
@@ -16,7 +17,7 @@ import org.pih.warehouse.core.User
 class MegamenuService {
 
     def userService
-    def grailsApplication
+    GrailsApplication grailsApplication
     def grailsLinkGenerator
 
     private getMessageTagLib() {

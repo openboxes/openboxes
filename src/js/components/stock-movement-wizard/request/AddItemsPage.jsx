@@ -1134,7 +1134,7 @@ class AddItemsPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
-  loadMoreRows({ startIndex, stopIndex }) {
+  loadMoreRows({ startIndex }) {
     this.setState({
       isFirstPageLoaded: true,
     });
