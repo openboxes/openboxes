@@ -60,7 +60,7 @@ class MessageTagLib {
 									data-args="${attrs.args}" 
 									data-localized="" 
 									src="${
-                        createLinkTo(dir: 'images/icons/silk', file: 'database.png')
+                        resource(dir: 'images/icons/silk', file: 'database.png')
                     }"/>
 							"""
                     return
@@ -102,7 +102,7 @@ class MessageTagLib {
 						data-message="${message}" 
 						data-localized="${localized}" 
 						src="${
-                createLinkTo(dir: 'images/icons/silk', file: image + '.png')
+                resource(dir: 'images/icons/silk', file: image + '.png')
             }" title="${attrs.code} = ${localized}"/>
 					
 				"""

@@ -28,11 +28,11 @@
                     </td>
                     <td align="right">
                         <g:link action="editComment" id="${commentInstance.id}" params="['order.id':orderInstance?.id]">
-                            <img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit" />
+                            <img src="${resource(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit" />
                         </g:link>
 
                         <g:link action="deleteComment" id="${commentInstance.id}" params="['order.id':orderInstance?.id]" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-                            <img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" />
+                            <img src="${resource(dir:'images/icons',file:'trash.png')}" alt="Delete" />
                         </g:link>
                     </td>
                 </tr>

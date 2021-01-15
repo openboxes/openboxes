@@ -25,21 +25,21 @@
                         <div class="buttons">
                             <span class="action-menu" style="margin-left: 15px">
                                 <button class="action-btn button">
-                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'play_green.png')}" />
+                                    <img src="${resource(dir:'images/icons/silk',file:'play_green.png')}" />
                                     <g:message code="report.runReport.label"/>
                                     <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
                                 </button>
                                 <div class="actions">
                                     <div class="action-menu-item">
                                         <a href="#" class="run-btn" data-run-action="summaryReport">
-                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'play_green.png')}" />
+                                            <img src="${resource(dir:'images/icons/silk',file:'play_green.png')}" />
                                             <g:message code="default.run.label"
                                                        args="[g.message(code: 'report.onOrderReportSummary.label', default: 'On Order Report Summary')]"/>
                                         </a>
                                     </div>
                                     <div class="action-menu-item">
                                         <a href="#" class="run-btn" data-run-action="detailedReport">
-                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'play_green.png')}" />
+                                            <img src="${resource(dir:'images/icons/silk',file:'play_green.png')}" />
                                             <g:message code="default.run.label"
                                                        args="[g.message(code: 'report.onOrderReportDetails.label', default: 'On Order Report Details')]"/>
                                         </a>
@@ -48,7 +48,7 @@
                             </span>
                             <span class="action-menu" style="margin-left: 15px">
                                 <button class="action-btn button">
-                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_excel.png')}" />&nbsp;
+                                    <img src="${resource(dir:'images/icons/silk',file:'page_white_excel.png')}" />&nbsp;
                                     ${warehouse.message(code: 'default.button.download.label')}
                                     <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
                                 </button>

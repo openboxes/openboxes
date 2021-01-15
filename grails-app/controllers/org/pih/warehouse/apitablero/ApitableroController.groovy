@@ -1,6 +1,7 @@
 package org.pih.warehouse.apitablero
 
 import grails.converters.JSON
+import grails.core.GrailsApplication
 import grails.plugin.cache.Cacheable
 import org.pih.warehouse.core.Location
 import grails.gorm.transactions.Transactional
@@ -14,7 +15,7 @@ class ApitableroController {
     def indicatorDataService
     def userService
     def messageService
-    def grailsApplication
+    GrailsApplication grailsApplication
 
     def config() {
         User user = User.get(session.user.id)

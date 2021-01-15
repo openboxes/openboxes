@@ -98,7 +98,7 @@ class CreateStockMovement extends Component {
 
   componentDidMount() {
     if (orderId) {
-      const url = `/openboxes/api/combineShipments/${orderId}`;
+      const url = `/api/combineShipments/${orderId}`;
       apiClient.get(url)
         .then((resp) => {
           const { data } = resp.data;
@@ -160,19 +160,19 @@ class CreateStockMovement extends Component {
       let stockMovementUrl = '';
 
       if (values.stockMovementId) {
-        stockMovementUrl = `/openboxes/api/stockMovements/${values.stockMovementId}/updateRequisition`;
+        stockMovementUrl = `/api/stockMovements/${values.stockMovementId}/updateRequisition`;
         payload = {
           description: values.description,
         };
       } else {
-        stockMovementUrl = '/openboxes/api/stockMovements/createCombinedShipments';
+        stockMovementUrl = '/api/stockMovements/createCombinedShipments';
       }
 
       apiClient.post(stockMovementUrl, payload)
         .then((response) => {
           if (response.data) {
             const resp = response.data.data;
-            this.props.history.push(`/openboxes/stockMovement/createCombinedShipments/${resp.id}`);
+            this.props.history.push(`/stockMovement/createCombinedShipments/${resp.id}`);
             this.props.nextPage({
               ...values,
               stockMovementId: resp.id,

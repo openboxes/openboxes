@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.core
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.Transaction
@@ -267,7 +267,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
     }
 
     Boolean isAccountingRequired() {
-        return ConfigurationHolder.config.openboxes.accounting.enabled && supports(ActivityCode.REQUIRE_ACCOUNTING)
+        return Holders.config.openboxes.accounting.enabled && supports(ActivityCode.REQUIRE_ACCOUNTING)
     }
 
 }

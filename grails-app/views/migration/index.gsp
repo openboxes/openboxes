@@ -44,7 +44,7 @@
                             </td>
                             <td class="value">
                                 <div id="receiptsWithoutTransaction" class="indicator">
-                                    <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
+                                    <img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/>
                                 </div>
                             </td>
                             <td>
@@ -62,7 +62,7 @@
                             </td>
                             <td class="value">
                                 <div id="shipmentsWithoutTransactions" class="indicator">
-                                    <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
+                                    <img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/>
                                 </div>
                             </td>
                             <td>
@@ -79,7 +79,7 @@
                             </td>
                             <td class="value">
                                 <div id="stockMovementsWithoutShipmentItems" class="indicator">
-                                    <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
+                                    <img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/>
                                 </div>
                             </td>
                             <td>

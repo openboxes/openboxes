@@ -14,6 +14,7 @@ import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import grails.util.Holders
 import grails.plugins.csv.CSVMapReader
+import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.IdentifierGeneratorTypeCode

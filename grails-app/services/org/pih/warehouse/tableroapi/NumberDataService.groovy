@@ -40,7 +40,7 @@ class NumberDataService {
             title,
             info,
             binLocations[0],
-            subTitle, "/openboxes/report/showBinLocationReport?location.id=" + location.id + "&status=inStock"
+            subTitle, "/report/showBinLocationReport?location.id=" + location.id + "&status=inStock"
             )
     }
 
@@ -67,7 +67,7 @@ class NumberDataService {
             title,
             info,
             shipments[0],
-            subTitle, "/openboxes/stockMovement/list?receiptStatusCode=PENDING&origin.id=" + location.id + "&createdBy.id=" + user.id
+            subTitle, "/stockMovement/list?receiptStatusCode=PENDING&origin.id=" + location.id + "&createdBy.id=" + user.id
             )
     }
 
@@ -94,7 +94,7 @@ class NumberDataService {
             title,
             info,
             incompletePutaways[0],
-            subTitle, "/openboxes/order/list?orderTypeCode=TRANSFER_ORDER&status=PENDING&orderedBy=" + user.id)
+            subTitle, "/order/list?orderTypeCode=TRANSFER_ORDER&status=PENDING&orderedBy=" + user.id)
     }
 
     NumberData getReceivingBin(def location) {
@@ -128,7 +128,7 @@ class NumberDataService {
             title,
             info,
             receivingBin[0],
-            subTitle, "/openboxes/report/showBinLocationReport?status=inStock"
+            subTitle, "/report/showBinLocationReport?status=inStock"
             )
     }
 
@@ -200,7 +200,7 @@ class NumberDataService {
             title,
             info,
             productsInDefaultBin[0],
-            subTitle, "/openboxes/report/showBinLocationReport?location.id=" + location.id + "&status=inStock"
+            subTitle, "/report/showBinLocationReport?location.id=" + location.id + "&status=inStock"
             )
     }
 
@@ -261,7 +261,7 @@ class NumberDataService {
             info,
             numberOfProducts,
             subTitle,
-            "/openboxes/report/showBinLocationReport?location.id=" + location.id, tooltipData
+            "/report/showBinLocationReport?location.id=" + location.id, tooltipData
             )
     }
 
@@ -297,7 +297,7 @@ class NumberDataService {
             title,
             info,
             expiredProductsInStock[0],
-            subTitle, "/openboxes/inventory/listExpiredStock?status=expired"
+            subTitle, "/inventory/listExpiredStock?status=expired"
             )
     }
 
@@ -333,7 +333,7 @@ class NumberDataService {
                 title,
                 info,
                 openStockRequests[0],
-                subTitle, "/openboxes/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC"
+                subTitle, "/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC"
         )
     }
 

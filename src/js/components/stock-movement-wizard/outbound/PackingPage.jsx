@@ -258,7 +258,7 @@ class PackingPage extends Component {
       this.setState({
         isFirstPageLoaded: true,
       });
-      const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=5`;
+      const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=5`;
       apiClient.get(url)
         .then((response) => {
           this.setPackPageItems(response, startIndex);

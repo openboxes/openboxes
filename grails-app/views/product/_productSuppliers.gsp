@@ -106,11 +106,11 @@
                         <button class="button btn-show-dialog" data-position="top"
                                 data-title="${g.message(code: 'default.add.label', args: [g.message(code:'productSupplier.label')])}"
                                 data-url="${request.contextPath}/productSupplier/dialog?product.id=${productInstance?.id}">
-                            <img src="${createLinkTo(dir:'images/icons/silk', file:'add.png')}" />
+                            <img src="${resource(dir:'images/icons/silk', file:'add.png')}" />
                             ${g.message(code: 'default.create.label', default: 'Create', args: [g.message(code:'productSupplier.label')])}
                         </button>
                         <g:link class="button" controller="productSupplier" action="export" params="['productSupplier.id':productInstance?.productSuppliers*.id, format: 'xls']">
-                            <img src="${createLinkTo(dir:'images/icons/silk', file:'page_excel.png')}" />
+                            <img src="${resource(dir:'images/icons/silk', file:'page_excel.png')}" />
                             ${g.message(code: 'default.export.label', default: 'Export', args: [g.message(code:'productSuppliers.label')])}
                         </g:link>
                     </div>

@@ -14,7 +14,7 @@ import 'react-table/react-table.css';
 import customTreeTableHOC from '../../utils/CustomTreeTable';
 import Select from '../../utils/Select';
 import SplitLineModal from './SplitLineModal';
-import apiClient, { parseResponse } from '../../utils/apiClient';
+import apiClient, { parseResponse, flattenRequest } from '../../utils/apiClient';
 import { showSpinner, hideSpinner, updateBreadcrumbs, fetchBreadcrumbsConfig } from '../../actions';
 import Filter from '../../utils/Filter';
 import showLocationChangedAlert from '../../utils/location-change-alert';
@@ -294,7 +294,7 @@ class PutAwaySecondPage extends Component {
     if (this.props.match.params.putAwayId) {
       this.props.showSpinner();
 
-      const url = `/openboxes/api/putaways/${this.props.match.params.putAwayId}`;
+      const url = `/api/putaways/${this.props.match.params.putAwayId}`;
 
       apiClient.get(url)
         .then((response) => {
@@ -378,7 +378,7 @@ class PutAwaySecondPage extends Component {
    */
   savePutAways(putAwayToSave, callback) {
     this.props.showSpinner();
-    const url = `/openboxes/api/putaways?location.id=${this.state.location.id}`;
+    const url = `/api/putaways?location.id=${this.state.location.id}`;
 
     return apiClient.post(url, flattenRequest(putAwayToSave))
       .then((response) => {

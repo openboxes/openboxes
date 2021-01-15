@@ -630,7 +630,7 @@ class AddItemsPage extends Component {
    */
   updateInventoryItemsAndTransitionToNextStep(formValues, lineItems) {
     const itemsToSave = this.getLineItemsToBeSaved(lineItems);
-    const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateInventoryItems`;
+    const updateItemsUrl = `/api/stockMovements/${this.state.values.stockMovementId}/updateInventoryItems`;
     const payload = {
       id: this.state.values.stockMovementId,
       lineItems: itemsToSave,
@@ -729,7 +729,7 @@ class AddItemsPage extends Component {
     if (!errors.length) {
       this.saveRequisitionItemsInCurrentStep(formValues.lineItems)
         .then(() => {
-          window.location = `/openboxes/stockMovement/show/${formValues.stockMovementId}`;
+          window.location = `/stockMovement/show/${formValues.stockMovementId}`;
         });
     } else {
       confirmAlert({
@@ -741,7 +741,7 @@ class AddItemsPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = `/openboxes/stockMovement/show/${formValues.stockMovementId}`; },
+            onClick: () => { window.location = `/stockMovement/show/${formValues.stockMovementId}`; },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),
@@ -883,7 +883,7 @@ class AddItemsPage extends Component {
     this.props.showSpinner();
 
     const { movementNumber, stockMovementId } = formValues;
-    const url = `/openboxes/stockMovement/exportCsv/${stockMovementId}`;
+    const url = `/stockMovement/exportCsv/${stockMovementId}`;
     this.saveRequisitionItemsInCurrentStep(lineItems)
       .then(() => {
         apiClient.get(url, { responseType: 'blob' })
@@ -913,7 +913,7 @@ class AddItemsPage extends Component {
       },
     };
 
-    const url = `/openboxes/stockMovement/importCsv/${stockMovementId}`;
+    const url = `/stockMovement/importCsv/${stockMovementId}`;
 
     return apiClient.post(url, formData, config)
       .then(() => {

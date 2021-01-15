@@ -7,7 +7,7 @@
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
  **/
-package org.pih.warehouse.util
+package org.pih.warehouse
 
 import grails.util.Holders
 import org.pih.warehouse.core.LocalizationService

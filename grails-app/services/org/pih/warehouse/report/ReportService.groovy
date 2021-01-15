@@ -139,7 +139,7 @@ class ReportService implements ApplicationContextAware {
             def unitPrice = hasRoleFinance ? product?.pricePerUnit : null
             def totalValue = hasRoleFinance ? ((product.pricePerUnit ?: 0) * (onHandQuantity ?: 0)) : null
 
-            def imageUrl = (product.thumbnail) ? '/openboxes/product/renderImage/${product?.thumbnail?.id}' : ''
+            def imageUrl = (product.thumbnail) ? '/product/renderImage/${product?.thumbnail?.id}' : ''
 
             items << [
                     id              : product.id,

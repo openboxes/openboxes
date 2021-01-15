@@ -9,7 +9,8 @@
  **/
 package org.pih.warehouse.jobs
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.core.GrailsApplication
+import grails.util.Holders
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import org.quartz.DisallowConcurrentExecution
@@ -20,7 +21,7 @@ import org.quartz.JobExecutionException
 class RefreshProductAvailabilityJob {
 
     def concurrent = false
-    def grailsApplication
+    GrailsApplication grailsApplication
     def productAvailabilityService
 
     // Should never be triggered on a schedule - should only be triggered by persistence event listener

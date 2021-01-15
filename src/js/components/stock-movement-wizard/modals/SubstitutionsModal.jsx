@@ -207,7 +207,7 @@ class SubstitutionsModal extends Component {
   }
 
   fetchSubstitutions() {
-    const url = `/openboxes/api/stockMovements/${this.state.attr.lineItem.requisitionItemId}/substitutionItems`;
+    const url = `/api/stockMovements/${this.state.attr.lineItem.requisitionItemId}/substitutionItems`;
 
     return apiClient.get(url)
       .then((resp) => {

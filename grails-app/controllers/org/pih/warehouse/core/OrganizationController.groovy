@@ -9,10 +9,10 @@
  **/
 package org.pih.warehouse.core
 
+import grails.plugins.csv.CSVWriter
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
 import org.springframework.transaction.TransactionStatus
-import org.grails.plugins.csv.CSVWriter
 
 class OrganizationController {
 
@@ -44,16 +44,16 @@ class OrganizationController {
 
         organizationInstanceList.each { organization ->
             csv << [
-                    id              : organization.id,
-                    code            : organization.code,
-                    name            : organization.name,
-                    defaultLocation : organization.defaultLocation ?: '',
-                    roles           : organization.roles.join(","),
+                    id             : organization.id,
+                    code           : organization.code,
+                    name           : organization.name,
+                    defaultLocation: organization.defaultLocation ?: '',
+                    roles          : organization.roles.join(","),
             ]
         }
         response.setHeader("Content-disposition", "attachment; filename=\"Organizations-${new Date().format("MM/dd/yyyy")}.csv\"")
         render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
-
+    }
 
     def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)

@@ -27,7 +27,7 @@ class Header extends Component {
   }
 
   logoutImpersonatedUser = () => {
-    const url = '/openboxes/api/logout';
+    const url = '/api/logout';
 
     apiClient.post(url)
       .then(() => {
@@ -54,7 +54,7 @@ class Header extends Component {
         <div className="d-flex align-items-center justify-content-between flex-wrap">
           <div className="logo-header">
             <a
-              href="/openboxes"
+              href="/"
               className="navbar-brand brand-name"
             >
               { this.state.logoUrl !== '' ?

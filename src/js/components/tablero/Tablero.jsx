@@ -170,16 +170,18 @@ class Tablero extends Component {
       const allPages = Object.entries(this.props.dashboardConfig.configurations)
         .map(([key, value]) => [key, value]);
       allPages.forEach((page) => {
-        const filters = Object.entries(page[1].filters)
-          .map(([keyFilter, valueFilter]) => {
-            const filter = {
-              name: keyFilter,
-              endpoint: valueFilter.endpoint,
-            };
-            return filter;
-          });
-        if (filters.length > 0 && page[0] === config) {
-          pageFilters = filters;
+        if (page[1].filters) {
+          const filters = Object.entries(page[1].filters)
+            .map(([keyFilter, valueFilter]) => {
+              const filter = {
+                name: keyFilter,
+                endpoint: valueFilter.endpoint,
+              };
+              return filter;
+            });
+          if (filters.length > 0 && page[0] === config) {
+            pageFilters = filters;
+          }
         }
       });
     }

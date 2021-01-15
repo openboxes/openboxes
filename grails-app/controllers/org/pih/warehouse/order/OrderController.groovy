@@ -14,8 +14,9 @@ import grails.plugins.csv.CSVWriter
 import grails.validation.ValidationException
 import grails.gorm.transactions.Transactional
 import org.apache.commons.lang.StringEscapeUtils
-import org.grails.plugins.csv.CSVWriter
+import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.core.UomService
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem

@@ -65,7 +65,7 @@
     <g:if test="${stockMovement.documents.find { it.fileUri } }">
         <div class="box">
             <h2>
-                <img src="${createLinkTo(dir:'images/icons/silk',file:'application_link.png')}" />
+                <img src="${resource(dir:'images/icons/silk',file:'application_link.png')}" />
                 <warehouse:message code="links.label" default="Links"/>
             </h2>
             <table class="zebra">
@@ -80,7 +80,7 @@
                     <g:if test ="${!document.hidden}">
                         <tr>
                             <td>
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'link.png')}"/>
+                                <img src="${resource(dir:'images/icons/silk',file:'link.png')}"/>
                             </td>
                             <td>
                                 <a href="${document.fileUri}" target="_blank">

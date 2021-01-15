@@ -1,6 +1,5 @@
 /* eslint-disable react/no-array-index-key */
 import React, { Component } from 'react';
-import _ from 'lodash';
 import { connect } from 'react-redux';
 import { getTranslate } from 'react-localize-redux';
 import PropTypes from 'prop-types';
@@ -19,20 +18,21 @@ class Breadcrumbs extends Component {
   }
 
   render() {
+    const path = process.env.REACT_APP_API_PATH;
     const listToReturn = this.props.breadcrumbsParams.map((value, id) =>
       (value.label === 'Openboxes' || value.label === '' ? null : (
         <a key={`item-${id}`} href={value.url} className="item-breadcrumbs">
           {value.defaultLabel ? this.props.translate(value.label, value.defaultLabel) : value.label}
-          <img className="item-breadcrumbs" alt="/" src="/openboxes/images/bc_separator.png" />
+          <img className="item-breadcrumbs" alt="/" src={`${path}static/images/bc_separator.png`} />
         </a>
       )));
 
     return (
       <div className="breadcrumbs-container d-flex">
-        <a className="item-breadcrumbs" href="/openboxes">
-          <img alt="Breadcrumbs" src="/openboxes/static/images/skin/house.png" />
+        <a className="item-breadcrumbs" href="/">
+          <img alt="Breadcrumbs" src={`${path}static/images/skin/house.png`} />
         </a>
-        <img className="item-breadcrumbs" alt="/" src="/openboxes/static/images/bc_separator.png" />
+        <img className="item-breadcrumbs" alt="/" src={`${path}static/images/bc_separator.png`} />
         <a
           role="button"
           href="#"
@@ -40,7 +40,7 @@ class Breadcrumbs extends Component {
           className="item-breadcrumbs"
         > {this.props.currentLocationName}
         </a>
-        <img className="item-breadcrumbs" alt="/" src="/openboxes/static/images/bc_separator.png" />
+        <img className="item-breadcrumbs" alt="/" src={`${path}static/images/bc_separator.png`} />
         { listToReturn }
       </div>
     );

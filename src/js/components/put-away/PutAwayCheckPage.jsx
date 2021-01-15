@@ -250,7 +250,7 @@ class PutAwayCheckPage extends Component {
   }
 
   goToFirstPage() {
-    this.props.history.push('/openboxes/putAway/create');
+    this.props.history.push('/putAway/create');
     this.props.goToPage(1, null);
   }
 

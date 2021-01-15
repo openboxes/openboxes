@@ -27,7 +27,7 @@ import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentItemException
-import org.pih.warehouse.util.DateUtil
+import org.pih.warehouse.DateUtil
 import util.ConfigHelper
 import grails.core.GrailsApplication
 

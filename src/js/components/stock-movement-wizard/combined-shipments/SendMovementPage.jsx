@@ -325,7 +325,7 @@ class SendMovementPage extends Component {
    * @public
    */
   fetchShipmentTypes() {
-    const url = '/openboxes/api/generic/shipmentType';
+    const url = '/api/generic/shipmentType';
 
     return apiClient.get(url)
       .then((response) => {
@@ -461,7 +461,7 @@ class SendMovementPage extends Component {
    * @public
    */
   sendFiles(files) {
-    const url = `/openboxes/stockMovement/uploadDocuments/${this.state.values.stockMovementId}`;
+    const url = `/stockMovement/uploadDocuments/${this.state.values.stockMovementId}`;
 
     const data = new FormData();
     _.forEach(files, (file, idx) => {

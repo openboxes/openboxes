@@ -237,7 +237,7 @@ class CreateStockMovement extends Component {
    * @public
    */
   fetchRequisitionTypes() {
-    const url = '/openboxes/api/getRequestTypes';
+    const url = '/api/getRequestTypes';
 
     return apiClient.get(url)
       .then((response) => {

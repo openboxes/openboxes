@@ -427,7 +427,7 @@ export function updateBreadcrumbs(listBreadcrumbsStep = [
 
 export function fetchBreadcrumbsConfig() {
   return (dispatch) => {
-    apiClient.get('/openboxes/apitablero/breadcrumbsConfig').then((res) => {
+    apiClient.get('/apitablero/breadcrumbsConfig').then((res) => {
       dispatch({
         type: FETCH_BREADCRUMBS_CONFIG,
         payload: res.data,

@@ -9,6 +9,7 @@
 **/
 package org.pih.warehouse.report
 
+import grails.core.GrailsApplication
 import org.apache.commons.validator.EmailValidator
 import org.grails.plugins.web.taglib.RenderTagLib
 import grails.web.context.ServletContextHolder
@@ -28,7 +29,7 @@ class NotificationService {
     def dataService
     def userService
     MailService mailService
-    def grailsApplication
+    GrailsApplication grailsApplication
 
     def getExpiryAlertsByLocation(Location location, Integer daysUntilExpiry = 0) {
         String query = """
@@ -127,7 +128,7 @@ class NotificationService {
 
     def sendShipmentItemsShippedNotification(Shipment shipmentInstance) {
         def emailValidator = EmailValidator.getInstance()
-        def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
         def recipientItems = shipmentInstance.shipmentItems.groupBy {it.recipient }
         recipientItems.each { Person recipient, items ->
             if (emailValidator.isValid(recipient?.email)) {
@@ -149,7 +150,7 @@ class NotificationService {
     def sendReceiptNotifications(PartialReceipt partialReceipt) {
         def shipment = partialReceipt.shipment
         def emailValidator = EmailValidator.getInstance()
-        def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib..ApplicationTagLib')
         def recipientItems = partialReceipt.partialReceiptItems.groupBy {it.recipient }
         recipientItems.each { Person recipient, items ->
             if (emailValidator.isValid(recipient?.email)) {
