@@ -128,7 +128,13 @@ class StockMovementItem {
                 sortOrder        : sortOrder,
                 orderItemId      : orderItemId,
                 orderNumber      : orderNumber,
-                packSize         : packSize
+                packSize         : packSize,
+                inventoryItem    : !inventoryItem ? null : [
+                        id            : inventoryItem.id,
+                        lotNumber     : inventoryItem.lotNumber,
+                        expirationDate: inventoryItem.expirationDate?.format("MM/dd/yyyy"),
+                        quantity      : inventoryItem.quantity
+                ]
         ]
     }
 

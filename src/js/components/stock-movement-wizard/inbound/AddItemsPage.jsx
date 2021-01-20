@@ -461,6 +461,32 @@ class AddItemsPage extends Component {
   }
 
   /**
+   * Shows Inventory item expiration date update confirmation dialog.
+   * @param {function} onConfirm
+   * @param {function} onCancel
+   * @public
+   */
+  confirmInventoryItemExpirationDateUpdate(onConfirm, onCancel) {
+    confirmAlert({
+      title: this.props.translate('react.stockMovement.message.confirmSave.label', 'Confirm save'),
+      message: this.props.translate(
+        'react.stockMovement.confirmExpiryDateUpdate.message',
+        'This will update the expiry date across all depots in the system. Are you sure you want to proceed?',
+      ),
+      buttons: [
+        {
+          label: this.props.translate('react.default.yes.label', 'Yes'),
+          onClick: onConfirm,
+        },
+        {
+          label: this.props.translate('react.default.no.label', 'No'),
+          onClick: onCancel,
+        },
+      ],
+    });
+  }
+
+  /**
    * Fetches all required data.
    * @param {boolean} forceFetch
    * @public
@@ -581,12 +607,40 @@ class AddItemsPage extends Component {
         if (resp) {
           values = { ...formValues, lineItems: resp.data.data.lineItems };
         }
-        this.transitionToNextStep()
-          .then(() => {
-            this.props.nextPage(values);
-          })
-          .catch(() => this.props.hideSpinner());
+
+        if (_.some(values.lineItems, item => item.inventoryItem
+          && item.expirationDate !== item.inventoryItem.expirationDate)) {
+          if (_.some(values.lineItems, item => item.inventoryItem.quantity && item.inventoryItem.quantity !== '0')) {
+            this.confirmInventoryItemExpirationDateUpdate(
+              () => this.updateInventoryItemsAndTransitionToNextStep(values, lineItems),
+              () => this.props.hideSpinner(),
+            );
+          } else {
+            this.updateInventoryItemsAndTransitionToNextStep(values, lineItems);
+          }
+        } else {
+          this.transitionToNextStepAndChangePage(formValues);
+        }
       })
+      .catch(() => this.props.hideSpinner());
+  }
+
+  /**
+   * Updates stock movement inventory items.
+   * @param {object} formValues
+   * @param {object} lineItems
+   * @public
+   */
+  updateInventoryItemsAndTransitionToNextStep(formValues, lineItems) {
+    const itemsToSave = this.getLineItemsToBeSaved(lineItems);
+    const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateInventoryItems`;
+    const payload = {
+      id: this.state.values.stockMovementId,
+      lineItems: itemsToSave,
+    };
+
+    apiClient.post(updateItemsUrl, payload)
+      .then(() => this.transitionToNextStepAndChangePage(formValues))
       .catch(() => this.props.hideSpinner());
   }
 
@@ -790,6 +844,19 @@ class AddItemsPage extends Component {
       return apiClient.post(url, payload);
     }
     return Promise.resolve();
+  }
+
+  /**
+   * Transition to next stock movement status and go to next form page.
+   * @param {object} formValues
+   * @public
+   */
+  transitionToNextStepAndChangePage(formValues) {
+    this.transitionToNextStep()
+      .then(() => {
+        this.props.nextPage(formValues);
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   /**
