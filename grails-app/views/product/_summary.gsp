@@ -109,6 +109,12 @@
 							</g:link>
 						</div>
 					</g:isSuperuser>
+					<div class="button-group right">
+						<g:link controller="product" action="addDocument" id="${productInstance?.id}" class="button">
+							<img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />&nbsp;
+							<warehouse:message code="product.addDocument.label" default="Add document"/>
+						</g:link>
+					</div>
                 </div>
             </td>
         </tr>
