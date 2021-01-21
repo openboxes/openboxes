@@ -19,14 +19,11 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.StockMovementService
-import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionSourceType
-import org.pih.warehouse.requisition.RequisitionStatus
-import org.pih.warehouse.requisition.RequisitionType
 
 class StockMovementApiController {
 
@@ -174,6 +171,13 @@ class StockMovementApiController {
         bindStockMovement(stockMovement, request.JSON)
         stockMovement = stockMovementService.updateItems(stockMovement)
         render([data: stockMovement] as JSON)
+    }
+
+    def updateInventoryItems = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        bindStockMovement(stockMovement, request.JSON)
+        stockMovementService.updateInventoryItems(stockMovement)
+        render status: 200
     }
 
     /**

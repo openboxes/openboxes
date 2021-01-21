@@ -34,8 +34,6 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
-import org.pih.warehouse.order.OrderStatus
-import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.order.ShipOrderCommand
 import org.pih.warehouse.order.ShipOrderItemCommand
 import org.pih.warehouse.picklist.Picklist
@@ -50,7 +48,6 @@ import org.pih.warehouse.requisition.RequisitionItemStatus
 import org.pih.warehouse.requisition.RequisitionItemType
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
-import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.ReferenceNumberType
@@ -1406,6 +1403,14 @@ class StockMovementService {
         }
     }
 
+    void updateInventoryItems(StockMovement stockMovement) {
+        if (stockMovement.lineItems) {
+            stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
+                inventoryService.findAndUpdateOrCreateInventoryItem(stockMovementItem.product,
+                        stockMovementItem.lotNumber, stockMovementItem.expirationDate)
+            }
+        }
+    }
 
     StockMovement updateShipmentBasedStockMovementItems(StockMovement stockMovement) {
         log.info "update shipment items " + (new JSONObject(stockMovement.toJson())).toString(4)
@@ -1555,6 +1560,16 @@ class StockMovementService {
         }
 
         def updatedStockMovement = StockMovement.createFromRequisition(requisition)
+
+        if (updatedStockMovement.lineItems) {
+            updatedStockMovement.lineItems.each { StockMovementItem stockMovementItem ->
+                InventoryItem inventoryItem = inventoryService.findOrCreateInventoryItem(stockMovementItem.product,
+                        stockMovementItem.lotNumber, stockMovementItem.expirationDate)
+                def quantity = productAvailabilityService.getQuantityOnHand(inventoryItem)
+                inventoryItem.quantity = quantity
+                stockMovementItem.inventoryItem = inventoryItem
+            }
+        }
 
         createMissingPicklistItems(updatedStockMovement)
         createMissingShipmentItems(updatedStockMovement)

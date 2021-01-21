@@ -28,10 +28,8 @@ import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductException
-import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
-import org.pih.warehouse.util.DateUtil
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.springframework.validation.Errors
@@ -1617,7 +1615,7 @@ class InventoryService implements ApplicationContextAware {
     }
 
     // findOrCreateInventoryItem with option to reassign expiration date for existing records
-    InventoryItem findOrCreateInventoryItemDuringImport(Product product, String lotNumber, Date expirationDate) {
+    InventoryItem findAndUpdateOrCreateInventoryItem(Product product, String lotNumber, Date expirationDate) {
         def inventoryItem = findInventoryItemByProductAndLotNumber(product, lotNumber)
         if (!inventoryItem) {
             inventoryItem = new InventoryItem()
@@ -2791,7 +2789,7 @@ class InventoryService implements ApplicationContextAware {
             }
 
             // Find or create an inventory item
-            def inventoryItem = findOrCreateInventoryItemDuringImport(product, lotNumber, expirationDate)
+            def inventoryItem = findAndUpdateOrCreateInventoryItem(product, lotNumber, expirationDate)
             println "Inventory item: " + inventoryItem.id + " " + inventoryItem.dateCreated + " " + inventoryItem.lastUpdated
             transactionEntry.inventoryItem = inventoryItem
 
