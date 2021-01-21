@@ -193,8 +193,8 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         def quantityInOtherShipments = shipmentItems?.findAll { it.shipment != shipment}?.sum { ShipmentItem shipmentItem ->
             shipmentItem?.quantity
         }
-        def quantityRemaining = quantityInOtherShipments ? quantity - quantityInOtherShipments : quantity
-        return quantityRemaining > 0 ? quantityRemaining * quantityPerUom : 0
+        def quantityRemaining = quantityInOtherShipments ? (quantity * quantityPerUom) - quantityInOtherShipments : (quantity * quantityPerUom)
+        return quantityRemaining > 0 ? quantityRemaining : 0
     }
 
     Integer getQuantityRemaining() {
