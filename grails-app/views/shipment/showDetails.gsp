@@ -237,6 +237,7 @@
                                             <g:each in="${shipmentInstance.documents + shipmentWorkflow.documentTemplates}" var="document" status="i">
                                                 <tr id="document-${document.id}" class="${i%2==0?'even':'odd'}">
                                                     <td class="middle">
+                                                    <g:if test="${!document?.fileUri}">
                                                         <g:set var="f" value="${document?.filename?.toLowerCase()}"/>
                                                         <g:if test="${f.endsWith('.jpg')||f.endsWith('.png')||f.endsWith('.gif') }">
                                                             <img src="${createLinkTo(dir:'images/icons/silk',file:'picture.png')}"/>
@@ -256,6 +257,7 @@
                                                         <g:else>
                                                             <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white.png')}"/>
                                                         </g:else>
+                                                    </g:if>
                                                     </td>
                                                     <td class="middle">
                                                         <g:link controller="document" action="download" id="${document.id}" params="[shipmentId:shipmentInstance?.id]" title="${document?.filename}">
@@ -601,6 +603,7 @@
                                     <g:each in="${shipmentInstance.documents + shipmentWorkflow.documentTemplates}" var="document" status="i">
                                         <tr id="document-${document.id}" class="${i%2==0?'odd':'even'}">
                                             <td class="middle">
+                                            <g:if test="${!document?.fileUri}">
                                                 <g:set var="f" value="${document?.filename?.toLowerCase()}"/>
                                                 <g:if test="${f.endsWith('.jpg')||f.endsWith('.png')||f.endsWith('.gif') }">
                                                     <img src="${createLinkTo(dir:'images/icons/silk',file:'picture.png')}"/>
@@ -620,6 +623,7 @@
                                                 <g:else>
                                                     <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white.png')}"/>
                                                 </g:else>
+                                            </g:if>
                                             </td>
                                             <td class="middle">
                                                 <g:link controller="document" action="download" id="${document.id}" params="[shipmentId:shipmentInstance?.id]" title="${document?.filename}">

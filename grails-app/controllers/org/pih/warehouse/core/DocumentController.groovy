@@ -232,7 +232,7 @@ class DocumentController {
             log.info "Document is too large"
             flash.message = "${warehouse.message(code: 'document.documentTooLarge.message')}"
             if (shipmentInstance) {
-                redirect(controller: 'shipment', action: 'showDetails', id: command.shipmentId)
+                redirect(controller: 'stockMovement', action: 'show', id: command.shipmentId)
                 return
             } else if (orderInstance) {
                 redirect(controller: 'order', action: 'show', id: command.orderId)
@@ -248,7 +248,7 @@ class DocumentController {
         // these controllers.
         log.info("Redirecting to appropriate show details page")
         if (shipmentInstance) {
-            redirect(controller: 'shipment', action: 'showDetails', id: command.shipmentId)
+            redirect(controller: 'stockMovement', action: 'show', id: command.shipmentId)
             return
         } else if (orderInstance) {
             redirect(controller: 'order', action: 'show', id: command.orderId)
