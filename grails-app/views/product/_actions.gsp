@@ -30,12 +30,14 @@
 				<warehouse:message code="inventory.showTransactionLog.label"/>
 			</g:link>
 		</div>
-		<div class="action-menu-item">
-			<g:link controller="inventoryItem" action="showLotNumbers" params="['product.id': productInstance?.id]">
-				<img src="${resource(dir: 'images/icons', file: 'barcode.png')}"/>&nbsp;
-				<warehouse:message code="inventory.showLotNumbers.label"/>
-			</g:link>
-		</div>
+		<g:isUserManager>
+			<div class="action-menu-item">
+				<g:link controller="inventoryItem" action="showLotNumbers" params="['product.id': productInstance?.id]">
+					<img src="${resource(dir: 'images/icons', file: 'barcode.png')}"/>&nbsp;
+					<warehouse:message code="inventory.showLotNumbers.label"/>
+				</g:link>
+			</div>
+		</g:isUserManager>
 		<div class="action-menu-item">
 			<hr />
 		</div>
