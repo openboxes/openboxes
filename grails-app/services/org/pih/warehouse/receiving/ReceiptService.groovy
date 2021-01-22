@@ -10,7 +10,6 @@
 package org.pih.warehouse.receiving
 
 import grails.validation.ValidationException
-import org.apache.commons.validator.EmailValidator
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptContainer
 import org.pih.warehouse.api.PartialReceiptItem
@@ -19,7 +18,6 @@ import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
-import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
@@ -39,6 +37,7 @@ class ReceiptService {
     def identifierService
     def grailsApplication
     def notificationService
+    def productAvailabilityService
 
     PartialReceipt getPartialReceipt(String id, String stepNumber) {
         Shipment shipment = Shipment.get(id)
@@ -148,6 +147,7 @@ class ReceiptService {
         partialReceiptItem.lotNumber = shipmentItem.inventoryItem?.lotNumber
         partialReceiptItem.expirationDate = shipmentItem.inventoryItem?.expirationDate
         partialReceiptItem.quantityShipped = shipmentItem?.quantity ?: 0
+        partialReceiptItem.quantityOnHand = productAvailabilityService.getQuantityOnHand(shipmentItem.inventoryItem)
 
         return partialReceiptItem
     }
@@ -165,6 +165,7 @@ class ReceiptService {
         partialReceiptItem.quantityShipped = receiptItem?.quantityShipped ?: 0
         partialReceiptItem.isSplitItem = receiptItem.isSplitItem
         partialReceiptItem.comment = receiptItem.comment
+        partialReceiptItem.quantityOnHand = productAvailabilityService.getQuantityOnHand(receiptItem.inventoryItem)
 
         return partialReceiptItem
     }
@@ -201,6 +202,11 @@ class ReceiptService {
         receiptItem.shipmentItem = partialReceiptItem.shipmentItem
         receiptItem.isSplitItem = partialReceiptItem.isSplitItem
         receiptItem.comment = partialReceiptItem.comment
+
+        if (partialReceiptItem.expirationDate && !partialReceiptItem.expirationDate.equals(inventoryItem.expirationDate)) {
+            inventoryItem.expirationDate = partialReceiptItem.expirationDate
+            inventoryItem.save(flush: true)
+        }
 
         if (partialReceiptItem.cancelRemaining) {
             //when completing the pending receipt status was already changed to received and the item quantity will in quantityReceived,
