@@ -419,6 +419,30 @@ class AddItemsPage extends Component {
   }
 
   /**
+   * Shows Inventory item expiration date update confirmation dialog.
+   * @param {function} onConfirm
+   * @public
+   */
+  confirmInventoryItemExpirationDateUpdate(onConfirm) {
+    confirmAlert({
+      title: this.props.translate('react.stockMovement.message.confirmSave.label', 'Confirm save'),
+      message: this.props.translate(
+        'react.stockMovement.confirmExpiryDateUpdate.message',
+        'This will update the expiry date across all depots in the system. Are you sure you want to proceed?',
+      ),
+      buttons: [
+        {
+          label: this.props.translate('react.default.yes.label', 'Yes'),
+          onClick: onConfirm,
+        },
+        {
+          label: this.props.translate('react.default.no.label', 'No'),
+        },
+      ],
+    });
+  }
+
+  /**
    * Fetches all required data.
    * @param {boolean} forceFetch
    * @public
@@ -513,21 +537,17 @@ class AddItemsPage extends Component {
    * @public
    */
   saveAndTransitionToNextStep(formValues, lineItems) {
-    this.props.showSpinner();
-
-    this.saveRequisitionItems(lineItems)
-      .then((resp) => {
-        let values = formValues;
-        if (resp) {
-          values = { ...formValues, lineItems: resp.data.data.lineItems };
-        }
-        this.transitionToNextStep()
-          .then(() => {
-            this.props.nextPage(values);
-          })
-          .catch(() => this.props.hideSpinner());
-      })
-      .catch(() => this.props.hideSpinner());
+    if (_.some(lineItems, item => item.inventoryItem
+      && item.expirationDate !== item.inventoryItem.expirationDate)) {
+      if (_.some(lineItems, item => item.inventoryItem.quantity && item.inventoryItem.quantity !== '0')) {
+        this.confirmInventoryItemExpirationDateUpdate(() =>
+          this.saveRequisitionItemsAndTransitionToNextStep(formValues, lineItems));
+      } else {
+        this.saveRequisitionItemsAndTransitionToNextStep(formValues, lineItems);
+      }
+    } else {
+      this.saveRequisitionItemsAndTransitionToNextStep(formValues, lineItems);
+    }
   }
 
   /**
@@ -549,6 +569,30 @@ class AddItemsPage extends Component {
     }
 
     return Promise.resolve();
+  }
+
+  /**
+   * Saves list of stock movement items and transition to next step.
+   * @param {object} formValues
+   * @param {object} lineItems
+   * @public
+   */
+  saveRequisitionItemsAndTransitionToNextStep(formValues, lineItems) {
+    this.props.showSpinner();
+
+    this.saveRequisitionItems(lineItems)
+      .then((resp) => {
+        let values = formValues;
+        if (resp) {
+          values = { ...formValues, lineItems: resp.data.data.lineItems };
+        }
+        this.transitionToNextStep()
+          .then(() => {
+            this.props.nextPage(values);
+          })
+          .catch(() => this.props.hideSpinner());
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   /**
