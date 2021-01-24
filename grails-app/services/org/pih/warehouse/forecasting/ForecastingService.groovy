@@ -13,7 +13,6 @@ import groovy.sql.Sql
 import groovy.time.TimeCategory
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.util.DateUtil
 
 import java.sql.Timestamp
@@ -271,16 +270,39 @@ class ForecastingService {
                 DATE_FORMAT(date_issued, '%d/%b/%Y') as date_issued,
                 origin_name,
                 destination_name,
-                product_code,
+                product_demand_details.product_code,
                 product_name,
                 quantity_requested,
                 quantity_picked,
                 reason_code_classification,
                 quantity_demand
             FROM product_demand_details
-            WHERE date_issued BETWEEN :startDate AND :endDate
-            AND origin_id = :originId
             """
+
+        if (params.category) {
+            query += " JOIN product ON product.id = product_demand_details.product_id"
+        }
+        if (params.tags && params.tags != "null") {
+            def ind = 0
+            params.tags = params.tags.split(",").inject([:]) { result, tag ->
+                result["tag${ind++}"] = tag
+                return result
+            }
+            params = params + params.tags
+            query += " LEFT JOIN product_tag ON product_tag.product_id = product_demand_details.product_id"
+        }
+        if (params.catalogs && params.catalogs != "null") {
+            def ind = 0
+            params.catalogs = params.catalogs.split(",").inject([:]) { result, catalog ->
+                result["catalog${ind++}"] = catalog
+                return result
+            }
+            params = params + params.catalogs
+            query += " LEFT JOIN product_catalog_item ON product_catalog_item.product_id = product_demand_details.product_id"
+        }
+
+        query += " WHERE date_issued BETWEEN :startDate AND :endDate AND origin_id = :originId"
+
         if (params.destinationId) {
             query += " AND destination_id = :destinationId"
         }
@@ -289,6 +311,21 @@ class ForecastingService {
         }
         if (params.reasonCode) {
             query += " AND reason_code_classification = :reasonCode"
+        }
+        if (params.category) {
+            query += " AND product.category_id = :category"
+        }
+        if (params.tags && params.tags != "null") {
+            query += " AND product_tag.tag_id in (${params.tags.keySet().collect { ":$it" }.join(',')})"
+        }
+        if (params.catalogs && params.catalogs != "null") {
+            query += " AND product_catalog_item.product_catalog_id in (${params.catalogs.keySet().collect { ":$it" }.join(',')})"
+        }
+
+        if ((params.tags && params.tags != "null") || (params.catalogs && params.catalogs != "null")) {
+            query += " GROUP BY request_number, request_item_id, date_requested, date_issued," +
+                    " origin_name, destination_name, product_demand_details.product_code, product_name," +
+                    " quantity_requested, quantity_picked, reason_code_classification, quantity_demand"
         }
 
         Sql sql = new Sql(dataSource)
