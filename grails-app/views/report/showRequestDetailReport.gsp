@@ -41,6 +41,39 @@
                                 </p>
                             </div>
                             <div class="filter-list-item">
+                                <label><warehouse:message code="category.label"/></label>
+                                <p>
+                                    <g:selectCategory id="category"
+                                                      class="chzn-select-deselect filter"
+                                                      data-placeholder="Select a category"
+                                                      name="category"
+                                                      noSelection="['':'']"
+                                                      value="${params?.category}"/>
+                                </p>
+                            </div>
+                            <div class="filter-list-item">
+                                <label><warehouse:message code="catalogs.name.label"/></label>
+                                <p>
+                                    <g:selectCatalogs id="catalogs"
+                                                      name="catalogs"
+                                                      noSelection="['':'']"
+                                                      value="${params?.catalogs}"
+                                                      style="width:100%;"
+                                                      class="chzn-select-deselect"/>
+                                </p>
+                            </div>
+                            <div class="filter-list-item">
+                                <label><warehouse:message code="tag.label"/></label>
+                                <p>
+                                    <g:selectTags name="tags"
+                                                  id="tags"
+                                                  noSelection="['':'']"
+                                                  value="${params?.tags}"
+                                                  multiple="true"
+                                                  class="chzn-select-deselect"/>
+                                </p>
+                            </div>
+                            <div class="filter-list-item">
                                 <label><warehouse:message code="requisitionItem.cancelReasonCode.label"/></label>
                                 <p>
                                     <g:selectRequestReasonCode name="reasonCode"
@@ -141,6 +174,9 @@
           data.push({ name: "endDate", value: $("#endDate").val() });
           data.push({ name: "productId", value: $("#product-id").val() });
           data.push({ name: "reasonCode", value: $("#reasonCode").val() });
+          data.push({ name: "category", value: $("#category").val() });
+          data.push({ name: "tags", value: $("#tags").val() });
+          data.push({ name: "catalogs", value: $("#catalogs").val() });
         },
         "fnServerData": function ( sSource, aoData, fnCallback ) {
           $.ajax( {
@@ -226,6 +262,9 @@
                 endDate: $("#endDate").val(),
                 productId: $("#product-id").val(),
                 reasonCode: $("#reasonCode").val(),
+                category: $("#category").val(),
+                tags: $("#tags").val(),
+                catalogs: $("#catalogs").val(),
                 format: "text/csv"
               };
               var queryString = $.param(params, true);
