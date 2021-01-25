@@ -672,11 +672,13 @@ class InventoryItemController {
         def inventoryItem = InventoryItem.get(params.id)
         def binLocation = Location.get(params.binLocation)
         def quantityAvailable = inventoryService.getQuantityFromBinLocation(location, binLocation, inventoryItem)
+        def existsInOtherLocation = inventoryService.isInventoryItemInOtherLocation(location.inventory, inventoryItem)
 
         render(template: params.template, model: [location         : location,
                                                   binLocation      : binLocation,
                                                   inventoryItem    : inventoryItem,
-                                                  quantityAvailable: quantityAvailable])
+                                                  quantityAvailable: quantityAvailable,
+                                                  existsInOtherLocation: existsInOtherLocation])
     }
 
     def refreshBinLocation = {
