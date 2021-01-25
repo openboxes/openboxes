@@ -243,7 +243,7 @@ class PutAwayCheckPage extends Component {
       .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.putAway.alert.putAwayCompleted.label', 'Putaway was successfully completed!'), { timeout: 3000 });
-        this.goToFirstPage();
+        window.location = `/openboxes/order/show/${this.props.initialValues.putAway.id}`;
       })
       .catch(() => this.props.hideSpinner());
   }
