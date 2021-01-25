@@ -73,8 +73,7 @@
 </div>
 <script>
 	function checkIfExistsInOtherLocation() {
-		var existsInOtherLocation = $("#existsInOtherLocation").val() === "true";
-		if (existsInOtherLocation) {
+		if ($("#existsInOtherLocation").val() === "true") {
 			if (!confirm('${warehouse.message(code: 'inventoryItem.existsInOtherLocation.label', default: 'Inventory item exists in other location, do you want to continue?')}')) {
 				return false
 			}
