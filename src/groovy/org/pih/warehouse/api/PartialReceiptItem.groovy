@@ -23,6 +23,8 @@ class PartialReceiptItem {
 
     String lotNumber
     Date expirationDate
+    Integer quantityOnHand
+
     Integer quantityShipped
     Product product
 
@@ -91,6 +93,7 @@ class PartialReceiptItem {
                 quantityReceiving     : quantityReceiving,
                 quantityRemaining     : quantityRemaining,
                 cancelRemaining       : cancelRemaining,
+                quantityOnHand        : quantityOnHand,
                 comment               : comment
         ]
     }

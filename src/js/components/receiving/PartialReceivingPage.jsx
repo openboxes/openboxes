@@ -584,20 +584,14 @@ class PartialReceivingPage extends Component {
   /**
    * Saves changes made in edit line modal and updates data.
    * @param {object} editLines
-   * @param {number} rowIndex
    * @param {number} parentIndex
    * @public
    */
-  saveEditLine(editLines, parentIndex, rowIndex) {
-    const formValues = update(this.state.values, {
-      containers: {
-        [parentIndex]: {
-          shipmentItems: {
-            $splice: [[rowIndex, 1, ...editLines]],
-          },
-        },
-      },
-    });
+  saveEditLine(editLines, parentIndex) {
+    const formValues = {
+      ...this.state.values,
+      containers: [{ ...this.state.values.containers[parentIndex], shipmentItems: editLines }],
+    };
     this.save(formValues);
   }
 

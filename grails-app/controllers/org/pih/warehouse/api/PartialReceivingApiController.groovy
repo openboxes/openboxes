@@ -49,10 +49,9 @@ class PartialReceivingApiController {
             receiptService.savePartialReceipt(partialReceipt, false)
         } else if (partialReceipt.receiptStatus == PartialReceiptStatus.ROLLBACK) {
             receiptService.rollbackPartialReceipts(partialReceipt.shipment)
-            partialReceipt = receiptService.getPartialReceipt(params.id, params.stepNumber)
         }
 
-
+        partialReceipt = receiptService.getPartialReceipt(params.id, params.stepNumber)
         render([data: partialReceipt] as JSON)
     }
 
