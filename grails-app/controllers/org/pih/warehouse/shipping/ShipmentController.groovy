@@ -925,7 +925,7 @@ class ShipmentController {
         } else {
             flash.message = "${warehouse.message(code: 'shipping.couldNotRemoveDocumentFromShipment.message', args: [params.id])}"
         }
-        redirect(action: 'showDetails', id: params.shipmentId)
+        redirect(controller: "stockMovement", action: "show", id: params.shipmentId)
     }
 
     def deleteEvent = {
