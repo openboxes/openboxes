@@ -78,10 +78,10 @@ class DashboardController {
 
         def shipment = Shipment.findByShipmentNumber(params.searchTerms)
         if (shipment) {
-            if (shipment?.isStockMovement()) {
+            if (shipment?.requisition) {
                 redirect(controller: "stockMovement", action: "show", id: shipment?.requisition?.id)
             } else {
-                redirect(controller: "shipment", action: "showDetails", id: shipment.id)
+                redirect(controller: "stockMovement", action: "show", id: shipment.id)
             }
             return
         }
