@@ -16,6 +16,7 @@ import org.apache.poi.ss.usermodel.*
 import org.grails.plugins.csv.CSVWriter
 import org.grails.plugins.excelimport.ExcelImportUtils
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.ProductPrice
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.UnitOfMeasureClass
@@ -325,7 +326,14 @@ class DataService {
         productPackage.product = product
         productPackage.gtin = ""
         productPackage.uom = unitOfMeasure
-        productPackage.price = price ?: 0.0
+        if (!productPackage.productPrice && price) {
+            ProductPrice productPrice = new ProductPrice()
+            productPrice.price = price
+            productPrice.save()
+            productPackage.productPrice = productPrice
+        } else if (productPackage.productPrice && price) {
+            productPackage.productPrice.price = price
+        }
         productPackage.quantity = quantity ?: 1
         productPackage = productPackage.merge()
 

@@ -63,7 +63,7 @@
                         <td>
                             <g:if test="${defaultProductPackage}">
                                 <g:hasRoleFinance>
-                                    ${defaultProductPackage?.price}
+                                    ${defaultProductPackage?.productPrice?.price}
                                     ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                 </g:hasRoleFinance>
                             </g:if>

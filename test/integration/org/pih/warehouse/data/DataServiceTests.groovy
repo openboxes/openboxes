@@ -67,7 +67,7 @@ class DataServiceTests extends GroovyTestCase {
         assertNotNull productPackage
         assertEquals "EA/1", productPackage.name
         assertEquals "EA/1", productPackage.description
-        assertEquals 1.50, productPackage.price
+        assertEquals 1.50, productPackage.productPrice.price
         assertEquals "EA", productPackage.uom.code
         assertEquals "EA", productPackage.uom.name
         assertEquals "EA", productPackage.uom.description
@@ -161,7 +161,7 @@ class DataServiceTests extends GroovyTestCase {
 
         assertNotNull product.getProductPackage("CS")
         assertEquals 1000, product.getProductPackage("CS").quantity
-        assertEquals 85.91, product.getProductPackage("CS").price, 0.0001
+        assertEquals 85.91, product.getProductPackage("CS").productPrice.price, 0.0001
 
 
         // Testing the new preferred for reorder flag
@@ -265,7 +265,7 @@ class DataServiceTests extends GroovyTestCase {
         def productPackage = product.getProductPackage("CS")
         assertNotNull productPackage
         assertEquals 1000, productPackage.quantity
-        assertEquals 85.91, productPackage.price, 0.0001
+        assertEquals 85.91, productPackage.productPrice.price, 0.0001
 
         /*
         product = Product.findByProductCode("QM56")

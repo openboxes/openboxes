@@ -65,9 +65,9 @@
 
 
                             <td>
-                                <g:if test="${defaultProductPackage}">
+                                <g:if test="${defaultProductPackage?.productPrice}">
                                     <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: ['0.00'])}">
-                                        ${fieldValue(bean: defaultProductPackage, field: "price")}
+                                        ${fieldValue(bean: defaultProductPackage.productPrice, field: "price")}
                                         ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                     </g:hasRoleFinance>
                                 </g:if>

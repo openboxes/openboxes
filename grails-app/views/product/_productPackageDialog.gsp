@@ -82,7 +82,7 @@
 				<td class="value">
 					<div class="middle">
 						<g:hasRoleFinance onAccessDenied="${g.message(code:'errors.userNotGrantedPermission.message', args: [session.user.username])}">
-							<g:textField name="price" value="${packageInstance?.price }" size="10" class="medium text"/>
+							<g:textField name="price" value="${packageInstance?.productPrice?.price }" size="10" class="medium text"/>
 							${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
 						</g:hasRoleFinance>
 					</div>
