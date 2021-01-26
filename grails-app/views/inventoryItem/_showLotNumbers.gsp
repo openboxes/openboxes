@@ -11,7 +11,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<g:if test="${!commandInstance?.inventoryItemList}">
+				<g:if test="${!commandInstance?.product?.inventoryItems}">
 					<tr class="even" style="min-height: 100px;">
 						<td colspan="3" style="text-align: center; vertical-align: middle">
 							<warehouse:message code="inventory.noItemsCurrentlyInStock.message"
@@ -25,7 +25,7 @@
 				<g:isSuperuser>
 					<g:set var="isSuperuser" value="${true}"/>
 				</g:isSuperuser>
-				<g:each var="inventoryItem" in="${commandInstance?.inventoryItemList}" status="status">
+				<g:each var="inventoryItem" in="${commandInstance?.product?.inventoryItems.sort { it.dateCreated }}" status="status">
 					<tr class="prop">
 						<td class="middle center" nowrap="nowrap">
 							<div class="action-menu">

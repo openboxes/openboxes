@@ -35,6 +35,7 @@
 					</tr>
 				</g:if>
 				<g:else>
+					<g:hiddenField name="lotNumber" value="${inventoryItem?.lotNumber}"/>
 					<tr class="prop">
 						<td valign="top" class="name"><label><warehouse:message code="product.lotNumber.label"/></label></td>
 						<td valign="top" class="value">
