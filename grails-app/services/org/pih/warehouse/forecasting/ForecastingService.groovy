@@ -12,6 +12,7 @@ package org.pih.warehouse.forecasting
 import groovy.sql.Sql
 import groovy.time.TimeCategory
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.util.DateUtil
 
@@ -283,21 +284,9 @@ class ForecastingService {
             query += " JOIN product ON product.id = product_demand_details.product_id"
         }
         if (params.tags && params.tags != "null") {
-            def ind = 0
-            params.tags = params.tags.split(",").inject([:]) { result, tag ->
-                result["tag${ind++}"] = tag
-                return result
-            }
-            params = params + params.tags
             query += " LEFT JOIN product_tag ON product_tag.product_id = product_demand_details.product_id"
         }
         if (params.catalogs && params.catalogs != "null") {
-            def ind = 0
-            params.catalogs = params.catalogs.split(",").inject([:]) { result, catalog ->
-                result["catalog${ind++}"] = catalog
-                return result
-            }
-            params = params + params.catalogs
             query += " LEFT JOIN product_catalog_item ON product_catalog_item.product_id = product_demand_details.product_id"
         }
 
@@ -313,13 +302,18 @@ class ForecastingService {
             query += " AND reason_code_classification = :reasonCode"
         }
         if (params.category) {
-            query += " AND product.category_id = :category"
+            Category category = Category.get(params.category)
+            if (category) {
+                def categories = category.children
+                categories << category
+                query += " AND product.category_id in (${categories.collect { "'$it.id'" }.join(',')})"
+            }
         }
         if (params.tags && params.tags != "null") {
-            query += " AND product_tag.tag_id in (${params.tags.keySet().collect { ":$it" }.join(',')})"
+            query += " AND product_tag.tag_id in (${params.tags.split(",").collect { "'$it'" }.join(',')})"
         }
         if (params.catalogs && params.catalogs != "null") {
-            query += " AND product_catalog_item.product_catalog_id in (${params.catalogs.keySet().collect { ":$it" }.join(',')})"
+            query += " AND product_catalog_item.product_catalog_id in (${params.catalogs.split(",").collect { "'$it'" }.join(',')})"
         }
 
         if ((params.tags && params.tags != "null") || (params.catalogs && params.catalogs != "null")) {
