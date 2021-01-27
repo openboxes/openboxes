@@ -4,15 +4,13 @@
         <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/>
     </button>
     <div class="actions">
-        <g:if test="${isSuperuser}">
-            <div class="action-menu-item">
-                <a href="javascript:void(0);" class="btn-show-dialog" data-title="${g.message(code:'inventory.editItem.label')}"
-                   data-url="${request.contextPath}/inventoryItem/showDialog?id=${itemInstance?.id}&binLocation=${binLocation?.id}&template=editItemDialog">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
-                    <g:message code="inventory.editItem.label"/>
-                </a>
-            </div>
-        </g:if>
+        <div class="action-menu-item">
+            <a href="javascript:void(0);" class="btn-show-dialog" data-title="${g.message(code:'inventory.editItem.label')}"
+               data-url="${request.contextPath}/inventoryItem/showDialog?id=${itemInstance?.id}&binLocation=${binLocation?.id}&template=editItemDialog">
+                <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
+                <g:message code="inventory.editItem.label"/>
+            </a>
+        </div>
         <g:supports activityCode="${org.pih.warehouse.core.ActivityCode.ADJUST_INVENTORY}">
             <div class="action-menu-item">
                 <a href="javascript:void(0);" class="btn-show-dialog" data-title="${g.message(code:'inventory.adjustStock.label')}"
