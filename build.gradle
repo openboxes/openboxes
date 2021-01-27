@@ -24,7 +24,7 @@ buildscript {
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.15.1"
         classpath "gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:2.2.0"
         classpath 'org.grails.plugins:database-migration:3.1.0.RC1'
-        classpath "gradle.plugin.com.virgo47.gradle:ClasspathJar:1.0.0"
+//        classpath "gradle.plugin.com.virgo47.gradle:ClasspathJar:1.0.0"
 
     }
 }
@@ -32,7 +32,7 @@ buildscript {
 //include gradle-node plugin
 plugins {
     id "com.moowork.node" version "0.12"
-    id "com.virgo47.ClasspathJar" version "1.0.0"
+//    id "com.virgo47.ClasspathJar" version "1.0.0"
 }
 
 //grails.project.class.dir = "target/classes"
@@ -192,6 +192,7 @@ dependencies {
     compile "org.grails.plugins:google-analytics:2.3.3" // was 1.0
 
     testCompile "org.grails.plugins:code-coverage:2.0.3-3" // was 1.2.5
+    compile group: 'io.micronaut', name: 'micronaut-http-client', version: '1.0.0.RC3'
 
     // new plugins
     compile("org.grails.plugins:sentry:11.7.24")
@@ -204,13 +205,16 @@ dependencies {
     compile ('org.grails.plugins:ajax-tags:1.0.0')
 
     // Used by PDF rendering plugin
-    runtime "org.springframework:spring-test:4.2.1.RELEASE"
+//    runtime "org.springframework:spring-test:4.2.1.RELEASE"
     runtime 'org.xhtmlrenderer:core-renderer:R8'
     runtime 'com.lowagie:itext:2.1.0'
 
     // Used by XLS rendering and Excel Importers
     compile ('org.apache.poi:poi:3.17')
 
+    testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
+    testCompile 'org.spockframework:spock-spring:1.1-groovy-2.4'
+    compile group: 'org.grails.plugins', name: 'rest-client-builder', version: '2.1.1'
 }
 
 sourceSets {
@@ -293,4 +297,4 @@ buildProperties.doLast {
         properties.store(it,null)
     }
 }
-apply plugin: "com.virgo47.ClasspathJar"
+//apply plugin: "com.virgo47.ClasspathJar"
