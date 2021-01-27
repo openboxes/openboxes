@@ -58,7 +58,7 @@
                             ${item?.requestNumber}
                         </g:link>
                     </td>
-                    <td>
+                    <td style="word-break: break-word;">
                         <g:link controller="stockMovement" action="show" id="${item?.id}">
                             ${item?.name}
                         </g:link>
