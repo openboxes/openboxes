@@ -272,9 +272,7 @@ class OrderService {
         // update the status of the order before saving
         order.updateStatus()
 
-        if (!order.originParty) {
-            order.originParty = order?.origin?.organization
-        }
+        order.originParty = order?.origin?.organization
 
         if (!order.destinationParty) {
             order.destinationParty = order?.destination?.organization
