@@ -83,35 +83,56 @@
                         </g:if>
                         <g:elseif test="${shipmentInstance?.destination?.id == session?.warehouse?.id}">
                             <g:if test="${shipmentItem?.receiptItems}">
-                                <g:each var="receiptItem" in="${shipmentItem?.receiptItems}">
-                                    <div style="margin: 10px;" title="${receiptItem?.quantityReceived} ${receiptItem?.inventoryItem?.product?.unitOfMeasure?:'EA'}">
+                                <g:each var="receiptItem" in="${shipmentItem?.receiptItems.sort { it.sortOrder }}">
+                                    <div style="margin-bottom: 10px;" title="${receiptItem?.quantityReceived} ${receiptItem?.inventoryItem?.product?.unitOfMeasure?:'EA'}">
                                         ${receiptItem?.binLocation?.name?:g.message(code:'default.label')}
                                     </div>
                                 </g:each>
                             </g:if>
                         </g:elseif>
-
                     </td>
                     <td class="lotNumber">
-                        ${shipmentItem?.inventoryItem?.lotNumber}
+                        <g:if test="${shipmentItem?.receiptItems}">
+                            <g:each var="receiptItem" in="${shipmentItem?.receiptItems.sort { it.sortOrder }}">
+                                <div style="margin-bottom: 10px;" title="${receiptItem?.quantityReceived} ${receiptItem?.inventoryItem?.product?.unitOfMeasure?:'EA'}">
+                                    ${receiptItem?.lotNumber}
+                                </div>
+                            </g:each>
+                        </g:if>
+                        <g:else>
+                            ${shipmentItem?.inventoryItem?.lotNumber}
+                        </g:else>
                     </td>
-                    <td class="center expirationDate">
-
-                        <g:if test="${shipmentItem?.inventoryItem?.expirationDate}">
+                    <td class="center expirationDate" nowrap="nowrap">
+                        <g:if test="${shipmentItem?.receiptItems}">
+                            <g:each var="receiptItem" in="${shipmentItem?.receiptItems.sort { it.sortOrder }}">
+                                <div style="margin-bottom: 10px;" title="${receiptItem?.quantityReceived} ${receiptItem?.inventoryItem?.product?.unitOfMeasure?:'EA'}">
+                                    <g:if test="${receiptItem?.expirationDate}">
+                                        <span class="expirationDate">
+                                            <g:formatDate date="${receiptItem?.expirationDate}" format="d MMM yyyy"/>
+                                        </span>
+                                    </g:if>
+                                    <g:else>
+                                        <span class="fade">
+                                            ${warehouse.message(code: 'default.never.label')}
+                                        </span>
+                                    </g:else>
+                                </div>
+                            </g:each>
+                        </g:if>
+                        <g:elseif test="${shipmentItem?.inventoryItem?.expirationDate}">
                             <span class="expirationDate">
                                 <g:formatDate date="${shipmentItem?.inventoryItem?.expirationDate}" format="d MMM yyyy"/>
                             </span>
-                        </g:if>
+                        </g:elseif>
                         <g:else>
                             <span class="fade">
                                 ${warehouse.message(code: 'default.never.label')}
                             </span>
                         </g:else>
-
                     </td>
                     <td class="center quantity">
                         <g:formatNumber number="${shipmentItem?.quantity}" format="###,##0" />
-
                     </td>
                     <g:if test="${shipmentInstance?.wasReceived()||shipmentInstance?.wasPartiallyReceived()}">
                         <td class="center" style="white-space:nowrap;${shipmentItem?.quantityReceived() != shipmentItem?.quantity ? ' color:red;' : ''}">
@@ -120,23 +141,28 @@
                         <td class="center" style="white-space:nowrap;${shipmentItem?.quantityReceived() != shipmentItem?.quantity ? ' color:red;' : ''}">
                             <g:formatNumber number="${shipmentItem?.quantityCanceled()}" format="###,##0"/>
                         </td>
-
                     </g:if>
                     <td>
                         ${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
                     </td>
-
-                    <td class="left">
-                        <g:if test="${shipmentItem?.recipient }">
-                            <div title="${shipmentItem?.recipient?.email}">${shipmentItem?.recipient?.name}</div>
+                    <td class="left" nowrap="nowrap">
+                        <g:if test="${shipmentItem?.receiptItems}">
+                            <g:each var="receiptItem" in="${shipmentItem?.receiptItems.sort { it.sortOrder }}">
+                                <div style="margin-bottom: 10px;" title="${receiptItem?.quantityReceived} ${receiptItem?.inventoryItem?.product?.unitOfMeasure?:'EA'}">
+                                    ${receiptItem?.recipient?.name?:g.message(code:'default.none.label')}
+                                </div>
+                            </g:each>
                         </g:if>
+                        <g:elseif test="${shipmentItem?.recipient }">
+                            <div title="${shipmentItem?.recipient?.email}">${shipmentItem?.recipient?.name}</div>
+                        </g:elseif>
                         <g:else>
                             <div class="fade"><g:message code="default.none.label"/></div>
                         </g:else>
                     </td>
                     <td class="left" >
                         <g:if test="${shipmentItem?.comments}">
-                            <div title="${shipmentItem?.comments.join("<br/>")}">
+                            <div title="${shipmentItem?.comments.join("\r\n")}">
                                 <img src="${createLinkTo(dir:'images/icons/silk',file:'note.png')}" />
                             </div>
                         </g:if>
