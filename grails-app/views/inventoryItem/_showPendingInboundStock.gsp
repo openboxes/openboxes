@@ -63,7 +63,7 @@
                                 </g:link>
                             </g:else>
                         </td>
-                        <td class="center">
+                        <td class="center" style="word-break: break-word;">
                             <g:if test="${entry.value['type']=='Stock Movement'}">
                                 <g:link controller="stockMovement" action="show" id="${item?.id}">
                                     ${item?.name }
