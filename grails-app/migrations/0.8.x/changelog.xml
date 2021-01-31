@@ -90,4 +90,5 @@
     <include file="0.8.x/changelog-2020-11-09-1517-alter-table-order-adjustment-add-column-canceled.xml"/>
     <include file="0.8.x/changelog-2020-11-25-1430-alter-table-requisition-add-column-source-type.xml"/>
     <include file="0.8.x/changelog-2020-12-26-1908-refactor-organization-demo-data.xml"/>
+    <include file="0.8.x/changelog-2021-01-30-1530-alter-table-document-change-file-uri-column-type.xml"/>
 </databaseChangeLog>
