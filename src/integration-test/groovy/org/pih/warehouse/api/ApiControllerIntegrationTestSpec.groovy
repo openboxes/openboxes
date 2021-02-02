@@ -1,4 +1,4 @@
-package org
+package org.pih.warehouse.api
 
 import grails.gorm.transactions.Rollback
 import grails.plugins.rest.client.RestBuilder
