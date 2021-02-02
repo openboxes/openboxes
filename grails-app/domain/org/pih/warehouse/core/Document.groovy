@@ -26,7 +26,7 @@ class Document implements Serializable {
     Date dateCreated        // The date the document was created
     Date lastUpdated        // The date the document was last updated
 
-    URI fileUri            // Universal Resource Identifier
+    String fileUri            // Universal Resource Identifier
     String documentNumber        // Document reference number
     DocumentType documentType    // Type of document
 
@@ -45,7 +45,7 @@ class Document implements Serializable {
         fileContents(nullable: true)
         extension(nullable: true, maxSize: 255)
         contentType(nullable: true, maxSize: 255)
-        fileUri(nullable: true)
+        fileUri(uri: true, nullable: true)
         fileContents(nullable: true, maxSize: 10485760) // 10 MBs
         documentNumber(nullable: true, maxSize: 255)
         documentType(nullable: true)

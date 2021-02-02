@@ -3,9 +3,12 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
-  <changeSet author="pmuchowski" id="3001202115300-0">
+  <changeSet author="pmuchowski" id="3001202115300-1">
+    <preConditions onFail="MARK_RAN">
+      <columnExists tableName="document" columnName="file_uri"/>
+    </preConditions>
     <modifyColumn tableName="document">
-      <column name="file_uri" type="BLOB"/>
+      <column name="file_uri" type="longtext"/>
     </modifyColumn>
   </changeSet>
 </databaseChangeLog>
