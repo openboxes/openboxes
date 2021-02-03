@@ -2329,7 +2329,7 @@ class StockMovementService {
                             documentType: documentTemplate?.documentType?.name,
                             contentType : documentTemplate?.contentType,
                             stepNumber  : null,
-                            uri         : g.createLink(controller: 'document', action: "render",
+                            uri         : documentTemplate?.fileUri ?: g.createLink(controller: 'document', action: "render",
                                     id: documentTemplate?.id, params: [shipmentId: stockMovement?.shipment?.id],
                                     absolute: true, title: documentTemplate?.filename),
                             fileUri    : documentTemplate?.fileUri
@@ -2345,7 +2345,7 @@ class StockMovementService {
                         documentType: document?.documentType?.name,
                         contentType : document?.contentType,
                         stepNumber  : null,
-                        uri         : g.createLink(controller: 'document', action: action,
+                        uri         : document?.fileUri ?: g.createLink(controller: 'document', action: action,
                                 id: document?.id, params: [shipmentId: stockMovement?.shipment?.id],
                                 absolute: true, title: document?.filename),
                         fileUri    : document?.fileUri
