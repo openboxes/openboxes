@@ -9,6 +9,10 @@
  **/
 package org.pih.warehouse.product
 
+import java.math.RoundingMode
+import java.text.SimpleDateFormat
+import org.pih.warehouse.core.ProductPrice
+
 class ProductSupplierController {
 
     def dataService
@@ -89,6 +93,35 @@ class ProductSupplierController {
             if (!productSupplierInstance.code) {
                 String prefix = productSupplierInstance?.product?.productCode
                 productSupplierInstance.code = identifierService.generateProductSupplierIdentifier(prefix)
+            }
+
+            if (params.price) {
+                BigDecimal parsedUnitPrice
+                try {
+                    parsedUnitPrice = new BigDecimal(params.price).setScale(2, RoundingMode.FLOOR)
+                } catch (Exception e) {
+                    log.error("Unable to parse unit price: " + e.message, e)
+                    flash.message = "Could not parse unit price with value: ${params.price}."
+                    render(view: "edit", model: [productSupplierInstance: productSupplierInstance])
+                    return
+                }
+                if (parsedUnitPrice < 0) {
+                    log.error("Wrong unit price value: ${parsedUnitPrice}.")
+                    flash.message = "Wrong unit price value: ${parsedUnitPrice}."
+                    render(view: "edit", model: [productSupplierInstance: productSupplierInstance])
+                    return
+                }
+                def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+
+                if (productSupplierInstance.contractPrice?.id) {
+                    productSupplierInstance.contractPrice.price = parsedUnitPrice
+                    productSupplierInstance.contractPrice.toDate = params.toDate ? dateFormat.parse(params.toDate) : null
+                } else {
+                    ProductPrice productPrice = new ProductPrice()
+                    productPrice.price = parsedUnitPrice
+                    productPrice.toDate = params.toDate ? dateFormat.parse(params.toDate) : null
+                    productSupplierInstance.contractPrice = productPrice
+                }
             }
 
             if (!productSupplierInstance.hasErrors() && productSupplierInstance.save(flush: true)) {
