@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="awalkowiak" id="2101202111191-1">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="product_price"/>
+      </not>
+    </preConditions>
+    <createTable tableName="product_price">
+
+      <column name="id" type="CHAR(38)">
+        <constraints nullable="false" primaryKey="true" />
+      </column>
+      <column name="version" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+
+      <column name="type" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="price" type="DECIMAL(19,4)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="currency_id" type="CHAR(38)" />
+      <column name="from_date" type="DATETIME"/>
+      <column name="to_date" type="DATETIME"/>
+
+      <column name="date_created" type="DATETIME"/>
+      <column name="last_updated" type="DATETIME"/>
+      <column name="created_by_id" type="CHAR(38)"/>
+      <column name="updated_by_id" type="CHAR(38)"/>
+
+      <!-- temporary column for migration process -->
+      <column name="product_package_id" type="CHAR(38)"/>
+    </createTable>
+  </changeSet>
+
+  <changeSet author="awalkowiak" id="2101202111191-2">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_product_price_unit_of_measure"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="currency_id" baseTableName="product_price"
+      constraintName="fk_product_price_unit_of_measure" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="unit_of_measure" />
+  </changeSet>
+
+  <changeSet author="awalkowiak" id="2101202111191-3">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_product_price_created_by"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="created_by_id" baseTableName="product_price"
+      constraintName="fk_product_price_created_by" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="user" />
+  </changeSet>
+
+  <changeSet author="awalkowiak" id="2101202111191-4">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_product_price_updated_by"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="updated_by_id" baseTableName="product_price"
+      constraintName="fk_product_price_updated_by" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="user" />
+  </changeSet>
+
+</databaseChangeLog>

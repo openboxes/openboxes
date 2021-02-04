@@ -1764,7 +1764,7 @@ class JsonController {
         ProductSupplier productSupplier = ProductSupplier.findById(params.productSupplierId)
         ProductPackage productPackage = productSupplier?.defaultProductPackage
         render([
-                unitPrice: productPackage?.price ? g.formatNumber(number: productPackage?.price) : null,
+                unitPrice: productPackage?.productPrice?.price ? g.formatNumber(number: productPackage?.productPrice?.price) : null,
                 supplierCode: productSupplier?.supplierCode,
                 manufacturer: productSupplier?.manufacturer,
                 manufacturerCode: productSupplier?.manufacturerCode,

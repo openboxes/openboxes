@@ -217,6 +217,24 @@
 								</td>
 							</tr>
 							<tr class="prop">
+								<td valign="top" class="name">
+									<label for="price"><warehouse:message code="productSupplier.contractPrice.label" default="Contract Price (each)" /></label>
+								</td>
+								<td valign="top" class="value ${hasErrors(bean: [productSupplierInstance?.contractPrice], field: 'price', 'errors')}">
+									<g:textField name="price"
+												 value="${g.formatNumber(number:productSupplierInstance?.contractPrice?.price, format:'###,###,##0.####') }"
+												 class="text" size="50" />
+								</td>
+							</tr>
+							<tr class="prop">
+								<td valign="top" class="name">
+									<label for="toDate"><warehouse:message code="productSupplier.contractValidUntil.label" default="Contract Valid Until" /></label>
+								</td>
+								<td valign="top" class="value ${hasErrors(bean: [productSupplierInstance?.contractPrice], field: 'toDate', 'errors')}">
+									<g:jqueryDatePicker name="toDate" value="${productSupplierInstance?.contractPrice?.toDate}" autocomplete="off" format="MM/dd/yyyy"/>
+								</td>
+							</tr>
+							<tr class="prop">
 								<td valign="top"></td>
 								<td valign="top left">
 									<div class="buttons">

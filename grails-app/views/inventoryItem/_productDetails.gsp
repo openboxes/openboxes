@@ -341,7 +341,7 @@
                         </td>
                         <td class="value">
                             ${productPackage?.uom?.code }/${productPackage?.quantity }
-                            @ ${productPackage?.price } ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                            @ ${productPackage?.productPrice?.price } ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                         </td>
                     </tr>
                 </g:each>
