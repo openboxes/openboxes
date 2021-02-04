@@ -18,17 +18,14 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.product.ProductPackage
-import org.pih.warehouse.product.ProductService
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentException
 import org.pih.warehouse.shipping.ShipmentItem
-import org.pih.warehouse.shipping.ShipmentType
 import util.ReportUtil
 
 import java.math.RoundingMode
-import java.text.SimpleDateFormat
 
 class OrderService {
 
@@ -529,12 +526,14 @@ class OrderService {
                 productPackage.name = "${orderItem?.quantityUom?.code}/${orderItem?.quantityPerUom as Integer}"
                 productPackage.uom = orderItem.quantityUom
                 productPackage.quantity = orderItem.quantityPerUom as Integer
-                productPackage.price = packagePrice
+                ProductPrice productPrice = new ProductPrice()
+                productPrice.price = packagePrice
+                productPackage.productPrice = productPrice
                 productPackage.save()
             }
             // Otherwise update the price
             else {
-                productPackage.price = packagePrice
+                productPackage.productPrice.price = packagePrice
             }
             // Associate product package with order item
             orderItem.productPackage = productPackage
@@ -544,7 +543,7 @@ class OrderService {
         }
         // Otherwise we update the existing price
         else {
-            orderItem.productPackage.price = packagePrice
+            orderItem.productPackage.productPrice.price = packagePrice
         }
     }
 

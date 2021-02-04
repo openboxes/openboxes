@@ -53,7 +53,7 @@
                 </td>
                 <td>
                     <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: ['0.00'])}">
-                        <g:formatNumber number="${pkg?.price}" />
+                        <g:formatNumber number="${pkg?.productPrice?.price}" />
                         ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                     </g:hasRoleFinance>
                 </td>
