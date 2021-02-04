@@ -92,9 +92,10 @@
     <include file="0.8.x/changelog-2020-12-11-1500-alter-table-order-item-add-column-order-index.xml"/>
     <include file="0.8.x/changelog-2020-12-13-2243-alter-table-add-uom-to-product-attributes.xml"/>
     <include file="0.8.x/changelog-2020-12-26-1908-refactor-organization-demo-data.xml"/>
-    <include file="0.8.x/changelog-2021-01-30-1530-alter-table-document-change-file-uri-column-type.xml"/>
     <include file="0.8.x/changelog-2021-01-21-1119-create-table-product-price.xml"/>
     <include file="0.8.x/changelog-2021-01-21-1125-alter-table-product-package-add-column-product-price.xml"/>
     <include file="0.8.x/changelog-2021-01-26-1100-migrate-price-into-product-price.xml"/>
+    <include file="0.8.x/changelog-2021-01-29-1221-create-table-preference-type.xml"/>
+    <include file="0.8.x/changelog-2021-01-30-1530-alter-table-document-change-file-uri-column-type.xml"/>
     <include file="0.8.x/changelog-2021-02-02-1300-alter-table-product-supplier-add-column-product-price.xml"/>
 </databaseChangeLog>
