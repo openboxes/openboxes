@@ -6,10 +6,10 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.data
 
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
+
 import org.junit.Ignore
 import org.junit.Test
 import org.pih.warehouse.core.Location
@@ -83,7 +83,7 @@ class DataServiceTests extends GroovyTestCase {
         }
 
         def product = dataService.findOrCreateProduct([productCode: "AB12", productName: "New product", category: "New category", manufacturer: "Mfg", manufacturerCode: "Mfgcode", vendor: "Vendor", vendorCode: "Vendor code", unitOfMeasure: "each"])
-        def inventoryLevel = dataService.findOrCreateInventoryLevel(product, location.inventory, "AB-12-12", 0, 10, 100, true)
+        def inventoryLevel = dataService.findOrCreateInventoryLevel(product, location.inventory, null, 0, 10, 100, true)
 
         assertNotNull inventoryLevel
         //assertEquals "AB-12-12", inventoryLevel.binLocation
