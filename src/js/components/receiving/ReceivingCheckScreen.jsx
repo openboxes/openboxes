@@ -60,6 +60,7 @@ const TABLE_FIELDS = {
     type: ArrayField,
     rowComponent: TableRowWithSubfields,
     subfieldKey: 'shipmentItems',
+    headerFontSize: '0.775rem',
     fields: {
       'parentContainer.name': {
         fieldKey: '',
@@ -422,7 +423,12 @@ class ReceivingCheckScreen extends Component {
                     </button>
               : null}
                 </span>
-                <div className="form-title">Shipment Informations</div>
+                <div className="form-title">
+                  <Translate
+                    id="react.partialReceiving.shipmentInformation.label"
+                    defaultMessage="Shipment information"
+                  />
+                </div>
                 {_.map(SHIPMENT_FIELDS, (fieldConfig, fieldName) =>
                 renderFormField(fieldConfig, fieldName, {
                   saveDisabled: this.state.completed ||
