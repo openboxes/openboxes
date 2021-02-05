@@ -55,7 +55,6 @@ class OpenBoxesSimpleDataBinder  implements DataBinder {
     int autoGrowCollectionLimit = 256
 
     OpenBoxesSimpleDataBinder() {
-        println "==============OpenBoxesSimpleDataBinder"
         registerStructuredEditor Date, new StructuredDateBindingEditor()
         registerStructuredEditor java.sql.Date, new StructuredSqlDateBindingEditor()
         registerStructuredEditor Calendar, new StructuredCalendarBindingEditor()
@@ -81,7 +80,6 @@ class OpenBoxesSimpleDataBinder  implements DataBinder {
      * @see grails.databinding.DataBindingSource
      */
     void bind(obj, DataBindingSource source) {
-        println "OpenBoxesSimpleDataBinder==============bind"
         bind obj, source, null, null, null, null
     }
 
@@ -95,7 +93,6 @@ class OpenBoxesSimpleDataBinder  implements DataBinder {
      * @see grails.databinding.events.DataBindingListener
      */
     void bind(obj, DataBindingSource source, DataBindingListener listener) {
-        println "OpenBoxesSimpleDataBinder==============bind1"
         bind obj, source, null, null, null, listener
     }
 
@@ -109,7 +106,6 @@ class OpenBoxesSimpleDataBinder  implements DataBinder {
      * @see DataBindingSource
      */
     void bind(obj, DataBindingSource source, List whiteList) {
-        println "OpenBoxesSimpleDataBinder==============bind2"
         bind obj, source, null, whiteList, null, null
     }
 
@@ -125,7 +121,6 @@ class OpenBoxesSimpleDataBinder  implements DataBinder {
      * @see DataBindingSource
      */
     void bind(obj, DataBindingSource source, List whiteList, List blackList) {
-        println "OpenBoxesSimpleDataBinder==============bind3"
         bind obj, source, null, whiteList, blackList, null
     }
 
@@ -136,7 +131,6 @@ class OpenBoxesSimpleDataBinder  implements DataBinder {
      * @see DataBindingSource
      */
     void bind(obj, GPathResult gpath) {
-        println "OpenBoxesSimpleDataBinder==============bind4"
         bind obj, new SimpleMapDataBindingSource(new GPathResultMap(gpath))
     }
 
@@ -157,7 +151,6 @@ class OpenBoxesSimpleDataBinder  implements DataBinder {
      * @see DataBindingSource
      */
     void bind(obj, DataBindingSource source, String filter, List whiteList, List blackList) {
-        println "OpenBoxesSimpleDataBinder==============bind5"
         bind obj, source, filter, whiteList, blackList, null
     }
 
@@ -181,28 +174,21 @@ class OpenBoxesSimpleDataBinder  implements DataBinder {
      * @see DataBindingListener
      */
     void bind(obj, DataBindingSource source, String filter, List whiteList, List blackList, DataBindingListener listener) {
-        println "OpenBoxesSimpleDataBinder==============bind6"
         doBind obj, source, filter, whiteList, blackList, listener, null
     }
 
     protected void doBind(obj, DataBindingSource source, String filter, List whiteList, List blackList, DataBindingListener listener, errors) {
-        println "OpenBoxesSimpleDataBinder==============doBind"
 
         Set<String> keys = source.getPropertyNames()
         Set<String> newKeys = []
         Map sources = [:]
         Set<String> keysToRemove = []
         for (String key : keys) {
-            println "Nested key:${key}"
             String name = key;
             final String prefixDot = ".";
             if (name.contains(prefixDot)) {
-                println "IT IS Nested key:${name}, "
-                println name.split("\\.")
-                println ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
                 String prefix = name.split("\\.")[0]
                 String newKey = name.split("\\.")[1]
-                println "IT IS Nested prefix: ${prefix}, newKey:${newKey}"
                 Map innerMap = [:]
                 if(!sources?.containsKey(prefix)){
                     sources[prefix] = [:]
@@ -210,38 +196,27 @@ class OpenBoxesSimpleDataBinder  implements DataBinder {
                 innerMap = sources[prefix]
                 innerMap[newKey] = source[key]
                 sources[prefix] = innerMap
-                println "sources[prefix]::${sources[prefix]}"
                 keysToRemove << key
             }
         }
-        println "keysToRemove::${keysToRemove}"
         if(keysToRemove){
             keys.removeAll(keysToRemove)
         }
-        println "keys::${keys}, obj:${obj}, source:${source}, filter:${filter}, whiteList:${whiteList}, blackList:${blackList}, listener:${listener}, errors:${errors}"
         for (String key in keys) {
-            println "Key:${key}"
             if (!filter || key.startsWith(filter + '.')) {
                 String propName = key
                 if (filter) {
                     propName = key[(1+filter.size())..-1]
                 }
-                println "propName::${propName}"
                 def metaProperty = obj.metaClass.getMetaProperty propName
-                println "metaProperty:${metaProperty}"
                 if (metaProperty) { // normal property
-                    println "in if meta prop"
                     if (isOkToBind(metaProperty.name, whiteList, blackList)) {
-                        println "isOkToBind::true"
                         def val = source[key]
-                        println "val::${val}"
                         try {
                             def converter = getValueConverter(obj, metaProperty.name)
                             if(converter) {
-                                println "inside bind property"
                                 bindProperty obj, source, metaProperty, converter.convert(source), listener, errors
                             } else {
-                                println "inside bind processProperty"
                                 processProperty obj, metaProperty, preprocessValue(val), source, listener, errors
                             }
                         } catch (Exception e) {
@@ -249,42 +224,30 @@ class OpenBoxesSimpleDataBinder  implements DataBinder {
                         }
                     }
                 } else {
-                    println "in else meta prop"
                     def descriptor = getIndexedPropertyReferenceDescriptor propName
-                    println "descriptor::${descriptor}"
                     if (descriptor) { // indexed property
-                        println "in if descriptor"
                         metaProperty = obj.metaClass.getMetaProperty descriptor.propertyName
-                        println "metaProperty::${metaProperty}"
                         if (metaProperty && isOkToBind(metaProperty.name, whiteList, blackList)) {
-                            println "in if metaProperty && isOkToBind"
                             def val = source.getPropertyValue key
                             processIndexedProperty obj, metaProperty, descriptor, val, source, listener, errors
                         }
                     } else if (propName.startsWith('_') && propName.length() > 1) { // boolean special handling
-                        println "in else propName.startsWith('_') && propName.length() > 1"
                         def restOfPropertyName = propName[1..-1]
                         if (!source.containsProperty(restOfPropertyName)) {
-                            println "in if !source.containsProperty(restOfPropertyName)"
                             metaProperty = obj.metaClass.getMetaProperty restOfPropertyName
                             if (metaProperty && isOkToBind(restOfPropertyName, whiteList, blackList)) {
-                                println "in else if metaProperty && isOkToBind("
                                 if ((Boolean == metaProperty.type || Boolean.TYPE == metaProperty.type)) {
                                     bindProperty obj, source, metaProperty, false, listener, errors
                                 }
                             }
                         }
-                    }else{
-                        println "NOTHING HAPPENED::"
                     }
                 }
             }
         }
         if(sources){
             sources?.each {key, value ->
-                println ">>>>>>sources  key:${key}"
                 def metaProperty = obj.metaClass.getMetaProperty key
-                println ">>>>>>sources  metaProperty:${metaProperty}"
                 processProperty obj, metaProperty, preprocessValue(value), new SimpleMapDataBindingSource(value), listener, errors
             }
         }
@@ -309,7 +272,6 @@ class OpenBoxesSimpleDataBinder  implements DataBinder {
     }
 
     protected processProperty(obj, MetaProperty metaProperty, val, DataBindingSource source, DataBindingListener listener, errors) {
-        println "OpenBoxesSimpleDataBinder==============processProperty"
         def propName = metaProperty.name
         def propertyType = metaProperty.type
         if (structuredEditors.containsKey(propertyType) && ('struct' == val || 'date.struct' == val)) {
@@ -735,16 +697,13 @@ class OpenBoxesSimpleDataBinder  implements DataBinder {
 
     protected bindProperty(obj, DataBindingSource source, MetaProperty metaProperty, propertyValue, DataBindingListener listener, errors) {
         def propName = metaProperty.name
-        println "bindProperty:::::${propName}"
         if (listener == null || listener.beforeBinding(obj, propName, propertyValue, errors) != false) {
-            println "bindProperty:::::if"
             try {
                 setPropertyValue obj, source, metaProperty, propertyValue, listener
             } catch (Exception e) {
                 addBindingError(obj, propName, propertyValue, e, listener, errors)
             }
         } else if (listener != null && propertyValue instanceof Map && obj[propName] != null) {
-            println "bindProperty:::::else if"
             bind obj[propName], new SimpleMapDataBindingSource(propertyValue)
         }
         listener?.afterBinding obj, propName, errors

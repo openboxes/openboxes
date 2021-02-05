@@ -59,7 +59,6 @@ class OpenBoxesDataBinder  extends OpenBoxesSimpleDataBinder {
     protected List<DataBindingListener> listeners = []
 
     OpenBoxesDataBinder(GrailsApplication grailsApplication) {
-        println "=============="
         this.grailsApplication = grailsApplication
         this.conversionService = new SpringConversionServiceAdapter()
         registerConverter new ByteArrayMultipartFileValueConverter()
@@ -67,26 +66,22 @@ class OpenBoxesDataBinder  extends OpenBoxesSimpleDataBinder {
 
     @Override
     void bind(obj, DataBindingSource source) {
-        println "==============bind"
         bind obj, source, null, getBindingIncludeList(obj), null, null
     }
 
     @Override
     void bind(obj, DataBindingSource source, DataBindingListener listener) {
-        println "==============bind1"
         bind obj, source, null, getBindingIncludeList(obj), null, listener
     }
 
     @Override
     void bind(object, DataBindingSource source, String filter, List whiteList, List blackList, DataBindingListener listener) {
-        println "==============bind2"
         def bindingResult = new BeanPropertyBindingResult(object, object.getClass().name)
         doBind object, source, filter, whiteList, blackList, listener, bindingResult
     }
 
     @Override
     protected void doBind(object, DataBindingSource source, String filter, List whiteList, List blackList, DataBindingListener listener, errors) {
-        println "==============bind3"
         BeanPropertyBindingResult bindingResult = (BeanPropertyBindingResult)errors
         def errorHandlingListener = new GrailsWebDataBindingListener(messageSource)
 
@@ -112,12 +107,10 @@ class OpenBoxesDataBinder  extends OpenBoxesSimpleDataBinder {
 
     @Override
     void bind(obj, GPathResult gpath) {
-        println "==============bind4"
         bind obj, new SimpleMapDataBindingSource(new GPathResultMap(gpath)), getBindingIncludeList(obj)
     }
 
     protected populateErrors(obj, BindingResult bindingResult) {
-        println "==============populateErrors"
         PersistentEntity domain = getPersistentEntity(obj.getClass())
 
         if (domain != null && bindingResult != null) {
@@ -158,7 +151,6 @@ class OpenBoxesDataBinder  extends OpenBoxesSimpleDataBinder {
 
     @Override
     protected Class<?> getReferencedTypeForCollection(String name, Object target) {
-        println "==============getReferencedTypeForCollection"
         def referencedType = super.getReferencedTypeForCollection(name, target)
         if (referencedType == null) {
             PersistentEntity dc = getPersistentEntity(target.getClass())
@@ -185,7 +177,6 @@ class OpenBoxesDataBinder  extends OpenBoxesSimpleDataBinder {
 
     @Override
     protected initializeProperty(obj, String propName, Class propertyType, DataBindingSource source) {
-        println "==============initializeProperty"
         def isInitialized = false
         if(source.dataSourceAware) {
             def isDomainClass = isDomainClass propertyType
@@ -207,7 +198,6 @@ class OpenBoxesDataBinder  extends OpenBoxesSimpleDataBinder {
     }
 
     protected getPersistentInstance(Class<?> type, id) {
-        println "==============getPersistentInstance"
         try {
             InvokerHelper.invokeStaticMethod type, 'get', id
         } catch (Exception exc) {}
@@ -251,7 +241,6 @@ class OpenBoxesDataBinder  extends OpenBoxesSimpleDataBinder {
 
     @Override
     protected processProperty(obj, MetaProperty metaProperty, val, DataBindingSource source, DataBindingListener listener, errors) {
-        println "==============processProperty"
         boolean needsBinding = true
 
         if (source.dataSourceAware) {
@@ -369,7 +358,6 @@ class OpenBoxesDataBinder  extends OpenBoxesSimpleDataBinder {
     protected processIndexedProperty(obj, MetaProperty metaProperty, IndexedPropertyReferenceDescriptor indexedPropertyReferenceDescriptor, val,
                                      DataBindingSource source, DataBindingListener listener, errors) {
 
-        println "==============processIndexedProperty"
         boolean needsBinding = true
         if (source.dataSourceAware) {
             def propName = indexedPropertyReferenceDescriptor.propertyName
@@ -466,7 +454,6 @@ class OpenBoxesDataBinder  extends OpenBoxesSimpleDataBinder {
 
     @Override
     protected addElementToCollectionAt(obj, String propertyName, Collection collection, index, val) {
-        println "==============addElementToCollectionAt"
         super.addElementToCollectionAt obj, propertyName, collection, index, val
 
         def domainClass = getPersistentEntity(obj.getClass())
@@ -506,7 +493,6 @@ class OpenBoxesDataBinder  extends OpenBoxesSimpleDataBinder {
 
     @Override
     protected setPropertyValue(obj, DataBindingSource source, MetaProperty metaProperty, propertyValue, DataBindingListener listener) {
-        println "==============setPropertyValue"
         def propName = metaProperty.name
         boolean isSet = false
         def domainClass = getPersistentEntity(obj.getClass())
@@ -558,7 +544,6 @@ class OpenBoxesDataBinder  extends OpenBoxesSimpleDataBinder {
 
     @Override
     protected preprocessValue(propertyValue) {
-        println "==============preprocessValue"
         if(propertyValue instanceof CharSequence) {
             String stringValue = propertyValue.toString()
             if (trimStrings) {
