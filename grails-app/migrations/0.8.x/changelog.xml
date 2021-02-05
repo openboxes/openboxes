@@ -98,4 +98,5 @@
     <include file="0.8.x/changelog-2021-01-29-1221-create-table-preference-type.xml"/>
     <include file="0.8.x/changelog-2021-01-30-1530-alter-table-document-change-file-uri-column-type.xml"/>
     <include file="0.8.x/changelog-2021-02-02-1300-alter-table-product-supplier-add-column-product-price.xml"/>
+    <include file="0.8.x/changelog-2021-02-04-1530-create-table-product-type-supported-activities.xml"/>
 </databaseChangeLog>

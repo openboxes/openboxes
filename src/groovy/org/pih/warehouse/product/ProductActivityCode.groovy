@@ -9,18 +9,13 @@
  **/
 package org.pih.warehouse.product
 
-class ProductType {
-
-    String name
-    ProductTypeCode productTypeCode
-
-    Date dateCreated
-    Date lastUpdated
-
-    static hasMany = [supportedActivities: ProductActivityCode]
-
-    static constraints = {
-        name(blank: false)
-        productTypeCode(nullable: false)
-    }
+enum ProductActivityCode {
+    SEARCHABLE,
+    SEARCHABLE_NO_STOCK,
+    SUBSTITUTABLE,
+    STOCK_LEVEL,
+    TAGGABLE,
+    CATALOGABLE,
+    STOCKLISTABLE,
+    DOCUMENTABLE
 }
