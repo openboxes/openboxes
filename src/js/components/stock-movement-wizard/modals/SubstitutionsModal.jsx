@@ -57,7 +57,7 @@ const FIELDS = {
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
         headerAlign: 'left',
-        flexWidth: '9.5',
+        flexWidth: '6',
         attributes: {
           async: true,
           openOnClick: false,
@@ -83,6 +83,14 @@ const FIELDS = {
               {renderHandlingIcons(option ? option.handlingIcons : [])}
             </span>
           ),
+          formatValue: value => (
+            <span className="d-flex">
+              <span className="text-truncate">
+                {value.name || ''}
+              </span>
+              {renderHandlingIcons(value ? value.handlingIcons : null)}
+            </span>
+          ),
         },
         getDynamicAttr: ({
           fieldValue, debouncedProductsFetch,
@@ -95,6 +103,7 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.expiry.label',
         defaultMessage: 'Expiry',
+        flexWidth: '2',
         attributes: {
           showValueTooltip: true,
         },
@@ -103,7 +112,7 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.quantityAvailable.label',
         defaultMessage: 'Qty Available',
-        fixedWidth: '150px',
+        flexWidth: '2',
         fieldKey: '',
         attributes: {
           // eslint-disable-next-line no-nested-ternary
@@ -122,7 +131,7 @@ const FIELDS = {
         type: TextField,
         label: 'react.stockMovement.quantitySelected.label',
         defaultMessage: 'Quantity selected',
-        fixedWidth: '140px',
+        flexWidth: '2',
         attributes: {
           type: 'number',
         },
