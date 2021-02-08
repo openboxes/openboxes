@@ -6,7 +6,6 @@
     box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.09);
 
     .steps {
-        max-width: 80%;
         margin: auto;
         flex: 1;
         justify-content: space-evenly;
@@ -28,7 +27,7 @@
 
                 // Icons
                 .fa {
-                    font-size: 30px !important;
+                    font-size: 20px !important;
                 }
 
                 .fa-check-circle-o {
@@ -45,7 +44,7 @@
 
                 .step-text {
                     position: absolute;
-                    top: 30px;
+                    top: 20px;
                     font-size: small;
                     white-space: nowrap;
                 }
