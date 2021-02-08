@@ -47,7 +47,10 @@ const SHIPMENT_FIELDS = {
     defaultMessage: 'Delivered on',
     type: params => <DateField {...params} />,
     attributes: {
-      disabled: true,
+      dateFormat: 'MM/DD/YYYY HH:mm Z',
+      required: true,
+      showTimeSelect: true,
+      autoComplete: 'off',
     },
   },
 };
