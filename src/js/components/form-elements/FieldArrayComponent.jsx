@@ -119,7 +119,10 @@ class FieldArrayComponent extends Component {
                       hideDelay="50"
                     >
                       <div
-                        className={`mx-2 text-truncate font-size-xs ${config.required ? 'required' : ''}`}
+                        className={`mx-2 text-truncate ${config.required ? 'required' : ''}`}
+                        style={{
+                          fontSize: fieldsConfig.headerFontSize ? fieldsConfig.headerFontSize : '0.875rem',
+                        }}
                       >{config.label &&
                       <Translate id={config.label} defaultMessage={config.defaultMessage} />}
                       </div>
