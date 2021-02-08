@@ -18,6 +18,8 @@
 
             <th><g:message code="productSupplier.manufacturerCode.label" default="Manufacturer Code" /></th>
 
+            <th><g:message code="productSupplier.preferenceTypeCode.label" default="Product Supplier Preference" /></th>
+
             <th><g:message code="productSupplier.minOrderQuantity.label" default="Minimum Order Quantity" /></th>
 
             <th><g:message code="package.packSize.label" default="Pack Size" /></th>
@@ -34,6 +36,8 @@
 
                 <g:each var="productSupplier" in="${productInstance?.productSuppliers.sort()}" status="status">
                     <g:set var="defaultProductPackage" value="${productSupplier.defaultProductPackage}"/>
+                    <g:set var="defaultPreference" value="${productSupplier.productSupplierPreferences.find { it.destinationParty == currentLocation.organization }}"/>
+                    <g:set var="globalPreference" value="${productSupplier.productSupplierPreferences.find { !it.destinationParty }}"/>
                     <tr class="prop ${status%2==0?'odd':'even'}">
 
                         <td>${fieldValue(bean: productSupplier, field: "code")?:g.message(code:'default.none.label')}</td>
@@ -47,6 +51,15 @@
                         <td>${fieldValue(bean: productSupplier, field: "manufacturer")}</td>
 
                         <td>${fieldValue(bean: productSupplier, field: "manufacturerCode")}</td>
+
+                        <td>
+                            <g:if test="${defaultPreference}">
+                                ${fieldValue(bean: defaultPreference?.preferenceType, field: "name")}
+                            </g:if>
+                            <g:elseif test="${globalPreference}">
+                                ${fieldValue(bean: globalPreference?.preferenceType, field: "name")}
+                            </g:elseif>
+                        </td>
 
                         <td>${fieldValue(bean: productSupplier, field: "minOrderQuantity")}</td>
 

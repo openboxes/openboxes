@@ -231,9 +231,9 @@ class InventoryItemController {
     def showSuppliers = {
 
         def productInstance = Product.get(params.id)
+        Location currentLocation = Location.get(session?.warehouse?.id)
 
-
-        render(template: "showSuppliers", model: [productInstance: productInstance])
+        render(template: "showSuppliers", model: [productInstance: productInstance, currentLocation: currentLocation])
     }
 
 
