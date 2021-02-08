@@ -70,7 +70,7 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
 
     static transients = ["defaultProductPackage"]
 
-    static hasMany = [productPackages: ProductPackage]
+    static hasMany = [productPackages: ProductPackage, productSupplierPreferences: ProductSupplierPreference]
 
     static mapping = {
         description type: 'text'
