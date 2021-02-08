@@ -18,8 +18,6 @@
 
             <th><g:message code="productSupplier.manufacturerCode.label" default="Manufacturer Code" /></th>
 
-            <th><g:message code="productSupplier.preferenceTypeCode.label" default="Preference Type" /></th>
-
             <th><g:message code="productSupplier.minOrderQuantity.label" default="Minimum Order Quantity" /></th>
 
             <th><g:message code="package.packSize.label" default="Pack Size" /></th>
@@ -49,8 +47,6 @@
                         <td>${fieldValue(bean: productSupplier, field: "manufacturer")}</td>
 
                         <td>${fieldValue(bean: productSupplier, field: "manufacturerCode")}</td>
-
-                        <td>${fieldValue(bean: productSupplier, field: "preferenceTypeCode")}</td>
 
                         <td>${fieldValue(bean: productSupplier, field: "minOrderQuantity")}</td>
 

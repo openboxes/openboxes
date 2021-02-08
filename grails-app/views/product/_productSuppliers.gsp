@@ -20,8 +20,6 @@
 
             <th><g:message code="productSupplier.manufacturerCode.label" default="Manufacturer Code" /></th>
 
-            <th><g:message code="productSupplier.preferenceTypeCode.label" default="Preference Type" /></th>
-
             <th><g:message code="productSupplier.ratingTypeCode.label" default="Rating Type" /></th>
 
             <th><g:message code="unitOfMeasure.label" default="Unit of Measure" /></th>
@@ -52,8 +50,6 @@
                             <td>${fieldValue(bean: productSupplier, field: "manufacturer")}</td>
 
                             <td>${fieldValue(bean: productSupplier, field: "manufacturerCode")}</td>
-
-                            <td>${fieldValue(bean: productSupplier, field: "preferenceTypeCode")}</td>
 
                             <td>${fieldValue(bean: productSupplier, field: "ratingTypeCode")}</td>
 

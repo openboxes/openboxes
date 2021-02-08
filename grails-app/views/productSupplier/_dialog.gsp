@@ -100,17 +100,6 @@
                 </tr>
                 <tr class="prop">
                     <td class="name">
-                        <label for="preferenceTypeCode"><warehouse:message code="productSupplier.preferenceTypeCode.label"/></label>
-                    </td>
-                    <td class="value ">
-                        <g:selectPreferenceType name="preferenceTypeCode"
-                                                noSelection="['':'']"
-                                                value="${productSupplier?.preferenceTypeCode}"
-                                                class="chzn-select-deselect"/>
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td class="name">
                         <label for="ratingTypeCode"><warehouse:message code="productSupplier.ratingTypeCode.label"/></label>
                     </td>
                     <td class="value ">

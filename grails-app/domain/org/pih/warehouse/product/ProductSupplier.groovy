@@ -47,9 +47,6 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
     String supplierCode        // Supplier's product code
     String supplierName        // Supplier's alternative product name
 
-    // Indicates whether the supplier product is preferred
-    PreferenceTypeCode preferenceTypeCode
-
     // Rating assigned to the supplier product
     RatingTypeCode ratingTypeCode
 
@@ -99,7 +96,6 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
         standardLeadTimeDays(nullable: true)
         minOrderQuantity(nullable: true)
         ratingTypeCode(nullable: true)
-        preferenceTypeCode(nullable: true)
         comments(nullable: true)
 
         contractPrice(nullable: true)
@@ -111,10 +107,9 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
 
 
     int compareTo(ProductSupplier obj) {
-        return preferenceTypeCode <=> obj.preferenceTypeCode ?:
-                ratingTypeCode <=> obj.ratingTypeCode ?:
-                        dateCreated <=> obj.dateCreated ?:
-                                id <=> obj.id
+        return ratingTypeCode <=> obj.ratingTypeCode ?:
+                dateCreated <=> obj.dateCreated ?:
+                        id <=> obj.id
     }
 
     static PROPERTIES = [
@@ -136,7 +131,6 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
             "defaultProductPackageQuantity": "defaultProductPackage.quantity",
             "defaultProductPackagePrice"   : "defaultProductPackage.price",
             "standardLeadTimeDays"         : "standardLeadTimeDays",
-            "preferenceTypeCode"           : "preferenceTypeCode",
             "ratingTypeCode"               : "ratingTypeCode",
             "comments"                     : "comments"
     ]

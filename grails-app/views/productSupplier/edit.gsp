@@ -90,19 +90,6 @@
 								</td>
 							</tr>
 
-							<tr class="prop">
-								<td valign="top" class="name">
-									<label for="preferenceTypeCode"><warehouse:message code="productSupplier.preferenceTypeCode.label" default="Preference Type Code" /></label>
-								</td>
-								<td valign="top" class="value ${hasErrors(bean: productSupplierInstance, field: 'preferenceTypeCode', 'errors')}">
-									<g:select class="chzn-select-deselect" name="preferenceTypeCode"
-                                              from="${org.pih.warehouse.core.PreferenceTypeCode?.values()}"
-                                              value="${productSupplierInstance?.preferenceTypeCode}" noSelection="['': '']" />
-								</td>
-							</tr>
-
-
-
 						<tr class="prop">
 								<td valign="top" class="name">
 								  <label for="upc"><warehouse:message code="productSupplier.upc.label" default="Upc" /></label>
