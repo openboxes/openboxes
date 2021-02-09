@@ -6,6 +6,7 @@ import React, { Component } from 'react';
 import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
 import { connect } from 'react-redux';
+import moment from 'moment';
 import { hideSpinner, showSpinner } from '../../actions';
 import apiClient, { flattenRequest, parseResponse } from '../../utils/apiClient';
 import { renderFormField } from '../../utils/form-utils';
@@ -176,9 +177,13 @@ const TABLE_FIELDS = {
 function validate(values) {
   const errors = {};
   errors.containers = [];
+  const dateDelivered = moment(values.dateDelivered, 'MM/DD/YYYY');
 
   if (!values.dateDelivered) {
     errors.dateDelivered = 'react.default.error.requiredField.label';
+  }
+  if (moment().diff(dateDelivered) < 0) {
+    errors.dateDelivered = 'react.partialReceiving.error.futureDate.label';
   }
   _.forEach(values.containers, (container, key) => {
     errors.containers[key] = { shipmentItems: [] };
