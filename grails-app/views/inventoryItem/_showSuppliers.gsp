@@ -1,6 +1,37 @@
+<%@ page import="org.pih.warehouse.core.ValidationCode" %>
+<html>
+<head>
+    <style>
+        .show-all {
+            right: 5px;
+            position: absolute;
+            top: 8px;
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            $('.show-all').on('click', function () {
+                var showAllElement = $('#show-all');
+                var showAllNewValue = showAllElement.val() === "true" ? "false" : "true";
+                if (showAllNewValue === "true") {
+                  $(".preference-hide").removeClass("hidden");
+                } else {
+                  $(".preference-hide").addClass("hidden");
+                }
+                showAllElement.val(showAllNewValue).trigger("change");
+            });
+        });
+    </script>
+</head>
+</html>
 <div class="box">
     <h2>
-        <warehouse:message code="product.sources.label" default="Product Sources"/>
+        <div>
+            <warehouse:message code="product.sources.label" default="Product Sources"/>
+            <div class="show-all button">
+                ${warehouse.message(code: 'default.showAll.label')}
+            </div>
+        </div>
     </h2>
 
     <div class="dialog">
@@ -33,12 +64,16 @@
             </thead>
             <tbody>
             <g:if test="${productInstance?.productSuppliers}">
+                <g:hiddenField id="show-all" name="show-all" value="false" />
 
                 <g:each var="productSupplier" in="${productInstance?.productSuppliers.sort()}" status="status">
                     <g:set var="defaultProductPackage" value="${productSupplier.defaultProductPackage}"/>
                     <g:set var="defaultPreference" value="${productSupplier.productSupplierPreferences.find { it.destinationParty == currentLocation.organization }}"/>
                     <g:set var="globalPreference" value="${productSupplier.productSupplierPreferences.find { !it.destinationParty }}"/>
-                    <tr class="prop ${status%2==0?'odd':'even'}">
+                    <tr class="prop ${status%2==0?'odd':'even'}
+                        ${defaultPreference?.preferenceType?.validationCode == org.pih.warehouse.core.ValidationCode.HIDE ||
+                            (defaultPreference?.preferenceType?.validationCode != org.pih.warehouse.core.ValidationCode.HIDE &&
+                                globalPreference?.preferenceType?.validationCode == org.pih.warehouse.core.ValidationCode.HIDE) ? 'preference-hide hidden' : '' }">
 
                         <td>${fieldValue(bean: productSupplier, field: "code")?:g.message(code:'default.none.label')}</td>
 
