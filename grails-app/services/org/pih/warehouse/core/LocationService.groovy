@@ -363,18 +363,21 @@ class LocationService {
                         binLocation.locationNumber = it.name
                         binLocation.parentLocation = location
                         binLocation.locationType = defaultLocationType
-                        location.addToLocations(binLocation)
+                        if (binLocation.validate()) {
+                            location.addToLocations(binLocation)
+                        }
+                        log.info "Errors " + binLocation.errors
                     } else {
                         log.info "Bin location ${it.name} already exists"
                     }
                 }
                 location.save()
-
+                log.info "Errors " + location.errors
             } else {
                 throw new ValidationException("location.cannotImportEmptyBinLocations.message")
             }
         } catch (Exception e) {
-            log.error("Unable to bin locations due to exception: " + e.message, e)
+            log.error("Unable to save bin locations due to exception: " + e.message)
             throw new RuntimeException(e.message)
         }
         finally {
