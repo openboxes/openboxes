@@ -1439,7 +1439,7 @@ class ShipmentService {
 
         // Associate the incoming transaction with the shipment
         shipment.addToIncomingTransactions(creditTransaction)
-        shipment.save(flush: true)
+        shipment.save()
 
         return creditTransaction
     }
