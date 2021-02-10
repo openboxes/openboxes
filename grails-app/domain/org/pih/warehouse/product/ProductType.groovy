@@ -11,6 +11,7 @@ package org.pih.warehouse.product
 
 class ProductType {
 
+    String id
     String name
     ProductTypeCode productTypeCode
 
