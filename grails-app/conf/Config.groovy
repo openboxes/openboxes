@@ -1135,7 +1135,8 @@ openboxes {
                         [label: "categories.label", defaultLabel: "Categories", href: "/${appName}/category/tree"],
                         [label: "product.components.label", defaultLabel: "Components", href: "/${appName}/productComponent/list"],
                         [label: "productGroups.label", defaultLabel: "Generic Products", href: "/${appName}/productGroup/list"],
-                        [label: "inventoryLevels.label", defaultLabel: "Inventory Levels", href: "/${appName}/inventoryLevel/list"]
+                        [label: "inventoryLevels.label", defaultLabel: "Inventory Levels", href: "/${appName}/inventoryLevel/list"],
+                        [label: "productType.label", defaultLabel: "Product Type", href: "/${appName}/productType/list", requiredRole: RoleType.ROLE_SUPERUSER]
                     ]
                 ],
                 [

@@ -464,6 +464,12 @@
                             <g:link controller="inventoryLevel" action="list" class="site">
                                 <warehouse:message code="inventoryLevels.label" default="Inventory Levels" /></g:link>
                         </div>
+                        <g:isSuperuser>
+                            <div class="mm-menu-item">
+                                <g:link controller="productType" action="list" class="site">
+                                    <warehouse:message code="productType.label" default="ProductType" /></g:link>
+                            </div>
+                        </g:isSuperuser>
                     </div>
                     <div class="mm-content-section">
                         <div class="mm-menu-item">
