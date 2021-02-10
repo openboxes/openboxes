@@ -49,8 +49,6 @@
 
                                 <th><g:message code="productSupplier.ratingTypeCode.label" default="Rating Type" /></th>
 
-                                <th><g:message code="productSupplier.preferenceTypeCode.label" default="Preference Type" /></th>
-
                                 <th><g:message code="productSupplier.unitOfMeasure.label" default="Unit of Measure" /></th>
 
                                 <th><g:message code="productSupplier.unitPrice.label" default="Unit Price" /></th>
@@ -89,8 +87,6 @@
                                 <td>${fieldValue(bean: productSupplierInstance, field: "manufacturer")}</td>
 
                                 <td>${fieldValue(bean: productSupplierInstance, field: "ratingTypeCode")}</td>
-
-                                <td>${fieldValue(bean: productSupplierInstance, field: "preferenceTypeCode")}</td>
 
                                 <td>
                                     ${fieldValue(bean: productSupplierInstance?.defaultProductPackage?.uom, field: "code")}/${fieldValue(bean: productSupplierInstance?.defaultProductPackage, field: "quantity")}

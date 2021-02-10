@@ -550,7 +550,6 @@ class MigrationService {
         productSupplier.brandName = product.brandName
         productSupplier.modelNumber = product.modelNumber
         productSupplier.ratingTypeCode = RatingTypeCode.NOT_RATED
-        productSupplier.preferenceTypeCode = PreferenceTypeCode.NOT_PREFERRED
 
         if (!ProductSupplier.find(productSupplier)) {
             // To ensure that we can find the product supplier using the finder above we needed to
