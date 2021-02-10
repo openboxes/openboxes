@@ -275,11 +275,7 @@ class OrderService {
         if (!order.originParty) {
             order.originParty = order?.origin?.organization
         }
-
-        if (!order.destinationParty) {
-            order.destinationParty = order?.destination?.organization
-        }
-
+        
         if (!order.orderNumber) {
             IdentifierGeneratorTypeCode identifierGeneratorTypeCode =
                     ConfigurationHolder.config.openboxes.identifier.purchaseOrder.generatorType
