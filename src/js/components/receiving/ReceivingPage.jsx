@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
+import moment from 'moment';
 import { fetchTranslations, hideSpinner, showSpinner } from '../../actions';
 import apiClient, { parseResponse } from '../../utils/apiClient';
 import { translateWithDefaultMessage } from '../../utils/Translate';
@@ -69,8 +70,42 @@ class ReceivingPage extends Component {
    */
   getWizardTitle() {
     const { formData } = this.state;
-    const newName = formData.shipment ? `${formData.shipment.shipmentNumber} - ${formData.shipment.name}` : null;
-    return newName;
+    if (!formData.shipment) {
+      return '';
+    }
+    const dateShipped = moment(formData.dateShipped).format('MM/DD/YYYY');
+    return [
+      {
+        text: 'Receiving',
+        color: '#000000',
+        delimeter: ' | ',
+      },
+      {
+        text: formData.shipment.shipmentNumber,
+        color: '#000000',
+        delimeter: ' - ',
+      },
+      {
+        text: formData.origin.name,
+        color: '#004d40',
+        delimeter: ' to ',
+      },
+      {
+        text: formData.destination.name,
+        color: '#01579b',
+        delimeter: ', ',
+      },
+      {
+        text: dateShipped,
+        color: '#4a148c',
+        delimeter: ', ',
+      },
+      {
+        text: formData.description,
+        color: '#770838',
+        delimeter: '',
+      },
+    ];
   }
 
   dataFetched = false;

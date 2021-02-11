@@ -1,4 +1,3 @@
-import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { getTranslate } from 'react-localize-redux';
@@ -68,23 +67,41 @@ class StockMovementCombinedShipments extends Component {
 
   getWizardTitle() {
     const { values } = this.state;
-    let newName = '';
     if (!values.movementNumber && !values.trackingNumber) {
       return '';
     }
-    if (values.movementNumber && values.name && !values.trackingNumber) {
-      newName = values.description;
-    }
-    if (values.trackingNumber) {
-      const {
-        origin, destination, dateShipped, stocklist, trackingNumber, description,
-      } = values;
-      const stocklistPart = stocklist && stocklist.name ? `${stocklist.name}.` : '';
-      const dateReq = moment(dateShipped, 'MM/DD/YYYY').format('DDMMMYYYY');
-      newName = `${origin.name}.${destination.name}.${dateReq}.${stocklistPart}${trackingNumber}.${description}`;
-      newName.replace(/ /gi, '');
-    }
-    return `${values.movementNumber} - ${newName}`;
+    return [
+      {
+        text: 'Stock Movement',
+        color: '#000000',
+        delimeter: ' | ',
+      },
+      {
+        text: values.movementNumber,
+        color: '#000000',
+        delimeter: ' - ',
+      },
+      {
+        text: values.origin.name,
+        color: '#004d40',
+        delimeter: ' to ',
+      },
+      {
+        text: values.destination.name,
+        color: '#01579b',
+        delimeter: ', ',
+      },
+      {
+        text: values.dateRequested,
+        color: '#4a148c',
+        delimeter: ', ',
+      },
+      {
+        text: values.description,
+        color: '#770838',
+        delimeter: '',
+      },
+    ];
   }
 
   getAdditionalWizardTitle() {
