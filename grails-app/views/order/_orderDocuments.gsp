@@ -55,8 +55,8 @@
                                 ${documentInstance.name}
                             </a>
                         </td>
-                        <td>
-                            <a href="${documentInstance.fileUri}" target="_blank">
+                        <td style="width: 80%;">
+                            <a href="${documentInstance.fileUri}" target="_blank" style="word-break:break-all;">
                                 ${documentInstance.fileUri}
                             </a>
                         </td>
