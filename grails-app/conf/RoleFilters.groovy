@@ -33,6 +33,7 @@ class RoleFilters {
             'inventory'       : ['createInboundTransfer', 'createOutboundTransfer', 'createConsumed', 'editTransaction', 'deleteTransaction', 'saveTransaction'],
             'inventoryItem'   : ['adjustStock', 'transferStock'],
             'productCatalog'  : ['create', 'importProductCatalog'],
+            'productType'     : ['edit', 'delete', 'save', 'update'],
             'transactionEntry': ['edit', 'delete', 'save', 'update'],
             'user'            : ['impersonate']
     ]

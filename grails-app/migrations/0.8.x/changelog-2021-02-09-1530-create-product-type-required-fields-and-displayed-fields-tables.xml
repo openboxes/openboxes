@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="pmuchowski" id="0902202115300-0">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="product_type" columnName="product_identifier_format"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="product_type">
+      <column name="product_identifier_format" type="VARCHAR(255)"/>
+    </addColumn>
+  </changeSet>
+  <changeSet author="pmuchowski" id="0902202115300-1">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="product_type_required_fields"/>
+      </not>
+    </preConditions>
+    <createTable tableName="product_type_required_fields">
+      <column name="product_type_id" type="CHAR(38)"/>
+      <column name="product_field" type="VARCHAR(255)"/>
+    </createTable>
+  </changeSet>
+  <changeSet author="pmuchowski" id="0902202115300-2">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_product_type_required_fields_product_type"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="product_type_id"
+      baseTableName="product_type_required_fields"
+      constraintName="fk_product_type_required_fields_product_type" deferrable="false"
+      initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product_type"/>
+  </changeSet>
+  <changeSet author="pmuchowski" id="0902202115300-3">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="product_type_displayed_fields"/>
+      </not>
+    </preConditions>
+    <createTable tableName="product_type_displayed_fields">
+      <column name="product_type_id" type="CHAR(38)"/>
+      <column name="product_field" type="VARCHAR(255)"/>
+    </createTable>
+  </changeSet>
+  <changeSet author="pmuchowski" id="0902202115300-4">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_product_type_displayed_fields_product_type"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="product_type_id"
+      baseTableName="product_type_displayed_fields"
+      constraintName="fk_product_type_displayed_fields_product_type" deferrable="false"
+      initiallyDeferred="false" referencedColumnNames="id" referencedTableName="product_type"/>
+  </changeSet>
+</databaseChangeLog>
