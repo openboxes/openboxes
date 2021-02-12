@@ -6,6 +6,6 @@ class DashboardPage extends Page {
     static url = "/"
 
     static at = {
-        title == 'Dashboard'
+        $(".card-component").find(".number-card").size() == 4
     }
 }

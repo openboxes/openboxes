@@ -3,7 +3,7 @@ package org.pih.warehouse.page
 import geb.Page
 
 class ChooseLocationPage extends Page {
-    static url = "/dashboard/chooseLocation"
+    static url = "dashboard/chooseLocation"
 
     static at = {
         title == 'Choose Location'
