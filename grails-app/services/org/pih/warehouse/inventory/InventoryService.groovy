@@ -1703,6 +1703,14 @@ class InventoryService implements ApplicationContextAware {
                 inventoryItem { inList("product", products) }
             }
         }
+        transactionEntries.each {
+            log.info "${it.transaction.transactionDate} " +
+                    "${it.transaction.transactionNumber} " +
+                    "${it.transaction.transactionType.transactionCode} " +
+                    "${it.inventoryItem?.product?.productCode} " +
+                    "${it.quantity}"
+        }
+
         return transactionEntries
     }
 

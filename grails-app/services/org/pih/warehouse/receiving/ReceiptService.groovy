@@ -21,6 +21,7 @@ import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.inventory.TransactionEvent
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
@@ -31,6 +32,7 @@ class ReceiptService {
 
     boolean transactional = true
 
+    def sessionFactory
     def shipmentService
     def inventoryService
     def locationService
@@ -262,19 +264,13 @@ class ReceiptService {
     }
 
     void saveAndCompletePartialReceipt(PartialReceipt partialReceipt) {
-        Receipt.withTransaction { status ->
-            try {
-                // Create receipt, event, and transaction
-                savePartialReceipt(partialReceipt, true)
-                savePartialReceiptEvent(partialReceipt)
-                saveInboundTransaction(partialReceipt)
-                // Send notification email on completed receiving
-                notificationService.sendReceiptNotifications(partialReceipt)
-            } catch (Exception e) {
-                log.error "An unexpected error occurred during receipt: " + e.message, e
-                throw e;
-            }
-        }
+        // Create receipt, event, and transaction
+        savePartialReceipt(partialReceipt, true)
+        savePartialReceiptEvent(partialReceipt)
+        saveInboundTransaction(partialReceipt)
+
+        // Send notification email on completed receiving
+        notificationService.sendReceiptNotifications(partialReceipt)
     }
 
     void savePartialReceiptEvent(PartialReceipt partialReceipt) {
@@ -300,11 +296,11 @@ class ReceiptService {
         }
     }
 
-    void saveInboundTransaction(PartialReceipt partialReceipt) {
+    Transaction saveInboundTransaction(PartialReceipt partialReceipt) {
         Shipment shipment = partialReceipt.shipment
         if (shipment) {
-            createInboundTransaction(partialReceipt)
-            grailsApplication.mainContext.publishEvent(new ShipmentStatusTransitionEvent(shipment, ShipmentStatusCode.RECEIVED))
+            return createInboundTransaction(partialReceipt)
+            //grailsApplication.mainContext.publishEvent(new ShipmentStatusTransitionEvent(shipment, ShipmentStatusCode.RECEIVED))
         }
     }
 
@@ -355,6 +351,8 @@ class ReceiptService {
             transactionEntry.quantity = it.quantityReceived
             transactionEntry.binLocation = it.binLocation
             transactionEntry.inventoryItem = inventoryItem
+            transactionEntry.product = it.product
+            transactionEntry.transaction = creditTransaction
             creditTransaction.addToTransactionEntries(transactionEntry)
         }
 
@@ -363,9 +361,16 @@ class ReceiptService {
             throw new ValidationException("Failed to receive shipment due to error while saving transaction", creditTransaction.errors)
         }
 
+
+
         // Associate the incoming transaction with the shipment
         shipment.addToIncomingTransactions(creditTransaction)
-        shipment.save(flush: true)
+        shipment.save()
+
+        sessionFactory.currentSession.flush()
+        sessionFactory.currentSession.clear()
+
+        grailsApplication.mainContext.publishEvent(new TransactionEvent(creditTransaction))
 
         return creditTransaction
     }

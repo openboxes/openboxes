@@ -51,7 +51,7 @@ class Transaction implements Comparable, Serializable {
     }
 
     def publishSaveEvent = {
-        publishEvent(new TransactionEvent(this, forceRefresh, getAssociatedProducts(), getAssociatedLocation()))
+        //publishEvent(new TransactionEvent(this, forceRefresh, getAssociatedProducts(), getAssociatedLocation()))
     }
 
     def publishDeleteEvent = {

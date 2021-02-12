@@ -25,13 +25,11 @@ class TransactionEventService implements ApplicationListener<TransactionEvent> {
         def productIds = event.associatedProducts
         Boolean forceRefresh = event.forceRefresh
 
-        log.info "Refresh product availability records for " +
-                "location=$location.id, " +
-                "transactionId=$transaction.id," +
-                "transactionDate=$transaction.transactionDate," +
-                "transactionNumber=$transaction.transactionNumber," +
-                "productIds=$productIds, " +
-                "forceRefresh=$forceRefresh"
+        log.info "Refresh product availability " +
+                "locationId=${location?.id}, " +
+                "transactionId=${transaction?.id}," +
+                "transactionDate=${transaction.transactionDate}, " +
+                "transactionNumber=${transaction?.transactionNumber}," +
 
         // FIXME Hack to allow the transaction to be persisted to the database. Otherwise, the
         // RefreshProductAvailabilityJob calculates product availability on all transactions
@@ -51,12 +49,13 @@ class TransactionEventService implements ApplicationListener<TransactionEvent> {
             def delayInMilliseconds = delayStart ?
                     grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayInMilliseconds : 0
             Date runAt = new Date() + delayInMilliseconds.milliseconds
+            log.info "Refresh product availability at ${runAt} (delayStart: ${delayStart}, delayInMs: ${delayInMilliseconds})"
             RefreshProductAvailabilityJob.schedule(runAt, [
                     locationId  : location?.id,
                     productIds  : productIds,
                     forceRefresh: forceRefresh
             ])
         }
-
+        log.info "Application event $event has completed!"
     }
 }

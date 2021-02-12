@@ -19,6 +19,9 @@ class TransactionEvent extends ApplicationEvent {
 
     TransactionEvent(Transaction source) {
         super(source)
+        this.forceRefresh = false
+        this.associatedProducts = source.associatedProducts
+        this.associatedLocation = source.associatedLocation
     }
 
     TransactionEvent(Transaction source, Boolean forceRefresh, List associatedProducts, String associatedLocation) {
