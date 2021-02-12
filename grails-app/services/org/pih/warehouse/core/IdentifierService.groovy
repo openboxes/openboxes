@@ -85,6 +85,14 @@ class IdentifierService {
         return generateIdentifier(grailsApplication.config.openboxes.identifier.purchaseOrder.format)
     }
 
+    def generateProductIdentifier(String format) {
+        if (StringUtils.isNotBlank(format)) {
+            return generateIdentifier(format)
+        }
+
+        return generateIdentifier(grailsApplication.config.openboxes.identifier.product.format)
+    }
+
     def generateProductIdentifier() {
         return generateIdentifier(grailsApplication.config.openboxes.identifier.product.format)
     }

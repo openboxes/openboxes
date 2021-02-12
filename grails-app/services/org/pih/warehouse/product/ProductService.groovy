@@ -14,14 +14,12 @@ import groovy.xml.Namespace
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
-import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
 import util.ReportUtil
 
 import java.text.SimpleDateFormat
-
 /**
  * @author jmiranda*
  */
@@ -959,11 +957,11 @@ class ProductService {
      *
      * @return
      */
-    def generateProductIdentifier() {
+    def generateProductIdentifier(ProductType productType) {
         def productCode
 
         try {
-            productCode = identifierService.generateProductIdentifier()
+            productCode = identifierService.generateProductIdentifier(productType?.productIdentifierFormat)
             if (validateProductIdentifier(productCode)) {
                 return productCode
             }
@@ -972,6 +970,10 @@ class ProductService {
             log.warn("Error generating unique product code " + e.message, e)
         }
         return productCode
+    }
+
+    def generateProductIdentifier() {
+        return generateProductIdentifier(null)
     }
 
     /**
@@ -995,7 +997,7 @@ class ProductService {
         if (product) {
             // Generate product code if it doesn't already exist
             if (!product.productCode) {
-                product.productCode = generateProductIdentifier()
+                product.productCode = generateProductIdentifier(product.productType)
             }
             // Handle tags
             try {
