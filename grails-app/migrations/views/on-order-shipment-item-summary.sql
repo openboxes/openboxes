@@ -15,12 +15,17 @@ FROM
 	product on product.id = shipment_item.product_id
         JOIN
     shipment ON shipment.id = shipment_item.shipment_id
+        JOIN
+    location on location.id = shipment.destination_id
+        JOIN
+    location_type on location.location_type_id = location_type.id
         LEFT OUTER JOIN
-    receipt_item ON shipment_item.id = receipt_item.shipment_item_id AND shipment_item.product_id = receipt_item.product_id
+    receipt_item ON shipment_item.id = receipt_item.shipment_item_id
         LEFT OUTER JOIN
     receipt ON receipt.id = receipt_item.receipt_id
 WHERE
     shipment.current_status IN (NULL, 'SHIPPED' , 'PARTIALLY_RECEIVED')
+    AND location_type.location_type_code = 'DEPOT'
 GROUP BY product.product_code, product.name, shipment_item.id, shipment.destination_id) c
 WHERE c.quantity_received + c.quantity_canceled < c.quantity_shipped
 GROUP BY product_code, name, destination_id
