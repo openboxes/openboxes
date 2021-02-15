@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="awalkowiak" id="1202202110300-0">
+    <preConditions onFail="MARK_RAN">
+      <and>
+        <tableExists tableName="preference_type" />
+        <sqlCheck expectedResult="0">
+          SELECT COUNT(*) FROM preference_type
+        </sqlCheck>
+      </and>
+    </preConditions>
+    <sql>
+      INSERT INTO preference_type (id, name, validation_code, date_created, last_updated, version) VALUES ('1', 'Preferred', 'DEFAULT', current_timestamp, current_timestamp, '0');
+      INSERT INTO preference_type (id, name, validation_code, date_created, last_updated, version) VALUES ('2', 'Approved', 'DEFAULT', current_timestamp, current_timestamp, '0');
+      INSERT INTO preference_type (id, name, validation_code, date_created, last_updated, version) VALUES ('3', 'Qualified', 'DEFAULT', current_timestamp, current_timestamp, '0');
+      INSERT INTO preference_type (id, name, validation_code, date_created, last_updated, version) VALUES ('4', 'Not Qualified', 'HIDE', current_timestamp, current_timestamp, '0');
+      INSERT INTO preference_type (id, name, validation_code, date_created, last_updated, version) VALUES ('5', 'Do Not Order', 'BLOCK', current_timestamp, current_timestamp, '0');
+      INSERT INTO preference_type (id, name, validation_code, date_created, last_updated, version) VALUES ('6', 'Contract', 'PREFERRED', current_timestamp, current_timestamp, '0');
+    </sql>
+  </changeSet>
+</databaseChangeLog>

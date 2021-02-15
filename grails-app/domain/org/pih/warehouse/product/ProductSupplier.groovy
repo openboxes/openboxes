@@ -61,6 +61,12 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
     // Additional comments
     String comments
 
+    // Documents Availability
+    Boolean coaAvailable = Boolean.FALSE
+    Boolean isoAvailable = Boolean.FALSE
+    Boolean gmpAvailable = Boolean.FALSE
+    String shipsFrom
+
     // Auditing fields
     Date dateCreated
     Date lastUpdated
@@ -97,6 +103,11 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
         minOrderQuantity(nullable: true)
         ratingTypeCode(nullable: true)
         comments(nullable: true)
+
+        coaAvailable(nullable: true)
+        isoAvailable(nullable: true)
+        gmpAvailable(nullable: true)
+        shipsFrom(nullable: true)
 
         contractPrice(nullable: true)
     }

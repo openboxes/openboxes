@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="awalkowiak" id="1202202110000-0">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="product_supplier" columnName="coa_available"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="product_supplier">
+      <column name="coa_available" type="BIT" defaultValueBoolean="false"/>
+    </addColumn>
+  </changeSet>
+  <changeSet author="awalkowiak" id="1202202110000-1">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="product_supplier" columnName="iso_available"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="product_supplier">
+      <column name="iso_available" type="BIT" defaultValueBoolean="false"/>
+    </addColumn>
+  </changeSet>
+  <changeSet author="awalkowiak" id="1202202110000-2">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="product_supplier" columnName="gmp_available"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="product_supplier">
+      <column name="gmp_available" type="BIT" defaultValueBoolean="false"/>
+    </addColumn>
+  </changeSet>
+  <changeSet author="awalkowiak" id="1202202110000-3">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="product_supplier" columnName="ships_from"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="product_supplier">
+      <column name="ships_from" type="LONGTEXT"/>
+    </addColumn>
+  </changeSet>
+</databaseChangeLog>

@@ -127,6 +127,39 @@
                                      value="${productSupplier?.minOrderQuantity}" />
                     </td>
                 </tr>
+                <tr class="prop">
+                    <td class="name">
+                        <label for="coaAvailable"><warehouse:message code="productSupplier.coaAvailable.label"/></label>
+                    </td>
+                    <td class="value ">
+                        <g:checkBox name="coaAvailable" value="${productSupplier?.coaAvailable}"/>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td class="name">
+                        <label for="isoAvailable"><warehouse:message code="productSupplier.isoAvailable.label"/></label>
+                    </td>
+                    <td class="value ">
+                        <g:checkBox name="isoAvailable" value="${productSupplier?.isoAvailable}"/>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td class="name">
+                        <label for="gmpAvailable"><warehouse:message code="productSupplier.gmpAvailable.label"/></label>
+                    </td>
+                    <td class="value ">
+                        <g:checkBox name="gmpAvailable" value="${productSupplier?.gmpAvailable}"/>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td class="name">
+                        <label for="shipsFrom"><warehouse:message code="productSupplier.shipsFrom.label"/></label>
+                    </td>
+                    <td class="value ">
+                        <g:textArea name="shipsFrom" class="medium text"
+                                    value="${productSupplier?.shipsFrom}" />
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>
