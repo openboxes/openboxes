@@ -21,14 +21,20 @@
 				<div class="button-bar">
                     <g:link class="button" action="list">
                         <img src="${createLinkTo(dir:'images/icons/silk', file:'application_view_list.png')}" />
-                        <warehouse:message code="default.list.label" args="[g.message(code:'productSupplier.label')]"/></g:link>
+                        <warehouse:message code="default.list.label" args="[g.message(code:'productSupplier.label')]"/>
+                    </g:link>
                     <g:link class="button" action="create">
                         <img src="${createLinkTo(dir:'images/icons/silk', file:'add.png')}" />
-                        <warehouse:message code="default.add.label" args="[g.message(code:'productSupplier.label')]"/></g:link>
-
+                        <warehouse:message code="default.add.label" args="[g.message(code:'productSupplier.label')]"/>
+                    </g:link>
                     <g:link class="button" action="export" params="[format: 'xls']">
                         <img src="${createLinkTo(dir:'images/icons/silk', file:'page_excel.png')}" />
-                        <warehouse:message code="default.export.label" args="[g.message(code:'productSuppliers.label')]"/></g:link>
+                        <warehouse:message code="default.export.label" args="[g.message(code:'productSuppliers.label')]"/>
+                    </g:link>
+                    <g:link class="button" controller="batch" action="downloadExcel" params="[type:'ProductSupplierPreference']">
+                        <img src="${createLinkTo(dir:'images/icons/silk', file:'page_excel.png')}" />
+                        <warehouse:message code="default.export.label" args="[g.message(code:'productSupplier.productSourcePreference.label')]"/>
+                    </g:link>
 	        	</div>
                 <div class="box">
                     <h2><warehouse:message code="default.filters.label"/></h2>
