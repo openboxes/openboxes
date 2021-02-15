@@ -658,13 +658,13 @@ class ReportService implements ApplicationContextAware {
     List getOnOrderSummary(Location location) {
         String query = """
             select 
-                oos.product_code as productCode, 
-                oos.name as productName, 
+                product.product_code as productCode, 
+                product.name as productName, 
                 oos.quantity_ordered_not_shipped as qtyOrderedNotShipped,
                 oos.quantity_shipped_not_received as qtyShippedNotReceived, 
                 ps.quantity_on_hand as qtyOnHand
             from on_order_summary oos
-            join product on oos.product_code = product.product_code
+            join product on oos.product_id = product.id
             left outer join product_snapshot ps on (product.id = ps.product_id 
                 and ps.location_id = oos.destination_id)
             where destination_id = :locationId
