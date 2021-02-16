@@ -72,7 +72,7 @@
 					</ul>
 					<div id="tabs-details" class="ui-tabs-hide">
                         <g:set var="formAction"><g:if test="${productInstance?.id}">update</g:if><g:else>save</g:else></g:set>
-                        <g:form action="${formAction}" onsubmit="return validateForm();">
+                        <g:form id="productForm" name="productForm" action="${formAction}" onsubmit="return validateForm();">
                             <g:hiddenField name="id" value="${productInstance?.id}" />
                             <g:hiddenField name="version" value="${productInstance?.version}" />
                             <!--  So we know which category to show on browse page after submit -->
@@ -580,7 +580,33 @@
 
 				$(".binLocation").change(function(){ updateBinLocation() });
 
-			});
+              var prevProdType = $('#productType').val();
+
+              $('#productType').change(function() {
+                var currentProdType = $(this).val();
+
+                var response = JSON.parse($.ajax({
+                  url: "${request.contextPath}/json/checkIfProductFieldRemoved",
+                  type: "get",
+                  async: false,
+                  data: { oldTypeId: prevProdType, newTypeId: currentProdType },
+                  contentType: "text/json",
+                  dataType: "json"
+                }).responseText);
+
+                if (response && response.fieldRemoved) {
+                  var success = confirm('${warehouse.message(code: 'product.productType.confirmChange.message', default: 'Changing the product type will delete data you have entered for this product. Would you like to proceed?')}');
+                  if (success) {
+                    prevProdType = $(this).val();
+                  } else {
+                    $(this).val(prevProdType);
+                  }
+                }
+
+                var data = $('#productForm').serialize();
+                window.location = '${g.createLink(controller: 'product', action: 'create')}?' + data;
+              });
+            });
 		</script>
     </body>
 </html>
