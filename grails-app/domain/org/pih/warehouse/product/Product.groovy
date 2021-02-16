@@ -13,9 +13,14 @@ import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.NotImplementedException
 import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.pih.warehouse.MessageTagLib
 import org.pih.warehouse.auth.AuthService
-import org.pih.warehouse.core.*
+import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.GlAccount
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Synonym
+import org.pih.warehouse.core.Tag
+import org.pih.warehouse.core.UnitOfMeasure
+import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
@@ -23,8 +28,6 @@ import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.shipping.ShipmentItem
-
-
 /**
  * An product is an instance of a generic.  For instance,
  * the product might be Ibuprofen, but the product is Advil 200mg
@@ -549,6 +552,23 @@ class Product implements Comparable, Serializable {
         return catalogs.find { catalog ->
             productCatalogs?.contains(catalog)
         }
+    }
+
+    def validateRequiredFields() {
+        if (!productType || !productType?.requiredFields || productType?.requiredFields?.isEmpty()) {
+            return true
+        }
+
+        def isValid = true
+
+        productType.requiredFields.each {
+            if (!this."$it.fieldName") {
+                isValid = false
+                errors.rejectValue(it.fieldName, "default.null.message", [it.fieldName, "Product"] as Object[], "")
+            }
+        }
+
+        return isValid
     }
 
     /**

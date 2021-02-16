@@ -31,4 +31,20 @@ class ProductType {
         productTypeCode(nullable: false)
         productIdentifierFormat(nullable: true)
     }
+
+    Boolean isFieldDisplayed(ProductField field) {
+        if (!displayedFields || displayedFields.isEmpty()) {
+            return true
+        }
+
+        return displayedFields.contains(field)
+    }
+
+    Boolean isAnyFieldDisplayed(List<ProductField> fields) {
+        if (!displayedFields || displayedFields.isEmpty()) {
+            return true
+        }
+
+        return fields?.any{ displayedFields.contains(it) }
+    }
 }

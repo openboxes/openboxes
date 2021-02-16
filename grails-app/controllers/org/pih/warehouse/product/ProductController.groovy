@@ -198,9 +198,11 @@ class ProductController {
         // when the session is closed.
         if (!productInstance?.id || productInstance.validate()) {
             if (!productInstance.productCode) {
-                productInstance.productCode = productService.generateProductIdentifier()
+                productInstance.productCode = productService.generateProductIdentifier(productInstance.productType)
             }
         }
+
+        productInstance.validateRequiredFields()
 
         if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
             log.info("saved product " + productInstance.errors)
@@ -294,10 +296,11 @@ class ProductController {
                 // when the session is closed.
                 if (productInstance.validate()) {
                     if (!productInstance.productCode) {
-                        productInstance.productCode = productService.generateProductIdentifier()
+                        productInstance.productCode = productService.generateProductIdentifier(productInstance.productType)
                     }
                 }
 
+                productInstance.validateRequiredFields()
 
                 if (!productInstance.hasErrors() && productInstance.save(failOnError: true, flush: true)) {
                     flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product: productInstance)])}"
