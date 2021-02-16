@@ -10,7 +10,6 @@
 package org.pih.warehouse.product
 
 import org.pih.warehouse.core.Organization
-import org.pih.warehouse.core.PreferenceTypeCode
 import org.pih.warehouse.core.ProductPrice
 import org.pih.warehouse.core.RatingTypeCode
 
@@ -65,7 +64,7 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
     Date dateCreated
     Date lastUpdated
 
-    static transients = ["defaultProductPackage"]
+    static transients = ["defaultProductPackage", "globalProductSupplierPreference"]
 
     static hasMany = [productPackages: ProductPackage, productSupplierPreferences: ProductSupplierPreference]
 
@@ -105,6 +104,9 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
         return productPackages ? productPackages.sort { it.dateCreated }.last() : null
     }
 
+    ProductSupplierPreference getGlobalProductSupplierPreference() {
+        return productSupplierPreferences ? productSupplierPreferences.find { it.destinationParty == null } : null
+    }
 
     int compareTo(ProductSupplier obj) {
         return ratingTypeCode <=> obj.ratingTypeCode ?:
@@ -113,25 +115,28 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
     }
 
     static PROPERTIES = [
-            "id"                           : "id",
-            "code"                         : "code",
-            "productCode"                  : "product.productCode",
-            "legacyProductCode"            : "productCode",
-            "productName"                  : "name",
-            "description"                  : "description",
-            "supplierId"                   : "supplier.id",
-            "supplierName"                 : "supplier.name",
-            "supplierCode"                 : "supplierCode",
-            "supplierProductName"          : "supplierName",
-            "manufacturerId"               : "manufacturer.id",
-            "manufacturerName"             : "manufacturer.name",
-            "manufacturerCode"             : "manufacturerCode",
-            "manufacturerProductName"      : "manufacturerName",
-            "defaultProductPackageUomCode" : "defaultProductPackage.uom.code",
-            "defaultProductPackageQuantity": "defaultProductPackage.quantity",
-            "defaultProductPackagePrice"   : "defaultProductPackage.price",
-            "standardLeadTimeDays"         : "standardLeadTimeDays",
-            "ratingTypeCode"               : "ratingTypeCode",
-            "comments"                     : "comments"
+            "ID"                                  : "id",
+            "Product Source Code"                 : "code",
+            "Product Source Name"                 : "name",
+            "Product Code"                        : "product.productCode",
+            "Product Name"                        : "product.name",
+            "Legacy Product Code"                 : "productCode",
+            "Supplier Name"                       : "supplier.name",
+            "Supplier Item No"                    : "supplier.code",
+            "Manufacturer Name"                   : "manufacturer.name",
+            "Manufacturer Item No"                : "manufacturer.code",
+            "Minimum Order Quantity"              : "minOrderQuantity",
+            "Contract Price (Each)"               : "contractPrice.currency.code",
+            "Contract Price Valid Until"          : ["property": "contractPrice.toDate", "dateFormat": "MM/dd/yyyy"],
+            "Rating Type"                         : "ratingTypeCode",
+            "Default Global Preference Type"      : "globalProductSupplierPreference.preferenceType.name",
+            "Preference Type Validity Start Date" : ["property": "globalProductSupplierPreference.validityStartDate", "dateFormat": "MM/dd/yyyy"],
+            "Preference Type Validity End Date"   : ["property": "globalProductSupplierPreference.validityEndDate", "dateFormat": "MM/dd/yyyy"],
+            "Preference Type Comment"             : "comments",
+            "Default Package Type"                : "defaultProductPackage.uom.code",
+            "Quantity per package"                : "defaultProductPackage.quantity",
+            "Package price"                       : "defaultProductPackage.productPrice.price",
+            "Date created"                        : ["property": "dateCreated", "dateFormat": "MM/dd/yyyy"],
+            "Last updated"                        : ["property": "lastUpdated", "dateFormat": "MM/dd/yyyy"]
     ]
 }
