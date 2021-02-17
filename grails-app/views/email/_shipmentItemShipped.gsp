@@ -1,4 +1,9 @@
 <%@ page contentType="text/html"%>
+<style>
+    label {
+        font-weight: bold;
+    }
+</style>
 <div>
     <div class="header">
         <g:render template="/email/header"/>
