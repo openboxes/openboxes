@@ -33,7 +33,7 @@ class AutoSuggestTagLib {
         attrs.name = attrs.name
         attrs.valueId = (attrs.valueId) ? attrs.valueId : ""
         attrs.valueName = (attrs.valueName) ? attrs.valueName : ""
-        attrs.width = (attrs.width) ? attrs.width : '100%'
+        attrs.width = (attrs.width) ? attrs.width + 'px' : '100%'
         attrs.size = (attrs.size) ? attrs.size : 30
         attrs.delay = (attrs.delay) ? attrs.delay : grailsApplication.config.openboxes.typeahead.delay
         attrs.minLength = (attrs.minLength) ? attrs.minLength : grailsApplication.config.openboxes.typeahead.minLength
