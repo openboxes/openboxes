@@ -13,9 +13,10 @@ import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
 import groovy.time.TimeCategory
+import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.StringUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
-import org.hibernate.Criteria
+import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Localization
@@ -27,20 +28,17 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.jobs.CalculateHistoricalQuantityJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
-import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.product.ProductPackage
-import org.pih.warehouse.product.ProductSummary
 import org.pih.warehouse.product.ProductSupplier
-import org.pih.warehouse.receiving.ReceiptStatusCode
+import org.pih.warehouse.product.ProductType
 import org.pih.warehouse.reporting.Indicator
 import org.pih.warehouse.reporting.TransactionFact
 import org.pih.warehouse.requisition.Requisition
@@ -48,11 +46,7 @@ import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemSortByCode
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.shipping.ShipmentItem
-import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.util.LocalizationUtil
-import org.grails.plugins.csv.CSVWriter
-import org.apache.commons.lang.StringEscapeUtils
 
 import java.text.DateFormat
 import java.text.NumberFormat
@@ -1821,6 +1815,23 @@ class JsonController {
         } else {
             throw new IllegalArgumentException("Start and end date are required")
         }
+    }
+
+    def checkIfProductFieldRemoved = {
+        ProductType oldProductType = ProductType.get(params.oldTypeId)
+        ProductType newProductType = ProductType.get(params.newTypeId)
+
+        Boolean fieldRemoved = false
+
+        if (newProductType?.displayedFields && !newProductType.displayedFields.isEmpty()) {
+            if (oldProductType?.displayedFields && !oldProductType.displayedFields.isEmpty()) {
+                fieldRemoved = !newProductType.displayedFields.containsAll(oldProductType.displayedFields)
+            } else {
+                fieldRemoved = true
+            }
+        }
+
+        render([fieldRemoved: fieldRemoved] as JSON)
     }
 }
 
