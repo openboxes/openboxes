@@ -10,25 +10,26 @@
 package org.pih.warehouse.inventory
 
 import groovy.time.TimeCategory
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.springframework.context.ApplicationListener
 class TransactionEventService implements ApplicationListener<TransactionEvent> {
 
     boolean transactional = true
+    def grailsApplication
 
     void onApplicationEvent(TransactionEvent event) {
         log.info "Application event $event has been published!"
         Transaction transaction = event?.source
-        def transactionId = transaction?.id
-        def transactionDate = transaction?.transactionDate
-        def locationId = event.associatedLocation
-        List productIds = event.associatedProducts
+        Location location = Location.load(event.associatedLocation)
+        def productIds = event.associatedProducts
         Boolean forceRefresh = event.forceRefresh
 
-        log.info "Refresh product availability in 10 seconds " +
-                "date=$transactionDate, " +
-                "location=$locationId, " +
-                "transaction=$transactionId," +
+        log.info "Refresh product availability records for " +
+                "location=$location.id, " +
+                "transactionId=$transaction.id," +
+                "transactionDate=$transaction.transactionDate," +
+                "transactionNumber=$transaction.transactionNumber," +
                 "productIds=$productIds, " +
                 "forceRefresh=$forceRefresh"
 
@@ -46,9 +47,12 @@ class TransactionEventService implements ApplicationListener<TransactionEvent> {
         //        forceRefresh: forceRefresh
         //])
         use(TimeCategory) {
-            Date runAt = new Date() + 500.milliseconds
+            def delayStart = grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayStart
+            def delayInMilliseconds = delayStart ?
+                    grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayInMilliseconds : 0
+            Date runAt = new Date() + delayInMilliseconds.milliseconds
             RefreshProductAvailabilityJob.schedule(runAt, [
-                    locationId  : locationId,
+                    locationId  : location?.id,
                     productIds  : productIds,
                     forceRefresh: forceRefresh
             ])

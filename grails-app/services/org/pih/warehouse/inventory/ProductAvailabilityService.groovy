@@ -29,9 +29,9 @@ class ProductAvailabilityService {
 
     def dataSource
     def persistenceInterceptor
-    LocationService locationService
-    InventoryService inventoryService
-    DataService dataService
+    def locationService
+    def inventoryService
+    def dataService
 
     def refreshProductAvailability(Boolean forceRefresh) {
         // Compute bin locations from transaction entries for all products over all depot locations
