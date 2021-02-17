@@ -1,6 +1,5 @@
 CREATE OR REPLACE VIEW product_summary AS
-SELECT uuid_short()                                               as id,
-       product.id                                                 as product_id,
+SELECT product.id                                                 as product_id,
        product_availability.location_id                           as location_id,
        ifnull(sum(quantity_on_hand), 0)                           as quantity_on_hand,
        ifnull(sum(distinct oos.quantity_ordered_not_shipped),
