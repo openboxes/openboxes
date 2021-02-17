@@ -46,4 +46,14 @@ class ProductSupplierPreference {
         updatedBy(nullable: true)
         createdBy(nullable: true)
     }
+
+    static PROPERTIES = [
+            "Product Source Code"                  : "productSupplier.code",
+            "Organization Code"                    : "destinationParty.code",
+            "Organization Name"                    : ["property": "destinationParty.name", "defaultValue": "DEFAULT"],
+            "Preference Type"                      : "preferenceType.name",
+            "Preference Type Validity Start Date"  : ["property": "validityStartDate", "dateFormat": "MM/dd/yyyy"],
+            "Preference Type Validity End Date"    : ["property": "validityEndDate", "dateFormat": "MM/dd/yyyy"],
+            "Preference Type Comment"              : "comments",
+    ]
 }

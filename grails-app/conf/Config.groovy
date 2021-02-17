@@ -1162,6 +1162,7 @@ openboxes {
                         [label: "product.batchEdit.label", defaultLabel: "Batch edit product", href: "/${appName}/product/batchEdit"],
                         [label: "product.importAsCsv.label", defaultLabel: "Import products", href: "/${appName}/product/importAsCsv"],
                         [label: "product.exportAsCsv.label", defaultLabel: "Export products", href: "/${appName}/product/exportAsCsv"],
+                        [label: "productSupplier.productSourcePreferencesExport.label", defaultLabel: "Export Product Source Preferences", href: "/${appName}/batch/downloadExcel?type=ProductSupplierPreference"],
                         [label: "import.inventory.label", defaultLabel: "Import Inventory", href: "/${appName}/batch/importData?type=inventory"],
                         [label: "import.inventoryLevel.label", defaultLabel: "Import Inventory Level", href: "/${appName}/batch/importData?type=inventoryLevel"]
                     ]
