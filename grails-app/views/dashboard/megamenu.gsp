@@ -522,7 +522,7 @@
                                     <warehouse:message code="product.exportAsCsv.label"/>
                                 </g:link>
                             </div>
-                            <div>
+                            <div class="mm-menu-item">
                                 <g:link controller="batch" action="downloadExcel" params="[type:'ProductSupplierPreference']">
                                     <warehouse:message code="default.export.label" args="[g.message(code:'productSupplier.productSourcePreference.label')]"/>
                                 </g:link>
