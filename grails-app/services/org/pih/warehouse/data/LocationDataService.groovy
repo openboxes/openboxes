@@ -49,7 +49,7 @@ class LocationDataService {
     }
 
     Location createOrUpdateLocation(Map params) {
-        Location location = Location.findByNameOrLocationNumber(params.name, params.name)
+        Location location = Location.findByNameOrLocationNumber(params.name, params.locationNumber)
         if (!location) {
             location = new Location()
         }
