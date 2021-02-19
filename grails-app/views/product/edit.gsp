@@ -72,7 +72,7 @@
 					</ul>
 					<div id="tabs-details" class="ui-tabs-hide">
                         <g:set var="formAction"><g:if test="${productInstance?.id}">update</g:if><g:else>save</g:else></g:set>
-                        <g:form id="productForm" name="productForm" action="${formAction}" onsubmit="return validateForm();">
+                        <g:form name="productForm" action="${formAction}" onsubmit="return validateForm();">
                             <g:hiddenField name="id" value="${productInstance?.id}" />
                             <g:hiddenField name="version" value="${productInstance?.version}" />
                             <!--  So we know which category to show on browse page after submit -->
@@ -603,8 +603,8 @@
                   }
                 }
 
-                var data = $('#productForm').serialize();
-                window.location = '${g.createLink(controller: 'product', action: 'create')}?' + data;
+                var data = $('form[name ="productForm"]').serialize();
+                window.location = '${g.createLink(controller: 'product', action: productInstance?.id ? 'edit' : 'create')}?' + data;
               });
             });
 		</script>

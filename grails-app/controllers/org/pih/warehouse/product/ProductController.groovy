@@ -227,6 +227,7 @@ class ProductController {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
             redirect(controller: "inventory", action: "browse")
         } else {
+            productInstance.properties = params
             def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, location.inventory)
             if (!inventoryLevelInstance) {
                 inventoryLevelInstance = new InventoryLevel()
