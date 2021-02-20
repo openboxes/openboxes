@@ -108,6 +108,7 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
         return product.attributes.findAll {
             ProductAttribute productAttribute -> productAttribute.productSupplier == this
         }
+    }
 
     ProductSupplierPreference getGlobalProductSupplierPreference() {
         return productSupplierPreferences ? productSupplierPreferences.find { it.destinationParty == null } : null
