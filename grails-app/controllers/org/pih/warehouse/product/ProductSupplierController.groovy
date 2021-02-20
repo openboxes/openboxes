@@ -9,6 +9,8 @@
  **/
 package org.pih.warehouse.product
 
+import grails.validation.ValidationException
+
 import java.math.RoundingMode
 import java.text.SimpleDateFormat
 import org.pih.warehouse.core.ProductPrice
@@ -111,6 +113,8 @@ class ProductSupplierController {
                 }
             }
             productSupplierInstance.properties = params
+
+            updateAttributes(productSupplierInstance, params)
 
             if (!productSupplierInstance.code) {
                 String prefix = productSupplierInstance?.product?.productCode
@@ -221,6 +225,55 @@ class ProductSupplierController {
                 render dataService.generateCsv(data)
                 response.outputStream.flush()
                 return;
+        }
+    }
+
+    def updateAttributes(ProductSupplier productSupplier, Map params) {
+        Map existingAtts = new HashMap()
+        productSupplier.attributes.each() {
+            existingAtts.put(it.attribute.id, it)
+        }
+
+        // Process attributes
+        def availableAttributes =
+                Attribute.findAll("from Attribute a where :entityTypeCodes in elements(a.entityTypeCodes)", [entityTypeCodes:"PRODUCT_SUPPLIER"])
+
+        log.info "Available attributes: " + availableAttributes
+        availableAttributes.each() {
+
+            String value = params["productAttributes." + it.id + ".value"]
+            if (value == "_other" || value == null || value == '') {
+                value = params["productAttributes." + it.id + ".otherValue"]
+            }
+
+            log.info("Process attribute " + it.name + " = " + value + ", required = ${it.required}, active = ${it.active}")
+            if (it.active && it.required && !value) {
+                productSupplier.errors.rejectValue("attributes", "product.attribute.required",
+                        [] as Object[],
+                        "Product attribute ${it.name} is required")
+                throw new ValidationException("Attribute required", productSupplier.errors)
+            }
+
+            ProductAttribute productAttribute = existingAtts.get(it.id)
+            if (value) {
+                if (!productAttribute) {
+                    productAttribute = new ProductAttribute("attribute": it, value: value)
+                    productAttribute.productSupplier = productSupplier
+                    productSupplier.product.addToAttributes(productAttribute)
+                    productSupplier.save()
+                } else {
+                    productAttribute.value = value
+                    productAttribute.productSupplier = productSupplier
+                    productAttribute.save()
+                }
+            } else {
+                if (productAttribute?.attribute?.active) {
+                    log.info("removing attribute ${productAttribute.attribute.name}")
+                    productSupplier.product.removeFromAttributes(productAttribute)
+                    productAttribute.delete()
+                    productSupplier.product.save()
+                }
+            }
         }
     }
 }

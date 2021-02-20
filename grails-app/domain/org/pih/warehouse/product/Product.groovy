@@ -406,7 +406,9 @@ class Product implements Comparable, Serializable {
             return null
         }
 
-        return attributes.find { ProductAttribute productAttribute -> productAttribute.attribute?.id == attribute?.id }
+        return attributes.find { ProductAttribute productAttribute ->
+            productAttribute.attribute?.id == attribute?.id && !productAttribute.productSupplier
+        }
     }
 
     /**

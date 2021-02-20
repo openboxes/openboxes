@@ -25,17 +25,16 @@
                     <div class="yui-u first">
                         <div class="box">
                             <h2><warehouse:message code="default.search.label" default="Search"/></h2>
-
                             <g:form action="list" method="get">
                                 <g:hiddenField name="sort" value="${params.sort?:'name'}"/>
                                 <g:hiddenField name="order" value="${params.order?:'asc'}"/>
                                 <div class="filter-list-item">
                                     <label><warehouse:message code="default.name.label"/></label>
-                                    <g:textField name="q" size="30" value="${params.q}"></g:textField>
+                                    <g:textField name="q" class="text large" value="${params.q}"></g:textField>
                                 </div>
                                 <div class="filter-list-item center middle">
-                                    <button type="submit" class="button icon search">
-                                        ${warehouse.message(code: 'default.button.find.label')}
+                                    <button type="submit" class="button block">
+                                        ${warehouse.message(code: 'default.button.search.label')}
                                     </button>
                                 </div>
 

@@ -127,9 +127,14 @@
                                      value="${productSupplier?.minOrderQuantity}" />
                     </td>
                 </tr>
+                <g:render template="../attribute/renderFormList"
+                          model="[fieldPrefix: 'productAttributes.',
+                                  entityTypeCodes: [org.pih.warehouse.core.EntityTypeCode.PRODUCT_SUPPLIER],
+                                  populatedAttributes:productSupplier?.attributes]"/>
             </tbody>
         </table>
     </div>
+    <hr/>
     <div class="buttons">
         <g:if test="${productSupplier.id}">
             <g:actionSubmit action="update" class="button icon accept" value="Save" id="update">${warehouse.message(code: 'default.button.save.label', default: 'Save')}</g:actionSubmit>

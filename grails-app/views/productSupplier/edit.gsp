@@ -90,7 +90,7 @@
 								</td>
 							</tr>
 
-						<tr class="prop">
+							<tr class="prop">
 								<td valign="top" class="name">
 								  <label for="upc"><warehouse:message code="productSupplier.upc.label" default="Upc" /></label>
 								</td>
@@ -221,17 +221,25 @@
 									<g:jqueryDatePicker name="toDate" value="${productSupplierInstance?.contractPrice?.toDate}" autocomplete="off" format="MM/dd/yyyy"/>
 								</td>
 							</tr>
-							<tr class="prop">
-								<td valign="top"></td>
-								<td valign="top left">
-									<div class="buttons">
-										<g:actionSubmit class="button" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
-										<g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
-									</div>
-								</td>
-							</tr>
 						</tbody>
 					</table>
+
+
+				</div>
+				<div class="box">
+					<h2>${g.message(code: 'attributes.label')}</h2>
+					<table>
+						<tbody>
+							<g:render template="../attribute/renderFormList"
+									  model="[fieldPrefix: 'productAttributes.',
+											  entityTypeCodes: [org.pih.warehouse.core.EntityTypeCode.PRODUCT_SUPPLIER],
+											  populatedAttributes:productSupplierInstance?.attributes]"/>
+						</tbody>
+					</table>
+				</div>
+				<div class="buttons">
+					<g:actionSubmit class="button" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
+					<g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
 				</div>
             </g:form>
         </div>

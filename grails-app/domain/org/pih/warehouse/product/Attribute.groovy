@@ -9,6 +9,8 @@
  **/
 package org.pih.warehouse.product
 
+import org.hibernate.type.EntityType
+import org.pih.warehouse.core.EntityTypeCode
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.UnitOfMeasureClass
 
@@ -42,7 +44,7 @@ class Attribute {
     Date dateCreated
     Date lastUpdated
 
-    static hasMany = [options: String]
+    static hasMany = [options: String, entityTypeCodes: EntityTypeCode]
 
     static mapping = {
         id generator: 'uuid'

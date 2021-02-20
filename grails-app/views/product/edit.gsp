@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.product.ProductField; org.pih.warehouse.inventory.InventoryLevel; org.pih.warehouse.product.Product" %>
+<%@ page import="org.pih.warehouse.core.EntityTypeCode; org.pih.warehouse.product.ProductField; org.pih.warehouse.inventory.InventoryLevel; org.pih.warehouse.product.Product" %>
 <html>
 	<head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -18,6 +18,7 @@
         #category_id_chosen {
             width: 100% !important;
         }
+        .ui-widget button { font-size: 11px; }
         </style>
 
     </head>
@@ -131,8 +132,6 @@
                                             <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'category', 'errors')}">
                                                 <g:selectCategory name="category.id" class="chzn-select" noSelection="['null':'']"
                                                                      value="${productInstance?.category?.id}" />
-
-
                                            </td>
                                         </tr>
                                         <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.GL_ACCOUNT)}">
@@ -159,7 +158,21 @@
                                                 </td>
                                             </tr>
                                         </g:if>
+                                        <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.PRICE_PER_UNIT)}">
+                                            <tr class="prop">
+                                                <td class="name middle"><label id="pricePerUnitLabel" for="pricePerUnit"><warehouse:message
+                                                        code="product.pricePerUnit.label"/></label></td>
+                                                <td class="value middle ${hasErrors(bean: productInstance, field: 'pricePerUnit', 'errors')}">
+                                                    <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.userNotGrantedPermission.message', args: [session.user.username])}">
+                                                        <g:textField name="pricePerUnit" placeholder="Price per unit (${grailsApplication.config.openboxes.locale.defaultCurrencyCode})"
+                                                                     value="${g.formatNumber(number:productInstance?.pricePerUnit, format:'###,###,##0.####') }"
+                                                                     class="text" size="50" />
 
+                                                        <span class="fade">${grailsApplication.config.openboxes.locale.defaultCurrencyCode}</span>
+                                                    </g:hasRoleFinance>
+                                                </td>
+                                            </tr>
+                                        </g:if>
                                         <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.DESCRIPTION)}">
                                             <tr class="prop">
                                                 <td class="name top"><label id="descriptionLabel" for="description"><warehouse:message
@@ -169,6 +182,35 @@
                                                     <g:textArea name="description" value="${productInstance?.description}" class="medium text"
                                                         cols="80" rows="8"
                                                         placeholder="Detailed text description (optional)" />
+                                                </td>
+                                            </tr>
+                                        </g:if>
+                                        <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.TAGS)}">
+                                            <tr class="prop">
+                                                <td class="name">
+                                                    <label id="tagsLabel"><warehouse:message code="product.tags.label" default="Tags"></warehouse:message></label>
+                                                </td>
+                                                <td class="value">
+                                                    <g:textField id="tags1" class="tags" name="tagsToBeAdded" value="${productInstance?.tagsToString() }"/>
+                                                    <script>
+                                                        $(function() {
+                                                            $('#tags1').tagsInput({
+                                                                'autocomplete_url':'${createLink(controller: 'json', action: 'findTags')}',
+                                                                'width': 'auto',
+                                                                'height': '20px',
+                                                                'removeWithBackspace' : true
+                                                            });
+                                                        });
+                                                    </script>
+                                                </td>
+                                            </tr>
+                                        </g:if>
+                                        <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.ABC_CLASS)}">
+                                            <tr class="prop">
+                                                <td class="name"><label id="abcClassLabel" for="abcClass"><warehouse:message
+                                                        code="product.abcClass.label" /></label></td>
+                                                <td class="value ${hasErrors(bean: productInstance, field: 'abcClass', 'errors')}">
+                                                    <g:textField name="abcClass" value="${productInstance?.abcClass}" size="50" class="medium text"/>
                                                 </td>
                                             </tr>
                                         </g:if>
@@ -249,53 +291,116 @@
                                                             </tr>
                                                         </g:if>
                                                     </table>
+                                                </td>
+                                            </tr>
+                                        </g:if>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="box">
+                                <h2>${g.message(code: 'attributes.label')}</h2>
+                                <g:set var="showUnlinkedAttributes" value="${true}"/>
+                                <table>
+                                    <tbody>
+                                        <g:render template="../attribute/renderFormList"
+                                                  model="[fieldPrefix: 'productAttributes.',
+                                                          populatedAttributes:productInstance?.attributes,
+                                                          entityTypeCodes: [org.pih.warehouse.core.EntityTypeCode.PRODUCT],
+                                                          showUnlinkedAttributes: true]"/>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="box">
+                                <h2>
+                                    ${g.message(code: 'default.other.label')}
+                                    <span class="deprecated" onclick="javascript:alert('${g.message(code: "productSupplier.deprecation.message")}')">
+                                        <g:message code="default.deprecated.label"/>
+                                    </span>
+                                </h2>
+                                <table>
+                                    <tbody>
+                                        <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.BRAND_NAME)}">
+                                            <tr class="prop">
+                                                <td class="name middle"><label id="brandNameLabel" for="brandName"><warehouse:message
+                                                        code="product.brandName.label" /></label></td>
+                                                <td class="value ${hasErrors(bean: productInstance, field: 'brandName', 'errors')}">
+                                                    <g:autoSuggestString id="brandName" name="brandName" size="50" class="text"
+                                                                         jsonUrl="${request.contextPath}/json/autoSuggest"
+                                                                         value="${productInstance?.brandName}"
+                                                                         placeholder="e.g. Advil, Tylenol"/>
+                                                </td>
+                                            </tr>
+                                        </g:if>
+                                        <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.MANUFACTURER)}">
+                                            <tr class="prop">
+                                                <td class="name middle"><label id="manufacturerLabel" for="manufacturer"><warehouse:message
+                                                        code="product.manufacturer.label" /></label></td>
+                                                <td class="value ${hasErrors(bean: productInstance, field: 'manufacturer', 'errors')}">
+                                                    <g:autoSuggestString id="manufacturer" name="manufacturer" size="50" class="text"
+                                                                         jsonUrl="${request.contextPath}/json/autoSuggest"
+                                                                         value="${productInstance?.manufacturer}"
+                                                                         placeholder="e.g. Pfizer, Beckton Dickson"/>
 
                                                 </td>
                                             </tr>
                                         </g:if>
-
-                                        <g:each var="attribute" in="${org.pih.warehouse.product.Attribute.list()}" status="status">
-
-                                            <g:if test="${attribute.active}">
-                                                <tr class="prop">
-                                                    <td class="name">
-                                                        <label for="productAttributes.${attribute?.id}.value"><format:metadata obj="${attribute}"/></label>
-                                                    </td>
-                                                    <td class="value">
-                                                        <g:set var="productAttribute" value="${productInstance?.attributes?.find { it.attribute.id == attribute.id } }"/>
-                                                        <g:set var="otherSelected" value="${productAttribute?.value && !attribute.options.contains(productAttribute?.value)}"/>
-                                                        <g:if test="${attribute.options}">
-                                                            <select name="productAttributes.${attribute?.id}.value" class="attributeValueSelector chzn-select-deselect">
-                                                                <option value=""></option>
-                                                                <g:each var="option" in="${attribute.options}" status="optionStatus">
-                                                                    <g:set var="selectedText" value=""/>
-                                                                    <g:if test="${productAttribute?.value == option}">
-                                                                        <g:set var="selectedText" value=" selected"/>
-                                                                    </g:if>
-                                                                    <option value="${option}"${selectedText}>${option}</option>
-                                                                </g:each>
-                                                                <g:if test="${attribute.allowOther || otherSelected}">
-                                                                    <option value="_other"<g:if test="${otherSelected}"> selected</g:if>>
-                                                                        <g:message code="product.attribute.value.other" default="Other..." />
-                                                                    </option>
-                                                                </g:if>
-                                                            </select>
-                                                        </g:if>
-                                                        <g:set var="onlyOtherVal" value="${attribute.allowOther && otherSelected || !attribute.options}"/>
-                                                        <g:textField size="50" class="otherAttributeValue text medium"
-                                                                     style="${otherAttVal || onlyOtherVal ? '' : 'display:none;'}"
-                                                                     name="productAttributes.${attribute?.id}.otherValue"
-                                                                     value="${otherAttVal || onlyOtherVal ? productAttribute?.value : ''}"/>
-                                                    </td>
-                                                </tr>
-                                            </g:if>
-                                        </g:each>
-                                        <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.ABC_CLASS)}">
+                                        <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.MANUFACTURER_CODE)}">
                                             <tr class="prop">
-                                                <td class="name"><label id="abcClassLabel" for="abcClass"><warehouse:message
-                                                        code="product.abcClass.label" /></label></td>
-                                                <td class="value ${hasErrors(bean: productInstance, field: 'abcClass', 'errors')}">
-                                                    <g:textField name="abcClass" value="${productInstance?.abcClass}" size="50" class="medium text"/>
+                                                <td class="name middle"><label id="manufacturerCodeLabel" for="manufacturerCode"><warehouse:message
+                                                        code="product.manufacturerCode.label"/></label></td>
+                                                <td class="value ${hasErrors(bean: productInstance, field: 'manufacturerCode', 'errors')}">
+                                                    <g:textField name="manufacturerCode" value="${productInstance?.manufacturerCode}" size="50" class="text"/>
+                                                </td>
+                                            </tr>
+                                        </g:if>
+                                        <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.MANUFACTURER_NAME)}">
+                                            <tr class="prop">
+                                                <td class="name middle"><label id="manufacturerNameLabel" for="manufacturerName"><warehouse:message
+                                                        code="product.manufacturerName.label"/></label></td>
+                                                <td class="value ${hasErrors(bean: productInstance, field: 'manufacturerName', 'errors')}">
+                                                    <g:textField name="manufacturerName" value="${productInstance?.manufacturerName}" size="50" class="text"/>
+                                                </td>
+                                            </tr>
+                                        </g:if>
+                                        <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.MODEL_NUMBER)}">
+                                            <tr class="prop">
+                                                <td class="name middle"><label id="modelNumberLabel" for="modelNumber"><warehouse:message
+                                                        code="product.modelNumber.label" /></label></td>
+                                                <td
+                                                        class="value ${hasErrors(bean: productInstance, field: 'modelNumber', 'errors')}">
+                                                    <g:textField name="modelNumber" value="${productInstance?.modelNumber}" size="50" class="text"/>
+                                                </td>
+                                            </tr>
+                                        </g:if>
+                                        <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.VENDOR)}">
+                                            <tr class="prop">
+                                                <td class="name middle"><label id="vendorLabel" for="vendor"><warehouse:message
+                                                        code="product.vendor.label" /></label></td>
+                                                <td
+                                                        class="value ${hasErrors(bean: productInstance, field: 'vendor', 'errors')}">
+                                                    <g:autoSuggestString id="vendor" name="vendor" size="50" class="text"
+                                                                         jsonUrl="${request.contextPath}/json/autoSuggest"
+                                                                         value="${productInstance?.vendor}"
+                                                                         placeholder="e.g. IDA, IMRES, McKesson"/>
+
+                                                </td>
+                                            </tr>
+                                        </g:if>
+                                        <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.VENDOR_CODE)}">
+                                            <tr class="prop">
+                                                <td class="name middle"><label id="vendorCodeLabel" for="vendorCode"><warehouse:message
+                                                        code="product.vendorCode.label"/></label></td>
+                                                <td class="value ${hasErrors(bean: productInstance, field: 'vendorCode', 'errors')}">
+                                                    <g:textField name="vendorCode" value="${productInstance?.vendorCode}" size="50" class="text"/>
+                                                </td>
+                                            </tr>
+                                        </g:if>
+                                        <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.VENDOR_NAME)}">
+                                            <tr class="prop">
+                                                <td class="name middle fade"><label id="vendorNameLabel" for="vendorName"><warehouse:message
+                                                        code="product.vendorName.label"/></label></td>
+                                                <td class="value ${hasErrors(bean: productInstance, field: 'vendorName', 'errors')}">
+                                                    <g:textField name="vendorName" value="${productInstance?.vendorName}" size="50" class="text"/>
                                                 </td>
                                             </tr>
                                         </g:if>
@@ -318,151 +423,24 @@
                                                 </td>
                                             </tr>
                                         </g:if>
-                                    <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.TAGS)}">
-                                        <tr class="prop">
-                                            <td class="name">
-                                                <label id="tagsLabel"><warehouse:message code="product.tags.label" default="Tags"></warehouse:message></label>
-                                            </td>
-                                            <td class="value">
-                                                <g:textField id="tags1" class="tags" name="tagsToBeAdded" value="${productInstance?.tagsToString() }"/>
-                                                <script>
-                                                    $(function() {
-                                                        $('#tags1').tagsInput({
-                                                            'autocomplete_url':'${createLink(controller: 'json', action: 'findTags')}',
-                                                            'width': 'auto',
-                                                            'height': '20px',
-                                                            'removeWithBackspace' : true
-                                                        });
-                                                    });
-                                                </script>
-                                            </td>
-                                        </tr>
-                                    </g:if>
-                                    <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.BRAND_NAME)}">
-                                        <tr class="prop">
-                                            <td class="name middle"><label id="brandNameLabel" for="brandName"><warehouse:message
-                                                    code="product.brandName.label" /></label></td>
-                                            <td class="value ${hasErrors(bean: productInstance, field: 'brandName', 'errors')}">
-                                                <g:autoSuggestString id="brandName" name="brandName" size="50" class="text"
-                                                                     jsonUrl="${request.contextPath}/json/autoSuggest"
-                                                                     value="${productInstance?.brandName}"
-                                                                     placeholder="e.g. Advil, Tylenol"/>
-                                            </td>
-                                        </tr>
-                                    </g:if>
-                                    <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.MANUFACTURER)}">
-                                        <tr class="prop">
-                                            <td class="name middle"><label id="manufacturerLabel" for="manufacturer"><warehouse:message
-                                                    code="product.manufacturer.label" /></label></td>
-                                            <td class="value ${hasErrors(bean: productInstance, field: 'manufacturer', 'errors')}">
-                                                <g:autoSuggestString id="manufacturer" name="manufacturer" size="50" class="text"
-                                                                     jsonUrl="${request.contextPath}/json/autoSuggest"
-                                                                     value="${productInstance?.manufacturer}"
-                                                                     placeholder="e.g. Pfizer, Beckton Dickson"/>
-
-                                            </td>
-                                        </tr>
-                                    </g:if>
-                                    <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.MANUFACTURER_CODE)}">
-                                        <tr class="prop">
-                                            <td class="name middle"><label id="manufacturerCodeLabel" for="manufacturerCode"><warehouse:message
-                                                    code="product.manufacturerCode.label"/></label></td>
-                                            <td class="value ${hasErrors(bean: productInstance, field: 'manufacturerCode', 'errors')}">
-                                                <g:textField name="manufacturerCode" value="${productInstance?.manufacturerCode}" size="50" class="text"/>
-                                            </td>
-                                        </tr>
-                                    </g:if>
-                                    <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.MANUFACTURER_NAME)}">
-                                        <tr class="prop">
-                                            <td class="name middle"><label id="manufacturerNameLabel" for="manufacturerName"><warehouse:message
-                                                    code="product.manufacturerName.label"/></label></td>
-                                            <td class="value ${hasErrors(bean: productInstance, field: 'manufacturerName', 'errors')}">
-                                                <g:textField name="manufacturerName" value="${productInstance?.manufacturerName}" size="50" class="text"/>
-                                            </td>
-                                        </tr>
-                                    </g:if>
-                                    <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.MODEL_NUMBER)}">
-                                        <tr class="prop">
-                                            <td class="name middle"><label id="modelNumberLabel" for="modelNumber"><warehouse:message
-                                                    code="product.modelNumber.label" /></label></td>
-                                            <td
-                                                    class="value ${hasErrors(bean: productInstance, field: 'modelNumber', 'errors')}">
-                                                <g:textField name="modelNumber" value="${productInstance?.modelNumber}" size="50" class="text"/>
-                                            </td>
-                                        </tr>
-                                    </g:if>
-                                    <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.VENDOR)}">
-                                        <tr class="prop">
-                                            <td class="name middle"><label id="vendorLabel" for="vendor"><warehouse:message
-                                                    code="product.vendor.label" /></label></td>
-                                            <td
-                                                    class="value ${hasErrors(bean: productInstance, field: 'vendor', 'errors')}">
-                                                <g:autoSuggestString id="vendor" name="vendor" size="50" class="text"
-                                                                     jsonUrl="${request.contextPath}/json/autoSuggest"
-                                                                     value="${productInstance?.vendor}"
-                                                                     placeholder="e.g. IDA, IMRES, McKesson"/>
-
-                                            </td>
-                                        </tr>
-                                    </g:if>
-                                    <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.VENDOR_CODE)}">
-                                        <tr class="prop">
-                                            <td class="name middle"><label id="vendorCodeLabel" for="vendorCode"><warehouse:message
-                                                    code="product.vendorCode.label"/></label></td>
-                                            <td class="value ${hasErrors(bean: productInstance, field: 'vendorCode', 'errors')}">
-                                                <g:textField name="vendorCode" value="${productInstance?.vendorCode}" size="50" class="text"/>
-                                            </td>
-                                        </tr>
-                                    </g:if>
-                                    <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.VENDOR_NAME)}">
-                                        <tr class="prop">
-                                            <td class="name middle fade"><label id="vendorNameLabel" for="vendorName"><warehouse:message
-                                                    code="product.vendorName.label"/></label></td>
-                                            <td class="value ${hasErrors(bean: productInstance, field: 'vendorName', 'errors')}">
-                                                <g:textField name="vendorName" value="${productInstance?.vendorName}" size="50" class="text"/>
-                                            </td>
-                                        </tr>
-                                    </g:if>
-                                    <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.PRICE_PER_UNIT)}">
-                                        <tr class="prop">
-                                            <td class="name middle"><label id="pricePerUnitLabel" for="pricePerUnit"><warehouse:message
-                                                    code="product.pricePerUnit.label"/></label></td>
-                                            <td class="value middle ${hasErrors(bean: productInstance, field: 'pricePerUnit', 'errors')}">
-                                                <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.userNotGrantedPermission.message', args: [session.user.username])}">
-                                                    <g:textField name="pricePerUnit" placeholder="Price per unit (${grailsApplication.config.openboxes.locale.defaultCurrencyCode})"
-                                                                 value="${g.formatNumber(number:productInstance?.pricePerUnit, format:'###,###,##0.####') }"
-                                                                 class="text" size="50" />
-
-                                                    <span class="fade">${grailsApplication.config.openboxes.locale.defaultCurrencyCode}</span>
-                                                </g:hasRoleFinance>
-                                            </td>
-                                        </tr>
-                                    </g:if>
                                     </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <td></td>
-                                            <td>
-                                                <div class="buttons left">
-                                                    <button type="submit" class="button icon approve">${warehouse.message(code: 'default.button.save.label', default: 'Save')}</button>
-                                                    &nbsp;
-                                                    <g:if test="${productInstance?.id }">
-                                                        <g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="button icon remove">
-                                                            ${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
-                                                        </g:link>
-                                                    </g:if>
-                                                    <g:else>
-                                                        <g:link controller="inventory" action="browse" class="button icon remove">
-                                                            ${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
-                                                        </g:link>
-                                                    </g:else>
-                                                </div>
-
-                                            </td>
-                                        </tr>
-                                    </tfoot>
                                 </table>
                             </div>
+                            <div class="buttons center">
+                                <button class="button icon approve">${warehouse.message(code: 'default.button.save.label', default: 'Save')}</button>
+                                <g:if test="${productInstance?.id }">
+                                    <g:link controller='inventoryItem' action='showStockCard' id='${productInstance?.id }' class="button icon remove">
+                                        ${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
+                                    </g:link>
+                                </g:if>
+                                <g:else>
+                                    <g:link controller="inventory" action="browse" class="button icon remove">
+                                        ${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
+                                    </g:link>
+                                </g:else>
+                            </div>
+
+
                         </g:form>
                     </div>
 

@@ -102,4 +102,6 @@
     <include file="0.8.x/changelog-2021-02-05-1200-create-table-product-supplier-preference.xml"/>
     <include file="0.8.x/changelog-2021-02-05-1230-alter-table-product-supplier-drop-column-preference-type-code.xml"/>
     <include file="0.8.x/changelog-2021-02-09-1530-create-product-type-required-fields-and-displayed-fields-tables.xml"/>
+    <include file="0.8.x/changelog-2021-02-12-1030-add-preference-type-initial-data.xml"/>
+    <include file="0.8.x/changelog-2021-02-19-1629-add-product-supplier-to-product-attribute.xml"/>
 </databaseChangeLog>

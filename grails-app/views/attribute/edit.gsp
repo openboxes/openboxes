@@ -96,6 +96,14 @@
 							</tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
+                                    <label for="entityTypeCodes"><g:message code="entityTypeCodes.label" default="Entity Type Codes" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: attributeInstance, field: 'entityTypeCodes', 'errors')}">
+                                    <g:selectEntityTypeCode name="entityTypeCodes" value="${attributeInstance?.entityTypeCodes}" class="chzn-select-deselect"/>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name">
                                     <label for="active"><g:message code="default.active.label" default="Active" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: attributeInstance, field: 'active', 'errors')}">
