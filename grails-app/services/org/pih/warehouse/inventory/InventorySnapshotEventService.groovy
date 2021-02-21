@@ -14,18 +14,18 @@ import org.springframework.context.ApplicationListener
 class InventorySnapshotEventService implements ApplicationListener<InventorySnapshotEvent> {
 
     def transactional = true
-    def inventorySnapshotService
+    def productAvailabilityService
 
     void onApplicationEvent(InventorySnapshotEvent event) {
         log.info "Application event ${event} has been published"
         if (event?.inventoryItem) {
-            inventorySnapshotService.updateInventorySnapshots(event?.inventoryItem)
+            productAvailabilityService.updateProductAvailability(event?.inventoryItem)
         }
-        else if (event?.binLocation) {
-            inventorySnapshotService.updateInventorySnapshots(event?.binLocation)
+        if (event?.binLocation) {
+            productAvailabilityService.updateProductAvailability(event?.binLocation)
         }
-        else if (event?.product) {
-            inventorySnapshotService.updateInventorySnapshots(event?.product)
+        if (event?.product) {
+            productAvailabilityService.updateProductAvailability(event?.product)
         }
     }
 }
