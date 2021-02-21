@@ -18,8 +18,7 @@ import org.hibernate.Criteria
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.LocationService
-import org.pih.warehouse.data.DataService
+import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAvailability
 
@@ -29,9 +28,9 @@ class ProductAvailabilityService {
 
     def dataSource
     def persistenceInterceptor
-    LocationService locationService
-    InventoryService inventoryService
-    DataService dataService
+    def locationService
+    def inventoryService
+    def dataService
 
     def refreshProductAvailability(Boolean forceRefresh) {
         // Compute bin locations from transaction entries for all products over all depot locations
@@ -465,4 +464,51 @@ class ProductAvailabilityService {
 
         return availableItems
     }
+
+    void updateProductAvailability(InventoryItem inventoryItem) {
+        def results = ProductAvailability.executeUpdate(
+                "update ProductAvailability a " +
+                        "set a.lotNumber=:lotNumber " +
+                        "where a.inventoryItem.id = :inventoryItemId " +
+                        "and a.lotNumber != :lotNumber",
+                [
+                        inventoryItemId: inventoryItem.id,
+                        lotNumber      : inventoryItem.lotNumber
+                ]
+        )
+        log.info "Updated ${results} product availability records for inventory item ${inventoryItem?.lotNumber}"
+    }
+
+
+    void updateProductAvailability(Location location) {
+        def isBinLocation = location?.locationType?.locationTypeCode in [LocationTypeCode.BIN_LOCATION, LocationTypeCode.INTERNAL]
+        if (isBinLocation) {
+            def results = ProductAvailability.executeUpdate(
+                    "update ProductAvailability a " +
+                            "set a.binLocationName = :binLocationName " +
+                            "where a.binLocation.id = :binLocationId " +
+                            "and a.binLocationName != :binLocationName",
+                    [
+                            binLocationId  : location.id,
+                            binLocationName: location.name
+                    ]
+            )
+            log.info "Updated ${results} product availability records for bin location ${location?.name}"
+        }
+    }
+
+    void updateProductAvailability(Product product) {
+        def results = ProductAvailability.executeUpdate(
+                "update ProductAvailability a " +
+                        "set a.productCode = :productCode " +
+                        "where a.product.id = :productId " +
+                        "and a.productCode != :productCode",
+                [
+                        productId  : product.id,
+                        productCode: product.productCode
+                ]
+        )
+        log.info "Updated ${results} product availability records for product ${product?.productCode}"
+    }
+
 }
