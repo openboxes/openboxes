@@ -15,17 +15,21 @@ class InventorySnapshotEventService implements ApplicationListener<InventorySnap
 
     def transactional = true
     def productAvailabilityService
+    def inventorySnapshotService
 
     void onApplicationEvent(InventorySnapshotEvent event) {
         log.info "Application event ${event} has been published"
         if (event?.inventoryItem) {
             productAvailabilityService.updateProductAvailability(event?.inventoryItem)
+            inventorySnapshotService.updateInventorySnapshots(event?.inventoryItem)
         }
         if (event?.binLocation) {
             productAvailabilityService.updateProductAvailability(event?.binLocation)
+            inventorySnapshotService.updateInventorySnapshots(event?.binLocation)
         }
         if (event?.product) {
             productAvailabilityService.updateProductAvailability(event?.product)
+            inventorySnapshotService.updateInventorySnapshots(event?.product)
         }
     }
 }
