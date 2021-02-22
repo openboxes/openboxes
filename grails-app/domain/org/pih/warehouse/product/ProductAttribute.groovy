@@ -20,6 +20,8 @@ class ProductAttribute {
     Attribute attribute
     String value
 
+    ProductSupplier productSupplier
+
     UnitOfMeasure unitOfMeasure
 
     static belongsTo = [product: Product]
@@ -32,6 +34,7 @@ class ProductAttribute {
         attribute(nullable: false)
         value(maxSize: 255)
         unitOfMeasure(nullable: true)
+        productSupplier(nullable: true)
     }
 
     static PROPERTIES = [

@@ -6,11 +6,6 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier')}" />
         <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
-        <style>
-            .button {
-                margin-top: 10px;
-            }
-        </style>
     </head>
     <body>
         <div class="body">
@@ -115,15 +110,11 @@
                         <g:each in="${productSupplierInstanceList}" status="i" var="productSupplierInstance">
                             <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                                 <td>
-                                    <g:link controller="product" action="edit" id="${productSupplierInstance?.product?.id}">
-                                        ${fieldValue(bean: productSupplierInstance, field: "product.productCode")}
-                                    </g:link>
+                                    ${fieldValue(bean: productSupplierInstance, field: "product.productCode")}
                                 </td>
                                 <td>${fieldValue(bean: productSupplierInstance, field: "code")?:g.message(code:'default.none.label')}</td>
                                 <td>
-                                    <g:link controller="product" action="edit" id="${productSupplierInstance?.product?.id}">
-                                        ${fieldValue(bean: productSupplierInstance, field: "product")}
-                                    </g:link>
+                                    ${fieldValue(bean: productSupplierInstance, field: "product")}
                                 </td>
                                 <td>${fieldValue(bean: productSupplierInstance, field: "name")?:g.message(code:'default.none.label')}</td>
                                 <td>${fieldValue(bean: productSupplierInstance, field: "supplier")}</td>
@@ -148,7 +139,9 @@
                                     </g:else>
                                 </td>
                                 <td>
-                                    ${fieldValue(bean: productSupplierInstance?.defaultProductPackage?.uom, field: "code")}/${fieldValue(bean: productSupplierInstance?.defaultProductPackage, field: "quantity")}
+                                    <g:if test="${productSupplierInstance?.defaultProductPackage}">
+                                        ${fieldValue(bean: productSupplierInstance?.defaultProductPackage?.uom, field: "code")}/${fieldValue(bean: productSupplierInstance?.defaultProductPackage, field: "quantity")}
+                                    </g:if>
                                 </td>
                                 <td>
                                     <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: [g.message(code:'default.none.label')])}">

@@ -8,23 +8,27 @@
             <thead>
             <g:sortableColumn property="code" title="${warehouse.message(code: 'default.code.label', default: 'Code')}" />
 
-            <th><g:message code="productSupplier.productCode.label" /></th>
-
             <th><g:message code="default.name.label" default="Name" /></th>
 
-            <th><g:message code="productSupplier.supplier.label" default="Supplier" /></th>
+            <th><g:message code="productSupplier.productCode.label" /></th>
 
-            <th><g:message code="productSupplier.supplierCode.label" default="Supplier Code" /></th>
+            <th>
+                <g:message code="productSupplier.supplier.label" default="Supplier" /> /
+                <g:message code="productSupplier.supplierCode.label" default="Supplier Code" />
+            </th>
 
-            <th><g:message code="productSupplier.manufacturer.label" default="Manufacturer" /></th>
-
-            <th><g:message code="productSupplier.manufacturerCode.label" default="Manufacturer Code" /></th>
+            <th>
+                <g:message code="productSupplier.manufacturer.label" default="Manufacturer" /> /
+                <g:message code="productSupplier.manufacturerCode.label" default="Manufacturer Code" />
+            </th>
 
             <th><g:message code="productSupplier.ratingTypeCode.label" default="Rating Type" /></th>
 
             <th><g:message code="unitOfMeasure.label" default="Unit of Measure" /></th>
 
             <th><g:message code="productPackage.price.label" default="Price" /></th>
+
+            <th><g:message code="attributes.label" default="Attributes" /></th>
 
             <th><g:message code="default.actions.label" default="Actions" /></th>
 
@@ -39,17 +43,20 @@
                         <tr class="prop ${status%2==0?'odd':'even'}">
                             <td>${fieldValue(bean: productSupplier, field: "code")?:g.message(code:'default.none.label')}</td>
 
-                            <td>${fieldValue(bean: productSupplier, field: "productCode")?:g.message(code:'default.none.label')}</td>
-
                             <td>${fieldValue(bean: productSupplier, field: "name")?:g.message(code:'default.none.label')}</td>
 
-                            <td>${fieldValue(bean: productSupplier, field: "supplier")}</td>
+                            <td>${fieldValue(bean: productSupplier, field: "productCode")?:g.message(code:'default.none.label')}</td>
 
-                            <td>${fieldValue(bean: productSupplier, field: "supplierCode")}</td>
+                            <td>
+                                ${fieldValue(bean: productSupplier, field: "supplier")}
+                                ${fieldValue(bean: productSupplier, field: "supplierCode")}
+                            </td>
 
-                            <td>${fieldValue(bean: productSupplier, field: "manufacturer")}</td>
+                            <td>
+                                ${fieldValue(bean: productSupplier, field: "manufacturer")}
+                                ${fieldValue(bean: productSupplier, field: "manufacturerCode")}
+                            </td>
 
-                            <td>${fieldValue(bean: productSupplier, field: "manufacturerCode")}</td>
 
                             <td>${fieldValue(bean: productSupplier, field: "ratingTypeCode")}</td>
 
@@ -58,8 +65,6 @@
                                     ${fieldValue(bean: defaultProductPackage?.uom, field: "code")}/${fieldValue(bean: defaultProductPackage, field: "quantity")}
                                 </g:if>
                             </td>
-
-
                             <td>
                                 <g:if test="${defaultProductPackage?.productPrice}">
                                     <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: ['0.00'])}">
@@ -67,6 +72,14 @@
                                         ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                     </g:hasRoleFinance>
                                 </g:if>
+                            </td>
+
+                            <td>
+                                <ul>
+                                    <g:each var="productAttribute" in="${productSupplier.attributes}">
+                                        <li>${productAttribute.attribute.name} (${productAttribute.attribute.code}) = ${productAttribute.value}</li>
+                                    </g:each>
+                                </ul>
                             </td>
 
                             <td>

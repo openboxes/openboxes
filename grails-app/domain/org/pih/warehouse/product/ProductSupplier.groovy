@@ -64,7 +64,7 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
     Date dateCreated
     Date lastUpdated
 
-    static transients = ["defaultProductPackage", "globalProductSupplierPreference"]
+    static transients = ["defaultProductPackage", "globalProductSupplierPreference", "attributes"]
 
     static hasMany = [productPackages: ProductPackage, productSupplierPreferences: ProductSupplierPreference]
 
@@ -102,6 +102,12 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
 
     ProductPackage getDefaultProductPackage() {
         return productPackages ? productPackages.sort { it.dateCreated }.last() : null
+    }
+
+    List<ProductAttribute> getAttributes() {
+        return product.attributes.findAll {
+            ProductAttribute productAttribute -> productAttribute.productSupplier == this
+        }
     }
 
     ProductSupplierPreference getGlobalProductSupplierPreference() {

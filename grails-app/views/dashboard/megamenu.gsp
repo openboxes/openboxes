@@ -118,7 +118,9 @@
                 <a href="javascript:void(0)" class="mm-item-link">
                     <warehouse:message code="requests.label"/>
                     <span class="deprecated"
-                          onclick="javascript:alert('${g.message(code: "requisition.deprecation.message")}')">deprecated</span>
+                          onclick="javascript:alert('${g.message(code: "requisition.deprecation.message")}')">
+                        <g:message code="default.deprecated.label"/>
+                    </span>
                 </a>
                 <div class="mm-item-content">
                     <div class="mm-content-section">
