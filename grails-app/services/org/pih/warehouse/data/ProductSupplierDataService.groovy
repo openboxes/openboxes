@@ -165,16 +165,24 @@ class ProductSupplierDataService {
                     id
                 FROM product_supplier_clean
                 WHERE product_id = :productId
-                AND supplier_id = IFNULL(:supplierId, supplier_id)
-                AND supplier_code = IFNULL(:supplierCode, supplier_code) 
-                AND manufacturer_id = IFNULL(:manufacturerId, manufacturer_id)
-                AND manufacturer_code = IFNULL(:manufacturerCode, manufacturer_code)
+                AND supplier_id = :supplierId 
                 """
+        if (params.supplierCode) {
+            query += " AND supplier_code = IFNULL(:supplierCode, supplier_code) "
+        } else {
+            if (params.manufacturer && params.manufacturerCode) {
+                query += " AND manufacturer_id = :manufacturerId AND manufacturer_code = :manufacturerCode "
+            } else if (params.manufacturer) {
+                query += " AND manufacturer_id = :manufacturerId AND (manufacturer_code is null OR manufacturer_code = '')"
+            } else if (params.manufacturerCode) {
+                query += " AND manufacturer_code = :manufacturerCode AND (manufacturer_id is null or manufacturer_id = '')"
+            }
+        }
         Sql sql = new Sql(dataSource)
         def data = sql.rows(query, [
                 'productId': params.product?.id,
                 'supplierId': params.supplier?.id,
-                'manufacturerId': params.manufacturer?.id,
+                'manufacturerId': params.manufacturer,
                 'manufacturerCode': manufacturerCode,
                 'supplierCode': supplierCode,
         ])
