@@ -10,7 +10,8 @@
 package org.pih.warehouse.product
 
 import grails.validation.ValidationException
-
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.PreferenceType
 import java.math.RoundingMode
 import java.text.SimpleDateFormat
 import org.pih.warehouse.core.ProductPrice
@@ -68,6 +69,17 @@ class ProductSupplierController {
             String prefix = productSupplierInstance?.product?.productCode
             productSupplierInstance.code = identifierService.generateProductSupplierIdentifier(prefix)
         }
+
+        if (params.preferenceType) {
+            PreferenceType preferenceType = PreferenceType.get(params.preferenceType)
+            Location location = Location.get(session.warehouse.id)
+            ProductSupplierPreference productSupplierPreference = new ProductSupplierPreference()
+            productSupplierPreference.preferenceType = preferenceType
+            productSupplierPreference.destinationParty = location.organization
+            productSupplierPreference.productSupplier = productSupplierInstance
+            productSupplierInstance.addToProductSupplierPreferences(productSupplierPreference)
+        }
+
         if (productSupplierInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), productSupplierInstance.id])}"
 
@@ -120,6 +132,21 @@ class ProductSupplierController {
             if (!productSupplierInstance.code) {
                 String prefix = productSupplierInstance?.product?.productCode
                 productSupplierInstance.code = identifierService.generateProductSupplierIdentifier(prefix)
+            }
+
+            if (params.preferenceType) {
+                PreferenceType preferenceType = PreferenceType.get(params.preferenceType)
+                Location location = Location.get(session.warehouse.id)
+                ProductSupplierPreference productSupplierPreference = productSupplierInstance?.productSupplierPreferences?.find {it.destinationParty == location.organization }
+                if (productSupplierPreference) {
+                    productSupplierPreference.preferenceType = preferenceType
+                } else {
+                    productSupplierPreference = new ProductSupplierPreference()
+                    productSupplierPreference.preferenceType = preferenceType
+                    productSupplierPreference.destinationParty = location.organization
+                    productSupplierPreference.productSupplier = productSupplierInstance
+                    productSupplierInstance.addToProductSupplierPreferences(productSupplierPreference)
+                }
             }
 
             if (params.price) {
@@ -197,13 +224,16 @@ class ProductSupplierController {
         log.info "Display dialog " + params
         def product = Product.get(params.product.id)
         def productSupplier = ProductSupplier.get(params.id)
+        Location location = Location.get(session.warehouse.id)
+        ProductSupplierPreference preference = productSupplier ?
+                (productSupplier?.productSupplierPreferences?.find {it.destinationParty == location.organization } ?: productSupplier.globalProductSupplierPreference) : null
 
         // If not found, initialize a new product supplier
         if (!productSupplier) {
             productSupplier = new ProductSupplier()
             productSupplier.product = product
         }
-        render(template: "dialog", model: [productSupplier: productSupplier])
+        render(template: "dialog", model: [productSupplier: productSupplier, preferenceType: preference?.preferenceType])
     }
 
     def export = {

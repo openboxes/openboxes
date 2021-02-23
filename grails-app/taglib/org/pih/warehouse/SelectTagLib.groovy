@@ -24,6 +24,7 @@ import org.pih.warehouse.core.PartyRole
 import org.pih.warehouse.core.PaymentMethodType
 import org.pih.warehouse.core.PaymentTerm
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.PreferenceType
 import org.pih.warehouse.core.PreferenceTypeCode
 import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.ReasonCode
@@ -225,7 +226,9 @@ class SelectTagLib {
     }
 
     def selectPreferenceType = { attrs, body ->
-        attrs.from = PreferenceTypeCode.list()
+        attrs.from = PreferenceType.list()
+        attrs.optionKey = "id"
+        attrs.optionValue = { it.name }
         out << g.select(attrs)
     }
 
