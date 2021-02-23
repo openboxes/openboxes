@@ -92,7 +92,7 @@
                             <g:radio name="type" value="productSupplier" checked="${params.type=='productSupplier'}"/>
                             ${g.message(code:'productSuppliers.label')}
                         </label>
-                        <g:link controller="batch" action="downloadExcel" params="[type:'ProductSupplier']">
+                        <g:link controller="batch" action="downloadTemplate" params="[template:'ProductSuppliers.xls']">
                             <warehouse:message code="default.download.label" args="[g.message(code:'default.template.label')]"/>
                         </g:link>
                     </div>
