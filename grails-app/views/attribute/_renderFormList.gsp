@@ -3,11 +3,6 @@
 <g:set var="availableAttributes" value="${availableAttributes.findAll {((it.entityTypeCodes.any { it in entityTypeCodes} ) ||
         (it.entityTypeCodes.empty && showUnlinkedAttributes))}}"/>
 
-<g:if test="${!availableAttributes}">
-    <div class="empty fade center">
-        There are no candidate attributes for ${entityTypeCodes.join(",")}.
-    </div>
-</g:if>
 <g:if test="${availableAttributes}">
     <g:each var="attribute" in="${availableAttributes}" status="status">
         <tr class="prop">

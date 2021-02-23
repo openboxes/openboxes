@@ -108,6 +108,22 @@
 							</tr>
 							<tr class="prop">
 								<td valign="top" class="name">
+								  <label for="modelNumber"><warehouse:message code="productSupplier.modelNumber.label" default="Model Number" /></label>
+								</td>
+								<td valign="top" class="value ${hasErrors(bean: productSupplierInstance, field: 'modelNumber', 'errors')}">
+									<g:textField class="text" size="80" name="modelNumber" maxlength="255" value="${productSupplierInstance?.modelNumber}" />
+								</td>
+							</tr>
+							<tr class="prop">
+								<td valign="top" class="name">
+								  <label for="brandName"><warehouse:message code="productSupplier.brandName.label" default="Brand Name" /></label>
+								</td>
+								<td valign="top" class="value ${hasErrors(bean: productSupplierInstance, field: 'brandName', 'errors')}">
+									<g:textField class="text" size="80" name="brandName" maxlength="255" value="${productSupplierInstance?.brandName}" />
+								</td>
+							</tr>
+							<tr class="prop">
+								<td valign="top" class="name">
 								  <label for="supplier"><warehouse:message code="productSupplier.supplier.label" default="Supplier" /></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: productSupplierInstance, field: 'supplier', 'errors')}">
@@ -132,22 +148,6 @@
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: productSupplierInstance, field: 'supplierName', 'errors')}">
 									<g:textField class="text" size="80" name="supplierName" maxlength="255" value="${productSupplierInstance?.supplierName}" />
-								</td>
-							</tr>
-							<tr class="prop">
-								<td valign="top" class="name">
-								  <label for="modelNumber"><warehouse:message code="productSupplier.modelNumber.label" default="Model Number" /></label>
-								</td>
-								<td valign="top" class="value ${hasErrors(bean: productSupplierInstance, field: 'modelNumber', 'errors')}">
-									<g:textField class="text" size="80" name="modelNumber" maxlength="255" value="${productSupplierInstance?.modelNumber}" />
-								</td>
-							</tr>
-							<tr class="prop">
-								<td valign="top" class="name">
-								  <label for="brandName"><warehouse:message code="productSupplier.brandName.label" default="Brand Name" /></label>
-								</td>
-								<td valign="top" class="value ${hasErrors(bean: productSupplierInstance, field: 'brandName', 'errors')}">
-									<g:textField class="text" size="80" name="brandName" maxlength="255" value="${productSupplierInstance?.brandName}" />
 								</td>
 							</tr>
 							<tr class="prop">

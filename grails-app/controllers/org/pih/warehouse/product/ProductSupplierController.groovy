@@ -62,6 +62,7 @@ class ProductSupplierController {
 
     def save = {
         def productSupplierInstance = new ProductSupplier(params)
+        updateAttributes(productSupplierInstance, params)
 
         if (!productSupplierInstance.code) {
             String prefix = productSupplierInstance?.product?.productCode
