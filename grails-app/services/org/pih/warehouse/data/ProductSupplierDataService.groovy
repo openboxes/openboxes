@@ -272,12 +272,15 @@ class ProductSupplierDataService {
         if (params.supplierCode) {
             query += " AND supplier_code = IFNULL(:supplierCode, supplier_code) "
         } else {
+            query += " AND (supplier_code is null OR supplier_code = '') "
             if (params.manufacturer && params.manufacturerCode) {
                 query += " AND manufacturer_id = :manufacturerId AND manufacturer_code = :manufacturerCode "
             } else if (params.manufacturer) {
                 query += " AND manufacturer_id = :manufacturerId AND (manufacturer_code is null OR manufacturer_code = '')"
             } else if (params.manufacturerCode) {
                 query += " AND manufacturer_code = :manufacturerCode AND (manufacturer_id is null or manufacturer_id = '')"
+            } else {
+                query += " AND (manufacturer_code is null OR manufacturer_code = '') AND (manufacturer_id is null or manufacturer_id = '')"
             }
         }
         Sql sql = new Sql(dataSource)
