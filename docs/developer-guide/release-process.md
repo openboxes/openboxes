@@ -1,18 +1,11 @@
 # Release Process
 Created Thursday 21 March 2019
-
-## Resources
-* https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow
-* https://gitversion.readthedocs.io/en/latest/git-branching-strategies/gitflow-examples/
-* https://gitversion.readthedocs.io/en/latest/git-branching-strategies/gitflow/
-* https://danielkummer.github.io/git-flow-cheatsheet/
-* https://medium.com/hard-work/gitflow-release-hotfix-bddee96fc5c3
-* https://www.fredonism.com/a-practical-take-on-gitflow-and-semantic-versioning
+Updated Tuesday 23 February 2021
 
 ## Overview
-* Create JIRA version (usually done while planning the release before development begins)
+* Create JIRA version 
 * Create release branch
-* Deploy to staging server (OBNAVSTAGE)
+* Deploy to staging server 
 * QA Process
 * Finalize Release
 
@@ -49,22 +42,22 @@ changes.
 
 1. Create new release branch off develop
 
-        git checkout -b release/0.8.9
-        git push --set-upstream origin release/0.8.9
+        git checkout -b release/x.y.z
+        git push --set-upstream origin release/x.y.z
 
 1. Change version number in application.properties
 
-        app.version=0.8.9
+        app.version=x.y.z
 
 1. Commit version change
 
-        git commit -am "bumped app version to 0.8.9"
+        git commit -am "bumped app version to x.y.z"
 
 ### Change release branch on Bamboo
 
 1. Go to Linked Repositories
 1. Select openboxes-release
-1. Change the Branch to release/0.8.9
+1. Change the Branch to release/x.y.z
 
 ![Change Release Branch](../img/bamboo-change-release-branch.png "Change Release Branch")
 
@@ -75,7 +68,7 @@ few minutes just go to the build plan page and trigger it manually.
 ### Testing Release
 Once the latest release branch has been deployed to OBNAVSTAGE we can start the QA pass. During 
 this process we might add a few Bug tickets, but there should be no new features. Developers 
-should either create branches off of release/0.8.9 or commit directly to the release branch.
+should either create branches off of release/x.y.z or commit directly to the release branch.
 
 ### Finalize Release
 Finalizing the release involves making the following changes to JIRA and Github.
@@ -83,46 +76,95 @@ Finalizing the release involves making the following changes to JIRA and Github.
 Once the QA pass has been completed and there are no more bugs, we can start to finalize the 
 release. 
 
+#### JIRA
+
 1. Close any tickets that have been completed
-1. Move remaining tickets to the next sprint
-1. Remove or change the fixVersion of any open tickets (0.8.9 -> 0.8.10) 
-1. Go to Agile board > Active Sprints 
-1. Close the current sprint using the current date as the End Date.
-1. Go to Agile Board > Complete Sprint
-1. Go to Kanban Board > Release 
-1. Go to Versions page 
-1. Merge 0.8.9-kanban1 into 0.8.9
-1. Git > Merge release/0.8.9 into master
+1. Move remaining tickets to the next sprint / backlog
+1. Remove fixVersion for any open tickets with fixVersion = x.y.z 
+1. Go to Versions page
+1. Generate Release Notes (text) for version x.y.z
+
+#### GitHub
+
+1. Create a Release on GitHub (include Release Notes from JIRA)
+
+    ![Create Release on GitHub](../img/github-create-release.png "Create Release on GitHub")
+
+1. Merge release branch into master
 
         git checkout master
-        git merge release/0.8.9
-        git push
-        
-1. Git > Tag release/0.8.9 (http://docs.openboxes.com/en/latest/developer-guide/tagging/)
+        git merge release/x.y.z
 
-        git tag -a v0.8.9 -m 'Release 0.8.9' <commit-sha>
+1. Bump app version (remove -SNAPSHOT)
+
+        git add application.properties
+        git commit -m "bumped app version to x.y.z"
+        
+1. Tag release ([See Tagging section](http://docs.openboxes.com/en/latest/developer-guide/tagging/))
+   
+        git tag -a vx.y.z -m 'Release x.y.z' 
         git push --tags
 
-1. Git > Merge master into develop
+1. Push master to remote
+
+        git push
+
+
+### Deployment
+
+1. Run Daily Stable Build plan (automated)
+
+    ![Run Daily Stable Build plan](../img/bamboo-daily-stable-build-plan.png)
+   
+
+1. Download the Latest WAR artifact from Daily Stable Build > Artifacts
+
+    ![Download latest WAR](../img/bamboo-download-latest-war.png)
+
+### Publish Release Notes 
+
+1. Upload WAR to release 
+
+    ![Download latest WAR](../img/github-upload-latest-war-to-release-details.png)
+
+
+1. Publish Release Notes to openboxes.com
+
+    ![Publish Release](../img/github-publish-release.png)
+
+
+### Cleanup
+
+1. On Bamboo, change openboxes-release back to master 
+   
+    ![Change Linked Repo](../img/bamboo-change-linked-repo-to-master.png)
+
+1. Merge master into develop
 
         git checkout develop
         git merge master
         # fix conflicts
         git push
         
-1. Git > Bump version
+1. Bump version (if major/minor release)
 
         # bump version number in application.properties
         git add application.properties
-        git commit -m "bumped app version to 0.8.10-SNAPSHOT"
+        git commit -m "bumped app version to x.y.z+1-SNAPSHOT"
         git push
 
-1. Git > Delete release/0.8.9 branch
+1. Delete release/x.y.z branch
 
-        git branch -d release/0.8.9
+        git branch -d release/x.y.z
 
-1. Github > Create new release with release notes 
-1. Bamboo > Download latest WAR from Daily Stable Build (master)
-1. GitHub > Upload WAR to release 
-1. Publish Release Notes to openboxes.com
-1. Bamboo > Change openboxes-release back to master 
+
+
+## Resources
+* <https://semver.org/>
+* <https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow>
+* <https://gitversion.readthedocs.io/en/latest/git-branching-strategies/gitflow-examples/>
+* <https://gitversion.readthedocs.io/en/latest/git-branching-strategies/gitflow/>
+* <https://danielkummer.github.io/git-flow-cheatsheet/>
+* <https://medium.com/hard-work/gitflow-release-hotfix-bddee96fc5c3>
+* <https://www.fredonism.com/a-practical-take-on-gitflow-and-semantic-versioning>
+
