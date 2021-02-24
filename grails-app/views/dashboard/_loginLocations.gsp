@@ -23,7 +23,6 @@
     border-radius: 4px 0px 0px 4px;
     overflow: hidden;
     margin: 2px 0px 2px 0px;
-    background: #CCCCCC;
 }
 #tabs-left .ui-tabs-nav li.ui-tabs-selected,
 #tabs-left .ui-tabs-nav li.ui-state-active {
