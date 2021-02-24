@@ -84,19 +84,9 @@
                             </tr>
                             <tr class='prop'>
                                 <td class='name middle'><label><warehouse:message code="order.destinationParty.label"/></label></td>
-                                <td valign='top'
-                                    class='value ${hasErrors(bean:order,field:'destinationParty','errors')}'>
-
-                                    <g:if test="${order.id}">
-                                        ${order.destinationParty.name} (${order.destinationParty?.code})
-                                    </g:if>
-                                    <g:else>
-                                        <g:selectOrganization name="destinationParty.id"
-                                                              id="destinationParty.id" value="${order?.destinationParty?.id}"
-                                                              roleTypes="[org.pih.warehouse.core.RoleType.ROLE_BUYER]"
-                                                              noSelection="['':'']"
-                                                              class="chzn-select-deselect" />
-                                    </g:else>
+                                <td valign='top' class='value ${hasErrors(bean:order,field:'destinationParty','errors')}'>
+                                    ${order.destinationParty.name} (${order.destinationParty?.code})
+                                    <g:hiddenField name="destinationParty.id" value="${order?.destinationParty?.id}"/>
                                 </td>
                             </tr>
                             <tr class='prop'>

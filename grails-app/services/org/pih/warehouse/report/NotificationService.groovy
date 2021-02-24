@@ -133,7 +133,7 @@ class NotificationService {
         def recipientItems = shipmentInstance.shipmentItems.groupBy {it.recipient }
         recipientItems.each { Person recipient, items ->
             if (emailValidator.isValid(recipient?.email)) {
-                def subject = g.message(code: "email.yourItemShipped.message", args: [shipmentInstance.shipmentNumber])
+                def subject = g.message(code: "email.yourItemShipped.message", args: [shipmentInstance.origin.name, shipmentInstance.destination.name, shipmentInstance.shipmentNumber])
                 def body = "${g.render(template: "/email/shipmentItemShipped", model: [shipmentInstance: shipmentInstance, shipmentItems: items, recipient:recipient])}"
                 mailService.sendHtmlMail(subject, body.toString(), recipient.email)
             }
@@ -155,7 +155,7 @@ class NotificationService {
         def recipientItems = partialReceipt.partialReceiptItems.groupBy {it.recipient }
         recipientItems.each { Person recipient, items ->
             if (emailValidator.isValid(recipient?.email)) {
-                def subject = g.message(code: "email.yourItemReceived.message", args: [shipment.shipmentNumber])
+                def subject = g.message(code: "email.yourItemReceived.message", args: [shipment.destination.name, shipment.shipmentNumber])
                 def body = "${g.render(template: "/email/shipmentItemReceived", model: [shipmentInstance: shipment, receiptItems: items, recipient: recipient])}"
                 mailService.sendHtmlMail(subject, body.toString(), recipient.email)
             }

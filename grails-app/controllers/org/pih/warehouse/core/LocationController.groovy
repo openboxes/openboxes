@@ -319,15 +319,18 @@ class LocationController {
 
             if (locationService.importBinLocations(params.id, multipartFile.inputStream)) {
                 flash.message = "Successfully imported all bin locations."
-
             } else {
                 flash.message = "Failed to import bin locations due to an unknown error."
             }
+            redirect(action: "edit", id: params.id)
+
         } catch (Exception e) {
+            Location locationInstance = Location.read(params.id)
             log.error("Failed to import bin locations due to the following error: " + e.message, e)
-            flash.message = "Failed to import bin locations due to the following error: " + e.message
+            flash.message = e.message
+            render(view: "edit", model: [locationInstance: locationInstance])
+            return
         }
-        redirect(action: "edit", id: params.id)
     }
 
 

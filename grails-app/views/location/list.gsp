@@ -6,25 +6,27 @@
         <title><warehouse:message code="locations.label" /></title>
 
     </head>
-    <body>        
+    <body>
         <div class="body">
-        
+
             <g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
             </g:if>
-           	
+
            	<div>
-				<div class="buttonBar">            	
+				<div class="buttonBar">
                     <g:link class="button" action="list">
                         <img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}" />&nbsp;
                         <warehouse:message code="default.list.label" args="[warehouse.message(code:'locations.label').toLowerCase()]"/>
                     </g:link>
-                    <g:isUserAdmin>
-                        <g:link class="button" action="edit">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
-                            <warehouse:message code="default.create.label"
-                             args="[warehouse.message(code: 'location.label').toLowerCase()]"/></g:link>
-                    </g:isUserAdmin>
+                    <g:link class="button" action="edit">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
+                        <warehouse:message code="default.create.label"
+                         args="[warehouse.message(code: 'location.label').toLowerCase()]"/></g:link>
+                    <g:link controller="batch" action="downloadExcel" params="[type:'Location']" class="button">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" />&nbsp;
+                        <warehouse:message code="default.export.label" args="[g.message(code:'locations.label')]"/>
+                    </g:link>
                 </div>
 
                 <div class="yui-gf">
