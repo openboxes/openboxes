@@ -104,4 +104,5 @@
     <include file="0.8.x/changelog-2021-02-09-1530-create-product-type-required-fields-and-displayed-fields-tables.xml"/>
     <include file="0.8.x/changelog-2021-02-12-1030-add-preference-type-initial-data.xml"/>
     <include file="0.8.x/changelog-2021-02-19-1629-add-product-supplier-to-product-attribute.xml"/>
+    <include file="0.8.x/changelog-2021-02-24-1700-fix-product-price-data.xml"/>
 </databaseChangeLog>
