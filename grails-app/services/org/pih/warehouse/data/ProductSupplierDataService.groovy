@@ -9,21 +9,27 @@
  **/
 package org.pih.warehouse.data
 
+import groovy.sql.Sql
 import org.pih.warehouse.core.Organization
+import org.pih.warehouse.core.PreferenceType
 import org.pih.warehouse.core.ProductPrice
+import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.product.ProductSupplier
+import org.pih.warehouse.product.ProductSupplierPreference
 import org.springframework.validation.BeanPropertyBindingResult
-import groovy.sql.Sql
+
+import java.text.SimpleDateFormat
 
 class ProductSupplierDataService {
 
     def uomService
     def identifierService
     def dataSource
+    def grailsApplication
 
     Boolean validate(ImportDataCommand command) {
         log.info "Validate data " + command.filename
@@ -31,30 +37,44 @@ class ProductSupplierDataService {
 
             def id = params.id
             def productCode = params.productCode
-            def supplierId = params.supplierId
             def supplierName = params.supplierName
-            def manufacturerId = params.manufacturerId
             def manufacturerName = params.manufacturerName
+            def ratingTypeCode = params.ratingTypeCode
+            def preferenceType = params.globalPreferenceTypeName
             def uomCode = params.defaultProductPackageUomCode
             def packageQuantity = params.defaultProductPackageQuantity
+            def validityStartDate = params.globalPreferenceTypeValidityStartDate
+            def validityEndDate = params.globalPreferenceTypeValidityEndDate
+            def contractPriceValidUntil = params.contractPriceValidUntil
 
             if (id && !ProductSupplier.exists(id)) {
                 command.errors.reject("Row ${index + 1}: Product supplier with ID ${id} does not exist")
             }
 
-            def product = Product.findByProductCode(productCode)
-            if (productCode && !product) {
+            if (!params.name) {
+                command.errors.reject("Row ${index + 1}: Product Source Name is required")
+            }
+
+            if (!productCode) {
+                command.errors.reject("Row ${index + 1}: Product Code is required")
+            } else if (productCode && !Product.findByProductCode(productCode)) {
                 command.errors.reject("Row ${index + 1}: Product with productCode ${productCode} does not exist")
             }
 
-            def supplier = Organization.get(supplierId)
-            if (supplier?.name != supplierName) {
-                command.errors.reject("Row ${index + 1}: Supplier '${supplier?.name}' with id ${supplier?.id} does not match supplierName '${supplierName}'")
+            if (supplierName && !Organization.findByName(supplierName)) {
+                command.errors.reject("Row ${index + 1}: Supplier with name '${supplierName}' does not exist")
             }
 
-            def manufacturer = Organization.get(manufacturerId)
-            if (manufacturer?.name != manufacturerName) {
-                command.errors.reject("Row ${index + 1}: Manufacturer '${manufacturer?.name}' with id ${manufacturer?.id} does not match manufacturerName '${manufacturerName}'")
+            if (manufacturerName && !Organization.findByName(manufacturerName)) {
+                command.errors.reject("Row ${index + 1}: Manufacturer with name '${manufacturerName}' does not exist")
+            }
+
+            if (ratingTypeCode && !RatingTypeCode.values().any { it.name == ratingTypeCode }) {
+                command.errors.reject("Row ${index + 1}: Rating Type with value '${ratingTypeCode}' does not exist")
+            }
+
+            if (preferenceType && !PreferenceType.findByName(preferenceType)) {
+                command.errors.reject("Row ${index + 1}: Preference Type with name '${preferenceType}' does not exist")
             }
 
             log.info("uomCode " + uomCode)
@@ -65,6 +85,47 @@ class ProductSupplierDataService {
                 }
                 if (unitOfMeasure && !packageQuantity) {
                     command.errors.reject("Row ${index + 1}: Unit of measure ${uomCode} requires a quantity")
+                }
+                if (unitOfMeasure && packageQuantity && packageQuantity % 1 != 0) {
+                    command.errors.reject("Row ${index + 1}: Unit of measure quntity must be a whole number")
+                }
+            }
+
+            def minDate = grailsApplication.config.openboxes.expirationDate.minValue
+            def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+            if (validityStartDate) {
+                try {
+                    def startDate = dateFormat.parse(validityStartDate)
+
+                    if (minDate > startDate) {
+                        command.errors.reject("Row ${index + 1}: Validity start date ${validityStartDate} is invalid. Please enter a date after ${minDate.getYear()+1900}.")
+                    }
+                } catch (Exception e) {
+                    command.errors.reject("Row ${index + 1}: Validity start date ${validityStartDate} is invalid")
+                }
+            }
+
+            if (validityEndDate) {
+                try {
+                    def endDate = dateFormat.parse(validityEndDate)
+
+                    if (minDate > endDate) {
+                        command.errors.reject("Row ${index + 1}: Validity start date ${validityEndDate} is invalid. Please enter a date after ${minDate.getYear()+1900}.")
+                    }
+                } catch (Exception e) {
+                    command.errors.reject("Row ${index + 1}: Validity end date ${validityEndDate} is invalid")
+                }
+            }
+
+            if (contractPriceValidUntil) {
+                try {
+                    def validUntilDate = dateFormat.parse(contractPriceValidUntil)
+
+                    if (minDate > validUntilDate) {
+                        command.errors.reject("Row ${index + 1}: Contract Price Valid Until date ${contractPriceValidUntil} is invalid. Please enter a date after ${minDate.getYear()+1900}.")
+                    }
+                } catch (Exception e) {
+                    command.errors.reject("Row ${index + 1}: Contract Price Valid Until date ${contractPriceValidUntil} is invalid")
                 }
             }
 
@@ -104,11 +165,10 @@ class ProductSupplierDataService {
         } else {
             productSupplier.properties = params
         }
-        productSupplier.name = params["productName"]
         productSupplier.productCode = params["legacyProductCode"]
         productSupplier.product = product
-        productSupplier.supplier = Organization.get(params["supplierId"])
-        productSupplier.manufacturer = Organization.get(params["manufacturerId"])
+        productSupplier.supplier = Organization.findByName(params["supplierName"])
+        productSupplier.manufacturer = Organization.findByName(params["manufacturerName"])
 
         if (unitOfMeasure && quantity) {
             ProductPackage defaultProductPackage =
@@ -131,6 +191,48 @@ class ProductSupplierDataService {
                 defaultProductPackage.productPrice = productPrice
             } else if (price && defaultProductPackage.productPrice) {
                 defaultProductPackage.productPrice.price = price
+            }
+        }
+
+        def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+
+        def contractPriceValidUntil = params.contractPriceValidUntil ? dateFormat.parse(params.contractPriceValidUntil) : null
+        UnitOfMeasure contractPriceCurrency = params.contractPriceCurrencyCode ?
+                UnitOfMeasure.findByCode(params.contractPriceCurrencyCode) : null
+
+        if (contractPriceCurrency) {
+            if (productSupplier.contractPrice) {
+                productSupplier.contractPrice.currency = contractPriceCurrency
+
+                if (contractPriceValidUntil) {
+                    productSupplier.contractPrice.toDate = contractPriceValidUntil
+                }
+            }
+        }
+
+        PreferenceType preferenceType = PreferenceType.findByName(params.globalPreferenceTypeName)
+
+        if (preferenceType) {
+            ProductSupplierPreference productSupplierPreference = productSupplier.getGlobalProductSupplierPreference()
+
+            if (!productSupplierPreference) {
+                productSupplierPreference = new ProductSupplierPreference()
+                productSupplier.addToProductSupplierPreferences(productSupplierPreference)
+            }
+
+            productSupplierPreference.preferenceType = preferenceType
+            productSupplierPreference.comments = params.globalPreferenceTypeComments
+
+            def globalPreferenceTypeValidityStartDate = params.globalPreferenceTypeValidityStartDate ? dateFormat.parse(params.globalPreferenceTypeValidityStartDate) : null
+
+            if (globalPreferenceTypeValidityStartDate) {
+                productSupplierPreference.validityStartDate = globalPreferenceTypeValidityStartDate
+            }
+
+            def globalPreferenceTypeValidityEndDate = params.globalPreferenceTypeValidityEndDate ? dateFormat.parse(params.globalPreferenceTypeValidityEndDate) : null
+
+            if (globalPreferenceTypeValidityEndDate) {
+                productSupplierPreference.validityEndDate = globalPreferenceTypeValidityEndDate
             }
         }
 
