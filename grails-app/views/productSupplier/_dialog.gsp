@@ -109,7 +109,7 @@
                                             class="chzn-select-deselect"/>
                     </td>
                 </tr>
-                <tr class="prop">
+                <tr class="prop" title="${warehouse.message(code: 'productSupplier.editPreferenceType.label')}">
                     <td class="name">
                         <label for="preferenceType"><warehouse:message code="preferenceType.label"/></label>
                     </td>
