@@ -1,6 +1,4 @@
-## Overview 
-
-### Authentication
+## Authentication
 In order to authenticate, you need a valid user account. In order to get the full benefits of the API your user should 
 probably be in role Superuser. Once you have created a Superuser <cough> user, you can attempt to authenticate 
 using your username and password.
@@ -20,11 +18,10 @@ Authentication was successful
 NOTE: `-c cookies` option will create a cookies file (cookies.txt) and save your session information to be used in 
 subsequent requests. This saves a huge amount of headache when you're testing the API.
 
-### Cookie
-Once you have authenticated, you have two options to 
+## Cookie
+Once you have authenticated, you have two options to authorize requests.
 
-
-#### Cookie Header 
+### Cookie Header 
 Copy the JSESSIONID Cookie from the response header to make subsequent authenticated requests 
 to the API
 ```
@@ -33,7 +30,7 @@ $ curl -i -X POST -H "Content-Type: application/json" \
 https://openboxes.ngrok.io/openboxes/api/categories
 
 ```
-#### Cookie File
+### Cookie File
 Or use `-b cookies.txt` to read from a cookies file and start making requests against the API. 
 NOTE: You'll need to use the `-c cookies.txt` on the login request in order to generate the proper cookies.
 ```
@@ -41,7 +38,7 @@ $ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
 https://openboxes.ngrok.io/openboxes/api/categories
 ```
 
-### Logout
+## Logout
 
 If you want to end your session, you can `POST` a request to the logout endpoint.
 ```
@@ -49,9 +46,9 @@ $ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
 https://openboxes.ngrok.io/openboxes/api/logout
 
 ```
-### Exceptions
+## Exceptions
 
-#### Unauthorized Access
+### Unauthorized Access
 If you try to access the API with no cookies (or an invalid/stale cookie) you'll receive the following error and will need to (re-)authenticate
 ```
 $ curl -i -X POST -H "Content-Type: application/json" \
@@ -68,7 +65,7 @@ Date: Thu, 21 Jun 2018 04:21:29 GMT
 ```
 
 
-### Pagination
+## Pagination
 All API endpoints will return all objects if pagination parameters are not provided.
 ```
 $ curl -X POST -H "Content-Type: application/json" \
@@ -90,7 +87,7 @@ https://openboxes.ngrok.io/openboxes/api/products?offset=0&max=1 | jsonlint
 
 ```
 
-### JSON Lint
+## Formatting
 While testing the API, I'd recommend installing jsonlint ...
 ```css
 npm install jsonlint -g

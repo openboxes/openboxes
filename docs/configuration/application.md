@@ -5,7 +5,7 @@
 
 ### Settings
 | Setting | Required | Description |
-| ---- | ---- | ---- | ---- |
+| ------- | -------- | ----------- |
 | openboxes.signup.defaultRoles | No | Used to specify default roles assigned to newly registered users (implies automatic activation).  Should only be used in cases where you either trust your registered users (e.g. app is running on LAN) or you don't care what users are allowed to do (e.g. demo server). |
 | openboxes.system.defaultTimezone | No | Not currently supported. | 
 | openboxes.fixtures.enabled | No | Only used on local machines when dataSource.url is overriden. When set to true this will trigger the creation of data fixtures used for testing.  | 
