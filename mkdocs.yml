@@ -2,25 +2,28 @@ site_name: OpenBoxes
 site_description:
 site_author: Justin Miranda
 repo_url: https://github.com/openboxes/openboxes
-theme: readthedocs
+#theme: readthedocs
+theme:
+  name: material
 include_search: true
 #use_absolute_urls: true
 use_directory_urls: true
-copyright: Copyright &copy; 2010-2019, OpenBoxes
+copyright: Copyright &copy; 2010-2021, OpenBoxes
 google_analytics: ['UA-37396941-2', 'openboxes.com']
 markdown_extensions:
   - admonition
   - footnotes
   - tables
 nav:
-  - Home: index.md
   - About:
-    - Features: https://openboxes.com/features/
+    - Home: index.md
     - Architecture: about/architecture.md
     - Benefits: about/benefits.md
     - Considerations: about/considerations.md
-    - Pricing: https://openboxes.com/pricing/
-    - Road Map: https://openboxes.com/roadmap/
+    - Website:
+      - Features: https://openboxes.com/features/
+      - Pricing: https://openboxes.com/pricing/
+      - Road Map: https://openboxes.com/roadmap/
     - Release Notes: about/release-notes.md
   - Installation:
     - Overview: installation/index.md
