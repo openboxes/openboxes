@@ -1,6 +1,6 @@
 # Release Process
-Created Thursday 21 March 2019
-Updated Tuesday 23 February 2021
+* Created Thursday 21 March 2019
+* Updated Tuesday 23 February 2021
 
 ## Overview
 * Create JIRA version 
