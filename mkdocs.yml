@@ -31,8 +31,7 @@ nav:
     - Installation:
       - Ubuntu:
         - Ubuntu 18.04:
-          - Overview: installation/ubuntu1804/index.md
-          - Requirements: installation/ubuntu1804/requirements.md
+          - Requirements: installation/ubuntu1804/index.md
           - Hosting: installation/ubuntu1804/hosting.md
           - Ubuntu: installation/ubuntu1804/ubuntu.md
           - Java: installation/ubuntu1804/java.md
