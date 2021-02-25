@@ -2,10 +2,10 @@ OpenBoxes is an open-source supply chain management system designed to manage su
 
 ## Features
 
-### Browse Inventory
+#### Browse Inventory
 <img src="https://openboxes.com/img/screenshots/inventory/browse-inventory.png"/>
 
-### View Stock Card
+#### View Stock Card
 <img src="https://openboxes.com/img/screenshots/inventory/track-lot-number-exp-date.png"/>
 
 ### View Stock History
