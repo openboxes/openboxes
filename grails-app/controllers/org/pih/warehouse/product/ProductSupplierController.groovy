@@ -70,6 +70,14 @@ class ProductSupplierController {
             productSupplierInstance.code = identifierService.generateProductSupplierIdentifier(prefix)
         }
 
+        if (params.defaultPreferenceType) {
+            PreferenceType preferenceType = PreferenceType.get(params.defaultPreferenceType)
+            ProductSupplierPreference defaultPreference = new ProductSupplierPreference()
+            defaultPreference.preferenceType = preferenceType
+            defaultPreference.productSupplier = productSupplierInstance
+            productSupplierInstance.addToProductSupplierPreferences(defaultPreference)
+        }
+
         if (params.preferenceType) {
             PreferenceType preferenceType = PreferenceType.get(params.preferenceType)
             Location location = Location.get(session.warehouse.id)
@@ -105,11 +113,13 @@ class ProductSupplierController {
 
     def edit = {
         def productSupplierInstance = ProductSupplier.get(params.id)
+        Location location = Location.get(session.warehouse.id)
+        ProductSupplierPreference preference = productSupplierInstance?.productSupplierPreferences?.find {it.destinationParty == location.organization }
         if (!productSupplierInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), params.id])}"
             redirect(action: "list")
         } else {
-            return [productSupplierInstance: productSupplierInstance]
+            return [productSupplierInstance: productSupplierInstance, preferenceType: preference?.preferenceType, defaultPreferenceType: productSupplierInstance?.globalProductSupplierPreference?.preferenceType]
         }
     }
 
@@ -132,6 +142,19 @@ class ProductSupplierController {
             if (!productSupplierInstance.code) {
                 String prefix = productSupplierInstance?.product?.productCode
                 productSupplierInstance.code = identifierService.generateProductSupplierIdentifier(prefix)
+            }
+
+            if (params.defaultPreferenceType) {
+                PreferenceType preferenceType = PreferenceType.get(params.defaultPreferenceType)
+                ProductSupplierPreference defaultPreference = productSupplierInstance?.globalProductSupplierPreference
+                if (defaultPreference) {
+                    defaultPreference.preferenceType = preferenceType
+                } else {
+                    defaultPreference = new ProductSupplierPreference()
+                    defaultPreference.preferenceType = preferenceType
+                    defaultPreference.productSupplier = productSupplierInstance
+                    productSupplierInstance.addToProductSupplierPreferences(defaultPreference)
+                }
             }
 
             if (params.preferenceType) {
