@@ -20,6 +20,7 @@ class ErrorsController {
     MailService mailService
     def userService
     def grailsApplication
+    def userAgentIdentService
 
     def handleException = {
         if (RequestUtil.isAjax(request)) {
@@ -28,6 +29,11 @@ class ErrorsController {
 
             render([errorCode: 500, cause: cause?.class, errorMessage: message] as JSON)
         } else {
+            if (userAgentIdentService.isMobile()) {
+                render(view: "/mobile/error")
+                return
+            }
+
             render(view: "/error")
         }
     }
