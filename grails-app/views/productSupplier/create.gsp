@@ -171,6 +171,16 @@
 						</tbody>
 					</table>
 				</div>
+				<div class="box">
+					<h2>${g.message(code: 'attributes.label')}</h2>
+					<table>
+						<tbody>
+						<g:render template="../attribute/renderFormList"
+								  model="[fieldPrefix: 'productAttributes.',
+										  entityTypeCodes: [org.pih.warehouse.core.EntityTypeCode.PRODUCT_SUPPLIER]]"/>
+						</tbody>
+					</table>
+				</div>
 				<div class="buttons">
 					<g:submitButton name="create" class="button" value="${warehouse.message(code: 'default.button.create.label', default: 'Create')}" />
 					<g:link class="button" action="list">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
