@@ -22,6 +22,7 @@ class AuthController {
     def grailsApplication
     def recaptchaService
     def ravenClient
+    def userAgentIdentService
 
     static allowedMethods = [login: "GET", doLogin: "POST", logout: "GET"]
 
@@ -29,7 +30,6 @@ class AuthController {
      * Show index page - just a redirect to the list page.
      */
     def index = {
-        log.info "auth controller index"
         redirect(action: "login", params: params)
     }
 
@@ -50,6 +50,11 @@ class AuthController {
         if (session.user) {
             flash.message = "You have already logged in."
             redirect(controller: "dashboard", action: "index")
+        }
+
+        if (userAgentIdentService.isMobile()) {
+            redirect(controller: "mobile", action: "login")
+            return
         }
 
     }

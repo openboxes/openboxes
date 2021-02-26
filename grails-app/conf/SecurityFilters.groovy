@@ -18,10 +18,10 @@ import org.pih.warehouse.util.RequestUtil
 class SecurityFilters {
 
     static ArrayList controllersWithAuthUserNotRequired = ['test', 'errors']
-    static ArrayList actionsWithAuthUserNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'changeLocation']
+    static ArrayList actionsWithAuthUserNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'changeLocation', 'menu']
 
     static ArrayList controllersWithLocationNotRequired = ['categoryApi', 'productApi', 'genericApi', 'api']
-    static ArrayList actionsWithLocationNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'chooseLocation']
+    static ArrayList actionsWithLocationNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'chooseLocation', 'menu']
 
     def authService
     def filters = {
@@ -59,6 +59,10 @@ class SecurityFilters {
                     return true
                 }
 
+                // This allows the menu to be g:include'd on mobile page (allowing for dynamic content to be added)
+                if (controllerName.equals("mobile") && actionName.equals("menu")) {
+                    return true
+                }
 
                 // Not sure when this happens
                 if (params.controller == null) {
