@@ -23,7 +23,8 @@
 			</g:hasErrors>
 
             <g:if test="${commandInstance?.data}">
-                <g:if test="${commandInstance.type != 'productSupplierPreference' && commandInstance?.data?.any { !it.quantity || it.quantity == 0 }}">
+                <g:if test="${commandInstance.type != 'productSupplierPreference' && commandInstance.type != 'productSupplierAttribute' &&
+                        commandInstance?.data?.any { !it.quantity || it.quantity == 0 }}">
                     <div class="message">
                         <warehouse:message code="import.blankQuantities.label" />
                     </div>
