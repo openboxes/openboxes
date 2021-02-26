@@ -221,7 +221,8 @@
                 $(".tabs").tabs({
                     cookie: {
                         expires: 1
-                    }
+                    },
+                    selected: ${params.tab ? params.tab : 0}
                 });
             });
         </script>

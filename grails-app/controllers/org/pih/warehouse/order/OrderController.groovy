@@ -978,6 +978,11 @@ class OrderController {
 
     def createCombinedShipment = {
         def orderInstance = Order.get(params.orderId)
+        if (!orderInstance.orderItems.find {it.quantityRemainingToShip != 0 }) {
+            flash.message = "${warehouse.message(code:'purchaseOrder.noItemsToShip.label')}"
+            redirect(controller: 'order', action: "show", id: orderInstance.id, params: ['tab': 4])
+            return
+        }
         StockMovement stockMovement = StockMovement.createFromOrder(orderInstance);
         stockMovement = stockMovementService.createShipmentBasedStockMovement(stockMovement)
         redirect(controller: 'stockMovement', action: "createCombinedShipments", params: [direction: 'INBOUND', id: stockMovement.id])
