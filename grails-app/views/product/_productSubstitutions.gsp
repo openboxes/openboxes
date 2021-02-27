@@ -61,8 +61,11 @@
                     </g:each>
                     <g:unless test="${productInstance?.substitutions}">
                         <tr class="prop">
-                            <td class="empty center" colspan="11">
-                                <g:message code="default.empty.message" default="There are no {0}" args="[g.message(code:'product.substitutions.label')]"/>
+                            <td class="padded fade center" colspan="11">
+                                <div class="padded fade center">
+                                    <!--<g:message code="default.empty.message" default="There are no {0}" args="[g.message(code:'product.substitutions.label')]"/>-->
+                                </div>
+
                             </td>
                         </tr>
                     </g:unless>
@@ -71,9 +74,10 @@
                 <tr>
                     <td colspan="8">
                         <div class="center">
-                            <button class="button icon add btn-show-dialog"
+                            <button class="button btn-show-dialog"
                                     data-title="${g.message(code: 'default.create.label', args: [g.message(code:'productAssociation.label')])}"
                                     data-url="${request.contextPath}/productAssociation/dialog?product.id=${productInstance?.id}">
+                                <img src="${createLinkTo(dir:'images/icons/silk', file:'add.png')}" />
                                 ${g.message(code: 'default.create.label', args: [g.message(code:'productAssociation.label')])}
                             </button>
                         </div>

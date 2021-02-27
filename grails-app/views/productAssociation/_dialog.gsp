@@ -21,7 +21,7 @@
             </tr>
             <tr class="prop">
                 <td class="name">
-                    <label>is associated with</label>
+                    <label></label>
                 </td>
                 <td class="value">
                     <div id="associatedProduct">
@@ -36,7 +36,7 @@
             </tr>
             <tr class="prop">
                 <td class="name">
-                    <label>to be used as a(n)</label>
+                    <label>${g.message(code: 'productAssociation.productAssociationTypeCode.label')}</label>
                 </td>
                 <td class="value">
                     <g:selectProductAssociationTypeCode name="code" value="${productAssociation.code}" class="chzn-select-deselect"/>
@@ -48,7 +48,7 @@
                 <td class="name">
                     <label for="comments"><g:message code="default.comments.label"/></label>
                 </td>
-                <td class="value ">
+                <td class="value">
                     <g:textArea name="comments" size="80" class="text medium" value="${productAssociation?.comments}" />
                 </td>
             </tr>
