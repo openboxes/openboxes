@@ -50,7 +50,7 @@
         <table id="data">
             <thead>
                 <tr class="header odd">
-                    <th><warehouse:message code="requisition.monthRequested.label" default="Month requested"/></th>
+                    <th><warehouse:message code="requisition.monthIssued.label" default="Month issued"/></th>
                     <th class="center middle"><warehouse:message code="requisitionItem.quantityRequested.label"/></th>
                     <th class="center middle"><warehouse:message code="requisitionItem.quantityIssued.label" default="Issued"/></th>
                     <th class="center middle"><warehouse:message code="requisitionItem.quantityDemand.label" default="Demand"/></th>
@@ -58,7 +58,7 @@
             </thead>
             <tbody>
 
-                <g:set var="itemsByMonth" value="${requisitionItems.groupBy { it.monthRequested } }"/>
+                <g:set var="itemsByMonth" value="${requisitionItems.groupBy { it.monthIssued } }"/>
                 <g:set var="totalQuantityRequested" value="${0 }"/>
                 <g:set var="totalQuantityIssued" value="${0}"/>
                 <g:set var="totalQuantityDemand" value="${0}"/>
@@ -121,10 +121,10 @@
                                                     </g:link>
                                                 </td>
                                                 <td>
-                                                    <g:formatDate date="${requisitionItem?.dateRequested}" format="MMM dd"/>
+                                                    <g:formatDate date="${requisitionItem?.dateRequested}" format="MM/dd/yyyy"/>
                                                 </td>
                                                 <td>
-                                                    <g:formatDate date="${requisitionItem?.dateIssued}" format="MMM dd"/>
+                                                    <g:formatDate date="${requisitionItem?.dateIssued}" format="MM/dd/yyyy"/>
                                                 </td>
                                                 <td>
                                                     ${requisitionItem?.destination}

@@ -125,6 +125,7 @@ class ForecastingService {
                 product_code,
                 product_name,
                 quantity_requested,
+                quantity_picked,
                 quantity_demand,
                 reason_code_classification
             FROM product_demand_details
@@ -340,7 +341,7 @@ class ForecastingService {
                     dateIssued       : it?.date_issued,
                     dateRequested    : it?.date_requested,
                     quantityRequested: it?.quantity_requested ?: 0,
-                    quantityIssued   : it.quantity_picked ?: 0,
+                    quantityIssued   : it?.quantity_picked ?: 0,
                     quantityDemand   : it?.quantity_demand ?: 0,
                     reasonCode       : it?.reason_code_classification,
             ]
