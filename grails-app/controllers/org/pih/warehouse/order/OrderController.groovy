@@ -21,6 +21,7 @@ import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.UomService
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.ValidationCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.shipping.Shipment
@@ -623,6 +624,11 @@ class OrderController {
         Order order = Order.get(params.order.id)
         OrderItem orderItem = OrderItem.get(params.orderItem.id)
         ProductSupplier productSupplier = null
+        ValidationCode validationCode = params.validationCode ? params.validationCode as ValidationCode : null
+        if (validationCode == ValidationCode.BLOCK) {
+            render(status: 500, text: "${warehouse.message(code: 'orderItem.blockedSupplier.label')}")
+            return
+        }
         if (params.productSupplier == "Create New") {
             Organization supplier = Organization.get(params.supplier.id)
             productSupplier = ProductSupplier.findByCodeAndSupplier(params.sourceCode, supplier)
