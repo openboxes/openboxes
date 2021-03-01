@@ -38,7 +38,7 @@ class ProductSupplierAttributeDataService {
             // Product should exist
             Product product = Product.findByProductCode(productCode)
             if (!product) {
-                command.errors.reject("Row ${index + 1}: Product with code: ${productCode} does not exist")
+                command.errors.reject("Row ${index + 1}: Product with code ${productCode} does not exist")
                 return
             }
 
@@ -51,7 +51,7 @@ class ProductSupplierAttributeDataService {
             // Product supplier should exist
             ProductSupplier productSupplier = ProductSupplier.findByCode(productSupplierCode)
             if (!productSupplier) {
-                command.errors.reject("Row ${index + 1}: Product source with code: ${productSupplierCode} does not exist")
+                command.errors.reject("Row ${index + 1}: Product source with code ${productSupplierCode} does not exist")
                 return
             }
 
@@ -64,13 +64,13 @@ class ProductSupplierAttributeDataService {
             // Attribute should exist
             Attribute attribute = Attribute.findByCode(attributeCode)
             if (!attribute) {
-                command.errors.reject("Row ${index + 1}: Attribute with code: ${attributeCode} does not exist")
+                command.errors.reject("Row ${index + 1}: Attribute with code ${attributeCode} does not exist")
                 return
             }
 
             // Validate that attribute is a product supplier attribute
             if (!attribute.entityTypeCodes.contains(EntityTypeCode.PRODUCT_SUPPLIER)) {
-                command.errors.reject("Row ${index + 1}: Attribute for given attribute code: ${attributeCode} is not supplier type")
+                command.errors.reject("Row ${index + 1}: Attribute for given attribute code ${attributeCode} is not supplier type")
                 return
             }
 
@@ -82,14 +82,14 @@ class ProductSupplierAttributeDataService {
 
             // Validate attribute value against options unless free text allowed
             if (!attribute.allowOther && !attribute.options.contains(attributeValue)) {
-                command.errors.reject("Row ${index + 1}: Attribute value: ${attributeValue} is not valid option for attribute with code: ${attributeCode}")
+                command.errors.reject("Row ${index + 1}: Attribute value ${attributeValue} is not valid option for attribute with code ${attributeCode}")
                 return
             }
 
             // Validate UOM data type matches unless UOM not specified for attribute
             UnitOfMeasure uom = unitOfMeasure ? UnitOfMeasure.findByCode(unitOfMeasure) : null
             if (attribute.unitOfMeasureClass && attribute.unitOfMeasureClass?.type != uom?.uomClass?.type) {
-                command.errors.reject("Row ${index + 1}: Unit of Measure: ${unitOfMeasure} " +
+                command.errors.reject("Row ${index + 1}: Unit of Measure ${unitOfMeasure} " +
                     "data type does not match the unit of measure data type for given attribute")
             }
         }
