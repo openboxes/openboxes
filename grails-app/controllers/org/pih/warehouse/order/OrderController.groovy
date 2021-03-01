@@ -660,9 +660,9 @@ class OrderController {
                 throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
             }
             orderItem.properties = params
-            Shipment pendingShipment = order.pendingShipment
-            if (pendingShipment) {
-                Set<ShipmentItem> itemsToUpdate = pendingShipment.shipmentItems.findAll { it.orderItemId == orderItem.id }
+            List pendingShipments = order.pendingShipments
+            if (pendingShipments) {
+                def itemsToUpdate = pendingShipments*.shipmentItems*.findAll { it.orderItemId == orderItem.id }.flatten().toArray()
                 itemsToUpdate.each { itemToUpdate ->
                     itemToUpdate.recipient = orderItem.recipient
                 }

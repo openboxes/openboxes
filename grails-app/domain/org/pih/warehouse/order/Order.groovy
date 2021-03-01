@@ -73,7 +73,7 @@ class Order implements Serializable {
             "isApprovalRequired",
             "displayStatus",
             "orderedOrderItems",
-            "pendingShipment",
+            "pendingShipments",
             "receivedOrderItems",
             "shipments",
             "shippedOrderItems",
@@ -233,12 +233,9 @@ class Order implements Serializable {
         return shipments.findAll { Shipment shipment -> shipment.currentStatus == statusCode }
     }
 
-    Shipment getPendingShipment() {
+    List getPendingShipments() {
         def pendingShipments = getShipmentsByStatus(ShipmentStatusCode.PENDING)
-        if (pendingShipments.size() > 1) {
-            throw new IllegalStateException("An order can only have one pending shipment")
-        }
-        pendingShipments ? pendingShipments?.first() : null
+        pendingShipments ? pendingShipments : null
     }
 
 
