@@ -21,13 +21,13 @@
 <body>
 
 <g:set var="pageParams"
-       value="['origin.id':params?.origin?.id, 'destination.id':params?.destination?.id, q:params.q,
+       value="[origin:params?.origin, destination:params?.destination, q:params.q,
                commodityClass:params.commodityClass, status:params.status, direction: params?.direction,
                requestedDateRange:params.requestedDateRange, issuedDateRange:params.issuedDateRange, type:params.type,
-               'createdBy.id':params?.createdBy?.id, sort:params?.sort, order:params?.order,
-               'requestedBy.id': params?.requestedBy?.id, receiptStatusCode: params.receiptStatusCode,
+               createdBy:params?.createdBy, sort:params?.sort, order:params?.order,
+               requestedBy: params?.requestedBy, receiptStatusCode: params.receiptStatusCode,
                'createdAfter': params?.createdAfter, 'createdBefore': params?.createdBefore,
-               'sourceType': params?.sourceType, 'updatedBy.id':params?.updatedBy?.id]"/>
+               'sourceType': params?.sourceType, updatedBy:params?.updatedBy, max: params.max, offset: params.offset]"/>
 
 <div class="body">
     <g:if test="${flash.message}">
@@ -134,35 +134,35 @@
                         <div class="filter-list-item">
                             <label><warehouse:message code="stockMovement.origin.label"/></label>
                             <p>
-                                <g:selectLocation name="origin.id" value="${params?.origin?.id}"
+                                <g:selectLocation name="origin" value="${params?.origin}"
                                                         noSelection="['null':'']" class="chzn-select-deselect"/>
                             </p>
                         </div>
                         <div class="filter-list-item">
                             <label><warehouse:message code="stockMovement.destination.label"/></label>
                             <p>
-                                <g:selectLocation name="destination.id" value="${params?.destination?.id}"
+                                <g:selectLocation name="destination" value="${params?.destination}"
                                                   noSelection="['null':'']" class="chzn-select-deselect"/>
                             </p>
                         </div>
                         <div class="filter-list-item">
                             <label><warehouse:message code="requisition.requestedBy.label"/></label>
                             <p>
-                                <g:selectUser name="requestedBy.id" value="${params?.requestedBy?.id}"
+                                <g:selectUser name="requestedBy" value="${params?.requestedBy}"
                                               noSelection="['null':'']" class="chzn-select-deselect"/>
                             </p>
                         </div>
                         <div class="filter-list-item">
                             <label><warehouse:message code="default.createdBy.label"/></label>
                             <p>
-                                <g:selectUser name="createdBy.id" value="${params?.createdBy?.id}"
+                                <g:selectUser name="createdBy" value="${params?.createdBy}"
                                               noSelection="['null':'']" class="chzn-select-deselect"/>
                             </p>
                         </div>
                         <div class="filter-list-item">
                             <label><warehouse:message code="default.updatedBy.label"/></label>
                             <p>
-                                <g:selectUser name="updatedBy.id" value="${params?.updatedBy?.id}"
+                                <g:selectUser name="updatedBy" value="${params?.updatedBy}"
                                               noSelection="['null':'']" class="chzn-select-deselect"/>
                             </p>
                         </div>

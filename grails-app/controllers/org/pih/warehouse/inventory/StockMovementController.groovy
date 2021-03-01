@@ -124,13 +124,13 @@ class StockMovementController {
             params.destination = params.destination ?: currentLocation
         } else {
             // This is necessary because sometimes we need to infer the direction from the parameters
-            if (params.origin?.id == currentLocation?.id && params.destination?.id == currentLocation?.id) {
+            if (params.origin == currentLocation?.id && params.destination == currentLocation?.id) {
                 stockMovementType = null
                 params.direction = null
-            } else if (params.origin?.id == currentLocation?.id) {
+            } else if (params.origin == currentLocation?.id) {
                 stockMovementType = StockMovementType.OUTBOUND
                 params.direction = stockMovementType.toString()
-            } else if (params.destination?.id == currentLocation?.id) {
+            } else if (params.destination == currentLocation?.id) {
                 stockMovementType = StockMovementType.INBOUND
                 params.direction = stockMovementType.toString()
             } else {
@@ -305,8 +305,9 @@ class StockMovementController {
             }
         }
         // We need to set the correct parameter so stock movement list is displayed properly
-        params.direction = (currentLocation == stockMovement.origin) ? StockMovementType.INBOUND :
-                (currentLocation == stockMovement.destination) ? StockMovementType.OUTBOUND : "ALL"
+        params.direction = params.direction ? params.direction :
+                ((currentLocation == stockMovement.origin) ? StockMovementType.INBOUND :
+                (currentLocation == stockMovement.destination) ? StockMovementType.OUTBOUND : "ALL")
 
         redirect(action: "list", params:params)
     }
