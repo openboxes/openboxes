@@ -100,9 +100,9 @@ FROM (
                          cancel_reason_code,
                          -- FIXME converting from boolean to string does not strike me as a good idea here
                          CASE
-                             WHEN insufficient_quantity_available = TRUE
+                             WHEN insufficient_quantity_available > 0
                                  THEN 'INSUFFICIENT_QUANTITY_AVAILABLE'
-                             WHEN clinical_judgment = TRUE THEN 'CLINICAL_JUDGMENT'
+                             WHEN clinical_judgment > 0 THEN 'CLINICAL_JUDGMENT'
                              ELSE NULL
                              END                             as reason_code_classification,
                          insufficient_quantity_available,
