@@ -3,13 +3,11 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="bootstrap"/>
-    <g:set var="entityName"
-           value="${warehouse.message(code: 'inventory.label', default: 'Inventory')}"/>
-    <title><warehouse:message code="inventory.browse.label" default="Browse inventory"/></title>
+    <title><g:message code="default.login.label" default="Login"/></title>
 </head>
 
 <body>
-    <div class="container-fluid">
+    <div class="container">
         <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
         </g:if>
