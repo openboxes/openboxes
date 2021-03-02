@@ -101,7 +101,7 @@ class ProductSupplierAttributeDataService {
         command.data.eachWithIndex { params, index ->
             ProductAttribute productAttribute = createOrUpdate(params)
             if (productAttribute.validate()) {
-                productAttribute.save(failOnError: true)
+                productAttribute.save(failOnError: true, flush: true)
             }
         }
     }
