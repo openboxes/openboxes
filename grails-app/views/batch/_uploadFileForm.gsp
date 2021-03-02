@@ -181,6 +181,21 @@
                         <tr>
                             <td>
                                 <label>
+                                    <g:radio name="type" value="productSupplierAttribute" checked="${params.type=='productSupplierAttribute'}"/>
+                                    ${g.message(code:'productSupplier.productSourceAttribute.label')}
+                                </label>
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                                <g:link controller="batch" action="downloadExcel" params="[type:'ProductSupplierAttribute']">
+                                    <warehouse:message code="default.download.label" args="[g.message(code:'default.template.label')]"/>
+                                </g:link>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>
                                     <g:radio name="type" value="productPackage" checked="${params.type=='productPackage'}"/>
                                     ${g.message(code:'productPackages.label')}
                                 </label>
