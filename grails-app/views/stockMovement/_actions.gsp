@@ -45,7 +45,7 @@
                 <g:if test="${(isPending || !stockMovement?.shipment?.currentStatus) && (isSameOrigin || !stockMovement?.origin?.isDepot())}">
                     <hr/>
                     <div class="action-menu-item">
-                        <g:link controller="stockMovement" action="remove" id="${stockMovement?.id}"
+                        <g:link controller="stockMovement" action="remove" id="${stockMovement?.id}" params="${pageParams}"
                                 onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
                             <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />
                             &nbsp;${warehouse.message(code: 'default.delete.label', args:[warehouse.message(code:'stockMovement.label')])}
