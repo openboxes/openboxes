@@ -84,6 +84,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
             "quantityInShipments",
             "quantityInShipmentsInStandardUom",
             "total",
+            "pendingShipmentItems",
             "shippedShipmentItems",
             "subtotal",
             "totalAdjustments",
@@ -143,12 +144,22 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         return shipmentItems ? shipmentItems.size() > 0 : false
     }
 
+    def getPendingShipmentItems() {
+        return order.pendingShipments*.shipmentItems*.findAll { it.orderItemId == orderItem.id }.flatten().toArray()
+    }
+
     def getShippedShipmentItems() {
         return shipmentItems.findAll { it.shipment.currentStatus >= ShipmentStatusCode.SHIPPED }
     }
 
     def hasShippedItems() {
         return shippedShipmentItems?shippedShipmentItems.size()>0:false
+    }
+
+    void refreshPendingShipmentItemRecipients() {
+        pendingShipmentItems.each { ShipmentItem shipmentItem ->
+            shipmentItem.recipient = recipient
+        }
     }
 
     Integer getQuantityInStandardUom() {
