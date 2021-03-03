@@ -310,6 +310,7 @@ class StockMovementService {
     }
 
     def getStockMovements(StockMovement criteria, Map params) {
+        params.includeStockMovementItems = false
         switch(criteria.stockMovementType) {
             case StockMovementType.OUTBOUND:
                 return getOutboundStockMovements(criteria, params)
@@ -366,10 +367,10 @@ class StockMovementService {
         }
         def stockMovements = shipments.collect { Shipment shipment ->
             if (shipment.requisition) {
-                return StockMovement.createFromRequisition(shipment.requisition)
+                return StockMovement.createFromRequisition(shipment.requisition, params.includeStockMovementItems)
             }
             else {
-                return StockMovement.createFromShipment(shipment)
+                return StockMovement.createFromShipment(shipment, params.includeStockMovementItems)
             }
         }
         return new PagedResultList(stockMovements, shipments.totalCount)
@@ -460,7 +461,7 @@ class StockMovementService {
         }
 
         def stockMovements = requisitions.collect { requisition ->
-            return StockMovement.createFromRequisition(requisition)
+            return StockMovement.createFromRequisition(requisition, params.includeStockMovementItems)
         }
 
         return new PagedResultList(stockMovements, requisitions.totalCount)

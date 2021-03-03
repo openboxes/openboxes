@@ -216,7 +216,6 @@
                         <div class="clear"></div>
                     </div>
                 </g:form>
-
             </div>
         </div>
         <div class="yui-u">
