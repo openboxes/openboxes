@@ -37,7 +37,6 @@ class ProductSupplierDataService {
             def productCode = params.productCode
             def supplierName = params.supplierName
             def manufacturerName = params.manufacturerName
-            def ratingTypeCode = params?.ratingTypeCode?.toUpperCase() as RatingTypeCode
             def preferenceType = params.globalPreferenceTypeName
             def uomCode = params.defaultProductPackageUomCode
             def packageQuantity = params.defaultProductPackageQuantity
@@ -63,9 +62,16 @@ class ProductSupplierDataService {
                 command.errors.reject("Row ${index + 1}: Manufacturer with name '${manufacturerName}' does not exist")
             }
 
-            if (ratingTypeCode && !RatingTypeCode.inList(ratingTypeCode)) {
-                command.errors.reject("Row ${index + 1}: Rating Type with value '${ratingTypeCode}' does not exist")
+            try {
+                def ratingTypeCode = params?.ratingTypeCode ? params?.ratingTypeCode?.toUpperCase() as RatingTypeCode : null
+                if (ratingTypeCode && !RatingTypeCode.inList(ratingTypeCode)) {
+                    command.errors.reject("Row ${index + 1}: Rating Type with value '${params.ratingTypeCode}' exists but is not valid.")
+                }
             }
+            catch(IllegalArgumentException e) {
+                command.errors.reject("Row ${index + 1}: Rating Type with value '${params.ratingTypeCode}' does not exist. " + e.message)
+            }
+
 
             if (preferenceType && !PreferenceType.findByName(preferenceType)) {
                 command.errors.reject("Row ${index + 1}: Preference Type with name '${preferenceType}' does not exist")
@@ -142,7 +148,7 @@ class ProductSupplierDataService {
         def productCode = params.productCode
         def supplierName = params.supplierName
         def manufacturerName = params.manufacturerName
-        def ratingType = params.ratingType
+        def ratingTypeCode = params?.ratingTypeCode ? params?.ratingTypeCode?.toUpperCase() as RatingTypeCode : null
         def supplierCode = params.supplierCode
         def manufacturerCode = params.manufacturerCode
 
@@ -159,8 +165,6 @@ class ProductSupplierDataService {
         } else {
             productSupplier.properties = params
         }
-
-        RatingTypeCode ratingTypeCode = ratingType ? RatingTypeCode.values().find { it.name == ratingType.toString().toUpperCase() } : null
 
         productSupplier.ratingTypeCode = ratingTypeCode
         productSupplier.productCode = params["legacyProductCode"]

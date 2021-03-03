@@ -36,7 +36,7 @@ class ProductSupplierExcelImporter extends AbstractExcelImporter {
                     'K': 'minOrderQuantity',
                     'L': 'contractPricePrice',
                     'M': 'contractPriceValidUntil',
-                    'N': 'ratingType',
+                    'N': 'ratingTypeCode',
                     'O': 'globalPreferenceTypeName',
                     'P': 'globalPreferenceTypeValidityStartDate',
                     'Q': 'globalPreferenceTypeValidityEndDate',
