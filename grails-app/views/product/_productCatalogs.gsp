@@ -4,7 +4,7 @@
             <warehouse:message code="product.catalogs.label" default="Product Catalogs"/>
         </h2>
         <g:formRemote name="addToProductCatalog"
-                          update="productCatalogs" onSuccess="onSuccess(data,textStatus)" onComplete="onComplete()"
+                          update="productCatalogs" onSuccess="onSuccess()" onComplete="onComplete()"
                           url="[controller: 'product', action:'addToProductCatalog']">
             <g:hiddenField name="product.id" value="${productInstance?.id}"/>
             <table>

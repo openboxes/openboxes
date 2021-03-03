@@ -992,7 +992,6 @@ class ProductController {
         render(template: 'productGroups', model: [product: product, productGroups: product?.productGroups])
     }
 
-
     /**
      * Delete product group from database
      */
@@ -1013,12 +1012,6 @@ class ProductController {
             response.status = 404
         }
         render(template: 'productGroups', model: [product: product, productGroups: product?.productGroups])
-    }
-
-
-    def synonyms = {
-        def product = Product.get(params.id)
-        render(template: 'synonyms', model: [product: product, synonyms: product.synonyms])
     }
 
     /**

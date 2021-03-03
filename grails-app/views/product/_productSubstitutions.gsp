@@ -61,11 +61,10 @@
                     </g:each>
                     <g:unless test="${productInstance?.substitutions}">
                         <tr class="prop">
-                            <td class="padded fade center" colspan="11">
+                            <td colspan="11">
                                 <div class="padded fade center">
                                     <!--<g:message code="default.empty.message" default="There are no {0}" args="[g.message(code:'product.substitutions.label')]"/>-->
                                 </div>
-
                             </td>
                         </tr>
                     </g:unless>
