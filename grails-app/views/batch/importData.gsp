@@ -23,8 +23,7 @@
 			</g:hasErrors>
 
             <g:if test="${commandInstance?.data}">
-                <g:if test="${commandInstance.type != 'productSupplierPreference' && commandInstance.type != 'productSupplierAttribute' &&
-                        commandInstance?.data?.any { !it.quantity || it.quantity == 0 }}">
+                <g:if test="${commandInstance.type == 'inventory' && commandInstance?.data?.any { !it.quantity || it.quantity == 0 }}">
                     <div class="message">
                         <warehouse:message code="import.blankQuantities.label" />
                     </div>
@@ -111,8 +110,8 @@
 
                             <a href="${createLink(controller: "batch", action: "importData", params: params)}"
                                class="button">
-                                <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}"/>&nbsp;
-                            <warehouse:message code="default.button.back.label" default="Back"/>
+                                <img src="${resource(dir: 'images/icons/silk', file: 'bullet_left.png')}"/>&nbsp;
+                                <warehouse:message code="default.button.back.label" default="Back"/>
                             </a>
 
 

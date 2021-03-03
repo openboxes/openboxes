@@ -132,7 +132,7 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
             "Manufacturer Name"                   : "manufacturer.name",
             "Manufacturer Item No"                : "manufacturerCode",
             "Minimum Order Quantity"              : "minOrderQuantity",
-            "Contract Price (Each)"               : "contractPrice.currency.code",
+            "Contract Price (Each)"               : "contractPrice.price",
             "Contract Price Valid Until"          : ["property": "contractPrice.toDate", "dateFormat": "MM/dd/yyyy"],
             "Rating Type"                         : "ratingTypeCode",
             "Default Global Preference Type"      : "globalProductSupplierPreference.preferenceType.name",
