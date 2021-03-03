@@ -367,10 +367,10 @@ class StockMovementService {
         }
         def stockMovements = shipments.collect { Shipment shipment ->
             if (shipment.requisition) {
-                return StockMovement.createFromRequisition(shipment.requisition)
+                return StockMovement.createFromRequisition(shipment.requisition, params.includeStockMovementItems)
             }
             else {
-                return StockMovement.createFromShipment(shipment)
+                return StockMovement.createFromShipment(shipment, params.includeStockMovementItems)
             }
         }
         return new PagedResultList(stockMovements, shipments.totalCount)
