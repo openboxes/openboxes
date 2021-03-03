@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="awalkowiak" id="0303202113150-0">
+    <preConditions onFail="MARK_RAN">
+      <and>
+        <tableExists tableName="invoice_type"/>
+        <sqlCheck expectedResult="0">
+          SELECT COUNT(*) FROM invoice_type
+        </sqlCheck>
+      </and>
+    </preConditions>
+    <sql>
+      INSERT INTO invoice_type (id, name, description, code, date_created, last_updated, version) VALUES
+      (1, 'Purchase Invoice', '', 'INVOICE', current_timestamp, current_timestamp, '0'),
+      (2, 'Sales Invoice', '', 'INVOICE', current_timestamp, current_timestamp, '0'),
+      (3, 'Return Invoice', '', 'INVOICE', current_timestamp, current_timestamp, '0'),
+      (4, 'Credit Note', '', 'CREDIT_NOTE', current_timestamp, current_timestamp, '0');
+    </sql>
+  </changeSet>
+</databaseChangeLog>

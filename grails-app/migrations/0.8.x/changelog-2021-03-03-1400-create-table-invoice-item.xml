@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="awalkowiak" id="0303202114000-0">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="invoice_item"/>
+      </not>
+    </preConditions>
+    <createTable tableName="invoice_item">
+
+      <column name="id" type="CHAR(38)">
+        <constraints nullable="false" primaryKey="true"/>
+      </column>
+      
+      <column name="invoice_id" type="CHAR(38)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="product_id" type="CHAR(38)"/>
+      <column name="gl_account_id" type="CHAR(38)"/>
+      <column name="budget_code_id" type="CHAR(38)"/>
+
+      <column name="quantity" type="DECIMAL(19,2)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="quantity_uom_id" type="CHAR(38)"/>
+      <column name="quantity_per_uom" type="DECIMAL(19,2)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="amount" type="DECIMAL(19,4)"/>
+
+      <column name="date_created" type="DATETIME"/>
+      <column name="last_updated" type="DATETIME"/>
+      <column name="created_by_id" type="CHAR(38)"/>
+      <column name="updated_by_id" type="CHAR(38)"/>
+
+      <column name="version" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+
+  <changeSet author="awalkowiak" id="0303202114000-1">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_invoice_item_invoice"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="invoice_id" baseTableName="invoice_item"
+      constraintName="fk_invoice_item_invoice" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="invoice" />
+  </changeSet>
+
+  <changeSet author="awalkowiak" id="0303202114000-2">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_invoice_item_product"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="product_id" baseTableName="invoice_item"
+      constraintName="fk_invoice_item_product" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="product" />
+  </changeSet>
+
+  <changeSet author="awalkowiak" id="0303202114000-3">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_invoice_item_gl_account"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="gl_account_id" baseTableName="invoice_item"
+      constraintName="fk_invoice_item_gl_account" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="gl_account" />
+  </changeSet>
+
+  <changeSet author="awalkowiak" id="0303202114000-4">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_invoice_item_budget_code"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="budget_code_id" baseTableName="invoice_item"
+      constraintName="fk_invoice_item_budget_code" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="budget_code" />
+  </changeSet>
+
+  <changeSet author="awalkowiak" id="0303202114000-5">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_invoice_item_quantity_uom"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="quantity_uom_id" baseTableName="invoice_item"
+      constraintName="fk_invoice_item_quantity_uom" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="unit_of_measure" />
+  </changeSet>
+
+  <changeSet author="awalkowiak" id="0303202114000-6">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_invoice_item_created_by"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="created_by_id" baseTableName="invoice_item"
+      constraintName="fk_invoice_item_created_by" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="user" />
+  </changeSet>
+
+  <changeSet author="awalkowiak" id="0303202114000-7">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_invoice_item_updated_by"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="updated_by_id" baseTableName="invoice_item"
+      constraintName="fk_invoice_item_updated_by" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="user" />
+  </changeSet>
+</databaseChangeLog>

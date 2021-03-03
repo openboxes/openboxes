@@ -105,4 +105,8 @@
     <include file="0.8.x/changelog-2021-02-12-1030-add-preference-type-initial-data.xml"/>
     <include file="0.8.x/changelog-2021-02-19-1629-add-product-supplier-to-product-attribute.xml"/>
     <include file="0.8.x/changelog-2021-02-24-1700-fix-product-price-data.xml"/>
+    <include file="0.8.x/changelog-2021-03-03-1300-create-table-invoice-type.xml"/>
+    <include file="0.8.x/changelog-2021-03-03-1315-add-invoice-type-initial-data.xml"/>
+    <include file="0.8.x/changelog-2021-03-03-1330-create-table-invoice.xml"/>
+    <include file="0.8.x/changelog-2021-03-03-1400-create-table-invoice-item.xml"/>
 </databaseChangeLog>
