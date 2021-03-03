@@ -308,7 +308,7 @@ class StockMovementController {
         params.direction = (currentLocation == stockMovement.origin) ? StockMovementType.OUTBOUND :
                 (currentLocation == stockMovement.destination) ? StockMovementType.INBOUND : "ALL"
 
-        forward(action: "list")
+        redirect(action: "list", params:params)
     }
 
     def requisition = {
