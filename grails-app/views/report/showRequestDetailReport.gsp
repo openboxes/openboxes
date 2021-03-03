@@ -129,17 +129,18 @@
                                 <th class="center"><g:message code="requisition.qtyRequested.label"/></th>
                                 <th class="center"><g:message code="requisition.qtyIssued.label"/></th>
                                 <th class="center"><g:message code="requisition.qtyDemand.label"/></th>
-                                <th class="center"><g:message code="requisitionItem.reasonCodes.label"/></th>
+                                <th class="center"><g:message code="requisitionItem.reasonCode.label"/></th>
+                                <th class="center"><g:message code="requisitionItem.reasonCodesClassification.label"/></th>
                             </tr>
                         </thead>
                         <tfoot>
                             <tr>
-                                <th colspan="9"/>
+                                <th colspan="10"/>
                                 <th><g:message code="report.totalDemand.label"/></th>
                                 <th id="totalDemand"></th>
                             </tr>
                             <tr>
-                                <th colspan="9"/>
+                                <th colspan="10"/>
                                 <th><g:message code="report.averageMonthlyDemand.label"/></th>
                                 <th id="averageMonthlyDemand"></th>
                             </tr>
@@ -228,6 +229,7 @@
             { "mData": "quantityIssued"},
             { "mData": "quantityDemand"},
             { "mData": "reasonCode"},
+            { "mData": "reasonCodeClassification"},
           ],
         "dom": '<"top"i>rt<"bottom"flp><"clear">',
         "aaSorting": [[ 0, "asc" ]],

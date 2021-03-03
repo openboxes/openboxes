@@ -28,6 +28,12 @@ SELECT
     request_item_status,
     reason_code_classification,
 
+    -- pick list item data
+    picklist_reason_code,
+
+    -- reason code
+	  COALESCE(cancel_reason_code, pick_reason_code, picklist_reason_code) AS reason_code,
+
     -- request item status
     CASE
         WHEN request_item_status = 'SUBSTITUTION'
@@ -80,7 +86,8 @@ FROM (
                 cancel_comments,
                 pick_reason_code,
                 reason_code_classification,
-                request_item_status
+                request_item_status,
+                picklist_reason_code
          FROM (
                   SELECT requisition.id                      as request_id,
                          requisition_item.id                 as request_item_id,
@@ -122,7 +129,10 @@ FROM (
                          )                                   AS quantity_modified,
 
                          -- quantity picked
-                         picked_items.quantity_picked
+                         picked_items.quantity_picked,
+
+                         -- picklist item reason code
+                         picked_items.picklist_reason_code as picklist_reason_code
                   FROM requisition_item
                            JOIN product ON product.id = requisition_item.product_id
                            JOIN requisition ON requisition.id = requisition_item.requisition_id
@@ -144,11 +154,12 @@ FROM (
                            LEFT OUTER JOIN (
                       SELECT ifnull(requisition_item.parent_requisition_item_id,
                                     requisition_item.id) as requisition_item_id,
-                             SUM(picklist_item.quantity) as quantity_picked
+                             SUM(picklist_item.quantity) as quantity_picked,
+                             picklist_item.reason_code as picklist_reason_code
                       FROM picklist_item
                                join requisition_item
                                     on picklist_item.requisition_item_id = requisition_item.id
-                      GROUP BY requisition_item.id
+                      GROUP BY requisition_item.id, picklist_item.reason_code
                   ) as picked_items ON (picked_items.requisition_item_id = requisition_item.id)
 
                       -- Used to determine whether a requisition item was changed or substituted
