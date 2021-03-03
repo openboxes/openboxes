@@ -9,10 +9,29 @@
  **/
 package org.pih.warehouse.product
 
+import org.pih.warehouse.core.EntityTypeCode
+
 
 class ProductAttributeValueController {
 
     def scaffold = ProductAttribute
+    def dataService
 
+    def exportProductAttribute = {
+        def entityTypeCode = params.entityTypeCode ? params.entityTypeCode as EntityTypeCode : null
+        def isEntitySupplier = entityTypeCode == EntityTypeCode.PRODUCT_SUPPLIER
+        def productAttributes = ProductAttribute.createCriteria().list {
+            if (isEntitySupplier) {
+                isNotNull("productSupplier")
+            } else {
+                isNull("productSupplier")
+            }
+        }
 
+        def filename = isEntitySupplier ? "productSourceAttribute.csv" : "productAttributes.csv"
+        def data = productAttributes ? dataService.transformObjects(productAttributes, isEntitySupplier ? ProductAttribute.SUPPLIER_PROPERTIES : ProductAttribute.PROPERTIES) : [[:]]
+        def text = dataService.generateCsv(data)
+        response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
+        render(contentType: "text/csv", text: text)
+    }
 }

@@ -44,4 +44,12 @@ class ProductAttribute {
             "unitOfMeasure": "unitOfMeasure.code"
     ]
 
+    static SUPPLIER_PROPERTIES = [
+            "productCode"   : "product.productCode",
+            "productSupplierCode" : "productSupplier.code",
+            "attributeCode" : "attribute.code",
+            "attributeValue": "value",
+            "unitOfMeasure": "unitOfMeasure.code"
+    ]
+
 }
