@@ -116,7 +116,7 @@ class ProductSupplierController {
                 productSupplierInstance.contractPrice = productPrice
             }
         }
-        
+
         if (productSupplierInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), productSupplierInstance.id])}"
 
@@ -235,6 +235,8 @@ class ProductSupplierController {
                     productPrice.toDate = params.toDate ? dateFormat.parse(params.toDate) : null
                     productSupplierInstance.contractPrice = productPrice
                 }
+            } else if (productSupplierInstance.contractPrice?.id) {
+                productSupplierInstance.contractPrice = null
             }
 
             if (!productSupplierInstance.hasErrors() && productSupplierInstance.save(flush: true)) {
