@@ -92,8 +92,9 @@
 
                             <g:each var="attribute" in="${availableAttributes}">
                                 <td>
-                                    <g:each var="productAttribute" in="${productSupplier.attributes.find { it.id == attribute.id }}">
-                                    ${productAttribute.value}
+                                    <g:each var="productAttribute" in="${productSupplier.attributes.find { it.attribute.id == attribute.id }}">
+                                        ${productAttribute.value}
+                                        ${productAttribute?.unitOfMeasure?.code}
                                     </g:each>
                                 </td>
                             </g:each>
