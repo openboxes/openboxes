@@ -1,3 +1,7 @@
+<%@ page import="org.pih.warehouse.core.EntityTypeCode; org.pih.warehouse.product.Attribute" %>
+<g:set var="availableAttributes" value="${org.pih.warehouse.product.Attribute.findAllByActive(true)}"/>
+<g:set var="availableAttributes" value="${availableAttributes.findAll { it.entityTypeCode == EntityTypeCode.PRODUCT_SUPPLIER}}"/>
+<g:set var="colspan" value="${(availableAttributes?.size()?:0) + 12}"/>
 <div class="box">
     <h2>
         <warehouse:message code="product.productSuppliers.label" default="Product Sources"/>
@@ -26,9 +30,13 @@
 
             <th><g:message code="unitOfMeasure.label" default="Unit of Measure" /></th>
 
-            <th><g:message code="productPackage.price.label" default="Price" /></th>
+            <th><g:message code="productPackage.price.label" default="Package Price" /></th>
 
-            <th><g:message code="attributes.label" default="Attributes" /></th>
+            <th><g:message code="product.pricePerUnit.label" default="Unit Price" /></th>
+
+            <g:each var="attribute" in="${availableAttributes}">
+                <th>${attribute.name} (${attribute.code})</th>
+            </g:each>
 
             <th><g:message code="default.actions.label" default="Actions" /></th>
 
@@ -73,15 +81,22 @@
                                     </g:hasRoleFinance>
                                 </g:if>
                             </td>
-
                             <td>
-                                <ul>
-                                    <g:each var="productAttribute" in="${productSupplier.attributes}">
-                                        <li>${productAttribute.attribute.name} (${productAttribute.attribute.code}) = ${productAttribute.value}</li>
-                                    </g:each>
-                                </ul>
+                                <g:if test="${defaultProductPackage?.productPrice && defaultProductPackage?.quantity}">
+                                    <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: ['0.00'])}">
+                                        ${defaultProductPackage?.productPrice?.price/defaultProductPackage?.quantity}
+                                        ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                    </g:hasRoleFinance>
+                                </g:if>
                             </td>
 
+                            <g:each var="attribute" in="${availableAttributes}">
+                                <td>
+                                    <g:each var="productAttribute" in="${productSupplier.attributes.find { it.id == attribute.id }}">
+                                    ${productAttribute.value}
+                                    </g:each>
+                                </td>
+                            </g:each>
                             <td>
                                 <div class="button-group">
                                     <a href="javascript:void(0);" class="btn-show-dialog button"
@@ -102,15 +117,15 @@
                 </g:if>
                 <g:unless test="${productInstance?.productSuppliers}">
                     <tr class="prop">
-                        <td class="empty center" colspan="11">
-                            <g:message code="productSuppliers.empty.label" default="There are no product suppliers"/>
+                        <td class="padded empty center" colspan="${colspan}">
+%{--                            <g:message code="productSuppliers.empty.label" default="There are no product suppliers"/>--}%
                         </td>
                     </tr>
                 </g:unless>
             </tbody>
             <tfoot>
             <tr>
-                <td colspan="12">
+                <td colspan="${colspan}">
                     <div class="center">
                         <button class="button btn-show-dialog" data-position="top"
                                 data-title="${g.message(code: 'default.add.label', args: [g.message(code:'productSupplier.label')])}"

@@ -88,6 +88,35 @@ class ProductSupplierController {
             productSupplierInstance.addToProductSupplierPreferences(productSupplierPreference)
         }
 
+        if (params.price) {
+            BigDecimal parsedUnitPrice
+            try {
+                parsedUnitPrice = new BigDecimal(params.price).setScale(2, RoundingMode.FLOOR)
+            } catch (Exception e) {
+                log.error("Unable to parse unit price: " + e.message, e)
+                flash.message = "Could not parse unit price with value: ${params.price}."
+                render(view: "edit", model: [productSupplierInstance: productSupplierInstance])
+                return
+            }
+            if (parsedUnitPrice < 0) {
+                log.error("Wrong unit price value: ${parsedUnitPrice}.")
+                flash.message = "Wrong unit price value: ${parsedUnitPrice}."
+                render(view: "edit", model: [productSupplierInstance: productSupplierInstance])
+                return
+            }
+            def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+
+            if (productSupplierInstance.contractPrice?.id) {
+                productSupplierInstance.contractPrice.price = parsedUnitPrice
+                productSupplierInstance.contractPrice.toDate = params.toDate ? dateFormat.parse(params.toDate) : null
+            } else {
+                ProductPrice productPrice = new ProductPrice()
+                productPrice.price = parsedUnitPrice
+                productPrice.toDate = params.toDate ? dateFormat.parse(params.toDate) : null
+                productSupplierInstance.contractPrice = productPrice
+            }
+        }
+        
         if (productSupplierInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), productSupplierInstance.id])}"
 
@@ -125,6 +154,10 @@ class ProductSupplierController {
 
     def update = {
         def productSupplierInstance = ProductSupplier.get(params.id)
+        Location location = Location.get(session.warehouse.id)
+        ProductSupplierPreference defaultPreference = productSupplierInstance?.globalProductSupplierPreference
+        ProductSupplierPreference productSupplierPreference = productSupplierInstance?.productSupplierPreferences?.find {it.destinationParty == location.organization }
+
         if (productSupplierInstance) {
             if (params.version) {
                 def version = params.version.toLong()
@@ -146,7 +179,6 @@ class ProductSupplierController {
 
             if (params.defaultPreferenceType) {
                 PreferenceType preferenceType = PreferenceType.get(params.defaultPreferenceType)
-                ProductSupplierPreference defaultPreference = productSupplierInstance?.globalProductSupplierPreference
                 if (defaultPreference) {
                     defaultPreference.preferenceType = preferenceType
                 } else {
@@ -155,12 +187,13 @@ class ProductSupplierController {
                     defaultPreference.productSupplier = productSupplierInstance
                     productSupplierInstance.addToProductSupplierPreferences(defaultPreference)
                 }
+            } else if (defaultPreference) {
+                productSupplierInstance.removeFromProductSupplierPreferences(defaultPreference)
+                defaultPreference.delete()
             }
 
             if (params.preferenceType) {
                 PreferenceType preferenceType = PreferenceType.get(params.preferenceType)
-                Location location = Location.get(session.warehouse.id)
-                ProductSupplierPreference productSupplierPreference = productSupplierInstance?.productSupplierPreferences?.find {it.destinationParty == location.organization }
                 if (productSupplierPreference) {
                     productSupplierPreference.preferenceType = preferenceType
                 } else {
@@ -170,6 +203,9 @@ class ProductSupplierController {
                     productSupplierPreference.productSupplier = productSupplierInstance
                     productSupplierInstance.addToProductSupplierPreferences(productSupplierPreference)
                 }
+            } else if (productSupplierPreference) {
+                productSupplierInstance.removeFromProductSupplierPreferences(productSupplierPreference)
+                productSupplierPreference.delete()
             }
 
             if (params.price) {

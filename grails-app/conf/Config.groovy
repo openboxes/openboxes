@@ -868,6 +868,9 @@ openboxes.barcode.printer.port = 9100
 openboxes.typeahead.delay = 300
 openboxes.typeahead.minLength = 3
 
+// Allow system administrators to disable refresh on startup
+openboxes.refreshAnalyticsDataOnStartup.enabled = true
+
 // Send stock alerts
 openboxes.jobs.sendStockAlertsJob.enabled = true
 openboxes.jobs.sendStockAlertsJob.skipOnEmpty = true

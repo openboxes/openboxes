@@ -21,6 +21,7 @@ import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.UomService
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.ValidationCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.shipping.Shipment
@@ -623,6 +624,11 @@ class OrderController {
         Order order = Order.get(params.order.id)
         OrderItem orderItem = OrderItem.get(params.orderItem.id)
         ProductSupplier productSupplier = null
+        ValidationCode validationCode = params.validationCode ? params.validationCode as ValidationCode : null
+        if (validationCode == ValidationCode.BLOCK) {
+            render(status: 500, text: "${warehouse.message(code: 'orderItem.blockedSupplier.label')}")
+            return
+        }
         if (params.productSupplier == "Create New") {
             Organization supplier = Organization.get(params.supplier.id)
             productSupplier = ProductSupplier.findByCodeAndSupplier(params.sourceCode, supplier)
@@ -978,6 +984,11 @@ class OrderController {
 
     def createCombinedShipment = {
         def orderInstance = Order.get(params.orderId)
+        if (!orderInstance.orderItems.find {it.quantityRemainingToShip != 0 }) {
+            flash.message = "${warehouse.message(code:'purchaseOrder.noItemsToShip.label')}"
+            redirect(controller: 'order', action: "show", id: orderInstance.id, params: ['tab': 4])
+            return
+        }
         StockMovement stockMovement = StockMovement.createFromOrder(orderInstance);
         stockMovement = stockMovementService.createShipmentBasedStockMovement(stockMovement)
         redirect(controller: 'stockMovement', action: "createCombinedShipments", params: [direction: 'INBOUND', id: stockMovement.id])

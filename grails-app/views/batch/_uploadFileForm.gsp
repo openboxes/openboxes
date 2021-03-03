@@ -1,3 +1,4 @@
+<%@ page import="org.pih.warehouse.core.EntityTypeCode" %>
 <g:uploadForm controller="batch" action="importData">
     <table>
         <tbody>
@@ -128,8 +129,10 @@
                                 </label>
                             </td>
                             <td>
-                                <g:link controller="batch" action="downloadExcel" params="[type:'ProductAttribute']">
-                                    <warehouse:message code="default.download.label" args="[g.message(code:'default.template.label')]"/>
+                            </td>
+                            <td>
+                                <g:link controller="productAttributeValue" action="exportProductAttribute">
+                                    <warehouse:message code="default.download.label" args="[g.message(code:'default.data.label')]"/>
                                 </g:link>
                             </td>
                         </tr>
@@ -189,9 +192,22 @@
                                 </label>
                             </td>
                             <td>
+                                <g:link controller="batch" action="downloadExcel" params="[type:'ProductSupplierPreference']">
+                                    <warehouse:message code="default.download.label" args="[g.message(code:'default.data.label')]"/>
+                                </g:link>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>
+                                    <g:radio name="type" value="productSupplierAttribute" checked="${params.type=='productSupplierAttribute'}"/>
+                                    ${g.message(code:'productSupplier.productSourceAttribute.label')}
+                                </label>
                             </td>
                             <td>
-                                <g:link controller="batch" action="downloadExcel" params="[type:'ProductSupplierPreference']">
+                            </td>
+                            <td>
+                                <g:link controller="productAttributeValue" action="exportProductAttribute" params="[entityTypeCode: EntityTypeCode.PRODUCT_SUPPLIER]">
                                     <warehouse:message code="default.download.label" args="[g.message(code:'default.data.label')]"/>
                                 </g:link>
                             </td>
