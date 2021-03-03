@@ -37,7 +37,7 @@ class ProductSupplierDataService {
             def productCode = params.productCode
             def supplierName = params.supplierName
             def manufacturerName = params.manufacturerName
-            def ratingType = params.ratingType
+            def ratingTypeCode = params?.ratingTypeCode?.toUpperCase() as RatingTypeCode
             def preferenceType = params.globalPreferenceTypeName
             def uomCode = params.defaultProductPackageUomCode
             def packageQuantity = params.defaultProductPackageQuantity
@@ -63,8 +63,8 @@ class ProductSupplierDataService {
                 command.errors.reject("Row ${index + 1}: Manufacturer with name '${manufacturerName}' does not exist")
             }
 
-            if (ratingType && !RatingTypeCode.values().any { it.name == ratingType.toString().toUpperCase() }) {
-                command.errors.reject("Row ${index + 1}: Rating Type with value '${ratingType}' does not exist")
+            if (ratingTypeCode && !RatingTypeCode.inList(ratingTypeCode)) {
+                command.errors.reject("Row ${index + 1}: Rating Type with value '${ratingTypeCode}' does not exist")
             }
 
             if (preferenceType && !PreferenceType.findByName(preferenceType)) {
@@ -95,7 +95,7 @@ class ProductSupplierDataService {
                         command.errors.reject("Row ${index + 1}: Validity start date ${validityStartDate} is invalid. Please enter a date after ${minDate.getYear()+1900}.")
                     }
                 } catch (Exception e) {
-                    command.errors.reject("Row ${index + 1}: Validity start date ${validityStartDate} is invalid")
+                    command.errors.reject("Row ${index + 1}: Validity start date ${validityStartDate} is invalid. "+ e.message)
                 }
             }
 
@@ -107,7 +107,7 @@ class ProductSupplierDataService {
                         command.errors.reject("Row ${index + 1}: Validity start date ${validityEndDate} is invalid. Please enter a date after ${minDate.getYear()+1900}.")
                     }
                 } catch (Exception e) {
-                    command.errors.reject("Row ${index + 1}: Validity end date ${validityEndDate} is invalid")
+                    command.errors.reject("Row ${index + 1}: Validity end date ${validityEndDate} is invalid. " + e.message)
                 }
             }
 
@@ -119,7 +119,7 @@ class ProductSupplierDataService {
                         command.errors.reject("Row ${index + 1}: Contract Price Valid Until date ${contractPriceValidUntil} is invalid. Please enter a date after ${minDate.getYear()+1900}.")
                     }
                 } catch (Exception e) {
-                    command.errors.reject("Row ${index + 1}: Contract Price Valid Until date ${contractPriceValidUntil} is invalid")
+                    command.errors.reject("Row ${index + 1}: Contract Price Valid Until date ${contractPriceValidUntil} is invalid. " + e.message)
                 }
             }
         }
