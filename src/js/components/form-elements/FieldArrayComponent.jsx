@@ -53,10 +53,11 @@ class FieldArrayComponent extends Component {
     } = this.props;
     const AddButton = fieldsConfig.addButton;
     const { maxTableHeight, virtualized } = fieldsConfig;
-    const addRow = (row = {}, index = null) => {
+    const addRow = (row = {}, index = null, shouldScroll = true) => {
       if (index === null) {
         const table = document.querySelectorAll('[role="rowgroup"]')[0];
-        if (table) {
+        // lines can also be added on modals and no scroll should be applied then
+        if (table && shouldScroll) {
           table.scrollIntoView({ block: 'end' });
         }
         fields.push(row);
