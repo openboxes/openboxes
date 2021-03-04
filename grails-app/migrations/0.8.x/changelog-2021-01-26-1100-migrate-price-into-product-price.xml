@@ -6,6 +6,7 @@
   <!-- migrate existing product_package.price into product_price -->
   <changeSet author="awalkowiak" id="2601202111001-1">
     <validCheckSum>4fd991a84d38876557d55ca24d5e360</validCheckSum>
+    <validCheckSum>462621a7c1369eff41f9d235aa1ca40</validCheckSum>
     <preConditions onFail="MARK_RAN">
       <and>
         <columnExists tableName="product_package" columnName="price"/>
@@ -14,7 +15,8 @@
     </preConditions>
     <sql>
       INSERT INTO product_price (id, version, type, price, product_package_id, date_created, last_updated)
-        SELECT uuid(), 0, 'DEFAULT_PRICE', price, id FROM product_package, now(), now()
+        SELECT uuid(), 0, 'DEFAULT_PRICE', price, id, now(), now()
+        FROM product_package
         WHERE price IS NOT NULL AND price > 0;
 
       UPDATE product_package
