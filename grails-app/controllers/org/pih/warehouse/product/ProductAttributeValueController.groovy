@@ -16,6 +16,7 @@ class ProductAttributeValueController {
 
     def scaffold = ProductAttribute
     def dataService
+    def documentService
 
     def exportProductAttribute = {
         def entityTypeCode = params.entityTypeCode ? params.entityTypeCode as EntityTypeCode : null
@@ -28,10 +29,10 @@ class ProductAttributeValueController {
             }
         }
 
-        def filename = isEntitySupplier ? "productSourceAttribute.csv" : "productAttributes.csv"
+        def filename = isEntitySupplier ? "productSourceAttribute" : "productAttributes"
         def data = productAttributes ? dataService.transformObjects(productAttributes, isEntitySupplier ? ProductAttribute.SUPPLIER_PROPERTIES : ProductAttribute.PROPERTIES) : [[:]]
-        def text = dataService.generateCsv(data)
-        response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-        render(contentType: "text/csv", text: text)
+        response.contentType = "application/vnd.ms-excel"
+        response.setHeader("Content-disposition", "attachment; filename=\"${filename}.xls\"")
+        documentService.generateExcel(response.outputStream, data)
     }
 }
