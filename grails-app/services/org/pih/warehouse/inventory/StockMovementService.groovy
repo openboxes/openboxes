@@ -517,6 +517,20 @@ class StockMovementService {
         }
     }
 
+    def getPendingRequisitionItems(Location origin) {
+        def requisitionItems = RequisitionItem.createCriteria().list {
+            requisition {
+                and {
+                    eq("origin", origin)
+                    not {
+                        'in'("status", [RequisitionStatus.ISSUED, RequisitionStatus.CANCELED])
+                    }
+                }
+            }
+        }
+        return requisitionItems
+    }
+
     def getStockMovementItems(String id, String stepNumber, String max, String offset) {
         // FIXME should get stock movement instead of requisition
         Requisition requisition = Requisition.get(id)
