@@ -1811,21 +1811,23 @@ class JsonController {
                     "Quantity Issued" { it.qtyIssued }
                     "Quantity Demand" { it.qtyDemand }
                     "Reason Code" { it.reasonCode }
+                    "Reason Code Classification" { it.reasonCodeClassification }
                 })
 
                 data.each {
                     csv << [
-                            requestNumber: it.requestNumber,
-                            dateRequested: it.dateRequested,
-                            dateIssued   : it.dateIssued,
-                            origin       : StringEscapeUtils.escapeCsv(it.origin),
-                            destination  : StringEscapeUtils.escapeCsv(it.destination),
-                            productCode  : it.productCode,
-                            productName  : StringEscapeUtils.escapeCsv(it.productName),
-                            qtyRequested : it.quantityRequested,
-                            qtyIssued    : it.quantityIssued,
-                            qtyDemand    : it.quantityDemand,
-                            reasonCode   : it.reasonCode,
+                            requestNumber           : it.requestNumber,
+                            dateRequested           : it.dateRequested,
+                            dateIssued              : it.dateIssued,
+                            origin                  : StringEscapeUtils.escapeCsv(it.origin),
+                            destination             : StringEscapeUtils.escapeCsv(it.destination),
+                            productCode             : it.productCode,
+                            productName             : StringEscapeUtils.escapeCsv(it.productName),
+                            qtyRequested            : it.quantityRequested,
+                            qtyIssued               : it.quantityIssued,
+                            qtyDemand               : it.quantityDemand,
+                            reasonCode              : it.reasonCode,
+                            reasonCodeClassification: it.reasonCodeClassification,
                     ]
                 }
 

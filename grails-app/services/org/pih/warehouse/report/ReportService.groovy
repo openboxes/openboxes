@@ -644,6 +644,7 @@ class ReportService implements ApplicationContextAware {
                         quantity_modified,
                         quantity_picked,
                         quantity_demand,
+                        reason_code,
                         reason_code_classification
                     FROM product_demand;""",
                 "DROP TABLE IF EXISTS product_demand_details;",
