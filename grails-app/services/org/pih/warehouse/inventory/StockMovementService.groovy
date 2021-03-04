@@ -276,14 +276,12 @@ class StockMovementService {
             throw new ObjectNotFoundException(stockMovement.id, StockMovement.class.toString())
         }
 
-        if (RequisitionStatus.ISSUED == requisition.status) {
-            requisition.name = stockMovement.description == requisition.description && requisition.destination == stockMovement.destination ? stockMovement.name : stockMovement.generateName()
-            requisition.destination = stockMovement.destination
-            requisition.description = stockMovement.description
+        requisition.name = stockMovement.description == requisition.description && requisition.destination == stockMovement.destination ? stockMovement.name : stockMovement.generateName()
+        requisition.destination = stockMovement.destination
+        requisition.description = stockMovement.description
 
-            if (requisition.hasErrors() || !requisition.save(flush: true)) {
-                throw new ValidationException("Invalid requisition", requisition.errors)
-            }
+        if (requisition.hasErrors() || !requisition.save(flush: true)) {
+            throw new ValidationException("Invalid requisition", requisition.errors)
         }
     }
 
