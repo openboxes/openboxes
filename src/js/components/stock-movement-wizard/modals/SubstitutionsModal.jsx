@@ -67,6 +67,7 @@ const FIELDS = {
           options: [],
           showValueTooltip: true,
           className: 'text-left',
+          showLabel: true,
           optionRenderer: option => (
             <strong style={{ color: option.color ? option.color : 'black' }} className="d-flex align-items-center">
               {option.label}
