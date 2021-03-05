@@ -53,7 +53,7 @@ class Select extends Component {
       objectValue = false, multi = false, delimiter = ';', async = false, showValueTooltip,
       arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, onTabPress, onEnterPress, ...attributes
     } = this.props;
-    const { formatValue, className } = attributes;
+    const { formatValue, className, showLabel = false } = attributes;
 
     const options = _.map(selectOptions, (value) => {
       if (typeof value === 'string') {
@@ -91,8 +91,10 @@ class Select extends Component {
       );
     };
 
-    if (attributes.disabled && this.props.value) {
-      const formattedValue = formatValue ? formatValue(this.props.value) : this.props.value.label;
+    if (attributes.disabled && this.props.value && showLabel) {
+      // eslint-disable-next-line no-nested-ternary
+      const formattedValue = formatValue ? formatValue(this.props.value) :
+        (this.props.value.label ? this.props.value.label : this.props.value);
       return (
         <div id={`${this.state.id}-container`}>
           <Tooltip
