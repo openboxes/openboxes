@@ -276,6 +276,9 @@ openboxes:
             format: "AAA-AAA-AAA"
         order:
             format: "NNNLLL"
+        organization:
+            minSize: 2
+            maxSize: 4
         product:
             format: "LLNN"
         productSupplier:
