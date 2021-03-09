@@ -44,7 +44,7 @@
                 <div class="tabs tabs-ui">
 					<ul>
 						<li>
-                            <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=productDetails">
+                            <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=productDetails&renderNotFoundError=false">
                                 <g:message code="product.details.label"/>
                             </a>
                         </li>
@@ -115,7 +115,6 @@
 				</div>
 			</div>
 		</div>
-        <div class="loading">Loading...</div>
 		<script type="text/javascript">
 
             function validateForm()  {

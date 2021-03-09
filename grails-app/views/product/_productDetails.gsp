@@ -35,7 +35,7 @@
 
                         </td>
                         <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'productCode', 'errors')}">
-                            <g:textField name="productCode" value="${productInstance?.productCode}" size="50" class="medium text"
+                            <g:textField name="productCode" value="${productInstance?.productCode}" class="text large"
                                          placeholder="${warehouse.message(code:'product.productCode.placeholder') }"/>
                         </td>
                     </tr>
@@ -45,7 +45,7 @@
                         code="product.title.label" /></label></td>
                     <td valign="top"
                         class="value ${hasErrors(bean: productInstance, field: 'name', 'errors')}">
-                        <g:autoSuggestString id="name" name="name" size="80" class="text"
+                        <g:autoSuggestString id="name" name="name" class="text large"
                             jsonUrl="${request.contextPath}/json/autoSuggest" value="${productInstance?.name?.encodeAsHTML()}"
                             placeholder="Product title (e.g. Ibuprofen, 200 mg, tablet)"/>
                     </td>
@@ -56,7 +56,7 @@
                       <label id="categoryLabel" for="category.id"><warehouse:message code="product.primaryCategory.label" /></label>
                     </td>
                     <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'category', 'errors')}">
-                        <g:selectCategory name="category.id" class="chzn-select" noSelection="['null':'']"
+                        <g:selectCategory name="category.id" class="chzn-select-deselect" noSelection="['null':'']"
                                              value="${productInstance?.category?.id}" />
                    </td>
                 </tr>
@@ -78,7 +78,7 @@
                             code="product.unitOfMeasure.label" /></label></td>
                         <td
                             class="value ${hasErrors(bean: productInstance, field: 'unitOfMeasure', 'errors')}">
-                            <g:autoSuggestString id="unitOfMeasure" name="unitOfMeasure" size="80" class="text"
+                            <g:autoSuggestString id="unitOfMeasure" name="unitOfMeasure" class="text large"
                                 jsonUrl="${request.contextPath}/json/autoSuggest"
                                 value="${productInstance?.unitOfMeasure}" placeholder="e.g. each, tablet, tube, vial"/>
                         </td>
@@ -87,14 +87,14 @@
                 <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.PRICE_PER_UNIT)}">
                     <tr class="prop">
                         <td class="name middle"><label id="pricePerUnitLabel" for="pricePerUnit"><warehouse:message
-                                code="product.pricePerUnit.label"/></label></td>
+                                code="product.pricePerUnit.label"/>
+                        <small class="fade">${grailsApplication.config.openboxes.locale.defaultCurrencyCode}</small>
+                        </label></td>
                         <td class="value middle ${hasErrors(bean: productInstance, field: 'pricePerUnit', 'errors')}">
                             <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.userNotGrantedPermission.message', args: [session.user.username])}">
                                 <g:textField name="pricePerUnit" placeholder="Price per unit (${grailsApplication.config.openboxes.locale.defaultCurrencyCode})"
                                              value="${g.formatNumber(number:productInstance?.pricePerUnit, format:'###,###,##0.####') }"
-                                             class="text" size="50" />
-
-                                <span class="fade">${grailsApplication.config.openboxes.locale.defaultCurrencyCode}</span>
+                                             class="text large" />
                             </g:hasRoleFinance>
                         </td>
                     </tr>
@@ -136,7 +136,7 @@
                         <td class="name"><label id="abcClassLabel" for="abcClass"><warehouse:message
                                 code="product.abcClass.label" /></label></td>
                         <td class="value ${hasErrors(bean: productInstance, field: 'abcClass', 'errors')}">
-                            <g:textField name="abcClass" value="${productInstance?.abcClass}" size="50" class="medium text"/>
+                            <g:textField name="abcClass" value="${productInstance?.abcClass}" class="medium large"/>
                         </td>
                     </tr>
                 </g:if>
@@ -250,7 +250,7 @@
                         <td class="name middle"><label id="brandNameLabel" for="brandName"><warehouse:message
                                 code="product.brandName.label" /></label></td>
                         <td class="value ${hasErrors(bean: productInstance, field: 'brandName', 'errors')}">
-                            <g:autoSuggestString id="brandName" name="brandName" size="50" class="text"
+                            <g:autoSuggestString id="brandName" name="brandName" class="text large"
                                                  jsonUrl="${request.contextPath}/json/autoSuggest"
                                                  value="${productInstance?.brandName}"
                                                  placeholder="e.g. Advil, Tylenol"/>
@@ -262,7 +262,7 @@
                         <td class="name middle"><label id="manufacturerLabel" for="manufacturer"><warehouse:message
                                 code="product.manufacturer.label" /></label></td>
                         <td class="value ${hasErrors(bean: productInstance, field: 'manufacturer', 'errors')}">
-                            <g:autoSuggestString id="manufacturer" name="manufacturer" size="50" class="text"
+                            <g:autoSuggestString id="manufacturer" name="manufacturer" class="text large"
                                                  jsonUrl="${request.contextPath}/json/autoSuggest"
                                                  value="${productInstance?.manufacturer}"
                                                  placeholder="e.g. Pfizer, Beckton Dickson"/>
@@ -275,7 +275,7 @@
                         <td class="name middle"><label id="manufacturerCodeLabel" for="manufacturerCode"><warehouse:message
                                 code="product.manufacturerCode.label"/></label></td>
                         <td class="value ${hasErrors(bean: productInstance, field: 'manufacturerCode', 'errors')}">
-                            <g:textField name="manufacturerCode" value="${productInstance?.manufacturerCode}" size="50" class="text"/>
+                            <g:textField name="manufacturerCode" value="${productInstance?.manufacturerCode}" class="text large"/>
                         </td>
                     </tr>
                 </g:if>
@@ -284,7 +284,7 @@
                         <td class="name middle"><label id="manufacturerNameLabel" for="manufacturerName"><warehouse:message
                                 code="product.manufacturerName.label"/></label></td>
                         <td class="value ${hasErrors(bean: productInstance, field: 'manufacturerName', 'errors')}">
-                            <g:textField name="manufacturerName" value="${productInstance?.manufacturerName}" size="50" class="text"/>
+                            <g:textField name="manufacturerName" value="${productInstance?.manufacturerName}" class="text large"/>
                         </td>
                     </tr>
                 </g:if>
@@ -294,7 +294,7 @@
                                 code="product.modelNumber.label" /></label></td>
                         <td
                                 class="value ${hasErrors(bean: productInstance, field: 'modelNumber', 'errors')}">
-                            <g:textField name="modelNumber" value="${productInstance?.modelNumber}" size="50" class="text"/>
+                            <g:textField name="modelNumber" value="${productInstance?.modelNumber}" class="text large"/>
                         </td>
                     </tr>
                 </g:if>
@@ -304,7 +304,7 @@
                                 code="product.vendor.label" /></label></td>
                         <td
                                 class="value ${hasErrors(bean: productInstance, field: 'vendor', 'errors')}">
-                            <g:autoSuggestString id="vendor" name="vendor" size="50" class="text"
+                            <g:autoSuggestString id="vendor" name="vendor" class="text large"
                                                  jsonUrl="${request.contextPath}/json/autoSuggest"
                                                  value="${productInstance?.vendor}"
                                                  placeholder="e.g. IDA, IMRES, McKesson"/>
@@ -317,7 +317,7 @@
                         <td class="name middle"><label id="vendorCodeLabel" for="vendorCode"><warehouse:message
                                 code="product.vendorCode.label"/></label></td>
                         <td class="value ${hasErrors(bean: productInstance, field: 'vendorCode', 'errors')}">
-                            <g:textField name="vendorCode" value="${productInstance?.vendorCode}" size="50" class="text"/>
+                            <g:textField name="vendorCode" value="${productInstance?.vendorCode}" class="text large"/>
                         </td>
                     </tr>
                 </g:if>
@@ -326,7 +326,7 @@
                         <td class="name middle fade"><label id="vendorNameLabel" for="vendorName"><warehouse:message
                                 code="product.vendorName.label"/></label></td>
                         <td class="value ${hasErrors(bean: productInstance, field: 'vendorName', 'errors')}">
-                            <g:textField name="vendorName" value="${productInstance?.vendorName}" size="50" class="text"/>
+                            <g:textField name="vendorName" value="${productInstance?.vendorName}" class="text large"/>
                         </td>
                     </tr>
                 </g:if>
@@ -335,7 +335,7 @@
                         <td class="name middle"><label id="upcLabel" for="upc"><warehouse:message
                                 code="product.upc.label" /></label></td>
                         <td class="value ${hasErrors(bean: productInstance, field: 'upc', 'errors')}">
-                            <g:textField name="upc" value="${productInstance?.upc}" size="50" class="medium text"/>
+                            <g:textField name="upc" value="${productInstance?.upc}" class="text large"/>
                         </td>
                     </tr>
                 </g:if>
@@ -344,7 +344,7 @@
                         <td class="name middle"><label id="ndcLabel" for="ndc"><warehouse:message
                                 code="product.ndc.label" /></label></td>
                         <td class="value ${hasErrors(bean: productInstance, field: 'ndc', 'errors')}">
-                            <g:textField name="ndc" value="${productInstance?.ndc}" size="50" class="medium text"
+                            <g:textField name="ndc" value="${productInstance?.ndc}" class="text large"
                                          placeholder="e.g. 0573-0165"/>
                         </td>
                     </tr>
