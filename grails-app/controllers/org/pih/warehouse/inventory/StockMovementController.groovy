@@ -508,22 +508,21 @@ class StockMovementController {
             "Status" { it.status }
             "Product Code" { it.productCode }
             "Product" { it.productName }
-            "Qty Requested" { it.quantity }
             "Qty Picked" { it.quantityPicked }
-            "Reason code" { it.reasonCode }
         })
         pendingRequisitionItems.each { requisitionItem ->
-            csv << [
-                    shipmentNumber  : requisitionItem?.requisition?.requestNumber,
-                    description     : requisitionItem?.requisition?.description ?: '',
-                    destination     : requisitionItem?.requisition?.destination,
-                    status          : requisitionItem?.requisition?.status,
-                    productCode     : requisitionItem?.product?.productCode,
-                    productName     : requisitionItem?.product?.name,
-                    quantity        : requisitionItem?.quantity,
-                    quantityPicked  : requisitionItem?.requisition?.status >= RequisitionStatus.PICKED ? requisitionItem?.totalQuantityPicked() : '',
-                    reasonCode      : requisitionItem?.cancelReasonCode ?: requisitionItem?.pickReasonCode ?: ''
-            ]
+            def quantityPicked = requisitionItem?.totalQuantityPicked()
+            if (quantityPicked) {
+                csv << [
+                        shipmentNumber  : requisitionItem?.requisition?.requestNumber,
+                        description     : requisitionItem?.requisition?.description ?: '',
+                        destination     : requisitionItem?.requisition?.destination,
+                        status          : requisitionItem?.requisition?.status,
+                        productCode     : requisitionItem?.product?.productCode,
+                        productName     : requisitionItem?.product?.name,
+                        quantityPicked  : quantityPicked,
+                ]
+            }
         }
 
         response.setHeader("Content-disposition", "attachment; filename=\"PendingShipmentItems-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
