@@ -240,9 +240,10 @@ class ProductController {
 
     def renderTemplate = {
         def productInstance = Product.get(params.id)
-        if (!productInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
-            redirect(controller: "inventory", action: "browse")
+        Boolean renderNotFoundError = params.renderNotFoundError ? Boolean.valueOf(params.renderNotFoundError) : true
+        if (!productInstance && renderNotFoundError) {
+            def text = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
+            render(text: text)
         } else {
             if (!params.templateName) {
                 throw new IllegalArgumentException("Must provide templateName parameter")
