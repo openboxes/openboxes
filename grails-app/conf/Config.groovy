@@ -762,6 +762,12 @@ openboxes.purchasing.approval.defaultRoleTypes = [RoleType.ROLE_APPROVER]
 openboxes.purchasing.updateUnitPrice.enabled = false
 openboxes.purchasing.updateUnitPrice.method = UpdateUnitPriceMethodCode.USER_DEFINED_PRICE
 
+openboxes.signup.recaptcha.enabled = false
+openboxes.signup.recaptcha.v2.siteKey = ""
+openboxes.signup.recaptcha.v2.secretKey = ""
+openboxes.signup.recaptcha.v3.siteKey = ""
+openboxes.signup.recaptcha.v3.secretKey = ""
+
 // OpenBoxes default uploads directory location
 openboxes.uploads.location = "uploads"
 

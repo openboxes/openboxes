@@ -3,31 +3,31 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
 	<title><warehouse:message code="auth.signup.label"/></title>
+	<script src="${createLinkTo(dir:'js/', file:'detect_timezone.js')}" type="text/javascript" ></script>
+	<g:if test="${grailsApplication.config.openboxes.signup.recaptcha.enabled}">
+	<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+	</g:if>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 	<style>
 		#hd { display: none; }
         input, select { width: 100%; }
         .required { color: red}
 	</style>
-
-		
-
 </head>
 <body>
 	<div class="body">
-		<g:form controller="auth" action="handleSignup" method="POST">		  
+		<g:form name="handleSignup" controller="auth" action="handleSignup" method="POST">
 		    <div class="dialog">
 				<div id="signupForm">
 					<g:if test="${flash.message}">
 					    <div class="message">${flash.message}</div>
-					</g:if>		
-			
+					</g:if>
+
 					<g:hasErrors bean="${userInstance}">
 					   <div class="errors">
 					       <g:renderErrors bean="${userInstance}" as="list" />
 					   </div>
-					</g:hasErrors>		
-								
+					</g:hasErrors>
 					<div id="loginBox" class="box">
 						<h2>
 							<img src="${createLinkTo(dir:'images/icons/silk',file:'lock.png')}" class="middle"/> Signup for an account
@@ -43,7 +43,7 @@
 					                    <g:textField name="firstName" value="${userInstance?.firstName}" class="text" size="40"/>
 					                </td>
 					            </tr>
-	
+
 					            <tr class="prop">
 					                <td class="name middle right">
                                         <span class="required">*</span>
@@ -63,7 +63,7 @@
 										<g:textField name="email" value="${userInstance?.email}" class="text" size="40"/>
 									</td>
 								</tr>
-	
+
 					            <tr class="prop">
 					                <td class="name middle right">
                                         <span class="required">*</span>
@@ -73,7 +73,7 @@
 					                    <g:passwordField name="password" value="${userInstance?.password}" class="text" size="40"/>
 					                </td>
 					            </tr>
-						    
+
 					            <tr class="prop">
 					                <td class="name middle right">
                                         <span class="required">*</span>
@@ -88,7 +88,7 @@
 										<label for="locale"><warehouse:message code="default.locale.label"/></label>
 									</td>
 									<td class="value ${hasErrors(bean: userInstance, field: 'locale', 'errors')}">
-										<div style="width: 235px">
+										<div>
 											<g:select name="locale" from="${ grailsApplication.config.openboxes.locale.supportedLocales.collect{ new Locale(it) } }"
 													  optionValue="displayName" value="${userInstance?.locale}" noSelection="['':'']" class="chzn-select-deselect"/>
 										</div>
@@ -105,7 +105,7 @@
 															  class="chzn-select-deselect"/>
 										</g:if>
 										<g:else>
-											<g:textField name="timezone" value="${userInstance?.timezone}" size="40" class="text medium"/>
+											<g:textField id="timezone" name="timezone" value="${userInstance?.timezone}" class="text large" />
 										</g:else>
 									</td>
 								</tr>
@@ -121,7 +121,7 @@
                                             <option value="personal">I'm evaluating OpenBoxes for personal use</option>
                                             <option value="company">I'm evaluating OpenBoxes for my company</option>
                                             <option value="contribute">I'd like to contribute to OpenBoxes</option>
-                                            <option value="contact">I have no idea what I'm doing, please contact me</option>
+                                            <option value="contact">I have no idea, stop bothering me</option>
                                             <option value="other">Other</option>
                                         </select>
                                     </td>
@@ -132,43 +132,57 @@
                                                 code="default.comments.label" default="Comments" /></label>
                                     </td>
 									<td valign="top">
-                                        <g:textArea name="comments" style="width: 100%;" rows="5"
-                                                    placeholder="What features are important to you? Do you need help getting started?">${params?.comments}</g:textArea>
-
+                                        <g:textArea name="comments" rows="5" class="text large"
+                                                    placeholder="Tell us more about yourself. What features are important to you? Do you need help getting started?">${params?.comments}</g:textArea>
 									</td>
 								</tr>
-
-
+								<g:if test="${grailsApplication.config.openboxes.signup.recaptcha.enabled}">
+									<tr class="prop">
+										<td class="name"></td>
+										<td valign="top">
+											<div class="g-recaptcha" data-sitekey="${grailsApplication.config.openboxes.signup.recaptcha.v2.siteKey}"></div>
+										</td>
+									</tr>
+								</g:if>
 								<tr class="prop">
 									<td class="name middle right"></td>
 									<td valign="top">
-										<button type="submit" class="button icon approve">
+										<button type="submit" class="button block" >
 											<warehouse:message code="auth.signup.label"/>
 										</button>
 									</td>
 								</tr>
 								<tr class="prop">
-									<td colspan="2">
+									<td class="name">
+									</td>
+									<td class="value">
 										<warehouse:message code="auth.alreadyHaveAccount.text"/>
 										<g:link class="list" controller="auth" action="login">
 											<warehouse:message code="auth.login.label" default="Login"/>
 										</g:link>
                                         <div class="right">
-
                                             <span class="required">*</span> denotes required fields
                                         </div>
-
 									</td>
-								
 								</tr>
 							</tbody>
-						</table>						
+						</table>
 					</div>
-					
-				</div>			
+				</div>
 			</div>
-		</g:form>		
+		</g:form>
 	</div>
+
+<script>
+$(document).ready(function() {
+	var timezone = jzTimezoneDetector.determine_timezone().timezone;
+	if (timezone) {
+		$("#timezone")
+		.val(timezone.olson_tz)
+		.trigger("chosen:updated");
+	}
+});
+</script>
 </body>
 </html>
-       
+
