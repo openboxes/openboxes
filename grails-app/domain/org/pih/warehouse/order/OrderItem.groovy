@@ -145,7 +145,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     }
 
     def getPendingShipmentItems() {
-        return order.pendingShipments*.shipmentItems*.findAll { it.orderItemId == this.id }.flatten().toArray()
+        return order.pendingShipments*.shipmentItems*.findAll { it.orderItemId == this.id }?.flatten()?.toArray()
     }
 
     def getShippedShipmentItems() {
