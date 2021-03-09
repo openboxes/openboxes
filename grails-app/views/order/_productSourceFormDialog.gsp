@@ -103,9 +103,9 @@
                 // Reload product sources in orderItemForm to include newly created
                 var productId = $("#product-id").val();
                 var supplierId = $("#supplierId").val();
+                var destinationPartyId = $("#destinationPartyId").val();
                 clearSource();
-                $('#productSupplier').html("");
-                productChanged(productId, supplierId, response);
+                productChanged(productId, supplierId, destinationPartyId, response);
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 if (jqXHR.responseText) {
