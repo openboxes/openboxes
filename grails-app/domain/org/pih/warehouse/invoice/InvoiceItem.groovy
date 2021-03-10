@@ -35,7 +35,6 @@ class InvoiceItem implements Serializable {
 
     String id
 
-    Invoice invoice
     Product product
     GlAccount glAccount
     BudgetCode budgetCode
@@ -50,6 +49,8 @@ class InvoiceItem implements Serializable {
     Date lastUpdated
     User createdBy
     User updatedBy
+
+    static belongsTo = [invoice: Invoice]
 
     static mapping = {
         id generator: 'uuid'

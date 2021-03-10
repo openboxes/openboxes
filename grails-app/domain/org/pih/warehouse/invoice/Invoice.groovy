@@ -13,6 +13,7 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Party
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.User
+import org.pih.warehouse.shipping.ReferenceNumber
 
 class Invoice implements Serializable {
 
@@ -33,7 +34,6 @@ class Invoice implements Serializable {
 
     String id
     String invoiceNumber
-    String referenceNumber
     String name
     String description
 
@@ -57,13 +57,15 @@ class Invoice implements Serializable {
     User createdBy
     User updatedBy
 
+    static hasMany = [referenceNumbers: ReferenceNumber]
+
     static mapping = {
         id generator: 'uuid'
+        referenceNumbers cascade: "all-delete-orphan"
     }
 
     static constraints = {
         invoiceNumber(nullable: false, blank: false, unique: true, maxSize: 255)
-        referenceNumber(nullable: true, maxSize: 255)
         name(nullable: true, maxSize: 255)
         description(nullable: true, maxSize: 255)
 
