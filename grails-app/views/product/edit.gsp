@@ -39,7 +39,7 @@
    			<g:if test="${productInstance?.id }">
 				<g:render template="summary" model="[productInstance:productInstance]"/>
 			</g:if>
-
+            <g:hiddenField id="isAccountingRequired" name="isAccountingRequired" value="${locationInstance?.isAccountingRequired()}"/>
 			<div>
                 <div class="tabs tabs-ui">
 					<ul>
