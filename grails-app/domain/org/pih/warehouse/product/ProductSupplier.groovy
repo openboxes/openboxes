@@ -101,7 +101,7 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
     }
 
     ProductPackage getDefaultProductPackage() {
-        return productPackages ? productPackages.sort { it.dateCreated }.last() : null
+        return productPackages ? productPackages.sort { it.lastUpdated }.last() : null
     }
 
     List<ProductAttribute> getAttributes() {

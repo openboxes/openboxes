@@ -536,6 +536,7 @@ class OrderService {
                     productPrice.price = packagePrice
                     productPackage.productPrice = productPrice
                 }
+                productPackage.lastUpdated = new Date()
             }
             // Associate product package with order item
             orderItem.productPackage = productPackage
