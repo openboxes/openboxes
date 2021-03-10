@@ -978,7 +978,7 @@ class OrderController {
 
     def createCombinedShipment = {
         def orderInstance = Order.get(params.orderId)
-        if (!orderInstance.orderItems.find {it.quantityRemainingToShip != 0 }) {
+        if (!orderInstance.orderItems.find {it.quantityRemainingToShip != 0 && it.orderItemStatusCode != OrderItemStatusCode.CANCELED }) {
             flash.message = "${warehouse.message(code:'purchaseOrder.noItemsToShip.label')}"
             redirect(controller: 'order', action: "show", id: orderInstance.id, params: ['tab': 4])
             return
