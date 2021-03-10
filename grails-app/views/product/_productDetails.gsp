@@ -1,3 +1,4 @@
+<%@ page import="org.pih.warehouse.product.ProductField" %>
 <g:set var="formAction"><g:if test="${productInstance?.id}">update</g:if><g:else>save</g:else></g:set>
 <g:form name="productForm" action="${formAction}" onsubmit="return validateForm();">
     <g:hiddenField name="id" value="${productInstance?.id}" />
