@@ -5,7 +5,7 @@ import Translate from '../../utils/Translate';
 import GlobalSearch from '../GlobalSearch';
 import LocationChooser from '../location/LocationChooser';
 import UserActionMenu from '../user/UserActionMenu';
-import apiClient from '../../utils/apiClient';
+import apiClient, { stringUrlInterceptor } from '../../utils/apiClient';
 
 
 class Header extends Component {
@@ -31,7 +31,7 @@ class Header extends Component {
 
     apiClient.post(url)
       .then(() => {
-        window.location = '/dashboard/index';
+        window.location = stringUrlInterceptor('/dashboard/index');
       });
   }
 
@@ -54,7 +54,7 @@ class Header extends Component {
         <div className="d-flex align-items-center justify-content-between flex-wrap">
           <div className="logo-header">
             <a
-              href="/"
+              href={stringUrlInterceptor('/')}
               className="navbar-brand brand-name"
             >
               { this.state.logoUrl !== '' ?

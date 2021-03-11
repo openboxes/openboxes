@@ -5,6 +5,7 @@ import { getTranslate } from 'react-localize-redux';
 import PropTypes from 'prop-types';
 import { showLocationChooser } from '../../actions';
 import { translateWithDefaultMessage } from '../../utils/Translate';
+import { stringUrlInterceptor } from '../../utils/apiClient';
 
 class Breadcrumbs extends Component {
   constructor(props) {
@@ -18,21 +19,23 @@ class Breadcrumbs extends Component {
   }
 
   render() {
-    const path = process.env.REACT_APP_API_PATH;
+    const separatorUrl = stringUrlInterceptor('static/images/bc_separator.png');
+    const houseUrl = stringUrlInterceptor('static/images/skin/house.png');
+
     const listToReturn = this.props.breadcrumbsParams.map((value, id) =>
       (value.label === 'Openboxes' || value.label === '' ? null : (
-        <a key={`item-${id}`} href={value.url} className="item-breadcrumbs">
+        <a key={`item-${id}`} href={stringUrlInterceptor(value.url)} className="item-breadcrumbs">
           {value.defaultLabel ? this.props.translate(value.label, value.defaultLabel) : value.label}
-          <img className="item-breadcrumbs" alt="/" src={`${path}static/images/bc_separator.png`} />
+          <img className="item-breadcrumbs" alt="/" src={separatorUrl} />
         </a>
       )));
 
     return (
       <div className="breadcrumbs-container d-flex">
-        <a className="item-breadcrumbs" href="/">
-          <img alt="Breadcrumbs" src={`${path}static/images/skin/house.png`} />
+        <a className="item-breadcrumbs" href={stringUrlInterceptor('/')}>
+          <img alt="Breadcrumbs" src={houseUrl} />
         </a>
-        <img className="item-breadcrumbs" alt="/" src={`${path}static/images/bc_separator.png`} />
+        <img className="item-breadcrumbs" alt="/" src={separatorUrl} />
         <a
           role="button"
           href="#"
@@ -40,7 +43,7 @@ class Breadcrumbs extends Component {
           className="item-breadcrumbs"
         > {this.props.currentLocationName}
         </a>
-        <img className="item-breadcrumbs" alt="/" src={`${path}static/images/bc_separator.png`} />
+        <img className="item-breadcrumbs" alt="/" src={separatorUrl} />
         { listToReturn }
       </div>
     );

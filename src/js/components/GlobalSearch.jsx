@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 
 import Select from '../utils/Select';
 import { debounceGlobalSearch } from '../utils/option-utils';
+import { stringUrlInterceptor } from '../utils/apiClient';
 
 class GlobalSearch extends Component {
   constructor(props) {
@@ -44,7 +45,7 @@ class GlobalSearch extends Component {
           }}
           onInputChange={this.onInputChange}
           onEnterPress={() => {
-            window.location = `/dashboard/globalSearch?searchTerms=${this.state.inputValue}`;
+            window.location = stringUrlInterceptor(`/dashboard/globalSearch?searchTerms=${this.state.inputValue}`);
           }}
           optionRenderer={option => <strong style={{ color: option.color ? option.color : 'black' }}>{option.label}</strong>}
         />

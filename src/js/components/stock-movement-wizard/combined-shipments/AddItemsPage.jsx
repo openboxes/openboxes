@@ -21,7 +21,7 @@ import LabelField from '../../form-elements/LabelField';
 import DateField from '../../form-elements/DateField';
 import { renderFormField } from '../../../utils/form-utils';
 import { showSpinner, hideSpinner, fetchUsers } from '../../../actions';
-import apiClient from '../../../utils/apiClient';
+import apiClient, { stringUrlInterceptor } from '../../../utils/apiClient';
 import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
 import { debounceProductsFetch } from '../../../utils/option-utils';
 import CombinedShipmentItemsModal from '../modals/CombinedShipmentItemsModal';
@@ -658,7 +658,7 @@ class AddItemsPage extends Component {
     if (!errors.length) {
       this.saveRequisitionItemsInCurrentStep(formValues.lineItems)
         .then(() => {
-          window.location = `/stockMovement/show/${formValues.stockMovementId}`;
+          window.location = stringUrlInterceptor(`/stockMovement/show/${formValues.stockMovementId}`);
         });
     } else {
       confirmAlert({
@@ -670,7 +670,7 @@ class AddItemsPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = `/stockMovement/show/${formValues.stockMovementId}`; },
+            onClick: () => { window.location = stringUrlInterceptor(`/stockMovement/show/${formValues.stockMovementId}`); },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),

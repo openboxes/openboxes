@@ -14,7 +14,7 @@ import 'react-table/react-table.css';
 import customTreeTableHOC from '../../utils/CustomTreeTable';
 import Select from '../../utils/Select';
 import SplitLineModal from './SplitLineModal';
-import apiClient, { parseResponse, flattenRequest } from '../../utils/apiClient';
+import apiClient, { parseResponse, flattenRequest, stringUrlInterceptor } from '../../utils/apiClient';
 import { showSpinner, hideSpinner, updateBreadcrumbs, fetchBreadcrumbsConfig } from '../../actions';
 import Filter from '../../utils/Filter';
 import showLocationChangedAlert from '../../utils/location-change-alert';
@@ -64,7 +64,7 @@ class PutAwaySecondPage extends Component {
   componentWillReceiveProps(nextProps) {
     showLocationChangedAlert(
       this.props.translate, this.state.location, nextProps.location,
-      () => { window.location = '/order/list?orderTypeCode=TRANSFER_ORDER&status=PENDING'; },
+      () => { window.location = stringUrlInterceptor('/order/list?orderTypeCode=TRANSFER_ORDER&status=PENDING'); },
     );
 
     const location = this.state.location.id ? this.state.location : nextProps.location;

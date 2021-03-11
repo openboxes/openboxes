@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { stringUrlInterceptor } from '../../utils/apiClient';
 
 /* global _ */
 const TableCard = props => (
@@ -16,7 +17,7 @@ const TableCard = props => (
       <tbody>
         {props.data.body.map(item => (
           <tr
-            onClick={() => window.open(item.link, '_blank')}
+            onClick={() => window.open(stringUrlInterceptor(item.link), '_blank')}
             key={`item-${item.number}`}
             className="table-link"
           >

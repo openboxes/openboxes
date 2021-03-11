@@ -15,7 +15,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 import { renderFormField } from '../../../utils/form-utils';
 import renderHandlingIcons from '../../../utils/product-handling-icons';
 import { showSpinner, hideSpinner } from '../../../actions';
-import apiClient from '../../../utils/apiClient';
+import apiClient, { stringUrlInterceptor } from '../../../utils/apiClient';
 import DateField from '../../form-elements/DateField';
 import DocumentButton from '../../DocumentButton';
 import SelectField from '../../form-elements/SelectField';
@@ -548,7 +548,7 @@ class SendMovementPage extends Component {
         .then(() => {
           this.stateTransitionToIssued()
             .then(() => {
-              window.location = `/stockMovement/show/${this.state.values.stockMovementId}`;
+              window.location = stringUrlInterceptor(`/stockMovement/show/${this.state.values.stockMovementId}`);
             })
             .catch(() => this.props.hideSpinner());
         })
@@ -593,7 +593,7 @@ class SendMovementPage extends Component {
     if (_.isEmpty(errors)) {
       this.saveValues(values)
         .then(() => {
-          window.location = `/stockMovement/show/${values.stockMovementId}`;
+          window.location = stringUrlInterceptor(`/stockMovement/show/${values.stockMovementId}`);
         });
     } else {
       confirmAlert({
@@ -605,7 +605,7 @@ class SendMovementPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = `/stockMovement/show/${values.stockMovementId}`; },
+            onClick: () => { window.location = stringUrlInterceptor(`/stockMovement/show/${values.stockMovementId}`); },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),

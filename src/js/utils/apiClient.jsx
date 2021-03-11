@@ -87,8 +87,16 @@ const urlInterceptor = (config) => {
     return config;
   }
 
-  const url = _.trimEnd(contextPath, '/') + cleanUrlFromContextPath(config.url);
+  const cleanedContextPath = _.trimEnd(contextPath, '/');
+  const cleanedUrl = _.trimStart(config.url ? cleanUrlFromContextPath(config.url) : '', '/');
+
+  const url = `${cleanedContextPath}/${cleanedUrl}`;
   return { ...config, url };
+};
+
+export const stringUrlInterceptor = (url) => {
+  const config = urlInterceptor({ url });
+  return config.url;
 };
 
 apiClient.interceptors.response.use(handleSuccess, handleError);
