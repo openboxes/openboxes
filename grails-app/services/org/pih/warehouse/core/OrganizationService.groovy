@@ -51,14 +51,6 @@ class OrganizationService {
         return findOrCreateOrganization(name, code, [RoleType.ROLE_SUPPLIER, RoleType.ROLE_MANUFACTURER])
     }
 
-    Organization findOrCreateBuyerOrganization(String name, String code) {
-        return findOrCreateOrganization(name, code, [RoleType.ROLE_BUYER, RoleType.ROLE_DISTRIBUTOR])
-    }
-
-    Organization findOrCreateSupplierOrganization(String name, String code) {
-        return findOrCreateOrganization(name, code, [RoleType.ROLE_SUPPLIER, RoleType.ROLE_MANUFACTURER])
-    }
-
     List getOrganizations(Map params) {
         List roleTypes = params.list("roleType").collect { it as RoleType }
 
