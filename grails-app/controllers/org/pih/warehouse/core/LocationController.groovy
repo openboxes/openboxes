@@ -32,16 +32,17 @@ class LocationController {
     }
 
     def list = {
-
-        def locationsTotal = 0
-        def locationType = LocationType.get(params["locationType.id"])
+        def defaultLocationType = LocationType.findByLocationTypeCode(LocationTypeCode.DEPOT)
+        def locationType = params.containsKey("locationType.id")?LocationType.get(params["locationType.id"])?:null:defaultLocationType
         def locationGroup = LocationGroup.get(params["locationGroup.id"])
+        def organization = Organization.get(params["organization.id"])
 
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         params.offset = params.offset ? params.int("offset") : 0
-        def locations = locationService.getLocations(locationType, locationGroup, params.q, params.max, params.offset as int)
 
-        [locationInstanceList: locations, locationInstanceTotal: locations.totalCount]
+        def locations = locationService.getLocations(organization, locationType, locationGroup, params.q, params.max, params.offset as int)
+
+        [locationInstanceList: locations, locationInstanceTotal: locations.totalCount, defaultLocationType:defaultLocationType]
     }
 
     def show = {
