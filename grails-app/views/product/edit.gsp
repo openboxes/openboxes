@@ -192,8 +192,7 @@
                 .dialog('close');
               });
 
-              $(".attributeValueSelector")
-              .change(function (event) {
+              $(".attributeValueSelector").livequery('change', function() {
                 if ($(this)
                 .val() == '_other') {
                   $(this)
@@ -214,8 +213,7 @@
                 .val('updated')
               }
 
-              $(".binLocation")
-              .change(function () {
+              $(".binLocation").livequery('change', function() {
                 updateBinLocation()
               });
 
