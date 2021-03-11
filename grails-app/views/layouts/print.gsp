@@ -37,9 +37,28 @@
 	</style>
 
 </head>
-<body >
-    <div class="${params.orientation?:'landscape'}" >
+<body>
+    <div class="${params.orientation?:'landscape'}">
 		<g:layoutBody />
 	</div>
+	<script type="text/javascript">
+		$(document).ready(function() {
+
+			$("#print-page").click(function(event){
+				window.print();
+				return false;
+			});
+
+			$("#select-orientation").change(function() {
+				var selected = this.value
+				if ('URLSearchParams' in window) {
+					var searchParams = new URLSearchParams(window.location.search)
+					searchParams.set("orientation", selected);
+					window.location.search = searchParams.toString();
+				}
+			});
+		});
+
+	</script>
 </body>
 </html>
