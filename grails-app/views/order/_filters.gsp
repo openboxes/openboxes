@@ -52,6 +52,16 @@
                                          data-allow-clear="true"/>
             </div>
             <div class="filter-list-item">
+                <label><warehouse:message code="order.destinationParty.label"/></label>
+                <g:selectOrganization name="destinationParty"
+                                      id="destinationParty"
+                                      value="${params.destinationParty}"
+                                      roleTypes="[org.pih.warehouse.core.RoleType.ROLE_BUYER]"
+                                      noSelection="['':'']"
+                                      class="chzn-select-deselect"
+                                      disabled="${isCentralPurchasingEnabled}" />
+            </div>
+            <div class="filter-list-item">
                 <label><warehouse:message code="order.orderedBy.label"/></label>
                 <g:selectPersonViaAjax id="orderedBy"
                                          name="orderedBy"
