@@ -49,7 +49,7 @@
                                     <label><warehouse:message code="default.type.label"/></label>
                                 </td>
                                 <td class="value">
-                                    ${commandInstance?.type}
+                                    ${commandInstance?.type?.capitalize()}
                                 </td>
                             </tr>
                             <tr class="prop">
@@ -60,14 +60,16 @@
                                     ${commandInstance?.filename}
                                 </td>
                             </tr>
-                            <tr class="prop">
-                                <td class="name">
-                                    <label><warehouse:message code="default.date.label"/></label>
-                                </td>
-                                <td class="value">
-                                    <g:jqueryDatePicker id="date" name="date" value="${commandInstance?.date}" format="MM/dd/yyyy" size="20"/>
-                                </td>
-                            </tr>
+                            <g:if test="${commandInstance?.type == 'inventory'}">
+                                <tr class="prop">
+                                    <td class="name">
+                                        <label><warehouse:message code="default.date.label"/></label>
+                                    </td>
+                                    <td class="value">
+                                        <g:jqueryDatePicker id="date" name="date" value="${commandInstance?.date}" format="MM/dd/yyyy" size="20"/>
+                                    </td>
+                                </tr>
+                            </g:if>
                         </table>
                     </div>
 

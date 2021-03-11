@@ -9,32 +9,51 @@
  **/
 package org.pih.warehouse.data
 
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.LocationType
+import org.pih.warehouse.core.LocationTypeCode
+import org.pih.warehouse.core.Organization
 import org.pih.warehouse.importer.ImportDataCommand
 import org.springframework.validation.BeanPropertyBindingResult
 
 class LocationDataService {
 
+    def messageSource
+    def grailsApplication
+    def organizationService
+
     /**
      * Validate inventory levels
      */
     Boolean validateData(ImportDataCommand command) {
+
+        Locale locale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
+
         command.data.eachWithIndex { params, index ->
 
             Location location = createOrUpdateLocation(params)
 
             LocationGroup locationGroup = params.locationGroup ? LocationGroup.findByName(params.locationGroup) : null
             if (params.locationGroup && !locationGroup) {
-                command.errors.reject("Row ${index + 1}: Location group ${params.locationGroup} for location ${params.name} does not exist")
+                command.errors.reject("Row ${index + 1}: Location group '${params.locationGroup}' does not exist")
             }
 
             if (!location.validate()) {
                 location.errors.each { BeanPropertyBindingResult error ->
-                    command.errors.reject("Row ${index + 1}: Location ${location.name} is invalid: ${error.getFieldError()}")
+                    String errorMessage = messageSource.getMessage(error.fieldError, locale)
+                    command.errors.reject("Row ${index + 1}: ${errorMessage}")
                 }
             }
+
+            if (!location?.organization?.validate()) {
+                location?.organization?.errors?.each { BeanPropertyBindingResult error ->
+                    String errorMessage = messageSource.getMessage(error.fieldError, locale)
+                    command.errors.reject("Row ${index + 1}: ${errorMessage}")
+                }
+            }
+
         }
     }
 
@@ -60,7 +79,16 @@ class LocationDataService {
         location.locationGroup = params.locationGroup ? LocationGroup.findByName(params.locationGroup) : null
         location.parentLocation = params.parentLocation ? Location.findByNameOrLocationNumber(params.parentLocation, params.parentLocation) : null
 
+        // Add required association to organization for depots and suppliers
+        if (!location.organization) {
+            Location currentLocation = AuthService?.currentLocation?.get()
+            Organization organization = (location.locationType?.locationTypeCode == LocationTypeCode.SUPPLIER) ?
+                    organizationService.findOrCreateSupplierOrganization(params.name, params.locationNumber) :
+                    (location?.locationType?.locationTypeCode == LocationTypeCode.DEPOT) ?
+                            currentLocation?.organization : null
 
+            location.organization = organization
+        }
         return location
     }
 }

@@ -737,7 +737,7 @@ openboxes.identifier.sequenceNumber.format = Constants.DEFAULT_SEQUENCE_NUMBER_F
 
 openboxes.identifier.organization.format = Constants.DEFAULT_ORGANIZATION_NUMBER_FORMAT
 openboxes.identifier.organization.minSize = 2
-openboxes.identifier.organization.maxSize = 3
+openboxes.identifier.organization.maxSize = 4
 
 openboxes.identifier.purchaseOrder.generatorType = IdentifierGeneratorTypeCode.SEQUENCE
 openboxes.identifier.purchaseOrder.format = "PO-\${destinationPartyCode}-\${sequenceNumber}"

@@ -25,20 +25,26 @@ class OrganizationService {
             organization.code = code?:identifierService.generateOrganizationIdentifier(name)
         }
 
-        if (!organization.hasRoleType(RoleType.ROLE_SUPPLIER)) {
-            organization.addToRoles(new PartyRole(roleType: RoleType.ROLE_SUPPLIER))
-        }
-
-        if (!organization.hasRoleType(RoleType.ROLE_MANUFACTURER)) {
-            organization.addToRoles(new PartyRole(roleType: RoleType.ROLE_MANUFACTURER))
+        if (roleTypes) {
+            roleTypes.each { RoleType roleType ->
+                if (!organization.hasRoleType(roleType)) {
+                    organization.addToRoles(new PartyRole(roleType: roleType))
+                }
+            }
         }
 
         if (organization.validate() && !organization.hasErrors()) {
-            return organization.save(flush: true)
-        } else {
-            throw new ValidationException("Organization is not valid", organization.errors)
+            organization.save()
         }
         return organization
+    }
+
+    Organization findOrCreateBuyerOrganization(String name, String code) {
+        return findOrCreateOrganization(name, code, [RoleType.ROLE_BUYER, RoleType.ROLE_DISTRIBUTOR])
+    }
+
+    Organization findOrCreateSupplierOrganization(String name, String code) {
+        return findOrCreateOrganization(name, code, [RoleType.ROLE_SUPPLIER, RoleType.ROLE_MANUFACTURER])
     }
 
     List getOrganizations(Map params) {
