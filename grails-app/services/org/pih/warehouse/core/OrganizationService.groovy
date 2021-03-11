@@ -16,8 +16,12 @@ class OrganizationService {
     def identifierService
     boolean transactional = true
 
-    Organization findOrCreateSupplierOrganization(String name, String code) {
-        Organization organization = Organization.findByName(name)
+    Organization findOrCreateOrganization(String name, String code) {
+        return findOrCreateOrganization(name, code, [])
+    }
+
+    Organization findOrCreateOrganization(String name, String code, List<RoleType> roleTypes) {
+        Organization organization = Organization.findByCodeOrName(code, name)
         if (!organization) {
             organization = new Organization()
             organization.name = name
@@ -37,6 +41,14 @@ class OrganizationService {
             organization.save()
         }
         return organization
+    }
+
+    Organization findOrCreateBuyerOrganization(String name, String code) {
+        return findOrCreateOrganization(name, code, [RoleType.ROLE_BUYER, RoleType.ROLE_DISTRIBUTOR])
+    }
+
+    Organization findOrCreateSupplierOrganization(String name, String code) {
+        return findOrCreateOrganization(name, code, [RoleType.ROLE_SUPPLIER, RoleType.ROLE_MANUFACTURER])
     }
 
     Organization findOrCreateBuyerOrganization(String name, String code) {
