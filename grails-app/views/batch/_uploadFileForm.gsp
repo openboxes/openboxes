@@ -192,6 +192,8 @@
                                 </label>
                             </td>
                             <td>
+                            </td>
+                            <td>
                                 <g:link controller="batch" action="downloadExcel" params="[type:'ProductSupplierPreference']">
                                     <warehouse:message code="default.download.label" args="[g.message(code:'default.data.label')]"/>
                                 </g:link>
