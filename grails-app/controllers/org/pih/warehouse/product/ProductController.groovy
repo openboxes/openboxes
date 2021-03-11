@@ -239,7 +239,14 @@ class ProductController {
     }
 
     def renderTemplate = {
-        def productInstance = Product.get(params.id)
+        def productInstance
+
+        if (params.id) {
+            productInstance = Product.get(params.id)
+        } else {
+            productInstance = new Product(params)
+        }
+
         Boolean renderNotFoundError = params.renderNotFoundError ? Boolean.valueOf(params.renderNotFoundError) : true
         if (!productInstance && renderNotFoundError) {
             def text = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"

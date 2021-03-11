@@ -44,7 +44,7 @@
                 <div class="tabs tabs-ui">
 					<ul>
 						<li>
-                            <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=productDetails&renderNotFoundError=false">
+                            <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=productDetails&renderNotFoundError=false&${request.queryString}">
                                 <g:message code="product.details.label"/>
                             </a>
                         </li>
@@ -222,8 +222,7 @@
               var prevProdType = $('#productType')
               .val();
 
-              $('#productType')
-              .change(function () {
+              $('#productType').livequery('change', function() {
                 var currentProdType = $(this)
                 .val();
 
