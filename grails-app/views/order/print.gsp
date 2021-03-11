@@ -7,8 +7,10 @@
     <title><warehouse:message code="order.print.label" default="Print order" /></title>
     <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'print.css')}" type="text/css" media="print, screen, projection" />
     <style>
+        .report-details table, .report-details tr { page-break-inside: auto; page-break-after: auto; page-break-before: avoid; }
+
         table.order-items{ border-collapse:collapse; }
-        table.order-items tr { border: none; }
+        table.order-items tr { border: none; page-break-inside: avoid; }
         table.order-items td { border-right: solid 1px lightgrey; border-left: solid 1px lightgrey; margin: 10px; padding: 10px;}
         table.order-items th { border: solid 1px lightgrey; margin: 10px; padding: 10px;}
 
