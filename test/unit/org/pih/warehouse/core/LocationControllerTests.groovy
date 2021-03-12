@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.core
 
 import grails.orm.PagedResultList
@@ -25,19 +25,33 @@ class LocationControllerTests extends ControllerUnitTestCase {
 		def ward = new LocationType(id: "2", name: "Ward")
 		def boston = new LocationGroup(id: "boston", name: "Boston")
 		def mirebalais = new LocationGroup(id: "boston", name: "Mirebalais")
-		
+
+		def main = new Organization(id: "MAIN", code: "MAIN", name: "Main Org")
+		def sister = new Organization(id: "SIS", code: "SIS", name: "Sister Org")
+
+		mockConfig """
+		openboxes { 
+			identifier {
+				organization { 
+					minSize = 2
+					maxSize = 4
+				}
+			}
+		}"""
+
+
 		mockDomain(Location, [
-			new Location(id: "1", name: "Boston", locationType: depot, locationGroup: boston),
-			new Location(id: "2", name: "Miami", locationType: depot, locationGroup: boston),
-			new Location(id: "3", name: "Mirebalais", locationType: depot, locationGroup: mirebalais),
-			new Location(id: "4", name: "Mirebalais > Pediatrics", locationType: ward, locationGroup: mirebalais)
+			new Location(id: "1", name: "Boston", locationType: depot, locationGroup: boston, organization: main),
+			new Location(id: "2", name: "Miami", locationType: depot, locationGroup: boston, organization: main),
+			new Location(id: "3", name: "Mirebalais", locationType: depot, locationGroup: mirebalais, organization: sister),
+			new Location(id: "4", name: "Mirebalais > Pediatrics", locationType: ward, locationGroup: mirebalais, organization: sister)
 		])
 		mockDomain(LocationType, [depot, ward])
 		mockDomain(LocationGroup, [boston, mirebalais])
+		mockDomain(Organization, [main, sister])
 
 		def locationServiceMock = mockFor(LocationService)
-		locationServiceMock.demand.getLocations { locationType, locationGroup, query, max, offset ->
-            println "Get locations"
+		locationServiceMock.demand.getLocations { organization, locationType, locationGroup, query, max, offset ->
             if (query=="Bos") {
                 return new PagedResultList([Location.get(1)], 1)
             }
@@ -45,7 +59,7 @@ class LocationControllerTests extends ControllerUnitTestCase {
 		}
 
 		controller.locationService = locationServiceMock.createMock()
-		
+
 		depot = LocationType.get("1")
 		assertNotNull depot
 	}
@@ -73,7 +87,7 @@ class LocationControllerTests extends ControllerUnitTestCase {
 	}
 
 	/*
-	void test_list_shouldListLocationsMatchingLocationType() { 
+	void test_list_shouldListLocationsMatchingLocationType() {
 		this.controller.params["locationType"] = "1"
 		def model = controller.list()
 		assertEquals 3, model["locationInstanceList"].size()
@@ -91,7 +105,7 @@ class LocationControllerTests extends ControllerUnitTestCase {
 		assertEquals 1, model["locationInstanceTotal"]
 	}
 	*/
-		
+
 	void test_show_shouldIncludeLocationInModel() {
 		// Mock the inventory service.
 		//def location = new Location(id: 1, name: "Boston", locationType: depot)
@@ -104,17 +118,17 @@ class LocationControllerTests extends ControllerUnitTestCase {
 		this.controller.params.id = "1"
 		def model = this.controller.show()
 		assertEquals "Boston", model["locationInstance"]?.name
-		
+
 	}
-	
+
 	/*
-	void test_uploadLogo_shouldDoSomething() { 
+	void test_uploadLogo_shouldDoSomething() {
 		this.controller.params.id = "1"
 		def model = this.controller.uploadLogo()
-		
-		
-		println model 		
-	}	
+
+
+		println model
+	}
 	*/
 
 

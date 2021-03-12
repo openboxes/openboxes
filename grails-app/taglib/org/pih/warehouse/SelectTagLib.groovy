@@ -59,6 +59,7 @@ class SelectTagLib {
     def locationService
     def shipmentService
     def requisitionService
+    def organizationService
 
     @Cacheable("selectCategoryCache")
     def selectCategory = { attrs, body ->
@@ -239,12 +240,17 @@ class SelectTagLib {
 
     def selectOrganization = { attrs, body ->
         def roleTypes = attrs.roleTypes
-
         if (roleTypes) {
+            // FIXME This was a really lazy way of doing this and
+            // causes performance issue due to N+1 query in collect
             def partyRoles = PartyRole.findAllByRoleTypeInList(roleTypes)
             def organizations = partyRoles.collect { it.party }.unique()
             attrs.from = organizations
         }
+        else {
+            attrs.from = organizationService.selectOrganizations()
+        }
+
         attrs.optionKey = 'id'
         attrs.optionValue = { it.name }
         out << g.select(attrs)
