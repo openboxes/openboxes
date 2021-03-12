@@ -72,13 +72,17 @@
                                     <label for="destination.id"><warehouse:message code="order.destination.label"/></label>
                                 </td>
                                 <td class='value ${hasErrors(bean:order,field:'destination','errors')}'>
-                                    <g:if test="${order?.destination }">
+                                    <g:if test="${!isCentralPurchasingEnabled}">
                                         ${order?.destination?.name }
                                         <g:hiddenField name="destination.id" value="${order?.destination?.id}"/>
                                     </g:if>
                                     <g:else>
-                                        ${session?.warehouse?.name }
-                                        <g:hiddenField name="destination.id" value="${session?.warehouse?.id}"/>
+                                        <g:selectLocation class="chzn-select-deselect filter"
+                                                          id="destination.id"
+                                                          name="destination.id"
+                                                          activityCode="${org.pih.warehouse.core.ActivityCode.MANAGE_INVENTORY}"
+                                                          noSelection="['':'']"
+                                                          value="${order?.destination?.id}"/>
                                     </g:else>
                                 </td>
                             </tr>
