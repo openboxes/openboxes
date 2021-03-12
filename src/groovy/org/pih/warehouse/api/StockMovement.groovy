@@ -54,7 +54,7 @@ class StockMovement {
 
     Date dateRequested
     Date dateShipped
-    Date dateDelivered
+    Date expectedDeliveryDate
     Date dateCreated
     Date lastUpdated
 
@@ -104,7 +104,7 @@ class StockMovement {
         stockMovementStatusCode(nullable: true)
         receiptStatusCode(nullable: true)
         dateShipped(nullable: true)
-        dateDelivered(nullable: true)
+        expectedDeliveryDate(nullable: true)
         shipmentType(nullable: true)
         trackingNumber(nullable: true)
         driverName(nullable: true)
@@ -135,7 +135,7 @@ class StockMovement {
             stocklist           : [id: stocklist?.id, name: stocklist?.name],
             dateRequested       : dateRequested?.format("MM/dd/yyyy"),
             dateShipped         : dateShipped?.format("MM/dd/yyyy HH:mm XXX"),
-            dateDelivered       : dateDelivered?.format("MM/dd/yyyy HH:mm XXX"),
+            expectedDeliveryDate: expectedDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),
             shipmentType        : shipmentType,
             shipmentStatus      : currentStatus,
             trackingNumber      : trackingNumber,
@@ -240,7 +240,7 @@ class StockMovement {
                 shipmentType: shipment.shipmentType,
                 statusCode: statusCode,
                 dateShipped: shipment?.expectedShippingDate,
-                dateDelivered: shipment?.expectedDeliveryDate,
+                expectedDeliveryDate: shipment?.expectedDeliveryDate,
                 identifier: shipment.shipmentNumber,
                 origin: shipment.origin,
                 destination: shipment.destination,
@@ -302,7 +302,7 @@ class StockMovement {
             comments: shipment?.additionalInformation,
             shipmentType: shipment?.shipmentType,
             dateShipped: shipment?.expectedShippingDate,
-            dateDelivered: shipment?.expectedDeliveryDate,
+            expectedDeliveryDate: shipment?.expectedDeliveryDate,
             driverName: shipment?.driverName,
             trackingNumber: trackingNumber?.identifier,
             currentStatus: shipment?.currentStatus,

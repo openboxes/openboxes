@@ -125,7 +125,7 @@ const SHIPMENT_FIELDS = {
       disabled: showOnly || received,
     }),
   },
-  dateDelivered: {
+  expectedDeliveryDate: {
     type: DateField,
     label: 'react.stockMovement.expectedReceiptDate.label',
     defaultMessage: 'Expected receipt date',
@@ -285,7 +285,7 @@ class SendMovementPage extends Component {
       trackingNumber: values.trackingNumber || '',
       driverName: values.driverName || '',
       comments: values.comments || '',
-      dateDelivered: values.dateDelivered || '',
+      expectedDeliveryDate: values.expectedDeliveryDate || '',
     };
 
     return this.saveShipment(payload);
@@ -414,7 +414,7 @@ class SendMovementPage extends Component {
             trackingNumber: stockMovementData.trackingNumber,
             driverName: stockMovementData.driverName,
             comments: stockMovementData.comments,
-            dateDelivered: stockMovementData.dateDelivered,
+            expectedDeliveryDate: stockMovementData.expectedDeliveryDate,
             // Below values are reassigned in case of editing destination or description
             name: stockMovementData.name,
             description: stockMovementData.description,
@@ -525,7 +525,7 @@ class SendMovementPage extends Component {
       trackingNumber: values.trackingNumber || '',
       driverName: values.driverName || '',
       comments: values.comments || '',
-      dateDelivered: values.dateDelivered || '',
+      expectedDeliveryDate: values.expectedDeliveryDate || '',
     };
 
     if ((this.props.currentLocationId !== values.origin.id) && (values.origin.type !== 'SUPPLIER' && values.hasManageInventory)) {
@@ -663,8 +663,8 @@ class SendMovementPage extends Component {
     if (!values.shipmentType) {
       errors.shipmentType = 'react.default.error.requiredField.label';
     }
-    if (!values.dateDelivered) {
-      errors.dateDelivered = 'react.default.error.requiredField.label';
+    if (!values.expectedDeliveryDate) {
+      errors.expectedDeliveryDate = 'react.default.error.requiredField.label';
     }
 
     return errors;
