@@ -11,6 +11,8 @@ package org.pih.warehouse.user
 
 
 import org.apache.commons.mail.EmailException
+import org.pih.warehouse.auth.UserSignupEvent
+import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.RoleType
@@ -22,6 +24,7 @@ class AuthController {
     def userService
     def authService
     def grailsApplication
+    def recaptchaService
 
     static allowedMethods = [login: "GET", doLogin: "POST", logout: "GET"]
 
@@ -144,7 +147,6 @@ class AuthController {
      * Allow user to register a new account
      */
     def signup = {
-
         Boolean enabled = grailsApplication.config.openboxes.signup.enabled
         if (!enabled) {
             flash.message = "Apologies, but the signup feature is disabled on your system. "  +
@@ -158,8 +160,10 @@ class AuthController {
      * Handle account registration.
      */
     def handleSignup = {
+        log.info "params " + params
 
         def userInstance = new User()
+
         if ("POST".equalsIgnoreCase(request.getMethod())) {
             userInstance.properties = params
 
@@ -172,56 +176,26 @@ class AuthController {
             // Set the email as username for backwards compatibility since we're no longer including username on signup
             userInstance.username = params.email
 
+            // Verify recaptcha challenge response if recaptcha is enabled
+            Boolean recaptchaEnabled = grailsApplication.config.openboxes.signup.enabled?:false
+            if (recaptchaEnabled && !recaptchaService.validate(params["g-recaptcha-response"])) {
+                userInstance.errors.reject("signup.recaptcha.fail.message", "Your reCAPTCHA challenge has failed, bot.")
+            }
+
+            publishEvent(new UserSignupEvent(userInstance, params.additionalQuestions))
+
             // Create account
             if (!userInstance.hasErrors() && userInstance.save(flush: true)) {
                 session.user = userInstance
 
-
                 // Attempt to add default roles to user instance
-                try {
-                    def defaultRoles = grailsApplication.config.openboxes.signup.defaultRoles
-                    if (!defaultRoles.isEmpty()) {
-                        println "Default roles: " + defaultRoles
-                        def roleTypes = defaultRoles.split(",")
-                        roleTypes.each { roleType ->
-                            def role = Role.findByRoleType(roleType)
-                            userInstance.addToRoles(role)
-                        }
+                userService.assignDefaultRoles(userInstance)
 
-                        if (userInstance.roles) {
-                            userInstance.active = Boolean.TRUE
-                        }
-                        userInstance.save()
-                    }
-                } catch (Exception e) {
-                    log.error("Unable to assign default roles: " + e.message, e)
-                }
-
-                // Send email to administrators
-                try {
-                    def recipients = userService.findUsersByRoleType(RoleType.ROLE_USER_NOTIFICATION)
-
-                    // Send email to user notification recipients
-                    if (recipients) {
-                        def to = recipients?.collect { it.email }?.unique()
-                        def subject = "${warehouse.message(code: 'email.userAccountCreated.message', args: [userInstance.username])}"
-                        def body = g.render(template: "/email/userAccountCreated", model: [userInstance: userInstance])
-                        mailService.sendHtmlMail(subject, body.toString(), to)
-                    }
-
-                    // Send confirmation email to user
-                    if (userInstance.email) {
-                        def subject = "${warehouse.message(code: 'email.userAccountConfirmed.message', args: [userInstance.email])}"
-                        def body = g.render(template: "/email/userAccountConfirmed", model: [userInstance: userInstance])
-                        mailService.sendHtmlMail(subject, body.toString(), userInstance.email)
-                    }
-                } catch (EmailException e) {
-                    log.error("Unable to send emails: " + e.message, e)
-                }
+                redirect(action: "chooseLogin")
+                return
 
             } else {
-                log.info("There will be errors: " + userInstance.errors)
-                // Reset the password to what the user entered
+                // Reset the password to what the user entered and redirect to signup
                 userInstance.password = params.password
                 userInstance.passwordConfirm = params.passwordConfirm
                 render(view: "signup", model: [userInstance: userInstance])

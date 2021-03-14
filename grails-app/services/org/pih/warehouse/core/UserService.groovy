@@ -88,6 +88,28 @@ class UserService {
         return userInstance.save(failOnError: true)
     }
 
+
+    void assignDefaultRoles(User userInstance) {
+        try {
+            def defaultRoles = grailsApplication.config.openboxes.signup.defaultRoles
+            if (!defaultRoles.isEmpty()) {
+                println "Default roles: " + defaultRoles
+                def roleTypes = defaultRoles.split(",")
+                roleTypes.each { roleType ->
+                    def role = Role.findByRoleType(roleType)
+                    userInstance.addToRoles(role)
+                }
+
+                if (userInstance.roles) {
+                    userInstance.active = Boolean.TRUE
+                }
+                userInstance.save()
+            }
+        } catch (Exception e) {
+            log.error("Unable to assign default roles: " + e.message, e)
+        }
+    }
+
     private void updateRoles(user, locationRolePairs) {
         def newAndUpdatedRoles = locationRolePairs.keySet().collect { locationId ->
             if (locationRolePairs[locationId]) {
