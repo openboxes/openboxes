@@ -1,3 +1,4 @@
+<%@ page import="org.pih.warehouse.inventory.InventoryLevel" %>
 <g:hasErrors bean="${inventoryLevelInstance}">
     <div class="errors">
         <g:renderErrors bean="${inventoryLevelInstance}" as="list" />
@@ -15,8 +16,8 @@
             <tr class="odd">
                 <th><warehouse:message code="default.actions.label"/></th>
                 <th><warehouse:message code="inventoryLevel.status.label"/></th>
-                <th><warehouse:message code="inventory.label"/></th>
-                <th><warehouse:message code="inventoryLevel.binLocation.label"/></th>
+                <th><warehouse:message code="location.label"/></th>
+                <th><warehouse:message code="product.preferredBin.label"/></th>
                 <th class="center"><warehouse:message code="inventoryLevel.abcClass.label" default="ABC Class"/></th>
                 <th class="center"><warehouse:message code="inventoryLevel.minQuantity.label"/></th>
                 <th class="center"><warehouse:message code="inventoryLevel.reorderQuantity.label"/></th>
@@ -31,20 +32,17 @@
 
             <g:each var="inventoryLevelInstance" in="${productInstance?.inventoryLevels}" status="i">
 
-                <tr class="prop ${i%2?'even':'odd'}">
+                <tr class="prop ${i%2?'even':'odd'} ${inventoryLevelInstance?.inventory?.warehouse?.id == session?.warehouse?.id ? 'active' : ''}">
                     <td>
-
                         <div class="action-menu">
                             <button class="action-btn">
                                 <img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>
                             </button>
                             <div class="actions">
                                 <div class="action-menu-item">
-
                                     <a href="javascript:void(0);" class="open-dialog create" dialog-id="inventory-level-${inventoryLevelInstance?.id}-dialog">
                                         <img src="${createLinkTo(dir:'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
                                         ${warehouse.message(code:'default.button.edit.label')}</a>
-
                                 </div>
                                 <div class="action-menu-item">
                                     <g:link controller="inventoryLevel" action="delete" class="" id="${inventoryLevelInstance?.id}">
@@ -61,7 +59,7 @@
                         ${inventoryLevelInstance?.inventory?.warehouse?.name }
                     </td>
                     <td>
-                        ${inventoryLevelInstance?.binLocation}
+                        ${inventoryLevelInstance?.preferredBinLocation}
                     </td>
                     <td class="center">
                         ${inventoryLevelInstance?.abcClass?:warehouse.message(code:'default.none.label')}
@@ -90,7 +88,7 @@
                         ${inventoryLevelInstance?.comments }
                     </td>
                     <td class="center">
-                        <g:formatDate date="${inventoryLevelInstance?.lastUpdated }"/>
+                        <g:formatDate date="${inventoryLevelInstance?.lastUpdated }" format="d MMM yyyy"/>
                     </td>
 
                 </tr>
@@ -124,3 +122,11 @@
         </table>
     </div>
 </g:form>
+<g:each var="inventoryLevelInstance" in="${productInstance?.inventoryLevels}" status="i">
+    <div id="inventory-level-${inventoryLevelInstance?.id}-dialog" class="dialog hidden" title="Edit inventory level">
+        <g:render template="../inventoryLevel/form" model="[inventoryLevelInstance:inventoryLevelInstance]"/>
+    </div>
+</g:each>
+<div id="inventory-level-dialog" class="dialog hidden" title="Add a new stock level">
+    <g:render template="../inventoryLevel/form" model="[productInstance:productInstance,inventoryLevelInstance:new InventoryLevel()]"/>
+</div>

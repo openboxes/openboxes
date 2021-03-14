@@ -25,7 +25,7 @@
 				<g:isSuperuser>
 					<g:set var="isSuperuser" value="${true}"/>
 				</g:isSuperuser>
-				<g:each var="inventoryItem" in="${commandInstance?.product?.inventoryItems}" status="status">
+				<g:each var="inventoryItem" in="${commandInstance?.product?.inventoryItems.sort { it.dateCreated }}" status="status">
 					<tr class="prop">
 						<td class="middle center" nowrap="nowrap">
 							<div class="action-menu">
@@ -34,19 +34,21 @@
 								</button>
 								<div class="actions left">
 									<div class="action-menu-item">
-										<g:link class="btn-show-dialog" data-disabled="${!isSuperuser}"
+										<g:link class="btn-show-dialog"
 										   data-title="${g.message(code:'inventory.editItem.label')}"
 										   data-url="${request.contextPath}/inventoryItem/showDialog?id=${inventoryItem?.id}&template=editItemDialog">
 											<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
 											<g:message code="default.edit.label" args="[g.message(code:'inventoryItem.label')]"/>
 										</g:link>
 									</div>
-									<div class="action-menu-item">
-										<g:link controller="inventoryItem" action="delete" id="${inventoryItem?.id}" data-disabled="${!isSuperuser}">
-											<img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>&nbsp;
-											<g:message code="default.delete.label" args="[g.message(code:'inventoryItem.label')]"/>
-										</g:link>
-									</div>
+									<g:isSuperuser>
+										<div class="action-menu-item">
+											<g:link controller="inventoryItem" action="delete" id="${inventoryItem?.id}" data-disabled="${!isSuperuser}">
+												<img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>&nbsp;
+												<g:message code="default.delete.label" args="[g.message(code:'inventoryItem.label')]"/>
+											</g:link>
+										</div>
+									</g:isSuperuser>
 								</div>
 							</div>
 						</td>

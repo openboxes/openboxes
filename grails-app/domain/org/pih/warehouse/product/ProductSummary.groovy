@@ -9,17 +9,20 @@
 **/
 package org.pih.warehouse.product
 
+import org.apache.commons.lang.builder.HashCodeBuilder
 import org.pih.warehouse.core.Location
 
-class ProductSummary {
+class ProductSummary implements Serializable {
 
-    Long id
     Product product
     Location location
     BigDecimal quantityOnHand
+    BigDecimal quantityOnOrder
+    BigDecimal quantityOnOrderNotShipped
+    BigDecimal quantityOnOrderNotReceived
 
     static mapping = {
-        id generator: "assigned"
+        id composite: ["product", "location"]
         version false
         cache usage: "read-only"
     }
@@ -28,5 +31,22 @@ class ProductSummary {
         product(nullable: false)
         location(nullable: false)
         quantityOnHand(nullable: false)
+        quantityOnOrder(nullable: true)
+        quantityOnOrderNotShipped(nullable: true)
+        quantityOnOrderNotReceived(nullable: true)
+    }
+
+    boolean equals(other) {
+        if (!(other instanceof ProductSummary)) {
+            return false
+        }
+        other.product?.id == product?.id && other.location?.id == location?.id
+    }
+
+    int hashCode() {
+        def builder = new HashCodeBuilder()
+        builder.append(product?.id)
+        builder.append(location?.id)
+        builder.toHashCode()
     }
 }

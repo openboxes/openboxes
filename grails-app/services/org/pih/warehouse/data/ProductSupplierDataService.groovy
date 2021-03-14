@@ -9,50 +9,72 @@
  **/
 package org.pih.warehouse.data
 
-import org.pih.warehouse.core.IdentifierService
+import groovy.sql.Sql
 import org.pih.warehouse.core.Organization
+import org.pih.warehouse.core.PreferenceType
+import org.pih.warehouse.core.ProductPrice
+import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.product.ProductSupplier
-import org.springframework.validation.BeanPropertyBindingResult
+import org.pih.warehouse.product.ProductSupplierPreference
+
+import java.text.SimpleDateFormat
 
 class ProductSupplierDataService {
 
     def uomService
     def identifierService
+    def dataSource
+    def grailsApplication
 
     Boolean validate(ImportDataCommand command) {
         log.info "Validate data " + command.filename
         command.data.eachWithIndex { params, index ->
 
-            def id = params.id
             def productCode = params.productCode
-            def supplierId = params.supplierId
             def supplierName = params.supplierName
-            def manufacturerId = params.manufacturerId
             def manufacturerName = params.manufacturerName
+            def preferenceType = params.globalPreferenceTypeName
             def uomCode = params.defaultProductPackageUomCode
             def packageQuantity = params.defaultProductPackageQuantity
+            def validityStartDate = params.globalPreferenceTypeValidityStartDate
+            def validityEndDate = params.globalPreferenceTypeValidityEndDate
+            def contractPriceValidUntil = params.contractPriceValidUntil
 
-            if (id && !ProductSupplier.exists(id)) {
-                command.errors.reject("Row ${index + 1}: Product supplier with ID ${id} does not exist")
+            if (!params.name) {
+                command.errors.reject("Row ${index + 1}: Product Source Name is required")
             }
 
-            def product = Product.findByProductCode(productCode)
-            if (productCode && !product) {
+            if (!productCode) {
+                command.errors.reject("Row ${index + 1}: Product Code is required")
+            } else if (productCode && !Product.findByProductCode(productCode)) {
                 command.errors.reject("Row ${index + 1}: Product with productCode ${productCode} does not exist")
             }
 
-            def supplier = Organization.get(supplierId)
-            if (supplier?.name != supplierName) {
-                command.errors.reject("Row ${index + 1}: Supplier '${supplier?.name}' with id ${supplier?.id} does not match supplierName '${supplierName}'")
+            if (supplierName && !Organization.findByName(supplierName)) {
+                command.errors.reject("Row ${index + 1}: Supplier with name '${supplierName}' does not exist")
             }
 
-            def manufacturer = Organization.get(manufacturerId)
-            if (manufacturer?.name != manufacturerName) {
-                command.errors.reject("Row ${index + 1}: Manufacturer '${manufacturer?.name}' with id ${manufacturer?.id} does not match manufacturerName '${manufacturerName}'")
+            if (manufacturerName && !Organization.findByName(manufacturerName)) {
+                command.errors.reject("Row ${index + 1}: Manufacturer with name '${manufacturerName}' does not exist")
+            }
+
+            try {
+                def ratingTypeCode = params?.ratingTypeCode ? params?.ratingTypeCode?.toUpperCase() as RatingTypeCode : null
+                if (ratingTypeCode && !RatingTypeCode.inList(ratingTypeCode)) {
+                    command.errors.reject("Row ${index + 1}: Rating Type with value '${params.ratingTypeCode}' exists but is not valid.")
+                }
+            }
+            catch(IllegalArgumentException e) {
+                command.errors.reject("Row ${index + 1}: Rating Type with value '${params.ratingTypeCode}' does not exist. " + e.message)
+            }
+
+
+            if (preferenceType && !PreferenceType.findByName(preferenceType)) {
+                command.errors.reject("Row ${index + 1}: Preference Type with name '${preferenceType}' does not exist")
             }
 
             log.info("uomCode " + uomCode)
@@ -64,12 +86,46 @@ class ProductSupplierDataService {
                 if (unitOfMeasure && !packageQuantity) {
                     command.errors.reject("Row ${index + 1}: Unit of measure ${uomCode} requires a quantity")
                 }
+                if (unitOfMeasure && packageQuantity && packageQuantity % 1 != 0) {
+                    command.errors.reject("Row ${index + 1}: Unit of measure quntity must be a whole number")
+                }
             }
 
-            def productSupplier = createOrUpdate(params)
-            if (!productSupplier.validate()) {
-                productSupplier.errors.each { BeanPropertyBindingResult error ->
-                    command.errors.reject("Row ${index + 1}: ${error.getFieldError()}")
+            def minDate = grailsApplication.config.openboxes.expirationDate.minValue
+            def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+            if (validityStartDate) {
+                try {
+                    def startDate = dateFormat.parse(validityStartDate)
+
+                    if (minDate > startDate) {
+                        command.errors.reject("Row ${index + 1}: Validity start date ${validityStartDate} is invalid. Please enter a date after ${minDate.getYear()+1900}.")
+                    }
+                } catch (Exception e) {
+                    command.errors.reject("Row ${index + 1}: Validity start date ${validityStartDate} is invalid. "+ e.message)
+                }
+            }
+
+            if (validityEndDate) {
+                try {
+                    def endDate = dateFormat.parse(validityEndDate)
+
+                    if (minDate > endDate) {
+                        command.errors.reject("Row ${index + 1}: Validity start date ${validityEndDate} is invalid. Please enter a date after ${minDate.getYear()+1900}.")
+                    }
+                } catch (Exception e) {
+                    command.errors.reject("Row ${index + 1}: Validity end date ${validityEndDate} is invalid. " + e.message)
+                }
+            }
+
+            if (contractPriceValidUntil) {
+                try {
+                    def validUntilDate = dateFormat.parse(contractPriceValidUntil)
+
+                    if (minDate > validUntilDate) {
+                        command.errors.reject("Row ${index + 1}: Contract Price Valid Until date ${contractPriceValidUntil} is invalid. Please enter a date after ${minDate.getYear()+1900}.")
+                    }
+                } catch (Exception e) {
+                    command.errors.reject("Row ${index + 1}: Contract Price Valid Until date ${contractPriceValidUntil} is invalid. " + e.message)
                 }
             }
         }
@@ -87,9 +143,16 @@ class ProductSupplierDataService {
     }
 
     def createOrUpdate(Map params) {
-
         log.info("params: ${params}")
-        Product product = Product.findByProductCode(params["productCode"])
+
+        def productCode = params.productCode
+        def supplierName = params.supplierName
+        def manufacturerName = params.manufacturerName
+        def ratingTypeCode = params?.ratingTypeCode ? params?.ratingTypeCode?.toUpperCase() as RatingTypeCode : null
+        def supplierCode = params.supplierCode
+        def manufacturerCode = params.manufacturerCode
+
+        Product product = productCode ? Product.findByProductCode(productCode) : null
         UnitOfMeasure unitOfMeasure = params.defaultProductPackageUomCode ?
                 UnitOfMeasure.findByCode(params.defaultProductPackageUomCode) : null
         BigDecimal price = params.defaultProductPackagePrice ?
@@ -102,11 +165,14 @@ class ProductSupplierDataService {
         } else {
             productSupplier.properties = params
         }
-        productSupplier.name = params["productName"]
+
+        productSupplier.ratingTypeCode = ratingTypeCode
         productSupplier.productCode = params["legacyProductCode"]
         productSupplier.product = product
-        productSupplier.supplier = Organization.get(params["supplierId"])
-        productSupplier.manufacturer = Organization.get(params["manufacturerId"])
+        productSupplier.supplier = supplierName ? Organization.findByName(supplierName) : null
+        productSupplier.manufacturer = manufacturerName ? Organization.findByName(manufacturerName) : null
+        productSupplier.supplierCode = supplierCode ? supplierCode : null
+        productSupplier.manufacturerCode = manufacturerCode ? manufacturerCode : null
 
         if (unitOfMeasure && quantity) {
             ProductPackage defaultProductPackage =
@@ -119,10 +185,59 @@ class ProductSupplierDataService {
                 defaultProductPackage.product = productSupplier.product
                 defaultProductPackage.uom = unitOfMeasure
                 defaultProductPackage.quantity = quantity
-                defaultProductPackage.price = price
+                ProductPrice productPrice = new ProductPrice()
+                productPrice.price = price
+                defaultProductPackage.productPrice = productPrice
                 productSupplier.addToProductPackages(defaultProductPackage)
-            } else {
-                defaultProductPackage.price = price
+            } else if (price && !defaultProductPackage.productPrice) {
+                ProductPrice productPrice = new ProductPrice()
+                productPrice.price = price
+                defaultProductPackage.productPrice = productPrice
+            } else if (price && defaultProductPackage.productPrice) {
+                defaultProductPackage.productPrice.price = price
+            }
+        }
+
+        def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+
+        def contractPriceValidUntil = params.contractPriceValidUntil ? dateFormat.parse(params.contractPriceValidUntil) : null
+        BigDecimal contractPricePrice = params.contractPricePrice ? new BigDecimal(params.contractPricePrice) : null
+
+        if (contractPricePrice) {
+            if (!productSupplier.contractPrice) {
+                productSupplier.contractPrice = new ProductPrice()
+            }
+
+            productSupplier.contractPrice.price = contractPricePrice
+
+            if (contractPriceValidUntil) {
+                productSupplier.contractPrice.toDate = contractPriceValidUntil
+            }
+        }
+
+        PreferenceType preferenceType = params.globalPreferenceTypeName ? PreferenceType.findByName(params.globalPreferenceTypeName) : null
+
+        if (preferenceType) {
+            ProductSupplierPreference productSupplierPreference = productSupplier.getGlobalProductSupplierPreference()
+
+            if (!productSupplierPreference) {
+                productSupplierPreference = new ProductSupplierPreference()
+                productSupplier.addToProductSupplierPreferences(productSupplierPreference)
+            }
+
+            productSupplierPreference.preferenceType = preferenceType
+            productSupplierPreference.comments = params.globalPreferenceTypeComments
+
+            def globalPreferenceTypeValidityStartDate = params.globalPreferenceTypeValidityStartDate ? dateFormat.parse(params.globalPreferenceTypeValidityStartDate) : null
+
+            if (globalPreferenceTypeValidityStartDate) {
+                productSupplierPreference.validityStartDate = globalPreferenceTypeValidityStartDate
+            }
+
+            def globalPreferenceTypeValidityEndDate = params.globalPreferenceTypeValidityEndDate ? dateFormat.parse(params.globalPreferenceTypeValidityEndDate) : null
+
+            if (globalPreferenceTypeValidityEndDate) {
+                productSupplierPreference.validityEndDate = globalPreferenceTypeValidityEndDate
             }
         }
 
@@ -134,12 +249,55 @@ class ProductSupplierDataService {
     }
 
     def getOrCreateNew(Map params) {
-        def productSupplier = params.productSupplier ? ProductSupplier.get(params.productSupplier) : null
-        if (productSupplier) {
-            return productSupplier
+        def productSupplier
+        if (params.productSupplier) {
+            productSupplier = params.productSupplier ? ProductSupplier.get(params.productSupplier) : null
+        } else {
+            productSupplier = getProductSupplier(params)
         }
 
-        return createProductSupplierWithoutPackage(params)
+        if (!productSupplier) {
+            return createProductSupplierWithoutPackage(params)
+        }
+
+        return productSupplier
+    }
+
+    def getProductSupplier(Map params) {
+        String supplierCode = params.supplierCode ? params.supplierCode.replaceAll('[ .,-]','') : null
+        String manufacturerCode = params.manufacturerCode ? params.manufacturerCode.replaceAll('[ .,-]','') : null
+
+        String query = """
+                select 
+                    id
+                FROM product_supplier_clean
+                WHERE product_id = :productId
+                AND supplier_id = :supplierId 
+                """
+        if (params.supplierCode) {
+            query += " AND supplier_code = IFNULL(:supplierCode, supplier_code) "
+        } else {
+            query += " AND (supplier_code is null OR supplier_code = '') "
+            if (params.manufacturer && params.manufacturerCode) {
+                query += " AND manufacturer_id = :manufacturerId AND manufacturer_code = :manufacturerCode "
+            } else if (params.manufacturer) {
+                query += " AND manufacturer_id = :manufacturerId AND (manufacturer_code is null OR manufacturer_code = '')"
+            } else if (params.manufacturerCode) {
+                query += " AND manufacturer_code = :manufacturerCode AND (manufacturer_id is null or manufacturer_id = '')"
+            } else {
+                query += " AND (manufacturer_code is null OR manufacturer_code = '') AND (manufacturer_id is null or manufacturer_id = '')"
+            }
+        }
+        Sql sql = new Sql(dataSource)
+        def data = sql.rows(query, [
+                'productId': params.product?.id,
+                'supplierId': params.supplier?.id,
+                'manufacturerId': params.manufacturer,
+                'manufacturerCode': manufacturerCode,
+                'supplierCode': supplierCode,
+        ])
+        def productSupplier = data ? ProductSupplier.get(data.first().id) : null
+        return productSupplier
     }
 
     def createProductSupplierWithoutPackage(Map params) {

@@ -11,14 +11,40 @@ package org.pih.warehouse.product
 
 class ProductType {
 
+    String id
     String name
     ProductTypeCode productTypeCode
+
+    String productIdentifierFormat
 
     Date dateCreated
     Date lastUpdated
 
+    static hasMany = [supportedActivities: ProductActivityCode, requiredFields: ProductField, displayedFields: ProductField]
+
+    static mapping = {
+        id generator: 'uuid'
+    }
+
     static constraints = {
         name(blank: false)
         productTypeCode(nullable: false)
+        productIdentifierFormat(nullable: true)
+    }
+
+    Boolean isFieldDisplayed(ProductField field) {
+        if (!displayedFields || displayedFields.isEmpty()) {
+            return true
+        }
+
+        return displayedFields.contains(field)
+    }
+
+    Boolean isAnyFieldDisplayed(List<ProductField> fields) {
+        if (!displayedFields || displayedFields.isEmpty()) {
+            return true
+        }
+
+        return fields?.any{ displayedFields.contains(it) }
     }
 }

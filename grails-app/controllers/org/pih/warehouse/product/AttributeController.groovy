@@ -9,6 +9,8 @@
  **/
 package org.pih.warehouse.product
 
+import org.pih.warehouse.core.EntityTypeCode
+
 class AttributeController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -49,14 +51,21 @@ class AttributeController {
     }
 
     def save = {
-        def attributeInstance = null
-        if (params.id) {
-            attributeInstance = Attribute.get(params.id)
-            attributeInstance.properties = params
-        } else {
-            params.id = null
-            attributeInstance = new Attribute(params)
+        // Pre-process and remove entity type code from parameters
+        EntityTypeCode entityTypeCode = params.entityTypeCode ?
+                params.remove("entityTypeCode") as EntityTypeCode : null
+
+        // FIXME If/when we switch back to allowing multiple entity type codes
+        //List entityTypeCodes = params.list("entityTypeCodes").collect { EntityTypeCode.valueOf(it) }
+        //params.remove("entityTypeCodes")
+
+        Attribute attributeInstance = params.id ? Attribute.get(params.id) : new Attribute(params)
+        attributeInstance.properties = params
+        if (entityTypeCode && !attributeInstance?.entityTypeCodes?.contains(entityTypeCode)) {
+            attributeInstance?.entityTypeCodes?.clear()
+            attributeInstance.addToEntityTypeCodes(entityTypeCode)
         }
+
         if (params.version) {
             def version = params.version.toLong()
             if (attributeInstance.version > version) {
@@ -74,7 +83,7 @@ class AttributeController {
             }
         }
 
-        if (attributeInstance.save(flush: true)) {
+        if (!attributeInstance.hasErrors() && attributeInstance.save(flush:true)) {
             flash.message = "${warehouse.message(code: 'default.saved.message', args: [warehouse.message(code: 'attribute.label', default: 'Attribute'), attributeInstance.id])}"
             redirect(action: "edit", id: attributeInstance.id)
         } else {

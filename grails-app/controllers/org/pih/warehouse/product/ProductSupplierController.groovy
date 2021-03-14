@@ -9,6 +9,13 @@
  **/
 package org.pih.warehouse.product
 
+import grails.validation.ValidationException
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.PreferenceType
+import java.math.RoundingMode
+import java.text.SimpleDateFormat
+import org.pih.warehouse.core.ProductPrice
+
 class ProductSupplierController {
 
     def dataService
@@ -23,7 +30,29 @@ class ProductSupplierController {
 
     def list = {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [productSupplierInstanceList: ProductSupplier.list(params), productSupplierInstanceTotal: ProductSupplier.count()]
+        def productSuppliers = ProductSupplier.createCriteria().list(max: params.max, offset: params.offset) {
+            if (params.product?.id) {
+                eq('product.id', params.product.id)
+            }
+            if (params.supplierId) {
+                eq('supplier.id', params.supplierId)
+            }
+            if (params.manufacturerId) {
+                eq('manufacturer.id', params.manufacturerId)
+            }
+            if (params.q) {
+                or {
+                    ilike("productCode", "%" + params.q + "%")
+                    ilike("code", "%" + params.q + "%")
+                    ilike("name", "%" + params.q + "%")
+                    ilike("supplierCode", "%" + params.q + "%")
+                    ilike("supplierName", "%" + params.q + "%")
+                    ilike("manufacturerCode", "%" + params.q + "%")
+                    ilike("manufacturerName", "%" + params.q + "%")
+                }
+            }
+        }
+        [productSupplierInstanceList: productSuppliers, productSupplierInstanceTotal: productSuppliers.totalCount]
     }
 
     def create = {
@@ -34,11 +63,60 @@ class ProductSupplierController {
 
     def save = {
         def productSupplierInstance = new ProductSupplier(params)
+        updateAttributes(productSupplierInstance, params)
 
         if (!productSupplierInstance.code) {
             String prefix = productSupplierInstance?.product?.productCode
             productSupplierInstance.code = identifierService.generateProductSupplierIdentifier(prefix)
         }
+
+        if (params.defaultPreferenceType) {
+            PreferenceType preferenceType = PreferenceType.get(params.defaultPreferenceType)
+            ProductSupplierPreference defaultPreference = new ProductSupplierPreference()
+            defaultPreference.preferenceType = preferenceType
+            defaultPreference.productSupplier = productSupplierInstance
+            productSupplierInstance.addToProductSupplierPreferences(defaultPreference)
+        }
+
+        if (params.preferenceType) {
+            PreferenceType preferenceType = PreferenceType.get(params.preferenceType)
+            Location location = Location.get(session.warehouse.id)
+            ProductSupplierPreference productSupplierPreference = new ProductSupplierPreference()
+            productSupplierPreference.preferenceType = preferenceType
+            productSupplierPreference.destinationParty = location.organization
+            productSupplierPreference.productSupplier = productSupplierInstance
+            productSupplierInstance.addToProductSupplierPreferences(productSupplierPreference)
+        }
+
+        if (params.price) {
+            BigDecimal parsedUnitPrice
+            try {
+                parsedUnitPrice = new BigDecimal(params.price).setScale(2, RoundingMode.FLOOR)
+            } catch (Exception e) {
+                log.error("Unable to parse unit price: " + e.message, e)
+                flash.message = "Could not parse unit price with value: ${params.price}."
+                render(view: "edit", model: [productSupplierInstance: productSupplierInstance])
+                return
+            }
+            if (parsedUnitPrice < 0) {
+                log.error("Wrong unit price value: ${parsedUnitPrice}.")
+                flash.message = "Wrong unit price value: ${parsedUnitPrice}."
+                render(view: "edit", model: [productSupplierInstance: productSupplierInstance])
+                return
+            }
+            def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+
+            if (productSupplierInstance.contractPrice?.id) {
+                productSupplierInstance.contractPrice.price = parsedUnitPrice
+                productSupplierInstance.contractPrice.toDate = params.toDate ? dateFormat.parse(params.toDate) : null
+            } else {
+                ProductPrice productPrice = new ProductPrice()
+                productPrice.price = parsedUnitPrice
+                productPrice.toDate = params.toDate ? dateFormat.parse(params.toDate) : null
+                productSupplierInstance.contractPrice = productPrice
+            }
+        }
+
         if (productSupplierInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), productSupplierInstance.id])}"
 
@@ -64,16 +142,22 @@ class ProductSupplierController {
 
     def edit = {
         def productSupplierInstance = ProductSupplier.get(params.id)
+        Location location = Location.get(session.warehouse.id)
+        ProductSupplierPreference preference = productSupplierInstance?.productSupplierPreferences?.find {it.destinationParty == location.organization }
         if (!productSupplierInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), params.id])}"
             redirect(action: "list")
         } else {
-            return [productSupplierInstance: productSupplierInstance]
+            return [productSupplierInstance: productSupplierInstance, preferenceType: preference?.preferenceType, defaultPreferenceType: productSupplierInstance?.globalProductSupplierPreference?.preferenceType]
         }
     }
 
     def update = {
         def productSupplierInstance = ProductSupplier.get(params.id)
+        Location location = Location.get(session.warehouse.id)
+        ProductSupplierPreference defaultPreference = productSupplierInstance?.globalProductSupplierPreference
+        ProductSupplierPreference productSupplierPreference = productSupplierInstance?.productSupplierPreferences?.find {it.destinationParty == location.organization }
+
         if (productSupplierInstance) {
             if (params.version) {
                 def version = params.version.toLong()
@@ -86,9 +170,73 @@ class ProductSupplierController {
             }
             productSupplierInstance.properties = params
 
+            updateAttributes(productSupplierInstance, params)
+
             if (!productSupplierInstance.code) {
                 String prefix = productSupplierInstance?.product?.productCode
                 productSupplierInstance.code = identifierService.generateProductSupplierIdentifier(prefix)
+            }
+
+            if (params.defaultPreferenceType) {
+                PreferenceType preferenceType = PreferenceType.get(params.defaultPreferenceType)
+                if (defaultPreference) {
+                    defaultPreference.preferenceType = preferenceType
+                } else {
+                    defaultPreference = new ProductSupplierPreference()
+                    defaultPreference.preferenceType = preferenceType
+                    defaultPreference.productSupplier = productSupplierInstance
+                    productSupplierInstance.addToProductSupplierPreferences(defaultPreference)
+                }
+            } else if (defaultPreference) {
+                productSupplierInstance.removeFromProductSupplierPreferences(defaultPreference)
+                defaultPreference.delete()
+            }
+
+            if (params.preferenceType) {
+                PreferenceType preferenceType = PreferenceType.get(params.preferenceType)
+                if (productSupplierPreference) {
+                    productSupplierPreference.preferenceType = preferenceType
+                } else {
+                    productSupplierPreference = new ProductSupplierPreference()
+                    productSupplierPreference.preferenceType = preferenceType
+                    productSupplierPreference.destinationParty = location.organization
+                    productSupplierPreference.productSupplier = productSupplierInstance
+                    productSupplierInstance.addToProductSupplierPreferences(productSupplierPreference)
+                }
+            } else if (productSupplierPreference) {
+                productSupplierInstance.removeFromProductSupplierPreferences(productSupplierPreference)
+                productSupplierPreference.delete()
+            }
+
+            if (params.price) {
+                BigDecimal parsedUnitPrice
+                try {
+                    parsedUnitPrice = new BigDecimal(params.price).setScale(2, RoundingMode.FLOOR)
+                } catch (Exception e) {
+                    log.error("Unable to parse unit price: " + e.message, e)
+                    flash.message = "Could not parse unit price with value: ${params.price}."
+                    render(view: "edit", model: [productSupplierInstance: productSupplierInstance])
+                    return
+                }
+                if (parsedUnitPrice < 0) {
+                    log.error("Wrong unit price value: ${parsedUnitPrice}.")
+                    flash.message = "Wrong unit price value: ${parsedUnitPrice}."
+                    render(view: "edit", model: [productSupplierInstance: productSupplierInstance])
+                    return
+                }
+                def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+
+                if (productSupplierInstance.contractPrice?.id) {
+                    productSupplierInstance.contractPrice.price = parsedUnitPrice
+                    productSupplierInstance.contractPrice.toDate = params.toDate ? dateFormat.parse(params.toDate) : null
+                } else {
+                    ProductPrice productPrice = new ProductPrice()
+                    productPrice.price = parsedUnitPrice
+                    productPrice.toDate = params.toDate ? dateFormat.parse(params.toDate) : null
+                    productSupplierInstance.contractPrice = productPrice
+                }
+            } else if (productSupplierInstance.contractPrice?.id) {
+                productSupplierInstance.contractPrice = null
             }
 
             if (!productSupplierInstance.hasErrors() && productSupplierInstance.save(flush: true)) {
@@ -137,13 +285,16 @@ class ProductSupplierController {
         log.info "Display dialog " + params
         def product = Product.get(params.product.id)
         def productSupplier = ProductSupplier.get(params.id)
+        Location location = Location.get(session.warehouse.id)
+        ProductSupplierPreference preference = productSupplier ?
+                (productSupplier?.productSupplierPreferences?.find {it.destinationParty == location.organization } ?: productSupplier.globalProductSupplierPreference) : null
 
         // If not found, initialize a new product supplier
         if (!productSupplier) {
             productSupplier = new ProductSupplier()
             productSupplier.product = product
         }
-        render(template: "dialog", model: [productSupplier: productSupplier])
+        render(template: "dialog", model: [productSupplier: productSupplier, preferenceType: preference?.preferenceType])
     }
 
     def export = {
@@ -166,6 +317,55 @@ class ProductSupplierController {
                 render dataService.generateCsv(data)
                 response.outputStream.flush()
                 return;
+        }
+    }
+
+    def updateAttributes(ProductSupplier productSupplier, Map params) {
+        Map existingAtts = new HashMap()
+        productSupplier.attributes.each() {
+            existingAtts.put(it.attribute.id, it)
+        }
+
+        // Process attributes
+        def availableAttributes =
+                Attribute.findAll("from Attribute a where :entityTypeCodes in elements(a.entityTypeCodes)", [entityTypeCodes:"PRODUCT_SUPPLIER"])
+
+        log.info "Available attributes: " + availableAttributes
+        availableAttributes.each() {
+
+            String value = params["productAttributes." + it.id + ".value"]
+            if (value == "_other" || value == null || value == '') {
+                value = params["productAttributes." + it.id + ".otherValue"]
+            }
+
+            log.info("Process attribute " + it.name + " = " + value + ", required = ${it.required}, active = ${it.active}")
+            if (it.active && it.required && !value) {
+                productSupplier.errors.rejectValue("attributes", "product.attribute.required",
+                        [] as Object[],
+                        "Product attribute ${it.name} is required")
+                throw new ValidationException("Attribute required", productSupplier.errors)
+            }
+
+            ProductAttribute productAttribute = existingAtts.get(it.id)
+            if (value) {
+                if (!productAttribute) {
+                    productAttribute = new ProductAttribute("attribute": it, value: value)
+                    productAttribute.productSupplier = productSupplier
+                    productSupplier.product.addToAttributes(productAttribute)
+                    productSupplier.save()
+                } else {
+                    productAttribute.value = value
+                    productAttribute.productSupplier = productSupplier
+                    productAttribute.save()
+                }
+            } else {
+                if (productAttribute?.attribute?.active) {
+                    log.info("removing attribute ${productAttribute.attribute.name}")
+                    productSupplier.product.removeFromAttributes(productAttribute)
+                    productAttribute.delete()
+                    productSupplier.product.save()
+                }
+            }
         }
     }
 }

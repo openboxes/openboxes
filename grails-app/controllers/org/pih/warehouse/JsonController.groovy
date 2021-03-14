@@ -13,9 +13,10 @@ import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
 import groovy.time.TimeCategory
+import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.StringUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
-import org.hibernate.Criteria
+import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Localization
@@ -24,23 +25,22 @@ import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.ValidationCode
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.jobs.CalculateHistoricalQuantityJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
-import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.product.ProductPackage
-import org.pih.warehouse.product.ProductSummary
 import org.pih.warehouse.product.ProductSupplier
-import org.pih.warehouse.receiving.ReceiptStatusCode
+import org.pih.warehouse.product.ProductSupplierPreference
+import org.pih.warehouse.product.ProductType
 import org.pih.warehouse.reporting.Indicator
 import org.pih.warehouse.reporting.TransactionFact
 import org.pih.warehouse.requisition.Requisition
@@ -48,11 +48,7 @@ import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemSortByCode
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.shipping.ShipmentItem
-import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.util.LocalizationUtil
-import org.grails.plugins.csv.CSVWriter
-import org.apache.commons.lang.StringEscapeUtils
 
 import java.text.DateFormat
 import java.text.NumberFormat
@@ -1744,17 +1740,34 @@ class JsonController {
     def productChanged = {
         Product product = Product.get(params.productId)
         Organization supplier = Organization.get(params.supplierId)
+        Organization destinationParty = Organization.get(params.destinationPartyId)
         List productSuppliers = []
         if (product && supplier) {
-            productSuppliers = ProductSupplier.findAllByProductAndSupplier(product, supplier)
+            productSuppliers = ProductSupplier.createCriteria().list {
+                eq("product", product)
+                eq("supplier", supplier)
+                or {
+                    isEmpty("productSupplierPreferences")
+                    productSupplierPreferences {
+                        and {
+                            eq("destinationParty", destinationParty)
+                            preferenceType {
+                                not {
+                                    eq("validationCode", ValidationCode.HIDE)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
         productSuppliers = productSuppliers.collect {[
-            id: it.id,
-            code: it.code,
-            supplierCode: it.supplierCode,
-            text: it.code + ' ' + it.name,
-            manufacturerCode: it.manufacturerCode,
-            manufacturer: it.manufacturer?.id,
+                id: it.id,
+                code: it.code,
+                supplierCode: it.supplierCode,
+                text: it.code + ' ' + it.name,
+                manufacturerCode: it.manufacturerCode,
+                manufacturer: it.manufacturer?.id,
         ]}
 
         render([productSupplierOptions: productSuppliers] as JSON)
@@ -1763,14 +1776,17 @@ class JsonController {
     def productSupplierChanged = {
         ProductSupplier productSupplier = ProductSupplier.findById(params.productSupplierId)
         ProductPackage productPackage = productSupplier?.defaultProductPackage
+        Organization destinationParty = Organization.get(params.destinationPartyId)
+        ProductSupplierPreference preference = productSupplier.productSupplierPreferences.find { it.destinationParty == destinationParty }
         render([
-                unitPrice: productPackage?.price ? g.formatNumber(number: productPackage?.price) : null,
+                unitPrice: productPackage?.productPrice?.price ? g.formatNumber(number: productPackage?.productPrice?.price) : null,
                 supplierCode: productSupplier?.supplierCode,
                 manufacturer: productSupplier?.manufacturer,
                 manufacturerCode: productSupplier?.manufacturerCode,
                 minOrderQuantity: productSupplier?.minOrderQuantity,
                 quantityPerUom: productPackage?.quantity,
                 unitOfMeasure: productPackage?.uom,
+                validationCode: preference?.preferenceType?.validationCode,
         ] as JSON)
     }
 
@@ -1795,21 +1811,23 @@ class JsonController {
                     "Quantity Issued" { it.qtyIssued }
                     "Quantity Demand" { it.qtyDemand }
                     "Reason Code" { it.reasonCode }
+                    "Reason Code Classification" { it.reasonCodeClassification }
                 })
 
                 data.each {
                     csv << [
-                            requestNumber: it.requestNumber,
-                            dateRequested: it.dateRequested,
-                            dateIssued   : it.dateIssued,
-                            origin       : StringEscapeUtils.escapeCsv(it.origin),
-                            destination  : StringEscapeUtils.escapeCsv(it.destination),
-                            productCode  : it.productCode,
-                            productName  : StringEscapeUtils.escapeCsv(it.productName),
-                            qtyRequested : it.quantityRequested,
-                            qtyIssued    : it.quantityIssued,
-                            qtyDemand    : it.quantityDemand,
-                            reasonCode   : it.reasonCode,
+                            requestNumber           : it.requestNumber,
+                            dateRequested           : it.dateRequested,
+                            dateIssued              : it.dateIssued,
+                            origin                  : StringEscapeUtils.escapeCsv(it.origin),
+                            destination             : StringEscapeUtils.escapeCsv(it.destination),
+                            productCode             : it.productCode,
+                            productName             : StringEscapeUtils.escapeCsv(it.productName),
+                            qtyRequested            : it.quantityRequested,
+                            qtyIssued               : it.quantityIssued,
+                            qtyDemand               : it.quantityDemand,
+                            reasonCode              : it.reasonCode,
+                            reasonCodeClassification: it.reasonCodeClassification,
                     ]
                 }
 
@@ -1821,6 +1839,23 @@ class JsonController {
         } else {
             throw new IllegalArgumentException("Start and end date are required")
         }
+    }
+
+    def checkIfProductFieldRemoved = {
+        ProductType oldProductType = ProductType.get(params.oldTypeId)
+        ProductType newProductType = ProductType.get(params.newTypeId)
+
+        Boolean fieldRemoved = false
+
+        if (newProductType?.displayedFields && !newProductType.displayedFields.isEmpty()) {
+            if (oldProductType?.displayedFields && !oldProductType.displayedFields.isEmpty()) {
+                fieldRemoved = !newProductType.displayedFields.containsAll(oldProductType.displayedFields)
+            } else {
+                fieldRemoved = true
+            }
+        }
+
+        render([fieldRemoved: fieldRemoved] as JSON)
     }
 }
 

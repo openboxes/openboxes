@@ -137,13 +137,6 @@
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><warehouse:message code="productSupplier.preferenceTypeCode.label" default="Preference Type Code" /></td>
-                            
-                            <td valign="top" class="value">${productSupplierInstance?.preferenceTypeCode?.encodeAsHTML()}</td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="productSupplier.comments.label" default="Comments" /></td>
                             
                             <td valign="top" class="value">${fieldValue(bean: productSupplierInstance, field: "comments")}</td>

@@ -58,8 +58,8 @@ You must not remove this notice, or any other, from this software.
 #### Required
 * Java 7 (must install Java 7)
 * MySQL 5.7
-* [SDK Man](http://sdkman.io/install.html)
-* [Grails 1.3.9](http://grails.org/download/archive/Grails)
+* [SDK Man](https://sdkman.io/install)
+* [Grails 1.3.9](https://grails.org/download.html)
 * NPM 6.13.7
 * Node 13.11.0
 

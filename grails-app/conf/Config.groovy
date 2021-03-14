@@ -476,6 +476,12 @@ openboxes {
                     archived = ['personal', 'warehouse', 'transaction', 'fillRate']
                     order = 10
                 }
+                inventoryValue {
+                    enabled = true
+                    endpoint = "/${appName}/apitablero/getInventoryValue"
+                    archived = ['personal', 'warehouse', 'inventory', 'transaction', 'fillRate']
+                    order = 11
+                }
             }
             graph {
                 inventorySummary {
@@ -731,7 +737,7 @@ openboxes.identifier.sequenceNumber.format = Constants.DEFAULT_SEQUENCE_NUMBER_F
 
 openboxes.identifier.organization.format = Constants.DEFAULT_ORGANIZATION_NUMBER_FORMAT
 openboxes.identifier.organization.minSize = 2
-openboxes.identifier.organization.maxSize = 3
+openboxes.identifier.organization.maxSize = 4
 
 openboxes.identifier.purchaseOrder.generatorType = IdentifierGeneratorTypeCode.SEQUENCE
 openboxes.identifier.purchaseOrder.format = "PO-\${destinationPartyCode}-\${sequenceNumber}"
@@ -862,6 +868,9 @@ openboxes.barcode.printer.port = 9100
 openboxes.typeahead.delay = 300
 openboxes.typeahead.minLength = 3
 
+// Allow system administrators to disable refresh on startup
+openboxes.refreshAnalyticsDataOnStartup.enabled = true
+
 // Send stock alerts
 openboxes.jobs.sendStockAlertsJob.enabled = true
 openboxes.jobs.sendStockAlertsJob.skipOnEmpty = true
@@ -881,6 +890,8 @@ openboxes.jobs.refreshInventorySnapshotAfterTransactionJob.maxRetryAttempts = 3
 // Refresh product availability materialized view
 openboxes.jobs.refreshProductAvailabilityJob.enabled = true
 openboxes.jobs.refreshProductAvailabilityJob.cronExpression = "0 0 0/2 * * ?" // every two hours starting at midnight
+openboxes.jobs.refreshProductAvailabilityJob.delayStart = true
+openboxes.jobs.refreshProductAvailabilityJob.delayInMilliseconds = 5000
 
 // Refresh transaction fact table
 openboxes.jobs.refreshTransactionFactJob.enabled = true
@@ -1129,7 +1140,8 @@ openboxes {
                         [label: "categories.label", defaultLabel: "Categories", href: "/${appName}/category/tree"],
                         [label: "product.components.label", defaultLabel: "Components", href: "/${appName}/productComponent/list"],
                         [label: "productGroups.label", defaultLabel: "Generic Products", href: "/${appName}/productGroup/list"],
-                        [label: "inventoryLevels.label", defaultLabel: "Inventory Levels", href: "/${appName}/inventoryLevel/list"]
+                        [label: "inventoryLevels.label", defaultLabel: "Inventory Levels", href: "/${appName}/inventoryLevel/list"],
+                        [label: "productType.label", defaultLabel: "Product Type", href: "/${appName}/productType/list", requiredRole: RoleType.ROLE_SUPERUSER]
                     ]
                 ],
                 [
@@ -1153,6 +1165,7 @@ openboxes {
                         [label: "product.batchEdit.label", defaultLabel: "Batch edit product", href: "/${appName}/product/batchEdit"],
                         [label: "product.importAsCsv.label", defaultLabel: "Import products", href: "/${appName}/product/importAsCsv"],
                         [label: "product.exportAsCsv.label", defaultLabel: "Export products", href: "/${appName}/product/exportAsCsv"],
+                        [label: "productSupplier.productSourcePreferencesExport.label", defaultLabel: "Export Product Source Preferences", href: "/${appName}/batch/downloadExcel?type=ProductSupplierPreference"],
                         [label: "import.inventory.label", defaultLabel: "Import Inventory", href: "/${appName}/batch/importData?type=inventory"],
                         [label: "import.inventoryLevel.label", defaultLabel: "Import Inventory Level", href: "/${appName}/batch/importData?type=inventoryLevel"]
                     ]
@@ -1227,6 +1240,7 @@ openboxes {
                         [label: "orderAdjustmentType.label", defaultLabel: "Order Adjustment Type", href: "/${appName}/orderAdjustmentType/list", requiredRole: RoleType.ROLE_ADMIN],
                         [label: "paymentMethodTypes.label", defaultLabel: "Payment Method Types", href: "/${appName}/paymentMethodType/list"],
                         [label: "paymentTerms.label", defaultLabel: "Payment Terms", href: "/${appName}/paymentTerm/list"],
+                        [label: "preferenceType.label", defaultLabel: "Preference Type", href: "/${appName}/preferenceType/list"],
                         [label: "shippers.label", defaultLabel: "Shippers", href: "/${appName}/shipper/list"],
                         [label: "shipmentWorkflows.label", defaultLabel: "Shipment Workflows", href: "/${appName}/shipmentWorkflow/list"]
                     ]

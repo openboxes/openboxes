@@ -41,6 +41,39 @@
                                 </p>
                             </div>
                             <div class="filter-list-item">
+                                <label><warehouse:message code="category.label"/></label>
+                                <p>
+                                    <g:selectCategory id="category"
+                                                      class="chzn-select-deselect filter"
+                                                      data-placeholder="Select a category"
+                                                      name="category"
+                                                      noSelection="['':'']"
+                                                      value="${params?.category}"/>
+                                </p>
+                            </div>
+                            <div class="filter-list-item">
+                                <label><warehouse:message code="catalogs.name.label"/></label>
+                                <p>
+                                    <g:selectCatalogs id="catalogs"
+                                                      name="catalogs"
+                                                      noSelection="['':'']"
+                                                      value="${params?.catalogs}"
+                                                      style="width:100%;"
+                                                      class="chzn-select-deselect"/>
+                                </p>
+                            </div>
+                            <div class="filter-list-item">
+                                <label><warehouse:message code="tag.label"/></label>
+                                <p>
+                                    <g:selectTags name="tags"
+                                                  id="tags"
+                                                  noSelection="['':'']"
+                                                  value="${params?.tags}"
+                                                  multiple="true"
+                                                  class="chzn-select-deselect"/>
+                                </p>
+                            </div>
+                            <div class="filter-list-item">
                                 <label><warehouse:message code="requisitionItem.cancelReasonCode.label"/></label>
                                 <p>
                                     <g:selectRequestReasonCode name="reasonCode"
@@ -96,17 +129,18 @@
                                 <th class="center"><g:message code="requisition.qtyRequested.label"/></th>
                                 <th class="center"><g:message code="requisition.qtyIssued.label"/></th>
                                 <th class="center"><g:message code="requisition.qtyDemand.label"/></th>
-                                <th class="center"><g:message code="requisitionItem.reasonCodes.label"/></th>
+                                <th class="center"><g:message code="requisitionItem.reasonCode.label"/></th>
+                                <th class="center"><g:message code="requisitionItem.reasonCodesClassification.label"/></th>
                             </tr>
                         </thead>
                         <tfoot>
                             <tr>
-                                <th colspan="9"/>
+                                <th colspan="10"/>
                                 <th><g:message code="report.totalDemand.label"/></th>
                                 <th id="totalDemand"></th>
                             </tr>
                             <tr>
-                                <th colspan="9"/>
+                                <th colspan="10"/>
                                 <th><g:message code="report.averageMonthlyDemand.label"/></th>
                                 <th id="averageMonthlyDemand"></th>
                             </tr>
@@ -141,6 +175,9 @@
           data.push({ name: "endDate", value: $("#endDate").val() });
           data.push({ name: "productId", value: $("#product-id").val() });
           data.push({ name: "reasonCode", value: $("#reasonCode").val() });
+          data.push({ name: "category", value: $("#category").val() });
+          data.push({ name: "tags", value: $("#tags").val() });
+          data.push({ name: "catalogs", value: $("#catalogs").val() });
         },
         "fnServerData": function ( sSource, aoData, fnCallback ) {
           $.ajax( {
@@ -159,16 +196,16 @@
             },
           } );
         },
-        "fnFooterCallback": function (nRow, aaData, iStart, iEnd) {
+        "fnFooterCallback": function (nRow, aaData) {
           var totalDemand = 0;
-          for (var i = iStart; i < iEnd; i++) {
+          for (var i = 0; i < aaData.length; i++) {
             totalDemand += aaData[i].quantityDemand;
           }
           nRow.getElementsByTagName('th')[2].innerHTML = totalDemand;
           var secondRow = $(nRow).next()[0];
-          var startDate = moment($('#startDate').val());
-          var endDate = moment($('#endDate').val());
-          var monthsDifference = endDate.diff(startDate, 'months');
+          var startDate = moment($('#startDate').val()).startOf('month');
+          var endDate = moment($('#endDate').val()).startOf('month');
+          var monthsDifference = endDate.diff(startDate, 'months', true) + 1;
           secondRow.getElementsByTagName('th')[2].innerHTML = Math.round(totalDemand / monthsDifference);
         },
         "oLanguage": {
@@ -192,6 +229,7 @@
             { "mData": "quantityIssued"},
             { "mData": "quantityDemand"},
             { "mData": "reasonCode"},
+            { "mData": "reasonCodeClassification"},
           ],
         "dom": '<"top"i>rt<"bottom"flp><"clear">',
         "aaSorting": [[ 0, "asc" ]],
@@ -226,6 +264,9 @@
                 endDate: $("#endDate").val(),
                 productId: $("#product-id").val(),
                 reasonCode: $("#reasonCode").val(),
+                category: $("#category").val(),
+                tags: $("#tags").val(),
+                catalogs: $("#catalogs").val(),
                 format: "text/csv"
               };
               var queryString = $.param(params, true);

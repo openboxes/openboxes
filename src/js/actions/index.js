@@ -209,6 +209,7 @@ function fetchGraphIndicator(
       payload: {
         id,
         title: 'Loading...',
+        info: 'Loading...',
         type: 'loading',
         data: [],
         archived: indicatorConfig.archived,
@@ -223,6 +224,7 @@ function fetchGraphIndicator(
         payload: {
           id,
           title: indicatorData.title,
+          info: indicatorData.info,
           type: indicatorData.type,
           data: indicatorData.data,
           archived: indicatorConfig.archived,

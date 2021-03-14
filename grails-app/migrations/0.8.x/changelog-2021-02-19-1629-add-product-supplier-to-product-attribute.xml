@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+
+  <changeSet author="jmiranda (generated)" id="1613773539429-1">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="attribute_entity_type_codes"/>
+      </not>
+    </preConditions>
+    <createTable tableName="attribute_entity_type_codes">
+      <column name="attribute_id" type="CHAR(38)"/>
+      <column name="entity_type_code" type="VARCHAR(255)"/>
+    </createTable>
+  </changeSet>
+
+  <changeSet author="jmiranda (generated)" id="1613773539429-2">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="product_attribute" columnName="product_supplier_id"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="product_attribute">
+      <column name="product_supplier_id" type="CHAR(38)"/>
+    </addColumn>
+  </changeSet>
+
+  <changeSet author="jmiranda (generated)" id="1613773539429-3">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="FK38EE09DA47B0D087"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="attribute_id"
+      baseTableName="attribute_entity_type_codes" constraintName="FK38EE09DA47B0D087"
+      deferrable="false" initiallyDeferred="false" referencedColumnNames="id"
+      referencedTableName="attribute"/>
+  </changeSet>
+
+  <changeSet author="jmiranda (generated)" id="1613773539429-4">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="FK94A534C29542386"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="product_supplier_id" baseTableName="product_attribute"
+      constraintName="FK94A534C29542386" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="product_supplier"/>
+  </changeSet>
+
+</databaseChangeLog>

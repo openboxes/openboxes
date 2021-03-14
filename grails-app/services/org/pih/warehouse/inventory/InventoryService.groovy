@@ -28,10 +28,8 @@ import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductException
-import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
-import org.pih.warehouse.util.DateUtil
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.springframework.validation.Errors
@@ -1342,11 +1340,17 @@ class InventoryService implements ApplicationContextAware {
             transaction.inventory = cmd.inventory
             transaction.comment = cmd.comment
             transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
+            transaction.transactionNumber = generateTransactionNumber()
 
             // Process each row added to the record inventory page
             cmd.recordInventoryRows.each { row ->
 
                 if (row) {
+                    if (row.expirationDate && !row.lotNumber) {
+                        cmd.errors.reject("inventoryItem.invalid", "Items with an expiry date must also have a lot number")
+                        row.error = true
+                        return cmd
+                    }
                     // 1. Find an existing inventory item for the given lot number and product and description
                     def inventoryItem =
                             findInventoryItemByProductAndLotNumber(cmd.product, row.lotNumber)
@@ -1611,7 +1615,7 @@ class InventoryService implements ApplicationContextAware {
     }
 
     // findOrCreateInventoryItem with option to reassign expiration date for existing records
-    InventoryItem findOrCreateInventoryItemDuringImport(Product product, String lotNumber, Date expirationDate) {
+    InventoryItem findAndUpdateOrCreateInventoryItem(Product product, String lotNumber, Date expirationDate) {
         def inventoryItem = findInventoryItemByProductAndLotNumber(product, lotNumber)
         if (!inventoryItem) {
             inventoryItem = new InventoryItem()
@@ -1702,6 +1706,17 @@ class InventoryService implements ApplicationContextAware {
         return transactionEntries
     }
 
+    Boolean isInventoryItemInOtherLocation(Inventory inventory, InventoryItem inventoryItem) {
+        def criteria = TransactionEntry.createCriteria()
+        def transactionEntries = criteria.list {
+            transaction {
+                ne("inventory", inventory)
+            }
+            eq('inventoryItem', inventoryItem)
+        }
+        return transactionEntries ? true : false
+    }
+
     /**
      * Adjusts the stock level by adding a new transaction entry with a
      * quantity change.
@@ -1733,6 +1748,7 @@ class InventoryService implements ApplicationContextAware {
                     TransactionType.get(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID)
             transaction.inventory = inventory
             transaction.comment = command.comment
+            transaction.transactionNumber = generateTransactionNumber()
 
             // Add transaction entry to transaction
             def transactionEntry = new TransactionEntry()
@@ -2009,7 +2025,7 @@ class InventoryService implements ApplicationContextAware {
 
         // save the local transfer
         if (!transfer.save(flush: true)) {
-            throw new RuntimeException("Unable to save local transfer " + transfer?.id)
+            throw new ValidationException("Unable to save local transfer ", transfer.errors)
         }
 
         // delete the old transaction
@@ -2047,6 +2063,7 @@ class InventoryService implements ApplicationContextAware {
         mirroredTransaction.order = baseTransaction.order
         mirroredTransaction.requisition = baseTransaction.requisition
         mirroredTransaction.transactionDate = baseTransaction.transactionDate
+        mirroredTransaction.transactionNumber = generateTransactionNumber()
 
         // create the transaction entries based on the base transaction
         baseTransaction.transactionEntries.each {
@@ -2640,7 +2657,7 @@ class InventoryService implements ApplicationContextAware {
         def dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
         def calendar = Calendar.getInstance()
         command.data.eachWithIndex { row, index ->
-            def rowIndex = index + 2
+            def rowIndex = index + 1
 
             if (!command.warnings[index]) {
                 command.warnings[index] = []
@@ -2672,6 +2689,10 @@ class InventoryService implements ApplicationContextAware {
                 if (!binLocation && row.binLocation) {
                     command.errors.reject("error.product.notExists", "Row ${rowIndex}: Bin location '${row.binLocation.trim()}' does not exist in this depot")
                     command.warnings[index] << "Bin location '${row.binLocation.trim()}' does not exist in this depot"
+                }
+
+                if (row.expirationDate && !row.lotNumber) {
+                    command.errors.reject("error.lotNumber.notExists", "Row ${rowIndex}: Items with an expiry date must also have a lot number")
                 }
 
                 def expirationDate = null
@@ -2779,7 +2800,7 @@ class InventoryService implements ApplicationContextAware {
             }
 
             // Find or create an inventory item
-            def inventoryItem = findOrCreateInventoryItemDuringImport(product, lotNumber, expirationDate)
+            def inventoryItem = findAndUpdateOrCreateInventoryItem(product, lotNumber, expirationDate)
             println "Inventory item: " + inventoryItem.id + " " + inventoryItem.dateCreated + " " + inventoryItem.lastUpdated
             transactionEntry.inventoryItem = inventoryItem
 

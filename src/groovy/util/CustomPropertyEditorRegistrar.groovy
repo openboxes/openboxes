@@ -9,6 +9,10 @@
  **/
 package util
 
+import org.pih.warehouse.core.EntityTypeCode
+import org.pih.warehouse.core.EntityTypeCodeEditor
+import org.pih.warehouse.core.IdentifierTypeCode
+import org.pih.warehouse.core.IdentifierTypeCodeEditor
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationEditor
 import org.pih.warehouse.core.Organization
@@ -34,14 +38,16 @@ import java.text.SimpleDateFormat
 class CustomPropertyEditorRegistrar implements PropertyEditorRegistrar {
     void registerCustomEditors(PropertyEditorRegistry registry) {
         registry.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("MM/dd/yyyy"), true))
-        registry.registerCustomEditor(Location.class, new LocationEditor())
-        registry.registerCustomEditor(Person.class, new PersonEditor())
-        registry.registerCustomEditor(User.class, new UserEditor())
         registry.registerCustomEditor(Category.class, new CategoryEditor())
+        registry.registerCustomEditor(EntityTypeCode.class, new EntityTypeCodeEditor())
+        registry.registerCustomEditor(IdentifierTypeCode.class, new IdentifierTypeCodeEditor())
+        registry.registerCustomEditor(Location.class, new LocationEditor())
         registry.registerCustomEditor(Organization.class, new OrganizationEditor())
+        registry.registerCustomEditor(Person.class, new PersonEditor())
+        registry.registerCustomEditor(ProductCatalog.class, new ProductCatalogEditor())
         registry.registerCustomEditor(TransactionType.class, new TransactionTypeEditor())
         registry.registerCustomEditor(Tag.class, new TagEditor())
-        registry.registerCustomEditor(ProductCatalog.class, new ProductCatalogEditor())
+        registry.registerCustomEditor(User.class, new UserEditor())
     }
 }
 

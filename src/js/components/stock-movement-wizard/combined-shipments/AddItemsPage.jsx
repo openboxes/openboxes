@@ -365,6 +365,9 @@ class AddItemsPage extends Component {
       if (moment().startOf('day').diff(dateRequested) > 0) {
         errors.lineItems[key] = { expirationDate: 'react.stockMovement.error.pastDate.label' };
       }
+      if (item.expirationDate && (_.isNil(item.lotNumber) || _.isEmpty(item.lotNumber))) {
+        errors.lineItems[key] = { lotNumber: 'react.stockMovement.error.expiryWithoutLot.label' };
+      }
       const splitItems = _.filter(values.lineItems, lineItem =>
         lineItem.referenceId === item.referenceId);
       if (!item.id) {
@@ -402,6 +405,30 @@ class AddItemsPage extends Component {
       message: this.props.translate(
         'react.stockMovement.confirmSave.message',
         'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
+      ),
+      buttons: [
+        {
+          label: this.props.translate('react.default.yes.label', 'Yes'),
+          onClick: onConfirm,
+        },
+        {
+          label: this.props.translate('react.default.no.label', 'No'),
+        },
+      ],
+    });
+  }
+
+  /**
+   * Shows Inventory item expiration date update confirmation dialog.
+   * @param {function} onConfirm
+   * @public
+   */
+  confirmInventoryItemExpirationDateUpdate(onConfirm) {
+    confirmAlert({
+      title: this.props.translate('react.stockMovement.message.confirmSave.label', 'Confirm save'),
+      message: this.props.translate(
+        'react.stockMovement.confirmExpiryDateUpdate.message',
+        'This will update the expiry date across all depots in the system. Are you sure you want to proceed?',
       ),
       buttons: [
         {
@@ -510,21 +537,17 @@ class AddItemsPage extends Component {
    * @public
    */
   saveAndTransitionToNextStep(formValues, lineItems) {
-    this.props.showSpinner();
-
-    this.saveRequisitionItems(lineItems)
-      .then((resp) => {
-        let values = formValues;
-        if (resp) {
-          values = { ...formValues, lineItems: resp.data.data.lineItems };
-        }
-        this.transitionToNextStep()
-          .then(() => {
-            this.props.nextPage(values);
-          })
-          .catch(() => this.props.hideSpinner());
-      })
-      .catch(() => this.props.hideSpinner());
+    if (_.some(lineItems, item => item.inventoryItem
+      && item.expirationDate !== item.inventoryItem.expirationDate)) {
+      if (_.some(lineItems, item => item.inventoryItem.quantity && item.inventoryItem.quantity !== '0')) {
+        this.confirmInventoryItemExpirationDateUpdate(() =>
+          this.saveRequisitionItemsAndTransitionToNextStep(formValues, lineItems));
+      } else {
+        this.saveRequisitionItemsAndTransitionToNextStep(formValues, lineItems);
+      }
+    } else {
+      this.saveRequisitionItemsAndTransitionToNextStep(formValues, lineItems);
+    }
   }
 
   /**
@@ -546,6 +569,30 @@ class AddItemsPage extends Component {
     }
 
     return Promise.resolve();
+  }
+
+  /**
+   * Saves list of stock movement items and transition to next step.
+   * @param {object} formValues
+   * @param {object} lineItems
+   * @public
+   */
+  saveRequisitionItemsAndTransitionToNextStep(formValues, lineItems) {
+    this.props.showSpinner();
+
+    this.saveRequisitionItems(lineItems)
+      .then((resp) => {
+        let values = formValues;
+        if (resp) {
+          values = { ...formValues, lineItems: resp.data.data.lineItems };
+        }
+        this.transitionToNextStep()
+          .then(() => {
+            this.props.nextPage(values);
+          })
+          .catch(() => this.props.hideSpinner());
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   /**
@@ -904,8 +951,7 @@ class AddItemsPage extends Component {
                     }
                   }}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
-                  disabled={!_.some(values.lineItems, item => !_.isEmpty(item))
-                  || invalid}
+                  disabled={!_.some(values.lineItems, item => !_.isEmpty(item))}
                 ><Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>

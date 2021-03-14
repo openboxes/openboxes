@@ -14,6 +14,7 @@ import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.EntityTypeCode
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.GlAccountType
 import org.pih.warehouse.core.Location
@@ -23,6 +24,7 @@ import org.pih.warehouse.core.PartyRole
 import org.pih.warehouse.core.PaymentMethodType
 import org.pih.warehouse.core.PaymentTerm
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.PreferenceType
 import org.pih.warehouse.core.PreferenceTypeCode
 import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.ReasonCode
@@ -114,6 +116,11 @@ class SelectTagLib {
         out << g.select(attrs)
     }
 
+    def selectEntityTypeCode = { attrs, body ->
+        attrs.from = EntityTypeCode.values()
+        attrs.optionValue = { format.metadata(obj: it) }
+        out << g.select(attrs)
+    }
     @Cacheable("selectTagCache")
     def selectTag = { attrs, body ->
         def tags = Tag.list(sort: "tag").collect {
@@ -174,16 +181,16 @@ class SelectTagLib {
 
     }
 
-
     def selectUnitOfMeasure = { attrs, body ->
-
-        UnitOfMeasureClass uomClass = UnitOfMeasureClass.findByType(UnitOfMeasureType.QUANTITY)
+        UnitOfMeasureType unitOfMeasureType = attrs.unitOfMeasureType ?
+                attrs.unitOfMeasureType as UnitOfMeasureType :
+                UnitOfMeasureType.QUANTITY
+        UnitOfMeasureClass uomClass = UnitOfMeasureClass.findByType(unitOfMeasureType)
         if (uomClass) {
             attrs.from = UnitOfMeasure.findAllByUomClass(uomClass)
         }
         attrs.optionKey = 'id'
         out << g.select(attrs)
-
     }
 
     def selectProduct = { attrs, body ->
@@ -219,7 +226,9 @@ class SelectTagLib {
     }
 
     def selectPreferenceType = { attrs, body ->
-        attrs.from = PreferenceTypeCode.list()
+        attrs.from = PreferenceType.list()
+        attrs.optionKey = "id"
+        attrs.optionValue = { it.name }
         out << g.select(attrs)
     }
 

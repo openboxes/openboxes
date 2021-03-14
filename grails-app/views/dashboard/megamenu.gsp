@@ -118,7 +118,9 @@
                 <a href="javascript:void(0)" class="mm-item-link">
                     <warehouse:message code="requests.label"/>
                     <span class="deprecated"
-                          onclick="javascript:alert('${g.message(code: "requisition.deprecation.message")}')">deprecated</span>
+                          onclick="javascript:alert('${g.message(code: "requisition.deprecation.message")}')">
+                        <g:message code="default.deprecated.label"/>
+                    </span>
                 </a>
                 <div class="mm-item-content">
                     <div class="mm-content-section">
@@ -464,6 +466,12 @@
                             <g:link controller="inventoryLevel" action="list" class="site">
                                 <warehouse:message code="inventoryLevels.label" default="Inventory Levels" /></g:link>
                         </div>
+                        <g:isSuperuser>
+                            <div class="mm-menu-item">
+                                <g:link controller="productType" action="list" class="site">
+                                    <warehouse:message code="productType.label" default="ProductType" /></g:link>
+                            </div>
+                        </g:isSuperuser>
                     </div>
                     <div class="mm-content-section">
                         <div class="mm-menu-item">
@@ -514,6 +522,11 @@
                             <div class="mm-menu-item">
                                 <g:link controller="product" action="exportAsCsv" class="list">
                                     <warehouse:message code="product.exportAsCsv.label"/>
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
+                                <g:link controller="batch" action="downloadExcel" params="[type:'ProductSupplierPreference']">
+                                    <warehouse:message code="default.export.label" args="[g.message(code:'productSupplier.productSourcePreference.label')]"/>
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">
@@ -736,6 +749,11 @@
                             <div class="mm-menu-item">
                                 <g:link controller="paymentTerm" action="list">
                                     <warehouse:message code="paymentTerms.label" />
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
+                                <g:link controller="preferenceType" action="list">
+                                    <warehouse:message code="preferenceType.label" />
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">

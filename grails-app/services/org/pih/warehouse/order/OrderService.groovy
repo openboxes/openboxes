@@ -18,17 +18,14 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.product.ProductPackage
-import org.pih.warehouse.product.ProductService
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentException
 import org.pih.warehouse.shipping.ShipmentItem
-import org.pih.warehouse.shipping.ShipmentType
 import util.ReportUtil
 
 import java.math.RoundingMode
-import java.text.SimpleDateFormat
 
 class OrderService {
 
@@ -272,10 +269,8 @@ class OrderService {
         // update the status of the order before saving
         order.updateStatus()
 
-        if (!order.originParty) {
-            order.originParty = order?.origin?.organization
-        }
-        
+        order.originParty = order?.origin?.organization
+
         if (!order.orderNumber) {
             IdentifierGeneratorTypeCode identifierGeneratorTypeCode =
                     ConfigurationHolder.config.openboxes.identifier.purchaseOrder.generatorType
@@ -527,12 +522,21 @@ class OrderService {
                 productPackage.name = "${orderItem?.quantityUom?.code}/${orderItem?.quantityPerUom as Integer}"
                 productPackage.uom = orderItem.quantityUom
                 productPackage.quantity = orderItem.quantityPerUom as Integer
-                productPackage.price = packagePrice
+                ProductPrice productPrice = new ProductPrice()
+                productPrice.price = packagePrice
+                productPackage.productPrice = productPrice
                 productPackage.save()
             }
             // Otherwise update the price
             else {
-                productPackage.price = packagePrice
+                if (productPackage.productPrice) {
+                    productPackage.productPrice.price = packagePrice
+                } else {
+                    ProductPrice productPrice = new ProductPrice()
+                    productPrice.price = packagePrice
+                    productPackage.productPrice = productPrice
+                }
+                productPackage.lastUpdated = new Date()
             }
             // Associate product package with order item
             orderItem.productPackage = productPackage
@@ -542,7 +546,14 @@ class OrderService {
         }
         // Otherwise we update the existing price
         else {
-            orderItem.productPackage.price = packagePrice
+            if (orderItem.productPackage.productPrice) {
+                orderItem.productPackage.productPrice.price = packagePrice
+            } else {
+                ProductPrice productPrice = new ProductPrice()
+                productPrice.price = packagePrice
+                orderItem.productPackage.productPrice = productPrice
+            }
+
         }
     }
 
@@ -572,7 +583,7 @@ class OrderService {
                     def sourceCode = item["sourceCode"]
                     def sourceName = item["sourceName"]
                     def supplierCode = item["supplierCode"]
-                    def manufacturer = item["manufacturer"]
+                    def manufacturerName = item["manufacturer"]
                     def manufacturerCode = item["manufacturerCode"]
                     def quantity = item["quantity"]
                     String recipient = item["recipient"]
@@ -589,6 +600,7 @@ class OrderService {
                         }
                     } else {
                         orderItem = new OrderItem()
+                        orderItem.orderIndex = order.orderItems ? order.orderItems.size() : 0
                     }
 
                     Product product
@@ -613,18 +625,17 @@ class OrderService {
                         if (productSource) {
                             orderItem.productSupplier = productSource
                         }
-                    } else if (supplierCode && manufacturer && manufacturerCode) {
-                        if (Organization.get(manufacturer)) {
-                            Organization supplier = Organization.get(supplierId)
-                            def supplierParams = [manufacturer: manufacturer,
-                                                  product: product,
-                                                  supplierCode: supplierCode,
-                                                  manufacturerCode: manufacturerCode,
-                                                  supplier: supplier,
-                                                  sourceName: sourceName]
-                            ProductSupplier productSupplier = productSupplierDataService.getOrCreateNew(supplierParams)
-                            orderItem.productSupplier = productSupplier
-                        }
+                    } else {
+                        Organization supplier = Organization.get(supplierId)
+                        Organization manufacturer = Organization.findByName(manufacturerName)
+                        def supplierParams = [manufacturer: manufacturer?.id,
+                                              product: product,
+                                              supplierCode: supplierCode ?: null,
+                                              manufacturerCode: manufacturerCode ?: null,
+                                              supplier: supplier,
+                                              sourceName: sourceName]
+                        ProductSupplier productSupplier = productSupplierDataService.getOrCreateNew(supplierParams)
+                        orderItem.productSupplier = productSupplier
                     }
 
                     if (unitOfMeasure) {

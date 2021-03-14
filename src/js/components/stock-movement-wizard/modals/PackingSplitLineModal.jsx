@@ -26,7 +26,7 @@ const FIELDS = {
           expirationDate: lineItem.expirationDate,
           binLocationName: lineItem.binLocationName,
           recipient: lineItem.recipient,
-        })}
+        }, null, false)}
       > <Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
       </button>
     ),

@@ -1,10 +1,14 @@
 <div class="dialog">
 
-	<g:form name="editInventoryItem" controller="inventoryItem" action="update">
+	<g:form name="editInventoryItem" controller="inventoryItem" action="update" onsubmit="return checkIfExistsInOtherLocation();">
 		<g:hiddenField name="id" value="${inventoryItem?.id}"/>
 		<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
 		<g:hiddenField name="product.id" value="${inventoryItem?.product?.id}"/>
 		<g:hiddenField name="inventoryItem.id" value="${inventoryItem?.id}"/>
+		<g:hiddenField name="existsInOtherLocation" id="existsInOtherLocation" value="${existsInOtherLocation}"/>
+		<g:isSuperuser>
+			<g:set var="isSuperuser" value="${true}"/>
+		</g:isSuperuser>
 
 		<table>
 			<tbody>
@@ -22,12 +26,23 @@
 						</td>
 					</tr>
 				</g:if>
-				<tr class="prop">
-					<td valign="top" class="name"><label><warehouse:message code="product.lotNumber.label"/></label></td>
-					<td valign="top" class="value">
-						<g:textField name="lotNumber" value="${inventoryItem?.lotNumber}" class="text lotNumber"/>
-					</td>
-				</tr>
+				<g:if test="${isSuperuser}">
+					<tr class="prop">
+						<td valign="top" class="name"><label><warehouse:message code="product.lotNumber.label"/></label></td>
+						<td valign="top" class="value">
+							<g:textField name="lotNumber" value="${inventoryItem?.lotNumber}" class="text lotNumber"/>
+						</td>
+					</tr>
+				</g:if>
+				<g:else>
+					<g:hiddenField name="lotNumber" value="${inventoryItem?.lotNumber}"/>
+					<tr class="prop">
+						<td valign="top" class="name"><label><warehouse:message code="product.lotNumber.label"/></label></td>
+						<td valign="top" class="value">
+							${inventoryItem?.lotNumber}
+						</td>
+					</tr>
+				</g:else>
 				<tr class="prop">
 					<td valign="top" class="name"><label><warehouse:message code="product.expirationDate.label"/></label></td>
 					<td valign="top" class="">
@@ -57,4 +72,13 @@
 	</g:form>
 
 </div>
+<script>
+	function checkIfExistsInOtherLocation() {
+		if ($("#existsInOtherLocation").val() === "true") {
+			if (!confirm('${warehouse.message(code: 'inventoryItem.existsInOtherLocation.label', default: 'Inventory item exists in other location, do you want to continue?')}')) {
+				return false
+			}
+		}
+	}
+</script>
 

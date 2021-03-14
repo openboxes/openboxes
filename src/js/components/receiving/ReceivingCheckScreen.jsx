@@ -6,6 +6,7 @@ import React, { Component } from 'react';
 import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
 import { connect } from 'react-redux';
+import moment from 'moment';
 import { hideSpinner, showSpinner } from '../../actions';
 import apiClient, { flattenRequest, parseResponse } from '../../utils/apiClient';
 import { renderFormField } from '../../utils/form-utils';
@@ -47,7 +48,10 @@ const SHIPMENT_FIELDS = {
     defaultMessage: 'Delivered on',
     type: params => <DateField {...params} />,
     attributes: {
-      disabled: true,
+      dateFormat: 'MM/DD/YYYY HH:mm Z',
+      required: true,
+      showTimeSelect: true,
+      autoComplete: 'off',
     },
   },
 };
@@ -57,6 +61,7 @@ const TABLE_FIELDS = {
     type: ArrayField,
     rowComponent: TableRowWithSubfields,
     subfieldKey: 'shipmentItems',
+    headerFontSize: '0.775rem',
     fields: {
       'parentContainer.name': {
         fieldKey: '',
@@ -156,6 +161,7 @@ const TABLE_FIELDS = {
         flexWidth: '1',
         getDynamicAttr: ({ saveDisabled, fieldValue, hasPartialReceivingSupport }) => ({
           disabled: saveDisabled || _.toInteger(fieldValue) <= 0 || !hasPartialReceivingSupport,
+          hide: !hasPartialReceivingSupport,
         }),
       },
       comment: {
@@ -171,9 +177,13 @@ const TABLE_FIELDS = {
 function validate(values) {
   const errors = {};
   errors.containers = [];
+  const dateDelivered = moment(values.dateDelivered, 'MM/DD/YYYY');
 
   if (!values.dateDelivered) {
     errors.dateDelivered = 'react.default.error.requiredField.label';
+  }
+  if (moment().diff(dateDelivered) < 0) {
+    errors.dateDelivered = 'react.partialReceiving.error.futureDate.label';
   }
   _.forEach(values.containers, (container, key) => {
     errors.containers[key] = { shipmentItems: [] };
@@ -418,7 +428,12 @@ class ReceivingCheckScreen extends Component {
                     </button>
               : null}
                 </span>
-                <div className="form-title">Shipment Informations</div>
+                <div className="form-title">
+                  <Translate
+                    id="react.partialReceiving.shipmentInformation.label"
+                    defaultMessage="Shipment information"
+                  />
+                </div>
                 {_.map(SHIPMENT_FIELDS, (fieldConfig, fieldName) =>
                 renderFormField(fieldConfig, fieldName, {
                   saveDisabled: this.state.completed ||

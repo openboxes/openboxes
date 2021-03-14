@@ -64,7 +64,7 @@
                     <g:render template="/stockMovement/actions" model="[stockMovement:stockMovement]"/>
                 </td>
                 <td>
-                    <div class="count">${stockMovement?.lineItems?.size()?:0}</div>
+                    <div class="count">${stockMovement?.lineItemCount}</div>
                 </td>
                 <g:if test="${!params.direction || params.direction as StockMovementType == StockMovementType.OUTBOUND}">
                     <td>

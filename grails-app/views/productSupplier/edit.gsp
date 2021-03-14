@@ -64,21 +64,12 @@
                             </tr>
                             <tr class="prop">
                                 <td class="name">
-                                    <label for="name"><g:message code="default.description.label"/></label>
-                                </td>
-                                <td class="value ">
-                                    <g:textArea name="description" class="medium text" value="${productSupplierInstance?.description}" />
-                                </td>
-                            </tr>
-                            <tr class="prop">
-                                <td class="name">
                                     <label for="name"><g:message code="productSupplier.productCode.label"/></label>
                                 </td>
                                 <td class="value ">
                                     <g:textArea name="productCode" class="medium text" value="${productSupplierInstance?.productCode}" />
                                 </td>
                             </tr>
-
 							<tr class="prop">
 								<td valign="top" class="name">
 									<label for="ratingTypeCode"><warehouse:message code="productSupplier.ratingTypeCode.label" default="Rating Type Code" /></label>
@@ -89,34 +80,28 @@
                                               value="${productSupplierInstance?.ratingTypeCode}" noSelection="['': '']" />
 								</td>
 							</tr>
-
 							<tr class="prop">
-								<td valign="top" class="name">
-									<label for="preferenceTypeCode"><warehouse:message code="productSupplier.preferenceTypeCode.label" default="Preference Type Code" /></label>
+								<td class="name">
+									<label for="defaultPreferenceType"><warehouse:message code="productSupplier.defaultPreferenceTypeCode.label"/></label>
 								</td>
-								<td valign="top" class="value ${hasErrors(bean: productSupplierInstance, field: 'preferenceTypeCode', 'errors')}">
-									<g:select class="chzn-select-deselect" name="preferenceTypeCode"
-                                              from="${org.pih.warehouse.core.PreferenceTypeCode?.values()}"
-                                              value="${productSupplierInstance?.preferenceTypeCode}" noSelection="['': '']" />
-								</td>
-							</tr>
-
-
-
-						<tr class="prop">
-								<td valign="top" class="name">
-								  <label for="upc"><warehouse:message code="productSupplier.upc.label" default="Upc" /></label>
-								</td>
-								<td valign="top" class="value ${hasErrors(bean: productSupplierInstance, field: 'upc', 'errors')}">
-									<g:textField class="text" size="80" name="upc" maxlength="255" value="${productSupplierInstance?.upc}" />
+								<td class="value">
+									<g:selectPreferenceType name="defaultPreferenceType"
+															size="80"
+															noSelection="['':'']"
+															value="${defaultPreferenceType?.id}"
+															class="chzn-select-deselect" />
 								</td>
 							</tr>
 							<tr class="prop">
-								<td valign="top" class="name">
-								  <label for="ndc"><warehouse:message code="productSupplier.ndc.label" default="Ndc" /></label>
+								<td class="name">
+									<label for="preferenceType"><warehouse:message code="preferenceType.label"/></label>
 								</td>
-								<td valign="top" class="value ${hasErrors(bean: productSupplierInstance, field: 'ndc', 'errors')}">
-									<g:textField class="text" size="80" name="ndc" maxlength="255" value="${productSupplierInstance?.ndc}" />
+								<td class="value">
+									<g:selectPreferenceType name="preferenceType"
+															size="80"
+															noSelection="['':'']"
+															value="${preferenceType?.id}"
+															class="chzn-select-deselect" />
 								</td>
 							</tr>
 							<tr class="prop">
@@ -137,30 +122,6 @@
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: productSupplierInstance, field: 'supplierCode', 'errors')}">
 									<g:textField class="text" size="80" name="supplierCode" maxlength="255" value="${productSupplierInstance?.supplierCode}" />
-								</td>
-							</tr>
-							<tr class="prop">
-								<td valign="top" class="name">
-								  <label for="supplierName"><warehouse:message code="productSupplier.supplierName.label" default="Supplier Name" /></label>
-								</td>
-								<td valign="top" class="value ${hasErrors(bean: productSupplierInstance, field: 'supplierName', 'errors')}">
-									<g:textField class="text" size="80" name="supplierName" maxlength="255" value="${productSupplierInstance?.supplierName}" />
-								</td>
-							</tr>
-							<tr class="prop">
-								<td valign="top" class="name">
-								  <label for="modelNumber"><warehouse:message code="productSupplier.modelNumber.label" default="Model Number" /></label>
-								</td>
-								<td valign="top" class="value ${hasErrors(bean: productSupplierInstance, field: 'modelNumber', 'errors')}">
-									<g:textField class="text" size="80" name="modelNumber" maxlength="255" value="${productSupplierInstance?.modelNumber}" />
-								</td>
-							</tr>
-							<tr class="prop">
-								<td valign="top" class="name">
-								  <label for="brandName"><warehouse:message code="productSupplier.brandName.label" default="Brand Name" /></label>
-								</td>
-								<td valign="top" class="value ${hasErrors(bean: productSupplierInstance, field: 'brandName', 'errors')}">
-									<g:textField class="text" size="80" name="brandName" maxlength="255" value="${productSupplierInstance?.brandName}" />
 								</td>
 							</tr>
 							<tr class="prop">
@@ -186,22 +147,6 @@
 							</tr>
 							<tr class="prop">
 								<td valign="top" class="name">
-								  <label for="manufacturerName"><warehouse:message code="productSupplier.manufacturerName.label" default="Manufacturer Name" /></label>
-								</td>
-								<td valign="top" class="value ${hasErrors(bean: productSupplierInstance, field: 'manufacturerName', 'errors')}">
-									<g:textField class="text" size="80" name="manufacturerName" maxlength="255" value="${productSupplierInstance?.manufacturerName}" />
-								</td>
-							</tr>
-							<tr class="prop">
-								<td valign="top" class="name">
-								  <label for="standardLeadTimeDays"><warehouse:message code="productSupplier.standardLeadTimeDays.label" default="Standard Lead Time Days" /></label>
-								</td>
-								<td valign="top" class="value ${hasErrors(bean: productSupplierInstance, field: 'standardLeadTimeDays', 'errors')}">
-									<g:textField class="text" name="standardLeadTimeDays" value="${fieldValue(bean: productSupplierInstance, field: 'standardLeadTimeDays')}" />
-								</td>
-							</tr>
-							<tr class="prop">
-								<td valign="top" class="name">
 								  <label for="minOrderQuantity"><warehouse:message code="productSupplier.minOrderQuantity.label" default="Min Order Quantity" /></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: productSupplierInstance, field: 'minOrderQuantity', 'errors')}">
@@ -210,23 +155,41 @@
 							</tr>
 							<tr class="prop">
 								<td valign="top" class="name">
-								  <label for="comments"><warehouse:message code="productSupplier.comments.label" default="Comments" /></label>
+									<label for="price"><warehouse:message code="productSupplier.contractPrice.label" default="Contract Price (each)" /></label>
 								</td>
-								<td valign="top" class="value ${hasErrors(bean: productSupplierInstance, field: 'comments', 'errors')}">
-									<g:textArea name="comments" value="${productSupplierInstance?.comments}" />
+								<td valign="top" class="value ${hasErrors(bean: [productSupplierInstance?.contractPrice], field: 'price', 'errors')}">
+									<g:textField name="price"
+												 value="${g.formatNumber(number:productSupplierInstance?.contractPrice?.price, format:'###,###,##0.####') }"
+												 class="text" size="50" />
 								</td>
 							</tr>
 							<tr class="prop">
-								<td valign="top"></td>
-								<td valign="top left">
-									<div class="buttons">
-										<g:actionSubmit class="button" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
-										<g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
-									</div>
+								<td valign="top" class="name">
+									<label for="toDate"><warehouse:message code="productSupplier.contractValidUntil.label" default="Contract Valid Until" /></label>
+								</td>
+								<td valign="top" class="value ${hasErrors(bean: [productSupplierInstance?.contractPrice], field: 'toDate', 'errors')}">
+									<g:jqueryDatePicker name="toDate" value="${productSupplierInstance?.contractPrice?.toDate}" autocomplete="off" format="MM/dd/yyyy"/>
 								</td>
 							</tr>
 						</tbody>
 					</table>
+
+
+				</div>
+				<div class="box">
+					<h2>${g.message(code: 'attributes.label')}</h2>
+					<table>
+						<tbody>
+							<g:render template="../attribute/renderFormList"
+									  model="[fieldPrefix: 'productAttributes.',
+											  entityTypeCodes: [org.pih.warehouse.core.EntityTypeCode.PRODUCT_SUPPLIER],
+											  populatedAttributes:productSupplierInstance?.attributes]"/>
+						</tbody>
+					</table>
+				</div>
+				<div class="buttons">
+					<g:actionSubmit class="button" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
+					<g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
 				</div>
             </g:form>
         </div>

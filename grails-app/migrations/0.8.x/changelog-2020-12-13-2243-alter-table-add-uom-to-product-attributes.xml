@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="jmiranda (generated)" id="1607920891722-1">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="attribute" columnName="unit_of_measure_class_id"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="attribute">
+      <column name="unit_of_measure_class_id" type="CHAR(38)"/>
+    </addColumn>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1607920891722-3">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="product_attribute" columnName="unit_of_measure_id"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="product_attribute">
+      <column name="unit_of_measure_id" type="CHAR(38)"/>
+    </addColumn>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1607920891722-47">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="FKC7AA9C4013CE80"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="unit_of_measure_class_id" baseTableName="attribute"
+      constraintName="FKC7AA9C4013CE80" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="unit_of_measure_class"/>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1607920891722-48">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="FK94A534C24DEBC91"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="unit_of_measure_id" baseTableName="product_attribute"
+      constraintName="FK94A534C24DEBC91" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="unit_of_measure"/>
+  </changeSet>
+
+</databaseChangeLog>

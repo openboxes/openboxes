@@ -53,7 +53,7 @@
                 </td>
                 <td>
                     <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: ['0.00'])}">
-                        <g:formatNumber number="${pkg?.price}" />
+                        <g:formatNumber number="${pkg?.productPrice?.price}" />
                         ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                     </g:hasRoleFinance>
                 </td>
@@ -94,7 +94,7 @@
                             <warehouse:message code="default.add.label" args="[g.message(code:'unitOfMeasureClass.label')]"/>
                         </a>
                     </div>
-                    <div class="center">
+                    <div class="left">
                         <a href="javascript:void(0);" class="open-dialog create button"
                            dialog-id="product-package-dialog">
                             <img src="${createLinkTo(dir:'images/icons/silk', file:'add.png')}" />&nbsp;
@@ -105,4 +105,19 @@
             </tr>
         </tfoot>
     </table>
+</div>
+<g:each var="packageInstance" in="${productInstance.packages }">
+    <g:set var="dialogId" value="${'editProductPackage-' + packageInstance.id}"/>
+    <div id="${dialogId}" class="dialog hidden" title="${packageInstance?.id?warehouse.message(code:'package.edit.label'):warehouse.message(code:'package.add.label') }">
+        <g:render template="productPackageDialog" model="[dialogId:dialogId,productInstance:productInstance,packageInstance:packageInstance]"/>
+    </div>
+</g:each>
+<div id="uom-class-dialog" class="dialog hidden" title="Add a unit of measure class">
+    <g:render template="uomClassDialog" model="[productInstance:productInstance]"/>
+</div>
+<div id="uom-dialog" class="dialog hidden" title="Add a unit of measure">
+    <g:render template="uomDialog" model="[productInstance:productInstance]"/>
+</div>
+<div id="product-package-dialog" class="dialog hidden" title="${packageInstance?.id?warehouse.message(code:'package.edit.label'):warehouse.message(code:'package.add.label') }">
+    <g:render template="productPackageDialog" model="[productInstance:productInstance,packageInstance:packageInstance]"/>
 </div>

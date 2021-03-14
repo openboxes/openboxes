@@ -23,7 +23,7 @@
 			</g:hasErrors>
 
             <g:if test="${commandInstance?.data}">
-                <g:if test="${commandInstance?.data?.any { !it.quantity || it.quantity == 0 }}">
+                <g:if test="${commandInstance.type == 'inventory' && commandInstance?.data?.any { !it.quantity || it.quantity == 0 }}">
                     <div class="message">
                         <warehouse:message code="import.blankQuantities.label" />
                     </div>
@@ -49,7 +49,7 @@
                                     <label><warehouse:message code="default.type.label"/></label>
                                 </td>
                                 <td class="value">
-                                    ${commandInstance?.type}
+                                    ${commandInstance?.type?.capitalize()}
                                 </td>
                             </tr>
                             <tr class="prop">
@@ -60,14 +60,16 @@
                                     ${commandInstance?.filename}
                                 </td>
                             </tr>
-                            <tr class="prop">
-                                <td class="name">
-                                    <label><warehouse:message code="default.date.label"/></label>
-                                </td>
-                                <td class="value">
-                                    <g:jqueryDatePicker id="date" name="date" value="${commandInstance?.date}" format="MM/dd/yyyy" size="20"/>
-                                </td>
-                            </tr>
+                            <g:if test="${commandInstance?.type == 'inventory'}">
+                                <tr class="prop">
+                                    <td class="name">
+                                        <label><warehouse:message code="default.date.label"/></label>
+                                    </td>
+                                    <td class="value">
+                                        <g:jqueryDatePicker id="date" name="date" value="${commandInstance?.date}" format="MM/dd/yyyy" size="20"/>
+                                    </td>
+                                </tr>
+                            </g:if>
                         </table>
                     </div>
 
@@ -110,8 +112,8 @@
 
                             <a href="${createLink(controller: "batch", action: "importData", params: params)}"
                                class="button">
-                                <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}"/>&nbsp;
-                            <warehouse:message code="default.button.back.label" default="Back"/>
+                                <img src="${resource(dir: 'images/icons/silk', file: 'bullet_left.png')}"/>&nbsp;
+                                <warehouse:message code="default.button.back.label" default="Back"/>
                             </a>
 
 

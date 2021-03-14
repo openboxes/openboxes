@@ -6,10 +6,10 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.data
 
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
+
 import org.junit.Ignore
 import org.junit.Test
 import org.pih.warehouse.core.Location
@@ -67,7 +67,7 @@ class DataServiceTests extends GroovyTestCase {
         assertNotNull productPackage
         assertEquals "EA/1", productPackage.name
         assertEquals "EA/1", productPackage.description
-        assertEquals 1.50, productPackage.price
+        assertEquals 1.50, productPackage.productPrice.price
         assertEquals "EA", productPackage.uom.code
         assertEquals "EA", productPackage.uom.name
         assertEquals "EA", productPackage.uom.description
@@ -83,7 +83,7 @@ class DataServiceTests extends GroovyTestCase {
         }
 
         def product = dataService.findOrCreateProduct([productCode: "AB12", productName: "New product", category: "New category", manufacturer: "Mfg", manufacturerCode: "Mfgcode", vendor: "Vendor", vendorCode: "Vendor code", unitOfMeasure: "each"])
-        def inventoryLevel = dataService.findOrCreateInventoryLevel(product, location.inventory, "AB-12-12", 0, 10, 100, true)
+        def inventoryLevel = dataService.findOrCreateInventoryLevel(product, location.inventory, null, 0, 10, 100, true)
 
         assertNotNull inventoryLevel
         //assertEquals "AB-12-12", inventoryLevel.binLocation
@@ -161,7 +161,7 @@ class DataServiceTests extends GroovyTestCase {
 
         assertNotNull product.getProductPackage("CS")
         assertEquals 1000, product.getProductPackage("CS").quantity
-        assertEquals 85.91, product.getProductPackage("CS").price, 0.0001
+        assertEquals 85.91, product.getProductPackage("CS").productPrice.price, 0.0001
 
 
         // Testing the new preferred for reorder flag
@@ -265,7 +265,7 @@ class DataServiceTests extends GroovyTestCase {
         def productPackage = product.getProductPackage("CS")
         assertNotNull productPackage
         assertEquals 1000, productPackage.quantity
-        assertEquals 85.91, productPackage.price, 0.0001
+        assertEquals 85.91, productPackage.productPrice.price, 0.0001
 
         /*
         product = Product.findByProductCode("QM56")

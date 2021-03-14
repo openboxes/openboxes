@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import moment from 'moment';
+import { confirmAlert } from 'react-confirm-alert';
+import { getTranslate } from 'react-localize-redux';
 
 import ModalWrapper from '../../form-elements/ModalWrapper';
 import ArrayField from '../../form-elements/ArrayField';
@@ -10,7 +12,7 @@ import TextField from '../../form-elements/TextField';
 import DateField from '../../form-elements/DateField';
 import SelectField from '../../form-elements/SelectField';
 import { showSpinner, hideSpinner } from '../../../actions';
-import Translate from '../../../utils/Translate';
+import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
 import { debounceProductsFetch } from '../../../utils/option-utils';
 
 const FIELDS = {
@@ -103,6 +105,7 @@ class EditLineModal extends Component {
 
     this.onOpen = this.onOpen.bind(this);
     this.onSave = this.onSave.bind(this);
+    this.save = this.save.bind(this);
     this.validate = this.validate.bind(this);
 
     this.debouncedProductsFetch = debounceProductsFetch(
@@ -148,11 +151,47 @@ class EditLineModal extends Component {
    * @public
    */
   onSave(values) {
+    if (_.some(values.lines, (line) => {
+      const oldItem = _.find(this.state.formValues.lines, item => line.product
+        && line.product.id === item.product.id && line.lotNumber === item.lotNumber);
+
+      return oldItem && oldItem.quantityOnHand && oldItem.expirationDate !== line.expirationDate;
+    })) {
+      this.confirmInventoryItemExpirationDateUpdate(() => this.save(values));
+    } else {
+      this.save(values);
+    }
+  }
+
+  save(values) {
     this.state.attr.saveEditLine(
       values.lines,
       this.state.attr.parentIndex,
-      this.state.attr.rowIndex,
     );
+  }
+
+  /**
+   * Shows Inventory item expiration date update confirmation dialog.
+   * @param {function} onConfirm
+   * @public
+   */
+  confirmInventoryItemExpirationDateUpdate(onConfirm) {
+    confirmAlert({
+      title: this.props.translate('react.partialReceiving.message.confirmSave.label', 'Confirm save'),
+      message: this.props.translate(
+        'react.partialReceiving.confirmExpiryDateUpdate.message',
+        'This will update the expiry date across all depots in the system. Are you sure you want to proceed?',
+      ),
+      buttons: [
+        {
+          label: this.props.translate('react.default.yes.label', 'Yes'),
+          onClick: onConfirm,
+        },
+        {
+          label: this.props.translate('react.default.no.label', 'No'),
+        },
+      ],
+    });
   }
 
   validate(values) {
@@ -170,6 +209,9 @@ class EditLineModal extends Component {
       const dateRequested = moment(line.expirationDate, 'MM/DD/YYYY');
       if (date.diff(dateRequested) > 0) {
         errors.lines[key] = { expirationDate: 'react.partialReceiving.error.invalidDate.label' };
+      }
+      if (line.expirationDate && (_.isNil(line.lotNumber) || _.isEmpty(line.lotNumber))) {
+        errors.lines[key] = { lotNumber: 'react.partialReceiving.error.expiryWithoutLot.label' };
       }
     });
 
@@ -206,6 +248,7 @@ const mapStateToProps = state => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
   minimumExpirationDate: state.session.minimumExpirationDate,
+  translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner })(EditLineModal);
@@ -228,4 +271,5 @@ EditLineModal.propTypes = {
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
   minimumExpirationDate: PropTypes.string.isRequired,
+  translate: PropTypes.func.isRequired,
 };

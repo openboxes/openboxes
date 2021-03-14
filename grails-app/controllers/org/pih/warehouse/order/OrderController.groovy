@@ -21,6 +21,7 @@ import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.UomService
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.ValidationCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.shipping.Shipment
@@ -49,7 +50,7 @@ class OrderController {
         Date statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
 
         // Set default values
-        params.destination = params.destination?:session?.warehouse?.id
+        params.destination = params.destination == null ? session?.warehouse?.id : params.destination
         params.orderTypeCode = params.orderTypeCode ? Enum.valueOf(OrderTypeCode.class, params.orderTypeCode) : OrderTypeCode.PURCHASE_ORDER
         params.status = params.status ? Enum.valueOf(OrderStatus.class, params.status) : null
 
@@ -623,6 +624,11 @@ class OrderController {
         Order order = Order.get(params.order.id)
         OrderItem orderItem = OrderItem.get(params.orderItem.id)
         ProductSupplier productSupplier = null
+        ValidationCode validationCode = params.validationCode ? params.validationCode as ValidationCode : null
+        if (validationCode == ValidationCode.BLOCK) {
+            render(status: 500, text: "${warehouse.message(code: 'orderItem.blockedSupplier.label')}")
+            return
+        }
         if (params.productSupplier == "Create New") {
             Organization supplier = Organization.get(params.supplier.id)
             productSupplier = ProductSupplier.findByCodeAndSupplier(params.sourceCode, supplier)
@@ -654,13 +660,7 @@ class OrderController {
                 throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
             }
             orderItem.properties = params
-            Shipment pendingShipment = order.pendingShipment
-            if (pendingShipment) {
-                Set<ShipmentItem> itemsToUpdate = pendingShipment.shipmentItems.findAll { it.orderItemId == orderItem.id }
-                itemsToUpdate.each { itemToUpdate ->
-                    itemToUpdate.recipient = orderItem.recipient
-                }
-            }
+            orderItem.refreshPendingShipmentItemRecipients()
         }
 
         if (productSupplier != null) {
@@ -714,10 +714,11 @@ class OrderController {
                     text: it.toString(),
                     orderItemStatusCode: it.orderItemStatusCode.name(),
                     hasShipmentAssociated: it.hasShipmentAssociated(),
-                    budgetCode: it.budgetCode
+                    budgetCode: it.budgetCode,
+                    orderIndex: it.orderIndex
             ]
         }
-        orderItems = orderItems.sort { it.dateCreated }
+        orderItems = orderItems.sort { a,b -> a.dateCreated <=> b.dateCreated ?: a.orderIndex <=> b.orderIndex }
         render orderItems as JSON
     }
 
@@ -977,6 +978,11 @@ class OrderController {
 
     def createCombinedShipment = {
         def orderInstance = Order.get(params.orderId)
+        if (!orderInstance.orderItems.find {it.quantityRemainingToShip != 0 && it.orderItemStatusCode != OrderItemStatusCode.CANCELED }) {
+            flash.message = "${warehouse.message(code:'purchaseOrder.noItemsToShip.label')}"
+            redirect(controller: 'order', action: "show", id: orderInstance.id, params: ['tab': 4])
+            return
+        }
         StockMovement stockMovement = StockMovement.createFromOrder(orderInstance);
         stockMovement = stockMovementService.createShipmentBasedStockMovement(stockMovement)
         redirect(controller: 'stockMovement', action: "createCombinedShipments", params: [direction: 'INBOUND', id: stockMovement.id])

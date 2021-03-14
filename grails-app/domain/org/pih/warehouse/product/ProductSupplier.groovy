@@ -10,9 +10,8 @@
 package org.pih.warehouse.product
 
 import org.pih.warehouse.core.Organization
-import org.pih.warehouse.core.PreferenceTypeCode
+import org.pih.warehouse.core.ProductPrice
 import org.pih.warehouse.core.RatingTypeCode
-import org.pih.warehouse.core.UnitOfMeasure
 
 class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
 
@@ -47,9 +46,6 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
     String supplierCode        // Supplier's product code
     String supplierName        // Supplier's alternative product name
 
-    // Indicates whether the supplier product is preferred
-    PreferenceTypeCode preferenceTypeCode
-
     // Rating assigned to the supplier product
     RatingTypeCode ratingTypeCode
 
@@ -59,6 +55,8 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
     // Minimum required to order
     BigDecimal minOrderQuantity
 
+    ProductPrice contractPrice
+
     // Additional comments
     String comments
 
@@ -66,9 +64,9 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
     Date dateCreated
     Date lastUpdated
 
-    static transients = ["defaultProductPackage"]
+    static transients = ["defaultProductPackage", "globalProductSupplierPreference", "attributes"]
 
-    static hasMany = [productPackages: ProductPackage]
+    static hasMany = [productPackages: ProductPackage, productSupplierPreferences: ProductSupplierPreference]
 
     static mapping = {
         description type: 'text'
@@ -97,44 +95,54 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
         standardLeadTimeDays(nullable: true)
         minOrderQuantity(nullable: true)
         ratingTypeCode(nullable: true)
-        preferenceTypeCode(nullable: true)
         comments(nullable: true)
 
+        contractPrice(nullable: true)
     }
 
     ProductPackage getDefaultProductPackage() {
-        return productPackages ? productPackages.sort { it.dateCreated }.last() : null
+        return productPackages ? productPackages.sort { it.lastUpdated }.last() : null
     }
 
+    List<ProductAttribute> getAttributes() {
+        return product.attributes.findAll {
+            ProductAttribute productAttribute -> productAttribute.productSupplier == this
+        }
+    }
+
+    ProductSupplierPreference getGlobalProductSupplierPreference() {
+        return productSupplierPreferences ? productSupplierPreferences.find { it.destinationParty == null } : null
+    }
 
     int compareTo(ProductSupplier obj) {
-        return preferenceTypeCode <=> obj.preferenceTypeCode ?:
-                ratingTypeCode <=> obj.ratingTypeCode ?:
-                        dateCreated <=> obj.dateCreated ?:
-                                id <=> obj.id
+        return ratingTypeCode <=> obj.ratingTypeCode ?:
+                dateCreated <=> obj.dateCreated ?:
+                        id <=> obj.id
     }
 
     static PROPERTIES = [
-            "id"                           : "id",
-            "code"                         : "code",
-            "productCode"                  : "product.productCode",
-            "legacyProductCode"            : "productCode",
-            "productName"                  : "name",
-            "description"                  : "description",
-            "supplierId"                   : "supplier.id",
-            "supplierName"                 : "supplier.name",
-            "supplierCode"                 : "supplierCode",
-            "supplierProductName"          : "supplierName",
-            "manufacturerId"               : "manufacturer.id",
-            "manufacturerName"             : "manufacturer.name",
-            "manufacturerCode"             : "manufacturerCode",
-            "manufacturerProductName"      : "manufacturerName",
-            "defaultProductPackageUomCode" : "defaultProductPackage.uom.code",
-            "defaultProductPackageQuantity": "defaultProductPackage.quantity",
-            "defaultProductPackagePrice"   : "defaultProductPackage.price",
-            "standardLeadTimeDays"         : "standardLeadTimeDays",
-            "preferenceTypeCode"           : "preferenceTypeCode",
-            "ratingTypeCode"               : "ratingTypeCode",
-            "comments"                     : "comments"
+            "ID"                                  : "id",
+            "Product Source Code"                 : "code",
+            "Product Source Name"                 : "name",
+            "Product Code"                        : "product.productCode",
+            "Product Name"                        : "product.name",
+            "Legacy Product Code"                 : "productCode",
+            "Supplier Name"                       : "supplier.name",
+            "Supplier Item No"                    : "supplierCode",
+            "Manufacturer Name"                   : "manufacturer.name",
+            "Manufacturer Item No"                : "manufacturerCode",
+            "Minimum Order Quantity"              : "minOrderQuantity",
+            "Contract Price (Each)"               : "contractPrice.price",
+            "Contract Price Valid Until"          : ["property": "contractPrice.toDate", "dateFormat": "MM/dd/yyyy"],
+            "Rating Type"                         : "ratingTypeCode",
+            "Default Global Preference Type"      : "globalProductSupplierPreference.preferenceType.name",
+            "Preference Type Validity Start Date" : ["property": "globalProductSupplierPreference.validityStartDate", "dateFormat": "MM/dd/yyyy"],
+            "Preference Type Validity End Date"   : ["property": "globalProductSupplierPreference.validityEndDate", "dateFormat": "MM/dd/yyyy"],
+            "Preference Type Comment"             : "globalProductSupplierPreference.comments",
+            "Default Package Type"                : "defaultProductPackage.uom.code",
+            "Quantity per package"                : "defaultProductPackage.quantity",
+            "Package price"                       : "defaultProductPackage.productPrice.price",
+            "Date created"                        : ["property": "dateCreated", "dateFormat": "MM/dd/yyyy"],
+            "Last updated"                        : ["property": "lastUpdated", "dateFormat": "MM/dd/yyyy"]
     ]
 }

@@ -69,34 +69,46 @@
                         <g:if test="${commandInstance.recordInventoryRows }">
                             <g:each var="recordInventoryRow" in="${commandInstance.recordInventoryRows}" status="status">
                                 <g:set var="styleClass" value="${params?.inventoryItem?.id && recordInventoryRow?.id == params?.inventoryItem?.id ? 'selected-row' : ''}"/>
-                                <tr class="${styleClass} ${status%2==0?'odd':'even'}">
+                                <tr class="${styleClass} ${status%2==0?'odd':'even'}" style="${recordInventoryRow.error ? 'background-color: #ffcccb;' : ''}">
                                     <td>
-                                        <g:hiddenField
-                                                name="recordInventoryRows[${status}].binLocation.id"
-                                                value="${recordInventoryRow?.binLocation?.id}"/>
+									<g:if test ="${!recordInventoryRow?.oldQuantity}">
+										<g:selectBinLocation  id="binLocation-${status}" class="binLocation" name="recordInventoryRows[${status}].binLocation.id"
+															  value="${recordInventoryRow?.binLocation?.id}" noSelection="['':'']"/>
+									</g:if>
+									<g:else>
+											<g:hiddenField
+													name="recordInventoryRows[${status}].binLocation.id"
+													value="${recordInventoryRow?.binLocation?.id}"/>
 
-										<g:if test="${recordInventoryRow?.binLocation}">
-											${recordInventoryRow?.binLocation?.name }
-										</g:if>
-										<g:else>
-											<g:if test="${!recordInventoryRow?.binLocation?.parentLocation?.hasBinLocationSupport()}">
-												<warehouse:message code="default.notSupported.label"/>
+											<g:if test="${recordInventoryRow?.binLocation}">
+												${recordInventoryRow?.binLocation?.name }
 											</g:if>
 											<g:else>
-												<warehouse:message code="default.label"/>
+												<g:if test="${!recordInventoryRow?.binLocation?.parentLocation?.hasBinLocationSupport()}">
+													<warehouse:message code="default.notSupported.label"/>
+												</g:if>
+												<g:else>
+													<warehouse:message code="default.label"/>
+												</g:else>
 											</g:else>
-										</g:else>
+									</g:else>
                                     </td>
                                     <td>
-                                        <g:hiddenField name="recordInventoryRows[${status}].id" value="${recordInventoryRow?.id }"/>
-                                        <g:hiddenField name="recordInventoryRows[${status}].lotNumber" value="${recordInventoryRow?.lotNumber }"/>
-										<g:if test="${recordInventoryRow?.lotNumber}">
-											<div class="lotNumber">
-												${recordInventoryRow?.lotNumber }
-											</div>
+										<g:if test ="${!recordInventoryRow?.oldQuantity}">
+											<g:textField id="lotNumber-${status}" class="lotNumber text" name="recordInventoryRows[${status}].lotNumber"
+														 size="25" value="${recordInventoryRow?.lotNumber}"/>
 										</g:if>
-                                        <g:else>
-											<span class="fade"><warehouse:message code="default.label"/></span>
+										<g:else>
+											<g:hiddenField name="recordInventoryRows[${status}].id" value="${recordInventoryRow?.id }"/>
+											<g:hiddenField name="recordInventoryRows[${status}].lotNumber" value="${recordInventoryRow?.lotNumber }"/>
+											<g:if test="${recordInventoryRow?.lotNumber}">
+												<div class="lotNumber">
+													${recordInventoryRow?.lotNumber }
+												</div>
+											</g:if>
+											<g:else>
+												<span class="fade"><warehouse:message code="default.label"/></span>
+											</g:else>
 										</g:else>
                                     </td>
                                     <td>
@@ -104,7 +116,7 @@
 											<g:set var="currentYear" value="${new Date()[Calendar.YEAR]}"/>
 											<g:set var="minimumYear" value="${grailsApplication.config.openboxes.expirationDate.minValue[Calendar.YEAR]}"/>
 											<g:datePicker name="recordInventoryRows[${status}].expirationDate" years="${minimumYear..currentYear + 20}"
-														  noSelection="['': '']" precision="day"/>
+														  noSelection="['': '']" precision="day" value="${recordInventoryRow?.expirationDate}"/>
 										</g:if>
 										<g:else>
 											<g:hiddenField name="recordInventoryRows[${status}].expirationDate"

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="awalkowiak" id="2402202117000-0">
+    <preConditions onFail="MARK_RAN">
+      <and>
+        <tableExists tableName="product_price"/>
+        <not>
+          <sqlCheck expectedResult="0">
+            SELECT COUNT(*) FROM product_price WHERE date_created IS NULL;
+          </sqlCheck>
+        </not>
+      </and>
+    </preConditions>
+    <sql>
+      UPDATE product_price SET date_created = current_timestamp WHERE date_created IS NULL;
+    </sql>
+  </changeSet>
+
+  <changeSet author="awalkowiak" id="2402202117000-1">
+    <preConditions onFail="MARK_RAN">
+      <and>
+        <tableExists tableName="product_price"/>
+        <not>
+          <sqlCheck expectedResult="0">
+            SELECT COUNT(*) FROM product_price WHERE last_updated IS NULL;
+          </sqlCheck>
+        </not>
+      </and>
+    </preConditions>
+    <sql>
+      UPDATE product_price SET last_updated = current_timestamp WHERE last_updated IS NULL;
+    </sql>
+  </changeSet>
+</databaseChangeLog>

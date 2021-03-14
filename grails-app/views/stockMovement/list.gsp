@@ -52,15 +52,19 @@
     <div class="buttonBar">
 
         <div class="right">
-            <g:if test="${params.direction as StockMovementType == StockMovementType.INBOUND}">
-                <div class="button-group">
+            <div class="button-container">
+                <g:if test="${params.direction as StockMovementType == StockMovementType.INBOUND}">
                     <g:link controller="stockMovement" action="exportItems" class="button">
                         <img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" />
                         ${warehouse.message(code: 'stockMovements.exportIncomingItems.label', default: 'Export all incoming items')}
                     </g:link>
-                </div>
-            </g:if>
-            <div class="button-group">
+                </g:if>
+                <g:if test="${params.direction as StockMovementType == StockMovementType.OUTBOUND}">
+                    <g:link class="button" action="exportPendingRequisitionItems">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" />&nbsp;
+                        <warehouse:message code="stockMovements.exportPendingShipmentItems.label" args="['Preference Type']"/>
+                    </g:link>
+                </g:if>
                 <g:link controller="stockMovement" action="list" params="${pageParams + ['createdBy.id':session.user.id, 'requestedBy.id':session.user.id]}" class="button">
                     <img src="${resource(dir: 'images/icons/silk', file: 'user.png')}" />&nbsp;
                     ${warehouse.message(code:'stockMovements.myStockMovements.label', default: 'My stock movements')}
@@ -216,7 +220,6 @@
                         <div class="clear"></div>
                     </div>
                 </g:form>
-
             </div>
         </div>
         <div class="yui-u">

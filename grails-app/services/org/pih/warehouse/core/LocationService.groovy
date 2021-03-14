@@ -290,8 +290,17 @@ class LocationService {
     }
 
     List getLocationsSupportingActivity(ActivityCode activity) {
-        return getAllLocations()?.findAll { it.supports(activity) }
+        def locations = [:]
 
+        Location.executeQuery('select l from Location l join l.supportedActivities s where s = :activity', [ activity: activity.id ]).each {
+            locations[it.id] = it
+        }
+
+        Location.executeQuery('select l from Location l join l.locationType t join t.supportedActivities s where s = :activity', [ activity: activity.id ]).each {
+            locations[it.id] = it
+        }
+
+        return locations.values().toList()
     }
 
     List getShipmentOrigins() {

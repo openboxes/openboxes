@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <!-- migrate existing product_package.price into product_price -->
+  <changeSet author="awalkowiak" id="2601202111001-1">
+    <validCheckSum>4fd991a84d38876557d55ca24d5e360</validCheckSum>
+    <validCheckSum>462621a7c1369eff41f9d235aa1ca40</validCheckSum>
+    <preConditions onFail="MARK_RAN">
+      <and>
+        <columnExists tableName="product_package" columnName="price"/>
+        <columnExists tableName="product_price" columnName="product_package_id"/>
+      </and>
+    </preConditions>
+    <sql>
+      INSERT INTO product_price (id, version, type, price, product_package_id, date_created, last_updated)
+        SELECT uuid(), 0, 'DEFAULT_PRICE', price, id, now(), now()
+        FROM product_package
+        WHERE price IS NOT NULL AND price > 0;
+
+      UPDATE product_package
+        INNER JOIN product_price ON product_price.product_package_id = product_package.id
+        SET product_package.product_price_id = product_price.id;
+    </sql>
+  </changeSet>
+
+  <!-- remove redundant product_package.price column  -->
+  <changeSet author="awalkowiak" id="2601202111001-2">
+    <preConditions onFail="MARK_RAN">
+      <columnExists tableName="product_package" columnName="price"/>
+    </preConditions>
+    <dropColumn tableName="product_package" columnName="price"/>
+  </changeSet>
+
+  <!-- remove temporary product_price.product_package_id column  -->
+  <changeSet author="awalkowiak" id="2601202111001-3">
+    <preConditions onFail="MARK_RAN">
+      <columnExists tableName="product_price" columnName="product_package_id"/>
+    </preConditions>
+    <dropColumn tableName="product_price" columnName="product_package_id"/>
+  </changeSet>
+</databaseChangeLog>

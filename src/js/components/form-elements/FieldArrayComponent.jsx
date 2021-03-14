@@ -53,10 +53,11 @@ class FieldArrayComponent extends Component {
     } = this.props;
     const AddButton = fieldsConfig.addButton;
     const { maxTableHeight, virtualized } = fieldsConfig;
-    const addRow = (row = {}, index = null) => {
+    const addRow = (row = {}, index = null, shouldScroll = true) => {
       if (index === null) {
         const table = document.querySelectorAll('[role="rowgroup"]')[0];
-        if (table) {
+        // lines can also be added on modals and no scroll should be applied then
+        if (table && shouldScroll) {
           table.scrollIntoView({ block: 'end' });
         }
         fields.push(row);
@@ -119,7 +120,10 @@ class FieldArrayComponent extends Component {
                       hideDelay="50"
                     >
                       <div
-                        className={`mx-2 text-truncate font-size-xs ${config.required ? 'required' : ''}`}
+                        className={`mx-2 text-truncate ${config.required ? 'required' : ''}`}
+                        style={{
+                          fontSize: fieldsConfig.headerFontSize ? fieldsConfig.headerFontSize : '0.875rem',
+                        }}
                       >{config.label &&
                       <Translate id={config.label} defaultMessage={config.defaultMessage} />}
                       </div>

@@ -12,8 +12,8 @@ package org.pih.warehouse.forecasting
 import groovy.sql.Sql
 import groovy.time.TimeCategory
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.util.DateUtil
 
 import java.sql.Timestamp
@@ -125,6 +125,7 @@ class ForecastingService {
                 product_code,
                 product_name,
                 quantity_requested,
+                quantity_picked,
                 quantity_demand,
                 reason_code_classification
             FROM product_demand_details
@@ -271,16 +272,28 @@ class ForecastingService {
                 DATE_FORMAT(date_issued, '%d/%b/%Y') as date_issued,
                 origin_name,
                 destination_name,
-                product_code,
+                product_demand_details.product_code,
                 product_name,
                 quantity_requested,
                 quantity_picked,
+                reason_code,
                 reason_code_classification,
                 quantity_demand
             FROM product_demand_details
-            WHERE date_issued BETWEEN :startDate AND :endDate
-            AND origin_id = :originId
             """
+
+        if (params.category) {
+            query += " JOIN product ON product.id = product_demand_details.product_id"
+        }
+        if (params.tags && params.tags != "null") {
+            query += " LEFT JOIN product_tag ON product_tag.product_id = product_demand_details.product_id"
+        }
+        if (params.catalogs && params.catalogs != "null") {
+            query += " LEFT JOIN product_catalog_item ON product_catalog_item.product_id = product_demand_details.product_id"
+        }
+
+        query += " WHERE date_issued BETWEEN :startDate AND :endDate AND origin_id = :originId"
+
         if (params.destinationId) {
             query += " AND destination_id = :destinationId"
         }
@@ -289,6 +302,26 @@ class ForecastingService {
         }
         if (params.reasonCode) {
             query += " AND reason_code_classification = :reasonCode"
+        }
+        if (params.category) {
+            Category category = Category.get(params.category)
+            if (category) {
+                def categories = category.children
+                categories << category
+                query += " AND product.category_id in (${categories.collect { "'$it.id'" }.join(',')})"
+            }
+        }
+        if (params.tags && params.tags != "null") {
+            query += " AND product_tag.tag_id in (${params.tags.split(",").collect { "'$it'" }.join(',')})"
+        }
+        if (params.catalogs && params.catalogs != "null") {
+            query += " AND product_catalog_item.product_catalog_id in (${params.catalogs.split(",").collect { "'$it'" }.join(',')})"
+        }
+
+        if ((params.tags && params.tags != "null") || (params.catalogs && params.catalogs != "null")) {
+            query += " GROUP BY request_number, request_item_id, date_requested, date_issued," +
+                    " origin_name, destination_name, product_demand_details.product_code, product_name," +
+                    " quantity_requested, quantity_picked, reason_code_classification, quantity_demand"
         }
 
         Sql sql = new Sql(dataSource)
@@ -301,17 +334,18 @@ class ForecastingService {
 
         data = data.collect {
             [
-                    productCode      : it?.product_code,
-                    productName      : it?.product_name,
-                    origin           : it?.origin_name,
-                    requestNumber    : it?.request_number,
-                    destination      : it?.destination_name,
-                    dateIssued       : it?.date_issued,
-                    dateRequested    : it?.date_requested,
-                    quantityRequested: it?.quantity_requested ?: 0,
-                    quantityIssued   : it.quantity_picked ?: 0,
-                    quantityDemand   : it?.quantity_demand ?: 0,
-                    reasonCode       : it?.reason_code_classification,
+                    productCode             : it?.product_code,
+                    productName             : it?.product_name,
+                    origin                  : it?.origin_name,
+                    requestNumber           : it?.request_number,
+                    destination             : it?.destination_name,
+                    dateIssued              : it?.date_issued,
+                    dateRequested           : it?.date_requested,
+                    quantityRequested       : it?.quantity_requested ?: 0,
+                    quantityIssued          : it?.quantity_picked ?: 0,
+                    quantityDemand          : it?.quantity_demand ?: 0,
+                    reasonCode              : it?.reason_code,
+                    reasonCodeClassification: it?.reason_code_classification,
             ]
         }
         return data

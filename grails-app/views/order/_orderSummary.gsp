@@ -51,7 +51,7 @@
 
             <tbody>
 
-            <g:each var="orderItem" in="${orderInstance?.orderItems?.sort { it.dateCreated }}" status="i">
+            <g:each var="orderItem" in="${orderInstance?.orderItems?.sort { a,b -> a.dateCreated <=> b.dateCreated ?: a.orderIndex <=> b.orderIndex }}" status="i">
                 <g:set var="isItemCanceled" value="${orderItem.orderItemStatusCode == OrderItemStatusCode.CANCELED}"/>
                 <g:if test="${!isItemCanceled || orderInstance?.orderTypeCode==OrderTypeCode.PURCHASE_ORDER}">
                     <tr class="order-item ${(i % 2) == 0 ? 'even' : 'odd'}" style="${isItemCanceled ? 'background-color: #ffcccb;' : ''}">

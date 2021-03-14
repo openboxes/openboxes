@@ -3,7 +3,7 @@
 <input id="${attrs.id}-value" class="value" type="hidden" name="${attrs.name}.value" value="${attrs.valueId}" ${attrs.valueDataBind }/>
 <input id="${attrs.id}-suggest" type="text" ${attrs.textDataBind}
        class="autocomplete text ${attrs.styleClass}" name="${attrs.name}-name" placeholder="${attrs.placeholder}" value="${attrs.valueName}"
-       style="width: ${attrs.width}px; display: ${attrs.suggestDisplay};" size="${attrs.size}">
+       style="width: ${attrs.width}; display: ${attrs.suggestDisplay};" size="${attrs.size}">
 
 <script language="javascript">
     $(document).ready(function() {

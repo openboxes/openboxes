@@ -104,8 +104,23 @@ enum RequisitionStatus {
         }
     }
 
+    static getStatusSortOrderFormula() {
+        return "(case status " +
+            "when '${CREATED}' then ${CREATED.sortOrder} " +
+            "when '${EDITING}' then ${EDITING.sortOrder} " +
+            "when '${VERIFYING}' then ${VERIFYING.sortOrder} " +
+            "when '${PICKING}' then ${PICKING.sortOrder} " +
+            "when '${PICKED}' then ${PICKED.sortOrder} " +
+            "when '${PENDING}' then ${PENDING.sortOrder} " +
+            "when '${CHECKING}' then ${CHECKING.sortOrder} " +
+            "when '${ISSUED}' then ${ISSUED.sortOrder} " +
+            "when '${RECEIVED}' then ${RECEIVED.sortOrder} " +
+            "when '${CANCELED}' then ${CANCELED.sortOrder} " +
+            "when '${DELETED}' then ${DELETED.sortOrder} " +
+            "else 0 " +
+            "end)"
+    }
+
     String toString() { return name() }
-
-
 
 }

@@ -83,9 +83,9 @@ class Wizard extends Component {
 
     return (
       <div className="content-wrap">
+        <WizardTitle title={title} additionalTitle={additionalTitle} values={values} />
         <WizardSteps steps={stepList} currentStep={currentPage} />
         <div className="panel panel-primary">
-          <WizardTitle title={title} additionalTitle={additionalTitle} />
           <WizardPage
             pageList={pageList}
             currentPage={currentPage}
@@ -116,7 +116,7 @@ Wizard.propTypes = {
   initialValues: PropTypes.shape({
     shipmentStatus: PropTypes.string,
   }),
-  title: PropTypes.string.isRequired,
+  title: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   additionalTitle: PropTypes.oneOf([PropTypes.string, PropTypes.func]),
   currentPage: PropTypes.number.isRequired,
   prevPage: PropTypes.number.isRequired,

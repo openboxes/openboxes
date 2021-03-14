@@ -203,4 +203,11 @@ class ApitableroController {
         NumberData numberData = numberDataService.getOpenStockRequests(location)
         render (numberData as JSON)
     }
+
+    @Cacheable("dashboardCache")
+    def getInventoryValue = {
+        Location location = Location.get(params.locationId)
+        NumberData numberData = numberDataService.getInventoryValue(location)
+        render (numberData as JSON)
+    }
 }
