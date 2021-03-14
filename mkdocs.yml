@@ -1,9 +1,17 @@
 site_name: OpenBoxes
-site_description:
+site_description: OpenBoxes documentation
 site_author: Justin Miranda
+site_url: https://docs.openboxes.com/en/
 repo_url: https://github.com/openboxes/openboxes
 theme:
   name: material
+  logo: img/logo.svg
+  palette:
+    primary: white
+    accent: blue
+  features:
+    - navigation.tabs
+    - toc.integration
 use_directory_urls: true
 copyright: Copyright &copy; 2010-2021, OpenBoxes
 google_analytics: ['UA-37396941-2', 'openboxes.com']
@@ -16,15 +24,11 @@ markdown_extensions:
       emoji_index: !!python/name:materialx.emoji.twemoji
       emoji_generator: !!python/name:materialx.emoji.to_svg
 nav:
-  - Home: index.md
-  - General:
+  - About:
+    - Introduction: index.md
     - Architecture: about/architecture.md
     - Benefits: about/benefits.md
     - Considerations: about/considerations.md
-    - Features: https://openboxes.com/features/
-    - Pricing: https://openboxes.com/pricing/
-    - Road Map: https://openboxes.com/roadmap/
-    - Releases: https://github.com/openboxes/openboxes/releases
     - Release Notes: about/release-notes.md
   - Installation Guide:
     - Getting Started: installation/index.md

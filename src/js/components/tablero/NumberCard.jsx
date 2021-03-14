@@ -49,6 +49,8 @@ const options = {
   },
 };
 
+const ZERO = 0;
+
 const NumberSparklineCard = ({
   cardTitle, cardInfo, color, value, goalDifference, sparklineData, translate,
 }) => (
@@ -104,6 +106,7 @@ const NumberCard = SortableElement(({
       isSparkline = true;
     }
   }
+  const cardNumberLocale = cardNumber ? cardNumber.toLocaleString() : ZERO.toLocaleString();
   const card = !isSparkline ? (
     <Tooltip
       html={<p style={{ whiteSpace: 'pre' }}> {cardDataTooltip} </p>}
@@ -118,7 +121,7 @@ const NumberCard = SortableElement(({
               translate(cardTitle.code, cardTitle.message)
              : cardTitle}
           </span>
-          <span className="result-card"> {cardNumberType === 'number' ? cardNumber.toLocaleString() : `${cardNumber.toLocaleString()} ${currencyCode}`} </span>
+          <span className="result-card"> {cardNumberType === 'number' ? cardNumberLocale : `${cardNumberLocale} ${currencyCode}`} </span>
           <span className="subtitle-card">
             {cardSubtitle.code ?
           _.truncate(translate(cardSubtitle.code, cardSubtitle.message), { length: 22 })

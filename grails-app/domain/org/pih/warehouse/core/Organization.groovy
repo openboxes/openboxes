@@ -59,7 +59,17 @@ class Organization extends Party {
             eq("orderTypeCode", OrderTypeCode.PURCHASE_ORDER)
             eq("destinationParty", this)
         }
+    }
 
+
+    String maxPurchaseOrderNumber() {
+        return Order.createCriteria().get {
+            projections {
+                max("orderNumber")
+            }
+            eq("orderTypeCode", OrderTypeCode.PURCHASE_ORDER)
+            eq("destinationParty", this)
+        }
     }
 
     Boolean hasRoleType(RoleType roleType) {
