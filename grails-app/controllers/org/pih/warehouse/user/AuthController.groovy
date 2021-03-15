@@ -191,8 +191,7 @@ class AuthController {
                 // Attempt to add default roles to user instance
                 userService.assignDefaultRoles(userInstance)
 
-                redirect(action: "chooseLogin")
-                return
+                flash.message = "Your account was successfully created"
 
             } else {
                 // Reset the password to what the user entered and redirect to signup
