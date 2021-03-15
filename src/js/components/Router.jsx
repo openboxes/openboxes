@@ -59,6 +59,12 @@ const AsyncTablero = Loadable({
   loading: Loading,
 });
 
+// TODO add megamenu and menu config
+const AsyncInvoice = Loadable({
+  loader: () => import('./invoice/InvoiceWizard'),
+  loading: Loading,
+});
+
 const Router = props => (
   <div>
     <BrowserRouter>
@@ -72,6 +78,7 @@ const Router = props => (
         <MainLayoutRoute path="/**/stockMovement/create/:stockMovementId?" component={AsyncStockMovement} />
         <MainLayoutRoute path="/**/partialReceiving/create/:shipmentId" component={AsyncReceivingPage} />
         <MainLayoutRoute path="/**/stocklistManagement/index/:productId?" component={AsyncManagement} />
+        <MainLayoutRoute path="/**/invoice/create/:invoiceId?" component={AsyncInvoice} />
         <MainLayoutRoute path="/**/" component={AsyncTablero} />
       </Switch>
     </BrowserRouter>

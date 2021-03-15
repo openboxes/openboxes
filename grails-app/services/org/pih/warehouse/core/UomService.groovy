@@ -24,4 +24,12 @@ class UomService {
             isNull("productSupplier")
         }
     }
+
+    def getCurrencies() {
+        return UnitOfMeasure.createCriteria().list {
+            uomClass {
+                eq("type", UnitOfMeasureType.CURRENCY)
+            }
+        }
+    }
 }

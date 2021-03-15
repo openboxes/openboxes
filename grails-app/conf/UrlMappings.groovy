@@ -250,6 +250,11 @@ class UrlMappings {
             action = [GET:"exportTemplate"]
         }
 
+        "/api/unitOfMeasure/currencies"(parseRequest: true) {
+            controller = "unitOfMeasureApi"
+            action = [GET:"currencies"]
+        }
+
         // Standard REST APIs
 
         "/api/${resource}s"(parseRequest: true) {
