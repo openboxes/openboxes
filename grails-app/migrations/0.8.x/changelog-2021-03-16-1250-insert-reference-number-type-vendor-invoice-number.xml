@@ -6,7 +6,7 @@
     <changeSet author="dhatala" id="1536634735965-2">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
-                <![CDATA[SELECT count(*) FROM reference_number_type WHERE name="Vendor Invoice Number"]]>
+                <![CDATA[SELECT count(*) FROM reference_number_type WHERE id="VENDOR_INVOICE_NUMBER"]]>
             </sqlCheck>
         </preConditions>
         <insert tableName="reference_number_type">
