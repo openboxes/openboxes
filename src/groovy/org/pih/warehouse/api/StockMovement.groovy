@@ -54,6 +54,7 @@ class StockMovement {
 
     Date dateRequested
     Date dateShipped
+    Date expectedDeliveryDate
     Date dateCreated
     Date lastUpdated
 
@@ -103,6 +104,7 @@ class StockMovement {
         stockMovementStatusCode(nullable: true)
         receiptStatusCode(nullable: true)
         dateShipped(nullable: true)
+        expectedDeliveryDate(nullable: true)
         shipmentType(nullable: true)
         trackingNumber(nullable: true)
         driverName(nullable: true)
@@ -122,40 +124,41 @@ class StockMovement {
 
     Map toJson() {
         return [
-                id                : id,
-                name              : name,
-                description       : description,
-                statusCode        : statusCode,
-                identifier        : identifier,
-                origin            : origin,
-                destination       : destination,
-                hasManageInventory: origin?.supports(ActivityCode.MANAGE_INVENTORY),
-                stocklist     : [id: stocklist?.id, name: stocklist?.name],
-                dateRequested : dateRequested?.format("MM/dd/yyyy"),
-                dateShipped   : dateShipped?.format("MM/dd/yyyy HH:mm XXX"),
-                shipmentType  : shipmentType,
-                shipmentStatus: currentStatus,
-                trackingNumber: trackingNumber,
-                driverName    : driverName,
-                comments      : comments,
-                requestedBy   : requestedBy,
-                lineItems     : lineItems,
-                lineItemCount : lineItemCount,
-                associations  : [
-                        requisition: [id: requisition?.id, requestNumber: requisition?.requestNumber, status: requisition?.status?.name()],
-                        shipment   : [id: shipment?.id, shipmentNumber: shipment?.shipmentNumber, status: shipment?.currentStatus?.name()],
-                        shipments  : requisition?.shipments?.collect {
-                            [id: it?.id, shipmentNumber: it?.shipmentNumber, status: it?.currentStatus?.name()]
-                        },
-                        documents  : documents
-                ],
-                isFromOrder   : isFromOrder,
-                isShipped     : isShipped,
-                isReceived    : isReceived,
-                shipped       : isShipped,
-                received      : isReceived,
-                requestType   : requestType,
-                sourceType    : sourceType?.name,
+            id                  : id,
+            name                : name,
+            description         : description,
+            statusCode          : statusCode,
+            identifier          : identifier,
+            origin              : origin,
+            destination         : destination,
+            hasManageInventory  : origin?.supports(ActivityCode.MANAGE_INVENTORY),
+            stocklist           : [id: stocklist?.id, name: stocklist?.name],
+            dateRequested       : dateRequested?.format("MM/dd/yyyy"),
+            dateShipped         : dateShipped?.format("MM/dd/yyyy HH:mm XXX"),
+            expectedDeliveryDate: expectedDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),
+            shipmentType        : shipmentType,
+            shipmentStatus      : currentStatus,
+            trackingNumber      : trackingNumber,
+            driverName          : driverName,
+            comments            : comments,
+            requestedBy         : requestedBy,
+            lineItems           : lineItems,
+            lineItemCount       : lineItemCount,
+            associations        : [
+                requisition: [id: requisition?.id, requestNumber: requisition?.requestNumber, status: requisition?.status?.name()],
+                shipment   : [id: shipment?.id, shipmentNumber: shipment?.shipmentNumber, status: shipment?.currentStatus?.name()],
+                shipments  : requisition?.shipments?.collect {
+                    [id: it?.id, shipmentNumber: it?.shipmentNumber, status: it?.currentStatus?.name()]
+                },
+                documents  : documents
+            ],
+            isFromOrder         : isFromOrder,
+            isShipped           : isShipped,
+            isReceived          : isReceived,
+            shipped             : isShipped,
+            received            : isReceived,
+            requestType         : requestType,
+            sourceType          : sourceType?.name,
         ]
     }
 
@@ -237,6 +240,7 @@ class StockMovement {
                 shipmentType: shipment.shipmentType,
                 statusCode: statusCode,
                 dateShipped: shipment?.expectedShippingDate,
+                expectedDeliveryDate: shipment?.expectedDeliveryDate,
                 identifier: shipment.shipmentNumber,
                 origin: shipment.origin,
                 destination: shipment.destination,
@@ -280,33 +284,34 @@ class StockMovement {
         }
 
         StockMovement stockMovement = new StockMovement(
-                id: requisition.id,
-                name: requisition.name,
-                identifier: requisition.requestNumber,
-                description: requisition.description,
-                statusCode: RequisitionStatus.toStockMovementStatus(requisition.status)?.name(),
-                origin: requisition.origin,
-                destination: requisition.destination,
-                dateRequested: requisition.dateRequested,
-                dateCreated: requisition.dateCreated,
-                lastUpdated: requisition.lastUpdated,
-                requestedBy: requisition.requestedBy,
-                createdBy: requisition.createdBy,
-                updatedBy: requisition.updatedBy,
-                requisition: requisition,
-                shipment: shipment,
-                comments: shipment?.additionalInformation,
-                shipmentType: shipment?.shipmentType,
-                dateShipped: shipment?.expectedShippingDate,
-                driverName: shipment?.driverName,
-                trackingNumber: trackingNumber?.identifier,
-                currentStatus: shipment?.currentStatus,
-                stocklist: requisition?.requisitionTemplate,
-                isFromOrder: Boolean.FALSE,
-                isShipped: shipment?.status?.code >= ShipmentStatusCode.SHIPPED,
-                isReceived: shipment?.status?.code >= ShipmentStatusCode.RECEIVED,
-                requestType: requisition?.type,
-                lineItemCount: requisition.requisitionItemCount
+            id: requisition.id,
+            name: requisition.name,
+            identifier: requisition.requestNumber,
+            description: requisition.description,
+            statusCode: RequisitionStatus.toStockMovementStatus(requisition.status)?.name(),
+            origin: requisition.origin,
+            destination: requisition.destination,
+            dateRequested: requisition.dateRequested,
+            dateCreated: requisition.dateCreated,
+            lastUpdated: requisition.lastUpdated,
+            requestedBy: requisition.requestedBy,
+            createdBy: requisition.createdBy,
+            updatedBy: requisition.updatedBy,
+            requisition: requisition,
+            shipment: shipment,
+            comments: shipment?.additionalInformation,
+            shipmentType: shipment?.shipmentType,
+            dateShipped: shipment?.expectedShippingDate,
+            expectedDeliveryDate: shipment?.expectedDeliveryDate,
+            driverName: shipment?.driverName,
+            trackingNumber: trackingNumber?.identifier,
+            currentStatus: shipment?.currentStatus,
+            stocklist: requisition?.requisitionTemplate,
+            isFromOrder: Boolean.FALSE,
+            isShipped: shipment?.status?.code >= ShipmentStatusCode.SHIPPED,
+            isReceived: shipment?.status?.code >= ShipmentStatusCode.RECEIVED,
+            requestType: requisition?.type,
+            lineItemCount: requisition.requisitionItemCount
         )
 
         // Include all requisition items except those that are substitutions or modifications because the
