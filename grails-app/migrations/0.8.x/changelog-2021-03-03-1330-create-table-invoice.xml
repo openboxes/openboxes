@@ -119,4 +119,28 @@
       <column name="reference_numbers_idx" type="INT"/>
     </createTable>
   </changeSet>
+
+  <changeSet author="awalkowiak" id="0303202113300-8">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_invoice_reference_number_invoice_id"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="invoice_reference_numbers_id"
+                             baseTableName="invoice_reference_number"
+                             constraintName="fk_invoice_reference_number_invoice_id" deferrable="false"
+                             initiallyDeferred="false" referencedColumnNames="id" referencedTableName="invoice"/>
+  </changeSet>
+
+  <changeSet author="awalkowiak" id="0303202113300-9">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_invoice_reference_number_reference_number_id"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="reference_number_id"
+                             baseTableName="invoice_reference_number"
+                             constraintName="fk_invoice_reference_number_reference_number_id" deferrable="false"
+                             initiallyDeferred="false" referencedColumnNames="id" referencedTableName="reference_number"/>
+  </changeSet>
 </databaseChangeLog>

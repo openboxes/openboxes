@@ -90,8 +90,8 @@ class Invoice implements Serializable {
         createdBy(nullable: true)
     }
 
-    ReferenceNumber getReferenceNumber(String typeName) {
-        def referenceNumberType = ReferenceNumberType.findByName(typeName)
+    ReferenceNumber getReferenceNumber(String id) {
+        def referenceNumberType = ReferenceNumberType.findById(id)
         if (referenceNumberType) {
             for (referenceNumber in referenceNumbers) {
                 if (referenceNumber.referenceNumberType == referenceNumberType) {
@@ -103,7 +103,7 @@ class Invoice implements Serializable {
     }
 
     ReferenceNumber getVendorInvoiceNumber() {
-        return getReferenceNumber("Vendor Invoice Number")
+        return getReferenceNumber(Constants.VENDOR_INVOICE_NUMBER_TYPE_ID)
     }
 
     Map toJson() {

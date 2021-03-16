@@ -191,7 +191,7 @@
         </a>
     </g:if>
 
-    <g:if test="${megamenuConfig.invocing.enabled}">
+    <g:if test="${megamenuConfig.invoicing.enabled}">
         <li class="mm-item">
             <a href="javascript:void(0)" class="mm-item-link">
                 <warehouse:message code="react.invoicing.label" />

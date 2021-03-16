@@ -120,7 +120,7 @@ class Constants {
     static final String DEFAULT_INVOICE_NUMBER_FORMAT = "NNNLLL"
 
     static final String TRACKING_NUMBER_TYPE_ID = "10"
-    static final String VENDOR_INVOICE_NUMBER_TYPE_ID = "11"
+    static final String VENDOR_INVOICE_NUMBER_TYPE_ID = "VENDOR_INVOICE_NUMBER"
 
     static final String DEFAULT_RECEIVING_LOCATION_PREFIX = "R"
 
