@@ -718,6 +718,14 @@ breadcrumbsConfig {
             actionUrl = "/${appName}/stockMovement/createCombinedShipments/"
             listUrl   = "/${appName}/stockMovement/list?direction=INBOUND"
         }
+        invoice {
+            actionLabel = "react.invoice.create.label"
+            defaultActionLabel = "Create"
+            listLabel = "react.invoice.label"
+            defaultListLabel = "Invoice"
+            actionUrl = "/${appName}/invoice/create/"
+            listUrl   = "/${appName}/invoice/list/"
+        }
 }
 
 // OpenBoxes identifier config
@@ -734,6 +742,7 @@ openboxes.identifier.receipt.format = Constants.DEFAULT_RECEIPT_NUMBER_FORMAT
 openboxes.identifier.requisition.format = Constants.DEFAULT_REQUISITION_NUMBER_FORMAT
 openboxes.identifier.shipment.format = Constants.DEFAULT_SHIPMENT_NUMBER_FORMAT
 openboxes.identifier.sequenceNumber.format = Constants.DEFAULT_SEQUENCE_NUMBER_FORMAT
+openboxes.identifier.invoice.format = Constants.DEFAULT_INVOICE_NUMBER_FORMAT
 
 openboxes.identifier.organization.format = Constants.DEFAULT_ORGANIZATION_NUMBER_FORMAT
 openboxes.identifier.organization.minSize = 2
@@ -1065,6 +1074,21 @@ openboxes {
                             [label: "order.createPurchase.label", defaultLabel: "Create Purchase Order", href: "/${appName}/purchaseOrder/index"],
                             [label: "order.listPurchase.label", defaultLabel: "List Purchase Orders", href: "/${appName}/order/list?orderTypeCode=PURCHASE_ORDER"],
                             [label: "shipment.shipfromPO.label", defaultLabel: "Ship from Purchase Order", href: "/${appName}/stockMovement/createCombinedShipments?direction=INBOUND"]
+                    ]
+                ]
+            ]
+        }
+        invoicing {
+            enabled = true
+            label = "react.invoicing.label"
+            defaultLabel = "Invoicing"
+            subsections = [
+                [
+                    label: "react.invoicing.label",
+                    defaultLabel: "Invoicing",
+                    menuItems: [
+                            [label: "react.invoice.createInvoice.label", defaultLabel: "Create Invoice", href: "/${appName}/invoice/create"],
+                            [label: "react.invoice.list.label", defaultLabel: "List Invoices", href: "/${appName}/invoice/list"],
                     ]
                 ]
             ]

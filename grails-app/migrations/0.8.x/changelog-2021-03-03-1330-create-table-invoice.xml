@@ -13,12 +13,12 @@
       <column name="id" type="CHAR(38)">
         <constraints nullable="false" primaryKey="true"/>
       </column>
-      <column name="invoiceNumber" type="VARCHAR(255)">
+      <column name="invoice_number" type="VARCHAR(255)">
         <constraints nullable="false"/>
       </column>
       <column name="name" type="VARCHAR(255)"/>
       <column name="description" type="VARCHAR(255)"/>
-      
+
       <column name="invoice_type_id" type="CHAR(38)"/>
 
       <column name="party_from_id" type="CHAR(38)"/>
@@ -114,8 +114,9 @@
       </not>
     </preConditions>
     <createTable tableName="invoice_reference_number">
-      <column name="invoice_id" type="CHAR(38)"/>
+      <column name="invoice_reference_numbers_id" type="CHAR(38)"/>
       <column name="reference_number_id" type="CHAR(38)"/>
+      <column name="reference_numbers_idx" type="INT"/>
     </createTable>
   </changeSet>
 
@@ -125,10 +126,10 @@
         <foreignKeyConstraintExists foreignKeyName="fk_invoice_reference_number_invoice_id"/>
       </not>
     </preConditions>
-    <addForeignKeyConstraint baseColumnNames="invoice_id"
-      baseTableName="invoice_reference_number"
-      constraintName="fk_invoice_reference_number_invoice_id" deferrable="false"
-      initiallyDeferred="false" referencedColumnNames="id" referencedTableName="invoice"/>
+    <addForeignKeyConstraint baseColumnNames="invoice_reference_numbers_id"
+                             baseTableName="invoice_reference_number"
+                             constraintName="fk_invoice_reference_number_invoice_id" deferrable="false"
+                             initiallyDeferred="false" referencedColumnNames="id" referencedTableName="invoice"/>
   </changeSet>
 
   <changeSet author="awalkowiak" id="0303202113300-9">
@@ -138,8 +139,8 @@
       </not>
     </preConditions>
     <addForeignKeyConstraint baseColumnNames="reference_number_id"
-      baseTableName="invoice_reference_number"
-      constraintName="fk_invoice_reference_number_reference_number_id" deferrable="false"
-      initiallyDeferred="false" referencedColumnNames="id" referencedTableName="reference_number"/>
+                             baseTableName="invoice_reference_number"
+                             constraintName="fk_invoice_reference_number_reference_number_id" deferrable="false"
+                             initiallyDeferred="false" referencedColumnNames="id" referencedTableName="reference_number"/>
   </changeSet>
 </databaseChangeLog>

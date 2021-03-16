@@ -22,6 +22,8 @@ import {
   SET_ACTIVE_CONFIG,
   UPDATE_BREADCRUMBS_PARAMS,
   FETCH_BREADCRUMBS_CONFIG,
+  FETCH_CURRENCIES,
+  FETCH_ORGANIZATIONS,
 } from './types';
 import apiClient, { parseResponse } from '../utils/apiClient';
 
@@ -73,6 +75,26 @@ export function fetchReasonCodes() {
 
   return {
     type: FETCH_REASONCODES,
+    payload: request,
+  };
+}
+
+export function fetchCurrencies() {
+  const url = '/openboxes/api/unitOfMeasure/currencies';
+  const request = apiClient.get(url);
+
+  return {
+    type: FETCH_CURRENCIES,
+    payload: request,
+  };
+}
+
+export function fetchOrganizations() {
+  const url = '/openboxes/api/organizations';
+  const request = apiClient.get(url);
+
+  return {
+    type: FETCH_ORGANIZATIONS,
     payload: request,
   };
 }

@@ -28,6 +28,7 @@ const initialState = {
   activeLanguage: '',
   fetchedTranslations: {
     default: false,
+    invoice: false,
     stockMovement: false,
     partialReceiving: false,
     putAway: false,

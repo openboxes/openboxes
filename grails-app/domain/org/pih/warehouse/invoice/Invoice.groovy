@@ -10,10 +10,13 @@
 package org.pih.warehouse.invoice
 
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.Party
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.User
 import org.pih.warehouse.shipping.ReferenceNumber
+import org.pih.warehouse.shipping.ReferenceNumberType
 
 class Invoice implements Serializable {
 
@@ -64,6 +67,8 @@ class Invoice implements Serializable {
         referenceNumbers cascade: "all-delete-orphan"
     }
 
+    static transients = ['vendorInvoiceNumber']
+
     static constraints = {
         invoiceNumber(nullable: false, blank: false, unique: true, maxSize: 255)
         name(nullable: true, maxSize: 255)
@@ -83,5 +88,38 @@ class Invoice implements Serializable {
 
         updatedBy(nullable: true)
         createdBy(nullable: true)
+    }
+
+    ReferenceNumber getReferenceNumber(String id) {
+        def referenceNumberType = ReferenceNumberType.findById(id)
+        if (referenceNumberType) {
+            for (referenceNumber in referenceNumbers) {
+                if (referenceNumber.referenceNumberType == referenceNumberType) {
+                    return referenceNumber
+                }
+            }
+        }
+        return null
+    }
+
+    ReferenceNumber getVendorInvoiceNumber() {
+        return getReferenceNumber(Constants.VENDOR_INVOICE_NUMBER_TYPE_ID)
+    }
+
+    Map toJson() {
+        return [
+            id: id,
+            invoiceNumber: invoiceNumber,
+            vendorInvoiceNumber: vendorInvoiceNumber?.identifier,
+            name: name,
+            description: description,
+            partyFrom: Organization.get(partyFrom?.id),
+            dateInvoiced: dateInvoiced.format("MM/dd/yyyy"),
+            dateSubmitted: dateSubmitted,
+            dateDue: dateDue,
+            datePaid: datePaid,
+            currencyUom: currencyUom?.id,
+            vendor: party?.id
+        ]
     }
 }
