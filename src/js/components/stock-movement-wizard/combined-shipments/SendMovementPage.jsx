@@ -127,7 +127,7 @@ const SHIPMENT_FIELDS = {
   },
   expectedDeliveryDate: {
     type: DateField,
-    label: 'react.stockMovement.expectedReceiptDate.label',
+    label: 'react.stockMovement.expectedDeliveryDate.label',
     defaultMessage: 'Expected receipt date',
     attributes: {
       dateFormat: 'MM/DD/YYYY',
