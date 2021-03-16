@@ -580,7 +580,8 @@ class SelectTagLib {
             attrs["class"] = "chzn-select-deselect"
             out << g.select(attrs)
         } else {
-            attrs["class"] = "text large"
+            attrs["class"] = "text large readonly"
+            attrs["disabled"] = "disabled"
             out << g.textField(attrs)
         }
     }
@@ -596,7 +597,7 @@ class SelectTagLib {
     }
 
     def selectLocale = { attrs, body ->
-        attrs.from = grailsApplication.config.openboxes.locale.supportedLocales
+        attrs.from = grailsApplication.config.openboxes.locale.supportedLocales?.sort()
         attrs.optionValue = { new Locale(it).displayName }
         out << g.select(attrs)
     }

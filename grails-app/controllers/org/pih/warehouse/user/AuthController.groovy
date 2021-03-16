@@ -9,11 +9,9 @@
  **/
 package org.pih.warehouse.user
 
-
-import org.apache.commons.mail.EmailException
+import grails.validation.ValidationException
+import org.pih.warehouse.auth.UserSignupEvent
 import org.pih.warehouse.core.MailService
-import org.pih.warehouse.core.Role
-import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 
 class AuthController {
@@ -22,6 +20,8 @@ class AuthController {
     def userService
     def authService
     def grailsApplication
+    def recaptchaService
+    def ravenClient
 
     static allowedMethods = [login: "GET", doLogin: "POST", logout: "GET"]
 
@@ -144,7 +144,6 @@ class AuthController {
      * Allow user to register a new account
      */
     def signup = {
-
         Boolean enabled = grailsApplication.config.openboxes.signup.enabled
         if (!enabled) {
             flash.message = "Apologies, but the signup feature is disabled on your system. "  +
@@ -158,7 +157,6 @@ class AuthController {
      * Handle account registration.
      */
     def handleSignup = {
-
         def userInstance = new User()
         if ("POST".equalsIgnoreCase(request.getMethod())) {
             userInstance.properties = params
@@ -172,56 +170,28 @@ class AuthController {
             // Set the email as username for backwards compatibility since we're no longer including username on signup
             userInstance.username = params.email
 
+            // Verify recaptcha challenge response if recaptcha is enabled
+            Boolean recaptchaEnabled = grailsApplication.config.openboxes.signup.enabled?:false
+            if (recaptchaEnabled && !recaptchaService.validate(params["g-recaptcha-response"])) {
+                userInstance.errors.reject("signup.recaptcha.fail.message",
+                        "Nice try, robot. But your feeble attempt has failed. If you're not a robot we apologize. Please try again.")
+
+                // Send failures to Sentry for auditing purposes
+                def exception = new ValidationException("reCAPTCHA challenge failed", userInstance.errors)
+                ravenClient.captureException(exception, 'root', 'error', request)
+            }
+
             // Create account
             if (!userInstance.hasErrors() && userInstance.save(flush: true)) {
-                session.user = userInstance
-
 
                 // Attempt to add default roles to user instance
-                try {
-                    def defaultRoles = grailsApplication.config.openboxes.signup.defaultRoles
-                    if (!defaultRoles.isEmpty()) {
-                        println "Default roles: " + defaultRoles
-                        def roleTypes = defaultRoles.split(",")
-                        roleTypes.each { roleType ->
-                            def role = Role.findByRoleType(roleType)
-                            userInstance.addToRoles(role)
-                        }
+                userService.assignDefaultRoles(userInstance)
 
-                        if (userInstance.roles) {
-                            userInstance.active = Boolean.TRUE
-                        }
-                        userInstance.save()
-                    }
-                } catch (Exception e) {
-                    log.error("Unable to assign default roles: " + e.message, e)
-                }
-
-                // Send email to administrators
-                try {
-                    def recipients = userService.findUsersByRoleType(RoleType.ROLE_USER_NOTIFICATION)
-
-                    // Send email to user notification recipients
-                    if (recipients) {
-                        def to = recipients?.collect { it.email }?.unique()
-                        def subject = "${warehouse.message(code: 'email.userAccountCreated.message', args: [userInstance.username])}"
-                        def body = g.render(template: "/email/userAccountCreated", model: [userInstance: userInstance])
-                        mailService.sendHtmlMail(subject, body.toString(), to)
-                    }
-
-                    // Send confirmation email to user
-                    if (userInstance.email) {
-                        def subject = "${warehouse.message(code: 'email.userAccountConfirmed.message', args: [userInstance.email])}"
-                        def body = g.render(template: "/email/userAccountConfirmed", model: [userInstance: userInstance])
-                        mailService.sendHtmlMail(subject, body.toString(), userInstance.email)
-                    }
-                } catch (EmailException e) {
-                    log.error("Unable to send emails: " + e.message, e)
-                }
+                // Publish event to trigger email notifications
+                publishEvent(new UserSignupEvent(userInstance, params.additionalQuestions))
 
             } else {
-                log.info("There will be errors: " + userInstance.errors)
-                // Reset the password to what the user entered
+                // If there's an error, reset the password to what the user entered and redirect to signup
                 userInstance.password = params.password
                 userInstance.passwordConfirm = params.passwordConfirm
                 render(view: "signup", model: [userInstance: userInstance])
@@ -229,8 +199,7 @@ class AuthController {
             }
         }
 
-        // FIXME For some reason, flash.message does not get displayed on redirect
-        //flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'user.label'), userInstance.email])}"
+        flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'user.label'), userInstance.email])}"
         redirect(action: "login")
     }
 
