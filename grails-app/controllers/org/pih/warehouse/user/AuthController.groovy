@@ -158,7 +158,6 @@ class AuthController {
      */
     def handleSignup = {
         def userInstance = new User()
-
         if ("POST".equalsIgnoreCase(request.getMethod())) {
             userInstance.properties = params
 
@@ -174,7 +173,10 @@ class AuthController {
             // Verify recaptcha challenge response if recaptcha is enabled
             Boolean recaptchaEnabled = grailsApplication.config.openboxes.signup.enabled?:false
             if (recaptchaEnabled && !recaptchaService.validate(params["g-recaptcha-response"])) {
-                userInstance.errors.reject("signup.recaptcha.fail.message", "Nice try, robot. But your feeble attempt has failed. If you're not a robot we apologize. Please try again.")
+                userInstance.errors.reject("signup.recaptcha.fail.message",
+                        "Nice try, robot. But your feeble attempt has failed. If you're not a robot we apologize. Please try again.")
+
+                // Send failures to Sentry for auditing purposes
                 def exception = new ValidationException("reCAPTCHA challenge failed", userInstance.errors)
                 ravenClient.captureException(exception, 'root', 'error', request)
             }
@@ -185,11 +187,11 @@ class AuthController {
                 // Attempt to add default roles to user instance
                 userService.assignDefaultRoles(userInstance)
 
-                // Send email notifications
+                // Publish event to trigger email notifications
                 publishEvent(new UserSignupEvent(userInstance, params.additionalQuestions))
 
             } else {
-                // Reset the password to what the user entered and redirect to signup
+                // If there's an error, reset the password to what the user entered and redirect to signup
                 userInstance.password = params.password
                 userInstance.passwordConfirm = params.passwordConfirm
                 render(view: "signup", model: [userInstance: userInstance])
@@ -197,7 +199,6 @@ class AuthController {
             }
         }
 
-        // FIXME For some reason, flash.message does not get displayed on redirect
         flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'user.label'), userInstance.email])}"
         redirect(action: "login")
     }

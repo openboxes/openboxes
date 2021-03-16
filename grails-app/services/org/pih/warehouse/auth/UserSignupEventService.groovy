@@ -18,7 +18,6 @@ class UserSignupEventService implements ApplicationListener<UserSignupEvent> {
 
     @Override
     void onApplicationEvent(UserSignupEvent authEvent) {
-        log.info "onApplicationEvent: " + authEvent.additionalQuestions
         notificationService.sendUserAccountCreation(authEvent.source, authEvent.additionalQuestions)
         notificationService.sendUserAccountConfirmation(authEvent.source, authEvent.additionalQuestions)
     }

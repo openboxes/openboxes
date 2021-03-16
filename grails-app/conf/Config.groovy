@@ -833,7 +833,6 @@ openboxes.bom.enabled = false
 
 // User Signup
 openboxes.signup.enabled = true
-//openboxes.signup.additionalQuestions.enabled = false
 openboxes.signup.recaptcha.enabled = false
 openboxes.signup.recaptcha.v2.siteKey = ""
 openboxes.signup.recaptcha.v2.secretKey = ""
@@ -842,7 +841,18 @@ openboxes {
     signup {
         additionalQuestions {
             enabled = false
-            //content = []
+//            content = [
+//                id: "human",
+//                label: "Are you human?",
+//                options:
+//                [
+//                        [key:"", value: ""],
+//                        [key:"yes", value: "Yes"],
+//                        [key:"no", value: "No"]
+//                        [key:"sorta", value: "Sorta"],
+//                ]
+//
+//            ]
         }
     }
 }
