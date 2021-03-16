@@ -93,7 +93,6 @@ class UserService {
         try {
             def defaultRoles = grailsApplication.config.openboxes.signup.defaultRoles
             if (!defaultRoles.isEmpty()) {
-                println "Default roles: " + defaultRoles
                 def roleTypes = defaultRoles.split(",")
                 roleTypes.each { roleType ->
                     def role = Role.findByRoleType(roleType)

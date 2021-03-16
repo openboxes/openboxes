@@ -204,7 +204,6 @@ class NotificationService {
                 def to = recipients?.collect { it.email }?.unique()
                 def subject = messageSource.getMessage('email.userAccountCreated.message', [userInstance.username].toArray(), locale)
                 def body = renderTemplate("/email/userAccountCreated", [userInstance: userInstance, additionalQuestions: additionalQuestions])
-                log.info "Body: ${body}"
                 mailService.sendHtmlMail(subject, body.toString(), to)
             }
 
@@ -220,7 +219,6 @@ class NotificationService {
                 def locale = userInstance?.locale ?: new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
                 def subject = messageSource.getMessage('email.userAccountConfirmed.message', [userInstance?.email].toArray(), locale)
                 def body = renderTemplate("/email/userAccountConfirmed", [userInstance: userInstance, additionalQuestions: additionalQuestions])
-                log.info "Body: ${body}"
                 mailService.sendHtmlMail(subject, body.toString(), userInstance?.email)
             }
         } catch (EmailException e) {

@@ -9,13 +9,9 @@
  **/
 package org.pih.warehouse.user
 
-
-import org.apache.commons.mail.EmailException
+import grails.validation.ValidationException
 import org.pih.warehouse.auth.UserSignupEvent
-import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.MailService
-import org.pih.warehouse.core.Role
-import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 
 class AuthController {
@@ -25,6 +21,7 @@ class AuthController {
     def authService
     def grailsApplication
     def recaptchaService
+    def ravenClient
 
     static allowedMethods = [login: "GET", doLogin: "POST", logout: "GET"]
 
@@ -160,8 +157,6 @@ class AuthController {
      * Handle account registration.
      */
     def handleSignup = {
-        log.info "params " + params
-
         def userInstance = new User()
 
         if ("POST".equalsIgnoreCase(request.getMethod())) {
@@ -179,19 +174,19 @@ class AuthController {
             // Verify recaptcha challenge response if recaptcha is enabled
             Boolean recaptchaEnabled = grailsApplication.config.openboxes.signup.enabled?:false
             if (recaptchaEnabled && !recaptchaService.validate(params["g-recaptcha-response"])) {
-                userInstance.errors.reject("signup.recaptcha.fail.message", "Your reCAPTCHA challenge has failed, bot.")
+                userInstance.errors.reject("signup.recaptcha.fail.message", "Nice try, robot. But your feeble attempt has failed. If you're not a robot we apologize. Please try again.")
+                def exception = new ValidationException("reCAPTCHA challenge failed", userInstance.errors)
+                ravenClient.captureException(exception, 'root', 'error', request)
             }
-
-            publishEvent(new UserSignupEvent(userInstance, params.additionalQuestions))
 
             // Create account
             if (!userInstance.hasErrors() && userInstance.save(flush: true)) {
-                session.user = userInstance
 
                 // Attempt to add default roles to user instance
                 userService.assignDefaultRoles(userInstance)
 
-                flash.message = "Your account was successfully created"
+                // Send email notifications
+                publishEvent(new UserSignupEvent(userInstance, params.additionalQuestions))
 
             } else {
                 // Reset the password to what the user entered and redirect to signup
@@ -203,7 +198,7 @@ class AuthController {
         }
 
         // FIXME For some reason, flash.message does not get displayed on redirect
-        //flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'user.label'), userInstance.email])}"
+        flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'user.label'), userInstance.email])}"
         redirect(action: "login")
     }
 
