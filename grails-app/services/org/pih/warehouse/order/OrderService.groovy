@@ -77,6 +77,11 @@ class OrderService {
                 if (orderTemplate.createdBy) {
                     eq("createdBy", orderTemplate.createdBy)
                 }
+                if (orderTemplate.destinationParty) {
+                    destinationParty {
+                        eq("id", params.destinationParty)
+                    }
+                }
             }
             order("dateOrdered", "desc")
         }
