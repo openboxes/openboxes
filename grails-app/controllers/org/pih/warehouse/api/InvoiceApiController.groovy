@@ -13,6 +13,7 @@ import grails.converters.JSON
 import grails.validation.ValidationException
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Organization
 import org.pih.warehouse.invoice.Invoice
 
 class InvoiceApiController {
@@ -84,9 +85,10 @@ class InvoiceApiController {
             invoice.invoiceNumber = identifierService.generateInvoiceIdentifier()
         }
 
-        invoice.party = Location.get(jsonObject?.vendor?.id)?.organization
+        invoice.party = Organization.get(jsonObject?.vendor)
 
         // TODO: find or create vendor invoice number in reference numbers
+        invoiceService.createOrUpdateVendorInvoiceNumber(invoice, jsonObject?.vendorInvoiceNumber)
 
         return invoice
     }

@@ -113,7 +113,7 @@ class InvoiceWizard extends Component {
   fetchInitialValues() {
     if (this.props.match.params.invoiceId) {
       this.props.showSpinner();
-      const url = `/openboxes/api/invoice/${this.props.match.params.invoiceId}`;
+      const url = `/openboxes/api/invoices/${this.props.match.params.invoiceId}`;
       apiClient.get(url)
         .then((response) => {
           const values = { ...response.data.data };
@@ -123,7 +123,7 @@ class InvoiceWizard extends Component {
             currentPage = 3;
           }
 
-          this.setState({ values, currentPage });
+          this.setState({ values, currentPage }, () => this.props.hideSpinner());
         })
         .catch(() => this.props.hideSpinner());
     }

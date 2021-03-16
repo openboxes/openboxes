@@ -9,11 +9,40 @@
  **/
 package org.pih.warehouse.invoice
 
+import org.pih.warehouse.core.Constants
+import org.pih.warehouse.shipping.ReferenceNumber
+import org.pih.warehouse.shipping.ReferenceNumberType
+
 class InvoiceService {
 
     boolean transactional = true
 
     List getInvoices(def params) {
         return []
+    }
+
+    ReferenceNumber createOrUpdateVendorInvoiceNumber(Invoice invoice, String vendorInvoiceNumber) {
+        ReferenceNumberType vendorInvoiceNumberType = ReferenceNumberType.findById(Constants.VENDOR_INVOICE_NUMBER_TYPE_ID)
+        if (!vendorInvoiceNumberType) {
+            throw new IllegalStateException("Must configure reference number type for Vendor Invoice Number with ID '${Constants.VENDOR_INVOICE_NUMBER_TYPE_ID}'")
+        }
+
+        ReferenceNumber referenceNumber = invoice.vendorInvoiceNumber
+
+        if (vendorInvoiceNumber) {
+            if (!referenceNumber) {
+                referenceNumber = new ReferenceNumber()
+                referenceNumber.identifier = vendorInvoiceNumber
+                referenceNumber.referenceNumberType = vendorInvoiceNumberType
+                invoice.addToReferenceNumbers(referenceNumber)
+            }
+            else {
+                referenceNumber.identifier = vendorInvoiceNumber
+            }
+        }
+        else if (referenceNumber) {
+            invoice.removeFromReferenceNumbers(referenceNumber)
+        }
+        return referenceNumber
     }
 }

@@ -14,8 +14,7 @@ import SelectField from '../form-elements/SelectField';
 import DateField from '../form-elements/DateField';
 import { renderFormField } from '../../utils/form-utils';
 import apiClient from '../../utils/apiClient';
-import { showSpinner, hideSpinner, fetchCurrencies } from '../../actions';
-import { debounceLocationsFetch } from '../../utils/option-utils';
+import { showSpinner, hideSpinner, fetchCurrencies, fetchOrganizations } from '../../actions';
 import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
 
 function validate(values) {
@@ -49,16 +48,11 @@ const FIELDS = {
     defaultMessage: 'Vendor',
     attributes: {
       required: true,
-      async: true,
       showValueTooltip: true,
-      openOnClick: false,
-      autoload: false,
-      cache: false,
-      options: [],
-      filterOptions: options => options,
+      objectValue: true,
     },
-    getDynamicAttr: props => ({
-      loadOptions: props.debounceLocationsFetch,
+    getDynamicAttr: ({ organizations }) => ({
+      options: organizations,
     }),
   },
   vendorInvoiceNumber: {
@@ -98,14 +92,12 @@ class CreateInvoicePage extends Component {
     this.state = {
       values: this.props.initialValues,
     };
-
-    this.debounceLocationsFetch =
-        debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength, null, true);
   }
 
   componentDidMount() {
-    if (!this.props.currenciesFetched) {
+    if (!this.props.currenciesFetched && !this.props.organizationsFetched) {
       this.props.fetchCurrencies();
+      this.props.fetchOrganizations();
     }
   }
 
@@ -136,10 +128,10 @@ class CreateInvoicePage extends Component {
       const invoiceUrl = `/openboxes/api/invoices/${values.invoiceId || ''}`;
 
       const payload = {
-        'vendor.id': values.vendor.id,
-        vendorInvoiceNumber: values.description,
-        dateInvoiced: values.dateRequested,
-        'currencyUom.id': values.currencyUom.id,
+        vendor: values.vendor,
+        vendorInvoiceNumber: values.vendorInvoiceNumber,
+        dateInvoiced: values.dateInvoiced,
+        'currencyUom.id': values.currencyUom,
       };
 
       apiClient.post(invoiceUrl, payload)
@@ -152,6 +144,7 @@ class CreateInvoicePage extends Component {
               invoiceId: resp.id,
               invoiceNumber: resp.invoiceNumber,
             });
+            this.props.hideSpinner();
           }
         })
         .catch(() => {
@@ -207,7 +200,7 @@ class CreateInvoicePage extends Component {
                 FIELDS,
                 (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
                   currencies: this.props.currencies,
-                  debounceLocationsFetch: this.debounceLocationsFetch,
+                  organizations: this.props.organizations,
                 }),
               )}
             </div>
@@ -225,14 +218,14 @@ class CreateInvoicePage extends Component {
 
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
-  debounceTime: state.session.searchConfig.debounceTime,
-  minSearchLength: state.session.searchConfig.minSearchLength,
   currencies: state.currencies.data,
+  organizations: state.organizations.data,
   currenciesFetched: state.currencies.fetched,
+  organizationsFetched: state.organizations.fetched,
 });
 
 export default withRouter(connect(mapStateToProps, {
-  showSpinner, hideSpinner, fetchCurrencies,
+  showSpinner, hideSpinner, fetchCurrencies, fetchOrganizations,
 })(CreateInvoicePage));
 
 CreateInvoicePage.propTypes = {
@@ -243,6 +236,7 @@ CreateInvoicePage.propTypes = {
     currencyUom: PropTypes.shape({}),
   }).isRequired,
   fetchCurrencies: PropTypes.func.isRequired,
+  fetchOrganizations: PropTypes.func.isRequired,
   showSpinner: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
   nextPage: PropTypes.func.isRequired,
@@ -250,8 +244,8 @@ CreateInvoicePage.propTypes = {
     push: PropTypes.func,
   }).isRequired,
   translate: PropTypes.func.isRequired,
-  debounceTime: PropTypes.number.isRequired,
-  minSearchLength: PropTypes.number.isRequired,
   currenciesFetched: PropTypes.bool.isRequired,
   currencies: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  organizations: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  organizationsFetched: PropTypes.bool.isRequired,
 };

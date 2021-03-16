@@ -11,7 +11,7 @@ export default function (state = initialState, action) {
     case FETCH_CURRENCIES:
       if (action.payload.data !== undefined) {
         const currencies = _.map(action.payload.data.data, currency => (
-          { value: currency.id, label: currency.description }
+          { value: currency.id, label: currency.name }
         ));
         return { ...state, data: currencies, fetched: true };
       }

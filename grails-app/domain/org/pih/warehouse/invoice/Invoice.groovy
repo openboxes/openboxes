@@ -10,6 +10,7 @@
 package org.pih.warehouse.invoice
 
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.Party
 import org.pih.warehouse.core.UnitOfMeasure
@@ -109,16 +110,16 @@ class Invoice implements Serializable {
         return [
             id: id,
             invoiceNumber: invoiceNumber,
-            vendorInvoiceNumber: getVendorInvoiceNumber(),
+            vendorInvoiceNumber: vendorInvoiceNumber?.identifier,
             name: name,
             description: description,
             partyFrom: Organization.get(partyFrom?.id),
-            party: Organization.get(party?.id),
-            dateInvoiced: dateInvoiced,
+            dateInvoiced: dateInvoiced.format("MM/dd/yyyy"),
             dateSubmitted: dateSubmitted,
             dateDue: dateDue,
             datePaid: datePaid,
-            currencyUom: currencyUom,
+            currencyUom: currencyUom?.id,
+            vendor: party?.id
         ]
     }
 }

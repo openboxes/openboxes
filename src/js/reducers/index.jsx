@@ -6,6 +6,7 @@ import reasonCodesReducer from './reasonCodesReducer';
 import sessionReducer from './sessionReducer';
 import indicatorsReducer from './indicatorsReducer';
 import currenciesReducer from './currenciesReducer';
+import organizationsReducer from './organizationsReducer';
 
 const rootReducer = combineReducers({
   localize: localizeReducer,
@@ -15,6 +16,7 @@ const rootReducer = combineReducers({
   session: sessionReducer,
   indicators: indicatorsReducer,
   currencies: currenciesReducer,
+  organizations: organizationsReducer,
 });
 
 export default rootReducer;
