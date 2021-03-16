@@ -94,7 +94,7 @@ class ApiControllerSpec extends Specification {
         controller.userService = userService
         controller.localizationService = localizationService
         controller.session.user = User.findByUsername("admin")
-        controller.session.location = Location.findByLocationNumber("TEST")
+        controller.session.warehouse = Location.findByLocationNumber("TEST")
 
         when:
         controller.getAppContext()
