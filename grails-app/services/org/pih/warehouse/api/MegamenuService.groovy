@@ -11,6 +11,7 @@ package org.pih.warehouse.api
 
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 
 class MegamenuService {
@@ -51,7 +52,7 @@ class MegamenuService {
         def builtSubsections = []
         subsections.each {
             def role = it.requiredRole
-            if (role && !userService.isUserInRole(user, role)) {
+            if (role && !userService.hasAnyRoles(user, [role, RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN])) {
                 return
             }
             ActivityCode[] activities = it.requiredActivities ?: []
@@ -71,7 +72,7 @@ class MegamenuService {
         def builtMenuItems = []
         menuItems.each {
             def role = it.requiredRole
-            if (role && !userService.isUserInRole(user, role)) {
+            if (role && !userService.hasAnyRoles(user, [role, RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN])) {
                 return
             }
             ActivityCode[] activities = it.requiredActivities ?: []
@@ -98,7 +99,7 @@ class MegamenuService {
         def parsedMenuConfig = []
         menuConfig.each { key, value ->
             def role = value.requiredRole
-            if (role && !userService.isUserInRole(user, role)) {
+            if (role && !userService.hasAnyRoles(user, [role, RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN])) {
                 return
             }
             ActivityCode[] activities = value.requiredActivities ?: []

@@ -1080,6 +1080,7 @@ openboxes {
         }
         invoicing {
             enabled = true
+            requiredRole = RoleType.ROLE_INVOICE
             label = "react.invoicing.label"
             defaultLabel = "Invoicing"
             subsections = [
