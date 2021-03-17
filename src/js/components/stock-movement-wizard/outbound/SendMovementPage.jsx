@@ -505,26 +505,29 @@ class SendMovementPage extends Component {
    * @public
    */
   sendFilesAndSave(values) {
-    this.props.showSpinner();
-    const { files } = this.state;
-    if (files.length > 1) {
-      this.sendFiles(files)
-        .then(() => {
-          Alert.success(this.props.translate('react.stockMovement.alert.filesSuccess.label', 'Files uploaded successfuly!'), { timeout: 3000 });
-          this.removeFiles(_.map(files, file => file.name));
-          this.prepareRequestAndSubmitStockMovement(values);
-        })
-        .catch(() => Alert.error(this.props.translate('react.stockMovement.alert.filesError.label', 'Error occured during files upload!')));
-    } else if (files.length === 1) {
-      this.sendFile(files[0])
-        .then(() => {
-          Alert.success(this.props.translate('react.stockMovement.alert.fileSuccess.label', 'File uploaded successfuly!'), { timeout: 3000 });
-          this.removeFile(files[0].name);
-          this.prepareRequestAndSubmitStockMovement(values);
-        })
-        .catch(() => Alert.error(this.props.translate('react.stockMovement.alert.fileError.label', 'Error occured during file upload!')));
-    } else {
-      this.prepareRequestAndSubmitStockMovement(values);
+    const errors = this.validate(values);
+    if (_.isEmpty(errors)) {
+      this.props.showSpinner();
+      const { files } = this.state;
+      if (files.length > 1) {
+        this.sendFiles(files)
+          .then(() => {
+            Alert.success(this.props.translate('react.stockMovement.alert.filesSuccess.label', 'Files uploaded successfuly!'), { timeout: 3000 });
+            this.removeFiles(_.map(files, file => file.name));
+            this.prepareRequestAndSubmitStockMovement(values);
+          })
+          .catch(() => Alert.error(this.props.translate('react.stockMovement.alert.filesError.label', 'Error occured during files upload!')));
+      } else if (files.length === 1) {
+        this.sendFile(files[0])
+          .then(() => {
+            Alert.success(this.props.translate('react.stockMovement.alert.fileSuccess.label', 'File uploaded successfuly!'), { timeout: 3000 });
+            this.removeFile(files[0].name);
+            this.prepareRequestAndSubmitStockMovement(values);
+          })
+          .catch(() => Alert.error(this.props.translate('react.stockMovement.alert.fileError.label', 'Error occured during file upload!')));
+      } else {
+        this.prepareRequestAndSubmitStockMovement(values);
+      }
     }
   }
 
@@ -690,6 +693,7 @@ class SendMovementPage extends Component {
     const errors = {};
     const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
     const dateShipped = moment(values.dateShipped, 'MM/DD/YYYY');
+    const expectedDeliveryDate = moment(values.expectedDeliveryDate, 'MM/DD/YYYY');
 
     if (date.diff(dateShipped) > 0) {
       errors.dateShipped = 'react.stockMovement.error.invalidDate.label';
@@ -702,6 +706,9 @@ class SendMovementPage extends Component {
     }
     if (!values.expectedDeliveryDate) {
       errors.expectedDeliveryDate = 'react.default.error.requiredField.label';
+    }
+    if (moment().startOf('day').diff(expectedDeliveryDate) > 0) {
+      errors.expectedDeliveryDate = 'react.stockMovement.error.pastDate.label';
     }
 
     return errors;
@@ -830,7 +837,7 @@ class SendMovementPage extends Component {
                     type="submit"
                     onClick={() => { this.sendFilesAndSave(values); }}
                     className={`${values.shipped ? 'btn btn-outline-secondary' : 'btn btn-outline-success'} float-right btn-form btn-xs`}
-                    disabled={invalid || values.statusCode === 'DISPATCHED' || showOnly}
+                    disabled={values.statusCode === 'DISPATCHED' || showOnly}
                   ><Translate id="react.stockMovement.sendShipment.label" defaultMessage="Send shipment" />
                   </button>
                   {values.shipped && this.props.isUserAdmin ?
