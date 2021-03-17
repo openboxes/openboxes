@@ -10,6 +10,7 @@
 package org.pih.warehouse.invoice
 
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.ReferenceNumberType
 
@@ -17,8 +18,55 @@ class InvoiceService {
 
     boolean transactional = true
 
-    List getInvoices(def params) {
-        return []
+    def dataService
+
+    def getInvoices(Invoice invoiceTemplate, Map params) {
+        def invoices = Invoice.createCriteria().list(params) {
+            and {
+                if (invoiceTemplate.invoiceNumber) {
+                    ilike("invoiceNumber", "%" + invoiceTemplate.invoiceNumber + "%")
+                }
+                if (invoiceTemplate.dateInvoiced) {
+                    eq('dateInvoiced', invoiceTemplate.dateInvoiced)
+                }
+                if (invoiceTemplate.createdBy) {
+
+                    eq('createdBy', invoiceTemplate.createdBy)
+                }
+            }
+            order("dateInvoiced", "desc")
+        }
+        return invoices
+    }
+
+    def listInvoices(Location currentLocation, Map params) {
+        String query = """
+            select * 
+            from invoice_list
+            where party_from_id = :partyId
+            AND created_by_id = IFNULL(:createdBy, created_by_id)
+            AND invoice_number LIKE :invoiceNumber
+            AND date_invoiced = IFNULL(:dateInvoiced, date_invoiced)
+            order by date_invoiced
+            """
+        def data = dataService.executeQuery(query, [
+                 partyId: currentLocation?.organization?.id,
+                 createdBy: params.createdBy,
+                 invoiceNumber: "%" + params.invoiceNumber + "%",
+                 dateInvoiced: params.dateInvoiced
+                ])
+
+        def invoices = data.collect { invoice ->
+            [
+                id : invoice.id,
+                invoiceNumber: invoice.invoice_number,
+                itemCount: invoice.item_count,
+                currency: invoice.currency,
+                vendorInvoiceNumber: invoice.vendor_invoice_number,
+                totalValue: invoice.total_value
+            ]
+        }
+        return invoices
     }
 
     ReferenceNumber createOrUpdateVendorInvoiceNumber(Invoice invoice, String vendorInvoiceNumber) {

@@ -57,4 +57,7 @@
   <changeSet id="1580848680306-19" author="dhatala" runOnChange="true" runAlways="true" failOnError="true">
     <sqlFile path="views/product-supplier-clean.sql"/>
   </changeSet>
+  <changeSet id="1580848680306-20" author="dhatala" runOnChange="true" runAlways="true" failOnError="true">
+    <sqlFile path="views/invoice-list.sql"/>
+  </changeSet>
 </databaseChangeLog>
