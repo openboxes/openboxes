@@ -192,24 +192,26 @@
     </g:if>
 
     <g:if test="${megamenuConfig.invoicing.enabled}">
-        <li class="mm-item">
-            <a href="javascript:void(0)" class="mm-item-link">
-                <warehouse:message code="react.invoicing.label" />
+        <g:hasRoleInvoice>
+            <li class="mm-item">
+                <a href="javascript:void(0)" class="mm-item-link">
+                    <warehouse:message code="react.invoicing.label" />
+                </a>
+                <div class="mm-item-content">
+                    <div class="mm-menu-item">
+                        <g:link controller="invoice" action="index" class="create">
+                            <warehouse:message code="default.create.label" args="[warehouse.message(code:'react.invoice.label')]"/>
+                        </g:link>
+                    </div>
+                    <div class="mm-menu-item">
+                        <g:link controller="invoice" action="list" class="list">
+                            <warehouse:message code="react.invoice.list.label" default="List Invoices" />
+                        </g:link>
+                    </div>
+                </div>
+            </li>
             </a>
-            <div class="mm-item-content">
-                <div class="mm-menu-item">
-                    <g:link controller="invoice" action="index" class="create">
-                        <warehouse:message code="default.create.label" args="[warehouse.message(code:'react.invoice.label')]"/>
-                    </g:link>
-                </div>
-                <div class="mm-menu-item">
-                    <g:link controller="invoice" action="list" class="list">
-                        <warehouse:message code="react.invoice.list.label" default="List Invoices" />
-                    </g:link>
-                </div>
-            </div>
-        </li>
-        </a>
+        </g:hasRoleInvoice>
     </g:if>
 
     <g:if test="${megamenuConfig.inbound.enabled}">
