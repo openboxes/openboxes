@@ -150,7 +150,7 @@ class InvoiceWizard extends Component {
 const mapStateToProps = state => ({
   locale: state.session.activeLanguage,
   invoiceTranslationsFetched: state.session.fetchedTranslations.invoice,
-  breadcrumbsConfig: state.session.breadcrumbsConfig.inbound,
+  breadcrumbsConfig: state.session.breadcrumbsConfig.invoice,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
