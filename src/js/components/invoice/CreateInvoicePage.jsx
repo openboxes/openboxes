@@ -24,6 +24,10 @@ function validate(values) {
     errors.vendor = 'react.default.error.requiredField.label';
   }
 
+  if (!values.vendorInvoiceNumber) {
+    errors.vendorInvoiceNumber = 'react.default.error.requiredField.label';
+  }
+
   if (!values.dateInvoiced) {
     errors.dateInvoiced = 'react.default.error.requiredField.label';
   }
@@ -61,7 +65,6 @@ const FIELDS = {
     defaultMessage: 'Vendor Invoice Number',
     attributes: {
       required: true,
-      autoFocus: true,
     },
   },
   dateInvoiced: {
