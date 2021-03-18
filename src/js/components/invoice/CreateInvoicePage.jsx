@@ -125,7 +125,7 @@ class CreateInvoicePage extends Component {
   }
 
   saveInvoice(values) {
-    if (values.vendor && values.vendorInvoiceNumber && values.dateInvoiced && values.currencyUom) {
+    if (values.vendor && values.vendorInvoiceNumber && values.dateInvoiced) {
       this.props.showSpinner();
 
       const invoiceUrl = `/openboxes/api/invoices/${values.invoiceId || ''}`;
