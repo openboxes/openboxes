@@ -40,4 +40,14 @@ class InvoiceController {
                 invoices         : invoices,
         ]
     }
+
+    def show = {
+        def invoiceInstance = Invoice.get(params.id)
+        if (!invoiceInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'invoice.label', default: 'Invoice'), params.id])}"
+            redirect(action: "list")
+        } else {
+            [invoiceInstance: invoiceInstance]
+        }
+    }
 }

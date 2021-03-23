@@ -9,11 +9,13 @@
 **/
 package org.pih.warehouse.invoice
 
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.Party
 import org.pih.warehouse.core.UnitOfMeasure
+import org.pih.warehouse.core.UnitOfMeasureConversion
 import org.pih.warehouse.core.User
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.ReferenceNumberType
@@ -67,7 +69,7 @@ class Invoice implements Serializable {
         referenceNumbers cascade: "all-delete-orphan"
     }
 
-    static transients = ['vendorInvoiceNumber']
+    static transients = ['vendorInvoiceNumber', 'invoiceItems', 'vendor', 'buyerOrganization', 'totalValue', 'totalValueNormalized']
 
     static constraints = {
         invoiceNumber(nullable: false, blank: false, unique: true, maxSize: 255)
@@ -90,6 +92,10 @@ class Invoice implements Serializable {
         createdBy(nullable: true)
     }
 
+    List<InvoiceItem> getInvoiceItems() {
+        return InvoiceItem.findAllByInvoice(this)
+    }
+
     ReferenceNumber getReferenceNumber(String id) {
         def referenceNumberType = ReferenceNumberType.findById(id)
         if (referenceNumberType) {
@@ -104,6 +110,27 @@ class Invoice implements Serializable {
 
     ReferenceNumber getVendorInvoiceNumber() {
         return getReferenceNumber(Constants.VENDOR_INVOICE_NUMBER_TYPE_ID)
+    }
+
+    Organization getVendor() {
+        return Organization.get(party?.id)
+    }
+
+    Organization getBuyerOrganization() {
+        return Organization.get(partyFrom?.id)
+    }
+
+    Float getTotalValue() {
+        return invoiceItems?.collect { it?.quantity * it?.quantityPerUom * it?.amount }?.sum() ?: 0
+    }
+
+    Float getTotalValueNormalized() {
+        BigDecimal currentExchangeRate
+        String defaultCurrencyCode = ConfigurationHolder.config.openboxes.locale.defaultCurrencyCode
+        if (currencyUom?.code != defaultCurrencyCode) {
+            currentExchangeRate = UnitOfMeasureConversion.conversionRateLookup(defaultCurrencyCode, currencyUom?.code).list()
+        }
+        return totalValue * (currentExchangeRate ?: 1.0)
     }
 
     Map toJson() {
