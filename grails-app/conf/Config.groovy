@@ -1028,7 +1028,7 @@ openboxes {
         }
         analytics {
             enabled = true
-            requiredRole = RoleType.ROLE_ADMIN
+            requiredRole = [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]
             label = "analytics.label"
             defaultLabel = "Analytics"
             menuItems = [
@@ -1080,7 +1080,7 @@ openboxes {
         }
         invoicing {
             enabled = true
-            requiredRole = RoleType.ROLE_INVOICE
+            requiredRole = [RoleType.ROLE_INVOICE]
             label = "react.invoicing.label"
             defaultLabel = "Invoicing"
             subsections = [
@@ -1191,7 +1191,7 @@ openboxes {
                         [label: "product.components.label", defaultLabel: "Components", href: "/${appName}/productComponent/list"],
                         [label: "productGroups.label", defaultLabel: "Generic Products", href: "/${appName}/productGroup/list"],
                         [label: "inventoryLevels.label", defaultLabel: "Inventory Levels", href: "/${appName}/inventoryLevel/list"],
-                        [label: "productType.label", defaultLabel: "Product Type", href: "/${appName}/productType/list", requiredRole: RoleType.ROLE_SUPERUSER]
+                        [label: "productType.label", defaultLabel: "Product Type", href: "/${appName}/productType/list", requiredRole: [RoleType.ROLE_SUPERUSER]]
                     ]
                 ],
                 [
@@ -1233,7 +1233,7 @@ openboxes {
         }
         configuration {
             enabled = true
-            requiredRole = RoleType.ROLE_ADMIN
+            requiredRole = [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]
             label = "configuration.label"
             defaultLabel = "Configuration"
             subsections = [
@@ -1280,14 +1280,14 @@ openboxes {
                     label: "default.other.label",
                     defaultLabel: "Other",
                     menuItems: [
-                        [label: "budgetCode.label", defaultLabel: "Budget Code", href: "/${appName}/budgetCode/list", requiredRole: RoleType.ROLE_ADMIN],
+                        [label: "budgetCode.label", defaultLabel: "Budget Code", href: "/${appName}/budgetCode/list", requiredRole: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
                         [label: "containerTypes.label", defaultLabel: "Container Types", href: "/${appName}/containerType/list"],
                         [label: "documents.label", defaultLabel: "Documents", href: "/${appName}/document/list"],
                         [label: "documentTypes.label", defaultLabel: "Document Types", href: "/${appName}/documentType/list"],
                         [label: "eventTypes.label", defaultLabel: "Event Types", href: "/${appName}/eventType/list"],
-                        [label: "glAccountType.label", defaultLabel: "GL Account Type", href: "/${appName}/glAccountType/list", requiredRole: RoleType.ROLE_ADMIN],
-                        [label: "glAccount.label", defaultLabel: "GL Account", href: "/${appName}/glAccount/list", requiredRole: RoleType.ROLE_ADMIN],
-                        [label: "orderAdjustmentType.label", defaultLabel: "Order Adjustment Type", href: "/${appName}/orderAdjustmentType/list", requiredRole: RoleType.ROLE_ADMIN],
+                        [label: "glAccountType.label", defaultLabel: "GL Account Type", href: "/${appName}/glAccountType/list", requiredRole: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
+                        [label: "glAccount.label", defaultLabel: "GL Account", href: "/${appName}/glAccount/list", requiredRole: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
+                        [label: "orderAdjustmentType.label", defaultLabel: "Order Adjustment Type", href: "/${appName}/orderAdjustmentType/list", requiredRole: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
                         [label: "paymentMethodTypes.label", defaultLabel: "Payment Method Types", href: "/${appName}/paymentMethodType/list"],
                         [label: "paymentTerms.label", defaultLabel: "Payment Terms", href: "/${appName}/paymentTerm/list"],
                         [label: "preferenceType.label", defaultLabel: "Preference Type", href: "/${appName}/preferenceType/list"],

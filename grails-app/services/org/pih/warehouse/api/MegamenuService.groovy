@@ -11,7 +11,6 @@ package org.pih.warehouse.api
 
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 
 class MegamenuService {
@@ -51,8 +50,8 @@ class MegamenuService {
     List buildAndTranslateSubsections(List subsections, User user, Location location) {
         def builtSubsections = []
         subsections.each {
-            def role = it.requiredRole
-            if (role && !userService.hasAnyRoles(user, [role, RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN])) {
+            def roles = it.requiredRole
+            if (roles && !userService.hasAnyRoles(user, roles)) {
                 return
             }
             ActivityCode[] activities = it.requiredActivities ?: []
@@ -71,8 +70,8 @@ class MegamenuService {
     List buildAndTranslateMenuItems(List menuItems, User user, Location location) {
         def builtMenuItems = []
         menuItems.each {
-            def role = it.requiredRole
-            if (role && !userService.hasAnyRoles(user, [role, RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN])) {
+            def roles = it.requiredRole
+            if (roles && !userService.hasAnyRoles(user, roles)) {
                 return
             }
             ActivityCode[] activities = it.requiredActivities ?: []
@@ -98,8 +97,8 @@ class MegamenuService {
     ArrayList buildAndTranslateMenu(Map menuConfig, User user, Location location) {
         def parsedMenuConfig = []
         menuConfig.each { key, value ->
-            def role = value.requiredRole
-            if (role && !userService.hasAnyRoles(user, [role, RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN])) {
+            def roles = value.requiredRole
+            if (roles && !userService.hasAnyRoles(user, roles)) {
                 return
             }
             ActivityCode[] activities = value.requiredActivities ?: []
