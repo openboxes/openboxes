@@ -222,8 +222,6 @@ class ReceiptService {
 
     void savePartialReceipt(PartialReceipt partialReceipt, boolean completed) {
 
-        log.info "Saving partial receipt " + partialReceipt
-
         Shipment shipment = partialReceipt?.shipment
         Receipt receipt = partialReceipt?.receipt
 
@@ -248,7 +246,6 @@ class ReceiptService {
         // Add receipt items
         partialReceipt.partialReceiptItems.each { partialReceiptItem ->
 
-            log.info "Saving partial receipt item " + partialReceiptItem
             if (partialReceiptItem.shouldSave) {
                 ReceiptItem receiptItem = createOrUpdateReceiptItem(partialReceiptItem)
                 receipt.addToReceiptItems(receiptItem)
@@ -267,9 +264,12 @@ class ReceiptService {
                 // Create receipt, event, and transaction
                 savePartialReceipt(partialReceipt, true)
                 savePartialReceiptEvent(partialReceipt)
-                saveInboundTransaction(partialReceipt)
-                // Send notification email on completed receiving
-                notificationService.sendReceiptNotifications(partialReceipt)
+                createInboundTransaction(partialReceipt)
+
+                // Trigger shipment status transition event to handle email notifications
+                grailsApplication.mainContext.publishEvent(
+                        new ShipmentStatusTransitionEvent(partialReceipt, ShipmentStatusCode.RECEIVED))
+
             } catch (Exception e) {
                 log.error "An unexpected error occurred during receipt: " + e.message, e
                 throw e;
@@ -299,15 +299,6 @@ class ReceiptService {
             }
         }
     }
-
-    void saveInboundTransaction(PartialReceipt partialReceipt) {
-        Shipment shipment = partialReceipt.shipment
-        if (shipment) {
-            createInboundTransaction(partialReceipt)
-            grailsApplication.mainContext.publishEvent(new ShipmentStatusTransitionEvent(shipment, ShipmentStatusCode.RECEIVED))
-        }
-    }
-
 
     Transaction createInboundTransaction(PartialReceipt partialReceipt) {
 

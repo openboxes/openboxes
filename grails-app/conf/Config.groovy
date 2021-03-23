@@ -890,8 +890,10 @@ openboxes.jobs.refreshInventorySnapshotAfterTransactionJob.maxRetryAttempts = 3
 // Refresh product availability materialized view
 openboxes.jobs.refreshProductAvailabilityJob.enabled = true
 openboxes.jobs.refreshProductAvailabilityJob.cronExpression = "0 0 0/2 * * ?" // every two hours starting at midnight
-openboxes.jobs.refreshProductAvailabilityJob.delayStart = true
-openboxes.jobs.refreshProductAvailabilityJob.delayInMilliseconds = 5000
+
+// Use delay when transactions are persisted to avoid missing data
+openboxes.jobs.refreshProductAvailabilityJob.delayStart = false
+openboxes.jobs.refreshProductAvailabilityJob.delayInMilliseconds = 0
 
 // Refresh transaction fact table
 openboxes.jobs.refreshTransactionFactJob.enabled = true

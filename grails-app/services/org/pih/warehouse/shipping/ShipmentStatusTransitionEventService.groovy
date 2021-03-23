@@ -41,6 +41,9 @@ class ShipmentStatusTransitionEventService implements ApplicationListener<Shipme
         else if (event.shipmentStatusCode in [ShipmentStatusCode.RECEIVED, ShipmentStatusCode.PARTIALLY_RECEIVED]) {
             notificationService.sendShipmentReceiptNotification(shipment, shipment.origin, outboundReceivedRoleTypes)
             notificationService.sendShipmentReceiptNotification(shipment, shipment.destination, inboundReceivedRoleTypes)
+
+            // Send notification email to recipients on completed receipt
+            notificationService.sendReceiptNotifications(event?.partialReceipt)
         }
 
     }
