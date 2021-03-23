@@ -135,7 +135,7 @@ class CreateInvoicePage extends Component {
     if (values.vendor && values.vendorInvoiceNumber && values.dateInvoiced && values.currencyUom) {
       this.props.showSpinner();
 
-      const invoiceUrl = `/openboxes/api/invoices/${values.invoiceId || ''}`;
+      const invoiceUrl = `/openboxes/api/invoices/${values.id || ''}`;
 
       const payload = {
         vendor: values.vendor,

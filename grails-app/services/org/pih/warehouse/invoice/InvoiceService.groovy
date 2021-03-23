@@ -47,7 +47,7 @@ class InvoiceService {
             AND created_by_id = IFNULL(:createdBy, created_by_id)
             AND invoice_number LIKE :invoiceNumber
             AND date_invoiced = IFNULL(:dateInvoiced, date_invoiced)
-            order by date_invoiced
+            order by date_invoiced, id
             """
         def data = dataService.executeQuery(query, [
                  partyId: currentLocation?.organization?.id,

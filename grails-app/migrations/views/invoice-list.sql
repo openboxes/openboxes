@@ -9,7 +9,7 @@ CREATE OR REPLACE VIEW invoice_list AS (
          person.id as created_by_id,
          CONCAT(person.first_name, ' ', person.last_name) as created_by_name,
          count(invoice_item.id) as item_count,
-         sum(invoice_item.amount * invoice_item.quantity) as total_value
+         sum(invoice_item.amount * invoice_item.quantity * invoice_item.quantity_per_uom) as total_value
     FROM invoice
     LEFT JOIN invoice_item ON invoice_item.invoice_id = invoice.id
     LEFT JOIN unit_of_measure ON unit_of_measure.id = invoice.currency_uom_id

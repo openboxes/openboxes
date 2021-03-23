@@ -56,6 +56,8 @@ class InvoiceItem implements Serializable {
         id generator: 'uuid'
     }
 
+    static transients = ['totalAmount']
+
     static constraints = {
         invoice(nullable: false)
         product(nullable: true)
@@ -69,5 +71,9 @@ class InvoiceItem implements Serializable {
 
         updatedBy(nullable: true)
         createdBy(nullable: true)
+    }
+
+    Float getTotalAmount() {
+        return quantityPerUom * quantity * amount ?: 0
     }
 }

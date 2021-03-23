@@ -29,6 +29,7 @@
                 <table>
                     <thead>
                     <tr>
+                        <th>${warehouse.message(code: 'default.actions.label')}</th>
                         <th>${warehouse.message(code: 'default.numItems.label')}</th>
                         <th>${warehouse.message(code: 'invoice.invoiceNumber.label')}</th>
                         <th>${warehouse.message(code: 'invoice.vendorInvoiceNumber.label')}</th>
@@ -48,17 +49,24 @@
                     </g:unless>
                     <g:each var="invoiceInstance" in="${invoices}" status="i">
                         <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+                            <td class="middle" width="1%">
+                                <div class="action-menu">
+                                    <g:render template="/invoice/actions" model="[invoiceInstance:invoiceInstance]"/>
+                                </div>
+                            </td>
                             <td>
                                 <div class="count">${invoiceInstance?.itemCount}</div>
                             </td>
                             <td class="middle">
-                                <div> ${invoiceInstance?.invoiceNumber}</div>
+                                <g:link action="show" id="${invoiceInstance.id}">
+                                    ${invoiceInstance?.invoiceNumber}
+                                </g:link>
                             </td>
                             <td class="middle">
                                 <div>${invoiceInstance?.vendorInvoiceNumber}</div>
                             </td>
                             <td class="middle">
-                                <div>${invoiceInstance?.totalValue}</div>
+                                <div><g:formatNumber number="${invoiceInstance?.totalValue}"/></div>
                             </td>
                             <td class="middle">
                                 <div>${invoiceInstance?.currency}</div>
