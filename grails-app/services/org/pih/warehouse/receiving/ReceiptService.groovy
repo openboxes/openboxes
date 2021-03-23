@@ -349,7 +349,7 @@ class ReceiptService {
             creditTransaction.addToTransactionEntries(transactionEntry)
         }
 
-        if (creditTransaction.hasErrors() || !creditTransaction.save()) {
+        if (creditTransaction.hasErrors() || !creditTransaction.save(flush:true)) {
             // did not save successfully, display errors message
             throw new ValidationException("Failed to receive shipment due to error while saving transaction", creditTransaction.errors)
         }

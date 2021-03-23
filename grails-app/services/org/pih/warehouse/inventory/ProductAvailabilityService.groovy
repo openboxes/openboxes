@@ -53,7 +53,7 @@ class ProductAvailabilityService {
         def startTime = System.currentTimeMillis()
         List binLocations = calculateBinLocations(location)
         saveProductAvailability(location, null, binLocations, forceRefresh)
-        log.info "Refreshed product availability for location (${location}) in ${System.currentTimeMillis() - startTime}ms"
+        log.info "Refreshed  ${binLocations?.size()} product availability records for location (${location}) in ${System.currentTimeMillis() - startTime}ms"
     }
 
     def refreshProductAvailability(Location location, Product product, Boolean forceRefresh) {
@@ -61,7 +61,7 @@ class ProductAvailabilityService {
         def startTime = System.currentTimeMillis()
         List binLocations = calculateBinLocations(location, product)
         saveProductAvailability(location, product, binLocations, forceRefresh)
-        log.info "Refreshed product availability for product (${product}) and location (${location}) in ${System.currentTimeMillis() - startTime}ms"
+        log.info "Refreshed ${binLocations?.size()} product availability records for product (${product}) and location (${location}) in ${System.currentTimeMillis() - startTime}ms"
     }
 
     def calculateBinLocations(Location location, Date date) {
