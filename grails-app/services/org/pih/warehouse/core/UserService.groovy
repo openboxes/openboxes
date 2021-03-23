@@ -196,7 +196,7 @@ class UserService {
     Boolean hasRoleInvoice(User u) {
         if (u) {
             def user = User.get(u.id)
-            def roleTypes = [RoleType.ROLE_INVOICE, RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN]
+            def roleTypes = [RoleType.ROLE_INVOICE]
             def co = getEffectiveRoles(user).any { Role role -> roleTypes.contains(role.roleType) }
             return co
         }
