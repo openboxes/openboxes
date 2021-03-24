@@ -17,9 +17,20 @@ class OrganizationService {
     boolean transactional = true
 
 
-    List selectOrganizations() {
-        return Organization.executeQuery("select id, name from Organization order by name asc").collect {
-            [id: it[0], name: it[1]]
+    List selectOrganizations(roleTypes) {
+        return Organization.createCriteria().list {
+            projections {
+                property("id")
+                property("name")
+            }
+            if (roleTypes) {
+                roles {
+                    'in'("roleType", roleTypes)
+                }
+            }
+            order("name", "asc")
+        }.collect {
+            return [id: it[0], name: it[1] ]
         }
     }
 
