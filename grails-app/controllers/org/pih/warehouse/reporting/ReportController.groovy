@@ -588,4 +588,70 @@ class ReportController {
         render(view: 'showRequestDetailReport', params: params)
     }
 
+    def showCycleCountReport = {
+        Location location = Location.load(session.warehouse.id)
+        List binLocations = inventoryService.getQuantityByBinLocation(location)
+        log.info "Returned ${binLocations.size()} bin locations for location ${location}"
+
+        Map additionalColumns = grailsApplication.config.openboxes.cycleCount.additionalColumns
+
+        List rows = binLocations.collect { row ->
+
+            // Required in order to avoid lazy initialization exception that occurs because all
+            // of the querying / session work that was done above was executed in worker threads
+            Product product = Product.load(row?.product?.id)
+
+            def latestInventoryDate = row?.product?.latestInventoryDate(location.id) ?: row?.product.earliestReceivingDate(location.id)
+            Map dataRow = params.print ? [
+                            "Product code"        : StringEscapeUtils.escapeCsv(row?.product?.productCode),
+                            "Product name"        : row?.product.name ?: "",
+                            "Lot number"          : StringEscapeUtils.escapeCsv(row?.inventoryItem.lotNumber ?: ""),
+                            "Expiration date"     : row?.inventoryItem.expirationDate ? row?.inventoryItem.expirationDate.format("dd-MMM-yyyy") : "",
+                            "Bin location"        : StringEscapeUtils.escapeCsv(row?.binLocation?.name ?: ""),
+                            "OB QOH"              : row?.quantity ?: 0,
+                            "Physical QOH"        : "",
+                            "Comment"             : "",
+                            "Generic product"     : row?.genericProduct?.name ?: "",
+                            "Category"            : StringEscapeUtils.escapeCsv(row?.category?.name ?: ""),
+                            "Formularies"         : product.productCatalogs.join(", ") ?: "",
+                            "ABC Classification"  : StringEscapeUtils.escapeCsv(row?.product.getAbcClassification(location.id) ?: ""),
+                            "Bin Location Old"    : StringEscapeUtils.escapeCsv(row?.product?.getBinLocation(location.id) ?: ""),
+                            "Status"              : g.message(code: "binLocationSummary.${row?.status}.label"),
+                            "Last Inventory Date" : latestInventoryDate ? latestInventoryDate.format("dd-MMM-yyyy") : "",
+                    ] : [
+                            productCode       : StringEscapeUtils.escapeCsv(row?.product?.productCode),
+                            productName       : row?.product.name ?: "",
+                            genericProduct    : row?.genericProduct?.name ?: "",
+                            category          : StringEscapeUtils.escapeCsv(row?.category?.name ?: ""),
+                            formularies       : product.productCatalogs.join(", ") ?: "",
+                            lotNumber         : StringEscapeUtils.escapeCsv(row?.inventoryItem.lotNumber ?: ""),
+                            expirationDate    : row?.inventoryItem.expirationDate ? row?.inventoryItem.expirationDate.format("dd-MMM-yyyy") : "",
+                            abcClassification : StringEscapeUtils.escapeCsv(row?.product.getAbcClassification(location.id) ?: ""),
+                            binLocation       : StringEscapeUtils.escapeCsv(row?.binLocation?.name ?: ""),
+                            binLocationOld    : StringEscapeUtils.escapeCsv(row?.product?.getBinLocation(location.id) ?: ""),
+                            status            : g.message(code: "binLocationSummary.${row?.status}.label"),
+                            lastInventoryDate : latestInventoryDate ? latestInventoryDate.format("dd-MMM-yyyy") : "",
+                            quantityOnHand    : row?.quantity ?: 0,
+                    ]
+
+            // Iterate over additional columns
+            additionalColumns.each { columnKey, Closure columnExpression ->
+                String columnValue = columnExpression ? columnExpression.call(row) : ""
+                dataRow << ["${StringEscapeUtils.escapeCsv(columnKey)}": StringEscapeUtils.escapeCsv(columnValue)]
+            }
+
+            return dataRow
+        }
+
+        if (params.print) {
+            def filename = "CycleCountReport-${location.name}-${new Date().format("dd MMM yyyy hhmmss")}"
+            response.contentType = "application/vnd.ms-excel"
+            response.setHeader("Content-disposition", "attachment; filename=\"${filename}.xls\"")
+            documentService.generateExcel(response.outputStream, rows)
+            return
+        }
+
+        render(view: "showCycleCountReport", model: [rows: rows])
+    }
+
 }
