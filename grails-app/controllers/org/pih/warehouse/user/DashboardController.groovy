@@ -11,8 +11,8 @@ package org.pih.warehouse.user
 
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
+import grails.plugin.springcache.annotations.Cacheable
 import org.apache.commons.lang.StringEscapeUtils
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
@@ -33,11 +33,9 @@ import java.text.SimpleDateFormat
 
 class DashboardController {
 
-    def shipmentService
     def inventoryService
     def dashboardService
     def productService
-    def requisitionService
     def userService
     def sessionFactory
     def grailsApplication
@@ -96,50 +94,10 @@ class DashboardController {
         redirect(controller: "inventory", action: "browse", params: params)
 
     }
-    def throwException = {
-        println "Configuration: " + ConfigurationHolder.config.grails
-        println "Configuration: " + ConfigurationHolder.config.grails.mail
-        try {
-            throw new RuntimeException("error of some kind")
-        } catch (RuntimeException e) {
-            log.error("Caught runtime exception: ${e.message}", e)
-            throw new RuntimeException("another exception wrapped in this exception", e)
-        }
-    }
-
-    def old = {
-
-        def startTime = System.currentTimeMillis()
-        if (!session.warehouse) {
-            redirect(action: "chooseLocation")
-        }
-
-        def currentUser = User.get(session?.user?.id)
-        def location = Location.get(session?.warehouse?.id)
-        def recentOutgoingShipments = shipmentService.getRecentOutgoingShipments(location?.id, 7, 7)
-        def recentIncomingShipments = shipmentService.getRecentIncomingShipments(location?.id, 7, 7)
-
-        log.info "dashboard.index Response time: " + (System.currentTimeMillis() - startTime) + " ms"
-
-        def newsItems = ConfigurationHolder.config.openboxes.dashboard.newsSummary.newsItems
-
-
-        [
-                newsItems                : newsItems,
-                rootCategory             : productService.getRootCategory(),
-                requisitionStatistics    : requisitionService.getRequisitionStatistics(location, null, params.onlyShowMine ? currentUser : null, null, [RequisitionStatus.ISSUED, RequisitionStatus.CANCELED] as List),
-                requisitions             : [],
-                outgoingShipmentsByStatus: shipmentService.getShipmentsByStatus(recentOutgoingShipments),
-                incomingShipmentsByStatus: shipmentService.getShipmentsByStatus(recentIncomingShipments),
-                tags                     : productService?.getPopularTags(50),
-                catalogs                 : productService?.getAllCatalogs()
-        ]
-    }
 
     def index = {
         render(template: "/common/react")
     }
-
 
     def expirationSummary = {
         def location = Location.get(session.warehouse.id)
@@ -174,53 +132,13 @@ class DashboardController {
         render results as JSON
     }
 
+    @Cacheable("megamenuCache")
     def megamenu = {
-
-        def user = User.get(session?.user?.id)
-        def location = Location.get(session?.warehouse?.id)
-
-        // Inbound Shipments
-        def inboundShipmentsTotal = Shipment.countByDestination(location)
-        def inboundShipmentsCount = Shipment.executeQuery(
-                """	select shipment.currentStatus, count(*) 
-							from Shipment as shipment
-							where shipment.destination = :destination
-							group by shipment.currentStatus""", [destination: location])
-
-        inboundShipmentsCount = inboundShipmentsCount.collect { [status: it[0], count: it[1]] }
-
-        // Outbound Shipments
-        def outboundShipmentsTotal = Shipment.countByOrigin(location)
-        def outboundShipmentsCount = Shipment.executeQuery(
-                """	select shipment.currentStatus, count(*) 
-							from Shipment as shipment 
-							where shipment.origin = :origin 
-							group by shipment.currentStatus""", [origin: location])
-
-        outboundShipmentsCount = outboundShipmentsCount.collect { [status: it[0], count: it[1]] }
-
-        // Orders
-        def incomingOrders = Order.executeQuery('select o.status, count(*) as count from Order as o where o.destination = ? group by o.status', [location])
-
-        // Requisitions
-        def requisitionStatistics = requisitionService.getRequisitionStatistics(location, null, user, new Date() - 30)
-
-        def categories = []
-        def category = productService.getRootCategory()
-        categories = category.categories
-        categories = categories.groupBy { it?.parentCategory }
-
         [
-                categories            : categories,
                 isSuperuser           : userService.isSuperuser(session?.user),
                 megamenuConfig        : grailsApplication.config.openboxes.megamenu,
-                inboundShipmentsTotal : inboundShipmentsTotal ?: 0,
-                inboundShipmentsCount : inboundShipmentsCount,
-                outboundShipmentsTotal: outboundShipmentsTotal ?: 0,
-                outboundShipmentsCount: outboundShipmentsCount,
-                incomingOrders        : incomingOrders,
-                requisitionStatistics : requisitionStatistics,
-                quickCategories       : productService.getQuickCategories()
+                quickCategories       : productService.quickCategories,
+                categories            : productService.rootCategory.categories.groupBy { it.parentCategory?.id },
         ]
     }
 
