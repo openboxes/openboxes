@@ -1,7 +1,7 @@
 <%@ page import="org.pih.warehouse.core.Constants; org.pih.warehouse.core.RoleType" %>
 <div id="footer">
 	<div style="line-height: 2em;" class="center middle">
-		&copy; <g:copyrightYear/> <a href="https://openboxes.com">Powered by OpenBoxes</a> &nbsp;&nbsp; | &nbsp;&nbsp;
+		&copy; <g:copyrightYear/> <a href="https://openboxes.com"><warehouse:message code="default.poweredBy.label" default="Powered by OpenBoxes"/></a> &nbsp;&nbsp; | &nbsp;&nbsp;
         <g:message code="application.grailsVersion.label"/>: &nbsp; <b><g:meta name="app.grails.version"></g:meta></b> &nbsp;&nbsp; | &nbsp;&nbsp;
         <g:message code="application.version.label"/>: &nbsp;<b><a href="https://github.com/openboxes/openboxes/releases/tag/v${g.meta(name:'app.version')}"><g:meta name="app.version"/></a></b>&nbsp;&nbsp; | &nbsp;&nbsp;
 		<g:message code="application.branchName.label"/>: <b><g:meta name="app.branchName"/></b>&nbsp;&nbsp; | &nbsp;&nbsp;
@@ -49,12 +49,12 @@
         <g:if test="${session.warehouse && session.user && session._showTime}">
             &nbsp;&nbsp; | &nbsp;&nbsp;
             <span>
-                Data load:
+                <g:message code="default.dataLoad.label" default="Data load"/>:
                 <b>${(request?.actionDuration?:0)/1000}s</b>
             </span>
             &nbsp;&nbsp; | &nbsp;&nbsp;
             <span>
-                Page load:
+                <g:message code="default.pageLoad.label" default="Page load"/>:
                 <b>${(request?.viewDuration?:0)/1000}s</b>
             </span>
         </g:if>
