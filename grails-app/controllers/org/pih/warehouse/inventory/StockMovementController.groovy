@@ -76,6 +76,12 @@ class StockMovementController {
         Location currentLocation = Location.get(session.warehouse.id)
         StockMovement stockMovement = params.id ? stockMovementService.getStockMovement(params.id) : null
 
+        if(!stockMovement.isEditAuthorized(currentLocation)) {
+            flash.error = stockMovementService.getDisabledMessage(stockMovement, currentLocation, true)
+            redirect(controller: "stockMovement", action: "show", id: params.id)
+            return
+        }
+
         StockMovementType stockMovementType = currentLocation == stockMovement.origin ?
                 StockMovementType.OUTBOUND : currentLocation == stockMovement.destination ?
                         StockMovementType.INBOUND : null
