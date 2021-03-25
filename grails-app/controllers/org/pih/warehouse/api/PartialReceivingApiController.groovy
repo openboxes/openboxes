@@ -41,7 +41,7 @@ class PartialReceivingApiController {
 
         if (partialReceipt.receiptStatus == PartialReceiptStatus.COMPLETED) {
             receiptService.saveAndCompletePartialReceipt(partialReceipt)
-            render([data:partialReceipt] as JSON)
+            render([data:[:]] as JSON)
             return
         } else if (partialReceipt.receiptStatus == PartialReceiptStatus.PENDING ||
                 partialReceipt.receiptStatus == PartialReceiptStatus.CHECKING) {

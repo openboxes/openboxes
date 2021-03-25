@@ -21,6 +21,7 @@ import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.inventory.TransactionEvent
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
@@ -264,11 +265,16 @@ class ReceiptService {
                 // Create receipt, event, and transaction
                 savePartialReceipt(partialReceipt, true)
                 savePartialReceiptEvent(partialReceipt)
-                createInboundTransaction(partialReceipt)
+                Transaction transaction = createInboundTransaction(partialReceipt)
 
                 // Trigger shipment status transition event to handle email notifications
                 grailsApplication.mainContext.publishEvent(
                         new ShipmentStatusTransitionEvent(partialReceipt, ShipmentStatusCode.RECEIVED))
+
+                // Trigger product availability refresh
+                transaction.blockRefresh = Boolean.FALSE
+                grailsApplication.mainContext.publishEvent(
+                        new TransactionEvent(transaction, false))
 
             } catch (Exception e) {
                 log.error "An unexpected error occurred during receipt: " + e.message, e
@@ -348,6 +354,9 @@ class ReceiptService {
             transactionEntry.inventoryItem = inventoryItem
             creditTransaction.addToTransactionEntries(transactionEntry)
         }
+
+        // FIXME Block the refresh of the product availability table (to be triggered at end of request)
+        creditTransaction.blockRefresh = Boolean.TRUE
 
         if (creditTransaction.hasErrors() || !creditTransaction.save(flush:true)) {
             // did not save successfully, display errors message
