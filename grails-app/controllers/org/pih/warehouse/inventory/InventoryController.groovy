@@ -1238,9 +1238,7 @@ class InventoryController {
         command.transactionEntries.each {
             if (!it.inventoryItem) {
                 // Find an existing inventory item for the given lot number and product and description
-                log.debug("Find inventory item " + it.product + " " + it.lotNumber)
                 def inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(it.product, it.lotNumber)
-                log.debug("Found inventory item? " + inventoryItem)
 
                 // If the inventory item doesn't exist, we create a new one
                 if (!inventoryItem) {
@@ -1248,7 +1246,6 @@ class InventoryController {
                     inventoryItem.lotNumber = it.lotNumber
                     inventoryItem.expirationDate = (it.lotNumber) ? it.expirationDate : null
                     inventoryItem.product = it.product
-                    log.debug("Save inventory item " + inventoryItem)
                     if (inventoryItem.hasErrors() || !inventoryItem.save()) {
                         inventoryItem.errors.allErrors.each { error ->
                             command.errors.reject("inventoryItem.invalid",

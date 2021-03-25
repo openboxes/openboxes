@@ -21,8 +21,16 @@ class TransactionEventService implements ApplicationListener<TransactionEvent> {
     void onApplicationEvent(TransactionEvent event) {
         log.info "Application event $event has been published!"
         Transaction transaction = event?.source
-        Location location = Location.load(event.associatedLocation)
-        def productIds = event.associatedProducts
+
+        // Some transaction event publishers might want to trigger the events on their own
+        // in order to allow the transaction to be saved to the database (e.g. Partial Receiving)
+        if (transaction?.blockRefresh) {
+            log.warn "Product availability refresh has been blocked by event publisher"
+            return
+        }
+
+        Location location = Location.load(transaction.associatedLocation)
+        def productIds = transaction.associatedProducts
         Boolean forceRefresh = event.forceRefresh
 
         log.info "Refresh product availability records for " +
@@ -33,24 +41,12 @@ class TransactionEventService implements ApplicationListener<TransactionEvent> {
                 "productIds=$productIds, " +
                 "forceRefresh=$forceRefresh"
 
-        // FIXME Hack to allow the transaction to be persisted to the database. Otherwise, the
-        // RefreshProductAvailabilityJob calculates product availability on all transactions
-        // except this one, which defeats the purpose of running this job. I'm still at a loss
-        // for why the transaction is not being returned in the query because the Hibernate
-        // sessions should not be shared between the thread associated with the request and
-        // the thread running the background job.
-        //
-        // The preferred approach would be to trigger the job now.
-        //RefreshProductAvailabilityJob.triggerNow([
-        //        locationId  : locationId,
-        //        productIds  : productIds,
-        //        forceRefresh: forceRefresh
-        //])
         use(TimeCategory) {
-            def delayStart = grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayStart
+            Boolean delayStart = grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayStart
             def delayInMilliseconds = delayStart ?
                     grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayInMilliseconds : 0
             Date runAt = new Date() + delayInMilliseconds.milliseconds
+            log.info "Triggering refresh product availability with ${delayInMilliseconds} ms delay"
             RefreshProductAvailabilityJob.schedule(runAt, [
                     locationId  : location?.id,
                     productIds  : productIds,

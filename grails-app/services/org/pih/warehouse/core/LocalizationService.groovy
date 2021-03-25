@@ -118,7 +118,6 @@ class LocalizationService {
     Properties getMessagesPropertiesFromClasspath(String messagesPropertiesUrl) {
         Properties properties = new Properties()
         File messagesPropertiesFile = new ClassPathResource(messagesPropertiesUrl)?.getFile()
-        log.info "messagesPropertiesFile: ${messagesPropertiesFile}"
         if (messagesPropertiesFile.exists()) {
             InputStream messagesPropertiesStream = new FileInputStream(messagesPropertiesFile)
             properties.load(messagesPropertiesStream)

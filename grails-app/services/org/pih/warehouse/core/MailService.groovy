@@ -13,7 +13,6 @@ import org.apache.commons.mail.ByteArrayDataSource
 import org.apache.commons.mail.EmailAttachment
 import org.apache.commons.mail.HtmlEmail
 import org.apache.commons.mail.SimpleEmail
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 import javax.mail.internet.InternetAddress
 
@@ -58,7 +57,6 @@ class MailService {
      * @return
      */
     def getIsMailEnabled() {
-        log.info "grails.mail = " + grailsApplication.config.grails.mail
         Boolean mailEnabled = grailsApplication.config.grails.mail.enabled.toBoolean()
         log.info(mailEnabled ? "Mail is enabled" : "Mail is disabled")
         return mailEnabled
