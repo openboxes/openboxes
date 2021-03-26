@@ -1,4 +1,4 @@
-package org.pih.warehouse.partialReceiving
+package org.pih.warehouse.receiving
 
 import org.pih.warehouse.shipping.Shipment
 
