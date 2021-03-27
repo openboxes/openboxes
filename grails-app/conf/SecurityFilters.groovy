@@ -16,6 +16,8 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.util.RequestUtil
 import org.pih.warehouse.core.LocationStatus
 
+import javax.servlet.http.HttpServletResponse
+
 class SecurityFilters {
 
     static ArrayList controllersWithAuthUserNotRequired = ['test', 'errors']
@@ -24,15 +26,56 @@ class SecurityFilters {
     static ArrayList controllersWithLocationNotRequired = ['categoryApi', 'productApi', 'genericApi', 'api']
     static ArrayList actionsWithLocationNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'chooseLocation', 'menu']
 
-    def authService
+    def userService
     def filters = {
+
+        locationCheck(uri: "/api/**") {
+            before = {
+                if(params["location.id"]) {
+                    session.warehouse = Location.get(params["location.id"])
+                }
+            }
+        }
+
+        apiAuthenticationCheck(uri: "/api/**") {
+            before = {
+
+                // If user is already logged in then we don't need to reauthenticate
+                if (session.user) {
+                    return true
+                }
+
+                // Otherwise we authenticate using basic auth
+                def authorizationHeader = request.getHeader('Authorization')
+                if (authorizationHeader) {
+                    try {
+                        User user = userService.authenticateUsingBasicAuth(authorizationHeader)
+                        if (user) {
+                            log.info "Authorization successful for user ${user?.username}"
+                            request.user = [username: user?.username]
+                            session.user = user
+                            return true
+                        } else {
+                            log.info "User ${user?.username} is not authorized"
+                            response.sendError HttpServletResponse.SC_UNAUTHORIZED
+                            return false
+                        }
+                    }
+                    catch (Exception e) {
+                        log.warn"Exception during authentication (${params}): ${e.message}"
+                        response.sendError HttpServletResponse.SC_UNAUTHORIZED
+                        return false
+                    }
+                } else {
+                    log.info('No Authorization header')
+                    response.sendError HttpServletResponse.SC_UNAUTHORIZED
+                    return false
+                }
+            }
+        }
+
         loginCheck(controller: '*', action: '*') {
 
-            afterView = {
-                // Clear out current user after rendering the view
-                AuthService.currentUser.set(null)
-                AuthService.currentLocation.set(null)
-            }
             before = {
 
                 // Set the current user (if there's on in the session)
@@ -135,6 +178,11 @@ class SecurityFilters {
                     redirect(controller: 'dashboard', action: 'chooseLocation')
                     return false
                 }
+            }
+            afterView = {
+                // Clear out current user after rendering the view
+                AuthService.currentUser.set(null)
+                AuthService.currentLocation.set(null)
             }
         }
     }

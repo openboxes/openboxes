@@ -437,26 +437,23 @@ class UserService {
         return recipients
     }
 
-    /**
-     *
-     * @param username
-     * @param password
-     * @return
-     */
-    def authenticate(username, password) {
+    def authenticate(String username, String password) {
         return authenticateUsingDatabase(username, password)
     }
 
-    /**
-     *
-     * @param username
-     * @param password
-     * @return
-     */
+    def authenticateUsingBasicAuth(String authorizationHeader) {
+        def encodedCredentials = authorizationHeader - 'Basic '
+        def decodedCredentials = new String(encodedCredentials.decodeBase64(), 'UTF-8')
+        def credentials = decodedCredentials.split(':', 2)
+        return authenticateUsingDatabase(credentials[0], credentials[1])
+    }
+
     def authenticateUsingDatabase(username, password) {
         def userInstance = User.findByUsernameOrEmail(username, username)
         if (userInstance) {
-            return (userInstance.password == password.encodeAsPassword() || userInstance.password == password)
+            if (userInstance.password == password.encodeAsPassword() || userInstance.password == password) {
+                return userInstance
+            }
         }
         return false
     }
