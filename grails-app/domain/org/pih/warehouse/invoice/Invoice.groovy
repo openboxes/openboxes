@@ -13,7 +13,6 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Organization
-import org.pih.warehouse.core.Party
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.UnitOfMeasureConversion
 import org.pih.warehouse.core.User
@@ -44,8 +43,8 @@ class Invoice implements Serializable {
 
     InvoiceType invoiceType
 
-    Party partyFrom // Party generating the invoice
-    Party party // Party responsible for paying
+    Organization partyFrom // Party generating the invoice
+    Organization party // Party responsible for paying
 
     // Date fields
     Date dateInvoiced
@@ -62,14 +61,15 @@ class Invoice implements Serializable {
     User createdBy
     User updatedBy
 
-    static hasMany = [referenceNumbers: ReferenceNumber]
+    static hasMany = [referenceNumbers: ReferenceNumber, invoiceItems: InvoiceItem]
 
     static mapping = {
         id generator: 'uuid'
         referenceNumbers cascade: "all-delete-orphan"
+        invoiceItems cascade: "all-delete-orphan"
     }
 
-    static transients = ['vendorInvoiceNumber', 'invoiceItems', 'vendor', 'buyerOrganization', 'totalValue', 'totalValueNormalized']
+    static transients = ['vendorInvoiceNumber', 'totalValue', 'totalValueNormalized']
 
     static constraints = {
         invoiceNumber(nullable: false, blank: false, unique: true, maxSize: 255)
@@ -92,10 +92,6 @@ class Invoice implements Serializable {
         createdBy(nullable: true)
     }
 
-    List<InvoiceItem> getInvoiceItems() {
-        return InvoiceItem.findAllByInvoice(this)
-    }
-
     ReferenceNumber getReferenceNumber(String id) {
         def referenceNumberType = ReferenceNumberType.findById(id)
         if (referenceNumberType) {
@@ -110,14 +106,6 @@ class Invoice implements Serializable {
 
     ReferenceNumber getVendorInvoiceNumber() {
         return getReferenceNumber(Constants.VENDOR_INVOICE_NUMBER_TYPE_ID)
-    }
-
-    Organization getVendor() {
-        return Organization.get(party?.id)
-    }
-
-    Organization getBuyerOrganization() {
-        return Organization.get(partyFrom?.id)
     }
 
     Float getTotalValue() {
