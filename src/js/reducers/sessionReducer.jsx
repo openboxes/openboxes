@@ -19,6 +19,7 @@ const initialState = {
     hasBinLocationSupport: true,
     hasPackingSupport: true,
     hasPartialReceivingSupport: true,
+    hasCentralPurchasingEnabled: true,
     locationType: { description: '', locationTypeCode: '' },
   },
   isSuperuser: false,

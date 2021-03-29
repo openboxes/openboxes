@@ -148,6 +148,7 @@ class BootStrap {
                     hasBinLocationSupport: location.hasBinLocationSupport(),
                     hasPackingSupport    : location.supports(ActivityCode.PACK_SHIPMENT),
                     hasPartialReceivingSupport : location.supports(ActivityCode.PARTIAL_RECEIVING),
+                    hasCentralPurchasingEnabled : location.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING),
                     organizationName     : location?.organization?.name,
                     backgroundColor : location?.bgColor,
             ]
