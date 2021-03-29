@@ -206,15 +206,17 @@ class Tablero extends Component {
         this.props.dashboardConfig,
         config,
         this.props.currentLocation,
+        this.props.currentUser,
       );
       this.loadPageFilters(config);
     } else {
       this.props.fetchConfigAndData(
         this.props.currentLocation,
         config,
+        this.props.currentUser,
       );
     }
-  }
+  };
 
   updateConfig = () => {
     const url = '/openboxes/apitablero/updateConfig';
@@ -384,6 +386,7 @@ const mapStateToProps = state => ({
   dashboardConfig: state.indicators.config,
   activeConfig: state.indicators.activeConfig,
   currentLocation: state.session.currentLocation.id,
+  currentUser: state.session.user.id,
 });
 
 export default connect(mapStateToProps, {
@@ -398,6 +401,7 @@ export default connect(mapStateToProps, {
 
 Tablero.defaultProps = {
   currentLocation: '',
+  currentUser: '',
   indicatorsData: null,
   numberData: [],
   configModified: false,
@@ -424,6 +428,7 @@ Tablero.propTypes = {
   }).isRequired,
   activeConfig: PropTypes.string.isRequired,
   currentLocation: PropTypes.string.isRequired,
+  currentUser: PropTypes.string.isRequired,
   addToIndicators: PropTypes.func.isRequired,
   reloadIndicator: PropTypes.func.isRequired,
   resetIndicators: PropTypes.func.isRequired,
