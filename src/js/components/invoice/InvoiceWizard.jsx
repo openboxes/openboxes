@@ -119,7 +119,7 @@ class InvoiceWizard extends Component {
           const values = { ...response.data.data };
 
           let currentPage = 2;
-          if (values.invoiceItems && values.invoiceItems.length > 0) {
+          if (values.totalCount > 0) {
             currentPage = 3;
           }
 

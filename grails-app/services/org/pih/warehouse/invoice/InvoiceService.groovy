@@ -11,8 +11,10 @@ package org.pih.warehouse.invoice
 
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.ReferenceNumberType
+import org.pih.warehouse.shipping.ShipmentItem
 
 class InvoiceService {
 
@@ -37,6 +39,14 @@ class InvoiceService {
             order("dateInvoiced", "desc")
         }
         return invoices
+    }
+
+    def getInvoiceItems(String id, String max, String offset) {
+        Invoice invoice = Invoice.get(id)
+        List<InvoiceItem> invoiceItems = InvoiceItem.createCriteria().list(max: max.toInteger(), offset: offset.toInteger()) {
+            eq("invoice", invoice)
+        }
+        return invoiceItems
     }
 
     def listInvoices(Location currentLocation, Map params) {
@@ -92,5 +102,20 @@ class InvoiceService {
             invoice.removeFromReferenceNumbers(referenceNumber)
         }
         return referenceNumber
+    }
+
+    def removeInvoiceItem(String id) {
+        InvoiceItem invoiceItem = InvoiceItem.get(id)
+        Invoice invoice = invoiceItem.invoice
+        invoice.removeFromInvoiceItems(invoiceItem)
+        invoiceItem.delete()
+    }
+
+    def updateItems(Invoice invoice, List items) {
+        invoice.invoiceItems.each { invoiceItem ->
+            def newItem = items.find { it.id == invoiceItem.id }
+            invoiceItem.quantity = newItem.quantity
+        }
+        invoice.save()
     }
 }

@@ -134,7 +134,9 @@ class Invoice implements Serializable {
             dateDue: dateDue,
             datePaid: datePaid,
             currencyUom: currencyUom?.id,
-            vendor: party?.id
+            vendor: party?.id,
+            totalCount: invoiceItems?.size() ?: 0,
+            totalValue: totalValue,
         ]
     }
 }
