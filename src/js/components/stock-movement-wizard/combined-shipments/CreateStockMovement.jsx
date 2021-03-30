@@ -58,7 +58,7 @@ const FIELDS = {
       filterOptions: options => options,
     },
     getDynamicAttr: props => ({
-      loadOptions: props.debouncedLocationsFetch,
+      loadOptions: props.debouncedOriginLocationsFetch,
       disabled: !_.isNil(props.stockMovementId),
     }),
   },
@@ -77,7 +77,7 @@ const FIELDS = {
       filterOptions: options => options,
     },
     getDynamicAttr: props => ({
-      loadOptions: props.debouncedLocationsFetch,
+      loadOptions: props.debouncedDestinationLocationsFetch,
       disabled: (!props.isSuperuser || !_.isNil(props.stockMovementId)) &&
         !props.hasCentralPurchasingEnabled,
     }),
@@ -93,7 +93,10 @@ class CreateStockMovement extends Component {
       values: this.props.initialValues,
     };
 
-    this.debouncedLocationsFetch =
+    this.debouncedOriginLocationsFetch =
+      debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength);
+
+    this.debouncedDestinationLocationsFetch =
       debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength, null, true);
   }
 
@@ -204,7 +207,8 @@ class CreateStockMovement extends Component {
                 FIELDS,
                 (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
                   isSuperuser: this.props.isSuperuser,
-                  debouncedLocationsFetch: this.debouncedLocationsFetch,
+                  debouncedDestinationLocationsFetch: this.debouncedDestinationLocationsFetch,
+                  debouncedOriginLocationsFetch: this.debouncedOriginLocationsFetch,
                   stockMovementId: values.id,
                   hasCentralPurchasingEnabled: this.props.hasCentralPurchasingEnabled,
                 }),
