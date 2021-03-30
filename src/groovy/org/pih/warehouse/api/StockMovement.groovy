@@ -17,7 +17,6 @@ import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.ReferenceNumber
-import org.pih.warehouse.shipping.ReferenceNumberType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
@@ -191,6 +190,30 @@ class StockMovement {
         return itemsWithPrice.collect { it?.quantity * it?.product?.pricePerUnit }.sum() ?: 0
     }
 
+    Boolean isPending() {
+        return shipment?.currentStatus == ShipmentStatusCode.PENDING
+    }
+
+    Boolean hasBeenIssued() {
+        return requisition?.status == RequisitionStatus.ISSUED
+    }
+
+    Boolean hasBeenShipped() {
+        return shipment?.currentStatus == ShipmentStatusCode.SHIPPED
+    }
+
+    Boolean hasBeenPartiallyReceived() {
+        return shipment?.currentStatus == ShipmentStatusCode.PARTIALLY_RECEIVED
+    }
+
+    Boolean hasBeenReceived() {
+        return shipment?.currentStatus == ShipmentStatusCode.RECEIVED
+    }
+
+    Boolean isElectronicType() {
+        requisition?.sourceType == RequisitionSourceType.ELECTRONIC
+    }
+
     Boolean isDeleteOrRollbackAuthorized(Location currentLocation) {
         Location origin = requisition?.origin?:shipment?.origin
         Location destination = requisition?.destination?:shipment?.destination
@@ -198,6 +221,22 @@ class StockMovement {
         boolean isDestination = destination?.id == currentLocation.id
         boolean canOriginManageInventory = origin?.supports(ActivityCode.MANAGE_INVENTORY)
         return ((canOriginManageInventory && isOrigin) || (!canOriginManageInventory && isDestination))
+    }
+
+    Boolean isEditAuthorized(Location currentLocation) {
+        boolean isSameOrigin = origin?.id == currentLocation?.id
+        boolean isDepot = origin?.isDepot()
+        boolean isCentralPurchasingEnabled = currentLocation?.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING)
+
+        return !hasBeenReceived() && !hasBeenPartiallyReceived() && (isSameOrigin || !isDepot || !isPending() || isElectronicType() || isCentralPurchasingEnabled)
+    }
+
+    Boolean isReceivingAuthorized(Location currentLocation) {
+        boolean isSameDestination = destination?.id == currentLocation?.id
+        boolean isCentralPurchasingEnabled = currentLocation?.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING)
+        boolean hasBeenPlaced = hasBeenShipped() || hasBeenPartiallyReceived()
+
+        return !hasBeenReceived() && hasBeenPlaced && hasBeenIssued() && (isSameDestination || isCentralPurchasingEnabled)
     }
 
     /**
