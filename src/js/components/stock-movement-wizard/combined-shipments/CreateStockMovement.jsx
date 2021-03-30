@@ -94,7 +94,7 @@ class CreateStockMovement extends Component {
     };
 
     this.debouncedLocationsFetch =
-      debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength);
+      debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength, null, true);
   }
 
   componentDidMount() {
@@ -164,6 +164,7 @@ class CreateStockMovement extends Component {
         stockMovementUrl = `/openboxes/api/stockMovements/${values.stockMovementId}/updateRequisition`;
         payload = {
           description: values.description,
+          'destination.id': values.destination.id,
         };
       } else {
         stockMovementUrl = '/openboxes/api/stockMovements/createCombinedShipments';
