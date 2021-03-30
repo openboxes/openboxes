@@ -28,13 +28,13 @@ export const debounceUsersFetch = (waitTime, minSearchLength) =>
   }, waitTime);
 
 export const debounceLocationsFetch =
-(waitTime, minSearchLength, activityCodes, vendorOnly = false) =>
+(waitTime, minSearchLength, activityCodes, fetchAll = false) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
       const activityCodesParams = activityCodes ? activityCodes.map(activityCode => `&activityCodes=${activityCode}`).join('') : '';
       const { direction } = queryString.parse(window.location.search);
-      const directionParam = vendorOnly ? 'INBOUND' : direction;
-      apiClient.get(`/openboxes/api/locations?name=${searchTerm}${direction ? `&direction=${directionParam}` : ''}${activityCodesParams}`)
+      const directionParam = fetchAll ? null : direction;
+      apiClient.get(`/openboxes/api/locations?name=${searchTerm}${directionParam ? `&direction=${directionParam}` : ''}${activityCodesParams}`)
         .then(result => callback(
           null,
           {
