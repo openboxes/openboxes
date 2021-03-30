@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.invoice
 
+import org.apache.commons.lang.StringUtils
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.shipping.ReferenceNumber
@@ -58,6 +59,35 @@ class InvoiceService {
         }
 
         return invoiceItems
+    }
+
+    def getInvoiceCandidates(String id, String orderNumber, String shipmentNumber, String max, String offset) {
+        Invoice invoice = Invoice.get(id)
+
+        if (!invoice) {
+            return []
+        }
+
+        List<InvoiceCandidate> invoiceCandidates = InvoiceCandidate.createCriteria()
+                .list(max: max.toInteger(), offset: offset.toInteger()) {
+                    if (invoice.party) {
+                        eq("vendor", invoice.party)
+                    }
+
+                    if (invoice.currencyUom?.code) {
+                        eq("currencyCode", invoice.currencyUom.code)
+                    }
+
+                    if (StringUtils.isNotBlank(orderNumber)) {
+                        eq("orderNumber", orderNumber)
+                    }
+
+                    if (StringUtils.isNotBlank(shipmentNumber)) {
+                        eq("shipmentNumber", shipmentNumber)
+                    }
+                }
+
+        return invoiceCandidates
     }
 
     def listInvoices(Location currentLocation, Map params) {

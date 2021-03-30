@@ -9,8 +9,8 @@
  **/
 
 
+
 import grails.converters.JSON
-import grails.util.Environment
 import liquibase.Liquibase
 import liquibase.database.DatabaseFactory
 import org.pih.warehouse.api.AvailableItem
@@ -34,6 +34,7 @@ import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.invoice.InvoiceCandidate
 import org.pih.warehouse.invoice.InvoiceItem
 import org.pih.warehouse.jobs.RefreshDemandDataJob
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
@@ -402,6 +403,10 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(InvoiceItem) { InvoiceItem invoiceItem ->
             return invoiceItem.toJson()
+        }
+
+        JSON.registerObjectMarshaller(InvoiceCandidate) { InvoiceCandidate invoiceCandidate ->
+            return invoiceCandidate.toJson()
         }
 
 
