@@ -127,10 +127,30 @@
                         </div>
                     </div>
                     <div class="yui-u">
-                        <g:render template="/invoice/invoiceItems"/>
+                        <div class="tabs tabs-ui">
+                            <ul>
+                                <li><a href="#tabs-items"><warehouse:message code="invoice.invoiceItems.label" default="Invoice Items"/></a></li>
+                                <li><a href="#tabs-documents"><warehouse:message code="document.documents.label" default="Documents"/></a></li>
+                            </ul>
+                            <div id="tabs-items" class="ui-tabs-hide">
+                                <g:render template="/invoice/invoiceItems"/>
+                            </div>
+                            <div id="tabs-documents" class="ui-tabs-hide">
+                                <g:render template="/invoice/documents"/>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+        <script>
+          $(document).ready(function() {
+            $(".tabs").tabs({
+              cookie: {
+                expires: 1
+              },
+            });
+          });
+        </script>
     </body>
 </html>

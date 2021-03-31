@@ -8,7 +8,7 @@
             <tr class="odd">
                 <th><warehouse:message code="default.code.label"/></th>
                 <th><warehouse:message code="default.name.label"/></th>
-                <th><warehouse:message code="order.orderItem.label"/></th>
+                <th><warehouse:message code="order.orderNumber.label"/></th>
                 <th><warehouse:message code="glAccount.label"/></th>
                 <th><warehouse:message code="budgetCode.label"/></th>
                 <th><warehouse:message code="default.quantity.label"/></th>
@@ -18,7 +18,7 @@
             </tr>
             </thead>
             <tbody>
-            <g:each var="invoiceItem" in="${invoiceInstance.invoiceItems}" status="status">
+            <g:each var="invoiceItem" in="${invoiceInstance.invoiceItems.sort { it.dateCreated }}" status="status">
                 <tr class="${status%2==0?'odd':'even'}">
                     <td>
                         ${invoiceItem?.product?.productCode}
@@ -27,7 +27,7 @@
                         ${invoiceItem?.product?.name}
                     </td>
                     <td>
-                        <%-- ${invoiceItem?.orderItem} --%>
+                        ${invoiceItem?.orderNumber}
                     </td>
                     <td>
                         ${invoiceItem?.glAccount?.name}

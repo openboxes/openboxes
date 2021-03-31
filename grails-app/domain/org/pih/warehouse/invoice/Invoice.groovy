@@ -16,6 +16,7 @@ import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.UnitOfMeasureConversion
 import org.pih.warehouse.core.User
+import org.pih.warehouse.order.Order
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.ReferenceNumberType
 
@@ -69,7 +70,7 @@ class Invoice implements Serializable {
         invoiceItems cascade: "all-delete-orphan"
     }
 
-    static transients = ['vendorInvoiceNumber', 'totalValue', 'totalValueNormalized']
+    static transients = ['vendorInvoiceNumber', 'totalValue', 'totalValueNormalized', 'documents']
 
     static constraints = {
         invoiceNumber(nullable: false, blank: false, unique: true, maxSize: 255)
@@ -119,6 +120,18 @@ class Invoice implements Serializable {
             currentExchangeRate = UnitOfMeasureConversion.conversionRateLookup(defaultCurrencyCode, currencyUom?.code).list()
         }
         return totalValue * (currentExchangeRate ?: 1.0)
+    }
+
+    def getDocuments() {
+        def documents = []
+        invoiceItems.each {invoiceItem ->
+            if (invoiceItem?.order?.documents) {
+                invoiceItem?.order?.documents?.each {document ->
+                    documents.add(document)
+                }
+            }
+        }
+        return documents
     }
 
     Map toJson() {
