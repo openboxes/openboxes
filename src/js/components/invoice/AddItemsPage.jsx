@@ -46,10 +46,13 @@ const FIELDS = {
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     // eslint-disable-next-line react/prop-types
-    addButton: () => (
+    addButton: ({ values, loadMoreRows }) => (
       <InvoiceItemsModal
         btnOpenText="react.default.button.addLines.label"
         btnOpenDefaultText="Add lines"
+        onOpen={() => {}}
+        invoiceId={values.id}
+        onResponse={loadMoreRows}
       >
         <Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
       </InvoiceItemsModal>
@@ -150,12 +153,13 @@ class AddItemsPage extends Component {
    */
   setInvoiceItems(response, startIndex) {
     this.props.showSpinner();
-    const { data } = response.data;
+    const { data, totalCount } = response.data;
 
     this.setState({
       values: {
         ...this.state.values,
         invoiceItems: !_.isNull(startIndex) ? _.uniqBy(_.concat(this.state.values.invoiceItems, data), 'id') : data,
+        totalCount,
       },
     }, () => {
       if (!_.isNull(startIndex) &&
