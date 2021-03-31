@@ -225,18 +225,18 @@ class StockMovement {
 
     Boolean isEditAuthorized(Location currentLocation) {
         boolean isSameOrigin = origin?.id == currentLocation?.id
+        boolean isSameDestination = destination?.id == currentLocation?.id
         boolean isDepot = origin?.isDepot()
         boolean isCentralPurchasingEnabled = currentLocation?.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING)
 
-        return !hasBeenReceived() && !hasBeenPartiallyReceived() && (isSameOrigin || !isDepot || !isPending() || isElectronicType() || isCentralPurchasingEnabled)
+        return !hasBeenReceived() && !hasBeenPartiallyReceived() && (isSameOrigin || (!isDepot && isSameDestination) || !isPending() || isElectronicType() || (isCentralPurchasingEnabled && isFromOrder))
     }
 
     Boolean isReceivingAuthorized(Location currentLocation) {
         boolean isSameDestination = destination?.id == currentLocation?.id
-        boolean isCentralPurchasingEnabled = currentLocation?.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING)
         boolean hasBeenPlaced = hasBeenShipped() || hasBeenPartiallyReceived()
 
-        return !hasBeenReceived() && hasBeenPlaced && hasBeenIssued() && (isSameDestination || isCentralPurchasingEnabled)
+        return !hasBeenReceived() && hasBeenPlaced && hasBeenIssued() && isSameDestination
     }
 
     /**
