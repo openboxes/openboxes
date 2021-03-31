@@ -1017,6 +1017,7 @@ openboxes.inventorySnapshot.batchSize = 100
 
 // Minimum date for expiration date
 openboxes.expirationDate.minValue = new Date("01/01/2000")
+openboxes.expirationDate.format = Constants.EXPIRATION_DATE_FORMAT
 
 // Global megamenu configuration
 // TODO: Clean up and add all missing message.properties
