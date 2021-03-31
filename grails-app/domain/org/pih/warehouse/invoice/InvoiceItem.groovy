@@ -15,6 +15,7 @@ import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.User
+import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ShipmentItem
@@ -63,7 +64,7 @@ class InvoiceItem implements Serializable {
         orderAdjustments joinTable: [name: 'order_adjustment_invoice', key: 'invoice_item_id', column: 'order_adjustment_id']
     }
 
-    static transients = ['totalAmount', 'unitOfMeasure', 'orderNumber', 'shipmentNumber', 'description']
+    static transients = ['totalAmount', 'unitOfMeasure', 'orderNumber', 'shipmentNumber', 'description', 'order']
 
     static constraints = {
         invoice(nullable: false)
@@ -95,15 +96,19 @@ class InvoiceItem implements Serializable {
     }
 
     String getOrderNumber() {
-        return shipmentItems ? shipmentItems?.find()?.shipment?.orders?.find()?.orderNumber : orderAdjustments?.find()?.order?.orderNumber
+        return shipmentItems ? shipmentItems?.iterator()?.next()?.orderNumber : (orderAdjustments ? orderAdjustments?.iterator()?.next()?.order?.orderNumber : null)
     }
 
     String getShipmentNumber() {
-        return shipmentItems?.find()?.shipment?.shipmentNumber
+        return shipmentItems ? shipmentItems?.iterator()?.next()?.shipment?.shipmentNumber : null
     }
 
     String getDescription() {
-        return orderAdjustments ? orderAdjustments?.find()?.description : product?.name
+        return orderAdjustments ? orderAdjustments?.iterator()?.next()?.description : product?.name
+    }
+
+    Order getOrder() {
+        return orderNumber ? Order.findByOrderNumber(orderNumber) : null
     }
 
     Map toJson() {
