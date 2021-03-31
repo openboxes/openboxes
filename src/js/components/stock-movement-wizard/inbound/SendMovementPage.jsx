@@ -628,8 +628,7 @@ class SendMovementPage extends Component {
     const isOrigin = this.props.currentLocationId === values.origin.id;
     const isDestination = this.props.currentLocationId === values.destination.id;
 
-    if ((values.hasManageInventory && isOrigin) || (!values.hasManageInventory && isDestination) ||
-      this.props.hasCentralPurchasingEnabled) {
+    if ((values.hasManageInventory && isOrigin) || (!values.hasManageInventory && isDestination)) {
       apiClient.post(url, payload)
         .then(() => {
           this.props.hideSpinner();
@@ -829,7 +828,6 @@ const mapStateToProps = state => ({
   isPaginated: state.session.isPaginated,
   pageSize: state.session.pageSize,
   minimumExpirationDate: state.session.minimumExpirationDate,
-  hasCentralPurchasingEnabled: state.session.currentLocation.hasCentralPurchasingEnabled,
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner })(SendMovementPage);
@@ -858,6 +856,4 @@ SendMovementPage.propTypes = {
   isPaginated: PropTypes.bool.isRequired,
   pageSize: PropTypes.number.isRequired,
   minimumExpirationDate: PropTypes.string.isRequired,
-  /** Is true when currently selected location has central purchasing enabled */
-  hasCentralPurchasingEnabled: PropTypes.bool.isRequired,
 };

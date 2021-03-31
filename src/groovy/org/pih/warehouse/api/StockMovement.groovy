@@ -236,7 +236,7 @@ class StockMovement {
         boolean isSameDestination = destination?.id == currentLocation?.id
         boolean hasBeenPlaced = hasBeenShipped() || hasBeenPartiallyReceived()
 
-        return !hasBeenReceived() && hasBeenPlaced && hasBeenIssued() && isSameDestination
+        return !hasBeenReceived() && hasBeenPlaced && (hasBeenIssued() || hasBeenShipped()) && isSameDestination
     }
 
     /**
