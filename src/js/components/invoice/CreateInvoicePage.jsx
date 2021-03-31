@@ -153,6 +153,7 @@ class CreateInvoicePage extends Component {
               ...values,
               invoiceId: resp.id,
               invoiceNumber: resp.invoiceNumber,
+              totalCount: resp.totalCount,
             });
             this.props.hideSpinner();
           }

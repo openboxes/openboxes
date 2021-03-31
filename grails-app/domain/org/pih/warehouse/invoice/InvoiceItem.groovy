@@ -9,6 +9,7 @@
 **/
 package org.pih.warehouse.invoice
 
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.GlAccount
@@ -56,7 +57,7 @@ class InvoiceItem implements Serializable {
         id generator: 'uuid'
     }
 
-    static transients = ['totalAmount']
+    static transients = ['totalAmount', 'unitOfMeasure']
 
     static constraints = {
         invoice(nullable: false)
@@ -75,5 +76,31 @@ class InvoiceItem implements Serializable {
 
     Float getTotalAmount() {
         return quantityPerUom * quantity * amount ?: 0
+    }
+
+    String getUnitOfMeasure() {
+        if (quantityUom) {
+            return "${quantityUom?.code}/${quantityPerUom as Integer}"
+        }
+        else {
+            def g = ApplicationHolder.application.mainContext.getBean( 'org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib' )
+            return "${g.message(code:'default.ea.label').toUpperCase()}/1"
+        }
+    }
+
+    Map toJson() {
+        return [
+                id: id,
+                orderNumber: '',
+                shipmentNumber: '',
+                budgetCode: budgetCode?.code,
+                glCode: glAccount?.code,
+                productCode: product?.productCode,
+                description: product?.name,
+                quantity: quantity,
+                uom: unitOfMeasure,
+                amount: amount,
+                totalAmount: totalAmount,
+        ]
     }
 }
