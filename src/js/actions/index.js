@@ -175,7 +175,7 @@ export function changeCurrentLocale(locale) {
 
 // New Dashboard
 
-function getParameterList(params = '', locationId = '') {
+function getParameterList(params = '', locationId = '', userId = '') {
   const listFiltersSelected = [];
   const listValues = [];
 
@@ -186,6 +186,7 @@ function getParameterList(params = '', locationId = '') {
   if (!pageConfig[dashboardKey]) { pageConfig[dashboardKey] = {}; }
 
   let listParams = params === '' ? `locationId=${locationId}` : `${params}&locationId=${locationId}`;
+  listParams += userId ? `&userId=${userId}` : '';
 
   // List of filter and category
   // filter[0] is the category
@@ -285,10 +286,11 @@ function fetchNumberIndicator(
   dispatch,
   indicatorConfig,
   locationId,
+  userId
 ) {
   const id = indicatorConfig.order;
 
-  const listParams = getParameterList('', locationId);
+  const listParams = getParameterList('', locationId, userId);
 
   const url = `${indicatorConfig.endpoint}?${listParams}`;
   if (!indicatorConfig.enabled) {
@@ -324,7 +326,7 @@ export function reloadIndicator(indicatorConfig, params, locationId) {
   };
 }
 
-function getData(dispatch, configData, locationId, config = 'personal') {
+function getData(dispatch, configData, locationId, config = 'personal', userId = '') {
   // new reference so that the original config is not modified
 
   const dataEndpoints = JSON.parse(JSON.stringify(configData.endpoints));
@@ -336,7 +338,7 @@ function getData(dispatch, configData, locationId, config = 'personal') {
     });
     Object.values(dataEndpoints.number).forEach((indicatorConfig) => {
       indicatorConfig.archived = indicatorConfig.archived.includes(config);
-      fetchNumberIndicator(dispatch, indicatorConfig, locationId);
+      fetchNumberIndicator(dispatch, indicatorConfig, locationId, userId);
     });
   } else {
     Object.values(dataEndpoints.graph).forEach((indicatorConfig) => {
@@ -347,7 +349,7 @@ function getData(dispatch, configData, locationId, config = 'personal') {
     });
     Object.values(dataEndpoints.number).forEach((indicatorConfig) => {
       indicatorConfig.archived = false;
-      fetchNumberIndicator(dispatch, indicatorConfig, locationId);
+      fetchNumberIndicator(dispatch, indicatorConfig, locationId, userId);
     });
   }
 }
@@ -356,6 +358,7 @@ export function fetchIndicators(
   configData,
   config,
   locationId,
+  userId
 ) {
   return (dispatch) => {
     dispatch({
@@ -365,7 +368,7 @@ export function fetchIndicators(
       },
     });
 
-    getData(dispatch, configData, locationId, config);
+    getData(dispatch, configData, locationId, config, userId);
   };
 }
 
@@ -395,7 +398,7 @@ export function reorderIndicators({ oldIndex, newIndex }, e, type) {
   };
 }
 
-export function fetchConfigAndData(locationId, config = 'personal', filterSelected) {
+export function fetchConfigAndData(locationId, config = 'personal', userId, filterSelected) {
   return (dispatch) => {
     apiClient.get('/openboxes/apitablero/config').then((res) => {
       dispatch({
@@ -404,7 +407,7 @@ export function fetchConfigAndData(locationId, config = 'personal', filterSelect
           data: res.data,
         },
       });
-      getData(dispatch, res.data, locationId, config, filterSelected);
+      getData(dispatch, res.data, locationId, config, userId, filterSelected);
     });
   };
 }
