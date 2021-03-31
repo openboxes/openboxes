@@ -261,6 +261,11 @@ class UrlMappings {
             action = [GET: "getInvoiceItems"]
         }
 
+        "/api/invoices/$id/invoiceItemCandidates"(parseRequest: true) {
+            controller = "invoiceApi"
+            action = [GET: "getInvoiceItemCandidates"]
+        }
+
         "/api/invoices/$id/removeItem"(parseRequest: true) {
             controller = "invoiceApi"
             action = [DELETE: "removeItem"]

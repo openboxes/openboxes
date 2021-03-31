@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="adminuser (generated)" id="2903202113200-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="shipment_invoice"/>
+            </not>
+        </preConditions>
+        <createTable tableName="shipment_invoice">
+            <column name="invoice_item_id" type="CHAR(38)"/>
+            <column name="shipment_item_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="adminuser (generated)" id="2903202113200-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists  foreignKeyName="shipment_invoice_ibfk_1"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="shipment_item_id"
+          baseTableName="shipment_invoice"
+          constraintName="shipment_invoice_ibfk_1" deferrable="false"
+          initiallyDeferred="false" referencedColumnNames="id" referencedTableName="shipment_item"/>
+    </changeSet>
+
+    <changeSet author="adminuser (generated)" id="2903202113200-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists  foreignKeyName="shipment_invoice_ibfk_2"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="invoice_item_id"
+          baseTableName="shipment_invoice"
+          constraintName="shipment_invoice_ibfk_2" deferrable="false"
+          initiallyDeferred="false" referencedColumnNames="id" referencedTableName="invoice_item"/>
+    </changeSet>
+
+    <changeSet author="adminuser (generated)" id="2903202113200-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="order_adjustment_invoice"/>
+            </not>
+        </preConditions>
+        <createTable tableName="order_adjustment_invoice">
+            <column name="invoice_item_id" type="CHAR(38)"/>
+            <column name="order_adjustment_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="adminuser (generated)" id="2903202113200-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists  foreignKeyName="order_adjustment_invoice_ibfk_1"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="order_adjustment_id"
+          baseTableName="order_adjustment_invoice"
+          constraintName="order_adjustment_invoice_ibfk_1" deferrable="false"
+          initiallyDeferred="false" referencedColumnNames="id" referencedTableName="order_adjustment"/>
+    </changeSet>
+
+    <changeSet author="adminuser (generated)" id="2903202113200-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists  foreignKeyName="order_adjustment_invoice_ibfk_2"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="invoice_item_id"
+          baseTableName="order_adjustment_invoice"
+          constraintName="order_adjustment_invoice_ibfk_2" deferrable="false"
+          initiallyDeferred="false" referencedColumnNames="id" referencedTableName="invoice_item"/>
+    </changeSet>
+</databaseChangeLog>

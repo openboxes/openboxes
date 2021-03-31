@@ -15,7 +15,9 @@ import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.User
+import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.shipping.ShipmentItem
 
 class InvoiceItem implements Serializable {
 
@@ -53,11 +55,15 @@ class InvoiceItem implements Serializable {
 
     static belongsTo = [invoice: Invoice]
 
+    static hasMany = [shipmentItems: ShipmentItem, orderAdjustments: OrderAdjustment]
+
     static mapping = {
         id generator: 'uuid'
+        shipmentItems joinTable: [name: 'shipment_invoice', key: 'invoice_item_id', column: 'shipment_item_id']
+        orderAdjustments joinTable: [name: 'order_adjustment_invoice', key: 'invoice_item_id', column: 'order_adjustment_id']
     }
 
-    static transients = ['totalAmount', 'unitOfMeasure']
+    static transients = ['totalAmount', 'unitOfMeasure', 'orderNumber', 'shipmentNumber', 'description']
 
     static constraints = {
         invoice(nullable: false)
@@ -88,15 +94,27 @@ class InvoiceItem implements Serializable {
         }
     }
 
+    String getOrderNumber() {
+        return shipmentItems ? shipmentItems?.find()?.shipment?.orders?.find()?.orderNumber : orderAdjustments?.find()?.order?.orderNumber
+    }
+
+    String getShipmentNumber() {
+        return shipmentItems?.find()?.shipment?.shipmentNumber
+    }
+
+    String getDescription() {
+        return orderAdjustments ? orderAdjustments?.find()?.description : product?.name
+    }
+
     Map toJson() {
         return [
                 id: id,
-                orderNumber: '',
-                shipmentNumber: '',
+                orderNumber: orderNumber,
+                shipmentNumber: shipmentNumber,
                 budgetCode: budgetCode?.code,
                 glCode: glAccount?.code,
                 productCode: product?.productCode,
-                description: product?.name,
+                description: description,
                 quantity: quantity,
                 uom: unitOfMeasure,
                 amount: amount,
