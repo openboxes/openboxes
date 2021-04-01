@@ -234,9 +234,8 @@ class StockMovement {
 
     Boolean isReceivingAuthorized(Location currentLocation) {
         boolean isSameDestination = destination?.id == currentLocation?.id
-        boolean hasBeenPlaced = hasBeenShipped() || hasBeenPartiallyReceived()
 
-        return !hasBeenReceived() && hasBeenPlaced && (hasBeenIssued() || hasBeenShipped()) && isSameDestination
+        return !hasBeenReceived() && (hasBeenIssued() || hasBeenShipped() || hasBeenPartiallyReceived()) && isSameDestination
     }
 
     /**

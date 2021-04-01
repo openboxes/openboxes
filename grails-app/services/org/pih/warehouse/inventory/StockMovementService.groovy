@@ -2409,11 +2409,9 @@ class StockMovementService {
             return g.message(code: "stockMovement.isDifferentOrigin.message")
         } else if (stockMovement?.hasBeenReceived()) {
             return g.message(code: "stockMovement.hasAlreadyBeenReceived.message", args: [stockMovement?.identifier])
-        } else if (!(stockMovement?.hasBeenShipped() || stockMovement?.hasBeenPartiallyReceived()) && stockMovement?.isFromOrder) {
-            return g.message(code: "stockMovement.hasNotBeenPlaced.message", args: [stockMovement?.identifier])
         } else if (!(stockMovement?.hasBeenShipped() || stockMovement?.hasBeenPartiallyReceived())) {
             return g.message(code: "stockMovement.hasNotBeenShipped.message", args: [stockMovement?.identifier])
-        } else if (!stockMovement?.hasBeenIssued()) {
+        } else if (!stockMovement?.hasBeenIssued() && !stockMovement?.isFromOrder) {
             return g.message(code: "stockMovement.hasNotBeenIssued.message", args: [stockMovement?.identifier])
         } else if (!isSameDestination) {
             return g.message(code: "stockMovement.isDifferentLocation.message")
