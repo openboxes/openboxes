@@ -179,7 +179,7 @@ class StocklistManagement extends Component {
     let url = `/openboxes/api/stocklistItems?product.id=${this.props.match.params.productId || ''}`;
 
     if (!item.new) {
-      url = `/openboxes/api/stocklistItems/${item.requisitionItem.id}`;
+      url = `/openboxes/api/stocklistItems/${item.id}`;
     }
 
     apiClient.post(url, flattenRequest(item))
@@ -202,7 +202,7 @@ class StocklistManagement extends Component {
       this.removeItem(index);
     } else {
       this.props.showSpinner();
-      const url = `/openboxes/api/stocklistItems/${item.requisitionItem.id}`;
+      const url = `/openboxes/api/stocklistItems/${item.id}`;
 
       apiClient.delete(url)
         .then(() => {
