@@ -51,7 +51,7 @@ const FIELDS = {
         btnOpenText="react.default.button.addLines.label"
         btnOpenDefaultText="Add lines"
         onOpen={() => saveInvoiceItems(values)}
-        invoiceId={values.id}
+        invoiceId={values.invoiceId || values.id}
         onResponse={loadMoreRows}
       >
         <Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
