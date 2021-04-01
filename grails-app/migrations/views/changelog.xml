@@ -63,4 +63,7 @@
   <changeSet id="1580848680306-21" author="pmuchowski" runOnChange="true" runAlways="true" failOnError="true">
     <sqlFile path="views/invoice-candidate-view.sql"/>
   </changeSet>
+  <changeSet id="1580848680306-22" author="dhatala" runOnChange="true" runAlways="true" failOnError="true">
+    <sqlFile path="views/stocklist-item-list.sql"/>
+  </changeSet>
 </databaseChangeLog>
