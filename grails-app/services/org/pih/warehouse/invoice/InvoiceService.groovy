@@ -153,23 +153,19 @@ class InvoiceService {
         invoiceItem.delete()
     }
 
-    def addItems(Invoice invoice, List items) {
+    def updateItems(Invoice invoice, List items) {
         items.each { item ->
-            InvoiceCandidate candidateItem = InvoiceCandidate.get(item.id)
-            if (candidateItem) {
-                InvoiceItem invoiceItem = invoiceItemService.createFromCandidate(candidateItem)
+            InvoiceItem invoiceItem = InvoiceItem.get(item.id)
+            if (invoiceItem) {
+                invoiceItem.quantity = item.quantity
+            } else {
+                InvoiceCandidate candidateItem = InvoiceCandidate.get(item.id)
+                invoiceItem = invoiceItemService.createFromCandidate(candidateItem)
                 invoiceItem.quantity = item.quantityToInvoice
                 invoice.addToInvoiceItems(invoiceItem)
             }
         }
-        invoice.save()
-    }
 
-    def updateItems(Invoice invoice, List items) {
-        invoice.invoiceItems.each { invoiceItem ->
-            def newItem = items.find { it.id == invoiceItem.id }
-            invoiceItem.quantity = newItem.quantity
-        }
         invoice.save()
     }
 }

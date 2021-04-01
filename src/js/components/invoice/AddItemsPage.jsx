@@ -46,11 +46,11 @@ const FIELDS = {
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     // eslint-disable-next-line react/prop-types
-    addButton: ({ values, loadMoreRows }) => (
+    addButton: ({ values, loadMoreRows, saveInvoiceItems }) => (
       <InvoiceItemsModal
         btnOpenText="react.default.button.addLines.label"
         btnOpenDefaultText="Add lines"
-        onOpen={() => {}}
+        onOpen={() => saveInvoiceItems(values)}
         invoiceId={values.id}
         onResponse={loadMoreRows}
       >
@@ -144,6 +144,7 @@ class AddItemsPage extends Component {
     this.updateTotalCount = this.updateTotalCount.bind(this);
     this.removeItem = this.removeItem.bind(this);
     this.updateRow = this.updateRow.bind(this);
+    this.saveInvoiceItems = this.saveInvoiceItems.bind(this);
   }
 
   /**
@@ -158,7 +159,7 @@ class AddItemsPage extends Component {
     this.setState({
       values: {
         ...this.state.values,
-        invoiceItems: !_.isNull(startIndex) ? _.uniqBy(_.concat(this.state.values.invoiceItems, data), 'id') : data,
+        invoiceItems: _.isNull(startIndex) || startIndex === 0 ? data : _.uniqBy(_.concat(this.state.values.invoiceItems, data), 'id'),
         totalCount,
       },
     }, () => {
@@ -291,6 +292,7 @@ class AddItemsPage extends Component {
                     updateTotalCount: this.updateTotalCount,
                     removeItem: this.removeItem,
                     updateRow: this.updateRow,
+                    saveInvoiceItems: this.saveInvoiceItems,
                   }))}
               </div>
               <div className="font-weight-bold float-right mr-5er e mt-1">

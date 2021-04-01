@@ -112,15 +112,6 @@ class InvoiceApiController {
         render status: 204
     }
 
-    def addItems = {
-        JSONObject jsonObject = request.JSON
-
-        Invoice invoice = Invoice.get(params.id)
-        List invoiceItems = jsonObject.remove("invoiceItems")
-        invoiceService.addItems(invoice, invoiceItems)
-        render status: 204
-    }
-
     def updateItems = {
         JSONObject jsonObject = request.JSON
 

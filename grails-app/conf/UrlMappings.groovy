@@ -271,11 +271,6 @@ class UrlMappings {
             action = [DELETE: "removeItem"]
         }
 
-        "/api/invoices/$id/addItems"(parseRequest: true) {
-            controller = "invoiceApi"
-            action = [POST: "addItems"]
-        }
-
         "/api/invoices/$id/items"(parseRequest: true) {
             controller = "invoiceApi"
             action = [POST: "updateItems"]

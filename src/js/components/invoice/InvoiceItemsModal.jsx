@@ -141,8 +141,10 @@ class InvoiceItemsModal extends Component {
   }
 
   onOpen() {
-    this.setState(INITIAL_STATE, () => {
-      this.fetchInvoiceItemCandidates();
+    this.props.onOpen().then(() => {
+      this.setState(INITIAL_STATE, () => {
+        this.fetchInvoiceItemCandidates();
+      });
     });
   }
 
@@ -155,10 +157,9 @@ class InvoiceItemsModal extends Component {
       invoiceItems: _.map(selectedInvoiceItems, (item, key) => ({
         id: key,
         quantityToInvoice: _.toInteger(item.quantityToInvoice),
-        sortOrder: _.toInteger(item.sortOrder),
       })),
     };
-    const url = `/openboxes/api/invoices/${invoiceId}/addItems`;
+    const url = `/openboxes/api/invoices/${invoiceId}/items`;
 
     apiClient.post(url, payload)
     .then(() => {
@@ -237,6 +238,7 @@ class InvoiceItemsModal extends Component {
         selectedInvoiceItems: {
           ...selectedInvoiceItems,
           [formValues.invoiceItems[rowIndex].id]: {
+            ...formValues.invoiceItems[rowIndex],
             quantityToInvoice: value ? formValues.invoiceItems[rowIndex].quantity : '',
             sortOrder: value ? formValues.invoiceItems[rowIndex].sortOrder : '',
           },
