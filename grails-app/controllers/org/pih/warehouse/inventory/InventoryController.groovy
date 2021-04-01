@@ -140,16 +140,11 @@ class InventoryController {
         command.offset = params?.offset as Integer
 
 
-        def products = inventoryService.searchProducts(command)
+        def products = productAvailabilityService.searchProducts(command)
 
-        // Get quantity for all products
-        def quantityList = products ? productAvailabilityService.getQuantityOnHand(products, command.location) : []
-
-        def searchResults = products.collect { product ->
-            def quantityOnHand = quantityList.find { it.p == product }?.quantityOnHand ?: 0
-            [product: product, quantityOnHand: quantityOnHand, color: product?.color]
+        command.searchResults = products.collect { it ->
+            [product: it[0], quantityOnHand: it[1], color: it[0]?.color]
         }
-        command.searchResults = searchResults
         command.totalCount = products.totalCount
 
         [commandInstance: command]

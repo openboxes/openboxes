@@ -252,7 +252,8 @@ class Product implements Comparable, Serializable {
             inventoryItems     : InventoryItem,
             productComponents  : ProductComponent,
             productSuppliers   : ProductSupplier,
-            productCatalogItems: ProductCatalogItem
+            productCatalogItems: ProductCatalogItem,
+            productAvailabilities: ProductAvailability
     ]
 
     static mapping = {

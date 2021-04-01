@@ -9,18 +9,22 @@
 **/
 package org.pih.warehouse.inventory
 
+import grails.orm.PagedResultList
 import groovy.sql.BatchingStatementWrapper
 import groovy.sql.Sql
 import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.hibernate.Criteria
+import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductActivityCode
 import org.pih.warehouse.product.ProductAvailability
+import org.pih.warehouse.product.ProductType
 
 class ProductAvailabilityService {
 
@@ -562,4 +566,81 @@ class ProductAvailabilityService {
         log.info "Updated ${results} product availability records for product ${product?.productCode}"
     }
 
+
+    /**
+     *
+     * @param commandInstance
+     * @return
+     */
+    List searchProducts(InventoryCommand command) {
+        def categories = inventoryService.getExplodedCategories([command.category])
+        List searchTerms = (command?.searchTerms ? Arrays.asList(command?.searchTerms?.split(" ")) : null)
+
+        // Only search if there are search terms otherwise the list of product IDs includes all products
+        def innerProductIds = !searchTerms ? [] : Product.createCriteria().list {
+            eq("active", true)
+            projections {
+                distinct 'id'
+            }
+            and {
+                searchTerms.each { searchTerm ->
+                    or {
+                        ilike("name", "%" + searchTerm + "%")
+                        inventoryItems {
+                            ilike("lotNumber", "%" + searchTerm + "%")
+                        }
+                    }
+                }
+            }
+        }
+
+        def products = Product.createCriteria().list {
+            eq("active", true)
+            and {
+                if (categories) {
+                    'in'("category", categories)
+                }
+                if (command.tags) {
+                    tags {
+                        'in'("id", command.tags*.id)
+                    }
+                }
+                if (command.catalogs) {
+                    productCatalogItems {
+                        productCatalog {
+                            'in'("id", command.catalogs*.id)
+                        }
+                    }
+                }
+                // This is pretty inefficient if the previous query does not narrow the results
+                if (innerProductIds) {
+                    'in'("id", innerProductIds)
+                }
+            }
+        }
+
+        def searchableTypes = ProductType.listAllBySupportedActivity([ProductActivityCode.SEARCHABLE])
+
+        def productsWithQoH = Product.executeQuery("""
+            select p, sum(pa.quantityOnHand)
+            from Product p
+            join p.productAvailabilities pa
+            where p in (:products)
+            and pa.location = :location
+            and (p.productType is null or (p.productType in (:searchableTypes) and pa.quantityOnHand > 0))
+            group by p, pa.location
+        """, [max: command.maxResults, offset: command.offset, location: command.location, products: products, searchableTypes: searchableTypes])
+
+        def totalCount = Product.executeQuery("""
+            select p, sum(pa.quantityOnHand)
+            from Product p
+            join p.productAvailabilities pa
+            where p in (:products)
+            and pa.location = :location
+            and (p.productType is null or (p.productType in (:searchableTypes) and pa.quantityOnHand > 0))
+            group by p, pa.location
+        """, [location: command.location, products: products, searchableTypes: searchableTypes]).size()
+
+        return new PagedResultList(productsWithQoH, totalCount)
+    }
 }
