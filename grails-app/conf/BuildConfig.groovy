@@ -90,27 +90,24 @@ grails.project.dependency.resolution = {
             exclude 'spock'
         }
 
-        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.docx:1.0.5") {
-            excludes "xercesImpl", "xml-apis", "xmlbeans"
-        }
-        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.odt:1.0.5") {
-            excludes "xercesImpl", "xml-apis", "xmlbeans"
-        }
-        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.freemarker:1.0.5") {
-            excludes "xercesImpl", "xml-apis", "xmlbeans"
-        }
-        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.velocity:1.0.5") {
-            excludes "xercesImpl", "xml-apis", "xmlbeans"
-        }
-        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.odt.odfdom:1.0.5") {
-            excludes "xercesImpl", "xml-apis", "xmlbeans"
-        }
-        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.xwpf:1.0.5") {
-            excludes "xercesImpl", "xml-apis", "xmlbeans"
-        }
-        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.docx4j:1.0.5") {
-            excludes "xercesImpl", "xml-apis", "xmlbeans"
-        }
+        compile ("fr.opensagres.xdocreport:xdocreport:1.0.6")
+        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.document:1.0.6")
+        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.docx:1.0.6")
+        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.odt:1.0.6")
+        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.template:1.0.6")
+        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.freemarker:1.0.6")
+        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.velocity:1.0.6")
+        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter:1.0.6")
+        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.odt.odfdom:1.0.6")
+        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.xwpf:1.0.6")
+        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.docx4j:1.0.6")
+        compile ("fr.opensagres.xdocreport:org.odftoolkit.odfdom.converter.pdf:1.0.6")
+        //compile ("fr.opensagres.xdocreport:fr.opensagres.poi.xwpf.converter.pdf:1.0.6")
+        //compile("org.thymeleaf:thymeleaf:3.0.12.RELEASE")
+//        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.docx4j:1.0.5") {
+//            excludes "xercesImpl", "xml-apis", "xmlbeans"
+//        }
+
 
         // Fake SMTP server
         test 'dumbster:dumbster:1.6'

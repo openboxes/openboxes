@@ -19,6 +19,7 @@ import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.DocumentCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.UomService
@@ -35,9 +36,10 @@ class OrderController {
     def stockMovementService
     def reportService
     def shipmentService
-    UomService uomService
+    def uomService
     def userService
     def productSupplierDataService
+    def documentTemplateService
 
     static allowedMethods = [save: "POST", update: "POST"]
 
@@ -838,6 +840,21 @@ class OrderController {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
             redirect(action: "list")
         } else {
+            try {
+                List documentTemplates = Document.findAllByDocumentCode(DocumentCode.PURCHASE_ORDER_TEMPLATE)
+                if (documentTemplates) {
+                    Document documentTemplate = documentTemplates.first()
+                    documentTemplateService.renderDocumentTemplate(documentTemplate, [orderInstance: orderInstance], response.outputStream)
+                    response.setHeader("Content-disposition", "attachment; filename=\"${orderInstance.orderNumber}\".pdf");
+                    //response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+                    log.info "document.contentType " + documentTemplate.contentType
+                    //response.setContentType(document.contentType)
+                    response.setContentType("application/pdf")
+                    return
+                }
+            } catch (Exception e) {
+                redirect(controller: "errors", action: "handleException")
+            }
             return [orderInstance: orderInstance]
         }
     }

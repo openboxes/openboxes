@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.core
 
 import fr.opensagres.xdocreport.converter.ConverterTypeTo
@@ -15,14 +15,62 @@ import fr.opensagres.xdocreport.converter.Options
 import fr.opensagres.xdocreport.document.IXDocReport
 import fr.opensagres.xdocreport.document.registry.XDocReportRegistry
 import fr.opensagres.xdocreport.template.IContext
+import fr.opensagres.xdocreport.template.ITemplateEngine
 import fr.opensagres.xdocreport.template.TemplateEngineKind
 import fr.opensagres.xdocreport.template.formatter.FieldsMetadata
+import fr.opensagres.xdocreport.template.freemarker.FreemarkerTemplateEngine
+import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
 class DocumentTemplateService {
 
     boolean transactional = true
+
+    def renderDocumentTemplate(Document documentTemplate, Map model, OutputStream outputStream) {
+        try {
+            InputStream inputStream = new ByteArrayInputStream(documentTemplate.fileContents)
+            IXDocReport report = XDocReportRegistry.getRegistry().
+                    loadReport(inputStream, TemplateEngineKind.Freemarker);
+
+            report.setTemplateEngine(new FreemarkerTemplateEngine())
+            // Add properties to the context
+            IContext context = report.createContext();
+            context.put("orderInstance", model.orderInstance)
+
+            log.info "Set field metadata"
+            FieldsMetadata metadata = report.createFieldsMetadata();
+            metadata.addFieldAsList("r.code");
+            metadata.addFieldAsList("r.description");
+            metadata.addFieldAsList("r.quantity");
+            metadata.addFieldAsList("r.unit");
+            metadata.addFieldAsList("r.price");
+            metadata.addFieldAsList("r.rowtotal");
+            //metadata.load("orderItems", OrderItem.class, true)
+
+            log.info "Add line items"
+            def orderItems = model.orderInstance.orderItems.collect { OrderItem orderItem ->
+                [
+                        code: orderItem.product?.productCode,
+                        description: orderItem.product?.name,
+                        quantity   : orderItem.quantity,
+                        unit       : orderItem?.product?.unitOfMeasure,
+                        price      : orderItem?.product?.pricePerUnit,
+                        rowtotal   : orderItem.quantity * orderItem?.product?.pricePerUnit
+                ]
+            }
+
+            log.info "Add line items to context"
+            context.put("items", orderItems);
+
+            Options options = Options.getTo(ConverterTypeTo.PDF).via(ConverterTypeVia.DOCX4J);
+            report.convert(context, options, outputStream);
+        } catch (Exception e) {
+            log.error("Error while rendering document template: " + e.message, e)
+        }
+    }
+
 
     def renderDocumentTemplate(Document document, Shipment shipment, OutputStream outputStream) {
 
