@@ -82,7 +82,7 @@ class InvoiceItem implements Serializable {
     }
 
     Float getTotalAmount() {
-        return quantityPerUom * quantity * amount ?: 0
+        return quantityPerUom * quantity * (amount?:1) ?: 0
     }
 
     String getUnitOfMeasure() {

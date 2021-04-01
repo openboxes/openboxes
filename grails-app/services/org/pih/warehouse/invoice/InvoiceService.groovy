@@ -20,6 +20,7 @@ class InvoiceService {
     boolean transactional = true
 
     def dataService
+    def invoiceItemService
 
     def getInvoices(Invoice invoiceTemplate, Map params) {
         def invoices = Invoice.createCriteria().list(params) {
@@ -61,7 +62,7 @@ class InvoiceService {
         return invoiceItems
     }
 
-    def getInvoiceCandidates(String id, String orderNumber, String shipmentNumber, String max, String offset) {
+    def getInvoiceCandidates(String id, String orderNumber, String shipmentNumber) {
         Invoice invoice = Invoice.get(id)
 
         if (!invoice) {
@@ -69,23 +70,23 @@ class InvoiceService {
         }
 
         List<InvoiceCandidate> invoiceCandidates = InvoiceCandidate.createCriteria()
-                .list(max: max.toInteger(), offset: offset.toInteger()) {
-                    if (invoice.party) {
-                        eq("vendor", invoice.party)
-                    }
-
-                    if (invoice.currencyUom?.code) {
-                        eq("currencyCode", invoice.currencyUom.code)
-                    }
-
-                    if (StringUtils.isNotBlank(orderNumber)) {
-                        eq("orderNumber", orderNumber)
-                    }
-
-                    if (StringUtils.isNotBlank(shipmentNumber)) {
-                        eq("shipmentNumber", shipmentNumber)
-                    }
+            .list() {
+                if (invoice.party) {
+                    eq("vendor", invoice.party)
                 }
+
+                if (invoice.currencyUom?.code) {
+                    eq("currencyCode", invoice.currencyUom.code)
+                }
+
+                if (StringUtils.isNotBlank(orderNumber)) {
+                    ilike("orderNumber", "%" + orderNumber + "%")
+                }
+
+                if (StringUtils.isNotBlank(shipmentNumber)) {
+                    ilike("shipmentNumber", "%" + shipmentNumber + "%")
+                }
+            }
 
         return invoiceCandidates
     }
@@ -153,10 +154,18 @@ class InvoiceService {
     }
 
     def updateItems(Invoice invoice, List items) {
-        invoice.invoiceItems.each { invoiceItem ->
-            def newItem = items.find { it.id == invoiceItem.id }
-            invoiceItem.quantity = newItem.quantity
+        items.each { item ->
+            InvoiceItem invoiceItem = InvoiceItem.get(item.id)
+            if (invoiceItem) {
+                invoiceItem.quantity = item.quantity
+            } else {
+                InvoiceCandidate candidateItem = InvoiceCandidate.get(item.id)
+                invoiceItem = invoiceItemService.createFromCandidate(candidateItem)
+                invoiceItem.quantity = item.quantityToInvoice
+                invoice.addToInvoiceItems(invoiceItem)
+            }
         }
+
         invoice.save()
     }
 }

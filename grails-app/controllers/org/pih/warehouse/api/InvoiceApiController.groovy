@@ -97,12 +97,13 @@ class InvoiceApiController {
 
     def getInvoiceItems = {
         List<InvoiceItem> invoiceItems = invoiceService.getInvoiceItems(params.id, params.max, params.offset)
-        render([data: invoiceItems] as JSON)
+        render([data: invoiceItems, totalCount: invoiceItems.totalCount?:invoiceItems.size()] as JSON)
     }
 
     def getInvoiceItemCandidates = {
-        List<InvoiceCandidate> invoiceCandidates = invoiceService.getInvoiceCandidates(params.id,
-                params.orderNumber, params.shipmentNumber, params.max, params.offset)
+        List<InvoiceCandidate> invoiceCandidates = invoiceService.getInvoiceCandidates(
+            params.id, params.orderNumber, params.shipmentNumber
+        )
         render([data: invoiceCandidates] as JSON)
     }
 
