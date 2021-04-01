@@ -25,10 +25,10 @@ const DELETE_BUTTON_FIELD = {
   buttonLabel: 'react.default.button.delete.label',
   buttonDefaultMessage: 'Delete',
   getDynamicAttr: ({
-    fieldValue, removeItem, removeRow, updateTotalCount,
+    fieldValue, removeItem, removeRow, updateTotalCount, values, rowIndex,
   }) => ({
     onClick: fieldValue && fieldValue.id ? () => {
-      removeItem(fieldValue.id).then(() => removeRow());
+      removeItem(fieldValue.id, values, rowIndex).then(() => removeRow());
       updateTotalCount(-1);
     } : () => { updateTotalCount(-1); removeRow(); },
   }),
@@ -135,7 +135,7 @@ class AddItemsPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      values: { ...this.props.initialValues, invoiceItems: [] },
+      values: { ...this.props.initialValues, invoiceItems: [], totalValue: 0 },
       isFirstPageLoaded: false,
     };
 
@@ -156,11 +156,15 @@ class AddItemsPage extends Component {
     this.props.showSpinner();
     const { data, totalCount } = response.data;
 
+    const value = _.reduce(data, (sum, val) =>
+      (sum + (val.totalAmount ? _.toInteger(val.totalAmount) : 0)), 0);
+
     this.setState({
       values: {
         ...this.state.values,
         invoiceItems: _.isNull(startIndex) || startIndex === 0 ? data : _.uniqBy(_.concat(this.state.values.invoiceItems, data), 'id'),
         totalCount,
+        totalValue: this.state.values.totalValue + value,
       },
     }, () => {
       if (!_.isNull(startIndex) &&
@@ -247,7 +251,7 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Saves invoices items and goes to the step.
+   * Saves invoices items and goes to the next step.
    * @param {object} values
    * @public
    */
@@ -258,14 +262,34 @@ class AddItemsPage extends Component {
   }
 
   /**
+   * Saves invoices items and goes to the previous step.
+   * @param {object} values
+   * @public
+   */
+  previousPage(values) {
+    this.saveInvoiceItems(values).then(() => {
+      this.props.previousPage(values);
+    });
+  }
+
+  /**
    * Removes chosen item from items list.
    * @param {string} itemId
    * @public
    */
-  removeItem(itemId) {
+  removeItem(itemId, values, index) {
     const removeItemsUrl = `/openboxes/api/invoices/${itemId}/removeItem`;
+    const item = values.invoiceItems[index];
 
     return apiClient.delete(removeItemsUrl)
+      .then(() => {
+        this.setState({
+          values: {
+            ...this.state.values,
+            totalValue: _.toInteger(this.state.values.totalValue) - _.toInteger(item.totalAmount),
+          },
+        });
+      })
       .catch(() => {
         this.props.hideSpinner();
         return Promise.reject(new Error('react.invoice.error.deleteInvoiceItem.label'));
@@ -301,7 +325,7 @@ class AddItemsPage extends Component {
               &nbsp;
               <div className="submit-buttons">
                 <button
-                  onClick={() => this.props.previousPage(this.props.initialValues)}
+                  onClick={() => this.previousPage(values)}
                   className="btn btn-outline-primary btn-form btn-xs"
                 >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
