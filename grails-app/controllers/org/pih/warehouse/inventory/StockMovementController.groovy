@@ -83,7 +83,7 @@ class StockMovementController {
         }
 
         StockMovementType stockMovementType = currentLocation == stockMovement.origin ?
-                StockMovementType.OUTBOUND : currentLocation == stockMovement.destination ?
+                StockMovementType.OUTBOUND : currentLocation == stockMovement.destination || stockMovement?.origin?.isSupplier() ?
                         StockMovementType.INBOUND : null
 
         if (stockMovementType == StockMovementType.OUTBOUND && stockMovement.requisition.sourceType == RequisitionSourceType.ELECTRONIC) {
