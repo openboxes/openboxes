@@ -1081,7 +1081,7 @@ class JsonController {
                     color: product.color
             ]
         }
-        render json as JSON
+        render json.findAll { it != null } as JSON
     }
 
     @CacheFlush("quantityOnHandCache")
