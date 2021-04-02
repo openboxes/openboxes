@@ -112,7 +112,7 @@ class CreateInvoicePage extends Component {
   }
 
   checkInvoiceChange(newValues) {
-    if (!this.state.invoiceId) {
+    if (!this.state.id) {
       return false;
     }
 
@@ -151,7 +151,7 @@ class CreateInvoicePage extends Component {
             this.props.history.push(`/openboxes/invoice/create/${resp.id}`);
             this.props.nextPage({
               ...values,
-              invoiceId: resp.id,
+              id: resp.id,
               invoiceNumber: resp.invoiceNumber,
               totalCount: resp.totalCount,
             });
