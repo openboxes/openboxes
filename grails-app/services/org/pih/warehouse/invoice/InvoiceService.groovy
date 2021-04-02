@@ -12,8 +12,11 @@ package org.pih.warehouse.invoice
 import org.apache.commons.lang.StringUtils
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.order.OrderAdjustment
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.ReferenceNumberType
+import org.pih.warehouse.shipping.ShipmentItem
 
 class InvoiceService {
 
@@ -160,12 +163,35 @@ class InvoiceService {
                 invoiceItem.quantity = item.quantity
             } else {
                 InvoiceCandidate candidateItem = InvoiceCandidate.get(item.id)
-                invoiceItem = invoiceItemService.createFromCandidate(candidateItem)
+                invoiceItem = createFromInvoiceItemCandidate(candidateItem)
                 invoiceItem.quantity = item.quantityToInvoice
                 invoice.addToInvoiceItems(invoiceItem)
             }
         }
 
         invoice.save()
+    }
+
+    InvoiceItem createFromInvoiceItemCandidate(InvoiceCandidate candidate) {
+        InvoiceItem invoiceItem = new InvoiceItem(
+            budgetCode: candidate.budgetCode,
+            product: Product.findByProductCode(candidate.productCode),
+            glAccount: candidate.glAccount,
+            quantity: candidate.quantity,
+            quantityUom: candidate.quantityUom,
+            quantityPerUom: candidate.quantityPerUom,
+        )
+
+        ShipmentItem shipmentItem = ShipmentItem.get(candidate.id)
+        if (shipmentItem) {
+            invoiceItem.addToShipmentItems(shipmentItem)
+        } else {
+            OrderAdjustment orderAdjustment = OrderAdjustment.get(candidate.id)
+            if (orderAdjustment) {
+                invoiceItem.addToOrderAdjustments(orderAdjustment)
+            }
+        }
+
+        return invoiceItem
     }
 }
