@@ -65,14 +65,14 @@ class InvoiceService {
         return invoiceItems
     }
 
-    def getInvoiceCandidates(String id, String orderNumber, String shipmentNumber) {
+    def getInvoiceItemCandidates(String id, String orderNumber, String shipmentNumber) {
         Invoice invoice = Invoice.get(id)
 
         if (!invoice) {
             return []
         }
 
-        List<InvoiceCandidate> invoiceCandidates = InvoiceCandidate.createCriteria()
+        List<InvoiceItemCandidate> invoiceItemCandidates = InvoiceItemCandidate.createCriteria()
             .list() {
                 if (invoice.party) {
                     eq("vendor", invoice.party)
@@ -91,7 +91,7 @@ class InvoiceService {
                 }
             }
 
-        return invoiceCandidates
+        return invoiceItemCandidates
     }
 
     def listInvoices(Location currentLocation, Map params) {
@@ -162,7 +162,7 @@ class InvoiceService {
             if (invoiceItem) {
                 invoiceItem.quantity = item.quantity
             } else {
-                InvoiceCandidate candidateItem = InvoiceCandidate.get(item.id)
+                InvoiceItemCandidate candidateItem = InvoiceItemCandidate.get(item.id)
                 invoiceItem = createFromInvoiceItemCandidate(candidateItem)
                 invoiceItem.quantity = item.quantityToInvoice
                 invoice.addToInvoiceItems(invoiceItem)
@@ -172,7 +172,7 @@ class InvoiceService {
         invoice.save()
     }
 
-    InvoiceItem createFromInvoiceItemCandidate(InvoiceCandidate candidate) {
+    InvoiceItem createFromInvoiceItemCandidate(InvoiceItemCandidate candidate) {
         InvoiceItem invoiceItem = new InvoiceItem(
             budgetCode: candidate.budgetCode,
             product: Product.findByProductCode(candidate.productCode),
