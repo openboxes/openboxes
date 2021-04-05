@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode; org.pih.warehouse.order.OrderTypeCode" %>
+<%@ page import="org.pih.warehouse.core.DocumentCode; org.pih.warehouse.shipping.ShipmentStatusCode; org.pih.warehouse.order.OrderTypeCode" %>
 <%@ page import="org.pih.warehouse.order.OrderStatus" %>
 
 <div id="order-summary" class="summary">
@@ -135,7 +135,7 @@
                             </g:link>
                         </div>
                         <div class="button-group right">
-                            <g:link controller="order" action="print" id="${orderInstance?.id}" class="button" target="_blank"
+                            <g:link controller="order" action="print" id="${orderInstance?.id}" class="button"
                                     disabled="${orderInstance?.status < org.pih.warehouse.order.OrderStatus.PLACED}"
                                     disabledMessage="Order must be placed in order to print.">
                                 <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />&nbsp;
@@ -187,6 +187,16 @@
                                 <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />&nbsp;
                                 <warehouse:message code="order.wizard.printOrder.label" default="Print Order"/>
                             </g:link>
+                            <g:each var="documentTemplate" in="${org.pih.warehouse.core.Document.findAllByDocumentCode(org.pih.warehouse.core.DocumentCode.PURCHASE_ORDER_TEMPLATE)}">
+                                <g:link controller="order" action="render" id="${orderInstance?.id}" target="_blank"
+                                        params="['documentTemplate.id': documentTemplate.id]" class="button"
+                                        disabled="${orderInstance?.status < org.pih.warehouse.order.OrderStatus.PLACED}"
+                                        disabledMessage="Order must be placed in order to print.">
+                                    <img src="${resource(dir: 'images/icons/silk', file: 'page.png')}" />&nbsp;
+                                    <warehouse:message code="default.download.label" default="Download" args="[documentTemplate?.name]"/>
+                                </g:link>
+                            </g:each>
+
                             <g:link controller="order" action="download" id="${orderInstance?.id}" class="button" target="_blank">
                                 <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" />&nbsp;
                                 <warehouse:message code="order.wizard.downloadOrder.label" default="Download Order"/>

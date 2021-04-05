@@ -40,6 +40,7 @@ class OrderController {
     def userService
     def productSupplierDataService
     def documentTemplateService
+    def groovyPagesTemplateEngine
 
     static allowedMethods = [save: "POST", update: "POST"]
 
@@ -840,25 +841,40 @@ class OrderController {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
             redirect(action: "list")
         } else {
-            try {
-                List documentTemplates = Document.findAllByDocumentCode(DocumentCode.PURCHASE_ORDER_TEMPLATE)
-                if (documentTemplates) {
-                    Document documentTemplate = documentTemplates.first()
-                    documentTemplateService.renderDocumentTemplate(documentTemplate, [orderInstance: orderInstance], response.outputStream)
-                    response.setHeader("Content-disposition", "attachment; filename=\"${orderInstance.orderNumber}\".pdf");
-                    //response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-                    log.info "document.contentType " + documentTemplate.contentType
-                    //response.setContentType(document.contentType)
-                    response.setContentType("application/pdf")
-                    return
-                }
-            } catch (Exception e) {
-                redirect(controller: "errors", action: "handleException")
+            Document documentTemplate = Document.findByName("${controllerName}:${actionName}")
+            if (documentTemplate) {
+                render documentTemplateService.renderGroovyServerPageDocumentTemplate(documentTemplate, [orderInstance:orderInstance])
+                return
             }
-            return [orderInstance: orderInstance]
+            [orderInstance: orderInstance]
         }
     }
 
+    def render = {
+        def orderInstance = Order.get(params.id)
+        if (!orderInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
+            redirect(action: "list")
+        } else {
+            if (!params?.documentTemplate?.id) {
+                throw new IllegalArgumentException("documentTemplate.id is required")
+            }
+
+            //try {
+                Document documentTemplate = Document.get(params?.documentTemplate?.id)
+                if (documentTemplate) {
+                    documentTemplateService.renderDocumentTemplate(documentTemplate, [orderInstance: orderInstance], response.outputStream)
+                    response.setHeader("Content-disposition", "attachment; filename=\"${orderInstance.orderNumber}\".pdf");
+                    response.setContentType("application/pdf")
+                    return
+                }
+            //} catch (Exception e) {
+            //    log.error("Render " + e.message, e)
+            //    throw e;
+            //}
+        }
+        [orderInstance:orderInstance]
+    }
 
     def renderPdf = {
         def orderInstance = Order.get(params.id)

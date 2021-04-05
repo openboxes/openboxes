@@ -19,6 +19,8 @@ import fr.opensagres.xdocreport.template.ITemplateEngine
 import fr.opensagres.xdocreport.template.TemplateEngineKind
 import fr.opensagres.xdocreport.template.formatter.FieldsMetadata
 import fr.opensagres.xdocreport.template.freemarker.FreemarkerTemplateEngine
+import org.apache.commons.io.IOUtils
+import org.codehaus.groovy.grails.web.pages.GroovyPagesTemplateEngine
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.shipping.Shipment
@@ -27,6 +29,15 @@ import org.pih.warehouse.shipping.ShipmentItem
 class DocumentTemplateService {
 
     boolean transactional = true
+    GroovyPagesTemplateEngine groovyPagesTemplateEngine
+
+    def renderGroovyServerPageDocumentTemplate(Document documentTemplate, Map model) {
+        def output = new StringWriter()
+        def template = groovyPagesTemplateEngine.createTemplate(new String(documentTemplate.fileContents), documentTemplate.name)
+        template.make(model).writeTo(output)
+        log.info "output " + output.toString()
+        return output.toString()
+    }
 
     def renderDocumentTemplate(Document documentTemplate, Map model, OutputStream outputStream) {
         try {
@@ -36,17 +47,16 @@ class DocumentTemplateService {
 
             report.setTemplateEngine(new FreemarkerTemplateEngine())
             // Add properties to the context
-            IContext context = report.createContext();
-            context.put("orderInstance", model.orderInstance)
+            IContext context = report.createContext(model);
 
             log.info "Set field metadata"
             FieldsMetadata metadata = report.createFieldsMetadata();
-            metadata.addFieldAsList("r.code");
-            metadata.addFieldAsList("r.description");
-            metadata.addFieldAsList("r.quantity");
-            metadata.addFieldAsList("r.unit");
-            metadata.addFieldAsList("r.price");
-            metadata.addFieldAsList("r.rowtotal");
+            metadata.addFieldAsList("i.code");
+            metadata.addFieldAsList("i.description");
+            metadata.addFieldAsList("i.quantity");
+            metadata.addFieldAsList("i.unit");
+            metadata.addFieldAsList("i.price");
+            metadata.addFieldAsList("i.rowtotal");
             //metadata.load("orderItems", OrderItem.class, true)
 
             log.info "Add line items"
