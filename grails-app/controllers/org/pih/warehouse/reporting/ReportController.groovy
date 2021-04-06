@@ -594,8 +594,6 @@ class ReportController {
         log.info "Returned ${binLocations.size()} bin locations for location ${location}"
         String dateFormat = grailsApplication.config.openboxes.expirationDate.format
 
-        Map additionalColumns = grailsApplication.config.openboxes.cycleCount.additionalColumns
-
         List rows = binLocations.collect { row ->
 
             // Required in order to avoid lazy initialization exception that occurs because all
@@ -616,7 +614,6 @@ class ReportController {
                             "Category"            : StringEscapeUtils.escapeCsv(row?.category?.name ?: ""),
                             "Formularies"         : product.productCatalogs.join(", ") ?: "",
                             "ABC Classification"  : StringEscapeUtils.escapeCsv(row?.product.getAbcClassification(location.id) ?: ""),
-                            "Bin Location Old"    : StringEscapeUtils.escapeCsv(row?.product?.getBinLocation(location.id) ?: ""),
                             "Status"              : g.message(code: "binLocationSummary.${row?.status}.label"),
                             "Last Inventory Date" : latestInventoryDate ? latestInventoryDate.format(dateFormat) : "",
                     ] : [
@@ -629,17 +626,10 @@ class ReportController {
                             expirationDate    : row?.inventoryItem.expirationDate ? row?.inventoryItem.expirationDate.format(dateFormat) : "",
                             abcClassification : StringEscapeUtils.escapeCsv(row?.product.getAbcClassification(location.id) ?: ""),
                             binLocation       : StringEscapeUtils.escapeCsv(row?.binLocation?.name ?: ""),
-                            binLocationOld    : StringEscapeUtils.escapeCsv(row?.product?.getBinLocation(location.id) ?: ""),
                             status            : g.message(code: "binLocationSummary.${row?.status}.label"),
                             lastInventoryDate : latestInventoryDate ? latestInventoryDate.format(dateFormat) : "",
                             quantityOnHand    : row?.quantity ?: 0,
                     ]
-
-            // Iterate over additional columns
-            additionalColumns.each { columnKey, Closure columnExpression ->
-                String columnValue = columnExpression ? columnExpression.call(row) : ""
-                dataRow << ["${StringEscapeUtils.escapeCsv(columnKey)}": StringEscapeUtils.escapeCsv(columnValue)]
-            }
 
             return dataRow
         }
