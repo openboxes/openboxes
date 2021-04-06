@@ -15,7 +15,7 @@ import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.UnitOfMeasure
 
-class InvoiceCandidate {
+class InvoiceItemCandidate {
 
     String id
 

@@ -34,7 +34,7 @@ import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.invoice.InvoiceCandidate
+import org.pih.warehouse.invoice.InvoiceItemCandidate
 import org.pih.warehouse.invoice.InvoiceItem
 import org.pih.warehouse.jobs.RefreshDemandDataJob
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
@@ -405,8 +405,8 @@ class BootStrap {
             return invoiceItem.toJson()
         }
 
-        JSON.registerObjectMarshaller(InvoiceCandidate) { InvoiceCandidate invoiceCandidate ->
-            return invoiceCandidate.toJson()
+        JSON.registerObjectMarshaller(InvoiceItemCandidate) { InvoiceItemCandidate invoiceItemCandidate ->
+            return invoiceItemCandidate.toJson()
         }
 
 

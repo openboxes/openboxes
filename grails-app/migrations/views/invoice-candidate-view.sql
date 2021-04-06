@@ -1,4 +1,5 @@
-CREATE OR REPLACE VIEW invoice_candidate AS
+DROP VIEW IF EXISTS invoice_candidate;
+CREATE OR REPLACE VIEW invoice_item_candidate AS
 (select order_adjustment.id as id,
         `order`.order_number as order_number,
         '' as shipment_number,

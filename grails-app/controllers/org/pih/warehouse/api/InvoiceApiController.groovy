@@ -15,7 +15,7 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.invoice.Invoice
-import org.pih.warehouse.invoice.InvoiceCandidate
+import org.pih.warehouse.invoice.InvoiceItemCandidate
 import org.pih.warehouse.invoice.InvoiceItem
 
 class InvoiceApiController {
@@ -101,10 +101,10 @@ class InvoiceApiController {
     }
 
     def getInvoiceItemCandidates = {
-        List<InvoiceCandidate> invoiceCandidates = invoiceService.getInvoiceCandidates(
+        List<InvoiceItemCandidate> invoiceItemCandidates = invoiceService.getInvoiceItemCandidates(
             params.id, params.orderNumber, params.shipmentNumber
         )
-        render([data: invoiceCandidates] as JSON)
+        render([data: invoiceItemCandidates] as JSON)
     }
 
     def removeItem = {

@@ -12,8 +12,11 @@ package org.pih.warehouse.invoice
 import org.apache.commons.lang.StringUtils
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.order.OrderAdjustment
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.ReferenceNumberType
+import org.pih.warehouse.shipping.ShipmentItem
 
 class InvoiceService {
 
@@ -62,14 +65,14 @@ class InvoiceService {
         return invoiceItems
     }
 
-    def getInvoiceCandidates(String id, String orderNumber, String shipmentNumber) {
+    def getInvoiceItemCandidates(String id, String orderNumber, String shipmentNumber) {
         Invoice invoice = Invoice.get(id)
 
         if (!invoice) {
             return []
         }
 
-        List<InvoiceCandidate> invoiceCandidates = InvoiceCandidate.createCriteria()
+        List<InvoiceItemCandidate> invoiceItemCandidates = InvoiceItemCandidate.createCriteria()
             .list() {
                 if (invoice.party) {
                     eq("vendor", invoice.party)
@@ -88,7 +91,7 @@ class InvoiceService {
                 }
             }
 
-        return invoiceCandidates
+        return invoiceItemCandidates
     }
 
     def listInvoices(Location currentLocation, Map params) {
@@ -159,13 +162,39 @@ class InvoiceService {
             if (invoiceItem) {
                 invoiceItem.quantity = item.quantity
             } else {
-                InvoiceCandidate candidateItem = InvoiceCandidate.get(item.id)
-                invoiceItem = invoiceItemService.createFromCandidate(candidateItem)
+                InvoiceItemCandidate candidateItem = InvoiceItemCandidate.get(item.id)
+                if (!candidateItem) {
+                    throw new IllegalArgumentException("No Invoice Item Candidate found with ID ${id}")
+                }
+                invoiceItem = createFromInvoiceItemCandidate(candidateItem)
                 invoiceItem.quantity = item.quantityToInvoice
                 invoice.addToInvoiceItems(invoiceItem)
             }
         }
 
         invoice.save()
+    }
+
+    InvoiceItem createFromInvoiceItemCandidate(InvoiceItemCandidate candidate) {
+        InvoiceItem invoiceItem = new InvoiceItem(
+            budgetCode: candidate.budgetCode,
+            product: Product.findByProductCode(candidate.productCode),
+            glAccount: candidate.glAccount,
+            quantity: candidate.quantity,
+            quantityUom: candidate.quantityUom,
+            quantityPerUom: candidate.quantityPerUom,
+        )
+
+        ShipmentItem shipmentItem = ShipmentItem.get(candidate.id)
+        if (shipmentItem) {
+            invoiceItem.addToShipmentItems(shipmentItem)
+        } else {
+            OrderAdjustment orderAdjustment = OrderAdjustment.get(candidate.id)
+            if (orderAdjustment) {
+                invoiceItem.addToOrderAdjustments(orderAdjustment)
+            }
+        }
+
+        return invoiceItem
     }
 }
