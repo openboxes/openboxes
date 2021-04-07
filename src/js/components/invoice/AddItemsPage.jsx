@@ -114,17 +114,23 @@ const FIELDS = {
         defaultMessage: 'UOM',
         flexWidth: '1',
       },
-      amount: {
+      unitPrice: {
         type: LabelField,
         label: 'react.invoice.unitPrice.label',
         defaultMessage: 'Unit Price',
         flexWidth: '1',
+        attributes: {
+          formatValue: value => (value ? (value.toFixed(2)) : value),
+        },
       },
       totalAmount: {
         type: LabelField,
         label: 'react.invoice.totalPrice.label',
         defaultMessage: 'Total Price',
         flexWidth: '1',
+        attributes: {
+          formatValue: value => (value ? (value.toFixed(2)) : value),
+        },
       },
       deleteButton: DELETE_BUTTON_FIELD,
     },
@@ -156,15 +162,16 @@ class AddItemsPage extends Component {
     this.props.showSpinner();
     const { data, totalCount } = response.data;
 
-    const value = _.reduce(data, (sum, val) =>
-      (sum + (val.totalAmount ? _.toInteger(val.totalAmount) : 0)), 0);
+    const invoiceItems = _.isNull(startIndex) || startIndex === 0 ? data : _.uniqBy(_.concat(this.state.values.invoiceItems, data), 'id');
+    const totalValue = _.reduce(invoiceItems, (sum, val) =>
+      (sum + (val.totalAmount ? parseFloat(val.totalAmount) : 0.0)), 0);
 
     this.setState({
       values: {
         ...this.state.values,
-        invoiceItems: _.isNull(startIndex) || startIndex === 0 ? data : _.uniqBy(_.concat(this.state.values.invoiceItems, data), 'id'),
+        invoiceItems,
         totalCount,
-        totalValue: this.state.values.totalValue + value,
+        totalValue: totalValue.toFixed(2),
       },
     }, () => {
       if (!_.isNull(startIndex) &&
@@ -280,13 +287,13 @@ class AddItemsPage extends Component {
   removeItem(itemId, values, index) {
     const removeItemsUrl = `/openboxes/api/invoices/${itemId}/removeItem`;
     const item = values.invoiceItems[index];
-
+    const newTotalValue = parseFloat(this.state.values.totalValue) - parseFloat(item.totalAmount);
     return apiClient.delete(removeItemsUrl)
       .then(() => {
         this.setState({
           values: {
             ...this.state.values,
-            totalValue: _.toInteger(this.state.values.totalValue) - _.toInteger(item.totalAmount),
+            totalValue: newTotalValue.toFixed(2),
           },
         });
       })
