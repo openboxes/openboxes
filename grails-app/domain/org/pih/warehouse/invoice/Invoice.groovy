@@ -127,7 +127,9 @@ class Invoice implements Serializable {
         invoiceItems.each {invoiceItem ->
             if (invoiceItem?.order?.documents) {
                 invoiceItem?.order?.documents?.each {document ->
-                    documents.add(document)
+                    if (!documents.contains(document)) {
+                        documents.add(document)
+                    }
                 }
             }
         }

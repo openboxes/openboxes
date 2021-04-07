@@ -64,7 +64,7 @@ class InvoiceItem implements Serializable {
         orderAdjustments joinTable: [name: 'order_adjustment_invoice', key: 'invoice_item_id', column: 'order_adjustment_id']
     }
 
-    static transients = ['totalAmount', 'unitOfMeasure', 'orderNumber', 'shipmentNumber', 'description', 'order']
+    static transients = ['unitPrice', 'totalAdjustments', 'subtotal', 'totalAmount', 'unitOfMeasure', 'orderNumber', 'shipmentNumber', 'description', 'order']
 
     static constraints = {
         invoice(nullable: false)
@@ -81,8 +81,29 @@ class InvoiceItem implements Serializable {
         createdBy(nullable: true)
     }
 
-    Float getTotalAmount() {
-        return quantityPerUom * quantity * (amount?:1) ?: 0
+    Float getUnitPrice() {
+        Float unitPrice = 0.0
+        if (shipmentItems) {
+            unitPrice = shipmentItems?.iterator()?.next()?.orderItems?.iterator()?.next()?.unitPrice
+        } else if (orderAdjustments) {
+            unitPrice = orderAdjustments?.iterator()?.next()?.orderItem?.unitPrice
+        }
+
+        return unitPrice ?: 0.0
+    }
+
+    def getTotalAdjustments() {
+        return orderAdjustments?.findAll {!it.canceled }.sum {
+            return it.amount ?: it.percentage ? (it.percentage/100) * subtotal : 0
+        }?:0
+    }
+
+    def getSubtotal() {
+        return (quantity ?: 0.0) * (unitPrice ?: 0.0)
+    }
+
+    def getTotalAmount() {
+        return (subtotal + totalAdjustments)?:0
     }
 
     String getUnitOfMeasure() {
@@ -123,6 +144,7 @@ class InvoiceItem implements Serializable {
                 quantity: quantity,
                 uom: unitOfMeasure,
                 amount: amount,
+                unitPrice: unitPrice,
                 totalAmount: totalAmount,
         ]
     }
