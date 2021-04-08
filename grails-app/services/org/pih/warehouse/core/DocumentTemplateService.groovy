@@ -19,6 +19,7 @@ import fr.opensagres.xdocreport.template.ITemplateEngine
 import fr.opensagres.xdocreport.template.TemplateEngineKind
 import fr.opensagres.xdocreport.template.formatter.FieldsMetadata
 import fr.opensagres.xdocreport.template.freemarker.FreemarkerTemplateEngine
+import groovy.text.Template
 import org.apache.commons.io.IOUtils
 import org.codehaus.groovy.grails.web.pages.GroovyPagesTemplateEngine
 import org.pih.warehouse.order.Order
@@ -32,53 +33,50 @@ class DocumentTemplateService {
     GroovyPagesTemplateEngine groovyPagesTemplateEngine
 
     def renderGroovyServerPageDocumentTemplate(Document documentTemplate, Map model) {
-        def output = new StringWriter()
-        def template = groovyPagesTemplateEngine.createTemplate(new String(documentTemplate.fileContents), documentTemplate.name)
+        StringWriter output = new StringWriter()
+        String templateContents = new String(documentTemplate.fileContents)
+        Template template = groovyPagesTemplateEngine.createTemplate(templateContents, documentTemplate.name)
         template.make(model).writeTo(output)
-        log.info "output " + output.toString()
         return output.toString()
     }
 
-    def renderDocumentTemplate(Document documentTemplate, Map model, OutputStream outputStream) {
-        try {
-            InputStream inputStream = new ByteArrayInputStream(documentTemplate.fileContents)
-            IXDocReport report = XDocReportRegistry.getRegistry().
-                    loadReport(inputStream, TemplateEngineKind.Freemarker);
+    def renderDocumentTemplate(Document documentTemplate, Map model, TemplateEngineKind templateEngineKind, ConverterTypeTo targetDocumentType, OutputStream outputStream) {
+        InputStream inputStream = new ByteArrayInputStream(documentTemplate.fileContents)
+        IXDocReport report = XDocReportRegistry.getRegistry().
+                loadReport(inputStream, templateEngineKind);
 
-            report.setTemplateEngine(new FreemarkerTemplateEngine())
-            // Add properties to the context
-            IContext context = report.createContext(model);
+        // Add properties to the context
+        IContext context = report.createContext(model);
 
-            log.info "Set field metadata"
-            FieldsMetadata metadata = report.createFieldsMetadata();
-            metadata.addFieldAsList("i.code");
-            metadata.addFieldAsList("i.description");
-            metadata.addFieldAsList("i.quantity");
-            metadata.addFieldAsList("i.unit");
-            metadata.addFieldAsList("i.price");
-            metadata.addFieldAsList("i.rowtotal");
-            //metadata.load("orderItems", OrderItem.class, true)
+        log.info "Set field metadata"
+        FieldsMetadata metadata = report.createFieldsMetadata();
+        metadata.addFieldAsList("orderItem.code");
+        metadata.addFieldAsList("orderItem.description");
+        metadata.addFieldAsList("orderItem.quantity");
+        metadata.addFieldAsList("orderItem.unit");
+        metadata.addFieldAsList("orderItem.price");
+        metadata.addFieldAsList("orderItem.total");
 
-            log.info "Add line items"
-            def orderItems = model.orderInstance.orderItems.collect { OrderItem orderItem ->
-                [
-                        code: orderItem.product?.productCode,
-                        description: orderItem.product?.name,
-                        quantity   : orderItem.quantity,
-                        unit       : orderItem?.product?.unitOfMeasure,
-                        price      : orderItem?.product?.pricePerUnit,
-                        rowtotal   : orderItem.quantity * orderItem?.product?.pricePerUnit
-                ]
-            }
-
-            log.info "Add line items to context"
-            context.put("items", orderItems);
-
-            Options options = Options.getTo(ConverterTypeTo.PDF).via(ConverterTypeVia.DOCX4J);
-            report.convert(context, options, outputStream);
-        } catch (Exception e) {
-            log.error("Error while rendering document template: " + e.message, e)
+        log.info "Add line items"
+        def orderItems = model.order.orderItems.collect { OrderItem orderItem ->
+            [
+                    code       : orderItem.product?.productCode,
+                    description: orderItem.product?.name,
+                    quantity   : orderItem.quantity,
+                    unit       : orderItem?.product?.unitOfMeasure,
+                    price      : orderItem?.product?.pricePerUnit,
+                    total   : orderItem.quantity * orderItem?.product?.pricePerUnit
+            ]
         }
+
+        log.info "Add line items to context"
+        context.put("orderItems", orderItems);
+
+        ConverterTypeVia sourceDocumentType = report.getKind() == "DOCX" ? ConverterTypeVia.DOCX4J :
+                report.getKind() == "ODT" ? ConverterTypeVia.ODFDOM : ConverterTypeVia.XWPF
+        Options options = Options.getTo(targetDocumentType).via(sourceDocumentType);
+
+        report.convert(context, options, outputStream);
     }
 
 

@@ -9,10 +9,13 @@
  **/
 package org.pih.warehouse.order
 
+import fr.opensagres.xdocreport.converter.ConverterTypeTo
+import fr.opensagres.xdocreport.template.TemplateEngineKind
 import grails.converters.JSON
 import grails.validation.ValidationException
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.plugins.csv.CSVWriter
+import org.hibernate.exception.ExceptionUtils
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.BudgetCode
@@ -850,6 +853,12 @@ class OrderController {
         }
     }
 
+    def downloadFields = {
+        response.setHeader("Content-disposition", "attachment; filename=order.fields.xml");
+        response.setContentType("application/xml")
+        documentTemplateService.downloadOrderFields(response.outputStream)
+    }
+
     def render = {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
@@ -859,23 +868,24 @@ class OrderController {
             if (!params?.documentTemplate?.id) {
                 throw new IllegalArgumentException("documentTemplate.id is required")
             }
+            Document documentTemplate = Document.get(params?.documentTemplate?.id)
+            if (documentTemplate) {
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
+                documentTemplateService.renderDocumentTemplate(documentTemplate,
+                        [order: orderInstance], TemplateEngineKind.Freemarker, ConverterTypeTo.PDF, outputStream)
 
-            //try {
-                Document documentTemplate = Document.get(params?.documentTemplate?.id)
-                if (documentTemplate) {
-                    documentTemplateService.renderDocumentTemplate(documentTemplate, [orderInstance: orderInstance], response.outputStream)
+                if (outputStream) {
+                    outputStream.writeTo(response.outputStream)
                     response.setHeader("Content-disposition", "attachment; filename=\"${orderInstance.orderNumber}\".pdf");
                     response.setContentType("application/pdf")
-                    return
                 }
-            //} catch (Exception e) {
-            //    log.error("Render " + e.message, e)
-            //    throw e;
-            //}
+                return
+            }
         }
         [orderInstance:orderInstance]
     }
 
+    // TODO remove dead code (OBS-634)
     def renderPdf = {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {

@@ -101,8 +101,8 @@ grails.project.dependency.resolution = {
         compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.odt.odfdom:1.0.6")
         compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.xwpf:1.0.6")
         compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.docx4j:1.0.6")
+        compile ("fr.opensagres.xdocreport:org.apache.poi.xwpf.converter.pdf:1.0.6")
         compile ("fr.opensagres.xdocreport:org.odftoolkit.odfdom.converter.pdf:1.0.6")
-        //compile ("fr.opensagres.xdocreport:fr.opensagres.poi.xwpf.converter.pdf:1.0.6")
         //compile("org.thymeleaf:thymeleaf:3.0.12.RELEASE")
 //        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.docx4j:1.0.5") {
 //            excludes "xercesImpl", "xml-apis", "xmlbeans"
