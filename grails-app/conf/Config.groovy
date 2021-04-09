@@ -752,6 +752,11 @@ openboxes.identifier.purchaseOrder.generatorType = IdentifierGeneratorTypeCode.S
 openboxes.identifier.purchaseOrder.format = "PO-\${destinationPartyCode}-\${sequenceNumber}"
 openboxes.identifier.purchaseOrder.properties = ["destinationPartyCode": "destinationParty.code"]
 
+openboxes.identifier.productCode.generatorType = IdentifierGeneratorTypeCode.SEQUENCE
+openboxes.identifier.productCode.delimiter = Constants.DEFAULT_IDENTIFIER_SEPARATOR
+openboxes.identifier.productCode.format = "\${productTypeCode}\${delimiter}\${sequenceNumber}"
+openboxes.identifier.productCode.properties = ["productTypeCode": "code"]
+
 // OpenBoxes default line printer port
 openboxes.linePrinterTerminal.port = "LPT1"
 

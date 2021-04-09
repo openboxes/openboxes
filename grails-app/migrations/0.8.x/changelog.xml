@@ -112,4 +112,5 @@
     <include file="0.8.x/changelog-2021-03-16-1250-insert-reference-number-type-vendor-invoice-number.xml"/>
     <include file="0.8.x/changelog-2021-03-17-1520-insert-invoice-role.xml"/>
     <include file="0.8.x/changelog-2021-03-29-1320-add-invoice-item-relations.xml"/>
+    <include file="0.8.x/changelog-2021-04-06-1200-add-code-and-sequence-number-to-product-type.xml"/>
 </databaseChangeLog>

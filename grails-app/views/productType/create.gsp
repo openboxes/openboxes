@@ -56,7 +56,15 @@
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: productTypeInstance, field: 'productIdentifierFormat', 'errors')}">
 									<g:textField class="text" size="80" name="productIdentifierFormat" value="${productTypeInstance?.productIdentifierFormat}" />
+								</td>
+							</tr>
 
+							<tr class="prop">
+								<td valign="top" class="name">
+									<label for="code"><warehouse:message code="productType.code.label" default="Code" /></label>
+								</td>
+								<td valign="top" class="value ${hasErrors(bean: productTypeInstance, field: 'code', 'errors')}">
+									<g:textField class="text" size="80" name="code" value="${productTypeInstance?.code}" />
 								</td>
 							</tr>
 
