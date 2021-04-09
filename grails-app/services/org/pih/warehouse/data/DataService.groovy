@@ -11,15 +11,10 @@ package org.pih.warehouse.data
 
 import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import org.apache.poi.ss.usermodel.Sheet
-import org.apache.poi.ss.usermodel.Workbook
 import org.grails.plugins.csv.CSVWriter
 import org.grails.plugins.excelimport.ExcelImportUtils
-import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.ProductPrice
-import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.UnitOfMeasureClass
 import org.pih.warehouse.core.UnitOfMeasureType
@@ -37,7 +32,6 @@ import java.text.SimpleDateFormat
 class DataService {
 
     def dataSource
-    def productService
     def sessionFactory
     def userService
 
@@ -387,11 +381,6 @@ class DataService {
         return product
     }
 
-
-    def findTags(tagNames) {
-        return Tag.findAll("from Tag as t where t.tag in (:tagNames)", [tagNames: tagNames])
-    }
-
     def findProduct(row) {
         def product = Product.findByProductCode(row.productCode)
         if (!product) {
@@ -472,50 +461,6 @@ class DataService {
     }
 
     /**
-     * FIXME This should be a method on product.
-     *
-     * @param product
-     * @param categoryName
-     * @return
-     */
-    def changeCategory(product, categoryName) {
-        def category = productService.findOrCreateCategory(categoryName)
-        if (product.category != category && category) {
-            product.category = category
-        }
-    }
-
-    /**
-     * FIXME This should be a method on product.
-     *
-     * @param product
-     * @param tags
-     * @return
-     */
-    def addTagsToProduct(product, tagNames) {
-        def tags = tagNames?.split(",")
-        if (tags) {
-            tags.each { tagName ->
-                if (tagName) {
-                    addTagToProduct(product, tagName)
-                }
-            }
-        }
-    }
-
-    def addTagToProduct(product, tagName) {
-        // Check if the product already has the given tag
-        def alreadyHasTag = product.tags.find { it.tag == tagName }
-        if (!alreadyHasTag) {
-            def foundTag = Tag.executeQuery("select distinct t from Tag t where t.tag = :tagName", [tagName: tagName, max: 1])
-            if (foundTag) {
-                product.addToTags(foundTag[0])
-                product.merge()
-            }
-        }
-    }
-
-    /**
      * Testing CSV data import functionality using Sql
      *
      * @return
@@ -530,80 +475,6 @@ class DataService {
                     email: fields[2]
             )
         }
-    }
-
-    /**
-     * Export data to CSV using groovy Sql classes.
-     */
-    def exportData() {
-        def sql = Sql.newInstance("jdbc:mysql://localhost:3306/mydb", "user", "pswd", "com.mysql.jdbc.Driver")
-        def people = sql.dataSet("PERSON")
-
-        people.each {
-            log.info it
-        }
-    }
-
-    /**
-     * Export the given products to CSV
-     *
-     * @param products
-     * @return
-     */
-    String exportProducts(products) {
-        def formatDate = new SimpleDateFormat("dd/MMM/yyyy hh:mm:ss")
-        def sw = new StringWriter()
-
-        def csvWriter = new CSVWriter(sw, {
-            "ID" { it.id }
-            "SKU" { it.productCode }
-            "Name" { it.name }
-            org.pih.warehouse.product.Category { it.category }
-            "Description" { it.description }
-            "Unit of Measure" { it.unitOfMeasure }
-            "Manufacturer" { it.manufacturer }
-            "Brand" { it.brandName }
-            "Manufacturer Code" { it.manufacturerCode }
-            "Manufacturer Name" { it.manufacturerName }
-            "Vendor" { it.vendor }
-            "Vendor Code" { it.vendorCode }
-            "Vendor Name" { it.vendorName }
-            "Cold Chain" { it.coldChain }
-            "UPC" { it.upc }
-            "NDC" { it.ndc }
-            "Date Created" { it.dateCreated }
-            "Date Updated" { it.lastUpdated }
-        })
-
-        products.each { product ->
-            def row = [
-                    id              : product?.id,
-                    productCode     : product.productCode ?: '',
-                    name            : product.name,
-                    category        : product?.category?.name,
-                    description     : product?.description ?: '',
-                    unitOfMeasure   : product.unitOfMeasure ?: '',
-                    manufacturer    : product.manufacturer ?: '',
-                    brandName       : product.brandName ?: '',
-                    manufacturerCode: product.manufacturerCode ?: '',
-                    manufacturerName: product.manufacturerName ?: '',
-                    vendor          : product.vendor ?: '',
-                    vendorCode      : product.vendorCode ?: '',
-                    vendorName      : product.vendorName ?: '',
-                    coldChain       : product.coldChain ?: Boolean.FALSE,
-                    upc             : product.upc ?: '',
-                    ndc             : product.ndc ?: '',
-                    dateCreated     : product.dateCreated ? "${formatDate.format(product.dateCreated)}" : "",
-                    lastUpdated     : product.lastUpdated ? "${formatDate.format(product.lastUpdated)}" : "",
-            ]
-            // We just want to make sure that these match because we use the same format to
-            // FIXME It would be better if we could drive the export off of this array of columns,
-            // but I'm not sure how.  It's possible that the constant could be a map of column
-            // names to closures (that might work)
-            assert row.keySet().size() == Constants.EXPORT_PRODUCT_COLUMNS.size()
-            csvWriter << row
-        }
-        return sw.toString()
     }
 
     String exportInventoryLevels(Collection inventoryLevels) {
@@ -846,73 +717,6 @@ class DataService {
             }
         }
         return sw.toString()
-    }
-
-    /**
-     * Utility method to retrieve basic properties for an upload file.
-     *
-     * @param uploadFile
-     * @return
-     */
-    def getFileProperties(uploadFile) {
-        def fileProps = [:]
-        println "content type:        " + uploadFile.contentType
-        switch (uploadFile.contentType) {
-            case "text/csv":
-                fileProps.type = "csv"
-                break
-            case "application/vnd.ms-excel":
-                fileProps.type = "xls"
-                break
-            case "application/vnd.oasis.opendocument.spreadsheet":
-                fileProps.type = "ods"
-                break
-            case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-                fileProps.type = "xlsx"
-                break
-            default:
-                fileProps.type = ""
-        }
-        fileProps.size = uploadFile.size
-        return fileProps
-    }
-
-    /**
-     * Converts an XLS file to a hash map.
-     *
-     * @param inputStream
-     * @param columTypes
-     * @param ignoredRows
-     * @return
-     */
-    def xlsToSimpleHash(inputStream, columTypes, ignoredRows) {
-        Workbook wb = new HSSFWorkbook(inputStream)
-        //so this is just going to get sheet 1 .. who uses more than 1?
-        //def numOfSheets = wb.getNumberOfSheets()
-        Sheet sheet = wb.getSheetAt(0)
-        def xlsData = [:]
-        sheet.iterator().eachWithIndex { row, rowNum ->
-            if (!ignoredRows.contains(rowNum)) {
-                xlsData[rowNum] = [:]
-                row.iterator().eachWithIndex { col, colNum ->
-                    switch (columTypes[colNum]) {
-                    //case ["number","num","int","integer",0, 'inList']
-                        case "number":
-                            xlsData[rowNum][colNum] = col.getNumericCellValue()
-                            break
-                        case "string":
-                            xlsData[rowNum][colNum] = col.getStringCellValue()
-                            break
-                        case "date":
-                            xlsData[rowNum][colNum] = col.getDateCellValue()
-                            break
-                        default:
-                            xlsData[rowNum][colNum] = ''
-                    }
-                }
-            } else log.debug "ignoring row ${rowNum}"
-        }
-        return xlsData
     }
 
 }
