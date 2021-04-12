@@ -272,7 +272,7 @@ class ReceiptService {
                         new ShipmentStatusTransitionEvent(partialReceipt, ShipmentStatusCode.RECEIVED))
 
                 // Trigger product availability refresh
-                transaction.blockRefresh = Boolean.FALSE
+                transaction.disableRefresh = Boolean.FALSE
                 grailsApplication.mainContext.publishEvent(
                         new TransactionEvent(transaction, false))
 
@@ -356,7 +356,7 @@ class ReceiptService {
         }
 
         // FIXME Block the refresh of the product availability table (to be triggered at end of request)
-        creditTransaction.blockRefresh = Boolean.TRUE
+        creditTransaction.disableRefresh = Boolean.TRUE
 
         if (creditTransaction.hasErrors() || !creditTransaction.save(flush:true)) {
             // did not save successfully, display errors message

@@ -1869,9 +1869,14 @@ class InventoryService implements ApplicationContextAware {
             transactionEntry.quantity = quantity
             transaction.addToTransactionEntries(transactionEntry)
 
+            // To prevent the product availability from being refreshed (we'll trigger it ourselves)
+            transaction.disableRefresh = command.disableRefresh
+
             if (!transaction.hasErrors() && transaction.save()) {
 
                 Transaction mirroredTransaction = createMirroredTransaction(transaction)
+                mirroredTransaction.disableRefresh = command.disableRefresh
+
                 TransactionEntry mirroredTransactionEntry = mirroredTransaction.transactionEntries.first()
                 mirroredTransactionEntry.binLocation = otherBinLocation
 
@@ -1951,7 +1956,6 @@ class InventoryService implements ApplicationContextAware {
         LocalTransfer transfer = getLocalTransfer(transaction)
         if (transfer) {
             transfer.delete(flush: true)
-
         }
     }
 
@@ -2023,13 +2027,13 @@ class InventoryService implements ApplicationContextAware {
         }
 
         // save the local transfer
-        if (!transfer.save(flush: true)) {
+        if (!transfer.save()) {
             throw new ValidationException("Unable to save local transfer ", transfer.errors)
         }
 
         // delete the old transaction
         if (oldTransaction) {
-            oldTransaction.delete(flush: true)
+            oldTransaction.delete()
         }
 
         return true

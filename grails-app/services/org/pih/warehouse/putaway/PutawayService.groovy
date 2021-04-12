@@ -16,11 +16,7 @@ import org.pih.warehouse.api.PutawayItem
 import org.pih.warehouse.api.PutawayStatus
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.InventoryService
-import org.pih.warehouse.inventory.ProductAvailabilityService
-import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransferStockCommand
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
@@ -30,9 +26,10 @@ import org.pih.warehouse.order.OrderTypeCode
 
 class PutawayService {
 
-    LocationService locationService
-    InventoryService inventoryService
-    ProductAvailabilityService productAvailabilityService
+    def locationService
+    def inventoryService
+    def productAvailabilityService
+    def grailsApplication
 
     boolean transactional = true
 
@@ -43,7 +40,6 @@ class PutawayService {
 
         List binLocationEntries = productAvailabilityService.getAvailableQuantityOnHandByBinLocation(location)
 
-        log.info "internalLocations " + internalLocations
         internalLocations.each { internalLocation ->
             List putawayItemsTemp = binLocationEntries.findAll {
                 it.binLocation == internalLocation
@@ -146,10 +142,11 @@ class PutawayService {
             command.otherBinLocation = putawayItem.putawayLocation
             command.order = order
             command.transferOut = Boolean.TRUE
-
-            Transaction transaction = inventoryService.transferStock(command)
-            transaction.save(failOnError: true)
+            command.disableRefresh = Boolean.TRUE
+            inventoryService.transferStock(command)
         }
+
+        grailsApplication.mainContext.publishEvent(new PutawayCompletedEvent(putaway))
 
         return order
     }
