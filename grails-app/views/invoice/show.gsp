@@ -123,6 +123,14 @@
                                         <div><format:date obj="${invoiceInstance?.dateInvoiced}"/></div>
                                     </td>
                                 </tr>
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                        <label><warehouse:message code="invoice.submitted.label"/></label>
+                                    </td>
+                                    <td valign="top" class="value">
+                                        <div><format:date obj="${invoiceInstance?.dateSubmitted}"/></div>
+                                    </td>
+                                </tr>
                             </table>
                         </div>
                     </div>

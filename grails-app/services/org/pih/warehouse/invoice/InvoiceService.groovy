@@ -197,4 +197,10 @@ class InvoiceService {
 
         return invoiceItem
     }
+
+    def submitInvoice(Invoice invoice) {
+        invoice.dateSubmitted = new Date()
+        // TODO OBPIH-3713: Add Invoice/Order/Shipment/Payment status change
+        invoice.save()
+    }
 }
