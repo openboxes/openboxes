@@ -30,10 +30,10 @@
                         ${invoiceItem?.orderNumber}
                     </td>
                     <td>
-                        ${invoiceItem?.glAccount?.name}
+                        ${invoiceItem?.glAccount?.code}
                     </td>
                     <td>
-                        ${invoiceItem?.createdBy}
+                        ${invoiceItem?.budgetCode?.code}
                     </td>
                     <td>
                         ${invoiceItem?.quantity}
