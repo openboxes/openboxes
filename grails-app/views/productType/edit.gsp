@@ -51,15 +51,18 @@
 								</td>
 							</tr>
 
-							<tr class="prop">
-								<td valign="top" class="name">
-									<label><warehouse:message code="productType.productIdentifierFormat.label" default="Product Identifier Format" /></label>
-								</td>
-								<td valign="top" class="value ${hasErrors(bean: productTypeInstance, field: 'productIdentifierFormat', 'errors')}">
-									${productTypeInstance?.productIdentifierFormat}
 
-								</td>
-							</tr>
+							<g:if test="${org.pih.warehouse.product.Product.findAllByProductType(productTypeInstance)?.size() == 0}">
+								<tr class="prop">
+									<td valign="top" class="name">
+										<label><warehouse:message code="productType.productIdentifierFormat.label" default="Product Identifier Format" /></label>
+									</td>
+									<td valign="top" class="value ${hasErrors(bean: productTypeInstance, field: 'productIdentifierFormat', 'errors')}">
+										${productTypeInstance?.productIdentifierFormat}
+
+									</td>
+								</tr>
+							</g:if>
 
 							<tr class="prop">
 								<td valign="top" class="name">
