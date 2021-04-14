@@ -120,4 +120,16 @@ class InvoiceApiController {
         invoiceService.updateItems(invoice, invoiceItems)
         render status: 204
     }
+
+    def submitInvoice = {
+        Invoice invoice = Invoice.get(params.id)
+        if (!invoice) {
+            throw new IllegalArgumentException("No Invoice found for invoice ID ${params.id}")
+        }
+
+        invoiceService.submitInvoice(invoice)
+
+        render([data: invoice?.toJson()] as JSON)
+
+    }
 }
