@@ -153,27 +153,32 @@ class IdentifierService {
         return identifier.toUpperCase()
     }
 
-    def generateSequentialProductIdentifier(ProductType productType, String sequentialPatternChar, Integer allowedSequences) {
-        // If custom identifier contains more than one sequential part, then throw exception
+    def extractSequenceFormat(String productIdentifierFormat, String sequentialPatternChar, Integer allowedSequences) {
         Pattern pattern = Pattern.compile("${sequentialPatternChar}+")
-        Matcher matcher = pattern.matcher(productType.productIdentifierFormat)
+        Matcher matcher = pattern.matcher(productIdentifierFormat)
         int count = 0
         def sequenceFormat = ""
+
         while (matcher.find()) {
             sequenceFormat = matcher.group()
             count++
         }
+
+        // If custom identifier contains more than one sequential part, then throw exception
         if (count > allowedSequences) {
             throw new IllegalArgumentException("Cannot have more sequence numbers than ${allowedSequences} in the same identifier")
         }
 
-        def sequenceNumber = productType.getNextSequenceNumber()
+        return sequenceFormat
+    }
+
+    def generateSequentialIdentifier(String identifierFormat, String sequenceFormat, String sequenceNumber) {
         List identifierFormatComponents
         List identifierComponents
 
         // Split custom identifier by sequence format (with keeping sequence inside identifier components)
         String sequenceDelimiter = "((?<=${sequenceFormat})|(?=${sequenceFormat}))"
-        identifierFormatComponents = productType.productIdentifierFormat.split(sequenceDelimiter)
+        identifierFormatComponents = identifierFormat.split(sequenceDelimiter)
         identifierComponents = identifierFormatComponents.collect { String identifierFormatComponent ->
             if (identifierFormatComponent.contains("0")) {
                 return generateSequenceNumber(sequenceNumber.toString(), identifierFormatComponent)
@@ -186,6 +191,30 @@ class IdentifierService {
         return identifierComponents.join("")
     }
 
+    def generateSequentialProductIdentifier(ProductType productType) {
+        def sequenceFormat = extractSequenceFormat(productType.productIdentifierFormat, Constants.DEFAULT_SEQUENCE_NUMBER_FORMAT_CHAR, 1)
+        def sequenceNumber = productType.getNextSequenceNumber()
+
+        return generateSequentialIdentifier(productType.productIdentifierFormat, sequenceFormat, sequenceNumber.toString())
+    }
+
+    String generateSequentialProductIdentifierFromCode(ProductType productType) {
+        if (!productType || !productType.code) {
+            throw new IllegalArgumentException("Missing product type or code")
+        }
+
+        Integer sequenceNumber = productType.getNextSequenceNumber()
+        String sequenceNumberStr = generateSequenceNumber(sequenceNumber.toString())
+
+        String template = ConfigurationHolder.config.openboxes.identifier.productCode.format
+        String delimiter = ConfigurationHolder.config.openboxes.identifier.productCode.delimiter
+        Map properties = ConfigurationHolder.config.openboxes.identifier.productCode.properties
+        Map model = dataService.transformObject(productType, properties)
+        model.put("sequenceNumber", sequenceNumberStr)
+        model.put("delimiter", delimiter)
+        return renderTemplate(template, model)
+    }
+
     String generateProductIdentifier(ProductType productType) {
         // If the product type is null, then generate product code from DEFAULT_PRODUCT_NUMBER_FORMAT
         if (!productType) {
@@ -194,16 +223,7 @@ class IdentifierService {
 
         // If the product type does not have a custom identifier but has code, then generate sequential product code
         if (!productType.productIdentifierFormat && productType.code) {
-            Integer sequenceNumber = productType.getNextSequenceNumber()
-            String sequenceNumberStr = generateSequenceNumber(sequenceNumber.toString())
-
-            String template = ConfigurationHolder.config.openboxes.identifier.productCode.format
-            String delimiter = ConfigurationHolder.config.openboxes.identifier.productCode.delimiter
-            Map properties = ConfigurationHolder.config.openboxes.identifier.productCode.properties
-            Map model = dataService.transformObject(productType, properties)
-            model.put("sequenceNumber", sequenceNumberStr)
-            model.put("delimiter", delimiter)
-            return renderTemplate(template, model)
+            return generateSequentialProductIdentifierFromCode(productType)
         }
 
         // If the product type does not have a custom identifier, then generate product code from DEFAULT_PRODUCT_NUMBER_FORMAT
@@ -216,7 +236,7 @@ class IdentifierService {
             return generateIdentifier(productType.productIdentifierFormat)
         }
 
-        return generateSequentialProductIdentifier(productType, Constants.DEFAULT_SEQUENCE_NUMBER_PATTERN, 1)
+        return generateSequentialProductIdentifier(productType)
     }
 
     def generateSequenceNumber(String sequenceNumber, String sequenceNumberFormat) {
