@@ -440,18 +440,20 @@
           var percentage = $("#percentage").val();
           var canManageAdjustments = ($("#canManageAdjustments").val() === "true");
           var budgetCode = $("#adjustmentBudgetCode").val();
+          var description = $("#description").val();
           var isAccountingRequired = ($("#isAccountingRequired").val() === "true");
 
           if (!orderAdjustmentType) $("#orderAdjustmentType").notify("Required")
           if (!(percentage || amount)) $("#amount").notify("Amount or percentage required")
           if (!(percentage || amount)) $("#percentage").notify("Amount or percentage required")
+          if (!description) $("#description").notify("Description required")
           if (!canManageAdjustments) $.notify("You do not have permissions to perform this action")
           if (!budgetCode && isAccountingRequired) {
             $("#adjustmentBudgetCode").notify("Required")
             return false
           }
 
-          if (orderAdjustmentType && canManageAdjustments && (amount || percentage)) {
+          if (orderAdjustmentType && canManageAdjustments && (amount || percentage) && description) {
             return true
           } else {
             return false
