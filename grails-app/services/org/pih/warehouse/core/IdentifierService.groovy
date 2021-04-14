@@ -31,6 +31,7 @@ class IdentifierService {
     boolean transactional = true
     def grailsApplication
     def dataService
+    def productTypeService
 
     /**
      * A: alphabetic
@@ -193,7 +194,7 @@ class IdentifierService {
 
     def generateSequentialProductIdentifier(ProductType productType) {
         def sequenceFormat = extractSequenceFormat(productType.productIdentifierFormat, Constants.DEFAULT_SEQUENCE_NUMBER_FORMAT_CHAR, 1)
-        def sequenceNumber = productType.getNextSequenceNumber()
+        def sequenceNumber = productTypeService.getAndSetNextSequenceNumber(productType)
 
         return generateSequentialIdentifier(productType.productIdentifierFormat, sequenceFormat, sequenceNumber.toString())
     }
@@ -203,7 +204,7 @@ class IdentifierService {
             throw new IllegalArgumentException("Missing product type or code")
         }
 
-        Integer sequenceNumber = productType.getNextSequenceNumber()
+        Integer sequenceNumber = productTypeService.getAndSetNextSequenceNumber(productType)
         String sequenceNumberStr = generateSequenceNumber(sequenceNumber.toString())
 
         String template = ConfigurationHolder.config.openboxes.identifier.productCode.format

@@ -63,8 +63,8 @@ class ProductType {
 
     Integer getNextSequenceNumber() {
         if (!sequenceNumber) {
-            sequenceNumber = 0
+            return 1
         }
-        return sequenceNumber += 1
+        return sequenceNumber + 1
     }
 }
