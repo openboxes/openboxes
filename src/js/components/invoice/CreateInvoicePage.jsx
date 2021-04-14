@@ -152,6 +152,7 @@ class CreateInvoicePage extends Component {
             this.props.nextPage({
               ...values,
               id: resp.id,
+              vendorName: resp.vendorName,
               invoiceNumber: resp.invoiceNumber,
               totalCount: resp.totalCount,
             });

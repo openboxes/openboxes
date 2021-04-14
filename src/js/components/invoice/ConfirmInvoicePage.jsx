@@ -23,7 +23,7 @@ const INVOICE_HEADER_FIELDS = {
       disabled: true,
     },
   },
-  vendor: {
+  vendorName: {
     type: TextField,
     label: 'react.Invoice.vendor.label',
     defaultMessage: 'Vendor',
