@@ -67,7 +67,7 @@
 							<tr class="prop">
 								<td valign="top" class="name"><label><warehouse:message code="default.description.label"/></label></td>
 								<td valign="top" class="value ${hasErrors(bean: orderAdjustment, field: 'description', 'errors')}">
-									<g:textField name="description" class="large text" value="${orderAdjustment.description}"/>
+									<g:textField name="description" id="description" class="large text" value="${orderAdjustment.description}"/>
 								</td>
 							</tr>
 							<tr class="prop">
@@ -114,10 +114,14 @@
 <script type="text/javascript">
 	function validateForm() {
 		var budgetCode = $("#budgetCode").val();
+		var description = $("#description").val();
 		var isAccountingRequired = ($("#isAccountingRequired").val() === "true");
 		if (!budgetCode && isAccountingRequired) {
-			$("#budgetCode").notify("Required")
+			$("#budgetCode").notify("Required");
 			return false
+		} else if (!description) {
+          $("#description").notify("Description required");
+          return false
 		} else {
 			return true
 		}

@@ -45,7 +45,7 @@ class OrderAdjustment implements Serializable {
         orderAdjustmentType(nullable:true)
         amount(nullable:true)
         percentage(nullable:true)
-        description(nullable:true)
+        description(nullable:false, blank: false)
         comments(nullable: true)
         budgetCode(nullable: true)
         glAccount(nullable: true)
