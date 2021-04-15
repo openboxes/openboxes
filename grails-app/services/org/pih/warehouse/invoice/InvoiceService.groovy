@@ -164,7 +164,7 @@ class InvoiceService {
             } else {
                 InvoiceItemCandidate candidateItem = InvoiceItemCandidate.get(item.id)
                 if (!candidateItem) {
-                    throw new IllegalArgumentException("No Invoice Item Candidate found with ID ${id}")
+                    throw new IllegalArgumentException("No Invoice Item Candidate found with ID ${item.id}")
                 }
                 invoiceItem = createFromInvoiceItemCandidate(candidateItem)
                 invoiceItem.quantity = item.quantityToInvoice
