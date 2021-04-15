@@ -286,7 +286,7 @@ class OrderController {
                     orderAdjustment.orderItem.removeFromOrderAdjustments(orderAdjustment)
                 }
                 orderAdjustment.properties = params
-                if (orderAdjustment.validate() && !orderAdjustment.hasErrors() && orderAdjustment.save(flush: true)) {
+                if (orderAdjustment.save(flush: true)) {
                     flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'orderAdjustment.label', default: 'Order Adjustment'), orderAdjustment.id])}"
                     redirect(controller:"purchaseOrder", action: "addItems", id: orderInstance.id, params:['skipTo': 'adjustments'])
                 } else {
@@ -295,7 +295,7 @@ class OrderController {
             } else {
                 orderAdjustment = new OrderAdjustment(params)
                 orderInstance.addToOrderAdjustments(orderAdjustment)
-                if (orderAdjustment.validate() && !orderInstance.hasErrors() && orderInstance.save(flush: true)) {
+                if (orderInstance.save(flush: true)) {
                     flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.id])}"
                     redirect(controller:"purchaseOrder", action: "addItems", id: orderInstance.id, params:['skipTo': 'adjustments'])
                 } else {
