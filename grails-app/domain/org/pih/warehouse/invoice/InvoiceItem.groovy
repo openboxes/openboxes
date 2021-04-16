@@ -17,6 +17,7 @@ import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustment
+import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ShipmentItem
 
@@ -64,7 +65,20 @@ class InvoiceItem implements Serializable {
         orderAdjustments joinTable: [name: 'order_adjustment_invoice', key: 'invoice_item_id', column: 'order_adjustment_id']
     }
 
-    static transients = ['unitPrice', 'totalAdjustments', 'subtotal', 'totalAmount', 'unitOfMeasure', 'orderNumber', 'shipmentNumber', 'description', 'order']
+    static transients = [
+        'shipmentItem',
+        'shipmentNumber',
+        'orderAdjustment',
+        'orderNumber',
+        'description',
+        'order',
+        'orderItem',
+        'totalAdjustments',
+        'unitPrice',
+        'totalItemPrice',
+        'totalAmount',
+        'unitOfMeasure'
+    ]
 
     static constraints = {
         invoice(nullable: false)
@@ -81,29 +95,61 @@ class InvoiceItem implements Serializable {
         createdBy(nullable: true)
     }
 
-    Float getUnitPrice() {
-        Float unitPrice = 0.0
+    ShipmentItem getShipmentItem() {
+        return shipmentItems ? shipmentItems?.iterator()?.next() : null
+    }
+
+    String getShipmentNumber() {
+        return shipmentItem?.shipment?.shipmentNumber
+    }
+
+    OrderAdjustment getOrderAdjustment() {
+        return orderAdjustments ? orderAdjustments?.iterator()?.next() : null
+    }
+
+    String getOrderNumber() {
+        return shipmentItem?.orderNumber ?: orderAdjustment?.order?.orderNumber ?: null
+    }
+
+    String getDescription() {
+        return orderAdjustment ? orderAdjustment.description : product?.name
+    }
+
+    OrderItem getOrderItem() {
+        if (orderAdjustments) {
+            return orderAdjustment?.orderItem
+        }
+        return shipmentItem?.orderItems?.iterator()?.next()
+    }
+
+    Order getOrder() {
+        return orderItem?.order
+    }
+
+    // Total order adjustment value
+    def getTotalAdjustments() {
+        return orderAdjustments?.findAll {!it.canceled }?.sum { it.getTotalAdjustments() } ?: 0
+    }
+
+    def getUnitPrice() {
+        def unitPrice = 0.0
         if (shipmentItems) {
-            unitPrice = shipmentItems?.iterator()?.next()?.orderItems?.iterator()?.next()?.unitPrice
+            unitPrice = orderItem?.unitPrice
         } else if (orderAdjustments) {
-            unitPrice = orderAdjustments?.iterator()?.next()?.orderItem?.unitPrice
+            unitPrice = totalAdjustments
         }
 
         return unitPrice ?: 0.0
     }
 
-    def getTotalAdjustments() {
-        return orderAdjustments?.findAll {!it.canceled }.sum {
-            return it.amount ?: it.percentage ? (it.percentage/100) * subtotal : 0
-        }?:0
-    }
-
-    def getSubtotal() {
+    // Total shipment item value
+    def getTotalItemPrice() {
         return (quantity ?: 0.0) * (unitPrice ?: 0.0)
     }
 
+    // Total adjustments value if order adjustment based or total item value if shipment item based
     def getTotalAmount() {
-        return (subtotal + totalAdjustments)?:0
+        return totalAdjustments ?: totalItemPrice
     }
 
     String getUnitOfMeasure() {
@@ -114,22 +160,6 @@ class InvoiceItem implements Serializable {
             def g = ApplicationHolder.application.mainContext.getBean( 'org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib' )
             return "${g.message(code:'default.ea.label').toUpperCase()}/1"
         }
-    }
-
-    String getOrderNumber() {
-        return shipmentItems ? shipmentItems?.iterator()?.next()?.orderNumber : (orderAdjustments ? orderAdjustments?.iterator()?.next()?.order?.orderNumber : null)
-    }
-
-    String getShipmentNumber() {
-        return shipmentItems ? shipmentItems?.iterator()?.next()?.shipment?.shipmentNumber : null
-    }
-
-    String getDescription() {
-        return orderAdjustments ? orderAdjustments?.iterator()?.next()?.description : product?.name
-    }
-
-    Order getOrder() {
-        return orderNumber ? Order.findByOrderNumber(orderNumber) : null
     }
 
     Map toJson() {

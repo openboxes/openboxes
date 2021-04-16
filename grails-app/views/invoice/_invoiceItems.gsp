@@ -42,7 +42,7 @@
                         <g:formatNumber number="${invoiceItem?.quantityPerUom}" maxFractionDigits="0" />
                     </td>
                     <td>
-                        ${g.formatNumber(number: invoiceItem?.amount?:0, format: '##,##0.00') }
+                        ${g.formatNumber(number: invoiceItem?.unitPrice?:0, format: '##,##0.00') }
                     </td>
                     <td>
                         ${g.formatNumber(number: invoiceItem?.totalAmount, format: '##,##0.00') }

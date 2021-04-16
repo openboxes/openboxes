@@ -12,8 +12,11 @@ CREATE OR REPLACE VIEW invoice_item_candidate AS
         order_item.quantity_uom_id as quantity_uom_id,
         order_item.unit_price as unit_price,
         order_item.quantity_per_uom as quantity_per_uom,
+        order_item.quantity as order_item_quantity,
         `order`.currency_code as currency_code,
-        `order`.origin_party_id as vendor_id
+        `order`.origin_party_id as vendor_id,
+        order_adjustment.amount as adjustment_amount,
+        order_adjustment.percentage as adjustment_percentage
  from order_adjustment
           join `order` on order_adjustment.order_id = `order`.id
           left join order_item on order_adjustment.order_item_id = order_item.id
@@ -34,8 +37,11 @@ union
         order_item.quantity_uom_id as quantity_uom_id,
         order_item.unit_price as unit_price,
         order_item.quantity_per_uom as quantity_per_uom,
+        order_item.quantity as order_item_quantity,
         `order`.currency_code as currency_code,
-        `order`.origin_party_id as vendor_id
+        `order`.origin_party_id as vendor_id,
+        NULL as adjustment_amount,
+        NULL as adjustment_percentage
  from shipment_item
           join shipment on shipment_item.shipment_id = shipment.id
           join product on shipment_item.product_id = product.id

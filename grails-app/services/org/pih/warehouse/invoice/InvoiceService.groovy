@@ -178,11 +178,11 @@ class InvoiceService {
     InvoiceItem createFromInvoiceItemCandidate(InvoiceItemCandidate candidate) {
         InvoiceItem invoiceItem = new InvoiceItem(
             budgetCode: candidate.budgetCode,
-            product: Product.findByProductCode(candidate.productCode),
+            product: candidate.productCode ? Product.findByProductCode(candidate.productCode) : null,
             glAccount: candidate.glAccount,
             quantity: candidate.quantity,
             quantityUom: candidate.quantityUom,
-            quantityPerUom: candidate.quantityPerUom,
+            quantityPerUom: candidate.quantityPerUom ?: 1,
         )
 
         ShipmentItem shipmentItem = ShipmentItem.get(candidate.id)
