@@ -563,8 +563,8 @@
             $("#orderAdjustmentType").val(null).trigger('change');
             $("#orderItems").val(null).trigger('change');
             $("#description").val("");
-            $("#percentage").val("");
-            $("#amount").val("");
+            $("#percentage").removeAttr("disabled").val("");
+            $("#amount").removeAttr("disabled").val("");
             $("#comments").val("");
             $("#adjustmentBudgetCode").val(null).trigger('change');
         }
