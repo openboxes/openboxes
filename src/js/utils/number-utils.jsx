@@ -1,7 +1,13 @@
-export default function accountingFormat(number) {
-  if (number && number < 0) {
-    return `(${number.toString().replace('-', '')})`;
+export default function accountingFormat(value) {
+  if (!value) {
+    return '';
   }
 
-  return number.toString();
+  const number = Number.parseFloat(value).toFixed(2);
+
+  if (number < 0) {
+    return `(${number.replace('-', '')})`;
+  }
+
+  return number;
 }

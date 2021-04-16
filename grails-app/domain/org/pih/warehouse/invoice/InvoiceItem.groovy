@@ -115,12 +115,15 @@ class InvoiceItem implements Serializable {
         return orderAdjustment ? orderAdjustment.description : product?.name
     }
 
-    Order getOrder() {
-        return orderNumber ? Order.findByOrderNumber(orderNumber) : null
+    OrderItem getOrderItem() {
+        if (orderAdjustments) {
+            return orderAdjustment?.orderItem
+        }
+        return shipmentItem?.orderItems?.iterator()?.next()
     }
 
-    OrderItem getOrderItem() {
-        return shipmentItem?.orderItems?.iterator()?.next()
+    Order getOrder() {
+        return orderItem?.order
     }
 
     // Total order adjustment value

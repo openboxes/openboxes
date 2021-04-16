@@ -121,7 +121,7 @@ const FIELDS = {
         defaultMessage: 'Unit Price',
         flexWidth: '1',
         attributes: {
-          formatValue: value => (value ? accountingFormat(value.toFixed(2)) : value),
+          formatValue: value => (value ? accountingFormat(value) : value),
         },
       },
       totalAmount: {
@@ -130,7 +130,7 @@ const FIELDS = {
         defaultMessage: 'Total Price',
         flexWidth: '1',
         attributes: {
-          formatValue: value => (value ? accountingFormat(value.toFixed(2)) : value),
+          formatValue: value => (value ? accountingFormat(value) : value),
         },
       },
       deleteButton: DELETE_BUTTON_FIELD,

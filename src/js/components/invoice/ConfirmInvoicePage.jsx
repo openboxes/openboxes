@@ -130,7 +130,7 @@ const INVOICE_ITEMS = {
         defaultMessage: 'Unit Price',
         flexWidth: '1',
         attributes: {
-          formatValue: value => (value ? accountingFormat(value.toFixed(2)) : value),
+          formatValue: value => (value ? accountingFormat(value) : value),
         },
       },
       totalAmount: {
@@ -139,7 +139,7 @@ const INVOICE_ITEMS = {
         defaultMessage: 'Total Price',
         flexWidth: '1',
         attributes: {
-          formatValue: value => (value ? accountingFormat(value.toFixed(2)) : value),
+          formatValue: value => (value ? accountingFormat(value) : value),
         },
       },
     },
