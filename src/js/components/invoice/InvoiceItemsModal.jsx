@@ -109,7 +109,7 @@ function validate(values) {
       item.checked &&
       (
         (_.toInteger(item.quantityToInvoice) > item.quantity) ||
-        _.toInteger(item.quantityToInvoice) < 0
+        _.toInteger(item.quantityToInvoice) <= 0
       )
     ) {
       errors.invoiceItems[key] = { quantityToInvoice: 'react.invoice.errors.quantityToInvoice.label' };
