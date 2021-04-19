@@ -16,6 +16,10 @@ class PaymentTerm implements Serializable {
     String name
     String description
 
+    BigDecimal prepaymentPercent
+    // Days payment due after invoice
+    Integer daysToPayment
+
     // Audit fields
     Date dateCreated
     Date lastUpdated
@@ -28,5 +32,7 @@ class PaymentTerm implements Serializable {
         code(nullable: false)
         name(nullable: false)
         description(nullable: true)
+        prepaymentPercent(nullable: true)
+        daysToPayment(nullable: true)
     }
 }

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <property name="now" value="now()"/>
+    <changeSet author="dhatala" id="1504202113400-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM payment_term WHERE id = 'PP100';
+            </sqlCheck>
+        </preConditions>
+        <insert tableName="payment_term">
+            <column name="id" value="PP100"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="code" value="PP100"/>
+            <column name="name" value="Prepayment 100"/>
+            <column name="description"/>
+            <column name="prepayment_percent" value="100"/>
+            <column name="days_to_payment"/>
+            <column name="date_created" valueDate="${now}"/>
+            <column name="last_updated" valueDate="${now}"/>
+        </insert>
+    </changeSet>
+    <changeSet author="dhatala" id="1504202113400-3">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM payment_term WHERE id = 'NET30';
+            </sqlCheck>
+        </preConditions>
+        <insert tableName="payment_term">
+            <column name="id" value="NET30"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="code" value="NET30"/>
+            <column name="name" value="Net 30"/>
+            <column name="description"/>
+            <column name="prepayment_percent"/>
+            <column name="days_to_payment" value="30"/>
+            <column name="date_created" valueDate="${now}"/>
+            <column name="last_updated" valueDate="${now}"/>
+        </insert>
+    </changeSet>
+    <changeSet author="dhatala" id="1504202113400-4">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM payment_term WHERE id = 'PP50';
+            </sqlCheck>
+        </preConditions>
+        <insert tableName="payment_term">
+            <column name="id" value="PP50"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="code" value="PP50"/>
+            <column name="name" value="Prepayment 50/Net 30"/>
+            <column name="description"/>
+            <column name="prepayment_percent" value="50"/>
+            <column name="days_to_payment" value="30"/>
+            <column name="date_created" valueDate="${now}"/>
+            <column name="last_updated" valueDate="${now}"/>
+        </insert>
+    </changeSet>
+    <changeSet author="dhatala" id="1504202113400-5">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM payment_term WHERE id = 'PP25';
+            </sqlCheck>
+        </preConditions>
+        <insert tableName="payment_term">
+            <column name="id" value="PP25"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="code" value="PP25"/>
+            <column name="name" value="Prepayment 25/Net 30"/>
+            <column name="description"/>
+            <column name="prepayment_percent" value="25"/>
+            <column name="days_to_payment" value="30"/>
+            <column name="date_created" valueDate="${now}"/>
+            <column name="last_updated" valueDate="${now}"/>
+        </insert>
+    </changeSet>
+    <changeSet author="dhatala" id="1504202113400-6">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM payment_term WHERE id = 'US';
+            </sqlCheck>
+        </preConditions>
+        <insert tableName="payment_term">
+            <column name="id" value="US"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="code" value="US"/>
+            <column name="name" value="Upon shipment"/>
+            <column name="description"/>
+            <column name="prepayment_percent"/>
+            <column name="days_to_payment" value="0"/>
+            <column name="date_created" valueDate="${now}"/>
+            <column name="last_updated" valueDate="${now}"/>
+        </insert>
+    </changeSet>
+    <changeSet author="dhatala" id="1504202113400-7">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM payment_term WHERE id = 'COD';
+            </sqlCheck>
+        </preConditions>
+        <insert tableName="payment_term">
+            <column name="id" value="COD"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="code" value="COD"/>
+            <column name="name" value="Cash On Delivery"/>
+            <column name="description"/>
+            <column name="prepayment_percent"/>
+            <column name="days_to_payment"/>
+            <column name="date_created" valueDate="${now}"/>
+            <column name="last_updated" valueDate="${now}"/>
+        </insert>
+    </changeSet>
+    <changeSet author="dhatala" id="1504202113400-8">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM payment_term WHERE id = 'PIA';
+            </sqlCheck>
+        </preConditions>
+        <insert tableName="payment_term">
+            <column name="id" value="PIA"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="code" value="PIA"/>
+            <column name="name" value="Payment In Advance"/>
+            <column name="description"/>
+            <column name="prepayment_percent"/>
+            <column name="days_to_payment"/>
+            <column name="date_created" valueDate="${now}"/>
+            <column name="last_updated" valueDate="${now}"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
