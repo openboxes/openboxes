@@ -72,7 +72,6 @@ class OrganizationService {
     List getOrganizations(Map params) {
         List roleTypes = params.list("roleType").collect { it as RoleType }
 
-        log.info "roleTypes " + roleTypes
         def organizations = Organization.createCriteria().list(params){
             if (params.q) {
                 or {
@@ -81,6 +80,9 @@ class OrganizationService {
                     ilike("name", "${params.q}%")
                     ilike("description", "${params.q}%")
                 }
+            }
+            if (params.name) {
+                ilike("name", "%${params.name}%")
             }
             if (roleTypes) {
                 roles {

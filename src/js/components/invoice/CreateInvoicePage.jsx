@@ -14,8 +14,9 @@ import SelectField from '../form-elements/SelectField';
 import DateField from '../form-elements/DateField';
 import { renderFormField } from '../../utils/form-utils';
 import apiClient from '../../utils/apiClient';
-import { showSpinner, hideSpinner, fetchCurrencies, fetchOrganizations } from '../../actions';
+import { showSpinner, hideSpinner, fetchCurrencies } from '../../actions';
 import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
+import { debounceOrganizationsFetch } from '../../utils/option-utils';
 
 function validate(values) {
   const errors = {};
@@ -49,18 +50,22 @@ const FIELDS = {
       disabled: true,
     },
   },
-  // Vendor = Party's location
   vendor: {
     type: SelectField,
     label: 'react.Invoice.vendor.label',
     defaultMessage: 'Vendor',
     attributes: {
       required: true,
+      async: true,
       showValueTooltip: true,
-      objectValue: true,
+      openOnClick: false,
+      autoload: false,
+      cache: false,
+      options: [],
+      filterOptions: options => options,
     },
-    getDynamicAttr: ({ organizations }) => ({
-      options: organizations,
+    getDynamicAttr: ({ debouncedOrganizationsFetch }) => ({
+      loadOptions: debouncedOrganizationsFetch,
     }),
   },
   vendorInvoiceNumber: {
@@ -102,12 +107,14 @@ class CreateInvoicePage extends Component {
     this.state = {
       values: this.props.initialValues,
     };
+
+    this.debounceOrganizationsFetch =
+      debounceOrganizationsFetch(this.props.debounceTime, this.props.minSearchLength);
   }
 
   componentDidMount() {
-    if (!this.props.currenciesFetched && !this.props.organizationsFetched) {
+    if (!this.props.currenciesFetched) {
       this.props.fetchCurrencies();
-      this.props.fetchOrganizations();
     }
   }
 
@@ -138,7 +145,7 @@ class CreateInvoicePage extends Component {
       const invoiceUrl = `/openboxes/api/invoices/${values.id || ''}`;
 
       const payload = {
-        vendor: values.vendor,
+        vendor: values.vendor.id,
         vendorInvoiceNumber: values.vendorInvoiceNumber,
         dateInvoiced: values.dateInvoiced,
         'currencyUom.id': values.currencyUom,
@@ -212,7 +219,7 @@ class CreateInvoicePage extends Component {
                 FIELDS,
                 (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
                   currencies: this.props.currencies,
-                  organizations: this.props.organizations,
+                  debouncedOrganizationsFetch: this.debounceOrganizationsFetch,
                 }),
               )}
             </div>
@@ -231,13 +238,13 @@ class CreateInvoicePage extends Component {
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   currencies: state.currencies.data,
-  organizations: state.organizations.data,
   currenciesFetched: state.currencies.fetched,
-  organizationsFetched: state.organizations.fetched,
+  debounceTime: state.session.searchConfig.debounceTime,
+  minSearchLength: state.session.searchConfig.minSearchLength,
 });
 
 export default withRouter(connect(mapStateToProps, {
-  showSpinner, hideSpinner, fetchCurrencies, fetchOrganizations,
+  showSpinner, hideSpinner, fetchCurrencies,
 })(CreateInvoicePage));
 
 CreateInvoicePage.propTypes = {
@@ -248,7 +255,6 @@ CreateInvoicePage.propTypes = {
     currencyUom: PropTypes.shape({}),
   }).isRequired,
   fetchCurrencies: PropTypes.func.isRequired,
-  fetchOrganizations: PropTypes.func.isRequired,
   showSpinner: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
   nextPage: PropTypes.func.isRequired,
@@ -258,6 +264,6 @@ CreateInvoicePage.propTypes = {
   translate: PropTypes.func.isRequired,
   currenciesFetched: PropTypes.bool.isRequired,
   currencies: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  organizations: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  organizationsFetched: PropTypes.bool.isRequired,
+  debounceTime: PropTypes.number.isRequired,
+  minSearchLength: PropTypes.number.isRequired,
 };
