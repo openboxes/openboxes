@@ -110,7 +110,10 @@ const INVOICE_ITEMS = {
         type: LabelField,
         label: 'react.invoice.description.label',
         defaultMessage: 'Description',
-        flexWidth: '1',
+        flexWidth: '5',
+        attributes: {
+          className: 'text-left',
+        },
       },
       quantity: {
         type: LabelField,

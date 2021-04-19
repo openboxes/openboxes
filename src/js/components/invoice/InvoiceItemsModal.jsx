@@ -14,6 +14,7 @@ import Select from '../../utils/Select';
 import apiClient from '../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../actions';
 import { translateWithDefaultMessage } from '../../utils/Translate';
+import accountingFormat from '../../utils/number-utils';
 
 const FIELDS = {
   invoiceItems: {
@@ -25,7 +26,7 @@ const FIELDS = {
       checked: {
         fieldKey: '',
         label: '',
-        flexWidth: '25px',
+        flexWidth: '0.1',
         type: ({
           // eslint-disable-next-line react/prop-types
           rowIndex, fieldValue, selectRow,
@@ -43,43 +44,52 @@ const FIELDS = {
         type: LabelField,
         label: 'react.invoice.orderNumber.label',
         defaultMessage: 'PO Number',
+        flexWidth: 1,
       },
       shipmentNumber: {
         type: LabelField,
         label: 'react.invoice.shipmentNumber.label',
         defaultMessage: 'Shipment Number',
+        flexWidth: 1,
       },
       budgetCode: {
         type: LabelField,
         label: 'react.invoice.budgetCode.label',
         defaultMessage: 'Budget Code',
+        flexWidth: 1,
       },
       glCode: {
         type: LabelField,
         label: 'react.invoice.glCode.label',
         defaultMessage: 'GL Code',
+        flexWidth: 1,
       },
       productCode: {
         type: LabelField,
         label: 'react.invoice.itemNumber.label',
         defaultMessage: 'Item No',
+        flexWidth: 1,
       },
       description: {
-        flexWidth: '200px',
         type: LabelField,
         label: 'react.invoice.description.label',
         defaultMessage: 'Description',
+        flexWidth: 3,
+        attributes: {
+          className: 'text-left',
+        },
       },
       quantity: {
         type: LabelField,
         label: 'react.invoice.quantity.label',
         defaultMessage: 'Qty',
+        flexWidth: 1,
       },
       quantityToInvoice: {
         type: TextField,
         label: 'react.invoice.quantityToInvoice.label',
         defaultMessage: 'Qty to Invoice',
-        fixedWidth: '150px',
+        flexWidth: 1,
         attributes: {
           type: 'number',
         },
@@ -93,12 +103,16 @@ const FIELDS = {
         type: LabelField,
         label: 'react.invoice.uom.label',
         defaultMessage: 'UoM',
+        flexWidth: 1,
       },
       unitPrice: {
-        flexWidth: '150px',
         type: LabelField,
         label: 'react.invoice.unitPrice.label',
         defaultMessage: 'Unit Price',
+        flexWidth: 1,
+        attributes: {
+          formatValue: value => (value ? accountingFormat(value) : value),
+        },
       },
     },
   },
