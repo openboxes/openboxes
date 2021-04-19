@@ -10,6 +10,7 @@ import LabelField from '../form-elements/LabelField';
 import ArrayField from '../form-elements/ArrayField';
 import TextField from '../form-elements/TextField';
 import Checkbox from '../../utils/Checkbox';
+import Select from '../../utils/Select';
 import apiClient from '../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../actions';
 import { translateWithDefaultMessage } from '../../utils/Translate';
@@ -19,11 +20,12 @@ const FIELDS = {
     type: ArrayField,
     arrowsNavigation: true,
     maxTableHeight: 'calc(100vh - 500px)',
+    overflowStyle: 'overlay',
     fields: {
       checked: {
         fieldKey: '',
         label: '',
-        flexWidth: '3',
+        flexWidth: '25px',
         type: ({
           // eslint-disable-next-line react/prop-types
           rowIndex, fieldValue, selectRow,
@@ -31,7 +33,7 @@ const FIELDS = {
           <Checkbox
             id={rowIndex.toString()}
             disabled={false}
-            className="ml-4"
+            className="ml-1"
             value={fieldValue.checked}
             onChange={value => selectRow(value, rowIndex)}
           />
@@ -63,6 +65,7 @@ const FIELDS = {
         defaultMessage: 'Item No',
       },
       description: {
+        flexWidth: '200px',
         type: LabelField,
         label: 'react.invoice.description.label',
         defaultMessage: 'Description',
@@ -76,7 +79,7 @@ const FIELDS = {
         type: TextField,
         label: 'react.invoice.quantityToInvoice.label',
         defaultMessage: 'Qty to Invoice',
-        fixedWidth: '140px',
+        fixedWidth: '150px',
         attributes: {
           type: 'number',
         },
@@ -92,6 +95,7 @@ const FIELDS = {
         defaultMessage: 'UoM',
       },
       unitPrice: {
+        flexWidth: '150px',
         type: LabelField,
         label: 'react.invoice.unitPrice.label',
         defaultMessage: 'Unit Price',
@@ -120,15 +124,15 @@ function validate(values) {
 }
 
 const INITIAL_STATE = {
-  orderNumberOptions: [],
-  selectedOrderNumber: '',
-  selectedShipmentNumber: '',
   selectedInvoiceItems: [],
   formValues: { invoiceItems: [] },
   sortOrder: 0,
+  orderNumberOptions: [],
+  shipmentNumberOptions: [],
+  selectedOrderNumbers: [],
+  selectedShipmentNumbers: [],
 };
 
-/* eslint-disable */
 class InvoiceItemsModal extends Component {
   constructor(props) {
     super(props);
@@ -162,13 +166,21 @@ class InvoiceItemsModal extends Component {
     const url = `/openboxes/api/invoices/${invoiceId}/items`;
 
     apiClient.post(url, payload)
-    .then(() => {
-      this.setState(INITIAL_STATE, () => {
-        this.props.hideSpinner();
-        this.props.onResponse({ startIndex: 0 });
-      });
-    })
-    .catch(() => this.props.hideSpinner());
+      .then(() => {
+        this.setState(INITIAL_STATE, () => {
+          this.props.hideSpinner();
+          this.props.onResponse({ startIndex: 0 });
+        });
+      })
+      .catch(() => this.props.hideSpinner());
+  }
+
+  setSelectedOrders(selectedOrderNumbers) {
+    this.setState({ selectedOrderNumbers }, () => this.fetchInvoiceItemCandidates());
+  }
+
+  setSelectedShipments(selectedShipmentNumbers) {
+    this.setState({ selectedShipmentNumbers }, () => this.fetchInvoiceItemCandidates());
   }
 
   getSortOrder() {
@@ -177,36 +189,6 @@ class InvoiceItemsModal extends Component {
     });
 
     return this.state.sortOrder;
-  }
-
-  setSelectedOrderNumber(selectedOrderNumber) {
-    this.setState({ selectedOrderNumber }, () => this.fetchInvoiceItemCandidates());
-  }
-
-  setSelectedShipmentNumber(selectedShipmentNumber) {
-    this.setState({ selectedShipmentNumber }, () => this.fetchInvoiceItemCandidates());
-  }
-
-  fetchInvoiceItemCandidates() {
-    const { selectedOrderNumber, selectedShipmentNumber, selectedInvoiceItems } = this.state;
-    const { invoiceId } = this.props;
-
-    let url = `/openboxes/api/invoices/${invoiceId}/invoiceItemCandidates?`;
-    url += selectedOrderNumber ? `&orderNumber=${selectedOrderNumber}` : '';
-    url += selectedShipmentNumber ? `&shipmentNumber=${selectedShipmentNumber}` : '';
-
-    return apiClient.get(url).then(resp => {
-      this.setState({
-        formValues: {
-          invoiceItems: _.map(resp.data.data, item => ({
-            ...item,
-            checked: !!selectedInvoiceItems[item.id],
-            quantityToInvoice: selectedInvoiceItems[item.id] ? selectedInvoiceItems[item.id].quantityToInvoice : '',
-            sortOrder: this.getSortOrder(),
-          })),
-        },
-      });
-    });
   }
 
   selectRow(value, rowIndex) {
@@ -263,12 +245,59 @@ class InvoiceItemsModal extends Component {
     });
   }
 
+  fetchInvoiceItemCandidates() {
+    const { selectedOrderNumbers, selectedShipmentNumbers, selectedInvoiceItems } = this.state;
+    const { invoiceId } = this.props;
+
+    const url = `/openboxes/api/invoices/${invoiceId}/invoiceItemCandidates`;
+
+    const payload = {
+      orderNumbers: selectedOrderNumbers,
+      shipmentNumbers: selectedShipmentNumbers,
+    };
+
+    return apiClient.post(url, payload).then((resp) => {
+      this.setState({
+        formValues: {
+          invoiceItems: _.map(resp.data.data, item => ({
+            ...item,
+            checked: !!selectedInvoiceItems[item.id],
+            quantityToInvoice: selectedInvoiceItems[item.id] ? selectedInvoiceItems[item.id].quantityToInvoice : '',
+            sortOrder: this.getSortOrder(),
+          })),
+        },
+      }, () => this.fetchOrderAndShipmentNumbers(invoiceId));
+    });
+  }
+
+  fetchOrderAndShipmentNumbers(invoiceId) {
+    if (this.state.orderNumberOptions.length === 0 &&
+        this.state.shipmentNumberOptions.length === 0) {
+      const url = `/openboxes/api/invoices/${invoiceId}/orderAndShipmentNumbers`;
+      apiClient.get(url)
+        .then((resp) => {
+          this.setState({
+            orderNumberOptions: _.map(resp.data.data.orderNumbers, orderNumber => (
+              { value: orderNumber, label: orderNumber }
+            )),
+            shipmentNumberOptions: _.map(resp.data.data.shipmentNumbers, shipmentNumber => (
+              { value: shipmentNumber, label: shipmentNumber }
+            )),
+          });
+        });
+    }
+  }
+
   render() {
     const {
-        selectedShipmentNumber, selectedOrderNumber, formValues,
+      formValues,
+      orderNumberOptions,
+      shipmentNumberOptions,
+      selectedOrderNumbers,
+      selectedShipmentNumbers,
     } = this.state;
     const {
-        btnOpenText, btnOpenDefaultText, translate, btnOpenDisabled,
+      btnOpenText, btnOpenDefaultText, translate, btnOpenDisabled,
     } = this.props;
 
     return (
@@ -292,24 +321,28 @@ class InvoiceItemsModal extends Component {
         btnSaveDisabled={!_.find(formValues.invoiceItems, item => item.checked)}
       >
         <div className="d-flex mb-3 justify-content-start align-items-center w-100 combined-shipment-filter">
-          <input
-            id="orderNumber"
-            name="orderNumber"
-            type="text"
-            className="form-control"
-            placeholder={translate('react.invoice.ordersNumber.label', 'Order Number')}
-            value={selectedOrderNumber}
-            onChange={(event) => this.setSelectedOrderNumber(event.target.value)}
+          <Select
+            fieldName="orderNumber"
+            placeholder={translate('react.invoice.selectOrders.label', 'Select orders...')}
+            value={selectedOrderNumbers}
+            multi
+            options={orderNumberOptions}
+            showValueTooltip
+            onChange={value => this.setSelectedOrders(value)}
+            classes=""
+            cache={false}
           />
           &nbsp;
-          <input
-            id="shipmentNumber"
-            name="shipmentNumber"
-            type="text"
-            className="form-control"
-            placeholder={translate('react.invoice.shipmentNumber.label', 'Shipment Number')}
-            value={selectedShipmentNumber}
-            onChange={(event) => this.setSelectedShipmentNumber(event.target.value)}
+          <Select
+            fieldName="shipmentNumber"
+            placeholder={translate('react.invoice.selectShipments.label', 'Select shipments...')}
+            value={selectedShipmentNumbers}
+            multi
+            options={shipmentNumberOptions}
+            showValueTooltip
+            onChange={value => this.setSelectedShipments(value)}
+            classes=""
+            cache={false}
           />
         </div>
       </ModalWrapper>
@@ -324,11 +357,19 @@ const mapStateToProps = state => ({
 export default (connect(mapStateToProps, { showSpinner, hideSpinner })(InvoiceItemsModal));
 
 InvoiceItemsModal.propTypes = {
+  showSpinner: PropTypes.func.isRequired,
+  hideSpinner: PropTypes.func.isRequired,
+  translate: PropTypes.func.isRequired,
+  onResponse: PropTypes.func.isRequired,
+  onOpen: PropTypes.func.isRequired,
+  invoiceId: PropTypes.string.isRequired,
   btnOpenText: PropTypes.string,
   btnOpenDefaultText: PropTypes.string,
+  btnOpenDisabled: PropTypes.bool,
 };
 
 InvoiceItemsModal.defaultProps = {
   btnOpenText: '',
   btnOpenDefaultText: '',
+  btnOpenDisabled: false,
 };

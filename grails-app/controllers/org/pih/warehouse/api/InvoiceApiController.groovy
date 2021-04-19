@@ -102,9 +102,16 @@ class InvoiceApiController {
 
     def getInvoiceItemCandidates = {
         List<InvoiceItemCandidate> invoiceItemCandidates = invoiceService.getInvoiceItemCandidates(
-            params.id, params.orderNumber, params.shipmentNumber
+            params.id, params.orderNumbers, params.shipmentNumbers
         )
         render([data: invoiceItemCandidates] as JSON)
+    }
+
+    def getOrderAndShipmentNumbers = {
+        List orderNumbers = invoiceService.getDistinctFieldFromInvoiceItemCandidates(params.id, "orderNumber")
+        List shipmentNumbers = invoiceService.getDistinctFieldFromInvoiceItemCandidates(params.id, "shipmentNumber")
+
+        render([data: [orderNumbers: orderNumbers, shipmentNumbers: shipmentNumbers]] as JSON)
     }
 
     def removeItem = {

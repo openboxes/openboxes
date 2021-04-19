@@ -65,7 +65,7 @@ class InvoiceService {
         return invoiceItems
     }
 
-    def getInvoiceItemCandidates(String id, String orderNumber, String shipmentNumber) {
+    def getInvoiceItemCandidates(String id, List orderNumbers, List shipmentNumbers) {
         Invoice invoice = Invoice.get(id)
 
         if (!invoice) {
@@ -82,13 +82,39 @@ class InvoiceService {
                     eq("currencyCode", invoice.currencyUom.code)
                 }
 
-                if (StringUtils.isNotBlank(orderNumber)) {
-                    ilike("orderNumber", "%" + orderNumber + "%")
+                if (orderNumbers.size() > 0) {
+                    'in'("orderNumber", orderNumbers)
                 }
 
-                if (StringUtils.isNotBlank(shipmentNumber)) {
-                    ilike("shipmentNumber", "%" + shipmentNumber + "%")
+                if (shipmentNumbers.size() > 0) {
+                    'in'("shipmentNumber", shipmentNumbers)
                 }
+            }
+
+        return invoiceItemCandidates
+    }
+
+    def getDistinctFieldFromInvoiceItemCandidates(String id, String distinctField) {
+        Invoice invoice = Invoice.get(id)
+
+        if (!invoice) {
+            return []
+        }
+
+        List<InvoiceItemCandidate> invoiceItemCandidates = InvoiceItemCandidate.createCriteria()
+            .list() {
+                projections {
+                    groupProperty(distinctField)
+                }
+                if (invoice.party) {
+                    eq("vendor", invoice.party)
+                }
+
+                if (invoice.currencyUom?.code) {
+                    eq("currencyCode", invoice.currencyUom.code)
+                }
+
+                ne(distinctField, "")
             }
 
         return invoiceItemCandidates
