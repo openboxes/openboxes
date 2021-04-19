@@ -46,6 +46,7 @@ import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociation
+import org.pih.warehouse.product.ProductSearchDto
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.requisition.Requisition
@@ -203,6 +204,10 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(Product) { Product product ->
             return product.toJson()
+        }
+
+        JSON.registerObjectMarshaller(ProductSearchDto) { ProductSearchDto productSearchDto ->
+            return productSearchDto.toJson()
         }
 
         JSON.registerObjectMarshaller(ProductAssociation) { ProductAssociation productAssociation ->
