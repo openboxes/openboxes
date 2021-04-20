@@ -17,67 +17,6 @@ class Doc4jController {
     def shipmentService
 	def documentTemplateService
 
-
-	def downloadSomething = {
-		Shipment shipment = Shipment.get(params.id);
-		Document document = Document.get("ff8081816b1157be016b116663b20001")
-		def filename = "${document.name} - " + shipment?.name?.trim() + "." + document.extension
-		response.setHeader("Content-disposition", "attachment; filename=\"${filename}\".pdf");
-		//response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-		log.info "document.contentType " + document.contentType
-		//response.setContentType(document.contentType)
-		response.setContentType("application/pdf")
-
-		documentTemplateService.renderDocumentTemplate(document, shipment, response.outputStream)
-		//response.outputStream << tempFile.readBytes()
-	}
-
-	def downloadShipmentManifestDocx = {
-		Shipment shipment = Shipment.get(params.id);
-		Document document = Document.get("ff8081816b1157be016b1aefde020002")
-		def filename = "${document.name} - " + shipment?.name?.trim() + "." + document.extension
-		response.setHeader("Content-disposition", "attachment; filename=\"${filename}\".pdf");
-		//response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-		log.info "document.contentType " + document.contentType
-		//response.setContentType(document.contentType)
-		response.setContentType("application/pdf")
-
-		documentTemplateService.renderDocumentTemplate(document, shipment, response.outputStream)
-		//response.outputStream << tempFile.readBytes()
-	}
-
-
-    def downloadLetter = {
-        def shipmentInstance = Shipment.get(params.id)
-
-        if (!shipmentInstance) {
-            throw new Exception("Unable to locate shipment with ID ${params.id}")
-        }
-
-        def tempFile = fileService.generateLetterAsDocx(shipmentInstance)
-        def filename = "Certificate of Donation - " + shipmentInstance?.name?.trim() + ".docx"
-        response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-        response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-        response.outputStream << tempFile.readBytes()
-    }
-
-    def downloadLetterAsPdf = {
-
-        def shipmentInstance = Shipment.get(params.id)
-
-        if (!shipmentInstance) {
-            throw new Exception("Unable to locate shipment with ID ${params.id}")
-        }
-
-        def filename = "Certificate of Donation - " + shipmentInstance?.name?.trim() + ".pdf"
-        fileService.generateLetterAsPdf(shipmentInstance, response.outputStream)
-
-        response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-        response.setContentType("application/pdf")
-        return
-    }
-
-
     /**
      *
      */
