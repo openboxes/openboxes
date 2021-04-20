@@ -17,6 +17,7 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.invoice.InvoiceItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
@@ -95,6 +96,9 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
             "completelyReceived",
             "pending",
             "quantityRemainingToShip",
+            "submittedInvoiceItems",
+            "quantityInvoiced",
+            "quantityInvoicedInStandardUom"
     ]
 
     static belongsTo = [order: Order, parentOrderItem: OrderItem]
@@ -284,6 +288,20 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
                                 quantity <=> orderItem?.quantity ?:
                                         id <=> orderItem?.id
         return sortOrder
+    }
+
+    def getSubmittedInvoiceItems() {
+        return InvoiceItem.list().findAll { it.orderItem == this && it.invoice.dateSubmitted }
+    }
+
+    Integer getQuantityInvoicedInStandardUom() {
+        return submittedInvoiceItems.sum { InvoiceItem invoiceItem ->
+            invoiceItem?.quantity
+        }?:0
+    }
+
+    Integer getQuantityInvoiced() {
+        return quantityInvoicedInStandardUom / quantityPerUom
     }
 
     Map toJson() {
