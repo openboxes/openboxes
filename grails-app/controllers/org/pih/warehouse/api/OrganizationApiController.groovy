@@ -20,11 +20,6 @@ class OrganizationApiController extends BaseDomainApiController {
     def organizationService
 
     def list = {
-        def minLength = grailsApplication.config.openboxes.typeahead.minLength
-        if (params.name && params.name.size() < minLength) {
-            render([data: []])
-            return
-        }
         def organizations = organizationService.getOrganizations(params)
         render ([data:organizations] as JSON)
      }

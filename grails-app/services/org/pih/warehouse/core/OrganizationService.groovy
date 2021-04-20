@@ -81,9 +81,6 @@ class OrganizationService {
                     ilike("description", "${params.q}%")
                 }
             }
-            if (params.name) {
-                ilike("name", "%${params.name}%")
-            }
             if (roleTypes) {
                 roles {
                     'in'("roleType", roleTypes)

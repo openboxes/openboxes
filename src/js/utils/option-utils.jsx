@@ -175,7 +175,7 @@ export const debounceProductsInOrders = (waitTime, minSearchLength, vendor, dest
 export const debounceOrganizationsFetch = (waitTime, minSearchLength) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
-      apiClient.get(`/openboxes/api/organizations?name=${searchTerm}`)
+      apiClient.get(`/openboxes/api/organizations?q=${searchTerm}`)
         .then(result => callback(
           null,
           {
