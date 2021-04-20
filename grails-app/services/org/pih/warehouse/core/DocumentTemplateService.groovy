@@ -45,9 +45,7 @@ class DocumentTemplateService {
         TemplateEngineKind templateEngineKind = isVelocityTemplate ?
                 TemplateEngineKind.Velocity : TemplateEngineKind.Freemarker
 
-        //InputStream inputStream = new ByteArrayInputStream(documentTemplate.fileContents)
-        File file = new File("/home/jmiranda/Dropbox/Document Templates/PO template.odt")
-        FileInputStream inputStream = new FileInputStream(file)
+        InputStream inputStream = new ByteArrayInputStream(documentTemplate.fileContents)
         IXDocReport report = XDocReportRegistry.getRegistry().loadReport(inputStream, templateEngineKind);
 
         // FIXME Need a better way to handle this generically (consider using config + dataService)
@@ -70,10 +68,6 @@ class DocumentTemplateService {
     }
 
     def createOrderContext(IXDocReport report, Order orderInstance) {
-
-        IContext context = report.createContext();
-
-
 
         // Add data to the context
         def orderItems = orderInstance.orderItems.collect { OrderItem orderItem ->
@@ -151,6 +145,7 @@ class DocumentTemplateService {
         metadata.addFieldAsList("orderAdjustments.description")
         metadata.addFieldAsList("orderAdjustments.totalPrice")
 
+        IContext context = report.createContext();
         context.put("order", order)
         context.put("orderItems", orderItems);
         context.put("orderAdjustments", orderAdjustments);
