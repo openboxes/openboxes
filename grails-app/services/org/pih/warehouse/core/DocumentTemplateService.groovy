@@ -15,14 +15,12 @@ import fr.opensagres.xdocreport.converter.Options
 import fr.opensagres.xdocreport.document.IXDocReport
 import fr.opensagres.xdocreport.document.registry.XDocReportRegistry
 import fr.opensagres.xdocreport.template.IContext
-import fr.opensagres.xdocreport.template.ITemplateEngine
 import fr.opensagres.xdocreport.template.TemplateEngineKind
 import fr.opensagres.xdocreport.template.formatter.FieldsMetadata
-import fr.opensagres.xdocreport.template.freemarker.FreemarkerTemplateEngine
 import groovy.text.Template
-import org.apache.commons.io.IOUtils
 import org.codehaus.groovy.grails.web.pages.GroovyPagesTemplateEngine
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
@@ -40,43 +38,123 @@ class DocumentTemplateService {
         return output.toString()
     }
 
-    def renderDocumentTemplate(Document documentTemplate, Map model, TemplateEngineKind templateEngineKind, ConverterTypeTo targetDocumentType, OutputStream outputStream) {
-        InputStream inputStream = new ByteArrayInputStream(documentTemplate.fileContents)
-        IXDocReport report = XDocReportRegistry.getRegistry().
-                loadReport(inputStream, templateEngineKind);
+    def renderOrderDocumentTemplate(Document documentTemplate, Order orderInstance, ConverterTypeTo targetDocumentType, OutputStream outputStream) {
 
-        // Add properties to the context
-        IContext context = report.createContext(model);
+        Boolean isVelocityTemplate = documentTemplate.filename.contains(".vm") || documentTemplate.filename.contains(".vtl")
 
-        log.info "Set field metadata"
-        FieldsMetadata metadata = report.createFieldsMetadata();
-        metadata.addFieldAsList("orderItem.code");
-        metadata.addFieldAsList("orderItem.description");
-        metadata.addFieldAsList("orderItem.quantity");
-        metadata.addFieldAsList("orderItem.unit");
-        metadata.addFieldAsList("orderItem.price");
-        metadata.addFieldAsList("orderItem.total");
+        TemplateEngineKind templateEngineKind = isVelocityTemplate ?
+                TemplateEngineKind.Velocity : TemplateEngineKind.Freemarker
 
-        log.info "Add line items"
-        def orderItems = model.order.orderItems.collect { OrderItem orderItem ->
-            [
-                    code       : orderItem.product?.productCode,
-                    description: orderItem.product?.name,
-                    quantity   : orderItem.quantity,
-                    unit       : orderItem?.product?.unitOfMeasure,
-                    price      : orderItem?.product?.pricePerUnit,
-                    total   : orderItem.quantity * orderItem?.product?.pricePerUnit
+        //InputStream inputStream = new ByteArrayInputStream(documentTemplate.fileContents)
+        File file = new File("/home/jmiranda/Dropbox/Document Templates/PO template.odt")
+        FileInputStream inputStream = new FileInputStream(file)
+        IXDocReport report = XDocReportRegistry.getRegistry().loadReport(inputStream, templateEngineKind);
+
+        // FIXME Need a better way to handle this generically (consider using config + dataService)
+        IContext context = orderInstance ? createOrderContext(report, orderInstance) : report.createContext();
+
+        ConverterTypeVia sourceDocumentType = report.kind == "DOCX" ? ConverterTypeVia.DOCX4J :
+                report.getKind() == "ODT" ? ConverterTypeVia.ODFDOM : ConverterTypeVia.XWPF
+
+        // Convert to the target type
+        if (targetDocumentType && sourceDocumentType) {
+            Options options = Options.getTo(targetDocumentType).via(sourceDocumentType);
+            report.convert(context, options, outputStream);
+        }
+        // Process document in place
+        else {
+            report.process(context, outputStream)
+        }
+        log.info "Report dump: " + report.dump()
+
+    }
+
+    def createOrderContext(IXDocReport report, Order orderInstance) {
+
+        IContext context = report.createContext();
+
+
+
+        // Add data to the context
+        def orderItems = orderInstance.orderItems.collect { OrderItem orderItem ->
+            return [
+                    code                : orderItem?.product?.productCode,
+                    type                : "Item",
+                    status              : orderItem.orderItemStatusCode?:"",
+                    description         : orderItem?.description ?: orderItem?.product?.name,
+                    quantity            : orderItem?.quantity ?: 0,
+                    supplierCode        : orderItem?.productSupplier?.supplierCode ?: "",
+                    manufacturer        : orderItem?.productSupplier?.manufacturer?.name ?: "",
+                    manufacturerCode    : orderItem?.productSupplier?.manufacturerCode ?: "",
+                    unitOfMeasure       : orderItem?.unitOfMeasure ?: "",
+                    unitPrice           : orderItem?.unitPrice ?: "",
+                    totalPrice          : orderItem?.totalPrice() ?: "",
+                    expectedShippingDate: orderItem?.estimatedShipDate ?: ""
+            ]
+        }
+        def orderAdjustments = orderInstance.orderAdjustments.collect { OrderAdjustment orderAdjustment ->
+            return [
+                    code                : orderAdjustment?.orderAdjustmentType?.code?:"",
+                    type                : "Adjustment",
+                    status              : "",
+                    description         : orderAdjustment?.description?:orderAdjustment?.orderAdjustmentType?.description?:"",
+                    quantity            : 1,
+                    supplierCode        : "",
+                    manufacturer        : "",
+                    manufacturerCode    : "",
+                    unitOfMeasure       : "",
+                    unitPrice           : "",
+                    totalPrice          : orderAdjustment?.totalAdjustments ?: "",
+                    expectedShippingDate: ""
             ]
         }
 
-        log.info "Add line items to context"
+        def order = orderInstance.toJson()
+        order.dateOrdered = orderInstance.dateOrdered
+        order.dateApproved = orderInstance.dateApproved
+        order.dateCompleted = orderInstance.dateCompleted
+        order.currencyCode = orderInstance.currencyCode?:""
+        order.exchangeRate = orderInstance.exchangeRate?:""
+        order.total = orderInstance.total?:""
+        order.subtotal = orderInstance.subtotal?:""
+        order.totalAdjustments = orderInstance.totalAdjustments?:""
+        order.description = orderInstance.description?:""
+
+        Address nullAddress = [address:"", address2: "", city: "", stateOrProvince: "", description: ""]
+        Organization vendor = orderInstance.originParty
+        order.vendor = vendor?.properties?:[:]
+        order.vendor.address = vendor?.defaultLocation?.address?:nullAddress
+
+        Organization buyer = orderInstance.destinationParty
+        order.buyer = buyer?.properties?:[:]
+        order.buyer.address = buyer?.defaultLocation?.address?:nullAddress
+
+        Location deliverto = orderInstance.destination
+        order.deliverto = deliverto?.properties?:[:]
+        order.deliverto.address = deliverto?.address?:nullAddress
+
+        // Add order item fields to metadata
+        FieldsMetadata metadata = report.createFieldsMetadata();
+        metadata.addFieldAsList("orderItems.code")
+        metadata.addFieldAsList("orderItems.description")
+        metadata.addFieldAsList("orderItems.quantity")
+        metadata.addFieldAsList("orderItems.supplierCode")
+        metadata.addFieldAsList("orderItems.manufacturer")
+        metadata.addFieldAsList("orderItems.manufacturerCode")
+        metadata.addFieldAsList("orderItems.unitOfMeasure")
+        metadata.addFieldAsList("orderItems.unitPrice")
+        metadata.addFieldAsList("orderItems.totalPrice")
+        metadata.addFieldAsList("orderItems.expectedShippingDate")
+
+        // Add order adjustment fields to metadata
+        metadata.addFieldAsList("orderAdjustments.code")
+        metadata.addFieldAsList("orderAdjustments.description")
+        metadata.addFieldAsList("orderAdjustments.totalPrice")
+
+        context.put("order", order)
         context.put("orderItems", orderItems);
-
-        ConverterTypeVia sourceDocumentType = report.getKind() == "DOCX" ? ConverterTypeVia.DOCX4J :
-                report.getKind() == "ODT" ? ConverterTypeVia.ODFDOM : ConverterTypeVia.XWPF
-        Options options = Options.getTo(targetDocumentType).via(sourceDocumentType);
-
-        report.convert(context, options, outputStream);
+        context.put("orderAdjustments", orderAdjustments);
+        return context
     }
 
 
@@ -138,13 +216,6 @@ class DocumentTemplateService {
         }
         context.put("r", shipmentItems);
 
-
-//        FieldsMetadata metadata = new FieldsMetadata();
-//        metadata.addFieldAsList( "developers.Name" );
-//        metadata.addFieldAsList( "developers.LastName" );
-//        metadata.addFieldAsList( "developers.Mail" );
-
-        //report.process(context, outputStream)
 
         // Write the PDF file to output stream
         //Options options = Options.getTo(ConverterTypeTo.PDF).via(ConverterTypeVia.ODFDOM);

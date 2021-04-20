@@ -212,7 +212,7 @@
                                                 params="['documentTemplate.id': documentTemplate.id]"
                                                 disabled="${orderInstance?.status < org.pih.warehouse.order.OrderStatus.PLACED}"
                                                 disabledMessage="Order must be placed in order to print.">
-                                                <img src="${resource(dir: 'images/icons/silk', file: 'page.png')}" />&nbsp;
+                                                <img src="${resource(dir: 'images/icons/silk', file: 'page_word.png')}" />&nbsp;
                                                 <warehouse:message code="default.download.label" default="Download" args="[documentTemplate?.name]"/>
                                             </g:link>
                                         </div>

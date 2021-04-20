@@ -108,6 +108,7 @@ grails.project.dependency.resolution = {
 //            excludes "xercesImpl", "xml-apis", "xmlbeans"
 //        }
 
+        compile "org.apache.xmlgraphics:batik-util:1.7"
 
         // Fake SMTP server
         test 'dumbster:dumbster:1.6'

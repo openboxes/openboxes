@@ -870,16 +870,38 @@ class OrderController {
             }
             Document documentTemplate = Document.get(params?.documentTemplate?.id)
             if (documentTemplate) {
-                ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
-                documentTemplateService.renderDocumentTemplate(documentTemplate,
-                        [order: orderInstance], TemplateEngineKind.Freemarker, ConverterTypeTo.PDF, outputStream)
 
-                if (outputStream) {
+                try {
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
+                    ConverterTypeTo targetDocumentType = params.format ? params.format as ConverterTypeTo : null
+                    documentTemplateService.renderOrderDocumentTemplate(documentTemplate,
+                            orderInstance, targetDocumentType, outputStream)
+
+                    // Set response headers appropriately
+                    if (targetDocumentType) {
+
+                        // Use the appropriate content type and extension of the conversion type
+                        // (except XHTML, just render as HTML response)
+                        if (targetDocumentType != ConverterTypeTo.XHTML) {
+                            response.setHeader("Content-disposition",
+                                    "attachment; filename=\"${documentTemplate.name}\"-${orderInstance.orderNumber}.${targetDocumentType.extension}");
+                            response.setContentType(targetDocumentType.mimeType)
+                        }
+                    }
+                    else {
+
+                        // Otherwise write processed document to response using the original
+                        // document template's extension and content type
+                        response.setHeader("Content-disposition",
+                                "attachment; filename=\"${documentTemplate.name}\"-${orderInstance.orderNumber}.${documentTemplate.extension}");
+                        response.setContentType(documentTemplate.contentType)
+                    }
                     outputStream.writeTo(response.outputStream)
-                    response.setHeader("Content-disposition", "attachment; filename=\"${orderInstance.orderNumber}\".pdf");
-                    response.setContentType("application/pdf")
+                    return
+                } catch (Exception e) {
+                    log.error("Unable to render document template ${documentTemplate.name} for order ${orderInstance?.id}", e)
+                    throw e;
                 }
-                return
             }
         }
         [orderInstance:orderInstance]
