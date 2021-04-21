@@ -15,7 +15,7 @@ class Doc4jController {
 
     def documentService
     def shipmentService
-	def documentTemplateService
+    def documentTemplateService
 
     /**
      *
