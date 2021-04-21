@@ -17,6 +17,7 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.invoice.InvoiceItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
@@ -95,6 +96,9 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
             "completelyReceived",
             "pending",
             "quantityRemainingToShip",
+            "invoiceItems",
+            "quantityInvoiced",
+            "quantityInvoicedInStandardUom"
     ]
 
     static belongsTo = [order: Order, parentOrderItem: OrderItem]
@@ -284,6 +288,34 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
                                 quantity <=> orderItem?.quantity ?:
                                         id <=> orderItem?.id
         return sortOrder
+    }
+
+    List<InvoiceItem> getInvoiceItems() {
+        def invoiceItems = InvoiceItem.executeQuery("""
+          SELECT ii
+            FROM InvoiceItem ii
+            JOIN ii.invoice i
+            JOIN ii.shipmentItems si
+            JOIN si.orderItems oi
+            WHERE oi.id = :id
+          """, [id: id])
+        return invoiceItems ?: null
+    }
+
+    Integer getQuantityInvoicedInStandardUom() {
+        return InvoiceItem.executeQuery("""
+          SELECT SUM(ii.quantity)
+            FROM InvoiceItem ii
+            JOIN ii.invoice i
+            JOIN ii.shipmentItems si
+            JOIN si.orderItems oi
+            WHERE oi.id = :id 
+            AND i.dateSubmitted IS NOT NULL
+          """, [id: id])?.first() ?: 0
+    }
+
+    Integer getQuantityInvoiced() {
+        return quantityInvoicedInStandardUom / quantityPerUom
     }
 
     Map toJson() {
