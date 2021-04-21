@@ -12,6 +12,7 @@ package org.pih.warehouse.inventory
 import grails.orm.PagedResultList
 import groovy.sql.BatchingStatementWrapper
 import groovy.sql.Sql
+import groovy.time.TimeCategory
 import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
@@ -21,6 +22,7 @@ import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
+import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductActivityCode
 import org.pih.warehouse.product.ProductAvailability
@@ -31,10 +33,24 @@ class ProductAvailabilityService {
     boolean transactional = true
 
     def dataSource
+    def grailsApplication
     def persistenceInterceptor
     def locationService
     def inventoryService
     def dataService
+
+    def triggerRefreshProductAvailability(String locationId, List<String> productIds, Boolean forceRefresh ) {
+        log.info "Triggering refresh product availability"
+        use(TimeCategory) {
+            Boolean delayStart = grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayStart
+            def delayInMilliseconds = delayStart ?
+                    grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayInMilliseconds : 0
+            Date runAt = new Date() + delayInMilliseconds.milliseconds
+            log.info "Triggering refresh product availability with ${delayInMilliseconds} ms delay"
+            RefreshProductAvailabilityJob.schedule(runAt,
+                    [locationId: locationId, productIds: productIds, forceRefresh: forceRefresh])
+        }
+    }
 
     def refreshProductAvailability(Boolean forceRefresh) {
         // Compute bin locations from transaction entries for all products over all depot locations

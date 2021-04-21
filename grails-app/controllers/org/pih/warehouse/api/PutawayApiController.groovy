@@ -53,7 +53,7 @@ class PutawayApiController {
     }
 
 
-    def create = { Putaway putaway ->
+    def create = {
         JSONObject jsonObject = request.JSON
 
         Location currentLocation = Location.get(session.warehouse.id)
@@ -63,25 +63,25 @@ class PutawayApiController {
 
         User currentUser = User.get(session.user.id)
 
+        Putaway putaway = new Putaway()
         bindPutawayData(putaway, currentUser, currentLocation, jsonObject)
         Order order
 
         // Putaway stock
         if (putaway?.putawayStatus?.equals(PutawayStatus.COMPLETED)) {
             order = putawayService.completePutaway(putaway)
+            putaway = Putaway.createFromOrder(order)
         } else {
             order = putawayService.savePutaway(putaway)
+            putaway = Putaway.createFromOrder(order)
+            putaway.sortBy = jsonObject.sortBy
+            putaway?.putawayItems?.each { PutawayItem putawayItem ->
+                putawayItem.availableItems =
+                        productAvailabilityService.getAvailableBinLocations(putawayItem.currentFacility, putawayItem.product)
+                putawayItem.inventoryLevel = InventoryLevel.findByProductAndInventory(putawayItem.product, putaway.origin.inventory)
+                putawayItem.quantityAvailable = productAvailabilityService.getQuantityOnHandInBinLocation(putawayItem.inventoryItem, putawayItem.currentLocation)
+            }
         }
-
-        putaway = Putaway.createFromOrder(order)
-        putaway.sortBy = jsonObject.sortBy
-        putaway?.putawayItems?.each { PutawayItem putawayItem ->
-            putawayItem.availableItems =
-                    productAvailabilityService.getAvailableBinLocations(putawayItem.currentFacility, putawayItem.product)
-            putawayItem.inventoryLevel = InventoryLevel.findByProductAndInventory(putawayItem.product, putaway.origin.inventory)
-            putawayItem.quantityAvailable = productAvailabilityService.getQuantityOnHandInBinLocation(putawayItem.inventoryItem, putawayItem.currentLocation)
-        }
-
         render([data: putaway?.toJson()] as JSON)
     }
 

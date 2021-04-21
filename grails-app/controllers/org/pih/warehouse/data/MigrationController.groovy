@@ -12,6 +12,7 @@ package org.pih.warehouse.data
 import grails.converters.JSON
 import grails.validation.ValidationException
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Transaction
@@ -19,6 +20,7 @@ import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.jobs.DataMigrationJob
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.reporting.ConsumptionFact
 import org.pih.warehouse.reporting.DateDimension
 import org.pih.warehouse.reporting.LocationDimension
@@ -31,30 +33,56 @@ class MigrationController {
     def dataService
     def migrationService
     def inventoryService
+    def locationService
+    def productAvailabilityService
 
     def index = {
 
+    }
+
+
+    def dataQuality = {
+
+    }
+
+    def dataMigration = {
+
         def organizations = migrationService.getSuppliersForMigration()
-
         def productSuppliers = migrationService.getProductsForMigration()
-
-        def stockoutFactCount = dataService.executeQuery("select count(*) as count from stockout_fact")[0]?.count ?: 0
-        def productDemandCount = dataService.executeQuery("select count(*) as count from product_demand_details")[0]?.count ?: 0
-        def productAvailabilityCount = dataService.executeQuery("select count(*) as count from product_availability")[0]?.count ?: 0
-
         TransactionType inventoryTransactionType = TransactionType.load(Constants.INVENTORY_TRANSACTION_TYPE_ID)
         def inventoryTransactionCount = Transaction.countByTransactionType(inventoryTransactionType)
+
         [
                 organizationCount        : organizations.size(),
                 inventoryTransactionCount: inventoryTransactionCount,
                 productSupplierCount     : productSuppliers.size(),
+
+        ]
+    }
+
+    def dimensionTables = {
+        [
+                locationDimensionCount: LocationDimension.count(),
+                productDimensionCount : ProductDimension.count(),
+                lotDimensionCount     : LotDimension.count(),
+                dateDimensionCount    : DateDimension.count(),
+        ]
+    }
+
+    def factTables = {
+        def stockoutFactCount = dataService.executeQuery("select count(*) as count from stockout_fact")[0]?.count ?: 0
+        [
                 transactionFactCount     : TransactionFact.count(),
                 consumptionFactCount     : ConsumptionFact.count(),
-                locationDimensionCount   : LocationDimension.count(),
-                productDimensionCount    : ProductDimension.count(),
-                lotDimensionCount        : LotDimension.count(),
-                dateDimensionCount       : DateDimension.count(),
                 stockoutFactCount        : stockoutFactCount,
+        ]
+    }
+
+    def materializedViews = {
+        def productDemandCount = dataService.executeQuery("select count(*) as count from product_demand_details")[0]?.count ?: 0
+        def productAvailabilityCount = dataService.executeQuery("select count(*) as count from product_availability")[0]?.count ?: 0
+
+        [
                 productDemandCount       : productDemandCount,
                 productAvailabilityCount : productAvailabilityCount
         ]
@@ -82,6 +110,122 @@ class MigrationController {
                         issued    : it.issued,
                 ]
             }.sort { it?.dateCreated }
+            render(template: "/common/dataTable", model: [data: data])
+        }
+    }
+
+    def loadProductAvailability = {
+        Location location = Location.get(params.id)
+        def results = ProductAvailability.createCriteria().list {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            projections {
+                count("id", "count")
+            }
+            eq("location", location)
+        }
+        def count = results ? results[0].count : null
+        render (status: 200, text: count)
+    }
+
+
+    def calculateProductAvailability = {
+        Location location = Location.get(params.id)
+        def binLocations = productAvailabilityService.calculateBinLocations(location)
+        render (status: 200, text: binLocations.size())
+    }
+
+    def productAvailability = {
+
+        def countByLocation = ProductAvailability.createCriteria().list {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            projections {
+                count("id", "count")
+                groupProperty("location", "location")
+            }
+        }
+
+        def data = locationService.depots.collect { Location location ->
+            def count = countByLocation.find { it.location == location }?.count?:null
+            [
+                    "Location" : location.name,
+                    "Product Availability":
+                            "<div data-url=\"${request.contextPath}/migration/loadProductAvailability/${location.id}\" class=\"fetch-indicator\">${count}</div>",
+                    "Calculated":
+                            "<div data-url=\"${request.contextPath}/migration/calculateProductAvailability/${location.id}\" class=\"fetch-indicator\">Fetch</div>",
+                    "Actions":
+                            "<a data-title=\"${location.name}\" class=\"button btn-show-dialog\" data-url=\"${request.contextPath}/migration/compareProductAvailability?location.id=${location.id}\">show diff</a>" +
+                            "<a data-title=\"${location.name}\" class=\"button btn-show-dialog\" data-url=\"${request.contextPath}/migration/compareProductAvailability?location.id=${location.id}&showAll=true\">show all</a>" +
+                            "<a class=\"button btn-post-data\" data-url=\"${request.contextPath}/migration/refreshProductAvailability?location.id=${location.id}\">refresh</a>"
+            ]
+        }.sort { it.count }
+
+        [data:data]
+    }
+
+    def refreshProductAvailability = {
+        Location location = params?.location ?
+                Location.get(params.location?.id) :
+                Location.get(session.warehouse.id)
+
+        productAvailabilityService.refreshProductAvailability(location, true)
+        render (status: 200, text: "Refreshed product availability for location ${location.name}")
+    }
+
+    def compareProductAvailability = {
+
+        log.info "params " + params
+
+        Location location = params?.location ?
+                Location.get(params.location?.id) :
+                Location.get(session.warehouse.id)
+
+
+        if ("count".equals(params.format)) {
+            render ProductAvailability.count()
+            return
+        }
+        else {
+            def showAll = params.showAll?:false
+            def startTime = System.currentTimeMillis()
+            def binLocations = productAvailabilityService.calculateBinLocations(location)
+            log.info "calculate time: " + (System.currentTimeMillis()-startTime)
+
+            startTime = System.currentTimeMillis()
+            def data = ProductAvailability.findAllByLocation(location)
+            data = data.collect { ProductAvailability pa ->
+                def binLocation = binLocations.find {
+                    it.product?.id == pa.product?.id &&
+                            it.inventoryItem?.id == pa.inventoryItem?.id &&
+                            it.binLocation?.id == pa.binLocation?.id
+                }
+                log.info "bin location " + binLocation
+                def quantityOnHandActual =
+                binLocations.remove(binLocation)
+                return [
+                        productCode : pa?.productCode,
+                        lotNumber : pa?.lotNumber,
+                        binLocation : pa?.binLocationName,
+                        quantityFromProductAvailability: pa.quantityOnHand?:0,
+                        quantityFromTransactions: binLocation?.quantity?:0,
+                        includedInProductAvailability: true
+                ]
+            }.findAll { it.quantityFromProductAvailability != it.quantityFromTransactions || showAll }
+
+            log.info "binLocations " + binLocations
+
+            def binLocationsRemaining = binLocations.collect {
+                [
+                        productCode: it?.product?.productCode,
+                        lotNumber : it?.inventoryItem?.lotNumber,
+                        binLocation : it?.binLocation?.name,
+                        quantityFromProductAvailability : null,
+                        quantityFromTransactions : it.quantity,
+                        includedInProductAvailability: false
+                ]
+            }
+
+            data.addAll(binLocationsRemaining)
+            log.info "time: " + (System.currentTimeMillis()-startTime)
             render(template: "/common/dataTable", model: [data: data])
         }
     }

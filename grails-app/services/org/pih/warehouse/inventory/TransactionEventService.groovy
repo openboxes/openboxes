@@ -9,50 +9,25 @@
  **/
 package org.pih.warehouse.inventory
 
-import groovy.time.TimeCategory
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.springframework.context.ApplicationListener
 class TransactionEventService implements ApplicationListener<TransactionEvent> {
 
     boolean transactional = true
     def grailsApplication
+    def productAvailabilityService
 
     void onApplicationEvent(TransactionEvent event) {
-        log.info "Application event $event has been published!"
+        log.info "Application event $event has been published! " + event.properties
         Transaction transaction = event?.source
 
         // Some transaction event publishers might want to trigger the events on their own
         // in order to allow the transaction to be saved to the database (e.g. Partial Receiving)
-        if (transaction?.blockRefresh) {
-            log.warn "Product availability refresh has been blocked by event publisher"
+        if (transaction?.disableRefresh) {
+            log.warn "Product availability refresh has been disabled by event publisher"
             return
         }
 
-        Location location = Location.load(transaction.associatedLocation)
-        def productIds = transaction.associatedProducts
-        Boolean forceRefresh = event.forceRefresh
-
-        log.info "Refresh product availability records for " +
-                "location=$location.id, " +
-                "transactionId=$transaction.id," +
-                "transactionDate=$transaction.transactionDate," +
-                "transactionNumber=$transaction.transactionNumber," +
-                "productIds=$productIds, " +
-                "forceRefresh=$forceRefresh"
-
-        use(TimeCategory) {
-            Boolean delayStart = grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayStart
-            def delayInMilliseconds = delayStart ?
-                    grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayInMilliseconds : 0
-            Date runAt = new Date() + delayInMilliseconds.milliseconds
-            log.info "Triggering refresh product availability with ${delayInMilliseconds} ms delay"
-            RefreshProductAvailabilityJob.schedule(runAt, [
-                    locationId  : location?.id,
-                    productIds  : productIds,
-                    forceRefresh: forceRefresh
-            ])
-        }
-
+        productAvailabilityService.triggerRefreshProductAvailability(transaction.associatedLocation,
+                transaction.associatedProducts, event.forceRefresh)
     }
 }
