@@ -51,8 +51,8 @@ class DocumentTemplateService {
         // FIXME Need a better way to handle this generically (consider using config + dataService)
         IContext context = orderInstance ? createOrderContext(report, orderInstance) : report.createContext();
 
-        ConverterTypeVia sourceDocumentType = report.kind == "DOCX" ? ConverterTypeVia.DOCX4J :
-                report.getKind() == "ODT" ? ConverterTypeVia.ODFDOM : ConverterTypeVia.XWPF
+        ConverterTypeVia sourceDocumentType = (report.kind == "DOCX") ? ConverterTypeVia.DOCX4J :
+                (report.kind == "ODT") ? ConverterTypeVia.ODFDOM : ConverterTypeVia.XWPF
 
         // Convert to the target type
         if (targetDocumentType && sourceDocumentType) {
