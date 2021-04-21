@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.order
 
+import fr.opensagres.xdocreport.converter.ConverterTypeTo
 import grails.converters.JSON
 import grails.validation.ValidationException
 import org.apache.commons.lang.StringEscapeUtils
@@ -21,7 +22,6 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
-import org.pih.warehouse.core.UomService
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.ValidationCode
 import org.pih.warehouse.product.Product
@@ -35,9 +35,10 @@ class OrderController {
     def stockMovementService
     def reportService
     def shipmentService
-    UomService uomService
+    def uomService
     def userService
     def productSupplierDataService
+    def documentTemplateService
 
     static allowedMethods = [save: "POST", update: "POST"]
 
@@ -838,46 +839,62 @@ class OrderController {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
             redirect(action: "list")
         } else {
-            return [orderInstance: orderInstance]
+            Document documentTemplate = Document.findByName("${controllerName}:${actionName}")
+            if (documentTemplate) {
+                render documentTemplateService.renderGroovyServerPageDocumentTemplate(documentTemplate, [orderInstance:orderInstance])
+                return
+            }
+            [orderInstance: orderInstance]
         }
     }
 
-
-    def renderPdf = {
+    def render = {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
             redirect(action: "list")
         } else {
+            if (!params?.documentTemplate?.id) {
+                throw new IllegalArgumentException("documentTemplate.id is required")
+            }
+            Document documentTemplate = Document.get(params?.documentTemplate?.id)
+            if (documentTemplate) {
 
-            def baseUri = request.scheme + "://" + request.serverName + ":" + request.serverPort
+                try {
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
+                    ConverterTypeTo targetDocumentType = params.format ? params.format as ConverterTypeTo : null
+                    documentTemplateService.renderOrderDocumentTemplate(documentTemplate,
+                            orderInstance, targetDocumentType, outputStream)
 
-            // JSESSIONID is required because otherwise the login page is rendered
-            def url = baseUri + params.url + ";jsessionid=" + session.getId()
-            url += "?print=true"
-            url += "&location.id=" + params.location.id
-            url += "&category.id=" + params.category.id
-            url += "&startDate=" + params.startDate
-            url += "&endDate=" + params.endDate
-            url += "&showTransferBreakdown=" + params.showTransferBreakdown
-            url += "&hideInactiveProducts=" + params.hideInactiveProducts
-            url += "&insertPageBreakBetweenCategories=" + params.insertPageBreakBetweenCategories
-            url += "&includeChildren=" + params.includeChildren
-            url += "&includeEntities=true"
+                    // Set response headers appropriately
+                    if (targetDocumentType) {
 
-            // Let the browser know what content type to expect
-            response.setContentType("application/pdf")
+                        // Use the appropriate content type and extension of the conversion type
+                        // (except XHTML, just render as HTML response)
+                        if (targetDocumentType != ConverterTypeTo.XHTML) {
+                            response.setHeader("Content-disposition",
+                                    "attachment; filename=\"${documentTemplate.name}\"-${orderInstance.orderNumber}.${targetDocumentType.extension}");
+                            response.setContentType(targetDocumentType.mimeType)
+                        }
+                    }
+                    else {
 
-            // Render pdf to the response output stream
-            log.info "BaseUri is $baseUri"
-            log.info("Session ID: " + session.id)
-            log.info "Fetching url $url"
-            reportService.generatePdf(url, response.getOutputStream())
-
-
+                        // Otherwise write processed document to response using the original
+                        // document template's extension and content type
+                        response.setHeader("Content-disposition",
+                                "attachment; filename=\"${documentTemplate.name}\"-${orderInstance.orderNumber}.${documentTemplate.extension}");
+                        response.setContentType(documentTemplate.contentType)
+                    }
+                    outputStream.writeTo(response.outputStream)
+                    return
+                } catch (Exception e) {
+                    log.error("Unable to render document template ${documentTemplate.name} for order ${orderInstance?.id}", e)
+                    throw e;
+                }
+            }
         }
+        [orderInstance:orderInstance]
     }
-
 
     def rollbackOrderStatus = {
 

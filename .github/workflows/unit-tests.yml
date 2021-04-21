@@ -56,7 +56,7 @@ jobs:
     - name: Unzip grails
       shell: bash
       if: steps.grails.outputs.cache-hit != 'true'
-      run: unzip  ${{ steps.sdkman.outputs.file }} -d $HOME/
+      run: unzip -o ${{ steps.sdkman.outputs.file }} -d $HOME/
     - name: npm install
       run: npm install
     - name: npm run bundle

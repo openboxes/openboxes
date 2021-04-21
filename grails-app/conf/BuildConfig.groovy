@@ -26,7 +26,7 @@ grails.project.dependency.resolution = {
     inherits("global") {
         // uncomment to disable ehcache
         // excludes 'ehcache'
-        excludes "xml-apis"
+        excludes "xml-apis", "xmlbeans"
     }
     log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
     repositories {
@@ -41,6 +41,7 @@ grails.project.dependency.resolution = {
         mavenRepo "http://repo.grails.org/grails/plugins-releases/"
         mavenRepo "http://repo.grails.org/grails/plugins/"
         mavenRepo "http://repo.grails.org/grails/core/"
+        mavenRepo "http://oss.sonatype.org/content/repositories/snapshots/"
     }
 
     dependencies {
@@ -88,6 +89,21 @@ grails.project.dependency.resolution = {
         test("org.codehaus.geb:geb-spock:0.6.3") {
             exclude 'spock'
         }
+
+        compile ("fr.opensagres.xdocreport:xdocreport:1.0.6")
+        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.document:1.0.6")
+        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.docx:1.0.6")
+        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.odt:1.0.6")
+        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.template:1.0.6")
+        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.freemarker:1.0.6")
+        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.velocity:1.0.6")
+        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter:1.0.6")
+        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.odt.odfdom:1.0.6")
+        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.xwpf:1.0.6")
+        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.docx4j:1.0.6")
+        compile ("fr.opensagres.xdocreport:org.apache.poi.xwpf.converter.pdf:1.0.6")
+        compile ("fr.opensagres.xdocreport:org.odftoolkit.odfdom.converter.pdf:1.0.6")
+        compile "org.apache.xmlgraphics:batik-util:1.7"
 
         // Fake SMTP server
         test 'dumbster:dumbster:1.6'
