@@ -10,22 +10,18 @@
 package org.pih.warehouse.order
 
 import fr.opensagres.xdocreport.converter.ConverterTypeTo
-import fr.opensagres.xdocreport.template.TemplateEngineKind
 import grails.converters.JSON
 import grails.validation.ValidationException
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.plugins.csv.CSVWriter
-import org.hibernate.exception.ExceptionUtils
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
-import org.pih.warehouse.core.DocumentCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
-import org.pih.warehouse.core.UomService
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.ValidationCode
 import org.pih.warehouse.product.Product
@@ -43,7 +39,6 @@ class OrderController {
     def userService
     def productSupplierDataService
     def documentTemplateService
-    def groovyPagesTemplateEngine
 
     static allowedMethods = [save: "POST", update: "POST"]
 

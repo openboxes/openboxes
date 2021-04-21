@@ -26,7 +26,7 @@ grails.project.dependency.resolution = {
     inherits("global") {
         // uncomment to disable ehcache
         // excludes 'ehcache'
-		excludes "xml-apis", "xmlbeans"
+        excludes "xml-apis", "xmlbeans"
     }
     log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
     repositories {

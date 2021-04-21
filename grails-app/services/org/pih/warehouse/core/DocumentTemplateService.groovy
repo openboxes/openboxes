@@ -70,11 +70,11 @@ class DocumentTemplateService {
     def createOrderContext(IXDocReport report, Order orderInstance) {
 
         // Add data to the context
-        def orderItems = orderInstance.orderItems.collect { OrderItem orderItem ->
+        def orderItems = orderInstance?.orderItems?.collect { OrderItem orderItem ->
             return [
                     code                : orderItem?.product?.productCode,
                     type                : "Item",
-                    status              : orderItem.orderItemStatusCode?:"",
+                    status              : orderItem?.orderItemStatusCode?:"",
                     description         : orderItem?.description ?: orderItem?.product?.name,
                     quantity            : orderItem?.quantity ?: 0,
                     supplierCode        : orderItem?.productSupplier?.supplierCode ?: "",
@@ -86,7 +86,7 @@ class DocumentTemplateService {
                     expectedShippingDate: orderItem?.estimatedShipDate ?: ""
             ]
         }
-        def orderAdjustments = orderInstance.orderAdjustments.collect { OrderAdjustment orderAdjustment ->
+        def orderAdjustments = orderInstance?.orderAdjustments?.collect { OrderAdjustment orderAdjustment ->
             return [
                     code                : orderAdjustment?.orderAdjustmentType?.code?:"",
                     type                : "Adjustment",
@@ -114,7 +114,7 @@ class DocumentTemplateService {
         order.totalAdjustments = orderInstance.totalAdjustments?:""
         order.description = orderInstance.description?:""
 
-        Address nullAddress = [address:"", address2: "", city: "", stateOrProvince: "", description: ""]
+        def nullAddress = [address:"", address2: "", city: "", stateOrProvince: "", description: ""]
         Organization vendor = orderInstance.originParty
         order.vendor = vendor?.properties?:[:]
         order.vendor.address = vendor?.defaultLocation?.address?:nullAddress
@@ -150,72 +150,5 @@ class DocumentTemplateService {
         context.put("orderItems", orderItems);
         context.put("orderAdjustments", orderAdjustments);
         return context
-    }
-
-
-    def renderDocumentTemplate(Document document, Shipment shipment, OutputStream outputStream) {
-
-        InputStream inputStream = new ByteArrayInputStream(document.fileContents)
-        IXDocReport report = XDocReportRegistry.getRegistry().
-                loadReport(inputStream, TemplateEngineKind.Freemarker);
-
-        // Add properties to the context
-        IContext context = report.createContext();
-
-        def destination = [
-                name           : shipment?.destination?.name,
-                streetAddress  : shipment?.destination?.address?.address,
-                city           : shipment?.destination?.address?.city,
-                stateOrProvince: shipment?.destination?.address?.stateOrProvince,
-                postalCode     : shipment?.destination?.address?.postalCode,
-                country        : shipment?.destination?.address?.country
-        ]
-        def origin = [
-                name           : shipment?.origin?.name,
-                streetAddress  : shipment?.destination?.address?.address,
-                city           : shipment?.destination?.address?.city,
-                stateOrProvince: shipment?.destination?.address?.stateOrProvince,
-                postalCode     : shipment?.destination?.address?.postalCode,
-                country        : shipment?.destination?.address?.country
-        ]
-        def shipmentData = [
-                name                : shipment?.name,
-                shipmentNumber      : shipment?.shipmentNumber,
-                expectedShippingDate: shipment?.expectedShippingDate,
-                totalValue          : shipment?.calculateTotalValue(),
-                actualShippingDate  : shipment?.actualShippingDate,
-                status              : shipment?.currentStatus?.name
-        ]
-        context.put("origin", origin)
-        context.put("destination", destination)
-        context.put("shipment", shipmentData);
-
-        // instruct XDocReport to inspect InvoiceRow entity as well
-        // which is given as a list and iterated in a table
-        FieldsMetadata metadata = report.createFieldsMetadata();
-        //metadata.load("r", ShipmentItem.class, true);
-        metadata.addFieldAsList("r.description");
-        metadata.addFieldAsList("r.quantity");
-        metadata.addFieldAsList("r.unit");
-        metadata.addFieldAsList("r.price");
-        metadata.addFieldAsList("r.rowtotal");
-
-        def shipmentItems = shipment.shipmentItems.collect { ShipmentItem shipmentItem ->
-            [
-                    description: shipmentItem?.product?.productCode + " " + shipmentItem?.product?.name,
-                    quantity   : shipmentItem.quantity,
-                    unit       : shipmentItem?.product?.unitOfMeasure,
-                    price      : shipmentItem?.product?.pricePerUnit,
-                    rowtotal   : shipmentItem.quantity * shipmentItem?.product?.pricePerUnit
-            ]
-        }
-        context.put("r", shipmentItems);
-
-
-        // Write the PDF file to output stream
-        //Options options = Options.getTo(ConverterTypeTo.PDF).via(ConverterTypeVia.ODFDOM);
-        Options options = Options.getTo(ConverterTypeTo.PDF).via(ConverterTypeVia.DOCX4J);
-        report.convert(context, options, outputStream);
-
     }
 }

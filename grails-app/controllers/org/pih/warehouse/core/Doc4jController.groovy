@@ -14,8 +14,6 @@ import org.pih.warehouse.shipping.Shipment
 class Doc4jController {
 
     def documentService
-    def shipmentService
-    def documentTemplateService
 
     /**
      *
