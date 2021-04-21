@@ -96,7 +96,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
             "completelyReceived",
             "pending",
             "quantityRemainingToShip",
-            "submittedInvoiceItems",
+            "invoiceItems",
             "quantityInvoiced",
             "quantityInvoicedInStandardUom"
     ]
@@ -290,14 +290,28 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         return sortOrder
     }
 
-    def getSubmittedInvoiceItems() {
-        return InvoiceItem.list().findAll { it.orderItem == this && it.invoice.dateSubmitted }
+    List<InvoiceItem> getInvoiceItems() {
+        def invoiceItems = InvoiceItem.executeQuery("""
+          SELECT ii
+            FROM InvoiceItem ii
+            JOIN ii.invoice i
+            JOIN ii.shipmentItems si
+            JOIN si.orderItems oi
+            WHERE oi.id = :id
+          """, [id: id])
+        return invoiceItems ?: null
     }
 
     Integer getQuantityInvoicedInStandardUom() {
-        return submittedInvoiceItems.sum { InvoiceItem invoiceItem ->
-            invoiceItem?.quantity
-        }?:0
+        return InvoiceItem.executeQuery("""
+          SELECT SUM(ii.quantity)
+            FROM InvoiceItem ii
+            JOIN ii.invoice i
+            JOIN ii.shipmentItems si
+            JOIN si.orderItems oi
+            WHERE oi.id = :id 
+            AND i.dateSubmitted IS NOT NULL
+          """, [id: id])?.first() ?: 0
     }
 
     Integer getQuantityInvoiced() {
