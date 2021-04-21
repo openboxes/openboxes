@@ -86,7 +86,7 @@ const FIELDS = {
       autoComplete: 'off',
     },
   },
-  currencyUom: {
+  'currencyUom.id': {
     label: 'react.invoice.currency.label',
     defaultMessage: 'Currency',
     type: SelectField,
@@ -148,7 +148,7 @@ class CreateInvoicePage extends Component {
         vendor: values.vendor.id,
         vendorInvoiceNumber: values.vendorInvoiceNumber,
         dateInvoiced: values.dateInvoiced,
-        'currencyUom.id': values.currencyUom,
+        'currencyUom.id': values.currencyUom.id,
       };
 
       apiClient.post(invoiceUrl, payload)
@@ -162,6 +162,7 @@ class CreateInvoicePage extends Component {
               vendorName: resp.vendorName,
               invoiceNumber: resp.invoiceNumber,
               totalCount: resp.totalCount,
+              currencyUom: resp.currencyUom,
             });
             this.props.hideSpinner();
           }
