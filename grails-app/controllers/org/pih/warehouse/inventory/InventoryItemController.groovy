@@ -18,6 +18,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductException
+import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
@@ -65,6 +66,15 @@ class InventoryItemController {
 
             // now populate the rest of the commmand object
             inventoryService.getStockCardCommand(cmd, params)
+
+            List<ProductPackage> packages = []
+
+            cmd.product.packages.each { ProductPackage productPackage ->
+                if (!packages.find { it.uom.code == productPackage.uom.code && it.quantity == productPackage.quantity }) {
+                    packages.add(productPackage)
+                }
+            }
+            cmd.product.packages = packages
 
             [commandInstance: cmd]
         } catch (ProductException e) {
