@@ -49,7 +49,7 @@ const INVOICE_HEADER_FIELDS = {
       dateFormat: 'MM/DD/YYYY',
     },
   },
-  'currencyUom.id': {
+  'currencyUom.code': {
     type: TextField,
     label: 'react.invoice.currency.label',
     defaultMessage: 'Currency',
