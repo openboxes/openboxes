@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.core.ActivityCode" %>
+<%@ page import="org.pih.warehouse.core.ActivityCode; org.pih.warehouse.order.OrderTypeCode" %>
 <div class="box">
     <h2><warehouse:message code="default.filters.label"/></h2>
     <g:form id="listForm" action="list" method="GET">
@@ -41,26 +41,40 @@
                                          data-allow-clear="true"
                                          data-ajax--cache="true"/>
             </div>
-            <div class="filter-list-item">
-                <label><warehouse:message code="order.destination.label"/></label>
-                <g:selectLocationViaAjax id="destination"
-                                         name="destination"
-                                         class="ajaxSelect2"
-                                         noSelection="['':'']"
-                                         value="${params.destination}"
-                                         data-ajax--url="${request.contextPath }/json/findLocations?activityCode=${org.pih.warehouse.core.ActivityCode.PLACE_ORDER}"
-                                         data-allow-clear="true"/>
-            </div>
-            <div class="filter-list-item">
-                <label><warehouse:message code="order.destinationParty.label"/></label>
-                <g:selectOrganization name="destinationParty"
-                                      id="destinationParty"
-                                      value="${params.destinationParty}"
-                                      roleTypes="[org.pih.warehouse.core.RoleType.ROLE_BUYER]"
-                                      noSelection="['':'']"
-                                      class="chzn-select-deselect"
-                                      disabled="${isCentralPurchasingEnabled}" />
-            </div>
+            <g:if test="${params.orderTypeCode == OrderTypeCode.PURCHASE_ORDER}">
+                <div class="filter-list-item">
+                    <label><warehouse:message code="order.destination.label"/></label>
+                    <g:selectLocationViaAjax id="destination"
+                                             name="destination"
+                                             class="ajaxSelect2"
+                                             noSelection="['':'']"
+                                             value="${params.destination}"
+                                             data-ajax--url="${request.contextPath }/json/findLocations?activityCode=${org.pih.warehouse.core.ActivityCode.RECEIVE_STOCK}"
+                                             data-allow-clear="true"/>
+                </div>
+                <div class="filter-list-item">
+                    <label><warehouse:message code="order.destinationParty.label"/></label>
+                    <g:selectOrganization name="destinationParty"
+                                          id="destinationParty"
+                                          value="${params.destinationParty}"
+                                          roleTypes="[org.pih.warehouse.core.RoleType.ROLE_BUYER]"
+                                          noSelection="['':'']"
+                                          class="chzn-select-deselect"
+                                          disabled="${isCentralPurchasingEnabled}" />
+                </div>
+            </g:if>
+            <g:elseif test="${params.orderTypeCode == OrderTypeCode.TRANSFER_ORDER}">
+                <div class="filter-list-item">
+                    <label><warehouse:message code="order.destination.label"/></label>
+                    <g:selectLocationViaAjax id="destination"
+                                             name="destination"
+                                             class="ajaxSelect2"
+                                             noSelection="['':'']"
+                                             value="${params.destination}"
+                                             data-ajax--url="${request.contextPath }/json/findLocations?activityCode=${org.pih.warehouse.core.ActivityCode.PLACE_ORDER}"
+                                             data-allow-clear="true"/>
+                </div>
+            </g:elseif>
             <div class="filter-list-item">
                 <label><warehouse:message code="order.orderedBy.label"/></label>
                 <g:selectPersonViaAjax id="orderedBy"
