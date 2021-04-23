@@ -50,4 +50,16 @@ class InvoiceController {
             [invoiceInstance: invoiceInstance]
         }
     }
+
+    def rollback = {
+        def invoiceInstance = Invoice.get(params.id)
+        if (!invoiceInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'invoice.label', default: 'Invoice'), params.id])}"
+            redirect(action: "list")
+        } else {
+            invoiceInstance.dateSubmitted = null
+            invoiceInstance.save()
+            redirect(action: "show", id: params.id)
+        }
+    }
 }
