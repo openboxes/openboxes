@@ -153,7 +153,8 @@
 							</tbody>
 							<tfoot>
 								<tr class="odd">
-									<th colspan="12"></th>
+									<g:set var="colspan" value="${params.orderTypeCode == OrderTypeCode.PURCHASE_ORDER ? 12 : 8}"/>
+									<th colspan="${colspan}"></th>
 									<th><label>${warehouse.message(code:'order.totalPrice.label')}</label></th>
 									<th colspan="2" class="right">
 										<g:formatNumber number="${totalPrice}"/>
