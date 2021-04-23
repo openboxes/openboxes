@@ -6,8 +6,8 @@
         <g:hiddenField name="max" value="${params.max ?: 10}"/>
         <div class="filter-list">
             <div class="filter-list-item">
-                <label>${warehouse.message(code: 'order.orderNumber.label')}</label>
-                <g:textField class="text" id="orderNumber" name="orderNumber" value="${params.orderNumber}" style="width:100%"/>
+                <label>${warehouse.message(code: 'default.search.label')}</label>
+                <g:textField class="text" id="q" name="q" value="${params.q}" style="width:100%" placeholder="Search by order number or description"/>
 
             </div>
             <div class="filter-list-item">
