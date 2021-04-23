@@ -146,6 +146,7 @@ CREATE OR REPLACE VIEW order_state AS (
                 WHEN (IFNULL(SUM(shipment_payment_ordered), 0) + IFNULL(SUM(adjustment_quantity_invoiced), 0) = 0) THEN NULL
                 WHEN (IFNULL(SUM(shipment_payment_ordered), 0) + IFNULL(SUM(adjustment_quantity_invoiced), 0) = IFNULL(SUM(shipment_item_invoiced), 0) + IFNULL(SUM(adjustment_invoiced), 0)) THEN 'INVOICED'
                 WHEN (IFNULL(SUM(shipment_payment_ordered), 0) + IFNULL(SUM(adjustment_quantity_invoiced), 0) > 0 AND IFNULL(SUM(shipment_item_invoiced), 0) + IFNULL(SUM(adjustment_invoiced) > 0, 0)) THEN 'PARTIALLY_INVOICED'
+                WHEN (IFNULL(sum(order_payment_status_from_shipments.quantity_ordered), 0) > 0 and IFNULL(sum(order_payment_status_from_shipments.shipment_item_quantity_invoiced), 0) > 0) THEN 'PARTIALLY_INVOICED'
                 ELSE NULL
             END AS payment_status
         FROM `order`
