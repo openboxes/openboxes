@@ -18,6 +18,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductException
+import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
@@ -65,7 +66,6 @@ class InventoryItemController {
 
             // now populate the rest of the commmand object
             inventoryService.getStockCardCommand(cmd, params)
-
             [commandInstance: cmd]
         } catch (ProductException e) {
             flash.message = e.message

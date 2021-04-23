@@ -28,14 +28,14 @@
                             ${warehouse.message(code:'default.each.label') }
                         </g:else>
                     </div>
-                    <g:if test="${productInstance?.packages }">
-                        <g:each var="productPackage" in="${productInstance?.packages }">
-                            <g:if test="${productPackage?.uom?.code != 'EA' && productPackage?.quantity}">
+                    <g:if test="${productInstance?.uoms}">
+                        <g:each var="productPackage" in="${productInstance?.uoms}">
+                            <g:if test="${productPackage?.uom != 'EA' && productPackage?.quantity}">
                                 <div>
                                     <span class="fade">
-                                        <g:set var="quantityPerPackage" value="${totalQuantity / productPackage?.quantity }"/>
-                                        ${g.formatNumber(number: quantityPerPackage, format: '###,###,###.#') }
-                                        ${productPackage?.uom?.code }/${productPackage.quantity }
+                                        <g:set var="quantityPerPackage" value="${totalQuantity / productPackage?.quantity}"/>
+                                        ${g.formatNumber(number: quantityPerPackage, format: '###,###,###.#')}
+                                        ${productPackage?.uom }/${productPackage.quantity}
                                     </span>
                                 </div>
                             </g:if>
@@ -133,16 +133,6 @@
                         </td>
                     </tr>
                 </g:if>
-                <g:if test="${inventoryLevel?.abcClass}">
-                    <tr class="prop">
-                        <td class="label">
-                            <label><warehouse:message code="product.abcClass.label"/></label>
-                        </td>
-                        <td class="value middle">
-                            <g:abcClassification product="${productInstance.id}"/>
-                        </td>
-                    </tr>
-                </g:if>
                 <g:if test="${inventoryLevel?.preferredBinLocation}">
                     <tr class="prop">
                         <td class="label">
@@ -223,14 +213,6 @@
             </tr>
             <tr class="prop">
                 <td class="label">
-                    <label>${warehouse.message(code: 'product.productCode.label') }</label>
-                </td>
-                <td class="value">
-                    ${productInstance?.productCode}
-                </td>
-            </tr>
-            <tr class="prop">
-                <td class="label">
                     <label><warehouse:message code="category.label"/></label>
                 </td>
                 <td class="value" id="productCategory">
@@ -254,6 +236,16 @@
 
                 </td>
             </tr>
+            <g:if test="${productInstance?.glAccount}">
+                <tr class="prop">
+                    <td class="label">
+                        <label><warehouse:message code="product.glCode.label"/></label>
+                    </td>
+                    <td class="value middle">
+                        ${productInstance?.glAccount?.code}
+                    </td>
+                </tr>
+            </g:if>
             <tr class="prop">
                 <td class="label">
                     <label>${warehouse.message(code: 'product.description.label') }</label>
@@ -268,30 +260,16 @@
                     </g:else>
                 </td>
             </tr>
-            <tr class="prop">
-                <td class="label left">
-                    <label><warehouse:message code="productSuppliers.label"/></label>
-                </td>
-                <td class="value">
-                    <g:if test="${productInstance?.productSuppliers }">
-                        <ul>
-                            <g:each var="productSupplier" in="${productInstance?.productSuppliers }">
-                                <li>
-                                    <g:link controller="product" action="edit" id="${productInstance.id }" fragment="ui-tabs-1">
-                                        ${productSupplier?.code }
-                                    </g:link>
-                                </li>
-                            </g:each>
-                        </ul>
-                    </g:if>
-                    <g:else>
-                        <g:link controller="product" action="edit" id="${productInstance.id }" fragment="tabs-productGroups">
-                            <warehouse:message code="default.button.manage.label"/>
-                        </g:link>
-                    </g:else>
-                </td>
-            </tr>
-
+            <g:if test="${inventoryLevel?.abcClass || productInstance?.abcClass}">
+                <tr class="prop">
+                    <td class="label">
+                        <label><warehouse:message code="product.abcClass.label"/></label>
+                    </td>
+                    <td class="value middle">
+                        <g:abcClassification product="${productInstance.id}"/>
+                    </td>
+                </tr>
+            </g:if>
             <tr class="prop">
                 <td class="label left">
                     <label><warehouse:message code="productGroups.label"/></label>
@@ -327,28 +305,6 @@
         </tbody>
     </table>
 </div>
-<g:if test="${productInstance?.packages }">
-    <div class="box">
-        <h2>
-            ${warehouse.message(code: 'product.packaging.label') }
-        </h2>
-        <table>
-            <tbody>
-                <g:each var="productPackage" in="${productInstance?.packages?.sort { it.quantity }}">
-                    <tr class="prop">
-                        <td class="label">
-                            <label>${productPackage?.uom }</label>
-                        </td>
-                        <td class="value">
-                            ${productPackage?.uom?.code }/${productPackage?.quantity }
-                            @ ${productPackage?.productPrice?.price } ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-                        </td>
-                    </tr>
-                </g:each>
-            </tbody>
-        </table>
-    </div>
-</g:if>
 <div class="box">
     <h2>
         ${warehouse.message(code: 'default.auditing.label') }
