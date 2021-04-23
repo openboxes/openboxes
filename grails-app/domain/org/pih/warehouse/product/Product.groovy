@@ -236,7 +236,8 @@ class Product implements Comparable, Serializable {
                          "binLocation",
                          "substitutions",
                          "applicationTagLib",
-                         "handlingIcons"
+                         "handlingIcons",
+                         "uoms"
     ]
 
     static hasMany = [
@@ -631,6 +632,10 @@ class Product implements Comparable, Serializable {
         if (this.hazardousMaterial) handlingIcons.add([icon: "fa-exclamation-triangle", color: "#ffa500", label: "${g.message(code: 'product.hazardousMaterial.label')}"])
         if (this.reconditioned) handlingIcons.add([icon: "fa-prescription-bottle", color: "#a9a9a9", label: "${g.message(code: 'product.reconditioned.label')}"])
         return handlingIcons
+    }
+
+    List getUoms() {
+       return packages.collect { [uom: it.uom.code, quantity: it.quantity] }.unique()
     }
 
     Map toJson() {

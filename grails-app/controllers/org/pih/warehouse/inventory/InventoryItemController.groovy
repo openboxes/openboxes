@@ -66,16 +66,6 @@ class InventoryItemController {
 
             // now populate the rest of the commmand object
             inventoryService.getStockCardCommand(cmd, params)
-
-            List<ProductPackage> packages = []
-
-            cmd.product.packages.each { ProductPackage productPackage ->
-                if (!packages.find { it.uom.code == productPackage.uom.code && it.quantity == productPackage.quantity }) {
-                    packages.add(productPackage)
-                }
-            }
-            cmd.product.packages = packages
-
             [commandInstance: cmd]
         } catch (ProductException e) {
             flash.message = e.message

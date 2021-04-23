@@ -28,14 +28,14 @@
                             ${warehouse.message(code:'default.each.label') }
                         </g:else>
                     </div>
-                    <g:if test="${productInstance?.packages}">
-                        <g:each var="productPackage" in="${productInstance?.packages}">
-                            <g:if test="${productPackage?.uom?.code != 'EA' && productPackage?.quantity}">
+                    <g:if test="${productInstance?.uoms}">
+                        <g:each var="productPackage" in="${productInstance?.uoms}">
+                            <g:if test="${productPackage?.uom != 'EA' && productPackage?.quantity}">
                                 <div>
                                     <span class="fade">
                                         <g:set var="quantityPerPackage" value="${totalQuantity / productPackage?.quantity}"/>
                                         ${g.formatNumber(number: quantityPerPackage, format: '###,###,###.#')}
-                                        ${productPackage?.uom?.code }/${productPackage.quantity}
+                                        ${productPackage?.uom }/${productPackage.quantity}
                                     </span>
                                 </div>
                             </g:if>
