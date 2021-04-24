@@ -204,7 +204,8 @@ dependencies {
     compile ('org.grails.plugins:ajax-tags:1.0.0')
 
     // Used by PDF rendering plugin
-    runtime "org.springframework:spring-test:4.2.1.RELEASE"
+    // NoSuchMethodError: org.springframework.test.context.MergedContextConfiguration.getContextCustomizers()Ljava/util/Set;
+    //runtime "org.springframework:spring-test:4.2.1.RELEASE"
     runtime 'org.xhtmlrenderer:core-renderer:R8'
     runtime 'com.lowagie:itext:2.1.0'
 
