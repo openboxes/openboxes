@@ -13,7 +13,7 @@ before_script:
 - nvm install 10.12.0
 - npm install
 - npm run bundle
-- echo "USE mysql;\nUPDATE user SET password=PASSWORD('password') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root
+- echo "USE mysql;\nALTER user 'root'@'localhost' IDENTIFIED BY 'password';\nFLUSH PRIVILEGES;\n" | mysql -u root
 script: 'grails test-app --non-interactive -echoOut -echoErr'
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
