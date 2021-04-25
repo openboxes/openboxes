@@ -3,7 +3,7 @@ package org.pih.warehouse.page
 import geb.Page
 
 class LoginPage extends Page {
-    static url = "/auth/login"
+    static url = "auth/login"
 
     static at = {
         title == 'Login'
