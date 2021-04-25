@@ -6,14 +6,8 @@ import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.domain.DomainClassUnitTestMixin
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.forecasting.ForecastingService
-import org.pih.warehouse.inventory.Inventory
-import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.InventoryItemController
-import org.pih.warehouse.inventory.InventoryLevel
-import org.pih.warehouse.inventory.RecordInventoryCommand
-import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.product.Product
+import spock.lang.Ignore
 import spock.lang.Specification
 
 @TestFor(InventoryItemController)
@@ -39,9 +33,6 @@ class InventoryItemControllerTests extends Specification {
         mockDomain(Location, [myLocation])
         mockDomain(Inventory, [inventory])
 
-        def productMock = mockFor(Product)
-        productMock.demand.static.getApplicationTagLib() { -> [:] }
-
         controller.inventoryService = [
                 populateRecordInventoryCommand: { commandInstance, userInventory ->
 
@@ -66,6 +57,7 @@ class InventoryItemControllerTests extends Specification {
         controller.session.warehouse = myLocation
     }
 
+    @Ignore
     void "test showRecordInventory"() {
         when:
         RecordInventoryCommand command = new RecordInventoryCommand(product: p, inventory: inventory)
