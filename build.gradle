@@ -192,6 +192,7 @@ dependencies {
     compile "org.grails.plugins:google-analytics:2.3.3" // was 1.0
 
     testCompile "org.grails.plugins:code-coverage:2.0.3-3" // was 1.2.5
+    compile group: 'io.micronaut', name: 'micronaut-http-client', version: '1.0.0.RC3'
 
     // new plugins
     compile("org.grails.plugins:sentry:11.7.24")
@@ -211,6 +212,11 @@ dependencies {
 
     // Used by XLS rendering and Excel Importers
     compile ('org.apache.poi:poi:3.17')
+
+    testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
+    testCompile 'org.spockframework:spock-spring:1.1-groovy-2.4'
+    compile group: 'org.grails.plugins', name: 'rest-client-builder', version: '2.1.1'
+
 
 }
 
