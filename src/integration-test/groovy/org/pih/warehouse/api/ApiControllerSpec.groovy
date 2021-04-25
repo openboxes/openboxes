@@ -17,8 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Shared
 import spock.lang.Specification
 
-@TestFor(ApiController)
 @Rollback
+@TestFor(ApiController)
 @Integration(applicationClass = Application.class)
 class ApiControllerSpec extends Specification {
 
@@ -37,9 +37,6 @@ class ApiControllerSpec extends Specification {
         Organization organization = Organization.findOrCreateWhere([code: "TEST", name: "Test Corporation", partyType: orgPartyType]).save()
         LocationType defaultLocationType = LocationType.findByLocationTypeCode(LocationTypeCode.DEPOT)
         location = Location.findOrCreateWhere([locationNumber: "TEST", name: "Test Warehouse", locationType: defaultLocationType, organization: organization]).save()
-    }
-
-    def cleanup() {
     }
 
     void "login should succeed"() {
