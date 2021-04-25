@@ -14,6 +14,7 @@ import LoadingCard from 'components/dashboard/LoadingCard';
 import Numbers from 'components/dashboard/Numbers';
 import NumbersRAG from 'components/dashboard/NumbersRAG';
 import NumbersTableCard from 'components/dashboard/NumbersTableCard';
+import { stringUrlInterceptor } from 'utils/apiClient';
 import TableCard from 'components/dashboard/TableCard';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -173,7 +174,7 @@ const handleChartClick = (elements) => {
   const link = elements[0]._chart.data.datasets[0].links[elements[0]._index];
 
   if (link && link !== '') {
-    window.location = link;
+    window.location = stringUrlInterceptor(link);
   }
 };
 
@@ -250,7 +251,7 @@ const GraphCard = SortableElement(({
     <div className={`graph-card ${size === 'big' ? 'big-size' : ''} ${cardType === 'error' ? 'error-card' : ''}`}>
       <div className="header-card">
         {cardLink ?
-          <a target="_blank" rel="noopener noreferrer" href={cardLink.code} className="title-link">
+          <a target="_blank" rel="noopener noreferrer" href={stringUrlInterceptor(cardLink.code)} className="title-link">
             <span className="title-link">
               {translate(cardTitle, cardTitle)}
             </span>

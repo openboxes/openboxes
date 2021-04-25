@@ -25,6 +25,7 @@ import {
   handleError,
   handleSuccess,
   parseResponse,
+  stringUrlInterceptor,
 } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-values-utils';
@@ -673,7 +674,7 @@ class PickPage extends Component {
                   <span><i className="fa fa-upload pr-2" /><Translate id="react.default.button.exportTemplate.label" defaultMessage="Export template" /></span>
                 </button>
                 <a
-                  href={`${this.state.printPicksUrl}${this.state.sorted ? '?sorted=true' : ''}`}
+                  href={stringUrlInterceptor(`${this.state.printPicksUrl}${this.state.sorted ? '?sorted=true' : ''}`)}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -689,7 +690,7 @@ class PickPage extends Component {
                 </button>
                 <button
                   type="button"
-                  onClick={() => { window.location = `/stockMovement/show/${values.stockMovementId}`; }}
+                  onClick={() => { window.location = stringUrlInterceptor(`/stockMovement/show/${values.stockMovementId}`); }}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
                 >
                   <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
@@ -706,7 +707,7 @@ class PickPage extends Component {
                 :
               <button
                 type="button"
-                onClick={() => { window.location = '/stockMovement/list?type=REQUEST'; }}
+                onClick={() => { window.location = stringUrlInterceptor('/stockMovement/list?type=REQUEST'); }}
                 className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
               >
                 <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>

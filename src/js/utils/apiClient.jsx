@@ -97,15 +97,26 @@ export const handleError = (error) => {
   return Promise.reject(error);
 };
 
-const urlInterceptor = (config) => {
-  const path = process.env.REACT_APP_API_PATH;
+// TODO: This is temporary cleaner. Once migration is complete it should be removed
+const cleanUrlFromContextPath = url => url.replace('/openboxes', '');
 
-  if (!path || path === '/') {
+const urlInterceptor = (config) => {
+  const contextPath = window.CONTEXT_PATH;
+
+  if (!contextPath) {
     return config;
   }
 
-  const url = _.trimEnd(path, '/') + config.url;
+  const cleanedContextPath = _.trimEnd(contextPath, '/');
+  const cleanedUrl = _.trimStart(config.url ? cleanUrlFromContextPath(config.url) : '', '/');
+
+  const url = `${cleanedContextPath}/${cleanedUrl}`;
   return { ...config, url };
+};
+
+export const stringUrlInterceptor = (url) => {
+  const config = urlInterceptor({ url });
+  return config.url;
 };
 
 apiClient.interceptors.response.use(handleSuccess, handleError);

@@ -115,11 +115,11 @@ class DashboardController {
             redirect(controller: "stockMovement", action: "list", params: [direction: 'INBOUND'] )
             return
         }
-        render(template: "/common/react")
+        render(template: "/common/react", model: [contextPath: grailsApplication.config.server.contextPath])
     }
 
     def supplier() {
-        render(template: "/common/react")
+        render(template: "/common/react", model: [contextPath: grailsApplication.config.server.contextPath])
     }
 
     def expirationSummary() {

@@ -16,7 +16,7 @@ import SelectField from 'components/form-elements/SelectField';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
 import TextField from 'components/form-elements/TextField';
 import EditLineModal from 'components/receiving/modals/EditLineModal';
-import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import apiClient, { flattenRequest, parseResponse, stringUrlInterceptor } from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, getReceivingPayloadContainers } from 'utils/form-values-utils';
@@ -501,7 +501,7 @@ class PartialReceivingPage extends Component {
     this.saveValues(formValues)
       .then(() => {
         const { requisition, shipmentId } = formValues;
-        window.location = `/stockMovement/show/${requisition || shipmentId}`;
+        window.location = stringUrlInterceptor(`/stockMovement/show/${requisition || shipmentId}`);
       })
       .catch(() => this.props.hideSpinner());
   }

@@ -1,22 +1,24 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
+import { stringUrlInterceptor } from '../../utils/apiClient';
+
 
 const Numbers = props => (
   <div className="gyr-indicator">
-    <a className="number-indicator" href={props.data.first.link}>
+    <a className="number-indicator" href={stringUrlInterceptor(props.data.first.link)}>
       <div className="value">
         <div className="circle" style={{ backgroundColor: props.options.colors.first }} /> {props.data.first.value}
       </div>
       <div className="subtitle">{props.data.first.subtitle}</div>
     </a>
-    <a className="number-indicator" href={props.data.second.link}>
+    <a className="number-indicator" href={stringUrlInterceptor(props.data.second.link)}>
       <div className="value">
         <div className="circle" style={{ backgroundColor: props.options.colors.second }} /> {props.data.second.value}
       </div>
       <div className="subtitle">{props.data.second.subtitle}</div>
     </a>
-    <a className="number-indicator" href={props.data.third.link}>
+    <a className="number-indicator" href={stringUrlInterceptor(props.data.third.link)}>
       <div className="value">
         <div className="circle" style={{ backgroundColor: props.options.colors.third }} /> {props.data.third.value}
       </div>

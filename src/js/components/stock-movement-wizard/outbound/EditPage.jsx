@@ -20,7 +20,7 @@ import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfield
 import TextField from 'components/form-elements/TextField';
 import DetailsModal from 'components/stock-movement-wizard/modals/DetailsModal';
 import SubstitutionsModal from 'components/stock-movement-wizard/modals/SubstitutionsModal';
-import apiClient from 'utils/apiClient';
+import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, matchesProductCodeOrName, showOutboundEditValidationErrors } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -780,7 +780,7 @@ class EditItemsPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = `/stockMovement/show/${formValues.stockMovementId}`; },
+            onClick: () => { window.location = stringUrlInterceptor(`/stockMovement/show/${formValues.stockMovementId}`); },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),
@@ -791,7 +791,7 @@ class EditItemsPage extends Component {
     } else {
       this.reviseRequisitionItems(formValues)
         .then(() => {
-          window.location = `/stockMovement/show/${formValues.stockMovementId}`;
+          window.location = stringUrlInterceptor(`/stockMovement/show/${formValues.stockMovementId}`);
         });
     }
   }
@@ -914,7 +914,7 @@ class EditItemsPage extends Component {
               <button
                 type="button"
                 onClick={() => {
-                  window.location = '/stockMovement/list?direction=OUTBOUND';
+                  window.location = stringUrlInterceptor('/stockMovement/list?direction=OUTBOUND');
                 }}
                 className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
               >
