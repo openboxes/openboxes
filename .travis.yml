@@ -1,4 +1,4 @@
-dist: trusty
+dist: bionic
 language: groovy
 jdk:
 - openjdk8
@@ -13,13 +13,17 @@ before_script:
 - nvm install 10.12.0
 - npm install
 - npm run bundle
-- echo "USE mysql;\nUPDATE user SET password=PASSWORD('password') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root
+- echo "USE mysql;\nALTER user 'root'@'localhost' IDENTIFIED BY 'password';\nFLUSH PRIVILEGES;\n" | mysql -u root
 script: 'grails test-app --non-interactive -echoOut -echoErr'
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 cache:
   directories:
-  - "$HOME/.grails"
-  - "$HOME/.ivy2"
-  - "$HOME/.npm"
+  - $HOME/.gradle/caches/
+  - $HOME/.gradle/wrapper/
+  - $HOME/.npm
+  - $HOME/build/openboxes/openboxes/node_modules
 notifications:
   slack:
     secure: NJ2bhtLK2Xn0vPfq/lAxehuwLshp50Uep1mHMTbiQ7WK/YxNhLbrjgIbh9ZcM/UxZ4AhYX3Wv4VUI9iyEa06XUNTtxaM3ia8Eqao1wTVMl9N0RvU+VgHINORmyZZlf4MNBOZItwsmZT2b094gAfPIg7r8VuCo1wVqGjubVfTeUQ=
