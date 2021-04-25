@@ -7,7 +7,7 @@ import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
 import { connect } from 'react-redux';
 import { hideSpinner, showSpinner } from '../../actions';
-import apiClient, { flattenRequest, parseResponse } from '../../utils/apiClient';
+import apiClient, { flattenRequest, parseResponse, stringUrlInterceptor } from '../../utils/apiClient';
 import { renderFormField } from '../../utils/form-utils';
 import Translate from '../../utils/Translate';
 import ArrayField from '../form-elements/ArrayField';
@@ -225,7 +225,7 @@ class ReceivingCheckScreen extends Component {
       }, () => {
         this.setState({ completed: true });
         const { requisition, shipmentId } = formValues;
-        window.location = `/stockMovement/show/${requisition || shipmentId}`;
+        window.location = stringUrlInterceptor(`/stockMovement/show/${requisition || shipmentId}`);
       });
     }
   }
@@ -281,7 +281,7 @@ class ReceivingCheckScreen extends Component {
           }, () => {
             this.setState({ completed: true });
             const { requisition, shipmentId } = formValues;
-            window.location = `/stockMovement/show/${requisition || shipmentId}`;
+            window.location = stringUrlInterceptor(`/stockMovement/show/${requisition || shipmentId}`);
           }),
         },
         {
@@ -316,7 +316,7 @@ class ReceivingCheckScreen extends Component {
       .then(() => {
         const { requisition, shipmentId } = formValues;
 
-        window.location = `/stockMovement/show/${requisition || shipmentId}`;
+        window.location = stringUrlInterceptor(`/stockMovement/show/${requisition || shipmentId}`);
       })
       .catch(() => this.props.hideSpinner());
   }

@@ -20,7 +20,7 @@ import ButtonField from '../../form-elements/ButtonField';
 import LabelField from '../../form-elements/LabelField';
 import { renderFormField } from '../../../utils/form-utils';
 import { showSpinner, hideSpinner, fetchUsers } from '../../../actions';
-import apiClient from '../../../utils/apiClient';
+import apiClient, { stringUrlInterceptor } from '../../../utils/apiClient';
 import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
 import { debounceProductsFetch } from '../../../utils/option-utils';
 import renderHandlingIcons from '../../../utils/product-handling-icons';
@@ -890,7 +890,7 @@ class AddItemsPage extends Component {
     if (!errors.length) {
       this.saveRequisitionItemsInCurrentStep(formValues.lineItems)
         .then(() => {
-          window.location = '/stockMovement/list?direction=INBOUND';
+          window.location = stringUrlInterceptor('/stockMovement/list?direction=INBOUND');
         });
     } else {
       confirmAlert({
@@ -902,7 +902,7 @@ class AddItemsPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = '/stockMovement/list?direction=INBOUND'; },
+            onClick: () => { window.location = stringUrlInterceptor('/stockMovement/list?direction=INBOUND'); },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),
@@ -1005,7 +1005,7 @@ class AddItemsPage extends Component {
     if (this.state.values.statusCode === 'CREATED') {
       return apiClient.post(url, payload)
         .then(() => {
-          window.location = `/stockMovement/list?direction=INBOUND&movementNumber=${movementNumber}&submitted=true`;
+          window.location = stringUrlInterceptor(`/stockMovement/list?direction=INBOUND&movementNumber=${movementNumber}&submitted=true`);
         });
     }
     return Promise.resolve();

@@ -20,7 +20,7 @@ import ButtonField from '../../form-elements/ButtonField';
 import LabelField from '../../form-elements/LabelField';
 import { renderFormField } from '../../../utils/form-utils';
 import { showSpinner, hideSpinner, fetchUsers } from '../../../actions';
-import apiClient from '../../../utils/apiClient';
+import apiClient, { stringUrlInterceptor } from '../../../utils/apiClient';
 import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
 import { debounceProductsFetch } from '../../../utils/option-utils';
 import renderHandlingIcons from '../../../utils/product-handling-icons';
@@ -770,7 +770,7 @@ class AddItemsPage extends Component {
     if (!errors.length) {
       this.saveRequisitionItemsInCurrentStep(formValues.lineItems)
         .then(() => {
-          window.location = `/stockMovement/show/${formValues.stockMovementId}`;
+          window.location = stringUrlInterceptor(`/stockMovement/show/${formValues.stockMovementId}`);
         });
     } else {
       confirmAlert({
@@ -782,7 +782,7 @@ class AddItemsPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = `/stockMovement/show/${formValues.stockMovementId}`; },
+            onClick: () => { window.location = stringUrlInterceptor(`/stockMovement/show/${formValues.stockMovementId}`); },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),
@@ -1061,7 +1061,7 @@ class AddItemsPage extends Component {
               <button
                 type="button"
                 disabled={invalid}
-                onClick={() => { window.location = '/stockMovement/list?direction=OUTBOUND'; }}
+                onClick={() => { window.location = stringUrlInterceptor('/stockMovement/list?direction=OUTBOUND'); }}
                 className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
               >
                 <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.exit.label" defaultMessage="Exit" /></span>

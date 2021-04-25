@@ -10,7 +10,7 @@ import 'react-table/react-table.css';
 
 import customTreeTableHOC from '../../utils/CustomTreeTable';
 import Select from '../../utils/Select';
-import apiClient, { parseResponse } from '../../utils/apiClient';
+import apiClient, { parseResponse, stringUrlInterceptor } from '../../utils/apiClient';
 import { showSpinner, hideSpinner, updateBreadcrumbs, fetchBreadcrumbsConfig } from '../../actions';
 import Filter from '../../utils/Filter';
 import Translate from '../../utils/Translate';
@@ -233,7 +233,7 @@ class PutAwayPage extends Component {
           _.forEach(this.state.putawayItems, (item, index) => { expanded[index] = true; });
         }
 
-        this.props.history.push(`/putAway/create/${putAway.id}`);
+        this.props.history.push(stringUrlInterceptor(`/putAway/create/${putAway.id}`));
         if (putAway.putawayNumber && putAway.id) {
           const {
             actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,

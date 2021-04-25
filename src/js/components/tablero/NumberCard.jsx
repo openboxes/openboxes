@@ -9,6 +9,7 @@ import DragHandle from './DragHandle';
 import { getColorByName } from '../../consts/dataFormat/colorMapping';
 import './tablero.scss';
 import { translateWithDefaultMessage } from '../../utils/Translate';
+import { stringUrlInterceptor } from '../../utils/apiClient';
 
 /* global _ */
 
@@ -158,7 +159,7 @@ const NumberCard = SortableElement(({
     );
 
   return (
-    cardLink ? <a target="_blank" rel="noopener noreferrer" href={cardLink} className="number-card">{card}</a> : <div className="number-card">{card}</div>
+    cardLink ? <a target="_blank" rel="noopener noreferrer" href={stringUrlInterceptor(cardLink)} className="number-card">{card}</a> : <div className="number-card">{card}</div>
   );
 });
 

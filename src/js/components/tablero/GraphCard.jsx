@@ -14,6 +14,7 @@ import NumbersTableCard from './NumbersTableCard';
 import TableCard from './TableCard';
 import NumbersRAG from './NumbersRAG';
 import { translateWithDefaultMessage } from '../../utils/Translate';
+import { stringUrlInterceptor } from '../../utils/apiClient';
 
 
 class FilterComponent extends Component {
@@ -105,7 +106,7 @@ const handleChartClick = (elements) => {
   const link = elements[0]._chart.data.datasets[0].links[elements[0]._index];
 
   if (link && link !== '') {
-    window.location = link;
+    window.location = stringUrlInterceptor(link);
   }
 };
 
@@ -177,7 +178,7 @@ const GraphCard = SortableElement(({
     <div className={`graph-card ${size === 'big' ? 'big-size' : ''} ${cardType === 'error' ? 'error-card' : ''}`}>
       <div className="header-card">
         {cardLink ?
-          <a target="_blank" rel="noopener noreferrer" href={cardLink.code} className="title-link">
+          <a target="_blank" rel="noopener noreferrer" href={stringUrlInterceptor(cardLink.code)} className="title-link">
             <span className="title-link">
               {cardTitle.code ?
               translate(cardTitle.code, cardTitle.message)

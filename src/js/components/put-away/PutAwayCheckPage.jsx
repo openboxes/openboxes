@@ -11,7 +11,7 @@ import 'react-table/react-table.css';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
 import customTreeTableHOC from '../../utils/CustomTreeTable';
-import apiClient from '../../utils/apiClient';
+import apiClient, { stringUrlInterceptor } from '../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../actions';
 import Filter from '../../utils/Filter';
 import showLocationChangedAlert from '../../utils/location-change-alert';
@@ -78,7 +78,7 @@ class PutAwayCheckPage extends Component {
   componentWillReceiveProps(nextProps) {
     showLocationChangedAlert(
       this.props.translate, this.state.location, nextProps.location,
-      () => { window.location = '/order/list?orderTypeCode=TRANSFER_ORDER&status=PENDING'; },
+      () => { window.location = stringUrlInterceptor('/order/list?orderTypeCode=TRANSFER_ORDER&status=PENDING'); },
     );
 
     const location = this.state.location.id ? this.state.location : nextProps.location;
@@ -250,7 +250,7 @@ class PutAwayCheckPage extends Component {
   }
 
   goToFirstPage() {
-    this.props.history.push('/putAway/create');
+    this.props.history.push(stringUrlInterceptor('/putAway/create'));
     this.props.goToPage(1, null);
   }
 

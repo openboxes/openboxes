@@ -7,7 +7,7 @@ import React, { Component } from 'react';
 import { Form } from 'react-final-form';
 import { connect } from 'react-redux';
 import { fetchUsers, hideSpinner, showSpinner } from '../../actions';
-import apiClient, { flattenRequest, parseResponse } from '../../utils/apiClient';
+import apiClient, { flattenRequest, parseResponse, stringUrlInterceptor } from '../../utils/apiClient';
 import Checkbox from '../../utils/Checkbox';
 import { renderFormField } from '../../utils/form-utils';
 import Select from '../../utils/Select';
@@ -508,7 +508,7 @@ class PartialReceivingPage extends Component {
     this.saveValues(formValues)
       .then(() => {
         const { requisition, shipmentId } = formValues;
-        window.location = `/stockMovement/show/${requisition || shipmentId}`;
+        window.location = stringUrlInterceptor(`/stockMovement/show/${requisition || shipmentId}`);
       })
       .catch(() => this.props.hideSpinner());
   }
