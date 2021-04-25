@@ -9,7 +9,7 @@ import Alert from 'react-s-alert';
 import ReactTable from 'react-table';
 
 import { hideSpinner, showSpinner } from 'actions';
-import apiClient from 'utils/apiClient';
+import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
 import customTreeTableHOC from 'utils/CustomTreeTable';
 import Filter from 'utils/Filter';
 import showLocationChangedAlert from 'utils/location-change-alert';
@@ -79,7 +79,7 @@ class PutAwayCheckPage extends Component {
   componentWillReceiveProps(nextProps) {
     showLocationChangedAlert(
       this.props.translate, this.state.location, nextProps.location,
-      () => { window.location = '/order/list?orderType=PUTAWAY_ORDER&status=PENDING'; },
+      () => { window.location = stringUrlInterceptor('/order/list?orderType=PUTAWAY_ORDER&status=PENDING'); },
     );
 
     const location = this.state.location.id ? this.state.location : nextProps.location;
@@ -263,7 +263,7 @@ class PutAwayCheckPage extends Component {
   }
 
   goToFirstPage() {
-    this.props.history.push('/putAway/create');
+    this.props.history.push(stringUrlInterceptor('/putAway/create'));
     this.props.goToPage(1, null);
   }
 

@@ -4,12 +4,13 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
+import { stringUrlInterceptor } from 'utils/apiClient';
 
 const Menu = ({ menuConfig }) => {
   function getSectionComponent(section, key) {
     return (
       <li className="nav-item" key={key}>
-        <a className="nav-link" href={section.href}>
+        <a className="nav-link" href={stringUrlInterceptor(section.href)}>
           {section.label}
         </a>
       </li>
@@ -27,7 +28,7 @@ const Menu = ({ menuConfig }) => {
               <div className="px-2 py-1" key={subsectionKey}>
                 <span className="subsection-title">{subsection.label}</span>
                 {_.map(subsection.menuItems, (menuItem, menuItemKey) => (
-                  <a className="dropdown-item" key={menuItemKey} href={menuItem.href} target={menuItem.target}>
+                  <a className="dropdown-item" key={menuItemKey} href={stringUrlInterceptor(menuItem.href)} target={menuItem.target}>
                     {menuItem.label}
                   </a>
                 ))}
@@ -47,7 +48,7 @@ const Menu = ({ menuConfig }) => {
         <div className="dropdown-menu" aria-labelledby="navbarDropdown">
           <div style={{ maxHeight: '60vh', overflow: 'auto' }} className="px-3 py-1">
             {_.map(section.menuItems, (menuItem, menuItemKey) => (
-              <a className="dropdown-item" key={menuItemKey} href={menuItem.href} target={menuItem.target}>
+              <a className="dropdown-item" key={menuItemKey} href={stringUrlInterceptor(menuItem.href)} target={menuItem.target}>
                 {menuItem.label}
               </a>
             ))}

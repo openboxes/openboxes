@@ -1284,9 +1284,9 @@ class AddItemsPage extends Component {
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
             onClick: () => {
-              let redirectTo = '/stockMovement/list?direction=INBOUND';
+              let redirectTo = stringUrlInterceptor('/stockMovement/list?direction=INBOUND');
               if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
-                redirectTo = '/dashboard';
+                redirectTo = stringUrlInterceptor('/dashboard');
               }
               window.location = redirectTo;
             },
@@ -1398,7 +1398,7 @@ class AddItemsPage extends Component {
             this.props.history.push('/');
             this.props.updateBreadcrumbs([]);
           } else {
-            window.location = `/stockMovement/list?direction=INBOUND&movementNumber=${movementNumber}&submitted=true`;
+            window.location = stringUrlInterceptor(`/stockMovement/list?direction=INBOUND&movementNumber=${movementNumber}&submitted=true`);
           }
         });
     }

@@ -13,7 +13,7 @@ import { hideSpinner, showSpinner } from 'actions';
 import DateField from 'components/form-elements/DateField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
-import apiClient from 'utils/apiClient';
+import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { debounceLocationsFetch, debounceUsersFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -268,7 +268,7 @@ class CreateStockMovement extends Component {
         .then((response) => {
           if (response.data) {
             const resp = response.data.data;
-            this.props.history.push(`/stockMovement/createInbound/${resp.id}`);
+            this.props.history.push(stringUrlInterceptor(`/stockMovement/createInbound/${resp.id}`));
             this.props.nextPage({
               ...values,
               stockMovementId: resp.id,

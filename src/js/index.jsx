@@ -19,6 +19,8 @@ import 'font-awesome/css/font-awesome.min.css';
 import 'css/main.scss';
 
 library.add(fab, fas);
+// eslint-disable-next-line
+__webpack_public_path__ = window.CONTEXT_PATH + '/assets/';
 
 ReactDOM.render(
   <Provider store={store}>

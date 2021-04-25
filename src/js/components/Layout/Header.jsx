@@ -8,7 +8,7 @@ import GlobalSearch from 'components/GlobalSearch';
 import LocationChooser from 'components/location/LocationChooser';
 import SupportButton from 'components/support-button/SupportButton';
 import UserActionMenu from 'components/user/UserActionMenu';
-import apiClient from 'utils/apiClient';
+import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
 import Translate from 'utils/Translate';
 
 
@@ -35,7 +35,7 @@ class Header extends Component {
 
     apiClient.post(url)
       .then(() => {
-        window.location = '/dashboard/index';
+        window.location = stringUrlInterceptor('/dashboard/index');
       });
   }
 
@@ -58,7 +58,7 @@ class Header extends Component {
         <div className="d-flex align-items-center justify-content-between flex-wrap">
           <div className="logo-header">
             <a
-              href={this.props.highestRole === 'Authenticated' ? '/stockMovement/list?direction=INBOUND' : '/'}
+              href={this.props.highestRole === 'Authenticated' ? stringUrlInterceptor('/stockMovement/list?direction=INBOUND') : stringUrlInterceptor('/')}
               className="navbar-brand brand-name"
             >
               { this.state.logoUrl !== '' ?
