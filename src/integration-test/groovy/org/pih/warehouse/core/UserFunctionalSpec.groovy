@@ -23,7 +23,7 @@ class UserFunctionalSpec extends GebSpec {
 
     void "test page with user list loading"() {
         when:"The page with user list is visited"
-            go '/user/list'
+            go 'user/list'
 
         then:"The title is correct"
             title == "Users"

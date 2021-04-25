@@ -204,7 +204,8 @@ dependencies {
     compile ('org.grails.plugins:ajax-tags:1.0.0')
 
     // Used by PDF rendering plugin
-    runtime "org.springframework:spring-test:4.2.1.RELEASE"
+    // NoSuchMethodError: org.springframework.test.context.MergedContextConfiguration.getContextCustomizers()Ljava/util/Set;
+    //runtime "org.springframework:spring-test:4.2.1.RELEASE"
     runtime 'org.xhtmlrenderer:core-renderer:R8'
     runtime 'com.lowagie:itext:2.1.0'
 
@@ -238,6 +239,10 @@ tasks.withType(Test) {
     systemProperty "geb.build.reportsDir", reporting.file("geb/integrationTest")
     systemProperty "webdriver.chrome.driver", System.getProperty('webdriver.chrome.driver')
     systemProperty "webdriver.gecko.driver", System.getProperty('webdriver.gecko.driver')
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat 'full'
+    }
 }
 
 assets {
