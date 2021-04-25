@@ -18,7 +18,7 @@ import DateField from 'components/form-elements/DateField';
 import LabelField from 'components/form-elements/LabelField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
-import apiClient from 'utils/apiClient';
+import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName } from 'utils/form-values-utils';
 import { debounceLocationsFetch } from 'utils/option-utils';
@@ -565,7 +565,7 @@ class SendMovementPage extends Component {
         .then(() => {
           this.stateTransitionToIssued()
             .then(() => {
-              window.location = `/stockMovement/show/${this.state.values.stockMovementId}`;
+              window.location = stringUrlInterceptor(`/stockMovement/show/${this.state.values.stockMovementId}`);
             })
             .catch(() => this.props.hideSpinner());
         })
@@ -610,7 +610,7 @@ class SendMovementPage extends Component {
     if (_.isEmpty(errors)) {
       this.saveValues(values)
         .then(() => {
-          window.location = `/stockMovement/show/${values.stockMovementId}`;
+          window.location = stringUrlInterceptor(`/stockMovement/show/${values.stockMovementId}`);
         });
     } else {
       confirmAlert({
@@ -622,7 +622,7 @@ class SendMovementPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = `/stockMovement/show/${values.stockMovementId}`; },
+            onClick: () => { window.location = stringUrlInterceptor(`/stockMovement/show/${values.stockMovementId}`); },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),
