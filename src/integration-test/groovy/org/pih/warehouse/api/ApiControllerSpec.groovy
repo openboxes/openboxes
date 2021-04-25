@@ -14,9 +14,11 @@ import org.pih.warehouse.core.PartyTypeCode
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
 import org.springframework.beans.factory.annotation.Autowired
+import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 
+@Ignore
 @Rollback
 @TestFor(ApiController)
 @Integration(applicationClass = Application.class)
