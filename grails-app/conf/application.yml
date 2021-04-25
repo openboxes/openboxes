@@ -81,7 +81,6 @@ grails:
         minifyJs: false
         minifyCss: false
         bundle: false
-    #serverURL: "http://localhost:8080/${appName}"
     doc:
         title: "OpenBoxes"
         subtitle: ""
@@ -210,10 +209,12 @@ environments:
         dataSource:
             dbCreate: none
             url: jdbc:mysql://localhost:3306/openboxes?useSSL=false&createDatabaseIfNotExist=true
+            serverUrl: "http://localhost:8080/${appName}"
     test:
         dataSource:
             dbCreate: none
-            url: jdbc:mysql://localhost:3306/testDB?useSSL=false&createDatabaseIfNotExist=true
+            url: jdbc:mysql://localhost:3306/openboxes?useSSL=false&createDatabaseIfNotExist=true
+            serverUrl: "http://localhost:8080/${appName}"
     production:
         dataSource:
             dbCreate: none
@@ -276,6 +277,9 @@ openboxes:
             format: "AAA-AAA-AAA"
         order:
             format: "NNNLLL"
+        organization:
+            minSize: 2
+            maxSize: 4
         product:
             format: "LLNN"
         productSupplier:
