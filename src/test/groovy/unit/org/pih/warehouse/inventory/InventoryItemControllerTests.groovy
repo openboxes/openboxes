@@ -10,6 +10,9 @@ import org.pih.warehouse.product.Product
 import spock.lang.Ignore
 import spock.lang.Specification
 
+
+
+@Ignore // Rewrite in spock
 @TestFor(InventoryItemController)
 @Mock([Location, InventoryItem, TransactionEntry])
 @TestMixin(DomainClassUnitTestMixin)
@@ -32,6 +35,8 @@ class InventoryItemControllerTests extends Specification {
         mockCommandObject(RecordInventoryCommand)
         mockDomain(Location, [myLocation])
         mockDomain(Inventory, [inventory])
+
+        //Product.metaClass.static.getApplicationTagLib = { return [:] }
 
         controller.inventoryService = [
                 populateRecordInventoryCommand: { commandInstance, userInventory ->
@@ -63,7 +68,6 @@ class InventoryItemControllerTests extends Specification {
         controller.session.warehouse = myLocation
     }
 
-    @Ignore
     void "test showRecordInventory"() {
         when:
         RecordInventoryCommand command = new RecordInventoryCommand(product: p, inventory: inventory)
