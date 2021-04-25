@@ -25,6 +25,7 @@ import { handleError, handleSuccess } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { debounceLocationsFetch } from 'utils/option-utils';
 import renderHandlingIcons from 'utils/product-handling-icons';
+import { stringUrlInterceptor } from '../../../utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import splitTranslation from 'utils/translation-utils';
 
@@ -644,7 +645,7 @@ class SendMovementPage extends Component {
         this.stateTransitionToIssued()
           .then(() => {
             // redirect to requisition list
-            window.location = `/stockMovement/show/${this.state.values.stockMovementId}`;
+            window.location = stringUrlInterceptor(`/stockMovement/show/${this.state.values.stockMovementId}`);
           })
           .catch(() => this.props.hideSpinner());
       })
@@ -688,7 +689,7 @@ class SendMovementPage extends Component {
     if (_.isEmpty(errors)) {
       this.saveValues(values)
         .then(() => {
-          window.location = `/stockMovement/show/${values.stockMovementId}`;
+          window.location = stringUrlInterceptor(`/stockMovement/show/${values.stockMovementId}`);
         });
     } else {
       confirmAlert({
@@ -700,7 +701,7 @@ class SendMovementPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = `/stockMovement/show/${values.stockMovementId}`; },
+            onClick: () => { window.location = stringUrlInterceptor(`/stockMovement/show/${values.stockMovementId}`); },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),
@@ -881,7 +882,7 @@ class SendMovementPage extends Component {
                       type="button"
                       disabled={invalid}
                       onClick={() => {
-                        window.location = '/stockMovement/list?direction=OUTBOUND';
+                        window.location = stringUrlInterceptor('/stockMovement/list?direction=OUTBOUND');
                       }}
                       className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
                     >

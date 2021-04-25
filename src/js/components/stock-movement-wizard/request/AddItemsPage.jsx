@@ -1356,9 +1356,9 @@ class AddItemsPage extends Component {
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
             onClick: () => {
-              let redirectTo = '/stockMovement/list?direction=INBOUND';
+              let redirectTo = stringUrlInterceptor('/stockMovement/list?direction=INBOUND');
               if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
-                redirectTo = '/dashboard';
+                redirectTo = stringUrlInterceptor('/dashboard');
               }
               window.location = redirectTo;
             },
@@ -1473,7 +1473,7 @@ class AddItemsPage extends Component {
           if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
             redirectToURL = '/';
           } else {
-            redirectToURL = '/stockMovement/list?direction=INBOUND';
+            redirectToURL = stringUrlInterceptor('/stockMovement/list?direction=INBOUND');
           }
           Alert.success(`${translatedSubmitMessage} ${movementNumber}`);
           this.props.history.push(redirectToURL);

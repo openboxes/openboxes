@@ -12,7 +12,6 @@ const GRAILS_VIEWS = path.resolve(__dirname, 'grails-app/views');
 const COMMON_VIEW = path.resolve(GRAILS_VIEWS, 'common');
 const RECEIVING_VIEW = path.resolve(GRAILS_VIEWS, 'partialReceiving');
 
-const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -26,7 +25,6 @@ module.exports = env => ({
     path: DEST,
     filename: 'javascripts/bundle.[hash].js',
     chunkFilename: 'bundle.[hash].[name].js',
-    publicPath: `${env && env.REACT_APP_API_PATH ? env.REACT_APP_API_PATH : '/openboxes/'}assets/`,
   },
   stats: {
     colors: true,
@@ -72,8 +70,9 @@ module.exports = env => ({
       template: `${ASSETS}/grails-template.html`,
       inject: false,
       templateParameters: compilation => ({
-        jsSource: `\${resource(dir:'/assets', file:'bundle.${compilation.hash}.js')}`,
-        cssSource: `\${resource(dir:'/assets', file:'bundle.${compilation.hash}.css')}`,
+        contextPath: '\${contextPath}',
+        jsSource: `\${resource(dir:'\${window.CONTEXT_PATH}/assets', file:'bundle.${compilation.hash}.js')}`,
+        cssSource: `\${resource(dir:'\${window.CONTEXT_PATH}/assets', file:'bundle.${compilation.hash}.css')}`,
         receivingIfStatement: '',
       }),
     }),
@@ -82,17 +81,15 @@ module.exports = env => ({
       template: `${ASSETS}/grails-template.html`,
       inject: false,
       templateParameters: compilation => ({
-        jsSource: `\${resource(dir:'/assets', file:'bundle.${compilation.hash}.js')}`,
-        cssSource: `\${resource(dir:'/assets', file:'bundle.${compilation.hash}.css')}`,
+        contextPath: '\${contextPath}',
+        jsSource: `\${resource(dir:'\${window.CONTEXT_PATH}/assets', file:'bundle.${compilation.hash}.js')}`,
+        cssSource: `\${resource(dir:'\${window.CONTEXT_PATH}/assets', file:'bundle.${compilation.hash}.css')}`,
         receivingIfStatement:
         // eslint-disable-next-line no-template-curly-in-string
           '<g:if test="${!params.id}">' +
           'You can access the Partial Receiving feature through the details page for an inbound shipment.' +
           '</g:if>',
       }),
-    }),
-    new webpack.DefinePlugin({
-      'process.env.REACT_APP_API_PATH': JSON.stringify(env && env.REACT_APP_API_PATH ? env.REACT_APP_API_PATH : '/openboxes')
     }),
   ],
   module: {
@@ -116,18 +113,30 @@ module.exports = env => ({
       {
         test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
         loader: 'file-loader?name=./[hash].[ext]',
+        options: {
+          postTransformPublicPath: (p) => `__webpack_public_path__ + ${p}`,
+        },
       },
       {
         test: /\.(woff|woff2)$/,
         loader: 'url-loader?prefix=font/&limit=5000&name=./[hash].[ext]',
+        options: {
+          postTransformPublicPath: (p) => `__webpack_public_path__ + ${p}`,
+        },
       },
       {
         test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
         loader: 'url-loader?limit=10000&mimetype=application/octet-stream&name=./[hash].[ext]',
+        options: {
+          postTransformPublicPath: (p) => `__webpack_public_path__ + ${p}`,
+        },
       },
       {
         test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
         loader: 'url-loader?limit=10000&mimetype=image/svg+xml&name=./[hash].[ext]',
+        options: {
+          postTransformPublicPath: (p) => `__webpack_public_path__ + ${p}`,
+        },
       },
       {
         test: /\.(png|jpg|gif)$/i,

@@ -22,6 +22,7 @@ import {
   flattenRequest,
   handleError,
   handleSuccess,
+  stringUrlInterceptor,
 } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { debounceUsersFetch } from 'utils/option-utils';
@@ -488,7 +489,7 @@ class PackingPage extends Component {
                 <button
                   type="button"
                   disabled={invalid}
-                  onClick={() => this.savePackingData(values.packPageItems).then(() => { window.location = `/stockMovement/show/${values.stockMovementId}`; })}
+                  onClick={() => this.savePackingData(values.packPageItems).then(() => { window.location = stringUrlInterceptor(`/stockMovement/show/${values.stockMovementId}`); })}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
                 >
                   <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
@@ -498,7 +499,7 @@ class PackingPage extends Component {
               <button
                 type="button"
                 disabled={invalid}
-                onClick={() => { window.location = '/stockMovement/list?direction=OUTBOUND'; }}
+                onClick={() => { window.location = stringUrlInterceptor('/stockMovement/list?direction=OUTBOUND'); }}
                 className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
               >
                 <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>

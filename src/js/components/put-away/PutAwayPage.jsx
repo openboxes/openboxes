@@ -8,7 +8,7 @@ import ReactTable from 'react-table';
 import selectTableHOC from 'react-table/lib/hoc/selectTable';
 
 import { hideSpinner, showSpinner } from 'actions';
-import apiClient, { parseResponse } from 'utils/apiClient';
+import apiClient, { parseResponse, stringUrlInterceptor } from 'utils/apiClient';
 import customTreeTableHOC from 'utils/CustomTreeTable';
 import Filter from 'utils/Filter';
 import Select from 'utils/Select';
@@ -212,7 +212,7 @@ class PutAwayPage extends Component {
           _.forEach(this.state.putawayItems, (item, index) => { expanded[index] = true; });
         }
 
-        this.props.history.push(`/putAway/create/${putAway.id}`);
+        this.props.history.push(stringUrlInterceptor(`/putAway/create/${putAway.id}`));
         this.props.nextPage({
           putAway,
           pivotBy: this.state.pivotBy,

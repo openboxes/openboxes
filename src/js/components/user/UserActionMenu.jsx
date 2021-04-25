@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { hideUserActions, showUserActions } from 'actions';
+import { stringUrlInterceptor } from 'utils/apiClient';
 
 
 class UserActionMenu extends Component {
@@ -41,7 +42,9 @@ class UserActionMenu extends Component {
         >
           {this.props.menuItems.map(item => (
             <li key={item.label}>
-              <a href={item.linkAction}> <img alt={item.label} src={item.linkIcon} />{item.label}
+              <a href={stringUrlInterceptor(item.linkAction)}>
+                <img alt={item.label} src={item.linkIcon} />
+                {item.label}
               </a>
             </li>))}
         </ul>
