@@ -59,6 +59,7 @@ class InvoiceController {
         } else {
             invoiceInstance.dateSubmitted = null
             invoiceInstance.save()
+            flash.message = "${warehouse.message(code: 'invoices.successfulRollback.message')}"
             redirect(action: "show", id: params.id)
         }
     }
