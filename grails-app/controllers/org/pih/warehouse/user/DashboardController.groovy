@@ -139,7 +139,8 @@ class DashboardController {
     }
 
     def index = {
-        render(template: "/common/react", model: [contextPath: grailsApplication.config.server.contextPath])
+        def contextPath = grailsApplication.config.server.contextPath
+        render(template: "/common/react", model: [contextPath: contextPath != '/' ? contextPath : ''])
     }
 
 
