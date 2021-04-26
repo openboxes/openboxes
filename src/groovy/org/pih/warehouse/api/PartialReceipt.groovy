@@ -59,6 +59,7 @@ class PartialReceipt {
                 containers               : partialReceiptContainers,
                 requisition              : shipment?.requisition?.id,
                 description              : shipment?.description,
+                recipient                : recipient,
         ]
     }
 

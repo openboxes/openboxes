@@ -18,6 +18,7 @@ import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
+import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
@@ -37,10 +38,9 @@ class ReceiptService {
     def locationService
     def identifierService
     def grailsApplication
-    def notificationService
     def productAvailabilityService
 
-    PartialReceipt getPartialReceipt(String id, String stepNumber) {
+    PartialReceipt getPartialReceipt(String id, String stepNumber, User user = null) {
         Shipment shipment = Shipment.get(id)
         if (!shipment) {
             throw new IllegalArgumentException("Unable to find shipment with ID ${id}")
@@ -58,7 +58,7 @@ class ReceiptService {
             boolean includeShipmentItems = stepNumber == "1"
             partialReceipt = getPartialReceiptFromReceipt(receipt, includeShipmentItems)
         } else {
-            partialReceipt = getPartialReceiptFromShipment(shipment)
+            partialReceipt = getPartialReceiptFromShipment(shipment, user)
         }
         return partialReceipt
     }
@@ -69,11 +69,11 @@ class ReceiptService {
      * @param shipment
      * @return
      */
-    PartialReceipt getPartialReceiptFromShipment(Shipment shipment) {
+    PartialReceipt getPartialReceiptFromShipment(Shipment shipment, User user) {
 
         PartialReceipt partialReceipt = new PartialReceipt()
         partialReceipt.shipment = shipment
-        partialReceipt.recipient = shipment.recipient
+        partialReceipt.recipient = user
         partialReceipt.dateShipped = shipment.actualShippingDate
         partialReceipt.dateDelivered = shipment.actualDeliveryDate ?: new Date()
 
@@ -108,6 +108,7 @@ class ReceiptService {
         partialReceipt.recipient = receipt.recipient
         partialReceipt.dateShipped = receipt?.shipment?.actualShippingDate
         partialReceipt.dateDelivered = receipt.actualDeliveryDate
+        partialReceipt.recipient = receipt.recipient
 
         String[] receivingLocationNames = [locationService.getReceivingLocationName(receipt.shipment?.shipmentNumber), "Receiving ${receipt.shipment?.shipmentNumber}"]
         Location defaultBinLocation = !receipt.shipment.destination.hasBinLocationSupport() ? null :

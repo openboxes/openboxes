@@ -172,7 +172,11 @@ class NotificationService {
         recipientItems.each { Person recipient, items ->
             if (emailValidator.isValid(recipient?.email)) {
                 def subject = g.message(code: "email.yourItemReceived.message", args: [shipment.destination.name, shipment.shipmentNumber])
-                def body = "${g.render(template: "/email/shipmentItemReceived", model: [shipmentInstance: shipment, receiptItems: items, recipient: recipient])}"
+                items.each {
+                    def quacan = it.quantityToCancel
+                    def co = quacan
+                }
+                def body = "${g.render(template: "/email/shipmentItemReceived", model: [shipmentInstance: shipment, receiptItems: items, recipient: recipient, receivedBy: partialReceipt.recipient])}"
                 mailService.sendHtmlMail(subject, body.toString(), recipient.email)
             }
         }
