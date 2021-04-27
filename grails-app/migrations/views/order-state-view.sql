@@ -20,7 +20,8 @@ CREATE OR REPLACE VIEW order_item_status AS
             LEFT OUTER JOIN product ON order_item.product_id = product.id
             LEFT OUTER JOIN order_shipment ON order_item.id = order_shipment.order_item_id
             LEFT OUTER JOIN shipment_item ON shipment_item.id = order_shipment.shipment_item_id
-        WHERE `order`.order_type_code = 'PURCHASE_ORDER' AND `order`.status NOT IN ('COMPLETED', 'CANCELLED') AND order_item.order_item_status_code != 'CANCELLED'
+        WHERE `order`.order_type_code = 'PURCHASE_ORDER'
+          AND order_item.order_item_status_code != 'CANCELLED'
         GROUP BY `order`.id, `order`.order_number, product.product_code, order_item.id
     )
 AS order_item_status;
@@ -50,7 +51,9 @@ CREATE OR REPLACE VIEW order_receipt_status AS
             LEFT OUTER JOIN order_shipment ON order_item.id = order_shipment.order_item_id
             LEFT OUTER JOIN shipment_item ON shipment_item.id = order_shipment.shipment_item_id
             LEFT OUTER JOIN shipment ON shipment.id = shipment_item.shipment_id
-        WHERE `order`.order_type_code = 'PURCHASE_ORDER' AND `order`.status NOT IN ('COMPLETED', 'CANCELLED') AND order_item.order_item_status_code != 'CANCELLED' AND shipment.current_status = 'RECEIVED'
+        WHERE `order`.order_type_code = 'PURCHASE_ORDER'
+          AND order_item.order_item_status_code != 'CANCELLED'
+          AND shipment.current_status = 'RECEIVED'
         GROUP BY `order`.id, `order`.order_number, product.product_code, order_item.id, shipment.id
     )
 AS order_receipt_status;
@@ -82,7 +85,9 @@ CREATE OR REPLACE VIEW order_payment_status_from_shipments AS
             LEFT OUTER JOIN shipment_invoice ON shipment_invoice.shipment_item_id = shipment_item.id
             LEFT OUTER JOIN invoice_item ON invoice_item.id = shipment_invoice.invoice_item_id
             LEFT OUTER JOIN invoice ON invoice.id = invoice_item.invoice_id
-        WHERE `order`.order_type_code = 'PURCHASE_ORDER' AND `order`.status NOT IN ('COMPLETED', 'CANCELLED') AND order_item.order_item_status_code != 'CANCELLED' AND invoice.date_submitted IS NOT NULL
+        WHERE `order`.order_type_code = 'PURCHASE_ORDER'
+          AND order_item.order_item_status_code != 'CANCELLED'
+          AND invoice.date_submitted IS NOT NULL
         GROUP BY `order`.id, `order`.order_number, product.product_code, order_item.id, invoice.date_submitted
     )
 AS order_payment_status_from_shipments;
@@ -112,7 +117,9 @@ CREATE OR REPLACE VIEW order_payment_status_from_adjustments AS
             LEFT OUTER JOIN order_adjustment_invoice ON order_adjustment_invoice.order_adjustment_id = order_adjustment.id
             LEFT OUTER JOIN invoice_item ON invoice_item.id = order_adjustment_invoice.invoice_item_id
             LEFT OUTER JOIN invoice ON invoice.id = invoice_item.invoice_id
-        WHERE `order`.order_type_code = 'PURCHASE_ORDER' AND `order`.status NOT IN ('COMPLETED', 'CANCELLED') AND order_item.order_item_status_code != 'CANCELLED' AND invoice.date_submitted IS NOT NULL
+        WHERE `order`.order_type_code = 'PURCHASE_ORDER'
+          AND order_item.order_item_status_code != 'CANCELLED'
+          AND invoice.date_submitted IS NOT NULL
         GROUP BY `order`.id, `order`.order_number, invoice_item.id, order_adjustment.id, invoice.date_submitted
     )
 AS order_payment_status_from_adjustments;
@@ -154,7 +161,6 @@ CREATE OR REPLACE VIEW order_state AS (
             LEFT OUTER JOIN order_receipt_status on order_receipt_status.order_id = `order`.id
             LEFT OUTER JOIN order_payment_status_from_shipments on order_payment_status_from_shipments.order_id = `order`.id
             LEFT OUTER JOIN order_payment_status_from_adjustments on order_payment_status_from_adjustments.order_id = `order`.id
-        WHERE status NOT IN ('COMPLETED', 'CANCELLED')
         GROUP BY `order`.id, `order`.order_number, `order`.status
     )
 AS order_state);
