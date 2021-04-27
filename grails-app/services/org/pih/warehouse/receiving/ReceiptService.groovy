@@ -10,6 +10,7 @@
 package org.pih.warehouse.receiving
 
 import grails.validation.ValidationException
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptContainer
 import org.pih.warehouse.api.PartialReceiptItem
@@ -18,7 +19,6 @@ import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
-import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
@@ -40,7 +40,7 @@ class ReceiptService {
     def grailsApplication
     def productAvailabilityService
 
-    PartialReceipt getPartialReceipt(String id, String stepNumber, User user = null) {
+    PartialReceipt getPartialReceipt(String id, String stepNumber) {
         Shipment shipment = Shipment.get(id)
         if (!shipment) {
             throw new IllegalArgumentException("Unable to find shipment with ID ${id}")
@@ -58,7 +58,7 @@ class ReceiptService {
             boolean includeShipmentItems = stepNumber == "1"
             partialReceipt = getPartialReceiptFromReceipt(receipt, includeShipmentItems)
         } else {
-            partialReceipt = getPartialReceiptFromShipment(shipment, user)
+            partialReceipt = getPartialReceiptFromShipment(shipment)
         }
         return partialReceipt
     }
@@ -69,11 +69,11 @@ class ReceiptService {
      * @param shipment
      * @return
      */
-    PartialReceipt getPartialReceiptFromShipment(Shipment shipment, User user) {
-
+    PartialReceipt getPartialReceiptFromShipment(Shipment shipment) {
+        def currentUser = AuthService.currentUser.get()
         PartialReceipt partialReceipt = new PartialReceipt()
         partialReceipt.shipment = shipment
-        partialReceipt.recipient = user
+        partialReceipt.recipient = currentUser
         partialReceipt.dateShipped = shipment.actualShippingDate
         partialReceipt.dateDelivered = shipment.actualDeliveryDate ?: new Date()
 
