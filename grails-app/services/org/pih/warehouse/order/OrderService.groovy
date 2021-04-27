@@ -313,9 +313,9 @@ class OrderService {
             if (orderInstance?.status >= OrderStatus.PLACED) {
                 orderInstance.errors.rejectValue("status", "order.hasAlreadyBeenPlaced.message")
             } else {
-                if (orderInstance?.orderItems?.size() > 0) {
+                if (orderInstance?.orderItems?.size() > 0 || orderInstance?.orderAdjustments?.size() > 0) {
                     if (canApproveOrder(orderInstance, userInstance)) {
-                        orderInstance.orderItems.each { orderItem ->
+                        orderInstance?.orderItems?.each { orderItem ->
                             orderItem.actualReadyDate = orderItem.estimatedReadyDate
                         }
                         orderInstance.status = OrderStatus.PLACED
