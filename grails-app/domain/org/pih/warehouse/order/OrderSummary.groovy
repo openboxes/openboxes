@@ -32,4 +32,16 @@ class OrderSummary {
         paymentStatus(nullable:true)
         derivedStatus(nullable:true)
     }
+
+    Map toJson() {
+        return [
+            id: id,
+            orderNumber: orderNumber,
+            orderStatus: orderStatus,
+            receiptStatus: receiptStatus,
+            shipmentStatus: shipmentStatus,
+            paymentStatus: paymentStatus,
+            derivedStatus: derivedStatus
+        ]
+    }
 }

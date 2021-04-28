@@ -1011,4 +1011,11 @@ class OrderController {
         stockMovement = stockMovementService.createShipmentBasedStockMovement(stockMovement)
         redirect(controller: 'stockMovement', action: "createCombinedShipments", params: [direction: 'INBOUND', id: stockMovement.id])
     }
+
+    def orderSummary = {
+        params.max = params.max?:10
+        params.offset = params.offset?:0
+        def orderSummaryList = orderService.getOrderSummaryList(params)
+        render(view: "orderSummaryList", model: [orderSummaryList: orderSummaryList ?: []], params: params)
+    }
 }
