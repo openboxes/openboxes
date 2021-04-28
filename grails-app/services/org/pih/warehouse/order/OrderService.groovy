@@ -653,10 +653,10 @@ class OrderService {
 
                     if (unitOfMeasure) {
                         String[] uomParts = unitOfMeasure.split("/")
-                        if (uomParts.length <= 1 || !UnitOfMeasure.findByName(uomParts[0])) {
+                        if (uomParts.length <= 1 || !UnitOfMeasure.findByCodeOrName(uomParts[0], uomParts[0])) {
                             throw new IllegalArgumentException("Could not find provided Unit of Measure: ${unitOfMeasure}.")
                         }
-                        UnitOfMeasure uom = uomParts.length > 1 ? UnitOfMeasure.findByName(uomParts[0]) : null
+                        UnitOfMeasure uom = uomParts.length > 1 ? UnitOfMeasure.findByCodeOrName(uomParts[0], uomParts[0]) : null
                         BigDecimal qtyPerUom = uomParts.length > 1 ? BigDecimal.valueOf(Double.valueOf(uomParts[1])) : null
                         orderItem.quantityUom = uom
                         orderItem.quantityPerUom = qtyPerUom

@@ -767,7 +767,7 @@ class OrderController {
                 String quantityString = formatNumber(number: orderItem?.quantity, maxFractionDigits: 1, minFractionDigits: 1)
                 String unitPriceString = formatNumber(number: orderItem?.unitPrice, maxFractionDigits: 4, minFractionDigits: 2)
                 String totalPriceString = formatNumber(number: orderItem?.totalPrice(), maxFractionDigits: 2, minFractionDigits: 2)
-                String unitOfMeasure = orderItem?.quantityUom ? "${orderItem?.quantityUom?.name}/${orderItem?.quantityPerUom}" : orderItem?.unitOfMeasure
+                String unitOfMeasure = orderItem?.quantityUom ? "${orderItem?.quantityUom?.code}/${orderItem?.quantityPerUom}" : orderItem?.unitOfMeasure
 
                 csv += "${orderItem?.id}," +
                         "${orderItem?.product?.productCode}," +
