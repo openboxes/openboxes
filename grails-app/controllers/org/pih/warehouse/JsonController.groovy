@@ -1757,13 +1757,16 @@ class JsonController {
                     """
                         SELECT ps.id, ps.code, ps.supplier_code, ps.name, ps.manufacturer_code, ps.manufacturer_id from product_supplier ps
                         LEFT OUTER JOIN product_supplier_preference default_preference ON default_preference.product_supplier_id = ps.id AND default_preference.destination_party_id IS NULL
-                        LEFT OUTER JOIN  product_supplier_preference preference ON preference.product_supplier_id = ps.id AND preference.destination_party_id = '${destinationParty.id}'
-                        WHERE product_id = '${product.id}'
-                        AND supplier_id = '${supplier.id}'
+                        LEFT OUTER JOIN  product_supplier_preference preference ON preference.product_supplier_id = ps.id AND preference.destination_party_id = :destinationPartyId
+                        WHERE product_id = :productId
+                        AND supplier_id = :supplierId
                         AND CASE WHEN preference.id IS NOT NULL THEN preference.preference_type_id != 4 ELSE
-                        (CASE WHEN default_preference.id IS NOT NUL THEN default_preference.preference_type_id != 4 ELSE true END) END
-                    """
-            )
+                        (CASE WHEN default_preference.id IS NOT NULL THEN default_preference.preference_type_id != 4 ELSE true END) END
+                    """, [
+                    supplierId: supplier.id,
+                    productId: product.id,
+                    destinationPartyId: destinationParty.id,
+            ])
         }
         productSuppliers = productSuppliers.collect {[
                 id: it.id,
