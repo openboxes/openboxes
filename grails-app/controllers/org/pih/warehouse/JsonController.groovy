@@ -25,7 +25,6 @@ import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
-import org.pih.warehouse.core.ValidationCode
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.inventory.Transaction
@@ -1754,31 +1753,28 @@ class JsonController {
         Organization destinationParty = Organization.get(params.destinationPartyId)
         List productSuppliers = []
         if (product && supplier) {
-            productSuppliers = ProductSupplier.createCriteria().list {
-                eq("product", product)
-                eq("supplier", supplier)
-                or {
-                    isEmpty("productSupplierPreferences")
-                    productSupplierPreferences {
-                        and {
-                            eq("destinationParty", destinationParty)
-                            preferenceType {
-                                not {
-                                    eq("validationCode", ValidationCode.HIDE)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            productSuppliers = dataService.executeQuery(
+                    """
+                        SELECT ps.id, ps.code, ps.supplier_code, ps.name, ps.manufacturer_code, ps.manufacturer_id from product_supplier ps
+                        LEFT OUTER JOIN product_supplier_preference default_preference ON default_preference.product_supplier_id = ps.id AND default_preference.destination_party_id IS NULL
+                        LEFT OUTER JOIN  product_supplier_preference preference ON preference.product_supplier_id = ps.id AND preference.destination_party_id = :destinationPartyId
+                        WHERE product_id = :productId
+                        AND supplier_id = :supplierId
+                        AND CASE WHEN preference.id IS NOT NULL THEN preference.preference_type_id != 4 ELSE
+                        (CASE WHEN default_preference.id IS NOT NULL THEN default_preference.preference_type_id != 4 ELSE true END) END
+                    """, [
+                    supplierId: supplier.id,
+                    productId: product.id,
+                    destinationPartyId: destinationParty.id,
+            ])
         }
         productSuppliers = productSuppliers.collect {[
                 id: it.id,
                 code: it.code,
-                supplierCode: it.supplierCode,
+                supplierCode: it.supplier_code,
                 text: it.code + ' ' + it.name,
-                manufacturerCode: it.manufacturerCode,
-                manufacturer: it.manufacturer?.id,
+                manufacturerCode: it.manufacturer_code,
+                manufacturer: it.manufacturer_id,
         ]}
 
         render([productSupplierOptions: productSuppliers] as JSON)
