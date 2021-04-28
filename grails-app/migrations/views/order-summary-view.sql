@@ -93,8 +93,7 @@ CREATE OR REPLACE VIEW order_payment_status_from_shipments AS
 AS order_payment_status_from_shipments;
 
 CREATE OR REPLACE VIEW order_payment_status_from_adjustments AS
-    SELECT
-        order_id,
+    SELECT order_id,
         order_number,
         adjustment_id,
         invoice_item_id,
@@ -124,11 +123,18 @@ CREATE OR REPLACE VIEW order_payment_status_from_adjustments AS
     )
 AS order_payment_status_from_adjustments;
 
-CREATE OR REPLACE VIEW order_state AS (
-    SELECT order_number, status, shipment_status, receipt_status, payment_status, COALESCE(payment_status, receipt_status, shipment_status, status) AS state
+CREATE OR REPLACE VIEW order_summary AS (
+    SELECT id,
+           order_number,
+           order_status,
+           shipment_status,
+           receipt_status,
+           payment_status,
+           COALESCE(payment_status, receipt_status, shipment_status, order_status) AS derived_status
     FROM (
-        SELECT `order`.order_number,
-            `order`.status,
+        SELECT `order`.id as id,
+            `order`.order_number,
+            `order`.status as order_status,
             IFNULL(SUM(shipment_ordered), 0)  AS total_ordered,
             IFNULL(SUM(shipped), 0)           AS total_shipped,
             CASE
@@ -162,5 +168,4 @@ CREATE OR REPLACE VIEW order_state AS (
             LEFT OUTER JOIN order_payment_status_from_shipments on order_payment_status_from_shipments.order_id = `order`.id
             LEFT OUTER JOIN order_payment_status_from_adjustments on order_payment_status_from_adjustments.order_id = `order`.id
         GROUP BY `order`.id, `order`.order_number, `order`.status
-    )
-AS order_state);
+    ) AS order_summary);

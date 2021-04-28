@@ -67,6 +67,6 @@
     <sqlFile path="views/stocklist-item-list.sql"/>
   </changeSet>
   <changeSet id="1580848680306-23" author="awalkowiak" runOnChange="true" runAlways="true" failOnError="true">
-    <sqlFile path="views/order-state-view.sql"/>
+    <sqlFile path="views/order-summary-view.sql"/>
   </changeSet>
 </databaseChangeLog>
