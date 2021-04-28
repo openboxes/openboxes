@@ -209,12 +209,10 @@ environments:
         dataSource:
             dbCreate: none
             url: jdbc:mysql://localhost:3306/openboxes?useSSL=false&createDatabaseIfNotExist=true
-            serverUrl: "http://localhost:8080/${appName}"
     test:
         dataSource:
             dbCreate: none
             url: jdbc:mysql://localhost:3306/openboxes?useSSL=false&createDatabaseIfNotExist=true
-            serverUrl: "http://localhost:8080/${appName}"
     production:
         dataSource:
             dbCreate: none
