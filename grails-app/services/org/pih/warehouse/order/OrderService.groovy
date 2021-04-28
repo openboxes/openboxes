@@ -869,4 +869,27 @@ class OrderService {
     def canManageAdjustments(Order order, User user) {
         return order.status == OrderStatus.PENDING || order?.status >= OrderStatus.PLACED && userService.hasRoleApprover(user)
     }
+
+    def getOrderSummaryList(Map params) {
+        return OrderSummary.createCriteria().list(params) {
+            if (params.orderNumber) {
+                ilike("orderNumber", "%${params.orderNumber}%")
+            }
+            if (params.orderStatus) {
+                'in'("orderStatus", params.orderStatus)
+            }
+            if (params.shipmentStatus) {
+                'in'("shipmentStatus", params.shipmentStatus)
+            }
+            if (params.receiptStatus) {
+                'in'("receiptStatus", params.receiptStatus)
+            }
+            if (params.paymentStatus) {
+                'in'("paymentStatus", params.paymentStatus)
+            }
+            if (params.derivedStatus) {
+                'in'("derivedStatus", params.derivedStatus)
+            }
+        }
+    }
 }
