@@ -10,8 +10,17 @@
 package util
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
+import grails.util.Holders
+
 // See http://jira.codehaus.org/browse/GRAILS-6515
 class ConfigHelper {
+
+    static getContextPath() {
+        String contextPath = Holders.grailsApplication.config.server.contextPath
+        return (contextPath != '/') ? contextPath : ''
+    }
+
+
     static booleanValue(def value) {
         if (value.class == java.lang.Boolean) {
             // because 'true.toBoolean() == false' !!!

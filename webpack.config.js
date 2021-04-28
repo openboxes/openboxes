@@ -17,75 +17,75 @@ const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const FileManagerPlugin = require('filemanager-webpack-plugin');
 
-module.exports = env => ({
-  entry: {
-    app: `${SRC}/index.jsx`,
-  },
-  output: {
-    path: DEST,
-    filename: 'javascripts/bundle.[hash].js',
-    chunkFilename: 'bundle.[hash].[name].js',
-  },
-  stats: {
-    colors: true,
-  },
-  plugins: [
-    new FileManagerPlugin({
-      onStart: {
-        delete: [
-          `${JS_DEST}/bundle.**`,
-          `${CSS_DEST}/bundle.**`,
-          `${BUILD_ASSETS}/bundle.**`
-        ]
-      },
-      onEnd: {
-        copy: [
-          { source: `${DEST}/bundle.*.js`, destination: JS_DEST },
-          { source: `${DEST}/bundle.*.css`, destination: CSS_DEST },
-          { source: `${DEST}/*.eot`, destination: IMAGES_DEST },
-          { source: `${DEST}/*.svg`, destination: IMAGES_DEST },
-          { source: `${DEST}/*.woff2`, destination: IMAGES_DEST },
-          { source: `${DEST}/*.ttf`, destination: IMAGES_DEST },
-          { source: `${DEST}/*.woff`, destination: IMAGES_DEST },
-          { source: `${JS_DEST}/bundle.*.js`, destination: BUILD_ASSETS },
-          { source: `${CSS_DEST}/bundle.*.css`, destination: BUILD_ASSETS }
-        ],
-        delete: [
-          `${DEST}/bundle.**`,
-          `${DEST}/*.eot`,
-          `${DEST}/*.svg`,
-          `${DEST}/*.woff2`,
-          `${DEST}/*.ttf`,
-          `${DEST}/*.woff`
-        ]
-      }
-    }),
-    new MiniCssExtractPlugin({
-      filename: 'stylesheets/bundle.[hash].css',
-      chunkFilename: 'bundle.[hash].[name].css',
-    }),
-    new OptimizeCSSAssetsPlugin({}),
-    new HtmlWebpackPlugin({
-      filename: `${COMMON_VIEW}/_react.gsp`,
-      template: `${ASSETS}/grails-template.html`,
-      inject: false,
-      templateParameters: compilation => ({
-        contextPath: '\${contextPath}',
-        jsSource: `\${resource(dir:'\${window.CONTEXT_PATH}/assets', file:'bundle.${compilation.hash}.js')}`,
-        cssSource: `\${resource(dir:'\${window.CONTEXT_PATH}/assets', file:'bundle.${compilation.hash}.css')}`,
-        receivingIfStatement: '',
+module.exports = {
+    entry: {
+      app: `${SRC}/index.jsx`,
+    },
+    output: {
+      path: DEST,
+      filename: 'javascripts/bundle.[hash].js',
+      chunkFilename: 'bundle.[hash].[name].js',
+    },
+    stats: {
+      colors: true,
+    },
+    plugins: [
+      new FileManagerPlugin({
+        onStart: {
+          delete: [
+            `${JS_DEST}/bundle.**`,
+            `${CSS_DEST}/bundle.**`,
+            `${BUILD_ASSETS}/bundle.**`
+          ]
+        },
+        onEnd: {
+          copy: [
+            { source: `${DEST}/bundle.*.js`, destination: JS_DEST },
+            { source: `${DEST}/bundle.*.css`, destination: CSS_DEST },
+            { source: `${DEST}/*.eot`, destination: IMAGES_DEST },
+            { source: `${DEST}/*.svg`, destination: IMAGES_DEST },
+            { source: `${DEST}/*.woff2`, destination: IMAGES_DEST },
+            { source: `${DEST}/*.ttf`, destination: IMAGES_DEST },
+            { source: `${DEST}/*.woff`, destination: IMAGES_DEST },
+            { source: `${JS_DEST}/bundle.*.js`, destination: BUILD_ASSETS },
+            { source: `${CSS_DEST}/bundle.*.css`, destination: BUILD_ASSETS }
+          ],
+          delete: [
+            `${DEST}/bundle.**`,
+            `${DEST}/*.eot`,
+            `${DEST}/*.svg`,
+            `${DEST}/*.woff2`,
+            `${DEST}/*.ttf`,
+            `${DEST}/*.woff`
+          ]
+        }
       }),
-    }),
-    new HtmlWebpackPlugin({
-      filename: `${RECEIVING_VIEW}/_create.gsp`,
-      template: `${ASSETS}/grails-template.html`,
-      inject: false,
-      templateParameters: compilation => ({
-        contextPath: '\${contextPath}',
-        jsSource: `\${resource(dir:'\${window.CONTEXT_PATH}/assets', file:'bundle.${compilation.hash}.js')}`,
-        cssSource: `\${resource(dir:'\${window.CONTEXT_PATH}/assets', file:'bundle.${compilation.hash}.css')}`,
-        receivingIfStatement:
-        // eslint-disable-next-line no-template-curly-in-string
+      new MiniCssExtractPlugin({
+        filename: 'stylesheets/bundle.[hash].css',
+        chunkFilename: 'bundle.[hash].[name].css',
+      }),
+      new OptimizeCSSAssetsPlugin({}),
+      new HtmlWebpackPlugin({
+        filename: `${COMMON_VIEW}/_react.gsp`,
+        template: `${ASSETS}/grails-template.html`,
+        inject: false,
+        templateParameters: compilation => ({
+          contextPath: '\${util.ConfigHelper.contextPath}',
+          jsSource: `\${resource(dir:'\${util.ConfigHelper.contextPath}/assets', file:'bundle.${compilation.hash}.js')}`,
+          cssSource: `\${resource(dir:'\${util.ConfigHelper.contextPath}/assets', file:'bundle.${compilation.hash}.css')}`,
+          receivingIfStatement: '',
+        }),
+      }),
+      new HtmlWebpackPlugin({
+        filename: `${RECEIVING_VIEW}/_create.gsp`,
+        template: `${ASSETS}/grails-template.html`,
+        inject: false,
+        templateParameters: compilation => ({
+          contextPath: '\${util.ConfigHelper.contextPath}',
+          jsSource: `\${resource(dir:'\${util.ConfigHelper.contextPath}/assets', file:'bundle.${compilation.hash}.js')}`,
+          cssSource: `\${resource(dir:'\${util.ConfigHelper.contextPath}/assets', file:'bundle.${compilation.hash}.css')}`,
+          receivingIfStatement:
+          // eslint-disable-next-line no-template-curly-in-string
           '<g:if test="${!params.id}">' +
           'You can access the Partial Receiving feature through the details page for an inbound shipment.' +
           '</g:if>',
@@ -169,4 +169,4 @@ module.exports = env => ({
     },
     extensions: ['.js', '.jsx'],
   },
-});
+};

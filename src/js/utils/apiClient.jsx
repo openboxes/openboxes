@@ -87,14 +87,13 @@ const cleanUrlFromContextPath = url => url.replace('/openboxes', '');
 
 const urlInterceptor = (config) => {
   const contextPath = window.CONTEXT_PATH;
+  const cleanedUrl = _.trimStart(config.url ? cleanUrlFromContextPath(config.url) : '', '/');
 
   if (!contextPath) {
-    return config;
+    return { ...config, url: `/${cleanedUrl}` };
   }
 
   const cleanedContextPath = _.trimEnd(contextPath, '/');
-  const cleanedUrl = _.trimStart(config.url ? cleanUrlFromContextPath(config.url) : '', '/');
-
   const url = `${cleanedContextPath}/${cleanedUrl}`;
   return { ...config, url };
 };
