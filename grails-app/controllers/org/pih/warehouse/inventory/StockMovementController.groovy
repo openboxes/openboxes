@@ -58,23 +58,19 @@ class StockMovementController {
     }
 
     def createOutbound() {
-        def contextPath = grailsApplication.config.server.contextPath
-        render(template: "/common/react", model: [contextPath: contextPath != '/' ? contextPath : ''], params: params)
+        render(template: "/common/react", params: params)
     }
 
     def createInbound() {
-        def contextPath = grailsApplication.config.server.contextPath
-        render(template: "/common/react", model: [contextPath: contextPath != '/' ? contextPath : ''], params: params)
+        render(template: "/common/react", params: params)
     }
 
     def createRequest() {
-        def contextPath = grailsApplication.config.server.contextPath
-        render(template: "/common/react", model: [contextPath: contextPath != '/' ? contextPath : ''], params: params)
+        render(template: "/common/react", params: params)
     }
 
     def verifyRequest() {
-        def contextPath = grailsApplication.config.server.contextPath
-        render(template: "/common/react", model: [contextPath: contextPath != '/' ? contextPath : ''], params: params)
+        render(template: "/common/react", params: params)
     }
 
     def createCombinedShipments() {
