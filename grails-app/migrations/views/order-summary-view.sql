@@ -20,8 +20,10 @@ CREATE OR REPLACE VIEW order_item_status AS
             LEFT OUTER JOIN product ON order_item.product_id = product.id
             LEFT OUTER JOIN order_shipment ON order_item.id = order_shipment.order_item_id
             LEFT OUTER JOIN shipment_item ON shipment_item.id = order_shipment.shipment_item_id
+            LEFT OUTER JOIN shipment ON shipment.id = shipment_item.shipment_id
         WHERE `order`.order_type_code = 'PURCHASE_ORDER'
           AND order_item.order_item_status_code != 'CANCELLED'
+          AND shipment.current_status IN ('SHIPPED', 'PARTIALLY_RECEIVED', 'RECEIVED')
         GROUP BY `order`.id, `order`.order_number, product.product_code, order_item.id
     )
 AS order_item_status;
@@ -158,7 +160,7 @@ CREATE OR REPLACE VIEW order_summary AS (
             CASE
                 WHEN (IFNULL(SUM(shipment_payment_ordered), 0) + IFNULL(SUM(adjustment_quantity_invoiced), 0) = 0) THEN NULL
                 WHEN (IFNULL(SUM(shipment_payment_ordered), 0) + IFNULL(SUM(adjustment_quantity_invoiced), 0) = IFNULL(SUM(shipment_item_invoiced), 0) + IFNULL(SUM(adjustment_invoiced), 0)) THEN 'INVOICED'
-                WHEN (IFNULL(SUM(shipment_payment_ordered), 0) + IFNULL(SUM(adjustment_quantity_invoiced), 0) > 0 AND IFNULL(SUM(shipment_item_invoiced), 0) + IFNULL(SUM(adjustment_invoiced) > 0, 0)) THEN 'PARTIALLY_INVOICED'
+                WHEN (IFNULL(SUM(shipment_payment_ordered), 0) + IFNULL(SUM(adjustment_quantity_invoiced), 0) > 0 AND IFNULL(SUM(shipment_item_invoiced), 0) + IFNULL(SUM(adjustment_invoiced), 0) > 0) THEN 'PARTIALLY_INVOICED'
                 WHEN (IFNULL(sum(order_payment_status_from_shipments.quantity_ordered), 0) > 0 and IFNULL(sum(order_payment_status_from_shipments.shipment_item_quantity_invoiced), 0) > 0) THEN 'PARTIALLY_INVOICED'
                 ELSE NULL
             END AS payment_status
