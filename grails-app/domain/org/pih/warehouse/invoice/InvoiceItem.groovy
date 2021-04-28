@@ -77,7 +77,8 @@ class InvoiceItem implements Serializable {
         'unitPrice',
         'totalItemPrice',
         'totalAmount',
-        'unitOfMeasure'
+        'unitOfMeasure',
+        'isPrepaymentInvoice'
     ]
 
     static constraints = {
@@ -144,7 +145,7 @@ class InvoiceItem implements Serializable {
 
     // Total shipment item value
     def getTotalItemPrice() {
-        if (invoice.invoiceType?.code == InvoiceTypeCode.PREPAYMENT_INVOICE) {
+        if (isPrepaymentInvoice) {
             return (quantity ?: 0.0) * (unitPrice ?: 0.0) * ((order.paymentTerm?.prepaymentPercent?:100) / 100)
         }
 
@@ -164,6 +165,10 @@ class InvoiceItem implements Serializable {
             def g = ApplicationHolder.application.mainContext.getBean( 'org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib' )
             return "${g.message(code:'default.ea.label').toUpperCase()}/1"
         }
+    }
+
+    boolean getIsPrepaymentInvoice() {
+        return invoice.invoiceType?.code == InvoiceTypeCode.PREPAYMENT_INVOICE
     }
 
     Map toJson() {

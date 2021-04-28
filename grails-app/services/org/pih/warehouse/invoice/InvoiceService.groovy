@@ -11,6 +11,7 @@ package org.pih.warehouse.invoice
 
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.product.Product
@@ -241,6 +242,7 @@ class InvoiceService {
         invoice.partyFrom = order.destination.organization
         invoice.party = order.origin.organization
         invoice.dateInvoiced = new Date()
+        invoice.currencyUom = UnitOfMeasure.findByCode(order.currencyCode)
         invoice.invoiceType = InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)
         createOrUpdateVendorInvoiceNumber(invoice, order.orderNumber + Constants.PREPAYMENT_INVOICE_SUFFIX)
 
