@@ -12,7 +12,8 @@ package org.pih.warehouse.invoice
 enum InvoiceTypeCode {
 
     INVOICE,
-    CREDIT_NOTE
+    CREDIT_NOTE,
+    PREPAYMENT_INVOICE
 
     String toString() {
         return name()

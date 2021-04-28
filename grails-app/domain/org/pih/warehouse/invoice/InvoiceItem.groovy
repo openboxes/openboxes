@@ -144,6 +144,10 @@ class InvoiceItem implements Serializable {
 
     // Total shipment item value
     def getTotalItemPrice() {
+        if (invoice.invoiceType?.code == InvoiceTypeCode.PREPAYMENT_INVOICE) {
+            return (quantity ?: 0.0) * (unitPrice ?: 0.0) * ((order.paymentTerm?.prepaymentPercent?:100) / 100)
+        }
+
         return (quantity ?: 0.0) * (unitPrice ?: 0.0)
     }
 

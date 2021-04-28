@@ -9,9 +9,9 @@
  **/
 package org.pih.warehouse.invoice
 
-import org.apache.commons.lang.StringUtils
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ReferenceNumber
@@ -23,7 +23,7 @@ class InvoiceService {
     boolean transactional = true
 
     def dataService
-    def invoiceItemService
+    def identifierService
 
     def getInvoices(Invoice invoiceTemplate, Map params) {
         def invoices = Invoice.createCriteria().list(params) {
@@ -226,7 +226,35 @@ class InvoiceService {
 
     def submitInvoice(Invoice invoice) {
         invoice.dateSubmitted = new Date()
-        // TODO OBPIH-3713: Add Invoice/Order/Shipment/Payment status change
         invoice.save()
+    }
+
+    Invoice generatePrepaymentInvoice(Order order) {
+        if (order.orderItems.any { it.hasInvoices } || order.orderAdjustments.any { it.hasInvoice }) {
+            throw new Exception("Some order items or order adjustments for this order already have been invoiced")
+        }
+
+        Invoice invoice = new Invoice()
+        invoice.invoiceNumber = identifierService.generateInvoiceIdentifier()
+        invoice.name = order.name
+        invoice.description = order.description
+        invoice.partyFrom = order.destination.organization
+        invoice.party = order.origin.organization
+        invoice.dateInvoiced = new Date()
+        invoice.invoiceType = InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)
+        createOrUpdateVendorInvoiceNumber(invoice, order.orderNumber + Constants.PREPAYMENT_INVOICE_SUFFIX)
+
+        List invoiceCandidates = InvoiceItemCandidate.findAllByOrderNumber(order.orderNumber)
+
+        if (invoiceCandidates.size() == 0) {
+            throw new Exception("No invoice item candidates found for given order")
+        }
+
+        invoiceCandidates.each { InvoiceItemCandidate candidateItem ->
+            InvoiceItem invoiceItem = createFromInvoiceItemCandidate(candidateItem)
+            invoice.addToInvoiceItems(invoiceItem)
+        }
+
+        return invoice.save()
     }
 }

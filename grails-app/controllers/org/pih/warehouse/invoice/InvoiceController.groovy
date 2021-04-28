@@ -11,6 +11,7 @@
 package org.pih.warehouse.invoice
 
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.order.Order
 
 import java.text.SimpleDateFormat
 
@@ -62,5 +63,16 @@ class InvoiceController {
             flash.message = "${warehouse.message(code: 'invoices.successfulRollback.message')}"
             redirect(action: "show", id: params.id)
         }
+    }
+
+    def generatePrepaymentInvoice = {
+        Order order = Order.get(params.id)
+        if (!order) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
+            redirect(action: "list")
+        }
+
+        Invoice invoice = invoiceService.generatePrepaymentInvoice(order)
+        redirect(action: "create", params: [id: invoice.id])
     }
 }

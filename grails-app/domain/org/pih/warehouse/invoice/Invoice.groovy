@@ -153,6 +153,7 @@ class Invoice implements Serializable {
             vendorName: party?.name,
             totalCount: invoiceItems?.size() ?: 0,
             totalValue: totalValue,
+            invoiceType: invoiceType?.code?.name()
         ]
     }
 }

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <property name="now" value="now()"/>
+    <changeSet author="awalkowiak" id="1504202110300-0">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM invoice_type WHERE id = '5';
+            </sqlCheck>
+        </preConditions>
+        <insert tableName="invoice_type">
+            <column name="id" value="5"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="code" value="PREPAYMENT_INVOICE"/>
+            <column name="name" value="Prepayment Invoice"/>
+            <column name="description"/>
+            <column name="date_created" valueDate="${now}"/>
+            <column name="last_updated" valueDate="${now}"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

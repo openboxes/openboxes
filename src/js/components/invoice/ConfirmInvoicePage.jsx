@@ -149,6 +149,8 @@ const INVOICE_ITEMS = {
   },
 };
 
+const PREPAYMENT_INVOICE = 'PREPAYMENT_INVOICE';
+
 class ConfirmInvoicePage extends Component {
   constructor(props) {
     super(props);
@@ -248,7 +250,8 @@ class ConfirmInvoicePage extends Component {
                 <button
                   className="btn btn-outline-primary btn-form btn-xs"
                   onClick={() => this.props.previousPage(this.state.values)}
-                  disabled={this.state.values.dateSubmitted}
+                  disabled={this.state.values.dateSubmitted ||
+                    this.state.values.invoiceType === PREPAYMENT_INVOICE}
                 >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>

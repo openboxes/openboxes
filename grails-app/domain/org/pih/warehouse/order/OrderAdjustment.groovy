@@ -33,7 +33,7 @@ class OrderAdjustment implements Serializable {
 
     Boolean canceled = Boolean.FALSE
 
-    static transients = ['totalAdjustments', 'submittedInvoiceItem', 'isInvoiced']
+    static transients = ['totalAdjustments', 'submittedInvoiceItem', 'invoiceItem', 'isInvoiced', 'hasInvoice']
 
     static belongsTo = [order: Order, orderItem: OrderItem]
 
@@ -58,6 +58,17 @@ class OrderAdjustment implements Serializable {
         return amount ?: percentage ? orderItem ? orderItem?.subtotal * (percentage/100) : order.subtotal * (percentage/100) : 0
     }
 
+    def getInvoiceItem() {
+        def invoiceItem = InvoiceItem.executeQuery("""
+          SELECT ii
+            FROM InvoiceItem ii
+            JOIN ii.invoice i
+            JOIN ii.orderAdjustments oa
+            WHERE oa.id = :id 
+          """, [id: id])
+        return invoiceItem ?: null
+    }
+
     def getSubmittedInvoiceItem() {
         def invoiceItem = InvoiceItem.executeQuery("""
           SELECT ii
@@ -72,5 +83,9 @@ class OrderAdjustment implements Serializable {
 
     Boolean getIsInvoiced() {
         return submittedInvoiceItem ? true : false
+    }
+
+    Boolean getHasInvoice() {
+        return invoiceItem ? true : false
     }
 }

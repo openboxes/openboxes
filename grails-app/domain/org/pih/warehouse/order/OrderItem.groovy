@@ -90,6 +90,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
             "subtotal",
             "totalAdjustments",
             "unitOfMeasure",
+            "hasInvoices",
             // Statuses
             "partiallyFulfilled",
             "completelyFulfilled",
@@ -312,6 +313,10 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
             WHERE oi.id = :id 
             AND i.dateSubmitted IS NOT NULL
           """, [id: id])?.first() ?: 0
+    }
+
+    def getHasInvoices() {
+        return invoiceItems ? true : false
     }
 
     Integer getQuantityInvoiced() {

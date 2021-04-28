@@ -70,6 +70,12 @@
             <g:elseif test="${orderInstance?.shipments}">
                 <g:set var="disabledMessage" value="${g.message(code:'order.errors.rollback.message')}"/>
             </g:elseif>
+            <g:hasRoleInvoice>
+                <g:set var="hasRoleInvoice" value="${true}"/>
+            </g:hasRoleInvoice>
+            <g:if test="${!hasRoleInvoice}">
+                <g:set var="disabledInvoiceMessage" value="${g.message(code:'errors.noPermissions.label')}"/>
+            </g:if>
             <g:if test="${orderInstance?.orderTypeCode == OrderTypeCode.TRANSFER_ORDER}">
                 <g:link controller="order" action="list" class="button" params="[orderTypeCode: OrderTypeCode.TRANSFER_ORDER]">
                     <img src="${resource(dir: 'images/icons/silk', file: 'application_view_list.png')}" />&nbsp;
@@ -164,6 +170,14 @@
                                 <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
                                 ${warehouse.message(code: 'default.button.rollback.label')}
                             </g:link>
+                            <g:if test="${orderInstance?.displayStatus == ShipmentStatusCode.SHIPPED || !orderInstance?.shipments}">
+                                <g:link controller="invoice" action="generatePrepaymentInvoice" id="${orderInstance?.id}" class="button"
+                                    disabled="${!hasRoleInvoice}"
+                                    disabledMessage="${disabledInvoiceMessage}">
+                                    <img src="${resource(dir: 'images/icons', file: 'document.png')}" />&nbsp;
+                                    ${warehouse.message(code: 'default.button.generatePrepayment.label', default: "Generate Prepayment Invoice")}
+                                </g:link>
+                            </g:if>
                             <g:link controller="order" action="createCombinedShipment" params="[direction:'INBOUND', orderId: orderInstance?.id]" class="button"
                                     disabled="${orderInstance?.status < OrderStatus.PLACED}"
                                     disabledMessage="Order must be placed in order to ship">

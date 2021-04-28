@@ -126,4 +126,5 @@ class Constants {
     static final String DEFAULT_RECEIVING_LOCATION_PREFIX = "R"
 
     static final String DEFAULT_DOCUMENT_TYPE_ID = "9"
+    static final String PREPAYMENT_INVOICE_SUFFIX = "-PREPAYMENT"
 }
