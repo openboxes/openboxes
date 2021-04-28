@@ -108,7 +108,6 @@ class ReceiptService {
         partialReceipt.recipient = receipt.recipient
         partialReceipt.dateShipped = receipt?.shipment?.actualShippingDate
         partialReceipt.dateDelivered = receipt.actualDeliveryDate
-        partialReceipt.recipient = receipt.recipient
 
         String[] receivingLocationNames = [locationService.getReceivingLocationName(receipt.shipment?.shipmentNumber), "Receiving ${receipt.shipment?.shipmentNumber}"]
         Location defaultBinLocation = !receipt.shipment.destination.hasBinLocationSupport() ? null :
