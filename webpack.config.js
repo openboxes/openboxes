@@ -71,8 +71,8 @@ module.exports = {
         inject: false,
         templateParameters: compilation => ({
           contextPath: '\${util.ConfigHelper.contextPath}',
-          jsSource: `\${resource(dir:'\${util.ConfigHelper.contextPath}/assets', file:'bundle.${compilation.hash}.js')}`,
-          cssSource: `\${resource(dir:'\${util.ConfigHelper.contextPath}/assets', file:'bundle.${compilation.hash}.css')}`,
+          jsSource: `\${resource(dir:'assets', file:'bundle.${compilation.hash}.js')}`,
+          cssSource: `\${resource(dir:'assets', file:'bundle.${compilation.hash}.css')}`,
           receivingIfStatement: '',
         }),
       }),
@@ -82,8 +82,8 @@ module.exports = {
         inject: false,
         templateParameters: compilation => ({
           contextPath: '\${util.ConfigHelper.contextPath}',
-          jsSource: `\${resource(dir:'\${util.ConfigHelper.contextPath}/assets', file:'bundle.${compilation.hash}.js')}`,
-          cssSource: `\${resource(dir:'\${util.ConfigHelper.contextPath}/assets', file:'bundle.${compilation.hash}.css')}`,
+          jsSource: `\${resource(dir:'assets', file:'bundle.${compilation.hash}.js')}`,
+          cssSource: `\${resource(dir:'assets', file:'bundle.${compilation.hash}.css')}`,
           receivingIfStatement:
           // eslint-disable-next-line no-template-curly-in-string
           '<g:if test="${!params.id}">' +
