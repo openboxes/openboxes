@@ -25,6 +25,7 @@ import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.ValidationCode
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.inventory.Transaction
@@ -1762,12 +1763,13 @@ class JsonController {
                         LEFT OUTER JOIN preference_type party_preference_type ON preference.preference_type_id = party_preference_type.id
                         WHERE product_id = :productId
                         AND supplier_id = :supplierId
-                        AND CASE WHEN preference.id IS NOT NULL THEN party_preference_type.validation_code != "HIDE" ELSE
-                        (CASE WHEN default_preference.id IS NOT NULL THEN default_preference_type.validation_code != "HIDE" ELSE true END) END
+                        AND CASE WHEN preference.id IS NOT NULL THEN party_preference_type.validation_code != :validationCode ELSE
+                        (CASE WHEN default_preference.id IS NOT NULL THEN default_preference_type.validation_code != :validationCode ELSE true END) END
                     """, [
                     supplierId: supplier.id,
                     productId: product.id,
                     destinationPartyId: destinationParty.id,
+                    validationCode: ValidationCode.HIDE.name(),
             ])
         }
         productSuppliers = productSuppliers.collect {[
