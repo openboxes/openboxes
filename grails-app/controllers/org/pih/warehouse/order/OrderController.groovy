@@ -756,6 +756,7 @@ class OrderController {
                     "${warehouse.message(code: 'orderItem.totalCost.label')}," + // total cost
                     "${warehouse.message(code: 'order.recipient.label')}," + // recipient
                     "${warehouse.message(code: 'orderItem.estimatedReadyDate.label')}," + // estimated ready date
+                    "${warehouse.message(code: 'orderItem.actualReadyDate.label')}," + // actual ready date
                     "${warehouse.message(code: 'orderItem.budgetCode.label')}," +
                     "\n"
 
@@ -783,6 +784,7 @@ class OrderController {
                         "${StringEscapeUtils.escapeCsv(totalPriceString)}," +
                         "${orderItem?.recipient?.name ?: ''}," +
                         "${orderItem?.estimatedReadyDate?.format("MM/dd/yyyy") ?: ''}," +
+                        "${orderItem?.actualReadyDate?.format("MM/dd/yyyy") ?: ''}," +
                         "${orderItem?.budgetCode?.code ?: ''}," +
                         "\n"
             }

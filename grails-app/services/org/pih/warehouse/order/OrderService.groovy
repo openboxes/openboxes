@@ -586,7 +586,7 @@ class OrderService {
 
             Order order = Order.get(orderId)
 
-            if (validateOrderItems(orderItems)) {
+            if (validateOrderItems(orderItems, order)) {
 
                 orderItems.each { item ->
 
@@ -603,6 +603,7 @@ class OrderService {
                     def unitPrice = item["unitPrice"]
                     def unitOfMeasure = item["unitOfMeasure"]
                     def estimatedReadyDate = item["estimatedReadyDate"]
+                    def actualReadyDate = item["actualReadyDate"]
                     def code = item["budgetCode"]
 
                     OrderItem orderItem
@@ -701,6 +702,17 @@ class OrderService {
                     }
                     orderItem.estimatedReadyDate = estReadyDate
 
+                    def actReadyDate = null
+                    if (actualReadyDate) {
+                        try {
+                            actReadyDate = new Date(actualReadyDate)
+                        } catch (Exception e) {
+                            log.error("Unable to parse date: " + e.message, e)
+                            throw new IllegalArgumentException("Could not parse actual ready date with value: ${actualReadyDate}.")
+                        }
+                    }
+                    orderItem.actualReadyDate = actReadyDate
+
                     if (order.destination.isAccountingRequired() && !code) {
                         throw new IllegalArgumentException("Budget code is required.")
                     }
@@ -759,6 +771,7 @@ class OrderService {
                 'totalCost',
                 'recipient',
                 'estimatedReadyDate',
+                'actualReadyDate',
                 'budgetCode'
             ]
             orderItems = csvMapReader.toList()
@@ -766,6 +779,13 @@ class OrderService {
         } catch (Exception e) {
             throw new RuntimeException("Error parsing order item CSV: " + e.message, e)
 
+        }
+
+        orderItems.each { orderItem ->
+            String[] uomParts = orderItem.unitOfMeasure.split("/")
+            def quantityUom = (int)Double.parseDouble(uomParts[1])
+            orderItem.unitOfMeasure = "${uomParts[0]}/${quantityUom}"
+            orderItem.unitPrice = new BigDecimal(orderItem.unitPrice).setScale(4, RoundingMode.FLOOR).toString()
         }
 
         return orderItems
@@ -779,8 +799,20 @@ class OrderService {
      * @param orderItems
      * @return
      */
-    boolean validateOrderItems(List orderItems) {
-        return true
+    boolean validateOrderItems(List orderItems, Order order) {
+        def propertiesMap = grailsApplication.config.openboxes.purchaseOrder.editableProperties
+
+        orderItems.each { orderItem ->
+            OrderItem existingOrderItem = order.orderItems.find { it.id == orderItem.id }
+            propertiesMap.each {
+                def excludedProperties = it.deny
+                excludedProperties.each { property ->
+                    if (order.status == it.status && (existingOrderItem.toImport()."${property}" != orderItem."${property}")) {
+                        throw new IllegalArgumentException("Can't edit the field ${property} of item ${orderItem.productCode} via import")
+                    }
+                }
+            }
+        }
     }
 
     List<OrderItem> getPendingInboundOrderItems(Location destination) {

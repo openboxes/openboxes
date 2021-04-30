@@ -26,6 +26,8 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
 
+import java.text.DecimalFormat
+
 class OrderItem implements Serializable, Comparable<OrderItem> {
 
     String id
@@ -329,6 +331,21 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
                 product      : product,
                 quantity     : quantity,
                 shipmentItems: shipmentItems,
+        ]
+    }
+
+    Map toImport() {
+        return [
+                id : id,
+                productCode : product?.productCode,
+                sourceName : productSupplier?.name ?: "",
+                supplierCode: productSupplier?.supplierCode ?: "",
+                manufacturer : productSupplier?.manufacturer?.name ?: "",
+                manufacturerCode : productSupplier?.manufacturerCode ?: "",
+                quantity : quantity.toString(),
+                unitPrice : unitPrice.toString(),
+                unitOfMeasure: unitOfMeasure ?: "",
+                budgetCode: budgetCode?.code ?: "",
         ]
     }
 
