@@ -60,13 +60,11 @@
                     <h2 style="display: flex; align-items: center; justify-content: space-between;">
                         <warehouse:message code="order.wizard.addItems.label"/>
                         <div class="button-group" style="margin-right: 5px;">
-                            <g:if test="${order?.status < OrderStatus.PLACED}">
-                                <input type="file" name="importTemplate" id="importTemplate" class="import-template" />
-                                <label for="importTemplate" class="button">
-                                    <img src="${resource(dir: 'images/icons/silk', file: 'disk_upload.png')}" />&nbsp;
-                                    <warehouse:message code="default.importTemplate.label" default="Import template"/>
-                                </label>
-                            </g:if>
+                            <input type="file" name="importTemplate" id="importTemplate" class="import-template" />
+                            <label for="importTemplate" class="button">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'disk_upload.png')}" />&nbsp;
+                                <warehouse:message code="default.importTemplate.label" default="Import template"/>
+                            </label>
                         </div>
                     </h2>
                     <g:form name="orderItemForm" action="create" method="post">

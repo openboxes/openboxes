@@ -15,6 +15,7 @@ import org.pih.warehouse.core.IdentifierGeneratorTypeCode
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.UpdateUnitPriceMethodCode
+import org.pih.warehouse.order.OrderStatus
 
 // Locations to search for config files that get merged into the main config
 // config files can either be Java properties files or ConfigSlurper scripts
@@ -775,6 +776,17 @@ openboxes.purchasing.approval.defaultRoleTypes = [RoleType.ROLE_APPROVER]
 //  * UpdateUnitPriceMethodCode.LAST_PURCHASE_PRICE
 openboxes.purchasing.updateUnitPrice.enabled = false
 openboxes.purchasing.updateUnitPrice.method = UpdateUnitPriceMethodCode.USER_DEFINED_PRICE
+
+// Order status property map
+openboxes.order.orderStatusPropertyMap = [
+        (OrderStatus.PLACED) : ["productCode", "sourceName", "supplierCode", "manufacturer", "manufacturerCode", "quantity", "unitPrice", "unitOfMeasure", "budgetCode"],
+]
+openboxes.purchaseOrder.editableProperties = [
+        [
+                status: OrderStatus.PLACED,
+                deny: ["productCode", "sourceName", "supplierCode", "manufacturer", "manufacturerCode", "quantity", "unitPrice", "unitOfMeasure", "budgetCode"]
+        ]
+]
 
 // OpenBoxes default uploads directory location
 openboxes.uploads.location = "uploads"
