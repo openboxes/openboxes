@@ -122,6 +122,8 @@ grails.project.dependency.resolution = {
         // REST client
         compile 'org.apache.httpcomponents:httpclient:4.5.12'
 
+        // JWT
+        compile "com.nimbusds:nimbus-jose-jwt:9.9"
 
     }
     plugins {

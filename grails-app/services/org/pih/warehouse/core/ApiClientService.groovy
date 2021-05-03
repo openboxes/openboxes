@@ -12,17 +12,22 @@ package org.pih.warehouse.core
 import grails.plugin.springcache.annotations.Cacheable
 import org.apache.commons.io.IOUtils
 import org.apache.http.HttpResponse
+import org.apache.http.NameValuePair
 import org.apache.http.client.HttpClient
 import org.apache.http.client.config.RequestConfig
+import org.apache.http.client.entity.UrlEncodedFormEntity
 import org.apache.http.client.methods.HttpDelete
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.client.methods.HttpPut
 import org.apache.http.client.methods.HttpRequestBase
+import org.apache.http.client.utils.URIBuilder
 import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.message.BasicHeader
+import org.apache.http.message.BasicNameValuePair
+import org.apache.http.params.HttpParams
 import org.apache.http.protocol.HTTP
 import org.codehaus.groovy.grails.web.json.JSONObject
 
@@ -34,8 +39,22 @@ class ApiClientService {
         return execute(new HttpGet(url))
     }
 
+    def get(String url, Map requestData) {
+        URIBuilder builder = new URIBuilder(url);
+        requestData.each { k, v ->
+            builder.setParameter(k, v)
+        }
+        HttpGet request = new HttpGet(builder.build());
+        return request
+        //return execute(request)
+    }
+
     JSONObject post(String url, Map requestData) {
-        return execute(new HttpPost(url), requestData)
+        return execute(new HttpPost(url), requestData, true)
+    }
+
+    JSONObject post(String url, Map requestData, Boolean isJson) {
+        return execute(new HttpPost(url), requestData, isJson)
     }
 
     def delete(String url) {
@@ -46,18 +65,36 @@ class ApiClientService {
         return execute(new HttpPut(url), requestData)
     }
 
-    JSONObject execute(HttpEntityEnclosingRequestBase request, Map requestData) {
+    JSONObject execute(HttpEntityEnclosingRequestBase request, Map requestData, Boolean isJson) {
         if (requestData) {
-            JSONObject jsonObject = new JSONObject(requestData)
-            StringEntity entity = new StringEntity(jsonObject.toString(), "UTF-8")
-            BasicHeader basicHeader = new BasicHeader(HTTP.CONTENT_TYPE,"application/json");
-            entity.setContentType(basicHeader);
-            request.setEntity(entity)
+            if (isJson) {
+                JSONObject jsonObject = new JSONObject(requestData)
+                entity.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+                request.setEntity(new StringEntity(jsonObject.toString(), "UTF-8"))
+            }
+            else {
+                log.info "Here "
+                List <NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+                requestData.each { k, v ->
+                    nameValuePairs.add(new BasicNameValuePair(k, v))
+                }
+                request.setEntity(new UrlEncodedFormEntity(nameValuePairs, HTTP.UTF_8));
+            }
         }
         return execute(request)
     }
 
+//    JSONObject execute(HttpEntityEnclosingRequestBase request, Map requestData) {
+//        StringEntity entity = new StringEntity(jsonObject.toString(), "UTF-8")
+//        entity.setContentType(basicHeader);
+//        request.setEntity(entity)
+//        return execute(request)
+//    }
+
+
     JSONObject execute(HttpRequestBase request) {
+
+        log.info "Request " + request
         // Request config
         request.setConfig(requestConfig)
 

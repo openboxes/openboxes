@@ -843,6 +843,12 @@ openboxes.ajaxRequest.timeout = 120000
 //google.analytics.enabled = false
 //google.analytics.webPropertyID = "UA-xxxxxx-x"
 
+// Google OAuth Client credentials
+google.oauth2.clientId = ""
+google.oauth2.clientSecret = ""
+
+
+
 // Fullstory integration
 openboxes.fullstory.enabled = false
 openboxes.fullstory.debug = false
