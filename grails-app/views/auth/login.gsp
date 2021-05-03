@@ -59,13 +59,13 @@
                                     <td class="middle left" colspan="2">
                                         <warehouse:message code="auth.newuser.text"/>
                                         <g:link class="list" controller="auth" action="signup"><warehouse:message code="auth.signup.label" default="Signup"/></g:link>
+										or <g:link controller="auth" action="login" id="oidc">Sign in via Google</g:link>
+
                                     </td>
                                 </tr>
-
                             </tbody>
 						</table>
 					</div>
-
 				</div>
 			</div>
 		</g:form>

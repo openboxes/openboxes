@@ -18,10 +18,10 @@ import org.pih.warehouse.util.RequestUtil
 class SecurityFilters {
 
     static ArrayList controllersWithAuthUserNotRequired = ['test', 'errors']
-    static ArrayList actionsWithAuthUserNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'changeLocation', 'menu']
+    static ArrayList actionsWithAuthUserNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'changeLocation', 'callback', 'menu']
 
     static ArrayList controllersWithLocationNotRequired = ['categoryApi', 'productApi', 'genericApi', 'api']
-    static ArrayList actionsWithLocationNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'chooseLocation', 'menu']
+    static ArrayList actionsWithLocationNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'chooseLocation', 'callback', 'menu]
 
     def authService
     def filters = {
@@ -113,7 +113,7 @@ class SecurityFilters {
                         redirect(controller: "errors", action: "handleUnauthorized")
                         return false
                     }
-
+                    flash.message = "User is not active. Please contact your system administrator."
                     redirect(controller: 'auth', action: 'login')
                     return false
                 }

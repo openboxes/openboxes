@@ -9,7 +9,9 @@
  **/
 package org.pih.warehouse.user
 
+import com.nimbusds.jose.JWSObject
 import grails.validation.ValidationException
+import org.apache.http.client.methods.HttpGet
 import org.pih.warehouse.auth.UserSignupEvent
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.User
@@ -22,6 +24,8 @@ class AuthController {
     def grailsApplication
     def recaptchaService
     def ravenClient
+    def oidcService
+    def identifierService
     def userAgentIdentService
 
     static allowedMethods = [login: "GET", doLogin: "POST", logout: "GET"]
@@ -43,6 +47,43 @@ class AuthController {
         }
     }
 
+    def callback = {
+        log.info "callback: " + params
+
+        if (params.code) {
+
+
+            def token = oidcService.getToken(params.code)
+            log.info "access_token " + token.access_token
+            log.info "expires_in " + token.expires_in
+            log.info "id_token " + token.id_token
+            log.info "token_type " + token.token_type
+            log.info "refresh_token " + token.refresh_token
+
+            def jwsObject = JWSObject.parse(token.id_token)
+            String email = jwsObject.payload.toJSONObject().email
+            User user = User.findByUsernameOrEmail(email, email)
+            if (!user) {
+                user = new User()
+                user.username = jwsObject.payload.toJSONObject().email
+                user.email = jwsObject.payload.toJSONObject().email
+                user.firstName = jwsObject.payload.toJSONObject().given_name
+                user.lastName = jwsObject.payload.toJSONObject().family_name
+                user.password = identifierService.generateIdentifier(20)
+                user.passwordConfirm = user.password
+                user.save(flush:true, failOnError: true)
+            }
+
+            log.info "USER " + user?.id
+            session.user = user
+            redirect(controller: "auth", action: "login")
+        }
+
+
+        render "callback successful"
+    }
+
+
     /**
      * Allows user to log into the system.
      */
@@ -54,6 +95,13 @@ class AuthController {
 
         if (userAgentIdentService.isMobile()) {
             redirect(controller: "mobile", action: "login")
+            return
+        }
+
+        if (params.id) {
+            HttpGet request = oidcService.authenticate()
+            //render ([url : request.URI.toString()] as JSON)
+            redirect(url: request.URI.toString())
             return
         }
 
