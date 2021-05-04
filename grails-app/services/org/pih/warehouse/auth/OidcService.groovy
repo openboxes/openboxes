@@ -32,6 +32,7 @@ class OidcService {
                 response_type: "code",
                 scope: "openid profile email",
                 redirect_uri: "https://openboxes.ngrok.io/openboxes/auth/callback",
+                hd: "packetfabric.com",
                 state: csrfToken,
                 nonce: identifierService.generateIdentifier(5)
         ]
