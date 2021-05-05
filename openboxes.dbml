@@ -1,8 +1,3 @@
-Project openboxes {
-  database_type: 'MySQL'
-  Note: 'Data model for latest development version of OpenBoxes'
-}
-
 Table "DATABASECHANGELOG" {
   "ID" varchar(63) [not null]
   "AUTHOR" varchar(63) [not null]
@@ -488,6 +483,90 @@ Indexes {
 }
 }
 
+Table "invoice" {
+  "id" char(38) [pk, not null]
+  "invoice_number" varchar(255) [not null]
+  "name" varchar(255) [default: NULL]
+  "description" varchar(255) [default: NULL]
+  "invoice_type_id" char(38) [default: NULL]
+  "party_from_id" char(38) [default: NULL]
+  "party_id" char(38) [default: NULL]
+  "date_invoiced" datetime [default: NULL]
+  "date_submitted" datetime [default: NULL]
+  "date_due" datetime [default: NULL]
+  "date_paid" datetime [default: NULL]
+  "currency_uom_id" char(38) [default: NULL]
+  "date_created" datetime [default: NULL]
+  "last_updated" datetime [default: NULL]
+  "created_by_id" char(38) [default: NULL]
+  "updated_by_id" char(38) [default: NULL]
+  "version" bigint(20) [not null]
+
+Indexes {
+  invoice_type_id [name: "fk_invoice_invoice_type"]
+  party_from_id [name: "fk_invoice_party_from"]
+  party_id [name: "fk_invoice_party"]
+  currency_uom_id [name: "fk_invoice_currency_uom"]
+  created_by_id [name: "fk_invoice_created_by"]
+  updated_by_id [name: "fk_invoice_updated_by"]
+}
+}
+
+Table "invoice_item" {
+  "id" char(38) [pk, not null]
+  "invoice_id" char(38) [not null]
+  "product_id" char(38) [default: NULL]
+  "gl_account_id" char(38) [default: NULL]
+  "budget_code_id" char(38) [default: NULL]
+  "quantity" decimal(19,2) [not null]
+  "quantity_uom_id" char(38) [default: NULL]
+  "quantity_per_uom" decimal(19,2) [not null]
+  "amount" decimal(19,4) [default: NULL]
+  "date_created" datetime [default: NULL]
+  "last_updated" datetime [default: NULL]
+  "created_by_id" char(38) [default: NULL]
+  "updated_by_id" char(38) [default: NULL]
+  "version" bigint(20) [not null]
+
+Indexes {
+  invoice_id [name: "fk_invoice_item_invoice"]
+  product_id [name: "fk_invoice_item_product"]
+  gl_account_id [name: "fk_invoice_item_gl_account"]
+  budget_code_id [name: "fk_invoice_item_budget_code"]
+  quantity_uom_id [name: "fk_invoice_item_quantity_uom"]
+  created_by_id [name: "fk_invoice_item_created_by"]
+  updated_by_id [name: "fk_invoice_item_updated_by"]
+}
+}
+
+Table "invoice_reference_number" {
+  "invoice_reference_numbers_id" char(38) [default: NULL]
+  "reference_number_id" char(38) [default: NULL]
+  "reference_numbers_idx" int(11) [default: NULL]
+
+Indexes {
+  invoice_reference_numbers_id [name: "fk_invoice_reference_number_invoice_id"]
+  reference_number_id [name: "fk_invoice_reference_number_reference_number_id"]
+}
+}
+
+Table "invoice_type" {
+  "id" char(38) [pk, not null]
+  "name" varchar(255) [not null]
+  "description" varchar(255) [default: NULL]
+  "code" varchar(100) [default: "INVOICE"]
+  "date_created" datetime [default: NULL]
+  "last_updated" datetime [default: NULL]
+  "created_by_id" char(38) [default: NULL]
+  "updated_by_id" char(38) [default: NULL]
+  "version" bigint(20) [not null]
+
+Indexes {
+  created_by_id [name: "fk_invoice_type_created_by"]
+  updated_by_id [name: "fk_invoice_type_updated_by"]
+}
+}
+
 Table "local_transfer" {
   "id" char(38) [pk, not null, default: ""]
   "source_transaction_id" char(38) [default: NULL]
@@ -701,6 +780,16 @@ Indexes {
 }
 }
 
+Table "order_adjustment_invoice" {
+  "invoice_item_id" char(38) [default: NULL]
+  "order_adjustment_id" char(38) [default: NULL]
+
+Indexes {
+  order_adjustment_id [name: "order_adjustment_invoice_ibfk_1"]
+  invoice_item_id [name: "order_adjustment_invoice_ibfk_2"]
+}
+}
+
 Table "order_adjustment_type" {
   "id" char(38) [pk, not null]
   "version" bigint(20) [not null]
@@ -883,6 +972,8 @@ Table "payment_term" {
   "description" varchar(255) [default: NULL]
   "date_created" datetime [not null]
   "last_updated" datetime [not null]
+  "prepayment_percent" decimal(19,2) [default: NULL]
+  "days_to_payment" int(11) [default: NULL]
 }
 
 Table "person" {
@@ -1360,6 +1451,8 @@ Table "product_type" {
   "name" varchar(255) [not null]
   "product_type_code" varchar(255) [not null]
   "product_identifier_format" varchar(255) [default: NULL]
+  "code" varchar(255) [default: NULL]
+  "sequence_number" int(11) [default: NULL]
 }
 
 Table "product_type_displayed_fields" {
@@ -1652,6 +1745,16 @@ Table "shipment_event" {
 Indexes {
   event_id [name: "FK6D032BB5786431F"]
   shipment_events_id [name: "FK6D032BB53B350242"]
+}
+}
+
+Table "shipment_invoice" {
+  "invoice_item_id" char(38) [default: NULL]
+  "shipment_item_id" char(38) [default: NULL]
+
+Indexes {
+  shipment_item_id [name: "shipment_invoice_ibfk_1"]
+  invoice_item_id [name: "shipment_invoice_ibfk_2"]
 }
 }
 
@@ -2114,6 +2217,40 @@ Ref:"inventory_item"."id" < "inventory_snapshot"."inventory_item_id"
 
 Ref:"location"."id" < "inventory_snapshot"."bin_location_id"
 
+Ref:"invoice_type"."id" < "invoice"."invoice_type_id"
+
+Ref:"party"."id" < "invoice"."party_from_id"
+
+Ref:"party"."id" < "invoice"."party_id"
+
+Ref:"unit_of_measure"."id" < "invoice"."currency_uom_id"
+
+Ref:"user"."id" < "invoice"."created_by_id"
+
+Ref:"user"."id" < "invoice"."updated_by_id"
+
+Ref:"invoice"."id" < "invoice_item"."invoice_id"
+
+Ref:"product"."id" < "invoice_item"."product_id"
+
+Ref:"gl_account"."id" < "invoice_item"."gl_account_id"
+
+Ref:"budget_code"."id" < "invoice_item"."budget_code_id"
+
+Ref:"unit_of_measure"."id" < "invoice_item"."quantity_uom_id"
+
+Ref:"user"."id" < "invoice_item"."created_by_id"
+
+Ref:"user"."id" < "invoice_item"."updated_by_id"
+
+Ref:"invoice"."id" < "invoice_reference_number"."invoice_reference_numbers_id"
+
+Ref:"reference_number"."id" < "invoice_reference_number"."reference_number_id"
+
+Ref:"user"."id" < "invoice_type"."created_by_id"
+
+Ref:"user"."id" < "invoice_type"."updated_by_id"
+
 Ref:"transaction"."id" < "local_transfer"."source_transaction_id"
 
 Ref:"transaction"."id" < "local_transfer"."destination_transaction_id"
@@ -2177,6 +2314,10 @@ Ref:"order_adjustment_type"."id" < "order_adjustment"."order_adjustment_type_id"
 Ref:"budget_code"."id" < "order_adjustment"."budget_code_id"
 
 Ref:"gl_account"."id" < "order_adjustment"."gl_account_id"
+
+Ref:"invoice_item"."id" < "order_adjustment_invoice"."invoice_item_id"
+
+Ref:"order_adjustment"."id" < "order_adjustment_invoice"."order_adjustment_id"
 
 Ref:"gl_account"."id" < "order_adjustment_type"."gl_account_id"
 
@@ -2457,6 +2598,10 @@ Ref:"document"."id" < "shipment_document"."document_id"
 Ref:"shipment"."id" < "shipment_event"."shipment_events_id"
 
 Ref:"event"."id" < "shipment_event"."event_id"
+
+Ref:"invoice_item"."id" < "shipment_invoice"."invoice_item_id"
+
+Ref:"shipment_item"."id" < "shipment_invoice"."shipment_item_id"
 
 Ref:"container"."id" < "shipment_item"."container_id"
 
