@@ -17,7 +17,6 @@ import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.hibernate.Criteria
-import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Location
@@ -290,7 +289,7 @@ class ProductAvailabilityService {
             resultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
             projections {
                 // Need to use alias other than product to prevent conflict
-                groupProperty("product", "p")
+                groupProperty("product", "prod")
                 sum("quantityOnHand", "quantityOnHand")
             }
             eq("location", location)
