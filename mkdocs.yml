@@ -46,6 +46,17 @@ nav:
           - Configuration: installation/ubuntu1804/configuration.md
           - Deployment: installation/ubuntu1804/deployment.md
           - Troubleshooting: installation/ubuntu1804/troubleshooting.md
+        - Ubuntu 18.04 (Grails v3):
+          - Overview: installation/ubuntu1804-grails3/index.md
+          - Hosting: installation/ubuntu1804-grails3/hosting.md
+          - Ubuntu: installation/ubuntu1804-grails3/ubuntu.md
+          - Java: installation/ubuntu1804-grails3/java.md
+          - MySQL: installation/ubuntu1804-grails3/mysql.md
+          - Application: installation/ubuntu1804-grails3/application.md
+          - Apache/Nginx: installation/ubuntu1804-grails3/webserver.md
+          - Deployment: installation/ubuntu1804-grails3/deployment.md
+          - Configuration: installation/ubuntu1804-grails3/configuration.md
+          - Troubleshooting: installation/ubuntu1804-grails3/troubleshooting.md
         - Ubuntu 16.04:
           - Instructions: installation/ubuntu1604.md
           - Notes: installation/ubuntu1604-notes.md
