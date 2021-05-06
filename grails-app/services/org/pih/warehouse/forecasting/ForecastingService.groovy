@@ -26,7 +26,7 @@ class ForecastingService {
 
     def dataSource
     def grailsApplication
-    def inventoryService
+    def productAvailabilityService
 
     def getDemand(Location origin, Product product) {
 
@@ -42,7 +42,7 @@ class ForecastingService {
             def totalDemand = rows.sum { it.quantity_demand } ?: 0
             def dailyDemand = (totalDemand && demandPeriod) ? (totalDemand / demandPeriod) : 0
             def monthlyDemand = totalDemand / Math.floor((demandPeriod / 30))
-            def quantityOnHand = inventoryService.getQuantityOnHand(origin, product)
+            def quantityOnHand = productAvailabilityService.getQuantityOnHand(product, origin)
             def onHandMonths = monthlyDemand ? quantityOnHand / monthlyDemand : 0
 
             return [

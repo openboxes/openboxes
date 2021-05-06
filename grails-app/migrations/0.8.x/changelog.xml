@@ -116,4 +116,5 @@
     <include file="0.8.x/changelog-2021-04-15-1310-add-column-payment-term-prepayment.xml"/>
     <include file="0.8.x/changelog-2021-04-15-1340-insert-payment-term.xml"/>
     <include file="0.8.x/changelog-2021-04-28-1030-insert-invoice-type.xml"/>
+    <include file="0.8.x/changelog-2021-04-30-1320-add-product-availability-index.xml"/>
 </databaseChangeLog>

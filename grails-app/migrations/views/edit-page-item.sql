@@ -15,17 +15,22 @@ CREATE OR REPLACE VIEW edit_page_item AS
         stock_movement_item.order_index as sort_order,
         stock_movement_item.cancel_reason_code,
         stock_movement_item.comments,
-        product_summary.quantity_on_hand,
+        p_a.quantity_on_hand,
         product_stocklist.quantity_demand,
-        CASE WHEN product_substitution_status.substitution_status IS NULL THEN 'NO' ELSE product_substitution_status.substitution_status END AS substitution_status
+        IF(product_substitution_status.substitution_status IS NULL, 'NO', product_substitution_status.substitution_status) AS substitution_status
     FROM
         stock_movement_item
             LEFT OUTER JOIN
         product_stocklist ON product_stocklist.product_id = stock_movement_item.product_id
             AND product_stocklist.origin_id = stock_movement_item.origin_id
+            LEFT OUTER JOIN (
+                SELECT product_availability.product_id as product_id,
+                       product_availability.location_id as location_id,
+                       ifnull(sum(quantity_on_hand), 0) as quantity_on_hand
+                FROM product_availability
+                GROUP BY location_id, product_id
+            ) p_a ON p_a.product_id = stock_movement_item.product_id
+            AND p_a.location_id = stock_movement_item.origin_id
             LEFT OUTER JOIN
-        product_summary ON product_summary.product_id = stock_movement_item.product_id
-            AND product_summary.location_id = stock_movement_item.origin_id
-			LEFT OUTER JOIN
-		product_substitution_status ON product_substitution_status.product_id = stock_movement_item.product_id
-			AND product_substitution_status.location_id = stock_movement_item.origin_id;
+        product_substitution_status ON product_substitution_status.product_id = stock_movement_item.product_id
+            AND product_substitution_status.location_id = stock_movement_item.origin_id;

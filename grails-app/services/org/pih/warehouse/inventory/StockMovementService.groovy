@@ -539,15 +539,19 @@ class StockMovementService {
 
         if (stepNumber == '3') {
             List editPageItems = getEditPageItems(requisition, max, offset)
+
             if (requisition && requisition.sourceType == RequisitionSourceType.ELECTRONIC) {
+                def quantityOnHandRequestingMap = productAvailabilityService.getQuantityOnHand(editPageItems.collect { it.product }, requisition.destination)
+                        .inject([:]) {map, item -> map << [(item.prod.id): item.quantityOnHand]}
+
                 editPageItems = editPageItems.collect { editPageItem ->
                     // origin = fulfilling, destination = requesting
-                    RequisitionItemSortByCode sortByCode = requisition.requisitionTemplate?.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX
-                    def quantityOnHandRequesting = productAvailabilityService.getQuantityOnHand(editPageItem.product, requisition.destination)
-                    editPageItem << [quantityOnHandRequesting: quantityOnHandRequesting]
+                    editPageItem << [quantityOnHandRequesting: quantityOnHandRequestingMap[editPageItem.product.id]]
+
                     if (requisition.requisitionTemplate) {
                         def stocklist = Requisition.get(requisition.requisitionTemplate.id)
                         def quantityOnStocklist = 0
+                        RequisitionItemSortByCode sortByCode = requisition.requisitionTemplate?.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX
                         stocklist."${sortByCode.methodName}"?.eachWithIndex { item, index ->
                             if (item.product == editPageItem.product && (index * 100 == editPageItem.sortOrder || index == editPageItem.sortOrder)) {
                                 quantityOnStocklist = item.quantity
@@ -664,20 +668,27 @@ class StockMovementService {
                 'max': max ? max.toInteger() : null,
         ]);
 
-        def editPageItems = data.collect {
-            def substitutionItems = dataService.executeQuery("""
-                    select 
+        def editItemsIds = data.collect { it.id }
+
+        def substitutionItemsMap = dataService.executeQuery("""
+                    select
                        *
-                    FROM edit_page_item
-                    where parent_requisition_item_id = :id and requisition_item_type = 'SUBSTITUTION'
+                    FROM substitution_item
+                    where parent_requisition_item_id in (:ids)
                     """, [
-                    'id': it.id,
-            ]);
+                'ids': editItemsIds,
+        ]).inject([:]) {map, item -> map << [(item.parent_requisition_item_id): item]}
+
+        def productsMap = Product.findAllByIdInList(data.collect { it.product_id })
+                .inject([:]) {map, item -> map << [(item.id): item]}
+
+        def editPageItems = data.collect {
+            def substitutionItems = substitutionItemsMap[it.id]
 
             def statusCode = substitutionItems ? RequisitionItemStatus.SUBSTITUTED :
                     it.quantity_revised != null ? RequisitionItemStatus.CHANGED : RequisitionItemStatus.APPROVED
             [
-                    product : Product.get(it.product_id),
+                    product : productsMap[it.product_id],
                     productName : it.name,
                     productCode : it.product_code,
                     requisitionItemId: it.id,
