@@ -23,7 +23,7 @@ CREATE OR REPLACE VIEW invoice_item_candidate AS
           left join product on order_item.product_id = product.id
           left join order_adjustment_type on order_adjustment.order_adjustment_type_id = order_adjustment_type.id
           left join order_adjustment_invoice on order_adjustment_invoice.order_adjustment_id = order_adjustment.id
- where order_adjustment_invoice.invoice_item_id is null)
+ where order_adjustment_invoice.invoice_item_id is null and (IFNULL(order_adjustment.canceled, 0) != 1))
 union
 (select shipment_item.id as id,
         `order`.order_number as order_number,
