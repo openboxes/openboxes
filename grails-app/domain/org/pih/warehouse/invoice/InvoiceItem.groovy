@@ -149,7 +149,7 @@ class InvoiceItem implements Serializable {
             return (quantity ?: 0.0) * (unitPrice ?: 0.0) * ((order.paymentTerm?.prepaymentPercent?:100) / 100)
         }
 
-        return (quantity ?: 0.0) * (unitPrice ?: 0.0)
+        return (quantity ? quantity/quantityPerUom : 0.0) * (unitPrice ?: 0.0)
     }
 
     // Total adjustments value if order adjustment based or total item value if shipment item based
