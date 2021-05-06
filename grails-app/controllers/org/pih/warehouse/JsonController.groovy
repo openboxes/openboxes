@@ -1797,7 +1797,8 @@ class JsonController {
                 minOrderQuantity: productSupplier?.minOrderQuantity,
                 quantityPerUom: productPackage?.quantity,
                 unitOfMeasure: productPackage?.uom,
-                validationCode: preference?.preferenceType?.validationCode,
+                validationCode: preference ? preference?.preferenceType?.validationCode :
+                        productSupplier.globalProductSupplierPreference?.preferenceType?.validationCode,
         ] as JSON)
     }
 
