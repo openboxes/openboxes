@@ -182,6 +182,7 @@
                                 <g:if test="${orderInstance.orderTypeCode == OrderTypeCode.PURCHASE_ORDER}">
                                     <li><a href="#tabs-adjustments"><warehouse:message code="orderAdjustments.label"/></a></li>
                                     <li><a href="#tabs-shipments"><warehouse:message code="shipments.label"/></a></li>
+                                    <li><a href="#tabs-invoices"><warehouse:message code="invoices.label"/></a></li>
                                 </g:if>
                                 <li><a href="#tabs-documents"><warehouse:message code="documents.label"/></a></li>
                                 <li><a href="#tabs-comments"><warehouse:message code="comments.label" default="Comments"/></a></li>
@@ -202,6 +203,9 @@
                                 </div>
                                 <div id="tabs-shipments" class="ui-tabs-hide">
                                     <g:render template="/order/orderShipments"/>
+                                </div>
+                                <div id="tabs-invoices" class="ui-tabs-hide">
+                                    <g:render template="/order/orderInvoices"/>
                                 </div>
                             </g:if>
                             <div id="tabs-documents" class="ui-tabs-hide">

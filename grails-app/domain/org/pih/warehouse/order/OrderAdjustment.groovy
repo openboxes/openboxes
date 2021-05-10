@@ -66,7 +66,7 @@ class OrderAdjustment implements Serializable {
             JOIN ii.orderAdjustments oa
             WHERE oa.id = :id 
           """, [id: id])
-        return invoiceItem ?: null
+        return invoiceItem ? invoiceItem[0] : null
     }
 
     def getSubmittedInvoiceItem() {
