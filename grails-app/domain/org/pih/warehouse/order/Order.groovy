@@ -83,6 +83,7 @@ class Order implements Serializable {
             "totalOrderItemAdjustments",
             "total",
             "totalNormalized",
+            "hasInvoice",
             // Statuses
             "pending",
             "placed",
@@ -90,7 +91,6 @@ class Order implements Serializable {
             "received",
             "canceled",
             "completed",
-
     ]
 
     static hasMany = [
@@ -318,6 +318,10 @@ class Order implements Serializable {
         if (dateCompleted) name += "${separator}${dateCompleted?.format("MMMMM d, yyyy")}"
         if (completedBy) name += "${separator}${completedBy.name}"
         return name
+    }
+
+    Boolean getHasInvoice() {
+        return orderItems.any { it.hasInvoices } || orderAdjustments.any { it.hasInvoice }
     }
 
 
