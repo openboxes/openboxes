@@ -16,7 +16,6 @@ import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.UnitOfMeasureConversion
 import org.pih.warehouse.core.User
-import org.pih.warehouse.order.Order
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.ReferenceNumberType
 
@@ -140,7 +139,7 @@ class Invoice implements Serializable {
         if (datePaid) {
             return InvoiceStatus.PAID
         } else if (dateSubmitted) {
-            return InvoiceStatus.SUBMITTED
+            return InvoiceStatus.POSTED
         }
 
         return InvoiceStatus.PENDING
