@@ -185,9 +185,9 @@ export const debounceOrganizationsFetch = (waitTime, minSearchLength) =>
                 value: {
                   id: obj.id,
                   name: obj.name,
-                  label: obj.name,
+                  label: `${obj.code} ${obj.name}`,
                 },
-                label: obj.name,
+                label: `${obj.code} ${obj.name}`,
               }
             )),
           },
