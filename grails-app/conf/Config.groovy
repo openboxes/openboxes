@@ -847,6 +847,9 @@ openboxes.ajaxRequest.timeout = 120000
 google.oauth2.clientId = ""
 google.oauth2.clientSecret = ""
 
+// Azure OAuth Client credentials
+azure.oauth2.clientId = ""
+azure.oauth2.clientSecret = ""
 
 
 // Fullstory integration

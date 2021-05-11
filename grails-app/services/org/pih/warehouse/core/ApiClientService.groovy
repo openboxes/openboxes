@@ -35,18 +35,11 @@ class ApiClientService {
 
     boolean transactional = false
 
+
+
+
     JSONObject get(String url) {
         return execute(new HttpGet(url))
-    }
-
-    def get(String url, Map requestData) {
-        URIBuilder builder = new URIBuilder(url);
-        requestData.each { k, v ->
-            builder.setParameter(k, v)
-        }
-        HttpGet request = new HttpGet(builder.build());
-        return request
-        //return execute(request)
     }
 
     JSONObject post(String url, Map requestData) {
@@ -73,7 +66,6 @@ class ApiClientService {
                 request.setEntity(new StringEntity(jsonObject.toString(), "UTF-8"))
             }
             else {
-                log.info "Here "
                 List <NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
                 requestData.each { k, v ->
                     nameValuePairs.add(new BasicNameValuePair(k, v))
@@ -94,16 +86,20 @@ class ApiClientService {
 
     JSONObject execute(HttpRequestBase request) {
 
-        log.info "Request " + request
         // Request config
         request.setConfig(requestConfig)
 
         // Execute request
         HttpClient httpClient = HttpClientBuilder.create().build();
+
+        log.info "Request " + request
+
         HttpResponse response = httpClient.execute(request)
 
         // Process response
         InputStream is = response.entity.content
+        log.info "response.entity " + response.entity
+
         String data = IOUtils.toString(is, "UTF-8")
         return new JSONObject(data)
     }
@@ -111,4 +107,15 @@ class ApiClientService {
     static private getRequestConfig() {
         return RequestConfig.custom().setConnectTimeout(10000).build();
     }
+
+    def buildGetRequest(String url, Map requestData) {
+        URIBuilder builder = new URIBuilder(url);
+        requestData.each { k, v ->
+            builder.setParameter(k, v)
+        }
+        HttpGet request = new HttpGet(builder.build());
+        return request
+    }
+
+
 }
