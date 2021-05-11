@@ -12,6 +12,7 @@ package org.pih.warehouse.order
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.*
+import org.pih.warehouse.invoice.InvoiceItem
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
 
@@ -84,6 +85,7 @@ class Order implements Serializable {
             "total",
             "totalNormalized",
             "hasInvoice",
+            "invoiceItems",
             // Statuses
             "pending",
             "placed",
@@ -322,6 +324,30 @@ class Order implements Serializable {
 
     Boolean getHasInvoice() {
         return orderItems.any { it.hasInvoices } || orderAdjustments.any { it.hasInvoice }
+    }
+
+    def getInvoiceItems() {
+        def invoiceItems = []
+
+        if (orderAdjustments && orderAdjustments.any { it.hasInvoice }) {
+            orderAdjustments?.each {
+                if (it.hasInvoice) {
+                    invoiceItems.add(it.invoiceItem)
+                }
+            }
+        }
+
+        if (orderItems && orderItems.any { it.hasInvoices }) {
+            orderItems.each {
+                if (it.hasInvoices) {
+                    it.invoiceItems.each { InvoiceItem invoiceItem ->
+                        invoiceItems.add(invoiceItem)
+                    }
+                }
+            }
+        }
+
+        return invoiceItems
     }
 
 
