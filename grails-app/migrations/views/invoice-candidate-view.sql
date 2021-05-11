@@ -2,6 +2,8 @@ DROP VIEW IF EXISTS invoice_candidate;
 CREATE OR REPLACE VIEW invoice_item_candidate AS
 (select order_adjustment.id as id,
         `order`.order_number as order_number,
+        `order`.id as order_id,
+        '' as shipment_id,
         '' as shipment_number,
         order_adjustment.budget_code_id as budget_code_id,
         coalesce(order_item.gl_account_id, order_adjustment_type.gl_account_id) as gl_account_id,
@@ -27,6 +29,8 @@ CREATE OR REPLACE VIEW invoice_item_candidate AS
 union
 (select shipment_item.id as id,
         `order`.order_number as order_number,
+        `order`.id as order_id,
+        shipment.id as shipment_id,
         shipment.shipment_number as shipment_number,
         order_item.budget_code_id as budget_code_id,
         product.gl_account_id as gl_account_id,
