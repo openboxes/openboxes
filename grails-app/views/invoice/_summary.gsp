@@ -40,6 +40,12 @@
                     <warehouse:message code="invoice.rollback.label" default="Rollback"/>
                 </g:link>
             </g:if>
+            <g:if test="${!invoiceInstance?.dateSubmitted}">
+                <g:link class="button" controller="invoice" action="delete" id="${invoiceInstance?.id}">
+                    <img src="${createLinkTo(dir:'images/icons/silk', file:'delete.png')}" />
+                    <g:message code="default.button.delete.label"/>
+                </g:link>
+            </g:if>
         </g:hasRoleInvoice>
     </div>
 </div>

@@ -65,6 +65,25 @@ class InvoiceController {
         }
     }
 
+    def delete = {
+        def invoiceInstance = Invoice.get(params.id)
+        if (invoiceInstance) {
+            try {
+                invoiceInstance.delete(flush: true)
+                flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'invoice.label', default: 'Invoice'), params.id])}"
+                redirect(action: "list")
+            }
+            catch (org.springframework.dao.DataIntegrityViolationException e) {
+                flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'invoice.label', default: 'Invoice'), params.id])}"
+                redirect(action: "list", id: params.id)
+            }
+        } else {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'invoice.label', default: 'Invoice'), params.id])}"
+            redirect(action: "list")
+        }
+        redirect(action: "list", id: params.id)
+    }
+
     def generatePrepaymentInvoice = {
         Order order = Order.get(params.id)
         if (!order) {
