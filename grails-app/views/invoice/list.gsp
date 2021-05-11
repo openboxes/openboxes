@@ -31,7 +31,10 @@
                     <tr>
                         <th>${warehouse.message(code: 'default.actions.label')}</th>
                         <th>${warehouse.message(code: 'default.numItems.label')}</th>
+                        <th>${warehouse.message(code: 'default.status.label')}</th>
+                        <th>${warehouse.message(code: 'invoice.invoiceType.label')}</th>
                         <th>${warehouse.message(code: 'invoice.invoiceNumber.label')}</th>
+                        <th>${warehouse.message(code: 'invoice.vendor.label')}</th>
                         <th>${warehouse.message(code: 'invoice.vendorInvoiceNumber.label')}</th>
                         <th>${warehouse.message(code: 'invoice.totalValue.label')}</th>
                         <th>${warehouse.message(code: 'invoice.currency.label')}</th>
@@ -54,8 +57,18 @@
                                     <g:render template="/invoice/actions" model="[invoiceInstance:invoiceInstance]"/>
                                 </div>
                             </td>
-                            <td>
+                            <td class="middle">
                                 <div class="count">${invoiceInstance?.itemCount}</div>
+                            </td>
+                            <td class="middle">
+                                <div class="tag">
+                                    <format:metadata obj="${invoiceInstance?.status}"/>
+                                </div>
+                            </td>
+                            <td class="middle">
+                                <div>
+                                    <format:metadata obj="${invoiceInstance?.invoiceTypeCode}"/>
+                                </div>
                             </td>
                             <td class="middle">
                                 <g:link action="show" id="${invoiceInstance.id}">
@@ -63,10 +76,13 @@
                                 </g:link>
                             </td>
                             <td class="middle">
+                                <div>${invoiceInstance?.vendor}</div>
+                            </td>
+                            <td class="middle">
                                 <div>${invoiceInstance?.vendorInvoiceNumber}</div>
                             </td>
                             <td class="middle">
-                                <div><g:formatNumber number="${invoiceInstance?.totalValue}"/></div>
+                                <div><g:formatNumber number="${invoiceInstance?.invoice?.totalValue}"/></div>
                             </td>
                             <td class="middle">
                                 <div>${invoiceInstance?.currency}</div>

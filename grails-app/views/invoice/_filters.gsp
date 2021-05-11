@@ -6,12 +6,45 @@
         <g:hiddenField name="max" value="${params.max ?: 10}"/>
         <div class="filter-list">
             <div class="filter-list-item">
+                <label><warehouse:message code="invoice.partyFrom.label"/></label>
+                <g:selectOrganization name="partyFromId"
+                                      id="partyFromId"
+                                      value="${params.partyFromId}"
+                                      noSelection="['':'']"
+                                      class="chzn-select-deselect"
+                                      disabled="${true}" />
+            </div>
+            <div class="filter-list-item">
                 <label>${warehouse.message(code: 'invoice.invoiceNumber.label')}</label>
                 <g:textField class="text" id="invoiceNumber" name="invoiceNumber" value="${params.invoiceNumber}" style="width:100%"/>
             </div>
             <div class="filter-list-item">
-                <label>${warehouse.message(code: 'invoice.purchaseOrderNumber.label')}</label>
-                <g:textField class="text" id="purchaseOrderNumber" name="purchaseOrderNumber" value="${params.purchaseOrderNumber}" style="width:100%"/>
+                <label>${warehouse.message(code: 'invoice.invoiceStatus.label', default: 'Invoice Status')}</label>
+                <g:select id="status"
+                          name="status"
+                          from="${org.pih.warehouse.invoice.InvoiceStatus.list()}"
+                          class="select2"
+                          optionValue="${{ format.metadata(obj: it) }}"
+                          value="${params.status}"
+                          noSelection="['': '']"/>
+            </div>
+            <div class="filter-list-item">
+                <label><warehouse:message code="invoice.vendor.label"/></label>
+                <g:selectOrganization name="vendor"
+                                      id="vendor"
+                                      value="${params.vendor}"
+                                      noSelection="['':'']"
+                                      class="chzn-select-deselect"/>
+            </div>
+            <div class="filter-list-item">
+                <label>${warehouse.message(code: 'invoice.invoiceType.label')}</label>
+                <g:select id="invoiceTypeCode"
+                          name="invoiceTypeCode"
+                          from="${org.pih.warehouse.invoice.InvoiceTypeCode.list()}"
+                          class="select2"
+                          optionValue="${{ format.metadata(obj: it) }}"
+                          value="${params?.invoiceTypeCode}"
+                          noSelection="['': '']"/>
             </div>
             <div class="filter-list-item">
                 <label>${warehouse.message(code: 'invoice.invoiceDate.label', default: 'Invoice Date')}</label>
