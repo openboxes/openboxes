@@ -13,14 +13,27 @@ import org.springframework.context.ApplicationEvent
 
 class TransactionEvent extends ApplicationEvent {
 
+    String locationId
+    List productIds
     Boolean forceRefresh = false
 
     TransactionEvent(Transaction source) {
         super(source)
+        this.locationId = source.associatedLocation
+        this.productIds = source.associatedProducts
     }
 
     TransactionEvent(Transaction source, Boolean forceRefresh) {
         super(source)
+        this.locationId = source.associatedLocation
+        this.productIds = source.associatedProducts
+        this.forceRefresh = forceRefresh
+    }
+
+    TransactionEvent(Transaction source, String locationId, List<String> productIds, Boolean forceRefresh) {
+        super(source)
+        this.locationId = locationId
+        this.productIds = productIds
         this.forceRefresh = forceRefresh
     }
 }

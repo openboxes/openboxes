@@ -109,9 +109,6 @@ class ProductAvailabilityService {
         try {
             Sql sql = new Sql(dataSource)
 
-            // Used to avoid deadlocks when running refresh using GPars-enabled
-            sql.execute("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;")
-
             // Execute SQL in batches
             sql.withBatch(batchSize) { BatchingStatementWrapper stmt ->
                 // If we need to force refresh then we want to set quantity on hand for all
