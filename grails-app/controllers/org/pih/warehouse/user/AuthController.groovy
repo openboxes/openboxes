@@ -47,43 +47,6 @@ class AuthController {
         }
     }
 
-    def callback = {
-        log.info "callback: " + params
-
-        if (params.code) {
-
-
-            def token = oidcService.getToken(params.code)
-            log.info "access_token " + token.access_token
-            log.info "expires_in " + token.expires_in
-            log.info "id_token " + token.id_token
-            log.info "token_type " + token.token_type
-            log.info "refresh_token " + token.refresh_token
-
-            def jwsObject = JWSObject.parse(token.id_token)
-            String email = jwsObject.payload.toJSONObject().email
-            User user = User.findByUsernameOrEmail(email, email)
-            if (!user) {
-                user = new User()
-                user.username = jwsObject.payload.toJSONObject().email
-                user.email = jwsObject.payload.toJSONObject().email
-                user.firstName = jwsObject.payload.toJSONObject().given_name
-                user.lastName = jwsObject.payload.toJSONObject().family_name
-                user.password = identifierService.generateIdentifier(20)
-                user.passwordConfirm = user.password
-                user.save(flush:true, failOnError: true)
-            }
-
-            log.info "USER " + user?.id
-            session.user = user
-            redirect(controller: "auth", action: "login")
-        }
-
-
-        render "callback successful"
-    }
-
-
     /**
      * Allows user to log into the system.
      */
@@ -187,7 +150,12 @@ class AuthController {
             redirect(controller: "dashboard", action: "index")
         } else {
             flash.message = "${warehouse.message(code: 'auth.logoutSuccess.message')}"
+            def oauthProvider = session.oauthProvider
             session.invalidate()
+            if (oauthProvider) {
+                redirect(controller: "${oauthProvider}Auth", action: "logout")
+                return
+            }
             redirect(action: 'login')
         }
     }
