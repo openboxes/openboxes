@@ -86,6 +86,7 @@ class Order implements Serializable {
             "totalNormalized",
             "hasInvoice",
             "invoiceItems",
+            "hasPrepaymentInvoice",
             // Statuses
             "pending",
             "placed",
@@ -348,6 +349,10 @@ class Order implements Serializable {
         }
 
         return invoiceItems
+    }
+
+    Boolean getHasPrepaymentInvoice() {
+        return orderItems.any { it.hasPrepaymentInvoice } || orderAdjustments.any { it.hasPrepaymentInvoice }
     }
 
 

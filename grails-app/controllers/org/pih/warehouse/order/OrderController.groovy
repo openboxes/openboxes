@@ -226,6 +226,11 @@ class OrderController {
     def remove = {
         def orderInstance = Order.get(params.id)
         if (orderInstance) {
+            if (orderInstance.hasPrepaymentInvoice) {
+                flash.message = "${warehouse.message(code: 'order.errors.deletePrepaid.message')}"
+                redirect(action: "show", id: orderInstance?.id)
+                return
+            }
             try {
                 orderService.deleteOrder(orderInstance)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"

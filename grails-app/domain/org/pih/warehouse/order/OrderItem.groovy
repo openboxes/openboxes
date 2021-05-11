@@ -18,6 +18,8 @@ import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.invoice.InvoiceItem
+import org.pih.warehouse.invoice.InvoiceType
+import org.pih.warehouse.invoice.InvoiceTypeCode
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
@@ -93,6 +95,8 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
             "totalAdjustments",
             "unitOfMeasure",
             "hasInvoices",
+            "prepaidInvoiceItems",
+            "hasPrepaymentInvoice",
             // Statuses
             "partiallyFulfilled",
             "completelyFulfilled",
@@ -305,6 +309,18 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         return invoiceItems ?: null
     }
 
+    List<InvoiceItem> getPrepaidInvoiceItems() {
+        def invoiceItems = InvoiceItem.executeQuery("""
+          SELECT ii
+            FROM InvoiceItem ii
+            JOIN ii.invoice i
+            JOIN ii.shipmentItems si
+            JOIN si.orderItems oi
+            WHERE oi.id = :id AND i.invoiceType = :invoiceType
+          """, [id: id, invoiceType: InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)])
+        return invoiceItems ?: null
+    }
+
     Integer getQuantityInvoicedInStandardUom() {
         return InvoiceItem.executeQuery("""
           SELECT SUM(ii.quantity)
@@ -319,6 +335,10 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
 
     def getHasInvoices() {
         return invoiceItems ? true : false
+    }
+
+    Boolean getHasPrepaymentInvoice() {
+        return prepaidInvoiceItems ? true : false
     }
 
     Integer getQuantityInvoiced() {

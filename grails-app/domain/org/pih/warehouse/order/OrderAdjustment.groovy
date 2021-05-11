@@ -12,6 +12,8 @@ package org.pih.warehouse.order
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.invoice.InvoiceItem
+import org.pih.warehouse.invoice.InvoiceType
+import org.pih.warehouse.invoice.InvoiceTypeCode
 
 class OrderAdjustment implements Serializable {
 
@@ -33,7 +35,7 @@ class OrderAdjustment implements Serializable {
 
     Boolean canceled = Boolean.FALSE
 
-    static transients = ['totalAdjustments', 'submittedInvoiceItem', 'invoiceItem', 'isInvoiced', 'hasInvoice']
+    static transients = ['totalAdjustments', 'submittedInvoiceItem', 'invoiceItem', 'isInvoiced', 'hasInvoice', 'prepaidInvoiceItem', 'hasPrepaymentInvoice']
 
     static belongsTo = [order: Order, orderItem: OrderItem]
 
@@ -81,11 +83,26 @@ class OrderAdjustment implements Serializable {
         return invoiceItem ?: null
     }
 
+    def getPrepaidInvoiceItem() {
+        def invoiceItem = InvoiceItem.executeQuery("""
+          SELECT ii
+            FROM InvoiceItem ii
+            JOIN ii.invoice i
+            JOIN ii.orderAdjustments oa
+            WHERE oa.id = :id AND i.invoiceType = :invoiceType
+          """, [id: id, invoiceType: InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)])
+        return invoiceItem ?: null
+    }
+
     Boolean getIsInvoiced() {
         return submittedInvoiceItem ? true : false
     }
 
     Boolean getHasInvoice() {
         return invoiceItem ? true : false
+    }
+
+    Boolean getHasPrepaymentInvoice() {
+        return prepaidInvoiceItem ? true : false
     }
 }
