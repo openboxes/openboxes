@@ -170,7 +170,8 @@
                                 <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
                                 ${warehouse.message(code: 'default.button.rollback.label')}
                             </g:link>
-                            <g:if test="${orderInstance?.displayStatus == ShipmentStatusCode.SHIPPED || !orderInstance?.shipments}">
+                            <g:if test="${!orderInstance?.hasInvoice && orderInstance?.paymentTerm?.prepaymentPercent &&
+                                    (orderInstance?.displayStatus == ShipmentStatusCode.SHIPPED || !orderInstance?.shipments)}">
                                 <g:link controller="invoice" action="generatePrepaymentInvoice" id="${orderInstance?.id}" class="button"
                                     disabled="${!hasRoleInvoice}"
                                     disabledMessage="${disabledInvoiceMessage}">
