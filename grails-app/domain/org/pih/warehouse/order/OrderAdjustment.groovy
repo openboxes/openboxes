@@ -89,7 +89,8 @@ class OrderAdjustment implements Serializable {
             FROM InvoiceItem ii
             JOIN ii.invoice i
             JOIN ii.orderAdjustments oa
-            WHERE oa.id = :id AND i.invoiceType = :invoiceType
+            WHERE oa.id = :id 
+            AND i.invoiceType = :invoiceType
           """, [id: id, invoiceType: InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)])
         return invoiceItem ?: null
     }
