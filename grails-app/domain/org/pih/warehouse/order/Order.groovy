@@ -323,10 +323,30 @@ class Order implements Serializable {
         return name
     }
 
+    /**
+     * Should only use in the context of displaying a single order (i.e. do not invoke on a list of orders).
+     *
+     * @return true if order has an invoice; false otherwise
+     */
     Boolean getHasInvoice() {
         return orderItems.any { it.hasInvoices } || orderAdjustments.any { it.hasInvoice }
     }
 
+    /**
+     * Should only use in the context of displaying a single order (i.e. do not invoke on a list of orders).
+     *
+     * @return true if order has a prepayment invoice; false otherwise
+     */
+    Boolean getHasPrepaymentInvoice() {
+        return orderItems.any { it.hasPrepaymentInvoice } || orderAdjustments.any { it.hasPrepaymentInvoice }
+    }
+
+    /**
+     * Should only use in the context of displaying a single order (i.e. do not invoke on a list of orders).
+     * FIXME We should probably be able to achieve this through a more
+     *
+     * @return true list of invoice items for all order items and order adjustments
+     */
     def getInvoiceItems() {
         def invoiceItems = []
 
@@ -350,11 +370,6 @@ class Order implements Serializable {
 
         return invoiceItems
     }
-
-    Boolean getHasPrepaymentInvoice() {
-        return orderItems.any { it.hasPrepaymentInvoice } || orderAdjustments.any { it.hasPrepaymentInvoice }
-    }
-
 
     Map toJson() {
         return [

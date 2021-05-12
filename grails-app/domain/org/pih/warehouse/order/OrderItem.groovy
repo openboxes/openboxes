@@ -316,7 +316,8 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
             JOIN ii.invoice i
             JOIN ii.shipmentItems si
             JOIN si.orderItems oi
-            WHERE oi.id = :id AND i.invoiceType = :invoiceType
+            WHERE oi.id = :id 
+            AND i.invoiceType = :invoiceType
           """, [id: id, invoiceType: InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)])
         return invoiceItems ?: null
     }
