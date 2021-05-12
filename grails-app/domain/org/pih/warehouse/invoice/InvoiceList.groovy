@@ -9,8 +9,7 @@
 **/
 package org.pih.warehouse.invoice
 
-class InvoiceList {
-    String id
+class InvoiceList implements Serializable {
     Invoice invoice
 
     String invoiceNumber
@@ -18,7 +17,8 @@ class InvoiceList {
 
     String partyFromId
     String partyId
-    String vendor // = party.code + " " + part.name
+    String partyCode
+    String partyName
 
     InvoiceTypeCode invoiceTypeCode
     InvoiceStatus status
@@ -34,5 +34,6 @@ class InvoiceList {
     static mapping = {
         version false
         cache usage: "read-only"
+        id composite: ['invoice', 'vendorInvoiceNumber']
     }
 }

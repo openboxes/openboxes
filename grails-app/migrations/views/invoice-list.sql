@@ -1,12 +1,12 @@
 CREATE OR REPLACE VIEW invoice_list AS (
    	SELECT
-         invoice.id as id,
-         invoice.id as invoice_id, -- for easy invoice access for total_value pull
+         invoice.id as invoice_id,
          invoice.invoice_number,
          reference_number.identifier as vendor_invoice_number,
          invoice.party_from_id,
          invoice.party_id,
-         CONCAT(party.code, ' ', party.name) as vendor,
+         party.code as party_code,
+         party.name as party_name,
          IF(invoice_type.code is not null, invoice_type.code, "INVOICE") as invoice_type_code,
          IF(invoice.date_paid is not null, "PAID", IF(invoice.date_submitted is not null, "POSTED", "PENDING")) as status,
          unit_of_measure.name as currency,

@@ -54,7 +54,7 @@
                         <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
                             <td class="middle" width="1%">
                                 <div class="action-menu">
-                                    <g:render template="/invoice/actions" model="[invoiceInstance:invoiceInstance]"/>
+                                    <g:render template="/invoice/actions" model="[invoiceId:invoiceInstance?.invoice?.id]"/>
                                 </div>
                             </td>
                             <td class="middle">
@@ -71,12 +71,12 @@
                                 </div>
                             </td>
                             <td class="middle">
-                                <g:link action="show" id="${invoiceInstance.id}">
+                                <g:link action="show" id="${invoiceInstance?.invoice?.id}">
                                     ${invoiceInstance?.invoiceNumber}
                                 </g:link>
                             </td>
                             <td class="middle">
-                                <div>${invoiceInstance?.vendor}</div>
+                                <div>${invoiceInstance?.partyCode} ${invoiceInstance?.partyName}</div>
                             </td>
                             <td class="middle">
                                 <div>${invoiceInstance?.vendorInvoiceNumber}</div>
