@@ -132,34 +132,36 @@ class InvoiceService {
         return invoiceItemCandidates
     }
 
-    def listInvoices(Location currentLocation, Map params) {
-        String query = """
-            select * 
-            from invoice_list
-            where party_from_id = :partyId
-            AND created_by_id = IFNULL(:createdBy, created_by_id)
-            AND invoice_number LIKE :invoiceNumber
-            AND date_invoiced = IFNULL(:dateInvoiced, date_invoiced)
-            order by date_invoiced, id
-            """
-        def data = dataService.executeQuery(query, [
-                 partyId: currentLocation?.organization?.id,
-                 createdBy: params.createdBy,
-                 invoiceNumber: "%" + params.invoiceNumber + "%",
-                 dateInvoiced: params.dateInvoiced
-                ])
+    def listInvoices(Map params) {
+        return InvoiceList.createCriteria().list(params) {
+            eq("partyFromId", params.partyFromId)
 
-        def invoices = data.collect { invoice ->
-            [
-                id : invoice.id,
-                invoiceNumber: invoice.invoice_number,
-                itemCount: invoice.item_count,
-                currency: invoice.currency,
-                vendorInvoiceNumber: invoice.vendor_invoice_number,
-                totalValue: invoice.total_value
-            ]
+            if (params.createdBy) {
+                eq("createdById", params.createdBy)
+            }
+
+            if (params.invoiceNumber) {
+                ilike("invoiceNumber", "%" + params.invoiceNumber + "%")
+            }
+
+            if (params.dateInvoiced) {
+                eq("dateInvoiced", params.dateInvoiced)
+            }
+
+            if (params.vendor) {
+                eq("partyId", params.vendor)
+            }
+
+            if (params.invoiceTypeCode) {
+                eq("invoiceTypeCode", params.invoiceTypeCode as InvoiceTypeCode)
+            }
+
+            if (params.status) {
+                eq("status", params.status as InvoiceStatus)
+            }
+
+            order("dateInvoiced", "desc")
         }
-        return invoices
     }
 
     ReferenceNumber createOrUpdateVendorInvoiceNumber(Invoice invoice, String vendorInvoiceNumber) {

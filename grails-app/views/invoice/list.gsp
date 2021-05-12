@@ -31,7 +31,10 @@
                     <tr>
                         <th>${warehouse.message(code: 'default.actions.label')}</th>
                         <th>${warehouse.message(code: 'default.numItems.label')}</th>
+                        <th>${warehouse.message(code: 'default.status.label')}</th>
+                        <th>${warehouse.message(code: 'invoice.invoiceType.label')}</th>
                         <th>${warehouse.message(code: 'invoice.invoiceNumber.label')}</th>
+                        <th>${warehouse.message(code: 'invoice.vendor.label')}</th>
                         <th>${warehouse.message(code: 'invoice.vendorInvoiceNumber.label')}</th>
                         <th>${warehouse.message(code: 'invoice.totalValue.label')}</th>
                         <th>${warehouse.message(code: 'invoice.currency.label')}</th>
@@ -51,22 +54,35 @@
                         <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
                             <td class="middle" width="1%">
                                 <div class="action-menu">
-                                    <g:render template="/invoice/actions" model="[invoiceInstance:invoiceInstance]"/>
+                                    <g:render template="/invoice/actions" model="[invoiceId:invoiceInstance?.invoice?.id]"/>
                                 </div>
                             </td>
-                            <td>
+                            <td class="middle">
                                 <div class="count">${invoiceInstance?.itemCount}</div>
                             </td>
                             <td class="middle">
-                                <g:link action="show" id="${invoiceInstance.id}">
+                                <div class="tag">
+                                    <format:metadata obj="${invoiceInstance?.status}"/>
+                                </div>
+                            </td>
+                            <td class="middle">
+                                <div>
+                                    <format:metadata obj="${invoiceInstance?.invoiceTypeCode}"/>
+                                </div>
+                            </td>
+                            <td class="middle">
+                                <g:link action="show" id="${invoiceInstance?.invoice?.id}">
                                     ${invoiceInstance?.invoiceNumber}
                                 </g:link>
+                            </td>
+                            <td class="middle">
+                                <div>${invoiceInstance?.partyCode} ${invoiceInstance?.partyName}</div>
                             </td>
                             <td class="middle">
                                 <div>${invoiceInstance?.vendorInvoiceNumber}</div>
                             </td>
                             <td class="middle">
-                                <div><g:formatNumber number="${invoiceInstance?.totalValue}"/></div>
+                                <div><g:formatNumber number="${invoiceInstance?.invoice?.totalValue}"/></div>
                             </td>
                             <td class="middle">
                                 <div>${invoiceInstance?.currency}</div>
