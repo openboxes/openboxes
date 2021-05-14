@@ -79,7 +79,8 @@ class InvoiceItem implements Serializable {
         'totalItemPrice',
         'totalAmount',
         'unitOfMeasure',
-        'isPrepaymentInvoice'
+        'isPrepaymentInvoice',
+        'prepaidItem'
     ]
 
     static constraints = {
@@ -129,7 +130,11 @@ class InvoiceItem implements Serializable {
 
     // Total order adjustment value
     def getTotalAdjustments() {
-        return orderAdjustments?.findAll {!it.canceled }?.sum { it.getTotalAdjustments() } ?: 0
+        def totalAdjustment = orderAdjustments?.findAll {!it.canceled }?.sum { it.getTotalAdjustments() } ?: 0
+        if (isPrepaymentInvoice) {
+            return totalAdjustment * ((order.paymentTerm?.prepaymentPercent?:100) / 100)
+        }
+        return totalAdjustment
     }
 
     def getUnitPrice() {
@@ -171,6 +176,32 @@ class InvoiceItem implements Serializable {
 
     boolean getIsPrepaymentInvoice() {
         return invoice.invoiceType?.code == InvoiceTypeCode.PREPAYMENT_INVOICE
+    }
+
+    def getPrepaidItem() {
+        def prepaidItem
+        if (orderAdjustments) {
+            prepaidItem = InvoiceItem.executeQuery("""
+              SELECT ii
+                FROM InvoiceItem ii
+                JOIN ii.invoice i
+                LEFT OUTER JOIN ii.orderAdjustments oa
+                WHERE oa.id = :orderAdjustmentId
+                AND i.invoiceType = :invoiceType
+              """, [orderAdjustmentId: orderAdjustment?.id, invoiceType: InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)])
+
+        } else {
+            prepaidItem = InvoiceItem.executeQuery("""
+              SELECT ii
+                FROM InvoiceItem ii
+                JOIN ii.invoice i
+                LEFT OUTER JOIN ii.shipmentItems si
+                LEFT OUTER JOIN si.orderItems oi
+                WHERE oi.id = :orderItemId
+                AND i.invoiceType = :invoiceType
+              """, [orderItemId: orderItem?.id, invoiceType: InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)])
+        }
+        return prepaidItem ? prepaidItem[0] : null
     }
 
     Map toJson() {

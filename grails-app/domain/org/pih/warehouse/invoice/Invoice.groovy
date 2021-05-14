@@ -69,7 +69,7 @@ class Invoice implements Serializable {
         invoiceItems cascade: "all-delete-orphan"
     }
 
-    static transients = ['vendorInvoiceNumber', 'totalValue', 'totalValueNormalized', 'documents', 'status', 'hasPrepaymentInvoice']
+    static transients = ['vendorInvoiceNumber', 'totalValue', 'totalValueNormalized', 'documents', 'status', 'hasPrepaymentInvoice', 'totalPrepaidValue']
 
     static constraints = {
         invoiceNumber(nullable: false, blank: false, unique: true, maxSize: 255)
@@ -147,6 +147,10 @@ class Invoice implements Serializable {
 
     boolean getHasPrepaymentInvoice() {
         return invoiceItems?.any { it.order?.hasPrepaymentInvoice }
+    }
+
+    Float getTotalPrepaidValue() {
+        return invoiceType?.code != InvoiceTypeCode.PREPAYMENT_INVOICE && invoiceItems.any { it.prepaidItem } ? invoiceItems?.collect { it?.prepaidItem?.totalAmount }?.sum() : 0
     }
 
     Map toJson() {
