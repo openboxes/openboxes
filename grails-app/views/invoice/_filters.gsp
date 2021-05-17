@@ -33,7 +33,7 @@
                 <g:selectOrganization name="vendor"
                                       id="vendor"
                                       value="${params.vendor}"
-                                      noSelection="['null':'']"
+                                      noSelection="['':'']"
                                       class="chzn-select-deselect"/>
             </div>
             <div class="filter-list-item">
