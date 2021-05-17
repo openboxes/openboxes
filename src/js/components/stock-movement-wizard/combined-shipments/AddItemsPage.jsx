@@ -81,6 +81,15 @@ const FIELDS = {
         label: 'react.stockMovement.orderNumber.label',
         defaultMessage: 'Order number',
         flexWidth: '1',
+        fieldKey: '',
+        getDynamicAttr: ({
+          fieldValue,
+        }) => ({
+          url: fieldValue && fieldValue.orderId ? `/openboxes/order/show/${fieldValue.orderId}` : '',
+        }),
+        attributes: {
+          formatValue: fieldValue => fieldValue && fieldValue.orderNumber,
+        },
       },
       product: {
         type: SelectField,

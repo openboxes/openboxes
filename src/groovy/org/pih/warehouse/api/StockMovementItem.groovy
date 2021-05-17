@@ -34,6 +34,7 @@ class StockMovementItem {
     String shipmentItemId
     String orderItemId
     String orderNumber
+    String orderId
 
     List<StockMovementItem> splitLineItems = []
     List<StockMovementItem> substitutionItems = []
@@ -128,6 +129,7 @@ class StockMovementItem {
                 sortOrder        : sortOrder,
                 orderItemId      : orderItemId,
                 orderNumber      : orderNumber,
+                orderId          : orderId,
                 packSize         : packSize,
                 inventoryItem    : !inventoryItem ? null : [
                         id            : inventoryItem.id,
@@ -165,6 +167,7 @@ class StockMovementItem {
                 expirationDate: shipmentItem?.inventoryItem?.expirationDate,
                 sortOrder: shipmentItem?.sortOrder,
                 orderNumber: shipmentItem?.orderNumber,
+                orderId: shipmentItem?.orderId,
                 quantityAvailable: shipmentItem.quantityRemainingToShip,
                 packSize: shipmentItem.quantityPerUom,
         )
