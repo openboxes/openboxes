@@ -321,7 +321,7 @@ class OrderService {
                         orderInstance.status = OrderStatus.PLACED
                         orderInstance.dateApproved = new Date()
                         orderInstance.approvedBy = userInstance
-                        if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
+                        if (!orderInstance.hasErrors() && orderInstance.merge()) {
                             grailsApplication.mainContext.publishEvent(new OrderStatusEvent(OrderStatus.PLACED, orderInstance))
                             return orderInstance
                         }
