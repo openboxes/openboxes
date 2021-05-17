@@ -148,7 +148,7 @@ class InvoiceService {
                 eq("dateInvoiced", params.dateInvoiced)
             }
 
-            if (params.vendor) {
+            if (params.vendor && params.vendor != "null") {
                 eq("partyId", params.vendor)
             }
 
