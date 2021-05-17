@@ -641,7 +641,10 @@ class OrderService {
                         }
                     } else {
                         Organization supplier = Organization.get(supplierId)
-                        Organization manufacturer = Organization.findByName(manufacturerName)
+                        Organization manufacturer = null
+                        if (manufacturerName) {
+                            manufacturer = Organization.findByName(manufacturerName)
+                        }
                         def supplierParams = [manufacturer: manufacturer?.id,
                                               product: product,
                                               supplierCode: supplierCode ?: null,
