@@ -90,6 +90,7 @@ class Order implements Serializable {
             // Statuses
             "pending",
             "placed",
+            "shipped",
             "partiallyReceived",
             "received",
             "canceled",
@@ -200,6 +201,13 @@ class Order implements Serializable {
      */
     Boolean isPlaced() {
         return (status == OrderStatus.PLACED)
+    }
+
+    /**
+     * @return a boolean indicating whether the order has been fully shipped
+     */
+    Boolean isShipped() {
+        return orderItems?.every { OrderItem orderItem -> orderItem.isCompletelyFulfilled() }
     }
 
     /**

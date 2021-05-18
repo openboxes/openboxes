@@ -27,7 +27,7 @@
                         ${invoiceItem?.product?.name}
                     </td>
                     <td>
-                        ${invoiceItem?.orderNumber}
+                        ${invoiceItem?.order?.orderNumber}
                     </td>
                     <td>
                         ${invoiceItem?.glAccount?.code}

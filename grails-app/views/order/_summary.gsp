@@ -171,12 +171,20 @@
                                 ${warehouse.message(code: 'default.button.rollback.label')}
                             </g:link>
                             <g:if test="${!orderInstance?.hasInvoice && orderInstance?.paymentTerm?.prepaymentPercent &&
-                                    (orderInstance?.displayStatus == ShipmentStatusCode.SHIPPED || !orderInstance?.shipments)}">
+                                    (orderInstance?.orderItems?.size() + orderInstance?.orderAdjustments?.size() > 0)}">
                                 <g:link controller="invoice" action="generatePrepaymentInvoice" id="${orderInstance?.id}" class="button"
                                     disabled="${!hasRoleInvoice}"
                                     disabledMessage="${disabledInvoiceMessage}">
                                     <img src="${resource(dir: 'images/icons', file: 'document.png')}" />&nbsp;
                                     ${warehouse.message(code: 'default.button.generatePrepayment.label', default: "Generate Prepayment Invoice")}
+                                </g:link>
+                            </g:if>
+                            <g:if test="${orderInstance?.hasPrepaymentInvoice && orderInstance?.isShipped()}">
+                                <g:link controller="invoice" action="generateInvoiceAfterPrepayment" id="${orderInstance?.id}" class="button"
+                                        disabled="${!hasRoleInvoice}"
+                                        disabledMessage="${disabledInvoiceMessage}">
+                                    <img src="${resource(dir: 'images/icons', file: 'document.png')}" />&nbsp;
+                                    ${warehouse.message(code: 'default.button.generateInvoice.label', default: "Generate Invoice")}
                                 </g:link>
                             </g:if>
                             <g:link controller="order" action="createCombinedShipment" params="[direction:'INBOUND', orderId: orderInstance?.id]" class="button"

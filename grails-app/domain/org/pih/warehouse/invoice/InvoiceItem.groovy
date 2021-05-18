@@ -19,6 +19,7 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
 class InvoiceItem implements Serializable {
@@ -67,13 +68,12 @@ class InvoiceItem implements Serializable {
     }
 
     static transients = [
-        'shipmentItem',
-        'shipmentNumber',
-        'orderAdjustment',
-        'orderNumber',
-        'description',
-        'order',
         'orderItem',
+        'shipmentItem',
+        'orderAdjustment',
+        'shipment',
+        'order',
+        'description',
         'totalAdjustments',
         'unitPrice',
         'totalItemPrice',
@@ -97,35 +97,34 @@ class InvoiceItem implements Serializable {
         createdBy(nullable: true)
     }
 
-    ShipmentItem getShipmentItem() {
-        return shipmentItems ? shipmentItems?.iterator()?.next() : null
+    OrderItem getOrderItem() {
+        return orderItems ? orderItems?.find { it } : null
     }
 
-    String getShipmentNumber() {
-        return shipmentItem?.shipment?.shipmentNumber
+    ShipmentItem getShipmentItem() {
+        return shipmentItems ? shipmentItems?.find { it } : null
     }
 
     OrderAdjustment getOrderAdjustment() {
-        return orderAdjustments ? orderAdjustments?.iterator()?.next() : null
+        return orderAdjustments ? orderAdjustments?.find { it } : null
     }
 
-    String getOrderNumber() {
-        return shipmentItem?.orderNumber ?: orderAdjustment?.order?.orderNumber ?: null
+    Shipment getShipment() {
+        return shipmentItem?.shipment
+    }
+
+    Order getOrder() {
+        if (orderItem) {
+            return orderItem.order
+        }
+        if (orderAdjustment) {
+            return orderAdjustment.order
+        }
+        return shipmentItem?.orderItems?.find { it }?.order
     }
 
     String getDescription() {
         return orderAdjustment ? orderAdjustment.description : product?.name
-    }
-
-    OrderItem getOrderItem() {
-        if (orderAdjustments) {
-            return orderAdjustment?.orderItem
-        }
-        return shipmentItem?.orderItems?.iterator()?.next()
-    }
-
-    Order getOrder() {
-        return orderItem?.order
     }
 
     // Total order adjustment value
@@ -136,7 +135,7 @@ class InvoiceItem implements Serializable {
     def getUnitPrice() {
         def unitPrice = 0.0
         if (shipmentItems) {
-            unitPrice = orderItem?.unitPrice
+            unitPrice = shipmentItem?.orderItems?.find { it }?.unitPrice
         } else if (orderAdjustments) {
             unitPrice = totalAdjustments
         }
@@ -175,8 +174,8 @@ class InvoiceItem implements Serializable {
     Map toJson() {
         return [
                 id: id,
-                orderNumber: orderNumber,
-                shipmentNumber: shipmentNumber,
+                orderNumber: order?.orderNumber ?: '',
+                shipmentNumber: shipment?.shipmentNumber ?: '',
                 budgetCode: budgetCode?.code,
                 glCode: glAccount?.code,
                 productCode: product?.productCode,
