@@ -24,7 +24,6 @@ class InvoiceService {
 
     boolean transactional = true
 
-    def dataService
     def identifierService
 
     def getInvoices(Invoice invoiceTemplate, Map params) {
@@ -65,6 +64,15 @@ class InvoiceService {
         }
 
         return invoiceItems
+    }
+
+    def getPrepaymentItems(String id) {
+        Invoice invoice = Invoice.get(id)
+        def prepaymentItems = []
+        invoice.invoiceItems.each { InvoiceItem invoiceItem ->
+            prepaymentItems += invoiceItem.prepaymentItem
+        }
+        return prepaymentItems
     }
 
     def getInvoiceItemCandidates(String id, List orderNumbers, List shipmentNumbers) {

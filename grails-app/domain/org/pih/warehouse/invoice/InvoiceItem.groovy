@@ -80,7 +80,7 @@ class InvoiceItem implements Serializable {
         'totalAmount',
         'unitOfMeasure',
         'isPrepaymentInvoice',
-        'prepaidItem'
+        'prepaymentItem'
     ]
 
     static constraints = {
@@ -178,10 +178,10 @@ class InvoiceItem implements Serializable {
         return invoice.invoiceType?.code == InvoiceTypeCode.PREPAYMENT_INVOICE
     }
 
-    def getPrepaidItem() {
-        def prepaidItem
+    def getPrepaymentItem() {
+        def prepaymentItem
         if (orderAdjustments) {
-            prepaidItem = InvoiceItem.executeQuery("""
+            prepaymentItem = InvoiceItem.executeQuery("""
               SELECT ii
                 FROM InvoiceItem ii
                 JOIN ii.invoice i
@@ -191,7 +191,7 @@ class InvoiceItem implements Serializable {
               """, [orderAdjustmentId: orderAdjustment?.id, invoiceType: InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)])
 
         } else {
-            prepaidItem = InvoiceItem.executeQuery("""
+            prepaymentItem = InvoiceItem.executeQuery("""
               SELECT ii
                 FROM InvoiceItem ii
                 JOIN ii.invoice i
@@ -201,7 +201,7 @@ class InvoiceItem implements Serializable {
                 AND i.invoiceType = :invoiceType
               """, [orderItemId: orderItem?.id, invoiceType: InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)])
         }
-        return prepaidItem ? prepaidItem[0] : null
+        return prepaymentItem ? prepaymentItem[0] : null
     }
 
     Map toJson() {

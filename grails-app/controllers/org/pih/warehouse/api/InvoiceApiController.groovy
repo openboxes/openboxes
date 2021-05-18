@@ -144,4 +144,9 @@ class InvoiceApiController {
         render([data: invoice?.toJson()] as JSON)
 
     }
+
+    def getPrepaymentItems = {
+        List<InvoiceItem> prepaymentItems = invoiceService.getPrepaymentItems(params.id)
+        render([data: prepaymentItems, totalCount: prepaymentItems.size()] as JSON)
+    }
 }

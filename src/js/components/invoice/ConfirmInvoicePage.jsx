@@ -187,6 +187,9 @@ class ConfirmInvoicePage extends Component {
       if (!_.isNull(startIndex) &&
           this.state.values.invoiceItems.length !== this.state.values.totalCount) {
         this.loadMoreRows({ startIndex: startIndex + this.props.pageSize });
+      } else if (this.state.values.invoiceItems.length === this.state.values.totalCount
+        && !this.state.values.isPrepaymentInvoice) {
+        this.fetchPrepaymentItems();
       }
       this.props.hideSpinner();
     });
@@ -224,6 +227,34 @@ class ConfirmInvoicePage extends Component {
         window.location = `/openboxes/invoice/show/${this.state.values.id}`;
       })
       .catch(() => this.props.hideSpinner());
+  }
+
+  fetchPrepaymentItems() {
+    const url = `/openboxes/api/invoices/${this.state.values.id}/prepaymentItems`;
+    apiClient.get(url)
+      .then((response) => {
+        const { data, totalCount } = response.data;
+        const lineItemsData = _.map(
+          data,
+          val => ({
+            ...val,
+            totalAmount: val.totalAmount * (-1),
+          }),
+        );
+        const invoiceItems = _.concat(this.state.values.invoiceItems, lineItemsData);
+        const updatedTotalCount = this.state.values.totalCount + totalCount;
+        const totalValue = _.reduce(invoiceItems, (sum, val) =>
+          (sum + (val.totalAmount ? parseFloat(val.totalAmount) : 0.0)), 0);
+
+        this.setState({
+          values: {
+            ...this.state.values,
+            invoiceItems,
+            totalCount: updatedTotalCount,
+            totalValue: totalValue.toFixed(2),
+          },
+        }, () => console.log(this.state));
+      });
   }
 
   render() {
