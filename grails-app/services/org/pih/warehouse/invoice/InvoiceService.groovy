@@ -19,6 +19,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.ReferenceNumberType
 import org.pih.warehouse.shipping.ShipmentItem
+import org.joda.time.LocalDate
 
 class InvoiceService {
 
@@ -275,7 +276,7 @@ class InvoiceService {
         invoice.description = order.description
         invoice.partyFrom = order.destination.organization
         invoice.party = order.origin.organization
-        invoice.dateInvoiced = new Date()
+        invoice.dateInvoiced = LocalDate.now().toDate()
         invoice.currencyUom = UnitOfMeasure.findByCode(order.currencyCode)
         invoice.invoiceType = InvoiceType.findByCode(InvoiceTypeCode.INVOICE)
         return invoice
