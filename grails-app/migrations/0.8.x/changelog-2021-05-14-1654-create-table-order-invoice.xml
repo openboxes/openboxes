@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+  <changeSet author="jmiranda (generated)" id="1621028114887-1">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="order_invoice"/>
+      </not>
+    </preConditions>
+    <createTable tableName="order_invoice">
+      <column name="invoice_item_id" type="CHAR(38)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="order_item_id" type="CHAR(38)"/>
+    </createTable>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1621028114887-2">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="FK6A1A433CB95ED8E0"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="invoice_item_id" baseTableName="order_invoice"
+      constraintName="FK6A1A433CB95ED8E0" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="invoice_item"/>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1621028114887-3">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="FK6A1A433C3BE9D843"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="order_item_id" baseTableName="order_invoice"
+      constraintName="FK6A1A433C3BE9D843" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="order_item"/>
+  </changeSet>
+</databaseChangeLog>
+

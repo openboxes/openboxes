@@ -57,10 +57,11 @@ class InvoiceItem implements Serializable {
 
     static belongsTo = [invoice: Invoice]
 
-    static hasMany = [shipmentItems: ShipmentItem, orderAdjustments: OrderAdjustment]
+    static hasMany = [shipmentItems: ShipmentItem, orderItems: OrderItem, orderAdjustments: OrderAdjustment]
 
     static mapping = {
         id generator: 'uuid'
+        orderItems joinTable: [name: 'order_invoice', key: 'invoice_item_id', column: 'order_item_id']
         shipmentItems joinTable: [name: 'shipment_invoice', key: 'invoice_item_id', column: 'shipment_item_id']
         orderAdjustments joinTable: [name: 'order_adjustment_invoice', key: 'invoice_item_id', column: 'order_adjustment_id']
     }
