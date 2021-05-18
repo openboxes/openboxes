@@ -26,7 +26,7 @@ const FIELDS = {
       checked: {
         fieldKey: '',
         label: '',
-        flexWidth: '3',
+        flexWidth: '0.4',
         type: ({
           // eslint-disable-next-line react/prop-types
           rowIndex, fieldValue, selectRow,
@@ -44,37 +44,65 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.orderNumber.label',
         defaultMessage: 'PO Number',
+        flexWidth: '1',
+        fieldKey: '',
+        getDynamicAttr: ({
+          fieldValue,
+        }) => ({
+          url: fieldValue && fieldValue.orderId ? `/openboxes/order/show/${fieldValue.orderId}` : '',
+        }),
+        attributes: {
+          formatValue: fieldValue => fieldValue && fieldValue.orderNumber,
+        },
       },
       productCode: {
         type: LabelField,
         label: 'react.stockMovement.productCode.label',
         defaultMessage: 'Product Code',
+        flexWidth: '1',
       },
       productName: {
         type: LabelField,
         label: 'react.stockMovement.productName.label',
         defaultMessage: 'Product name',
+        flexWidth: '3',
+        attributes: {
+          className: 'text-left ml-1',
+          showValueTooltip: true,
+        },
+      },
+      supplierCode: {
+        type: LabelField,
+        label: 'react.stockMovement.supplierCode.label',
+        defaultMessage: 'Supplier code',
+        flexWidth: '1',
       },
       budgetCode: {
         type: LabelField,
         label: 'react.stockMovement.budgetCode.label',
         defaultMessage: 'Budget Code',
+        flexWidth: '1',
       },
       recipient: {
         type: LabelField,
         label: 'react.stockMovement.recipient.label',
         defaultMessage: 'Recipient',
+        flexWidth: '1.5',
+        attributes: {
+          showValueTooltip: true,
+        },
       },
       quantityAvailable: {
         type: LabelField,
         label: 'react.stockMovement.quantityAvailable.label',
         defaultMessage: 'Quantity Available',
+        flexWidth: '1',
       },
       quantityToShip: {
         type: TextField,
         label: 'react.stockMovement.quantityToShip.label',
         defaultMessage: 'Quantity to Ship',
-        fixedWidth: '140px',
+        flexWidth: '1',
         attributes: {
           type: 'number',
         },
@@ -88,6 +116,7 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.uom.label',
         defaultMessage: 'UoM',
+        flexWidth: '1',
       },
     },
   },
