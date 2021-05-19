@@ -79,7 +79,9 @@ class InvoiceItem implements Serializable {
         'totalItemPrice',
         'totalAmount',
         'unitOfMeasure',
-        'isPrepaymentInvoice'
+        'isPrepaymentInvoice',
+        'prepaymentItem',
+        'totalPrepaymentAmount'
     ]
 
     static constraints = {
@@ -129,7 +131,11 @@ class InvoiceItem implements Serializable {
 
     // Total order adjustment value
     def getTotalAdjustments() {
-        return orderAdjustments?.findAll {!it.canceled }?.sum { it.getTotalAdjustments() } ?: 0
+        def totalAdjustment = orderAdjustments?.findAll {!it.canceled }?.sum { it.getTotalAdjustments() } ?: 0
+        if (isPrepaymentInvoice) {
+            return totalAdjustment * ((order.paymentTerm?.prepaymentPercent?:100) / 100)
+        }
+        return totalAdjustment
     }
 
     def getUnitPrice() {
@@ -159,6 +165,10 @@ class InvoiceItem implements Serializable {
         return totalAdjustments ?: totalItemPrice
     }
 
+    def getTotalPrepaymentAmount() {
+        return isPrepaymentInvoice ? totalAmount * (-1) : 0.0
+    }
+
     String getUnitOfMeasure() {
         if (quantityUom) {
             return "${quantityUom?.code}/${quantityPerUom as Integer}"
@@ -171,6 +181,32 @@ class InvoiceItem implements Serializable {
 
     boolean getIsPrepaymentInvoice() {
         return invoice.invoiceType?.code == InvoiceTypeCode.PREPAYMENT_INVOICE
+    }
+
+    def getPrepaymentItem() {
+        def prepaymentItem
+        if (orderAdjustments) {
+            prepaymentItem = InvoiceItem.executeQuery("""
+              SELECT ii
+                FROM InvoiceItem ii
+                JOIN ii.invoice i
+                LEFT OUTER JOIN ii.orderAdjustments oa
+                WHERE oa.id = :orderAdjustmentId
+                AND i.invoiceType = :invoiceType
+              """, [orderAdjustmentId: orderAdjustment?.id, invoiceType: InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)])
+
+        } else {
+            prepaymentItem = InvoiceItem.executeQuery("""
+              SELECT ii
+                FROM InvoiceItem ii
+                JOIN ii.invoice i
+                LEFT OUTER JOIN ii.orderItems oi
+                WHERE oi.id = :orderItemId
+                AND i.invoiceType = :invoiceType
+              """, [orderItemId: shipmentItem?.orderItems?.find { it }?.id,
+                    invoiceType: InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)])
+        }
+        return prepaymentItem ? prepaymentItem[0] : null
     }
 
     Map toJson() {
@@ -187,6 +223,7 @@ class InvoiceItem implements Serializable {
                 amount: amount,
                 unitPrice: unitPrice,
                 totalAmount: totalAmount,
+                totalPrepaymentAmount: totalPrepaymentAmount,
         ]
     }
 }

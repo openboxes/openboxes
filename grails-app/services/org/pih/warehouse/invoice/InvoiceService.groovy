@@ -24,7 +24,6 @@ class InvoiceService {
 
     boolean transactional = true
 
-    def dataService
     def identifierService
 
     def getInvoices(Invoice invoiceTemplate, Map params) {
