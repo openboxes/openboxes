@@ -84,9 +84,14 @@ class Order implements Serializable {
             "totalOrderItemAdjustments",
             "total",
             "totalNormalized",
+            "invoices",
             "hasInvoice",
             "invoiceItems",
             "hasPrepaymentInvoice",
+            "hasItemsOrAdjustments",
+            "isPrepaymentInvoiceAllowed",
+            "isPrepaymentRequired",
+            "canGenerateInvoice",
             // Statuses
             "pending",
             "placed",
@@ -334,10 +339,36 @@ class Order implements Serializable {
     /**
      * Should only use in the context of displaying a single order (i.e. do not invoke on a list of orders).
      *
+     * @return true list of invoice items for all order items and order adjustments
+     */
+    List<InvoiceItem> getInvoiceItems() {
+        def invoiceItems = []
+        orderAdjustments?.each {
+            invoiceItems += it.invoiceItems
+        }
+        orderItems?.each {
+            invoiceItems += it.invoiceItems
+        }
+        return invoiceItems
+    }
+
+
+    /**
+     * Should only use in the context of displaying a single order (i.e. do not invoke on a list of orders).
+     *
+     * @return list of all invoices for order
+     */
+    def getInvoices() {
+        return invoiceItems*.invoice.unique()
+    }
+
+    /**
+     * Should only use in the context of displaying a single order (i.e. do not invoke on a list of orders).
+     *
      * @return true if order has an invoice; false otherwise
      */
     Boolean getHasInvoice() {
-        return orderItems.any { it.hasInvoices } || orderAdjustments.any { it.hasInvoice }
+        return !invoices.empty
     }
 
     /**
@@ -349,34 +380,20 @@ class Order implements Serializable {
         return orderItems.any { it.hasPrepaymentInvoice } || orderAdjustments.any { it.hasPrepaymentInvoice }
     }
 
-    /**
-     * Should only use in the context of displaying a single order (i.e. do not invoke on a list of orders).
-     * FIXME We should probably be able to achieve this through a more
-     *
-     * @return true list of invoice items for all order items and order adjustments
-     */
-    def getInvoiceItems() {
-        def invoiceItems = []
+    Boolean getHasItemsOrAdjustments() {
+        return orderItems || orderAdjustments
+    }
 
-        if (orderAdjustments && orderAdjustments.any { it.hasInvoice }) {
-            orderAdjustments?.each {
-                if (it.hasInvoice) {
-                    invoiceItems.add(it.invoiceItem)
-                }
-            }
-        }
+    Boolean getIsPrepaymentRequired() {
+        return paymentTerm?.prepaymentPercent > 0
+    }
 
-        if (orderItems && orderItems.any { it.hasInvoices }) {
-            orderItems.each {
-                if (it.hasInvoices) {
-                    it.invoiceItems.each { InvoiceItem invoiceItem ->
-                        invoiceItems.add(invoiceItem)
-                    }
-                }
-            }
-        }
+    Boolean getIsPrepaymentInvoiceAllowed() {
+        return !hasInvoice && isPrepaymentRequired && hasItemsOrAdjustments
+    }
 
-        return invoiceItems
+    Boolean getCanGenerateInvoice() {
+        return hasPrepaymentInvoice && isShipped() && invoices.size() == 1
     }
 
     Map toJson() {

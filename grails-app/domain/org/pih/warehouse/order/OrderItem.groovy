@@ -298,14 +298,14 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     }
 
     List<InvoiceItem> getInvoiceItems() {
-        def invoiceItems = InvoiceItem.executeQuery("""
+        return InvoiceItem.executeQuery("""
           SELECT ii
             FROM InvoiceItem ii
-            JOIN ii.invoice i
-            JOIN ii.orderItems oi
-            WHERE oi.id = :id
+            LEFT JOIN ii.orderItems oi
+            LEFT JOIN ii.shipmentItems si
+            LEFT JOIN si.orderItems soi
+            WHERE oi.id = :id OR soi.id = :id
           """, [id: id])
-        return invoiceItems ?: null
     }
 
     List<InvoiceItem> getPrepaidInvoiceItems() {
@@ -313,8 +313,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
           SELECT ii
             FROM InvoiceItem ii
             JOIN ii.invoice i
-            JOIN ii.shipmentItems si
-            JOIN si.orderItems oi
+            JOIN ii.orderItems oi
             WHERE oi.id = :id 
             AND i.invoiceType = :invoiceType
           """, [id: id, invoiceType: InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)])
