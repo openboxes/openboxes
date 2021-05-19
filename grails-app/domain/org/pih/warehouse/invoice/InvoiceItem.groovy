@@ -80,7 +80,8 @@ class InvoiceItem implements Serializable {
         'totalAmount',
         'unitOfMeasure',
         'isPrepaymentInvoice',
-        'prepaymentItem'
+        'prepaymentItem',
+        'totalPrepaymentAmount'
     ]
 
     static constraints = {
@@ -164,6 +165,10 @@ class InvoiceItem implements Serializable {
         return totalAdjustments ?: totalItemPrice
     }
 
+    def getTotalPrepaymentAmount() {
+        return isPrepaymentInvoice ? totalAmount * (-1) : 0.0
+    }
+
     String getUnitOfMeasure() {
         if (quantityUom) {
             return "${quantityUom?.code}/${quantityPerUom as Integer}"
@@ -195,11 +200,11 @@ class InvoiceItem implements Serializable {
               SELECT ii
                 FROM InvoiceItem ii
                 JOIN ii.invoice i
-                LEFT OUTER JOIN ii.shipmentItems si
-                LEFT OUTER JOIN si.orderItems oi
+                LEFT OUTER JOIN ii.orderItems oi
                 WHERE oi.id = :orderItemId
                 AND i.invoiceType = :invoiceType
-              """, [orderItemId: orderItem?.id, invoiceType: InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)])
+              """, [orderItemId: shipmentItem?.orderItems?.find { it }?.id,
+                    invoiceType: InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)])
         }
         return prepaymentItem ? prepaymentItem[0] : null
     }
@@ -218,6 +223,7 @@ class InvoiceItem implements Serializable {
                 amount: amount,
                 unitPrice: unitPrice,
                 totalAmount: totalAmount,
+                totalPrepaymentAmount: totalPrepaymentAmount,
         ]
     }
 }

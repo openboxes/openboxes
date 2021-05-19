@@ -69,7 +69,17 @@ class Invoice implements Serializable {
         invoiceItems cascade: "all-delete-orphan"
     }
 
-    static transients = ['vendorInvoiceNumber', 'totalValue', 'totalValueNormalized', 'documents', 'status', 'hasPrepaymentInvoice', 'totalPrepaymentValue', 'isPrepaymentInvoice']
+    static transients = [
+            'vendorInvoiceNumber',
+            'totalValue',
+            'totalValueNormalized',
+            'documents',
+            'status',
+            'hasPrepaymentInvoice',
+            'totalPrepaymentValue',
+            'isPrepaymentInvoice',
+            'prepaymentItems'
+    ]
 
     static constraints = {
         invoiceNumber(nullable: false, blank: false, unique: true, maxSize: 255)
@@ -154,7 +164,15 @@ class Invoice implements Serializable {
     }
 
     Float getTotalPrepaymentValue() {
-        return !isPrepaymentInvoice && invoiceItems.any { it.prepaymentItem } ? invoiceItems?.collect { it?.prepaymentItem?.totalAmount }?.sum() : 0
+        return isPrepaymentInvoice ? invoiceItems.sum { it.totalAmount } : 0
+    }
+
+    List<InvoiceItem> getPrepaymentItems() {
+        def prepaymentItems = []
+        invoiceItems.each { InvoiceItem invoiceItem ->
+            prepaymentItems += invoiceItem.prepaymentItem
+        }
+        return prepaymentItems
     }
 
     Map toJson() {
@@ -175,11 +193,8 @@ class Invoice implements Serializable {
             totalCount: invoiceItems?.size() ?: 0,
             totalValue: totalValue,
             invoiceType: invoiceType?.code?.name(),
-<<<<<<< fab8728caa055f6eb3a8ed26c524967747bc04bc
-            hasPrepaymentInvoice: hasPrepaymentInvoice
-=======
+            hasPrepaymentInvoice: hasPrepaymentInvoice,
             isPrepaymentInvoice: isPrepaymentInvoice,
->>>>>>> OBPIH-3797 Add prepayment lines to last page of invoice
         ]
     }
 }

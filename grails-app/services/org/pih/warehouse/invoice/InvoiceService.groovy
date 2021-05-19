@@ -66,15 +66,6 @@ class InvoiceService {
         return invoiceItems
     }
 
-    def getPrepaymentItems(String id) {
-        Invoice invoice = Invoice.get(id)
-        def prepaymentItems = []
-        invoice.invoiceItems.each { InvoiceItem invoiceItem ->
-            prepaymentItems += invoiceItem.prepaymentItem
-        }
-        return prepaymentItems
-    }
-
     def getInvoiceItemCandidates(String id, List orderNumbers, List shipmentNumbers) {
         Invoice invoice = Invoice.get(id)
 

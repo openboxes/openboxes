@@ -238,7 +238,7 @@ class ConfirmInvoicePage extends Component {
           data,
           val => ({
             ...val,
-            totalAmount: val.totalAmount * (-1),
+            totalAmount: val.totalPrepaymentAmount,
           }),
         );
         const invoiceItems = _.concat(this.state.values.invoiceItems, lineItemsData);
@@ -253,7 +253,7 @@ class ConfirmInvoicePage extends Component {
             totalCount: updatedTotalCount,
             totalValue: totalValue.toFixed(2),
           },
-        }, () => console.log(this.state));
+        });
       });
   }
 
