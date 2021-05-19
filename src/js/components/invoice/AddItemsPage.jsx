@@ -204,7 +204,7 @@ class AddItemsPage extends Component {
     this.setState({
       isFirstPageLoaded: true,
     });
-    const url = `/openboxes/api/invoices/${this.state.values.id}/invoiceItems?offset=${startIndex}&max=${this.props.pageSize}`;
+    const url = `/openboxes/api/invoices/${this.state.values.id}/items?offset=${startIndex}&max=${this.props.pageSize}`;
     apiClient.get(url)
       .then((response) => {
         this.setInvoiceItems(response, startIndex);

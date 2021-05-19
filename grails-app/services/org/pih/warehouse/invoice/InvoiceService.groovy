@@ -11,10 +11,10 @@ package org.pih.warehouse.invoice
 
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
-import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustment
+import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.ReferenceNumberType
@@ -215,6 +215,73 @@ class InvoiceService {
         invoice.save()
     }
 
+    def submitInvoice(Invoice invoice) {
+        invoice.dateSubmitted = new Date()
+        invoice.save()
+    }
+
+    Invoice generatePrepaymentInvoice(Order order) {
+        if (order.orderItems.any { it.hasInvoices } || order.orderAdjustments.any { it.hasInvoice }) {
+            throw new Exception("Some order items or order adjustments for this order already have been invoiced")
+        }
+
+        Invoice invoice = createFromOrder(order)
+        invoice.invoiceType = InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)
+        createOrUpdateVendorInvoiceNumber(invoice, order.orderNumber + Constants.PREPAYMENT_INVOICE_SUFFIX)
+
+        if (order?.orderItems?.empty && order?.orderAdjustments?.empty) {
+            throw new Exception("No order items or order adjustments found for given order")
+        }
+
+        order.orderItems.each { OrderItem orderItem ->
+            InvoiceItem invoiceItem = createFromOrderItem(orderItem)
+            invoice.addToInvoiceItems(invoiceItem)
+        }
+
+        order.orderAdjustments.each { OrderAdjustment orderAdjustment ->
+            InvoiceItem invoiceItem = createFromOrderAdjustment(orderAdjustment)
+            invoice.addToInvoiceItems(invoiceItem)
+        }
+
+        return invoice.save()
+    }
+
+    Invoice generateInvoice(Order order) {
+        if (!order.hasPrepaymentInvoice) {
+            throw new Exception("This order has no prepayment invoice")
+        }
+
+        Invoice invoice = createFromOrder(order)
+        createOrUpdateVendorInvoiceNumber(invoice, order.orderNumber)
+
+        order.orderItems.each { OrderItem orderItem ->
+            orderItem?.shipmentItems?.each { ShipmentItem shipmentItem ->
+                InvoiceItem invoiceItem = createFromShipmentItem(shipmentItem)
+                invoice.addToInvoiceItems(invoiceItem)
+            }
+        }
+
+        order.orderAdjustments.each { OrderAdjustment orderAdjustment ->
+            InvoiceItem invoiceItem = createFromOrderAdjustment(orderAdjustment)
+            invoice.addToInvoiceItems(invoiceItem)
+        }
+
+        return invoice.save()
+    }
+
+    Invoice createFromOrder(Order order) {
+        Invoice invoice = new Invoice()
+        invoice.invoiceNumber = identifierService.generateInvoiceIdentifier()
+        invoice.name = order.name
+        invoice.description = order.description
+        invoice.partyFrom = order.destination.organization
+        invoice.party = order.origin.organization
+        invoice.dateInvoiced = new Date()
+        invoice.currencyUom = UnitOfMeasure.findByCode(order.currencyCode)
+        invoice.invoiceType = InvoiceType.findByCode(InvoiceTypeCode.INVOICE)
+        return invoice
+    }
+
     InvoiceItem createFromInvoiceItemCandidate(InvoiceItemCandidate candidate) {
         InvoiceItem invoiceItem = new InvoiceItem(
             budgetCode: candidate.budgetCode,
@@ -238,38 +305,43 @@ class InvoiceService {
         return invoiceItem
     }
 
-    def submitInvoice(Invoice invoice) {
-        invoice.dateSubmitted = new Date()
-        invoice.save()
+    InvoiceItem createFromOrderItem(OrderItem orderItem) {
+        InvoiceItem invoiceItem = new InvoiceItem(
+            quantity: orderItem.quantity,
+            product: orderItem.product,
+            glAccount: orderItem.glAccount ?: orderItem.product.glAccount,
+            budgetCode: orderItem?.budgetCode,
+            quantityUom: orderItem?.quantityUom,
+            quantityPerUom: orderItem.quantityPerUom ?: 1
+        )
+        invoiceItem.addToOrderItems(orderItem)
+        return invoiceItem
     }
 
-    Invoice generatePrepaymentInvoice(Order order) {
-        if (order.orderItems.any { it.hasInvoices } || order.orderAdjustments.any { it.hasInvoice }) {
-            throw new Exception("Some order items or order adjustments for this order already have been invoiced")
-        }
+    InvoiceItem createFromShipmentItem(ShipmentItem shipmentItem) {
+        OrderItem orderItem = shipmentItem.orderItems?.find { it }
+        InvoiceItem invoiceItem = new InvoiceItem(
+            quantity: shipmentItem.quantity,
+            product: shipmentItem.product,
+            glAccount: shipmentItem.product.glAccount,
+            budgetCode: orderItem?.budgetCode,
+            quantityUom: orderItem?.quantityUom,
+            quantityPerUom: orderItem.quantityPerUom ?: 1
+        )
+        invoiceItem.addToShipmentItems(shipmentItem)
+        return invoiceItem
+    }
 
-        Invoice invoice = new Invoice()
-        invoice.invoiceNumber = identifierService.generateInvoiceIdentifier()
-        invoice.name = order.name
-        invoice.description = order.description
-        invoice.partyFrom = order.destinationParty
-        invoice.party = order.origin.organization
-        invoice.dateInvoiced = new Date()
-        invoice.currencyUom = UnitOfMeasure.findByCode(order.currencyCode)
-        invoice.invoiceType = InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)
-        createOrUpdateVendorInvoiceNumber(invoice, order.orderNumber + Constants.PREPAYMENT_INVOICE_SUFFIX)
-
-        List invoiceCandidates = InvoiceItemCandidate.findAllByOrderNumber(order.orderNumber)
-
-        if (invoiceCandidates.size() == 0) {
-            throw new Exception("No invoice item candidates found for given order")
-        }
-
-        invoiceCandidates.each { InvoiceItemCandidate candidateItem ->
-            InvoiceItem invoiceItem = createFromInvoiceItemCandidate(candidateItem)
-            invoice.addToInvoiceItems(invoiceItem)
-        }
-
-        return invoice.save()
+    InvoiceItem createFromOrderAdjustment(OrderAdjustment orderAdjustment) {
+        InvoiceItem invoiceItem = new InvoiceItem(
+            budgetCode: orderAdjustment.budgetCode,
+            product: orderAdjustment.orderItem?.product,
+            glAccount: orderAdjustment.glAccount ?: orderAdjustment.orderItem?.glAccount,
+            quantity: 1,
+            quantityUom: orderAdjustment.orderItem?.quantityUom,
+            quantityPerUom: orderAdjustment.orderItem?.quantityPerUom ?: 1
+        )
+        invoiceItem.addToOrderAdjustments(orderAdjustment)
+        return invoiceItem
     }
 }

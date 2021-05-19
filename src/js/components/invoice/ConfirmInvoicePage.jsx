@@ -210,7 +210,7 @@ class ConfirmInvoicePage extends Component {
     this.setState({
       isFirstPageLoaded: true,
     });
-    const url = `/openboxes/api/invoices/${this.state.values.id}/invoiceItems?offset=${startIndex}&max=${this.props.pageSize}`;
+    const url = `/openboxes/api/invoices/${this.state.values.id}/items?offset=${startIndex}&max=${this.props.pageSize}`;
     apiClient.get(url)
       .then((response) => {
         this.setInvoiceItems(response, startIndex);
@@ -251,7 +251,8 @@ class ConfirmInvoicePage extends Component {
                   className="btn btn-outline-primary btn-form btn-xs"
                   onClick={() => this.props.previousPage(this.state.values)}
                   disabled={this.state.values.dateSubmitted ||
-                    this.state.values.invoiceType === PREPAYMENT_INVOICE}
+                    this.state.values.invoiceType === PREPAYMENT_INVOICE ||
+                    this.state.values.hasPrepaymentInvoice}
                 >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
