@@ -170,8 +170,7 @@
                                 <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
                                 ${warehouse.message(code: 'default.button.rollback.label')}
                             </g:link>
-                            <g:if test="${!orderInstance?.hasInvoice && orderInstance?.paymentTerm?.prepaymentPercent &&
-                                    (orderInstance?.orderItems?.size() + orderInstance?.orderAdjustments?.size() > 0)}">
+                            <g:if test="${orderInstance?.isPrepaymentInvoiceAllowed}">
                                 <g:link controller="invoice" action="generatePrepaymentInvoice" id="${orderInstance?.id}" class="button"
                                     disabled="${!hasRoleInvoice}"
                                     disabledMessage="${disabledInvoiceMessage}">
@@ -179,7 +178,7 @@
                                     ${warehouse.message(code: 'default.button.generatePrepayment.label', default: "Generate Prepayment Invoice")}
                                 </g:link>
                             </g:if>
-                            <g:if test="${orderInstance?.hasPrepaymentInvoice && orderInstance?.isShipped()}">
+                            <g:if test="${orderInstance?.canGenerateInvoice}">
                                 <g:link controller="invoice" action="generateInvoice" id="${orderInstance?.id}" class="button"
                                         disabled="${!hasRoleInvoice}"
                                         disabledMessage="${disabledInvoiceMessage}">

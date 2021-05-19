@@ -35,7 +35,15 @@ class OrderAdjustment implements Serializable {
 
     Boolean canceled = Boolean.FALSE
 
-    static transients = ['totalAdjustments', 'submittedInvoiceItem', 'invoiceItem', 'isInvoiced', 'hasInvoice', 'prepaidInvoiceItem', 'hasPrepaymentInvoice']
+    static transients = [
+        'totalAdjustments',
+        'submittedInvoiceItems',
+        'invoiceItems',
+        'isInvoiced',
+        'hasInvoice',
+        'prepaidInvoiceItems',
+        'hasPrepaymentInvoice'
+    ]
 
     static belongsTo = [order: Order, orderItem: OrderItem]
 
@@ -60,19 +68,18 @@ class OrderAdjustment implements Serializable {
         return amount ?: percentage ? orderItem ? orderItem?.subtotal * (percentage/100) : order.subtotal * (percentage/100) : 0
     }
 
-    def getInvoiceItem() {
-        def invoiceItem = InvoiceItem.executeQuery("""
+    def getInvoiceItems() {
+        return InvoiceItem.executeQuery("""
           SELECT ii
             FROM InvoiceItem ii
             JOIN ii.invoice i
             JOIN ii.orderAdjustments oa
             WHERE oa.id = :id 
           """, [id: id])
-        return invoiceItem ? invoiceItem[0] : null
     }
 
-    def getSubmittedInvoiceItem() {
-        def invoiceItem = InvoiceItem.executeQuery("""
+    def getSubmittedInvoiceItems() {
+        return InvoiceItem.executeQuery("""
           SELECT ii
             FROM InvoiceItem ii
             JOIN ii.invoice i
@@ -80,11 +87,10 @@ class OrderAdjustment implements Serializable {
             WHERE oa.id = :id 
             AND i.dateSubmitted IS NOT NULL
           """, [id: id])
-        return invoiceItem ?: null
     }
 
-    def getPrepaidInvoiceItem() {
-        def invoiceItem = InvoiceItem.executeQuery("""
+    def getPrepaidInvoiceItems() {
+        return InvoiceItem.executeQuery("""
           SELECT ii
             FROM InvoiceItem ii
             JOIN ii.invoice i
@@ -92,18 +98,17 @@ class OrderAdjustment implements Serializable {
             WHERE oa.id = :id 
             AND i.invoiceType = :invoiceType
           """, [id: id, invoiceType: InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)])
-        return invoiceItem ?: null
     }
 
     Boolean getIsInvoiced() {
-        return submittedInvoiceItem ? true : false
+        return !submittedInvoiceItems.empty
     }
 
     Boolean getHasInvoice() {
-        return invoiceItem ? true : false
+        return !invoiceItems.empty
     }
 
     Boolean getHasPrepaymentInvoice() {
-        return prepaidInvoiceItem ? true : false
+        return !prepaidInvoiceItems.empty
     }
 }
