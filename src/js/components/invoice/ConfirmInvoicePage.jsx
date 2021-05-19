@@ -252,7 +252,7 @@ class ConfirmInvoicePage extends Component {
                   onClick={() => this.props.previousPage(this.state.values)}
                   disabled={this.state.values.dateSubmitted ||
                     this.state.values.invoiceType === PREPAYMENT_INVOICE ||
-                    this.state.values.hasPrepaymentAssociated}
+                    this.state.values.hasPrepaymentInvoice}
                 >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>

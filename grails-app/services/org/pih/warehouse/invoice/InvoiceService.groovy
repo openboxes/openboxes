@@ -229,7 +229,7 @@ class InvoiceService {
         invoice.invoiceType = InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)
         createOrUpdateVendorInvoiceNumber(invoice, order.orderNumber + Constants.PREPAYMENT_INVOICE_SUFFIX)
 
-        if (order.orderItems.size() + order.orderAdjustments.size() == 0) {
+        if (order?.orderItems?.empty && order?.orderAdjustments?.empty) {
             throw new Exception("No order items or order adjustments found for given order")
         }
 
@@ -246,7 +246,7 @@ class InvoiceService {
         return invoice.save()
     }
 
-    Invoice generateInvoiceAfterPrepayment(Order order) {
+    Invoice generateInvoice(Order order) {
         if (!order.hasPrepaymentInvoice) {
             throw new Exception("This order has no prepayment invoice")
         }

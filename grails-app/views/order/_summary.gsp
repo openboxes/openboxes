@@ -180,7 +180,7 @@
                                 </g:link>
                             </g:if>
                             <g:if test="${orderInstance?.hasPrepaymentInvoice && orderInstance?.isShipped()}">
-                                <g:link controller="invoice" action="generateInvoiceAfterPrepayment" id="${orderInstance?.id}" class="button"
+                                <g:link controller="invoice" action="generateInvoice" id="${orderInstance?.id}" class="button"
                                         disabled="${!hasRoleInvoice}"
                                         disabledMessage="${disabledInvoiceMessage}">
                                     <img src="${resource(dir: 'images/icons', file: 'document.png')}" />&nbsp;

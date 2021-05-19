@@ -96,14 +96,14 @@ class InvoiceController {
         redirect(action: "create", params: [id: invoice.id])
     }
 
-    def generateInvoiceAfterPrepayment = {
+    def generateInvoice = {
         Order order = Order.get(params.id)
         if (!order) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
             redirect(action: "list")
         }
 
-        Invoice invoice = invoiceService.generateInvoiceAfterPrepayment(order)
+        Invoice invoice = invoiceService.generateInvoice(order)
         redirect(action: "create", params: [id: invoice.id])
     }
 }

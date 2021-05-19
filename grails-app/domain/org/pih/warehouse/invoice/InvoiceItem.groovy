@@ -138,6 +138,8 @@ class InvoiceItem implements Serializable {
             unitPrice = shipmentItem?.orderItems?.find { it }?.unitPrice
         } else if (orderAdjustments) {
             unitPrice = totalAdjustments
+        } else if (orderItems) {
+            unitPrice = orderItem.unitPrice
         }
 
         return unitPrice ?: 0.0
@@ -174,8 +176,8 @@ class InvoiceItem implements Serializable {
     Map toJson() {
         return [
                 id: id,
-                orderNumber: order?.orderNumber ?: '',
-                shipmentNumber: shipment?.shipmentNumber ?: '',
+                orderNumber: order?.orderNumber,
+                shipmentNumber: shipment?.shipmentNumber,
                 budgetCode: budgetCode?.code,
                 glCode: glAccount?.code,
                 productCode: product?.productCode,

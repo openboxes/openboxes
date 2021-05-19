@@ -54,4 +54,6 @@ union
           join `order` on order_item.order_id = `order`.id
           left join order_invoice on order_invoice.order_item_id = order_item.id
           left join shipment_invoice on shipment_invoice.shipment_item_id = shipment_item.id
- where order_invoice.invoice_item_id is null and shipment_invoice.invoice_item_id is null and shipment.current_status = 'SHIPPED');
+ where order_invoice.invoice_item_id is null
+   and shipment_invoice.invoice_item_id is null
+   and shipment.current_status = 'SHIPPED');
