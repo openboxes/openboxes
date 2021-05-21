@@ -14,6 +14,7 @@ import grails.converters.JSON
 import grails.validation.ValidationException
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.plugins.csv.CSVWriter
+import org.hibernate.StaleObjectStateException
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.BudgetCode
@@ -182,17 +183,24 @@ class OrderController {
 
     def placeOrder = {
         log.info "Issue order " + params
-        def orderInstance = orderService.placeOrder(params.id, session.user.id)
-        if (orderInstance) {
-            if (orderInstance.hasErrors()) {
-                render(view: 'show', model: [orderInstance: orderInstance])
+        try {
+            def orderInstance = orderService.placeOrder(params.id, session.user.id)
+            if (orderInstance) {
+                if (orderInstance.hasErrors()) {
+                    render(view: 'show', model: [orderInstance: orderInstance])
+                } else {
+                    flash.message = "${warehouse.message(code: 'order.orderHasBeenPlacedWithVendor.message', args: [orderInstance?.orderNumber, orderInstance?.origin?.name])}"
+                    redirect(action: 'show', id: orderInstance.id)
+                }
             } else {
-                flash.message = "${warehouse.message(code: 'order.orderHasBeenPlacedWithVendor.message', args: [orderInstance?.orderNumber, orderInstance?.origin?.name])}"
-                redirect(action: 'show', id: orderInstance.id)
+                flash.message = "${warehouse.message(code: 'order.notFound.message', args: [params.id], default: 'Order {0} was not found.')}"
+                redirect(action: "list")
             }
-        } else {
-            flash.message = "${warehouse.message(code: 'order.notFound.message', args: [params.id], default: 'Order {0} was not found.')}"
-            redirect(action: "list")
+        } catch (StaleObjectStateException e) {
+            log.error("Unable to place order due to error: " + e.message, e)
+            Order orderInstance = Order.read(params.id)
+            orderInstance.errors.reject("There was an issue when placing the order, please try again")
+            render(view: 'show', model: [orderInstance: orderInstance])
         }
     }
 
