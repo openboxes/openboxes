@@ -307,7 +307,8 @@
                                         id="dlgBudgetCode"
                                         value="${orderItem.budgetCode?.id}"
                                         class="select2"
-                                        noSelection="['':'']"/>
+                                        noSelection="['':'']"
+                                        disabled="${orderItem.hasInvoices}"/>
                 </td>
             </tr>
         </g:elseif>
