@@ -315,6 +315,41 @@ class InvoiceItemsModal extends Component {
     }
   }
 
+  checkAllVisibleItems(value) {
+    const formValues = update(this.state.formValues, {
+      invoiceItems: {
+        $apply: items => items.map(invoiceItem => (
+          {
+            ...invoiceItem,
+            checked: value,
+          }
+        )),
+      },
+    });
+    const selectedItems = this.state.selectedInvoiceItems ? this.state.selectedInvoiceItems : [];
+    if (value) {
+      // eslint-disable-next-line no-return-assign
+      _.map(formValues.invoiceItems, (invoiceItem, key) =>
+        selectedItems[invoiceItem.id] =
+            {
+              ...formValues.invoiceItems[key],
+              quantityToInvoice: value ? formValues.invoiceItems[key].quantity : '',
+              sortOrder: value ? formValues.invoiceItems[key].sortOrder : '',
+            });
+    } else {
+      _.map(formValues.invoiceItems, (invoiceItem, key) => {
+        delete selectedItems[formValues.invoiceItems[key].id];
+      });
+    }
+
+    this.setState({ formValues, selectedInvoiceItems: selectedItems }, console.log(this.state));
+  }
+
+  checkSelected() {
+    return _.every(this.state.formValues.invoiceItems, item =>
+      _.includes(_.keys(this.state.selectedInvoiceItems), item.id));
+  }
+
   render() {
     const {
       formValues,
@@ -370,6 +405,14 @@ class InvoiceItemsModal extends Component {
             onChange={value => this.setSelectedShipments(value)}
             classes=""
             cache={false}
+          />
+        </div>
+        <div>
+          <Checkbox
+            disabled={false}
+            className="m-3"
+            checked={this.checkSelected()}
+            onChange={value => this.checkAllVisibleItems(value)}
           />
         </div>
       </ModalWrapper>
