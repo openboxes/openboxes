@@ -288,6 +288,9 @@ class OrderController {
                 params.budgetCode = BudgetCode.get(params.budgetCode)
             }
             if (orderAdjustment) {
+                if (orderAdjustment.hasInvoice) {
+                    throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
+                }
                 if (orderAdjustment.orderItem && !params.orderItem.id) {
                     orderAdjustment.orderItem.removeFromOrderAdjustments(orderAdjustment)
                 }
@@ -329,6 +332,9 @@ class OrderController {
                     flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'orderAdjustment.label', default: 'Order Adjustment'), params.id])}"
                     redirect(action: "show", id: orderInstance?.id)
                 } else {
+                    if (orderAdjustment.hasInvoice) {
+                        throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
+                    }
                     orderInstance.removeFromOrderAdjustments(orderAdjustment)
                     orderAdjustment.delete()
                     if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
@@ -961,7 +967,7 @@ class OrderController {
     def cancelOrderAdjustment = {
         OrderAdjustment orderAdjustment = OrderAdjustment.get(params.id)
         User user = User.get(session?.user?.id)
-        def canEdit = orderService.canManageAdjustments(orderAdjustment.order, user)
+        def canEdit = orderService.canManageAdjustments(orderAdjustment.order, user) && !orderAdjustment.hasInvoice
         if(canEdit) {
             orderAdjustment.canceled = true
             render (status: 200, text: "Adjustment canceled successfully")
