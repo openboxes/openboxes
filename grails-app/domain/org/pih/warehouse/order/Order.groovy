@@ -13,6 +13,7 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.*
 import org.pih.warehouse.invoice.InvoiceItem
+import org.pih.warehouse.invoice.InvoiceTypeCode
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
 
@@ -88,6 +89,7 @@ class Order implements Serializable {
             "hasInvoice",
             "invoiceItems",
             "hasPrepaymentInvoice",
+            "hasRegularInvoice",
             "hasItemsOrAdjustments",
             "isPrepaymentInvoiceAllowed",
             "isPrepaymentRequired",
@@ -377,7 +379,16 @@ class Order implements Serializable {
      * @return true if order has a prepayment invoice; false otherwise
      */
     Boolean getHasPrepaymentInvoice() {
-        return orderItems.any { it.hasPrepaymentInvoice } || orderAdjustments.any { it.hasPrepaymentInvoice }
+        return invoices.any { it.invoiceType?.code == InvoiceTypeCode.PREPAYMENT_INVOICE }
+    }
+
+    /**
+     * Should only use in the context of displaying a single order (i.e. do not invoke on a list of orders).
+     *
+     * @return true if order has a regular invoice; false otherwise
+     */
+    Boolean getHasRegularInvoice() {
+        return invoices.any { it.invoiceType?.code == InvoiceTypeCode.INVOICE }
     }
 
     Boolean getHasItemsOrAdjustments() {
@@ -393,7 +404,7 @@ class Order implements Serializable {
     }
 
     Boolean getCanGenerateInvoice() {
-        return hasPrepaymentInvoice && isShipped() && invoices.size() == 1
+        return hasPrepaymentInvoice && isShipped() && !hasRegularInvoice
     }
 
     Map toJson() {

@@ -139,7 +139,12 @@
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					if (jqXHR.responseText) {
-						$.notify(jqXHR.responseText, "error");
+                      try {
+                        let data = JSON.parse(jqXHR.responseText);
+                        $.notify(data.errorMessage, "error");
+                      } catch (e) {
+                        $.notify(jqXHR.responseText, "error");
+                      }
 					} else {
 						$.notify("Error saving adjustment");
 					}

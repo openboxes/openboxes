@@ -41,8 +41,6 @@ class OrderAdjustment implements Serializable {
         'invoiceItems',
         'isInvoiced',
         'hasInvoice',
-        'prepaidInvoiceItems',
-        'hasPrepaymentInvoice'
     ]
 
     static belongsTo = [order: Order, orderItem: OrderItem]
@@ -89,26 +87,11 @@ class OrderAdjustment implements Serializable {
           """, [id: id])
     }
 
-    def getPrepaidInvoiceItems() {
-        return InvoiceItem.executeQuery("""
-          SELECT ii
-            FROM InvoiceItem ii
-            JOIN ii.invoice i
-            JOIN ii.orderAdjustments oa
-            WHERE oa.id = :id 
-            AND i.invoiceType = :invoiceType
-          """, [id: id, invoiceType: InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)])
-    }
-
     Boolean getIsInvoiced() {
         return !submittedInvoiceItems.empty
     }
 
     Boolean getHasInvoice() {
         return !invoiceItems.empty
-    }
-
-    Boolean getHasPrepaymentInvoice() {
-        return !prepaidInvoiceItems.empty
     }
 }
