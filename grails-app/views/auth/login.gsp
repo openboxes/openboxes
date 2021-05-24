@@ -30,7 +30,7 @@
                 <g:hiddenField name="targetUri" value="${params?.targetUri}" />
                 <g:hiddenField id="browserTimezone" name="browserTimezone" />
 
-                <h2 class="text-center">
+                <h2 class="text-left">
                     <i class="fa fa-lock"></i>
                     <warehouse:message code="default.login.label" default="Login"/>
                 </h2>
@@ -58,16 +58,18 @@
                 <div class="form-group">
                     <button type="submit" class="btn btn-secondary btn-block login-btn"><g:message code="auth.login.label"/></button>
                 </div>
-    %{--            <div class="clearfix">--}%
-    %{--                <label class="float-left form-check-label"><input type="checkbox"> Remember me</label>--}%
-    %{--                <a href="#" class="float-right text-success">Forgot Password?</a>--}%
-    %{--            </div>--}%
                 <div class="or-seperator"><i>or</i></div>
                 <div class="text-center social-btn">
-    %{--                <g:link controller="amazonAuth" action="login" class="btn btn-warning btn-block"><i class="fa fa-amazon"></i> Sign in with <b>Amazon</b></g:link>--}%
-    %{--                <g:link controller="github" action="login" class="btn btn-dark btn-block"><i class="fa fa-github"></i> Sign in with <b>GitHub</b></g:link>--}%
-                    <g:link controller="googleAuth" action="login" class="btn btn-danger btn-block"><i class="fa fa-google"></i> Sign in with <b>Google</b></g:link>
-                    <g:link controller="azureAuth" action="login" class="btn btn-primary btn-block"><i class="fa fa-windows"></i> Sign in with <b>Microsoft</b></g:link>
+                    <g:each var="provider" in="${grailsApplication.config.openboxes.oauth2Providers}">
+                        <g:set var="providerConfig" value="${provider.value}"/>
+                        <g:if test="${Boolean.valueOf(providerConfig.enabled)}">
+                            <g:link controller="openIdConnect" action="authenticate" id="${provider.key}" class="${providerConfig.btnClass}">
+                                <i class="${providerConfig?.iconClass}"></i>
+                                Sign in with <b>${providerConfig?.title?:provider.key}</b>
+                            </g:link>
+
+                        </g:if>
+                    </g:each>
                 </div>
             </g:form>
             <div class="hint-text">

@@ -843,13 +843,39 @@ openboxes.ajaxRequest.timeout = 120000
 //google.analytics.enabled = false
 //google.analytics.webPropertyID = "UA-xxxxxx-x"
 
-// Google OAuth Client credentials
-google.oauth2.clientId = ""
-google.oauth2.clientSecret = ""
-
-// Azure OAuth Client credentials
-azure.oauth2.clientId = ""
-azure.oauth2.clientSecret = ""
+// OAuth Client credentials
+openboxes {
+    oauth2Providers {
+        example {
+            enabled = false
+            title = "Example"
+            clientId = ""
+            clientSecret = ""
+            redirectUrl = ""
+            domainHint = ""
+            openIdConfigurationUrl = "https://example.com/.well-known/openid-configuration"
+            openIdConfiguration {
+                authorization_endpoint = ""
+                token_endpoint = ""
+                end_session_endpoint = ""
+            }
+        }
+        google {
+            enabled = false
+            title = "Google"
+            clientId = ""
+            clientSecret = ""
+            redirectUrl = ""
+            domainHint = ""
+            openIdConfigurationUrl = "https://accounts.google.com/.well-known/openid-configuration"
+            openIdConfiguration {
+                authorization_endpoint = ""
+                token_endpoint = ""
+                end_session_endpoint = ""
+            }
+        }
+    }
+}
 
 
 // Fullstory integration
