@@ -150,10 +150,10 @@ class AuthController {
             redirect(controller: "dashboard", action: "index")
         } else {
             flash.message = "${warehouse.message(code: 'auth.logoutSuccess.message')}"
-            def oauthProvider = session.oauthProvider
+            def providerId = session.oauthProvider
             session.invalidate()
-            if (oauthProvider) {
-                redirect(controller: "${oauthProvider}Auth", action: "logout")
+            if (providerId) {
+                redirect(controller: "openIdConnect", action: "logout", id: providerId)
                 return
             }
             redirect(action: 'login')

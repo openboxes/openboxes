@@ -52,7 +52,6 @@ class AzureAuthController {
     }
 
     def logout = {
-        log.info "logout " + params
         redirect(url: azureAuthService.logoutUrl)
     }
 }

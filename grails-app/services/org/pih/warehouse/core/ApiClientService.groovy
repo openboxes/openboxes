@@ -109,6 +109,8 @@ class ApiClientService {
     }
 
     def buildGetRequest(String url, Map requestData) {
+
+        log.info "Create GET request for ${url} ${requestData}"
         URIBuilder builder = new URIBuilder(url);
         requestData.each { k, v ->
             builder.setParameter(k, v)
