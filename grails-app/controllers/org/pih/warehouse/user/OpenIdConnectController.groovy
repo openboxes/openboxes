@@ -19,11 +19,6 @@ class OpenIdConnectController {
     def identifierService
     def openIdConnectService
 
-    def index = {
-        render ([oauth2Providers:grailsApplication.config.openboxes.oauth2Providers] as JSON)
-    }
-
-
     def authenticate = {
         session.state = identifierService.generateIdentifier(10)
         redirect url: openIdConnectService.getAuthenticationUrl(params.id, session.state)
@@ -31,6 +26,8 @@ class OpenIdConnectController {
 
     def callback = {
         log.info "Params " + params
+
+        // FIXME Validate state passed back from identity provider
 
         if (params.error) {
             flash.message = "${params.error_description}"

@@ -63,9 +63,17 @@ class OpenIdConnectService {
         return request.URI.toString()
     }
 
-    // FIXME should be created automatically but configurable
-    def getRedirectUri(String providerName) {
-        return "https://openboxes.ngrok.io/openboxes/openIdConnect/callback/${providerName}"
+    def getRedirectUri(String providerId) {
+        def config = getConfig(providerId);
+
+        // Use user-overriden the redirectUrl
+        if (config.redirectUrl)
+            return config.redirectUrl
+
+        // Otherwise generate a default redirectUrl
+        def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        return g.createLink(controller: "openIdConnect", action: "callback", id: providerId, absolute: true)
+
     }
 
     def getLogoutUrl(String providerId) {
