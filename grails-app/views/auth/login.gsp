@@ -29,7 +29,7 @@
                 <g:hiddenField id="browserTimezone" name="browserTimezone" />
 
                 <h2 class="text-left">
-                    <i class="fa fa-lock"></i>
+                    <i class="fa fa-arrow-circle-o-right"></i>
                     <warehouse:message code="default.login.label" default="Login"/>
                 </h2>
                 <div class="form-group">
