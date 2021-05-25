@@ -107,13 +107,13 @@ class SecurityFilters {
 
                 // When a user has been authenticated, we want to check if they have an active account
                 if (session?.user && !session?.user?.active) {
+                    User currentUser = session.user
                     session.user = null
-
                     if (RequestUtil.isAjax(request)) {
                         redirect(controller: "errors", action: "handleUnauthorized")
                         return false
                     }
-                    flash.message = "User is not active. Please contact your system administrator."
+                    flash.message = "User (${currentUser?.username}) has been created but is not active yet. Please contact your system administrator."
                     redirect(controller: 'auth', action: 'login')
                     return false
                 }
