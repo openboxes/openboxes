@@ -221,7 +221,7 @@ class InvoiceService {
     }
 
     Invoice generatePrepaymentInvoice(Order order) {
-        if (order.orderItems.any { it.hasInvoices } || order.orderAdjustments.any { it.hasInvoice }) {
+        if (order.orderItems.any { it.hasInvoices } || order.orderAdjustments.any { it.hasInvoices }) {
             throw new Exception("Some order items or order adjustments for this order already have been invoiced")
         }
 
