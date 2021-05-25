@@ -29,7 +29,7 @@
 
 
 			<g:form name="handleSignup" controller="auth" action="handleSignup" method="POST">
-                <h2 class="text-left">
+                <h2 class="text-center">
                     <i class="fa fa-user-circle-o"></i>
                     <warehouse:message code="default.signup.label" default="Signup for an account"/>
                 </h2>

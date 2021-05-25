@@ -28,7 +28,7 @@
                 <g:hiddenField name="targetUri" value="${params?.targetUri}" />
                 <g:hiddenField id="browserTimezone" name="browserTimezone" />
 
-                <h2 class="text-left">
+                <h2 class="text-center">
                     <i class="fa fa-arrow-circle-o-right"></i>
                     <warehouse:message code="default.login.label" default="Login"/>
                 </h2>
