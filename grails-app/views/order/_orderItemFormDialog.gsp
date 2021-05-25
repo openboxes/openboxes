@@ -308,7 +308,7 @@
                                         value="${orderItem.budgetCode?.id}"
                                         class="select2"
                                         noSelection="['':'']"
-                                        disabled="${orderItem.hasInvoices}"/>
+                                        disabled="${orderItem.hasRegularInvoice}"/>
                 </td>
             </tr>
         </g:elseif>

@@ -388,7 +388,7 @@ class Order implements Serializable {
      * @return true if order has a regular invoice; false otherwise
      */
     Boolean getHasRegularInvoice() {
-        return invoices.any { it.invoiceType?.code == InvoiceTypeCode.INVOICE }
+        return invoices.any { it.invoiceType == null || it.invoiceType?.code == InvoiceTypeCode.INVOICE }
     }
 
     Boolean getHasItemsOrAdjustments() {

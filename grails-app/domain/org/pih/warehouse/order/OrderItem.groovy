@@ -94,7 +94,10 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
             "subtotal",
             "totalAdjustments",
             "unitOfMeasure",
+            "invoices",
             "hasInvoices",
+            "hasPrepaymentInvoice",
+            "hasRegularInvoice",
             // Statuses
             "partiallyFulfilled",
             "completelyFulfilled",
@@ -318,8 +321,20 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
           """, [id: id])?.first() ?: 0
     }
 
-    def getHasInvoices() {
-        return invoiceItems ? true : false
+    def getInvoices() {
+        return invoiceItems*.invoice.unique()
+    }
+
+    Boolean getHasInvoices() {
+        return !invoices.empty
+    }
+
+    Boolean getHasPrepaymentInvoice() {
+        return invoices.any { it.invoiceType?.code == InvoiceTypeCode.PREPAYMENT_INVOICE }
+    }
+
+    Boolean getHasRegularInvoice() {
+        return invoices.any { it.invoiceType == null || it.invoiceType?.code == InvoiceTypeCode.INVOICE }
     }
 
     Integer getQuantityInvoiced() {
