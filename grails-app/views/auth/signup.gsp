@@ -33,7 +33,6 @@
                     <i class="fa fa-user-circle-o"></i>
                     <warehouse:message code="default.signup.label" default="Signup for an account"/>
                 </h2>
-                <hr/>
                 <div class="form-label-group">
                     <g:textField name="firstName" value="${userInstance?.firstName}" class="form-control required"
                                  placeholder="${g.message(code: 'user.firstName.label')}" autofocus="autofocus"/>
@@ -81,7 +80,7 @@
                     </div>
                     <g:if test="${grailsApplication.config.openboxes.signup.additionalQuestions.enabled}">
                         <g:each var="question" in="${grailsApplication.config.openboxes.signup.additionalQuestions.content}">
-                            <div class="form-group form-inline">
+                            <div class="form-group">
                                 <label for="${question.id}" class="control-label">
                                     ${question.label}
                                 </label>
