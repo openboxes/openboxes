@@ -1093,6 +1093,7 @@ openboxes {
                     menuItems: [
                             [label: "order.createPurchase.label", defaultLabel: "Create Purchase Order", href: "/${appName}/purchaseOrder/index"],
                             [label: "order.listPurchase.label", defaultLabel: "List Purchase Orders", href: "/${appName}/order/list?orderTypeCode=PURCHASE_ORDER"],
+                            [label: "location.listSuppliers.label", defaultLabel: "List Suppliers", href: "/${appName}/location/listSuppliers"],
                             [label: "shipment.shipfromPO.label", defaultLabel: "Ship from Purchase Order", href: "/${appName}/stockMovement/createCombinedShipments?direction=INBOUND"]
                     ]
                 ]

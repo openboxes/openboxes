@@ -182,6 +182,11 @@
                     </g:link>
                 </div>
                 <div class="mm-menu-item">
+                    <g:link controller="location" action="listSuppliers" class="list">
+                        <warehouse:message code="location.listSuppliers.label" default="List Suppliers"/>
+                    </g:link>
+                </div>
+                <div class="mm-menu-item">
                     <g:link controller="stockMovement" action="createCombinedShipments" params="[direction:'INBOUND']">
                         <warehouse:message code="shipment.shipfromPO.label"/>
                     </g:link>

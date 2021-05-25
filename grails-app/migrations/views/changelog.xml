@@ -72,4 +72,7 @@
   <changeSet id="1580848680306-24" author="pmuchowski" runOnChange="true" runAlways="true" failOnError="true">
     <sqlFile path="views/substitution-item.sql"/>
   </changeSet>
+  <changeSet id="1580848680306-25" author="dbienkowska" runOnChange="true" runAlways="true" failOnError="true">
+    <sqlFile path="views/supplier-list.sql"/>
+  </changeSet>
 </databaseChangeLog>
