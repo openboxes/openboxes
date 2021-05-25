@@ -27,7 +27,11 @@ class OpenIdConnectController {
     def callback = {
         log.info "Params " + params
 
-        // FIXME Validate state passed back from identity provider
+        if (params.state != "${session.state}") {
+            flash.message = "The anti-forgery token returned by the identity provider is invalid."
+            redirect(controller: "auth", action: "login")
+            return
+        }
 
         if (params.error) {
             flash.message = "${params.error_description}"

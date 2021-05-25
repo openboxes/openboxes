@@ -591,10 +591,10 @@ class SelectTagLib {
         def timezones = getTimezones()
         if (timezones) {
             attrs.from = timezones
-            attrs["class"] = "chzn-select-deselect"
+            attrs["class"] = attrs?.class ?: "chzn-select-deselect"
             out << g.select(attrs)
         } else {
-            attrs["class"] = "text large readonly"
+            attrs["class"] = attrs?.class ?: "text large readonly"
             attrs["disabled"] = "disabled"
             out << g.textField(attrs)
         }
