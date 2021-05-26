@@ -118,4 +118,5 @@
     <include file="0.8.x/changelog-2021-04-28-1030-insert-invoice-type.xml"/>
     <include file="0.8.x/changelog-2021-04-30-1320-add-product-availability-index.xml"/>
     <include file="0.8.x/changelog-2021-05-14-1654-create-table-order-invoice.xml"/>
+    <include file="0.8.x/changelog-2021-05-24-1200-add-replenishment-type-to-requisition.xml"/>
 </databaseChangeLog>

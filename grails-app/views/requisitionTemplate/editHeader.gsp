@@ -1,5 +1,6 @@
 <%@ page import="org.pih.warehouse.requisition.RequisitionItemSortByCode; grails.converters.JSON; org.pih.warehouse.core.RoleType"%>
 <%@ page import="org.pih.warehouse.requisition.RequisitionType"%>
+<%@ page import="org.pih.warehouse.requisition.ReplenishmentType"%>
 <%@ page contentType="text/html;charset=UTF-8"%>
 <html>
 <head>
@@ -106,6 +107,21 @@
                                 </td>
                                 <td class="value">
                                     <g:textField name="replenishmentPeriod" value="${requisition.replenishmentPeriod}" class="text large" size="80"/>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label for="replenishmentType">
+                                        <warehouse:message code="requisitionTemplate.replenishmentType.label" />
+                                    </label>
+                                </td>
+                                <td class="value">
+                                    <g:select id="replenishmentType"
+                                              name="replenishmentType"
+                                              from="${ReplenishmentType.list()}"
+                                              noSelection="['':'']"
+                                              value="${requisition.replenishmentType}"
+                                              class="chzn-select-deselect"/>
                                 </td>
                             </tr>
                             <tr class="prop">
