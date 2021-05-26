@@ -45,15 +45,6 @@ class LocationController {
         [locationInstanceList: locations, locationInstanceTotal: locations.totalCount, defaultLocationType:defaultLocationType]
     }
 
-    def listSuppliers = {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        params.offset = params.offset ? params.int("offset") : 0
-
-        def suppliers = locationService.getSuppliers(params.q, params.max, params.offset as int)
-
-        [suppliers: suppliers, suppliersTotal: suppliers.totalCount]
-    }
-
     def show = {
         def locationInstance = inventoryService.getLocation(params.id)
         if (!locationInstance) {

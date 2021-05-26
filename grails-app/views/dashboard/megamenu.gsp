@@ -182,7 +182,7 @@
                     </g:link>
                 </div>
                 <div class="mm-menu-item">
-                    <g:link controller="location" action="listSuppliers" class="list">
+                    <g:link controller="supplier" action="list" class="list">
                         <warehouse:message code="location.listSuppliers.label" default="List Suppliers"/>
                     </g:link>
                 </div>

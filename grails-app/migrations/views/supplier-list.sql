@@ -3,8 +3,8 @@ CREATE OR REPLACE VIEW supplier AS (
 		location.id AS id,
 		location.name AS name,
 		location.organization_id,
-		COUNT(distinct purchase_order.id) AS open_purchase_orders,
-        COUNT(distinct shipment.id) AS open_shipments
+		COUNT(distinct purchase_order.id) AS pending_orders_count,
+        COUNT(distinct shipment.id) AS pending_shipments_count
     FROM location
 	JOIN location_type
 		ON location_type.id = location.location_type_id

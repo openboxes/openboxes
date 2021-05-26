@@ -9,20 +9,17 @@
  **/
 package org.pih.warehouse.core
 
-class Supplier {
+class SupplierController {
 
-    String id
-    String name
+    def locationService
 
-    Organization organization
+    def list = {
+        params.max = Math.min(params.max ? params.int('max') : 10, 100)
+        params.offset = params.offset ? params.int("offset") : 0
 
-    Integer pendingShipmentsCount
-    Integer pendingOrdersCount
+        def suppliers = locationService.getSuppliers(params.q, params.max, params.offset as int)
 
-
-    static mapping = {
-        id generator: 'uuid'
-        version false
-        cache usage: "read-only"
+        [suppliers: suppliers, suppliersTotal: suppliers.totalCount]
     }
+
 }

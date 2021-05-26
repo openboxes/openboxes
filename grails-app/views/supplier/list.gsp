@@ -15,13 +15,13 @@
                     <div class="yui-u first">
                         <div class="dialog box">
                             <h2>Filters</h2>
-                            <g:form action="listSuppliers" method="get">
+                            <g:form action="list" method="get">
                                 <div>
                                     <div class="filter-list-item">
                                         <label>${warehouse.message(code: 'default.search.label')}</label>
                                         <g:textField class="text" id="q" name="q" value="${params.q}" style="width:100%" placeholder="Search by organization name or location name"/>
                                     </div>
-                                    <div class="filter-list-item">
+                                    <div class="filter-list-item center">
                                         <button type="submit" class="button icon search">
                                             ${warehouse.message(code: 'default.button.search.label')}
                                         </button>
@@ -55,12 +55,12 @@
                                             <td>${supplier?.name}</td>
                                             <td>
                                                 <g:link controller="order" action="list" params="[orderTypeCode:OrderTypeCode.PURCHASE_ORDER, origin: supplier.id, destination: null]" class="list">
-                                                    ${supplier?.openPurchaseOrders}
+                                                    ${supplier?.pendingOrdersCount}
                                                 </g:link>
                                             </td>
                                             <td>
                                                 <g:link controller="stockMovement" action="list" params="[direction:'INBOUND', 'origin.id': supplier?.id, 'destination.id': null, receiptStatusCode: ShipmentStatusCode.listPending()]" class="list">
-                                                    ${supplier?.openShipments}
+                                                    ${supplier?.pendingShipmentsCount}
                                                 </g:link>
                                             </td>
                                         </tr>
