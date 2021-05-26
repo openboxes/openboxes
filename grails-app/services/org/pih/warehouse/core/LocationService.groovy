@@ -159,6 +159,23 @@ class LocationService {
 
     }
 
+    def getSuppliers(String query, Integer max, Integer offset) {
+        def terms = "%" + query + "%"
+        def locations = Supplier.createCriteria().list(max: max, offset: offset) {
+            if (query) {
+                or {
+                    ilike("name", terms)
+                    organization {
+                        ilike("name", terms)
+                    }
+                }
+            }
+
+            order("name")
+        }
+        return locations
+    }
+
 
     def getLoginLocations(Integer currentLocationId) {
         return getLoginLocations(Location.get(currentLocationId))
