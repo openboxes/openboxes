@@ -48,6 +48,8 @@ import org.docx4j.wml.Tr
 import org.docx4j.wml.TrPr
 import org.groovydev.SimpleImageBuilder
 import org.pih.warehouse.api.Stocklist
+import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemSortByCode
 import org.pih.warehouse.shipping.ReferenceNumber
@@ -1571,5 +1573,31 @@ class DocumentService {
         }
     }
 
+    List<Document> getAllDocumentsBySupplierOrganization(Organization supplierOrganization) {
+        List<Order> orders = Order.createCriteria().list {
+            eq("originParty", supplierOrganization)
+            eq("orderTypeCode", OrderTypeCode.PURCHASE_ORDER)
+        }
+
+        def documents = []
+
+        orders.each { order ->
+            order.documents.collect { document ->
+                documents += [
+                        orderNumber     : order.orderNumber,
+                        orderDescription: order.name,
+                        origin          : order.origin,
+                        destination     : order.destination,
+                        id              : document.id,
+                        documentType    : document.documentType,
+                        documentName    : document.name,
+                        fileType        : document.contentType,
+                        fileUri         : document.fileUri,
+                ]
+            }
+        }
+
+        return documents
+    }
 
 }
