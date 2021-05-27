@@ -113,6 +113,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
     String monthRequested
 
     Integer replenishmentPeriod = 0
+    ReplenishmentTypeCode replenishmentTypeCode = ReplenishmentTypeCode.PUSH
 
     Integer statusSortOrder
 
@@ -172,6 +173,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         datePublished(nullable: true)
         requisitionTemplate(nullable: true)
         replenishmentPeriod(nullable: true)
+        replenishmentTypeCode(nullable: true)
         sortByCode(nullable: true)
         statusSortOrder(nullable: true)
     }
