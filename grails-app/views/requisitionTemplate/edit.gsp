@@ -1,6 +1,6 @@
 <%@ page import="org.pih.warehouse.requisition.RequisitionItemSortByCode; grails.converters.JSON; org.pih.warehouse.core.RoleType"%>
 <%@ page import="org.pih.warehouse.requisition.RequisitionType"%>
-<%@ page import="org.pih.warehouse.requisition.ReplenishmentType"%>
+<%@ page import="org.pih.warehouse.requisition.ReplenishmentTypeCode"%>
 <%@ page contentType="text/html;charset=UTF-8"%>
 <html>
 <head>
@@ -48,13 +48,39 @@
 
                 <g:hiddenField name="id" value="${requisition.id}"/>
                 <g:hiddenField name="version" value="${requisition.version}"/>
-                <g:hiddenField id="replenishmentType" name="replenishmentType" value="${requisition.replenishmentType}"/>
-                <g:hiddenField id="pushType" name="pushType" value="${ReplenishmentType.PUSH}"/>
+                <g:hiddenField id="replenishmentTypeCode" name="replenishmentTypeCode" value="${requisition.replenishmentTypeCode}"/>
+                <g:hiddenField id="pullType" name="pullType" value="${ReplenishmentTypeCode.PULL}"/>
 
                 <div>
                     <table class="sortable dataTable" data-update-url="${createLink(controller:'json', action:'sortRequisitionItems')}">
                         <thead>
-                            <g:if test="${requisition.replenishmentType == ReplenishmentType.PUSH}">
+                            <g:if test="${requisition.replenishmentTypeCode == ReplenishmentTypeCode.PULL}">
+                                <tr>
+                                    <th class="center">
+                                        <warehouse:message code="product.productCode.label" default="#"/>
+                                    </th>
+                                    <th>
+                                        <warehouse:message code="product.label"/>
+                                    </th>
+                                    <th>
+                                        <warehouse:message code="category.label"/>
+                                    </th>
+                                    <th class="center">
+                                        <warehouse:message code="unitOfMeasure.label"/>
+                                    </th>
+                                    <g:hasRoleFinance>
+                                        <th id="finance" class="center">
+                                            <warehouse:message code="requisitionTemplate.unitCost.label"/>
+                                        </th>
+                                    </g:hasRoleFinance>
+                                    <g:isUserAdmin>
+                                        <th id="actions">
+                                            <warehouse:message code="default.actions.label"/>
+                                        </th>
+                                    </g:isUserAdmin>
+                                </tr>
+                            </g:if>
+                            <g:else>
                                 <tr>
                                     <th class="center">
                                         <warehouse:message code="product.productCode.label" default="#"/>
@@ -88,32 +114,6 @@
                                         </th>
                                     </g:isUserAdmin>
                                 </tr>
-                            </g:if>
-                            <g:else>
-                                <tr>
-                                    <th class="center">
-                                        <warehouse:message code="product.productCode.label" default="#"/>
-                                    </th>
-                                    <th>
-                                        <warehouse:message code="product.label"/>
-                                    </th>
-                                    <th>
-                                        <warehouse:message code="category.label"/>
-                                    </th>
-                                    <th class="center">
-                                        <warehouse:message code="unitOfMeasure.label"/>
-                                    </th>
-                                    <g:hasRoleFinance>
-                                        <th id="finance" class="center">
-                                            <warehouse:message code="requisitionTemplate.unitCost.label"/>
-                                        </th>
-                                    </g:hasRoleFinance>
-                                    <g:isUserAdmin>
-                                        <th id="actions">
-                                            <warehouse:message code="default.actions.label"/>
-                                        </th>
-                                    </g:isUserAdmin>
-                                </tr>
                             </g:else>
                         </thead>
                         <tbody>
@@ -122,7 +122,27 @@
                         <tfoot>
                             <g:isUserAdmin>
                                 <tr class="prop">
-                                    <g:if test="${requisition.replenishmentType == ReplenishmentType.PUSH}">
+                                    <g:if test="${requisition.replenishmentTypeCode == ReplenishmentTypeCode.PULL}">
+                                        <td></td>
+                                        <td>
+                                            <g:autoSuggest id="product"
+                                                           name="product"
+                                                           jsonUrl="${request.contextPath }/json/findProductByName?skipQuantity=true"
+                                                           width="100%"
+                                                           styleClass="text"
+                                                           showColor="true"/>
+                                        </td>
+                                        <td></td>
+                                        <td class="center">
+                                            <g:select name="unitOfMeasure"
+                                                      class="chzn-select-deselect"
+                                                      from="['EA/1']"/>
+                                        </td>
+                                        <g:hasRoleFinance>
+                                            <td></td>
+                                        </g:hasRoleFinance>
+                                    </g:if>
+                                    <g:else>
                                         <td></td>
                                         <td>
                                             <g:autoSuggest id="product"
@@ -146,26 +166,6 @@
                                             <td></td>
                                             <td></td>
                                         </g:hasRoleFinance>
-                                    </g:if>
-                                    <g:else>
-                                        <td></td>
-                                        <td>
-                                            <g:autoSuggest id="product"
-                                                           name="product"
-                                                           jsonUrl="${request.contextPath }/json/findProductByName?skipQuantity=true"
-                                                           width="100%"
-                                                           styleClass="text"
-                                                           showColor="true"/>
-                                        </td>
-                                        <td></td>
-                                        <td class="center">
-                                            <g:select name="unitOfMeasure"
-                                                      class="chzn-select-deselect"
-                                                      from="['EA/1']"/>
-                                        </td>
-                                        <g:hasRoleFinance>
-                                            <td></td>
-                                        </g:hasRoleFinance>
                                     </g:else>
                                     <td>
                                         <button class="button icon add" id="add-requisition-item">
@@ -175,7 +175,7 @@
                                 </tr>
                             </g:isUserAdmin>
                             <tr>
-                                <td colspan="${requisition.replenishmentType == ReplenishmentType.PUSH ? 9 : 6}">
+                                <td colspan="${requisition.replenishmentTypeCode == ReplenishmentTypeCode.PUSH || !requisition.replenishmentTypeCode ? 9 : 6}">
                                     <div class="buttons">
                                         <button id="update-requisition" class="button" name="save">
                                             <img src="${createLinkTo(dir:'images/icons/silk',file:'accept.png')}" />&nbsp;
@@ -193,10 +193,20 @@
 <script>
     $(document).ready(function() {
         var columns = [];
-        const replenishmentType = $("#replenishmentType").val();
-        const pushType = $("#pushType").val();
+        const replenishmentType = $("#replenishmentTypeCode").val();
+        const pullType = $("#pullType").val();
 
-        if (replenishmentType == pushType) {
+        if (replenishmentType == pullType) {
+            columns = [
+                { "mData": "product.productCode" },
+                { "mData": "product.name" },
+                { "mData": "product.category" },
+                { "mData": "productPackageId" },
+            ];
+            if ($("#finance").length) {
+                columns.push({ "mData": "product.pricePerUnit" });
+            }
+        } else {
             columns = [
                 { "mData": "product.productCode" },
                 { "mData": "product.name" },
@@ -204,20 +214,10 @@
                 { "mData": "quantity" },
                 { "mData": "productPackageId" },
                 { "mData": "monthlyDemand" }
-            ];
+                ];
             if ($("#finance").length) {
                 columns.push({ "mData": "product.pricePerUnit" });
                 columns.push({ "mData": "totalCost" });
-            }
-        } else {
-            columns = [
-                { "mData": "product.productCode" },
-                { "mData": "product.name" },
-                { "mData": "product.category" },
-                { "mData": "productPackageId" },
-            ];
-            if ($("#finance").length) {
-                columns.push({ "mData": "product.pricePerUnit" });
             }
         }
 
@@ -290,7 +290,25 @@
                     }
                 });
 
-                if (replenishmentType == pushType) {
+                if (replenishmentType == pullType) {
+                    $('td:eq(0)', nRow).addClass('center middle').css('color', aData["product"].color);
+                    $('td:eq(1)', nRow).addClass('middle');
+                    $('td:eq(1)', nRow).html('<a style="color: ' + aData["product"].color +
+                        '" href="${request.contextPath}/inventoryItem/showStockCard/' + aData["product"].id + '" target="_blank">' + aData["product"].name + '</a>');
+                    $('td:eq(2)', nRow).addClass('middle dont-break-out');
+                    $('td:eq(3)', nRow).addClass('center middle');
+                    $('td:eq(3)', nRow).html(selectPackage);
+                    if ($("#finance").length) {
+                        $('td:eq(4)', nRow).html(Number(aData["product"].pricePerUnit).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}");
+                    }
+                    if ($("#actions").length) {
+                        if ($("#finance").length) {
+                            $('td:eq(5)', nRow).html(deleteButton);
+                        } else {
+                            $('td:eq(4)', nRow).html(deleteButton);
+                        }
+                    }
+                } else {
                     $('td:eq(0)', nRow).addClass('center middle').css('color', aData["product"].color);
                     $('td:eq(1)', nRow).addClass('middle');
                     $('td:eq(1)', nRow).html('<a style="color: ' + aData["product"].color +
@@ -317,24 +335,6 @@
                             $('td:eq(6)', nRow).html(deleteButton);
                         }
                     }
-                } else {
-                    $('td:eq(0)', nRow).addClass('center middle').css('color', aData["product"].color);
-                    $('td:eq(1)', nRow).addClass('middle');
-                    $('td:eq(1)', nRow).html('<a style="color: ' + aData["product"].color +
-                        '" href="${request.contextPath}/inventoryItem/showStockCard/' + aData["product"].id + '" target="_blank">' + aData["product"].name + '</a>');
-                    $('td:eq(2)', nRow).addClass('middle dont-break-out');
-                    $('td:eq(3)', nRow).addClass('center middle');
-                    $('td:eq(3)', nRow).html(selectPackage);
-                    if ($("#finance").length) {
-                        $('td:eq(4)', nRow).html(Number(aData["product"].pricePerUnit).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}");
-                    }
-                    if ($("#actions").length) {
-                        if ($("#finance").length) {
-                            $('td:eq(5)', nRow).html(deleteButton);
-                        } else {
-                            $('td:eq(4)', nRow).html(deleteButton);
-                        }
-                    }
                 }
 
                 return nRow;
@@ -351,12 +351,12 @@
 
             if (productId) {
                 var params = { "product.id": productId, "requisition.id": requisitionId, "orderIndex": orderIndex };
-                if (replenishmentType == pushType && quantity) {
+                if (replenishmentType == pullType) {
+                    params.quantity = 0;
+                } else if (quantity) {
                     params.quantity = quantity;
-                } else if (replenishmentType == pushType) {
-                  return;
                 } else {
-                  params.quantity = 0;
+                  return;
                 }
 
                 $.ajax({
@@ -369,7 +369,7 @@
                         table.fnAddData(data.data);
                         $("#product-id").val('');
                         $("#product-suggest").val('');
-                        if (replenishmentType == pushType) {
+                        if (replenishmentType != pullType) {
                             $("#quantity").val('');
                         }
                     },

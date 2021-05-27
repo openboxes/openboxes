@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.requisition
 
-enum ReplenishmentType {
+enum ReplenishmentTypeCode {
 
     PUSH,
     PULL

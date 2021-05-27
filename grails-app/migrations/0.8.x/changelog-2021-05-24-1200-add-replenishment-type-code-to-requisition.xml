@@ -6,11 +6,11 @@
   <changeSet author="awalkowiak" id="2405202112000-0">
     <preConditions onFail="MARK_RAN">
       <not>
-        <columnExists tableName="requisition" columnName="replenishment_type"/>
+        <columnExists tableName="requisition" columnName="replenishment_type_code"/>
       </not>
     </preConditions>
     <addColumn tableName="requisition">
-      <column name="replenishment_type" type="VARCHAR(255)"/>
+      <column name="replenishment_type_code" type="VARCHAR(255)"/>
     </addColumn>
   </changeSet>
 </databaseChangeLog>

@@ -1,6 +1,6 @@
 <%@ page import="org.pih.warehouse.requisition.RequisitionItemSortByCode; grails.converters.JSON; org.pih.warehouse.core.RoleType"%>
 <%@ page import="org.pih.warehouse.requisition.RequisitionType"%>
-<%@ page import="org.pih.warehouse.requisition.ReplenishmentType"%>
+<%@ page import="org.pih.warehouse.requisition.ReplenishmentTypeCode"%>
 <%@ page contentType="text/html;charset=UTF-8"%>
 <html>
 <head>
@@ -128,16 +128,16 @@
                             </tr>
                             <tr class="prop">
                                 <td class="name">
-                                    <label for="replenishmentType">
-                                        <warehouse:message code="requisitionTemplate.replenishmentType.label" />
+                                    <label for="replenishmentTypeCode">
+                                        <warehouse:message code="requisitionTemplate.replenishmentTypeCode.label" />
                                     </label>
                                 </td>
                                 <td class="value">
-                                    <g:select id="replenishmentType"
-                                              name="replenishmentType"
-                                              from="${ReplenishmentType.list()}"
+                                    <g:select id="replenishmentTypeCode"
+                                              name="replenishmentTypeCode"
+                                              from="${ReplenishmentTypeCode.list()}"
                                               noSelection="['':'']"
-                                              value="${requisition.replenishmentType}"
+                                              value="${requisition.replenishmentTypeCode}"
                                               class="chzn-select-deselect"/>
                                 </td>
                             </tr>
