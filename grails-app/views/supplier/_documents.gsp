@@ -5,8 +5,8 @@
             <table>
                 <thead>
                 <tr class="odd">
-                    <th><warehouse:message code="order.purchaseOrderNumber.label" default="PO Number"/></th>
-                    <th><warehouse:message code="order.orderDescription.label" default="PO Description"/></th>
+                    <th><warehouse:message code="purchaseOrder.orderNumber.label" default="PO Number"/></th>
+                    <th><warehouse:message code="purchaseOrder.description.label" default="PO Description"/></th>
                     <th><warehouse:message code="default.origin.label"/></th>
                     <th><warehouse:message code="default.destination.label"/></th>
                     <th><warehouse:message code="document.type.label"/></th>
@@ -25,7 +25,7 @@
                         <td><format:metadata obj="${documentInstance?.documentType}"/></td>
                         <td>${documentInstance?.documentName}</td>
                         <td>${documentInstance?.fileType}</td>
-                        <td><g:link controller="document" action="download" id="${documentInstance?.id}">download</g:link></td>
+                        <td><g:link controller="document" action="download" id="${documentInstance?.documentId}">download</g:link></td>
                     </tr>
                 </g:each>
                 </tbody>

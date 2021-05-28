@@ -18,7 +18,7 @@
                     <g:each var="location" in="${supplier.locations.sort { it.name } }">
                         <div style="margin: 10px 0 10px 30px;">
                             <g:link controller="location" action="show" id="${location.id}">
-                                ⚫ ${location?.name}
+                                ${location?.name}
                             </g:link>
                         </div>
                     </g:each>

@@ -21,6 +21,7 @@ import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.util.CellRangeAddress
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.hibernate.criterion.CriteriaSpecification
 import org.docx4j.TextUtils
 import org.docx4j.XmlUtils
 import org.docx4j.convert.out.pdf.PdfConversion
@@ -1574,28 +1575,35 @@ class DocumentService {
     }
 
     List<Document> getAllDocumentsBySupplierOrganization(Organization supplierOrganization) {
-        List<Order> orders = Order.createCriteria().list {
-            eq("originParty", supplierOrganization)
-            eq("orderTypeCode", OrderTypeCode.PURCHASE_ORDER)
-        }
-
-        def documents = []
-
-        orders.each { order ->
-            order.documents.collect { document ->
-                documents += [
-                        orderNumber     : order.orderNumber,
-                        orderDescription: order.name,
-                        origin          : order.origin,
-                        destination     : order.destination,
-                        id              : document.id,
-                        documentType    : document.documentType,
-                        documentName    : document.name,
-                        fileType        : document.contentType,
-                        fileUri         : document.fileUri,
-                ]
+        def documents = Order.createCriteria().list {
+                resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+                projections {
+                    property("id", "orderId")
+                    property("orderNumber", "orderNumber")
+                    property("name", "orderDescription")
+                    origin {
+                        property("name", "origin")
+                    }
+                    destination {
+                        property("name", "destination")
+                    }
+                    documents {
+                        property("id", "documentId")
+                        property("documentNumber", "documentNumber")
+                        documentType {
+                            property("name", "documentType")
+                        }
+                        property("name", "documentName")
+                        property("contentType", "fileType")
+                        property("fileUri", "fileUri")
+                    }
+                }
+                eq("originParty", supplierOrganization)
+                eq("orderTypeCode", OrderTypeCode.PURCHASE_ORDER)
+                documents {
+                    isNotNull("id")
+                }
             }
-        }
 
         return documents
     }
