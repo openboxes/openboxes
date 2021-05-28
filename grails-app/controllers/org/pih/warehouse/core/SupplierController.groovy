@@ -12,6 +12,7 @@ package org.pih.warehouse.core
 class SupplierController {
 
     def locationService
+    def documentService
 
     def list = {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
@@ -20,6 +21,13 @@ class SupplierController {
         def suppliers = locationService.getSuppliers(params.q, params.max, params.offset as int)
 
         [suppliers: suppliers, suppliersTotal: suppliers.totalCount]
+    }
+
+    def show = {
+        Organization supplier = Organization.get(params.id)
+        List<Document> documents = documentService.getAllDocumentsBySupplierOrganization(supplier)
+
+        [supplier: supplier, documents: documents]
     }
 
 }

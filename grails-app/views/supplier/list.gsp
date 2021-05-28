@@ -48,7 +48,7 @@
                                     <g:each in="${suppliers}" status="i" var="supplier">
                                         <tr class="prop ${(i % 2) == 0 ? 'odd' : 'even'}">
                                             <td>
-                                                <g:link controller="location" action="showSuppliers" id="${supplier?.organization?.id }">
+                                                <g:link controller="supplier" action="show" id="${supplier?.organization?.id }">
                                                     ${supplier?.organization?.name}
                                                 </g:link>
                                             </td>

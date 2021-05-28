@@ -103,7 +103,7 @@
                                     <th class="center"><g:message code="product.label"/></th>
                                     <th class="center"><g:message code="product.qtyOrderedNotShipped.label" default="Qty Ordered Not Shipped"/></th>
                                     <th class="center"><g:message code="product.qtyShippedNotReceived.label" default="Qty Shipped Not Received"/></th>
-                                    <th class="center"><g:message code="order.purchaseOrderNumber.label" default="PO #"/></th>
+                                    <th class="center"><g:message code="purchaseOrder.orderNumber.label" default="PO #"/></th>
                                     <th class="center"><g:message code="order.purchaseOrderDescription.label" default="PO Description"/></th>
                                     <th class="center"><g:message code="productSupplier.supplierOrganization.label" default="Supplier Organization"/></th>
                                     <th class="center"><g:message code="productSupplier.supplierLocation.label" default="Supplier Location"/></th>
