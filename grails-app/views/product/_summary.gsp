@@ -60,7 +60,6 @@
 		</tbody>
 	</table>
 </div>
-<g:if test="${showSummaryActions}">
 <div class="summary-actions">
     <table>
         <tr>
@@ -124,7 +123,6 @@
 
     </table>
 </div>
-</g:if>
 <script>
     $(function() {
         $('.nailthumb-product img').hide();

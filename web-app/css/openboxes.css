@@ -3182,7 +3182,7 @@ table.pvtTable tr th { background-color: #ddd; }
     text-align: left;
     color: black;
 }
-#tabs-left .ui-tabs-panel {
+.tabs-left .ui-tabs-panel {
     height: 400px;
     width: 100%;
 }
