@@ -333,7 +333,7 @@
               }
             },
             open: function(event, ui) {
-                $(this).html("Loading...");
+                $(this).html("<div class='loading'></div>");
                 $(this).load(url, function(response, status, xhr) {
                     if (xhr.status !== 200) {
                         $(this).text("");

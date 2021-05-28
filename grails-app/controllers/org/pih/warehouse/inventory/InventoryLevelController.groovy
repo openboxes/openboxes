@@ -65,11 +65,23 @@ class InventoryLevelController {
     }
 
     def save = {
-        def location = Location.get(params.location.id)
         def product = Product.get(params.product.id)
-        def existingInventoryLevel = InventoryLevel.findByProductAndInventory(product, location.inventory)
+        def location = Location.get(params.location.id)
+        def internalLocation = params.internalLocation ? Location.get(params.internalLocation) : null
+
+        // FIXME Should move this to service layer
+        def existingInventoryLevel = InventoryLevel.createCriteria().count {
+            eq("product", product)
+            eq("inventory", location.inventory)
+            if (internalLocation) {
+                eq("internalLocation", internalLocation)
+            }
+            else {
+                isNull("internalLocation")
+            }
+        }
         if (existingInventoryLevel) {
-            flash.error = "An inventory level already exists for item ${product?.name} in depot ${location?.name}"
+            flash.error = "Inventory level already exists for '${product?.name}' in location '${location?.name}', bin location '${internalLocation?.name}' "
             redirect(controller: "product", action: "edit", id: product.id)
         } else {
             def inventoryLevelInstance = new InventoryLevel(params)
@@ -161,11 +173,12 @@ class InventoryLevelController {
     }
 
     def dialog = {
-        def inventoryLevelInstance = InventoryLevel.get(params.id)
+        def inventoryLevelInstance = params.id ? InventoryLevel.get(params.id) : new InventoryLevel()
+        def productInstance = params.productId ? Product.get(params.productId) : null
         if (!inventoryLevelInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), params.id])}"
         }
-        render(template: "form", model: [inventoryLevelInstance: inventoryLevelInstance])
+        render(template: "form", model: [inventoryLevelInstance: inventoryLevelInstance, productInstance: productInstance])
     }
 
     def markAsSupported = {

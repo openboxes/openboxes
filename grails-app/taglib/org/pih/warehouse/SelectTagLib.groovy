@@ -410,7 +410,6 @@ class SelectTagLib {
     }
 
     def selectBinLocationByLocation = { attrs, body ->
-        log.info "selectBinLocationByLocation: " + attrs
         def location = Location.get(attrs.id)
 
         if (location && location.hasBinLocationSupport()) {
@@ -423,8 +422,6 @@ class SelectTagLib {
         attrs["noSelection"] = ["": ""]
         attrs.optionKey = 'id'
         attrs.optionValue = 'name'
-
-        log.info "attrs: " + attrs
 
         out << g.select(attrs)
     }

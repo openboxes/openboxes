@@ -27,7 +27,15 @@ enum InventoryStatus {
     }
 
     static list() {
-        [INACTIVE, SUPPORTED, SUPPORTED_NON_INVENTORY, NOT_SUPPORTED, STOCK, FORMULARY]
+       return [SUPPORTED, NOT_SUPPORTED, SUPPORTED_NON_INVENTORY, STOCK, FORMULARY, INACTIVE ]
+    }
+
+    static listEnabled() {
+        return [SUPPORTED, SUPPORTED_NON_INVENTORY, STOCK, FORMULARY]
+    }
+
+    static listDisabled() {
+        return [INACTIVE, NOT_SUPPORTED]
     }
 
     String toString() { return name() }
