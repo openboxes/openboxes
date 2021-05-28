@@ -175,7 +175,7 @@ const NO_STOCKLIST_FIELDS = {
   },
 };
 
-const STOCKLIST_FIELDS = {
+const STOCKLIST_FIELDS_PUSH_TYPE = {
   lineItems: {
     type: ArrayField,
     arrowsNavigation: true,
@@ -302,6 +302,135 @@ const STOCKLIST_FIELDS = {
   },
 };
 
+const STOCKLIST_FIELDS_PULL_TYPE = {
+  lineItems: {
+    type: ArrayField,
+    arrowsNavigation: true,
+    virtualized: true,
+    totalCount: ({ totalCount }) => totalCount,
+    isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
+    loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
+    isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
+    addButton: ({
+      // eslint-disable-next-line react/prop-types
+      addRow, getSortOrder, newItemAdded, updateTotalCount,
+    }) => (
+      <button
+        type="button"
+        className="btn btn-outline-success btn-xs"
+        onClick={() => {
+          updateTotalCount(1);
+          addRow({ sortOrder: getSortOrder() });
+          newItemAdded();
+        }}
+      ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
+      </button>
+    ),
+    fields: {
+      product: {
+        fieldKey: 'disabled',
+        type: SelectField,
+        label: 'react.stockMovement.requestedProduct.label',
+        defaultMessage: 'Requested product',
+        headerAlign: 'left',
+        flexWidth: '9',
+        attributes: {
+          async: true,
+          openOnClick: false,
+          autoload: false,
+          filterOptions: options => options,
+          cache: false,
+          options: [],
+          showValueTooltip: true,
+          className: 'text-left',
+          optionRenderer: option => (
+            <strong style={{ color: option.color ? option.color : 'black' }} className="d-flex align-items-center">
+              {option.label}
+              &nbsp;
+              {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
+            </strong>
+          ),
+          valueRenderer: option => (
+            <span className="d-flex align-items-center">
+              <span className="text-truncate">
+                {option.label}
+              </span>
+                &nbsp;
+              {renderHandlingIcons(option ? option.handlingIcons : [])}
+            </span>
+          ),
+        },
+        getDynamicAttr: ({
+          fieldValue, debouncedProductsFetch, rowIndex, rowCount, newItem,
+        }) => ({
+          disabled: !!fieldValue,
+          loadOptions: debouncedProductsFetch,
+          autoFocus: newItem && rowIndex === rowCount - 1,
+        }),
+      },
+      demandPerReplenishmentPeriod: {
+        type: LabelField,
+        label: 'react.stockMovement.demandPerReplenishmentPeriod.label',
+        defaultMessage: 'Demand per Replenishment Period',
+        flexWidth: '1.7',
+        attributes: {
+          type: 'number',
+        },
+      },
+      quantityOnHand: {
+        type: LabelField,
+        label: 'react.stockMovement.quantityOnHand.label',
+        defaultMessage: 'QoH',
+        flexWidth: '1.7',
+        attributes: {
+          type: 'number',
+        },
+      },
+      quantityRequested: {
+        type: TextField,
+        label: 'react.stockMovement.neededQuantity.label',
+        defaultMessage: 'Needed Qty',
+        flexWidth: '1.7',
+        attributes: {
+          type: 'number',
+        },
+        getDynamicAttr: ({
+          rowIndex, values, updateRow,
+        }) => ({
+          onBlur: () => updateRow(values, rowIndex),
+        }),
+      },
+      comments: {
+        type: TextField,
+        label: 'react.stockMovement.comments.label',
+        defaultMessage: 'Comments',
+        flexWidth: '1.7',
+        getDynamicAttr: ({
+          addRow, rowCount, rowIndex, getSortOrder,
+          updateTotalCount, updateRow, values,
+        }) => ({
+          onTabPress: rowCount === rowIndex + 1 ? () => {
+            updateTotalCount(1);
+            addRow({ sortOrder: getSortOrder() });
+          } : null,
+          arrowRight: rowCount === rowIndex + 1 ? () => {
+            updateTotalCount(1);
+            addRow({ sortOrder: getSortOrder() });
+          } : null,
+          arrowDown: rowCount === rowIndex + 1 ? () => () => {
+            updateTotalCount(1);
+            addRow({ sortOrder: getSortOrder() });
+          } : null,
+          onBlur: () => updateRow(values, rowIndex),
+        }),
+      },
+      deleteButton: DELETE_BUTTON_FIELD,
+    },
+  },
+};
+
+const REPLENISHMENT_TYPE_PULL = 'PULL';
+
 /**
  * The second step of stock movement where user can add items to stock list.
  * This component supports three different cases: with or without stocklist
@@ -362,7 +491,10 @@ class AddItemsPage extends Component {
    */
   getFields() {
     if (_.get(this.state.values.stocklist, 'id')) {
-      return STOCKLIST_FIELDS;
+      if (_.get(this.state.values.stocklist, 'replenishmentType.name') === REPLENISHMENT_TYPE_PULL) {
+        return STOCKLIST_FIELDS_PULL_TYPE;
+      }
+      return STOCKLIST_FIELDS_PUSH_TYPE;
     }
 
     return NO_STOCKLIST_FIELDS;
@@ -437,6 +569,23 @@ class AddItemsPage extends Component {
 
     if (this.state.values.lineItems.length === 0 && !data.length) {
       lineItemsData = new Array(1).fill({ sortOrder: 100 });
+    } else if (_.get(this.state.values.stocklist, 'replenishmentType.name') === REPLENISHMENT_TYPE_PULL) {
+      lineItemsData = _.map(
+        data,
+        (val) => {
+          const { quantityRequested, demandPerReplenishmentPeriod, quantityOnHand } = val;
+          const qtyRequested = quantityRequested || demandPerReplenishmentPeriod - quantityOnHand;
+          return {
+            ...val,
+            disabled: true,
+            quantityRequested: qtyRequested >= 0 ? qtyRequested : 0,
+            product: {
+              ...val.product,
+              label: `${val.productCode} ${val.product.name}`,
+            },
+          };
+        },
+      );
     } else {
       lineItemsData = _.map(
         data,
@@ -832,7 +981,6 @@ class AddItemsPage extends Component {
       return apiClient.post(updateItemsUrl, payload)
         .then((resp) => {
           const { lineItems } = resp.data.data;
-
           const lineItemsBackendData = _.map(
             lineItems,
             val => ({
@@ -849,6 +997,10 @@ class AddItemsPage extends Component {
                 this.state.values.lineItems,
                 lineItem => lineItem.sortOrder === val.sortOrder,
               ).monthlyDemand,
+              demandPerReplenishmentPeriod: _.find(
+                this.state.values.lineItems,
+                lineItem => lineItem.sortOrder === val.sortOrder,
+              ).demandPerReplenishmentPeriod,
             }),
           );
 

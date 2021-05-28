@@ -41,6 +41,7 @@ import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.receiving.ReceiptItem
+import org.pih.warehouse.requisition.ReplenishmentTypeCode
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemSortByCode
@@ -548,7 +549,14 @@ class StockMovementService {
                     // origin = fulfilling, destination = requesting
                     editPageItem << [quantityOnHandRequesting: quantityOnHandRequestingMap[editPageItem.product.id]]
 
-                    if (requisition.requisitionTemplate) {
+                    def template = requisition.requisitionTemplate
+                    if (!template || (template && template.replenishmentTypeCode == ReplenishmentTypeCode.PULL)) {
+                        def quantityDemand = forecastingService.getDemand(requisition.destination, editPageItem.product)
+                        editPageItem << [
+                            quantityDemand                  : quantityDemand?.monthlyDemand?:0,
+                            demandPerReplenishmentPeriod    : Math.ceil(quantityDemand?.dailyDemand?:0 * template?.replenishmentPeriod?:0)
+                        ]
+                    } else {
                         def stocklist = Requisition.get(requisition.requisitionTemplate.id)
                         def quantityOnStocklist = 0
                         RequisitionItemSortByCode sortByCode = requisition.requisitionTemplate?.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX
@@ -558,9 +566,6 @@ class StockMovementService {
                             }
                         }
                         editPageItem << [quantityOnStocklist: quantityOnStocklist]
-                    } else {
-                        def quantityDemand = forecastingService.getDemand(requisition.destination, editPageItem.product)?.monthlyDemand?:0
-                        editPageItem << [quantityDemand: quantityDemand]
                     }
                 }
             }
@@ -615,31 +620,33 @@ class StockMovementService {
                 if (requisition && requisition.sourceType == RequisitionSourceType.ELECTRONIC) {
                     stockMovementItems = stockMovementItems.collect { stockMovementItem ->
                         def quantityOnHand = productAvailabilityService.getQuantityOnHand(stockMovementItem.product, requisition.destination)
-                        if (requisition.requisitionTemplate) {
-                            [
-                                    id               : stockMovementItem.id,
-                                    product          : stockMovementItem.product,
-                                    productCode      : stockMovementItem.productCode,
-                                    quantityOnHand   : quantityOnHand ?: 0,
-                                    quantityAllowed  : stockMovementItem.quantityAllowed,
-                                    comments         : stockMovementItem.comments,
-                                    quantityRequested: stockMovementItem.quantityRequested,
-                                    statusCode       : stockMovementItem.statusCode,
-                                    sortOrder        : stockMovementItem.sortOrder,
-                            ]
-                        } else {
+                        def template = requisition.requisitionTemplate
+                        if (!template || (template && template.replenishmentTypeCode == ReplenishmentTypeCode.PULL)) {
                             def demand = forecastingService.getDemand(requisition.destination, stockMovementItem.product)
                             [
-                                    id               : stockMovementItem.id,
-                                    product          : stockMovementItem.product,
-                                    productCode      : stockMovementItem.productCode,
-                                    quantityOnHand   : quantityOnHand ?: 0,
-                                    quantityAllowed  : stockMovementItem.quantityAllowed,
-                                    comments         : stockMovementItem.comments,
-                                    quantityRequested: stockMovementItem.quantityRequested,
-                                    statusCode       : stockMovementItem.statusCode,
-                                    sortOrder        : stockMovementItem.sortOrder,
-                                    monthlyDemand    : demand.monthlyDemand,
+                                    id                              : stockMovementItem.id,
+                                    product                         : stockMovementItem.product,
+                                    productCode                     : stockMovementItem.productCode,
+                                    quantityOnHand                  : quantityOnHand ?: 0,
+                                    quantityAllowed                 : stockMovementItem.quantityAllowed,
+                                    comments                        : stockMovementItem.comments,
+                                    quantityRequested               : stockMovementItem.quantityRequested,
+                                    statusCode                      : stockMovementItem.statusCode,
+                                    sortOrder                       : stockMovementItem.sortOrder,
+                                    monthlyDemand                   : demand?.monthlyDemand?:0,
+                                    demandPerReplenishmentPeriod    : Math.ceil(demand?.dailyDemand?:0 * template?.replenishmentPeriod?:0)
+                            ]
+                        } else {
+                            [
+                                    id                  : stockMovementItem.id,
+                                    product             : stockMovementItem.product,
+                                    productCode         : stockMovementItem.productCode,
+                                    quantityOnHand      : quantityOnHand ?: 0,
+                                    quantityAllowed     : stockMovementItem.quantityAllowed,
+                                    comments            : stockMovementItem.comments,
+                                    quantityRequested   : stockMovementItem.quantityRequested,
+                                    statusCode          : stockMovementItem.statusCode,
+                                    sortOrder           : stockMovementItem.sortOrder,
                             ]
                         }
                     }
