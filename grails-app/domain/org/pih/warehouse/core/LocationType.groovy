@@ -136,5 +136,12 @@ class LocationType implements Comparable, Serializable {
         return (locationTypeCode in [LocationTypeCode.DEPOT, LocationTypeCode.DISPENSARY, LocationTypeCode.WARD])
     }
 
+    Boolean isInternalLocation() {
+        return (locationTypeCode in LocationTypeCode.listInternalTypeCodes())
+    }
+
+    Boolean isFacilityLocation() {
+        return (locationTypeCode in LocationTypeCode.listFacilityTypeCodes())
+    }
 
 }

@@ -45,6 +45,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
     LocationType locationType
     LocationGroup locationGroup
     Organization organization
+    Location zone
 
     User manager                                // the person in charge of the warehouse
     Inventory inventory                            // each warehouse has a single inventory
@@ -59,6 +60,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
 
     static belongsTo = [parentLocation: Location, organization: Organization]
     static hasMany = [locations: Location, supportedActivities: String, employees: User]
+    static mappedBy = [locations: "parentLocation"]
 
     static constraints = {
         name(nullable: false, blank: false, maxSize: 255, unique: 'parentLocation')
@@ -74,6 +76,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
         locationNumber(nullable: true, unique: true)
         locationGroup(nullable: true)
         parentLocation(nullable: true)
+        zone(nullable: true)
         bgColor(nullable: true, validator: { bgColor, obj ->
             def fgColor = obj.properties['fgColor']
             if (fgColor == null) return true
@@ -229,6 +232,14 @@ class Location implements Comparable<Location>, java.io.Serializable {
     Boolean hasBinLocationSupport() {
         ActivityCode[] requiredActivities = [ActivityCode.PICK_STOCK, ActivityCode.PUTAWAY_STOCK]
         return supportsAny(requiredActivities) && !binLocations?.empty
+    }
+
+    Boolean isInternalLocation() {
+        return locationType?.isInternalLocation()
+    }
+
+    Boolean isFacilityLocation() {
+        return locationType?.isFacilityLocation()
     }
 
     /**
