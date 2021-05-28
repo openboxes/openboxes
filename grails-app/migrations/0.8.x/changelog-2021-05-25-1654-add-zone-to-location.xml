@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="adminuser (generated)" id="2605202117200-1">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="location" columnName="zone_id"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="location">
+      <column name="zone_id" type="CHAR(38)"/>
+    </addColumn>
+  </changeSet>
+  <changeSet author="adminuser (generated)" id="2605202117200-2">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="zone_location_ibfk_3"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="zone_id" baseTableName="location"
+      constraintName="zone_location_ibfk_3" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="location"/>
+  </changeSet>
+</databaseChangeLog>
+

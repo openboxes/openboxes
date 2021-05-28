@@ -20,7 +20,6 @@ import org.hibernate.Criteria
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductActivityCode
@@ -565,7 +564,7 @@ class ProductAvailabilityService {
 
 
     void updateProductAvailability(Location location) {
-        def isBinLocation = location?.locationType?.locationTypeCode in [LocationTypeCode.BIN_LOCATION, LocationTypeCode.INTERNAL]
+        def isBinLocation = location?.isInternalLocation()
         if (isBinLocation) {
             def results = ProductAvailability.executeUpdate(
                     "update ProductAvailability a " +

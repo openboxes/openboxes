@@ -37,7 +37,7 @@
                     <li><a href="#location-details-tab"><g:message code="location.label"/></a></li>
                     <li><a href="#location-configuration-tab"><g:message code="location.configuration.label"
                                                                   default="Configuration"/></a></li>
-                    <g:if test="${locationInstance?.locationType?.locationTypeCode != LocationTypeCode.BIN_LOCATION}">
+                    <g:if test="${!locationInstance?.isInternalLocation()}">
                         <li><a href="#location-address-tab"><g:message code="location.address.label"
                                                                        default="Address"/></a></li>
                     <%--<li><a href="#location-binLocations-tab"><g:message code="location.binLocations.label" default="Bin Locations"/></a></li>--%>
@@ -98,7 +98,7 @@
                                                  class="text" size="80"/>
                                 </td>
                             </tr>
-                            <g:if test="${locationInstance?.locationType?.locationTypeCode == LocationTypeCode.BIN_LOCATION}">
+                            <g:if test="${locationInstance?.isInternalLocation()}">
                                 <tr class="prop">
                                     <td valign="top" class="name">
                                         <label for="name"><warehouse:message
@@ -145,7 +145,7 @@
                                               noSelection="['null': '']"/>
                                 </td>
                             </tr>
-                            <g:if test="${locationInstance?.locationType?.locationTypeCode != LocationTypeCode.BIN_LOCATION}">
+                            <g:if test="${!locationInstance?.isInternalLocation()}">
                                 <tr class="prop">
                                     <td valign="top" class="name">
                                         <label for="name"><warehouse:message
@@ -235,7 +235,7 @@
                             </tr>
 
 
-                            <g:if test="${locationInstance?.locationType?.locationTypeCode != LocationTypeCode.BIN_LOCATION}">
+                            <g:if test="${!locationInstance?.isInternalLocation()}">
                                 <tr class="prop">
                                     <td valign="top" class="name">
                                         <label for="bgColor"><warehouse:message
@@ -353,7 +353,7 @@
                     </div>
                 </div>
 
-                <g:if test="${locationInstance?.locationType?.locationTypeCode != LocationTypeCode.BIN_LOCATION}">
+                <g:if test="${!locationInstance?.isInternalLocation()}">
 
                     <div id="location-address-tab">
                         <g:hiddenField name="address.id" value="${locationInstance?.address?.id}"/>

@@ -46,4 +46,19 @@ enum LocationTypeCode {
         [DEPOT, CONSUMER, DISPENSARY, WARD, BIN_LOCATION, INTERNAL, SUPPLIER, DONOR, VIRTUAL, DISPOSAL, DISTRIBUTOR]
     }
 
+    static listFacilityTypeCodes() {
+        return [DEPOT, DISPENSARY, WARD]
+    }
+
+    static listInternalTypeCodes() {
+        return [BIN_LOCATION, INTERNAL]
+    }
+
+    static listExternalLocationTypeCodes() {
+        return [SUPPLIER, DISTRIBUTOR, DONOR, CONSUMER]
+    }
+
+    static listVirtual() {
+        return [DISPOSAL, VIRTUAL]
+    }
 }
