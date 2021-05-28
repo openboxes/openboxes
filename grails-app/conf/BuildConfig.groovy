@@ -193,6 +193,7 @@ grails.project.dependency.resolution = {
         //}
         test(name: 'geb', version: '0.6.3') {}
         test ":code-coverage:1.2.5" //2.0.3-3
+        compile ":build-test-data:1.1.1"
 
         // Dependencies that we want to use but cannot due to errors
         //compile ":standalone:1.0"

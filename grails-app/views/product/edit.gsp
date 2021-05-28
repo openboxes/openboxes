@@ -15,9 +15,6 @@
 		<link rel="stylesheet" href="${createLinkTo(dir:'js/jquery.tagsinput/',file:'jquery.tagsinput.css')}" type="text/css" media="screen, projection" />
 		<script src="${createLinkTo(dir:'js/jquery.tagsinput/', file:'jquery.tagsinput.js')}" type="text/javascript" ></script>
         <style>
-        #category_id_chosen {
-            width: 100% !important;
-        }
         .ui-widget button { font-size: 11px; }
         </style>
 
@@ -40,82 +37,69 @@
 				<g:render template="summary" model="[productInstance:productInstance]"/>
 			</g:if>
             <g:hiddenField id="isAccountingRequired" name="isAccountingRequired" value="${locationInstance?.isAccountingRequired()}"/>
-			<div>
-                <div class="tabs tabs-ui">
-					<ul>
-						<li>
-                            <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=productDetails&renderNotFoundError=false&${request.queryString}">
-                                <g:message code="product.details.label"/>
+            <div class="tabs tabs-ui">
+                <ul>
+                    <li>
+                        <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=productDetails&renderNotFoundError=false&${request.queryString}">
+                            <g:message code="product.details.label"/>
+                        </a>
+                    </li>
+                    <%-- Only show these tabs if the product has been created --%>
+                    <g:if test="${productInstance?.id }">
+                        <li>
+                            <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=productSuppliers">
+                                <g:message code="product.productSuppliers.label" default="Sources"/>
                             </a>
                         </li>
-						<%-- Only show these tabs if the product has been created --%>
-						<g:if test="${productInstance?.id }">
+                        <li>
+                            <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=inventoryLevels">
+                                <g:message code="inventoryLevels.label" default="Stock levels"/>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=documents">
+                                <g:message code="product.documents.label" default="Documents"/>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=productSubstitutions">
+                                <g:message code="product.substitutions.label" default="Substitutions"/>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=productPackages">
+                                <g:message code="packages.label" default="Packages"/>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=productCatalogs">
+                                <warehouse:message code="product.catalogs.label" default="Catalogs"/>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=productGroups">
+                                <warehouse:message code="product.productGroups.label" default="Product Groups"/>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=productSynonyms">
+                                <g:message code="product.synonyms.label"/>
+                            </a>
+                        </li>
+                        <g:if test="${grailsApplication.config.openboxes.bom.enabled}">
                             <li>
-                                <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=productSuppliers">
-                                    <g:message code="product.productSuppliers.label" default="Sources"/>
+                                <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=productComponents">
+                                    <g:message code="product.components.label" default="Components (Bill of Materials)"/>
                                 </a>
                             </li>
-                            <li>
-                                <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=inventoryLevels">
-                                    <g:message code="inventoryLevels.label" default="Stock levels"/>
-                                </a>
-                            </li>
-							<li>
-                                <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=documents">
-                                    <g:message code="product.documents.label" default="Documents"/>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=productSubstitutions">
-                                    <g:message code="product.substitutions.label" default="Substitutions"/>
-                                </a>
-                            </li>
-							<li>
-                                <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=productPackages">
-                                    <g:message code="packages.label" default="Packages"/>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=productCatalogs">
-                                    <warehouse:message code="product.catalogs.label" default="Catalogs"/>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=productGroups">
-                                    <warehouse:message code="product.productGroups.label" default="Product Groups"/>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=productSynonyms">
-                                    <g:message code="product.synonyms.label"/>
-                                </a>
-                            </li>
-                            <g:if test="${grailsApplication.config.openboxes.bom.enabled}">
-                                <li>
-                                    <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=productComponents">
-                                        <g:message code="product.components.label" default="Components (Bill of Materials)"/>
-                                    </a>
-                                </li>
-                            </g:if>
                         </g:if>
-					</ul>
-
-
-                    <%-- Only show these tabs if the product has been created --%>
-%{--                    <g:if test="${productInstance?.id }">--}%
-
-%{--                        <div id="tabs-synonyms" class="ui-tabs-hide">--}%
-%{--                            <div class="box">--}%
-%{--                                <h2><warehouse:message code="product.synonyms.label" default="Synonyms"/></h2>--}%
-%{--                                <g:render template="synonyms" model="[product: productInstance, synonyms:productInstance?.synonyms]"/>--}%
-%{--                            </div>--}%
-%{--                        </div>--}%
-
-%{--					</g:if>--}%
-				</div>
-			</div>
-		</div>
-		<script type="text/javascript">
+                    </g:if>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="loading">Loading...</div>
+    <script type="text/javascript">
 
             function validateForm()  {
                 var glAccount = $("#glAccount").val();

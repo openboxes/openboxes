@@ -65,7 +65,7 @@
                         <g:if test="${session?.warehouse}">
                             <li>
                                 <button class="btn-show-dialog button"
-                                        data-title="${g.message(code:'dashboard.chooseLocation.label')}"
+                                        data-title="${g.message(code:'dashboard.chooseLocation.label')}" data-height="300"
                                         data-url="${request.contextPath}/dashboard/changeLocation?targetUri=${targetUri}">
                                     <img src="${resource(dir: 'images/icons/silk', file: 'map.png')}" />
                                     ${session?.warehouse?.name }

@@ -3144,3 +3144,72 @@ table.pvtTable tr th { background-color: #ddd; }
 .blurred {
     filter: blur(6px);
 }
+
+.tabs-left {
+    position: relative;
+    padding-left: 35%;
+    overflow: auto;
+    display: flex;
+}
+.tabs-left .ui-tabs-nav {
+    position: absolute;
+    left: 0.25em;
+    top: 0.25em;
+    width: 33%;
+    padding: 0.2em 0 0.5em 0.5em;
+    background-color: #888;
+}
+.tabs-left .ui-tabs-nav li {
+    right: 1px;
+    width: 100%;
+    border-right: none;
+    border-bottom-width: 1px !important;
+    -moz-border-radius: 4px 0px 0px 4px;
+    -webkit-border-radius: 4px 0px 0px 4px;
+    border-radius: 4px 0px 0px 4px;
+    overflow: hidden;
+    margin: 2px 0px 2px 0px;
+}
+.tabs-left .ui-tabs-nav li.ui-tabs-selected,
+.tabs-left .ui-tabs-nav li.ui-state-active {
+    border-right: 1px solid transparent;
+    background-color: #ffffff;
+    border-color: white;
+}
+.tabs-left .ui-tabs-nav li a {
+    float: left;
+    width: 100%;
+    text-align: left;
+    color: black;
+}
+.tabs-left .ui-tabs-panel {
+    height: 400px;
+    width: 100%;
+}
+.organization-group {
+    height: 400px;
+}
+.header-border {
+    margin-bottom: 15px;
+    margin-top: 10px;
+    border: 1px solid #888;
+    border-radius: 4px;
+    display: inline-block;
+}
+.header-border .heading {
+    margin-left: 20px;
+    margin-top: -10px;
+}
+.header-border .heading > span {
+    background-color: white;
+}
+.element {
+    margin: 5px;
+    display: inline-block;
+    padding: 0.5em 1em;
+    border: 1px solid #d4d4d4;
+    text-align: center;
+    color: black !important;
+    background-clip: padding-box;
+    border-radius: 0.2em;
+}

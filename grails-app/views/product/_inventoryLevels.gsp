@@ -14,83 +14,85 @@
         <table>
             <thead>
             <tr class="odd">
-                <th><warehouse:message code="default.actions.label"/></th>
                 <th><warehouse:message code="inventoryLevel.status.label"/></th>
                 <th><warehouse:message code="location.label"/></th>
-                <th><warehouse:message code="product.preferredBin.label"/></th>
                 <th class="center"><warehouse:message code="inventoryLevel.abcClass.label" default="ABC Class"/></th>
-                <th class="center"><warehouse:message code="inventoryLevel.minQuantity.label"/></th>
-                <th class="center"><warehouse:message code="inventoryLevel.reorderQuantity.label"/></th>
-                <th class="center"><warehouse:message code="inventoryLevel.maxQuantity.label"/></th>
+                <th class="center"><warehouse:message code="inventoryLevel.preferredBinLocation.label" default="Putaway Location"/></th>
+                <th class="center border-right"><warehouse:message code="inventoryLevel.replenishmentLocation.label" default="Replenishment Location"/></th>
+                <th class="center"><warehouse:message code="default.minimum.label" default="Minimum"/></th>
+                <th class="center"><warehouse:message code="default.reorder.label" default="Reorder"/></th>
+                <th class="center border-right"><warehouse:message code="default.maximum.label" default="Maximum"/></th>
                 <th class="center"><warehouse:message code="inventoryLevel.forecastQuantity.label"/></th>
-                <th class="center"><warehouse:message code="inventoryLevel.forecastPeriodDays.label"/></th>
+                <th class="center border-right"><warehouse:message code="inventoryLevel.forecastPeriodDays.label"/></th>
                 <th class="center"><warehouse:message code="default.comments.label"/></th>
                 <th class="center"><warehouse:message code="default.lastUpdated.label"/></th>
+                <th><warehouse:message code="default.actions.label"/></th>
             </tr>
             </thead>
             <tbody>
 
-            <g:each var="inventoryLevelInstance" in="${productInstance?.inventoryLevels}" status="i">
+            <g:each var="inventoryLevelInstance" in="${productInstance?.inventoryLevels.sort { it?.inventory?.warehouse?.name }}" status="i">
 
-                <tr class="prop ${i%2?'even':'odd'} ${inventoryLevelInstance?.inventory?.warehouse?.id == session?.warehouse?.id ? 'active' : ''}">
-                    <td>
-                        <div class="action-menu">
-                            <button class="action-btn">
-                                <img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" style="vertical-align: middle"/>
-                            </button>
-                            <div class="actions">
-                                <div class="action-menu-item">
-                                    <a href="javascript:void(0);" class="open-dialog create" dialog-id="inventory-level-${inventoryLevelInstance?.id}-dialog">
-                                        <img src="${createLinkTo(dir:'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
-                                        ${warehouse.message(code:'default.button.edit.label')}</a>
-                                </div>
-                                <div class="action-menu-item">
-                                    <g:link controller="inventoryLevel" action="delete" class="" id="${inventoryLevelInstance?.id}">
-                                        <img src="${createLinkTo(dir:'images/icons/silk', file: 'delete.png')}"/>&nbsp;
-                                        ${warehouse.message(code:'default.button.delete.label')}</g:link>
-                                </div>
-                            </div>
-                        </div>
+                <tr class="prop ${i%2?'even':'odd'}">
+                    <td class="center middle">
+                        <g:if test="${inventoryLevelInstance?.status in org.pih.warehouse.inventory.InventoryStatus.listEnabled()}">
+                            <img src="${createLinkTo(dir:'images/icons/silk', file: 'accept.png')}" title="${inventoryLevelInstance?.status}" />
+                        </g:if>
+                        <g:elseif test="${inventoryLevelInstance?.status in org.pih.warehouse.inventory.InventoryStatus.listDisabled()}">
+                            <img src="${createLinkTo(dir:'images/icons/silk', file: 'delete.png')}" title="${inventoryLevelInstance?.status}" />
+                        </g:elseif>
+                        <g:else>
+                            <img src="${createLinkTo(dir:'images/icons/silk', file: 'error.png')}" title="${inventoryLevelInstance?.status}"/>
+                        </g:else>
                     </td>
-                    <td>
-                        ${inventoryLevelInstance?.status}
-                    </td>
-                    <td>
+                    <td class="middle">
                         ${inventoryLevelInstance?.inventory?.warehouse?.name }
+                        <g:if test="${inventoryLevelInstance?.internalLocation}">/
+                            ${inventoryLevelInstance?.internalLocation?.name }
+                        </g:if>
                     </td>
-                    <td>
-                        ${inventoryLevelInstance?.preferredBinLocation}
+                    <td class="center middle">
+                        ${inventoryLevelInstance?.abcClass}
                     </td>
-                    <td class="center">
-                        ${inventoryLevelInstance?.abcClass?:warehouse.message(code:'default.none.label')}
+                    <td class="center middle">
+                        ${inventoryLevelInstance?.preferredBinLocation?.name}
                     </td>
-                    <td class="center">
+                    <td class="center middle border-right">
+                        ${inventoryLevelInstance?.replenishmentLocation?.name}
+                    </td>
+                    <td class="center middle">
                         ${inventoryLevelInstance?.minQuantity?:0 }
                         ${productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
                     </td>
-                    <td class="center">
+                    <td class="center middle">
                         ${inventoryLevelInstance?.reorderQuantity?:0 }
                         ${productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
                     </td>
-                    <td class="center">
+                    <td class="center middle border-right">
                         ${inventoryLevelInstance?.maxQuantity?:0 }
                         ${productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
                     </td>
-                    <td class="center">
+                    <td class="center middle">
                         ${inventoryLevelInstance?.forecastQuantity?:0 }
                         ${productInstance?.unitOfMeasure?:warehouse.message(code:'default.each.label')}
                     </td>
-                    <td class="center">
+                    <td class="center middle border-right">
                         ${inventoryLevelInstance?.forecastPeriodDays?:0 }
                         ${warehouse.message(code:'default.days.label')}
                     </td>
-                    <td class="center">
+                    <td class="center middle">
                         ${inventoryLevelInstance?.comments }
                     </td>
-                    <td class="center">
+                    <td class="center middle">
                         <g:formatDate date="${inventoryLevelInstance?.lastUpdated }" format="d MMM yyyy"/>
                     </td>
-
+                    <td>
+                        <a href="javascript:void(0);" class="button btn-show-dialog"  data-width="900" data-height="500"
+                           data-title="${warehouse.message(code:'inventoryLevel.edit.label', default: 'Edit stock level')}"
+                           data-url="${request.contextPath}/inventoryLevel/dialog/${inventoryLevelInstance?.id}">
+                            <img src="${createLinkTo(dir:'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
+                            ${warehouse.message(code:'default.button.edit.label')}</a>
+                    </td>
                 </tr>
             </g:each>
             <g:unless test="${productInstance?.inventoryLevels}">
@@ -105,9 +107,11 @@
             </tbody>
             <tfoot>
             <tr class="prop">
-                <td colspan="12" class="center">
+                <td colspan="14" class="center">
 
-                    <a href="javascript:void(0);" class="open-dialog create button" dialog-id="inventory-level-dialog">
+                    <a href="javascript:void(0);" class="button btn-show-dialog"
+                       data-title="${warehouse.message(code:'inventoryLevel.create.label', default: 'Create stock level')}" data-width="900" data-height="500"
+                       data-url="${request.contextPath}/inventoryLevel/dialog/${inventoryLevelInstance?.id}?productId=${productInstance?.id}">
                         <img src="${createLinkTo(dir:'images/icons/silk', file: 'add.png')}"/>&nbsp;
                         ${warehouse.message(code:'inventoryLevel.create.label', default: 'Create stock level')}</a>
 
@@ -122,11 +126,3 @@
         </table>
     </div>
 </g:form>
-<g:each var="inventoryLevelInstance" in="${productInstance?.inventoryLevels}" status="i">
-    <div id="inventory-level-${inventoryLevelInstance?.id}-dialog" class="dialog hidden" title="Edit inventory level">
-        <g:render template="../inventoryLevel/form" model="[inventoryLevelInstance:inventoryLevelInstance]"/>
-    </div>
-</g:each>
-<div id="inventory-level-dialog" class="dialog hidden" title="Add a new stock level">
-    <g:render template="../inventoryLevel/form" model="[productInstance:productInstance,inventoryLevelInstance:new InventoryLevel()]"/>
-</div>
