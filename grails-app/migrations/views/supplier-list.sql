@@ -10,7 +10,7 @@ CREATE OR REPLACE VIEW supplier AS (
 		ON location_type.id = location.location_type_id
     LEFT OUTER JOIN `order` AS purchase_order
 		ON purchase_order.origin_id = location.id
-		AND purchase_order.status != 'COMPLETED'
+		AND purchase_order.status NOT IN ('COMPLETED', 'CANCELED', 'REJECTED')
 		AND purchase_order.order_type_code = 'PURCHASE_ORDER'
 	LEFT OUTER JOIN shipment
 		ON shipment.origin_id = location.id

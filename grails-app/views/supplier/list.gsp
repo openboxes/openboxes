@@ -52,7 +52,11 @@
                                                     ${supplier?.organization?.name}
                                                 </g:link>
                                             </td>
-                                            <td>${supplier?.name}</td>
+                                            <td>
+                                                <g:link controller="location" action="show" id="${supplier?.id }">
+                                                    ${supplier?.name}
+                                                </g:link>
+                                            </td>
                                             <td>
                                                 <g:link controller="order" action="list" params="[orderTypeCode:OrderTypeCode.PURCHASE_ORDER, origin: supplier.id, destination: null]" class="list">
                                                     ${supplier?.pendingOrdersCount}
