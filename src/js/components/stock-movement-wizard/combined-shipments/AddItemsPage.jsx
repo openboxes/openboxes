@@ -209,9 +209,10 @@ const FIELDS = {
               recipient: fieldValue.recipient,
               sortOrder: fieldValue.sortOrder + 1,
               orderItemId: fieldValue.orderItemId,
-              referenceId: fieldValue.id,
+              referenceId: fieldValue.orderItemId,
               orderNumber: fieldValue.orderNumber,
               packSize: fieldValue.packSize,
+              quantityAvailable: fieldValue.quantityAvailable,
             }, rowIndex);
           },
         }),
@@ -316,7 +317,7 @@ class AddItemsPage extends Component {
           ...val.product,
           label: `${val.productCode} ${val.product.name}`,
         },
-        referenceId: val.id,
+        referenceId: val.orderItemId,
       }),
     );
 
@@ -380,13 +381,12 @@ class AddItemsPage extends Component {
       const splitItems = _.filter(values.lineItems, lineItem =>
         lineItem.referenceId === item.referenceId);
       if (!item.id) {
-        const originalItem = _.find(splitItems, original => original.id);
         const requestedQuantity = _.reduce(
           splitItems, (sum, val) =>
             (sum + (val.quantityRequested ? _.toInteger(val.quantityRequested) : 0)),
           0,
         );
-        if (originalItem && requestedQuantity > originalItem.quantityAvailable) {
+        if (requestedQuantity > item.quantityAvailable) {
           _.forEach(values.lineItems, (lineItem, lineItemKey) => {
             _.forEach(splitItems, (splitItem) => {
               if (lineItem === splitItem) {
@@ -630,7 +630,7 @@ class AddItemsPage extends Component {
                 ...val.product,
                 label: `${val.productCode} ${val.product.name}`,
               },
-              referenceId: val.id,
+              referenceId: val.orderItemId,
             }),
           );
 
