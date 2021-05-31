@@ -6,7 +6,7 @@ CREATE OR REPLACE VIEW order_item_status AS
         quantity_shipped,
         order_status,
         (quantity_ordered > 0)                 AS shipment_ordered,
-        (quantity_shipped >= quantity_ordered) AS shipped
+        (quantity_shipped >= 0) AS shipped -- indicates if anything was shipped, (can be partially shipped)
     FROM (
         SELECT order.id                 AS order_id,
             `order`.order_number        AS order_number,
@@ -23,7 +23,6 @@ CREATE OR REPLACE VIEW order_item_status AS
             LEFT OUTER JOIN shipment ON shipment.id = shipment_item.shipment_id
         WHERE `order`.order_type_code = 'PURCHASE_ORDER'
           AND order_item.order_item_status_code != 'CANCELLED'
-          AND shipment.current_status IN ('SHIPPED', 'PARTIALLY_RECEIVED', 'RECEIVED')
         GROUP BY `order`.id, `order`.order_number, product.product_code, order_item.id
     )
 AS order_item_status;
@@ -138,7 +137,7 @@ CREATE OR REPLACE VIEW order_summary AS (
             `order`.order_number,
             `order`.status as order_status,
             IFNULL(SUM(shipment_ordered), 0)  AS total_ordered,
-            IFNULL(SUM(shipped), 0)           AS total_shipped,
+            IFNULL(SUM(shipped), 0)           AS total_shipped, -- items fully shipped or partially shipped
             CASE
                 WHEN (IFNULL(SUM(shipment_ordered), 0) + IFNULL(SUM(shipped), 0) = 0) THEN NULL
                 WHEN (IFNULL(SUM(shipment_ordered), 0) = IFNULL(SUM(shipped), 0)) THEN 'SHIPPED'
