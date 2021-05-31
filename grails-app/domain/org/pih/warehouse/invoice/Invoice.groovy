@@ -10,6 +10,7 @@
 package org.pih.warehouse.invoice
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Organization
@@ -133,11 +134,22 @@ class Invoice implements Serializable {
 
     def getDocuments() {
         def documents = []
+        def g = ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
         invoiceItems.each {invoiceItem ->
             if (invoiceItem?.order?.documents) {
                 invoiceItem?.order?.documents?.each {document ->
-                    if (!documents.contains(document)) {
-                        documents.add(document)
+                    if (!documents.find { it.id == document.id }) {
+                        def link = document.fileUri ?: g.createLink(controller: 'document', action: "download", id: document.id, absolute: true)
+                        documents << [
+                                id          : document?.id,
+                                name        : document?.name,
+                                link: link,
+                                fileUri: document?.fileUri,
+                                filename: document?.filename,
+                                documentType: document?.documentType,
+                                size: document?.size,
+                                lastUpdated: document?.lastUpdated,
+                        ]
                     }
                 }
             }
@@ -195,6 +207,7 @@ class Invoice implements Serializable {
             invoiceType: invoiceType?.code?.name(),
             hasPrepaymentInvoice: hasPrepaymentInvoice,
             isPrepaymentInvoice: isPrepaymentInvoice,
+            documents: documents,
         ]
     }
 }
