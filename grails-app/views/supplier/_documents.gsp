@@ -18,7 +18,11 @@
                 <tbody>
                 <g:each var="documentInstance" in="${documents?.findAll { !it?.fileUri }}">
                     <tr>
-                        <td>${documentInstance?.orderNumber}</td>
+                        <td>
+                            <g:link controller="order" action="show" id="${documentInstance?.orderId}">
+                                ${documentInstance?.orderNumber}
+                            </g:link>
+                        </td>
                         <td>${documentInstance?.orderDescription}</td>
                         <td>${documentInstance?.origin}</td>
                         <td>${documentInstance?.destination}</td>
@@ -38,6 +42,8 @@
             <table>
                 <thead>
                 <tr class="odd">
+                    <th><warehouse:message code="purchaseOrder.orderNumber.label" default="PO Number"/></th>
+                    <th><warehouse:message code="purchaseOrder.description.label" default="PO Description"/></th>
                     <th><g:message code="default.name.label"/></th>
                     <th><warehouse:message code="document.url.label" default="URL"/></th>
                 </tr>
@@ -46,11 +52,17 @@
                 <g:each var="documentInstance" in="${documents?.findAll { it?.fileUri }}">
                     <tr>
                         <td>
+                            <g:link controller="order" action="show" id="${documentInstance?.orderId}">
+                                ${documentInstance?.orderNumber}
+                            </g:link>
+                        </td>
+                        <td>${documentInstance?.orderDescription}</td>
+                        <td>
                             <a href="${documentInstance?.fileUri}" target="_blank">
                                 ${documentInstance?.documentName}
                             </a>
                         </td>
-                        <td style="width: 80%;">
+                        <td style="width: 60%;">
                             <a href="${documentInstance?.fileUri}" target="_blank" style="word-break:break-all;">
                                 ${documentInstance?.fileUri}
                             </a>
