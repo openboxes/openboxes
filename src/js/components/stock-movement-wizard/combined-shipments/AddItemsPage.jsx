@@ -380,7 +380,7 @@ class AddItemsPage extends Component {
       }
       const splitItems = _.filter(values.lineItems, lineItem =>
         lineItem.referenceId === item.referenceId);
-      if (!item.id) {
+      if (!item.id || splitItems.length > 1) {
         const requestedQuantity = _.reduce(
           splitItems, (sum, val) =>
             (sum + (val.quantityRequested ? _.toInteger(val.quantityRequested) : 0)),
@@ -593,7 +593,13 @@ class AddItemsPage extends Component {
       .then((resp) => {
         let values = formValues;
         if (resp) {
-          values = { ...formValues, lineItems: resp.data.data.lineItems };
+          values = {
+            ...formValues,
+            lineItems: _.map(resp.data.data.lineItems, item => ({
+              ...item,
+              referenceId: item.orderItemId,
+            })),
+          };
         }
         this.transitionToNextStep()
           .then(() => {
