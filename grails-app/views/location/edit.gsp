@@ -38,8 +38,14 @@
                     <li><a href="#location-configuration-tab"><g:message code="location.configuration.label"
                                                                   default="Configuration"/></a></li>
                     <g:if test="${!locationInstance?.isInternalLocation()}">
-                        <li><a href="#location-address-tab"><g:message code="location.address.label"
+                        <g:if test="${!locationInstance?.isZone()}">
+                            <li><a href="#location-address-tab"><g:message code="location.address.label"
                                                                        default="Address"/></a></li>
+                            <li><a href="${request.contextPath}/location/showZoneLocations/${locationInstance?.id}"
+                                   id="location-zoneLocations-tab">
+                                <g:message code="location.zoneLocations.label" default="Zone Locations"/></a>
+                            </li>
+                        </g:if>
                     <%--<li><a href="#location-binLocations-tab"><g:message code="location.binLocations.label" default="Bin Locations"/></a></li>--%>
                         <li><a href="${request.contextPath}/location/showBinLocations/${locationInstance?.id}"
                                id="location-binLocations-tab">
@@ -98,7 +104,7 @@
                                                  class="text" size="80"/>
                                 </td>
                             </tr>
-                            <g:if test="${locationInstance?.isInternalLocation()}">
+                            <g:if test="${locationInstance?.isInternalLocation() || locationInstance.isZone()}">
                                 <tr class="prop">
                                     <td valign="top" class="name">
                                         <label for="name"><warehouse:message
@@ -111,6 +117,24 @@
                                                           value="${locationInstance?.parentLocation?.id}"
                                                           noSelection="['null': '']"
                                                           class="chzn-select-deselect"/>
+                                    </td>
+                                </tr>
+                            </g:if>
+                            <g:if test="${locationInstance?.isInternalLocation()}">
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                        <label for="name"><warehouse:message
+                                                code="location.zoneLocation.label"/></label>
+                                    </td>
+                                    <td valign="top"
+                                        class="value ${hasErrors(bean: locationInstance, field: 'zone', 'errors')}">
+
+                                        <g:selectZoneLocationByLocation
+                                                name="zone.id"
+                                                id="${locationInstance?.parentLocation?.id}"
+                                                value="${locationInstance?.zone?.id}"
+                                                noSelection="['null': '']"
+                                                class="chzn-select-deselect"/>
                                     </td>
                                 </tr>
                             </g:if>
@@ -145,7 +169,7 @@
                                               noSelection="['null': '']"/>
                                 </td>
                             </tr>
-                            <g:if test="${!locationInstance?.isInternalLocation()}">
+                            <g:if test="${!locationInstance?.isInternalLocation() && !locationInstance.isZone()}">
                                 <tr class="prop">
                                     <td valign="top" class="name">
                                         <label for="name"><warehouse:message
@@ -235,7 +259,7 @@
                             </tr>
 
 
-                            <g:if test="${!locationInstance?.isInternalLocation()}">
+                            <g:if test="${!locationInstance?.isInternalLocation() && !locationInstance?.isZone()}">
                                 <tr class="prop">
                                     <td valign="top" class="name">
                                         <label for="bgColor"><warehouse:message
@@ -353,7 +377,7 @@
                     </div>
                 </div>
 
-                <g:if test="${!locationInstance?.isInternalLocation()}">
+                <g:if test="${!locationInstance?.isInternalLocation() && !locationInstance?.isZone()}">
 
                     <div id="location-address-tab">
                         <g:hiddenField name="address.id" value="${locationInstance?.address?.id}"/>
@@ -486,7 +510,13 @@
      title="${g.message(code: 'default.add.label', args: [g.message(code: 'location.internal.label')])}">
     <div class="dialog">
         <g:form controller="location" action="update">
-            <g:hiddenField name="parentLocation.id" value="${locationInstance?.id}"/>
+            <g:if test="${locationInstance?.isZone()}">
+                <g:hiddenField name="zone.id" value="${locationInstance?.id}"/>
+                <g:hiddenField name="parentLocation.id" value="${locationInstance?.parentLocation?.id}"/>
+            </g:if>
+            <g:else>
+                <g:hiddenField name="parentLocation.id" value="${locationInstance?.id}"/>
+            </g:else>
             <g:hiddenField name="version" value="${locationInstance?.version}"/>
             <table>
                 <tbody>
@@ -538,6 +568,65 @@
 
 <div id="dlgShowContents"
      title="${g.message(code: 'default.show.label', args: [g.message(code: 'location.binLocation.label')])}">
+    <!-- Contents loaded dynamically -->
+</div>
+
+<div id="dlgAddZoneLocation"
+     title="${g.message(code: 'default.add.label', args: [g.message(code: 'location.zoneLocation.label')])}">
+    <div class="dialog">
+        <g:form controller="location" action="update">
+            <g:hiddenField name="parentLocation.id" value="${locationInstance?.id}"/>
+            <g:hiddenField name="version" value="${locationInstance?.version}"/>
+            <table>
+                <tbody>
+                <tr class="prop">
+                    <td valign="top" class="name">
+                        <label for="name"><warehouse:message
+                                code="location.locationType.label"/></label>
+                    </td>
+                    <td valign="top" class="value">
+                        <g:set var="zoneLocationTypes"
+                               value="${org.pih.warehouse.core.LocationType.zoneLocationTypes.sort()}"/>
+                        <g:set var="defaultZoneLocationType"
+                               value="${org.pih.warehouse.core.LocationType.defaultZoneLocationType}"/>
+                        <g:select name="locationType.id" from="${zoneLocationTypes}"
+                                  class="chzn-select-deselect"
+                                  value="${zoneLocation?.locationType?.id ?: defaultZoneLocationType?.id}"
+                                  optionKey="id" optionValue="${{ format.metadata(obj: it) }}"
+                                  noSelection="['null': '']"/>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td valign="top" class="name">
+                        <label for="name"><warehouse:message code="location.name.label"/></label>
+                    </td>
+                    <td valign="top"
+                        class="value ${hasErrors(bean: locationInstance, field: 'name', 'errors')}">
+                        <g:textField name="name" value="${zoneLocation?.name}" class="text"
+                                     size="80"/>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td valign="top" class="name">
+
+                    </td>
+                    <td valign="top" class="value">
+                        <button type="submit" class="button">
+                            <warehouse:message code="default.button.save.label"/>
+                        </button>
+
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+
+        </g:form>
+    </div>
+</div>
+
+<div id="dlgShowZoneContents"
+     title="${g.message(code: 'default.show.label', args: [g.message(code: 'location.zoneLocation.label')])}">
     <!-- Contents loaded dynamically -->
 </div>
 
@@ -612,6 +701,8 @@
     // Define all dialog windows
     $("#dlgShowContents").dialog({autoOpen: false, modal: true, width: 800});
     $("#dlgAddBinLocation").dialog({autoOpen: false, modal: true, width: 800});
+    $("#dlgShowZoneContents").dialog({autoOpen: false, modal: true, width: 800});
+    $("#dlgAddZoneLocation").dialog({autoOpen: false, modal: true, width: 800});
     $("#dlgImportBinLocations").dialog({autoOpen: false, modal: true, width: 800});
 
     $(".btnShowContents").livequery("click", function (event) {
@@ -632,6 +723,19 @@
     $(".btnCloseDialog").livequery("click", function () {
       event.preventDefault();
       $("#dlgAddBinLocation").dialog('close');
+    });
+
+    $(".btnShowZoneLocationContents").livequery("click", function (event) {
+      var id = $(this).data("id");
+      var url = "${request.contextPath}/location/showContents/" + id;
+      console.log(url);
+      $("#dlgShowZoneContents").load(url).dialog('open');
+      event.preventDefault();
+    });
+
+    $("#btnAddZoneLocation").livequery("click", function (event) {
+      event.preventDefault();
+      $("#dlgAddZoneLocation").dialog('open');
     });
 
     // Import Bin Locations

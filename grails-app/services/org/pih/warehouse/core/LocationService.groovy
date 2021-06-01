@@ -51,6 +51,27 @@ class LocationService {
         return location
     }
 
+    def getZones(Location parentLocation) {
+        return Location.createCriteria().list {
+            eq("active", Boolean.TRUE)
+            eq("parentLocation", parentLocation)
+            locationType {
+                'in'("locationTypeCode", LocationTypeCode.listZoneTypeCodes())
+            }
+
+            order("name")
+        }
+    }
+
+    def getBinLocations(Location parentLocation) {
+        return Location.createCriteria().list {
+            eq("active", Boolean.TRUE)
+            eq("parentLocation", parentLocation)
+            locationType {
+                'in'("locationTypeCode", LocationTypeCode.listInternalTypeCodes())
+            }
+        }
+    }
 
     def getAllLocations() {
         return getLocations(null, [:])
