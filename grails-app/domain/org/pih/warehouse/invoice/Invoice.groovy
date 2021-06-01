@@ -136,8 +136,8 @@ class Invoice implements Serializable {
         invoiceItems.each {invoiceItem ->
             if (invoiceItem?.order?.documents) {
                 invoiceItem?.order?.documents?.each {document ->
-                    if (!documents.contains(document)) {
-                        documents.add(document)
+                    if (!documents.find { it.id == document.id }) {
+                        documents.add(document.toJson())
                     }
                 }
             }
@@ -195,6 +195,7 @@ class Invoice implements Serializable {
             invoiceType: invoiceType?.code?.name(),
             hasPrepaymentInvoice: hasPrepaymentInvoice,
             isPrepaymentInvoice: isPrepaymentInvoice,
+            documents: documents,
         ]
     }
 }

@@ -14,6 +14,7 @@ import LabelField from '../form-elements/LabelField';
 import Translate from '../../utils/Translate';
 import ArrayField from '../form-elements/ArrayField';
 import apiClient from '../../utils/apiClient';
+import DocumentButton from '../DocumentButton';
 
 const INVOICE_HEADER_FIELDS = {
   invoiceNumber: {
@@ -161,6 +162,7 @@ class ConfirmInvoicePage extends Component {
 
     this.isRowLoaded = this.isRowLoaded.bind(this);
     this.loadMoreRows = this.loadMoreRows.bind(this);
+    this.toggleDropdown = this.toggleDropdown.bind(this);
   }
 
   /**
@@ -257,6 +259,15 @@ class ConfirmInvoicePage extends Component {
       });
   }
 
+  /**
+   * Toggle the downloadable files
+   */
+  toggleDropdown() {
+    this.setState({
+      isDropdownVisible: !this.state.isDropdownVisible,
+    });
+  }
+
   render() {
     return (
       <div>
@@ -268,6 +279,37 @@ class ConfirmInvoicePage extends Component {
           render={({ handleSubmit, values }) => (
             <form onSubmit={handleSubmit}>
               <div className="classic-form classic-form-condensed">
+                <span className="buttons-container classic-form-buttons">
+                  <span className="mr-3">
+                    <div className="dropdown">
+                      <button
+                        type="button"
+                        onClick={this.toggleDropdown}
+                        className="dropdown-button float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+                      >
+                        <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.download.label" defaultMessage="Download" /></span>
+                      </button>
+                      <div className={`dropdown-content print-buttons-container col-md-3 flex-grow-1
+                        ${this.state.isDropdownVisible ? 'visible' : ''}`}
+                      >
+                        {this.state.values.documents.length > 0 &&
+                        _.map(this.state.values.documents, (document, idx) => {
+                          if (document.hidden) {
+                            return null;
+                          }
+                          return (<DocumentButton
+                            link={document.link}
+                            buttonTitle={document.name}
+                            {...document}
+                            key={idx}
+                            disabled={false}
+                          />);
+                        })}
+                      </div>
+                    </div>
+                  </span>
+                </span>
+                <div className="form-title"><Translate id="react.invoice.options.label" defaultMessage="Invoice options" /></div>
                 {_.map(INVOICE_HEADER_FIELDS, (fieldConfig, fieldName) =>
                   renderFormField(fieldConfig, fieldName, {
                     values,
