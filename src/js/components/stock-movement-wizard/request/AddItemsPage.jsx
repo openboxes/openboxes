@@ -491,7 +491,7 @@ class AddItemsPage extends Component {
    */
   getFields() {
     if (_.get(this.state.values.stocklist, 'id')) {
-      if (_.get(this.state.values.stocklist, 'replenishmentType.name') === REPLENISHMENT_TYPE_PULL) {
+      if (_.get(this.state.values.replenishmentType, 'name') === REPLENISHMENT_TYPE_PULL) {
         return STOCKLIST_FIELDS_PULL_TYPE;
       }
       return STOCKLIST_FIELDS_PUSH_TYPE;
@@ -569,7 +569,7 @@ class AddItemsPage extends Component {
 
     if (this.state.values.lineItems.length === 0 && !data.length) {
       lineItemsData = new Array(1).fill({ sortOrder: 100 });
-    } else if (_.get(this.state.values.stocklist, 'replenishmentType.name') === REPLENISHMENT_TYPE_PULL) {
+    } else if (_.get(this.state.values.replenishmentType, 'name') === REPLENISHMENT_TYPE_PULL) {
       lineItemsData = _.map(
         data,
         (val) => {
