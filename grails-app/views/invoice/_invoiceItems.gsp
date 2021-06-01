@@ -21,10 +21,10 @@
             <g:each var="invoiceItem" in="${invoiceInstance.invoiceItems.sort { it.dateCreated }}" status="status">
                 <tr class="${status%2==0?'odd':'even'}">
                     <td>
-                        ${invoiceItem?.product?.productCode}
+                        ${invoiceItem?.product?.productCode?:g.message(code:'default.all.label')}
                     </td>
                     <td>
-                        ${invoiceItem?.product?.name}
+                        ${invoiceItem?.description}
                     </td>
                     <td>
                         ${invoiceItem?.order?.orderNumber}

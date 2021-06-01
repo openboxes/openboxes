@@ -12,13 +12,11 @@
                     ${invoiceInstance?.invoiceNumber}
                 </div>
             </td>
-            <%--
             <td class="top right" width="1%">
                 <div class="tag tag-alert">
                     <format:metadata obj="${invoiceInstance?.status}"/>
                 </div>
             </td>
-            --%>
         </tr>
         </tbody>
     </table>
