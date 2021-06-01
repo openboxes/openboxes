@@ -132,10 +132,10 @@ class StockMovement {
             destination         : destination,
             hasManageInventory  : origin?.supports(ActivityCode.MANAGE_INVENTORY),
             stocklist           : [
-                id                  : stocklist?.id,
-                name                : stocklist?.name,
-                replenishmentType   : stocklist?.replenishmentTypeCode
+                id  : stocklist?.id,
+                name: stocklist?.name
             ],
+            replenishmentType   : stocklist?.replenishmentTypeCode,
             dateRequested       : dateRequested?.format("MM/dd/yyyy"),
             dateShipped         : dateShipped?.format("MM/dd/yyyy HH:mm XXX"),
             expectedDeliveryDate: expectedDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),

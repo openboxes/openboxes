@@ -863,7 +863,7 @@ class EditItemsPage extends Component {
 
   getFields() {
     if (_.get(this.state.values.stocklist, 'id')) {
-      if (_.get(this.state.values.stocklist, 'replenishmentType.name') === REPLENISHMENT_TYPE_PULL) {
+      if (_.get(this.state.values.replenishmentType, 'name') === REPLENISHMENT_TYPE_PULL) {
         return STOCKLIST_FIELDS_PULL_TYPE;
       }
       return STOCKLIST_FIELDS_PUSH_TYPE;
