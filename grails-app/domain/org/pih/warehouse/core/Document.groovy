@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.core
 
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 
 /**
  * A document is a file (e.g. document, image) that can be associated with an
@@ -37,7 +38,7 @@ class Document implements Serializable {
         cache true
     }
 
-    static transients = ["size", "image"]
+    static transients = ["size", "image", 'link']
 
     static constraints = {
         name(nullable: true, maxSize: 255)
@@ -66,6 +67,24 @@ class Document implements Serializable {
     static List findAllByDocumentCode(DocumentCode documentCode) {
         List<DocumentType> documentTypes = DocumentType.findAllByDocumentCode(documentCode)
         return Document.findAllByDocumentTypeInList(documentTypes)
+    }
+
+    def getLink() {
+        def g = ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        return fileUri ?: g.createLink(controller: 'document', action: "download", id: id, absolute: true)
+    }
+
+    Map toJson() {
+        return [
+                id          : id,
+                name        : name,
+                link        : link,
+                fileUri     : fileUri,
+                filename    : filename,
+                documentType: documentType,
+                size        : size,
+                lastUpdated : lastUpdated,
+        ]
     }
 
 }

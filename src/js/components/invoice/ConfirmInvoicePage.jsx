@@ -297,7 +297,6 @@ class ConfirmInvoicePage extends Component {
                           if (document.hidden) {
                             return null;
                           }
-                          console.log(document);
                           return (<DocumentButton
                             link={document.link}
                             buttonTitle={document.name}
