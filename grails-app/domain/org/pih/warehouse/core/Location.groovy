@@ -242,7 +242,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
         return locationType?.isFacilityLocation()
     }
 
-    Boolean isZone() {
+    Boolean isZoneLocation() {
         return locationType?.isZone()
     }
 
