@@ -554,7 +554,7 @@ class StockMovementService {
                         def quantityDemand = forecastingService.getDemand(requisition.destination, editPageItem.product)
                         editPageItem << [
                             quantityDemand                  : quantityDemand?.monthlyDemand?:0,
-                            demandPerReplenishmentPeriod    : Math.ceil((quantityDemand?.dailyDemand?:0) * (template?.replenishmentPeriod?:0))
+                            demandPerReplenishmentPeriod    : Math.ceil((quantityDemand?.dailyDemand?:0) * (template?.replenishmentPeriod?:30))
                         ]
                     } else {
                         def stocklist = Requisition.get(requisition.requisitionTemplate.id)
@@ -634,7 +634,7 @@ class StockMovementService {
                                     statusCode                      : stockMovementItem.statusCode,
                                     sortOrder                       : stockMovementItem.sortOrder,
                                     monthlyDemand                   : demand?.monthlyDemand?:0,
-                                    demandPerReplenishmentPeriod    : Math.ceil((demand?.dailyDemand?:0) * (template?.replenishmentPeriod?:0))
+                                    demandPerReplenishmentPeriod    : Math.ceil((demand?.dailyDemand?:0) * (template?.replenishmentPeriod?:30))
                             ]
                         } else {
                             [
