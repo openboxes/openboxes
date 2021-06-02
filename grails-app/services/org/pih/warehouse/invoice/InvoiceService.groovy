@@ -234,12 +234,12 @@ class InvoiceService {
             throw new Exception("No order items or order adjustments found for given order")
         }
 
-        order.orderItems.findAll { it.orderItemStatusCode != OrderItemStatusCode.CANCELED }.each { OrderItem orderItem ->
+        order.activeOrderItems.each { OrderItem orderItem ->
             InvoiceItem invoiceItem = createFromOrderItem(orderItem)
             invoice.addToInvoiceItems(invoiceItem)
         }
 
-        order.orderAdjustments.findAll {!it.canceled }.each { OrderAdjustment orderAdjustment ->
+        order.activeOrderAdjustments.each { OrderAdjustment orderAdjustment ->
             InvoiceItem invoiceItem = createFromOrderAdjustment(orderAdjustment)
             invoice.addToInvoiceItems(invoiceItem)
         }

@@ -102,6 +102,8 @@ class Order implements Serializable {
             "received",
             "canceled",
             "completed",
+            'activeOrderAdjustments',
+            'activeOrderItems'
     ]
 
     static hasMany = [
@@ -405,6 +407,14 @@ class Order implements Serializable {
 
     Boolean getCanGenerateInvoice() {
         return hasPrepaymentInvoice && isShipped() && !hasRegularInvoice
+    }
+
+    List<OrderItem> getActiveOrderItems() {
+        return orderItems.findAll { it.orderItemStatusCode != OrderItemStatusCode.CANCELED }
+    }
+
+    List<OrderAdjustment> getActiveOrderAdjustments() {
+        return orderAdjustments.findAll {!it.canceled }
     }
 
     Map toJson() {
