@@ -165,6 +165,10 @@ class ConfirmInvoicePage extends Component {
     this.toggleDropdown = this.toggleDropdown.bind(this);
   }
 
+  componentDidMount() {
+    this.fetchInvoiceData();
+  }
+
   /**
    * Sets state of invoice items after fetch and calls method to fetch next items
    * @param {string} startIndex
@@ -195,6 +199,26 @@ class ConfirmInvoicePage extends Component {
       }
       this.props.hideSpinner();
     });
+  }
+
+  /**
+   * Fetches invoice values from API.
+   * @public
+   */
+  fetchInvoiceData() {
+    if (this.state.values.id) {
+      this.props.showSpinner();
+      const url = `/openboxes/api/invoices/${this.state.values.id}`;
+      apiClient.get(url)
+        .then((response) => {
+          const values = {
+            ...this.state.values,
+            documents: response.data.data.documents,
+          };
+
+          this.setState({ values }, () => this.props.hideSpinner());
+        });
+    }
   }
 
   /**
@@ -292,7 +316,7 @@ class ConfirmInvoicePage extends Component {
                       <div className={`dropdown-content print-buttons-container col-md-3 flex-grow-1
                         ${this.state.isDropdownVisible ? 'visible' : ''}`}
                       >
-                        {this.state.values.documents.length > 0 &&
+                        {this.state.values.documents && this.state.values.documents.length > 0 &&
                         _.map(this.state.values.documents, (document, idx) => {
                           if (document.hidden) {
                             return null;
