@@ -38,7 +38,7 @@
                     <li><a href="#location-configuration-tab"><g:message code="location.configuration.label"
                                                                   default="Configuration"/></a></li>
                     <g:if test="${!locationInstance?.isInternalLocation()}">
-                        <g:if test="${!locationInstance?.isZone()}">
+                        <g:if test="${!locationInstance?.isZoneLocation()}">
                             <li><a href="#location-address-tab"><g:message code="location.address.label"
                                                                        default="Address"/></a></li>
                             <li><a href="${request.contextPath}/location/showZoneLocations/${locationInstance?.id}"
@@ -104,7 +104,7 @@
                                                  class="text" size="80"/>
                                 </td>
                             </tr>
-                            <g:if test="${locationInstance?.isInternalLocation() || locationInstance.isZone()}">
+                            <g:if test="${locationInstance?.isInternalLocation() || locationInstance.isZoneLocation()}">
                                 <tr class="prop">
                                     <td valign="top" class="name">
                                         <label for="name"><warehouse:message
@@ -169,7 +169,7 @@
                                               noSelection="['null': '']"/>
                                 </td>
                             </tr>
-                            <g:if test="${!locationInstance?.isInternalLocation() && !locationInstance.isZone()}">
+                            <g:if test="${!locationInstance?.isInternalLocation() && !locationInstance.isZoneLocation()}">
                                 <tr class="prop">
                                     <td valign="top" class="name">
                                         <label for="name"><warehouse:message
@@ -259,7 +259,7 @@
                             </tr>
 
 
-                            <g:if test="${!locationInstance?.isInternalLocation() && !locationInstance?.isZone()}">
+                            <g:if test="${!locationInstance?.isInternalLocation() && !locationInstance?.isZoneLocation()}">
                                 <tr class="prop">
                                     <td valign="top" class="name">
                                         <label for="bgColor"><warehouse:message
@@ -377,7 +377,7 @@
                     </div>
                 </div>
 
-                <g:if test="${!locationInstance?.isInternalLocation() && !locationInstance?.isZone()}">
+                <g:if test="${!locationInstance?.isInternalLocation() && !locationInstance?.isZoneLocation()}">
 
                     <div id="location-address-tab">
                         <g:hiddenField name="address.id" value="${locationInstance?.address?.id}"/>
@@ -510,7 +510,7 @@
      title="${g.message(code: 'default.add.label', args: [g.message(code: 'location.internal.label')])}">
     <div class="dialog">
         <g:form controller="location" action="update">
-            <g:if test="${locationInstance?.isZone()}">
+            <g:if test="${locationInstance?.isZoneLocation()}">
                 <g:hiddenField name="zone.id" value="${locationInstance?.id}"/>
                 <g:hiddenField name="parentLocation.id" value="${locationInstance?.parentLocation?.id}"/>
             </g:if>
