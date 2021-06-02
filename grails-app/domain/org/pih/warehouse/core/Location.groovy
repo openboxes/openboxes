@@ -254,6 +254,14 @@ class Location implements Comparable<Location>, java.io.Serializable {
         Location.list().findAll { it.isDepotWardOrPharmacy() }.sort { it.name }
     }
 
+    List<Location> getInternalLocations() {
+        return locations?.toList()?.findAll { it.isInternalLocation() }
+    }
+
+    List<Location> getInternalLocationsByZone(Location zone) {
+        return locations?.toList()?.findAll { it.isInternalLocation() && it.zone?.id == zone?.id }
+    }
+
     /**
      * Gets all bin locations for the given location.
      *
