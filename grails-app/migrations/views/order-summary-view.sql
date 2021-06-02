@@ -6,15 +6,19 @@ CREATE OR REPLACE VIEW order_item_status AS
         quantity_shipped,
         order_status,
         (quantity_ordered > 0)                 AS shipment_ordered,
-        (quantity_shipped >= 0) AS shipped -- indicates if anything was shipped, (can be partially shipped)
+        (quantity_shipped >= quantity_ordered) AS shipped, 				    -- indicates if item was shipped
+        (quantity_shipped > 0)  			         AS partially_shipped 	-- indicates if item was partially shipped
     FROM (
         SELECT order.id                 AS order_id,
             `order`.order_number        AS order_number,
             order.status                AS order_status,
             order_item.id               AS order_item_id,
             product.product_code        AS product_code,
-            SUM(order_item.quantity)    AS quantity_ordered,
-            SUM(shipment_item.quantity) AS quantity_shipped
+            SUM(order_item.quantity * order_item.quantity_per_uom)    AS quantity_ordered, -- to compare with shipped quantity which is already multiplied by qty per uom
+            CASE
+              WHEN shipment.current_status IN ('SHIPPED', 'PARTIALLY_RECEIVED', 'RECEIVED') THEN SUM(shipment_item.quantity)
+              ELSE 0
+          	END AS quantity_shipped
         FROM `order`
             LEFT OUTER JOIN order_item ON order.id = order_item.order_id
             LEFT OUTER JOIN product ON order_item.product_id = product.id
@@ -23,7 +27,7 @@ CREATE OR REPLACE VIEW order_item_status AS
             LEFT OUTER JOIN shipment ON shipment.id = shipment_item.shipment_id
         WHERE `order`.order_type_code = 'PURCHASE_ORDER'
           AND order_item.order_item_status_code != 'CANCELLED'
-        GROUP BY `order`.id, `order`.order_number, product.product_code, order_item.id
+        GROUP BY `order`.id, `order`.order_number, product.product_code, order_item.id, shipment.current_status
     )
 AS order_item_status;
 
@@ -136,12 +140,11 @@ CREATE OR REPLACE VIEW order_summary AS (
         SELECT `order`.id as id,
             `order`.order_number,
             `order`.status as order_status,
-            IFNULL(SUM(shipment_ordered), 0)  AS total_ordered,
-            IFNULL(SUM(shipped), 0)           AS total_shipped, -- items fully shipped or partially shipped
             CASE
                 WHEN (IFNULL(SUM(shipment_ordered), 0) + IFNULL(SUM(shipped), 0) = 0) THEN NULL
+                WHEN (IFNULL(SUM(shipment_ordered), 0) + IFNULL(SUM(partially_shipped), 0) = 0) THEN NULL
                 WHEN (IFNULL(SUM(shipment_ordered), 0) = IFNULL(SUM(shipped), 0)) THEN 'SHIPPED'
-                WHEN (IFNULL(SUM(shipment_ordered), 0) > 0 AND IFNULL(SUM(shipped), 0) > 0) THEN 'PARTIALLY_SHIPPED'
+                WHEN (IFNULL(SUM(shipment_ordered), 0) > 0 AND IFNULL(SUM(partially_shipped), 0) > 0) THEN 'PARTIALLY_SHIPPED'
                 ELSE NULL
             END AS shipment_status,
             IFNULL(SUM(receipt_ordered), 0) AS total_receipt_ordered,
