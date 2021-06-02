@@ -32,7 +32,8 @@ class LocationType implements Comparable, Serializable {
         cache true
     }
 
-    static transients = ["defaultInternalLocationType", "internalLocationTypes"]
+    static transients = ["defaultInternalLocationType", "internalLocationTypes",
+                         "zoneLocationTypes", "defaultZoneLocationType"]
 
     static constraints = {
         name(nullable: false, maxSize: 255)
@@ -91,6 +92,16 @@ class LocationType implements Comparable, Serializable {
 
     }
 
+    static List<LocationType> getZoneLocationTypes() {
+        return LocationType.createCriteria().list {
+            'in'("locationTypeCode", LocationTypeCode.listZoneTypeCodes())
+        }
+    }
+
+    static LocationType getDefaultZoneLocationType() {
+        def locationTypes = zoneLocationTypes
+        return locationTypes ? locationTypes[0] : null
+    }
 
     String toString() {
         return "${name}"
@@ -142,6 +153,10 @@ class LocationType implements Comparable, Serializable {
 
     Boolean isFacilityLocation() {
         return (locationTypeCode in LocationTypeCode.listFacilityTypeCodes())
+    }
+
+    Boolean isZone() {
+        return (locationTypeCode in LocationTypeCode.listZoneTypeCodes())
     }
 
 }

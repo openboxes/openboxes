@@ -18,14 +18,11 @@ import org.pih.warehouse.core.EntityTypeCode
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.GlAccountType
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.Organization
-import org.pih.warehouse.core.PartyRole
 import org.pih.warehouse.core.PaymentMethodType
 import org.pih.warehouse.core.PaymentTerm
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.PreferenceType
-import org.pih.warehouse.core.PreferenceTypeCode
 import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.Tag
@@ -38,7 +35,6 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustmentType
-import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociationTypeCode
@@ -416,6 +412,21 @@ class SelectTagLib {
             attrs.from = Location.findAllByParentLocationAndActive(location, true).sort {
                 it?.name?.toLowerCase()
             }
+        }
+
+        attrs["class"] = "chzn-select-deselect"
+        attrs["noSelection"] = ["": ""]
+        attrs.optionKey = 'id'
+        attrs.optionValue = 'name'
+
+        out << g.select(attrs)
+    }
+
+    def selectZoneLocationByLocation = { attrs, body ->
+        def location = Location.get(attrs.id)
+
+        if (location) {
+            attrs.from = locationService.getZones(location)
         }
 
         attrs["class"] = "chzn-select-deselect"

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="adminuser (generated)" id="2805202117200-1">
+    <preConditions onFail="MARK_RAN">
+      <sqlCheck expectedResult="0">
+        select count(*) from location_type where location_type_code = "ZONE";
+      </sqlCheck>
+    </preConditions>
+    <comment>Creating default location type for Zone Location in case one has not been created.</comment>
+    <insert tableName="location_type">
+      <column name="id" value="ZONE"/>
+      <column name="version" valueNumeric="0"/>
+      <column name="name" value="Zone"/>
+      <column name="description" value="Default zone location type"/>
+      <column name="location_type_code" value="ZONE"/>
+      <column name="sort_order" valueNumeric="0"/>
+      <column name="date_created" valueDate="2021-05-28 00:00:00"/>
+      <column name="last_updated" valueDate="2021-05-28 00:00:00"/>
+    </insert>
+  </changeSet>
+
+</databaseChangeLog>
+

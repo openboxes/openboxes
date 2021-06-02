@@ -304,8 +304,23 @@ class LocationController {
         if (!locationInstance) {
             render "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
         } else {
-            def binLocations = Location.findAllByParentLocation(locationInstance)
+            def binLocations
+            if (locationInstance.isZone()) {
+                binLocations = Location.findAllByZone(locationInstance)
+            } else {
+                binLocations = locationService.getBinLocations(locationInstance)
+            }
             [locationInstance: locationInstance, binLocations: binLocations]
+        }
+    }
+
+    def showZoneLocations = {
+        def locationInstance = Location.get(params.id)
+        if (!locationInstance) {
+            render "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
+        } else {
+            def zoneLocations = locationService.getZones(locationInstance)
+            [locationInstance: locationInstance, zoneLocations: zoneLocations]
         }
     }
 
