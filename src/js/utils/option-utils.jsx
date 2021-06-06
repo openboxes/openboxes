@@ -28,7 +28,7 @@ export const debounceUsersFetch = (waitTime, minSearchLength) =>
   }, waitTime);
 
 export const debounceLocationsFetch =
-(waitTime, minSearchLength, activityCodes, fetchAll = false) =>
+(waitTime, minSearchLength, activityCodes, fetchAll = false, withOrgCode = false) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
       const activityCodesParams = activityCodes ? activityCodes.map(activityCode => `&activityCodes=${activityCode}`).join('') : '';
@@ -39,17 +39,18 @@ export const debounceLocationsFetch =
           null,
           {
             complete: true,
-            options: _.map(result.data.data, obj => (
-              {
+            options: _.map(result.data.data, (obj) => {
+              const label = `${obj.name} [${obj.locationType.description}]`;
+              return {
                 value: {
                   id: obj.id,
                   type: obj.locationType.locationTypeCode,
                   name: obj.name,
-                  label: `${obj.name} [${obj.locationType.description}]`,
+                  label: withOrgCode ? `${obj.organizationCode} ${label}` : label,
                 },
-                label: `${obj.name} [${obj.locationType.description}]`,
-              }
-            )),
+                label: withOrgCode ? `${obj.organizationCode} ${label}` : label,
+              };
+            }),
           },
         ))
         .catch(error => callback(error, { options: [] }));

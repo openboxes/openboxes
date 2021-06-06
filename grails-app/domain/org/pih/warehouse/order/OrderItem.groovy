@@ -161,7 +161,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     }
 
     def getShippedShipmentItems() {
-        return shipmentItems.findAll { it.shipment.currentStatus >= ShipmentStatusCode.SHIPPED }
+        return shipmentItems.findAll { it.shipment?.currentStatus >= ShipmentStatusCode.SHIPPED }
     }
 
     def hasShippedItems() {

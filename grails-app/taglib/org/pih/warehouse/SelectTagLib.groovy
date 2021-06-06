@@ -540,7 +540,7 @@ class SelectTagLib {
             it?.name?.toLowerCase()
         }
         attrs.optionKey = 'id'
-        attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]" }
+        attrs.optionValue = { "${it.organization?.code?:''} ${it.name} [${format.metadata(obj: it?.locationType)}]" }
         out << g.select(attrs)
     }
 
