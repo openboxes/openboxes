@@ -168,11 +168,7 @@ class Invoice implements Serializable {
     }
 
     List<InvoiceItem> getPrepaymentItems() {
-        def prepaymentItems = []
-        invoiceItems.each { InvoiceItem invoiceItem ->
-            prepaymentItems += invoiceItem.prepaymentItem
-        }
-        return prepaymentItems
+        return invoiceItems.findAll { it.prepaymentItem }.collect { it.prepaymentItem }
     }
 
     Map toJson() {
