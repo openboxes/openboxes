@@ -10,6 +10,8 @@
 package org.pih.warehouse.core
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
+import org.pih.warehouse.product.ProductSupplier
+
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import org.apache.commons.lang.RandomStringUtils
@@ -116,6 +118,19 @@ class IdentifierService {
             identifier = "${prefix}${Constants.DEFAULT_NAME_SEPARATOR}${identifier}"
         }
         return identifier
+    }
+
+    def generateProductSupplierIdentifier(String prefix, String suffix) {
+        if (prefix && suffix) {
+            if (ProductSupplier.findByCode("${prefix}${Constants.DEFAULT_NAME_SEPARATOR}${suffix}")) {
+                return generateProductSupplierIdentifier("${prefix}${Constants.DEFAULT_NAME_SEPARATOR}${suffix}")
+            }
+            return "${prefix}${Constants.DEFAULT_NAME_SEPARATOR}${suffix}"
+        } else if (prefix) {
+            return generateProductSupplierIdentifier(prefix)
+        } else {
+            return generateIdentifier(grailsApplication.config.openboxes.identifier.productSupplier.format)
+        }
     }
 
     def generateRequisitionIdentifier() {
