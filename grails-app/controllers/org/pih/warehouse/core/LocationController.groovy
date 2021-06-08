@@ -353,22 +353,37 @@ class LocationController {
     def exportBinLocations = {
 
         Location location = Location.get(params.id)
+        Location zone = null
+
+        if (location?.isZoneLocation()) {
+            zone = location
+            location = location?.parentLocation
+        }
 
         if (!location) {
             throw new IllegalArgumentException("Must specify location")
         }
 
-        if (location.locations) {
+        def binLocations
+
+        if (zone) {
+            binLocations = location.getInternalLocationsByZone(zone)
+        } else {
+            binLocations = location.internalLocations
+        }
+
+        if (binLocations) {
             def date = new Date()
             response.setHeader("Content-disposition",
                     "attachment; filename=\"BinLocations-${location?.name}-${date.format("yyyyMMdd-hhmmss")}.csv\"")
             response.contentType = "text/csv"
-            def csvrows = location.locations.collect { binLocation ->
+            def csvrows = binLocations.collect { binLocation ->
                 return [
                         "id"            : binLocation.id ?: "",
                         "locationType"  : binLocation?.locationType?.locationTypeCode ?: "",
                         "locationNumber": binLocation?.locationNumber ?: "",
-                        "locationName"  : binLocation?.name ?: ""
+                        "locationName"  : binLocation?.name ?: "",
+                        "zoneName"      : binLocation?.zone?.name ?: ""
                 ]
             }
 

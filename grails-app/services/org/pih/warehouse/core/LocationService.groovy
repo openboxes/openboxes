@@ -390,6 +390,8 @@ class LocationService {
         try {
 
             Location location = Location.get(locationId)
+            location = location?.isZoneLocation() ? location?.parentLocation : location
+
             if (!location) {
                 throw new ValidationException("location.cannotImportBinLocationsWithoutParentLocation.message")
             }
@@ -416,6 +418,17 @@ class LocationService {
                         binLocation.locationNumber = it.name
                         binLocation.parentLocation = location
                         binLocation.locationType = defaultLocationType
+
+                        if (it.zoneName) {
+                            Location zone = Location.findByNameAndParentLocation(it.zoneName, location)
+
+                            if (!zone) {
+                                throw new ValidationException("Zone with name: ${it.zoneName} does not exist", binLocation.errors)
+                            } else {
+                                binLocation.zone = zone
+                            }
+                        }
+
                         location.addToLocations(binLocation)
                         if (!binLocation.validate()) {
                             throw new ValidationException("Bin location ${it.name} is invalid", binLocation.errors)
@@ -461,7 +474,8 @@ class LocationService {
             try {
                 cellIndex = 0
                 def name = getStringCellValue(row.getCell(cellIndex++))
-                binLocations << [name: name]
+                def zoneName = getStringCellValue(row.getCell(cellIndex++))
+                binLocations << [name: name, zoneName: zoneName]
             }
             catch (IllegalStateException e) {
                 log.error("Error parsing XLS file " + e.message, e)
