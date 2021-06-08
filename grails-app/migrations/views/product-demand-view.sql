@@ -180,17 +180,17 @@ FROM (
                       select parent_item.id as requisition_item_id,
                              -- check all reason codes for insufficient quantity available
                              sum(if(parent_item.cancel_reason_code in
-                                    ('STOCKOUT', 'LOW_STOCK', 'COULD_NOT_LOCATE')
+                                    ('STOCKOUT', 'LOW_STOCK', 'COULD_NOT_LOCATE', 'BACKORDER')
                                         or parent_item.pick_reason_code in
-                                           ('STOCKOUT', 'LOW_STOCK', 'COULD_NOT_LOCATE')
+                                           ('STOCKOUT', 'LOW_STOCK', 'COULD_NOT_LOCATE', 'BACKORDER')
                                         or child_item.cancel_reason_code in
-                                           ('STOCKOUT', 'LOW_STOCK', 'COULD_NOT_LOCATE')
+                                           ('STOCKOUT', 'LOW_STOCK', 'COULD_NOT_LOCATE', 'BACKORDER')
                                         or child_item.pick_reason_code in
-                                           ('STOCKOUT', 'LOW_STOCK', 'COULD_NOT_LOCATE')
+                                           ('STOCKOUT', 'LOW_STOCK', 'COULD_NOT_LOCATE', 'BACKORDER')
                                         or parent_picklist_item.reason_code in
-                                           ('STOCKOUT', 'LOW_STOCK', 'COULD_NOT_LOCATE')
+                                           ('STOCKOUT', 'LOW_STOCK', 'COULD_NOT_LOCATE', 'BACKORDER')
                                         or child_picklist_item.reason_code in
-                                           ('STOCKOUT', 'LOW_STOCK', 'COULD_NOT_LOCATE'), true,
+                                           ('STOCKOUT', 'LOW_STOCK', 'COULD_NOT_LOCATE', 'BACKORDER'), true,
                                     false)) as insufficient_quantity_available,
                              -- otherwise the reason code is probably related to a clinical judgment
                              sum((coalesce(parent_item.cancel_reason_code,
