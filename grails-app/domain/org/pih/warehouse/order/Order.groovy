@@ -216,7 +216,7 @@ class Order implements Serializable {
      * @return a boolean indicating whether the order has been fully shipped
      */
     Boolean isShipped() {
-        return orderItems?.every { OrderItem orderItem -> orderItem.orderItemStatusCode != OrderItemStatusCode.CANCELED && orderItem.isCompletelyFulfilled() }
+        return activeOrderItems?.every { OrderItem orderItem -> orderItem.isCompletelyFulfilled() }
     }
 
     /**
