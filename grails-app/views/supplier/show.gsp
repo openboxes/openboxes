@@ -28,8 +28,12 @@
                 <div class="yui-u">
                     <div class="tabs tabs-ui">
                         <ul>
+                            <li><a href="#tabs-priceHistory"><warehouse:message code="supplier.priceHistory.label" default="Price History"/></a></li>
                             <li><a href="#tabs-documents"><warehouse:message code="document.documents.label" default="Documents"/></a></li>
                         </ul>
+                        <div id="tabs-priceHistory" class="ui-tabs-hide">
+                            <g:render template="/supplier/priceHistory"/>
+                        </div>
                         <div id="tabs-documents" class="ui-tabs-hide">
                             <g:render template="/supplier/documents"/>
                         </div>
