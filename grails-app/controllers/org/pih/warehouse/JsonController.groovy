@@ -1869,50 +1869,6 @@ class JsonController {
 
         render([fieldRemoved: fieldRemoved] as JSON)
     }
-
-    def getPriceHistory = {
-        Organization supplier = Organization.get(params.supplierId)
-        Product product = Product.get(params.productId)
-        def data = orderService.getOrderItemsForPriceHistory(supplier, product, params.q)
-
-        if (params.format == "text/csv") {
-            def sw = new StringWriter()
-
-            def csv = new CSVWriter(sw, {
-                "Order Number" { it.orderNumber }
-                "Date Created" { it.dateCreated }
-                "Description" { it.description }
-                "Product Code" { it.productCode }
-                "Product" { it.productName }
-                "Source Code" { it.sourceCode }
-                "Supplier Code" { it.supplierCode }
-                "Manufacturer" { it.manufacturerName }
-                "Manufacturer Code" { it.manufacturerCode }
-                "Unit Price" { it.unitPrice }
-            })
-
-            data.each {
-                csv << [
-                        orderNumber           : it.orderNumber,
-                        dateCreated           : it.dateCreated.format("MM/dd/yyyy"),
-                        description           : it.description,
-                        productCode           : it.productCode,
-                        productName           : it.productName,
-                        sourceCode            : it.sourceCode ?: '',
-                        supplierCode          : it.supplierCode ?: '',
-                        manufacturerName      : it.manufacturerName ?: '',
-                        manufacturerCode      : it.manufacturerCode ?: '',
-                        unitPrice             : it.unitPrice ?: '',
-                ]
-            }
-
-            response.setHeader("Content-disposition", "attachment; filename=\"Request-Detail-Report.csv\"")
-            render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
-            return
-        }
-
-        render([aaData: data] as JSON)
-    }
 }
 
 

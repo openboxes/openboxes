@@ -63,7 +63,7 @@
       "sPaginationType": "full_numbers",
       "iDisplayLength": 10,
       "bFilter": false,
-      "sAjaxSource": "${request.contextPath}/json/getPriceHistory",
+      "sAjaxSource": "${request.contextPath}/supplier/getPriceHistory",
       "fnServerParams": function ( data ) {
         data.push({ name: "supplierId", value: $("#supplierId").val() });
         data.push({ name: "q", value: $("#q").val() });
