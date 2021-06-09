@@ -1,3 +1,4 @@
+<%@ page import="org.pih.warehouse.inventory.LotStatusCode" %>
 <style>
 	.recalled { background-color: #ffcccb; }
 </style>
@@ -28,7 +29,7 @@
 					<g:set var="isSuperuser" value="${true}"/>
 				</g:isSuperuser>
 				<g:each var="inventoryItem" in="${commandInstance?.product?.inventoryItems.sort { it.dateCreated }}" status="status">
-					<tr class="prop ${inventoryItem?.recalled ? 'recalled' : ''}">
+					<tr class="prop ${inventoryItem?.lotStatus == LotStatusCode.RECALLED ? 'recalled' : ''}">
 						<td class="middle center" nowrap="nowrap">
 							<div class="action-menu">
 								<button class="action-btn">
@@ -50,7 +51,7 @@
 												<g:message code="default.delete.label" args="[g.message(code:'inventoryItem.label')]"/>
 											</g:link>
 										</div>
-										<g:if test="${inventoryItem?.recalled}">
+										<g:if test="${inventoryItem?.lotStatus == LotStatusCode.RECALLED}">
 											<div class="action-menu-item">
 												<g:link controller="inventoryItem" action="revertRecall" id="${inventoryItem?.id}" data-disabled="${!isSuperuser}">
 													<img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}"/>&nbsp;

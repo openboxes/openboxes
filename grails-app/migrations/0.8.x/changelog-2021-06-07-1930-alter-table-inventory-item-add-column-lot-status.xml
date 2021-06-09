@@ -6,11 +6,11 @@
   <changeSet author="awalkowiak" id="0706202119300-0">
     <preConditions onFail="MARK_RAN">
       <not>
-        <columnExists tableName="inventory_item" columnName="recalled"/>
+        <columnExists tableName="inventory_item" columnName="lot_status"/>
       </not>
     </preConditions>
     <addColumn tableName="inventory_item">
-      <column name="recalled" type="BIT"/>
+      <column name="lot_status" type="VARCHAR(255)"/>
     </addColumn>
   </changeSet>
 </databaseChangeLog>

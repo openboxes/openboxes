@@ -40,7 +40,7 @@ class InventoryItem implements Serializable {
     Product product                        // Product that we're tracking
     String lotNumber                        // Lot information for a product
     Date expirationDate
-    Boolean recalled = Boolean.FALSE
+    LotStatusCode lotStatus
 
     String comments
 
@@ -67,7 +67,7 @@ class InventoryItem implements Serializable {
         lotNumber(nullable: true, unique: ['product'], maxSize: 255)
         expirationDate(shared:"expirationDateConstraint")
         comments(nullable: true)
-        recalled(nullable: true)
+        lotStatus(nullable: true)
     }
 
     Map toJson() {
@@ -80,7 +80,7 @@ class InventoryItem implements Serializable {
                 "quantityOnHand" : quantity ?: 0,
                 "quantityATP"    : quantity ?: 0,       //todo: quantity available to promise will coming soon
                 "expires"        : expirationStatus,
-                "recalled"       : recalled
+                "lotStatus"      : lotStatus
         ]
     }
 

@@ -946,7 +946,7 @@ class InventoryItemController {
     def recall = {
         InventoryItem inventoryItem = InventoryItem.get(params.id)
         if (userService.isUserAdmin(session.user)) {
-            inventoryItem.recalled = Boolean.TRUE
+            inventoryItem.lotStatus = LotStatusCode.RECALLED
             flash.message = "${warehouse.message(code: 'inventoryItem.recall.message')}"
         } else {
             flash.message = "${warehouse.message(code: 'errors.noPermissions.label')}"
@@ -957,7 +957,7 @@ class InventoryItemController {
     def revertRecall = {
         InventoryItem inventoryItem = InventoryItem.get(params.id)
         if (userService.isUserAdmin(session.user)) {
-            inventoryItem.recalled = Boolean.FALSE
+            inventoryItem.lotStatus = null
             flash.message = "${warehouse.message(code: 'inventoryItem.revertRecall.message')}"
         } else {
             flash.message = "${warehouse.message(code: 'errors.noPermissions.label')}"
