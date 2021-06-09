@@ -122,4 +122,5 @@
     <include file="0.8.x/changelog-2021-05-25-1654-add-zone-to-location.xml"/>
     <include file="0.8.x/changelog-2021-05-26-1356-add-bin-location-to-inventory-level.xml"/>
     <include file="0.8.x/changelog-2021-05-28-1756-add-zone-location-type.xml"/>
+    <include file="0.8.x/changelog-2021-06-07-1930-alter-table-inventory-item-add-column-lot-status.xml"/>
 </databaseChangeLog>
