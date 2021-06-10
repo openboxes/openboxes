@@ -116,7 +116,7 @@ const TABLE_FIELDS = {
         defaultMessage: 'Expiration date',
         flexWidth: '1',
       },
-      'binLocation.name': {
+      binLocation: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.binLocation.label',
         defaultMessage: 'Bin Location',
@@ -124,6 +124,14 @@ const TABLE_FIELDS = {
         getDynamicAttr: ({ hasBinLocationSupport }) => ({
           hide: !hasBinLocationSupport,
         }),
+        attributes: {
+          showValueTooltip: true,
+          formatValue: fieldValue => (
+            <div className="d-flex">
+              {fieldValue.zoneName ? <div className="text-truncate" style={{ minWidth: 30, flexShrink: 20 }}>{fieldValue.zoneName}</div> : ''}
+              <div className="text-truncate">{fieldValue.zoneName ? `: ${fieldValue.name}` : fieldValue.name}</div>
+            </div>),
+        },
       },
       'recipient.name': {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
