@@ -85,6 +85,8 @@ class PartialReceiptItem {
                 "expirationDate"      : expirationDate?.format("MM/dd/yyyy"),
                 "binLocation.id"      : binLocation?.id,
                 "binLocation.name"    : binLocation?.name,
+                "binLocation.zoneId"  : binLocation?.zone?.id,
+                "binLocation.zoneName": binLocation?.zone?.name,
                 "recipient.id"        : recipient?.id,
                 "recipient.name"      : recipient?.name,
                 quantityShipped       : quantityShipped,
