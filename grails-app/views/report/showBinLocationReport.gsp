@@ -94,6 +94,7 @@
                                 <th class="center"><g:message code="default.status.label"/></th>
                                 <th class="center"><g:message code="product.productCode.label"/></th>
                                 <th class="center"><g:message code="product.label"/></th>
+                                <th class="center"><g:message code="location.zone.label"/></th>
                                 <th class="center"><g:message code="location.binLocation.label"/></th>
                                 <th class="center"><g:message code="inventoryItem.lotNumber.label"/></th>
                                 <th class="center"><g:message code="inventoryItem.expirationDate.label"/></th>
@@ -178,6 +179,7 @@
                 { "mData": "status", "sWidth": "1%" },
                 { "mData": "productCode", "sWidth": "1%" },
                 { "mData": "productName", "sWidth": "20%" },
+                { "mData": "zone", "sWidth": "5%"  },
                 { "mData": "binLocation", "sWidth": "5%"  },
                 { "mData": "lotNumber", "sWidth": "5%"  },
                 { "mData": "expirationDate", "sWidth": "5%"  },
