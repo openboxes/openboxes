@@ -169,12 +169,10 @@
                             </td>
                         </g:if>
                         <td class="middle">
-                            <g:set var="received" value="${shipmentItems?.receiptItems*.findAll { it.inventoryItem == inventoryItem }?.quantityReceived?.flatten()?.sum()}"/>
-                            ${received}
+                            ${requisitionItem?.getReceiptItems(inventoryItem)?.quantityReceived?.sum()}
                         </td>
                         <td>
-                            <g:set var="comments" value="${shipmentItems?.receiptItems*.findAll { it.inventoryItem == inventoryItem }?.comment?.flatten()?.join(', ')}"/>
-                            ${comments}
+                            ${requisitionItem?.getReceiptItems(inventoryItem)?.comment?.join(', ')}
                         </td>
 
                         <% j++ %>
