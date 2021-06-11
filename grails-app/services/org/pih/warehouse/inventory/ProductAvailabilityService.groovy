@@ -647,7 +647,7 @@ class ProductAvailabilityService {
             }
         }
 
-        def searchableTypes = ProductType.listAllBySupportedActivity([ProductActivityCode.SEARCHABLE])
+        def searchableTypes = ProductType.listAllBySupportedActivity([ProductActivityCode.SEARCHABLE])?:[null]
 
         def productsWithQoH = Product.executeQuery("""
             select p, sum(pa.quantityOnHand)
