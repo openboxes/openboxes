@@ -938,6 +938,7 @@ class OrderService {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             projections {
                 property("unitPrice", "unitPrice")
+                property("quantityPerUom", "quantityPerUom")
                 order {
                     property("orderNumber", "orderNumber")
                     property("id", "orderId")
