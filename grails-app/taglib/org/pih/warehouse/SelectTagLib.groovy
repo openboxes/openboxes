@@ -737,9 +737,11 @@ class SelectTagLib {
                 writer << '</optgroup>'
                 writer.println()
             }
+            // iterate through items with no group
             noGroup.each {
                 writer << '<option '
                 def keyValue = null
+                // check type of optionKey, retrieve value from iterated object and assign it to keyValue
                 if (optionKey instanceof Closure) {
                     keyValue = optionKey(it)
                 } else if (it != null && optionKey == 'id' && grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, it.getClass().name)) {
@@ -747,6 +749,7 @@ class SelectTagLib {
                 } else {
                     keyValue = it[optionKey]
                 }
+                // add value to the option and mark if it's selected
                 writeValueAndCheckIfSelected(keyValue, value, writer)
                 writer << '>'
                 writer << optionValue(it).toString().encodeAsHTML()
