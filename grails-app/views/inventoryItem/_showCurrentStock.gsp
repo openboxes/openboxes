@@ -39,12 +39,21 @@
                                   model="[commandInstance:commandInstance,binLocation:entry.binLocation,itemInstance:entry.inventoryItem,itemQuantity:entry.quantity,isSuperuser:isSuperuser]" />
                     </td>
                     <td>
-                        <g:if test="${entry?.binLocation}">
-                            <g:link controller="location" action="edit" id="${entry.binLocation?.id}">${entry?.binLocation?.name}</g:link>
-                        </g:if>
-                        <g:else>
-                            <warehouse:message code="default.label" default="Default"/>
-                        </g:else>
+                        <div class="line">
+                            <g:if test="${entry?.binLocation}">
+                                <g:if test="${entry?.binLocation?.zone}">
+                                    <span class="line-base" title="${entry?.binLocation?.zone?.name}">
+                                        <g:link controller="location" action="edit" id="${entry.binLocation?.zone?.id}">${entry?.binLocation?.zone?.name}</g:link>
+                                    </span>:&nbsp;
+                                </g:if>
+                                <span class="line-extension" title="${entry?.binLocation?.name}">
+                                    <g:link controller="location" action="edit" id="${entry.binLocation?.id}">${entry?.binLocation?.name}</g:link>
+                                </span>
+                            </g:if>
+                            <g:else>
+                                <warehouse:message code="default.label" default="Default"/>
+                            </g:else>
+                        </div>
                     </td>
                     <td>
                         ${entry?.inventoryItem?.lotNumber?:"Default"}

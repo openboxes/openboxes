@@ -10,6 +10,26 @@
 
 	<title><g:pageProperty name="page.title"/></title>
 
+	<style>
+		.line {
+			display: flex;
+			min-width: 0;
+		}
+
+		.line-base {
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			overflow: hidden;
+			max-width: 50px;
+		}
+
+		.line-extension {
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			overflow: hidden;
+			max-width: 100px;
+		}
+	</style>
 </head>
 <body>
 	<div class="body">
