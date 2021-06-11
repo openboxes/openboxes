@@ -34,13 +34,21 @@ const FIELDS = {
         label: 'react.stockMovement.expiry.label',
         defaultMessage: 'Expiry',
       },
-      'binLocation.name': {
+      binLocation: {
         type: LabelField,
         label: 'react.stockMovement.binLocation.label',
         defaultMessage: 'Bin Location',
         getDynamicAttr: ({ hasBinLocationSupport }) => ({
           hide: !hasBinLocationSupport,
         }),
+        attributes: {
+          showValueTooltip: true,
+          formatValue: fieldValue => fieldValue && (
+            <div className="d-flex">
+              {fieldValue.zoneName ? <div className="text-truncate" style={{ minWidth: 30, flexShrink: 20 }}>{fieldValue.zoneName}</div> : ''}
+              <div className="text-truncate">{fieldValue.zoneName ? `: ${fieldValue.name}` : fieldValue.name}</div>
+            </div>),
+        },
       },
       quantityAvailable: {
         type: LabelField,
@@ -139,10 +147,22 @@ class EditPickModal extends Component {
           ...avItem,
           id: picklistItem.id,
           quantityPicked: picklistItem.quantityPicked,
+          binLocation: {
+            id: picklistItem['binLocation.id'],
+            name: picklistItem['binLocation.name'],
+            zoneName: picklistItem['binLocation.zoneName'],
+          },
         };
       }
 
-      return avItem;
+      return {
+        ...avItem,
+        binLocation: {
+          id: avItem['binLocation.id'],
+          name: avItem['binLocation.name'],
+          zoneName: avItem['binLocation.zoneName'],
+        },
+      };
     });
 
     this.setState({
