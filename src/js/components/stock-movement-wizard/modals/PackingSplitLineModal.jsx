@@ -57,13 +57,21 @@ const FIELDS = {
         label: 'react.stockMovement.expiry.label',
         defaultMessage: 'Expiry',
       },
-      binLocationName: {
+      binLocation: {
         type: LabelField,
         label: 'react.stockMovement.binLocation.label',
         defaultMessage: 'Bin Location',
         getDynamicAttr: ({ hasBinLocationSupport }) => ({
           hide: !hasBinLocationSupport,
         }),
+        attributes: {
+          showValueTooltip: true,
+          formatValue: fieldValue => fieldValue && (
+            <div className="d-flex">
+              {fieldValue.zoneName ? <div className="text-truncate" style={{ minWidth: 30, flexShrink: 20 }}>{fieldValue.zoneName}</div> : ''}
+              <div className="text-truncate">{fieldValue.zoneName ? `: ${fieldValue.name}` : fieldValue.name}</div>
+            </div>),
+        },
       },
       quantityShipped: {
         type: TextField,
@@ -180,7 +188,7 @@ class PackingSplitLineModal extends Component {
             product: this.state.attr.lineItem.product,
             lotNumber: this.state.attr.lineItem.lotNumber,
             expirationDate: this.state.attr.lineItem.expirationDate,
-            binLocationName: this.state.attr.lineItem.binLocationName,
+            binLocation: this.state.attr.lineItem.binLocation,
             quantityShipped: this.state.attr.lineItem.quantityShipped,
             recipient: this.state.attr.lineItem.recipient,
             palletName: this.state.attr.lineItem.palletName,
