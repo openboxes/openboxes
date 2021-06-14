@@ -24,7 +24,7 @@ const FIELDS = {
           product: lineItem.product,
           lotNumber: lineItem.lotNumber,
           expirationDate: lineItem.expirationDate,
-          binLocationName: lineItem.binLocationName,
+          binLocation: lineItem.binLocation,
           recipient: lineItem.recipient,
         }, null, false)}
       > <Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
