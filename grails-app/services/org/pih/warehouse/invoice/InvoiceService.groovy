@@ -337,7 +337,7 @@ class InvoiceService {
         InvoiceItem invoiceItem = new InvoiceItem(
             budgetCode: orderAdjustment.budgetCode,
             product: orderAdjustment.orderItem?.product,
-            glAccount: orderAdjustment.glAccount ?: orderAdjustment.orderItem?.glAccount,
+            glAccount: orderAdjustment.glAccount ?: orderAdjustment.orderItem?.glAccount ?: orderAdjustment.orderAdjustmentType?.glAccount,
             quantity: 1,
             quantityUom: orderAdjustment.orderItem?.quantityUom,
             quantityPerUom: orderAdjustment.orderItem?.quantityPerUom ?: 1
