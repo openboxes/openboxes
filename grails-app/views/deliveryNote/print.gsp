@@ -224,7 +224,7 @@
                                             <label><warehouse:message code="deliveryNote.receivedDate.label" default="Received date"/>:</label>
                                         </td>
                                         <td>
-                                            <g:formatDate date="${requisition?.shipment?.expectedDeliveryDate}" format="d MMMMM yyyy  hh:mma"/>
+                                            <g:formatDate date="${requisition?.shipment?.receipt?.actualDeliveryDate}" format="d MMMMM yyyy  hh:mma"/>
                                         </td>
                                     </tr>
                                 </table>
