@@ -103,7 +103,7 @@
       "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
         $('td:eq(0)', nRow).html('<a href="${request.contextPath}/order/show/' + aData["orderId"] + '">' + aData["orderNumber"] + '</a>');
         $('td:eq(1)', nRow).html(moment(aData["dateCreated"]).format("DD/MMM/YYYY"));
-        $('td:eq(9)', nRow).html(aData["unitPrice"]/aData["quantityPerUom"]);
+        $('td:eq(9)', nRow).html((aData["unitPrice"]/aData["quantityPerUom"]).toLocaleString('en-US'));
         return nRow;
       }
     });
