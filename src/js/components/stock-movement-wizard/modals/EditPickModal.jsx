@@ -44,7 +44,7 @@ const FIELDS = {
         attributes: {
           showValueTooltip: true,
           formatValue: fieldValue => fieldValue && (
-            <div className="d-flex">
+            <div className="d-flex justify-content-center">
               {fieldValue.zoneName ? <div className="text-truncate" style={{ minWidth: 30, flexShrink: 20 }}>{fieldValue.zoneName}</div> : ''}
               <div className="text-truncate">{fieldValue.zoneName ? `: ${fieldValue.name}` : fieldValue.name}</div>
             </div>),
