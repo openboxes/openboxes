@@ -170,7 +170,7 @@ class StockMovementCombinedShipments extends Component {
               id: resp.origin.id,
               type: originType ? originType.locationTypeCode : null,
               name: resp.origin.name,
-              label: `${resp.origin.name} [${originType ? originType.description : null}]`,
+              label: `${resp.origin.organizationCode ? `${resp.origin.organizationCode} - ` : ''}${resp.origin.name}`,
             },
             destination: {
               id: resp.destination.id,

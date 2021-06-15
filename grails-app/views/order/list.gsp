@@ -114,9 +114,15 @@
                                         <g:if test="${orderTypeCode != OrderTypeCode.TRANSFER_ORDER}">
                                             <td class="middle">
                                                 ${fieldValue(bean: orderInstance, field: "origin.name")}
+												<g:if test="origin.organization.code">
+													 (${fieldValue(bean: orderInstance, field: "origin.organization.code")})
+												</g:if>
                                             </td>
                                             <td class="middle">
                                                 ${fieldValue(bean: orderInstance, field: "destination.name")}
+												<g:if test="destination.organization.code">
+													(${fieldValue(bean: orderInstance, field: "destination.organization.code")})
+												</g:if>
                                             </td>
                                         </g:if>
                                         <td class="middle">
