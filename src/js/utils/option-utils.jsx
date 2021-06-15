@@ -27,8 +27,14 @@ export const debounceUsersFetch = (waitTime, minSearchLength) =>
     }
   }, waitTime);
 
-export const debounceLocationsFetch =
-(waitTime, minSearchLength, activityCodes, fetchAll = false, withOrgCode = false) =>
+export const debounceLocationsFetch = (
+  waitTime,
+  minSearchLength,
+  activityCodes,
+  fetchAll = false,
+  withOrgCode = false,
+  withTypeDescription = true,
+) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
       const activityCodesParams = activityCodes ? activityCodes.map(activityCode => `&activityCodes=${activityCode}`).join('') : '';
@@ -40,15 +46,16 @@ export const debounceLocationsFetch =
           {
             complete: true,
             options: _.map(result.data.data, (obj) => {
-              const label = `${obj.name} [${obj.locationType.description}]`;
+              const locationType = withTypeDescription ? ` [${obj.locationType.description}]` : '';
+              const label = `${obj.name}${locationType}`;
               return {
                 value: {
                   id: obj.id,
                   type: obj.locationType.locationTypeCode,
                   name: obj.name,
-                  label: withOrgCode ? `${obj.organizationCode} ${label}` : label,
+                  label: withOrgCode ? `${obj.organizationCode ? `${obj.organizationCode} - ` : ''}${label}` : label,
                 },
-                label: withOrgCode ? `${obj.organizationCode} ${label}` : label,
+                label: withOrgCode ? `${obj.organizationCode ? `${obj.organizationCode} - ` : ''}${label}` : label,
               };
             }),
           },

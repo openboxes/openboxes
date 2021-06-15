@@ -54,7 +54,6 @@
 									<th>${warehouse.message(code: 'default.name.label')}</th>
                                     <g:if test="${orderTypeCode != OrderTypeCode.TRANSFER_ORDER}">
                                         <th>${warehouse.message(code: 'order.origin.label')}</th>
-                                        <th>${warehouse.message(code: 'order.originCode.label')}</th>
                                         <th>${warehouse.message(code: 'order.destination.label')}</th>
                                     </g:if>
                                     <th>${warehouse.message(code: 'order.orderedBy.label')}</th>
@@ -115,12 +114,15 @@
                                         <g:if test="${orderTypeCode != OrderTypeCode.TRANSFER_ORDER}">
                                             <td class="middle">
                                                 ${fieldValue(bean: orderInstance, field: "origin.name")}
-                                            </td>
-                                            <td class="middle">
-                                                ${fieldValue(bean: orderInstance, field: "origin.organization.code")}
+												<g:if test="origin.organization.code">
+													 (${fieldValue(bean: orderInstance, field: "origin.organization.code")})
+												</g:if>
                                             </td>
                                             <td class="middle">
                                                 ${fieldValue(bean: orderInstance, field: "destination.name")}
+												<g:if test="destination.organization.code">
+													(${fieldValue(bean: orderInstance, field: "destination.organization.code")})
+												</g:if>
                                             </td>
                                         </g:if>
                                         <td class="middle">
@@ -157,7 +159,7 @@
 							</tbody>
 							<tfoot>
 								<tr class="odd">
-									<g:set var="colspan" value="${params.orderTypeCode == OrderTypeCode.PURCHASE_ORDER ? 13 : 8}"/>
+									<g:set var="colspan" value="${params.orderTypeCode == OrderTypeCode.PURCHASE_ORDER ? 12 : 8}"/>
 									<th colspan="${colspan}"></th>
 									<th><label>${warehouse.message(code:'order.totalPrice.label')}</label></th>
 									<th colspan="2" class="right">

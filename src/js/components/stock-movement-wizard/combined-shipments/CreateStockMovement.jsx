@@ -97,9 +97,10 @@ class CreateStockMovement extends Component {
       debounceLocationsFetch(
         this.props.debounceTime,
         this.props.minSearchLength,
-        null,
-        false,
-        true,
+        null, // activityCodes
+        false, // fetchAll
+        true, // withOrgCode
+        false, // withTypeDescription
       );
 
     this.debouncedDestinationLocationsFetch =
@@ -138,7 +139,7 @@ class CreateStockMovement extends Component {
         id: origin.id,
         type: origin.locationType ? origin.locationType.locationTypeCode : null,
         name: origin.name,
-        label: `${origin.organizationCode} ${origin.name} [${origin.locationType ? origin.locationType.description : null}]`,
+        label: `${origin.organizationCode ? `${origin.organizationCode} - ` : ''}${origin.name}`,
       };
     }
     if (destination) {
