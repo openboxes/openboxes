@@ -47,7 +47,7 @@ class InternalLocationApiController {
 
         String[] receivingLocationNames = [locationService.getReceivingLocationName(shipmentNumber), "Receiving ${shipmentNumber}"]
         List<Location> locations = locationService.getInternalLocations(parentLocation, locationTypeCodes, activityCodes, receivingLocationNames)
-        render([data: locations?.collect { [id: it.id, name: it.name] }] as JSON)
+        render([data: locations?.collect { [id: it.id, name: it.name, zoneId: it.zone?.id, zoneName: it.zone?.name] }] as JSON)
     }
 
     def read = {

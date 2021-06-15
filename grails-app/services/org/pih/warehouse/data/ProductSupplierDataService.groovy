@@ -10,6 +10,7 @@
 package org.pih.warehouse.data
 
 import groovy.sql.Sql
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PreferenceType
 import org.pih.warehouse.core.ProductPrice
@@ -302,8 +303,9 @@ class ProductSupplierDataService {
 
     def createProductSupplierWithoutPackage(Map params) {
         Product product = Product.get(params.product.id)
+        Organization organization = Organization.get(params.supplier.id)
         ProductSupplier productSupplier = new ProductSupplier()
-        productSupplier.code = params.sourceCode?:identifierService.generateProductSupplierIdentifier(product?.productCode)
+        productSupplier.code = params.sourceCode ?: identifierService.generateProductSupplierIdentifier(product?.productCode, organization?.code)
         productSupplier.name = params.sourceName ?: product?.name
         productSupplier.supplier = Organization.get(params.supplier.id)
         productSupplier.supplierCode = params.supplierCode

@@ -75,6 +75,14 @@
                                     </tr>
                                     <tr class="prop">
                                         <td valign="top" class="name">
+                                            <label><warehouse:message code="invoice.invoiceType.label"/></label>
+                                        </td>
+                                        <td valign="top" class="value">
+                                            ${invoiceInstance?.invoiceType?.name}
+                                        </td>
+                                    </tr>
+                                    <tr class="prop">
+                                        <td valign="top" class="name">
                                             <label><warehouse:message code="invoice.totalValue.label"/></label>
                                             <small>${warehouse.message(code: 'invoice.localCurrency.label', default: 'Local Currency')}</small>
                                         </td>

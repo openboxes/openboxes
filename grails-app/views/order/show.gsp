@@ -61,18 +61,18 @@
                                 </tr>
                                 <tr class="prop">
                                     <td valign="top" class="name">
-                                        <label><warehouse:message code="order.destination.label"/></label>
+                                        <label><warehouse:message code="order.origin.label"/></label>
                                     </td>
                                     <td valign="top" class="value">
-                                        ${orderInstance?.destination?.name }
+                                        ${orderInstance?.origin?.name}
                                     </td>
                                 </tr>
                                 <tr class="prop">
                                     <td valign="top" class="name">
-                                        <label><warehouse:message code="order.origin.label"/></label>
+                                        <label><warehouse:message code="order.destination.label"/></label>
                                     </td>
                                     <td valign="top" class="value">
-                                        ${orderInstance?.origin?.name }
+                                        ${orderInstance?.destination?.name}
                                     </td>
                                 </tr>
                                 <tr class="prop">
@@ -84,6 +84,32 @@
                                     </td>
                                 </tr>
 
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                        <label><warehouse:message code="paymentTerm.label"/></label>
+                                    </td>
+                                    <td valign="top" class="value">
+                                        <g:if test="${orderInstance?.paymentTerm}">
+                                            <div>${orderInstance?.paymentTerm?.name}</div>
+                                        </g:if>
+                                        <g:else>
+                                            <g:message code="default.none.label"/>
+                                        </g:else>
+                                    </td>
+                                </tr>
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                        <label><warehouse:message code="order.paymentMethodType.label"/></label>
+                                    </td>
+                                    <td valign="top" class="value">
+                                        <g:if test="${orderInstance?.paymentMethodType}">
+                                            <div>${orderInstance?.paymentMethodType?.name}</div>
+                                        </g:if>
+                                        <g:else>
+                                            <g:message code="default.none.label"/>
+                                        </g:else>
+                                    </td>
+                                </tr>
                                 <tr class="prop">
                                     <td valign="top" class="name">
                                         <label><warehouse:message code="order.subtotal.label"/></label>

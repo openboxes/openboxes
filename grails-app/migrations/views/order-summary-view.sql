@@ -14,7 +14,7 @@ CREATE OR REPLACE VIEW order_item_status AS
             order.status                AS order_status,
             order_item.id               AS order_item_id,
             product.product_code        AS product_code,
-            SUM(order_item.quantity * order_item.quantity_per_uom)    AS quantity_ordered, -- to compare with shipped quantity which is already multiplied by qty per uom
+            order_item.quantity * order_item.quantity_per_uom    AS quantity_ordered, -- to compare with shipped quantity which is already multiplied by qty per uom
             CASE
               WHEN shipment.current_status IN ('SHIPPED', 'PARTIALLY_RECEIVED', 'RECEIVED') THEN SUM(shipment_item.quantity)
               ELSE 0

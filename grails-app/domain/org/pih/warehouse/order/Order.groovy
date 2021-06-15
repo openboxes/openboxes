@@ -90,7 +90,7 @@ class Order implements Serializable {
             "invoiceItems",
             "hasPrepaymentInvoice",
             "hasRegularInvoice",
-            "hasItemsOrAdjustments",
+            "hasActiveItemsOrAdjustments",
             "isPrepaymentInvoiceAllowed",
             "isPrepaymentRequired",
             "canGenerateInvoice",
@@ -216,7 +216,7 @@ class Order implements Serializable {
      * @return a boolean indicating whether the order has been fully shipped
      */
     Boolean isShipped() {
-        return orderItems?.every { OrderItem orderItem -> orderItem.orderItemStatusCode != OrderItemStatusCode.CANCELED && orderItem.isCompletelyFulfilled() }
+        return activeOrderItems?.every { OrderItem orderItem -> orderItem.isCompletelyFulfilled() }
     }
 
     /**
@@ -393,8 +393,8 @@ class Order implements Serializable {
         return invoices.any { it.invoiceType == null || it.invoiceType?.code == InvoiceTypeCode.INVOICE }
     }
 
-    Boolean getHasItemsOrAdjustments() {
-        return orderItems || orderAdjustments
+    Boolean getHasActiveItemsOrAdjustments() {
+        return activeOrderItems || activeOrderAdjustments
     }
 
     Boolean getIsPrepaymentRequired() {
@@ -402,18 +402,18 @@ class Order implements Serializable {
     }
 
     Boolean getIsPrepaymentInvoiceAllowed() {
-        return !hasInvoice && isPrepaymentRequired && hasItemsOrAdjustments
+        return !hasInvoice && isPrepaymentRequired && hasActiveItemsOrAdjustments
     }
 
     Boolean getCanGenerateInvoice() {
         return hasPrepaymentInvoice && isShipped() && !hasRegularInvoice
     }
 
-    List<OrderItem> getActiveOrderItems() {
+    def getActiveOrderItems() {
         return orderItems.findAll { it.orderItemStatusCode != OrderItemStatusCode.CANCELED }
     }
 
-    List<OrderAdjustment> getActiveOrderAdjustments() {
+    def getActiveOrderAdjustments() {
         return orderAdjustments.findAll {!it.canceled }
     }
 

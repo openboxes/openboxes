@@ -12,6 +12,7 @@ package org.pih.warehouse.order
 import grails.validation.ValidationException
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.grails.plugins.csv.CSVMapReader
+import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.*
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
@@ -929,5 +930,68 @@ class OrderService {
                 'in'("derivedStatus", params.derivedStatus)
             }
         }
+    }
+
+    List<OrderItem> getOrderItemsForPriceHistory(Organization supplierOrganization, Product productInstance, String query) {
+        def terms = "%" + query + "%"
+        def orderItems = OrderItem.createCriteria().list() {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            projections {
+                property("unitPrice", "unitPrice")
+                property("quantityPerUom", "quantityPerUom")
+                order {
+                    property("orderNumber", "orderNumber")
+                    property("id", "orderId")
+                    property("dateCreated", "dateCreated")
+                    property("name", "description")
+                }
+                product {
+                    property("productCode", "productCode")
+                    property("name", "productName")
+                }
+                productSupplier {
+                    property("code", "sourceCode")
+                    property("supplierCode", "supplierCode")
+                    property("manufacturerCode", "manufacturerCode")
+                    manufacturer {
+                        property("name", "manufacturerName")
+                    }
+                }
+            }
+            order {
+                eq("orderTypeCode", OrderTypeCode.PURCHASE_ORDER)
+                eq("originParty", supplierOrganization)
+            }
+            if (productInstance) {
+                eq("product", productInstance)
+            }
+            if (terms) {
+                or {
+                    product {
+                        or {
+                            ilike("productCode", terms)
+                            ilike("name", terms)
+                         }
+                    }
+                    order {
+                        or {
+                            ilike("orderNumber", terms)
+                            ilike("name", terms)
+                        }
+                    }
+                    productSupplier {
+                        or {
+                            ilike("manufacturerCode", terms)
+                            ilike("manufacturerName", terms)
+                            ilike("code", terms)
+                            ilike("supplierCode", terms)
+                            ilike("supplierName", terms)
+                        }
+                    }
+                }
+            }
+        }
+
+        return orderItems
     }
 }

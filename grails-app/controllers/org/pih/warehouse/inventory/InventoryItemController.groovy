@@ -37,6 +37,7 @@ class InventoryItemController {
     def requisitionService
     def orderService
     def forecastingService
+    def userService
     def grailsApplication
 
 
@@ -940,5 +941,27 @@ class InventoryItemController {
             }
         }
         redirect(action: "showStockCard", params: ['product.id': productInstance?.id])
+    }
+
+    def recall = {
+        InventoryItem inventoryItem = InventoryItem.get(params.id)
+        if (userService.isUserAdmin(session.user)) {
+            inventoryItem.lotStatus = LotStatusCode.RECALLED
+            flash.message = "${warehouse.message(code: 'inventoryItem.recall.message')}"
+        } else {
+            flash.message = "${warehouse.message(code: 'errors.noPermissions.label')}"
+        }
+        redirect(action: 'showLotNumbers', params: ['product.id': inventoryItem?.product?.id])
+    }
+
+    def revertRecall = {
+        InventoryItem inventoryItem = InventoryItem.get(params.id)
+        if (userService.isUserAdmin(session.user)) {
+            inventoryItem.lotStatus = null
+            flash.message = "${warehouse.message(code: 'inventoryItem.revertRecall.message')}"
+        } else {
+            flash.message = "${warehouse.message(code: 'errors.noPermissions.label')}"
+        }
+        redirect(action: 'showLotNumbers', params: ['product.id': inventoryItem?.product?.id])
     }
 }

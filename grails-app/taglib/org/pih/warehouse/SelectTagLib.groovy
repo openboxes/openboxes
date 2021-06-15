@@ -405,6 +405,23 @@ class SelectTagLib {
         }
     }
 
+    def selectBinLocationWithOptGroup = { attrs, body ->
+        def currentLocation = Location.get(session?.warehouse?.id)
+        if (currentLocation.hasBinLocationSupport()) {
+            attrs.from = Location.findAllByParentLocationAndActive(currentLocation, true).sort {
+                it?.name?.toLowerCase()
+            }
+            attrs.optionKey = 'id'
+            attrs.optionValue = { it.zone ? it.zone.name + ": " + it.name : it.name }
+            attrs.groupBy = 'zone'
+
+            out << g.selectWithOptGroup(attrs)
+        } else {
+            out << g.message(code: "default.notSupported.label")
+            out << g.hiddenField(id: attrs.id, name: attrs.name, value: attrs.value)
+        }
+    }
+
     def selectBinLocationByLocation = { attrs, body ->
         def location = Location.get(attrs.id)
 
@@ -623,6 +640,7 @@ class SelectTagLib {
         def noSelection = attrs.remove('noSelection')
         def disabled = attrs.remove('disabled')
         Set optGroupSet = new TreeSet()
+        def noGroup = []
         attrs.id = attrs.id ? attrs.id : attrs.name
 
         if (value instanceof Collection && attrs.multiple == null) {
@@ -639,7 +657,7 @@ class SelectTagLib {
 
         // figure out the groups
         from.each {
-            optGroupSet.add(it.properties[groupBy])
+            it.properties[groupBy] ? optGroupSet.add(it.properties[groupBy]) : noGroup.add(it)
         }
 
         writer << "<select name=\"${attrs.remove('name')}\" "
@@ -717,6 +735,25 @@ class SelectTagLib {
                 }
 
                 writer << '</optgroup>'
+                writer.println()
+            }
+            // iterate through items with no group
+            noGroup.each {
+                writer << '<option '
+                def keyValue = null
+                // check type of optionKey, retrieve value from iterated object and assign it to keyValue
+                if (optionKey instanceof Closure) {
+                    keyValue = optionKey(it)
+                } else if (it != null && optionKey == 'id' && grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, it.getClass().name)) {
+                    keyValue = it.ident()
+                } else {
+                    keyValue = it[optionKey]
+                }
+                // add value to the option and mark if it's selected
+                writeValueAndCheckIfSelected(keyValue, value, writer)
+                writer << '>'
+                writer << optionValue(it).toString().encodeAsHTML()
+                writer << '</option>'
                 writer.println()
             }
         }

@@ -9,125 +9,133 @@
     <g:set var="entityName" value="${warehouse.message(code: 'requisition.label', default: 'Requisition')}"/>
     <title><warehouse:message code="default.show.label" args="[entityName]"/></title>
     <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'buttons.css')}" type="text/css" media="all" />
+    <g:javascript library="jquery" plugin="jquery" />
 
     <style>
+        @page { margin: .25in; }
+        .landscape { size:landscape; width: 26.7cm;  }
+        .portrait { size:portrait; }
 
-    table {
-        border-collapse: collapse;
-        page-break-inside: auto;
-        -fs-table-paginate: paginate;
-        border-spacing: 0;
-        margin: 5px;
-    }
-    thead {display: table-header-group;}
-    tr {page-break-inside: avoid; page-break-after: auto;}
-    td {vertical-align: top; }
-    th { background-color: lightgrey; font-weight: bold;}
-    body { font-size: 11px; }
+        table {
+            border-collapse: collapse;
+            page-break-inside: auto;
+            -fs-table-paginate: paginate;
+            border-spacing: 0;
+            margin: 5px;
+        }
+        thead {display: table-header-group;}
+        tr {page-break-inside: avoid; page-break-after: auto;}
+        td {vertical-align: top; }
+        th { background-color: lightgrey; font-weight: bold;}
+        body { font-size: 11px; }
 
-    div.header {
-        display: block;
-        text-align: center;
-        position: running(header);
-    }
-    div.footer {
-        display: block;
-        text-align: center;
-        position: running(footer);
-    }
+        div.header {
+            display: block;
+            text-align: center;
+            position: running(header);
+        }
+        div.footer {
+            display: block;
+            text-align: center;
+            position: running(footer);
+        }
 
-    @page {
-        size: letter;
-        background: white;
-        @top-center { content: element(header) }
-        @bottom-center { content: element(footer) }
-    }
+        @page {
+            size: letter;
+            background: white;
+            @top-center { content: element(header) }
+            @bottom-center { content: element(footer) }
+        }
 
-    .small {font-size: xx-small;}
-    .large { font-size: larger; }
-    .line{border-bottom: 1px solid black}
-    .page-start {
-        -fs-page-sequence: start;
-        page-break-before: avoid;
-    }
+        .small {font-size: xx-small;}
+        .large { font-size: larger; }
+        .line{border-bottom: 1px solid black}
+        .page-start {
+            -fs-page-sequence: start;
+            page-break-before: avoid;
+        }
 
-    .page-content { page-break-after: avoid; }
-    .page-header { page-break-before: avoid; }
-    .break {page-break-after:always}
-    .page:before { content: counter(page); }
-    .pagecount:before { content: counter(pages); }
-    body { font: 11px "lucida grande", verdana, arial, helvetica, sans-serif; }
+        .page-content { page-break-after: avoid; }
+        .page-header { page-break-before: avoid; }
+        .break {page-break-after:always}
+        .page:before { content: counter(page); }
+        .pagecount:before { content: counter(pages); }
+        body { font: 11px "lucida grande", verdana, arial, helvetica, sans-serif; }
 
-    table {border-collapse: collapse; page-break-inside: auto;}
-    thead {display: table-header-group;}
+        table {border-collapse: collapse; page-break-inside: auto;}
+        thead {display: table-header-group;}
 
-    table td, table th {
-        padding: 5px;
-        border: 1px solid lightgrey;
-        vertical-align: middle;
-    }
-    .first-line {
-        display: flex;
-        justify-content: space-between;
-    }
+        table td, table th {
+            padding: 5px;
+            border: 1px solid lightgrey;
+            vertical-align: middle;
+        }
+        .first-line {
+            display: flex;
+            justify-content: space-between;
+        }
 
-    .no-border-table td, .no-border-table th { border: 0 !important; }
-    .m-0 { margin: 0 !important; }
-    .m-5 { margin: 5px !important }
-    .b-0 { border: 0 !important; }
-    .b-t0 { border-top: 0 !important; }
-    .b-r0 { border-right: 0 !important; }
-    .b-b0 { border-bottom: 0 !important; }
-    .b-l0 { border-left: 0 !important; }
-    .no-padding { padding: 0 !important; }
-    .w100 { width: 100% !important; }
-    .no-wrap { white-space: nowrap; }
-    .gray-background { background-color: #ddd !important; }
-    .fixed-layout { table-layout: fixed; }
-    .signature-table tr { height: 40px;  }
-    .break-word { word-wrap: break-word; }
+        .no-border-table td, .no-border-table th { border: 0 !important; }
+        .m-0 { margin: 0 !important; }
+        .m-5 { margin: 5px !important }
+        .b-0 { border: 0 !important; }
+        .b-t0 { border-top: 0 !important; }
+        .b-r0 { border-right: 0 !important; }
+        .b-b0 { border-bottom: 0 !important; }
+        .b-l0 { border-left: 0 !important; }
+        .no-padding { padding: 0 !important; }
+        .w100 { width: 100% !important; }
+        .no-wrap { white-space: nowrap; }
+        .gray-background { background-color: #ddd !important; }
+        .fixed-layout { table-layout: fixed; }
+        .signature-table tr { height: 40px;  }
+        .break-word { word-wrap: break-word; }
 
-    .signature-table table {
-        width: 100%;
-        padding: 5px;
-        border: 0;
-        margin: auto;
-        margin-bottom: 20px;
-        margin-top: 20px;
-    }
+        .signature-table table {
+            width: 100%;
+            padding: 5px;
+            border: 0;
+            margin: auto;
+            margin-bottom: 20px;
+            margin-top: 20px;
+        }
 
-    .signature-table {
-        width: 100%;
-        margin: auto;
-        margin-bottom: 20px;
-        margin-top: 100px;
-    }
-    .signature-table tr, .signature-table td {
-        border: 0px solid lightgrey;
-        border-top: 1px solid lightgrey;
-        height: 60px;
-        vertical-align: top;
-    }
+        .signature-table {
+            width: 100%;
+            margin: auto;
+            margin-bottom: 20px;
+            margin-top: 100px;
+        }
+        .signature-table tr, .signature-table td {
+            border: 0px solid lightgrey;
+            border-top: 1px solid lightgrey;
+            height: 60px;
+            vertical-align: top;
+        }
 
-    .top { vertical-align: top }
-    .bottom { vertical-align: bottom }
-    .right { text-align: right; }
-    .center { text-align: center; }
-    .left { text-align: left; }
+        .top { vertical-align: top }
+        .bottom { vertical-align: bottom }
+        .right { text-align: right; }
+        .center { text-align: center; }
+        .left { text-align: left; }
 
-    @media print {
-        .print-button { display:none; }
-        .print-header { display:none; }
-    }
-    .canceled {
-        text-decoration: line-through;
-    }
+        @media print {
+            .print-button { display:none; }
+            .print-header { display:none; }
+        }
+        .canceled {
+            text-decoration: line-through;
+        }
+
+        #select-orientation {
+            height: 25px;
+            margin-right: 15px;
+        }
     </style>
 
 </head>
 
-<body>
-
+<body class="${params.orientation?:'portrait'}">
     <div class="print-header">
         <table class="w100 fixed-layout no-border-table">
             <tr>
@@ -135,11 +143,11 @@
                     <h1 class="m-0">${g.message(code: 'deliveryNote.button.print.label')}</h1>
                 </td>
                 <td class="right">
-                    <div class="button-container" >
-                        <a href="#" id="print-button" onclick="window.print()" class="button">
-                            ${warehouse.message(code: "default.button.print.label", default:"Print")}
-                        </a>
-
+                    <div class="button-container">
+                        <g:select id="select-orientation" name="orientation" from="['', 'portrait', 'landscape']" value="${params.orientation}" />
+                        <button id="print-page" type="button" class="button">
+                            ${warehouse.message(code:"default.button.print.label")}
+                        </button>
                         <a href="javascript:window.close();" class="button">
                             ${warehouse.message(code: "default.button.close.label")}
                         </a>
@@ -209,6 +217,14 @@
                                         </td>
                                         <td>
                                             <g:formatDate date="${requisition?.shipment?.expectedShippingDate}" format="d MMMMM yyyy  hh:mma"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="name">
+                                            <label><warehouse:message code="deliveryNote.receivedDate.label" default="Received date"/>:</label>
+                                        </td>
+                                        <td>
+                                            <g:formatDate date="${requisition?.shipment?.receipt?.actualDeliveryDate}" format="d MMMMM yyyy  hh:mma"/>
                                         </td>
                                     </tr>
                                 </table>
@@ -445,6 +461,22 @@
         </table>
 
     </div>
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $("#print-page").click(function(event){
+          window.print();
+          return false;
+        });
 
+        $("#select-orientation").change(function() {
+          var selected = this.value;
+          if ('URLSearchParams' in window) {
+            var searchParams = new URLSearchParams(window.location.search);
+            searchParams.set("orientation", selected);
+            window.location.search = searchParams.toString();
+          }
+        });
+      });
+    </script>
 </body>
 </html>
