@@ -304,6 +304,13 @@ class ConfirmInvoicePage extends Component {
             <form onSubmit={handleSubmit}>
               <div className="classic-form classic-form-condensed">
                 <span className="buttons-container classic-form-buttons">
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary float-right btn-form btn-xs"
+                    onClick={() => { window.location = `/openboxes/invoice/show/${values.id}`; }}
+                  >
+                    <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
+                  </button>
                   <span className="mr-3">
                     <div className="dropdown">
                       <button
