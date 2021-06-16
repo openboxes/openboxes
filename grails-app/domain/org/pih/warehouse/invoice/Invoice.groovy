@@ -16,8 +16,10 @@ import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.UnitOfMeasureConversion
 import org.pih.warehouse.core.User
+import org.pih.warehouse.order.Order
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.ReferenceNumberType
+import org.pih.warehouse.shipping.Shipment
 
 class Invoice implements Serializable {
 
@@ -78,7 +80,9 @@ class Invoice implements Serializable {
             'hasPrepaymentInvoice',
             'totalPrepaymentValue',
             'isPrepaymentInvoice',
-            'prepaymentItems'
+            'prepaymentItems',
+            'orders',
+            'shipments'
     ]
 
     static constraints = {
@@ -169,6 +173,14 @@ class Invoice implements Serializable {
 
     List<InvoiceItem> getPrepaymentItems() {
         return invoiceItems.findAll { it.prepaymentItem }.collect { it.prepaymentItem }
+    }
+
+    List<Order> getOrders() {
+        return this.invoiceItems*.orderItems?.order?.flatten()?.unique()
+    }
+
+    List<Shipment> getShipments() {
+        return this.invoiceItems*.shipmentItems?.shipment?.flatten()?.unique()
     }
 
     Map toJson() {
