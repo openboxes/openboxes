@@ -338,7 +338,7 @@ class AddItemsPage extends Component {
               </button>
             </span>
             <form onSubmit={handleSubmit}>
-              <div className="table-form mt-4">
+              <div className="table-form">
                 {_.map(FIELDS, (fieldConfig, fieldName) =>
                   renderFormField(fieldConfig, fieldName, {
                     values,
