@@ -176,11 +176,11 @@ class Invoice implements Serializable {
     }
 
     List<Order> getOrders() {
-        return this.invoiceItems*.orderItems?.order?.flatten()?.unique()
+        return invoiceItems*.orderItems?.order?.flatten()?.unique()
     }
 
     List<Shipment> getShipments() {
-        return this.invoiceItems*.shipmentItems?.shipment?.flatten()?.unique()
+        return invoiceItems*.shipmentItems?.shipment?.flatten()?.unique()
     }
 
     Map toJson() {
