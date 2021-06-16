@@ -22,7 +22,7 @@ import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
-import org.pih.warehouse.inventory.TransactionEvent
+import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
@@ -274,7 +274,7 @@ class ReceiptService {
                 // Trigger product availability refresh
                 transaction.disableRefresh = Boolean.FALSE
                 grailsApplication.mainContext.publishEvent(
-                        new TransactionEvent(transaction, transaction.associatedLocation, transaction.associatedProducts, false))
+                        new RefreshProductAvailabilityEvent(transaction, transaction.associatedLocation, transaction.associatedProducts, false))
 
             } catch (Exception e) {
                 log.error "An unexpected error occurred during receipt: " + e.message, e

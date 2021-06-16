@@ -10,19 +10,17 @@
 package org.pih.warehouse.inventory
 
 import org.springframework.context.ApplicationListener
-class TransactionEventService implements ApplicationListener<TransactionEvent> {
+class RefreshProductAvailabilityEventService implements ApplicationListener<RefreshProductAvailabilityEvent> {
 
     boolean transactional = true
     def grailsApplication
     def productAvailabilityService
 
-    void onApplicationEvent(TransactionEvent event) {
+    void onApplicationEvent(RefreshProductAvailabilityEvent event) {
         log.info "Application event $event has been published! " + event.properties
-        Transaction transaction = event?.source
-
-        // Some transaction event publishers might want to trigger the events on their own
+        // Some event publishers might want to trigger the events on their own
         // in order to allow the transaction to be saved to the database (e.g. Partial Receiving)
-        if (transaction?.disableRefresh) {
+        if (event?.disableRefresh) {
             log.warn "Product availability refresh has been disabled by event publisher"
             return
         }

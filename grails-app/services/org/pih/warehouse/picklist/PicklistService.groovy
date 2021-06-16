@@ -9,6 +9,9 @@
  **/
 package org.pih.warehouse.picklist
 
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.LotStatusCode
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
 
@@ -40,12 +43,30 @@ class PicklistService {
         def itemsToDelete = picklist.picklistItems.findAll {
             dbItem -> !picklistItems.any { clientItem -> clientItem.id == dbItem.id }
         }
-        itemsToDelete.each { picklist.removeFromPicklistItems(it) }
-        picklist.save(flush: true)
-        requisition.save(flush: true)
-        picklist.picklistItems?.each { it.save(flush: true) }
-        picklist
-
+        itemsToDelete.each {
+            picklist.removeFromPicklistItems(it)
+            it.delete()
+        }
+        return picklist.save()
     }
 
+    def getQuantityPicked(Location binLocation, InventoryItem ii) {
+        return Picklist.createCriteria().list {
+            projections {
+                picklistItems {
+                    sum("quantity")
+                }
+            }
+            requisition {
+                'in'("status", RequisitionStatus.listPending())
+            }
+            picklistItems {
+                eq("binLocation", binLocation)
+                eq("inventoryItem", ii)
+                inventoryItem {
+                    ne("lotStatus", LotStatusCode.RECALLED)
+                }
+            }
+        }
+    }
 }
