@@ -9,7 +9,7 @@
             </g:hasRoleInvoice>
             <td>
                 <div class="title">
-                    ${invoiceInstance?.invoiceNumber}
+                    ${invoiceInstance?.invoiceNumber} ${invoiceInstance?.party?.name} ${invoiceInstance?.vendorInvoiceNumber}
                 </div>
             </td>
             <td class="top right" width="1%">

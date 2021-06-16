@@ -46,7 +46,7 @@
                                             <label><warehouse:message code="invoice.vendor.label"/></label>
                                         </td>
                                         <td valign="top" class="value">
-                                            ${invoiceInstance?.party?.name}
+                                            ${invoiceInstance?.party?.code} ${invoiceInstance?.party?.name}
                                         </td>
                                     </tr>
                                     <tr class="prop">
@@ -99,6 +99,36 @@
                                             ${invoiceInstance?.totalValueNormalized} ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                         </td>
                                     </tr>
+                                    <g:if test="${invoiceInstance?.orders}">
+                                        <tr class="prop">
+                                            <td class="name">
+                                                <g:message code="orders.label"/>
+                                            </td>
+                                            <td class="value">
+                                                <g:each var="order" in="${invoiceInstance?.orders}">
+                                                    <g:link controller="order" action="show" id="${order?.id}" target="_blank">
+                                                        ${g.message(code:'default.view.label', args: [g.message(code: 'order.label')])}
+                                                        ${order.orderNumber}
+                                                    </g:link>
+                                                </g:each>
+                                            </td>
+                                        </tr>
+                                    </g:if>
+                                    <g:if test="${invoiceInstance?.shipments}">
+                                        <tr class="prop">
+                                            <td class="name">
+                                                <g:message code="shipments.label"/>
+                                            </td>
+                                            <td class="value">
+                                                <g:each var="shipment" in="${invoiceInstance?.shipments}">
+                                                    <g:link controller="stockMovement" action="show" id="${shipment?.id}" target="_blank">
+                                                        ${g.message(code:'default.view.label', args: [g.message(code: 'shipment.label')])}
+                                                        ${shipment.shipmentNumber}
+                                                    </g:link>
+                                                </g:each>
+                                            </td>
+                                        </tr>
+                                    </g:if>
                                 </tbody>
                             </table>
                         </div>
