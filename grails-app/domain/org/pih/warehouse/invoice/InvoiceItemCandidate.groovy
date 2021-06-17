@@ -87,7 +87,10 @@ class InvoiceItemCandidate {
         return [
             id: id,
             orderNumber: orderNumber,
+            orderId: order?.id,
+            supplierCode: order?.origin?.organization?.code?:'',
             shipmentNumber: shipmentNumber,
+            shipmentId: shipment?.id,
             budgetCode: budgetCode?.code,
             glCode: glAccount?.code,
             productCode: productCode,

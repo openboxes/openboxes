@@ -19,6 +19,8 @@ $blue-gamma: #3bafda;
 $blue-delta: #4fc1e9;
 $blue-epsilon: #bce7f7;
 
+$black-alpha: #212529;
+
 body {
   overflow-x: hidden;
 }
@@ -872,4 +874,10 @@ div.crossed-out .table-inner-row:before {
 
 .negative-value {
   background-color: $red-delta !important;
+}
+
+.linked-label-field {
+  a {
+    color: $black-alpha;
+  }
 }

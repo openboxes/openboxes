@@ -64,12 +64,30 @@ const FIELDS = {
         label: 'react.invoice.orderNumber.label',
         defaultMessage: 'PO Number',
         flexWidth: '1',
+        getDynamicAttr: ({ values, rowIndex }) => {
+          const orderId = values && values.invoiceItems
+              && values.invoiceItems[rowIndex]
+              && values.invoiceItems[rowIndex].orderId;
+          return { url: orderId ? `/openboxes/order/show/${orderId}` : '' };
+        },
+        attributes: {
+          className: 'linked-label-field',
+        },
       },
       shipmentNumber: {
         type: LabelField,
         label: 'react.invoice.shipmentNumber.label',
         defaultMessage: 'Shipment Number',
         flexWidth: '1',
+        getDynamicAttr: ({ values, rowIndex }) => {
+          const shipmentId = values && values.invoiceItems
+              && values.invoiceItems[rowIndex]
+              && values.invoiceItems[rowIndex].shipmentId;
+          return { url: shipmentId ? `/openboxes/stockMovement/show/${shipmentId}` : '' };
+        },
+        attributes: {
+          className: 'linked-label-field',
+        },
       },
       budgetCode: {
         type: LabelField,
