@@ -51,22 +51,24 @@
 												<g:message code="default.delete.label" args="[g.message(code:'inventoryItem.label')]"/>
 											</g:link>
 										</div>
-										<g:if test="${inventoryItem?.lotStatus == LotStatusCode.RECALLED}">
-											<div class="action-menu-item">
-												<g:link controller="inventoryItem" action="revertRecall" id="${inventoryItem?.id}" data-disabled="${!isSuperuser}">
-													<img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}"/>&nbsp;
-													<g:message code="inventoryItem.revertRecall.label"/>
-												</g:link>
-											</div>
+										<g:if test="${inventoryItem?.lotNumber}">
+											<g:if test="${inventoryItem?.lotStatus == LotStatusCode.RECALLED}">
+												<div class="action-menu-item">
+													<g:link controller="inventoryItem" action="revertRecall" id="${inventoryItem?.id}" data-disabled="${!isSuperuser}">
+														<img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}"/>&nbsp;
+														<g:message code="inventoryItem.revertRecall.label"/>
+													</g:link>
+												</div>
+											</g:if>
+											<g:else>
+												<div class="action-menu-item">
+													<g:link controller="inventoryItem" action="recall" id="${inventoryItem?.id}" data-disabled="${!isSuperuser}">
+														<img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}"/>&nbsp;
+														<g:message code="inventoryItem.recall.label"/>
+													</g:link>
+												</div>
+											</g:else>
 										</g:if>
-										<g:else>
-											<div class="action-menu-item">
-												<g:link controller="inventoryItem" action="recall" id="${inventoryItem?.id}" data-disabled="${!isSuperuser}">
-													<img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}"/>&nbsp;
-													<g:message code="inventoryItem.recall.label"/>
-												</g:link>
-											</div>
-										</g:else>
 									</g:isSuperuser>
 								</div>
 							</div>
