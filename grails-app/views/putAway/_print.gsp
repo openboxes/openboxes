@@ -129,9 +129,9 @@
                         <td>${putawayItem["inventoryItem.expirationDate"]}</td>
                         <td style="width: 30px;">${putawayItem?.quantity}</td>
                         <td style="width: 50px;">${putawayItem?.quantity}</td>
-                        <td style="width: 50px;">${putawayItem["preferredBin"]}</td>
+                        <td style="width: 50px;">${(putawayItem["preferredBin.zoneName"] ? putawayItem["preferredBin.zoneName"] + ": " : '') + putawayItem["preferredBin.name"]}</td>
                         <td style="width: 70px;">${putawayItem["currentBins"]}</td>
-                        <td style="width: 130px;">${putawayItem["putawayLocation.name"]}</td>
+                        <td style="width: 130px;">${(putawayItem["putawayLocation.zoneName"] ? putawayItem["putawayLocation.zoneName"] + ": " : '') + putawayItem["putawayLocation.name"]}</td>
                     </tr>
                 </g:if>
                 <g:else>
@@ -143,9 +143,9 @@
                             <td>${status==0 ? putawayItem["inventoryItem.expirationDate"]: ""}</td>
                             <td style="width: 30px;">${status==0 ? putawayItem?.quantity: ""}</td>
                             <td style="width: 50px;">${splitItem["quantity"]?:""}</td>
-                            <td style="width: 50px;">${putawayItem["preferredBin"]}</td>
+                            <td style="width: 50px;">${(putawayItem["preferredBin.zoneName"] ? putawayItem["preferredBin.zoneName"] + ": " : '') + putawayItem["preferredBin.name"]}</td>
                             <td style="width: 70px;">${putawayItem["currentBins"]}</td>
-                            <td style="width: 130px;">${splitItem["putawayLocation.name"]}</td>
+                            <td style="width: 130px;">${(splitItem["putawayLocation.zoneName"] ? splitItem["putawayLocation.zoneName"] + ": " : '') + splitItem["putawayLocation.name"]}</td>
                         </tr>
                     </g:each>
 
