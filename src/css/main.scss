@@ -11,6 +11,7 @@ $gray-eta: #EEE;
 $red-alpha: #843534;
 $red-beta: #a94442;
 $red-gamma: #ce8483;
+$red-delta: #ffcccc;
 
 $blue-alpha: #163038;
 $blue-beta: #0c769e;
@@ -867,4 +868,8 @@ div.crossed-out .table-inner-row:before {
   > div {
     width: 100%;
   }
+}
+
+.negative-value {
+  background-color: $red-delta !important;
 }
