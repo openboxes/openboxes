@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
+import { Tooltip } from 'react-tippy';
 
 import { showSpinner, hideSpinner } from '../../actions';
 import { renderFormField } from '../../utils/form-utils';
@@ -65,6 +66,9 @@ const INVOICE_HEADER_FIELDS = {
     attributes: {
       disabled: true,
     },
+    getDynamicAttr: ({ values }) => ({
+      className: values && values.totalValue && (values.totalValue < 0 || values.totalValue.startsWith('(')) ? 'negative-value' : '',
+    }),
   },
 };
 
@@ -76,7 +80,37 @@ const INVOICE_ITEMS = {
     isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
+    getDynamicRowAttr: ({ rowValues }) => ({ className: rowValues && rowValues.totalAmount && rowValues.totalAmount < 0 ? 'negative-value' : '' }),
     fields: {
+      prepaymentIcon: {
+        type: (params) => {
+          const { values } = params;
+          const hasItems = values && values.invoiceItems;
+          const isPrepLine = hasItems && (values.isPrepaymentInvoice ||
+              values.invoiceItems[params.rowIndex].isPrepaymentItem);
+          if (isPrepLine) {
+            return (
+              <div className="d-flex align-items-center justify-content-center">
+                <div><LabelField {...params} /></div>
+                <Tooltip
+                  html="Prepayment"
+                  theme="transparent"
+                  delay="150"
+                  duration="250"
+                  hideDelay="50"
+                >
+                  {/* &#x24C5; = hexadecimal circled letter P */}
+                  <b>&#x24C5;</b>
+                </Tooltip>
+              </div>
+            );
+          }
+          return null;
+        },
+        label: '',
+        defaultMessage: '',
+        flexWidth: '0.25',
+      },
       orderNumber: {
         type: LabelField,
         label: 'react.invoice.orderNumber.label',
@@ -121,6 +155,17 @@ const INVOICE_ITEMS = {
         label: 'react.invoice.qty.label',
         defaultMessage: 'Qty',
         flexWidth: '1',
+        getDynamicAttr: params => ({
+          formatValue: () => {
+            const { values } = params;
+            const hasItems = values && values.invoiceItems;
+            const isPrepLine = hasItems && values.invoiceItems[params.rowIndex].isPrepaymentItem;
+            if (isPrepLine) {
+              return params.fieldValue * (-1);
+            }
+            return params.fieldValue;
+          },
+        }),
       },
       uom: {
         type: LabelField,
@@ -187,7 +232,7 @@ class ConfirmInvoicePage extends Component {
         ...this.state.values,
         invoiceItems,
         totalCount,
-        totalValue: totalValue.toFixed(2),
+        totalValue: accountingFormat(totalValue.toFixed(2)),
       },
     }, () => {
       if (!_.isNull(startIndex) &&
@@ -265,6 +310,7 @@ class ConfirmInvoicePage extends Component {
           val => ({
             ...val,
             totalAmount: val.totalPrepaymentAmount,
+            isPrepaymentItem: true,
           }),
         );
         const invoiceItems = _.concat(this.state.values.invoiceItems, lineItemsData);
@@ -277,7 +323,7 @@ class ConfirmInvoicePage extends Component {
             ...this.state.values,
             invoiceItems,
             totalCount: updatedTotalCount,
-            totalValue: totalValue.toFixed(2),
+            totalValue: accountingFormat(totalValue.toFixed(2)),
           },
         });
       });
