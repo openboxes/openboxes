@@ -214,7 +214,9 @@ class InvoiceItem implements Serializable {
         return [
                 id: id,
                 orderNumber: order?.orderNumber,
+                orderId: order?.id,
                 shipmentNumber: shipment?.shipmentNumber,
+                shipmentId: shipment?.id,
                 budgetCode: budgetCode?.code,
                 glCode: glAccount?.code,
                 productCode: product?.productCode,
