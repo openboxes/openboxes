@@ -91,7 +91,6 @@ const INVOICE_ITEMS = {
           if (isPrepLine) {
             return (
               <div className="d-flex align-items-center justify-content-center">
-                <div><LabelField {...params} /></div>
                 <Tooltip
                   html="Prepayment"
                   theme="transparent"
