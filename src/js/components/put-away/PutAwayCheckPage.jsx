@@ -148,8 +148,14 @@ class PutAwayCheckPage extends Component {
       Filter,
     }, {
       Header: <Translate id="react.putAway.preferredBin.label" defaultMessage="Preferred bin" />,
-      accessor: 'preferredBin.name',
+      accessor: 'preferredBin',
       style: { whiteSpace: 'normal' },
+      Cell: props => (
+        <div>
+          {props.value && props.value.zoneName ? <div>{props.value.zoneName}:&nbsp;</div> : ''}
+          <div>{props.value ? props.value.name : ''}</div>
+        </div>
+      ),
       Filter,
     }, {
       Header: <Translate id="react.putAway.currentBin.label" defaultMessage="Current bin" />,
@@ -158,8 +164,14 @@ class PutAwayCheckPage extends Component {
       Filter,
     }, {
       Header: <Translate id="react.putAway.putAwayBin.label" defaultMessage="Putaway Bin" />,
-      accessor: 'putawayLocation.name',
+      accessor: 'putawayLocation',
       style: { whiteSpace: 'normal' },
+      Cell: props => (
+        <div>
+          {props.value && props.value.zoneName ? <div>{props.value.zoneName}:&nbsp;</div> : ''}
+          <div>{props.value ? props.value.name : ''}</div>
+        </div>
+      ),
       Filter,
     }, {
       Header: <Translate id="react.putAway.stockMovement.label" defaultMessage="Stock Movement" />,

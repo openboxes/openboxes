@@ -45,8 +45,11 @@ class PutawayItem {
         if (availableItems) {
             currentBins = availableItems?.findAll {
                 !it?.binLocation?.supports(ActivityCode.RECEIVE_STOCK)
-            }?.collect { it?.binLocation?.name }?.unique()?.sort()?.join(", ")
+            }?.sort{
+                a, b -> (!a?.binLocation?.zone ? !b?.binLocation?.zone ? 0 : 1 : !b?.binLocation?.zone ? -1 : (a?.binLocation?.zone?.name?.toLowerCase() <=> b?.binLocation?.zone?.name?.toLowerCase())) ?: a?.binLocation?.name?.toLowerCase() <=> b?.binLocation?.name?.toLowerCase()
+            }?.collect { ((it?.binLocation?.zone ? "${it?.binLocation?.zone?.name}: " : "") + it?.binLocation?.name) }?.unique()?.join(", ")
         }
+
         return currentBins
     }
 
@@ -116,11 +119,15 @@ class PutawayItem {
                 currentBins                   : currentBins,
                 'preferredBin.id'             : preferredBin?.id,
                 'preferredBin.name'           : preferredBin?.name,
+                "preferredBin.zoneId"         : preferredBin?.zone?.id,
+                "preferredBin.zoneName"       : preferredBin?.zone?.name,
                 currentBinsAbbreviated        : currentBinsAbbreviated,
                 "putawayFacility.id"          : putawayFacility?.id,
                 "putawayFacility.name"        : putawayFacility?.name,
                 "putawayLocation.id"          : putawayLocation?.id,
                 "putawayLocation.name"        : putawayLocation?.name,
+                "putawayLocation.zoneId"      : putawayLocation?.zone?.id,
+                "putawayLocation.zoneName"    : putawayLocation?.zone?.name,
                 quantity                      : quantity,
                 quantityAvailable             : quantityAvailable,
                 splitItems                    : splitItems.collect { it?.toJson() }

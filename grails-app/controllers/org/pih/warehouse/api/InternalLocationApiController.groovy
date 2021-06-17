@@ -28,7 +28,7 @@ class InternalLocationApiController {
         ActivityCode[] activityCodes = params.activityCode ? params.list("activityCode") : null
         LocationTypeCode[] locationTypeCodes = params.locationTypeCode ? params.list("locationTypeCode") : [LocationTypeCode.INTERNAL, LocationTypeCode.BIN_LOCATION]
         List<Location> locations = locationService.getInternalLocations(parentLocation, locationTypeCodes, activityCodes)
-        render([data: locations?.collect { [id: it.id, name: it.name] }] as JSON)
+        render([data: locations?.collect { [id: it.id, name: it.name, zoneId: it.zone?.id, zoneName: it.zone?.name] }] as JSON)
     }
 
     def listReceiving = {
