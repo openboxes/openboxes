@@ -14,6 +14,7 @@ import org.pih.warehouse.picklist.PicklistItem
 // import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
+import org.springframework.context.ApplicationEvent
 
 class RequisitionItemTests extends GrailsUnitTestCase {
 
@@ -108,6 +109,7 @@ class RequisitionItemTests extends GrailsUnitTestCase {
         mockDomain(Picklist, [picklist])
         mockDomain(RequisitionItem, [requisitionItem])
         mockDomain(PicklistItem, [picklistItem])
+        PicklistItem.metaClass.publishEvent = { ApplicationEvent event -> }
 
         requisition.picklist = picklist
         requisition.picklist.addToPicklistItems(picklistItem)
