@@ -103,6 +103,11 @@ class InvoiceController {
             redirect(action: "list")
         }
 
+        if (!order.activeOrderItems && !order.activeOrderAdjustments) {
+            flash.message = "${warehouse.message(code: 'invoices.emptyOrder.message')}"
+            redirect(controller: "order", action: "create", params: [id: order.id])
+        }
+
         Invoice invoice = invoiceService.generateInvoice(order)
         redirect(action: "create", params: [id: invoice.id])
     }
