@@ -140,12 +140,23 @@ class LocationController {
         def locationInstance = Location.get(params.id)
         if (locationInstance) {
             try {
+                if (locationInstance.locationType.locationTypeCode == LocationTypeCode.ZONE && Location.findAllByZone(locationInstance)) {
+                    flash.message = "${warehouse.message(code: 'location.zoneAssigned.message')}"
+                    redirect(action: "edit", id: params.id)
+                    return
+                }
+
+                def parentLocation = locationInstance.parentLocation
+                if (parentLocation) {
+                    parentLocation.removeFromLocations(locationInstance)
+                }
+
                 locationInstance.delete(flush: true)
 
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
 
-                if (locationInstance.parentLocation) {
-                    redirect(action: "edit", id: locationInstance.parentLocation.id)
+                if (parentLocation) {
+                    redirect(action: "edit", id: parentLocation.id)
                 } else {
                     redirect(action: "list")
                 }

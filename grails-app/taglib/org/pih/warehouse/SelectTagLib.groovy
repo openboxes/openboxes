@@ -447,7 +447,7 @@ class SelectTagLib {
         }
 
         attrs["class"] = "chzn-select-deselect"
-        attrs["noSelection"] = ["": ""]
+        attrs["noSelection"] = ["null": ""]
         attrs.optionKey = 'id'
         attrs.optionValue = 'name'
 
