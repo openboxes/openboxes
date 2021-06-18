@@ -80,6 +80,7 @@ class Invoice implements Serializable {
             'hasPrepaymentInvoice',
             'totalPrepaymentValue',
             'isPrepaymentInvoice',
+            'prepaymentInvoices',
             'prepaymentItems',
             'orders',
             'shipments'
@@ -171,10 +172,6 @@ class Invoice implements Serializable {
         return isPrepaymentInvoice ? invoiceItems.sum { it.totalAmount } : 0
     }
 
-    List<InvoiceItem> getPrepaymentItems() {
-        return invoiceItems.findAll { it.prepaymentItem }.collect { it.prepaymentItem }
-    }
-
     List<Order> getOrders() {
         List<Order> orders = []
         orders += invoiceItems*.orderItems?.order?.flatten()
@@ -185,6 +182,23 @@ class Invoice implements Serializable {
 
     List<Shipment> getShipments() {
         return invoiceItems*.shipmentItems?.shipment?.flatten()?.unique()
+    }
+
+    // Technically it should be only one Prepayment Invoice for one Order (and only one Order in orders for 'final' invoice)
+    List<Invoice> getPrepaymentInvoices() {
+        // Avoid returning prepayment invoice for PREPAYMENT_INVOICE (it is only for 'final' invoice)
+        if (invoiceType?.code == InvoiceTypeCode.PREPAYMENT_INVOICE) {
+            return []
+        }
+        return orders?.invoices?.flatten()?.findAll { it.invoiceType?.code == InvoiceTypeCode.PREPAYMENT_INVOICE }?.unique()
+    }
+
+    List<InvoiceItem> getPrepaymentItems() {
+        // Avoid returning prepayment items for PREPAYMENT_INVOICE (these are only for 'final' invoice)
+        if (invoiceType?.code == InvoiceTypeCode.PREPAYMENT_INVOICE) {
+            return []
+        }
+        return prepaymentInvoices?.invoiceItems?.flatten()
     }
 
     Map toJson() {
