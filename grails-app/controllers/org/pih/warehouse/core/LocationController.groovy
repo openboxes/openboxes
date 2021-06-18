@@ -140,7 +140,7 @@ class LocationController {
         def locationInstance = Location.get(params.id)
         if (locationInstance) {
             try {
-                if (locationInstance.locationType.locationTypeCode == LocationTypeCode.ZONE && Location.findAllByZone(locationInstance)) {
+                if (locationInstance.isZoneLocation() && Location.findAllByZone(locationInstance)) {
                     flash.message = "${warehouse.message(code: 'location.zoneAssigned.message')}"
                     redirect(action: "edit", id: params.id)
                     return
