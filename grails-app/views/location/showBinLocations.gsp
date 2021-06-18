@@ -22,6 +22,7 @@
                 <tr class="prop">
                     <th width="1%"><g:message code="warehouse.active.label" default="Active"/></th>
                     <th><g:message code="location.binLocation.label" default="Bin Location"/></th>
+                    <th><g:message code="location.zone.label"/></th>
                     <th><g:message code="location.locationType.label"/></th>
                     <th><g:message code="default.actions.label"></g:message></th>
                 </tr>
@@ -41,6 +42,9 @@
                             <a href="${request.contextPath}/location/edit/${binLocation?.id}" fragment="location-details-tab">
                                 ${binLocation.name}
                             </a>
+                        </td>
+                        <td>
+                            ${binLocation?.zone?.name}
                         </td>
                         <td>
                             ${binLocation?.locationType?.name}
