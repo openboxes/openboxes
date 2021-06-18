@@ -18,10 +18,12 @@ CREATE OR REPLACE VIEW invoice_item_candidate AS
         `order`.currency_code as currency_code,
         `order`.origin_party_id as vendor_id,
         order_adjustment.amount as adjustment_amount,
-        order_adjustment.percentage as adjustment_percentage
+        order_adjustment.percentage as adjustment_percentage,
+        product_supplier.supplier_code as supplier_code
  from order_adjustment
           join `order` on order_adjustment.order_id = `order`.id
           left join order_item on order_adjustment.order_item_id = order_item.id
+          left join product_supplier on order_item.product_supplier_id = product_supplier.id
           left join product on order_item.product_id = product.id
           left join order_adjustment_type on order_adjustment.order_adjustment_type_id = order_adjustment_type.id
           left join order_adjustment_invoice on order_adjustment_invoice.order_adjustment_id = order_adjustment.id
@@ -45,12 +47,14 @@ union
         `order`.currency_code as currency_code,
         `order`.origin_party_id as vendor_id,
         NULL as adjustment_amount,
-        NULL as adjustment_percentage
+        NULL as adjustment_percentage,
+        product_supplier.supplier_code as supplier_code
  from shipment_item
           join shipment on shipment_item.shipment_id = shipment.id
           join product on shipment_item.product_id = product.id
           join order_shipment on order_shipment.shipment_item_id = shipment_item.id
           join order_item on order_shipment.order_item_id = order_item.id
+          left join product_supplier on order_item.product_supplier_id = product_supplier.id
           join `order` on order_item.order_id = `order`.id
           left join order_invoice on order_invoice.order_item_id = order_item.id
           left join shipment_invoice on shipment_invoice.shipment_item_id = shipment_item.id
