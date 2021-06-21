@@ -1,5 +1,6 @@
-<%@ page import="org.pih.warehouse.inventory.LotStatusCode; org.pih.warehouse.product.Product"%>
+<%@ page import="org.pih.warehouse.product.Product"%>
 <%@ page import="org.pih.warehouse.inventory.InventoryStatus" %>
+<%@ page import="org.pih.warehouse.inventory.LotStatusCode" %>
 <html>
 <head>
     <style>
