@@ -36,6 +36,7 @@ class ProductAvailabilityService {
     def locationService
     def inventoryService
     def dataService
+    def picklistService
 
     def triggerRefreshProductAvailability(String locationId, List<String> productIds, Boolean forceRefresh) {
         log.info "Triggering refresh product availability"
@@ -84,20 +85,41 @@ class ProductAvailabilityService {
 
     def calculateBinLocations(Location location, Date date) {
         def binLocations = inventoryService.getBinLocationDetails(location, date)
-        binLocations = transformBinLocations(binLocations)
+        binLocations = transformBinLocations(binLocations, [], [])
         return binLocations
     }
 
     def calculateBinLocations(Location location) {
         def binLocations = inventoryService.getBinLocationDetails(location)
-        binLocations = transformBinLocations(binLocations)
+        def picked = picklistService.getQuantityPickedByProductAndLocation(location, null)
+        def onHold = getQuantityOnHold(location, null)
+        binLocations = transformBinLocations(binLocations, picked, onHold)
         return binLocations
     }
 
     def calculateBinLocations(Location location, Product product) {
         def binLocations = inventoryService.getProductQuantityByBinLocation(location, product, Boolean.TRUE)
-        binLocations = transformBinLocations(binLocations)
+        def picked = picklistService.getQuantityPickedByProductAndLocation(location, product)
+        def onHold = getQuantityOnHold(location, product)
+        binLocations = transformBinLocations(binLocations, picked, onHold)
         return binLocations
+    }
+
+    def getQuantityOnHold(Location location, Product product){
+        return ProductAvailability.createCriteria().list {
+            projections {
+                groupProperty("binLocation.id", "binLocation")
+                groupProperty("inventoryItem.id", "inventoryItem")
+                sum("quantityOnHand", "quantityOnHold")
+            }
+            eq("location", location)
+            if (product) {
+                eq("product", product)
+            }
+            inventoryItem {
+                eq("lotStatus", LotStatusCode.RECALLED)
+            }
+        }.collect { [binLocation: it[0], inventoryItem: it[1], quantityOnHold: it[2]] }
     }
 
     def saveProductAvailability(Location location, Product product, List binLocations, Boolean forceRefresh) {
@@ -168,15 +190,15 @@ class ProductAvailabilityService {
         return insertStatement
     }
 
-    def transformBinLocations(List binLocations) {
+    def transformBinLocations(List binLocations, List picked, List onHold) {
         def binLocationsTransformed = binLocations.collect {
             [
                 product          : [id: it?.product?.id, productCode: it?.product?.productCode, name: it?.product?.name],
                 inventoryItem    : [id: it?.inventoryItem?.id, lotNumber: it?.inventoryItem?.lotNumber, expirationDate: it?.inventoryItem?.expirationDate],
                 binLocation      : [id: it?.binLocation?.id, name: it?.binLocation?.name],
                 quantity         : it.quantity,
-                quantityAllocated: it.quantityAllocated,
-                quantityOnHold   : it.quantityOnHold
+                quantityAllocated: picked ? (picked.find { row -> row.binLocation == it?.binLocation?.id && row.inventoryItem == it?.inventoryItem?.id }?.quantityAllocated?:0) : 0,
+                quantityOnHold   : onHold ? (onHold.find { row -> row.binLocation == it?.binLocation?.id && row.inventoryItem == it?.inventoryItem?.id }?.quantityOnHold?:0) : 0
             ]
         }
 

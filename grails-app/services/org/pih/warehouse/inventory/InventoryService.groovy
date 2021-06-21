@@ -863,9 +863,7 @@ class InventoryService implements ApplicationContextAware {
                             product          : product,
                             inventoryItem    : inventoryItem,
                             binLocation      : binLocation,
-                            quantity         : quantity,
-                            quantityAllocated: picklistService.getQuantityPicked(binLocation, inventoryItem)[0]?:0,
-                            quantityOnHold   : getQuantityOnHold(binLocation, inventoryItem)[0]?:0
+                            quantity         : quantity
                         ]
                     }
                 }
@@ -879,20 +877,6 @@ class InventoryService implements ApplicationContextAware {
 
         return binLocations
     }
-
-    def getQuantityOnHold(Location binLocation, InventoryItem ii){
-        return ProductAvailability.createCriteria().list {
-            projections {
-                sum("quantityOnHand")
-            }
-            eq("binLocation", binLocation)
-            eq("inventoryItem", ii)
-            inventoryItem {
-                eq("lotStatus", LotStatusCode.RECALLED)
-            }
-        }
-    }
-
 
     /**
      * Get quantity by bin location given a list transaction entries.

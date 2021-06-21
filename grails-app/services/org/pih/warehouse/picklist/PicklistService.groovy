@@ -12,6 +12,7 @@ package org.pih.warehouse.picklist
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.LotStatusCode
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
 
@@ -50,23 +51,29 @@ class PicklistService {
         return picklist.save()
     }
 
-    def getQuantityPicked(Location binLocation, InventoryItem ii) {
-        return Picklist.createCriteria().list {
+    def getQuantityPickedByProductAndLocation(Location location, Product product) {
+        Picklist.createCriteria().list {
             projections {
                 picklistItems {
-                    sum("quantity")
+                    groupProperty("binLocation.id", "binLocation")
+                    groupProperty("inventoryItem.id", "inventoryItem")
+                    sum("quantity", "quantity")
+                    groupProperty("sortOrder", "sortOrder")
                 }
             }
             requisition {
                 'in'("status", RequisitionStatus.listPending())
+                eq("origin", location)
             }
             picklistItems {
-                eq("binLocation", binLocation)
-                eq("inventoryItem", ii)
-                inventoryItem {
-                    ne("lotStatus", LotStatusCode.RECALLED)
+                if (product) {
+                    requisitionItem {
+                        eq("product", product)
+                    }
                 }
+                order("binLocation")
+                order("inventoryItem")
             }
-        }
+        }.collect { [binLocation: it[0], inventoryItem: it[1], quantityAllocated: it[2]] }
     }
 }
