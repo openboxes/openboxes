@@ -130,7 +130,7 @@ class InvoiceItem implements Serializable {
 
     // Total order adjustment value
     def getTotalAdjustments() {
-        def totalAdjustment = orderAdjustments?.findAll {!it.canceled }?.sum { it.getTotalAdjustments() } ?: 0
+        def totalAdjustment = orderAdjustments?.sum { it.getTotalAdjustments() } ?: 0
         if (isPrepaymentInvoice) {
             return totalAdjustment * ((order.paymentTerm?.prepaymentPercent?:100) / 100)
         }
