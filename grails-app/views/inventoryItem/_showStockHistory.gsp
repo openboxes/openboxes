@@ -1,5 +1,6 @@
 <%@ page import="org.pih.warehouse.product.Product"%>
 <%@ page import="org.pih.warehouse.inventory.InventoryStatus" %>
+<%@ page import="org.pih.warehouse.inventory.LotStatusCode" %>
 <html>
 <head>
     <style>
@@ -276,7 +277,8 @@
                             <g:set var="rowClass" value="${(count%2==0)?'odd':'even' }"/>
                         </g:else>
 
-                        <tr class="${rowClass} monthRow dataRow ${isCurrentYear ? 'currentYear' : ''}">
+                        <tr class="${rowClass} monthRow dataRow ${isCurrentYear ? 'currentYear' : ''} ${stockHistoryEntry?.inventoryItem?.lotStatus == LotStatusCode.RECALLED ? 'recalled' : ''}"
+                            title="${stockHistoryEntry?.inventoryItem?.lotStatus == LotStatusCode.RECALLED ? warehouse.message(code: 'inventoryItem.recalledLot.label') : ''}">
                             <td  class="middle">
                                 <g:if test="${stockHistoryEntry?.showDetails}">
                                     <g:if test="${stockHistoryEntry?.transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.DEBIT}">
