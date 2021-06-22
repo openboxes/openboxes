@@ -278,7 +278,7 @@
                         </g:else>
 
                         <tr class="${rowClass} monthRow dataRow ${isCurrentYear ? 'currentYear' : ''} ${stockHistoryEntry?.inventoryItem?.lotStatus == LotStatusCode.RECALLED ? 'recalled' : ''}"
-                            title="${stockHistoryEntry?.inventoryItem?.lotStatus == LotStatusCode.RECALLED ? 'This lot has been recalled' : ''}">
+                            title="${stockHistoryEntry?.inventoryItem?.lotStatus == LotStatusCode.RECALLED ? warehouse.message(code: 'inventoryItem.recalledLot.label') : ''}">
                             <td  class="middle">
                                 <g:if test="${stockHistoryEntry?.showDetails}">
                                     <g:if test="${stockHistoryEntry?.transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.DEBIT}">
