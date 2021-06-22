@@ -67,6 +67,22 @@ class ProductAvailabilityService {
         log.info "Refreshed product availability in ${System.currentTimeMillis() - startTime}ms"
     }
 
+    def refreshProductAvailability(Product product, Boolean forceRefresh) {
+        // Compute bin locations from transaction entries for specific product over all depot locations
+        // Uses GPars to improve performance (OBNAV Benchmark: 5 minutes without, 45 seconds with)
+        def startTime = System.currentTimeMillis()
+        GParsPool.withPool {
+            locationService.depots.eachParallel { Location loc ->
+                persistenceInterceptor.init()
+                Location location = Location.get(loc.id)
+                refreshProductAvailability(location, product, forceRefresh)
+                persistenceInterceptor.flush()
+                persistenceInterceptor.destroy()
+            }
+        }
+        log.info "Refreshed product availability in ${System.currentTimeMillis() - startTime}ms"
+    }
+
     def refreshProductAvailability(Location location, Boolean forceRefresh) {
         log.info "Refreshing product availability location (${location}), forceRefresh (${forceRefresh}) ..."
         def startTime = System.currentTimeMillis()

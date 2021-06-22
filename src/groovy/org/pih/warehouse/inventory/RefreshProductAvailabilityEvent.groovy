@@ -27,6 +27,12 @@ class RefreshProductAvailabilityEvent extends ApplicationEvent {
         this.disableRefresh = source.disableRefresh
     }
 
+    RefreshProductAvailabilityEvent(InventoryItem source) {
+        super(source)
+        this.locationId = null
+        this.productIds = source.associatedProducts
+    }
+
     RefreshProductAvailabilityEvent(PicklistItem source) {
         super(source)
         this.locationId = source.associatedLocation
