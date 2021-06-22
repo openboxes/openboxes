@@ -5,7 +5,7 @@ export default function accountingFormat(value) {
 
   const number = Number.parseFloat(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-  if (number < 0) {
+  if (number < 0 || number.startsWith('-')) {
     return `(${number.replace('-', '')})`;
   }
 
