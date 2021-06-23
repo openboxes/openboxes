@@ -106,6 +106,11 @@
                                 <g:message code="default.import.label" args="[g.message(code:'inventory.label', default: 'Inventory')]"/>
                             </g:link>
                         </div>
+                        <div class="mm-menu-item">
+                            <g:link controller="stockTransfer" action="index" class="create">
+                                <warehouse:message code="inventory.createStockTransfer.label" />
+                            </g:link>
+                        </div>
                     </div>
                 </div>
             </li>

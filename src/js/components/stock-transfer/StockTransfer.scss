@@ -1,0 +1,88 @@
+.page {
+    background-color: #f3f6f7;
+}
+
+// Wizard title
+.panel-heading {
+    background-color: #fff;
+    text-align: left;
+    padding: 0px 1.5rem 8px;
+    box-shadow: 0 4px 2px -2px rgba(0, 0, 0, .09);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    line-height: 24px !important;
+    font-size: 22px !important;
+    margin: 0 1.5rem;
+}
+
+// Wizard page
+.panel-body {
+    display: flex;
+    flex-direction: column;
+
+    .stock-transfer {
+        background-color: #fff;
+        box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.09);
+        padding: 12px 24px;
+        margin-bottom: 16px;
+        position: relative;
+        width: 100%;
+
+        .stock-transfer-buttons {
+            margin-bottom: 1rem !important;
+        }
+    }
+
+    .submit-buttons {
+        margin-top: 18px;
+        width: 100%;
+
+        >button {
+            height: 32px;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+
+            &:not(:first-child) {
+                margin-left: 1em !important;
+            }
+        }
+    }
+
+    .buttons-container {
+        padding: 6px 0;
+        display: flex;
+        justify-content: flex-end;
+
+        .btn-xs {
+            background-color: #fff;
+            height: 32px;
+            border: none;
+            box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.09);
+            color: grey;
+            padding: 4px 8px;
+            margin-left: 1em !important;
+        }
+    }
+
+    .classic-form-buttons {
+        position: absolute;
+        right: calc(24px - 8px);
+        padding: 0 !important;
+
+        .btn-xs {
+            background-color: #eee;
+            color: #28a745;
+            box-shadow: none !important;
+        }
+    }
+
+    .count-selected {
+        border-radius: 4px !important;
+        border: 1px solid gray;
+        padding: 6px;
+        background-color: lightgray;
+        color: gray;
+        font-size: 14px;
+    }
+}

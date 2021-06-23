@@ -65,6 +65,11 @@ const AsyncInvoice = Loadable({
   loading: Loading,
 });
 
+const AsyncStockTransfer = Loadable({
+  loader: () => import('./stock-transfer/StockTransferWizard'),
+  loading: Loading,
+});
+
 const Router = props => (
   <div>
     <BrowserRouter>
@@ -79,6 +84,7 @@ const Router = props => (
         <MainLayoutRoute path="/**/partialReceiving/create/:shipmentId" component={AsyncReceivingPage} />
         <MainLayoutRoute path="/**/stocklistManagement/index/:productId?" component={AsyncManagement} />
         <MainLayoutRoute path="/**/invoice/create/:invoiceId?" component={AsyncInvoice} />
+        <MainLayoutRoute path="/**/stockTransfer/create/:stockTransferId?" component={AsyncStockTransfer} />
         <MainLayoutRoute path="/**/" component={AsyncTablero} />
       </Switch>
     </BrowserRouter>

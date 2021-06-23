@@ -727,6 +727,14 @@ breadcrumbsConfig {
             actionUrl = "/${appName}/invoice/create/"
             listUrl   = "/${appName}/invoice/list/"
         }
+        stockTransfer {
+            actionLabel = "react.stockTransfer.createStockTransfer.label"
+            defaultActionLabel = "Create Stock Transfer"
+            listLabel = "react.stockTransfer.label"
+            defaultListLabel = "Stock Transfer"
+            actionUrl = "/${appName}/stockTransfer/create/"
+            listUrl = "/"
+        }
 }
 
 // OpenBoxes identifier config
@@ -1077,7 +1085,8 @@ openboxes {
                     defaultLabel: "Manage Inventory",
                     menuItems: [
                         [label: "inventory.manage.label", defaultLabel: "Manage Inventory", href: "/${appName}/inventory/manage"],
-                        [label: "inventory.import.label", defaultLabel: "Import Inventory", href: "/${appName}/batch/importData?type=inventory&execution=e1s1"]
+                        [label: "inventory.import.label", defaultLabel: "Import Inventory", href: "/${appName}/batch/importData?type=inventory&execution=e1s1"],
+                        [label: "inventory.createStockTransfer.label", defaultLabel: "Create Stock Transfer", href: "/${appName}/stockTransfer/index"]
                     ]
                 ]
             ]
