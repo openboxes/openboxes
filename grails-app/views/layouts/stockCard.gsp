@@ -31,7 +31,7 @@
 		}
 
 		.recalled {
-			background-color: #ffcccb;
+			background-color: #ffcccb !important;
 		}
 	</style>
 </head>
