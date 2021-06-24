@@ -11,9 +11,20 @@ package org.pih.warehouse.picklist
 
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.pih.warehouse.requisition.RequisitionItem
 
 class PicklistItem implements Serializable {
+
+    def publishRefreshEvent = {
+        publishEvent(new RefreshProductAvailabilityEvent(this))
+    }
+
+    def afterInsert = publishRefreshEvent
+
+    def afterUpdate = publishRefreshEvent
+
+    def afterDelete = publishRefreshEvent
 
     String id
     RequisitionItem requisitionItem
@@ -47,6 +58,16 @@ class PicklistItem implements Serializable {
         reasonCode(nullable: true)
         comment(nullable: true)
         sortOrder(nullable: true)
+    }
+
+    static transients = ['associatedLocation', 'associatedProducts']
+
+    String getAssociatedLocation() {
+        return requisitionItem?.requisition?.origin?.id
+    }
+
+    List getAssociatedProducts() {
+        return [inventoryItem?.product?.id]
     }
 
     Map toJson() {

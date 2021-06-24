@@ -26,6 +26,7 @@ import org.pih.warehouse.importer.ImporterUtil
 import org.pih.warehouse.importer.InventoryExcelImporter
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.shipping.Shipment
@@ -50,6 +51,7 @@ class InventoryService implements ApplicationContextAware {
     def identifierService
     def messageService
     def locationService
+    def picklistService
 
     static transactional = true
 
@@ -854,14 +856,14 @@ class InventoryService implements ApplicationContextAware {
                     // Exclude bin locations with quantity 0 (include negative quantity for data quality purposes)
                     if (quantity != 0 || includeOutOfStock) {
                         binLocations << [
-                                id           : binLocation?.id,
-                                status       : status(quantity),
-                                value        : value,
-                                category     : product.category,
-                                product      : product,
-                                inventoryItem: inventoryItem,
-                                binLocation  : binLocation,
-                                quantity     : quantity
+                            id               : binLocation?.id,
+                            status           : status(quantity),
+                            value            : value,
+                            category         : product.category,
+                            product          : product,
+                            inventoryItem    : inventoryItem,
+                            binLocation      : binLocation,
+                            quantity         : quantity
                         ]
                     }
                 }
@@ -875,7 +877,6 @@ class InventoryService implements ApplicationContextAware {
 
         return binLocations
     }
-
 
     /**
      * Get quantity by bin location given a list transaction entries.

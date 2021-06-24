@@ -7,6 +7,7 @@ import org.pih.warehouse.inventory.InventoryItem
 // import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.product.*
 import grails.test.GrailsUnitTestCase
+import org.springframework.context.ApplicationEvent
 
 
 class PicklistServiceTests extends GrailsUnitTestCase {
@@ -24,6 +25,7 @@ class PicklistServiceTests extends GrailsUnitTestCase {
         mockDomain(PicklistItem, [])
         mockDomain(RequisitionItem, [])
         mockDomain(InventoryItem, [])
+        PicklistItem.metaClass.publishEvent = { ApplicationEvent event -> }
         
         def service = new PicklistService()
 
@@ -54,6 +56,7 @@ class PicklistServiceTests extends GrailsUnitTestCase {
         def plItem2 = new PicklistItem(id:"pli2", quantity:20, comment: "better")
         mockDomain(Picklist, [picklistInDb])
         mockDomain(PicklistItem, [plItem1, plItem2])
+        PicklistItem.metaClass.publishEvent = { ApplicationEvent event -> }
 
         picklistInDb.addToPicklistItems(plItem1)
         picklistInDb.addToPicklistItems(plItem2)
@@ -104,6 +107,7 @@ class PicklistServiceTests extends GrailsUnitTestCase {
         mockDomain(PicklistItem, [plItem1, plItem2])
         picklistInDb.addToPicklistItems(plItem1)
         picklistInDb.addToPicklistItems(plItem2)
+        PicklistItem.metaClass.publishEvent = { ApplicationEvent event -> }
 
         Person john = new Person(id: "7890")
         def picklistItem1 = [id: plItem1.id, "requisitionItem.id":"ri1", "inventoryItem.id":"ii1", quantity:100]
