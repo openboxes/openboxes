@@ -12,6 +12,7 @@ import customTreeTableHOC from '../../utils/CustomTreeTable';
 import { showSpinner, hideSpinner } from '../../actions';
 import Filter from '../../utils/Filter';
 import Translate from '../../utils/Translate';
+import apiClient from '../../utils/apiClient';
 
 const SelectTreeTable = selectTableHOC(customTreeTableHOC(ReactTable));
 
@@ -118,58 +119,64 @@ class CreateStockTransfer extends Component {
    * Fetches available items to put away from API.
    * @public
    */
-  fetchStockTransferCandidates() {
+  fetchStockTransferCandidates(locationId) {
     this.props.showSpinner();
+    const url = `/openboxes/api/stockTransfers?location.id=${locationId}`;
 
-    // TODO after API for fetching is implemented, using mocks for testing purpose
-    const stockTransferItems = [{
-      _id: 1,
-      productCode: 'code2',
-      productName: 'product1',
-      lotNumber: 'lot3',
-      expirationDate: '7/11/2021',
-      zone: 'zone2',
-      binLocation: 'bin2',
-      quantityOnHand: 45,
-    }, {
-      _id: 2,
-      productCode: 'code2',
-      productName: 'product1',
-      lotNumber: 'lot2',
-      expirationDate: '7/1/2021',
-      zone: 'zone1',
-      binLocation: 'bin1',
-      quantityOnHand: 51,
-    }, {
-      _id: 3,
-      productCode: 'code2',
-      productName: 'product2',
-      lotNumber: 'lot3',
-      expirationDate: '7/22/2021',
-      zone: 'zone2',
-      binLocation: 'bin1',
-      quantityOnHand: 88,
-    }, {
-      _id: 4,
-      productCode: 'code2',
-      productName: 'product3',
-      lotNumber: 'lot2',
-      expirationDate: '7/25/2021',
-      zone: 'zone3',
-      binLocation: 'bin1',
-      quantityOnHand: 41,
-    }, {
-      _id: 5,
-      productCode: 'code2',
-      productName: 'product2',
-      lotNumber: 'lot3',
-      expirationDate: '7/2/2021',
-      zone: 'zone3',
-      binLocation: 'bin1',
-      quantityOnHand: 43,
-    }];
+    return apiClient.get(url)
+      .then(() => {
+        // TODO add after API for fetching is implemented, using mocks for testing purpose
+      })
+      .catch(() => {
+        const stockTransferItems = [{
+          _id: 1,
+          productCode: 'code2',
+          productName: 'product1',
+          lotNumber: 'lot3',
+          expirationDate: '7/11/2021',
+          zone: 'zone2',
+          binLocation: 'bin2',
+          quantityOnHand: 45,
+        }, {
+          _id: 2,
+          productCode: 'code2',
+          productName: 'product1',
+          lotNumber: 'lot2',
+          expirationDate: '7/1/2021',
+          zone: 'zone1',
+          binLocation: 'bin1',
+          quantityOnHand: 51,
+        }, {
+          _id: 3,
+          productCode: 'code2',
+          productName: 'product2',
+          lotNumber: 'lot3',
+          expirationDate: '7/22/2021',
+          zone: 'zone2',
+          binLocation: 'bin1',
+          quantityOnHand: 88,
+        }, {
+          _id: 4,
+          productCode: 'code2',
+          productName: 'product3',
+          lotNumber: 'lot2',
+          expirationDate: '7/25/2021',
+          zone: 'zone3',
+          binLocation: 'bin1',
+          quantityOnHand: 41,
+        }, {
+          _id: 5,
+          productCode: 'code2',
+          productName: 'product2',
+          lotNumber: 'lot3',
+          expirationDate: '7/2/2021',
+          zone: 'zone3',
+          binLocation: 'bin1',
+          quantityOnHand: 43,
+        }];
 
-    this.setState({ stockTransferItems }, () => this.props.hideSpinner());
+        this.setState({ stockTransferItems }, () => this.props.hideSpinner());
+      });
   }
 
   /**
