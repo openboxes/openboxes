@@ -38,6 +38,7 @@ class InventoryItemController {
     def orderService
     def forecastingService
     def userService
+    def productAvailabilityService
     def grailsApplication
 
 
@@ -67,7 +68,8 @@ class InventoryItemController {
 
             // now populate the rest of the commmand object
             inventoryService.getStockCardCommand(cmd, params)
-            [commandInstance: cmd]
+            def totalQuantityAvailableToPromise = productAvailabilityService.getQuantityAvailableToPromise(cmd.product, cmd.warehouse)
+            [commandInstance: cmd, totalQuantityAvailableToPromise: totalQuantityAvailableToPromise]
         } catch (ProductException e) {
             flash.message = e.message
             redirect(controller: "dashboard", action: "index")

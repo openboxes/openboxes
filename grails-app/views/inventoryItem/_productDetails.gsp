@@ -43,6 +43,18 @@
                     </g:if>
                 </td>
             </tr>
+            <g:if test="${totalQuantityAvailableToPromise >= 0}">
+                <tr class="prop">
+                    <td class="label">
+                        <label><warehouse:message code="product.quantityAvailableToPromise.label" default="Quantity ATP"/></label>
+                    </td>
+                    <td class="value">
+                        <div>
+                            ${g.formatNumber(number: totalQuantityAvailableToPromise, format: '###,###,###') }
+                        </div>
+                    </td>
+                </tr>
+            </g:if>
             <g:if test="${grailsApplication.config.openboxes.forecasting.enabled}">
                 <tr class="prop">
                     <td class="label">

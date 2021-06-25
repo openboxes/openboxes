@@ -180,7 +180,6 @@ class ProductAvailabilityService {
     }
 
     String generateInsertStatement(Location location, Map entry) {
-        Integer onHandQuantity = entry.quantity
         String productId = "${StringEscapeUtils.escapeSql(entry.product?.id)}"
         String productCode = "${StringEscapeUtils.escapeSql(entry.product?.productCode)}"
         String lotNumber = entry?.inventoryItem?.lotNumber ?
@@ -192,18 +191,28 @@ class ProductAvailabilityService {
         String binLocationName = entry?.binLocation?.name ?
                 "'${StringEscapeUtils.escapeSql(entry?.binLocation?.name)}'" : "'DEFAULT'"
 
+        Integer onHandQuantity = entry.quantity?:0
         Integer quantityAllocated = entry.quantityAllocated?:0
         Integer quantityOnHold = entry.quantityOnHold?:0
+        Integer quantityAvailableToPromise = calculateQtyATP(onHandQuantity, quantityAllocated, quantityOnHold)
         def insertStatement =
                 "INSERT INTO product_availability (id, version, location_id, product_id, product_code, " +
                         "inventory_item_id, lot_number, bin_location_id, bin_location_name, " +
-                        "quantity_on_hand, quantity_allocated, quantity_on_hold, date_created, last_updated) " +
+                        "quantity_on_hand, quantity_allocated, quantity_on_hold, quantity_available_to_promise, date_created, last_updated) " +
                         "values ('${UUID.randomUUID().toString()}', 0, '${location?.id}', " +
                         "'${productId}', '${productCode}', " +
                         "${inventoryItemId}, ${lotNumber}, " +
-                        "${binLocationId}, ${binLocationName}, ${onHandQuantity}, ${quantityAllocated}, ${quantityOnHold}, now(), now()) " +
-                        "ON DUPLICATE KEY UPDATE quantity_on_hand=${onHandQuantity}, quantity_allocated=${quantityAllocated}, quantity_on_hold=${quantityOnHold}, version=version+1, last_updated=now()"
+                        "${binLocationId}, ${binLocationName}, ${onHandQuantity}, ${quantityAllocated}, ${quantityOnHold}, ${quantityAvailableToPromise}, now(), now()) " +
+                        "ON DUPLICATE KEY UPDATE quantity_on_hand=${onHandQuantity}, quantity_allocated=${quantityAllocated}, quantity_on_hold=${quantityOnHold}, quantity_available_to_promise=${quantityAvailableToPromise}, version=version+1, last_updated=now()"
         return insertStatement
+    }
+
+    Integer calculateQtyATP(Integer onHandQuantity, Integer quantityAllocated, Integer quantityOnHold) {
+        if (onHandQuantity == quantityOnHold) {
+            return 0
+        }
+        def qtyATP = onHandQuantity - quantityAllocated - quantityOnHold
+        return qtyATP >= 0 ? qtyATP : 0
     }
 
     def transformBinLocations(List binLocations, List picked, List onHold) {
@@ -320,6 +329,19 @@ class ProductAvailabilityService {
         }
 
         return productAvailability?.get(0)?.quantityOnHand ?: 0
+    }
+
+    Integer getQuantityAvailableToPromise(Product product, Location location) {
+        def productAvailability = ProductAvailability.createCriteria().list {
+            resultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+            projections {
+                sum("quantityAvailableToPromise", "quantityAvailableToPromise")
+            }
+            eq("location", location)
+            eq("product", product)
+        }
+
+        return productAvailability?.get(0)?.quantityAvailableToPromise ?: 0
     }
 
     def getQuantityOnHand(List<Product> products, Location location) {

@@ -70,7 +70,8 @@
                         model="[productInstance:commandInstance?.product,
                             inventoryInstance:commandInstance?.inventory,
                             inventoryLevelInstance: commandInstance?.inventoryLevel,
-                            totalQuantity: commandInstance?.totalQuantity]"/>
+                            totalQuantity: commandInstance?.totalQuantity,
+							totalQuantityAvailableToPromise: totalQuantityAvailableToPromise]"/>
                 </div>
                 <div class="yui-u">
 

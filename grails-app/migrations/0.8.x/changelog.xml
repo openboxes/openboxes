@@ -124,4 +124,5 @@
     <include file="0.8.x/changelog-2021-05-28-1756-add-zone-location-type.xml"/>
     <include file="0.8.x/changelog-2021-06-07-1930-alter-table-inventory-item-add-column-lot-status.xml"/>
     <include file="0.8.x/changelog-2021-06-11-1700-alter-table-product-availability-add-column-quantity-on-hold.xml"/>
+    <include file="0.8.x/changelog-2021-06-24-1100-alter-table-product-availability-add-column-quantity-available-to-promise.xml"/>
 </databaseChangeLog>
