@@ -1,8 +1,10 @@
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%
     def comparator = { a,b ->
-      def itemA = a.retrievePicklistItemsSortedByBinName()[0]
-      def itemB = b.retrievePicklistItemsSortedByBinName()[0]
+      def pickItemsA = pickListItemsByRequisition[a.id]?.sort { pickA, pickB -> pickA.binLocation?.name <=> pickB.binLocation?.name }
+      def pickItemsB = pickListItemsByRequisition[b.id]?.sort { pickA, pickB -> pickA.binLocation?.name <=> pickB.binLocation?.name }
+      def itemA = pickItemsA[0]
+      def itemB = pickItemsB[0]
       def nameA = itemA?.binLocation?.name
       def nameB = itemB?.binLocation?.name
       def orderA = itemA?.sortOrder
@@ -12,7 +14,7 @@
       return !nameA ? !nameB ? orderA <=> orderB : 1 : !nameB ? -1 : nameA <=> nameB ?: orderA <=> orderB
     }
 %>
-<div class="page-content">
+<div>
     <table id="requisition-items" class="fs-repeat-header">
         <thead>
         <tr>
@@ -54,10 +56,10 @@
         <g:each in="${sortedRequisitionItems}" status="i" var="requisitionItem">
             <g:if test="${picklist}">
                 <g:if test="${sorted}">
-                    <g:set var="picklistItems" value="${requisitionItem?.retrievePicklistItemsSortedByBinName()}"/>
+                    <g:set var="picklistItems" value="${pickListItemsByRequisition[requisitionItem.id]?.sort { pickA, pickB -> pickA.binLocation?.name <=> pickB.binLocation?.name }?.findAll { it.quantity > 0 }}"/>
                 </g:if>
                 <g:else>
-                    <g:set var="picklistItems" value="${requisitionItem?.retrievePicklistItems()}"/>
+                    <g:set var="picklistItems" value="${pickListItemsByRequisition[requisitionItem.id]?.findAll { it.quantity > 0 }}"/>
                 </g:else>
                 <g:set var="numInventoryItem" value="${picklistItems?.size() ?: 1}"/>
             </g:if>
