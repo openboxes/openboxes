@@ -68,8 +68,7 @@ class InventoryItemController {
 
             // now populate the rest of the commmand object
             inventoryService.getStockCardCommand(cmd, params)
-            def totalQuantityAvailableToPromise = productAvailabilityService.getQuantityAvailableToPromise(cmd.product, cmd.warehouse)
-            [commandInstance: cmd, totalQuantityAvailableToPromise: totalQuantityAvailableToPromise]
+            [commandInstance: cmd]
         } catch (ProductException e) {
             flash.message = e.message
             redirect(controller: "dashboard", action: "index")

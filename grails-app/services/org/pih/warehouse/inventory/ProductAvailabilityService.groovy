@@ -194,7 +194,7 @@ class ProductAvailabilityService {
         Integer onHandQuantity = entry.quantity?:0
         Integer quantityAllocated = entry.quantityAllocated?:0
         Integer quantityOnHold = entry.quantityOnHold?:0
-        Integer quantityAvailableToPromise = calculateQtyATP(onHandQuantity, quantityAllocated, quantityOnHold)
+        Integer quantityAvailableToPromise = calculateQuantityAvailableToPromise(onHandQuantity, quantityAllocated, quantityOnHold)
         def insertStatement =
                 "INSERT INTO product_availability (id, version, location_id, product_id, product_code, " +
                         "inventory_item_id, lot_number, bin_location_id, bin_location_name, " +
@@ -207,12 +207,12 @@ class ProductAvailabilityService {
         return insertStatement
     }
 
-    Integer calculateQtyATP(Integer onHandQuantity, Integer quantityAllocated, Integer quantityOnHold) {
+    Integer calculateQuantityAvailableToPromise(Integer onHandQuantity, Integer quantityAllocated, Integer quantityOnHold) {
         if (onHandQuantity == quantityOnHold) {
             return 0
         }
-        def qtyATP = onHandQuantity - quantityAllocated - quantityOnHold
-        return qtyATP >= 0 ? qtyATP : 0
+        def quantityAvailableToPromise = onHandQuantity - quantityAllocated - quantityOnHold
+        return quantityAvailableToPromise >= 0 ? quantityAvailableToPromise : 0
     }
 
     def transformBinLocations(List binLocations, List picked, List onHold) {
@@ -329,19 +329,6 @@ class ProductAvailabilityService {
         }
 
         return productAvailability?.get(0)?.quantityOnHand ?: 0
-    }
-
-    Integer getQuantityAvailableToPromise(Product product, Location location) {
-        def productAvailability = ProductAvailability.createCriteria().list {
-            resultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
-            projections {
-                sum("quantityAvailableToPromise", "quantityAvailableToPromise")
-            }
-            eq("location", location)
-            eq("product", product)
-        }
-
-        return productAvailability?.get(0)?.quantityAvailableToPromise ?: 0
     }
 
     def getQuantityOnHand(List<Product> products, Location location) {
