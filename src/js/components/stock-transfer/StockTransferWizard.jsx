@@ -6,6 +6,7 @@ import { withRouter } from 'react-router-dom';
 import { getTranslate } from 'react-localize-redux';
 
 import CreateStockTransfer from './CreateStockTransfer';
+import StockTransferSecondPage from './StockTransferSecondPage';
 import Wizard from '../wizard/Wizard';
 import apiClient, { parseResponse } from '../../utils/apiClient';
 import {
@@ -79,7 +80,9 @@ class StockTransferWizard extends Component {
    * @public
    */
   getStepList() {
-    const stepList = [this.props.translate('react.stockTransfer.createStockTransfer.label', 'Create Stock Transfer')];
+    const stepList = [this.props.translate('react.stockTransfer.createStockTransfer.label', 'Create Stock Transfer'),
+      this.props.translate('react.stockTransfer.startStockTransfer.label', 'Start Stock Transfer'),
+    ];
     return stepList;
   }
 
@@ -120,7 +123,7 @@ class StockTransferWizard extends Component {
     const locationId = location.id;
     const title = this.getWizardTitle();
     const additionalTitle = null;
-    const pageList = [CreateStockTransfer];
+    const pageList = [CreateStockTransfer, StockTransferSecondPage];
     const stepList = this.getStepList();
 
     if (_.get(location, 'id')) {
