@@ -16,7 +16,7 @@
 %>
 <div class="page" style="page-break-after: ${pageBreakAfter};">
     <table id="requisition-items" class="fs-repeat-header" border="0">
-        <thead>
+        <thead style="display: table-row-group">
             <tr class="">
                 <td colspan="10">
                     <h4 class="title">${groupName}</h4>
