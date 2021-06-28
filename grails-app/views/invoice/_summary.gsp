@@ -33,7 +33,7 @@
                 <warehouse:message code="invoice.editInvoice.label" default="Edit Invoice"/>
             </g:link>
             <g:if test="${invoiceInstance?.dateSubmitted}">
-                <g:link class="button" controller="invoice" action="rollback" id="${invoiceInstance?.id}">
+                <g:link name="invoiceRollback" class="button" controller="invoice" action="rollback" id="${invoiceInstance?.id}">
                     <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
                     <warehouse:message code="invoice.rollback.label" default="Rollback"/>
                 </g:link>
@@ -48,3 +48,11 @@
         </g:hasRoleInvoice>
     </div>
 </div>
+<script>
+  $(document).ready(function() {
+    $('a[name="invoiceRollback"]').bind('click', function() {
+      var refresh = confirm('${warehouse.message(code: 'invoice.refreshValues.label', default: 'Do you want to refresh Invoice values using PO?')}') || '';
+      $(this).attr('href', $(this).attr('href') + '?refreshInvoice=' + refresh);
+    })
+  });
+</script>

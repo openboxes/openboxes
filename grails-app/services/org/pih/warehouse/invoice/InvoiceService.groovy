@@ -283,6 +283,36 @@ class InvoiceService {
         return invoice
     }
 
+    def refreshInvoiceItems(Invoice invoice) {
+        invoice.invoiceItems?.each { item ->
+            if (item.orderAdjustment) {
+                OrderAdjustment orderAdjustment = item.orderAdjustment
+
+                item.budgetCode = orderAdjustment.budgetCode
+                item.quantityUom = orderAdjustment.orderItem?.quantityUom
+                item.quantityPerUom = orderAdjustment.orderItem?.quantityPerUom ?: 1
+                item.unitPrice = orderAdjustment.totalAdjustments
+            } else if (item.shipmentItem) {
+                ShipmentItem shipmentItem = item.shipmentItem
+                OrderItem orderItem = shipmentItem.orderItems?.find { it }
+
+                item.quantity = shipmentItem.quantity ? shipmentItem.quantity/orderItem.quantityPerUom : 0
+                item.budgetCode = orderItem?.budgetCode
+                item.quantityUom = orderItem?.quantityUom
+                item.quantityPerUom = orderItem?.quantityPerUom ?: 1
+                item.unitPrice = orderItem?.unitPrice
+            } else {
+                OrderItem orderItem = item.orderItem
+
+                item.quantity = orderItem.quantity
+                item.budgetCode = orderItem.budgetCode
+                item.quantityUom = orderItem.quantityUom
+                item.quantityPerUom = orderItem.quantityPerUom ?: 1
+                item.unitPrice = orderItem.unitPrice
+            }
+        }
+    }
+
     InvoiceItem createFromInvoiceItemCandidate(InvoiceItemCandidate candidate) {
         InvoiceItem invoiceItem = new InvoiceItem(
             budgetCode: candidate.budgetCode,
@@ -291,6 +321,7 @@ class InvoiceService {
             quantity: candidate.quantity,
             quantityUom: candidate.quantityUom,
             quantityPerUom: candidate.quantityPerUom ?: 1,
+            unitPrice: candidate.unitPrice
         )
 
         ShipmentItem shipmentItem = ShipmentItem.get(candidate.id)
@@ -313,7 +344,8 @@ class InvoiceService {
             glAccount: orderItem.glAccount ?: orderItem.product.glAccount,
             budgetCode: orderItem?.budgetCode,
             quantityUom: orderItem?.quantityUom,
-            quantityPerUom: orderItem.quantityPerUom ?: 1
+            quantityPerUom: orderItem.quantityPerUom ?: 1,
+            unitPrice: orderItem.unitPrice
         )
         invoiceItem.addToOrderItems(orderItem)
         return invoiceItem
@@ -327,7 +359,8 @@ class InvoiceService {
             glAccount: shipmentItem.product.glAccount,
             budgetCode: orderItem?.budgetCode,
             quantityUom: orderItem?.quantityUom,
-            quantityPerUom: orderItem.quantityPerUom ?: 1
+            quantityPerUom: orderItem?.quantityPerUom ?: 1,
+            unitPrice: orderItem?.unitPrice
         )
         invoiceItem.addToShipmentItems(shipmentItem)
         return invoiceItem
@@ -340,7 +373,8 @@ class InvoiceService {
             glAccount: orderAdjustment.glAccount ?: orderAdjustment.orderItem?.glAccount ?: orderAdjustment.orderAdjustmentType?.glAccount,
             quantity: 1,
             quantityUom: orderAdjustment.orderItem?.quantityUom,
-            quantityPerUom: orderAdjustment.orderItem?.quantityPerUom ?: 1
+            quantityPerUom: orderAdjustment.orderItem?.quantityPerUom ?: 1,
+            unitPrice: orderAdjustment.totalAdjustments
         )
         invoiceItem.addToOrderAdjustments(orderAdjustment)
         return invoiceItem
