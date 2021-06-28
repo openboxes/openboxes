@@ -121,7 +121,7 @@
                         <td class="center middle">
                             <g:if test="${picklistItems}">
                                 <div class="binLocation">
-                                    ${(picklistItems[j]?.binLocation?.zone ? picklistItems[j].binLocation.zone.name + ': ' : '') + picklistItems[j]?.binLocation?.name}
+                                    ${picklistItems[j]?.binLocation?.name}
                                 </div>
                             </g:if>
                         </td>
