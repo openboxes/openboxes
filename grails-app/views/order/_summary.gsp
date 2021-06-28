@@ -1,5 +1,7 @@
 <%@ page import="org.pih.warehouse.core.DocumentCode; org.pih.warehouse.shipping.ShipmentStatusCode; org.pih.warehouse.order.OrderTypeCode" %>
 <%@ page import="org.pih.warehouse.order.OrderStatus" %>
+<%@ page import="org.pih.warehouse.order.OrderType" %>
+<%@ page import="org.pih.warehouse.core.Constants" %>
 
 <div id="order-summary" class="summary">
 	<g:if test="${orderInstance?.id}">
@@ -76,8 +78,8 @@
             <g:if test="${!hasRoleInvoice}">
                 <g:set var="disabledInvoiceMessage" value="${g.message(code:'errors.noPermissions.label')}"/>
             </g:if>
-            <g:if test="${orderInstance?.orderTypeCode == OrderTypeCode.TRANSFER_ORDER}">
-                <g:link controller="order" action="list" class="button" params="[orderTypeCode: OrderTypeCode.TRANSFER_ORDER]">
+            <g:if test="${orderInstance?.orderType == OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
+                <g:link controller="order" action="list" class="button" params="[orderType: Constants.PUTAWAY_ORDER]">
                     <img src="${resource(dir: 'images/icons/silk', file: 'application_view_list.png')}" />&nbsp;
                     <warehouse:message code="default.list.label" args="[g.message(code: 'orders.label')]" default="List orders"/>
                 </g:link>

@@ -15,6 +15,7 @@ import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
 import org.pih.warehouse.api.PutawayStatus
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.TransferStockCommand
@@ -22,6 +23,7 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.order.OrderStatus
+import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
 
 class PutawayService {
@@ -84,7 +86,7 @@ class PutawayService {
     }
 
     List<PutawayItem> getPendingItems(Location location) {
-        List<Order> orders = Order.findAllByOriginAndOrderTypeCode(location, OrderTypeCode.TRANSFER_ORDER)
+        List<Order> orders = Order.findAllByOriginAndOrderType(location, OrderType.findByCode(Constants.PUTAWAY_ORDER))
         List<Putaway> putaways = orders.collect { Putaway.createFromOrder(it) }
         List<PutawayItem> putawayItems = []
 
@@ -159,7 +161,8 @@ class PutawayService {
             order = new Order()
         }
 
-        order.orderTypeCode = OrderTypeCode.TRANSFER_ORDER
+        OrderType orderType = OrderType.findByCode(Constants.PUTAWAY_ORDER)
+        order.orderType = orderType
         order.status = OrderStatus.valueOf(putaway.putawayStatus.toString())
         if (!order.orderNumber) {
             order.orderNumber = "P-${putaway.putawayNumber}"

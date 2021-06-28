@@ -14,7 +14,11 @@
     <sql>
       UPDATE `order` o
         INNER JOIN order_type o_t on o_t.id = o.order_type_code
-        SET o.order_type_id = o_t.id WHERE o.order_type_id IS NULL;
+        SET o.order_type_id = o_t.id WHERE o.order_type_id IS NULL AND o.order_type_code != 'TRANSFER_ORDER';
+
+      UPDATE `order` o
+        INNER JOIN order_type o_t on o_t.id = 'PUTAWAY_ORDER'
+        SET o.order_type_id = o_t.id WHERE o.order_type_id IS NULL AND o.order_type_code = 'TRANSFER_ORDER';
     </sql>
   </changeSet>
 

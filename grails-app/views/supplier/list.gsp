@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode; org.pih.warehouse.order.OrderTypeCode" %>
+<%@ page import="org.pih.warehouse.order.OrderType; org.pih.warehouse.shipping.ShipmentStatusCode; org.pih.warehouse.order.OrderTypeCode" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -58,7 +58,7 @@
                                                 </g:link>
                                             </td>
                                             <td>
-                                                <g:link controller="order" action="list" params="[orderTypeCode:OrderTypeCode.PURCHASE_ORDER, origin: supplier.id, destination: null]" class="list">
+                                                <g:link controller="order" action="list" params="[orderType:OrderTypeCode.PURCHASE_ORDER.name(), origin: supplier.id, destination: null]" class="list">
                                                     ${supplier?.pendingOrdersCount}
                                                 </g:link>
                                             </td>

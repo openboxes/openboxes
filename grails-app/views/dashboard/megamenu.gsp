@@ -1,4 +1,5 @@
-<%@page import="org.pih.warehouse.core.ActivityCode"%>
+<%@page import="org.pih.warehouse.core.ActivityCode;"%>
+<%@page import="org.pih.warehouse.core.Constants;"%>
 <%@page import="org.pih.warehouse.order.OrderTypeCode"%>
 <%@page import="org.pih.warehouse.requisition.RequisitionStatus"%>
 <%@page import="org.pih.warehouse.shipping.Shipment"%>
@@ -182,7 +183,7 @@
                     </g:link>
                 </div>
                 <div class="mm-menu-item">
-                    <g:link controller="order" action="list" params="[orderTypeCode:OrderTypeCode.PURCHASE_ORDER]" class="list">
+                    <g:link controller="order" action="list" params="[orderType:OrderTypeCode.PURCHASE_ORDER.name()]" class="list">
                         <warehouse:message code="order.listPurchase.label" default="List Purchase Orders" />
                     </g:link>
                 </div>
@@ -262,7 +263,7 @@
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">
-                                <g:link controller="order" action="list" params="[orderTypeCode: 'TRANSFER_ORDER', status: 'PENDING']">
+                                <g:link controller="order" action="list" params="[orderType: Constants.PUTAWAY_ORDER, status: 'PENDING']">
                                     <warehouse:message code="default.list.label" args="[g.message(code:'putAways.label')]"/>
                                 </g:link>
                             </div>

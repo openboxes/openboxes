@@ -60,7 +60,7 @@
         </div>
         <div class="right">
             <div class="title">
-                <warehouse:message code="enum.OrderTypeCode.${orderInstance?.orderTypeCode}"/>
+                ${orderInstance?.orderType?.name}
             </div>
             <table width="25%">
                 <tr>
