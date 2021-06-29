@@ -103,20 +103,48 @@ class StockTransferSecondPage extends Component {
       style: { whiteSpace: 'normal' },
       Cell: (props) => {
         const itemIndex = props.index;
+        const splitItems = _.filter(this.state.stockTransfer.stockTransferItems, lineItem =>
+          lineItem.referenceId === props.original.referenceId);
+        let disabled = false;
+        let disabledMessage;
+        if (!props.original.id || splitItems.length > 1) {
+          const quantityToTransfer = _.reduce(
+            splitItems, (sum, val) =>
+              (sum + (val.transferQty ? _.toInteger(val.transferQty) : 0)),
+            0,
+          );
+          if (quantityToTransfer > props.original.quantityOnHand) {
+            _.forEach(this.state.stockTransfer.stockTransferItems, (lineItem) => {
+              _.forEach(splitItems, (splitItem) => {
+                if (lineItem === splitItem) {
+                  disabled = true;
+                  disabledMessage = this.props.translate(
+                    'react.stockTransfer.higherSplitQuantity.label',
+                    'Sum of quantity to transfer of split items cannot be higher than quantity in current bin.',
+                  );
+                }
+              });
+            });
+          }
+        } else if (splitItems.length === 1 &&
+          props.original.quantityOnHand < _.toInteger(props.value)) {
+          disabled = true;
+          disabledMessage = this.props.translate(
+            'react.stockTransfer.higherQuantity.label',
+            'Quantity to transfer cannot be higher than quantity in current bin',
+          );
+        }
         return (
           <Tooltip
-            html={this.props.translate(
-                'react.stockTransfer.higherQuantity.label',
-                'Quantity to transfer cannot be higher than quantity in current bin',
-              )}
-            disabled={!props.value || props.value <= props.original.quantityOnHand}
+            html={disabledMessage}
+            disabled={!disabled}
             theme="transparent"
             arrow="true"
             delay="150"
             duration="250"
             hideDelay="50"
           >
-            <div className={props.value > props.original.quantityOnHand ? 'has-error' : ''}>
+            <div className={props.value && disabled ? 'has-error' : ''}>
               <input
                 type="number"
                 className="form-control form-control-xs"
@@ -136,29 +164,35 @@ class StockTransferSecondPage extends Component {
     }, {
       Header: <Translate id="react.stockTransfer.transferTo.label" defaultMessage="Transfer to" />,
       accessor: 'transferBin',
-      Cell: (cellInfo) => {
-        const splitItems = _.get(this.state.stockTransfer.stockTransferItems, `[${cellInfo.index}].splitItems`);
-
-        if (splitItems && splitItems.length > 0) {
-          return <Translate id="react.stockTransfer.splitLine.label" defaultMessage="Split line" />;
-        }
-
-        return (<Select
-          options={this.state.bins}
-          objectValue
-          value={_.get(this.state.stockTransfer.stockTransferItems, `[${cellInfo.index}].${cellInfo.column.id}`) || null}
-          onChange={value => this.changeStockTransfer(update(this.state.stockTransfer, {
+      Cell: cellInfo => (<Select
+        options={this.state.bins}
+        objectValue
+        value={_.get(this.state.stockTransfer.stockTransferItems, `[${cellInfo.index}].${cellInfo.column.id}`) || null}
+        onChange={value => this.changeStockTransfer(update(this.state.stockTransfer, {
             stockTransferItems: { [cellInfo.index]: { transferBin: { $set: value } } },
           }))}
-          className="select-xs"
-        />);
-      },
+        className="select-xs"
+      />),
       Filter,
     }, {
       Header: '',
       accessor: 'splitItems',
       Cell: cellInfo => (
         <div className="d-flex flex-row flex-wrap">
+          <button
+            className="btn btn-outline-success btn-xs mr-1 mb-1"
+            onClick={() => this.splitLine(cellInfo.index, {
+              productCode: cellInfo.original.productCode,
+              productName: cellInfo.original.productName,
+              lotNumber: cellInfo.original.lotNumber,
+              expirationDate: cellInfo.original.expirationDate,
+              quantityOnHand: cellInfo.original.quantityOnHand,
+              zone: cellInfo.original.zone,
+              binLocation: cellInfo.original.binLocation,
+              referenceId: cellInfo.original.id,
+            })}
+          ><Translate id="react.stockTransfer.splitLine.label" defaultMessage="Split line" />
+          </button>
           <button
             className="btn btn-outline-danger btn-xs mb-1"
             onClick={() => this.deleteItem(cellInfo.index)}
@@ -188,7 +222,7 @@ class StockTransferSecondPage extends Component {
       })
       .catch(() => {
         const stockTransferItems = [{
-          _id: 1,
+          id: 1,
           productCode: 'code2',
           productName: 'product1',
           lotNumber: 'lot3',
@@ -196,8 +230,9 @@ class StockTransferSecondPage extends Component {
           zone: 'zone2',
           binLocation: 'bin2',
           quantityOnHand: 45,
+          referenceId: 1,
         }, {
-          _id: 2,
+          id: 2,
           productCode: 'code2',
           productName: 'product1',
           lotNumber: 'lot2',
@@ -205,8 +240,9 @@ class StockTransferSecondPage extends Component {
           zone: 'zone1',
           binLocation: 'bin1',
           quantityOnHand: 51,
+          referenceId: 2,
         }, {
-          _id: 3,
+          id: 3,
           productCode: 'code2',
           productName: 'product2',
           lotNumber: 'lot3',
@@ -214,8 +250,9 @@ class StockTransferSecondPage extends Component {
           zone: 'zone2',
           binLocation: 'bin1',
           quantityOnHand: 88,
+          referenceId: 3,
         }, {
-          _id: 4,
+          id: 4,
           productCode: 'code2',
           productName: 'product3',
           lotNumber: 'lot2',
@@ -223,8 +260,9 @@ class StockTransferSecondPage extends Component {
           zone: 'zone3',
           binLocation: 'bin1',
           quantityOnHand: 41,
+          referenceId: 4,
         }, {
-          _id: 5,
+          id: 5,
           productCode: 'code2',
           productName: 'product2',
           lotNumber: 'lot3',
@@ -232,6 +270,7 @@ class StockTransferSecondPage extends Component {
           zone: 'zone3',
           binLocation: 'bin1',
           quantityOnHand: 43,
+          referenceId: 5,
         }];
 
         this.setState({ stockTransfer: { stockTransferItems } }, () => this.props.hideSpinner());
@@ -330,12 +369,36 @@ class StockTransferSecondPage extends Component {
   }
 
   /**
+   * Save stock transfer and go to the previous page.
+   * @public
+   */
+  previousPage() {
+    this.saveStockTransfer(this.state.stockTransfer, (stockTransfer) => {
+      this.props.previousPage({
+        stockTransfer,
+      });
+    });
+  }
+
+  /**
    * Generates stock transfer pdf
    * @public
    */
   // eslint-disable-next-line class-methods-use-this
   generateStockTransfer() {
     // TODO add in another ticket
+  }
+
+  splitLine(itemIndex, row) {
+    const stockTransfer = update(this.state.stockTransfer, {
+      stockTransferItems: {
+        $splice: [
+          [itemIndex + 1, 0, row],
+        ],
+      },
+    });
+
+    this.setState({ stockTransfer });
   }
 
   render() {
@@ -383,6 +446,12 @@ class StockTransferSecondPage extends Component {
         <div className="submit-buttons">
           <button
             type="button"
+            onClick={() => this.previousPage()}
+            className="btn btn-outline-primary btn-form btn-xs"
+          ><Translate id="react.default.button.previous.label" defaultMessage="Previous" />
+          </button>
+          <button
+            type="button"
             onClick={() => this.nextPage()}
             className="btn btn-outline-primary btn-form float-right btn-xs"
           ><Translate id="react.default.button.next.label" defaultMessage="Next" />
@@ -412,6 +481,8 @@ StockTransferSecondPage.propTypes = {
   hideSpinner: PropTypes.func.isRequired,
   /** Function taking user to the next page */
   nextPage: PropTypes.func.isRequired,
+  /** Function taking user to the previous page */
+  previousPage: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
   /** All stock transfer's data */
   initialValues: PropTypes.shape({
