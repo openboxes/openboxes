@@ -369,6 +369,18 @@ class StockTransferSecondPage extends Component {
   }
 
   /**
+   * Save stock transfer and go to the previous page.
+   * @public
+   */
+  previousPage() {
+    this.saveStockTransfer(this.state.stockTransfer, (stockTransfer) => {
+      this.props.previousPage({
+        stockTransfer,
+      });
+    });
+  }
+
+  /**
    * Generates stock transfer pdf
    * @public
    */
@@ -434,6 +446,12 @@ class StockTransferSecondPage extends Component {
         <div className="submit-buttons">
           <button
             type="button"
+            onClick={() => this.previousPage()}
+            className="btn btn-outline-primary btn-form btn-xs"
+          ><Translate id="react.default.button.previous.label" defaultMessage="Previous" />
+          </button>
+          <button
+            type="button"
             onClick={() => this.nextPage()}
             className="btn btn-outline-primary btn-form float-right btn-xs"
           ><Translate id="react.default.button.next.label" defaultMessage="Next" />
@@ -463,6 +481,8 @@ StockTransferSecondPage.propTypes = {
   hideSpinner: PropTypes.func.isRequired,
   /** Function taking user to the next page */
   nextPage: PropTypes.func.isRequired,
+  /** Function taking user to the previous page */
+  previousPage: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
   /** All stock transfer's data */
   initialValues: PropTypes.shape({
