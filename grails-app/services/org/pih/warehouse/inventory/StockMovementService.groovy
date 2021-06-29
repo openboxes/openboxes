@@ -675,16 +675,14 @@ class StockMovementService {
                 'max': max ? max.toInteger() : null,
         ]);
 
-        def editItemsIds = data.collect { it.id }
+        def editItemsIds = data.collect { "'$it.id'" }.join(',')
 
         def substitutionItemsMap = dataService.executeQuery("""
                     select
                        *
                     FROM substitution_item
-                    where parent_requisition_item_id in (:ids)
-                    """, [
-                'ids': editItemsIds,
-        ]).inject([:]) {map, item -> map << [(item.parent_requisition_item_id): item]}
+                    where parent_requisition_item_id in (${editItemsIds})
+                    """).groupBy { it.parent_requisition_item_id }
 
         def productsMap = Product.findAllByIdInList(data.collect { it.product_id })
                 .inject([:]) {map, item -> map << [(item.id): item]}
