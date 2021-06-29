@@ -19,6 +19,7 @@ class RecordInventoryCommand {
     Inventory inventory
     InventoryLevel inventoryLevel
     Integer totalQuantity
+    Integer totalQuantityAvailableToPromise
     Date transactionDate = new Date()
     String comment
     RecordInventoryRowCommand recordInventoryRow
@@ -30,6 +31,7 @@ class RecordInventoryCommand {
         inventory(nullable: true)
         inventoryLevel(nullable: true)
         totalQuantity(nullable: true)
+        totalQuantityAvailableToPromise(nullable: true)
         transactionDate(nullable: false)
         comment(nullable: true)
         recordInventoryRows(validator: { val, obj, errors ->

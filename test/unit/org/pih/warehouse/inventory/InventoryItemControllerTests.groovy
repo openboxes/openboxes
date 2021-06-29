@@ -40,6 +40,9 @@ class InventoryItemControllerTests extends ControllerUnitTestCase {
         inventoryServiceMock.demand.getQuantityByProductMap(1) { transactionEntryList ->
             return [:]
         }
+        inventoryServiceMock.demand.getQuantityAvailableToPromise(1) { location, product ->
+            return 0
+        }
         inventoryServiceMock.demand.getInventoryItemsWithQuantity(1) { product, inv ->
             return ["pro1": [[id:"item1"], [id:"item2"], [id:"item3"], [id:"item4"]]]
         }
