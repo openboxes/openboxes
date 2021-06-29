@@ -31,6 +31,7 @@ class RecordInventoryCommand {
         inventory(nullable: true)
         inventoryLevel(nullable: true)
         totalQuantity(nullable: true)
+        totalQuantityAvailableToPromise(nullable: true)
         transactionDate(nullable: false)
         comment(nullable: true)
         recordInventoryRows(validator: { val, obj, errors ->
