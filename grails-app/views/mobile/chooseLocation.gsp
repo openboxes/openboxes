@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="layout" content="bootstrap"/>
+    <meta name="layout" content="mobile"/>
     <title><g:message code="dashboard.chooseLocation.label" default="Choose Location"/></title>
 </head>
 
@@ -17,11 +17,7 @@
     </g:hasErrors>
     <div class="row">
         <div class="col-sm-12">
-
-
             <div id="accordion" class="accordion">
-
-
                 <div class="accordion-item">
                     <h2 id="heading0" class="accordion-header">
                         <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#collapse0" aria-expanded="true" aria-controls="collapse0">

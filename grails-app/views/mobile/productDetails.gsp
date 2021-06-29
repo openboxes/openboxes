@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="layout" content="bootstrap" />
+    <meta name="layout" content="mobile" />
     <title><warehouse:message code="product.label" default="Product"/></title>
 </head>
 <body>
@@ -16,32 +16,56 @@
         </g:link>
     </div>
 
-    <div class="row">
-        <div class="col-2">
+    <div class="card">
+
+        <div class="card-body">
+
+            <h1><small>${product.productCode}</small> ${product.name}</h1>
+
             <picture>
                 <g:if test="${product.images}">
-                    <img src="${resource(dir: 'images', file: 'default-product.png')}" class="img-fluid"/>
+                    <g:set var="image" value="${product?.images?.sort()?.first()}"/>
+                    <img src="${createLink(controller:'product', action:'renderImage', id:image?.id)}" class="img-fluid"/>
                 </g:if>
                 <g:else>
                     <img src="${resource(dir: 'images', file: 'default-product.png')}" class="img-fluid"/>
                 </g:else>
             </picture>
-        </div>
-        <div class="col">
-            <h5>${product.productCode}</h5>
-            <h6>
-                ${product.name}
-                <g:renderHandlingIcons product="${product}"/>
-            </h6>
+
+            <h3>Description</h3>
             <g:if test="${product.description}">
-                <p class="text-truncate">
+                <p>
                     ${product.description}
                 </p>
             </g:if>
-        </div>
-        <div class="col-3">
-            <h5><g:formatNumber number="${productSummary.quantityOnHand}" maxFractionDigits="0"/></h5>
-            <small class="text-muted">${product?.unitOfMeasure}</small>
+
+
+            <h3>Details</h3>
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <label>QoH</label>
+                    <span>
+                        <g:formatNumber number="${productSummary.quantityOnHand?:0}" maxFractionDigits="0"/>
+                        <small class="text-muted">${product?.unitOfMeasure?:"EA"}</small>
+                    </span>
+                </li>
+
+                <g:each var="productAttribute" in="${product.attributes}">
+                    <li class="list-group-item">
+                        <label>${productAttribute.attribute.name}</label>
+                        <span>
+                            ${productAttribute?.value?:0}
+                            ${productAttribute?.unitOfMeasure?.name}
+                            ${productAttribute?.attribute?.unitOfMeasureClass?.baseUom?.name}
+                        </span>
+                    </li>
+                </g:each>
+            </ul>
+
+            <h3>Barcode</h3>
+            <g:displayBarcode format="${com.google.zxing.BarcodeFormat.CODE_128}" data="${product.productCode}" showData="${false}"/>
+
+
         </div>
     </div>
 </div>
