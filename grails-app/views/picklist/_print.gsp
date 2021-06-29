@@ -247,46 +247,71 @@
         </table>
     </div>
 
-    <g:set var="requisitionItems" value='${requisition.requisitionItems.sort { it.product.name }}'/>
-    <g:set var="requisitionItemsCanceled" value='${requisitionItems.findAll { it.isCanceled()}}'/>
-    <g:set var="requisitionItems" value='${requisitionItems.findAll { !it.isCanceled()&&!it.isChanged() }}'/>
-    <g:set var="requisitionItemsColdChain" value='${requisitionItems.findAll { it?.product?.coldChain }}'/>
-    <g:set var="requisitionItemsControlled" value='${requisitionItems.findAll {it?.product?.controlledSubstance}}'/>
-    <g:set var="requisitionItemsHazmat" value='${requisitionItems.findAll {it?.product?.hazardousMaterial}}'/>
-    <g:set var="requisitionItemsOther" value='${requisitionItems.findAll {!it?.product?.hazardousMaterial && !it?.product?.coldChain && !it?.product?.controlledSubstance}}'/>
+    <g:set var="allRequisitionItems" value='${requisition.requisitionItems.sort { it.product.name }}'/>
+    <g:set var="allPickListItems" value='${allRequisitionItems*.retrievePicklistItems()?.flatten()}'/>
+    <g:set var="zoneNames" value='${allPickListItems?.collect { it?.binLocation?.zone?.name }?.unique()?.sort{ a, b -> !a ? !b ? 0 : 1 : !b ? -1 : a <=> b }}'/>
+    <g:set var="allPickListItems" value='${allRequisitionItems*.retrievePicklistItems()?.flatten()}'/>
+    <g:set var="pickListItemsByZone" value='${allPickListItems?.groupBy { it?.binLocation?.zone?.name } ?: [:]}'/>
 
-    <div>
-        <g:if test="${requisitionItemsColdChain}">
-            <g:set var="pageTitle">
-                ${warehouse.message(code:'product.coldChain.label', default:'Cold chain')}
-            </g:set>
-            <g:render template="/picklist/page" model="[pageTitle: pageTitle, requisitionItems:requisitionItemsColdChain, location: location, picklist:picklist, pageBreakAfter: (requisitionItemsControlled||requisitionItemsHazmat||requisitionItemsOther)?'always':'avoid', sorted:sorted]"/>
+    <g:each var="zoneName" status="i" in="${zoneNames}">
+
+        <g:set var="pickListItemsByRequisition" value='${pickListItemsByZone[zoneName]?.groupBy { it?.requisitionItem?.id } ?: [:]}'/>
+
+        <g:if test="${!zoneName}">
+            <g:set var="requisitionItems" value='${allRequisitionItems.findAll { !it.picklistItems?.size() || pickListItemsByRequisition[it.id]?.size() }}'/>
         </g:if>
-        <g:if test="${requisitionItemsControlled}">
-            <g:set var="pageTitle">
-                ${warehouse.message(code:'product.controlledSubstance.label', default:'Controlled substance')}
-            </g:set>
-            <g:render template="/picklist/page" model="[pageTitle: pageTitle,requisitionItems:requisitionItemsControlled, location: location, picklist:picklist, pageBreakAfter: (requisitionItemsHazmat||requisitionItemsOther)?'always':'avoid', sorted:sorted]"/>
-        </g:if>
-        <g:if test="${requisitionItemsHazmat}">
-            <g:set var="pageTitle">
-                ${warehouse.message(code:'product.hazardousMaterial.label', default:'Hazardous material')}
-            </g:set>
-            <g:render template="/picklist/page" model="[pageTitle: pageTitle,requisitionItems:requisitionItemsHazmat, location: location, picklist:picklist, pageBreakAfter: (requisitionItemsOther)?'always':'avoid', sorted:sorted]"/>
-        </g:if>
-        <g:if test="${requisitionItemsOther}">
-            <g:set var="pageTitle">
-                ${warehouse.message(code:'default.otherItems.label', default:'Other items')}
-            </g:set>
-            <g:render template="/picklist/page" model="[pageTitle: pageTitle,requisitionItems:requisitionItemsOther, location: location, picklist:picklist, pageBreakAfter: (requisitionItemsCanceled)?'always':'avoid', sorted:sorted]"/>
-        </g:if>
-        <g:if test="${requisitionItemsCanceled}">
-            <g:set var="pageTitle">
-                ${warehouse.message(code:'default.canceled.label', default:'Canceled items')}
-            </g:set>
-            <g:render template="/picklist/page" model="[pageTitle: pageTitle,requisitionItems:requisitionItemsCanceled, location: location, picklist:picklist, pageBreakAfter: 'avoid', sorted:sorted]"/>
-        </g:if>
-    </div>
+        <g:else>
+            <g:set var="requisitionItems" value='${allRequisitionItems.findAll { pickListItemsByRequisition[it.id]?.size() }}'/>
+        </g:else>
+
+        <g:set var="requisitionItemsCanceled" value='${requisitionItems.findAll { it.isCanceled()}}'/>
+        <g:set var="requisitionItems" value='${requisitionItems.findAll { !it.isCanceled()&&!it.isChanged() }}'/>
+        <g:set var="requisitionItemsColdChain" value='${requisitionItems.findAll { it?.product?.coldChain }}'/>
+        <g:set var="requisitionItemsControlled" value='${requisitionItems.findAll {it?.product?.controlledSubstance}}'/>
+        <g:set var="requisitionItemsHazmat" value='${requisitionItems.findAll {it?.product?.hazardousMaterial}}'/>
+        <g:set var="requisitionItemsOther" value='${requisitionItems.findAll {!it?.product?.hazardousMaterial && !it?.product?.coldChain && !it?.product?.controlledSubstance}}'/>
+
+        <g:set var="showZoneName" value='${zoneName || zoneNames.size() > 1}'/>
+
+        <div class="page-content" style="page-break-after: ${showZoneName && i < zoneNames.size() - 1 ? 'always':'avoid'};">
+            <g:if test="${showZoneName}">
+                <h1 class="subtitle">
+                    ${zoneName ?: g.message(code: 'location.noZone.label', default: 'No zone')}
+                </h1>
+            </g:if>
+
+            <g:if test="${requisitionItemsColdChain}">
+                <g:set var="pageTitle">
+                    ${warehouse.message(code:'product.coldChain.label', default:'Cold chain')}
+                </g:set>
+                <g:render template="/picklist/page" model="[pageTitle: pageTitle, requisitionItems:requisitionItemsColdChain, pickListItemsByRequisition: pickListItemsByRequisition, location: location, picklist:picklist, pageBreakAfter: 'avoid', sorted:sorted]"/>
+            </g:if>
+            <g:if test="${requisitionItemsControlled}">
+                <g:set var="pageTitle">
+                    ${warehouse.message(code:'product.controlledSubstance.label', default:'Controlled substance')}
+                </g:set>
+                <g:render template="/picklist/page" model="[pageTitle: pageTitle,requisitionItems:requisitionItemsControlled, pickListItemsByRequisition: pickListItemsByRequisition, location: location, picklist:picklist, pageBreakAfter: 'avoid', sorted:sorted]"/>
+            </g:if>
+            <g:if test="${requisitionItemsHazmat}">
+                <g:set var="pageTitle">
+                    ${warehouse.message(code:'product.hazardousMaterial.label', default:'Hazardous material')}
+                </g:set>
+                <g:render template="/picklist/page" model="[pageTitle: pageTitle,requisitionItems:requisitionItemsHazmat, pickListItemsByRequisition: pickListItemsByRequisition, location: location, picklist:picklist, pageBreakAfter: 'avoid', sorted:sorted]"/>
+            </g:if>
+            <g:if test="${requisitionItemsOther}">
+                <g:set var="pageTitle">
+                    ${warehouse.message(code:'product.generalGoods.label', default:'General Goods')}
+                </g:set>
+                <g:render template="/picklist/page" model="[pageTitle: pageTitle,requisitionItems:requisitionItemsOther, pickListItemsByRequisition: pickListItemsByRequisition, location: location, picklist:picklist, pageBreakAfter: 'avoid', sorted:sorted]"/>
+            </g:if>
+            <g:if test="${requisitionItemsCanceled}">
+                <g:set var="pageTitle">
+                    ${warehouse.message(code:'default.canceled.label', default:'Canceled items')}
+                </g:set>
+                <g:render template="/picklist/page" model="[pageTitle: pageTitle,requisitionItems:requisitionItemsCanceled, pickListItemsByRequisition: pickListItemsByRequisition, location: location, picklist:picklist, pageBreakAfter: 'avoid', sorted:sorted]"/>
+            </g:if>
+        </div>
+    </g:each>
 </div>
 
 </body>

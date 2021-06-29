@@ -24,6 +24,7 @@ class StockCardCommand {
     Inventory inventory
     InventoryLevel inventoryLevel
     Integer totalQuantity
+    Integer totalQuantityAvailableToPromise
 
     // Current stock section
     List<InventoryItem> lotNumberList
