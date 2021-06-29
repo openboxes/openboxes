@@ -19,6 +19,8 @@ import org.pih.warehouse.product.ProductSummary
 class MobileController {
 
     def userService
+    def productService
+    def inventoryService
     def locationService
     def megamenuService
 
@@ -65,9 +67,15 @@ class MobileController {
 
     def productList = {
         Location location = Location.get(session.warehouse.id)
-        def productSummaries = ProductSummary.findAllByLocation(location, [max: 10])
-
-        [productSummaries:productSummaries]
+        def terms = params?.q ? params?.q?.split(" ") : "".split(" ")
+        def products = inventoryService.searchProducts(terms, [])
+        if (products) {
+            def productSummaries = ProductSummary.createCriteria().list(max: params.max ?: 10, offset: params.offset ?: 0) {
+                eq("location", location)
+                'in'("product", products)
+            }
+            [productSummaries:productSummaries]
+        }
     }
 
     def productDetails = {

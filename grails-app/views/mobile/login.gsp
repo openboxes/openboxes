@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="layout" content="bootstrap"/>
+    <meta name="layout" content="mobile"/>
     <title><g:message code="default.login.label" default="Login"/></title>
 </head>
 
