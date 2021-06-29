@@ -70,7 +70,7 @@ class ProductAttributeExcelImporter extends AbstractExcelImporter {
     ProductAttribute createOrUpdateProductAttribute(Map params) {
         Product product = Product.findByProductCode(params.productCode)
         Attribute attribute = Attribute.findByCode(params.attributeCode)
-        UnitOfMeasure unitOfMeasure = UnitOfMeasure.findByCode(params.unitOfMeasureCode)
+        UnitOfMeasure unitOfMeasure = params?.unitOfMeasureCode ? UnitOfMeasure.findByCode(params.unitOfMeasureCode) : null
         ProductAttribute productAttribute = ProductAttribute.findByProductAndAttribute(product, attribute)
         if (!productAttribute) {
             productAttribute = new ProductAttribute()
