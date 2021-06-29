@@ -194,7 +194,11 @@ class DashboardController {
             if (session.targetUri || params.targetUri) {
                 def targetUri = params.targetUri ?: session.targetUri
                 if (targetUri && !targetUri.contains("chooseLocation") && !targetUri.contains("errors")) {
-                    redirect(uri: targetUri)
+                    // Redirects are sending browser to http instead of https
+                    // TODO Should make this configurable
+                    targetUri = g.createLink(uri: targetUri, absolute: true)
+                    log.info "Redirecting to URI " + targetUri
+                    redirect(url: targetUri)
                     return
                 }
             }
