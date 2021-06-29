@@ -13,6 +13,7 @@ import grails.orm.PagedResultList
 import grails.validation.ValidationException
 import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringUtils
+import org.hibernate.Criteria
 import org.hibernate.criterion.CriteriaSpecification
 import org.joda.time.LocalDate
 import org.pih.warehouse.api.AvailableItem
@@ -1209,7 +1210,22 @@ class InventoryService implements ApplicationContextAware {
         // Used in the current stock tab
         cmd.quantityByBinLocation = getQuantityByBinLocation(cmd.transactionEntryList)
 
+        cmd.totalQuantityAvailableToPromise = getQuantityAvailableToPromise(cmd.product, cmd.warehouse)
+
         return cmd
+    }
+
+    Integer getQuantityAvailableToPromise(Product product, Location location) {
+        def productAvailability = ProductAvailability.createCriteria().list {
+            resultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+            projections {
+                sum("quantityAvailableToPromise", "quantityAvailableToPromise")
+            }
+            eq("location", location)
+            eq("product", product)
+        }
+
+        return productAvailability?.get(0)?.quantityAvailableToPromise ?: 0
     }
 
 

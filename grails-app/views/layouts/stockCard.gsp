@@ -60,17 +60,19 @@
 			</div>
 		</g:hasErrors>
 		<g:render template="../product/summary" model="[productInstance:commandInstance?.product,
-			inventoryInstance:commandInstance?.inventory,
-			inventoryLevelInstance: commandInstance?.inventoryLevel,
-			totalQuantity: commandInstance?.totalQuantity]"/>
+                                                        inventoryInstance:commandInstance?.inventory,
+                                                        inventoryLevelInstance: commandInstance?.inventoryLevel,
+                                                        totalQuantity: commandInstance?.totalQuantity,
+                                                        totalQuantityAvailableToPromise: commandInstance?.totalQuantityAvailableToPromise]"/>
 		<div class="dialog">
             <div class="yui-gf">
                 <div class="yui-u first">
                     <g:render template="productDetails"
                         model="[productInstance:commandInstance?.product,
-                            inventoryInstance:commandInstance?.inventory,
-                            inventoryLevelInstance: commandInstance?.inventoryLevel,
-                            totalQuantity: commandInstance?.totalQuantity]"/>
+								inventoryInstance:commandInstance?.inventory,
+								inventoryLevelInstance: commandInstance?.inventoryLevel,
+								totalQuantity: commandInstance?.totalQuantity,
+								totalQuantityAvailableToPromise: commandInstance?.totalQuantityAvailableToPromise]"/>
                 </div>
                 <div class="yui-u">
 
