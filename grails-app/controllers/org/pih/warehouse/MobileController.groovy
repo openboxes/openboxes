@@ -15,6 +15,7 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSummary
+import org.pih.warehouse.requisition.Requisition
 
 class MobileController {
 
@@ -35,13 +36,15 @@ class MobileController {
             eq("orderTypeCode", OrderTypeCode.PURCHASE_ORDER)
         }
 
-        def userCount = User.count()
+        def requisitionCount = Requisition.createCriteria().count {
+            eq("origin", location)
+        }
 
         [
                 data: [
-                        [name: "Products", class: "fa fa-cubes", count: productCount, url: g.createLink(controller: "mobile", action: "productList")],
-                        [name: "Purchase Orders", class: "fa fa-shopping-cart", count: orderCount, url: g.createLink(controller: "order", action: "list")],
-                        [name: "Users", class: "fa fa-user", count: userCount, url: g.createLink(controller: "user", action: "list")]
+                        [name: "Inventory Items", class: "fa fa-box", count: productCount, url: g.createLink(controller: "mobile", action: "productList")],
+                        [name: "Purchase Orders", class: "fa fa-shopping-cart", count: orderCount, url: g.createLink(controller: "order", action: "list", params: ['origin.id', location.id])],
+                        [name: "Replenishment Orders", class: "fa fa-truck", count: requisitionCount, url: g.createLink(controller: "stockMovement", action: "list", params: ['origin.id', location.id])],
                 ]
         ]
     }
@@ -79,11 +82,15 @@ class MobileController {
     }
 
     def productDetails = {
-        Product product = Product.get(params.id)
+        Product product = Product.findByIdOrProductCode(params.id, params.id)
         Location location = Location.get(session.warehouse.id)
         def productSummary = ProductSummary.findByProductAndLocation(product, location)
-
-        [productSummary:productSummary]
-
+        if (productSummary) {
+            [productSummary: productSummary]
+        }
+        else {
+            flash.message = "Product ${product.productCode} is not available in ${location.locationNumber}"
+            redirect(action: "productList")
+        }
     }
 }
