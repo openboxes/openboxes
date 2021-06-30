@@ -125,7 +125,7 @@ class CreateStockTransfer extends Component {
       })
       .catch(() => {
         const stockTransferItems = [{
-          id: 1,
+          _id: 1,
           productCode: 'code2',
           productName: 'product1',
           lotNumber: 'lot3',
@@ -134,7 +134,7 @@ class CreateStockTransfer extends Component {
           binLocation: 'bin2',
           quantityOnHand: 45,
         }, {
-          id: 2,
+          _id: 2,
           productCode: 'code2',
           productName: 'product1',
           lotNumber: 'lot2',
@@ -143,7 +143,7 @@ class CreateStockTransfer extends Component {
           binLocation: 'bin1',
           quantityOnHand: 51,
         }, {
-          id: 3,
+          _id: 3,
           productCode: 'code2',
           productName: 'product2',
           lotNumber: 'lot3',
@@ -152,7 +152,7 @@ class CreateStockTransfer extends Component {
           binLocation: 'bin1',
           quantityOnHand: 88,
         }, {
-          id: 4,
+          _id: 4,
           productCode: 'code2',
           productName: 'product3',
           lotNumber: 'lot2',
@@ -161,7 +161,7 @@ class CreateStockTransfer extends Component {
           binLocation: 'bin1',
           quantityOnHand: 41,
         }, {
-          id: 5,
+          _id: 5,
           productCode: 'code2',
           productName: 'product2',
           lotNumber: 'lot3',
