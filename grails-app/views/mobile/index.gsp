@@ -7,21 +7,19 @@
 </head>
 
 <body>
-    <div class="container">
-        <div class="row">
-            <g:each var="indicator" in="${data}">
-                <div class="col-md-4">
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="${indicator.class}"></i> ${indicator.name}</h5>
-                            <h2 class="card-text">
-                                <a href="${indicator.url}" class="text-decoration-none">${indicator.count}</a>
-                            </h2>
-                        </div>
+    <div class="row">
+        <g:each var="indicator" in="${data}">
+            <div class="col-md-4">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="${indicator.class}"></i> ${indicator.name}</h5>
+                        <h2 class="card-text">
+                            <a href="${indicator.url}" class="text-decoration-none">${indicator.count}</a>
+                        </h2>
                     </div>
                 </div>
-            </g:each>
-        </div>
+            </div>
+        </g:each>
     </div>
 </body>
 </html>

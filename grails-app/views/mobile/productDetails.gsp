@@ -7,12 +7,12 @@
 </head>
 <body>
 
-<div class="container">
+<div>
     <g:set var="product" value="${productSummary.product}"/>
     <div class="row">
         <g:link controller="mobile" action="productList" class="nav nav-link">
             <i class="fa fa-chevron-left"></i>
-            <g:message code="products.label"/>
+            <g:message code="default.button.back.label" />
         </g:link>
     </div>
 
@@ -20,7 +20,7 @@
 
         <div class="card-body">
 
-            <h1><small>${product.productCode}</small> ${product.name}</h1>
+            <h5 class="display-5"><small class="text-small">${product.productCode}</small> ${product.name}</h5>
 
             <picture>
                 <g:if test="${product.images}">
@@ -32,7 +32,7 @@
                 </g:else>
             </picture>
 
-            <h3>Description</h3>
+            <h3 class="display-3">Description</h3>
             <g:if test="${product.description}">
                 <p>
                     ${product.description}
@@ -40,30 +40,39 @@
             </g:if>
 
 
-            <h3>Details</h3>
+            <h3 class="display-3">Details</h3>
             <ul class="list-group">
-                <li class="list-group-item">
-                    <label>QoH</label>
-                    <span>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Status
+                    <g:if test="${productSummary.quantityOnHand > 0}">
+                        <div class="text-success">In Stock</div>
+                    </g:if>
+                    <g:else>
+                        <div class="text-danger">Out of Stock</div>
+                    </g:else>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div class="label">QoH</div>
+                    <span class="badge badge-primary badge-pill text-secondary">
                         <g:formatNumber number="${productSummary.quantityOnHand?:0}" maxFractionDigits="0"/>
-                        <small class="text-muted">${product?.unitOfMeasure?:"EA"}</small>
+                        ${product?.unitOfMeasure?:"EA"}
                     </span>
                 </li>
-
                 <g:each var="productAttribute" in="${product.attributes}">
-                    <li class="list-group-item">
-                        <label>${productAttribute.attribute.name}</label>
-                        <span>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        ${productAttribute.attribute.name}
+                        <span class="badge badge-primary badge-pill text-secondary">
                             ${productAttribute?.value?:0}
-                            ${productAttribute?.unitOfMeasure?.name}
-                            ${productAttribute?.attribute?.unitOfMeasureClass?.baseUom?.name}
+                            ${productAttribute?.unitOfMeasure?.name?:productAttribute?.attribute?.unitOfMeasureClass?.baseUom?.name}
                         </span>
                     </li>
                 </g:each>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Barcode
+                    <g:displayBarcode format="${com.google.zxing.BarcodeFormat.CODE_128}" data="${product.productCode}" showData="${false}" height="20"/>
+                </li>
             </ul>
 
-            <h3>Barcode</h3>
-            <g:displayBarcode format="${com.google.zxing.BarcodeFormat.CODE_128}" data="${product.productCode}" showData="${false}"/>
 
 
         </div>
