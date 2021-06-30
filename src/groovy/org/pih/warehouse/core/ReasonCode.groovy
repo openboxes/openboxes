@@ -67,6 +67,7 @@ enum ReasonCode {
     CLINICAL_JUDGMENT(35),
     INSUFFICIENT_QUANTITY_AVAILABLE(36),
     BACKORDER(37),
+    REJECTED_DUE_TO_GRADE_MISMATCH(39),
     OTHER(100)
 
 
@@ -112,6 +113,8 @@ enum ReasonCode {
         return [
                 STOCKOUT,
                 LOW_STOCK,
+                EXPIRED,
+                REJECTED_DUE_TO_GRADE_MISMATCH,
                 PACKAGE_SIZE,
                 APPROVED_CHANGE,
                 EARLIER_EXPIRATION_DATE,
