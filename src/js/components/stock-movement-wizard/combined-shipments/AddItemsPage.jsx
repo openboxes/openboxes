@@ -727,6 +727,29 @@ class AddItemsPage extends Component {
   }
 
   /**
+   * Removes all items from requisition's items list.
+   * @public
+   */
+  removeAll() {
+    const removeItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/removeAllItems`;
+
+    return apiClient.delete(removeItemsUrl)
+      .then(() => {
+        this.setState({
+          totalCount: 0,
+          values: {
+            ...this.state.values,
+            lineItems: [],
+          },
+        });
+      })
+      .catch(() => {
+        this.fetchLineItems();
+        return Promise.reject(new Error('react.stockMovement.error.deleteRequisitionItem.label'));
+      });
+  }
+
+  /**
    * Refetch the data, all not saved changes will be lost.
    * @public
    */
@@ -925,6 +948,14 @@ class AddItemsPage extends Component {
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
                 <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
+              </button>
+              <button
+                type="button"
+                disabled={invalid}
+                onClick={() => this.removeAll()}
+                className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs"
+              >
+                <span><i className="fa fa-remove pr-2" /><Translate id="react.default.button.deleteAll.label" defaultMessage="Delete all" /></span>
               </button>
             </span>
             <form onSubmit={handleSubmit}>
