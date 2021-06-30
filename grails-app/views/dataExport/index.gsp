@@ -21,17 +21,23 @@
         <div class="yui-u first">
             <div class="box">
                 <h2><warehouse:message code="default.dataExports.label" default="Data Exports"/></h2>
-                <div class="filter-list-item">
+                <table>
                     <g:each in="${documents}" var="document">
-                        ${document.name}
-                        <g:link controller="dataExport" action="render" id="${document.id}" params="[format:'csv']" class="button">
-                             CSV
-                        </g:link>
-                        <g:link controller="dataExport" action="render" id="${document.id}" params="[format:'json']" class="button">
-                             JSON
-                        </g:link>
+                        <tr>
+                            <td class="middle">
+                                ${document.name}
+                            </td>
+                            <td class="right">
+                                <g:link controller="dataExport" action="render" id="${document.id}" params="[format:'csv']" class="button">
+                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" class="middle"/>&nbsp; CSV
+                                </g:link>
+                                <g:link controller="dataExport" action="render" id="${document.id}" params="[format:'json']" class="button">
+                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'page_code.png')}" class="middle"/>&nbsp; JSON
+                                </g:link>
+                            </td>
+                        </tr>
                     </g:each>
-                </div>
+                </table>
             </div>
         </div>
     </div>
