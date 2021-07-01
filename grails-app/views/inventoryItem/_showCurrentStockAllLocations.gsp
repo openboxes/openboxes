@@ -1,7 +1,26 @@
+<html>
+<head>
+    <style>
+        .download-button {
+            right: 5px;
+            position: absolute;
+            top: 5px;
+        }
+    </style>
+</head>
+<body>
 <div class="box dialog list">
     <h2>
-        <g:message code="inventory.currentStock.label" default="Current Stock"/>
-        <small><g:message code="default.allLocations.label" default="All Locations"/></small>
+        <div>
+            <g:message code="inventory.currentStock.label" default="Current Stock"/>
+            <small><g:message code="default.allLocations.label" default="All Locations"/></small>
+            <div class="download-button">
+                <g:link controller="inventoryItem" action="showCurrentStockAllLocations" params="[download:true]" id="${commandInstance.product.id}" class="button">
+                    <img src="${createLinkTo(dir:'images/icons/silk',file: 'page_excel.png')}" />
+                    ${warehouse.message(code: 'inventory.exportExcel.label', default: 'Export to Excel')}
+                </g:link>
+            </div>
+        </div>
     </h2>
     <table>
         <thead>
@@ -103,6 +122,7 @@
         </g:unless>
     </table>
 </div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqgrid/4.6.0/js/jquery.jqGrid.min.js" type="text/javascript" ></script>
+</body>
+</html>
 
