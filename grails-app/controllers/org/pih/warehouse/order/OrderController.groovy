@@ -74,6 +74,7 @@ class OrderController {
             def csv = new CSVWriter(sw, {
                 "Supplier organization" { it.supplierOrganization }
                 "Supplier location" { it.supplierLocation }
+                "Destination" { it.destinationLocation }
                 "PO Number" { it.number }
                 "PO Description" { it.description }
                 "PO Status" { it.status }
@@ -85,11 +86,14 @@ class OrderController {
                 "Manufacturer" { it.manufacturer }
                 "Manufacturer Code" { it.manufacturerCode }
                 "Unit of Measure" { it.unitOfMeasure }
+                "Qty per UOM" { it.quantityPerUom }
                 "Quantity Ordered" { it.quantityOrdered }
                 "Quantity Shipped" { it.quantityShipped}
                 "Quantity Received" { it.quantityReceived}
+                "Quantity Invoiced" { it.quantityInvoiced}
                 "Unit Price" { it.unitPrice}
                 "Total Cost" { it.totalCost}
+                "Currency" { it.currency }
                 "Recipient" { it.recipient}
                 "Estimated Ready Date" { it.estimatedReadyDate}
                 "Actual Ready Date" { it.actualReadyDate}
@@ -98,24 +102,28 @@ class OrderController {
 
             orders*.orderItems*.each { orderItem ->
                 csv << [
-                        supplierOrganization: orderItem?.order?.origin?.organization?.name,
+                        supplierOrganization: orderItem?.order?.origin?.organization?.code + " - " + orderItem?.order?.origin?.organization?.name,
                         supplierLocation: orderItem?.order?.origin?.name,
+                        destinationLocation: orderItem?.order?.destination?.name,
                         number       : orderItem?.order?.orderNumber,
                         description       : orderItem?.order?.name ?: '',
                         status       : orderItem?.order?.displayStatus,
                         code       : orderItem?.product?.productCode,
                         productName       : orderItem?.product?.name,
-                        itemStatus        : orderItem?.orderItemStatusCode.name(),
+                        itemStatus        : OrderItemStatusCode.CANCELED == orderItem?.orderItemStatusCode ? orderItem?.orderItemStatusCode?.name() : '',
                         sourceCode       : orderItem?.productSupplier?.code ?: '',
                         supplierCode       : orderItem?.productSupplier?.supplierCode ?: '',
                         manufacturer       : orderItem?.productSupplier?.manufacturer?.name ?: '',
                         manufacturerCode       : orderItem?.productSupplier?.manufacturerCode ?: '',
-                        unitOfMeasure: orderItem.unitOfMeasure ?: '',
+                        unitOfMeasure: orderItem.quantityUom?.code ?: '',
+                        quantityPerUom: orderItem.quantityPerUom ?: '',
                         quantityOrdered: orderItem.quantity,
                         quantityShipped: orderItem.quantityShipped,
                         quantityReceived: orderItem.quantityReceived,
+                        quantityInvoiced: orderItem.quantityInvoiced,
                         unitPrice:  orderItem.unitPrice ?: '',
                         totalCost: orderItem.total ?: '',
+                        currency: orderItem?.order?.currencyCode,
                         recipient: orderItem.recipient ?: '',
                         estimatedReadyDate: orderItem.estimatedReadyDate?.format("MM/dd/yyyy") ?: '',
                         actualReadyDate: orderItem.actualReadyDate?.format("MM/dd/yyyy") ?: '',
