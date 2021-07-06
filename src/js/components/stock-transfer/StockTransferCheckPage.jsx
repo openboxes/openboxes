@@ -206,18 +206,6 @@ class StockTransferSecondPage extends Component {
   }
 
   /**
-   * Save stock transfer and go to the previous page.
-   * @public
-   */
-  previousPage() {
-    this.saveStockTransfer(this.state.stockTransfer, (stockTransfer) => {
-      this.props.previousPage({
-        stockTransfer,
-      });
-    });
-  }
-
-  /**
    * Sends all changes made by user in this step of put-away to API and updates data.
    * @public
    */
@@ -287,7 +275,7 @@ class StockTransferSecondPage extends Component {
         <div className="submit-buttons">
           <button
             type="button"
-            onClick={() => this.previousPage()}
+            onClick={() => this.props.previousPage(this.state.stockTransfer)}
             className="btn btn-outline-primary btn-form btn-xs"
           ><Translate id="react.default.button.previous.label" defaultMessage="Previous" />
           </button>
