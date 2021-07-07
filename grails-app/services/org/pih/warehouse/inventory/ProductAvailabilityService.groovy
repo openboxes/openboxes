@@ -397,6 +397,24 @@ class ProductAvailabilityService {
         return quantityMap
     }
 
+    Map<Product, Integer> getQuantityAvailableToPromiseByProduct(Location location, List<Product> products) {
+        def quantityMap = [:]
+        if (location) {
+            def results = ProductAvailability.executeQuery("""
+						select pa.product, sum(pa.quantityAvailableToPromise)
+						from ProductAvailability pa
+						where pa.location = :location
+						and pa.product in (:products)
+						group by pa.product
+						""", [location: location, products:products])
+            results.each {
+                quantityMap[it[0]] = it[1]
+            }
+        }
+
+        return quantityMap
+    }
+
     Map<Product, Map<Location, Integer>> getQuantityOnHandByProduct(Location[] locations) {
         def quantityMap = [:]
         if (locations) {

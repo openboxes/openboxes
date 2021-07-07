@@ -63,6 +63,7 @@
                                 <th class="center"><warehouse:message code="inventoryLevel.reorderQuantity.label"/></th>
                                 <th class="center"><warehouse:message code="inventoryLevel.maximumQuantity.label"/></th>
                                 <th class="center border-right"><warehouse:message code="inventoryLevel.currentQuantity.label" default="Current quantity"/></th>
+                                <th class="center border-right"><warehouse:message code="default.quantityAvailableToPromise.label" default="Quantity ATP"/></th>
                                 <th><warehouse:message code="product.pricePerUnit.label" default="Price per unit"/></th>
                                 <th class="center"><warehouse:message code="product.totalValue.label" default="Total amount"/></th>
                             </tr>
@@ -72,6 +73,7 @@
                                 <g:each var="entry" in="${quantityMap.sort()}" status="i">
                                     <g:set var="product" value="${entry.key}"/>
                                     <g:set var="quantity" value="${entry.value}"/>
+                                    <g:set var="quantityAvailableToPromise" value="${entry?.key?.getQuantityAvailableToPromise(session.warehouse.id)}"/>
                                     <g:set var="inventoryLevel" value="${entry?.key?.getInventoryLevel(session.warehouse.id)}"/>
                                     <tr>
                                         <td>
@@ -111,6 +113,9 @@
                                         <td class="center border-right">
                                             ${quantity}
                                         </td>
+                                        <td class="center border-right">
+                                            ${quantityAvailableToPromise}
+                                        </td>
                                         <td class="center">
                                             <g:if test="${hasRoleFinance}">
                                                 <g:formatNumber number="${product?.pricePerUnit?:0.0}" minFractionDigits="2"/>
@@ -136,7 +141,7 @@
                             <g:if test="${hasRoleFinance}">
                                 <tfoot>
                                 <tr>
-                                    <th colspan="13">
+                                    <th colspan="14">
                                         <div class="title right middle">
                                             <warehouse:message code="inventory.totalValue.label" default="Total value"/>
                                             <g:formatNumber number="${totalStockValue}"/>
@@ -185,6 +190,7 @@
                     { "mData": "reorderQuantity", "sType": 'numeric' },
                     { "mData": "maxQuantity", "sType": 'numeric'},
                     { "mData": "currentQuantity", "sType": 'numeric' },
+                    { "mData": "quantityAvailableToPromise", "sType": 'numeric' },
                     { "mData": "unitPrice", "sType": 'numeric' },
                     { "mData": "totalValue", "sType": 'numeric' }
 

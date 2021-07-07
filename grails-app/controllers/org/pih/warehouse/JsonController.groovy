@@ -1042,7 +1042,7 @@ class JsonController {
         // Only calculate quantities if there are products - otherwise this will calculate quantities for all products in the system
         def location = Location.get(session.warehouse.id)
         def quantityMap = products ?
-                productAvailabilityService.getQuantityOnHandByProduct(location, products) : []
+                productAvailabilityService.getQuantityAvailableToPromiseByProduct(location, products) : []
 
         if (terms) {
             products = products.sort() {
