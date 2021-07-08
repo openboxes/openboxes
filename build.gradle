@@ -305,3 +305,17 @@ buildProperties.doLast {
     }
 }
 apply plugin: "com.virgo47.ClasspathJar"
+
+ext {
+    dockerBuildDir = mkdir("${buildDir}/docker")
+}
+
+task prepareDocker(type: Copy, dependsOn: assemble) {
+    description = 'Copy files from ./docker and openboxes.war to Docker temporal build directory'
+    group = 'Docker'
+
+    from 'docker/Dockerfile'
+    from 'build/libs/openboxes.war'
+
+    into dockerBuildDir
+}
