@@ -11,12 +11,15 @@ import 'react-table/react-table.css';
 
 import customTreeTableHOC from '../../utils/CustomTreeTable';
 import Select from '../../utils/Select';
-import apiClient from '../../utils/apiClient';
+import apiClient, { flattenRequest, parseResponse } from '../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../actions';
 import Filter from '../../utils/Filter';
 import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
+import { extractStockTransferItems, prepareRequest } from './utils';
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
+
+const CANCELED = 'CANCELED';
 
 /**
  * The second page of stock transfer where user can choose qty and bin to transfer
@@ -64,12 +67,12 @@ class StockTransferSecondPage extends Component {
   getColumns = () => [
     {
       Header: <Translate id="react.stockTransfer.code.label" defaultMessage="Code" />,
-      accessor: 'productCode',
+      accessor: 'product.productCode',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.product.label" defaultMessage="Product" />,
-      accessor: 'productName',
+      accessor: 'product.name',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
@@ -89,32 +92,33 @@ class StockTransferSecondPage extends Component {
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.currentZone.label" defaultMessage="Current Zone" />,
-      accessor: 'zone',
+      accessor: 'originZone',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.currentBinLocation.label" defaultMessage="Current Bin Location" />,
-      accessor: 'binLocation',
+      accessor: 'originBinLocation.name',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.qtyToTransfer.label" defaultMessage="Qty to Transfer" />,
-      accessor: 'transferQty',
+      accessor: 'quantity',
       style: { whiteSpace: 'normal' },
       Cell: (props) => {
         const itemIndex = props.index;
-        const splitItems = _.filter(this.state.stockTransfer.stockTransferItems, lineItem =>
-          lineItem.referenceId === props.original.referenceId);
+        const { stockTransferItems } = this.state.stockTransfer;
+        const splitItems = _.filter(stockTransferItems, lineItem =>
+          lineItem.referenceId && lineItem.referenceId === props.original.referenceId);
         let disabled = false;
         let disabledMessage;
         if (!props.original.id || splitItems.length > 1) {
           const quantityToTransfer = _.reduce(
             splitItems, (sum, val) =>
-              (sum + (val.transferQty ? _.toInteger(val.transferQty) : 0)),
+              (sum + (val.quantity ? _.toInteger(val.quantity) : 0)),
             0,
           );
           if (quantityToTransfer > props.original.quantityOnHand) {
-            _.forEach(this.state.stockTransfer.stockTransferItems, (lineItem) => {
+            _.forEach(stockTransferItems, (lineItem) => {
               _.forEach(splitItems, (splitItem) => {
                 if (lineItem === splitItem) {
                   disabled = true;
@@ -149,10 +153,10 @@ class StockTransferSecondPage extends Component {
                 type="number"
                 className="form-control form-control-xs"
                 value={props.value}
+                disabled={props.original.status === CANCELED}
                 onChange={(event) => {
               const stockTransfer = update(this.state.stockTransfer, {
-                // eslint-disable-next-line max-len
-                stockTransferItems: { [itemIndex]: { transferQty: { $set: event.target.value } } },
+                stockTransferItems: { [itemIndex]: { quantity: { $set: event.target.value } } },
               });
               this.changeStockTransfer(stockTransfer);
             }}
@@ -163,15 +167,16 @@ class StockTransferSecondPage extends Component {
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.transferTo.label" defaultMessage="Transfer to" />,
-      accessor: 'transferBin',
+      accessor: 'destinationBinLocation',
       Cell: cellInfo => (<Select
         options={this.state.bins}
         objectValue
         value={_.get(this.state.stockTransfer.stockTransferItems, `[${cellInfo.index}].${cellInfo.column.id}`) || null}
         onChange={value => this.changeStockTransfer(update(this.state.stockTransfer, {
-            stockTransferItems: { [cellInfo.index]: { transferBin: { $set: value } } },
-          }))}
+          stockTransferItems: { [cellInfo.index]: { destinationBinLocation: { $set: value } } },
+        }))}
         className="select-xs"
+        disabled={cellInfo.original.status === CANCELED}
       />),
       Filter,
     }, {
@@ -179,20 +184,13 @@ class StockTransferSecondPage extends Component {
       accessor: 'splitItems',
       Cell: cellInfo => (
         <div className="d-flex flex-row flex-wrap">
-          <button
-            className="btn btn-outline-success btn-xs mr-1 mb-1"
-            onClick={() => this.splitLine(cellInfo.index, {
-              productCode: cellInfo.original.productCode,
-              productName: cellInfo.original.productName,
-              lotNumber: cellInfo.original.lotNumber,
-              expirationDate: cellInfo.original.expirationDate,
-              quantityOnHand: cellInfo.original.quantityOnHand,
-              zone: cellInfo.original.zone,
-              binLocation: cellInfo.original.binLocation,
-              referenceId: cellInfo.original.id,
-            })}
-          ><Translate id="react.stockTransfer.splitLine.label" defaultMessage="Split line" />
-          </button>
+          {!cellInfo.original.referenceId && (
+            <button
+              className="btn btn-outline-success btn-xs mr-1 mb-1"
+              onClick={() => this.splitItem(cellInfo)}
+            ><Translate id="react.stockTransfer.splitItem.label" defaultMessage="Split line" />
+            </button>
+          )}
           <button
             className="btn btn-outline-danger btn-xs mb-1"
             onClick={() => this.deleteItem(cellInfo.index)}
@@ -213,68 +211,19 @@ class StockTransferSecondPage extends Component {
 
   fetchStockTransfer() {
     this.props.showSpinner();
-
-    const url = `/openboxes/api/stockTransfer/${this.props.match.params.id}`;
+    const url = `/openboxes/api/stockTransfers/${this.props.match.params.stockTransferId}`;
 
     apiClient.get(url)
-      .then(() => {
-        // TODO add after fetching API is done, using mocks for testing purposes
-      })
-      .catch(() => {
-        const stockTransferItems = [{
-          id: 1,
-          productCode: 'code2',
-          productName: 'product1',
-          lotNumber: 'lot3',
-          expirationDate: '7/11/2021',
-          zone: 'zone2',
-          binLocation: 'bin2',
-          quantityOnHand: 45,
-          referenceId: 1,
-        }, {
-          id: 2,
-          productCode: 'code2',
-          productName: 'product1',
-          lotNumber: 'lot2',
-          expirationDate: '7/1/2021',
-          zone: 'zone1',
-          binLocation: 'bin1',
-          quantityOnHand: 51,
-          referenceId: 2,
-        }, {
-          id: 3,
-          productCode: 'code2',
-          productName: 'product2',
-          lotNumber: 'lot3',
-          expirationDate: '7/22/2021',
-          zone: 'zone2',
-          binLocation: 'bin1',
-          quantityOnHand: 88,
-          referenceId: 3,
-        }, {
-          id: 4,
-          productCode: 'code2',
-          productName: 'product3',
-          lotNumber: 'lot2',
-          expirationDate: '7/25/2021',
-          zone: 'zone3',
-          binLocation: 'bin1',
-          quantityOnHand: 41,
-          referenceId: 4,
-        }, {
-          id: 5,
-          productCode: 'code2',
-          productName: 'product2',
-          lotNumber: 'lot3',
-          expirationDate: '7/2/2021',
-          zone: 'zone3',
-          binLocation: 'bin1',
-          quantityOnHand: 43,
-          referenceId: 5,
-        }];
+      .then((response) => {
+        const stockTransfer = parseResponse(response.data.data);
+        const stockTransferItems = extractStockTransferItems(stockTransfer);
 
-        this.setState({ stockTransfer: { stockTransferItems } }, () => this.props.hideSpinner());
-      });
+        this.setState(
+          { stockTransfer: { ...stockTransfer, stockTransferItems } },
+          () => this.props.hideSpinner(),
+        );
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   /**
@@ -315,9 +264,25 @@ class StockTransferSecondPage extends Component {
    * Sends all changes made by user in this step of stock transfer to API and updates data.
    * @public
    */
-  // eslint-disable-next-line class-methods-use-this
-  saveStockTransfer(stockTransfer, callback) {
-    callback();
+  saveStockTransfer(data, callback) {
+    const url = '/openboxes/api/stockTransfers/';
+    const payload = prepareRequest(data);
+    apiClient.post(url, flattenRequest(payload))
+      .then((response) => {
+        const stockTransfer = parseResponse(response.data.data);
+        const stockTransferItems = extractStockTransferItems(stockTransfer);
+
+        this.setState(
+          { stockTransfer: { ...stockTransfer, stockTransferItems } },
+          () => {
+            this.props.hideSpinner();
+            if (callback) {
+              callback(stockTransfer);
+            }
+          },
+        );
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   changeStockTransfer(stockTransfer) {
@@ -326,34 +291,34 @@ class StockTransferSecondPage extends Component {
 
   deleteItem(itemIndex) {
     this.props.showSpinner();
-    const url = `/openboxes/api/stockTransferItems/${_.get(this.state.stockTransfer.stockTransferItems, `[${itemIndex}].id`)}`;
 
-    apiClient.delete(url)
-      .then(() => {
-        const stockTransfer = update(this.state.stockTransfer, {
-          stockTransferItems: {
-            $splice: [
-              [itemIndex, 1],
-            ],
-          },
-        });
+    const itemToDelete = _.get(this.state.stockTransfer.stockTransferItems, `[${itemIndex}]`);
 
-        this.setState({ stockTransfer });
-        this.props.hideSpinner();
-      })
-      // TODO update catch after API with deleting item is done
-      .catch(() => {
-        const stockTransfer = update(this.state.stockTransfer, {
-          stockTransferItems: {
-            $splice: [
-              [itemIndex, 1],
-            ],
-          },
-        });
+    if (itemToDelete.id) {
+      const url = `/openboxes/api/stockTransferItems/${itemToDelete.id}`;
+      apiClient.delete(url)
+        .then((response) => {
+          const stockTransfer = parseResponse(response.data.data);
+          const stockTransferItems = extractStockTransferItems(stockTransfer);
 
-        this.setState({ stockTransfer });
-        this.props.hideSpinner();
+          this.setState(
+            { stockTransfer: { ...stockTransfer, stockTransferItems } },
+            () => this.props.hideSpinner(),
+          );
+        })
+        .catch(() => this.props.hideSpinner());
+    } else {
+      const stockTransfer = update(this.state.stockTransfer, {
+        stockTransferItems: {
+          $splice: [
+            [itemIndex, 1],
+          ],
+        },
       });
+
+      this.setState({ stockTransfer });
+      this.props.hideSpinner();
+    }
   }
 
   /**
@@ -369,18 +334,6 @@ class StockTransferSecondPage extends Component {
   }
 
   /**
-   * Save stock transfer and go to the previous page.
-   * @public
-   */
-  previousPage() {
-    this.saveStockTransfer(this.state.stockTransfer, (stockTransfer) => {
-      this.props.previousPage({
-        stockTransfer,
-      });
-    });
-  }
-
-  /**
    * Generates stock transfer pdf
    * @public
    */
@@ -389,12 +342,27 @@ class StockTransferSecondPage extends Component {
     // TODO add in another ticket
   }
 
-  splitLine(itemIndex, row) {
+  splitItem(row) {
+    const { index, original } = row;
+
+    const newLine = {
+      ...original,
+      referenceId: original.id ? original.id : original.referenceId,
+      id: null,
+      status: null,
+    };
+
     const stockTransfer = update(this.state.stockTransfer, {
       stockTransferItems: {
-        $splice: [
-          [itemIndex + 1, 0, row],
+        // If splitting not yet canceled item, then cancel original row and add two new split lines
+        // else if splitting already CANCELED line add a new line once
+        $splice: original.status !== CANCELED ? [
+          [index + 1, 0, newLine],
+          [index + 1, 0, newLine],
+        ] : [
+          [index + 1, 0, newLine],
         ],
+        [index]: { $set: original.id ? { ...original, status: CANCELED } : original },
       },
     });
 
@@ -446,12 +414,6 @@ class StockTransferSecondPage extends Component {
         <div className="submit-buttons">
           <button
             type="button"
-            onClick={() => this.previousPage()}
-            className="btn btn-outline-primary btn-form btn-xs"
-          ><Translate id="react.default.button.previous.label" defaultMessage="Previous" />
-          </button>
-          <button
-            type="button"
             onClick={() => this.nextPage()}
             className="btn btn-outline-primary btn-form float-right btn-xs"
           ><Translate id="react.default.button.next.label" defaultMessage="Next" />
@@ -482,7 +444,6 @@ StockTransferSecondPage.propTypes = {
   /** Function taking user to the next page */
   nextPage: PropTypes.func.isRequired,
   /** Function taking user to the previous page */
-  previousPage: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
   /** All stock transfer's data */
   initialValues: PropTypes.shape({
@@ -490,7 +451,7 @@ StockTransferSecondPage.propTypes = {
   }).isRequired,
   match: PropTypes.shape({
     params: PropTypes.shape({
-      id: PropTypes.string,
+      stockTransferId: PropTypes.string,
     }),
   }).isRequired,
   /** Location (currently chosen). To be used in internalLocations and stock transfer requests. */

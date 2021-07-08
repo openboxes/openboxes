@@ -19,8 +19,11 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.hibernate.Criteria
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
+import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductActivityCode
 import org.pih.warehouse.product.ProductAvailability
@@ -721,5 +724,15 @@ class ProductAvailabilityService {
         """, [location: command.location, products: products, searchableTypes: searchableTypes]).size()
 
         return new PagedResultList(productsWithQoH, totalCount)
+    }
+
+    List<ProductAvailability> getStockTransferCandidates(Location location) {
+        return ProductAvailability.createCriteria().list {
+            eq("location", location)
+            binLocation {
+                ne("locationType", LocationType.get(Constants.RECEIVING_LOCATION_TYPE_ID))
+            }
+            gt("quantityOnHand", 0)
+        }
     }
 }

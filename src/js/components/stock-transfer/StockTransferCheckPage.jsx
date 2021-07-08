@@ -11,12 +11,15 @@ import 'react-table/react-table.css';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
 import customTreeTableHOC from '../../utils/CustomTreeTable';
-import apiClient from '../../utils/apiClient';
+import apiClient, { flattenRequest, parseResponse } from '../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../actions';
 import Filter from '../../utils/Filter';
 import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
+import { extractNonCanceledItems } from './utils';
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
+
+const COMPLETE = 'COMPLETE';
 
 /**
  * The second page of stock transfer where user can choose qty and bin to transfer
@@ -63,12 +66,12 @@ class StockTransferSecondPage extends Component {
   getColumns = () => [
     {
       Header: <Translate id="react.stockTransfer.code.label" defaultMessage="Code" />,
-      accessor: 'productCode',
+      accessor: 'product.productCode',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.product.label" defaultMessage="Product" />,
-      accessor: 'productName',
+      accessor: 'product.name',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
@@ -88,22 +91,22 @@ class StockTransferSecondPage extends Component {
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.currentZone.label" defaultMessage="Current Zone" />,
-      accessor: 'zone',
+      accessor: 'originZone',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.currentBinLocation.label" defaultMessage="Current Bin Location" />,
-      accessor: 'binLocation',
+      accessor: 'originBinLocation.name',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.qtyToTransfer.label" defaultMessage="Qty to Transfer" />,
-      accessor: 'transferQty',
+      accessor: 'quantity',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.transferTo.label" defaultMessage="Transfer to" />,
-      accessor: 'transferBin',
+      accessor: 'destinationBinLocation.name',
       style: { whiteSpace: 'normal' },
       Filter,
     },
@@ -119,73 +122,19 @@ class StockTransferSecondPage extends Component {
 
   fetchStockTransfer() {
     this.props.showSpinner();
-
-    const url = `/openboxes/api/stockTransfer/${this.props.match.params.id}`;
+    const url = `/openboxes/api/stockTransfers/${this.props.match.params.stockTransferId}`;
 
     apiClient.get(url)
-      .then(() => {
-        // TODO add after fetching API is done, using mocks for testing purposes
-      })
-      .catch(() => {
-        const stockTransferItems = [{
-          id: 1,
-          productCode: 'code2',
-          productName: 'product1',
-          lotNumber: 'lot3',
-          expirationDate: '7/11/2021',
-          zone: 'zone2',
-          binLocation: 'bin2',
-          quantityOnHand: 45,
-          transferQty: 45,
-          transferBin: 'transfer bin 1',
-        }, {
-          id: 2,
-          productCode: 'code2',
-          productName: 'product1',
-          lotNumber: 'lot2',
-          expirationDate: '7/1/2021',
-          zone: 'zone1',
-          binLocation: 'bin1',
-          quantityOnHand: 51,
-          transferQty: 21,
-          transferBin: 'transfer bin 2',
-        }, {
-          id: 3,
-          productCode: 'code2',
-          productName: 'product2',
-          lotNumber: 'lot3',
-          expirationDate: '7/22/2021',
-          zone: 'zone2',
-          binLocation: 'bin1',
-          quantityOnHand: 88,
-          transferQty: 88,
-          transferBin: 'transfer bin 3',
-        }, {
-          id: 4,
-          productCode: 'code2',
-          productName: 'product3',
-          lotNumber: 'lot2',
-          expirationDate: '7/25/2021',
-          zone: 'zone3',
-          binLocation: 'bin1',
-          quantityOnHand: 41,
-          transferQty: 20,
-          transferBin: 'transfer bin 4',
-        }, {
-          id: 5,
-          productCode: 'code2',
-          productName: 'product2',
-          lotNumber: 'lot3',
-          expirationDate: '7/2/2021',
-          zone: 'zone3',
-          binLocation: 'bin1',
-          quantityOnHand: 43,
-          transferQty: 43,
-          transferBin: 'transfer bin 5',
-        }];
+      .then((response) => {
+        const stockTransfer = parseResponse(response.data.data);
+        const stockTransferItems = extractNonCanceledItems(stockTransfer);
 
-        this.setState({ stockTransfer: { stockTransferItems } }, () => this.props.hideSpinner());
-      });
+        this.setState(
+          { stockTransfer: { ...stockTransfer, stockTransferItems } },
+          () => this.props.hideSpinner(),
+        );
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   /**
@@ -194,9 +143,14 @@ class StockTransferSecondPage extends Component {
    */
   save() {
     this.props.showSpinner();
-    const url = `/openboxes/api/stockTransfers?id=${this.state.stockTransfer.id}`;
+    const url = '/openboxes/api/stockTransfers';
 
-    return apiClient.post(url)
+    const payload = {
+      ...this.state.stockTransfer,
+      status: COMPLETE,
+    };
+
+    return apiClient.post(url, flattenRequest(payload))
       .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.stockTransfer.alert.stockTransferCompleted.label', 'Stock transfer was successfully completed!'), { timeout: 3000 });
@@ -319,7 +273,7 @@ StockTransferSecondPage.propTypes = {
   }).isRequired,
   match: PropTypes.shape({
     params: PropTypes.shape({
-      id: PropTypes.string,
+      stockTransferId: PropTypes.string,
     }),
   }).isRequired,
   /** Location (currently chosen). To be used in internalLocations and stock transfer requests. */

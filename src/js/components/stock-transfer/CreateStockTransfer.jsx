@@ -12,7 +12,7 @@ import customTreeTableHOC from '../../utils/CustomTreeTable';
 import { showSpinner, hideSpinner } from '../../actions';
 import Filter from '../../utils/Filter';
 import Translate from '../../utils/Translate';
-import apiClient from '../../utils/apiClient';
+import apiClient, { flattenRequest, parseResponse } from '../../utils/apiClient';
 
 const SelectTreeTable = selectTableHOC(customTreeTableHOC(ReactTable));
 
@@ -72,12 +72,12 @@ class CreateStockTransfer extends Component {
   getColumns = () => [
     {
       Header: <Translate id="react.stockTransfer.code.label" defaultMessage="Code" />,
-      accessor: 'productCode',
+      accessor: 'product.productCode',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.product.label" defaultMessage="Product" />,
-      accessor: 'productName',
+      accessor: 'product.name',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
@@ -92,12 +92,12 @@ class CreateStockTransfer extends Component {
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.zone.label" defaultMessage="Zone" />,
-      accessor: 'zone',
+      accessor: 'originZone',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.binLocation.label" defaultMessage="Bin Location" />,
-      accessor: 'binLocation',
+      accessor: 'originBinLocation.name',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
@@ -117,71 +117,45 @@ class CreateStockTransfer extends Component {
    */
   fetchStockTransferCandidates(locationId) {
     this.props.showSpinner();
-    const url = `/openboxes/api/stockTransfers?location.id=${locationId}`;
+    const url = `/openboxes/api/stockTransfers/candidates?location.id=${locationId}`;
 
     return apiClient.get(url)
-      .then(() => {
-        // TODO add after API for fetching is implemented, using mocks for testing purpose
-      })
-      .catch(() => {
-        const stockTransferItems = [{
-          _id: 1,
-          productCode: 'code2',
-          productName: 'product1',
-          lotNumber: 'lot3',
-          expirationDate: '7/11/2021',
-          zone: 'zone2',
-          binLocation: 'bin2',
-          quantityOnHand: 45,
-        }, {
-          _id: 2,
-          productCode: 'code2',
-          productName: 'product1',
-          lotNumber: 'lot2',
-          expirationDate: '7/1/2021',
-          zone: 'zone1',
-          binLocation: 'bin1',
-          quantityOnHand: 51,
-        }, {
-          _id: 3,
-          productCode: 'code2',
-          productName: 'product2',
-          lotNumber: 'lot3',
-          expirationDate: '7/22/2021',
-          zone: 'zone2',
-          binLocation: 'bin1',
-          quantityOnHand: 88,
-        }, {
-          _id: 4,
-          productCode: 'code2',
-          productName: 'product3',
-          lotNumber: 'lot2',
-          expirationDate: '7/25/2021',
-          zone: 'zone3',
-          binLocation: 'bin1',
-          quantityOnHand: 41,
-        }, {
-          _id: 5,
-          productCode: 'code2',
-          productName: 'product2',
-          lotNumber: 'lot3',
-          expirationDate: '7/2/2021',
-          zone: 'zone3',
-          binLocation: 'bin1',
-          quantityOnHand: 43,
-        }];
-
+      .then((resp) => {
+        const stockTransferCandidates = parseResponse(resp.data.data);
+        const stockTransferItems = [];
+        stockTransferCandidates.forEach((item) => {
+          // this _id is used internally in TreeTable
+          const _id = _.uniqueId('item_');
+          stockTransferItems.push({ _id, ...item });
+        });
         this.setState({ stockTransferItems }, () => this.props.hideSpinner());
-      });
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   /**
    * Sends all changes made by user in this step of stock transfer to API and updates data.
    * @public
    */
-  // TODO after API for creating stock transfer implemented
   createStockTransfer() {
-    this.props.nextPage();
+    this.props.showSpinner();
+    const url = '/openboxes/api/stockTransfers/';
+    const payload = {
+      stockTransferItems: _.filter(
+        this.state.stockTransferItems,
+        item => _.includes([...this.state.selection], item._id),
+      ),
+    };
+
+    apiClient.post(url, flattenRequest(payload))
+      .then((response) => {
+        const stockTransfer = parseResponse(response.data.data);
+        this.props.hideSpinner();
+
+        this.props.history.push(`/openboxes/stockTransfer/create/${stockTransfer.id}`);
+        this.props.nextPage({ ...stockTransfer });
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   /**
