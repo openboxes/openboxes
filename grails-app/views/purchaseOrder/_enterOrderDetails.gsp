@@ -1,3 +1,4 @@
+<%@ page import="org.pih.warehouse.order.OrderType" %>
 <%@ page import="org.pih.warehouse.order.OrderTypeCode" %>
 
 <html>
@@ -29,7 +30,7 @@
 			</g:hasErrors>
 		</g:each>
 		<g:form action="saveOrderDetails" method="post">
-            <g:hiddenField name="orderTypeCode" value="${org.pih.warehouse.order.OrderTypeCode.PURCHASE_ORDER}"/>
+            <g:hiddenField name="orderType" value="${OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}"/>
             <g:hiddenField id="orderId" name="order.id" value="${order?.id }"></g:hiddenField>
 			<div class="dialog">
                 <g:render template="/order/summary" model="[orderInstance:order,currentState:'editOrder']"/>

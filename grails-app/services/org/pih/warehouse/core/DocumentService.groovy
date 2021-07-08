@@ -50,6 +50,7 @@ import org.docx4j.wml.TrPr
 import org.groovydev.SimpleImageBuilder
 import org.pih.warehouse.api.Stocklist
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemSortByCode
@@ -1599,7 +1600,7 @@ class DocumentService {
                     }
                 }
                 eq("originParty", supplierOrganization)
-                eq("orderTypeCode", OrderTypeCode.PURCHASE_ORDER)
+                eq("orderType", OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name()))
                 documents {
                     isNotNull("id")
                 }

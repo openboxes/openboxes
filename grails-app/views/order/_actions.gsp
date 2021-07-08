@@ -1,5 +1,7 @@
-<%@ page import="org.pih.warehouse.order.OrderTypeCode" %>
+<%@ page import="org.pih.warehouse.core.Constants" %>
 <%@ page import="org.pih.warehouse.order.OrderStatus" %>
+<%@ page import="org.pih.warehouse.order.OrderType" %>
+<%@ page import="org.pih.warehouse.order.OrderTypeCode" %>
 <g:if test="${orderInstance?.id }">
 	<span id="shipment-action-menu" class="action-menu">
 		<button class="action-btn">
@@ -36,7 +38,7 @@
 					&nbsp;${warehouse.message(code: 'order.addDocument.label')}
 				</g:link>
 			</div>
-			<g:if test="${orderInstance?.orderTypeCode == OrderTypeCode.PURCHASE_ORDER}">
+			<g:if test="${orderInstance?.orderType == OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
 				<g:if test="${orderInstance?.isPending()}">
 					<div class="action-menu-item">
 						<g:link controller="purchaseOrder" action="edit" id="${orderInstance?.id}" params="[id:orderInstance?.id]">
@@ -74,7 +76,7 @@
 					</div>
 				</g:if>
 			</g:if>
-			<g:elseif test="${orderInstance?.orderTypeCode == OrderTypeCode.TRANSFER_ORDER}">
+			<g:elseif test="${orderInstance?.orderType == OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
 				<div class="action-menu-item">
 					<g:link controller="putAway" action="generatePdf" id="${orderInstance?.id}" target="_blank">
 						<img src="${resource(dir: 'images/icons', file: 'pdf.png')}" class="middle"/>
@@ -97,7 +99,7 @@
 					<g:elseif test="${orderInstance?.shipments}">
 						<g:set var="disabledMessage" value="${g.message(code:'order.errors.rollback.message')}"/>
 					</g:elseif>
-					<g:if test="${orderInstance?.isPlaced() && orderInstance?.orderTypeCode == OrderTypeCode.PURCHASE_ORDER}">
+					<g:if test="${orderInstance?.isPlaced() && orderInstance?.orderType == OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
 							<g:link controller="order" action="rollbackOrderStatus" id="${orderInstance?.id}"
 									onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
 									disabled="${orderInstance?.shipments || !isApprover}"
@@ -107,7 +109,7 @@
 							</g:link>
 					</g:if>
 				</div>
-				<g:if test="${!(orderInstance?.orderTypeCode == OrderTypeCode.TRANSFER_ORDER && orderInstance?.status == OrderStatus.COMPLETED)}">
+				<g:if test="${!(orderInstance?.orderType == OrderType.findByCode(Constants.PUTAWAY_ORDER) && orderInstance?.status == OrderStatus.COMPLETED)}">
 					<div class="action-menu-item">
 						<g:link controller="order" action="remove" id="${orderInstance?.id}"
 								disabled="${orderInstance?.status != OrderStatus.PENDING}"

@@ -125,5 +125,8 @@
     <include file="0.8.x/changelog-2021-06-07-1930-alter-table-inventory-item-add-column-lot-status.xml"/>
     <include file="0.8.x/changelog-2021-06-11-1700-alter-table-product-availability-add-column-quantity-on-hold.xml"/>
     <include file="0.8.x/changelog-2021-06-24-1100-alter-table-product-availability-add-column-quantity-available-to-promise.xml"/>
+    <include file="0.8.x/changelog-2021-06-24-1800-create-table-order-type.xml"/>
+    <include file="0.8.x/changelog-2021-06-24-1815-alter-table-order-add-column-order-type.xml"/>
+    <include file="0.8.x/changelog-2021-06-24-1830-migrate-order-type-code-into-order-type.xml"/>
     <include file="0.8.x/changelog-2021-06-25-1810-alter-table-invoice-item-add-column-unit-price.xml"/>
 </databaseChangeLog>

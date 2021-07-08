@@ -127,4 +127,6 @@ class Constants {
 
     static final String DEFAULT_DOCUMENT_TYPE_ID = "9"
     static final String PREPAYMENT_INVOICE_SUFFIX = "-PREPAYMENT"
+
+    static final String PUTAWAY_ORDER = "PUTAWAY_ORDER"
 }

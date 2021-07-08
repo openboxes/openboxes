@@ -52,8 +52,8 @@ class OrderService {
                         ilike("orderNumber", "%" + params.q + "%")
                     }
                 }
-                if (orderTemplate.orderTypeCode) {
-                    eq("orderTypeCode", orderTemplate.orderTypeCode)
+                if (orderTemplate.orderType) {
+                    eq("orderType", orderTemplate.orderType)
                 }
                 if (orderTemplate.destination) {
                     eq("destination", orderTemplate.destination)
@@ -125,7 +125,7 @@ class OrderService {
             and {
                 eq("origin", origin)
                 eq("destination", destination)
-                eq("orderTypeCode", OrderTypeCode.PURCHASE_ORDER)
+                eq("orderType", OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name()))
             }
         }
     }
@@ -826,7 +826,7 @@ class OrderService {
         def orderItems = OrderItem.createCriteria().list() {
             order {
                 eq("destination", destination)
-                eq("orderTypeCode", OrderTypeCode.PURCHASE_ORDER)
+                eq("orderType", OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name()))
                 not {
                     'in'("status", OrderStatus.PENDING)
                 }
@@ -843,7 +843,7 @@ class OrderService {
         def orderItems = OrderItem.createCriteria().list() {
             order {
                 eq("destination", destination)
-                eq("orderTypeCode", OrderTypeCode.PURCHASE_ORDER)
+                eq("orderType", OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name()))
                 not {
                     'in'("status", OrderStatus.PENDING)
                 }
@@ -959,7 +959,7 @@ class OrderService {
                 }
             }
             order {
-                eq("orderTypeCode", OrderTypeCode.PURCHASE_ORDER)
+                eq("orderType", OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name()))
                 eq("originParty", supplierOrganization)
             }
             if (productInstance) {

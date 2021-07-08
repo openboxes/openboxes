@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="awalkowiak" id="2406202118000-0">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="order_type"/>
+      </not>
+    </preConditions>
+    <createTable tableName="order_type">
+
+      <column name="id" type="CHAR(38)">
+        <constraints nullable="false" primaryKey="true" />
+      </column>
+      <column name="version" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+
+      <column name="name" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="description" type="VARCHAR(255)"/>
+      <column name="code" type="VARCHAR(100)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="order_type_code" type="VARCHAR(100)">
+        <constraints nullable="false"/>
+      </column>
+
+      <column name="date_created" type="DATETIME"/>
+      <column name="last_updated" type="DATETIME"/>
+      <column name="created_by_id" type="CHAR(38)"/>
+      <column name="updated_by_id" type="CHAR(38)"/>
+    </createTable>
+  </changeSet>
+
+  <changeSet author="awalkowiak" id="2406202118000-1">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_order_type_created_by"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="created_by_id" baseTableName="order_type"
+      constraintName="fk_order_type_created_by" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="user" />
+  </changeSet>
+
+  <changeSet author="awalkowiak" id="2406202118000-2">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_order_type_updated_by"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="updated_by_id" baseTableName="order_type"
+      constraintName="fk_order_type_updated_by" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="user" />
+  </changeSet>
+
+  <!-- ADD INITIAL DATA -->
+  <changeSet author="awalkowiak" id="2406202118000-3">
+    <preConditions onFail="MARK_RAN">
+      <and>
+        <tableExists tableName="order_type"/>
+        <sqlCheck expectedResult="0">
+          SELECT COUNT(*) FROM order_type
+        </sqlCheck>
+      </and>
+    </preConditions>
+    <sql>
+      INSERT INTO order_type (id, name, description, code, order_type_code, date_created, last_updated, version) VALUES
+      ('SALES_ORDER', 'Sales Order', '', 'SALES_ORDER', 'SALES_ORDER', current_timestamp, current_timestamp, '0'),
+      ('PRODUCTION_ORDER', 'Production Order', '', 'PRODUCTION_ORDER', 'PRODUCTION_ORDER', current_timestamp, current_timestamp, '0'),
+      ('PURCHASE_ORDER', 'Purchase Order', '', 'PURCHASE_ORDER', 'PURCHASE_ORDER', current_timestamp, current_timestamp, '0'),
+      ('WORK_ORDER', 'Work Order', '', 'WORK_ORDER', 'WORK_ORDER', current_timestamp, current_timestamp, '0'),
+      ('TRANSFER_ORDER', 'Transfer Order', '', 'TRANSFER_ORDER', 'TRANSFER_ORDER', current_timestamp, current_timestamp, '0'),
+      ('PUTAWAY_ORDER', 'Putaway Order', '', 'PUTAWAY_ORDER', 'TRANSFER_ORDER', current_timestamp, current_timestamp, '0');
+    </sql>
+  </changeSet>
+
+</databaseChangeLog>
