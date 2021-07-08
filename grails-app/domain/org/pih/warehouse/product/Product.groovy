@@ -474,7 +474,7 @@ class Product implements Comparable, Serializable {
             eq("product", this)
         }
 
-        return productAvailability?.get(0)?.quantityAvailableToPromise ?: 0
+        return productAvailability ? productAvailability?.get(0)?.quantityAvailableToPromise : 0
     }
 
 

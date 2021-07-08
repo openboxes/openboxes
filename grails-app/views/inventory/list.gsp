@@ -47,7 +47,7 @@
                     <div class="box">
                         <h2>
                             <warehouse:message code="${controllerName}.${actionName}.label"/> -
-                            <warehouse:message code="default.showing.message" args="[quantityMap?.keySet()?.size()]"/>
+                            <warehouse:message code="default.showing.message" args="[availableItems.size()]"/>
                         </h2>
                         <table id="inventoryTable">
                             <thead>
@@ -70,14 +70,14 @@
                             </thead>
                             <tbody>
 
-                                <g:each var="entry" in="${quantityMap.sort()}" status="i">
-                                    <g:set var="product" value="${entry.key}"/>
-                                    <g:set var="quantity" value="${entry.value}"/>
-                                    <g:set var="quantityAvailableToPromise" value="${entry?.key?.getQuantityAvailableToPromise(session.warehouse.id)}"/>
-                                    <g:set var="inventoryLevel" value="${entry?.key?.getInventoryLevel(session.warehouse.id)}"/>
+                                <g:each var="availableItem" in="${availableItems}" status="i">
+                                    <g:set var="product" value="${availableItem.product}"/>
+                                    <g:set var="quantity" value="${availableItem.quantity}"/>
+                                    <g:set var="quantityAvailableToPromise" value="${availableItem.quantityAvailableToPromise}"/>
+                                    <g:set var="inventoryLevel" value="${availableItem.inventoryLevel}"/>
                                     <tr>
                                         <td>
-                                            <g:set var="status" value="${statusMap[product]}"/>
+                                            <g:set var="status" value="${availableItem.status}"/>
                                             ${warehouse.message(code:'enum.InventoryLevelStatus.'+status)}
                                         </td>
                                         <td>

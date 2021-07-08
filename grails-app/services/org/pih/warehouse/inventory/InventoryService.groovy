@@ -1225,7 +1225,7 @@ class InventoryService implements ApplicationContextAware {
             eq("product", product)
         }
 
-        return productAvailability?.get(0)?.quantityAvailableToPromise ?: 0
+        return productAvailability ? productAvailability?.get(0)?.quantityAvailableToPromise : 0
     }
 
 
