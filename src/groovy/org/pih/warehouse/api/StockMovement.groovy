@@ -224,7 +224,9 @@ class StockMovement {
         boolean isOrigin = origin?.id == currentLocation.id
         boolean isDestination = destination?.id == currentLocation.id
         boolean canOriginManageInventory = origin?.supports(ActivityCode.MANAGE_INVENTORY)
-        return ((canOriginManageInventory && isOrigin) || (!canOriginManageInventory && isDestination))
+        boolean isCentralPurchasingEnabled = currentLocation?.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING)
+
+        return ((canOriginManageInventory && isOrigin) || (!canOriginManageInventory && isDestination) || (isCentralPurchasingEnabled && isFromOrder))
     }
 
     Boolean isEditAuthorized(Location currentLocation) {
