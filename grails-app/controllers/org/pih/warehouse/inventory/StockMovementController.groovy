@@ -24,6 +24,7 @@ import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionSourceType
@@ -293,6 +294,7 @@ class StockMovementController {
 
     def remove = {
         Location currentLocation = Location.get(session.warehouse.id)
+        boolean isCentralPurchasingEnabled = currentLocation?.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING)
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         if (stockMovement.isDeleteOrRollbackAuthorized(currentLocation)) {
             if (stockMovement?.shipment?.currentStatus == ShipmentStatusCode.PENDING || !stockMovement?.shipment?.currentStatus) {
@@ -318,6 +320,10 @@ class StockMovementController {
         params.direction = (currentLocation == stockMovement.origin) ? StockMovementType.OUTBOUND :
                 (currentLocation == stockMovement.destination) ? StockMovementType.INBOUND : "ALL"
 
+        if (isCentralPurchasingEnabled) {
+            redirect(controller: 'order', action: "list", params: [orderTypeCode: OrderTypeCode.PURCHASE_ORDER])
+            return
+        }
         redirect(action: "list", params:params)
     }
 
