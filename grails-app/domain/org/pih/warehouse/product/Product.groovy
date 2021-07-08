@@ -464,7 +464,7 @@ class Product implements Comparable, Serializable {
      */
     def getQuantityAvailableToPromise(String locationId) {
         def productAvailability = ProductAvailability.createCriteria().list {
-            resultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+
             projections {
                 sum("quantityAvailableToPromise", "quantityAvailableToPromise")
             }
@@ -474,7 +474,7 @@ class Product implements Comparable, Serializable {
             eq("product", this)
         }
 
-        return productAvailability ? productAvailability?.get(0)?.quantityAvailableToPromise : 0
+        return productAvailability ? productAvailability?.get(0) : 0
     }
 
 

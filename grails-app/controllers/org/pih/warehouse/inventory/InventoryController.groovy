@@ -525,7 +525,7 @@ class InventoryController {
         } else {
             quantityMap.each { Product product, quantity ->
                 def inventoryLevel = product.getInventoryLevel(session.warehouse.id)
-                def quantityAvailableToPromise = product.getQuantityAvailableToPromise(session.warehouse.id)
+                def quantityAvailableToPromise = inventoryService.getQuantityAvailableToPromise(product, location)
                 availableItems << [
                         status: statusMap[product],
                         product: product,
@@ -734,6 +734,7 @@ class InventoryController {
 
     def getCsvForProductMap(map, statusMap) {
         def hasRoleFinance = userService.hasRoleFinance(session.user)
+        def location = Location.get(session.warehouse.id)
 
         def csv = ""
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.status.label')}" + '"' + ","
@@ -759,7 +760,7 @@ class InventoryController {
             def status = statusMap[product]
             def totalValue = (product?.pricePerUnit ?: 0) * (quantity ?: 0)
             def statusMessage = "${warehouse.message(code: 'enum.InventoryLevelStatusCsv.' + status)}"
-            def quantityAvailableToPromise = product.getQuantityAvailableToPromise(session.warehouse.id)
+            def quantityAvailableToPromise = inventoryService.getQuantityAvailableToPromise(product, location)
             csv += '"' + (statusMessage ?: "") + '"' + ","
             csv += '"' + (product.productCode ?: "") + '"' + ","
             csv += StringEscapeUtils.escapeCsv(product?.name) + ","
