@@ -10,7 +10,7 @@ import org.pih.warehouse.order.Order
 class PutAwayController {
 
     PdfRenderingService pdfRenderingService
-    def inventoryService
+    def productAvailabilityService
 
     def index = {
         redirect(action: "create")
@@ -39,7 +39,7 @@ class PutAwayController {
             putaway = Putaway.createFromOrder(order)
             putaway.putawayItems.each { PutawayItem putawayItem ->
                 putawayItem.availableItems =
-                        inventoryService.getAvailableBinLocations(putawayItem.currentFacility, putawayItem.product)
+                        productAvailabilityService.getAllAvailableBinLocations(putawayItem.currentFacility, putawayItem.product)
                 putawayItem.inventoryLevel = InventoryLevel.findByProductAndInventory(putawayItem.product, putaway.origin.inventory)
             }
             jsonObject = new JSONObject(putaway.toJson())

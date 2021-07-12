@@ -44,7 +44,7 @@ class PutawayItem {
         String currentBins = ""
         if (availableItems) {
             currentBins = availableItems?.findAll {
-                !it?.binLocation?.supports(ActivityCode.RECEIVE_STOCK)
+                it.quantityOnHand > 0 && !it?.binLocation?.supports(ActivityCode.RECEIVE_STOCK)
             }?.sort{
                 a, b -> (!a?.binLocation?.zone ? !b?.binLocation?.zone ? 0 : 1 : !b?.binLocation?.zone ? -1 : (a?.binLocation?.zone?.name?.toLowerCase() <=> b?.binLocation?.zone?.name?.toLowerCase())) ?: a?.binLocation?.name?.toLowerCase() <=> b?.binLocation?.name?.toLowerCase()
             }?.collect { ((it?.binLocation?.zone ? "${it?.binLocation?.zone?.name}: " : "") + it?.binLocation?.name) }?.unique()?.join(", ")
