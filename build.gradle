@@ -271,7 +271,7 @@ assets {
 //bootRun.dependsOn(['npmInstall', 'npm_run_bundle'])
 
 //Generate webpack bundle when packaging the app
-//assetCompile.dependsOn(['npmInstall', 'npm_run_bundle'])
+assetCompile.dependsOn(['npmInstall', 'npm_run_bundle'])
 
 buildProperties.doLast {
     // Find the right file
