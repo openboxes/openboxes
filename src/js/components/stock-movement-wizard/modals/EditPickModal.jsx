@@ -50,7 +50,7 @@ const FIELDS = {
             </div>),
         },
       },
-      quantityAvailable: {
+      quantityOnHand: {
         type: LabelField,
         label: 'react.stockMovement.quantityAvailable.label',
         defaultMessage: 'Qty Available',
@@ -76,7 +76,7 @@ function validate(values) {
   const errors = {};
   errors.availableItems = [];
   _.forEach(values.availableItems, (item, key) => {
-    if (item.quantityPicked > item.quantityAvailable) {
+    if (item.quantityPicked > item.quantityOnHand) {
       errors.availableItems[key] = { quantityPicked: 'react.stockMovement.errors.higherTyPicked.label' };
     }
     if (item.quantityPicked < 0) {

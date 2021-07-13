@@ -45,7 +45,7 @@ class PutawayApiController {
         putaway.sortBy = params.sortBy
         putaway.putawayItems.each { PutawayItem putawayItem ->
             putawayItem.availableItems =
-                    productAvailabilityService.getAvailableBinLocations(putawayItem.currentFacility, putawayItem.product)
+                    productAvailabilityService.getAllAvailableBinLocations(putawayItem.currentFacility, putawayItem.product)
             putawayItem.inventoryLevel = InventoryLevel.findByProductAndInventory(putawayItem.product, putaway.origin.inventory)
             putawayItem.quantityAvailable = productAvailabilityService.getQuantityOnHandInBinLocation(putawayItem.inventoryItem, putawayItem.currentLocation)
         }
@@ -77,7 +77,7 @@ class PutawayApiController {
             putaway.sortBy = jsonObject.sortBy
             putaway?.putawayItems?.each { PutawayItem putawayItem ->
                 putawayItem.availableItems =
-                        productAvailabilityService.getAvailableBinLocations(putawayItem.currentFacility, putawayItem.product)
+                        productAvailabilityService.getAllAvailableBinLocations(putawayItem.currentFacility, putawayItem.product)
                 putawayItem.inventoryLevel = InventoryLevel.findByProductAndInventory(putawayItem.product, putaway.origin.inventory)
                 putawayItem.quantityAvailable = productAvailabilityService.getQuantityOnHandInBinLocation(putawayItem.inventoryItem, putawayItem.currentLocation)
             }

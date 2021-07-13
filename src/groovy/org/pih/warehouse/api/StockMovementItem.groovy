@@ -294,6 +294,7 @@ class AvailableItem {
     InventoryItem inventoryItem
     Location binLocation
     BigDecimal quantityAvailable
+    BigDecimal quantityOnHand
 
     static constraints = {
         inventoryItem(nullable: true)
@@ -315,6 +316,7 @@ class AvailableItem {
                 expirationDate    : inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
                 binLocation       : binLocation,
                 quantityAvailable : quantityAvailable,
+                quantityOnHand    : quantityOnHand,
                 // deprecated
                 "binLocation.id"  : binLocation?.id,
                 "binLocation.name": binLocation?.name,
@@ -363,7 +365,7 @@ class SubstitutionItem {
     }
 
     Integer getQuantityAvailable() {
-        availableItems ? availableItems.sum { it.quantityAvailable } : 0
+        availableItems ? availableItems.sum { it.quantityOnHand } : 0
     }
 
     Map toJson() {
@@ -425,7 +427,7 @@ class EditPageItem {
     List<SubstitutionItem> substitutionItems
 
     Integer getQuantityAvailable() {
-        availableItems ? availableItems.sum { it.quantityAvailable } : null
+        availableItems ? availableItems.sum { it.quantityOnHand } : null
     }
 
     Integer getQuantityAfterCancellation() {
