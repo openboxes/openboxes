@@ -7,15 +7,15 @@
   <changeSet author="dhatala" id="0807202115300-0">
     <preConditions onFail="MARK_RAN">
       <sqlCheck expectedResult="0">
-        select count(*) from location_type where location_type_code = "INTERNAL_LOCATION";
+        select count(*) from location_type where id = "HOLD_LOCATION";
       </sqlCheck>
     </preConditions>
     <insert tableName="location_type">
-      <column name="id" value="INTERNAL_LOCATION"/>
+      <column name="id" value="HOLD_LOCATION"/>
       <column name="version" valueNumeric="0"/>
       <column name="name" value="Hold"/>
       <column name="description" value="Default hold location type"/>
-      <column name="location_type_code" value="INTERNAL_LOCATION"/>
+      <column name="location_type_code" value="INTERNAL"/>
       <column name="sort_order" valueNumeric="0"/>
       <column name="date_created" valueDate="${now}"/>
       <column name="last_updated" valueDate="${now}"/>
@@ -26,12 +26,12 @@
       <sqlCheck expectedResult="0">
         SELECT count(*)
         FROM location_type_supported_activities
-        WHERE location_type_id = 'INTERNAL_LOCATION'
+        WHERE location_type_id = 'HOLD_LOCATION'
         AND supported_activities_string = 'HOLD_STOCK';
       </sqlCheck>
     </preConditions>
     <insert tableName="location_type_supported_activities">
-      <column name="location_type_id" value="INTERNAL_LOCATION"/>
+      <column name="location_type_id" value="HOLD_LOCATION"/>
       <column name="supported_activities_string" value="HOLD_STOCK"/>
     </insert>
   </changeSet>
@@ -40,12 +40,12 @@
       <sqlCheck expectedResult="0">
         SELECT count(*)
         FROM location_type_supported_activities
-        WHERE location_type_id = 'INTERNAL_LOCATION'
+        WHERE location_type_id = 'HOLD_LOCATION'
         AND supported_activities_string = 'PUTAWAY_STOCK';
       </sqlCheck>
     </preConditions>
     <insert tableName="location_type_supported_activities">
-      <column name="location_type_id" value="INTERNAL_LOCATION"/>
+      <column name="location_type_id" value="HOLD_LOCATION"/>
       <column name="supported_activities_string" value="PUTAWAY_STOCK"/>
     </insert>
   </changeSet>
