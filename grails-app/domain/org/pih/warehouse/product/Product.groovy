@@ -13,6 +13,7 @@ import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.NotImplementedException
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.hibernate.Criteria
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.GlAccount
@@ -457,12 +458,23 @@ class Product implements Comparable, Serializable {
     }
 
     /**
-     * Currently not implement since it would require coupling InventoryService to Product.
+     * Get quantity available to promise for this product given the location
      *
      * @param locationId
      */
-    def getQuantityAvailableToPromise(Integer locationId) {
-        throw new NotImplementedException()
+    def getQuantityAvailableToPromise(String locationId) {
+        def productAvailability = ProductAvailability.createCriteria().list {
+
+            projections {
+                sum("quantityAvailableToPromise", "quantityAvailableToPromise")
+            }
+            location {
+                eq("id", locationId)
+            }
+            eq("product", this)
+        }
+
+        return productAvailability ? productAvailability?.get(0) : 0
     }
 
 
