@@ -656,9 +656,6 @@ class OrderController {
             render(status: 500, text: "${warehouse.message(code: 'orderItem.blockedSupplier.label')}")
             return
         }
-        if (params.productSupplier || params.supplierCode) {
-            productSupplier = productSupplierDataService.getOrCreateNew(params)
-        }
         if (params.productSupplier == "Create New") {
             Organization supplier = Organization.get(params.supplier.id)
             productSupplier = ProductSupplier.findByCodeAndSupplier(params.sourceCode, supplier)
@@ -666,12 +663,9 @@ class OrderController {
                 render(status: 500, text: "Product source with given code for your supplier already exists")
                 return
             }
-            try {
-                productSupplier = productSupplierDataService.createProductSupplierWithoutPackage(params)
-            } catch (Exception e) {
-                log.error("Error " + e.message, e)
-                render(status: 500, text: "Error creating product source")
-            }
+        }
+        if (params.productSupplier || params.supplierCode) {
+            productSupplier = productSupplierDataService.getOrCreateNew(params, params.productSupplier == "Create New")
         }
         params.remove("productSupplier")
         if (params.budgetCode) {
