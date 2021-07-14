@@ -138,14 +138,7 @@ class InventoryController {
         command.category = params.categoryId ? Category.get(params.categoryId) : productService.getRootCategory()
         command.maxResults = params?.max as Integer
         command.offset = params?.offset as Integer
-
-
-        def products = productAvailabilityService.searchProducts(command)
-
-        command.searchResults = products.collect { it ->
-            [product: it[0], quantityOnHand: it[1], color: it[0]?.color]
-        }
-        command.totalCount = products.totalCount
+        command.searchResults = productAvailabilityService.searchProducts(command)
 
         [commandInstance: command]
     }
