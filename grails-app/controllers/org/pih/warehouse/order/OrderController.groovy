@@ -120,7 +120,7 @@ class OrderController {
                         quantityOrdered: orderItem.quantity,
                         quantityShipped: orderItem.quantityShipped,
                         quantityReceived: orderItem.quantityReceived,
-                        quantityInvoiced: orderItem.quantityInvoiced,
+                        quantityInvoiced: orderItem.quantityInvoicedInStandardUom,
                         unitPrice:  orderItem.unitPrice ?: '',
                         totalCost: orderItem.total ?: '',
                         currency: orderItem?.order?.currencyCode,
