@@ -69,7 +69,7 @@
                             ${orderItem?.quantityReceived}
                         </td>
                         <td class="right">
-                            ${orderItem?.quantityInvoiced}
+                            ${orderItem?.quantityInvoicedInStandardUom}
                         </td>
                         <td class="">
                             <g:formatNumber number="${orderItem?.unitPrice?:0}" />
