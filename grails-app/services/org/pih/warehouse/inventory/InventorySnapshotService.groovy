@@ -393,7 +393,7 @@ class InventorySnapshotService {
                         "and a.lotNumber != :lotNumber",
                 [
                         inventoryItemId: inventoryItem.id,
-                        lotNumber      : inventoryItem.lotNumber
+                        lotNumber      : inventoryItem.lotNumber?:Constants.DEFAULT_LOT_NUMBER
                 ]
         )
         log.info "Updated ${results} inventory snapshots for inventory item ${inventoryItem}"
@@ -407,7 +407,7 @@ class InventorySnapshotService {
                         "and a.binLocationName != :binLocationName",
                 [
                         binLocationId  : binLocation.id,
-                        binLocationName: binLocation.name
+                        binLocationName: binLocation.name?:Constants.DEFAULT_BIN_LOCATION_NAME
                 ]
         )
         log.info "Updated ${results} inventory snapshots for bin location ${binLocation}"

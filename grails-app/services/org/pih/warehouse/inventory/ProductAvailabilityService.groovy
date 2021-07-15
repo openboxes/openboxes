@@ -19,6 +19,7 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.hibernate.Criteria
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.product.Product
@@ -608,10 +609,10 @@ class ProductAvailabilityService {
                         "and a.lotNumber != :lotNumber",
                 [
                         inventoryItemId: inventoryItem.id,
-                        lotNumber      : inventoryItem.lotNumber
+                        lotNumber      : inventoryItem.lotNumber?:Constants.DEFAULT_LOT_NUMBER
                 ]
         )
-        log.info "Updated ${results} product availability records for inventory item ${inventoryItem?.lotNumber}"
+        log.info "Updated ${results} product availability records for inventory item ${inventoryItem?.lotNumber?:Constants.DEFAULT_LOT_NUMBER}"
     }
 
 
@@ -625,10 +626,10 @@ class ProductAvailabilityService {
                             "and a.binLocationName != :binLocationName",
                     [
                             binLocationId  : location.id,
-                            binLocationName: location.name
+                            binLocationName: location.name?:Constants.DEFAULT_BIN_LOCATION_NAME
                     ]
             )
-            log.info "Updated ${results} product availability records for bin location ${location?.name}"
+            log.info "Updated ${results} product availability records for bin location ${location?.name?:Constants.DEFAULT_BIN_LOCATION_NAME}"
         }
     }
 
