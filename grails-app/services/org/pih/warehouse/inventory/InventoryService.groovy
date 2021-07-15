@@ -2718,7 +2718,7 @@ class InventoryService implements ApplicationContextAware {
         command.data.eachWithIndex { row, index ->
             println "${index}: ${row}"
             // ignore a line if physical qoh is empty
-            if (!row.quantity) {
+            if (row.quantity == null) {
                 return
             }
             def transactionEntry = new TransactionEntry()
