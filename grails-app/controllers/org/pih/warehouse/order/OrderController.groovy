@@ -665,7 +665,7 @@ class OrderController {
             }
         }
         if (params.productSupplier || params.supplierCode) {
-            productSupplier = productSupplierDataService.getOrCreateNew(params)
+            productSupplier = productSupplierDataService.getOrCreateNew(params, params.productSupplier == "Create New")
         }
         params.remove("productSupplier")
         if (params.budgetCode) {
