@@ -137,6 +137,11 @@ class StockTransferSecondPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  filterMethod = (filter, row) => {
+    const val = row[filter.id];
+    return _.toString(val).toLowerCase().includes(filter.value.toLowerCase());
+  };
+
   /**
    * Sends all changes made by user in this step of stock transfer to API and updates data.
    * @public
@@ -223,6 +228,7 @@ class StockTransferSecondPage extends Component {
               minRows={0}
               showPaginationBottom={false}
               filterable
+              defaultFilterMethod={this.filterMethod}
             />
             : null
         }
