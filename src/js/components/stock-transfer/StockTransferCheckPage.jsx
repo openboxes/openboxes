@@ -19,7 +19,7 @@ import { extractNonCanceledItems } from './utils';
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
 
-const COMPLETE = 'COMPLETE';
+const COMPLETED = 'COMPLETED';
 
 /**
  * The second page of stock transfer where user can choose qty and bin to transfer
@@ -130,7 +130,10 @@ class StockTransferSecondPage extends Component {
         const stockTransferItems = extractNonCanceledItems(stockTransfer);
 
         this.setState(
-          { stockTransfer: { ...stockTransfer, stockTransferItems } },
+          {
+            stockTransfer: { ...stockTransfer, stockTransferItems },
+            originalItems: stockTransfer.stockTransferItems,
+          },
           () => this.props.hideSpinner(),
         );
       })
@@ -152,7 +155,8 @@ class StockTransferSecondPage extends Component {
 
     const payload = {
       ...this.state.stockTransfer,
-      status: COMPLETE,
+      stockTransferItems: this.state.originalItems,
+      status: COMPLETED,
     };
 
     return apiClient.post(url, flattenRequest(payload))
@@ -165,7 +169,7 @@ class StockTransferSecondPage extends Component {
   }
 
   /**
-   * Sends all changes made by user in this step of put-away to API and updates data.
+   * Sends all changes made by user in this step of stock transfer to API and updates data.
    * @public
    */
   completeStockTransfer() {

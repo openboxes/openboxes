@@ -9,10 +9,13 @@
  **/
 package org.pih.warehouse.stockTransfer
 
+import org.apache.commons.beanutils.BeanUtils
 import org.pih.warehouse.api.StockTransfer
 import org.pih.warehouse.api.StockTransferItem
 import org.pih.warehouse.api.StockTransferStatus
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.TransferStockCommand
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
@@ -155,9 +158,10 @@ class StockTransferService {
     }
 
     OrderItem updateOrderItem(StockTransferItem stockTransferItem, OrderItem orderItem) {
-        OrderItemStatusCode orderItemStatusCode =
-                !stockTransferItem?.splitItems?.empty ? OrderItemStatusCode.CANCELED :
-                        stockTransferItem.status == StockTransferStatus.COMPLETED ? OrderItemStatusCode.COMPLETED : OrderItemStatusCode.PENDING
+        def emptySplitItems = stockTransferItem?.splitItems?.empty
+        def statusCompleted = (stockTransferItem.status == StockTransferStatus.COMPLETED || orderItem?.order?.status == OrderStatus.COMPLETED)
+        OrderItemStatusCode orderItemStatusCode = !emptySplitItems ? OrderItemStatusCode.CANCELED :
+            (statusCompleted ? OrderItemStatusCode.COMPLETED : OrderItemStatusCode.PENDING)
 
         orderItem.orderItemStatusCode = orderItemStatusCode
         orderItem.product = stockTransferItem.product
@@ -166,5 +170,89 @@ class StockTransferService {
         orderItem.originBinLocation = stockTransferItem.originBinLocation
         orderItem.destinationBinLocation = stockTransferItem.destinationBinLocation
         return orderItem
+    }
+
+    Order completeStockTransfer(StockTransfer stockTransfer) {
+        validateStockTransfer(stockTransfer)
+
+        // Save the stockTransfer as an order
+        Order order = createOrderFromStockTransfer(stockTransfer)
+
+        // Need to process the split items
+        processSplitItems(stockTransfer)
+
+        stockTransfer.stockTransferItems.each { StockTransferItem stockTransferItem ->
+            TransferStockCommand command = new TransferStockCommand()
+            command.location = stockTransferItem.location?:stockTransfer?.destination
+            command.binLocation = stockTransferItem.originBinLocation
+            command.inventoryItem = stockTransferItem.inventoryItem
+            command.quantity = stockTransferItem.quantity
+            command.otherLocation = stockTransferItem.location
+            command.otherBinLocation = stockTransferItem.destinationBinLocation
+            command.order = order
+            command.transferOut = Boolean.TRUE
+            command.disableRefresh = Boolean.TRUE
+            inventoryService.transferStock(command)
+        }
+
+        grailsApplication.mainContext.publishEvent(new StockTransferCompletedEvent(stockTransfer))
+
+        return order
+    }
+
+    void processSplitItems(StockTransfer stockTransfer) {
+
+        stockTransfer.stockTransferItems.toArray().each { StockTransferItem oldStockTransferItem ->
+
+            if (oldStockTransferItem.splitItems) {
+                // Iterate over split items and create new stock transfer items for them
+                // NOTE: The only fields we change from the original are the stock transfer destination bin and quantity.
+                oldStockTransferItem.splitItems.each { StockTransferItem splitSockTransferItem ->
+                    StockTransferItem newStockTransferItemItem = new StockTransferItem()
+                    BeanUtils.copyProperties(newStockTransferItemItem, oldStockTransferItem)
+                    newStockTransferItemItem.quantity = splitSockTransferItem.quantity
+                    newStockTransferItemItem.location = splitSockTransferItem.location
+                    newStockTransferItemItem.destinationBinLocation = splitSockTransferItem.destinationBinLocation
+                    stockTransfer.stockTransferItems.add(newStockTransferItemItem)
+                }
+
+                // Remove the original stock transfer item since it was replaced with the above
+                stockTransfer.stockTransferItems.remove(oldStockTransferItem)
+            }
+        }
+    }
+
+    void validateStockTransfer(StockTransfer stockTransfer) {
+        stockTransfer.stockTransferItems.toArray().each { StockTransferItem stockTransferItem ->
+            validateStockTransferItem(stockTransferItem)
+        }
+    }
+
+    void validateStockTransferItem(StockTransferItem stockTransferItem) {
+        def quantity = stockTransferItem.quantity
+
+        if (stockTransferItem.splitItems) {
+            quantity = stockTransferItem.splitItems.sum { it.quantity }
+        }
+
+        validateQuantityAvailable(stockTransferItem.location, stockTransferItem.originBinLocation, stockTransferItem.inventoryItem, quantity)
+    }
+
+    void validateQuantityAvailable(Location location , Location originBinLocation, InventoryItem inventoryItem, BigDecimal quantity) {
+
+        if (!location) {
+            throw new IllegalArgumentException("Location is required")
+        }
+
+        Integer quantityAvailable = productAvailabilityService.getQuantityOnHandInBinLocation(inventoryItem, originBinLocation)
+        log.info "Quantity: ${quantity} vs ${quantityAvailable}"
+
+        if (quantityAvailable < 0) {
+            throw new IllegalStateException("The inventory item is no longer available at the specified location ${location} and bin ${originBinLocation} ")
+        }
+
+        if (quantity > quantityAvailable) {
+            throw new IllegalStateException("Quantity available ${quantityAvailable} is less than quantity to stock transfer ${quantity} for product ${inventoryItem.product.productCode} ${inventoryItem.product.name}")
+        }
     }
 }
