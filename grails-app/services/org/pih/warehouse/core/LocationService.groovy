@@ -312,7 +312,7 @@ class LocationService {
     }
 
     List getDepots() {
-        return getAllLocations()?.findAll { it.supports(ActivityCode.MANAGE_INVENTORY) }
+        return getAllLocations()?.findAll { it.supports(ActivityCode.MANAGE_INVENTORY) }?.toArray()?:[]
     }
 
     List getNearbyLocations(Location currentLocation) {
