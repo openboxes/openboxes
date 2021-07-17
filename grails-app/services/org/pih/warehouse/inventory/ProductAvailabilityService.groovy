@@ -485,7 +485,7 @@ class ProductAvailabilityService {
         return data
     }
 
-    List getQuantityOnHandByBinLocation(Location location, List<Product> products) {
+    List getAvailableItems(Location location, List<Product> products) {
         log.info("getQuantityOnHandByBinLocation: location=${location} product=${products}")
         def data = []
         if (location) {
@@ -494,7 +494,8 @@ class ProductAvailabilityService {
 						    pa.product, 
 						    ii,
 						    pa.binLocation,
-						    pa.quantityOnHand
+						    pa.quantityOnHand,
+						    pa.quantityAvailableToPromise
 						from ProductAvailability pa
 						left outer join pa.inventoryItem ii
 						left outer join pa.binLocation bl
@@ -508,11 +509,12 @@ class ProductAvailabilityService {
                 def quantity = it[3]
 
                 [
-                        status       : status(quantity),
-                        product      : it[0],
-                        inventoryItem: inventoryItem,
-                        binLocation  : binLocation,
-                        quantity     : quantity
+                        status                      : status(quantity),
+                        product                     : it[0],
+                        inventoryItem               : inventoryItem,
+                        binLocation                 : binLocation,
+                        quantityOnHand              : quantity,
+                        quantityAvailableToPromise  : it[4]
                 ]
             }
         }
@@ -546,13 +548,14 @@ class ProductAvailabilityService {
     }
 
     List<AvailableItem> getAvailableBinLocations(Location location, List products) {
-        def availableBinLocations = getQuantityOnHandByBinLocation(location, products)
+        def availableBinLocations = getAvailableItems(location, products)
 
         List<AvailableItem> availableItems = availableBinLocations.collect {
             return new AvailableItem(
                     inventoryItem: it?.inventoryItem,
                     binLocation: it?.binLocation,
-                    quantityAvailable: it.quantity
+                    quantityAvailable: it.quantityAvailableToPromise,
+                    quantityOnHand: it.quantityOnHand
             )
         }
 
@@ -562,21 +565,25 @@ class ProductAvailabilityService {
 
     // Include also bin locations with negative qty (needed for edit page items)
     List<AvailableItem> getAllAvailableBinLocations(Location location, List products) {
-        def availableBinLocations = getQuantityOnHandByBinLocation(location, products)
+        def availableBinLocations = getAvailableItems(location, products)
 
         List<AvailableItem> availableItems = availableBinLocations.collect {
             return new AvailableItem(
                     inventoryItem: it?.inventoryItem,
                     binLocation: it?.binLocation,
-                    quantityAvailable: it.quantity
+                    quantityAvailable: it.quantityAvailableToPromise,
+                    quantityOnHand: it.quantityOnHand
             )
         }
 
         return availableItems
     }
 
+    /**
+     * Sorting used by first expiry, first out algorithm
+     */
     List<AvailableItem> sortAvailableItems(List<AvailableItem> availableItems) {
-        availableItems = availableItems.findAll { it.quantityAvailable > 0 }
+        availableItems = availableItems.findAll { it.quantityOnHand > 0 }
 
         // Sort bins  by available quantity
         availableItems = availableItems.sort { a, b ->
