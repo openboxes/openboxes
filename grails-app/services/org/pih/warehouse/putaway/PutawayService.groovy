@@ -24,7 +24,6 @@ import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderType
-import org.pih.warehouse.order.OrderTypeCode
 
 class PutawayService {
 

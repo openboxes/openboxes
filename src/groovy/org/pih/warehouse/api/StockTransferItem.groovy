@@ -39,6 +39,7 @@ class StockTransferItem {
         stockTransferItem.id = orderItem.id
         stockTransferItem.product = orderItem.product
         stockTransferItem.inventoryItem = orderItem.inventoryItem
+        stockTransferItem.location = orderItem?.order?.origin
         stockTransferItem.originBinLocation = orderItem.originBinLocation
         stockTransferItem.destinationBinLocation = orderItem.destinationBinLocation
         stockTransferItem.quantity = orderItem.quantity
@@ -56,16 +57,13 @@ class StockTransferItem {
         StockTransferItem stockTransferItem = new StockTransferItem()
         stockTransferItem.product = productAvailability.product
         stockTransferItem.inventoryItem = productAvailability.inventoryItem
+        stockTransferItem.location = productAvailability.location
         stockTransferItem.originBinLocation = productAvailability.binLocation
         stockTransferItem.destinationBinLocation = productAvailability.binLocation
         stockTransferItem.quantity = productAvailability.quantityOnHand
         stockTransferItem.quantityOnHand = productAvailability.quantityOnHand
 
         return stockTransferItem
-    }
-
-    static StockTransferItem createFromStockTransferItemMap(Map stockTransferItemMap) {
-
     }
 
     static StockTransferStatus getItemStatus(OrderItemStatusCode orderItemStatusCode) {

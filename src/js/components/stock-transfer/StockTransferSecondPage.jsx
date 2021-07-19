@@ -226,6 +226,15 @@ class StockTransferSecondPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  filterMethod = (filter, row) => {
+    let val = row[filter.id];
+    if (filter.id === 'destinationBinLocation') {
+      val = _.get(val, 'name');
+    }
+
+    return _.toString(val).toLowerCase().includes(filter.value.toLowerCase());
+  };
+
   /**
    * Fetches available bin locations from API.
    * @public
@@ -408,6 +417,7 @@ class StockTransferSecondPage extends Component {
               minRows={0}
               showPaginationBottom={false}
               filterable
+              defaultFilterMethod={this.filterMethod}
             />
             : null
         }

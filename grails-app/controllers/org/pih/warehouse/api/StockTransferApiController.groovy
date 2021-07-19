@@ -51,10 +51,14 @@ class StockTransferApiController {
 
         bindStockTransferData(stockTransfer, currentUser, currentLocation, jsonObject)
 
-        Order order = stockTransferService.createOrderFromStockTransfer(stockTransfer)
-
-        if (order.hasErrors() || !order.save(flush: true)) {
-            throw new ValidationException("Invalid order", order.errors)
+        Order order
+        if (stockTransfer?.status == StockTransferStatus.COMPLETED) {
+            order = stockTransferService.completeStockTransfer(stockTransfer)
+        } else {
+            order = stockTransferService.createOrderFromStockTransfer(stockTransfer)
+            if (order.hasErrors() || !order.save(flush: true)) {
+                throw new ValidationException("Invalid order", order.errors)
+            }
         }
 
         stockTransfer = StockTransfer.createFromOrder(order)
@@ -83,10 +87,16 @@ class StockTransferApiController {
         jsonObject.stockTransferItems.each { stockTransferItemMap ->
             StockTransferItem stockTransferItem = new StockTransferItem()
             bindData(stockTransferItem, stockTransferItemMap)
+            if (!stockTransferItem.location) {
+                stockTransferItem.location = stockTransfer.origin
+            }
 
             stockTransferItemMap.splitItems.each { splitItemMap ->
                 StockTransferItem splitItem = new StockTransferItem()
                 bindData(splitItem, splitItemMap)
+                if (!splitItem.location) {
+                    splitItem.location = stockTransfer.origin
+                }
                 stockTransferItem.splitItems.add(splitItem)
             }
 
