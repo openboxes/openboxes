@@ -422,7 +422,7 @@ class ProductAvailabilityService {
         def quantityMap = [:]
         if (locations) {
             def results = ProductAvailability.executeQuery("""
-						select product, pa.location, category.name, sum(pa.quantityOnHand)
+						select product, pa.location, category.name, sum(pa.quantityOnHand), sum(pa.quantityAvailableToPromise)
 						from ProductAvailability pa, Product product, Category category
 						where pa.location in (:locations)
 						and pa.product = product
@@ -434,7 +434,7 @@ class ProductAvailabilityService {
                 if (!quantityMap[it[0]]) {
                     quantityMap[it[0]] = [:]
                 }
-                quantityMap[it[0]][it[1]?.id] = it[3]
+                quantityMap[it[0]][it[1]?.id] = [quantityOnHand: it[3], quantityAvailableToPromise: it[4]]
             }
         }
 

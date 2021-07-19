@@ -549,11 +549,13 @@ class ReportController {
                         sw.append(locationName).append(",")
                     }
 
-                    sw.append("QoH Total")
+                    sw.append("QoH Total").append(",")
+                    sw.append("Quantity Available Total")
                     sw.append("\n")
                     command.entries.each { entry ->
                         if (entry.key) {
-                            def totalQuantity = entry.value?.values()?.sum()
+                            def totalQuantity = entry.value?.values()?.quantityOnHand?.sum()
+                            def totalQuantityAvailableToPromise = entry.value?.values()?.quantityAvailableToPromise?.sum()
                             def form = entry.key?.getProductCatalogs()?.collect {
                                 it.name
                             }?.join(",")
@@ -565,10 +567,11 @@ class ReportController {
                             sw.append('"' + (entry.key?.tagsToString() ?: "")?.toString()?.replace('"', '""') + '"').append(",")
 
                             command.locations?.each { location ->
-                                sw.append('"' + (entry.value[location?.id] != null ? entry.value[location?.id] : "").toString() + '"').append(",")
+                                sw.append('"' + (entry.value[location?.id] != null ? entry.value[location?.id]?.quantityOnHand?:0 : "").toString() + '"').append(",")
                             }
 
-                            sw.append('"' + (totalQuantity != null ? totalQuantity : "").toString() + '"')
+                            sw.append('"' + (totalQuantity != null ? totalQuantity : "").toString() + '"').append(",")
+                            sw.append('"' + (totalQuantityAvailableToPromise != null ? totalQuantityAvailableToPromise : "").toString() + '"')
                             sw.append("\n")
                         }
                     }
