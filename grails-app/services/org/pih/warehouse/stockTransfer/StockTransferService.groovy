@@ -191,11 +191,8 @@ class StockTransferService {
             command.otherBinLocation = stockTransferItem.destinationBinLocation
             command.order = order
             command.transferOut = Boolean.TRUE
-            command.disableRefresh = Boolean.TRUE
             inventoryService.transferStock(command)
         }
-
-        grailsApplication.mainContext.publishEvent(new StockTransferCompletedEvent(stockTransfer))
 
         return order
     }
