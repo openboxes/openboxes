@@ -99,7 +99,7 @@
                                 <th class="center"><g:message code="inventoryItem.lotNumber.label"/></th>
                                 <th class="center"><g:message code="inventoryItem.expirationDate.label"/></th>
                                 <th class="center"><g:message code="default.quantity.label"/></th>
-                                <th class="center"><g:message code="default.quantityAvailableToPromise.label"/></th>
+                                <th class="center"><g:message code="default.quantityAvailable.label"/></th>
                                 <th class="center"><g:message code="default.uom.label"/></th>
                                 <th class="center"><g:message code="product.unitCost.label"/></th>
                                 <th class="center"><g:message code="product.totalValue.label"/></th>

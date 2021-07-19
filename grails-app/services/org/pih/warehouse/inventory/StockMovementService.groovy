@@ -693,33 +693,34 @@ class StockMovementService {
             def statusCode = substitutionItems ? RequisitionItemStatus.SUBSTITUTED :
                     it.quantity_revised != null ? RequisitionItemStatus.CHANGED : RequisitionItemStatus.APPROVED
             [
-                    product : productsMap[it.product_id],
-                    productName : it.name,
-                    productCode : it.product_code,
-                    requisitionItemId: it.id,
-                    requisition_id: it.requisition_id,
-                    quantityRequested     : it.quantity,
-                    quantityRevised       : it.quantity_revised,
-                    quantityCanceled      : it.quantity_canceled,
-                    quantityConsumed      : it.quantity_demand,
-                    quantityAvailable     : it.quantity_on_hand,
-                    substitutionStatus    : it.substitution_status,
-                    sortOrder : it.sort_order,
-                    reasonCode : it.cancel_reason_code,
-                    comments : it.comments,
-                    statusCode: statusCode.name(),
-                    substitutionItems: substitutionItems.collect {
-                        [
-                                product : Product.get(it.product_id),
-                                productId        : it.product_id,
-                                productCode      : it.product_code,
-                                productName      : it.name,
-                                quantityAvailable: it.quantity_on_hand,
-                                quantityConsumed: it.quantity_demand,
-                                quantitySelected : it.quantity,
-                                quantityRequested: it.quantity
-                        ]
-                    },
+                product                     : productsMap[it.product_id],
+                productName                 : it.name,
+                productCode                 : it.product_code,
+                requisitionItemId           : it.id,
+                requisition_id              : it.requisition_id,
+                quantityRequested           : it.quantity,
+                quantityRevised             : it.quantity_revised,
+                quantityCanceled            : it.quantity_canceled,
+                quantityConsumed            : it.quantity_demand,
+                quantityOnHand              : it.quantity_on_hand,
+                quantityAvailableToPromise  : it.quantity_available_to_promise,
+                substitutionStatus          : it.substitution_status,
+                sortOrder                   : it.sort_order,
+                reasonCode                  : it.cancel_reason_code,
+                comments                    : it.comments,
+                statusCode                  : statusCode.name(),
+                substitutionItems           : substitutionItems.collect {
+                    [
+                        product             : Product.get(it.product_id),
+                        productId           : it.product_id,
+                        productCode         : it.product_code,
+                        productName         : it.name,
+                        quantityAvailable   : it.quantity_on_hand,
+                        quantityConsumed    : it.quantity_demand,
+                        quantitySelected    : it.quantity,
+                        quantityRequested   : it.quantity
+                    ]
+                },
             ]
         }
         return editPageItems
