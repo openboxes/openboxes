@@ -112,6 +112,7 @@ class ReportController {
             csv += g.message(code: 'location.zone.label') + ","
             csv += g.message(code: 'location.binLocation.label') + ","
             csv += g.message(code: 'default.quantity.label') + ","
+            csv += g.message(code: 'default.quantityAvailableToPromise.label') + ","
             csv += g.message(code: 'product.unitCost.label') + ","
             csv += g.message(code: 'product.totalValue.label')
             csv += "\n"
@@ -136,6 +137,7 @@ class ReportController {
             csv += StringEscapeUtils.escapeCsv(binLocation?.binLocation?.zone?.name ?: '') + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.binLocation?.name ?: defaultBinLocation) + ","
             csv += binLocation.quantity + ","
+            csv += binLocation.quantityAvailableToPromise + ","
             csv += binLocation.unitCost + ","
             csv += binLocation.totalValue
             csv += "\n"
@@ -439,7 +441,7 @@ class ReportController {
                 String csv = dataService.generateCsv(lineItems)
                 response.setHeader("Content-disposition", "attachment; filename=\"StockMovementItems-CurrentStock.csv\"")
                 render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
-                return;
+                return
             }
         } catch (Exception e) {
             log.error("Unable to generate bin location report due to error: " + e.message, e)
