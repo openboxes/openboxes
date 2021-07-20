@@ -20,7 +20,7 @@ class SentryInterceptor {
     SentryClient sentryClient
 
     public SentryInterceptor() {
-        matchAll().except(uri: '/static/**').except(uri: "/info")
+        matchAll().except(uri: '/static/**').except(uri: "/info").except(uri: "/health")
     }
 
     boolean before() {
