@@ -1,0 +1,37 @@
+version: "3.8"
+services:
+    app:
+      extends: 
+        file: docker-compose-generic.yml
+        service: app
+      image: ghcr.io/openboxes/openboxes:feature-upgrade-to-grails-3.3.10
+      # Use below 'image' property (with proper tag) if you use locally-built image
+      # image: openboxes/openboxes:latest
+      environment:
+        # It's hardcoded - DB connection happens via docker network
+        DATASOURCE_URL: jdbc:mysql://db/openboxes?useSSL=false
+      depends_on: 
+        db:
+          condition: service_healthy
+
+    nginx:
+      extends: 
+        file: docker-compose-generic.yml
+        service: nginx
+      depends_on:
+        - app
+
+    db:
+      image: mysql:5.7
+      container_name: openboxes-db
+      environment:
+        MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+        MYSQL_DATABASE: openboxes
+        MYSQL_USER: ${DATASOURCE_USERNAME:-openboxes}
+        MYSQL_PASSWORD: ${DATASOURCE_PASSWORD:-openboxes}
+      volumes:
+        - ./mysql/:/var/lib/mysql/
+      healthcheck:
+        test: mysqladmin ping -h localhost -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
+        timeout: 20s
+        retries: 5
