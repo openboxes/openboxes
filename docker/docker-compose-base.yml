@@ -1,0 +1,27 @@
+version: "3.8"
+services:
+    app:
+      image: ghcr.io/openboxes/openboxes:feature-upgrade-to-grails-3.3.10
+      container_name: openboxes-app
+      expose:
+        - "8080"
+      environment:
+        DATASOURCE_USERNAME: ${DATASOURCE_USERNAME:-openboxes}
+        DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD:-openboxes}
+        DATASOURCE_URL: ${DATASOURCE_URL:-jdbc:mysql://db/openboxes?useSSL=false}
+        JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:--Xms1024m -Xmx1024m -XX:+UseParallelGC -Djava.awt.headless=true}
+      healthcheck:
+        test: "curl --fail --silent localhost:8080/openboxes/health | grep UP || exit 1"
+        interval: 10sl
+        timeout: 5s
+        retries: 5
+        start_period: 30s
+
+    nginx:
+      image: nginx:1.13
+      container_name: openboxes-nginx
+      restart: always
+      ports:
+      - 80:80
+      volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
