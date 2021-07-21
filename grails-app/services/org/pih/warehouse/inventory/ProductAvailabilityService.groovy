@@ -18,6 +18,7 @@ import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.hibernate.Criteria
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -125,20 +126,18 @@ class ProductAvailabilityService {
     }
 
     def getQuantityOnHold(Location location, Product product){
-        return ProductAvailability.createCriteria().list {
-            projections {
-                groupProperty("binLocation.id", "binLocation")
-                groupProperty("inventoryItem.id", "inventoryItem")
-                sum("quantityOnHand", "quantityOnHold")
-            }
-            eq("location", location)
-            if (product) {
-                eq("product", product)
-            }
-            inventoryItem {
-                eq("lotStatus", LotStatusCode.RECALLED)
-            }
-        }.collect { [binLocation: it[0], inventoryItem: it[1], quantityOnHold: it[2]] }
+        return ProductAvailability.executeQuery("""
+                select bl.id, it.id, sum(pa.quantityOnHand)
+                from ProductAvailability pa
+                left outer join pa.binLocation bl
+                left outer join pa.inventoryItem it
+                left outer join bl.supportedActivities sa
+                where pa.location = :location
+                and pa.product = :product
+                and (sa = :supportedActivity or it.lotStatus = :lotStatusCode)
+                group by pa.inventoryItem, pa.binLocation
+                """, [location: location, product:product, supportedActivity: ActivityCode.HOLD_STOCK.id, lotStatusCode: LotStatusCode.RECALLED]
+        ).collect { [binLocation: it[0], inventoryItem: it[1], quantityOnHold: it[2]] }
     }
 
     def saveProductAvailability(Location location, Product product, List binLocations, Boolean forceRefresh) {
