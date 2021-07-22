@@ -639,7 +639,8 @@ class EditItemsPage extends Component {
           [editPageItemIndex]: {
             $set: {
               ...editPageItem,
-              quantityOnHand: editPageItem.quantityOnHand || 0,
+              quantityOnHand: editPageItem.quantityAvailable || 0,
+              quantityAvailableToPromise: editPageItem.quantityAvailableToPromise || 0,
               substitutionItems: _.map(editPageItem.substitutionItems, sub => ({
                 ...sub,
                 requisitionItemId: editPageItem.requisitionItemId,
