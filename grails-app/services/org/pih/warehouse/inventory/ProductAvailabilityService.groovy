@@ -18,6 +18,7 @@ import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.hibernate.Criteria
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -125,20 +126,29 @@ class ProductAvailabilityService {
     }
 
     def getQuantityOnHold(Location location, Product product){
-        return ProductAvailability.createCriteria().list {
-            projections {
-                groupProperty("binLocation.id", "binLocation")
-                groupProperty("inventoryItem.id", "inventoryItem")
-                sum("quantityOnHand", "quantityOnHold")
-            }
-            eq("location", location)
-            if (product) {
-                eq("product", product)
-            }
-            inventoryItem {
-                eq("lotStatus", LotStatusCode.RECALLED)
-            }
-        }.collect { [binLocation: it[0], inventoryItem: it[1], quantityOnHold: it[2]] }
+        String query = """
+                    select bl.id as blId, it.id as itId, sum(pa.quantity_on_hand)
+                        from product_availability pa
+                        left outer join location bl on pa.bin_location_id = bl.id
+                        left outer join inventory_item it on pa.inventory_item_id = it.id
+                        left outer join location_supported_activities sa on sa.location_id = bl.id
+                        where pa.location_id = :locationId
+                        and (sa.supported_activities_string = :supportedActivity or it.lot_status = :lotStatusCode)
+                    """
+        if (product) {
+            query += " and pa.product_id = :productId "
+        }
+        query += " group by pa.inventory_item_id, pa.bin_location_id; "
+
+        Sql sql = new Sql(dataSource)
+        List data = sql.rows(query, [
+                'productId': product?.id,
+                'locationId': location?.id,
+                'supportedActivity': ActivityCode.HOLD_STOCK.id,
+                'lotStatusCode': LotStatusCode.RECALLED.toString(),
+        ]).collect { [binLocation: it[0], inventoryItem: it[1], quantityOnHold: it[2]] }
+
+        return data
     }
 
     def saveProductAvailability(Location location, Product product, List binLocations, Boolean forceRefresh) {
