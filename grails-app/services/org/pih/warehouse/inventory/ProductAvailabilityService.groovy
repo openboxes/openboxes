@@ -745,4 +745,18 @@ class ProductAvailabilityService {
             gt("quantityOnHand", 0)
         }
     }
+
+    def getQuantityAvailableToPromise(Location location, Location binLocation, InventoryItem inventoryItem) {
+        return ProductAvailability.createCriteria().get {
+            projections {
+                sum("quantityAvailableToPromise")
+            }
+
+            eq("location", location)
+            eq("inventoryItem", inventoryItem)
+            if (binLocation) {
+                eq("binLocation", binLocation)
+            }
+        }
+    }
 }

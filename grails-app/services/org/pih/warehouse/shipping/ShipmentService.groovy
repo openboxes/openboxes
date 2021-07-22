@@ -40,10 +40,8 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptStatusCode
-import org.pih.warehouse.requisition.RequisitionStatus
 import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.Errors
-import org.springframework.validation.ObjectError
 
 import javax.mail.internet.InternetAddress
 import java.math.RoundingMode
@@ -59,6 +57,7 @@ class ShipmentService {
     def identifierService
     def documentService
     def personDataService
+    def productAvailabilityService
     GrailsApplication grailsApplication
 
     /**
@@ -704,16 +703,22 @@ class ShipmentService {
                 throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
             }
 
-            // Check whether there's any stock in the bin location for the given inventory item
-            def quantityOnHand = getQuantityOnHand(origin, shipmentItem.binLocation, shipmentItem.inventoryItem, binLocationRequired)
+            def quantityAvailableToPromise = productAvailabilityService.getQuantityAvailableToPromise(origin, shipmentItem.binLocation, shipmentItem.inventoryItem)
+            def quantityPicked
+            if (shipmentItem?.binLocation) {
+                quantityPicked = shipmentItem?.requisitionItem?.picklistItems?.findAll { it.inventoryItem == shipmentItem?.inventoryItem && it.binLocation == shipmentItem?.binLocation }?.sum { it.quantity }
+            } else {
+                quantityPicked = shipmentItem?.requisitionItem?.picklistItems?.findAll { it.inventoryItem == shipmentItem?.inventoryItem }?.sum { it.quantity }
+            }
             def duplicatedShipmentItemsQuantity = getDuplicatedShipmentItemsQuantity(shipmentItem.shipment, shipmentItem.binLocation, shipmentItem.inventoryItem)
+            def quantityAvailableWithPicked = quantityAvailableToPromise?:0 + quantityPicked?:0
 
-            log.info "Shipment item quantity ${shipmentItem.quantity} vs quantity on hand ${quantityOnHand} vs duplicated shipment items quantity ${duplicatedShipmentItemsQuantity}"
+            log.info "Shipment item quantity ${shipmentItem.quantity} vs quantity available to promise ${quantityAvailableWithPicked} vs duplicated shipment items quantity ${duplicatedShipmentItemsQuantity}"
 
             log.info("Checking shipment item ${shipmentItem?.inventoryItem} quantity [" +
-                    shipmentItem.quantity + "] <= quantity on hand [" + quantityOnHand + "]")
-            if (duplicatedShipmentItemsQuantity > quantityOnHand && origin.supports(ActivityCode.MANAGE_INVENTORY)) {
-                String errorMessage = "Shipping quantity (${shipmentItem.quantity}) can not exceed on hand quantity (${quantityOnHand}) for " +
+                    shipmentItem.quantity + "] <= quantity available to promise [" + quantityAvailableWithPicked + "]")
+            if (duplicatedShipmentItemsQuantity > quantityAvailableWithPicked && origin.supports(ActivityCode.MANAGE_INVENTORY)) {
+                String errorMessage = "Shipping quantity (${shipmentItem.quantity}) can not exceed quantity available (${quantityAvailableWithPicked}) for " +
                         "product code ''${shipmentItem.product.productCode}'' " +
                         "and lot number ''${shipmentItem?.inventoryItem?.lotNumber}'' " +
                         "at origin ''${origin.name}'' " +
@@ -723,7 +728,7 @@ class ShipmentService {
                 shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedAvailableQuantity",
                         [
                                 shipmentItem.quantity + " " + shipmentItem?.product?.unitOfMeasure,
-                                quantityOnHand + " " + shipmentItem?.product?.unitOfMeasure,
+                                quantityAvailableWithPicked + " " + shipmentItem?.product?.unitOfMeasure,
                                 shipmentItem?.product?.productCode,
                                 shipmentItem?.inventoryItem?.lotNumber,
                                 origin.name,
@@ -774,55 +779,6 @@ class ShipmentService {
         }
 
         return results[0] ?: 0
-    }
-
-    /**
-     * Get quantity on hand for the given bin location and inventory item stored at the given location.
-     *
-     * @param location
-     * @param binLocation
-     * @param inventoryItem
-     * @return
-     */
-    Integer getQuantityOnHand(Location location, Location binLocation, InventoryItem inventoryItem, boolean binLocationRequired) {
-        List transactionEntries = getTransactionEntries(location, inventoryItem?.product)
-        List binLocations = inventoryService.getQuantityByBinLocation(transactionEntries)
-
-        // Filter by inventory item
-        if (inventoryItem) {
-            binLocations = binLocations.findAll { it.inventoryItem == inventoryItem }
-        }
-
-        // Bin location validation is required when picking to ensure that we don't
-        // pick from the Default bin if it doesn't have any stock
-        if (binLocationRequired) {
-            binLocations = binLocations.findAll { it.binLocation == binLocation }
-        }
-
-        def quantityOnHand = binLocations.sum { it.quantity }
-        return quantityOnHand ?: 0
-    }
-
-
-    /**
-     * Get all transaction entries for the given bin location and inventory item.
-     *
-     * @param inventoryInstance
-     * @return
-     */
-    List getTransactionEntries(Location location, Product product) {
-        def criteria = TransactionEntry.createCriteria()
-        def transactionEntries = criteria.list {
-            inventoryItem {
-                eq("product", product)
-            }
-            transaction {
-                eq("inventory", location.inventory)
-                order("transactionDate", "asc")
-                order("dateCreated", "asc")
-            }
-        }
-        return transactionEntries
     }
 
 
