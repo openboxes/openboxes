@@ -8,6 +8,7 @@ import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import { getTranslate } from 'react-localize-redux';
 import { confirmAlert } from 'react-confirm-alert';
+import { Tooltip } from 'react-tippy';
 
 import moment from 'moment';
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -146,7 +147,33 @@ const FIELDS = {
     isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
+    getDynamicRowAttr: ({ rowValues }) => ({ className: rowValues.recalled ? 'recalled-row ' : '' }),
     fields: {
+      recalled: {
+        type: (params) => {
+          const { fieldValue } = params;
+          if (fieldValue) {
+            return (
+              <div className="d-flex align-items-center justify-content-center">
+                <Tooltip
+                  html={params.translate('react.stockMovement.recalledLot.message', 'This lot has been recalled')}
+                  theme="transparent"
+                  delay="150"
+                  duration="250"
+                  hideDelay="50"
+                >
+                  {/* &#x24C7; = hexadecimal circled letter R */}
+                  <b>&#x24C7;</b>
+                </Tooltip>
+              </div>
+            );
+          }
+          return null;
+        },
+        label: '',
+        defaultMessage: '',
+        flexWidth: '0.5',
+      },
       palletName: {
         type: LabelField,
         label: 'react.stockMovement.packLevel1.label',
@@ -868,6 +895,7 @@ class SendMovementPage extends Component {
                         isRowLoaded: this.isRowLoaded,
                         isPaginated: this.props.isPaginated,
                         isFirstPageLoaded: this.state.isFirstPageLoaded,
+                        translate: this.props.translate,
                       }))}
                 </div>
               </div>
