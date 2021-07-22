@@ -430,8 +430,14 @@ class EditPageItem {
     List<SubstitutionItem> availableSubstitutions
     List<SubstitutionItem> substitutionItems
 
+    // This is quantity on hand
+    // TODO: refactor into quantity on hand when every stock movement type will display both QATP and QoH
     Integer getQuantityAvailable() {
         availableItems ? availableItems.sum { it.quantityOnHand } : null
+    }
+
+    Integer getQuantityAvailableToPromise() {
+        availableItems ? availableItems.sum { it.quantityAvailable } : null
     }
 
     Integer getQuantityAfterCancellation() {
@@ -477,24 +483,25 @@ class EditPageItem {
 
     Map toJson() {
         return [
-                requisitionItemId     : requisitionItem.id,
-                statusCode            : requisitionItem.status.name(),
-                reasonCode            : requisitionItem?.cancelReasonCode,
-                comments              : requisitionItem?.comment,
-                productId             : productId,
-                productCode           : productCode,
-                productName           : productName,
-                product               : requisitionItem?.product,
-                minExpirationDate     : minExpirationDate?.format("MM/dd/yyyy"),
-                quantityRequested     : quantityRequested,
-                quantityRevised       : quantityRevised,
-                quantityConsumed      : quantityConsumed,
-                quantityAvailable     : quantityAvailable,
-                totalMonthlyQuantity  : totalMonthlyQuantity,
-                substitutionStatus    : substitutionStatusCode,
-                availableSubstitutions: availableSubstitutions,
-                substitutionItems     : substitutionItems,
-                sortOrder             : sortOrder
+            requisitionItemId           : requisitionItem.id,
+            statusCode                  : requisitionItem.status.name(),
+            reasonCode                  : requisitionItem?.cancelReasonCode,
+            comments                    : requisitionItem?.comment,
+            productId                   : productId,
+            productCode                 : productCode,
+            productName                 : productName,
+            product                     : requisitionItem?.product,
+            minExpirationDate           : minExpirationDate?.format("MM/dd/yyyy"),
+            quantityRequested           : quantityRequested,
+            quantityRevised             : quantityRevised,
+            quantityConsumed            : quantityConsumed,
+            quantityAvailableToPromise  : quantityAvailableToPromise,
+            quantityAvailable           : quantityAvailable,
+            totalMonthlyQuantity        : totalMonthlyQuantity,
+            substitutionStatus          : substitutionStatusCode,
+            availableSubstitutions      : availableSubstitutions,
+            substitutionItems           : substitutionItems,
+            sortOrder                   : sortOrder
         ]
     }
 }
