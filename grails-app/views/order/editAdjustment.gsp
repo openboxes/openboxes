@@ -31,8 +31,7 @@
 				<h2><warehouse:message code="order.orderAjustments.label" default="Order Adjustments"/></h2>
 				<g:form name="orderAdjustmentForm" action="saveAdjustment">
 					<g:hiddenField name="id" value="${orderAdjustment?.id}" />
-					<g:hiddenField id="isAccountingRequired" name="isAccountingRequired"
-								   value="${orderInstance?.destination?.isAccountingRequired()}">
+					<g:hiddenField id="isAccountingRequired" name="isAccountingRequired" value="${isAccountingRequired}">
 					</g:hiddenField>
 					<table>
 						<tbody>

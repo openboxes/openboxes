@@ -16,8 +16,7 @@
                     <format:product product="${orderItem.product}"/>
                     <g:hiddenField id="dlgProduct" name="product.id" value="${orderItem?.product?.id}"/>
                     <g:hiddenField id="dlgSupplierId" name="supplier.id" value="${orderItem?.order?.originParty?.id }"></g:hiddenField>
-                    <g:hiddenField id="isAccountingRequired" name="isAccountingRequired"
-                                   value="${orderItem?.order?.destination?.isAccountingRequired()}">
+                    <g:hiddenField id="isAccountingRequired" name="isAccountingRequired" value="${isAccountingRequired}">
                     </g:hiddenField>
                 </td>
             </tr>
@@ -173,8 +172,7 @@
                     <format:product product="${orderItem.product}"/>
                     <g:hiddenField id="dlgProduct" name="product.id" value="${orderItem?.product?.id}"/>
                     <g:hiddenField id="dlgSupplierId" name="supplier.id" value="${orderItem?.order?.originParty?.id }"></g:hiddenField>
-                    <g:hiddenField id="isAccountingRequired" name="isAccountingRequired"
-                                   value="${orderItem?.order?.destination?.isAccountingRequired()}">
+                    <g:hiddenField id="isAccountingRequired" name="isAccountingRequired" value="${isAccountingRequired}">
                     </g:hiddenField>
                 </td>
             </tr>
