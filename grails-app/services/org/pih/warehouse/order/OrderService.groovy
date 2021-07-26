@@ -579,7 +579,7 @@ class OrderService {
      * @param orderItems
      * @return
      */
-    boolean importOrderItems(String orderId, String supplierId, List orderItems) {
+    boolean importOrderItems(String orderId, String supplierId, List orderItems, Location currentLocation) {
 
         int count = 0
         try {
@@ -624,7 +624,7 @@ class OrderService {
                         if (!product) {
                             throw new ProductException("Unable to locate product with product code ${productCode}")
                         }
-                        if (order.destination.isAccountingRequired() && !product.glAccount) {
+                        if (currentLocation.isAccountingRequired() && !product.glAccount) {
                             throw new ProductException("Product ${productCode}: Cannot add order item without a valid general ledger code")
                         }
                         orderItem.product = product
@@ -720,7 +720,7 @@ class OrderService {
                     }
                     orderItem.actualReadyDate = actReadyDate
 
-                    if (order.destination.isAccountingRequired() && !code) {
+                    if (currentLocation.isAccountingRequired() && !code) {
                         throw new IllegalArgumentException("Budget code is required.")
                     }
                     BudgetCode budgetCode = BudgetCode.findByCode(code)
