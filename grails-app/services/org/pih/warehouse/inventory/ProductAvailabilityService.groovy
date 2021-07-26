@@ -179,7 +179,7 @@ class ProductAvailabilityService {
         Integer onHandQuantity = entry.quantity?:0
         Integer quantityAllocated = entry.quantityAllocated?:0
         Integer quantityOnHold = entry.quantityOnHold?:0
-        Integer quantityAvailableToPromise = calculateQuantityAvailableToPromise(onHandQuantity, quantityAllocated, quantityOnHold)
+        Integer quantityAvailableToPromise = onHandQuantity - quantityAllocated - quantityOnHold
         def insertStatement =
                 "INSERT INTO product_availability (id, version, location_id, product_id, product_code, " +
                         "inventory_item_id, lot_number, bin_location_id, bin_location_name, " +
@@ -190,14 +190,6 @@ class ProductAvailabilityService {
                         "${binLocationId}, ${binLocationName}, ${onHandQuantity}, ${quantityAllocated}, ${quantityOnHold}, ${quantityAvailableToPromise}, now(), now()) " +
                         "ON DUPLICATE KEY UPDATE quantity_on_hand=${onHandQuantity}, quantity_allocated=${quantityAllocated}, quantity_on_hold=${quantityOnHold}, quantity_available_to_promise=${quantityAvailableToPromise}, version=version+1, last_updated=now()"
         return insertStatement
-    }
-
-    Integer calculateQuantityAvailableToPromise(Integer onHandQuantity, Integer quantityAllocated, Integer quantityOnHold) {
-        if (onHandQuantity == quantityOnHold) {
-            return 0
-        }
-        def quantityAvailableToPromise = onHandQuantity - quantityAllocated - quantityOnHold
-        return quantityAvailableToPromise >= 0 ? quantityAvailableToPromise : 0
     }
 
     def transformBinLocations(List binLocations, List picked) {
