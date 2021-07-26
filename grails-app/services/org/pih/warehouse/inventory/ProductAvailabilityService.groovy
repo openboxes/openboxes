@@ -105,50 +105,22 @@ class ProductAvailabilityService {
 
     def calculateBinLocations(Location location, Date date) {
         def binLocations = inventoryService.getBinLocationDetails(location, date)
-        binLocations = transformBinLocations(binLocations, [], [])
+        binLocations = transformBinLocations(binLocations, [])
         return binLocations
     }
 
     def calculateBinLocations(Location location) {
         def binLocations = inventoryService.getBinLocationDetails(location)
         def picked = picklistService.getQuantityPickedByProductAndLocation(location, null)
-        def onHold = getQuantityOnHold(location, null)
-        binLocations = transformBinLocations(binLocations, picked, onHold)
+        binLocations = transformBinLocations(binLocations, picked)
         return binLocations
     }
 
     def calculateBinLocations(Location location, Product product) {
         def binLocations = inventoryService.getProductQuantityByBinLocation(location, product, Boolean.TRUE)
         def picked = picklistService.getQuantityPickedByProductAndLocation(location, product)
-        def onHold = getQuantityOnHold(location, product)
-        binLocations = transformBinLocations(binLocations, picked, onHold)
+        binLocations = transformBinLocations(binLocations, picked)
         return binLocations
-    }
-
-    def getQuantityOnHold(Location location, Product product){
-        String query = """
-                    select bl.id as blId, it.id as itId, sum(pa.quantity_on_hand)
-                        from product_availability pa
-                        left outer join location bl on pa.bin_location_id = bl.id
-                        left outer join inventory_item it on pa.inventory_item_id = it.id
-                        left outer join location_supported_activities sa on sa.location_id = bl.id
-                        where pa.location_id = :locationId
-                        and (sa.supported_activities_string = :supportedActivity or it.lot_status = :lotStatusCode)
-                    """
-        if (product) {
-            query += " and pa.product_id = :productId "
-        }
-        query += " group by pa.inventory_item_id, pa.bin_location_id; "
-
-        Sql sql = new Sql(dataSource)
-        List data = sql.rows(query, [
-                'productId': product?.id,
-                'locationId': location?.id,
-                'supportedActivity': ActivityCode.HOLD_STOCK.id,
-                'lotStatusCode': LotStatusCode.RECALLED.toString(),
-        ]).collect { [binLocation: it[0], inventoryItem: it[1], quantityOnHold: it[2]] }
-
-        return data
     }
 
     def saveProductAvailability(Location location, Product product, List binLocations, Boolean forceRefresh) {
@@ -228,7 +200,7 @@ class ProductAvailabilityService {
         return quantityAvailableToPromise >= 0 ? quantityAvailableToPromise : 0
     }
 
-    def transformBinLocations(List binLocations, List picked, List onHold) {
+    def transformBinLocations(List binLocations, List picked) {
         def binLocationsTransformed = binLocations.collect {
             [
                 product          : [id: it?.product?.id, productCode: it?.product?.productCode, name: it?.product?.name],
@@ -236,7 +208,7 @@ class ProductAvailabilityService {
                 binLocation      : [id: it?.binLocation?.id, name: it?.binLocation?.name],
                 quantity         : it.quantity,
                 quantityAllocated: picked ? (picked.find { row -> row.binLocation == it?.binLocation?.id && row.inventoryItem == it?.inventoryItem?.id }?.quantityAllocated?:0) : 0,
-                quantityOnHold   : onHold ? (onHold.find { row -> row.binLocation == it?.binLocation?.id && row.inventoryItem == it?.inventoryItem?.id }?.quantityOnHold?:0) : 0
+                quantityOnHold   : it?.binLocation?.supports(ActivityCode.HOLD_STOCK) || it?.inventoryItem?.lotStatus == LotStatusCode.RECALLED ? it.quantity : 0
             ]
         }
 
