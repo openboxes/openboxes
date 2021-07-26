@@ -26,7 +26,7 @@ class SecurityInterceptor {
     def authService
 
     public SecurityInterceptor() {
-        matchAll().except(uri: '/static/**').except(controller: "errors").except(uri: "/info")
+        matchAll().except(uri: '/static/**').except(controller: "errors").except(uri: "/info").except(uri: "/health")
     }
 
     void afterView() {
