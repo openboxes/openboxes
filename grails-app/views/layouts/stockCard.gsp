@@ -33,6 +33,10 @@
 		.recalled {
 			background-color: #ffcccb !important;
 		}
+
+		.restricted {
+			background-color: #fca714 !important;
+		}
 	</style>
 </head>
 <body>
