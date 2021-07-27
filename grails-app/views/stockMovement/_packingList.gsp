@@ -2,8 +2,8 @@
 <g:set var="shipmentInstance" value="${stockMovement?.shipment}"/>
 <g:set var="shipmentItemsByContainer" value="${shipmentInstance?.shipmentItems?.groupBy { it.container } }"/>
 <style>
-    .recalled-lot {
-        background: linear-gradient(0deg, rgba(221,221,221,1) 0%, rgba(255,255,255,1) 50%, rgba(221,221,221,1) 100%);
+    .recalled {
+        background-color: #ffcccb;
     }
 </style>
 <div id="packingList" class="box dialog">
@@ -47,7 +47,7 @@
             <g:each var="shipmentItem" in="${shipmentInstance.sortShipmentItemsBySortOrder()}" status="i">
                 <g:set var="rowspan" value="${shipmentItemsByContainer[shipmentItem?.container]?.size() }"/>
                 <g:set var="newContainer" value="${previousContainer != shipmentItem?.container }"/>
-                <tr class="prop ${(count++ % 2 == 0)?'odd':'even'} ${newContainer?'new-container':''} ${shipmentItem?.hasRecalledLot?'recalled-lot':''} shipmentItem">
+                <tr class="prop ${(count++ % 2 == 0)?'odd':'even'} ${newContainer?'new-container':''} ${shipmentItem?.hasRecalledLot?'recalled':''} shipmentItem">
                     <td>
                         <g:if test="${shipmentItem?.hasRecalledLot}">
                             <div data-toggle="tooltip" data-placement="top" title="${g.message(code:'inventoryItem.recalledLot.label')}">

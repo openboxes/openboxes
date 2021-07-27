@@ -620,8 +620,8 @@ tr.crossed-out td:before {
   background-color: $white-alpha;
 }
 
-.recalled-row {
-  background: linear-gradient(0deg, rgba(222,226,230,1) 0%, rgba(255,255,255,1) 50%, rgba(222,226,230,1) 100%);
+.recalled {
+  background-color: $red-delta;
 }
 
 .table-row {
