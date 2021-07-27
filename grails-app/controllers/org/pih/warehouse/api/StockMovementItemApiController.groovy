@@ -16,8 +16,6 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.requisition.RequisitionItem
-import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.shipping.ShipmentItem
 
 class StockMovementItemApiController {
 
@@ -143,7 +141,7 @@ class StockMovementItemApiController {
 
         stockMovementService.substituteItem(stockMovementItem)
 
-        EditPageItem editPageItem = stockMovementService.buildEditPageItem(stockMovementItem)
+        def editPageItem = stockMovementService.getEditPageItem(stockMovementItem)
 
         render([data: editPageItem] as JSON)
     }
@@ -153,7 +151,7 @@ class StockMovementItemApiController {
 
         stockMovementService.revertItem(stockMovementItem)
 
-        EditPageItem editPageItem = stockMovementService.buildEditPageItem(stockMovementItem)
+        def editPageItem = stockMovementService.getEditPageItem(stockMovementItem)
 
         render([data: editPageItem] as JSON)
     }
