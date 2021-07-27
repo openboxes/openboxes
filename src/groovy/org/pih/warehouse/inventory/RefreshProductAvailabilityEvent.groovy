@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.inventory
 
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.picklist.PicklistItem
 import org.springframework.context.ApplicationEvent
 
@@ -25,6 +26,14 @@ class RefreshProductAvailabilityEvent extends ApplicationEvent {
         this.productIds = source.associatedProducts
         this.forceRefresh = source.forceRefresh
         this.disableRefresh = source.disableRefresh
+    }
+
+    RefreshProductAvailabilityEvent(Location source) {
+        super(source)
+        this.locationId = source?.isBinLocation() ?source?.parentLocation?.id : source?.id
+        this.productIds = []
+        this.forceRefresh = forceRefresh
+        this.disableRefresh = disableRefresh
     }
 
     RefreshProductAvailabilityEvent(InventoryItem source) {
