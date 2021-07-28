@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?><databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="dbienkowska" id="2707202116100-0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="inventory_level" columnName="replenishment_period_days"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="inventory_level">
+            <column name="replenishment_period_days" type="DECIMAL(19,2)"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>
