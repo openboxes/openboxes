@@ -11,6 +11,7 @@
 import com.mchange.v2.c3p0.ComboPooledDataSource
 import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
 import org.pih.warehouse.jobs.PersistenceContextJobListener
+import org.springframework.integration.sftp.session.DefaultSftpSessionFactory
 
 beans = {
 
@@ -23,6 +24,14 @@ beans = {
         quartzPersistenceContextJobListener(PersistenceContextJobListener) {
             persistenceInterceptor = ref('persistenceInterceptor')
         }
+    }
+
+    sftpSessionFactory(DefaultSftpSessionFactory) { bean ->
+        host = "localhost"
+        port = 22
+        user = "jmiranda"
+        password = "password"
+        timeout = 2000
     }
 
     /**

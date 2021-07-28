@@ -123,6 +123,10 @@ grails.project.dependency.resolution = {
         // REST client
         compile 'org.apache.httpcomponents:httpclient:4.5.12'
 
+        // Spring Data integration
+        compile "org.springframework.integration:spring-integration-core:3.0.5.RELEASE"
+        compile "org.springframework.integration:spring-integration-sftp:3.0.5.RELEASE"
+
         // for com.google.common
         compile 'com.google.guava:guava:12.0'
 
