@@ -19,7 +19,6 @@ import org.pih.warehouse.requisition.RequisitionItem
 
 class StockMovementItemApiController {
 
-    def inventoryService
     def stockMovementService
 
     def list = {
@@ -43,7 +42,7 @@ class StockMovementItemApiController {
     def getSubstitutionItems = {
         RequisitionItem requisitionItem = RequisitionItem.load(params.id)
         def location = Location.get(session.warehouse.id)
-        List<SubstitutionItem> substitutionItems = stockMovementService.getAvailableSubstitutions(location, requisitionItem.product)
+        List<SubstitutionItem> substitutionItems = stockMovementService.getAvailableSubstitutions(location, requisitionItem)
         render([data: substitutionItems] as JSON)
     }
 
@@ -53,7 +52,7 @@ class StockMovementItemApiController {
         log.debug "JSON " + jsonObject.toString(4)
         StockMovementItem stockMovementItem = stockMovementService.getStockMovementItem(params.id)
 
-        stockMovementService.removeShipmentItemsForModifiedRequisitionItem(stockMovementItem)
+        stockMovementService.removeShipmentAndPicklistItemsForModifiedRequisitionItem(stockMovementItem)
 
         log.debug("Updating picklist items")
         List picklistItems = jsonObject.remove("picklistItems")
@@ -109,7 +108,7 @@ class StockMovementItemApiController {
     def clearPicklist = {
         StockMovementItem stockMovementItem = stockMovementService.getStockMovementItem(params.id)
 
-        stockMovementService.removeShipmentItemsForModifiedRequisitionItem(stockMovementItem)
+        stockMovementService.removeShipmentAndPicklistItemsForModifiedRequisitionItem(stockMovementItem)
 
         log.debug "Clear picklist for stock movement item ${stockMovementItem}"
         stockMovementService.clearPicklist(stockMovementItem)
@@ -159,7 +158,7 @@ class StockMovementItemApiController {
     def cancelItem = {
         StockMovementItem stockMovementItem = stockMovementService.getStockMovementItem(params.id)
 
-        stockMovementService.removeShipmentItemsForModifiedRequisitionItem(stockMovementItem)
+        stockMovementService.removeShipmentAndPicklistItemsForModifiedRequisitionItem(stockMovementItem)
 
         RequisitionItem requisitionItem = stockMovementItem.requisitionItem
 

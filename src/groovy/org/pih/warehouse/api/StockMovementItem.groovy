@@ -369,6 +369,10 @@ class SubstitutionItem {
     }
 
     Integer getQuantityAvailable() {
+        availableItems ? availableItems.sum { it.quantityAvailable } : 0
+    }
+
+    Integer getQuantityOnHand() {
         availableItems ? availableItems.sum { it.quantityOnHand } : 0
     }
 
@@ -380,6 +384,7 @@ class SubstitutionItem {
                 product          : product,
                 minExpirationDate: minExpirationDate?.format("MM/dd/yyyy"),
                 quantityAvailable: quantityAvailable,
+                quantityOnHand   : quantityOnHand,
                 quantityConsumed : quantityConsumed,
                 quantitySelected : quantitySelected,
                 quantityRequested: quantitySelected,

@@ -11,6 +11,7 @@ CREATE OR REPLACE VIEW substitution_item AS
         requisition_item.order_index as sort_order,
         requisition_item.quantity,
         p_a.quantity_on_hand,
+        p_a.quantity_available_to_promise,
         product_stocklist.quantity_demand
     FROM
         requisition_item
@@ -24,7 +25,8 @@ CREATE OR REPLACE VIEW substitution_item AS
             LEFT OUTER JOIN (
                 SELECT product_availability.product_id as product_id,
                        product_availability.location_id as location_id,
-                       ifnull(sum(quantity_on_hand), 0) as quantity_on_hand
+                       ifnull(sum(quantity_on_hand), 0) as quantity_on_hand,
+                       ifnull(sum(quantity_available_to_promise), 0) as quantity_available_to_promise
                 FROM product_availability
                 GROUP BY location_id, product_id
             ) p_a ON p_a.product_id = requisition_item.product_id
