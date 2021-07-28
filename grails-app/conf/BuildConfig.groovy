@@ -42,6 +42,7 @@ grails.project.dependency.resolution = {
         mavenRepo "https://repo.grails.org/grails/plugins/"
         mavenRepo "https://repo.grails.org/grails/core/"
         mavenRepo "https://oss.sonatype.org/content/repositories/snapshots/"
+        mavenRepo "http://insecure.repo1.maven.org/maven2"
     }
 
     dependencies {
@@ -125,6 +126,12 @@ grails.project.dependency.resolution = {
 
         // for com.google.common
         compile 'com.google.guava:guava:12.0'
+
+        // Spring Data integration
+        compile "org.springframework.integration:spring-integration-core:3.0.5.RELEASE"
+        compile "org.springframework.integration:spring-integration-sftp:3.0.5.RELEASE"
+
+
     }
     plugins {
 
@@ -196,6 +203,7 @@ grails.project.dependency.resolution = {
         test(name: 'geb', version: '0.6.3') {}
         test ":code-coverage:1.2.5" //2.0.3-3
         compile ":build-test-data:1.1.1"
+        //compile ":zap-security-tests:0.1.2"
 
         // Dependencies that we want to use but cannot due to errors
         //compile ":standalone:1.0"
