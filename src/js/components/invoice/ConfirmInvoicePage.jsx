@@ -434,14 +434,15 @@ class ConfirmInvoicePage extends Component {
                 >
                   <Translate id="react.invoice.submit.label" defaultMessage="Submit for Approval" />
                 </button>
-                <button
-                  type="submit"
-                  onClick={() => { this.postInvoice(); }}
-                  className="btn btn-outline-success float-right btn-form btn-xs"
-                  disabled={this.state.values.datePosted}
-                >
-                  <Translate id="react.invoice.post.label" defaultMessage="Post Invoice" />
-                </button>
+                {this.props.isSuperuser &&
+                  <button
+                    type="submit"
+                    onClick={() => { this.postInvoice(); }}
+                    className="btn btn-outline-success float-right btn-form btn-xs"
+                    disabled={this.state.values.datePosted}
+                  >
+                    <Translate id="react.invoice.post.label" defaultMessage="Post Invoice" />
+                  </button>}
               </div>
               <div className="my-2 table-form">
                 {_.map(INVOICE_ITEMS, (fieldConfig, fieldName) =>
@@ -464,6 +465,7 @@ class ConfirmInvoicePage extends Component {
 
 const mapStateToProps = state => ({
   pageSize: state.session.pageSize,
+  isSuperuser: state.session.isSuperuser,
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner })(ConfirmInvoicePage);
@@ -478,4 +480,5 @@ ConfirmInvoicePage.propTypes = {
   /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
   pageSize: PropTypes.number.isRequired,
+  isSuperuser: PropTypes.bool.isRequired,
 };
