@@ -10,10 +10,19 @@
 
 import com.mchange.v2.c3p0.ComboPooledDataSource
 import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
+import org.springframework.integration.sftp.session.DefaultSftpSessionFactory
 
 beans = {
 
     customPropertyEditorRegistrar(util.CustomPropertyEditorRegistrar)
+
+    sftpSessionFactory(DefaultSftpSessionFactory) { bean ->
+        host = "localhost"
+        port = 22
+        user = "jmiranda"
+        password = "password"
+        timeout = 2000
+    }
 
     /**
      * c3P0 pooled data source that allows 'DB keepalive' queries
