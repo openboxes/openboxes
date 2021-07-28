@@ -86,7 +86,7 @@ class OrderAdjustment implements Serializable {
             JOIN ii.invoice i
             JOIN ii.orderAdjustments oa
             WHERE oa.id = :id 
-            AND i.dateSubmitted IS NOT NULL
+            AND i.datePosted IS NOT NULL
           """, [id: id])
     }
 

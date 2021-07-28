@@ -221,6 +221,11 @@ class InvoiceService {
         invoice.save()
     }
 
+    def postInvoice(Invoice invoice) {
+        invoice.datePosted = new Date()
+        invoice.save()
+    }
+
     Invoice generatePrepaymentInvoice(Order order) {
         if (order.orderItems.any { it.hasInvoices } || order.orderAdjustments.any { it.hasInvoices }) {
             throw new Exception("Some order items or order adjustments for this order already have been invoiced")

@@ -317,7 +317,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
             JOIN ii.shipmentItems si
             JOIN si.orderItems oi
             WHERE oi.id = :id 
-            AND i.dateSubmitted IS NOT NULL
+            AND i.datePosted IS NOT NULL
           """, [id: id])?.first() ?: 0
     }
 
