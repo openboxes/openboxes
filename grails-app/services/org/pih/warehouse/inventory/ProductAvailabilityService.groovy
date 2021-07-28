@@ -738,6 +738,7 @@ class ProductAvailabilityService {
         }
     }
 
+    // Get quantity available to promise (with negative values)
     def getQuantityAvailableToPromise(Location location, Location binLocation, InventoryItem inventoryItem) {
         return ProductAvailability.createCriteria().get {
             projections {

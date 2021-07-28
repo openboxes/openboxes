@@ -711,7 +711,7 @@ class ShipmentService {
                 quantityPicked = shipmentItem?.requisitionItem?.picklistItems?.findAll { it.inventoryItem == shipmentItem?.inventoryItem }?.sum { it.quantity }
             }
             def duplicatedShipmentItemsQuantity = getDuplicatedShipmentItemsQuantity(shipmentItem.shipment, shipmentItem.binLocation, shipmentItem.inventoryItem)
-            def quantityAvailableWithPicked = quantityAvailableToPromise?:0 + quantityPicked?:0
+            def quantityAvailableWithPicked = quantityAvailableToPromise + quantityPicked
 
             log.info "Shipment item quantity ${shipmentItem.quantity} vs quantity available to promise ${quantityAvailableWithPicked} vs duplicated shipment items quantity ${duplicatedShipmentItemsQuantity}"
 
