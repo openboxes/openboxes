@@ -32,13 +32,13 @@
                 <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
                 <warehouse:message code="invoice.editInvoice.label" default="Edit Invoice"/>
             </g:link>
-            <g:if test="${invoiceInstance?.dateSubmitted}">
+            <g:if test="${invoiceInstance?.datePosted}">
                 <g:link name="invoiceRollback" class="button" controller="invoice" action="rollback" id="${invoiceInstance?.id}">
                     <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
                     <warehouse:message code="invoice.rollback.label" default="Rollback"/>
                 </g:link>
             </g:if>
-            <g:if test="${!invoiceInstance?.dateSubmitted}">
+            <g:if test="${!invoiceInstance?.datePosted}">
                 <g:link class="button" controller="invoice" action="eraseInvoice" id="${invoiceInstance?.id}"
                         onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
                     <img src="${createLinkTo(dir:'images/icons/silk', file:'delete.png')}" />

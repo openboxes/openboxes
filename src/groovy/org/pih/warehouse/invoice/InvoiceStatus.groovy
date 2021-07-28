@@ -11,9 +11,11 @@ package org.pih.warehouse.invoice
 
 enum InvoiceStatus {
 
-    PENDING(10),
-    POSTED(20),
-    PAID(30)
+    PENDING(0),  // Drafted
+    INVOICED(10), // Invoice has been issued / received
+    SUBMITTED(20), // Invoice has been submitted for approval
+    POSTED(30),  // Invoice has been posted
+    PAID(40) // Invoice has been paid
 
     int sortOrder
 
@@ -24,7 +26,7 @@ enum InvoiceStatus {
     }
 
     static list() {
-        [PENDING, POSTED, PAID]
+        [PENDING, INVOICED, SUBMITTED, POSTED, PAID]
     }
 
     String toString() { return name() }

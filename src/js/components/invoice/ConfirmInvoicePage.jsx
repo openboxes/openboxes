@@ -311,6 +311,15 @@ class ConfirmInvoicePage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  postInvoice() {
+    const url = `/openboxes/api/invoices/${this.state.values.id}/post`;
+    apiClient.post(url)
+      .then(() => {
+        window.location = `/openboxes/invoice/show/${this.state.values.id}`;
+      })
+      .catch(() => this.props.hideSpinner());
+  }
+
   fetchPrepaymentItems() {
     const url = `/openboxes/api/invoices/${this.state.values.id}/prepaymentItems`;
     apiClient.get(url)
@@ -411,7 +420,7 @@ class ConfirmInvoicePage extends Component {
                 <button
                   className="btn btn-outline-primary btn-form btn-xs"
                   onClick={() => this.props.previousPage(this.state.values)}
-                  disabled={this.state.values.dateSubmitted ||
+                  disabled={this.state.values.datePosted ||
                     this.state.values.invoiceType === PREPAYMENT_INVOICE ||
                     this.state.values.hasPrepaymentInvoice}
                 >
@@ -422,6 +431,14 @@ class ConfirmInvoicePage extends Component {
                   onClick={() => { this.submitInvoice(); }}
                   className="btn btn-outline-success float-right btn-form btn-xs"
                   disabled={this.state.values.dateSubmitted}
+                >
+                  <Translate id="react.invoice.submit.label" defaultMessage="Submit for Approval" />
+                </button>
+                <button
+                  type="submit"
+                  onClick={() => { this.postInvoice(); }}
+                  className="btn btn-outline-success float-right btn-form btn-xs"
+                  disabled={this.state.values.datePosted}
                 >
                   <Translate id="react.invoice.post.label" defaultMessage="Post Invoice" />
                 </button>

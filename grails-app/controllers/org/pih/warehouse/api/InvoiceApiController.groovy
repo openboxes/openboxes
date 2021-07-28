@@ -92,7 +92,7 @@ class InvoiceApiController {
         if (!invoice.invoiceType) {
             invoice.invoiceType = InvoiceType.findByCode(InvoiceTypeCode.INVOICE)
         }
-        
+
         invoice.party = Organization.get(jsonObject?.vendor)
 
         // TODO: find or create vendor invoice number in reference numbers
@@ -144,12 +144,19 @@ class InvoiceApiController {
         if (!invoice) {
             throw new IllegalArgumentException("No Invoice found for invoice ID ${params.id}")
         }
-
         invoiceService.submitInvoice(invoice)
-
         render([data: invoice?.toJson()] as JSON)
-
     }
+
+    def postInvoice = {
+        Invoice invoice = Invoice.get(params.id)
+        if (!invoice) {
+            throw new IllegalArgumentException("No Invoice found for invoice ID ${params.id}")
+        }
+        invoiceService.postInvoice(invoice)
+        render([data: invoice?.toJson()] as JSON)
+    }
+
 
     def getPrepaymentItems = {
         Invoice invoice = Invoice.get(params.id)

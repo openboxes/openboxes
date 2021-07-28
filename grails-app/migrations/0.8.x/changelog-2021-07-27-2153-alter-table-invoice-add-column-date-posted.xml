@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="jmiranda" id="1627440880116-1">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="invoice" columnName="date_posted"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="invoice">
+      <column name="date_posted" type="DATETIME"/>
+    </addColumn>
+  </changeSet>
+  <changeSet author="jmiranda" id="1627440880116-2">
+    <preConditions onFail="MARK_RAN">
+      <columnExists tableName="invoice" columnName="date_posted"/>
+    </preConditions>
+    <sql>
+      UPDATE invoice SET date_posted = date_submitted WHERE date_submitted IS NOT NULL;
+    </sql>
+  </changeSet>
+
+</databaseChangeLog>
+

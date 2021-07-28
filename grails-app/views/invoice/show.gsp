@@ -166,7 +166,7 @@
                                         <label><warehouse:message code="invoice.submitted.label"/></label>
                                     </td>
                                     <td valign="top" class="value">
-                                        <div><format:date obj="${invoiceInstance?.dateSubmitted}"/></div>
+                                        <div><format:date obj="${invoiceInstance?.datePosted}"/></div>
                                     </td>
                                 </tr>
                             </table>
