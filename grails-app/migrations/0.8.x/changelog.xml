@@ -130,4 +130,5 @@
     <include file="0.8.x/changelog-2021-06-24-1830-migrate-order-type-code-into-order-type.xml"/>
     <include file="0.8.x/changelog-2021-06-25-1810-alter-table-invoice-item-add-column-unit-price.xml"/>
     <include file="0.8.x/changelog-2021-07-08-1530-add-hold-location-type.xml"/>
+    <include file="0.8.x/changelog-2021-07-27-1610-alter-table-inventory-levels-add-column-order-period.xml"/>
 </databaseChangeLog>
