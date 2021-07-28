@@ -18,6 +18,7 @@ class RefreshProductAvailabilityEvent extends ApplicationEvent {
     List productIds
     Boolean forceRefresh = Boolean.FALSE
     Boolean disableRefresh = Boolean.FALSE
+    Boolean synchronousRequired = Boolean.FALSE
 
     RefreshProductAvailabilityEvent(Transaction source) {
         super(source)
@@ -37,6 +38,7 @@ class RefreshProductAvailabilityEvent extends ApplicationEvent {
         super(source)
         this.locationId = source.associatedLocation
         this.productIds = source.associatedProducts
+        this.synchronousRequired = source.synchronousRequired
     }
 
     RefreshProductAvailabilityEvent(Transaction source, Boolean forceRefresh) {

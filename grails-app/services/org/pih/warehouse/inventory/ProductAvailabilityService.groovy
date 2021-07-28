@@ -55,6 +55,33 @@ class ProductAvailabilityService {
         }
     }
 
+    def refreshProductsAvailability(String locationId, def productIds, Boolean forceRefresh) {
+        // Calculate product availability for a single location/product, or all products within a single location
+        if (locationId) {
+            Location location = Location.load(locationId)
+            if (productIds && locationId) {
+                productIds.each { productId ->
+                    Product product = Product.load(productId)
+                    refreshProductAvailability(location, product, forceRefresh)
+                }
+            }
+            else {
+                refreshProductAvailability(location, forceRefresh)
+            }
+        }
+        // Calculate product availability for a single product within all locations
+        else if (productIds) {
+            productIds.each { productId ->
+                Product product = Product.load(productId)
+                refreshProductAvailability(product, forceRefresh)
+            }
+        }
+        // Calculate product availability for all products within all locations
+        else {
+            refreshProductAvailability(forceRefresh)
+        }
+    }
+
     def refreshProductAvailability(Boolean forceRefresh) {
         // Compute bin locations from transaction entries for all products over all depot locations
         // Uses GPars to improve performance (OBNAV Benchmark: 5 minutes without, 45 seconds with)

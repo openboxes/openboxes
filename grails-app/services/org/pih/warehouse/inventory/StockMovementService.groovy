@@ -844,6 +844,7 @@ class StockMovementService {
             picklist.picklistItems.findAll {
                 it.requisitionItem == requisitionItem
             }.toArray().each {
+                it.synchronousRequired = Boolean.TRUE
                 picklist.removeFromPicklistItems(it)
                 requisitionItem.removeFromPicklistItems(it)
                 it.delete()
@@ -1005,6 +1006,7 @@ class StockMovementService {
             picklistItem.reasonCode = reasonCode
             picklistItem.comment = comment
             picklistItem.sortOrder = requisitionItem.orderIndex
+            picklistItem.synchronousRequired = Boolean.TRUE
         }
         picklist.save(flush: true)
     }
@@ -1757,6 +1759,7 @@ class StockMovementService {
         }
 
         picklistItems.each { PicklistItem picklistItem ->
+            picklistItem.synchronousRequired = Boolean.TRUE
             picklistItem.delete()
         }
     }
