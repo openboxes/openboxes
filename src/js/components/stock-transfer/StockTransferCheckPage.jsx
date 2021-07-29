@@ -209,6 +209,23 @@ class StockTransferSecondPage extends Component {
     });
   }
 
+  previousPage() {
+    this.props.showSpinner();
+    const url = '/openboxes/api/stockTransfers';
+
+    const payload = {
+      ...this.state.stockTransfer,
+      stockTransferItems: this.state.originalItems,
+    };
+
+    return apiClient.post(url, flattenRequest(payload))
+      .then(() => {
+        this.props.hideSpinner();
+        this.props.previousPage(this.state.stockTransfer);
+      })
+      .catch(() => this.props.hideSpinner());
+  }
+
   render() {
     const {
       columns, pivotBy,
@@ -239,7 +256,7 @@ class StockTransferSecondPage extends Component {
         <div className="submit-buttons">
           <button
             type="button"
-            onClick={() => this.props.previousPage(this.state.stockTransfer)}
+            onClick={() => this.previousPage()}
             className="btn btn-outline-primary btn-form btn-xs"
           ><Translate id="react.default.button.previous.label" defaultMessage="Previous" />
           </button>
