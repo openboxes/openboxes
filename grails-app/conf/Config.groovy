@@ -235,6 +235,7 @@ log4j = {
             'org.apache.commons.mail',
             'grails.plugins.raven',
             'net.kencochrane.raven',
+            'org.springframework.integration',
             //'com.unboundid'
             //'org.hibernate.transaction',
             //'org.jumpmind',
