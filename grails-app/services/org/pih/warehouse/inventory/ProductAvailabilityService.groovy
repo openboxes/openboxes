@@ -28,6 +28,7 @@ import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductActivityCode
 import org.pih.warehouse.product.ProductAvailability
+import org.pih.warehouse.product.ProductSearch
 import org.pih.warehouse.product.ProductType
 
 class ProductAvailabilityService {
@@ -620,10 +621,10 @@ class ProductAvailabilityService {
                         "and a.lotNumber != :lotNumber",
                 [
                         inventoryItemId: inventoryItem.id,
-                        lotNumber      : inventoryItem.lotNumber
+                        lotNumber      : inventoryItem.lotNumber?:Constants.DEFAULT_LOT_NUMBER
                 ]
         )
-        log.info "Updated ${results} product availability records for inventory item ${inventoryItem?.lotNumber}"
+        log.info "Updated ${results} product availability records for inventory item ${inventoryItem?.lotNumber?:Constants.DEFAULT_LOT_NUMBER}"
     }
 
 
@@ -637,10 +638,10 @@ class ProductAvailabilityService {
                             "and a.binLocationName != :binLocationName",
                     [
                             binLocationId  : location.id,
-                            binLocationName: location.name
+                            binLocationName: location.name?:Constants.DEFAULT_BIN_LOCATION_NAME
                     ]
             )
-            log.info "Updated ${results} product availability records for bin location ${location?.name}"
+            log.info "Updated ${results} product availability records for bin location ${location?.name?:Constants.DEFAULT_BIN_LOCATION_NAME}"
         }
     }
 
@@ -686,54 +687,41 @@ class ProductAvailabilityService {
             }
         }
 
-        def products = Product.createCriteria().list {
-            eq("active", true)
-            and {
-                if (categories) {
-                    'in'("category", categories)
-                }
-                if (command.tags) {
-                    tags {
-                        'in'("id", command.tags*.id)
+        return ProductSearch.createCriteria().list(max: command.maxResults, offset: command.offset) {
+            product {
+                eq("active", true)
+                and {
+                    if (categories) {
+                        'in'("category", categories)
                     }
-                }
-                if (command.catalogs) {
-                    productCatalogItems {
-                        productCatalog {
-                            'in'("id", command.catalogs*.id)
+                    if (command.tags) {
+                        tags {
+                            'in'("id", command.tags*.id)
                         }
                     }
+                    if (command.catalogs) {
+                        productCatalogItems {
+                            productCatalog {
+                                'in'("id", command.catalogs*.id)
+                            }
+                        }
+                    }
+                    // This is pretty inefficient if the previous query does not narrow the results
+                    // if the inner products list is empty, but there are search terms then return empty results
+                    if (innerProductIds || searchTerms) {
+                        'in'("id", innerProductIds ?: [null])
+                    }
                 }
-                // This is pretty inefficient if the previous query does not narrow the results
-                if (innerProductIds) {
-                    'in'("id", innerProductIds)
+            }
+            eq("location", command.location)
+            or {
+                isNull("type")
+                and {
+                    eq("isSearchableType", Boolean.TRUE)
+                    gt("quantityOnHand", 0)
                 }
             }
         }
-
-        def searchableTypes = ProductType.listAllBySupportedActivity([ProductActivityCode.SEARCHABLE])?:[null]
-
-        def productsWithQoH = Product.executeQuery("""
-            select p, sum(pa.quantityOnHand)
-            from Product p
-            join p.productAvailabilities pa
-            where p in (:products)
-            and pa.location = :location
-            and (p.productType is null or (p.productType in (:searchableTypes) and pa.quantityOnHand > 0))
-            group by p, pa.location
-        """, [max: command.maxResults, offset: command.offset, location: command.location, products: products, searchableTypes: searchableTypes])
-
-        def totalCount = Product.executeQuery("""
-            select p, sum(pa.quantityOnHand)
-            from Product p
-            join p.productAvailabilities pa
-            where p in (:products)
-            and pa.location = :location
-            and (p.productType is null or (p.productType in (:searchableTypes) and pa.quantityOnHand > 0))
-            group by p, pa.location
-        """, [location: command.location, products: products, searchableTypes: searchableTypes]).size()
-
-        return new PagedResultList(productsWithQoH, totalCount)
     }
 
     List<ProductAvailability> getStockTransferCandidates(Location location) {

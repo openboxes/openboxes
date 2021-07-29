@@ -146,7 +146,7 @@
                                         <g:else>
                                             <a href="${createLink(controller: 'user', action: 'updateAuthUserLocale', params: ['locale':locale,'returnUrl':request.forwardURI])}">
                                                 <!-- fetch the display for locale based on the current locale -->
-                                                ${locale?.getDisplayName(locale?:defaultLocale)} (${locale?.getDisplayLanguage(session.user.locale)})
+                                                ${locale?.getDisplayName(locale?:defaultLocale)} (${locale?.getDisplayLanguage(session.user.locale?:defaultLocale)})
                                             </a>
                                         </g:else>
                                         </li>

@@ -51,6 +51,7 @@ class Invoice implements Serializable {
     // Date fields
     Date dateInvoiced
     Date dateSubmitted
+    Date datePosted
     Date dateDue
     Date datePaid
 
@@ -96,9 +97,10 @@ class Invoice implements Serializable {
         partyFrom(nullable: true)
         party(nullable: true)
 
+        dateDue(nullable: true)
         dateInvoiced(nullable: true)
         dateSubmitted(nullable: true)
-        dateDue(nullable: true)
+        datePosted(nullable: true)
         datePaid(nullable: true)
 
         currencyUom(nullable: true)
@@ -153,10 +155,11 @@ class Invoice implements Serializable {
     def getStatus() {
         if (datePaid) {
             return InvoiceStatus.PAID
-        } else if (dateSubmitted) {
+        } else if (datePosted) {
             return InvoiceStatus.POSTED
+        } else if (dateSubmitted) {
+            return InvoiceStatus.SUBMITTED
         }
-
         return InvoiceStatus.PENDING
     }
 
@@ -211,6 +214,7 @@ class Invoice implements Serializable {
             partyFrom: Organization.get(partyFrom?.id),
             dateInvoiced: dateInvoiced.format("MM/dd/yyyy"),
             dateSubmitted: dateSubmitted,
+            datePosted: datePosted,
             dateDue: dateDue,
             datePaid: datePaid,
             currencyUom: currencyUom,

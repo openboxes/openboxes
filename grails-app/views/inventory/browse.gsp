@@ -36,7 +36,7 @@
                             <h2>
                                 <g:set var="rangeBegin" value="${Integer.valueOf(params.offset)+1 }"/>
                                 <g:set var="rangeEnd" value="${(Integer.valueOf(params.max) + Integer.valueOf(params.offset))}"/>
-                                <g:set var="totalResults" value="${commandInstance.totalCount }"/>
+                                <g:set var="totalResults" value="${commandInstance?.searchResults?.totalCount }"/>
 
                                 <g:if test="${totalResults < rangeEnd || rangeEnd < 0}">
                                     <g:set var="rangeEnd" value="${totalResults }"/>
@@ -155,7 +155,7 @@
 							</div>
                             <div class="paginateButtons">
 
-                                <g:paginate total="${commandInstance?.totalCount}"
+                                <g:paginate total="${commandInstance?.searchResults?.totalCount}"
                                             action="browse" max="${params.max}" params="${pageParams}"/>
 
                                 <div class="right">

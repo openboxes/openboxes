@@ -73,8 +73,7 @@
                         <g:hiddenField id="supplierId" name="supplier.id" value="${order?.originParty?.id }"></g:hiddenField>
                         <g:hiddenField id="destinationPartyId" name="destinationPartyId.id" value="${order?.destinationParty?.id }"></g:hiddenField>
                         <g:hiddenField id="validationCode" name="validationCode" value=""></g:hiddenField>
-                        <g:hiddenField id="isAccountingRequired" name="isAccountingRequired"
-                                       value="${order?.destination?.isAccountingRequired()}">
+                        <g:hiddenField id="isAccountingRequired" name="isAccountingRequired" value="${isAccountingRequired}">
                         </g:hiddenField>
                         <table id="orderItemsTable" class="items-table">
                             <thead>
