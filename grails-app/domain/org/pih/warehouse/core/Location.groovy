@@ -12,6 +12,7 @@ package org.pih.warehouse.core
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventorySnapshotEvent
+import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
@@ -24,6 +25,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
 
     def publishPersistenceEvent = {
         publishEvent(new InventorySnapshotEvent(this))
+        publishEvent(new RefreshProductAvailabilityEvent(this))
     }
 
     def afterInsert = publishPersistenceEvent
