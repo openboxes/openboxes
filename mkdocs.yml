@@ -61,6 +61,7 @@ nav:
           - Instructions: installation/ubuntu1604.md
           - Notes: installation/ubuntu1604-notes.md
         - Ubuntu 14.04: installation/ubuntu1404.md
+        - Advanced: installation/advanced.md
       - Docker: installation/docker.md
       - Mac OS: installation/macos.md
       - Windows: installation/windows.md
@@ -77,7 +78,17 @@ nav:
   - User Guide: user-guide/index.md
   - Developer Guide:
     - Introduction: developer-guide/index.md
-    - Release Process: developer-guide/release-process.md
+    - Release:
+      - Overview: developer-guide/release/index.md
+      - Plan: developer-guide/release/plan.md
+      - Develop: developer-guide/release/develop.md
+      - Prepare: developer-guide/release/prepare.md
+      - Test: developer-guide/release/testing.md
+      - Finalize: developer-guide/release/finalize.md
+      - Document: developer-guide/release/document.md
+      - Publish: developer-guide/release/publish.md
+      - Deploy: developer-guide/release/deploy.md
+      - Cleanup: developer-guide/release/cleanup.md
     - Getting Started: developer-guide/getting-started.md
     - Contributing: developer-guide/contributing.md
     - Syncing a Fork: developer-guide/syncing-a-fork.md
