@@ -83,7 +83,7 @@ class DataServiceTests extends GroovyTestCase {
         }
 
         def product = dataService.findOrCreateProduct([productCode: "AB12", productName: "New product", category: "New category", manufacturer: "Mfg", manufacturerCode: "Mfgcode", vendor: "Vendor", vendorCode: "Vendor code", unitOfMeasure: "each"])
-        def inventoryLevel = dataService.findOrCreateInventoryLevel(product, location.inventory, null, 0, 10, 100, true)
+        def inventoryLevel = dataService.findOrCreateInventoryLevel(product, location.inventory, null, 0, 10, 100, 120, 7, true)
 
         assertNotNull inventoryLevel
         //assertEquals "AB-12-12", inventoryLevel.binLocation

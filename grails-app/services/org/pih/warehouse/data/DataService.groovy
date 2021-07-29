@@ -175,7 +175,7 @@ class DataService {
                     }
                 }
 
-                addInventoryLevelToProduct(product, location.inventory, preferredBinLocation, row.minQuantity, row.reorderQuantity, row.maxQuantity, row.preferredForReorder)
+                addInventoryLevelToProduct(product, location.inventory, preferredBinLocation, row.minQuantity, row.reorderQuantity, row.maxQuantity, row.expectedLeadTimeDays, row.replenishmentPeriodDays, row.preferredForReorder)
             }
 
             // Create product package if UOM and quantity are provided
@@ -206,8 +206,8 @@ class DataService {
      * @param maxQuantity
      * @return
      */
-    def addInventoryLevelToProduct(Product product, Inventory inventory, Location preferredBinLocation, Double minQuantity, Double reorderQuantity, Double maxQuantity, Boolean preferredForReorder) {
-        findOrCreateInventoryLevel(product, inventory, preferredBinLocation, minQuantity, reorderQuantity, maxQuantity, preferredForReorder)
+    def addInventoryLevelToProduct(Product product, Inventory inventory, Location preferredBinLocation, Double minQuantity, Double reorderQuantity, Double maxQuantity, Double expectedLeadTimeDays, Double replenishmentPeriodDays, Boolean preferredForReorder) {
+        findOrCreateInventoryLevel(product, inventory, preferredBinLocation, minQuantity, reorderQuantity, maxQuantity, expectedLeadTimeDays, replenishmentPeriodDays, preferredForReorder)
     }
 
     /**
@@ -282,7 +282,7 @@ class DataService {
      * @param maxQuantity
      * @return
      */
-    def findOrCreateInventoryLevel(Product product, Inventory inventory, Location preferredBinLocation, Double minQuantity, Double reorderQuantity, Double maxQuantity, Boolean preferredForReorder) {
+    def findOrCreateInventoryLevel(Product product, Inventory inventory, Location preferredBinLocation, Double minQuantity, Double reorderQuantity, Double maxQuantity, Double expectedLeadTimeDays, Double replenishmentPeriodDays, Boolean preferredForReorder) {
 
         log.info "Product ${product.productCode} inventory ${inventory} preferred ${preferredForReorder}"
 
@@ -300,6 +300,8 @@ class DataService {
         inventoryLevel.reorderQuantity = reorderQuantity
         inventoryLevel.maxQuantity = maxQuantity
         inventoryLevel.preferred = Boolean.valueOf(preferredForReorder)
+        inventoryLevel.expectedLeadTimeDays = expectedLeadTimeDays
+        inventoryLevel.replenishmentPeriodDays = replenishmentPeriodDays
 
         return inventoryLevel
     }
