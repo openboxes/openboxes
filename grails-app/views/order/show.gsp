@@ -1,4 +1,5 @@
 <%@ page import="org.pih.warehouse.order.Order" %>
+<%@ page import="org.pih.warehouse.order.OrderType" %>
 <%@ page import="org.pih.warehouse.order.OrderTypeCode" %>
 <html>
     <head>
@@ -59,7 +60,7 @@
                                         <format:metadata obj="${orderInstance?.orderType?.name}"/>
                                     </td>
                                 </tr>
-                                <g:if test="${orderInstance.orderTypeCode == OrderTypeCode.PURCHASE_ORDER}">
+                                <g:if test="${orderInstance.orderType == OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
                                     <tr class="prop">
                                         <td valign="top" class="name">
                                             <label><warehouse:message code="order.originCode.label"/></label>
@@ -85,7 +86,7 @@
                                         ${orderInstance?.destination?.name}
                                     </td>
                                 </tr>
-                                <g:if test="${orderInstance.orderTypeCode == OrderTypeCode.PURCHASE_ORDER}">
+                                <g:if test="${orderInstance.orderType == OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
                                     <tr class="prop">
                                         <td valign="top" class="name">
                                             <label><warehouse:message code="paymentTerm.label"/></label>
