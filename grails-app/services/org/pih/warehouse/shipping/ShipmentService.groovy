@@ -704,14 +704,9 @@ class ShipmentService {
             }
 
             def quantityAvailableToPromise = productAvailabilityService.getQuantityAvailableToPromise(origin, shipmentItem.binLocation, shipmentItem.inventoryItem)
-            def quantityPicked
-            if (shipmentItem?.binLocation) {
-                quantityPicked = shipmentItem?.requisitionItem?.picklistItems?.findAll { it.inventoryItem == shipmentItem?.inventoryItem && it.binLocation == shipmentItem?.binLocation }?.sum { it.quantity }
-            } else {
-                quantityPicked = shipmentItem?.requisitionItem?.picklistItems?.findAll { it.inventoryItem == shipmentItem?.inventoryItem }?.sum { it.quantity }
-            }
+            def quantityAvailableWithPicked = quantityAvailableToPromise + shipmentItem.quantityPicked
+
             def duplicatedShipmentItemsQuantity = getDuplicatedShipmentItemsQuantity(shipmentItem.shipment, shipmentItem.binLocation, shipmentItem.inventoryItem)
-            def quantityAvailableWithPicked = quantityAvailableToPromise + quantityPicked
 
             log.info "Shipment item quantity ${shipmentItem.quantity} vs quantity available to promise ${quantityAvailableWithPicked} vs duplicated shipment items quantity ${duplicatedShipmentItemsQuantity}"
 
