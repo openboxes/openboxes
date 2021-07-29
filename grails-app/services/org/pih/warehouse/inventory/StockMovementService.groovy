@@ -15,7 +15,6 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.DocumentGroupCode
-import org.pih.warehouse.api.EditPageItem
 import org.pih.warehouse.api.PackPageItem
 import org.pih.warehouse.api.PickPageItem
 import org.pih.warehouse.api.StockMovement
@@ -665,16 +664,31 @@ class StockMovementService {
         }
     }
 
+    def getEditPageItem(StockMovementItem stockMovementItem) {
+        def query = """ select * FROM edit_page_item where id = :itemId """
+
+        def data = dataService.executeQuery(query, ['itemId': stockMovementItem.id])
+
+        List editPageItems = buildEditPageItems(data)
+
+        return editPageItems ? editPageItems.first() : null
+    }
+
     List getEditPageItems(Requisition requisition, String max, String offset) {
         def query = offset ?
                 """ select * FROM edit_page_item where requisition_id = :requisition and requisition_item_type = 'ORIGINAL' ORDER BY sort_order limit :offset, :max; """ :
                 """ select * FROM edit_page_item where requisition_id = :requisition and requisition_item_type = 'ORIGINAL' ORDER BY sort_order """
+
         def data = dataService.executeQuery(query, [
                 'requisition': requisition.id,
-                'offset': offset ? offset.toInteger() : null,
-                'max': max ? max.toInteger() : null,
-        ]);
+                'offset'     : offset ? offset.toInteger() : null,
+                'max'        : max ? max.toInteger() : null,
+        ])
 
+        return buildEditPageItems(data)
+    }
+
+    List buildEditPageItems(def data) {
         def editItemsIds = data.collect { "'$it.id'" }.join(',')
 
         def substitutionItemsMap = dataService.executeQuery("""
@@ -687,11 +701,17 @@ class StockMovementService {
         def productsMap = Product.findAllByIdInList(data.collect { it.product_id })
                 .inject([:]) {map, item -> map << [(item.id): item]}
 
+        Requisition requisition = Requisition.get(data.first()?.requisition_id)
+        def picklistItemsMap = requisition?.getPicklist()?.picklistItems?.groupBy { it.requisitionItem.id }
+
         def editPageItems = data.collect {
             def substitutionItems = substitutionItemsMap[it.id]
 
             def statusCode = substitutionItems ? RequisitionItemStatus.SUBSTITUTED :
                     it.quantity_revised != null ? RequisitionItemStatus.CHANGED : RequisitionItemStatus.APPROVED
+
+            def picklistQtyForItem = (!picklistItemsMap || !picklistItemsMap[it.id]) ? 0 : picklistItemsMap[it.id].sum { it.quantity }
+
             [
                 product                     : productsMap[it.product_id],
                 productName                 : it.name,
@@ -703,19 +723,22 @@ class StockMovementService {
                 quantityCanceled            : it.quantity_canceled,
                 quantityConsumed            : it.quantity_demand,
                 quantityOnHand              : it.quantity_on_hand,
-                quantityAvailableToPromise  : it.quantity_available_to_promise,
+                quantityAvailableToPromise  : (it.quantity_available_to_promise ?: 0) + picklistQtyForItem,
                 substitutionStatus          : it.substitution_status,
                 sortOrder                   : it.sort_order,
                 reasonCode                  : it.cancel_reason_code,
                 comments                    : it.comments,
                 statusCode                  : statusCode.name(),
                 substitutionItems           : substitutionItems.collect {
+                    def picklistQtyForSubstitution = !picklistItemsMap[it.id] ? 0 : picklistItemsMap[it.id].sum { it.quantity }
+
                     [
                         product             : Product.get(it.product_id),
                         productId           : it.product_id,
                         productCode         : it.product_code,
                         productName         : it.name,
-                        quantityAvailable   : it.quantity_on_hand,
+                        quantityAvailable   : (it.quantity_available_to_promise ?: 0) + picklistQtyForSubstitution,
+                        quantityOnHand      : it.quantity_on_hand,
                         quantityConsumed    : it.quantity_demand,
                         quantitySelected    : it.quantity,
                         quantityRequested   : it.quantity
@@ -723,6 +746,7 @@ class StockMovementService {
                 },
             ]
         }
+
         return editPageItems
     }
 
@@ -820,6 +844,7 @@ class StockMovementService {
             picklist.picklistItems.findAll {
                 it.requisitionItem == requisitionItem
             }.toArray().each {
+                it.synchronousRequired = Boolean.TRUE
                 picklist.removeFromPicklistItems(it)
                 requisitionItem.removeFromPicklistItems(it)
                 it.delete()
@@ -906,7 +931,6 @@ class StockMovementService {
      * @param id
      */
     void createPicklist(RequisitionItem requisitionItem) {
-        Product product = requisitionItem.product
         Location location = requisitionItem?.requisition?.origin
         Integer quantityRequired = requisitionItem?.calculateQuantityRequired()
 
@@ -914,7 +938,7 @@ class StockMovementService {
 
         if (quantityRequired) {
             // Retrieve all available items and then calculate suggested
-            List<AvailableItem> availableItems = productAvailabilityService.getAvailableBinLocations(location, product)
+            List<AvailableItem> availableItems = getAvailableItems(location, requisitionItem)
             log.info "Available items: ${availableItems}"
             List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
             log.info "Suggested items " + suggestedItems
@@ -982,6 +1006,7 @@ class StockMovementService {
             picklistItem.reasonCode = reasonCode
             picklistItem.comment = comment
             picklistItem.sortOrder = requisitionItem.orderIndex
+            picklistItem.synchronousRequired = Boolean.TRUE
         }
         picklist.save(flush: true)
     }
@@ -1012,6 +1037,52 @@ class StockMovementService {
         // FIXME Check to see if both of these are needed
         requisition.save()
         picklist.save()
+    }
+
+    Set<PicklistItem> getPicklistItems(RequisitionItem requisitionItem) {
+        if (requisitionItem.modificationItem) {
+            requisitionItem = requisitionItem.modificationItem
+        }
+
+        Picklist picklist = requisitionItem?.requisition?.picklist
+
+        if (picklist) {
+            return picklist.picklistItems.findAll {
+                it.requisitionItem == requisitionItem
+            }
+        }
+
+        return []
+    }
+
+    List<AvailableItem> getAvailableItems(Location location, RequisitionItem requisitionItem) {
+        List<AvailableItem> availableItems = productAvailabilityService.getAllAvailableBinLocations(location, requisitionItem.product)
+        def picklistItems = getPicklistItems(requisitionItem)
+
+        return calculateQuantityAvailableToPromise(availableItems, picklistItems)
+    }
+
+    List<AvailableItem> calculateQuantityAvailableToPromise(List<AvailableItem> availableItems, def picklistItems) {
+        for (PicklistItem picklistItem : picklistItems) {
+            AvailableItem availableItem = availableItems.find {
+                it.inventoryItem == picklistItem.inventoryItem && it.binLocation == picklistItem.binLocation
+            }
+
+            if (!availableItem) {
+                availableItem = new AvailableItem(
+                        inventoryItem: picklistItem.inventoryItem,
+                        binLocation: picklistItem.binLocation,
+                        quantityAvailable: 0,
+                        quantityOnHand: picklistItem.quantity
+                )
+
+                availableItems.add(availableItem)
+            }
+
+            availableItem.quantityAvailable += picklistItem.quantity
+        }
+
+        return productAvailabilityService.sortAvailableItems(availableItems)
     }
 
     /**
@@ -1054,27 +1125,10 @@ class StockMovementService {
         return suggestedItems
     }
 
-    /**
-     * Get a list of substitution items for the given stock movement item.
-     *
-     * @param stockMovementItem
-     * @return
-     */
-    List getSubstitutionItems(StockMovementItem stockMovementItem) {
-
-        // Gather all substitutions
-        RequisitionItem requisitionItem = RequisitionItem.load(stockMovementItem.id)
-
-        List substitutionItems = requisitionItem?.substitutionItems?.collect { substitutionItem ->
-            StockMovementItem.createFromRequisitionItem(substitutionItem)
-        }
-        return substitutionItems
-    }
-
-
-    List<SubstitutionItem> getAvailableSubstitutions(Location location, Product product) {
-
+    List<SubstitutionItem> getAvailableSubstitutions(Location location, RequisitionItem requisitionItem) {
+        Product product = requisitionItem.product
         List<SubstitutionItem> availableSubstitutions
+
         if (location) {
             def productAssociations =
                     productService.getProductAssociations(product, [ProductAssociationTypeCode.SUBSTITUTE])
@@ -1082,7 +1136,17 @@ class StockMovementService {
             availableSubstitutions = productAssociations.collect { productAssociation ->
 
                 def associatedProduct = productAssociation.associatedProduct
-                def availableItems = productAvailabilityService.getAvailableBinLocations(location, associatedProduct)
+                def availableItems
+
+                if (requisitionItem.substitutionItems) {
+                    def picklistItems = requisitionItem.substitutionItems.findAll { it.product == associatedProduct }
+                            .collect { it.picklistItems }?.flatten()
+
+                    availableItems = productAvailabilityService.getAllAvailableBinLocations(location, associatedProduct)
+                    availableItems = calculateQuantityAvailableToPromise(availableItems, picklistItems)
+                } else {
+                    availableItems = productAvailabilityService.getAvailableBinLocations(location, associatedProduct)
+                }
 
                 log.info "Available items for substitution ${associatedProduct}: ${availableItems}"
                 SubstitutionItem substitutionItem = new SubstitutionItem()
@@ -1094,24 +1158,8 @@ class StockMovementService {
                 return substitutionItem
             }
         }
+
         return availableSubstitutions.findAll { availableItems -> availableItems.quantityAvailable > 0 }
-    }
-
-    List<SubstitutionItem> getSubstitutionItems(Location location, RequisitionItem requisitionItem) {
-        !requisitionItem?.substitutionItems ? null : requisitionItem?.substitutionItems?.collect { RequisitionItem item ->
-            List<AvailableItem> availableItems = productAvailabilityService.getAvailableBinLocations(location, item.product)
-
-            SubstitutionItem substitutionItem = new SubstitutionItem()
-            substitutionItem.product = item?.product
-            substitutionItem.productId = item?.product?.id
-            substitutionItem.productName = item?.product?.name
-            substitutionItem.productCode = item?.product?.productCode
-            substitutionItem.quantitySelected = item?.quantity
-            substitutionItem.quantityConsumed = calculateMonthlyStockListQuantity(item.product, location)
-            substitutionItem.availableItems = availableItems
-            substitutionItem.sortOrder = item?.orderIndex
-            return substitutionItem
-        }
     }
 
     /**
@@ -1137,77 +1185,6 @@ class StockMovementService {
         return pickPageItems
     }
 
-    Float calculateMonthlyStockListQuantity(Product product, Location location) {
-
-        List monthlyStockListQuantities = RequisitionItem.createCriteria().list {
-            projections {
-                property("quantity")
-                requisition {
-                    property("replenishmentPeriod")
-                }
-
-            }
-            requisition {
-                eq("isTemplate", Boolean.TRUE)
-                eq("isPublished", Boolean.TRUE)
-                eq("origin", location)
-            }
-            eq("product", product)
-        }
-
-        Float monthlyStockListQuantity =
-                monthlyStockListQuantities.sum {
-                    it[1] ? Math.ceil(((Double) it[0]) / it[1] * 30) : 0
-                }
-
-        return monthlyStockListQuantity
-    }
-
-    Float calculateMonthlyStockListQuantity(StockMovementItem stockMovementItem) {
-        Integer monthlyStockListQuantity = 0
-        RequisitionItem requisitionItem = RequisitionItem.load(stockMovementItem.id)
-        Location location = requisitionItem?.requisition?.origin
-        List<Requisition> stocklists = requisitionService.getRequisitionTemplates(location)
-        if (stocklists) {
-            stocklists.each { stocklist ->
-                def stocklistItems = stocklist.requisitionItems.findAll {
-                    it?.product?.id == requisitionItem?.product?.id
-                }
-                if (stocklistItems) {
-                    monthlyStockListQuantity += stocklistItems.sum {
-                        it?.requisition?.replenishmentPeriod ? Math.ceil(((Double) it?.quantity) / it?.requisition?.replenishmentPeriod * 30) : 0
-                    }
-                }
-            }
-        }
-        return monthlyStockListQuantity
-    }
-
-    EditPageItem buildEditPageItem(StockMovementItem stockMovementItem) {
-        EditPageItem editPageItem = new EditPageItem()
-        RequisitionItem requisitionItem = RequisitionItem.load(stockMovementItem.id)
-        Location location = requisitionItem?.requisition?.origin
-
-        // Qty Available
-        List<AvailableItem> availableItems = productAvailabilityService.getAllAvailableBinLocations(location, requisitionItem.product)
-
-        // Substitution
-        List<SubstitutionItem> availableSubstitutions = getAvailableSubstitutions(location, requisitionItem.product)
-        List<SubstitutionItem> substitutionItems = getSubstitutionItems(location, requisitionItem)
-
-        editPageItem.requisitionItem = requisitionItem
-        editPageItem.productId = requisitionItem.product.id
-        editPageItem.productCode = requisitionItem.product.productCode
-        editPageItem.productName = requisitionItem.product.name
-        editPageItem.quantityRequested = requisitionItem.quantity
-        editPageItem.quantityConsumed = calculateMonthlyStockListQuantity(stockMovementItem)
-        editPageItem.availableSubstitutions = availableSubstitutions
-        editPageItem.availableItems = availableItems
-        editPageItem.substitutionItems = substitutionItems?.sort { it.sortOrder }
-        editPageItem.sortOrder = stockMovementItem.sortOrder
-        return editPageItem
-    }
-
     /**
      *
      * @param requisitionItem
@@ -1223,7 +1200,7 @@ class StockMovementService {
                 picklistItems: requisitionItem.picklistItems)
         Location location = requisitionItem?.requisition?.origin
 
-        List<AvailableItem> availableItems = productAvailabilityService.getAvailableBinLocations(location, requisitionItem.product)
+        List<AvailableItem> availableItems = getAvailableItems(location, requisitionItem)
         Integer quantityRequired = requisitionItem?.calculateQuantityRequired()
         List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
         pickPageItem.availableItems = availableItems
@@ -1528,7 +1505,7 @@ class StockMovementService {
                 if (requisitionItem) {
                     log.info "Item updated " + requisitionItem.id
 
-                    removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
+                    removeShipmentAndPicklistItemsForModifiedRequisitionItem(requisitionItem)
 
                     if (!stockMovementItem.quantityRequested) {
                         log.info "Item deleted " + requisitionItem.id
@@ -1600,7 +1577,7 @@ class StockMovementService {
         return updatedStockMovement
     }
 
-    List<EditPageItem> reviseItems(StockMovement stockMovement) {
+    List reviseItems(StockMovement stockMovement) {
         Requisition requisition = Requisition.get(stockMovement.id)
         def revisedItems = []
 
@@ -1614,7 +1591,7 @@ class StockMovementService {
                     throw new IllegalArgumentException("Could not find stock movement item with ID ${stockMovementItem.id}")
                 }
 
-                removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
+                removeShipmentAndPicklistItemsForModifiedRequisitionItem(requisitionItem)
 
                 log.info "Item revised " + requisitionItem.id
 
@@ -1642,7 +1619,7 @@ class StockMovementService {
 
         stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
             if (stockMovementItem.statusCode == 'CHANGED') {
-                EditPageItem editPageItem = buildEditPageItem(stockMovementItem)
+                def editPageItem = getEditPageItem(stockMovementItem)
                 revisedItems.add(editPageItem)
             }
         }
@@ -1678,7 +1655,7 @@ class StockMovementService {
     }
 
     def revertItem(StockMovementItem stockMovementItem) {
-        removeShipmentItemsForModifiedRequisitionItem(stockMovementItem)
+        removeShipmentAndPicklistItemsForModifiedRequisitionItem(stockMovementItem)
 
         log.info "Revert the stock movement item ${stockMovementItem}"
 
@@ -1718,7 +1695,7 @@ class StockMovementService {
 
     void removeRequisitionItem(RequisitionItem requisitionItem) {
         Requisition requisition = requisitionItem.requisition
-        removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
+        removeShipmentAndPicklistItemsForModifiedRequisitionItem(requisitionItem)
         requisitionItem.undoChanges()
         requisitionItem.save(flush: true)
 
@@ -1748,6 +1725,11 @@ class StockMovementService {
         removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
     }
 
+    void removeShipmentAndPicklistItemsForModifiedRequisitionItem(StockMovementItem stockMovementItem) {
+        RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem?.id)
+        removeShipmentAndPicklistItemsForModifiedRequisitionItem(requisitionItem)
+    }
+
     void removeShipmentItemsForModifiedRequisitionItem(RequisitionItem requisitionItem) {
 
         // Get all shipment items associated with the given requisition item
@@ -1762,6 +1744,11 @@ class StockMovementService {
         shipmentItems.each { ShipmentItem shipmentItem ->
             shipmentItem.delete()
         }
+    }
+
+    void removeShipmentAndPicklistItemsForModifiedRequisitionItem(RequisitionItem requisitionItem) {
+
+        removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
 
         // Find all picklist items associated with the given requisition item
         List<PicklistItem> picklistItems = PicklistItem.findAllByRequisitionItem(requisitionItem)
@@ -1772,6 +1759,7 @@ class StockMovementService {
         }
 
         picklistItems.each { PicklistItem picklistItem ->
+            picklistItem.synchronousRequired = Boolean.TRUE
             picklistItem.delete()
         }
     }
@@ -1779,7 +1767,7 @@ class StockMovementService {
     void updateAdjustedItems(StockMovement stockMovement, String adjustedProductCode) {
         stockMovement?.lineItems?.each { StockMovementItem stockMovementItem ->
             if (stockMovementItem.productCode == adjustedProductCode) {
-                removeShipmentItemsForModifiedRequisitionItem(stockMovementItem.requisitionItem)
+                removeShipmentAndPicklistItemsForModifiedRequisitionItem(stockMovementItem.requisitionItem)
                 createPicklist(stockMovementItem)
                 createMissingShipmentItem(stockMovementItem.requisitionItem)
             }
