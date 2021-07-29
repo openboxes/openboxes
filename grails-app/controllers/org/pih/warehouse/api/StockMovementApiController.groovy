@@ -211,6 +211,12 @@ class StockMovementApiController {
         render([data: stockMovement] as JSON)
     }
 
+    def createPickList = {
+        stockMovementService.createPicklist(params.id)
+
+        render status: 200
+    }
+
     def exportPickListItems = {
         List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null )
         List<PicklistItem> picklistItems = pickPageItems.inject([]) { result, pickPageItem ->
