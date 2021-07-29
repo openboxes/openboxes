@@ -78,7 +78,12 @@ nav:
   - User Guide: user-guide/index.md
   - Developer Guide:
     - Introduction: developer-guide/index.md
-    - Release:
+    - Getting Started: developer-guide/getting-started.md
+    - Contributing: developer-guide/contributing.md
+    - Syncing a Fork: developer-guide/syncing-a-fork.md
+    - Tagging a Release: developer-guide/tagging.md
+    - Troubleshooting: developer-guide/troubleshooting.md
+    - Release Lifecycle:
       - Overview: developer-guide/release/index.md
       - Plan: developer-guide/release/plan.md
       - Develop: developer-guide/release/develop.md
@@ -89,11 +94,6 @@ nav:
       - Publish: developer-guide/release/publish.md
       - Deploy: developer-guide/release/deploy.md
       - Cleanup: developer-guide/release/cleanup.md
-    - Getting Started: developer-guide/getting-started.md
-    - Contributing: developer-guide/contributing.md
-    - Syncing a Fork: developer-guide/syncing-a-fork.md
-    - Tagging a Release: developer-guide/tagging.md
-    - Troubleshooting: developer-guide/troubleshooting.md
   - API Guide:
     - Overview: api-guide/index.md
     - Generic API: api-guide/generic.md
