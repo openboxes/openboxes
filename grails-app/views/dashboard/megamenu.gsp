@@ -460,7 +460,10 @@
                         <g:link controller="report" action="exportDemandReport" params="[downloadFormat:'csv']" >
                             <warehouse:message code="default.export.label" args="[g.message(code:'product.demand.label', default: 'product demand')]"/></g:link>
                     </div>
-
+                    <div class="mm-menu-item">
+                        <g:link controller="dataExport" action="index">
+                            <warehouse:message code="export.custom.label" default="Custom data exports"/></g:link>
+                    </div>
                 </div>
             </div>
         </li>
