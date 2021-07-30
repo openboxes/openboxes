@@ -12,23 +12,23 @@
 </head>
 <body>
 	<div class="body">
-		<g:form controller="auth" action="handleLogin" method="post">	
-		
+		<g:form controller="auth" action="handleLogin" method="post">
+
 			<g:hiddenField name="targetUri" value="${params?.targetUri}" />
 			<g:hiddenField id="browserTimezone" name="browserTimezone" />
-			  
+
 		    <div id="loginContainer" class="dialog">
 				<div id="loginForm">
 					<g:if test="${flash.message}">
 					    <div class="message">${flash.message}</div>
-					</g:if>	
-				
+					</g:if>
+
 					<g:hasErrors bean="${userInstance}">
 					   <div class="errors">
 					       <g:renderErrors bean="${userInstance}" as="list" />
 					   </div>
 					</g:hasErrors>
-								
+
 					<div id="loginBox" class="box">
                         <h2>
                             <img src="${createLinkTo(dir:'images/icons/silk',file:'lock.png')}" class="middle"/>
@@ -51,7 +51,7 @@
 									<td class="middle center">
 										<button type="submit" class="button big" id="loginButton">
 											<g:message code="auth.login.label"/>
-										</button> 															
+										</button>
 									</td>
 								</tr>
 
@@ -65,13 +65,13 @@
                             </tbody>
 						</table>
 					</div>
-					
+
 				</div>
 			</div>
 		</g:form>
 	</div>
-	
-	<script type="text/javascript"> 	
+
+	<script type="text/javascript">
 		$(document).ready(function() {
 
 			var timezone = jzTimezoneDetector.determine_timezone().timezone; // Now you have an instance of the TimeZone object.
@@ -82,6 +82,6 @@
 
             openboxes.expireFromLocal();
 		});
-	</script>	
+	</script>
 </body>
 </html>
