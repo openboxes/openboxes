@@ -50,7 +50,11 @@
                     </td>
                 </tr>
             </g:each>
+
         </table>
+        <div class="pagination">
+            <g:paginate total="${productSummaries.totalCount}"/>
+        </div>
     </div>
 </body>
 </html>

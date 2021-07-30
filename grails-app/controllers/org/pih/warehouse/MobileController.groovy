@@ -33,7 +33,9 @@ class MobileController {
 
         def orderCount = Order.createCriteria().count {
             eq("destination", location)
-            eq("orderTypeCode", OrderTypeCode.PURCHASE_ORDER)
+            orderType {
+                eq("orderTypeCode", OrderTypeCode.PURCHASE_ORDER)
+            }
         }
 
         def requisitionCount = Requisition.createCriteria().count {
@@ -71,14 +73,11 @@ class MobileController {
     def productList = {
         Location location = Location.get(session.warehouse.id)
         def terms = params?.q ? params?.q?.split(" ") : "".split(" ")
-        def products = inventoryService.searchProducts(terms, [])
-        if (products) {
-            def productSummaries = ProductSummary.createCriteria().list(max: params.max ?: 10, offset: params.offset ?: 0) {
-                eq("location", location)
-                'in'("product", products)
-            }
-            [productSummaries:productSummaries]
+        def productSummaries = ProductSummary.createCriteria().list(max: params.max ?: 10, offset: params.offset ?: 0) {
+            eq("location", location)
+            order("product", "asc")
         }
+        [productSummaries:productSummaries]
     }
 
     def productDetails = {
