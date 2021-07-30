@@ -42,6 +42,7 @@ grails.project.dependency.resolution = {
         mavenRepo "https://repo.grails.org/grails/plugins/"
         mavenRepo "https://repo.grails.org/grails/core/"
         mavenRepo "https://oss.sonatype.org/content/repositories/snapshots/"
+        mavenRepo "http://insecure.repo1.maven.org/maven2"
     }
 
     dependencies {
