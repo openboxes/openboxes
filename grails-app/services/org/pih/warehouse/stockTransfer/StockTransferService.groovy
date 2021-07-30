@@ -252,4 +252,10 @@ class StockTransferService {
             throw new IllegalStateException("Quantity available ${quantityAvailable} is less than quantity to stock transfer ${quantity} for product ${inventoryItem.product.productCode} ${inventoryItem.product.name}")
         }
     }
+
+    def setQuantityOnHand(StockTransfer stockTransfer) {
+        stockTransfer?.stockTransferItems?.each { StockTransferItem stockTransferItem ->
+            stockTransferItem.quantityOnHand = productAvailabilityService.getQuantityOnHandInBinLocation(stockTransferItem.inventoryItem, stockTransferItem.originBinLocation)
+        }
+    }
 }

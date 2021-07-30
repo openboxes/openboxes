@@ -35,6 +35,7 @@ class StockTransferApiController {
         }
 
         StockTransfer stockTransfer = StockTransfer.createFromOrder(order)
+        stockTransferService.setQuantityOnHand(stockTransfer)
         render([data: stockTransfer?.toJson()] as JSON)
     }
 
@@ -62,6 +63,7 @@ class StockTransferApiController {
         }
 
         stockTransfer = StockTransfer.createFromOrder(order)
+        stockTransferService.setQuantityOnHand(stockTransfer)
         render([data: stockTransfer?.toJson()] as JSON)
     }
 

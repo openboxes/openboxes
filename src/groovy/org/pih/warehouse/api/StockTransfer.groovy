@@ -51,14 +51,8 @@ class StockTransfer {
     }
 
     static StockTransferStatus getStatus(OrderStatus orderStatus) {
-        switch (orderStatus) {
-            case OrderStatus.COMPLETED:
-                return StockTransferStatus.COMPLETED
-            case OrderStatus.CANCELED:
-                return StockTransferStatus.CANCELED
-            default:
-                return StockTransferStatus.PENDING
-        }
+        StockTransferStatus stockTransferStatus = StockTransferStatus.valueOf(orderStatus.name())
+        return stockTransferStatus ?: StockTransferStatus.PENDING
     }
 
     Map toJson() {
