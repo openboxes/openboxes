@@ -58,7 +58,7 @@ class OrderController {
         // Set default values
         params.destination = params.destination == null && !isCentralPurchasingEnabled ? session?.warehouse?.id : params.destination
 
-        params.orderType = params.orderType ? OrderType.findByIdOrCode(params.orderType, params.orderType) : OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())
+        OrderType orderType = params.orderType ? OrderType.findByIdOrCode(params.orderType, params.orderType) : OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())
 
         params.status = params.status ? Enum.valueOf(OrderStatus.class, params.status) : null
         params.destinationParty = isCentralPurchasingEnabled ? currentLocation?.organization?.id : params.destinationParty
@@ -68,6 +68,8 @@ class OrderController {
         params.offset = params.format ? null : params.offset?:0
 
         def orderTemplate = new Order(params)
+        orderTemplate.orderType = orderType
+
         def orders = orderService.getOrders(orderTemplate, statusStartDate, statusEndDate, params)
 
         if (params.format && orders) {
