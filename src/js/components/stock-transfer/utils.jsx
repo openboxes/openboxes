@@ -1,6 +1,9 @@
 import _ from 'lodash';
 
-function extractItem(item) {
+const PENDING = 'PENDING';
+const CANCELED = 'CANCELED';
+
+function extractItem(item, status) {
   const { destinationBinLocation, destinationZone } = item;
   return {
     ...item,
@@ -10,10 +13,11 @@ function extractItem(item) {
       zoneId: destinationZone && destinationZone.id ? destinationZone.id : null,
       zoneName: destinationZone && destinationZone.name ? destinationZone.name : null,
     },
+    quantity: status === PENDING ? '' : item.quantity,
   };
 }
 
-function extractSplitItem(item, splitItem) {
+function extractSplitItem(item, splitItem, status) {
   return {
     ...splitItem,
     destinationBinLocation: {
@@ -24,6 +28,7 @@ function extractSplitItem(item, splitItem) {
       zoneName: splitItem.destinationBinLocation.zone ?
         splitItem.destinationBinLocation.zone.name : null,
     },
+    quantity: status === PENDING ? '' : item.quantity,
     quantityOnHand: item.quantityOnHand,
     referenceId: item.id, // set a referenceId from original item
   };
@@ -32,10 +37,10 @@ function extractSplitItem(item, splitItem) {
 export function extractStockTransferItems(stockTransfer) {
   const stockTransferItems = [];
   _.forEach(stockTransfer.stockTransferItems, (item) => {
-    stockTransferItems.push(extractItem(item));
+    stockTransferItems.push(extractItem(item, stockTransfer.status));
     if (item.splitItems.length > 0) {
       _.forEach(item.splitItems, (splitItem) => {
-        stockTransferItems.push(extractSplitItem(item, splitItem));
+        stockTransferItems.push(extractSplitItem(item, splitItem, stockTransfer.status));
       });
     }
   });
@@ -45,19 +50,19 @@ export function extractStockTransferItems(stockTransfer) {
 export function extractNonCanceledItems(stockTransfer) {
   const stockTransferItems = [];
   _.forEach(stockTransfer.stockTransferItems, (item) => {
-    if (item.status !== 'CANCELED') {
-      stockTransferItems.push(extractItem(item));
+    if (item.status !== CANCELED) {
+      stockTransferItems.push(extractItem(item, stockTransfer.status));
     }
     if (item.splitItems.length > 0) {
       _.forEach(item.splitItems, (splitItem) => {
-        stockTransferItems.push(extractSplitItem(item, splitItem));
+        stockTransferItems.push(extractSplitItem(item, splitItem, stockTransfer.status));
       });
     }
   });
   return stockTransferItems;
 }
 
-export function prepareRequest(stockTransfer) {
+export function prepareRequest(stockTransfer, status) {
   const originalItems = _.filter(stockTransfer.stockTransferItems, item => !item.referenceId);
   const stockTransferItems = _.map(originalItems, item => ({
     ...item,
@@ -65,7 +70,8 @@ export function prepareRequest(stockTransfer) {
       stockTransfer.stockTransferItems,
       splitItem => splitItem.referenceId === item.id,
     ),
+    quantity: item.quantity === '' ? item.quantityOnHand : item.quantity,
   }));
 
-  return { ...stockTransfer, stockTransferItems };
+  return { ...stockTransfer, stockTransferItems, status };
 }

@@ -19,6 +19,7 @@ import { extractStockTransferItems, prepareRequest } from './utils';
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
 
+const APPROVED = 'APPROVED';
 const CANCELED = 'CANCELED';
 
 /**
@@ -275,7 +276,7 @@ class StockTransferSecondPage extends Component {
    */
   saveStockTransfer(data, callback) {
     const url = '/openboxes/api/stockTransfers/';
-    const payload = prepareRequest(data);
+    const payload = prepareRequest(data, APPROVED);
     apiClient.post(url, flattenRequest(payload))
       .then((response) => {
         const stockTransfer = parseResponse(response.data.data);
@@ -378,6 +379,19 @@ class StockTransferSecondPage extends Component {
     this.setState({ stockTransfer });
   }
 
+  autofill() {
+    const { stockTransfer } = this.state;
+    this.setState({
+      stockTransfer: {
+        ...stockTransfer,
+        stockTransferItems: _.map(stockTransfer.stockTransferItems, item => ({
+          ...item,
+          quantity: item.quantityOnHand,
+        })),
+      },
+    });
+  }
+
   render() {
     const {
       columns, pivotBy,
@@ -389,21 +403,31 @@ class StockTransferSecondPage extends Component {
 
     return (
       <div className="stock-transfer">
-        <div className="d-flex justify-content-end mb-3 submit-buttons">
-          <button
-            type="button"
-            onClick={() => this.saveStockTransfer(this.state.stockTransfer)}
-            className="btn btn-success btn-form btn-xs"
-            disabled={_.some(this.state.stockTransfer.stockTransferItems, stockTransferItem =>
+        <div className="d-flex">
+          <div className="submit-buttons">
+            <button
+              type="button"
+              onClick={() => this.autofill(this.state.stockTransfer)}
+              className="btn btn-primary btn-form btn-xs"
+            ><Translate id="react.partialReceiving.autofillQuantities.label" defaultMessage="Autofill quantities" />
+            </button>
+          </div>
+          <div className="d-flex mb-3 justify-content-end submit-buttons">
+            <button
+              type="button"
+              onClick={() => this.saveStockTransfer(this.state.stockTransfer)}
+              className="btn btn-success btn-form btn-xs"
+              disabled={_.some(this.state.stockTransfer.stockTransferItems, stockTransferItem =>
               stockTransferItem.quantity > stockTransferItem.quantityAvailable)}
-          ><span><i className="fa fa-save pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
-          </button>
-          <button
-            className="btn btn-outline-success btn-xs mr-3"
-            onClick={() => this.generateStockTransfer()}
-          >
-            <span><i className="fa fa-print pr-2" /><Translate id="react.stockTransfer.generateStockTransfer.label" defaultMessage="Generate Stock Transfer" /></span>
-          </button>
+            ><span><i className="fa fa-save pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
+            </button>
+            <button
+              className="btn btn-outline-success btn-xs mr-3"
+              onClick={() => this.generateStockTransfer()}
+            >
+              <span><i className="fa fa-print pr-2" /><Translate id="react.stockTransfer.generateStockTransfer.label" defaultMessage="Generate Stock Transfer" /></span>
+            </button>
+          </div>
         </div>
         {
           this.state.stockTransfer.stockTransferItems ?

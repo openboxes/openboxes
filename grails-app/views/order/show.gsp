@@ -60,7 +60,7 @@
                                         <format:metadata obj="${orderInstance?.orderType?.name}"/>
                                     </td>
                                 </tr>
-                                <g:if test="${orderInstance.orderType == OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
+                                <g:if test="${orderInstance.orderType?.code == OrderTypeCode.PURCHASE_ORDER.name()}">
                                     <tr class="prop">
                                         <td valign="top" class="name">
                                             <label><warehouse:message code="order.originCode.label"/></label>
@@ -86,7 +86,7 @@
                                         ${orderInstance?.destination?.name}
                                     </td>
                                 </tr>
-                                <g:if test="${orderInstance.orderType == OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
+                                <g:if test="${orderInstance.orderType?.code == OrderTypeCode.PURCHASE_ORDER.name()}">
                                     <tr class="prop">
                                         <td valign="top" class="name">
                                             <label><warehouse:message code="paymentTerm.label"/></label>
