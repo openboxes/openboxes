@@ -46,7 +46,7 @@
                                          data-allow-clear="true"
                                          data-ajax--cache="true"/>
             </div>
-            <g:if test="${params.orderType == OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
+            <g:if test="${params.orderType == OrderTypeCode.PURCHASE_ORDER.name()}">
                 <div class="filter-list-item">
                     <label><warehouse:message code="order.destination.label"/></label>
                     <g:selectLocationViaAjax id="destination"
@@ -68,7 +68,7 @@
                                           disabled="${isCentralPurchasingEnabled}" />
                 </div>
             </g:if>
-            <g:elseif test="${params.orderType == OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
+            <g:elseif test="${params.orderType == Constants.PUTAWAY_ORDER}">
                 <div class="filter-list-item">
                     <label><warehouse:message code="order.destination.label"/></label>
                     <g:selectLocationViaAjax id="destination"
