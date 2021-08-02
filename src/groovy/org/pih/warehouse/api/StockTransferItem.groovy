@@ -79,23 +79,24 @@ class StockTransferItem {
 
     Map toJson() {
         return [
-                id                      : id,
-                "product.id"             : product?.id,
+                id                              : id,
+                "product.id"                    : product?.id,
                 "product.productCode"           : product?.productCode,
-                "product.name"           : product?.name,
-                "inventoryItem.id"       : inventoryItem?.id,
-                "lotNumber"             : inventoryItem?.lotNumber,
-                "expirationDate"        : inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
-                "originBinLocation.id"     : originBinLocation?.id,
-                "originBinLocation.name"     : originBinLocation?.name,
-                "originZone"            : originBinLocation?.zone?.name,
-                "destinationBinLocation.id": destinationBinLocation?.id,
-                "destinationBinLocation.name": destinationBinLocation?.name,
-                "destinationZone"       : destinationBinLocation?.zone?.name,
-                quantity                : quantity,
-                quantityOnHand          : quantityOnHand,
-                status                  : status.name(),
-                splitItems              : splitItems.collect { it?.toJson() }
+                "product.name"                  : product?.name,
+                "inventoryItem.id"              : inventoryItem?.id,
+                "lotNumber"                     : inventoryItem?.lotNumber,
+                "expirationDate"                : inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
+                "originBinLocation.id"          : originBinLocation?.id,
+                "originBinLocation.name"        : originBinLocation?.name,
+                "originZone"                    : originBinLocation?.zone?.name,
+                "destinationBinLocation.id"     : destinationBinLocation?.id,
+                "destinationBinLocation.name"   : destinationBinLocation?.name,
+                "destinationZone.id"            : destinationBinLocation?.zone?.id,
+                "destinationZone.name"          : destinationBinLocation?.zone?.name,
+                quantity                        : quantity,
+                quantityOnHand                  : quantityOnHand,
+                status                          : status.name(),
+                splitItems                      : splitItems.collect { it?.toJson() }
         ]
     }
 }

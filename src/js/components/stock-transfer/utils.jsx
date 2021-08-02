@@ -5,29 +5,48 @@ const CANCELED = 'CANCELED';
 
 function extractItem(item, status) {
   const { destinationBinLocation, destinationZone } = item;
-  return {
-    ...item,
-    destinationBinLocation: {
-      id: destinationBinLocation && destinationBinLocation.id ? destinationBinLocation.id : '',
-      name: destinationBinLocation && destinationBinLocation.name ? destinationBinLocation.name : '',
+
+  let destinationBin = {};
+  if (status === PENDING) {
+    destinationBin = {
+      id: null, name: null, zoneId: null, zoneName: null,
+    };
+  } else {
+    destinationBin = {
+      id: destinationBinLocation && destinationBinLocation.id ? destinationBinLocation.id : null,
+      name: destinationBinLocation && destinationBinLocation.name ?
+        destinationBinLocation.name : null,
       zoneId: destinationZone && destinationZone.id ? destinationZone.id : null,
       zoneName: destinationZone && destinationZone.name ? destinationZone.name : null,
-    },
+    };
+  }
+
+  return {
+    ...item,
+    destinationBinLocation: destinationBin,
     quantity: status === PENDING ? '' : item.quantity,
   };
 }
 
 function extractSplitItem(item, splitItem, status) {
+  let destinationBin = {};
+
+  if (status === PENDING) {
+    destinationBin = {
+      id: null, name: null, zoneId: null, zoneName: null,
+    };
+  } else {
+    destinationBin = {
+      id: splitItem.destinationBinLocation.id ? splitItem.destinationBinLocation.id : null,
+      name: splitItem.destinationBinLocation.name ? splitItem.destinationBinLocation.name : null,
+      zoneId: splitItem.destinationZone ? splitItem.destinationZone.id : null,
+      zoneName: splitItem.destinationZone ? splitItem.destinationZone.name : null,
+    };
+  }
+
   return {
     ...splitItem,
-    destinationBinLocation: {
-      id: splitItem.destinationBinLocation.id ? splitItem.destinationBinLocation.id : '',
-      name: splitItem.destinationBinLocation.name ? splitItem.destinationBinLocation.name : '',
-      zoneId: splitItem.destinationBinLocation.zone ?
-        splitItem.destinationBinLocation.zone.id : null,
-      zoneName: splitItem.destinationBinLocation.zone ?
-        splitItem.destinationBinLocation.zone.name : null,
-    },
+    destinationBinLocation: destinationBin,
     quantity: status === PENDING ? '' : item.quantity,
     quantityOnHand: item.quantityOnHand,
     referenceId: item.id, // set a referenceId from original item
