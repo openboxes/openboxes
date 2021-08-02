@@ -38,10 +38,10 @@ grails.project.dependency.resolution = {
         mavenLocal()
         mavenCentral()
 
-        mavenRepo "http://repo.grails.org/grails/plugins-releases/"
-        mavenRepo "http://repo.grails.org/grails/plugins/"
-        mavenRepo "http://repo.grails.org/grails/core/"
-        mavenRepo "http://oss.sonatype.org/content/repositories/snapshots/"
+        mavenRepo "https://repo.grails.org/grails/plugins-releases/"
+        mavenRepo "https://repo.grails.org/grails/plugins/"
+        mavenRepo "https://repo.grails.org/grails/core/"
+        mavenRepo "https://oss.sonatype.org/content/repositories/snapshots/"
     }
 
     dependencies {
