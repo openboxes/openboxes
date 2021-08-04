@@ -8,7 +8,12 @@ CREATE OR REPLACE VIEW invoice_list AS (
          party.code as party_code,
          party.name as party_name,
          IF(invoice_type.code is not null, invoice_type.code, "INVOICE") as invoice_type_code,
-         IF(invoice.date_paid is not null, "PAID", IF(invoice.date_submitted is not null, "POSTED", "PENDING")) as status,
+         CASE
+             WHEN invoice.date_paid is not null THEN 'PAID'
+             WHEN invoice.date_posted is not null THEN 'POSTED'
+             WHEN invoice.date_submitted is not null THEN 'SUBMITTED'
+             ELSE 'PENDING'
+         END as status,
          unit_of_measure.name as currency,
          count(invoice_item.id) as item_count,
          invoice.date_invoiced,
