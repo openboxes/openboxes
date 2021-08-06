@@ -138,6 +138,8 @@ class Product implements Comparable, Serializable {
     // http://docs.oracle.com/cd/A60725_05/html/comnls/us/inv/lotcntrl.htm
     Boolean lotControl = Boolean.TRUE
 
+    Boolean lotAndExpiryControl = Boolean.FALSE
+
     // Used to indicate that the product is an essential med (as defined by the WHO, MSPP, or PIH).
     // WHO Model Lists of Essential Medicines - http://www.who.int/medicines/publications/essentialmedicines/en/
     Boolean essential = Boolean.TRUE
@@ -287,6 +289,7 @@ class Product implements Comparable, Serializable {
         hazardousMaterial(nullable: true)
         serialized(nullable: true)
         lotControl(nullable: true)
+        lotAndExpiryControl(nullable: true)
         essential(nullable: true)
 
         defaultUom(nullable: true)
