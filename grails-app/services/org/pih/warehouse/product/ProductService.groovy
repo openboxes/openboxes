@@ -1146,6 +1146,7 @@ class ProductService {
             product.controlled_substance as controlledSubstance, 
             product.hazardous_material as hazardousMaterial, 
             product.reconditioned,
+            product.lot_and_expiry_control as lotAndExpiryControl,
             (
                 select max(pc.color) 
                 from product_catalog_item pci 

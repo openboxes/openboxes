@@ -655,17 +655,18 @@ class Product implements Comparable, Serializable {
 
     Map toJson() {
         [
-                id           : id,
-                productCode  : productCode,
-                name         : name,
-                description  : description,
-                category     : category,
-                unitOfMeasure: unitOfMeasure,
-                pricePerUnit : pricePerUnit,
-                dateCreated  : dateCreated,
-                lastUpdated  : lastUpdated,
-                color        : color,
-                handlingIcons: handlingIcons
+                id                  : id,
+                productCode         : productCode,
+                name                : name,
+                description         : description,
+                category            : category,
+                unitOfMeasure       : unitOfMeasure,
+                pricePerUnit        : pricePerUnit,
+                dateCreated         : dateCreated,
+                lastUpdated         : lastUpdated,
+                color               : color,
+                handlingIcons       : handlingIcons,
+                lotAndExpiryControl : lotAndExpiryControl,
         ]
     }
 }
