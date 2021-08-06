@@ -553,9 +553,7 @@ class SelectTagLib {
 
     def selectOrderSupplier = { attrs, body ->
         def currentLocation = Location.get(session?.warehouse?.id)
-        attrs.from = locationService.getOrderSuppliers(currentLocation).sort {
-            it?.name?.toLowerCase()
-        }
+        attrs.from = locationService.getOrderSuppliers(currentLocation)
         attrs.optionKey = 'id'
         attrs.optionValue = { "${it.organization?.code ? it.organization?.code + ' - ' :''}${it.name}" }
         out << g.select(attrs)
