@@ -181,7 +181,6 @@ class BatchController {
                             dataImporter = new ProductPackageExcelImporter(command?.filename)
                             break
                         case "outboundStockMovement":
-                            log.info"outbound stock movement - case -----------> "
                             dataImporter = new OutboundStockMovementExcelImporter(command?.filename)
                             break
                         case "tag":
