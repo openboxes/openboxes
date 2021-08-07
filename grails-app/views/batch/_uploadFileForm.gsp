@@ -232,6 +232,21 @@
                         <tr>
                             <td>
                                 <label>
+                                    <g:radio name="type" value="outboundStockMovement" checked="${params.type=='outboundStockMovement'}"/>
+                                    <warehouse:message code="import.outboundStockMovement.label" default="Requisition / Outbound Stock Movement"/>
+                                </label>
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                                <g:link controller="batch" action="downloadExcel" params="[type:'outboundStockMovement']">
+                                    <warehouse:message code="default.download.label" args="[g.message(code:'default.data.label')]"/>
+                                </g:link>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>
                                     <g:radio name="type" value="tag" checked="${params.type=='tag'}"/>
                                     <warehouse:message code="import.tag.label" default="Tag"/>
                                 </label>
