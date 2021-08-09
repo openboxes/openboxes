@@ -86,7 +86,7 @@ class DocumentTemplateService {
                     unitOfMeasure       : orderItem?.unitOfMeasure ?: "",
                     unitPrice           : orderItem?.unitPrice ?: "",
                     totalPrice          : orderItem?.totalPrice() ?: "",
-                    expectedShippingDate: orderItem?.estimatedReadyDate ?: ""
+                    expectedShippingDate: orderItem?.estimatedReadyDate ? orderItem?.estimatedReadyDate?.format("MMM dd, yyyy") : ""
             ]
         }
         def orderAdjustments = orderInstance?.orderAdjustments?.findAll { !it.canceled }?.collect { OrderAdjustment orderAdjustment ->
