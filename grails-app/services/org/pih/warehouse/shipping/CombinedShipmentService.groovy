@@ -88,6 +88,11 @@ class CombinedShipmentService {
                 valid = false
             }
 
+            if (product && product.lotAndExpiryControl && (!line.expiry || !line.lotNumber)) {
+                line.errors << "Both lot number and expiry date are required for the '${line.productCode} ${line.productName}' product."
+                valid = false
+            }
+
             if (!line.id) {
                 def codes = lineItems.findAll { it.productCode == line.productCode }
                 if (codes.size() > 1) {
