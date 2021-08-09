@@ -275,6 +275,10 @@ class StockMovementItem {
             throw new IllegalArgumentException("Product '${productCode} ${productName}' could not be found")
         }
 
+        if (product.lotAndExpiryControl && (!expirationDate || !lotNumber)) {
+            throw new IllegalArgumentException("Both lot number and expiry date are required for the '${productCode} ${productName}' product.")
+        }
+
         StockMovementItem stockMovementItem = new StockMovementItem()
         stockMovementItem.id = requisitionItemId
 
