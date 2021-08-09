@@ -23,13 +23,13 @@ class OutboundStockMovementDataService {
     Boolean validateData(ImportDataCommand command) {
         log.info "Validate data " + command.filename
         command.data.eachWithIndex { params, index ->
-            if (!params?.'Source') {
-                throw new IllegalArgumentException("Row ${index + 1}: Source is required")
+            if (!params?.origin) {
+                throw new IllegalArgumentException("Row ${index + 1}: Origin/Source is required")
             }
-            if (!params?.'Dest Venue Code') {
-                throw new IllegalArgumentException("Row ${index + 1}: Dest Venue Code is required")
+            if (!params?.destination) {
+                throw new IllegalArgumentException("Row ${index + 1}: Destination is required")
             }
-            if (!params?.'Requested Quantity') {
+            if (!params?.quantity) {
                 throw new IllegalArgumentException("Row ${index + 1}: Requested Quantity is required")
             }
             Requisition requisition = createOrUpdateRequisition(params)
@@ -44,7 +44,6 @@ class OutboundStockMovementDataService {
     void importData(ImportDataCommand command) {
         log.info "Import data " + command.filename
         command.data.eachWithIndex {params, index ->
-            // println "params = $params index = $index"
             Requisition requisition = createOrUpdateRequisition(params)
             if(requisition.validate()){
                 requisition.save(failOnError: true)
@@ -53,7 +52,7 @@ class OutboundStockMovementDataService {
     }
 
     Requisition createOrUpdateRequisition(Map params ){
-        Product product = Product.findByProductCode(params.get('SKU Code'))
+        Product product = Product.findByProductCode(params.productCode)
         if(!product) {
             throw new IllegalArgumentException("Product not found for SKU Code")
         }
@@ -63,37 +62,37 @@ class OutboundStockMovementDataService {
         if(!requisitionItem) {
             requisitionItem = new RequisitionItem()
         }
-        def requestedQuantity = params.get('Requested Quantity')
+        def requestedQuantity = params.quantity
         if (!(requestedQuantity > 0)) {
             throw new IllegalArgumentException("Requested quantity should be greater than 0")
         }
         requisitionItem.product = product
         requisitionItem.quantity = requestedQuantity
-        def loadCode = params.get('Load Code')
-        def requisition = Requisition.findByRequestNumber(loadCode)
+        def requestNumber = params.requestNumber
+        def requisition = Requisition.findByRequestNumber(requestNumber)
         if (!requisition) {
             requisition = new Requisition(
                     name: 'Load Code',
-                    requestNumber: loadCode
+                    requestNumber: requestNumber
             )
         }
-        def deliveryDate = params.get('Delivery Date')
+        def deliveryDate = params.requestedDeliveryDate
         if (!isDateOneWeekFromNow(deliveryDate)) {
             throw new IllegalArgumentException("Delivery date must be after seven days from now")
         }
         requisition.requestedDeliveryDate = deliveryDate.toDate()
-        Location source = Location.findByLocationNumber(params.get('Source'))
-        if(!source) {
+        Location origin = Location.findByLocationNumber(params.origin)
+        if(!origin) {
             throw new IllegalArgumentException("Location not found for source.")
         }
-        requisition.origin = source
-        Location destination = Location.findByLocationNumber(params.get('Dest Venue Code'))
+        requisition.origin = origin
+        Location destination = Location.findByLocationNumber(params.destination)
         if(!destination) {
             throw new IllegalArgumentException("Location not found for destination")
         }
         requisition.destination = destination
-        if(params.get('Special Instructions')) {
-            requisitionItem.description = params.get('Special Instructions')
+        if(params.description) {
+            requisitionItem.description = params.description
         }
         requisition.requestedBy = AuthService.currentUser.get()
         requisition.addToRequisitionItems(requisitionItem)
@@ -103,7 +102,6 @@ class OutboundStockMovementDataService {
     boolean isDateOneWeekFromNow(def date) {
         LocalDate today = LocalDate.now()
         LocalDate oneWeekFromNow = new LocalDate(today.getYear(), today.getMonthOfYear(), today.getDayOfMonth()+7)
-        log.info "today ${today} oneweek -> ${oneWeekFromNow} the date --> ${date}"
         if(date > oneWeekFromNow) {
             return true
         }

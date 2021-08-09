@@ -17,30 +17,24 @@ class OutboundStockMovementExcelImporter extends AbstractExcelImporter {
         sheet   : 'Sheet1',
             startRow : 1,
             columnMap : [
-                    'A': 'Source',
-                    'B': 'Dest Venue Code',
-                    'C': 'Item Description',
-                    'D': 'SKU Code',
-                    'E': 'Requested Quantity',
-                    'F': 'Pallet Quantity',
-                    'G': 'Pallet Spaces',
-                    'H': 'Delivery Date',
-                    'I': 'Load Code',
-                    'J': 'Special Instructions'
+                    'A': 'origin', // 'Source',
+                    'B': 'destination', // 'Dest Venue Code',
+                    'D': 'productCode', // 'SKU Code',
+                    'E': 'quantity', // 'Requested Quantity',
+                    'H': 'requestedDeliveryDate', // 'Delivery Date',
+                    'I': 'requestNumber', // 'Load Code',
+                    'J': 'description' // 'Special Instructions'
             ]
     ]
 
     static Map propertyMap = [
-            "Source"    : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "Dest Venue Code"   : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "Item Description"    : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "SKU Code"       : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "Requested Quantity": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue: null]),
-            "Pallet Quantity": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "Pallet Spaces": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "Delivery Date": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "Load Code": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "Special Instructions": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null])
+            "origin"    : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            "destination"   : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            "productCode"       : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            "quantity": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue: null]),
+            "requestedDeliveryDate": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            "requestNumber": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            "description": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null])
     ]
 
     OutboundStockMovementExcelImporter(String fileName) {
