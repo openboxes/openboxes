@@ -548,7 +548,7 @@ class AddItemsPage extends Component {
   saveAndTransitionToNextStep(formValues, lineItems) {
     if (_.some(lineItems, item => item.inventoryItem
       && item.expirationDate !== item.inventoryItem.expirationDate)) {
-      if (_.some(lineItems, item => item.inventoryItem.quantity && item.inventoryItem.quantity !== '0')) {
+      if (_.some(lineItems, item => item.inventoryItem && item.inventoryItem.quantity && item.inventoryItem.quantity !== '0')) {
         this.confirmInventoryItemExpirationDateUpdate(() =>
           this.saveRequisitionItemsAndTransitionToNextStep(formValues, lineItems));
       } else {
