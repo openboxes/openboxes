@@ -17,6 +17,7 @@ import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.InventoryExcelImporter
 import org.pih.warehouse.importer.InventoryLevelExcelImporter
 import org.pih.warehouse.importer.LocationExcelImporter
+import org.pih.warehouse.importer.OutboundStockMovementExcelImporter
 import org.pih.warehouse.importer.PersonExcelImporter
 import org.pih.warehouse.importer.ProductAttributeExcelImporter
 import org.pih.warehouse.importer.ProductCatalogExcelImporter
@@ -178,6 +179,9 @@ class BatchController {
                             break
                         case "productPackage":
                             dataImporter = new ProductPackageExcelImporter(command?.filename)
+                            break
+                        case "outboundStockMovement":
+                            dataImporter = new OutboundStockMovementExcelImporter(command?.filename)
                             break
                         case "tag":
                             dataImporter = new TagExcelImporter(command?.filename)
