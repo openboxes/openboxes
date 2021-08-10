@@ -84,7 +84,7 @@ class OutboundStockMovementDataService {
             if (!origin) {
                 throw new IllegalArgumentException("Location not found for origin ${params.origin}")
             }
-            requisition.origin = source
+            requisition.origin = origin
 
             Location destination = Location.findByLocationNumber(params.destination)
             if (!destination) {
@@ -99,7 +99,6 @@ class OutboundStockMovementDataService {
         def requisitionItem = RequisitionItem.createCriteria().get {
             eq 'product' , product
             eq "requisition", requisition
-            eq "quantity", quantityRequested
         }
         if (!requisitionItem) {
             requisitionItem = new RequisitionItem()
