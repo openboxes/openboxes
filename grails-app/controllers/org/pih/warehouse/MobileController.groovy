@@ -9,8 +9,11 @@
 **/
 package org.pih.warehouse
 
+import org.pih.warehouse.api.StockMovement
+import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
+import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.product.Product
@@ -24,6 +27,7 @@ class MobileController {
     def inventoryService
     def locationService
     def megamenuService
+    def stockMovementService
 
     def index = {
 
@@ -46,7 +50,7 @@ class MobileController {
                 data: [
                         [name: "Inventory Items", class: "fa fa-box", count: productCount, url: g.createLink(controller: "mobile", action: "productList")],
                         [name: "Purchase Orders", class: "fa fa-shopping-cart", count: orderCount, url: g.createLink(controller: "order", action: "list", params: ['origin.id', location.id])],
-                        [name: "Replenishment Orders", class: "fa fa-truck", count: requisitionCount, url: g.createLink(controller: "stockMovement", action: "list", params: ['origin.id', location.id])],
+                        [name: "Replenishment Orders", class: "fa fa-truck", count: requisitionCount, url: g.createLink(controller: "mobile", action: "outboundList", params: ['origin.id', location.id])],
                 ]
         ]
     }
@@ -92,4 +96,12 @@ class MobileController {
             redirect(action: "productList")
         }
     }
+
+    def outboundList = {
+        Location origin = Location.get(params.origin?params.origin.id:session.warehouse.id)
+        StockMovement stockMovement = new StockMovement(origin: origin, stockMovementType: StockMovementType.OUTBOUND, stockMovementStatusCode: StockMovementStatusCode.PENDING)
+        def stockMovements = stockMovementService.getStockMovements(stockMovement, [max:params.max?:10, offset: params.offset?:0])
+        [stockMovements:stockMovements]
+    }
+
 }
