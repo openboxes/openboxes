@@ -82,6 +82,8 @@ enum RequisitionStatus {
                 return StockMovementStatusCode.PACKED
             case RequisitionStatus.ISSUED:
                 return StockMovementStatusCode.DISPATCHED
+            case null:
+                return StockMovementStatusCode.REQUESTING
             default:
                 return StockMovementStatusCode.valueOf(requisitionStatus.toString())
         }

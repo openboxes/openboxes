@@ -15,6 +15,7 @@ import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionStatus
 import org.springframework.validation.BeanPropertyBindingResult
 import org.pih.warehouse.auth.AuthService
 
@@ -24,7 +25,7 @@ class OutboundStockMovementDataService {
         log.info "Validate data " + command.filename
         command.data.eachWithIndex { params, index ->
             if (!params?.origin) {
-                throw new IllegalArgumentException("Row ${index + 1}: Origin/Source is required")
+                throw new IllegalArgumentException("Row ${index + 1}: Origin is required")
             }
             if (!params?.destination) {
                 throw new IllegalArgumentException("Row ${index + 1}: Destination is required")
@@ -32,10 +33,10 @@ class OutboundStockMovementDataService {
             if (!params?.quantity) {
                 throw new IllegalArgumentException("Row ${index + 1}: Requested Quantity is required")
             }
-            Requisition requisition = createOrUpdateRequisition(params)
-            if (!requisition.validate()) {
-                requisition.errors.each { BeanPropertyBindingResult error ->
-                    command.errors.reject("${index + 1}: ${requisition.name} ${error.getFieldError()}")
+            RequisitionItem requisitionItem = buildRequisitionItem(params)
+            if (!requisitionItem.validate()) {
+                requisitionItem.errors.each { BeanPropertyBindingResult error ->
+                    command.errors.reject("${index + 1}: ${requisitionItem} ${error.getFieldError()}")
                 }
             }
         }
@@ -44,59 +45,73 @@ class OutboundStockMovementDataService {
     void importData(ImportDataCommand command) {
         log.info "Import data " + command.filename
         command.data.eachWithIndex {params, index ->
-            Requisition requisition = createOrUpdateRequisition(params)
-            if(requisition.validate()){
-                requisition.save(failOnError: true)
+            RequisitionItem requisitionItem = buildRequisitionItem(params)
+            if(requisitionItem.validate()){
+                requisitionItem.save(failOnError: true)
             }
         }
     }
 
-    Requisition createOrUpdateRequisition(Map params ){
-        Product product = Product.findByProductCode(params.productCode)
+
+    RequisitionItem buildRequisitionItem(Map params) {
+        String productCode = params.productCode
+        Product product = Product.findByProductCode(productCode)
         if(!product) {
-            throw new IllegalArgumentException("Product not found for SKU Code")
+            throw new IllegalArgumentException("Product not found for ${productCode}")
         }
-        def requisitionItem = RequisitionItem.createCriteria().get {
-            eq 'product' , product
-        }
-        if(!requisitionItem) {
-            requisitionItem = new RequisitionItem()
-        }
-        def requestedQuantity = params.quantity
-        if (!(requestedQuantity > 0)) {
+
+        def quantityRequested = params.quantity as Integer
+        if (!(quantityRequested > 0)) {
             throw new IllegalArgumentException("Requested quantity should be greater than 0")
         }
-        requisitionItem.product = product
-        requisitionItem.quantity = requestedQuantity
-        def requestNumber = params.requestNumber
-        def requisition = Requisition.findByRequestNumber(requestNumber)
-        if (!requisition) {
-            requisition = new Requisition(
-                    name: 'Load Code',
-                    requestNumber: requestNumber
-            )
-        }
+
         def deliveryDate = params.requestedDeliveryDate
         if (!isDateOneWeekFromNow(deliveryDate)) {
             throw new IllegalArgumentException("Delivery date must be after seven days from now")
         }
-        requisition.requestedDeliveryDate = deliveryDate.toDate()
-        Location origin = Location.findByLocationNumber(params.origin)
-        if(!origin) {
-            throw new IllegalArgumentException("Location not found for source.")
+
+        def comments = params.destination
+        def requestNumber = params.requestNumber
+        def requisition = Requisition.findByRequestNumber(requestNumber)
+        if (!requisition) {
+            requisition = new Requisition(
+                    name: "Outbound Order ${requestNumber}",
+                    requestNumber: requestNumber,
+                    status: RequisitionStatus.CREATED
+            )
+
+            Location origin = Location.findByLocationNumber(params.origin)
+            if (!origin) {
+                throw new IllegalArgumentException("Location not found for origin ${params.origin}")
+            }
+            requisition.origin = source
+
+            Location destination = Location.findByLocationNumber(params.destination)
+            if (!destination) {
+                throw new IllegalArgumentException("Location not found for destination ${params.destination}")
+            }
+            requisition.destination = destination
+            requisition.requestedDeliveryDate = deliveryDate.toDate()
+            requisition.requestedBy = AuthService.currentUser.get()
+            requisition.save(failOnError: true)
         }
-        requisition.origin = origin
-        Location destination = Location.findByLocationNumber(params.destination)
-        if(!destination) {
-            throw new IllegalArgumentException("Location not found for destination")
+
+        def requisitionItem = RequisitionItem.createCriteria().get {
+            eq 'product' , product
+            eq "requisition", requisition
+            eq "quantity", quantityRequested
         }
-        requisition.destination = destination
-        if(params.description) {
-            requisitionItem.description = params.description
+        if (!requisitionItem) {
+            requisitionItem = new RequisitionItem()
         }
-        requisition.requestedBy = AuthService.currentUser.get()
+
+        requisitionItem.product = product
+        requisitionItem.quantity = quantityRequested
+        requisitionItem.comment = comments
+
         requisition.addToRequisitionItems(requisitionItem)
-        return requisition
+
+        return requisitionItem
     }
 
     boolean isDateOneWeekFromNow(def date) {

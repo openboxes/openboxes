@@ -233,15 +233,16 @@
                             <td>
                                 <label>
                                     <g:radio name="type" value="outboundStockMovement" checked="${params.type=='outboundStockMovement'}"/>
-                                    <warehouse:message code="import.outboundStockMovement.label" default="Requisition / Outbound Stock Movement"/>
+                                    <warehouse:message code="import.outboundStockMovement.label" default="Stock Movements (Outbound)"/>
                                 </label>
                             </td>
                             <td>
                             </td>
                             <td>
-                                <g:link controller="batch" action="downloadExcel" params="[type:'outboundStockMovement']">
-                                    <warehouse:message code="default.download.label" args="[g.message(code:'default.data.label')]"/>
-                                </g:link>
+                                %{--Cannot implement export yet --}%
+                                %{--<g:link controller="batch" action="downloadExcel" params="[type:'outboundStockMovement']">--}%
+                                %{--    <warehouse:message code="default.download.label" args="[g.message(code:'default.data.label')]"/>--}%
+                                %{--</g:link>--}%
                             </td>
                         </tr>
                         <tr>
