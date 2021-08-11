@@ -2659,6 +2659,13 @@ class InventoryService implements ApplicationContextAware {
                     command.errors.reject("error.lotNumber.notExists", "Row ${rowIndex}: Items with an expiry date must also have a lot number")
                 }
 
+                if (product.lotAndExpiryControl && (!row.expirationDate || !row.lotNumber)) {
+                    command.errors.reject(
+                        "error.lotAndExpiryControl.required",
+                        "Row ${rowIndex}: Both lot number and expiry date are required for the '${product.productCode} ${product.name}' product."
+                    )
+                }
+
                 def expirationDate = null
                 try {
                     if (row.expirationDate) {
