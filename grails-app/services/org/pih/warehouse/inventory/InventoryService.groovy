@@ -1305,6 +1305,13 @@ class InventoryService implements ApplicationContextAware {
                         row.error = true
                         return cmd
                     }
+
+                    if(cmd.product && cmd.product.lotAndExpiryControl && (!row.expirationDate || !row.lotNumber)) {
+                        cmd.errors.reject("inventoryItem.invalid", "Both lot number and expiry date are required for this product.")
+                        row.error = true
+                        return cmd
+                    }
+
                     // 1. Find an existing inventory item for the given lot number and product and description
                     def inventoryItem =
                             findInventoryItemByProductAndLotNumber(cmd.product, row.lotNumber)
