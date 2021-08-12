@@ -161,7 +161,7 @@ class InvoiceService {
                 eq("status", params.status as InvoiceStatus)
             }
 
-            order("dateInvoiced", "desc")
+            order("dateCreated", "desc")
         }
     }
 

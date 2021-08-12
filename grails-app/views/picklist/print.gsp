@@ -122,7 +122,6 @@
 <g:set var="allRequisitionItems" value='${requisition.requisitionItems.sort { it.product.name }}'/>
 <g:set var="allPickListItems" value='${allRequisitionItems*.retrievePicklistItems()?.flatten()}'/>
 <g:set var="zoneNames" value='${allPickListItems?.collect { it?.binLocation?.zone?.name }?.unique()?.sort{ a, b -> !a ? !b ? 0 : 1 : !b ? -1 : a <=> b }}'/>
-<g:set var="allPickListItems" value='${allRequisitionItems*.retrievePicklistItems()?.flatten()}'/>
 <g:set var="pickListItemsByZone" value='${allPickListItems?.groupBy { it?.binLocation?.zone?.name } ?: [:]}'/>
 
 <g:each var="zoneName" status="i" in="${zoneNames}">

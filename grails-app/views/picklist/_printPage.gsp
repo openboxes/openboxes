@@ -3,8 +3,8 @@
     def comparator = { a,b ->
       def pickItemsA = pickListItemsByRequisition[a.id]?.sort { pickA, pickB -> pickA.binLocation?.name <=> pickB.binLocation?.name }
       def pickItemsB = pickListItemsByRequisition[b.id]?.sort { pickA, pickB -> pickA.binLocation?.name <=> pickB.binLocation?.name }
-      def itemA = pickItemsA[0]
-      def itemB = pickItemsB[0]
+      def itemA = pickItemsA ? pickItemsA[0] : null
+      def itemB = pickItemsB ? pickItemsB[0] : null
       def nameA = itemA?.binLocation?.name
       def nameB = itemB?.binLocation?.name
       def orderA = itemA?.sortOrder
