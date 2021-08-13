@@ -47,7 +47,7 @@ function extractSplitItem(item, splitItem, status) {
   return {
     ...splitItem,
     destinationBinLocation: destinationBin,
-    quantity: status === PENDING ? '' : item.quantity,
+    quantity: status === PENDING ? '' : splitItem.quantity,
     quantityOnHand: item.quantityOnHand,
     referenceId: item.id, // set a referenceId from original item
   };

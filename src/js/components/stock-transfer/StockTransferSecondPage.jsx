@@ -139,6 +139,27 @@ class StockTransferSecondPage extends Component {
             'Quantity to transfer cannot be higher than quantity in current bin',
           );
         }
+
+        if (!_.toInteger(props.value)) {
+          disabled = true;
+          disabledMessage = this.props.translate(
+            'react.stockTransfer.selectOrDeleteLine.label',
+            'Please select a quantity or delete the line',
+          );
+        } else if (_.toInteger(props.value) > props.original.quantityOnHand) {
+          disabled = true;
+          disabledMessage = this.props.translate(
+            'react.stockTransfer.higherThanQoH.label',
+            'Cant transfer more than on hand.',
+          );
+        } else if (_.toInteger(props.value) < 0) {
+          disabled = true;
+          disabledMessage = this.props.translate(
+            'react.stockTransfer.errors.negativeQty.label',
+            'Quantity to transfer can\'t be negative',
+          );
+        }
+
         return (
           <Tooltip
             html={disabledMessage}
@@ -149,7 +170,7 @@ class StockTransferSecondPage extends Component {
             duration="250"
             hideDelay="50"
           >
-            <div className={props.value && disabled ? 'has-error' : ''}>
+            <div className={disabled && props.original.status !== CANCELED ? 'has-error' : ''}>
               <input
                 type="number"
                 className="form-control form-control-xs"
@@ -318,13 +339,29 @@ class StockTransferSecondPage extends Component {
         })
         .catch(() => this.props.hideSpinner());
     } else {
-      const stockTransfer = update(this.state.stockTransfer, {
+      let stockTransfer = update(this.state.stockTransfer, {
         stockTransferItems: {
           $splice: [
             [itemIndex, 1],
           ],
         },
       });
+
+      const originalItem = _.find(
+        stockTransfer.stockTransferItems,
+        item => item.id === itemToDelete.referenceId,
+      );
+      const splitItems = _.filter(
+        stockTransfer.stockTransferItems,
+        item => item.referenceId === originalItem.id,
+      );
+
+      if (splitItems.length === 0 && originalItem) {
+        const originalItemIndex = _.findIndex(stockTransfer.stockTransferItems, originalItem);
+        stockTransfer = update(stockTransfer, {
+          stockTransferItems: { [originalItemIndex]: { status: { $set: 'PENDING' } } },
+        });
+      }
 
       this.setState({ stockTransfer });
       this.props.hideSpinner();
@@ -372,7 +409,7 @@ class StockTransferSecondPage extends Component {
         ] : [
           [index + 1, 0, newLine],
         ],
-        [index]: { $set: original.id ? { ...original, status: CANCELED } : original },
+        [index]: { $set: original.id ? { ...original, status: CANCELED, quantity: '' } : { ...original, quantity: '' } },
       },
     });
 
@@ -389,6 +426,33 @@ class StockTransferSecondPage extends Component {
           quantity: item.quantityOnHand,
         })),
       },
+    });
+  }
+
+  isDisabled() {
+    const { stockTransferItems } = this.state.stockTransfer;
+
+    return stockTransferItems && !!stockTransferItems.find((item) => {
+      const { quantity, quantityOnHand, status } = item;
+
+      if (status !== 'CANCELED' && (!quantity || quantity > quantityOnHand || quantity <= 0)) {
+        return true;
+      }
+
+      const splitItems = _.filter(stockTransferItems, lineItem =>
+        lineItem.referenceId && lineItem.referenceId === item.referenceId);
+
+      if (!item.id || splitItems.length > 1) {
+        const quantityToTransfer = _.reduce(
+          splitItems, (sum, val) =>
+            (sum + (val.quantity ? _.toInteger(val.quantity) : 0)),
+          0,
+        );
+        if (quantityToTransfer > quantityOnHand) {
+          return true;
+        }
+      }
+      return false;
     });
   }
 
@@ -449,6 +513,7 @@ class StockTransferSecondPage extends Component {
           <button
             type="button"
             onClick={() => this.nextPage()}
+            disabled={this.isDisabled()}
             className="btn btn-outline-primary btn-form float-right btn-xs"
           ><Translate id="react.default.button.next.label" defaultMessage="Next" />
           </button>
