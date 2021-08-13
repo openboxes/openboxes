@@ -151,9 +151,18 @@ class StockTransferService {
             item.delete()
         }
 
+        OrderItem parentItem = orderItem?.parentOrderItem
         Order order = orderItem.order
         order.removeFromOrderItems(orderItem)
+        if (parentItem) {
+            parentItem.removeFromOrderItems(orderItem)
+        }
         orderItem.delete()
+
+        if (parentItem?.orderItems?.toArray()?.size() == 0 && parentItem.orderItemStatusCode == OrderItemStatusCode.CANCELED) {
+            parentItem.orderItemStatusCode = OrderItemStatusCode.PENDING
+            parentItem.save()
+        }
         return order
     }
 
