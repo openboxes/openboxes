@@ -47,7 +47,7 @@ class RefreshProductAvailabilityEvent extends ApplicationEvent {
         super(source)
         this.locationId = source.associatedLocation
         this.productIds = source.associatedProducts
-        this.synchronousRequired = source.synchronousRequired
+        this.disableRefresh = source.disableRefresh
     }
 
     RefreshProductAvailabilityEvent(Transaction source, Boolean forceRefresh) {

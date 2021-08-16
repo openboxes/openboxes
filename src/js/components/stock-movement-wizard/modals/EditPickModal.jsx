@@ -182,7 +182,8 @@ class EditPickModal extends Component {
   onSave(values) {
     this.props.showSpinner();
 
-    const url = `/openboxes/api/stockMovementItems/${this.state.attr.fieldValue['requisitionItem.id']}/updatePicklist`;
+    const picklistUrl = `/openboxes/api/stockMovementItems/${this.state.attr.fieldValue['requisitionItem.id']}/updatePicklist`;
+    const itemsUrl = `/openboxes/api/stockMovementItems/${this.state.attr.fieldValue['requisitionItem.id']}?stepNumber=4`;
     const payload = {
       picklistItems: _.map(values.availableItems, avItem => ({
         id: avItem.id || '',
@@ -193,12 +194,16 @@ class EditPickModal extends Component {
       reasonCode: values.reasonCode || '',
     };
 
-    return apiClient.post(url, payload)
-      .then((resp) => {
-        const pickPageItem = resp.data.data;
+    apiClient.post(picklistUrl, payload)
+      .then(() => {
+        apiClient.get(itemsUrl)
+          .then((resp) => {
+            const pickPageItem = resp.data.data;
 
-        this.state.attr.onResponse(pickPageItem);
-        this.props.hideSpinner();
+            this.state.attr.onResponse(pickPageItem);
+            this.props.hideSpinner();
+          })
+          .catch(() => { this.props.hideSpinner(); });
       })
       .catch(() => { this.props.hideSpinner(); });
   }

@@ -695,13 +695,19 @@ class EditItemsPage extends Component {
   revertItem(values, itemId) {
     this.props.showSpinner();
     const revertItemsUrl = `/openboxes/api/stockMovementItems/${itemId}/revertItem`;
+    const itemsUrl = `/openboxes/api/stockMovementItems/${itemId}?stepNumber=3`;
 
     return apiClient.post(revertItemsUrl)
-      .then((response) => {
-        const editPageItem = response.data.data;
-        this.updateEditPageItem(values, editPageItem);
-        this.props.hideSpinner();
-      })
+      .then(() => apiClient.get(itemsUrl)
+        .then((response) => {
+          const editPageItem = response.data.data;
+          this.updateEditPageItem(values, editPageItem);
+          this.props.hideSpinner();
+        })
+        .catch(() => {
+          this.props.hideSpinner();
+          return Promise.reject(new Error(this.props.translate('react.stockMovement.error.revertRequisitionItem.label', 'Could not revert requisition items')));
+        }))
       .catch(() => {
         this.props.hideSpinner();
         return Promise.reject(new Error(this.props.translate('react.stockMovement.error.revertRequisitionItem.label', 'Could not revert requisition items')));

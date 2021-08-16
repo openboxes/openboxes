@@ -447,14 +447,19 @@ class PickPage extends Component {
   revertUserPick(itemId) {
     this.props.showSpinner();
 
-    const itemsUrl = `/openboxes/api/stockMovementItems/${itemId}/createPicklist`;
+    const createPicklistUrl = `/openboxes/api/stockMovementItems/${itemId}/createPicklist`;
+    const itemsUrl = `/openboxes/api/stockMovementItems/${itemId}?stepNumber=4`;
 
-    apiClient.post(itemsUrl)
-      .then((resp) => {
-        const pickPageItem = resp.data.data;
+    apiClient.post(createPicklistUrl)
+      .then(() => {
+        apiClient.get(itemsUrl)
+          .then((resp) => {
+            const pickPageItem = resp.data.data;
 
-        this.updatePickPageItem(pickPageItem);
-        this.props.hideSpinner();
+            this.updatePickPageItem(pickPageItem);
+            this.props.hideSpinner();
+          })
+          .catch(() => { this.props.hideSpinner(); });
       })
       .catch(() => { this.props.hideSpinner(); });
   }
