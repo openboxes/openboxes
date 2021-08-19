@@ -3,12 +3,7 @@ package org.pih.warehouse.xml.executionstatus;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.pih.warehouse.xml.acceptancestatus.Header;
-import org.pih.warehouse.xml.executionstatus.ExecutionStatus;
-import org.pih.warehouse.xml.executionstatus.TripExecution;
-
 import static org.junit.Assert.*;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
