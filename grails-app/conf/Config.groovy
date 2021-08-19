@@ -1380,6 +1380,12 @@ openboxes {
 
 openboxes.generateName.separator = " - "
 
+// OpenBoxes FTP server configuration
+openboxes.integration.ftp.server = "localhost"
+openboxes.integration.ftp.user = "sftpuser"
+openboxes.integration.ftp.password = "password"
+openboxes.integration.ftp.directory = "files"
+
 
 // Disable feature during development
 openboxes.shipping.splitPickItems.enabled = true
