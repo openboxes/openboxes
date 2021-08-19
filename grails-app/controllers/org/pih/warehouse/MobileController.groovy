@@ -28,6 +28,7 @@ class MobileController {
     def locationService
     def megamenuService
     def stockMovementService
+    def fileTransferService
 
     def index = {
 
@@ -46,11 +47,15 @@ class MobileController {
             eq("origin", location)
         }
 
+        def messageCount = 1;
+
+
         [
                 data: [
-                        [name: "Inventory Items", class: "fa fa-box", count: productCount, url: g.createLink(controller: "mobile", action: "productList")],
-                        [name: "Purchase Orders", class: "fa fa-shopping-cart", count: orderCount, url: g.createLink(controller: "order", action: "list", params: ['origin.id', location.id])],
-                        [name: "Replenishment Orders", class: "fa fa-truck", count: requisitionCount, url: g.createLink(controller: "mobile", action: "outboundList", params: ['origin.id', location.id])],
+                        [name: "Inventory", class: "fa fa-box", count: productCount, url: g.createLink(controller: "mobile", action: "productList")],
+                        [name: "Inbound Orders", class: "fa fa-shopping-cart", count: orderCount, url: g.createLink(controller: "order", action: "list", params: ['origin.id', location.id])],
+                        [name: "Outbound Orders", class: "fa fa-truck", count: requisitionCount, url: g.createLink(controller: "mobile", action: "outboundList", params: ['origin.id', location.id])],
+                        [name: "Messages", class: "fa fa-envelope", count: messageCount, url: g.createLink(controller: "mobile", action: "messageList", params: ['origin.id', location.id])],
                 ]
         ]
     }
@@ -102,6 +107,18 @@ class MobileController {
         StockMovement stockMovement = new StockMovement(origin: origin, stockMovementType: StockMovementType.OUTBOUND, stockMovementStatusCode: StockMovementStatusCode.PENDING)
         def stockMovements = stockMovementService.getStockMovements(stockMovement, [max:params.max?:10, offset: params.offset?:0])
         [stockMovements:stockMovements]
+    }
+
+    def messageList = {
+        def messages = fileTransferService.listMessages()
+        [messages:messages]
+    }
+
+    def messageDetails = {
+        def content = fileTransferService.retrieveMessage(params.filename)
+        //def xml = new XML(content)
+        render text: content, contentType: 'text/xml', encoding: 'UTF-8'
+        return
     }
 
 }
