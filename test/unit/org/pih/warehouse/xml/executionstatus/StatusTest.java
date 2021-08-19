@@ -1,8 +1,12 @@
-package org.pih.warehouse.xml;
+package org.pih.warehouse.xml.executionstatus;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.pih.warehouse.xml.acceptancestatus.Header;
+import org.pih.warehouse.xml.executionstatus.ExecutionStatus;
+import org.pih.warehouse.xml.executionstatus.TripExecution;
+
 import static org.junit.Assert.*;
 
 import javax.xml.bind.JAXBContext;
@@ -46,13 +50,13 @@ public class StatusTest {
         JAXBContext jaxbContext = JAXBContext.newInstance(TripExecution.class);
         Marshaller marshaller = jaxbContext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        marshaller.marshal(tripExecution, new File("./uploads/new_status.xml"));
+        marshaller.marshal(tripExecution, new File("/tmp/new_status.xml"));
         marshaller.marshal(tripExecution, System.out);
     }
 
     @Test
     public void testXmlToObject() throws  JAXBException, FileNotFoundException {
-        File xmlFile = new File("./uploads/new_status.xml");
+        File xmlFile = new File("/tmp/new_status.xml");
         JAXBContext jaxbContext = JAXBContext.newInstance(TripExecution.class);
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         TripExecution tripExecution = (TripExecution) unmarshaller.unmarshal(xmlFile);
@@ -60,6 +64,4 @@ public class StatusTest {
         assertEquals( tripExecution.getTripID() , "10032021");
         assertEquals( tripExecution.getExecutionStatus().get(0).getStatus() , "PICKUP");
     }
-
-
 }
