@@ -532,43 +532,54 @@ class StockMovementService {
         return requisitionItems
     }
 
+    def getStockMovementItem(String id, String stepNumber) {
+        RequisitionItem requisitionItem = RequisitionItem.get(id)
+        StockMovementItem stockMovementItem = null
+        Requisition requisition = null
+        ShipmentItem shipmentItem = null
+
+        if (stepNumber == '3') {
+            return getEditPageItem(requisitionItem)
+        }
+
+        if (requisitionItem) {
+            stockMovementItem = StockMovementItem.createFromRequisitionItem(requisitionItem)
+            requisition = requisitionItem.requisition
+        } else {
+            shipmentItem = ShipmentItem.get(id)
+
+            if (shipmentItem) {
+                stockMovementItem = StockMovementItem.createFromShipmentItem(shipmentItem)
+                if (stockMovementItem.inventoryItem) {
+                    def quantity = productAvailabilityService.getQuantityOnHand(stockMovementItem.inventoryItem)
+                    stockMovementItem.inventoryItem.quantity = quantity
+                }
+            }
+        }
+
+        switch(stepNumber) {
+            case "2":
+                return getAddPageItem(requisition, stockMovementItem)
+            case "4":
+                return buildPickPageItem(requisitionItem, stockMovementItem.sortOrder)
+            case "5":
+                return buildPackPageItem(shipmentItem)
+            case "6":
+                if (requisition && !requisition.origin.isSupplier() && requisition.origin.supports(ActivityCode.MANAGE_INVENTORY)) {
+                    return buildPackPageItem(shipmentItem)
+                }
+            default:
+                return stockMovementItem
+        }
+    }
+
     def getStockMovementItems(String id, String stepNumber, String max, String offset) {
         // FIXME should get stock movement instead of requisition
         Requisition requisition = Requisition.get(id)
         List<StockMovementItem> stockMovementItems = []
 
         if (stepNumber == '3') {
-            List editPageItems = getEditPageItems(requisition, max, offset)
-
-            if (requisition && requisition.sourceType == RequisitionSourceType.ELECTRONIC) {
-                def quantityOnHandRequestingMap = productAvailabilityService.getQuantityOnHand(editPageItems.collect { it.product }, requisition.destination)
-                        .inject([:]) {map, item -> map << [(item.prod.id): item.quantityOnHand]}
-
-                editPageItems = editPageItems.collect { editPageItem ->
-                    // origin = fulfilling, destination = requesting
-                    editPageItem << [quantityOnHandRequesting: quantityOnHandRequestingMap[editPageItem.product.id]]
-
-                    def template = requisition.requisitionTemplate
-                    if (!template || (template && template.replenishmentTypeCode == ReplenishmentTypeCode.PULL)) {
-                        def quantityDemand = forecastingService.getDemand(requisition.destination, editPageItem.product)
-                        editPageItem << [
-                            quantityDemand                  : quantityDemand?.monthlyDemand?:0,
-                            demandPerReplenishmentPeriod    : Math.ceil((quantityDemand?.dailyDemand?:0) * (template?.replenishmentPeriod?:30))
-                        ]
-                    } else {
-                        def stocklist = Requisition.get(requisition.requisitionTemplate.id)
-                        def quantityOnStocklist = 0
-                        RequisitionItemSortByCode sortByCode = requisition.requisitionTemplate?.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX
-                        stocklist."${sortByCode.methodName}"?.eachWithIndex { item, index ->
-                            if (item.product == editPageItem.product && (index * 100 == editPageItem.sortOrder || index == editPageItem.sortOrder)) {
-                                quantityOnStocklist = item.quantity
-                            }
-                        }
-                        editPageItem << [quantityOnStocklist: quantityOnStocklist]
-                    }
-                }
-            }
-            return editPageItems
+            return getEditPageItems(requisition, max, offset)
         }
 
         if (requisition) {
@@ -616,41 +627,7 @@ class StockMovementService {
 
         switch(stepNumber) {
             case "2":
-                if (requisition && requisition.sourceType == RequisitionSourceType.ELECTRONIC) {
-                    stockMovementItems = stockMovementItems.collect { stockMovementItem ->
-                        def quantityOnHand = productAvailabilityService.getQuantityOnHand(stockMovementItem.product, requisition.destination)
-                        def template = requisition.requisitionTemplate
-                        if (!template || (template && template.replenishmentTypeCode == ReplenishmentTypeCode.PULL)) {
-                            def demand = forecastingService.getDemand(requisition.destination, stockMovementItem.product)
-                            [
-                                    id                              : stockMovementItem.id,
-                                    product                         : stockMovementItem.product,
-                                    productCode                     : stockMovementItem.productCode,
-                                    quantityOnHand                  : quantityOnHand ?: 0,
-                                    quantityAllowed                 : stockMovementItem.quantityAllowed,
-                                    comments                        : stockMovementItem.comments,
-                                    quantityRequested               : stockMovementItem.quantityRequested,
-                                    statusCode                      : stockMovementItem.statusCode,
-                                    sortOrder                       : stockMovementItem.sortOrder,
-                                    monthlyDemand                   : demand?.monthlyDemand?:0,
-                                    demandPerReplenishmentPeriod    : Math.ceil((demand?.dailyDemand?:0) * (template?.replenishmentPeriod?:30))
-                            ]
-                        } else {
-                            [
-                                    id                  : stockMovementItem.id,
-                                    product             : stockMovementItem.product,
-                                    productCode         : stockMovementItem.productCode,
-                                    quantityOnHand      : quantityOnHand ?: 0,
-                                    quantityAllowed     : stockMovementItem.quantityAllowed,
-                                    comments            : stockMovementItem.comments,
-                                    quantityRequested   : stockMovementItem.quantityRequested,
-                                    statusCode          : stockMovementItem.statusCode,
-                                    sortOrder           : stockMovementItem.sortOrder,
-                            ]
-                        }
-                    }
-                }
-                return stockMovementItems
+                return getAddPageItems(requisition, stockMovementItems)
             case "4":
                 return getPickPageItems(id, max, offset)
             case "5":
@@ -664,14 +641,69 @@ class StockMovementService {
         }
     }
 
-    def getEditPageItem(StockMovementItem stockMovementItem) {
+    def getAddPageItems(Requisition requisition, List stockMovementItems) {
+        return stockMovementItems.collect {
+            stockMovementItem -> getAddPageItem(requisition, stockMovementItem)
+        }
+    }
+
+    def getAddPageItem(Requisition requisition, def stockMovementItem) {
+        if (stockMovementItem && requisition && requisition.sourceType == RequisitionSourceType.ELECTRONIC) {
+            def quantityOnHand = productAvailabilityService.getQuantityOnHand(stockMovementItem.product, requisition.destination)
+            def template = requisition.requisitionTemplate
+            if (!template || (template && template.replenishmentTypeCode == ReplenishmentTypeCode.PULL)) {
+                def demand = forecastingService.getDemand(requisition.destination, stockMovementItem.product)
+                return [
+                        id                              : stockMovementItem.id,
+                        product                         : stockMovementItem.product,
+                        productCode                     : stockMovementItem.productCode,
+                        quantityOnHand                  : quantityOnHand ?: 0,
+                        quantityAllowed                 : stockMovementItem.quantityAllowed,
+                        comments                        : stockMovementItem.comments,
+                        quantityRequested               : stockMovementItem.quantityRequested,
+                        statusCode                      : stockMovementItem.statusCode,
+                        sortOrder                       : stockMovementItem.sortOrder,
+                        monthlyDemand                   : demand?.monthlyDemand?:0,
+                        demandPerReplenishmentPeriod    : Math.ceil((demand?.dailyDemand?:0) * (template?.replenishmentPeriod?:30))
+                ]
+            } else {
+                return [
+                        id                  : stockMovementItem.id,
+                        product             : stockMovementItem.product,
+                        productCode         : stockMovementItem.productCode,
+                        quantityOnHand      : quantityOnHand ?: 0,
+                        quantityAllowed     : stockMovementItem.quantityAllowed,
+                        comments            : stockMovementItem.comments,
+                        quantityRequested   : stockMovementItem.quantityRequested,
+                        statusCode          : stockMovementItem.statusCode,
+                        sortOrder           : stockMovementItem.sortOrder,
+                ]
+            }
+        }
+
+        return stockMovementItem
+    }
+
+    def getEditPageItem(RequisitionItem requisitionItem) {
         def query = """ select * FROM edit_page_item where id = :itemId """
 
-        def data = dataService.executeQuery(query, ['itemId': stockMovementItem.id])
+        def data = dataService.executeQuery(query, ['itemId': requisitionItem?.id])
 
         List editPageItems = buildEditPageItems(data)
+        def editPageItem = editPageItems ? editPageItems.first() : null
 
-        return editPageItems ? editPageItems.first() : null
+        if (editPageItem) {
+            Requisition requisition = Requisition.get(requisitionItem?.requisition?.id)
+
+            if (requisition && requisition.sourceType == RequisitionSourceType.ELECTRONIC) {
+                def quantityOnHandRequestingMap = productAvailabilityService.getQuantityOnHand(editPageItems.collect { it.product }, requisition.destination)
+                        .inject([:]) {map, item -> map << [(item.prod.id): item.quantityOnHand]}
+
+                calculateFieldsForElectronicRequisitionItem(requisition, editPageItem, quantityOnHandRequestingMap)
+            }
+        }
+
+        return editPageItem
     }
 
     List getEditPageItems(Requisition requisition, String max, String offset) {
@@ -685,7 +717,42 @@ class StockMovementService {
                 'max'        : max ? max.toInteger() : null,
         ])
 
-        return buildEditPageItems(data)
+        List editPageItems = buildEditPageItems(data)
+
+        if (requisition && requisition.sourceType == RequisitionSourceType.ELECTRONIC) {
+            def quantityOnHandRequestingMap = productAvailabilityService.getQuantityOnHand(editPageItems.collect { it.product }, requisition.destination)
+                    .inject([:]) {map, item -> map << [(item.prod.id): item.quantityOnHand]}
+
+            editPageItems = editPageItems.collect { editPageItem ->
+                calculateFieldsForElectronicRequisitionItem(requisition, editPageItem, quantityOnHandRequestingMap)
+            }
+        }
+
+        return editPageItems
+    }
+
+    void calculateFieldsForElectronicRequisitionItem(Requisition requisition, def editPageItem, def quantityOnHandRequestingMap) {
+        // origin = fulfilling, destination = requesting
+        editPageItem << [quantityOnHandRequesting: quantityOnHandRequestingMap[editPageItem.product.id]]
+
+        def template = requisition.requisitionTemplate
+        if (!template || (template && template.replenishmentTypeCode == ReplenishmentTypeCode.PULL)) {
+            def quantityDemand = forecastingService.getDemand(requisition.destination, editPageItem.product)
+            editPageItem << [
+                    quantityDemand                  : quantityDemand?.monthlyDemand?:0,
+                    demandPerReplenishmentPeriod    : Math.ceil((quantityDemand?.dailyDemand?:0) * (template?.replenishmentPeriod?:30))
+            ]
+        } else {
+            def stocklist = Requisition.get(requisition.requisitionTemplate.id)
+            def quantityOnStocklist = 0
+            RequisitionItemSortByCode sortByCode = requisition.requisitionTemplate?.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX
+            stocklist."${sortByCode.methodName}"?.eachWithIndex { item, index ->
+                if (item.product == editPageItem.product && (index * 100 == editPageItem.sortOrder || index == editPageItem.sortOrder)) {
+                    quantityOnStocklist = item.quantity
+                }
+            }
+            editPageItem << [quantityOnStocklist: quantityOnStocklist]
+        }
     }
 
     List buildEditPageItems(def data) {
@@ -844,13 +911,15 @@ class StockMovementService {
             picklist.picklistItems.findAll {
                 it.requisitionItem == requisitionItem
             }.toArray().each {
-                it.synchronousRequired = Boolean.TRUE
+                it.disableRefresh = Boolean.TRUE
                 picklist.removeFromPicklistItems(it)
                 requisitionItem.removeFromPicklistItems(it)
                 it.delete()
             }
             picklist.save()
         }
+
+        productAvailabilityService.refreshProductsAvailability(requisitionItem?.requisition?.origin?.id, [requisitionItem?.product?.id], false)
     }
 
     void createMissingPicklistItems(StockMovement stockMovement) {
@@ -942,8 +1011,8 @@ class StockMovementService {
             log.info "Available items: ${availableItems}"
             List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
             log.info "Suggested items " + suggestedItems
+            clearPicklist(requisitionItem)
             if (suggestedItems) {
-                clearPicklist(requisitionItem)
                 for (SuggestedItem suggestedItem : suggestedItems) {
                     createOrUpdatePicklistItem(requisitionItem,
                             null,
@@ -1006,9 +1075,11 @@ class StockMovementService {
             picklistItem.reasonCode = reasonCode
             picklistItem.comment = comment
             picklistItem.sortOrder = requisitionItem.orderIndex
-            picklistItem.synchronousRequired = Boolean.TRUE
+            picklistItem.disableRefresh = Boolean.TRUE
         }
         picklist.save(flush: true)
+
+        productAvailabilityService.refreshProductsAvailability(requisitionItem?.requisition?.origin?.id, [inventoryItem?.product?.id], false)
     }
 
     void createOrUpdatePicklistItem(StockMovement stockMovement, List<PickPageItem> pickPageItems) {
@@ -1053,6 +1124,32 @@ class StockMovementService {
         }
 
         return []
+    }
+
+    void updatePicklistItem(StockMovementItem stockMovementItem, List picklistItems, String reasonCode) {
+        RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
+
+        clearPicklist(requisitionItem)
+
+        picklistItems.each { picklistItemMap ->
+
+            PicklistItem picklistItem = picklistItemMap["id"] ?
+                    PicklistItem.get(picklistItemMap["id"]) : null
+
+            InventoryItem inventoryItem = picklistItemMap["inventoryItem.id"] ?
+                    InventoryItem.get(picklistItemMap["inventoryItem.id"]) : null
+
+            Location binLocation = picklistItemMap["binLocation.id"] ?
+                    Location.get(picklistItemMap["binLocation.id"]) : null
+
+            BigDecimal quantityPicked = (picklistItemMap.quantityPicked != null && picklistItemMap.quantityPicked != "") ?
+                    new BigDecimal(picklistItemMap.quantityPicked) : null
+
+            String comment = picklistItemMap.comment
+
+            createOrUpdatePicklistItem(requisitionItem, picklistItem, inventoryItem, binLocation,
+                    quantityPicked?.intValueExact(), reasonCode, comment)
+        }
     }
 
     List<AvailableItem> getAvailableItems(Location location, RequisitionItem requisitionItem) {
@@ -1231,7 +1328,7 @@ class StockMovementService {
         if (shipmentItem?.container?.parentContainer) {
             palletName = shipmentItem?.container?.parentContainer?.name
             boxName = shipmentItem?.container?.name
-        } else if (shipmentItem.container) {
+        } else if (shipmentItem?.container) {
             palletName = shipmentItem?.container?.name
         }
 
@@ -1619,7 +1716,7 @@ class StockMovementService {
 
         stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
             if (stockMovementItem.statusCode == 'CHANGED') {
-                def editPageItem = getEditPageItem(stockMovementItem)
+                def editPageItem = getEditPageItem(stockMovementItem?.requisitionItem)
                 revisedItems.add(editPageItem)
             }
         }
@@ -1759,9 +1856,13 @@ class StockMovementService {
         }
 
         picklistItems.each { PicklistItem picklistItem ->
-            picklistItem.synchronousRequired = Boolean.TRUE
+            picklistItem.disableRefresh = Boolean.TRUE
+            picklistItem.picklist?.removeFromPicklistItems(picklistItem)
+            picklistItem.requisitionItem?.removeFromPicklistItems(picklistItem)
             picklistItem.delete()
         }
+
+        productAvailabilityService.refreshProductsAvailability(requisitionItem?.requisition?.origin?.id, [requisitionItem?.product?.id], false)
     }
 
     void updateAdjustedItems(StockMovement stockMovement, String adjustedProductCode) {
