@@ -1,4 +1,5 @@
-package org.pih.warehouse.xml;
+package org.pih.warehouse.xml.executionstatus;
+
 import javax.xml.bind.annotation.*;
 import java.util.List;
 

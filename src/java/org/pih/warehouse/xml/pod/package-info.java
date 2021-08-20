@@ -1,7 +1,7 @@
 @XmlSchema(
-        namespace = "http://www.etrucknow.com/edi/carrier/trip_execution/v1",
+        namespace = "http://www.etrucknow.com/edi/business_partner/document_upload/v1",
         elementFormDefault = XmlNsForm.QUALIFIED)
-package org.pih.warehouse.xml;
+package org.pih.warehouse.xml.pod;
 
 import javax.xml.bind.annotation.XmlNsForm;
 import javax.xml.bind.annotation.XmlSchema;
