@@ -1,4 +1,4 @@
-package org.pih.warehouse.xml.acceptancestatus;
+package org.pih.warehouse.xml.pod;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -14,11 +14,17 @@ public class Header {
     private String sequenceNumber;
     private String sourceApp;
 
-    public Header() {
-
-    }
+    public Header() {    }
 
     public Header(String version, String username, String password, String sequenceNumber, String sourceApp) {
+        this.version = version;
+        this.username = username;
+        this.password = password;
+        this.sequenceNumber = sequenceNumber;
+        this.sourceApp = sourceApp;
+    }
+
+    public Header(String version, String sequenceNumber, String sourceApp) {
         this.version = version;
         this.sequenceNumber = sequenceNumber;
         this.sourceApp = sourceApp;
