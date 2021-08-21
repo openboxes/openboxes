@@ -15,10 +15,13 @@
 </head>
 
 <body>
-    <g:include controller="mobile" action="menu"/>
-    <div class="container">
+    <div class="container-fluid">
+        <g:include controller="mobile" action="menu"/>
+        <g:if test="${flash.message}">
+            <div class="alert alert-info">${flash.message}</div>
+        </g:if>
 
-    <h1><g:layoutTitle/></h1>
+        <h1><g:layoutTitle/></h1>
     <g:layoutBody/>
 </div>
     <script
