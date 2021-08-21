@@ -19,47 +19,44 @@ class FileTransferService {
     boolean transactional = true
     def grailsApplication
 
-    def listMessages() {
-        // Configuration
+    SecureFtpClient getSecureFtpClient() {
         String server = grailsApplication.config.openboxes.integration.ftp.server
         Integer port = grailsApplication.config.openboxes.integration.ftp.port?:22
         String user = grailsApplication.config.openboxes.integration.ftp.user
         String password = grailsApplication.config.openboxes.integration.ftp.password
-        String directory = grailsApplication.config.openboxes.integration.ftp.directory
 
-        // Retrieve files
         SecureFtpClient ftpClient = new SecureFtpClient(server, port, user, password)
         ftpClient.connect()
-        def filenames = ftpClient.listFiles(directory)
-        def messages = filenames.collect { String filename ->
-            String source = "${directory}/${filename}"
-            log.info "retrieving file ${source} ..."
-            def inputStream = ftpClient.retrieveFileAsInputStream(source)
-            String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name())
-            return [filename: filename, content: content]
-        }
-        ftpClient.disconnect()
+        return ftpClient
+    }
 
-        return messages
+    def listMessages() {
+
+        try {
+            String directory = grailsApplication.config.openboxes.integration.ftp.directory
+            def filenames = secureFtpClient.listFiles(directory)
+            def messages = filenames.collect { String filename ->
+                String source = "${directory}/${filename}"
+                def inputStream = secureFtpClient.retrieveFileAsInputStream(source)
+                String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name())
+                return [filename: filename, content: content]
+            }
+            return messages
+        }
+        finally {
+            secureFtpClient.disconnect()
+        }
     }
 
     def retrieveMessage(String filename) {
-        // Configuration
-        String server = grailsApplication.config.openboxes.integration.ftp.server
-        Integer port = grailsApplication.config.openboxes.integration.ftp.port?:22
-        String user = grailsApplication.config.openboxes.integration.ftp.user
-        String password = grailsApplication.config.openboxes.integration.ftp.password
-        String directory = grailsApplication.config.openboxes.integration.ftp.directory
-
-        // Retrieve files
-        SecureFtpClient ftpClient = new SecureFtpClient(server, port, user, password)
-        ftpClient.connect()
-        String source = "${directory}/${filename}"
-        log.info "source: ${source}"
-        def inputStream = ftpClient.retrieveFileAsInputStream(source)
-        String contents = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name())
-        ftpClient.disconnect()
-        return contents
+        try {
+            String directory = grailsApplication.config.openboxes.integration.ftp.directory
+            String source = "${directory}/${filename}"
+            def inputStream = secureFtpClient.retrieveFileAsInputStream(source)
+            return IOUtils.toString(inputStream, StandardCharsets.UTF_8.name())
+        } finally {
+            secureFtpClient.disconnect()
+        }
     }
 
 }
