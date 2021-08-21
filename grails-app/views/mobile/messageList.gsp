@@ -22,8 +22,9 @@
                     <td>
                         ${message.filename}
                     </td>
-                    <td>
-                        <g:link controller="mobile" action="messageDetails" params="[filename: message.filename]">Retrieve</g:link>
+                    <td class="col-2">
+                        <g:link controller="mobile" action="messageProcess" params="[filename: message.filename]" class="btn btn-outline-primary">Process</g:link>
+                        <g:link controller="mobile" action="messageDetails" params="[filename: message.filename]" class="btn btn-outline-secondary">Download</g:link>
                     </td>
                 </tr>
             </g:each>

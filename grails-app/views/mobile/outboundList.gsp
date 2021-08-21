@@ -24,7 +24,15 @@
                 <tr>
                     <td>
                         <a href="${createLink(controller: 'stockMovement', action: 'show', id: stockMovement?.id)}" class="text-decoration-none text-reset">
-                            ${stockMovement?.status}
+                            <g:if test="${stockMovement?.shipment?.currentEvent}">
+                                ${stockMovement.shipment?.currentEvent?.eventType?.eventCode}
+                                <div>
+                                    <small><g:formatDate date="${stockMovement.shipment?.currentEvent?.eventDate}" format="MMM dd hh:mm a"/></small>
+                                </div>
+                            </g:if>
+                            <g:else>
+                                ${stockMovement?.status}
+                            </g:else>
                         </a>
                     </td>
                     <td>

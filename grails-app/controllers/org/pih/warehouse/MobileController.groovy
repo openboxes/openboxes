@@ -9,16 +9,22 @@
 **/
 package org.pih.warehouse
 
+import org.apache.commons.io.IOUtils
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
+import org.pih.warehouse.integration.AcceptanceStatusEvent
 import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSummary
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.xml.acceptancestatus.AcceptanceStatus
+
+import javax.xml.bind.JAXBContext
+import javax.xml.bind.Unmarshaller
 
 class MobileController {
 
@@ -29,6 +35,7 @@ class MobileController {
     def megamenuService
     def stockMovementService
     def fileTransferService
+    def grailsApplication
 
     def index = {
 
@@ -47,9 +54,7 @@ class MobileController {
             eq("origin", location)
         }
 
-        def messageCount = 1;
-
-
+        def messageCount = fileTransferService.listMessages().size()
         [
                 data: [
                         [name: "Inventory", class: "fa fa-box", count: productCount, url: g.createLink(controller: "mobile", action: "productList")],
@@ -120,5 +125,29 @@ class MobileController {
         render text: content, contentType: 'text/xml', encoding: 'UTF-8'
         return
     }
+
+    def messageUpload = {
+
+    }
+
+    def messageProcess = {
+
+        // We need to move this into an integration service
+        String xmlContent = fileTransferService.retrieveMessage(params.filename)
+        InputStream xmlContents = IOUtils.toInputStream(xmlContent)
+        JAXBContext jaxbContext = JAXBContext.newInstance(AcceptanceStatus.class);
+        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        //TripExecution tripExecution = (TripExecution) unmarshaller.unmarshal(xmlContents);
+        AcceptanceStatus acceptanceStatus = (AcceptanceStatus) unmarshaller.unmarshal(xmlContents);
+
+        // Publish message to event bus
+        log.info "publish to event bus"
+        grailsApplication.mainContext.publishEvent(new AcceptanceStatusEvent(acceptanceStatus))
+
+        flash.message = "Message has been processed"
+        redirect(action: "messageList")
+
+    }
+
 
 }
