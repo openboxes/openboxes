@@ -121,11 +121,17 @@ class NotificationService {
 
     }
 
-
     def sendShipmentCreatedNotification(Shipment shipmentInstance, Location location, List<RoleType> roleTypes) {
         def users = userService.findUsersByRoleTypes(location, roleTypes)
         String subject = "Shipment ${shipmentInstance?.shipmentNumber} has been created"
         String template = "/email/shipmentCreated"
+        sendShipmentNotifications(shipmentInstance, users, template, subject)
+    }
+
+    def sendShipmentAcceptedNotification(Shipment shipmentInstance, Location location, List<RoleType> roleTypes) {
+        def users = userService.findUsersByRoleTypes(location, roleTypes)
+        String subject = "Shipment ${shipmentInstance?.shipmentNumber} has been accepted"
+        String template = "/email/shipmentAccepted"
         sendShipmentNotifications(shipmentInstance, users, template, subject)
     }
 
