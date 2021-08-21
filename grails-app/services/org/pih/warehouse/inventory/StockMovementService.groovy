@@ -29,9 +29,13 @@ import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCode
+import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventCode
+import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.ShipOrderCommand
@@ -67,6 +71,7 @@ class StockMovementService {
     def locationService
     def dataService
     def forecastingService
+    def notificationService
 
     boolean transactional = true
 
@@ -177,6 +182,15 @@ class StockMovementService {
                 updateRequisitionStatus(stockMovement.id, requisitionStatus)
             }
         }
+    }
+
+    void acceptStockMovement(StockMovement stockMovement) {
+        Shipment shipment = stockMovement.shipment
+        EventType eventType = EventType.findByEventCode(EventCode.ACCEPTED)
+        Event event = new Event(eventType: eventType, eventDate: new Date())
+        shipment.addToEvents(event)
+        shipment.save(flush:true)
+        notificationService.sendShipmentAcceptedNotification(shipment, shipment.origin, [RoleType.ROLE_SHIPMENT_NOTIFICATION])
     }
 
     void validateQuantityRequested(StockMovement stockMovement) {
@@ -2162,6 +2176,25 @@ class StockMovementService {
         updateRequisitionOnShipmentChange(stockMovement)
 
         return shipment
+    }
+
+    StockMovement findByTrackingNumber(String trackingNumber) {
+        ReferenceNumberType trackingNumberType = ReferenceNumberType.findById(Constants.TRACKING_NUMBER_TYPE_ID)
+        ReferenceNumber referenceNumber = ReferenceNumber.findByReferenceNumberTypeAndIdentifier(trackingNumberType, trackingNumber)
+        log.info "reference number ${referenceNumber}"
+        if (!referenceNumber) {
+            throw new Exception("Tracking number ${trackingNumber} is not associated with a shipment")
+        }
+
+        // Attempt to find shipment by reference number
+        Shipment shipment = Shipment.createCriteria().get {
+            referenceNumbers {
+                eq("id", referenceNumber.id)
+            }
+        }
+
+        return getShipmentBasedStockMovement(shipment)
+
     }
 
 

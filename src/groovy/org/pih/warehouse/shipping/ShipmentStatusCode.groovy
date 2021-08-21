@@ -12,10 +12,11 @@ package org.pih.warehouse.shipping
 enum ShipmentStatusCode {
 
     CREATED(0),
-    PENDING(1),
-    SHIPPED(2),
-    PARTIALLY_RECEIVED(3),
-    RECEIVED(4)
+    PENDING(10),
+    ACCEPTED(20),
+    SHIPPED(30),
+    PARTIALLY_RECEIVED(40),
+    RECEIVED(50)
 
     int sortOrder
 
