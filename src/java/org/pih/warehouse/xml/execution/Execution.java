@@ -1,18 +1,18 @@
-package org.pih.warehouse.xml.executionstatus;
+package org.pih.warehouse.xml.execution;
 
 import javax.xml.bind.annotation.*;
 import java.util.List;
 
 @XmlType (name="",propOrder={"header","tripID","executionStatus"})
-@XmlRootElement(name = "execution")
-public class TripExecution {
+@XmlRootElement(name = "Execution")
+public class Execution {
 
     private String tripID;
     private Header header;
     private List<ExecutionStatus> executionStatus = null;
 
-    public TripExecution() {}
-    public TripExecution(String tripId, Header header, List <ExecutionStatus> executionStatus) {
+    public Execution() {}
+    public Execution(String tripId, Header header, List <ExecutionStatus> executionStatus) {
         this.tripID = tripId;
         this.header = header;
         this.executionStatus = executionStatus;
@@ -36,6 +36,7 @@ public class TripExecution {
         return header;
     }
 
+    @XmlElement(name = "ExecutionStatus")
     public List <ExecutionStatus> getExecutionStatus() {
         return executionStatus;
     }
