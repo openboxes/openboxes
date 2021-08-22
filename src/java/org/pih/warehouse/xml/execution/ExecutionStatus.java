@@ -1,12 +1,24 @@
-package org.pih.warehouse.xml.executionstatus;
+package org.pih.warehouse.xml.execution;
 
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-@XmlRootElement(name = "executionStatus")
 @XmlType(propOrder={"orderId","status","dateTime", "geoData"})
 public class ExecutionStatus {
+
+    private String orderId;
+    private String status;
+    private String dateTime;
+    private GeoData geoData;
+
+    public ExecutionStatus(String orderId, String status, String dateTime, GeoData geoData) {
+        this.orderId = orderId;
+        this.status = status;
+        this.dateTime = dateTime;
+        this.geoData = geoData;
+    }
+
+    public ExecutionStatus() { }
 
     @XmlElement(name = "OrderID")
     public String getOrderId() {
@@ -17,7 +29,7 @@ public class ExecutionStatus {
         this.orderId = orderId;
     }
 
-    @XmlElement(name = "status")
+    @XmlElement(name = "Status")
     public String getStatus() {
         return status;
     }
@@ -26,7 +38,7 @@ public class ExecutionStatus {
         this.status = status;
     }
 
-    @XmlElement(name = "dateTime")
+    @XmlElement(name = "DateTime")
     public String getDateTime() {
         return dateTime;
     }
@@ -35,18 +47,13 @@ public class ExecutionStatus {
         this.dateTime = dateTime;
     }
 
-    @XmlElement(name = "geoData")
-    public String getGeoData() {
+    @XmlElement(name = "GeoData")
+    public GeoData getGeoData() {
         return geoData;
     }
 
-    public void setGeoData(String geoData) {
+    public void setGeoData(GeoData geoData) {
         this.geoData = geoData;
     }
-
-    private String orderId;
-    private String status;
-    private String dateTime;
-    private String geoData;
 
 }
