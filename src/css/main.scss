@@ -346,8 +346,7 @@ body {
 }
 
 .has-control-error {
-  outline: solid 3px $red-beta;
-  outline-offset: -3px;
+  background-color: $red-gamma !important;
 }
 
 .has-error .help-block,
