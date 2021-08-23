@@ -149,6 +149,13 @@ class NotificationService {
         sendShipmentNotifications(shipmentInstance, users, template, subject)
     }
 
+    def sendShipmentDeliveryNotification(Shipment shipmentInstance, Location location, List<RoleType> roleTypes) {
+        List<User> users = userService.findUsersByRoleTypes(location, roleTypes)
+        String subject = "Shipment ${shipmentInstance?.shipmentNumber} has been delivered"
+        String template = "/email/shipmentDelivered"
+        sendShipmentNotifications(shipmentInstance, users, template, subject)
+    }
+
     def sendShipmentItemsShippedNotification(Shipment shipmentInstance) {
         def emailValidator = EmailValidator.getInstance()
         def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
