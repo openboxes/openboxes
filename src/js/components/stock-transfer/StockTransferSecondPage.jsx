@@ -485,12 +485,14 @@ class StockTransferSecondPage extends Component {
               stockTransferItem.quantity > stockTransferItem.quantityAvailable)}
             ><span><i className="fa fa-save pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
             </button>
-            <button
-              className="btn btn-outline-success btn-xs mr-3"
-              onClick={() => this.generateStockTransfer()}
+            <a
+              href={`/openboxes/stockTransfer/print/${this.props.match.params.stockTransferId}`}
+              className="btn btn-outline-secondary btn-xs p-1 ml-3 mb-1"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               <span><i className="fa fa-print pr-2" /><Translate id="react.stockTransfer.generateStockTransfer.label" defaultMessage="Generate Stock Transfer" /></span>
-            </button>
+            </a>
           </div>
         </div>
         {
