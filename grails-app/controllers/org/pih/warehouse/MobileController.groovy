@@ -179,15 +179,11 @@ class MobileController {
 
     }
 
-    def documentRender = {
+    def documentDownload = {
         Document document = Document.get(params.id)
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(document.fileContents)
-        ImageInputStream iis = ImageIO.createImageInputStream(byteArrayInputStream)
-        ImageReader imageReader = ImageIO.getImageReaders(iis).iterator().next()
-
-
-        render "yes"
+        response.contentType = document.contentType
+        response.outputStream << document.fileContents
+        response.outputStream.flush()
     }
-
 
 }

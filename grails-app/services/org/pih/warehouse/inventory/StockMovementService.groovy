@@ -197,14 +197,11 @@ class StockMovementService {
         document.fileContents = fileContents.bytes
 
         // FIXME we need to figure out a way to detect the mimetype of the file
-        document.contentType = "image/png"
+        document.contentType = "application/octet-stream"
 
         stockMovement.shipment.addToDocuments(document)
-        stockMovement.shipment.save()
-
+        stockMovement.shipment.save(flush:true)
     }
-
-
 
     void updateRequisitionStatus(String id, RequisitionStatus status) {
 

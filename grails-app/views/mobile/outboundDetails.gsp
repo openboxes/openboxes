@@ -11,10 +11,13 @@
     <div class="card">
         <div class="card-header">
             <div class="row align-items-center">
-                <div class="col-11 text-left">
+                <div class="col-1">
+                    <g:displayBarcode showData="${false}" data="${stockMovement.identifier}"/>
+                </div>
+                <div class="col-9 text-left">
                     <h5 class="m-0">${stockMovement.identifier} ${stockMovement.name}</h5>
                 </div>
-                <div class="col-1 text-right">
+                <div class="col-2 text-right">
                     <span class="badge bg-primary mt-2 mr-2 pl-5">${stockMovement?.status}</span>
                 </div>
             </div>
@@ -28,7 +31,6 @@
                         ${stockMovement?.origin?.locationNumber}
                     </span>
                 </div>
-
                 <div class="col-12 col-sm-3 text-center time-info mt-3 mt-sm-0">
                     <span class="text-muted d-block">Destination</span>
                     <span class="text-4 font-weight-500 text-dark">
@@ -41,13 +43,10 @@
                         ${g.formatDate(date: stockMovement.requisition.dateCreated)}
                     </span>
                 </div>
-
-
                 <div class="col-12 col-sm-3 text-center time-info mt-3 mt-sm-0">
                     <span class="text-muted d-block">Expected Delivery</span>
                     <div class="text-5 font-weight-500 text-dark">
                         ${g.formatDate(date: stockMovement.expectedDeliveryDate)}
-
                     </div>
                     <g:if test="${stockMovement.expectedDeliveryDate < new Date()}">
                         <div class="badge badge-pill bg-danger">Delayed - Expected ${prettyDateFormat(date: stockMovement?.expectedDeliveryDate)}</div>
@@ -108,12 +107,16 @@
                             <thead>
                                 <tr>
                                     <th>
+                                    </th>
+                                    <th>
+                                    </th>
+                                    <th>
                                         <g:message code="product.productCode.label"/>
                                     </th>
                                     <th>
                                         <g:message code="product.label"/>
                                     </th>
-                                    <th>
+                                    <th class="text-center">
                                         <g:message code="default.quantity.label"/>
                                     </th>
                                 </tr>
@@ -121,13 +124,25 @@
                             <tbody>
                                 <g:each var="item" in="${stockMovement.lineItems}">
                                     <tr>
+                                        <td class="col-1">
+                                            <g:if test="${item?.product?.images}">
+                                                <g:set var="image" value="${item?.product?.images?.sort()?.first()}"/>
+                                                <img src="${createLink(controller:'product', action:'renderImage', id:image?.id)}" class="img-fluid"/>
+                                            </g:if>
+                                            <g:else>
+                                                <img src="${resource(dir: 'images', file: 'default-product.png')}" class="img-fluid"/>
+                                            </g:else>
+                                        </td>
+                                        <td class="col-1">
+                                            <g:displayBarcode showData="${false}" data="${item?.product?.productCode}"/>
+                                        </td>
                                         <td class="col-2">
                                             ${item?.product?.productCode}
                                         </td>
-                                        <td class="col-8">
+                                        <td class="col-6">
                                             ${item?.product?.name}
                                         </td>
-                                        <td class="col-2">
+                                        <td class="col-1 text-center">
                                             ${item.quantityRequested}
                                         </td>
                                     </tr>
@@ -170,7 +185,6 @@
                                                 <div class="card-body">
                                                     <div class="float-end">${formatDate(date: stockMovement.dateCreated, format: "MMM dd, yyyy hh:mm:ss")}</div>
                                                     <div class="card-title text-muted">${event.name}</div>
-                    %{--                                <p class="card-text text-muted">${event.name}</p>--}%
                                                 </div>
                                             </div>
                                         </div>
@@ -207,14 +221,8 @@
                                         <td>
                                             ${document.name}
                                         </td>
-                                        <td>
-                                            <img src="data:image/png;base64,${document.trim()}"/>
-                                            ${document.}
-                                        </td>
-
-                                        <td class="text-right">
+                                        <td class="text-right col-4">
                                             <a href="${document.uri}" target="_blank" class="btn btn-outline-primary">Download</a>
-                                            <g:link controller="mobile" action="documentRender" id="${document?.id}" target="_blank" class="btn btn-outline-secondary">Render</g:link>
                                         </td>
                                     </tr>
                                 </g:each>
