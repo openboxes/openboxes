@@ -22,8 +22,8 @@
         </g:if>
 
         <h1><g:layoutTitle/></h1>
-    <g:layoutBody/>
-</div>
+        <g:layoutBody/>
+    </div>
     <script
       src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
       integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="
