@@ -127,7 +127,13 @@ class MobileController {
     }
 
     def messageUpload = {
-
+        def messageFile = request.getFile('messageFile')
+        if(messageFile) {
+            String fileName = messageFile.originalFilename
+            File file = new File ("/tmp/${fileName}")
+            messageFile.transferTo(file)
+            fileTransferService.storeMessage(file)
+        }
     }
 
     def messageProcess = {
