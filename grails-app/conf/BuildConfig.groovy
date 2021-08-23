@@ -135,6 +135,8 @@ grails.project.dependency.resolution = {
         // Mock ftp server
         test "org.mockftpserver:MockFtpServer:2.4"
 
+        // Java advanced image I/O
+        compile "com.github.jai-imageio:jai-imageio-core:1.3.1"
 
     }
     plugins {

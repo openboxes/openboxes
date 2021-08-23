@@ -24,7 +24,9 @@ class AcceptanceStatusEventService implements ApplicationListener<AcceptanceStat
         log.info "Acceptance status " + acceptanceStatusEvent.acceptanceStatus.tripDetails.toString()
         String trackingNumber = acceptanceStatusEvent.acceptanceStatus.tripDetails.tripId
         StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber)
-
+        if (!stockMovement) {
+            throw new Exception("Unable to locate stock movement by tracking number ${trackingNumber}")
+        }
         stockMovementService.acceptStockMovement(stockMovement)
     }
 }
