@@ -12,9 +12,12 @@ package org.pih.warehouse
 import org.apache.commons.io.IOUtils
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementType
+import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.integration.AcceptanceStatusEvent
+import org.pih.warehouse.integration.DocumentUploadEvent
 import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderTypeCode
@@ -22,9 +25,16 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSummary
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.xml.acceptancestatus.AcceptanceStatus
+import org.pih.warehouse.xml.pod.DocumentUpload
 
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.Unmarshaller
+import javax.imageio.ImageIO
+import javax.imageio.ImageReader
+import javax.imageio.stream.ImageInputStream
+
+
+
 
 class MobileController {
 
@@ -114,6 +124,21 @@ class MobileController {
         [stockMovements:stockMovements]
     }
 
+    def outboundDetails = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+
+        def events = stockMovement.shipment.events.collect { Event event ->
+            [name: event?.eventType?.name, date: event?.eventDate]
+        }
+
+        events << [name: "Order created", date: stockMovement?.requisition?.dateCreated]
+        events << [name: "Order updated", date: stockMovement?.requisition?.lastUpdated]
+
+        events = events.sort { it.dateCreated }
+
+        [stockMovement:stockMovement, events:events]
+    }
+
     def messageList = {
         def messages = fileTransferService.listMessages()
         [messages:messages]
@@ -132,21 +157,36 @@ class MobileController {
 
     def messageProcess = {
 
-        // We need to move this into an integration service
-        String xmlContent = fileTransferService.retrieveMessage(params.filename)
-        InputStream xmlContents = IOUtils.toInputStream(xmlContent)
-        JAXBContext jaxbContext = JAXBContext.newInstance(AcceptanceStatus.class);
+        // Retrive XML file
+        String xmlContents = fileTransferService.retrieveMessage(params.filename)
+
+        // Convert XML message to message object
+        JAXBContext jaxbContext = JAXBContext.newInstance("org.pih.warehouse.xml.acceptancestatus:org.pih.warehouse.xml.executionstatus:org.pih.warehouse.xml.pod");
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        //TripExecution tripExecution = (TripExecution) unmarshaller.unmarshal(xmlContents);
-        AcceptanceStatus acceptanceStatus = (AcceptanceStatus) unmarshaller.unmarshal(xmlContents);
+        InputStream inputStream = IOUtils.toInputStream(xmlContents)
+        Object messageObject = unmarshaller.unmarshal(inputStream)
 
         // Publish message to event bus
-        log.info "publish to event bus"
-        grailsApplication.mainContext.publishEvent(new AcceptanceStatusEvent(acceptanceStatus))
+        if (messageObject instanceof DocumentUpload) {
+            grailsApplication.mainContext.publishEvent(new DocumentUploadEvent(messageObject))
+        }
+        else if (messageObject instanceof AcceptanceStatus) {
+            grailsApplication.mainContext.publishEvent(new AcceptanceStatusEvent(messageObject))
+        }
 
         flash.message = "Message has been processed"
         redirect(action: "messageList")
 
+    }
+
+    def documentRender = {
+        Document document = Document.get(params.id)
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(document.fileContents)
+        ImageInputStream iis = ImageIO.createImageInputStream(byteArrayInputStream)
+        ImageReader imageReader = ImageIO.getImageReaders(iis).iterator().next()
+
+
+        render "yes"
     }
 
 
