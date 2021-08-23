@@ -29,6 +29,7 @@ import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCode
+import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.EventType
@@ -185,12 +186,26 @@ class StockMovementService {
     }
 
     void acceptStockMovement(StockMovement stockMovement) {
-        Shipment shipment = stockMovement.shipment
+        Shipment shipment = stockMovement?.shipment
         EventType eventType = EventType.findByEventCode(EventCode.ACCEPTED)
         Event event = new Event(eventType: eventType, eventDate: new Date())
         shipment.addToEvents(event)
         shipment.save(flush:true)
         notificationService.sendShipmentAcceptedNotification(shipment, shipment.origin, [RoleType.ROLE_SHIPMENT_NOTIFICATION])
+    }
+
+    void attachDocument(StockMovement stockMovement, String fileName, String fileContents) {
+        Document document = new Document()
+        document.documentType = DocumentType.get(Constants.DEFAULT_DOCUMENT_TYPE_ID)
+        document.name = fileName
+        document.filename = fileName
+        document.fileContents = fileContents.bytes
+
+        // FIXME we need to figure out a way to detect the mimetype of the file
+        document.contentType = "application/octet-stream"
+
+        stockMovement.shipment.addToDocuments(document)
+        stockMovement.shipment.save(flush:true)
     }
 
     void updateRequisitionStatus(String id, RequisitionStatus status) {
@@ -2099,8 +2114,12 @@ class StockMovementService {
         ReferenceNumberType trackingNumberType = ReferenceNumberType.findById(Constants.TRACKING_NUMBER_TYPE_ID)
         ReferenceNumber referenceNumber = ReferenceNumber.findByReferenceNumberTypeAndIdentifier(trackingNumberType, trackingNumber)
         log.info "reference number ${referenceNumber}"
+
+        // FIXME Figure out the best way to handle the case where the eTN identifier has not been properly mapped to an OB shipment
         if (!referenceNumber) {
-            throw new Exception("Tracking number ${trackingNumber} is not associated with a shipment")
+            //throw new Exception("Tracking number ${trackingNumber} is not associated with a shipment")
+            log.error "Tracking number ${trackingNumber} is not associated with a shipment"
+            return null
         }
 
         // Attempt to find shipment by reference number
