@@ -1,23 +1,22 @@
-package org.pih.warehouse.xml.acceptancestatus;
+package org.pih.warehouse.integration.xml.acceptancestatus;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
-import org.pih.warehouse.xml.executionstatus.TripExecution;
+import org.junit.Test
+import org.pih.warehouse.integration.xml.XmlXsdValidator;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertEquals
+import static org.junit.Assert.assertTrue;
 
 public class AcceptanceStatusTest {
     private AcceptanceStatus acceptanceStatus;
+    // TODO: need to figure out a place for the XSDs
+    private final String ACCEPTANCE_STATUS_XSD = "src/java/org/pih/warehouse/integration/xml/acceptancestatus/acceptance_status_v1.xsd";
 
     @Before
     public void setUp() {
@@ -29,7 +28,7 @@ public class AcceptanceStatusTest {
         tripDetails.setTripId("TripID");
         tripDetails.setCarrier(carrier);
         TripOrderDetails tripOrderDetails = new TripOrderDetails();
-        List<String> orderList = new ArrayList<>();
+        List<String> orderList = new ArrayList();
         orderList.add("10032021-A");
         orderList.add("10032021-B");
         tripOrderDetails.setOrderId(orderList);
@@ -51,11 +50,14 @@ public class AcceptanceStatusTest {
     @Test
     public void testXmlToAcceptanceStatus() throws JAXBException, FileNotFoundException {
         File xmlFile = new File("/tmp/acceptance_status.xml");
+        String xmlFileContents = xmlFile.text
+
         JAXBContext jaxbContext = JAXBContext.newInstance(AcceptanceStatus.class);
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         AcceptanceStatus acceptanceStatus = (AcceptanceStatus) unmarshaller.unmarshal(xmlFile);
 
         assertEquals( acceptanceStatus.getAction() , "ACCEPT");
         assertEquals( acceptanceStatus.getTripDetails().getCarrier().getId() , "MYSH01505");
+        assertTrue( XmlXsdValidator.validateXmlSchema(ACCEPTANCE_STATUS_XSD, xmlFileContents))
     }
 }

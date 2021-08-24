@@ -21,7 +21,7 @@ import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSummary
 import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.xml.acceptancestatus.AcceptanceStatus
+import org.pih.warehouse.integration.xml.acceptancestatus.AcceptanceStatus
 
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.Unmarshaller

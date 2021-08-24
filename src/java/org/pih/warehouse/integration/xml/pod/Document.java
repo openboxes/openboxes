@@ -1,4 +1,4 @@
-package org.pih.warehouse.xml.pod;
+package org.pih.warehouse.integration.xml.pod;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;

@@ -1,4 +1,4 @@
-package org.pih.warehouse.xml.executionstatus;
+package org.pih.warehouse.integration.xml.executionstatus;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;

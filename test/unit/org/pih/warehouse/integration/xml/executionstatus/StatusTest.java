@@ -1,4 +1,4 @@
-package org.pih.warehouse.xml.executionstatus;
+package org.pih.warehouse.integration.xml.executionstatus;
 
 import org.junit.After;
 import org.junit.Before;
