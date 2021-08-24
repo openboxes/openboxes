@@ -65,7 +65,12 @@ class StockTransfer {
                 "origin.name"      : origin?.name,
                 "destination.id"   : destination?.id,
                 "destination.name" : destination?.name,
-                stockTransferItems : stockTransferItems.collect { it?.toJson() },
+                stockTransferItems : stockTransferItems.sort { a, b ->
+                    a.product?.productCode <=> b.product?.productCode ?:
+                        a.inventoryItem?.lotNumber <=> b.inventoryItem?.lotNumber ?:
+                            a.originBinLocation?.zone?.name <=> b.originBinLocation?.zone?.name ?:
+                                a.originBinLocation?.name <=> b.originBinLocation?.name
+                }.collect { it?.toJson() },
                 orderedBy          : orderedBy?.name
         ]
     }

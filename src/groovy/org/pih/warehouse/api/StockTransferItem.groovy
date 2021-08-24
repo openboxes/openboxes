@@ -96,7 +96,10 @@ class StockTransferItem {
                 quantity                        : quantity,
                 quantityOnHand                  : quantityOnHand,
                 status                          : status.name(),
-                splitItems                      : splitItems.collect { it?.toJson() }
+                splitItems                      : splitItems.sort { a, b ->
+                    a.destinationBinLocation?.name <=> b.destinationBinLocation?.name ?:
+                        b.quantity <=> a.quantity
+                }.collect { it?.toJson() }
         ]
     }
 }
