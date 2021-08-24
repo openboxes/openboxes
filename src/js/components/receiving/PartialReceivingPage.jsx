@@ -83,10 +83,12 @@ const TABLE_FIELDS = {
     getDynamicRowAttr: ({ rowValues, subfield, translate }) => {
       let className = '';
       let tooltip = null;
-      if (isReceived(subfield, rowValues)) {
+      const received = isReceived(subfield, rowValues);
+      const receiving = isReceiving(subfield, rowValues);
+      if (received) {
         className = 'text-disabled';
       }
-      if (rowValues.product && rowValues.product.lotAndExpiryControl) {
+      if (!received && receiving && rowValues.product && rowValues.product.lotAndExpiryControl) {
         if (!rowValues.lotNumber || !rowValues.expirationDate) {
           tooltip = translate('react.partialReceiving.error.lotAndExpiryControl.label');
           className += ' has-control-error';
@@ -328,7 +330,8 @@ function validate(values) {
           quantityReceiving: 'react.partialReceiving.error.quantityToReceiveNegative.label',
         };
       }
-      if (!_.isNil(item.product) && item.product.lotAndExpiryControl) {
+      const receiving = !_.isNil(item.quantityReceiving) && item.quantityReceiving !== '';
+      if (receiving && !_.isNil(item.product) && item.product.lotAndExpiryControl) {
         if (!item.expirationDate && (_.isNil(item.lotNumber) || _.isEmpty(item.lotNumber))) {
           errors.containers[key].shipmentItems[key2] = {
             expirationDate: 'react.partialReceiving.error.lotAndExpiryControl.label',
