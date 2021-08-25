@@ -133,7 +133,9 @@ class MobileController {
             File file = new File ("/tmp/${fileName}")
             messageFile.transferTo(file)
             fileTransferService.storeMessage(file)
+            flash.message = "File ${fileName} transferred successfully"
         }
+        redirect(action: "messageList")
     }
 
     def messageProcess = {
