@@ -30,16 +30,18 @@ class FileTransferService {
         return ftpClient
     }
 
-    def listMessages() {
-
+    def listMessages(boolean includeContent = false) {
         try {
             String directory = grailsApplication.config.openboxes.integration.ftp.directory
             def filenames = secureFtpClient.listFiles(directory)
             def messages = filenames.collect { String filename ->
                 String source = "${directory}/${filename}"
-                def inputStream = secureFtpClient.retrieveFileAsInputStream(source)
-                String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name())
-                return [filename: filename, content: content]
+                if (includeContent) {
+                    def inputStream = secureFtpClient.retrieveFileAsInputStream(source)
+                    String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name())
+                    return [filename: filename, content: content]
+                }
+                return [filename:filename]
             }
             return messages
         }

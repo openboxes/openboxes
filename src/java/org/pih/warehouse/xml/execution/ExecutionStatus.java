@@ -1,6 +1,7 @@
 package org.pih.warehouse.xml.execution;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType(propOrder={"orderId","status","dateTime", "geoData"})
@@ -55,5 +56,29 @@ public class ExecutionStatus {
     public void setGeoData(GeoData geoData) {
         this.geoData = geoData;
     }
+
+}
+
+@XmlType(name = "Status")
+@XmlEnum
+enum Status {
+
+    PICKUP,
+    DELIVERY,
+    ACCEPT,
+    GATE_IN_PICKUP,
+    GATE_OUT_PICKUP,
+    GATE_IN_DELIVERY,
+    GATE_OUT_DELIVERY,
+    IN_TRANSIT,
+    DELIVERED;
+
+  public String value() {
+    return name();
+  }
+
+  public static Status fromValue(String v) {
+    return valueOf(v);
+  }
 
 }

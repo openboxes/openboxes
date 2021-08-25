@@ -25,25 +25,25 @@
 
         <div class="card-body">
             <div class="row">
-                <div class="col-12 col-sm-3 text-center time-info mt-3 mt-sm-0">
+                <div class="col-12 col-sm-2 text-center time-info mt-3 mt-sm-0">
                     <span class="text-muted d-block">Origin</span>
                     <span class="text-5 font-weight-500 text-dark">
                         ${stockMovement?.origin?.locationNumber}
                     </span>
                 </div>
-                <div class="col-12 col-sm-3 text-center time-info mt-3 mt-sm-0">
+                <div class="col-12 col-sm-2 text-center time-info mt-3 mt-sm-0">
                     <span class="text-muted d-block">Destination</span>
                     <span class="text-4 font-weight-500 text-dark">
                         ${stockMovement?.destination?.locationNumber}
                     </span>
                 </div>
-                <div class="col-12 col-sm-3 text-center company-info">
+                <div class="col-12 col-sm-2 text-center company-info">
                     <span class="text-muted d-block">Ordered On</span>
                     <span class="text-4 font-weight-500 text-dark mt-1 mt-lg-0">
                         ${g.formatDate(date: stockMovement.requisition.dateCreated)}
                     </span>
                 </div>
-                <div class="col-12 col-sm-3 text-center time-info mt-3 mt-sm-0">
+                <div class="col-12 col-sm-2 text-center time-info mt-3 mt-sm-0">
                     <span class="text-muted d-block">Expected Delivery</span>
                     <div class="text-5 font-weight-500 text-dark">
                         ${g.formatDate(date: stockMovement.expectedDeliveryDate)}
@@ -51,6 +51,12 @@
                     <g:if test="${stockMovement.expectedDeliveryDate < new Date()}">
                         <div class="badge badge-pill bg-danger">Delayed - Expected ${prettyDateFormat(date: stockMovement?.expectedDeliveryDate)}</div>
                     </g:if>
+                </div>
+                <div class="col-12 col-sm-2 text-center time-info mt-3 mt-sm-0">
+                    <span class="text-muted d-block">Tracking Number</span>
+                    <span class="text-5 font-weight-500 text-dark">
+                        ${stockMovement?.trackingNumber?:"Not Available"}
+                    </span>
                 </div>
             </div>
 
@@ -183,8 +189,11 @@
                                         <div class="col py-2">
                                             <div class="card">
                                                 <div class="card-body">
-                                                    <div class="float-end">${formatDate(date: stockMovement.dateCreated, format: "MMM dd, yyyy hh:mm:ss")}</div>
-                                                    <div class="card-title text-muted">${event.name}</div>
+                                                    <div class="card-title text-muted h5">
+                                                        <g:link controller="shipment" action="editEvent" id="${event?.id}"
+                                                            params="[shipmentId:stockMovement?.shipment?.id]">${event?.name?:'Unspecified'}</g:link>
+                                                    </div>
+                                                    <div class="text-muted">${formatDate(date: event?.date, format: "MMM dd, yyyy hh:mm:ss")}</div>
                                                 </div>
                                             </div>
                                         </div>
