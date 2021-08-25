@@ -31,36 +31,58 @@
                 </tr>
             </g:unless>
             <g:each in="${stockTransferItems}" status="i" var="stockTransferItem">
+                <g:set var="splitItems" value="${stockTransferItem?.orderItems?.sort { a, b ->
+                    a.destinationBinLocation?.name <=> b.destinationBinLocation?.name ?:
+                        b.quantity <=> a.quantity }}"
+                />
+                <g:set var="splitItemsSize" value="${splitItems?.size() ?: 1}"/>
                 <g:set var="backgroundColor" value="${(i % 2) == 0 ? '#fff' : '#f7f7f7'}"/>
-                <tr class="prop" style="background-color: ${backgroundColor}">
-                    <td class="center" width="1%">
-                        ${i + 1}
-                    </td>
-                    <td class="center" width="1%">
-                        ${stockTransferItem.originBinLocation?.name}
-                    </td>
-                    <td class="center" width="1%">
-                        ${stockTransferItem.product?.productCode}
-                    </td>
-                    <td width="50%">
-                        ${stockTransferItem.product?.name}
-                    </td>
-                    <td class="center" width="1%">
-                        ${stockTransferItem.inventoryItem?.lotNumber}
-                    </td>
-                    <td class="center" width="1%">
-                        <g:formatDate date="${stockTransferItem.inventoryItem?.expirationDate}" format="MM/dd/yyyy"/>
-                    </td>
-                    <td class="center" width="1%">
-                        ${stockTransferItem.destinationBinLocation?.name}
-                    </td>
-                    <td class="center" width="1%">
-                        ${stockTransferItem.quantity}
-                    </td>
-                    <td class="middle" width=30%">
-                        <!-- Notes -->
-                    </td>
-                </tr>
+                <g:set var="j" value="${0}"/>
+
+                <g:while test="${j < splitItemsSize}">
+                    <tr class="prop" style="background-color: ${backgroundColor}">
+                        <g:if test="${j==0}">
+                            <td class="center" width="1%" rowspan="${splitItemsSize}">
+                                ${i + 1}
+                            </td>
+                            <td class="center" width="1%" rowspan="${splitItemsSize}">
+                                ${stockTransferItem?.originBinLocation?.name}
+                            </td>
+                            <td class="center" width="1%" rowspan="${splitItemsSize}">
+                                ${stockTransferItem?.product?.productCode}
+                            </td>
+                            <td width="50%" rowspan="${splitItemsSize}">
+                                ${stockTransferItem?.product?.name}
+                            </td>
+                            <td class="center" width="1%" rowspan="${splitItemsSize}">
+                                ${stockTransferItem?.inventoryItem?.lotNumber}
+                            </td>
+                            <td class="center" width="1%" rowspan="${splitItemsSize}">
+                                <g:formatDate date="${stockTransferItem?.inventoryItem?.expirationDate}" format="MM/dd/yyyy"/>
+                            </td>
+                        </g:if>
+                        <td class="center" width="1%">
+                            <g:if test="${splitItems}">
+                                ${splitItems[j]?.destinationBinLocation?.name}
+                            </g:if>
+                            <g:else>
+                                ${stockTransferItem?.destinationBinLocation?.name}
+                            </g:else>
+                        </td>
+                        <td class="center" width="1%">
+                            <g:if test="${splitItems}">
+                                ${splitItems[j]?.quantity}
+                            </g:if>
+                            <g:else>
+                                ${stockTransferItem?.quantity}
+                            </g:else>
+                        </td>
+                        <td class="middle" width=30%">
+                            <!-- Notes -->
+                        </td>
+                        <% j++ %>
+                    </tr>
+                </g:while>
             </g:each>
         </tbody>
     </table>
