@@ -73,7 +73,7 @@
 
 </table>
 
-<g:set var="allStockTransferItems" value='${stockTransfer.orderItems.sort { it.product.name }}'/>
+<g:set var="allStockTransferItems" value='${stockTransfer.orderItems.findAll { !it.parentOrderItem }.sort { it.product.name }}'/>
 <g:set var="zoneNames" value='${allStockTransferItems?.collect { it?.originBinLocation?.zone?.name }?.unique()?.sort{ a, b -> !a ? !b ? 0 : 1 : !b ? -1 : a <=> b }}'/>
 <g:set var="stockTransferItemsByZone" value='${allStockTransferItems?.groupBy { it?.originBinLocation?.zone?.name } ?: [:]}'/>
 
