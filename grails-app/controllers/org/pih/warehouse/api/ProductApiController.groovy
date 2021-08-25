@@ -14,6 +14,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociation
 import org.pih.warehouse.product.ProductAssociationTypeCode
+import org.pih.warehouse.product.ProductAttribute
 import org.pih.warehouse.product.ProductAvailability
 
 class ProductApiController extends BaseDomainApiController {
@@ -23,6 +24,47 @@ class ProductApiController extends BaseDomainApiController {
     def forecastingService
     def grailsApplication
     def productAvailabilityService
+
+
+    def details = {
+        def product = Product.get(params.id)
+        def location = Location.get(session.warehouse.id)
+        def data = [product:product, location:location]
+
+
+        List<AvailableItem> availableItems = inventoryService.getAvailableItems(location, product)
+
+        Integer quantityAvailable = availableItems.collect { AvailableItem availableItem -> availableItem.quantityAvailable?:0 }.sum()
+        Integer quantityOnHand = availableItems.collect { AvailableItem availableItem -> availableItem.quantityOnHand?:0 }.sum()
+
+        data.status = quantityAvailable ? "In Stock" : "Out of Stock"
+        data.quantityAvailableToPromise = quantityAvailable
+        data.quantityOnHand = quantityOnHand
+        data.quantityAllocated = 0
+        data.quantityOnOrder = 0
+        data.unitOfMeasure = product.unitOfMeasure?:"EA"
+
+        data.images = product?.images?.collect {
+            return [ id: it.id, name: it.filename, contentType: it.contentType, fileUri: it.fileUri?:it?.link ]
+        }
+        data.documents = product?.documents?.collect {
+            return [ id: it.id, name: it.filename, contentType: it.contentType, fileUri: it.fileUri?:it?.link ]
+        }
+
+        data.attributes = product.attributes.collect { ProductAttribute productAttribute ->
+            return [ id: productAttribute.id,
+                     code: productAttribute.attribute?.code,
+                     name: productAttribute?.attribute?.name,
+                    value: productAttribute?.value,
+                    unitOfMeasure: productAttribute?.unitOfMeasure?:productAttribute?.attribute?.unitOfMeasureClass?.baseUom?.name
+            ]
+        }
+        data.availableItems = availableItems
+
+        render([data: data] as JSON)
+
+    }
+
 
     def demand = {
         def product = Product.get(params.id)
