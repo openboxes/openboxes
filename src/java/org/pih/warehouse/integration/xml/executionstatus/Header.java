@@ -1,30 +1,32 @@
-package org.pih.warehouse.xml.acceptancestatus;
+package org.pih.warehouse.integration.xml.executionstatus;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "Header")
-@XmlType(propOrder={"version","username","password","sequenceNumber", "sourceApp"})
+@XmlType(propOrder={"version","username","password","sequenceNumber","destinationApp"})
 public class Header {
 
     private String version;
     private String username;
     private String password;
     private String sequenceNumber;
-    private String sourceApp;
+    private String destinationApp;
 
     public Header() {
 
     }
 
-    public Header(String version, String username, String password, String sequenceNumber, String sourceApp) {
+    public Header(String version, String username, String password, String sequenceNumber, String destinationApp) {
         this.version = version;
+        this.username = username;
+        this.password = password;
         this.sequenceNumber = sequenceNumber;
-        this.sourceApp = sourceApp;
+        this.destinationApp = destinationApp;
     }
 
-    @XmlElement(name = "Version")
+    @XmlElement(name = "version")
     String getVersion() {
         return version;
     }
@@ -60,12 +62,12 @@ public class Header {
         this.sequenceNumber = sequenceNumber;
     }
 
-    @XmlElement(name = "SourceApp")
-    String getSourceApp() {
-        return sourceApp;
+    @XmlElement(name = "DestinationApp")
+    String getDestinationApp() {
+        return destinationApp;
     }
 
-    void setSourceApp(String sourceApp) {
-        this.sourceApp = sourceApp;
+    void setDestinationApp(String destinationApp) {
+        this.destinationApp = destinationApp;
     }
 }
