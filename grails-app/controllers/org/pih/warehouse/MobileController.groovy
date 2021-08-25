@@ -25,9 +25,9 @@ import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSummary
 import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.xml.acceptancestatus.AcceptanceStatus
-import org.pih.warehouse.xml.execution.Execution
-import org.pih.warehouse.xml.pod.DocumentUpload
+import org.pih.warehouse.integration.xml.acceptancestatus.AcceptanceStatus
+import org.pih.warehouse.integration.xml.pod.DocumentUpload
+import org.pih.warehouse.integration.xml.execution.Execution
 
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.Unmarshaller
@@ -151,7 +151,15 @@ class MobileController {
     }
 
     def messageUpload = {
-
+        def messageFile = request.getFile('messageFile')
+        if(messageFile) {
+            String fileName = messageFile.originalFilename
+            File file = new File ("/tmp/${fileName}")
+            messageFile.transferTo(file)
+            fileTransferService.storeMessage(file)
+            flash.message = "File ${fileName} transferred successfully"
+        }
+        redirect(action: "messageList")
     }
 
     def messageProcess = {
