@@ -34,7 +34,7 @@ class StockTransferService {
     boolean transactional = true
 
     def getStockTransferCandidates(Location location) {
-        List stockTransferItems = []
+        List<StockTransferItem> stockTransferItems = []
 
         List stockTransferCandidates = productAvailabilityService.getStockTransferCandidates(location)
 
@@ -51,7 +51,11 @@ class StockTransferService {
             }
         }
 
-        return stockTransferItems
+        return stockTransferItems.sort { a, b ->
+            a.product?.productCode <=> b.product?.productCode ?:
+                a.inventoryItem?.lotNumber <=> b.inventoryItem?.lotNumber ?:
+                    a.originBinLocation?.zone?.name <=> b.originBinLocation?.zone?.name ?:
+                        a.originBinLocation?.name <=> b.originBinLocation?.name }
     }
 
     List<StockTransferItem> getPendingItems(Location location) {
