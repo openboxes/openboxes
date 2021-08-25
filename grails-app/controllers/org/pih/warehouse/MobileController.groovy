@@ -187,17 +187,4 @@ class MobileController {
         response.outputStream << document.fileContents
         response.outputStream.flush()
     }
-
-
-    def parseDate = {
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssX")
-        dateFormatter.setLenient(true)
-
-        String dateString = "2020-10-07T15:43:48+01:00"
-        Date date = dateFormatter.parse(dateString)
-
-        render date
-
-    }
-
 }

@@ -44,7 +44,6 @@ class TripExecutionEventService implements ApplicationListener<TripExecutionEven
             Event event = new Event(eventType: eventType, eventDate: eventDate)
             shipment.addToEvents(event)
             shipment.save(flush:true)
-            //otificationService.sendShipmentEventNotification(shipment, event, [RoleType.ROLE_SHIPMENT_NOTIFICATION])
         }
 
     }
