@@ -1,6 +1,6 @@
 package org.pih.warehouse.integration
 
-import org.pih.warehouse.xml.acceptancestatus.AcceptanceStatus
+import org.pih.warehouse.integration.xml.acceptancestatus.AcceptanceStatus
 import org.springframework.context.ApplicationEvent
 
 class AcceptanceStatusEvent extends ApplicationEvent {

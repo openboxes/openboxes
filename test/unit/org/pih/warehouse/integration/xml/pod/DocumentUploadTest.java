@@ -1,4 +1,4 @@
-package org.pih.warehouse.xml.pod;
+package org.pih.warehouse.integration.xml.pod;
 
 import org.junit.After;
 import org.junit.Before;
