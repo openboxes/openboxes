@@ -18,6 +18,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.integration.AcceptanceStatusEvent
 import org.pih.warehouse.integration.DocumentUploadEvent
+import org.pih.warehouse.integration.TripExecutionEvent
 import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderTypeCode
@@ -25,16 +26,12 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSummary
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.xml.acceptancestatus.AcceptanceStatus
+import org.pih.warehouse.xml.execution.Execution
 import org.pih.warehouse.xml.pod.DocumentUpload
 
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.Unmarshaller
-import javax.imageio.ImageIO
-import javax.imageio.ImageReader
-import javax.imageio.stream.ImageInputStream
-
-
-
+import java.text.SimpleDateFormat
 
 class MobileController {
 
@@ -127,14 +124,16 @@ class MobileController {
     def outboundDetails = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
-        def events = stockMovement.shipment.events.collect { Event event ->
-            [name: event?.eventType?.name, date: event?.eventDate]
-        }
+        def events = stockMovement?.shipment?.events?.collect { Event event ->
+            [id: event?.id, name: event?.eventType?.toString(), date: event?.eventDate]
+        } ?: []
 
         events << [name: "Order created", date: stockMovement?.requisition?.dateCreated]
-        events << [name: "Order updated", date: stockMovement?.requisition?.lastUpdated]
+        if (stockMovement?.requisition?.dateCreated != stockMovement?.requisition?.lastUpdated) {
+            events << [name: "Order updated", date: stockMovement?.requisition?.lastUpdated]
+        }
 
-        events = events.sort { it.dateCreated }
+        events = events.sort { it.date }
 
         [stockMovement:stockMovement, events:events]
     }
@@ -161,7 +160,7 @@ class MobileController {
         String xmlContents = fileTransferService.retrieveMessage(params.filename)
 
         // Convert XML message to message object
-        JAXBContext jaxbContext = JAXBContext.newInstance("org.pih.warehouse.xml.acceptancestatus:org.pih.warehouse.xml.executionstatus:org.pih.warehouse.xml.pod");
+        JAXBContext jaxbContext = JAXBContext.newInstance("org.pih.warehouse.xml.acceptancestatus:org.pih.warehouse.xml.execution:org.pih.warehouse.xml.pod");
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         InputStream inputStream = IOUtils.toInputStream(xmlContents)
         Object messageObject = unmarshaller.unmarshal(inputStream)
@@ -172,6 +171,9 @@ class MobileController {
         }
         else if (messageObject instanceof AcceptanceStatus) {
             grailsApplication.mainContext.publishEvent(new AcceptanceStatusEvent(messageObject))
+        }
+        else if (messageObject instanceof Execution) {
+            grailsApplication.mainContext.publishEvent(new TripExecutionEvent(messageObject))
         }
 
         flash.message = "Message has been processed"
@@ -184,6 +186,18 @@ class MobileController {
         response.contentType = document.contentType
         response.outputStream << document.fileContents
         response.outputStream.flush()
+    }
+
+
+    def parseDate = {
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssX")
+        dateFormatter.setLenient(true)
+
+        String dateString = "2020-10-07T15:43:48+01:00"
+        Date date = dateFormatter.parse(dateString)
+
+        render date
+
     }
 
 }
