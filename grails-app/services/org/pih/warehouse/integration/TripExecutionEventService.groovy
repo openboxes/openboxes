@@ -15,7 +15,7 @@ import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.xml.execution.ExecutionStatus
+import org.pih.warehouse.integration.xml.execution.ExecutionStatus
 import org.springframework.context.ApplicationListener
 
 import java.text.SimpleDateFormat
