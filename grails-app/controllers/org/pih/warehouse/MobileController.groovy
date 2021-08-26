@@ -31,7 +31,6 @@ import org.pih.warehouse.integration.xml.execution.Execution
 
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.Unmarshaller
-import java.text.SimpleDateFormat
 
 class MobileController {
 
