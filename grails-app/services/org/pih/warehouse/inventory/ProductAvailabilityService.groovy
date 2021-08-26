@@ -25,8 +25,6 @@ import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductActivityCode
 import org.pih.warehouse.product.ProductAvailability
-import org.pih.warehouse.product.ProductSearch
-import org.pih.warehouse.product.ProductType
 
 class ProductAvailabilityService {
 
