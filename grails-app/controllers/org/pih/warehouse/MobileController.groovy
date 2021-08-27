@@ -64,7 +64,7 @@ class MobileController {
         [
                 data: [
                         [name: "Inventory", class: "fa fa-box", count: productCount, url: g.createLink(controller: "mobile", action: "productList")],
-                        [name: "Inbound Orders", class: "fa fa-shopping-cart", count: orderCount, url: g.createLink(controller: "order", action: "list", params: ['origin.id', location.id])],
+                        [name: "Inbound Orders", class: "fa fa-shopping-cart", count: orderCount, url: g.createLink(controller: "mobile", action: "inboundList", params: ['origin.id', location.id])],
                         [name: "Outbound Orders", class: "fa fa-truck", count: requisitionCount, url: g.createLink(controller: "mobile", action: "outboundList", params: ['origin.id', location.id])],
                         [name: "Messages", class: "fa fa-envelope", count: messageCount, url: g.createLink(controller: "mobile", action: "messageList", params: ['origin.id', location.id])],
                 ]
@@ -111,6 +111,14 @@ class MobileController {
             flash.message = "Product ${product.productCode} is not available in ${location.locationNumber}"
             redirect(action: "productList")
         }
+    }
+
+    def inboundList = {
+        Location destination = Location.get(params.origin?params.origin.id:session.warehouse.id)
+        StockMovement stockMovement = new StockMovement(destination: destination,
+                stockMovementType: StockMovementType.INBOUND, stockMovementStatusCode: StockMovementStatusCode.PENDING)
+        def stockMovements = stockMovementService.getStockMovements(stockMovement, [max:params.max?:10, offset: params.offset?:0])
+        [stockMovements: stockMovements]
     }
 
     def outboundList = {
