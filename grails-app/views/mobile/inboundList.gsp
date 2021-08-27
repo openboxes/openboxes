@@ -24,7 +24,7 @@
             <g:each var="stockMovement" in="${stockMovements}">
                 <tr>
                     <td>
-                        <a href="${createLink(controller: 'mobile', action: 'outboundDetails', id: stockMovement?.id)}" class="text-decoration-none text-reset">
+                        <a href="${createLink(controller: 'mobile', action: 'inboundDetails', id: stockMovement?.id)}" class="text-decoration-none text-reset">
                             ${stockMovement.identifier}
                         </a>
                     </td>
@@ -38,10 +38,22 @@
                         <g:formatDate date="${stockMovement?.expectedDeliveryDate}" format="dd MMM yyyy"/>
                     </td>
                     <td>
-
+                        <a href="${createLink(controller: 'stockMovement', action: 'show', id: stockMovement?.id)}" class="text-decoration-none text-reset">
+                            <g:if test="${stockMovement?.shipment?.currentEvent?.eventType?.eventCode}">
+                                <div class="badge bg-primary">
+                                    ${stockMovement.shipment?.currentEvent?.eventType?.eventCode}
+                                </div>
+                                <div>
+                                    <small><g:formatDate date="${stockMovement.shipment?.currentEvent?.eventDate}" format="MMM dd hh:mm a"/></small>
+                                </div>
+                            </g:if>
+                            <g:else>
+                                <div class="badge bg-primary">${stockMovement?.status}</div>
+                            </g:else>
+                        </a>
                     </td>
                     <td>
-                        <a href="${createLink(controller: 'mobile', action: 'outboundDetails', id: stockMovement?.id)}" class="btn btn-link">
+                        <a href="${createLink(controller: 'mobile', action: 'inboundDetails', id: stockMovement?.id)}" class="btn btn-link">
                             <button class="btn btn-outline-primary">List</button>
                         </a>
                     </td>

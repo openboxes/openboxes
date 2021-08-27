@@ -28,6 +28,7 @@ import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.integration.xml.acceptancestatus.AcceptanceStatus
 import org.pih.warehouse.integration.xml.pod.DocumentUpload
 import org.pih.warehouse.integration.xml.execution.Execution
+import org.pih.warehouse.shipping.Shipment
 
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.Unmarshaller
@@ -49,12 +50,14 @@ class MobileController {
         def productCount = ProductSummary.countByLocation(location)
         def productListUrl = g.createLink(controller: "mobile", action: "productList")
 
-        def orderCount = Order.createCriteria().count {
+        StockMovement stockMovement = new StockMovement(destination: location,
+                stockMovementType: StockMovementType.INBOUND, stockMovementStatusCode: StockMovementStatusCode.PENDING)
+
+        def orderCount = stockMovementService.getStockMovements(stockMovement, [max:params.max?:10, offset: params.offset?:0]).size()
+
+        /*def orderCount = Shipment.createCriteria().count {
             eq("destination", location)
-            orderType {
-                eq("orderTypeCode", OrderTypeCode.PURCHASE_ORDER)
-            }
-        }
+        }*/
 
         def requisitionCount = Requisition.createCriteria().count {
             eq("origin", location)
@@ -126,6 +129,23 @@ class MobileController {
         StockMovement stockMovement = new StockMovement(origin: origin, stockMovementType: StockMovementType.OUTBOUND, stockMovementStatusCode: StockMovementStatusCode.PENDING)
         def stockMovements = stockMovementService.getStockMovements(stockMovement, [max:params.max?:10, offset: params.offset?:0])
         [stockMovements:stockMovements]
+    }
+
+    def inboundDetails = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+
+        def events = stockMovement?.shipment?.events?.collect { Event event ->
+            [id: event?.id, name: event?.eventType?.toString(), date: event?.eventDate]
+        } ?: []
+
+        events << [name: "Order created", date: stockMovement?.dateCreated]
+        if (stockMovement?.dateCreated != stockMovement?.lastUpdated) {
+            events << [name: "Order updated", date: stockMovement?.lastUpdated]
+        }
+
+        events = events.sort { it.date }
+
+        [stockMovement:stockMovement, events:events]
     }
 
     def outboundDetails = {
