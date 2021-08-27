@@ -132,9 +132,12 @@ grails.project.dependency.resolution = {
         compile "org.springframework.integration:spring-integration-sftp:3.0.5.RELEASE"
 
         // Apache Commons Net
+        // Apache Commons Net (FTP)
         compile "commons-net:commons-net:3.3"
-        compile "com.jcraft:jsch:0.1.46"
-        compile "com.hierynomus:sshj:0.31.0"
+
+        // SSH clients
+        //compile "com.jcraft:jsch:0.1.46"
+        compile ("com.hierynomus:sshj:0.31.0") { excludes "slf4j-api" }
 
         // Mock ftp server
         test "org.mockftpserver:MockFtpServer:2.4"
