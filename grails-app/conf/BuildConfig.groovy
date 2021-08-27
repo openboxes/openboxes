@@ -134,7 +134,6 @@ grails.project.dependency.resolution = {
         compile "org.springframework.integration:spring-integration-core:3.0.5.RELEASE"
         compile "org.springframework.integration:spring-integration-sftp:3.0.5.RELEASE"
 
-        // Apache Commons Net
         // Apache Commons Net (FTP)
         compile "commons-net:commons-net:3.3"
 
