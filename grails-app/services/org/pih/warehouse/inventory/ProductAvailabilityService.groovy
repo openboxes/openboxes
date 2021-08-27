@@ -25,8 +25,6 @@ import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductActivityCode
 import org.pih.warehouse.product.ProductAvailability
-import org.pih.warehouse.product.ProductSearch
-import org.pih.warehouse.product.ProductType
 
 class ProductAvailabilityService {
 
@@ -675,40 +673,56 @@ class ProductAvailabilityService {
             }
         }
 
-        return ProductSearch.createCriteria().list(max: command.maxResults, offset: command.offset) {
-            product {
-                eq("active", true)
-                and {
-                    if (categories) {
-                        'in'("category", categories)
-                    }
-                    if (command.tags) {
-                        tags {
-                            'in'("id", command.tags*.id)
-                        }
-                    }
-                    if (command.catalogs) {
-                        productCatalogItems {
-                            productCatalog {
-                                'in'("id", command.catalogs*.id)
-                            }
-                        }
-                    }
-                    // This is pretty inefficient if the previous query does not narrow the results
-                    // if the inner products list is empty, but there are search terms then return empty results
-                    if (innerProductIds || searchTerms) {
-                        'in'("id", innerProductIds ?: [null])
+        def paginationParams = searchTerms ? [:] : [max: command.maxResults, offset: command.offset]
+
+        def products = Product.createCriteria().list(paginationParams) {
+            eq("active", true)
+            and {
+                if (categories) {
+                    'in'("category", categories)
+                }
+                if (command.tags) {
+                    tags {
+                        'in'("id", command.tags*.id)
                     }
                 }
-            }
-            eq("location", command.location)
-            or {
-                isNull("type")
-                and {
-                    eq("isSearchableType", Boolean.TRUE)
-                    gt("quantityOnHand", 0)
+                if (command.catalogs) {
+                    productCatalogItems {
+                        productCatalog {
+                            'in'("id", command.catalogs*.id)
+                        }
+                    }
+                }
+                // This is pretty inefficient if the previous query does not narrow the results
+                // if the inner products list is empty, but there are search terms then return empty results
+                if (innerProductIds || searchTerms) {
+                    'in'("id", innerProductIds ?: [null])
                 }
             }
         }
+
+        def quantityMap = products ? getQuantityOnHandByProduct(command.location, products) : []
+
+        def items = []
+
+        products.each { Product product ->
+            def quantity = quantityMap[product] ?: 0
+
+            if (product.productType) {
+                if (!product.productType.supportedActivities?.contains(ProductActivityCode.SEARCHABLE)) {
+                    return
+                } else if (quantity == 0) {
+                    return
+                }
+            }
+
+            items << [
+                id   : product.id,
+                product: product,
+                quantityOnHand: quantity
+            ]
+        }
+
+        return searchTerms ? items : new PagedResultList(items, products.totalCount)
     }
 }

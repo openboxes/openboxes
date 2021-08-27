@@ -75,7 +75,4 @@
   <changeSet id="1580848680306-25" author="dbienkowska" runOnChange="true" runAlways="true" failOnError="true">
     <sqlFile path="views/supplier-list.sql"/>
   </changeSet>
-  <changeSet id="1580848680306-26" author="awalkowiak" runOnChange="true" runAlways="true" failOnError="true">
-    <sqlFile path="views/product-search.sql"/>
-  </changeSet>
 </databaseChangeLog>
