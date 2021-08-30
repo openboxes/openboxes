@@ -8,11 +8,6 @@
 
 <body>
 
-<g:if test="${flash.message}">
-    <div class="message">
-        ${flash.message}
-    </div>
-</g:if>
 <g:hasErrors bean="${commandInstance}">
     <div class="errors">
         <g:renderErrors bean="${commandInstance}" as="list" />
@@ -56,7 +51,7 @@
                         </a>
                     </td>
                     <td>
-                        ${stockMovement?.destination?.name} ${stockMovement?.destination?.locationNumber}
+                        ${stockMovement?.destination?.name} (${stockMovement?.destination?.locationNumber})
                     </td>
                     <td>
                         <g:formatDate date="${stockMovement?.requisition?.requestedDeliveryDate}" format="dd MMM yyyy"/>
@@ -80,16 +75,6 @@
         </div>
     </div>
     <div class="col-2">
-        <div class="card text-center">
-            <div class="card-header">
-                Create Inbound Order
-            </div>
-            <div class="card-body">
-                %{--<p class="card-text">With supporting text below as a natural lead-in to additional content.</p>--}%
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#inboundModal">Create</button>
-            </div>
-        </div>
-
         <div class="card text-center">
             <div class="card-header">
                 Create Outbound Order
