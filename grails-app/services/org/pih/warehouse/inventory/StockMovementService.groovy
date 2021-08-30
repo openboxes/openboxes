@@ -684,6 +684,12 @@ class StockMovementService {
         return stockMovementItem
     }
 
+    def getEditPageItem(String id) {
+        RequisitionItem requisitionItem = RequisitionItem.get(id)
+
+        return getEditPageItem(requisitionItem)
+    }
+
     def getEditPageItem(RequisitionItem requisitionItem) {
         def query = """ select * FROM edit_page_item where id = :itemId """
 
@@ -1716,7 +1722,7 @@ class StockMovementService {
 
         stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
             if (stockMovementItem.statusCode == 'CHANGED') {
-                def editPageItem = getEditPageItem(stockMovementItem?.requisitionItem)
+                def editPageItem = getEditPageItem(stockMovementItem?.id)
                 revisedItems.add(editPageItem)
             }
         }
