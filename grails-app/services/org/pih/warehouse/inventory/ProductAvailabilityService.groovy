@@ -9,7 +9,6 @@
 **/
 package org.pih.warehouse.inventory
 
-import grails.orm.PagedResultList
 import groovy.sql.BatchingStatementWrapper
 import groovy.sql.Sql
 import groovy.time.TimeCategory
@@ -24,12 +23,9 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
-import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.product.ProductActivityCode
 import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.product.ProductSearch
-import org.pih.warehouse.product.ProductType
 
 class ProductAvailabilityService {
 
@@ -600,6 +596,11 @@ class ProductAvailabilityService {
                     !b?.inventoryItem?.expirationDate ? 0 : 1 :
                     !b?.inventoryItem?.expirationDate ? -1 :
                             a?.inventoryItem?.expirationDate <=> b?.inventoryItem?.expirationDate
+        }
+
+        // Move items with zero available quantity to the end
+        availableItems = availableItems.sort { a, b ->
+            (a?.quantityAvailable <= 0) <=> (b?.quantityAvailable <= 0)
         }
 
         return availableItems

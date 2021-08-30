@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { getTranslate } from 'react-localize-redux';
 
 import ModalWrapper from '../../form-elements/ModalWrapper';
 import LabelField from '../../form-elements/LabelField';
@@ -10,7 +11,7 @@ import ArrayField from '../../form-elements/ArrayField';
 import SelectField from '../../form-elements/SelectField';
 import apiClient from '../../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../../actions';
-import Translate from '../../../utils/Translate';
+import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
 
 const FIELDS = {
   reasonCode: {
@@ -23,7 +24,30 @@ const FIELDS = {
   },
   availableItems: {
     type: ArrayField,
+    getDynamicRowAttr: ({ rowValues }) => {
+      let className = '';
+      if (!rowValues.quantityAvailable) {
+        className = 'text-disabled';
+      }
+      return { className };
+    },
     fields: {
+      status: {
+        type: LabelField,
+        fieldKey: '',
+        flexWidth: '8',
+        getDynamicAttr: ({ translate }) => ({
+          showValueTooltip: true,
+          formatValue: (fieldValue) => {
+            if (!fieldValue.status || fieldValue.status === 'AVAILABLE') {
+              return '';
+            }
+
+            const status = translate(`react.stockMovement.enum.AvailableItemStatus.${fieldValue.status}`, fieldValue.status);
+            return status + (fieldValue.pickedRequisitionNumbers ? ` [${fieldValue.pickedRequisitionNumbers}]` : '');
+          },
+        }),
+      },
       lotNumber: {
         type: LabelField,
         label: 'react.stockMovement.lot.label',
@@ -33,6 +57,7 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.expiry.label',
         defaultMessage: 'Expiry',
+        fixedWidth: '120px',
       },
       binLocation: {
         type: LabelField,
@@ -56,17 +81,21 @@ const FIELDS = {
         defaultMessage: 'Qty Available',
         fixedWidth: '150px',
         attributes: {
-          formatValue: value => (value ? value.toLocaleString('en-US') : null),
+          formatValue: value => (value || value === 0 ? value.toLocaleString('en-US') : null),
         },
       },
       quantityPicked: {
         type: TextField,
+        fieldKey: '',
         label: 'react.stockMovement.quantityPicked.label',
         defaultMessage: 'Qty Picked',
-        fixedWidth: '140px',
+        fixedWidth: '120px',
         attributes: {
           type: 'number',
         },
+        getDynamicAttr: ({ fieldValue }) => ({
+          disabled: fieldValue && !fieldValue.quantityAvailable,
+        }),
       },
     },
   },
@@ -135,43 +164,7 @@ class EditPickModal extends Component {
    * @public
    */
   onOpen() {
-    const availableItems = _.map(this.state.attr.fieldValue.availableItems, (avItem) => {
-      // check if this picklist item already exists
-      const picklistItem = _.find(
-        _.filter(this.state.attr.fieldValue.picklistItems, listItem => !listItem.initial),
-        item => item['inventoryItem.id'] === avItem['inventoryItem.id'] && item['binLocation.id'] === avItem['binLocation.id'],
-      );
-
-      if (picklistItem) {
-        return {
-          ...avItem,
-          id: picklistItem.id,
-          quantityPicked: picklistItem.quantityPicked,
-          binLocation: {
-            id: picklistItem['binLocation.id'],
-            name: picklistItem['binLocation.name'],
-            zoneName: picklistItem['binLocation.zoneName'],
-          },
-        };
-      }
-
-      return {
-        ...avItem,
-        binLocation: {
-          id: avItem['binLocation.id'],
-          name: avItem['binLocation.name'],
-          zoneName: avItem['binLocation.zoneName'],
-        },
-      };
-    });
-
-    this.setState({
-      formValues: {
-        availableItems,
-        reasonCode: '',
-        quantityRequired: this.state.attr.fieldValue.quantityRequired,
-      },
-    });
+    this.fetchPickPageItem();
   }
 
   /**
@@ -182,8 +175,8 @@ class EditPickModal extends Component {
   onSave(values) {
     this.props.showSpinner();
 
-    const picklistUrl = `/openboxes/api/stockMovementItems/${this.state.attr.fieldValue['requisitionItem.id']}/updatePicklist`;
-    const itemsUrl = `/openboxes/api/stockMovementItems/${this.state.attr.fieldValue['requisitionItem.id']}?stepNumber=4`;
+    const picklistUrl = `/openboxes/api/stockMovementItems/${this.state.attr.itemId}/updatePicklist`;
+    const itemsUrl = `/openboxes/api/stockMovementItems/${this.state.attr.itemId}?stepNumber=4`;
     const payload = {
       picklistItems: _.map(values.availableItems, avItem => ({
         id: avItem.id || '',
@@ -226,6 +219,55 @@ class EditPickModal extends Component {
     );
   }
 
+  fetchPickPageItem() {
+    const itemsUrl = `/openboxes/api/stockMovementItems/${this.state.attr.itemId}/details?stepNumber=4`;
+
+    apiClient.get(itemsUrl)
+      .then((resp) => {
+        const pickPageItem = resp.data.data;
+
+        const availableItems = _.map(pickPageItem.availableItems, (avItem) => {
+          // check if this picklist item already exists
+          const picklistItem = _.find(pickPageItem.picklistItems, item => item['inventoryItem.id'] === avItem['inventoryItem.id'] && item['binLocation.id'] === avItem['binLocation.id']);
+
+          if (picklistItem) {
+            return {
+              ...avItem,
+              id: picklistItem.id,
+              quantityPicked: picklistItem.quantityPicked,
+              binLocation: {
+                id: picklistItem['binLocation.id'],
+                name: picklistItem['binLocation.name'],
+                zoneName: picklistItem['binLocation.zoneName'],
+              },
+            };
+          }
+
+          return {
+            ...avItem,
+            binLocation: {
+              id: avItem['binLocation.id'],
+              name: avItem['binLocation.name'],
+              zoneName: avItem['binLocation.zoneName'],
+            },
+          };
+        });
+
+        this.setState({
+          formValues: {
+            availableItems,
+            reasonCode: '',
+            quantityRequired: pickPageItem.quantityRequired,
+            productCode: pickPageItem.productCode,
+            productName: pickPageItem['product.name'],
+          },
+        });
+
+        this.props.hideSpinner();
+      })
+      .catch(() => { this.props.hideSpinner(); });
+  }
+
   render() {
     if (this.state.attr.subfield) {
       return null;
@@ -242,18 +284,19 @@ class EditPickModal extends Component {
         formProps={{
           reasonCodes: this.state.attr.reasonCodes,
           hasBinLocationSupport: this.props.hasBinLocationSupport,
+          translate: this.props.translate,
         }}
         renderBodyWithValues={this.calculatePicked}
       >
         <div>
           <div className="font-weight-bold">
-            <Translate id="react.stockMovement.productCode.label" defaultMessage="Product code" />: {this.state.attr.fieldValue.productCode}
+            <Translate id="react.stockMovement.productCode.label" defaultMessage="Product code" />: {this.state.formValues.productCode}
           </div>
           <div className="font-weight-bold">
-            <Translate id="react.stockMovement.productName.label" defaultMessage="Product name" />: {this.state.attr.fieldValue['product.name']}
+            <Translate id="react.stockMovement.productName.label" defaultMessage="Product name" />: {this.state.formValues.productName}
           </div>
           <div className="font-weight-bold">
-            <Translate id="react.stockMovement.quantityRequired.label" defaultMessage="Qty Required" />: {this.state.attr.fieldValue.quantityRequired}
+            <Translate id="react.stockMovement.quantityRequired.label" defaultMessage="Qty Required" />: {this.state.formValues.quantityRequired}
           </div>
         </div>
       </ModalWrapper>
@@ -261,7 +304,11 @@ class EditPickModal extends Component {
   }
 }
 
-export default connect(null, { showSpinner, hideSpinner })(EditPickModal);
+const mapStateToProps = state => ({
+  translate: translateWithDefaultMessage(getTranslate(state.localize)),
+});
+
+export default connect(mapStateToProps, { showSpinner, hideSpinner })(EditPickModal);
 
 EditPickModal.propTypes = {
   /** Name of the field */
@@ -276,4 +323,5 @@ EditPickModal.propTypes = {
   hideSpinner: PropTypes.func.isRequired,
   /** Is true when currently selected location supports bins */
   hasBinLocationSupport: PropTypes.bool.isRequired,
+  translate: PropTypes.func.isRequired,
 };

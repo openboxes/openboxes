@@ -126,13 +126,12 @@ const FIELDS = {
           defaultTitleMessage: 'Edit Pick',
         },
         getDynamicAttr: ({
-          fieldValue, subfield, stockMovementId, updatePickPageItem,
+          fieldValue, subfield, updatePickPageItem,
           reasonCodes, hasBinLocationSupport, showOnly,
         }) => ({
-          fieldValue: flattenRequest(fieldValue),
+          itemId: _.get(fieldValue, 'requisitionItem.id'),
           btnOpenDisabled: showOnly,
           subfield,
-          stockMovementId,
           btnOpenText: fieldValue && fieldValue.hasChangedPick ? '' : 'react.default.button.edit.label',
           btnOpenDefaultText: fieldValue && fieldValue.hasChangedPick ? '' : 'Edit',
           btnOpenClassName: fieldValue && fieldValue.hasChangedPick ? ' btn fa fa-check btn-outline-success' : 'btn btn-outline-primary',

@@ -304,6 +304,9 @@ class AvailableItem {
     BigDecimal quantityAvailable
     BigDecimal quantityOnHand
 
+    AvailableItemStatus status
+    List<String> pickedRequisitionNumbers
+
     static constraints = {
         inventoryItem(nullable: true)
         binLocation(nullable: true)
@@ -316,23 +319,28 @@ class AvailableItem {
 
     Map toJson() {
         return [
-                "inventoryItem.id": inventoryItem?.id,
-                "product.name"    : inventoryItem?.product?.name,
-                "product"         : inventoryItem?.product,
-                "productCode"     : inventoryItem?.product?.productCode,
-                lotNumber         : inventoryItem?.lotNumber,
-                expirationDate    : inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
-                binLocation       : binLocation,
-                quantityAvailable : quantityAvailable,
-                quantityOnHand    : quantityOnHand,
+                "inventoryItem.id"      : inventoryItem?.id,
+                "product.name"          : inventoryItem?.product?.name,
+                "product"               : inventoryItem?.product,
+                "productCode"           : inventoryItem?.product?.productCode,
+                lotNumber               : inventoryItem?.lotNumber,
+                expirationDate          : inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
+                binLocation             : binLocation,
+                quantityAvailable       : quantityAvailable,
+                quantityOnHand          : quantityOnHand,
+                status                  : status?.name(),
+                pickedRequisitionNumbers: pickedRequisitionNumbers ? pickedRequisitionNumbers?.join(",") : "",
                 // deprecated
-                "binLocation.id"  : binLocation?.id,
-                "binLocation.name": binLocation?.name,
+                "binLocation.id"        : binLocation?.id,
+                "binLocation.name"      : binLocation?.name,
         ]
     }
 
 }
 
+enum AvailableItemStatus {
+    AVAILABLE, PICKED, RECALLED, HOLD
+}
 
 class SuggestedItem extends AvailableItem {
 
@@ -523,7 +531,7 @@ class PickPageItem {
     Integer sortOrder
 
     Set<PicklistItem> picklistItems = []
-    Set<AvailableItem> availableItems = []
+    List<AvailableItem> availableItems = []
     Set<SuggestedItem> suggestedItems = []
 
 
