@@ -1,5 +1,6 @@
 package org.pih.warehouse.jobs
 
+import net.schmizz.sshj.connection.ConnectionException
 import org.apache.commons.io.IOUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
 import org.pih.warehouse.integration.ftp.SecureFtpClient
@@ -25,32 +26,39 @@ class MessageRetrievalJob {
             return
         }
 
-
         log.info "Starting message retrieval job at ${new Date()}"
         def startTime = System.currentTimeMillis()
 
         // Configuration
-        String server = grailsApplication.config.openboxes.integration.ftp.server
-        Integer port = grailsApplication.config.openboxes.integration.ftp.port?:22
-        String user = grailsApplication.config.openboxes.integration.ftp.user
-        String password = grailsApplication.config.openboxes.integration.ftp.password
         String directory = grailsApplication.config.openboxes.integration.ftp.directory
 
-        // Retrieve files
-        SecureFtpClient ftpClient = new SecureFtpClient(server, port, user, password)
-        ftpClient.connect()
-        def filenames = ftpClient.listFiles(directory)
-        log.info "Found ${filenames.size()} files: "
-        filenames.each { String filename ->
-            String source = "${directory}/${filename}"
-            log.info "retrieving file ${source} ..."
-            //ftpClient.retrieveFile("${source}", "/tmp")
-            def inputStream = ftpClient.retrieveFileAsInputStream(source)
-            String text = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name())
-            log.info "contents: " + text
-        }
-        ftpClient.disconnect()
+        // Retrieve files by SFTP
+        Map sftpConfig = grailsApplication.config.openboxes.integration.ftp.flatten()
+        SecureFtpClient sftpClient = new SecureFtpClient(sftpConfig)
+        try {
+            sftpClient.connect()
 
+            // Get filenames
+            def filenames = sftpClient.listFiles(directory)
+            log.info "Found ${filenames.size()} files: "
+
+            // Process each file individually
+            filenames.each { String filename ->
+                String source = "${directory}/${filename}"
+                log.info "retrieving file ${source} ..."
+                def inputStream = sftpClient.retrieveFileAsInputStream(source)
+                log.info "source: ${source}"
+
+                String messageContent = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name())
+                // TODO Pass messageContent to be message pipeline to be validated and processed
+            }
+
+        } catch(ConnectionException e) {
+            log.error "Unable to retrieve message due to exception: " + e.message, e
+        }
+        finally {
+            sftpClient.disconnect()
+        }
         log.info "Finished message retrieval job in " + (System.currentTimeMillis() - startTime) + " ms"
     }
 
