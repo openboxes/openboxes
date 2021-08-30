@@ -60,6 +60,11 @@ class UrlMappings {
             action = [GET: "read"]
         }
 
+        "/api/stockMovementItems/$id/details"(parseRequest: true) {
+            controller = "stockMovementItemApi"
+            action = [GET: "details"]
+        }
+
         "/api/stockMovementItems/$id/updatePicklist"(parseRequest: true) {
             controller = "stockMovementItemApi"
             action = [POST: "updatePicklist"]

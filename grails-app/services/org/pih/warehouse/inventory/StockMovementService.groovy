@@ -14,6 +14,7 @@ import grails.validation.ValidationException
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.api.AvailableItemStatus
 import org.pih.warehouse.api.DocumentGroupCode
 import org.pih.warehouse.api.PackPageItem
 import org.pih.warehouse.api.PickPageItem
@@ -31,6 +32,7 @@ import org.pih.warehouse.core.DocumentCode
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
+import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.ShipOrderCommand
@@ -533,6 +535,10 @@ class StockMovementService {
     }
 
     def getStockMovementItem(String id, String stepNumber) {
+        return getStockMovementItem(id, stepNumber, false)
+    }
+
+    def getStockMovementItem(String id, String stepNumber, Boolean showDetails) {
         RequisitionItem requisitionItem = RequisitionItem.get(id)
         StockMovementItem stockMovementItem = null
         Requisition requisition = null
@@ -561,7 +567,7 @@ class StockMovementService {
             case "2":
                 return getAddPageItem(requisition, stockMovementItem)
             case "4":
-                return buildPickPageItem(requisitionItem, stockMovementItem.sortOrder)
+                return buildPickPageItem(requisitionItem, stockMovementItem.sortOrder, showDetails)
             case "5":
                 return buildPackPageItem(shipmentItem)
             case "6":
@@ -1159,10 +1165,20 @@ class StockMovementService {
     }
 
     List<AvailableItem> getAvailableItems(Location location, RequisitionItem requisitionItem) {
+        return getAvailableItems(location, requisitionItem, false)
+    }
+
+    List<AvailableItem> getAvailableItems(Location location, RequisitionItem requisitionItem, Boolean calculateStatus) {
         List<AvailableItem> availableItems = productAvailabilityService.getAllAvailableBinLocations(location, requisitionItem.product)
         def picklistItems = getPicklistItems(requisitionItem)
 
-        return calculateQuantityAvailableToPromise(availableItems, picklistItems)
+        availableItems = calculateQuantityAvailableToPromise(availableItems, picklistItems)
+
+        if (calculateStatus) {
+            return calculateAvailableItemsStatus(requisitionItem, availableItems)
+        }
+
+        return availableItems
     }
 
     List<AvailableItem> calculateQuantityAvailableToPromise(List<AvailableItem> availableItems, def picklistItems) {
@@ -1186,6 +1202,41 @@ class StockMovementService {
         }
 
         return productAvailabilityService.sortAvailableItems(availableItems)
+    }
+
+    List<AvailableItem> calculateAvailableItemsStatus(RequisitionItem requisitionItem, List<AvailableItem> availableItems) {
+        return availableItems?.collect {
+            if (it.quantityAvailable > 0) {
+                it.status = AvailableItemStatus.AVAILABLE
+            } else if (it.inventoryItem?.recalled) {
+                it.status = AvailableItemStatus.RECALLED
+            } else if (it.binLocation?.supports(ActivityCode.HOLD_STOCK)) {
+                it.status = AvailableItemStatus.HOLD
+            } else {
+                it.status = AvailableItemStatus.PICKED
+
+                Requisition requisition = requisitionItem.requisition
+
+                def picklists = getPicklistByLocationAndProduct(it.binLocation, it.inventoryItem)
+                List<String> pickedRequisitionNumbers = picklists?.collect { it.requisition.requestNumber }?.findAll { it != requisition.requestNumber }?.unique()
+
+                it.pickedRequisitionNumbers = pickedRequisitionNumbers
+            }
+
+            return it
+        }
+    }
+
+    def getPicklistByLocationAndProduct(Location binLocation, InventoryItem inventoryItem) {
+        return Picklist.createCriteria().list {
+            requisition {
+                'in'("status", RequisitionStatus.listPending())
+            }
+            picklistItems {
+                eq("inventoryItem", inventoryItem)
+                eq("binLocation", binLocation)
+            }
+        }
     }
 
     /**
@@ -1288,12 +1339,16 @@ class StockMovementService {
         return pickPageItems
     }
 
+    PickPageItem buildPickPageItem(RequisitionItem requisitionItem, Integer sortOrder) {
+        return buildPickPageItem(requisitionItem, sortOrder, false)
+    }
+
     /**
      *
      * @param requisitionItem
      * @return
      */
-    PickPageItem buildPickPageItem(RequisitionItem requisitionItem, Integer sortOrder) {
+    PickPageItem buildPickPageItem(RequisitionItem requisitionItem, Integer sortOrder, Boolean showDetails) {
 
         if (!requisitionItem.picklistItems || (requisitionItem.picklistItems && requisitionItem.totalQuantityPicked() != requisitionItem.quantity &&
                 !requisitionItem.picklistItems.reasonCode)) {
@@ -1303,7 +1358,7 @@ class StockMovementService {
                 picklistItems: requisitionItem.picklistItems)
         Location location = requisitionItem?.requisition?.origin
 
-        List<AvailableItem> availableItems = getAvailableItems(location, requisitionItem)
+        List<AvailableItem> availableItems = getAvailableItems(location, requisitionItem, showDetails)
         Integer quantityRequired = requisitionItem?.calculateQuantityRequired()
         List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
         pickPageItem.availableItems = availableItems
