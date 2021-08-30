@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2012 Partners In Health.  All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software.
-**/
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse
 
 import org.apache.commons.io.IOUtils
@@ -16,6 +16,9 @@ import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
+import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.importer.InboundStockMovementExcelImporter
+import org.pih.warehouse.importer.OutboundStockMovementExcelImporter
 import org.pih.warehouse.integration.AcceptanceStatusEvent
 import org.pih.warehouse.integration.DocumentUploadEvent
 import org.pih.warehouse.integration.TripExecutionEvent
@@ -29,6 +32,7 @@ import org.pih.warehouse.integration.xml.acceptancestatus.AcceptanceStatus
 import org.pih.warehouse.integration.xml.pod.DocumentUpload
 import org.pih.warehouse.integration.xml.execution.Execution
 import org.pih.warehouse.shipping.Shipment
+import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest
 
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.Unmarshaller
@@ -43,6 +47,7 @@ class MobileController {
     def stockMovementService
     def fileTransferService
     def grailsApplication
+    def uploadService
 
     def index = {
 
@@ -91,7 +96,7 @@ class MobileController {
         User user = User.get(session.user.id)
         Location warehouse = Location.get(session.warehouse.id)
         render (view: "/mobile/chooseLocation",
-            model: [savedLocations: user.warehouse ? [user.warehouse] : null, loginLocationsMap: locationService.getLoginLocationsMap(user, warehouse)])
+                model: [savedLocations: user.warehouse ? [user.warehouse] : null, loginLocationsMap: locationService.getLoginLocationsMap(user, warehouse)])
     }
 
     def productList = {
@@ -130,6 +135,72 @@ class MobileController {
         StockMovement stockMovement = new StockMovement(origin: origin, stockMovementType: StockMovementType.OUTBOUND, stockMovementStatusCode: StockMovementStatusCode.PENDING)
         def stockMovements = stockMovementService.getStockMovements(stockMovement, [max:params.max?:10, offset: params.offset?:0])
         [stockMovements:stockMovements]
+    }
+
+    def importData = { ImportDataCommand command ->
+
+        log.info params
+        log.info command.location
+        log.info session
+        File localFile = null
+        if (request instanceof DefaultMultipartHttpServletRequest) {
+            def uploadFile = request.getFile("xlsFile")
+            if (!uploadFile.empty) {
+                try {
+                    localFile = uploadService.createLocalFile(uploadFile.originalFilename)
+                    uploadFile.transferTo(localFile)
+                    session.localFile = localFile
+                } catch (Exception e) {
+                    flash.message = "Unable to upload file due to exception: " + e.message
+                    return
+                }
+            } else {
+                flash.message = "${warehouse.message(code: 'inventoryItem.emptyFile.message')}"
+            }
+        } else {
+            localFile = session.localFile
+        }
+        def dataImporter
+        if (localFile) {
+            command.importFile = localFile
+            command.filename = localFile.getAbsolutePath()
+            command.location = Location.get(session.warehouse.id)
+
+            if (params.type == "outbound")
+                dataImporter = new OutboundStockMovementExcelImporter(command.filename)
+            else
+                dataImporter = new InboundStockMovementExcelImporter(command.filename)
+
+            if(dataImporter) {
+                println "Using data importer ${dataImporter.class.name}"
+                command.data = dataImporter.data
+                dataImporter.validateData(command)
+                command.columnMap = dataImporter.columnMap
+            }
+
+            if (command?.data?.isEmpty()) {
+                command.errors.reject("importFile", "${warehouse.message(code: 'inventoryItem.pleaseEnsureDate.message', args: [dataImporter.columnMap?.sheet?:'Sheet1', localFile.getAbsolutePath()])}")
+            }
+
+            if (!command.hasErrors() ) {
+                println "data is about to be imported ..."
+                try {
+                    dataImporter.importData(command)
+                }catch (Exception e) {
+                    command.errors.reject(e.message)
+                }
+                if (!command.errors.hasErrors()) {
+                    flash.message = "${warehouse.message(code: 'inventoryItem.importSuccess.message', args: [localFile.getAbsolutePath()])}"
+                    redirect(action: "outboundList")
+                    return
+                }
+                log.info "There were errors: " + command.errors
+            }else {
+                log.info "There are some errors ${command.errors}"
+                flash.message = "There are some validation errors"
+            }
+        }
+        redirect action: 'outboundList'
     }
 
     def inboundDetails = {
