@@ -4,11 +4,15 @@ import net.schmizz.sshj.SSHClient
 import net.schmizz.sshj.sftp.RemoteFile
 import net.schmizz.sshj.sftp.RemoteResourceInfo
 import net.schmizz.sshj.sftp.SFTPClient
+import net.schmizz.sshj.transport.TransportException
 import net.schmizz.sshj.transport.verification.OpenSSHKnownHosts
 import net.schmizz.sshj.xfer.FileSystemFile
+import org.apache.commons.logging.LogFactory
 
 
 class SecureFtpClient {
+
+    static final LOG = LogFactory.getLog(this)
 
     private String server
     private int port
@@ -16,6 +20,7 @@ class SecureFtpClient {
     private String password
     private String knownHosts
     private String directory
+    private String fingerprint
     private Integer heartbeatInterval = 30
     private SSHClient sshClient
 
@@ -32,6 +37,7 @@ class SecureFtpClient {
         this.user = config.user?:null
         this.password = config.password?:null
         this.heartbeatInterval = config.heartbeatInterval?:30
+        this.fingerprint = config?.fingerprint?:null
         this.knownHosts = config.knownHosts
         this.directory = directory
     }
@@ -39,24 +45,30 @@ class SecureFtpClient {
 
 
     void connect() throws IOException {
-        sshClient = new SSHClient()
+        try {
+            sshClient = new SSHClient()
 
-        // Load known hosts from configuration if unable to use ~/.ssh/known_hosts
-        if (knownHosts) {
-            sshClient.addHostKeyVerifier(new OpenSSHKnownHosts(new InputStreamReader(new ByteArrayInputStream(knownHosts.bytes))))
-        }
-        // Or from default ~/.ssh/known_hosts file
-        else {
-            sshClient.loadKnownHosts()
-        }
+            // Load known hosts from configuration if unable to use ~/.ssh/known_hosts
+            //if (knownHosts) {
+            //    sshClient.addHostKeyVerifier(new OpenSSHKnownHosts(new InputStreamReader(new ByteArrayInputStream(knownHosts.bytes))))
+            //}
+            // Or from default ~/.ssh/known_hosts file
+            //else {
+            //    sshClient.loadKnownHosts()
+            //}
+            if (fingerprint) {
+                sshClient.addHostKeyVerifier(fingerprint)
+            }
+            sshClient.connect(server)
 
-        sshClient.connect(server)
+            // Set heartbeat interval
+            sshClient.transport.heartbeatInterval = heartbeatInterval
 
-        // Set heartbeat interval
-        sshClient.transport.heartbeatInterval = heartbeatInterval
-
-        if (user && password) {
-            sshClient.authPassword(user, password)
+            if (user && password) {
+                sshClient.authPassword(user, password)
+            }
+        } catch (TransportException e) {
+            LOG.error("Unable to connect to sftp server due to error: " + e.message, e)
         }
     }
 

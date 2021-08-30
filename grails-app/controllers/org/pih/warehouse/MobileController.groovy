@@ -63,7 +63,8 @@ class MobileController {
             eq("origin", location)
         }
 
-        def messageCount = fileTransferService.listMessages().size()
+        def messages = fileTransferService.listMessages()
+        def messageCount = messages ? messages?.size() :0
         [
                 data: [
                         [name: "Inventory", class: "fa fa-box", count: productCount, url: g.createLink(controller: "mobile", action: "productList")],
