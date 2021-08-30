@@ -20,14 +20,10 @@ class FileTransferService {
     def grailsApplication
 
     SecureFtpClient getSecureFtpClient() {
-        String server = grailsApplication.config.openboxes.integration.ftp.server
-        Integer port = grailsApplication.config.openboxes.integration.ftp.port?:22
-        String user = grailsApplication.config.openboxes.integration.ftp.user
-        String password = grailsApplication.config.openboxes.integration.ftp.password
-
-        SecureFtpClient ftpClient = new SecureFtpClient(server, port, user, password)
-        ftpClient.connect()
-        return ftpClient
+        Map sftpConfig = grailsApplication.config.openboxes.integration.ftp.flatten()
+        SecureFtpClient sftpClient = new SecureFtpClient(sftpConfig)
+        sftpClient.connect()
+        return sftpClient
     }
 
     def listMessages(boolean includeContent = false) {
@@ -44,7 +40,7 @@ class FileTransferService {
                 return [filename:filename]
             }
             return messages
-        }
+        } catch (Exception e) { }
         finally {
             secureFtpClient.disconnect()
         }
