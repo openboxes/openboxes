@@ -8,7 +8,8 @@
 
 <body>
 
-    <div class="row g-0">
+<div class="row g-0">
+    <div class="col">
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -65,5 +66,41 @@
             <g:paginate total="${stockMovements.totalCount}"/>
         </div>
     </div>
+    <div class="col-2">
+        <div class="card text-center">
+            <div class="card-header">
+                Create Inbound Orders
+            </div>
+            <div class="card-body">
+                %{--<p class="card-text">With supporting text below as a natural lead-in to additional content.</p>--}%
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#inboundModal">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="inboundModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <g:uploadForm class="needs-validation" action="importData" enctype="multipart/form-data">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createInboundBack">Create Inbound Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input name="type" type="hidden" value="inbound"/>
+                    <g:hiddenField name="location.id" value="${session.warehouse.id }"/>
+                    <input class="form-control" type="file" name="xlsFile" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </div>
+            </div>
+        </div>
+    </g:uploadForm>
+</div>
+
 </body>
 </html>
