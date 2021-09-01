@@ -9,7 +9,6 @@
  **/
 package replenishment
 
-import org.apache.commons.beanutils.BeanUtils
 import org.pih.warehouse.api.Replenishment
 import org.pih.warehouse.api.ReplenishmentItem
 import org.pih.warehouse.api.ReplenishmentStatus
@@ -37,14 +36,13 @@ class ReplenishmentService {
         }
     }
 
-    Order createOrderFromReplenishment(Replenishment replenishment) {
+    Order createOrUpdateOrderFromReplenishment(Replenishment replenishment) {
 
         Order order = Order.get(replenishment.id)
         if (!order) {
             order = new Order()
         }
 
-        // TODO: Is this TRANSFER_ORDER or something else?
         OrderType orderType = OrderType.findByCode(OrderTypeCode.TRANSFER_ORDER.name())
         order.orderType = orderType
         order.status = OrderStatus.valueOf(replenishment.status.toString())
@@ -118,7 +116,7 @@ class ReplenishmentService {
         validateReplenishment(replenishment)
 
         // Save the replenishment as an order
-        Order order = createOrderFromReplenishment(replenishment)
+        Order order = createOrUpdateOrderFromReplenishment(replenishment)
 
         // TODO: Process pick list items
 

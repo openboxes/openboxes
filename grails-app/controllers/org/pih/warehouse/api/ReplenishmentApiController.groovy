@@ -55,19 +55,37 @@ class ReplenishmentApiController {
 
         bindReplenishmentData(replenishment, currentUser, currentLocation, jsonObject)
 
-        Order order
+        Order order = replenishmentService.createOrUpdateOrderFromReplenishment(replenishment)
+        if (order.hasErrors() || !order.save(flush: true)) {
+            throw new ValidationException("Invalid order", order.errors)
+        }
+
+        render status: 201
+    }
+
+    def update = {
+        JSONObject jsonObject = request.JSON
+
+        User currentUser = User.get(session.user.id)
+        Location currentLocation = Location.get(session.warehouse.id)
+        if (!currentLocation || !currentUser) {
+            throw new IllegalArgumentException("User must be logged into a location to update replenishment")
+        }
+
+        Replenishment replenishment = new Replenishment()
+
+        bindReplenishmentData(replenishment, currentUser, currentLocation, jsonObject)
+
         if (replenishment?.status == ReplenishmentStatus.COMPLETED) {
-            order = replenishmentService.completeReplenishment(replenishment)
+            replenishmentService.completeReplenishment(replenishment)
         } else {
-            order = replenishmentService.createOrderFromReplenishment(replenishment)
+            Order order = replenishmentService.createOrUpdateOrderFromReplenishment(replenishment)
             if (order.hasErrors() || !order.save(flush: true)) {
                 throw new ValidationException("Invalid order", order.errors)
             }
         }
 
-        replenishment = Replenishment.createFromOrder(order)
-        replenishmentService.refreshQuantities(replenishment)
-        render([data: replenishment?.toJson()] as JSON)
+        render status: 200
     }
 
     Replenishment bindReplenishmentData(Replenishment replenishment, User currentUser, Location currentLocation, JSONObject jsonObject) {
@@ -105,7 +123,10 @@ class ReplenishmentApiController {
     }
 
     def statusOptions = {
-        render([data: InventoryLevelStatus.listReplenishmentOptions()?.collect { [ id: it.name(), label: it.name() ] }] as JSON)
+        def options = InventoryLevelStatus.listReplenishmentOptions()?.collect {
+            [ id: it.name(), label: "${g.message(code: 'enum.InventoryLevelStatus.' + it.name())}" ]
+        }
+        render([data: options] as JSON)
     }
 
     def requirements = {
@@ -120,7 +141,7 @@ class ReplenishmentApiController {
     }
 
     def removeItem = {
-        Order order = replenishmentService.deleteReplenishmentItem(params.id)
-        render([data: Replenishment.createFromOrder(order)?.toJson()] as JSON)
+        replenishmentService.deleteReplenishmentItem(params.id)
+        render status: 204
     }
 }

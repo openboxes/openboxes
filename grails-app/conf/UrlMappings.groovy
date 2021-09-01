@@ -328,17 +328,17 @@ class UrlMappings {
         // Replenishment API
 
         "/api/replenishments/statusOptions"(parseRequest: true) {
-            controller = "stockTransferApi"
+            controller = "replenishmentApi"
             action = [GET: "statusOptions"]
         }
 
         "/api/replenishments/$id/"(parseRequest: true) {
-            controller = { "stockTransferApi" }
-            action = [GET: "read", POST: "create"]
+            controller = { "replenishmentApi" }
+            action = [GET: "read", POST: "create", PUT: "update"]
         }
 
         "/api/replenishments/$id/removeItem"(parseRequest: true) {
-            controller = { "stockTransferApi" }
+            controller = { "replenishmentApi" }
             action = [DELETE: "removeItem"]
         }
 
