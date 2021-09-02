@@ -60,10 +60,11 @@
                         <g:formatDate date="${stockMovement?.expectedDeliveryDate}" format="dd MMM yyyy"/>
                     </td>
                     <td>
-                        <a href="${createLink(controller: 'mobile', action: 'outboundDetails', id: stockMovement?.id)}" class="btn btn-link">
-
-                            <button class="btn btn-outline-primary">Details</button>
-
+                        <a href="${createLink(controller: 'mobile', action: 'outboundDetails', id: stockMovement?.id)}" class="btn btn-outline-primary">
+                            Details
+                        </a>
+                        <a href="${createLink(controller: 'mobile', action: 'outboundDelete', id: stockMovement?.id)}" class="btn btn-outline-danger">
+                            Delete
                         </a>
                     </td>
                 </tr>

@@ -21,9 +21,7 @@ class FileTransferService {
 
     SecureFtpClient getSecureFtpClient() {
         Map sftpConfig = grailsApplication.config.openboxes.integration.ftp.flatten()
-        SecureFtpClient sftpClient = new SecureFtpClient(sftpConfig)
-        sftpClient.connect()
-        return sftpClient
+        return new SecureFtpClient(sftpConfig)
     }
 
     def listMessages(boolean includeContent = false) {
