@@ -36,11 +36,9 @@ class MessageRetrievalJob {
         Map sftpConfig = grailsApplication.config.openboxes.integration.ftp.flatten()
         SecureFtpClient sftpClient = new SecureFtpClient(sftpConfig)
         try {
-            sftpClient.connect()
-
             // Get filenames
             def filenames = sftpClient.listFiles(directory)
-            log.info "Found ${filenames.size()} files: "
+            log.info "Processing ${filenames.size()} files"
 
             // Process each file individually
             filenames.each { String filename ->
