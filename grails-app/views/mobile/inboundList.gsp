@@ -17,7 +17,7 @@
                     <th><g:message code="supplier.label"/></th>
                     <th><g:message code="stockMovement.deliveryForFa.label" default="Delivery For FA"/></th>
                     <th><g:message code="stockMovement.requestedDeliveryDate.label" default="Requested Delivery Date"/></th>
-                    <th><g:message code="stockMovement.status.label" default="Status"/></th>
+                    <th><g:message code="stockMovement.status.label" default="Status"/>&nbsp;&nbsp;<button class="btn btn-primary"><g:link class="text-white" controller="mobile" action="inboundList" params="[status: 'transit']">Transit</g:link></button> </th>
                     <th><g:message code="stockMovement.stockArriving.label" default="Stock Arriving (List)"/></th>
                 </tr>
             </thead>
