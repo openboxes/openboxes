@@ -16,6 +16,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.requisition.RequisitionType
 import org.springframework.validation.BeanPropertyBindingResult
 import org.pih.warehouse.auth.AuthService
 
@@ -74,24 +75,18 @@ class OutboundStockMovementDataService {
         def requestNumber = params.requestNumber
         def requisition = Requisition.findByRequestNumber(requestNumber)
         if (!requisition) {
+            String name = "Outbound Order ${requestNumber}"
             requisition = new Requisition(
-                    name: "Outbound Order ${requestNumber}",
+                    name: name,
                     requestNumber: requestNumber,
                     status: RequisitionStatus.CREATED
             )
-
-            Location origin = Location.findByLocationNumber(params.origin)
-            if (!origin) {
-                throw new IllegalArgumentException("Location not found for origin ${params.origin}")
-            }
-            requisition.origin = origin
-
-            Location destination = Location.findByLocationNumber(params.destination)
-            if (!destination) {
-                throw new IllegalArgumentException("Location not found for destination ${params.destination}")
-            }
-            requisition.destination = destination
+            requisition.origin = findLocationByLocationNumber(params.origin)
+            requisition.destination = findLocationByLocationNumber(params.destination)
+            requisition.type = RequisitionType.DEFAULT
+            requisition.description = name
             requisition.requestedDeliveryDate = deliveryDate.toDate()
+            requisition.dateRequested = new Date()
             requisition.requestedBy = AuthService.currentUser.get()
             requisition.save(failOnError: true)
         }
@@ -111,6 +106,14 @@ class OutboundStockMovementDataService {
         requisition.addToRequisitionItems(requisitionItem)
 
         return requisitionItem
+    }
+
+    Location findLocationByLocationNumber(String locationNumber) {
+        Location location = Location.findByLocationNumber(locationNumber)
+        if (!location) {
+            throw new IllegalArgumentException("Location not found for location number ${locationNumber}")
+        }
+        return location
     }
 
     boolean isDateOneWeekFromNow(def date) {
