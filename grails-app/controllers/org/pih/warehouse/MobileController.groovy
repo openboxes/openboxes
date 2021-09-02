@@ -127,8 +127,8 @@ class MobileController {
         Location destination = Location.get(params.origin?params.origin.id:session.warehouse.id)
         StockMovement stockMovement = new StockMovement(destination: destination,
                 stockMovementType: StockMovementType.INBOUND, stockMovementStatusCode: StockMovementStatusCode.PENDING)
-        if(params.status == "transit") {
-            params.receiptStatusCode = ["ACCEPTED","SHIPPED"]
+        if(params.status == "SHIPPED") {
+            params.receiptStatusCode = ["SHIPPED"]
             stockMovement = new StockMovement(
                     destination: destination,
                     stockMovementType: StockMovementType.INBOUND,
