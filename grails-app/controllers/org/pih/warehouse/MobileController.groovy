@@ -237,6 +237,11 @@ class MobileController {
         [stockMovement:stockMovement, events:events]
     }
 
+    def outboundDelete = {
+        stockMovementService.deleteStockMovement(params.id)
+        redirect(action: "outboundList")
+    }
+
     def messageList = {
         def messages = fileTransferService.listMessages()
         [messages:messages]
