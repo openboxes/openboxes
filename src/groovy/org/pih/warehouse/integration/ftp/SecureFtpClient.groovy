@@ -6,6 +6,7 @@ import net.schmizz.sshj.sftp.RemoteResourceInfo
 import net.schmizz.sshj.sftp.SFTPClient
 import net.schmizz.sshj.transport.TransportException
 import net.schmizz.sshj.transport.verification.OpenSSHKnownHosts
+import net.schmizz.sshj.transport.verification.PromiscuousVerifier
 import net.schmizz.sshj.xfer.FileSystemFile
 import org.apache.commons.logging.LogFactory
 
@@ -14,6 +15,8 @@ class SecureFtpClient {
 
     static final LOG = LogFactory.getLog(this)
 
+    private SSHClient sshClient
+
     private String server
     private int port
     private String user
@@ -21,8 +24,8 @@ class SecureFtpClient {
     private String knownHosts
     private String directory
     private String fingerprint
-    private Integer heartbeatInterval = 30
-    private SSHClient sshClient
+    private Integer heartbeatInterval = 60
+    private Boolean debug = false
 
     SecureFtpClient(String server, int port, String user, String password) {
         this.server = server
@@ -36,29 +39,41 @@ class SecureFtpClient {
         this.port = config.port?:22
         this.user = config.user?:null
         this.password = config.password?:null
-        this.heartbeatInterval = config.heartbeatInterval?:30
+        this.heartbeatInterval = config.heartbeatInterval?:60
         this.fingerprint = config?.fingerprint?:null
-        this.knownHosts = config.knownHosts
-        this.directory = directory
+        this.knownHosts = config.knownHosts?:null
+        this.directory = config?.directory?:""
+        this.debug = config.debug?:false
     }
 
 
-
-    void connect() throws IOException {
+    SFTPClient getSftpClient() throws IOException {
         try {
             sshClient = new SSHClient()
 
-            // Load known hosts from configuration if unable to use ~/.ssh/known_hosts
-            //if (knownHosts) {
-            //    sshClient.addHostKeyVerifier(new OpenSSHKnownHosts(new InputStreamReader(new ByteArrayInputStream(knownHosts.bytes))))
-            //}
-            // Or from default ~/.ssh/known_hosts file
-            //else {
-            //    sshClient.loadKnownHosts()
-            //}
             if (fingerprint) {
+                LOG.info "Using host key verifier ${fingerprint}"
                 sshClient.addHostKeyVerifier(fingerprint)
             }
+            else {
+                if (debug) {
+                    LOG.info "Using promiscuous host key verifier"
+                    ssh.addHostKeyVerifier(new PromiscuousVerifier())
+                }
+                else {
+                    // Load known hosts from configuration if unable to use ~/.ssh/known_hosts
+                    if (knownHosts) {
+                        LOG.info "Adding host key verifier ${knownHosts}"
+                        sshClient.addHostKeyVerifier(new OpenSSHKnownHosts(new InputStreamReader(new ByteArrayInputStream(knownHosts.bytes))))
+                    }
+                    // Or from default ~/.ssh/known_hosts file
+                    else {
+                        LOG.info "Adding default host key verifiers"
+                        sshClient.loadKnownHosts()
+                    }
+                }
+            }
+
             sshClient.connect(server)
 
             // Set heartbeat interval
@@ -67,18 +82,20 @@ class SecureFtpClient {
             if (user && password) {
                 sshClient.authPassword(user, password)
             }
+            return sshClient.newSFTPClient()
+
         } catch (TransportException e) {
             LOG.error("Unable to connect to sftp server due to error: " + e.message, e)
         }
     }
 
     void disconnect() throws IOException {
-        sshClient.close()
-        sshClient.disconnect()
+        if (sshClient) {
+            sshClient.disconnect()
+        }
     }
 
     Collection<String> listFiles(String path) {
-        SFTPClient sftpClient = sshClient.newSFTPClient()
         List<RemoteResourceInfo> files = sftpClient.ls(path)
         def filenames = files.collect { RemoteResourceInfo remoteResourceInfo ->
             return remoteResourceInfo.name
@@ -87,20 +104,28 @@ class SecureFtpClient {
     }
 
     void retrieveFile(String source, String destination) {
-        SFTPClient sftpClient = sshClient.newSFTPClient()
-        sftpClient.get(source, new FileSystemFile(destination))
-        sftpClient.close()
+        try {
+            sftpClient.get(source, new FileSystemFile(destination))
+        } finally {
+            //sftpClient.close();
+        }
     }
 
     InputStream retrieveFileAsInputStream(String source) {
-        SFTPClient sftpClient = sshClient.newSFTPClient()
-        RemoteFile remoteFile = sftpClient.SFTPEngine.open(source)
-        return new RemoteFile.RemoteFileInputStream(remoteFile)
+        try {
+            RemoteFile remoteFile = sftpClient.SFTPEngine.open(source)
+            return new RemoteFile.RemoteFileInputStream(remoteFile)
+        } finally {
+            //sftpClient.close()
+        }
     }
 
     void storeFile(File file, String path) {
-        SFTPClient sftpClient = sshClient.newSFTPClient()
-        sftpClient.put(new FileSystemFile(file.path), path);
+        try {
+            sftpClient.put(new FileSystemFile(file.path), path);
+        } finally {
+            //sfptClient.close()
+        }
     }
 
 }
