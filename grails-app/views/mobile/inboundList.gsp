@@ -8,18 +8,29 @@
 
 <body>
 
+<div class="row g-0 mb-2">
+    <div class="col col-md-4">
+        <g:form controller="mobile" action="inboundList" method="GET">
+            <div class="form-group">
+                <g:select class="btn btn-primary btn-sm" name="status" from="${['TRANSIT']}" value="${params.status}"
+                          noSelection="['':' - Choose a Status - ']"/>
+                <input type="submit" value="Filter" class="btn btn-sm btn-primary">
+            </div>
+        </g:form>
+    </div>
+</div>
 <div class="row g-0">
     <div class="col">
         <table class="table table-bordered">
             <thead>
-                <tr>
-                    <th><g:message code="requisition.orderNumber.label"/></th>
-                    <th><g:message code="supplier.label"/></th>
-                    <th><g:message code="stockMovement.deliveryForFa.label" default="Delivery For FA"/></th>
-                    <th><g:message code="stockMovement.requestedDeliveryDate.label" default="Requested Delivery Date"/></th>
-                    <th><g:message code="stockMovement.status.label" default="Status"/>&nbsp;&nbsp;<button class="btn btn-primary"><g:link class="text-white" controller="mobile" action="inboundList" params="[status: 'SHIPPED']">Transit</g:link></button> </th>
-                    <th><g:message code="stockMovement.stockArriving.label" default="Stock Arriving (List)"/></th>
-                </tr>
+            <tr>
+                <th><g:message code="requisition.orderNumber.label"/></th>
+                <th><g:message code="supplier.label"/></th>
+                <th><g:message code="stockMovement.deliveryForFa.label" default="Delivery For FA"/></th>
+                <th><g:message code="stockMovement.requestedDeliveryDate.label" default="Requested Delivery Date"/></th>
+                <th><g:message code="stockMovement.status.label" default="Status"/>Transit</th>
+                <th><g:message code="stockMovement.stockArriving.label" default="Stock Arriving (List)"/></th>
+            </tr>
             </thead>
             <tbody>
             <g:each var="stockMovement" in="${stockMovements}">
