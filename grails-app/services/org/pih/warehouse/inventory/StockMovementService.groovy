@@ -781,7 +781,7 @@ class StockMovementService {
                 .inject([:]) {map, item -> map << [(item.id): item]}
 
         Requisition requisition = Requisition.get(data.first()?.requisition_id)
-        def picklistItemsMap = requisition?.getPicklist()?.picklistItems?.groupBy { it.requisitionItem.id }
+        def picklistItemsMap = requisition?.getPicklist()?.picklistItems?.groupBy { it.requisitionItem.product.id }
 
         def editPageItems = data.collect {
             def substitutionItems = substitutionItemsMap[it.id]
@@ -789,7 +789,7 @@ class StockMovementService {
             def statusCode = substitutionItems ? RequisitionItemStatus.SUBSTITUTED :
                     it.quantity_revised != null ? RequisitionItemStatus.CHANGED : RequisitionItemStatus.APPROVED
 
-            def picklistQtyForItem = (!picklistItemsMap || !picklistItemsMap[it.id]) ? 0 : picklistItemsMap[it.id].sum { it.quantity }
+            def picklistQtyForItem = (!picklistItemsMap || !picklistItemsMap[it.product_id]) ? 0 : picklistItemsMap[it.product_id].sum { it.quantity }
 
             [
                 product                     : productsMap[it.product_id],
@@ -809,7 +809,7 @@ class StockMovementService {
                 comments                    : it.comments,
                 statusCode                  : statusCode.name(),
                 substitutionItems           : substitutionItems.collect {
-                    def picklistQtyForSubstitution = !picklistItemsMap[it.id] ? 0 : picklistItemsMap[it.id].sum { it.quantity }
+                    def picklistQtyForSubstitution = !picklistItemsMap[it.product_id] ? 0 : picklistItemsMap[it.product_id].sum { it.quantity }
 
                     [
                         product             : Product.get(it.product_id),
@@ -1218,7 +1218,7 @@ class StockMovementService {
                 Requisition requisition = requisitionItem.requisition
 
                 def picklists = getPicklistByLocationAndProduct(it.binLocation, it.inventoryItem)
-                List<String> pickedRequisitionNumbers = picklists?.collect { it.requisition.requestNumber }?.findAll { it != requisition.requestNumber }?.unique()
+                List<String> pickedRequisitionNumbers = picklists?.collect { it.requisition.requestNumber }?.unique()
 
                 it.pickedRequisitionNumbers = pickedRequisitionNumbers
             }
