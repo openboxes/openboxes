@@ -318,6 +318,30 @@ class UrlMappings {
             action = [DELETE: "removeItem"]
         }
 
+        // Requirement API
+
+        "/api/requirements"(parseRequest: true) {
+            controller = { "replenishmentApi" }
+            action = [GET: "requirements"]
+        }
+
+        // Replenishment API
+
+        "/api/replenishments/statusOptions"(parseRequest: true) {
+            controller = "replenishmentApi"
+            action = [GET: "statusOptions"]
+        }
+
+        "/api/replenishments/$id/"(parseRequest: true) {
+            controller = { "replenishmentApi" }
+            action = [GET: "read", POST: "create", PUT: "update"]
+        }
+
+        "/api/replenishments/$id/removeItem"(parseRequest: true) {
+            controller = { "replenishmentApi" }
+            action = [DELETE: "removeItem"]
+        }
+
         // Standard REST APIs
 
         "/api/${resource}s"(parseRequest: true) {

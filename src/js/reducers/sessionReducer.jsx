@@ -35,6 +35,7 @@ const initialState = {
     putAway: false,
     stockListManagement: false,
     stockTransfer: false,
+    replenishment: false,
   },
   searchConfig: {
     debounceTime: 500,
