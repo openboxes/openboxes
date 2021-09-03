@@ -7,18 +7,25 @@
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
  **/
-package replenishment
+package org.pih.warehouse.replenishment
 
+import org.apache.commons.beanutils.BeanUtils
 import org.pih.warehouse.api.Replenishment
 import org.pih.warehouse.api.ReplenishmentItem
 import org.pih.warehouse.api.ReplenishmentStatus
-import org.pih.warehouse.inventory.InventoryLevel
-import org.pih.warehouse.inventory.Requirement
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryLevelStatus
+import org.pih.warehouse.inventory.Requirement
 import org.pih.warehouse.inventory.TransferStockCommand
-import org.pih.warehouse.order.*
+import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.order.OrderItemStatusCode
+import org.pih.warehouse.order.OrderStatus
+import org.pih.warehouse.order.OrderType
+import org.pih.warehouse.order.OrderTypeCode
+import org.pih.warehouse.picklist.PicklistItem
 
 class ReplenishmentService {
 
@@ -61,7 +68,7 @@ class ReplenishmentService {
         }
 
         // Generate name
-        order.name = order.generateName()
+        order.name = order.name ?: order.generateName()
 
         replenishment.replenishmentItems.toArray().each { ReplenishmentItem replenishmentItem ->
 
@@ -77,7 +84,7 @@ class ReplenishmentService {
 
             updateOrderItem(replenishmentItem, orderItem)
 
-            // TODO: Process pick items
+            // TODO: OBAM-169: if new order item, then create a picklist from suggested items
         }
 
         order.save(failOnError: true)
@@ -90,7 +97,15 @@ class ReplenishmentService {
             throw new IllegalArgumentException("No replenishment item found with ID ${id}")
         }
 
-        // TODO: Remove picklist for this item
+        List<PicklistItem> picklistItems = PicklistItem.findAllByOrderItem(orderItem)
+        if (picklistItems) {
+            picklistItems.each { PicklistItem picklistItem ->
+                picklistItem.disableRefresh = Boolean.TRUE
+                picklistItem.picklist?.removeFromPicklistItems(picklistItem)
+                picklistItem.orderItem?.removeFromPicklistItems(picklistItem)
+                picklistItem.delete()
+            }
+        }
 
         Order order = orderItem.order
         order.removeFromOrderItems(orderItem)
@@ -100,9 +115,7 @@ class ReplenishmentService {
     }
 
     OrderItem updateOrderItem(ReplenishmentItem replenishmentItem, OrderItem orderItem) {
-        // TODO: If PICKED then COMPLETED, otherwise PENDING
-        OrderItemStatusCode orderItemStatusCode = OrderItemStatusCode.PENDING
-
+        OrderItemStatusCode orderItemStatusCode = orderItem?.picklistItems ? OrderItemStatusCode.COMPLETED : OrderItemStatusCode.PENDING
         orderItem.orderItemStatusCode = orderItemStatusCode
         orderItem.product = replenishmentItem.product
         orderItem.inventoryItem = replenishmentItem.inventoryItem
@@ -118,7 +131,8 @@ class ReplenishmentService {
         // Save the replenishment as an order
         Order order = createOrUpdateOrderFromReplenishment(replenishment)
 
-        // TODO: Process pick list items
+        // Process pick list items
+        processPicklistItems(replenishment)
 
         replenishment.replenishmentItems.each { ReplenishmentItem replenishmentItem ->
             TransferStockCommand command = new TransferStockCommand()
@@ -136,6 +150,27 @@ class ReplenishmentService {
         return order
     }
 
+    void processPicklistItems(Replenishment replenishment) {
+        replenishment.replenishmentItems.toArray().each { ReplenishmentItem oldReplenishmentItem ->
+
+            if (oldReplenishmentItem.picklistItems) {
+                // Iterate over picklist items and create new replenishment items for them
+                // NOTE: The only fields we change from the ReplenishmentItem are the replenishment destination bin and quantity.
+                oldReplenishmentItem.picklistItems.each { ReplenishmentItem picklistItem ->
+                    ReplenishmentItem newReplenishmentItem = new ReplenishmentItem()
+                    BeanUtils.copyProperties(newReplenishmentItem, oldReplenishmentItem)
+                    newReplenishmentItem.quantity = picklistItem.quantity
+                    newReplenishmentItem.location = picklistItem.location
+                    newReplenishmentItem.binLocation = picklistItem.binLocation
+                    replenishment.replenishmentItems.add(newReplenishmentItem)
+                }
+
+                // Remove the original replenishment item since it was replaced with the above
+                replenishment.replenishmentItems.remove(oldReplenishmentItem)
+            }
+        }
+    }
+
     void validateReplenishment(Replenishment replenishment) {
         replenishment.replenishmentItems.toArray().each { ReplenishmentItem replenishmentItem ->
             validateReplenishmentItem(replenishmentItem)
@@ -145,7 +180,9 @@ class ReplenishmentService {
     void validateReplenishmentItem(ReplenishmentItem replenishmentItem) {
         def quantity = replenishmentItem.quantity
 
-        // TODO: Sum pick list items quantity
+        if (replenishmentItem.picklistItems) {
+            quantity = replenishmentItem.picklistItems.sum { it.quantity }
+        }
 
         validateQuantityAvailable(replenishmentItem.replenishmentLocation, replenishmentItem.inventoryItem, quantity)
     }
@@ -164,7 +201,7 @@ class ReplenishmentService {
         }
 
         if (quantity > quantityAvailable) {
-            throw new IllegalStateException("Quantity available ${quantityAvailable} is less than quantity to stock transfer ${quantity} for product ${inventoryItem.product.productCode} ${inventoryItem.product.name}")
+            throw new IllegalStateException("Quantity available ${quantityAvailable} is less than quantity to replenish ${quantity} for product ${inventoryItem.product.productCode} ${inventoryItem.product.name}")
         }
     }
 

@@ -40,7 +40,7 @@ class Replenishment {
                 orderedBy: order.orderedBy
         )
 
-        // Add all order items to stock transfer
+        // Add all order items to replenishment
         order.orderItems.each { orderItem ->
             replenishment.replenishmentItems.add(ReplenishmentItem.createFromOrderItem(orderItem))
         }
