@@ -1,9 +1,9 @@
-package org.pih.warehouse.xml.order;
+package org.pih.warehouse.integration.xml.order;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.pih.warehouse.xml.executionstatus.TripExecution;
+import org.pih.warehouse.integration.xml.executionstatus.TripExecution;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -122,13 +122,13 @@ public class OrderTest {
         orderDetails.setOrderCargoDetails(new CargoDetails(items));
         RefType refType = new RefType("z09", "TEST REFERENCE");
         RefType refType1 = new RefType("ADE", "A12345");
-        ArrayList<RefType> refTypes = new ArrayList<>();
+        ArrayList<RefType> refTypes = new ArrayList<RefType>();
         refTypes.add(refType);
         refTypes.add(refType1);
         orderDetails.setManageReferences(new ManageReferences(refTypes));
 
         Remark remark = new Remark("Lorem Ipsum");
-        ArrayList <Remark> remarks = new ArrayList<>(Arrays.asList(remark));
+        ArrayList <Remark> remarks = new ArrayList<Remark>(Arrays.asList(remark));
         orderDetails.setManageRemarks(new ManageRemarks(remarks));
         order.setOrderDetails(orderDetails);
 

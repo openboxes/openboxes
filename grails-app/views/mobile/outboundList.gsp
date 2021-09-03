@@ -63,9 +63,6 @@
                         <a href="${createLink(controller: 'mobile', action: 'outboundDetails', id: stockMovement?.id)}" class="btn btn-outline-primary">
                             Details
                         </a>
-                        <a href="${createLink(controller: 'mobile', action: 'outboundDelete', id: stockMovement?.id)}" class="btn btn-outline-danger">
-                            Delete
-                        </a>
                     </td>
                 </tr>
             </g:each>

@@ -96,11 +96,15 @@ class SecureFtpClient {
     }
 
     Collection<String> listFiles(String path) {
-        List<RemoteResourceInfo> files = sftpClient.ls(path)
-        def filenames = files.collect { RemoteResourceInfo remoteResourceInfo ->
-            return remoteResourceInfo.name
+        try {
+            List<RemoteResourceInfo> files = sftpClient.ls(path)
+            def filenames = files.collect { RemoteResourceInfo remoteResourceInfo ->
+                return remoteResourceInfo.name
+            }
+            return filenames
+        } finally {
+            //sftpClient.close()
         }
-        return filenames
     }
 
     void retrieveFile(String source, String destination) {
