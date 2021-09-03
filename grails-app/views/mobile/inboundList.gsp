@@ -12,7 +12,10 @@
     <div class="col col-md-4">
         <g:form controller="mobile" action="inboundList" method="GET">
             <div class="form-group">
-                <g:select class="btn btn-primary btn-sm" name="status" from="${['TRANSIT']}" value="${params.status}"
+                <g:select class="btn btn-primary btn-sm"
+                          name="status" from="${['TRANSIT':'IN_TRANSIT'].entrySet()}"
+                          value="${params.status}"
+                          optionKey="value" optionValue="value"
                           noSelection="['':' - Choose a Status - ']"/>
                 <input type="submit" value="Filter" class="btn btn-sm btn-primary">
             </div>
@@ -28,7 +31,7 @@
                 <th><g:message code="supplier.label"/></th>
                 <th><g:message code="stockMovement.deliveryForFa.label" default="Delivery For FA"/></th>
                 <th><g:message code="stockMovement.requestedDeliveryDate.label" default="Requested Delivery Date"/></th>
-                <th><g:message code="stockMovement.status.label" default="Status"/>Transit</th>
+                <th><g:message code="stockMovement.status.label" default="Status"/></th>
                 <th><g:message code="stockMovement.stockArriving.label" default="Stock Arriving (List)"/></th>
             </tr>
             </thead>
