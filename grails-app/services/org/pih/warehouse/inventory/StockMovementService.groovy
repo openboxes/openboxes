@@ -175,9 +175,13 @@ class StockMovementService {
                         break
 
                 }
-                // If the dependent actions were updated properly then we can update the
+                // If the dependent actions were updated properly then we can update the status
                 RequisitionStatus requisitionStatus = RequisitionStatus.fromStockMovementStatus(status)
                 updateRequisitionStatus(stockMovement.id, requisitionStatus)
+
+                // Broadcast status change to event bus in case there's more work to be done
+                
+
             }
         }
     }

@@ -14,51 +14,70 @@
           rel="stylesheet"/>
 </head>
 
-<body>
-    <div class="container-fluid">
+<body class="d-flex flex-column h-100">
+    <header>
         <g:include controller="mobile" action="menu"/>
-        <g:if test="${flash.message}">
-            <div class="alert alert-info">${flash.message}</div>
-        </g:if>
+    </header>
+    <main class="flex-shrink-0">
+        <div class="container-fluid">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><g:link controller="mobile">Home</g:link></li>
+                    <li class="breadcrumb-item"><g:link controller="mobile"
+                                                        action="chooseLocation">${session.warehouse.name}</g:link></li>
+                    <li class="breadcrumb-item active" aria-current="page"><g:layoutTitle/></li>
+                </ol>
+            </nav>
+            <g:if test="${flash.message}">
+                <div class="alert alert-info">${flash.message}</div>
+            </g:if>
 
-        <h1><g:layoutTitle/></h1>
-        <g:layoutBody/>
-    </div>
-    <script
-      src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
-      integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="
-      crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
-            crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/js/all.min.js"></script>
-    <script src="/openboxes/js/onScan/onScan.min.js" type="text/javascript"></script>
-    <script>
-    $(document).ready(function() {
-        // Enable scan events for the entire document
-        console.log("initialize onScan");
-        onScan.attachTo(document, {
-            minLength: 3,
-            suffixKeyCodes: [13], // enter-key expected at the end of a scan
-            //reactToPaste: true, // Compatibility to built-in scanners in paste-mode (as opposed to keyboard-mode)
-            onScan: function(scanned, count) {
-                console.log('Scanned: ', count, 'x ', scanned);
-                alert("Scanned " + scanned)
-            },
-            onKeyDetect: function(keyCode, event){
-                console.log('Pressed: ', keyCode, event);
-            },
-            onScanError: function(obj) {
-                console.log('onScanError: ', obj);
-            },
-            onScanButtonLongPress: function(obj) {
-                console.log('onScanButtonLongPress: ', obj);
-            },
-            onKeyProcess: function(char, event) {
-                console.log('onKeyProcess: ', char, event);
-            }
-        });
+            <h2><g:layoutTitle/></h2>
+            <g:layoutBody/>
+        </div>
+    </main>
+%{--    <footer class="footer mt-auto py-3 bg-light">--}%
+%{--        <div class="container-fluid">--}%
+%{--            <span class="text-muted">Place sticky footer content here.</span>--}%
+%{--        </div>--}%
+%{--    </footer>--}%
+
+<script
+        src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/js/all.min.js"></script>
+<script src="/openboxes/js/onScan/onScan.min.js" type="text/javascript"></script>
+<script>
+  $(document)
+  .ready(function () {
+    // Enable scan events for the entire document
+    console.log("initialize onScan");
+    onScan.attachTo(document, {
+      minLength: 3,
+      suffixKeyCodes: [13], // enter-key expected at the end of a scan
+      //reactToPaste: true, // Compatibility to built-in scanners in paste-mode (as opposed to keyboard-mode)
+      onScan: function (scanned, count) {
+        console.log('Scanned: ', count, 'x ', scanned);
+        alert("Scanned " + scanned)
+      },
+      onKeyDetect: function (keyCode, event) {
+        console.log('Pressed: ', keyCode, event);
+      },
+      onScanError: function (obj) {
+        console.log('onScanError: ', obj);
+      },
+      onScanButtonLongPress: function (obj) {
+        console.log('onScanButtonLongPress: ', obj);
+      },
+      onKeyProcess: function (char, event) {
+        console.log('onKeyProcess: ', char, event);
+      }
     });
-    </script>
+  });
+</script>
 </body>
 </html>

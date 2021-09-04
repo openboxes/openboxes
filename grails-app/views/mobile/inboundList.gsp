@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="layout" content="mobile" />
-    <title><warehouse:message code="stockMovements.inbound.label" default="Stock Movements (Inbound)"/></title>
+    <title><warehouse:message code="default.inbound.label" default="Inbound"/></title>
 </head>
 
 <body>
@@ -13,31 +13,17 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th><g:message code="requisition.orderNumber.label"/></th>
-                    <th><g:message code="supplier.label"/></th>
-                    <th><g:message code="stockMovement.deliveryForFa.label" default="Delivery For FA"/></th>
-                    <th><g:message code="stockMovement.requestedDeliveryDate.label" default="Requested Delivery Date"/></th>
                     <th><g:message code="stockMovement.status.label" default="Status"/></th>
-                    <th><g:message code="stockMovement.stockArriving.label" default="Stock Arriving (List)"/></th>
+                    <th><g:message code="requisition.orderNumber.label"/></th>
+                    <th><g:message code="stockMovement.origin.label"/></th>
+                    <th><g:message code="stockMovement.destination.label" default="Destination"/></th>
+                    <th><g:message code="stockMovement.requestedDeliveryDate.label" default="Requested Delivery Date"/></th>
+                    <th><g:message code="default.actions.label" default="Actions"/></th>
                 </tr>
             </thead>
             <tbody>
             <g:each var="stockMovement" in="${stockMovements}">
                 <tr>
-                    <td>
-                        <a href="${createLink(controller: 'mobile', action: 'inboundDetails', id: stockMovement?.id)}" class="text-decoration-none text-reset">
-                            ${stockMovement.identifier}
-                        </a>
-                    </td>
-                    <td>
-                        ${stockMovement?.origin?.name}
-                    </td>
-                    <td>
-                        ${stockMovement?.destination?.name} ${stockMovement?.destination?.locationNumber}
-                    </td>
-                    <td>
-                        <g:formatDate date="${stockMovement?.expectedDeliveryDate}" format="dd MMM yyyy"/>
-                    </td>
                     <td>
                         <a href="${createLink(controller: 'stockMovement', action: 'show', id: stockMovement?.id)}" class="text-decoration-none text-reset">
                             <g:if test="${stockMovement?.shipment?.currentEvent?.eventType?.eventCode}">
@@ -54,8 +40,22 @@
                         </a>
                     </td>
                     <td>
+                        <a href="${createLink(controller: 'mobile', action: 'inboundDetails', id: stockMovement?.id)}" class="text-decoration-none text-reset">
+                            ${stockMovement.identifier}
+                        </a>
+                    </td>
+                    <td>
+                        ${stockMovement?.origin?.name}
+                    </td>
+                    <td>
+                        ${stockMovement?.destination?.name} ${stockMovement?.destination?.locationNumber}
+                    </td>
+                    <td>
+                        <g:formatDate date="${stockMovement?.expectedDeliveryDate}" format="dd MMM yyyy"/>
+                    </td>
+                    <td>
                         <a href="${createLink(controller: 'mobile', action: 'inboundDetails', id: stockMovement?.id)}" class="btn btn-link">
-                            <button class="btn btn-outline-primary">List</button>
+                            <button class="btn btn-outline-primary">Details</button>
                         </a>
                     </td>
                 </tr>

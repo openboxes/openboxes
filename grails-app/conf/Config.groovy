@@ -938,6 +938,10 @@ openboxes.typeahead.minLength = 3
 // Allow system administrators to disable refresh on startup
 openboxes.refreshAnalyticsDataOnStartup.enabled = true
 
+// Message retrieval job
+openboxes.jobs.messageRetrievalJob.enabled = true
+openboxes.jobs.messageRetrievalJob.cronExpression = "0 */5 * * * ?" // every five minutes
+
 // Send stock alerts
 openboxes.jobs.sendStockAlertsJob.enabled = true
 openboxes.jobs.sendStockAlertsJob.skipOnEmpty = true
@@ -1394,6 +1398,35 @@ openboxes.integration.ftp.user = "sftpuser"
 openboxes.integration.ftp.password = "password"
 openboxes.integration.ftp.directory = "files"
 
+// eTruckNow delivery order defaults
+openboxes.integration.order.address.timeZone = "Europe/London"
+
+// Default order header
+openboxes.integration.order.header.version = "V1"
+openboxes.integration.order.header.username = "TestName"
+openboxes.integration.order.header.password = "TestPwd"
+openboxes.integration.order.header.sequenceNumber = "20201008154348_SG3009200527"
+openboxes.integration.order.header.destinationApp = "ETRUCKNOW"
+
+// Default action
+openboxes.integration.order.action = "CREATE"
+
+// Default organization details
+openboxes.integration.order.organizationDetails.companyCode = "MYKN"
+openboxes.integration.order.organizationDetails.branchCode = "MYKUL"
+
+// Default order details
+openboxes.integration.order.orderDetails.departmentCode = "MYKUL"
+openboxes.integration.order.orderDetails.orderType = "NORMAL"
+openboxes.integration.order.orderDetails.orderProductType = "NORMAL"
+openboxes.integration.order.orderDetails.modeOfTransport = "FTL"
+openboxes.integration.order.orderDetails.serviceType = "Pharma"
+openboxes.integration.order.orderDetails.deliveryTerms = "Shipper"
+
+// Default trade terms
+openboxes.integration.order.orderDetails.termsOfTrade.incoterm = "DAP"
+openboxes.integration.order.orderDetails.termsOfTrade.freightName.term = "10"
+openboxes.integration.order.orderDetails.termsOfTrade.freightName.name = "Shipper"
 
 // Disable feature during development
 openboxes.shipping.splitPickItems.enabled = true
