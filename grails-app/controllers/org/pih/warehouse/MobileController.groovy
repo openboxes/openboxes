@@ -22,6 +22,8 @@ import org.pih.warehouse.importer.OutboundStockMovementExcelImporter
 import org.pih.warehouse.integration.AcceptanceStatusEvent
 import org.pih.warehouse.integration.DocumentUploadEvent
 import org.pih.warehouse.integration.TripExecutionEvent
+import org.pih.warehouse.integration.TripNotificationEvent
+import org.pih.warehouse.integration.xml.trip.Trip
 import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderTypeCode
@@ -36,6 +38,7 @@ import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest
 
 import javax.xml.bind.JAXBContext
+import javax.xml.bind.Marshaller
 import javax.xml.bind.Unmarshaller
 
 class MobileController {
@@ -49,6 +52,7 @@ class MobileController {
     def fileTransferService
     def grailsApplication
     def uploadService
+    def tmsIntegrationService
 
     def index = {
 
@@ -232,18 +236,34 @@ class MobileController {
     def outboundDetails = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
+        // Move to service layer
         def events = stockMovement?.shipment?.events?.collect { Event event ->
             [id: event?.id, name: event?.eventType?.toString(), date: event?.eventDate]
         } ?: []
-
         events << [name: "Order created", date: stockMovement?.requisition?.dateCreated]
         if (stockMovement?.requisition?.dateCreated != stockMovement?.requisition?.lastUpdated) {
             events << [name: "Order updated", date: stockMovement?.requisition?.lastUpdated]
         }
-
         events = events.sort { it.date }
 
-        [stockMovement:stockMovement, events:events]
+        // Generate QR Code link for stock movement
+        def qrCodeLink = "${createLink(controller: "mobile", action: "outboundDetails", id: stockMovement.id, absolute: true)}"
+
+        [stockMovement:stockMovement, qrCodeLink: qrCodeLink, events:events]
+    }
+
+    def outboundDownload = {
+
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        Object deliveryOrder = tmsIntegrationService.createDeliveryOrder(stockMovement)
+
+        JAXBContext jaxbContext = JAXBContext.newInstance(org.pih.warehouse.integration.xml.order.Order.class);
+        Marshaller marshaller = jaxbContext.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        marshaller.marshal(deliveryOrder, response.outputStream);
+        response.setHeader "Content-disposition", "attachment;filename=\"CreateDeliveryOrder-${stockMovement?.identifier}.xml\""
+        response.contentType = "application/xml"
+        response.outputStream.flush()
     }
 
     def outboundDelete = {
@@ -269,8 +289,15 @@ class MobileController {
             String fileName = messageFile.originalFilename
             File file = new File ("/tmp/${fileName}")
             messageFile.transferTo(file)
-            fileTransferService.storeMessage(file)
-            flash.message = "File ${fileName} transferred successfully"
+            try {
+                fileTransferService.storeMessage(file)
+                flash.message = "File ${fileName} transferred successfully"
+
+            } catch (Exception e) {
+                log.error "Unable to upload message due to error: " + e.message, e
+                flash.message = "File ${fileName} not transferred due to error: " + e.message
+
+            }
         }
         redirect(action: "messageList")
     }
@@ -281,7 +308,7 @@ class MobileController {
         String xmlContents = fileTransferService.retrieveMessage(params.filename)
 
         // Convert XML message to message object
-        JAXBContext jaxbContext = JAXBContext.newInstance("org.pih.warehouse.xml.acceptancestatus:org.pih.warehouse.xml.execution:org.pih.warehouse.xml.pod");
+        JAXBContext jaxbContext = JAXBContext.newInstance("org.pih.warehouse.integration.xml.acceptancestatus:org.pih.warehouse.integration.xml.execution:org.pih.warehouse.integration.xml.pod:org.pih.warehouse.integration.xml.trip");
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         InputStream inputStream = IOUtils.toInputStream(xmlContents)
         Object messageObject = unmarshaller.unmarshal(inputStream)
@@ -295,6 +322,9 @@ class MobileController {
         }
         else if (messageObject instanceof Execution) {
             grailsApplication.mainContext.publishEvent(new TripExecutionEvent(messageObject))
+        }
+        else if (messageObject instanceof Trip) {
+            grailsApplication.mainContext.publishEvent(new TripNotificationEvent(messageObject))
         }
 
         flash.message = "Message has been processed"
