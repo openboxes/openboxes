@@ -11,6 +11,9 @@ package org.pih.warehouse.integration
 
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Organization
+import org.pih.warehouse.core.User
 import org.pih.warehouse.integration.xml.order.Address
 import org.pih.warehouse.integration.xml.order.CargoDetails
 import org.pih.warehouse.integration.xml.order.ContactData
@@ -38,72 +41,61 @@ import org.pih.warehouse.integration.xml.order.UnitTypeQuantity
 import org.pih.warehouse.integration.xml.order.UnitTypeVolume
 import org.pih.warehouse.integration.xml.order.UnitTypeWeight
 
+import java.text.SimpleDateFormat
+
 class TmsIntegrationService {
 
     boolean transactional = true
 
+    def grailsApplication
+    def dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssX")
+
 
     def createDeliveryOrder(StockMovement stockMovement) {
+
+
+        Map config = grailsApplication.config.openboxes.integration.order
+        def defaultCurrencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode
+
         Order order = new Order();
-        Header header = new Header("V1", "TestName", "TestPWD", "20201008154348_SG3009200527", "ETRUCKNOW");
+        Header header = new Header(config.header.version, config.header.username,
+                config.header.password, config.header.sequenceNumber, config.header.destinationApp);
         order.setHeader(header);
-        order.setAction("CREATE");
-        order.setKnOrgDetails(new KNOrgDetails("MYKN", "MYKUL"));
+        order.setAction(config.action);
+        order.setKnOrgDetails(new KNOrgDetails(config.organizationDetails.companyCode, config.organizationDetails.branchCode));
 
         OrderDetails orderDetails = new OrderDetails();
         orderDetails.setExtOrderId(stockMovement?.identifier);
-        orderDetails.setDepartmentCode("MYKUL");
-        orderDetails.setOrderType("NORMAL");
-        orderDetails.setOrderProductType("NORMAL");
-        orderDetails.setModeOfTransport("FTL");
-        orderDetails.setServiceType("Pharma");
-        orderDetails.setDeliveryTerms("Shipper");
-        orderDetails.setGoodsValue(new GoodsValue("500", "EUR"));
-        orderDetails.setTermsOfTrade(new TermsOfTrade("DAP", new FreightName("10", "Shipper")));
+        orderDetails.setDepartmentCode(config.orderDetails.departmentCode);
+        orderDetails.setOrderType(config.orderDetails.orderType);
+        orderDetails.setOrderProductType(config.orderDetails.orderProductType);
+        orderDetails.setModeOfTransport(config.orderDetails.modeOfTransport);
+        orderDetails.setServiceType(config.orderDetails.serviceType);
+        orderDetails.setDeliveryTerms(config.orderDetails.deliveryTerms);
 
-        PartyType partyType = new PartyType();
-        partyType.setPartyID(new PartyID("MYSH01505", "RT"));
-        partyType.setType("CONSIGNEE");
-        partyType.setContactData(new ContactData("Vijetha", "Kakarlapudi", new Phone("60", "9989570124"), "vijetha.kakarlapudi@gmail.com"));
+        orderDetails.setGoodsValue(new GoodsValue("${stockMovement.totalValue?:0}", defaultCurrencyCode));
 
-        PartyType partyType2 = new PartyType();
-        partyType2.setPartyID(new PartyID("MYSH01505", "RT"));
-        partyType2.setType("SHIPPER");
-        partyType2.setContactData(new ContactData("Vijetha", "Kakarlapudi", new Phone("60", "9989570124"), "vijetha.kakarlapudi@gmail.com"));
+        orderDetails.setTermsOfTrade(new TermsOfTrade(config.orderDetails.termsOfTrade.incoterm,
+                new FreightName( config.orderDetails.termsOfTrade.freightName.name, config.orderDetails.termsOfTrade.freightName.name)));
 
-        PartyType partyType3 = new PartyType();
-        partyType3.setPartyID(new PartyID("MYSH01505", "RT"));
-        partyType3.setType("CUSTOMER");
-        partyType3.setContactData(new ContactData("Vijetha", "Kakarlapudi", new Phone("60", "9989570124"), "vijetha.kakarlapudi@gmail.com"));
-
+        // FIXME Fix magic strings
         ArrayList <PartyType> partyTypes = new ArrayList<PartyType>();
-        partyTypes.add(partyType);
-        partyTypes.add(partyType2);
-        partyTypes.add(partyType3);
-
+        partyTypes.add(buildPartyType(stockMovement?.origin, stockMovement?.origin?.manager, "SHIPPER"))
+        partyTypes.add(buildPartyType(stockMovement?.destination, stockMovement?.destination?.manager, "CONSIGNEE"))
+        partyTypes.add(buildPartyType(stockMovement?.destination?.organization, stockMovement?.destination?.manager, "CUSTOMER"))
         orderDetails.setOrderParties(new OrderParties(partyTypes));
 
-        Address dummyAddress = new Address("Main Address", "Test Street 1", "Test City", "Test State", "10500", "DC", "Asia/Kolkata" );
-        LocationInfo orderStartLocation = new LocationInfo(
-                "1",
-                dummyAddress,
-                new PlannedDateTime("2020-10-08T15:43:48+01:00", "2020-10-08T15:43:48+01:00"),
-                "Instructions"
-        );
-        orderDetails.setOrderStartLocation(orderStartLocation);
-        LocationInfo orderEndLocation = new LocationInfo(
-                "3",
-                dummyAddress,
-                new PlannedDateTime("2020-10-08T15:43:48+01:00", "2020-10-08T15:43:48+01:00"),
-                "Instructions"
-        );
-        orderDetails.setOrderEndLocation(orderEndLocation);
+        // Start and end locations
+        orderDetails.setOrderStartLocation(buildLocationInfo("1", stockMovement?.origin, stockMovement?.expectedShippingDate, null));
+        orderDetails.setOrderEndLocation(buildLocationInfo("2", stockMovement?.destination, stockMovement?.expectedDeliveryDate, null));
+
+        // Order cargo summary
         orderDetails.setOrderCargoSummary(new OrderCargoSummary(
                 new UnitTypeQuantity("1.0"),
                 new UnitTypeVolume("1.0", "cbm"),
-                new UnitTypeWeight("200", "kg"),
-                "true",
-                "1"
+                new UnitTypeWeight("1.0", "kg"),
+                "false",
+                "0"
         ));
 
         ArrayList itemList = new ArrayList<ItemDetails>();
@@ -112,32 +104,77 @@ class TmsIntegrationService {
             itemDetails.setCargoType("GEN_CATEGORY");
             itemDetails.setStackable("false");
             itemDetails.setSplittable("false");
-            itemDetails.setDangerousGoodsFlag("true");
+            itemDetails.setDangerousGoodsFlag("false");
             itemDetails.setDescription(stockMovementItem?.product?.name);
-            itemDetails.setHandlingUnit("BLUE-PALLETS");
-            itemDetails.setQuantity();
+            itemDetails.setHandlingUnit("DEFAULT");
+            itemDetails.setQuantity(stockMovementItem.quantityShipped);
             itemDetails.setLength(new UnitTypeLength("1.0", "m"));
             itemDetails.setWidth(new UnitTypeLength("1.0", "m"));
             itemDetails.setHeight(new UnitTypeLength("1.0", "m"));
-            itemDetails.setWeight(new UnitTypeWeight("200.0", "kg"));
+            itemDetails.setWeight(new UnitTypeWeight("1.0", "kg"));
             itemDetails.setActualVolume(new UnitTypeVolume("1.0", "cbm"));
-            itemDetails.setActualWeight(new UnitTypeWeight("200.0", "kg"));
+            itemDetails.setActualWeight(new UnitTypeWeight("1.0", "kg"));
             itemDetails.setLdm("25");
             itemList.add(itemDetails)
         }
 
         orderDetails.setOrderCargoDetails(new CargoDetails(itemList));
-        RefType refType = new RefType("z09", "TEST REFERENCE");
-        RefType refType1 = new RefType("ADE", "A12345");
-        ArrayList<RefType> refTypes = new ArrayList<RefType>();
-        refTypes.add(refType);
-        refTypes.add(refType1);
-        orderDetails.setManageReferences(new ManageReferences(refTypes));
 
-        Remark remark = new Remark("Lorem Ipsum");
-        ArrayList <Remark> remarks = new ArrayList<Remark>(Arrays.asList(remark));
-        orderDetails.setManageRemarks(new ManageRemarks(remarks));
+//        RefType refType = new RefType("z09", "TEST REFERENCE");
+//        RefType refType1 = new RefType("ADE", "A12345");
+//        ArrayList<RefType> refTypes = new ArrayList<RefType>();
+//        refTypes.add(refType);
+//        refTypes.add(refType1);
+//        orderDetails.setManageReferences(new ManageReferences(refTypes));
+
+        if (stockMovement.comments) {
+            Remark remark = new Remark(stockMovement.comments);
+            ArrayList<Remark> remarks = new ArrayList<Remark>(Arrays.asList(remark));
+            orderDetails.setManageRemarks(new ManageRemarks(remarks));
+        }
         order.setOrderDetails(orderDetails);
+
         return order;
+    }
+
+
+    PartyType buildPartyType(Location location, User contactData, String type) {
+        return buildPartyType(location?.organization, contactData, type)
+    }
+
+    PartyType buildPartyType(Organization organization, User contactData, String type) {
+        PartyType partyType = new PartyType();
+        partyType.setPartyID(new PartyID(organization?.code, organization?.name));
+        partyType.setType(type);
+
+        // Add contact information
+        User contact = contactData?:organization?.defaultLocation?.manager
+        if (contact) {
+            partyType.setContactData(new ContactData(contact.firstName, contact?.lastName,
+                    new Phone(null, contact?.phoneNumber), contact?.email));
+        }
+    }
+
+    LocationInfo buildLocationInfo(String stopSequence, Location location, Date expectedDate, String driverInstructions) {
+        String expectedDateString = expectedDate ? dateFormatter.format(expectedDate) : null
+        return new LocationInfo(
+                stopSequence,
+                location?.address ? buildAddress(location?.address) : null,
+                new PlannedDateTime(expectedDateString, expectedDateString),
+                driverInstructions
+        );
+    }
+
+    Address buildAddress(org.pih.warehouse.core.Address address) {
+
+        def defaultTimeZone = grailsApplication.config.openboxes.integration.order.address.timeZone?:null
+        return new Address(
+                address.description,
+                address.address,
+                address.city,
+                address.stateOrProvince?:"",
+                address.postalCode?:"",
+                address.country?:"",
+                defaultTimeZone)
     }
 }

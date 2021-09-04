@@ -1,7 +1,8 @@
 <header class="p-3 mb-3 border-bottom bg-light">
     <div class="container-fluid">
         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-            <g:link controller="mobile" class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-decoration-none">
+            <g:link controller="mobile"
+                    class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-decoration-none">
                 <g:if test="${session.warehouse}">
                     <g:displayLogo location="${session?.warehouse?.id}" includeLink="${false}"/>
                 </g:if>
@@ -56,9 +57,11 @@
                             </g:else>
                         </a>
                         <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
-                            <li><g:link controller="user" action="edit" id="${session?.user?.id}" class="dropdown-item" href="#">Profile</g:link></li>
+                            <li><g:link controller="user" action="edit" id="${session?.user?.id}"
+                                        class="dropdown-item" href="#">Profile</g:link></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><g:link controller="auth" action="logout" class="dropdown-item" href="#">Sign out</g:link></li>
+                            <li><g:link controller="auth" action="logout" class="dropdown-item"
+                                        href="#">Sign out</g:link></li>
                         </ul>
                     </div>
 
@@ -67,5 +70,3 @@
         </div>
     </div>
 </header>
-
-

@@ -58,7 +58,7 @@ class SecureFtpClient {
             else {
                 if (debug) {
                     LOG.info "Using promiscuous host key verifier"
-                    ssh.addHostKeyVerifier(new PromiscuousVerifier())
+                    sshClient.addHostKeyVerifier(new PromiscuousVerifier())
                 }
                 else {
                     // Load known hosts from configuration if unable to use ~/.ssh/known_hosts

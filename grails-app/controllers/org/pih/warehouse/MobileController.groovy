@@ -278,8 +278,15 @@ class MobileController {
             String fileName = messageFile.originalFilename
             File file = new File ("/tmp/${fileName}")
             messageFile.transferTo(file)
-            fileTransferService.storeMessage(file)
-            flash.message = "File ${fileName} transferred successfully"
+            try {
+                fileTransferService.storeMessage(file)
+                flash.message = "File ${fileName} transferred successfully"
+
+            } catch (Exception e) {
+                log.error "Unable to upload message due to error: " + e.message, e
+                flash.message = "File ${fileName} not transferred due to error: " + e.message
+
+            }
         }
         redirect(action: "messageList")
     }
