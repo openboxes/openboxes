@@ -1,4 +1,4 @@
-package org.pih.warehouse.xml.execution;
+package org.pih.warehouse.integration.xml.execution;
 
 import org.junit.After;
 import org.junit.Before;
@@ -10,7 +10,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 

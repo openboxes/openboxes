@@ -54,6 +54,7 @@ class StockMovement {
     Date dateRequested
     Date dateShipped
     Date expectedDeliveryDate
+    Date expectedShippingDate
     Date dateCreated
     Date lastUpdated
 
@@ -103,6 +104,7 @@ class StockMovement {
         stockMovementStatusCode(nullable: true)
         receiptStatusCode(nullable: true)
         dateShipped(nullable: true)
+        expectedShippedDate(nullable: true)
         expectedDeliveryDate(nullable: true)
         shipmentType(nullable: true)
         trackingNumber(nullable: true)
@@ -284,6 +286,7 @@ class StockMovement {
                 shipmentType: shipment.shipmentType,
                 statusCode: statusCode,
                 dateShipped: shipment?.expectedShippingDate,
+                expectedShippingDate: shipment?.expectedShippingDate,
                 expectedDeliveryDate: shipment?.expectedDeliveryDate,
                 identifier: shipment.shipmentNumber,
                 origin: shipment.origin,
@@ -346,6 +349,7 @@ class StockMovement {
             comments: shipment?.additionalInformation,
             shipmentType: shipment?.shipmentType,
             dateShipped: shipment?.expectedShippingDate,
+            expectedShippingDate: shipment?.expectedShippingDate,
             expectedDeliveryDate: shipment?.expectedDeliveryDate,
             driverName: shipment?.driverName,
             trackingNumber: trackingNumber?.identifier,
