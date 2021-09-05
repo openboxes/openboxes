@@ -34,6 +34,7 @@ import org.pih.warehouse.integration.xml.acceptancestatus.AcceptanceStatus
 import org.pih.warehouse.integration.xml.pod.DocumentUpload
 import org.pih.warehouse.integration.xml.execution.Execution
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest
 
 import javax.xml.bind.JAXBContext
@@ -130,6 +131,14 @@ class MobileController {
         Location destination = Location.get(params.origin?params.origin.id:session.warehouse.id)
         StockMovement stockMovement = new StockMovement(destination: destination,
                 stockMovementType: StockMovementType.INBOUND, stockMovementStatusCode: StockMovementStatusCode.PENDING)
+        if(params.status == "IN_TRANSIT") {
+            params.receiptStatusCode = ["SHIPPED"]
+            stockMovement = new StockMovement(
+                    destination: destination,
+                    stockMovementType: StockMovementType.INBOUND,
+                    receiptStatusCodes: params.list("receiptStatusCode") as ShipmentStatusCode[]
+            )
+        }
         def stockMovements = stockMovementService.getStockMovements(stockMovement, [max:params.max?:10, offset: params.offset?:0])
         [stockMovements: stockMovements]
     }
