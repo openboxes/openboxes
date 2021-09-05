@@ -8,6 +8,20 @@
 
 <body>
 
+<div class="row g-0 mb-2">
+    <div class="col col-md-4">
+        <g:form controller="mobile" action="inboundList" method="GET">
+            <div class="form-group">
+                <g:select class="btn btn-primary btn-sm"
+                          name="status" from="${['TRANSIT':'IN_TRANSIT'].entrySet()}"
+                          value="${params.status}"
+                          optionKey="value" optionValue="value"
+                          noSelection="['':' - Choose a Status - ']"/>
+                <input type="submit" value="Filter" class="btn btn-sm btn-primary">
+            </div>
+        </g:form>
+    </div>
+</div>
 <div class="row g-0">
     <div class="col">
         <table class="table table-bordered">
