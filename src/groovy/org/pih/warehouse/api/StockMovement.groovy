@@ -104,7 +104,7 @@ class StockMovement {
         stockMovementStatusCode(nullable: true)
         receiptStatusCode(nullable: true)
         dateShipped(nullable: true)
-        expectedShippedDate(nullable: true)
+        expectedShippingDate(nullable: true)
         expectedDeliveryDate(nullable: true)
         shipmentType(nullable: true)
         trackingNumber(nullable: true)
