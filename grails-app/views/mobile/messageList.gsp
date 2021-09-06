@@ -8,8 +8,10 @@
 
 <body>
 
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#messageUploadModal">Import Message</button>
+
     <div class="row g-0">
-        <table class="table table-bordered">
+        <table class="table table-borderless table-striped">
             <thead>
                 <tr>
                     <th><g:message code="filename.label" default="Filename"/></th>
@@ -32,21 +34,26 @@
         </table>
     </div>
 
-    <g:uploadForm class="row g-3 needs-validation" action="messageUpload" enctype="multipart/form-data">
-        <div class="col-md-4">
-            <div class="card mb-3">
-                <h5 class="card-title"><i class="fa fa-upload"></i> Upload Message </h5>
-                <div class="mb-3">
-                    <label for="messageFile" class="form-label"></label>
-                    <input class="form-control" type="file" name="messageFile" id="messageFile" required>
-                </div>
-                <div class="col-12">
-                    <button class="btn btn-primary" type="submit">Submit form</button>
+    <!-- Modal -->
+    <div class="modal fade" id="messageUploadModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <g:uploadForm class="row g-3 needs-validation" action="messageUpload" enctype="multipart/form-data">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel"><i class="fa fa-upload"></i> Upload Message </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="messageFile" class="form-label"></label>
+                        <input class="form-control" type="file" name="messageFile" id="messageFile" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                    </div>
                 </div>
             </div>
-        </div>
-    </g:uploadForm>
-
-
+        </g:uploadForm>
+    </div>
 </body>
 </html>
