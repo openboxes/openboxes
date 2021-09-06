@@ -8,14 +8,17 @@
 
 <body>
 
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#messageUploadModal">Import Message</button>
+<div class="clearfix">
+    <button type="button" class="btn btn-outline-primary float-end" data-bs-toggle="modal"
+            data-bs-target="#messageUploadModal">Upload Message</button>
+</div>
 
     <div class="row g-0">
         <table class="table table-borderless table-striped">
             <thead>
                 <tr>
                     <th><g:message code="filename.label" default="Filename"/></th>
-                    <th><g:message code="default.actions.label"/></th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -24,9 +27,11 @@
                     <td>
                         ${message.filename}
                     </td>
-                    <td class="col-2">
-                        <g:link controller="mobile" action="messageProcess" params="[filename: message.filename]" class="btn btn-outline-primary">Process</g:link>
-                        <g:link controller="mobile" action="messageDetails" params="[filename: message.filename]" class="btn btn-outline-secondary">Download</g:link>
+                    <td class="col">
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <g:link controller="mobile" action="messageProcess" params="[filename: message.filename]" class="btn btn-outline-primary">Process</g:link>
+                            <g:link controller="mobile" action="messageDetails" params="[filename: message.filename]" class="btn btn-outline-secondary">Download</g:link>
+                        </div>
                     </td>
                 </tr>
             </g:each>

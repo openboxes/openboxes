@@ -41,20 +41,18 @@
                     </g:link>
                 </li>
                 <li class="nav-item">
-                    <div class="divider-vertical"></div>
-                </li>
-                <li class="nav-item">
                     <div class="dropdown text-end">
                         <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle"
                            id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                            <g:if test="${false && session.user?.id}">
-                                <img src="${resource(controller: 'user', action: 'viewThumb', id: session?.user?.id)}"
+                            <g:if test="${session.user?.id}">
+                                <img src="${createLink(controller: 'user', action: 'viewThumb', id: session?.user?.id)}"
                                      width="48" height="48" class="rounded-circle"/>
                             </g:if>
                             <g:else>
                                 <img src="${resource(dir: 'images/icons/user', file: 'default-avatar.jpg')}"
                                      width="48" height="48" class="rounded-circle"/>
                             </g:else>
+                            ${session?.user?.name}
                         </a>
                         <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
                             <li><g:link controller="user" action="edit" id="${session?.user?.id}"
