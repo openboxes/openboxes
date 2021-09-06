@@ -185,4 +185,16 @@ class ReplenishmentApiController {
 
         render status: 200
     }
+
+    def deletePicklist = {
+        OrderItem orderItem = OrderItem.get(params.id)
+        if (!orderItem) {
+            throw new IllegalArgumentException("Can't find order item with given id: ${params.id}")
+        }
+
+//        TODO: OBAM-169: Update picklist items made by user for given orderItem
+//        replenishmentService.removePicklist(orderItem)
+
+        render status: 200
+    }
 }
