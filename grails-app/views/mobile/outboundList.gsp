@@ -59,6 +59,11 @@
                                 <div class="badge bg-primary">
                                     ${stockMovement.shipment?.currentEvent?.eventType?.eventCode}
                                 </div>
+                                <g:if test="${stockMovement.stockMovementStatusCode < org.pih.warehouse.inventory.StockMovementStatusCode.PICKED }">
+                                    <div class="badge bg-info">
+                                        Ready To be Picked
+                                    </div>
+                                </g:if>
                                 <div>
                                     <small><g:formatDate date="${stockMovement.shipment?.currentEvent?.eventDate}" format="MMM dd hh:mm a"/></small>
                                 </div>
