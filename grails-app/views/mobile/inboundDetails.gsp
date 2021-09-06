@@ -160,8 +160,6 @@
 
             </div>
             <div class="tab-pane fade" id="events" role="tabpanel" aria-labelledby="events-tab">
-
-
                 <div class="card">
                     <div class="card-header">
                         <div class="row align-items-center trip-title">

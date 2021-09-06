@@ -13,7 +13,7 @@
             <g:each var="productSummary" in="${productSummaries}">
                 <g:set var="product" value="${productSummary.product}"/>
                 <tr class="border-bottom">
-                    <td class="col-2">
+                    <td class="col-1">
                         <picture>
                             <a href="${createLink(controller: 'mobile', action: 'productDetails', id: product?.id)}" class="text-decoration-none">
                                 <g:if test="${product.images}">
@@ -44,8 +44,8 @@
                         </a>
                     </td>
                     <td>
-                        <a href="${createLink(controller: 'mobile', action: 'productDetails', id: product?.id)}" class="btn btn-link">
-                            <i class="fa fa-chevron-right"></i>
+                        <a href="${createLink(controller: 'mobile', action: 'productDetails', id: product?.id)}" class="btn btn-primary">
+                            Details <i class="fa fa-chevron-right"></i>
                         </a>
                     </td>
                 </tr>

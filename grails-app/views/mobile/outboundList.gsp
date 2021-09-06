@@ -13,10 +13,14 @@
         <g:renderErrors bean="${commandInstance}" as="list" />
     </div>
 </g:hasErrors>
+<div class="clearfix">
+    <button type="button" class="btn btn-outline-primary float-end"
+            data-bs-toggle="modal" data-bs-target="#outboundModal"><i class="fa fa-file-import"></i> Import Orders</button>
+</div>
 
 <div class="row g-0">
     <div class="col">
-        <table class="table table-bordered">
+        <table class="table table-borderless table-striped">
             <thead>
                 <tr>
                     <th><g:message code="stockMovement.status.label"/></th>
@@ -61,7 +65,7 @@
                     </td>
                     <td>
                         <a href="${createLink(controller: 'mobile', action: 'outboundDetails', id: stockMovement?.id)}" class="btn btn-outline-primary">
-                            Details
+                            <i class="fa fa-binoculars"></i> View
                         </a>
                     </td>
                 </tr>
@@ -70,17 +74,6 @@
         </table>
         <div class="pagination">
             <g:paginate total="${stockMovements.totalCount}"/>
-        </div>
-    </div>
-    <div class="col-2">
-        <div class="card text-center">
-            <div class="card-header">
-                Create Outbound Orders
-            </div>
-            <div class="card-body">
-                %{--<p class="card-text">With supporting text below as a natural lead-in to additional content.</p>--}%
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#outboundModal">Create</button>
-            </div>
         </div>
     </div>
 </div>
