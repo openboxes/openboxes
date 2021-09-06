@@ -37,7 +37,7 @@
                     <th><g:message code="stockMovement.origin.label"/></th>
                     <th><g:message code="stockMovement.destination.label" default="Destination"/></th>
                     <th><g:message code="stockMovement.requestedDeliveryDate.label" default="Requested Delivery Date"/></th>
-                    <th><g:message code="default.actions.label" default="Actions"/></th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -73,9 +73,11 @@
                         <g:formatDate date="${stockMovement?.expectedDeliveryDate}" format="dd MMM yyyy"/>
                     </td>
                     <td>
-                        <a href="${createLink(controller: 'mobile', action: 'inboundDetails', id: stockMovement?.id)}" class="btn btn-link">
-                            <button class="btn btn-outline-primary">Details</button>
-                        </a>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="${createLink(controller: 'mobile', action: 'inboundDetails', id: stockMovement?.id)}" class="btn btn-link">
+                                <button class="btn btn-outline-primary">Details</button>
+                            </a>
+                        </div>
                     </td>
                 </tr>
             </g:each>
