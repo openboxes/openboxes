@@ -1389,6 +1389,8 @@ openboxes.integration.ftp.user = "sftpuser"
 openboxes.integration.ftp.password = "password"
 openboxes.integration.ftp.directory = "files"
 
+openboxes.integration.tracking.uri = "https://tms.etrucknow.com/tracking/orderTracking/%s"
+
 // eTruckNow delivery order defaults
 openboxes.integration.order.address.timeZone = "Europe/London"
 
