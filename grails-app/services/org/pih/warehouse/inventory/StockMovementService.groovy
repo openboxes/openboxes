@@ -178,7 +178,7 @@ class StockMovementService {
                 updateRequisitionStatus(stockMovement.id, requisitionStatus)
 
                 // Broadcast status change to event bus in case there's more work to be done
-                
+
 
             }
         }
@@ -496,6 +496,20 @@ class StockMovementService {
         return new PagedResultList(stockMovements, requisitions.totalCount)
     }
 
+    StockMovement getStockMovementByIdentifier(String identifier) {
+        Requisition requisition = Requisition.findByRequestNumber(identifier)
+        if (requisition) {
+            return getStockMovement(requisition?.id)
+        } else {
+            Shipment shipment = Shipment.findByShipmentNumber(identifier)
+            if (shipment) {
+                return getStockMovement(shipment?.id)
+            }
+            else {
+                throw new ObjectNotFoundException(id, StockMovement.class.toString())
+            }
+        }
+    }
 
     StockMovement getStockMovement(String id) {
         return getStockMovement(id, (String) null)
@@ -1906,12 +1920,14 @@ class StockMovementService {
         }
     }
 
-    Shipment createShipment(StockMovement stockMovement) {
+    Shipment createShipment(StockMovement stockMovement, Boolean validate = true) {
         log.info "create shipment " + (new JSONObject(stockMovement.toJson())).toString(4)
 
         Requisition requisition = stockMovement.requisition
 
-        validateRequisition(requisition)
+        if (validate) {
+            validateRequisition(requisition)
+        }
 
         Shipment shipment = Shipment.findByRequisition(requisition)
 

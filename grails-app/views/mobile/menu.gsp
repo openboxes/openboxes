@@ -46,11 +46,11 @@
                            id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
                             <g:if test="${session.user?.id}">
                                 <img src="${createLink(controller: 'user', action: 'viewThumb', id: session?.user?.id)}"
-                                     width="48" height="48" class="rounded-circle"/>
+                                     width="24" height="24" class="rounded-circle"/>
                             </g:if>
                             <g:else>
                                 <img src="${resource(dir: 'images/icons/user', file: 'default-avatar.jpg')}"
-                                     width="48" height="48" class="rounded-circle"/>
+                                     width="24" height="24" class="rounded-circle"/>
                             </g:else>
                             ${session?.user?.name}
                         </a>
