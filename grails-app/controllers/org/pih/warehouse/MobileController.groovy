@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse
 
+import grails.orm.PagedResultList
 import org.apache.commons.io.IOUtils
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementType
@@ -25,15 +26,12 @@ import org.pih.warehouse.integration.TripExecutionEvent
 import org.pih.warehouse.integration.TripNotificationEvent
 import org.pih.warehouse.integration.xml.trip.Trip
 import org.pih.warehouse.inventory.StockMovementStatusCode
-import org.pih.warehouse.order.Order
-import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSummary
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.integration.xml.acceptancestatus.AcceptanceStatus
 import org.pih.warehouse.integration.xml.pod.DocumentUpload
 import org.pih.warehouse.integration.xml.execution.Execution
-import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest
 
@@ -75,12 +73,17 @@ class MobileController {
 
         def messages = fileTransferService.listMessages()
         def messageCount = messages ? messages?.size() :0
+
+        def readyToBePicked = stockMovement.findAll{ it.stockMovementStatusCode < StockMovementStatusCode.PICKED }
+        def readyToBePickedCount = readyToBePicked.size()
+        def status =  'READY_TO_BE_PICKED'
         [
                 data: [
                         [name: "Inventory", class: "fa fa-box", count: productCount, url: g.createLink(controller: "mobile", action: "productList")],
                         [name: "Inbound Orders", class: "fa fa-shopping-cart", count: orderCount, url: g.createLink(controller: "mobile", action: "inboundList", params: ['origin.id', location.id])],
                         [name: "Outbound Orders", class: "fa fa-truck", count: requisitionCount, url: g.createLink(controller: "mobile", action: "outboundList", params: ['origin.id', location.id])],
                         [name: "Messages", class: "fa fa-envelope", count: messageCount, url: g.createLink(controller: "mobile", action: "messageList", params: ['origin.id', location.id])],
+                        [name: "Ready to be Picked", class: "fa fa-truck-pickup", count: readyToBePickedCount, url: g.createLink(controller: "mobile", action: "outboundList", params: [status: status])],
                 ]
         ]
     }
@@ -139,14 +142,35 @@ class MobileController {
                     receiptStatusCodes: params.list("receiptStatusCode") as ShipmentStatusCode[]
             )
         }
+
         def stockMovements = stockMovementService.getStockMovements(stockMovement, [max:params.max?:10, offset: params.offset?:0])
+
+        if ( params.status == "READY_TO_BE_PICKED") {
+            def tempStockMovements = stockMovements.findAll{ it.stockMovementStatusCode < StockMovementStatusCode.PICKED }
+            stockMovements = new PagedResultList(tempStockMovements, tempStockMovements.size())
+        }
         [stockMovements: stockMovements]
     }
 
     def outboundList = {
+        log.info "outboundList params ${params}"
         Location origin = Location.get(params.origin?params.origin.id:session.warehouse.id)
         StockMovement stockMovement = new StockMovement(origin: origin, stockMovementType: StockMovementType.OUTBOUND, stockMovementStatusCode: StockMovementStatusCode.PENDING)
+        if(params.status == "IN_TRANSIT") {
+            params.receiptStatusCode = ["SHIPPED"]
+            stockMovement = new StockMovement(
+                    origin: origin,
+                    stockMovementType: StockMovementType.OUTBOUND,
+                    receiptStatusCodes: params.list("receiptStatusCode") as ShipmentStatusCode[]
+            )
+        }
         def stockMovements = stockMovementService.getStockMovements(stockMovement, [max:params.max?:10, offset: params.offset?:0])
+
+        if(params.status == "READY_TO_BE_PICKED") {
+            def tempStockMovements = stockMovements.findAll{ it.stockMovementStatusCode < StockMovementStatusCode.PICKED }
+            stockMovements = new PagedResultList(tempStockMovements, tempStockMovements.size())
+        }
+
         [stockMovements:stockMovements]
     }
 
