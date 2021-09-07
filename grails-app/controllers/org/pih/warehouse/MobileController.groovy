@@ -313,21 +313,23 @@ class MobileController {
         InputStream inputStream = IOUtils.toInputStream(xmlContents)
         Object messageObject = unmarshaller.unmarshal(inputStream)
 
-        // Publish message to event bus
-        if (messageObject instanceof DocumentUpload) {
-            grailsApplication.mainContext.publishEvent(new DocumentUploadEvent(messageObject))
+        try {
+            // Publish message to event bus
+            if (messageObject instanceof DocumentUpload) {
+                grailsApplication.mainContext.publishEvent(new DocumentUploadEvent(messageObject))
+            } else if (messageObject instanceof AcceptanceStatus) {
+                grailsApplication.mainContext.publishEvent(new AcceptanceStatusEvent(messageObject))
+            } else if (messageObject instanceof Execution) {
+                grailsApplication.mainContext.publishEvent(new TripExecutionEvent(messageObject))
+            } else if (messageObject instanceof Trip) {
+                grailsApplication.mainContext.publishEvent(new TripNotificationEvent(messageObject))
+            }
+            flash.message = "Message has been processed"
         }
-        else if (messageObject instanceof AcceptanceStatus) {
-            grailsApplication.mainContext.publishEvent(new AcceptanceStatusEvent(messageObject))
-        }
-        else if (messageObject instanceof Execution) {
-            grailsApplication.mainContext.publishEvent(new TripExecutionEvent(messageObject))
-        }
-        else if (messageObject instanceof Trip) {
-            grailsApplication.mainContext.publishEvent(new TripNotificationEvent(messageObject))
+        catch (Exception e) {
+            flash.message = e.message
         }
 
-        flash.message = "Message has been processed"
         redirect(action: "messageList")
 
     }
