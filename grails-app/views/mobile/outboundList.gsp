@@ -27,7 +27,8 @@
                     <th><g:message code="stockMovement.identifier.label"/></th>
                     <th><g:message code="stockMovement.destination.label"/></th>
                     <th><g:message code="stockMovement.requestedDeliveryDate.label" default="Requested Delivery Date"/></th>
-                    <th><g:message code="react.stockMovement.expectedDeliveryDate.label" default="Requested Delivery Date"/></th>
+                    <th><g:message code="stockMovement.expectedDeliveryDate.label" default="Expected Delivery Date"/></th>
+                    <th><g:message code="stockMovement.trackingNumber.label" /></th>
                     <th></th>
                 </tr>
             </thead>
@@ -62,6 +63,14 @@
                     </td>
                     <td>
                         <g:formatDate date="${stockMovement?.expectedDeliveryDate}" format="dd MMM yyyy"/>
+                    </td>
+                    <td>
+                        <g:if test="${stockMovement?.trackingNumber}">
+                            <g:link url="${stockMovement.trackingUri}">${stockMovement?.trackingNumber}</g:link>
+                        </g:if>
+                        <g:else>
+                            Not Available
+                        </g:else>
                     </td>
                     <td>
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">

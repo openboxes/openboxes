@@ -24,10 +24,15 @@ class TripNotificationEventService implements ApplicationListener<TripNotificati
         List<Orders> orders = tripNotificationEvent.trip.tripOrderDetails.orders
         orders.each { Orders deliveryOrder ->
             log.info "Trip notification order" + deliveryOrder.toString()
-            String stockMovementId = deliveryOrder.extOrderId
+            String identifier = deliveryOrder.extOrderId
             String trackingNumber = deliveryOrder.orderId
-            StockMovement stockMovement = stockMovementService.getStockMovement(stockMovementId)
-            stockMovementService.createOrUpdateTrackingNumber(stockMovement.shipment, trackingNumber)
+
+            // FIXME Need to ensure that stock movement is ready to receive notifcation i.e. shipment has been created
+            StockMovement stockMovement = stockMovementService.getStockMovementByIdentifier(identifier)
+            if (!stockMovement?.shipment) {
+                stockMovement?.shipment = stockMovementService.createShipment(stockMovement, false)
+            }
+            stockMovementService.createOrUpdateTrackingNumber(stockMovement?.shipment, trackingNumber)
         }
     }
 }

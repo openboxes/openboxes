@@ -144,6 +144,7 @@ class StockMovement {
             shipmentType        : shipmentType,
             shipmentStatus      : currentStatus,
             trackingNumber      : trackingNumber,
+            trackingUri: trackingUri,
             driverName          : driverName,
             comments            : comments,
             requestedBy         : requestedBy,
@@ -265,6 +266,12 @@ class StockMovement {
         name = name.replace(" ", "")
         return name
     }
+
+    String getTrackingUri() {
+        final String uriTemplate = ConfigurationHolder.config.openboxes.integration.tracking.uri
+        return String.format(uriTemplate, trackingNumber)
+    }
+
 
     static StockMovement createFromShipment(Shipment shipment) {
         return createFromShipment(shipment, Boolean.TRUE)
