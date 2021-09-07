@@ -1,4 +1,8 @@
+%{--<%
+    import org.pih.warehouse.inventory.StockMovementStatusCode;
+%>--}%
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="org.pih.warehouse.inventory.StockMovementStatusCode; org.pih.warehouse.shipping.ShipmentStatusCode" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -14,7 +18,7 @@
         <g:form controller="mobile" action="inboundList" method="GET">
             <div class="form-group">
                 <g:select class="btn btn-outline-secondary"
-                          name="status" from="${['TRANSIT':'IN_TRANSIT'].entrySet()}"
+                          name="status" from="${['TRANSIT':'IN_TRANSIT', 'READY_TO_BE_PICKED':'READY_TO_BE_PICKED'].entrySet()}"
                           value="${params.status}"
                           optionKey="value" optionValue="value"
                           noSelection="['':' - Choose a Status - ']"/>
@@ -49,6 +53,11 @@
                                 <div class="badge bg-primary">
                                     ${stockMovement.shipment?.currentEvent?.eventType?.eventCode}
                                 </div>
+                                <g:if test="${stockMovement.stockMovementStatusCode < org.pih.warehouse.inventory.StockMovementStatusCode.PICKED }">
+                                    <div class="badge bg-info">
+                                        Ready To be Picked
+                                    </div>
+                                </g:if>
                                 <div>
                                     <small><g:formatDate date="${stockMovement.shipment?.currentEvent?.eventDate}" format="MMM dd hh:mm a"/></small>
                                 </div>
