@@ -17,6 +17,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryLevelStatus
 import org.pih.warehouse.inventory.Requirement
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
 
@@ -26,7 +27,6 @@ class ReplenishmentApiController {
     def replenishmentService
 
     def list = {
-        // TODO: How to distinguish replenishments from stock transfer orders?
         List<Order> replenishments = Order.findAllByOrderType(OrderType.get(OrderTypeCode.TRANSFER_ORDER.name()))
         render([data: replenishments.collect { it.toJson() }] as JSON)
     }
@@ -114,7 +114,14 @@ class ReplenishmentApiController {
                 replenishmentItem.location = replenishment.destination
             }
 
-            // TODO: process pick list items
+            replenishmentItemMap.pickItems.each { pickItemMap ->
+                ReplenishmentItem pickItem = new ReplenishmentItem()
+                bindData(pickItem, pickItemMap)
+                if (!pickItem.location) {
+                    pickItem.location = replenishment.origin
+                }
+                replenishmentItem.picklistItems.add(pickItem)
+            }
 
             replenishment.replenishmentItems.add(replenishmentItem)
         }
@@ -143,5 +150,51 @@ class ReplenishmentApiController {
     def removeItem = {
         replenishmentService.deleteReplenishmentItem(params.id)
         render status: 204
+    }
+
+    def createPicklist = {
+        OrderItem orderItem = OrderItem.get(params.id)
+        if (!orderItem) {
+            throw new IllegalArgumentException("Can't find order item with given id: ${params.id}")
+        }
+
+//        TODO: OBAM-169: Remove user modified picklist for given orderItem
+//        replenishmentService.removePicklist(orderItem)
+
+//        TODO: OBAM-169: Create new auto picklist for given orderItem from suggested items
+//        replenishmentService.createPicklist(orderItem)
+
+        render status: 201
+    }
+
+    def updatePicklist = {
+        OrderItem orderItem = OrderItem.get(params.id)
+        if (!orderItem) {
+            throw new IllegalArgumentException("Can't find order item with given id: ${params.id}")
+        }
+
+        JSONObject jsonObject = request.JSON
+        List picklistItems = jsonObject.remove("picklistItems")
+
+        if (!picklistItems) {
+            throw new IllegalArgumentException("Must specifiy picklistItems")
+        }
+
+//        TODO: OBAM-169: Update picklist items made by user for given orderItem
+//        replenishmentService.updatePicklist(orderItem, picklistItems)
+
+        render status: 200
+    }
+
+    def deletePicklist = {
+        OrderItem orderItem = OrderItem.get(params.id)
+        if (!orderItem) {
+            throw new IllegalArgumentException("Can't find order item with given id: ${params.id}")
+        }
+
+//        TODO: OBAM-169: Update picklist items made by user for given orderItem
+//        replenishmentService.removePicklist(orderItem)
+
+        render status: 200
     }
 }

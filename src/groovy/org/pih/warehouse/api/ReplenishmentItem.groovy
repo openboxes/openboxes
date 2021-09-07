@@ -56,21 +56,27 @@ class ReplenishmentItem {
         replenishmentItem.totalQuantityOnHand = orderItem.quantity
         replenishmentItem.status = getItemStatus(orderItem.orderItemStatusCode)
 
-//        TODO: Finalize when order <-> picklist association will be added
-//        orderItem.picklist?.picklistItems?.each { item ->
-//            replenishmentItem.picklistItems.add(createFromOrderItem(item))
-//        }
+        orderItem?.picklistItems?.each { PicklistItem picklistItem ->
+            replenishmentItem.picklistItems.add(createFromPicklistItem(picklistItem))
+        }
 
         return replenishmentItem
     }
 
 
-//    TODO: Finalize when order <-> picklist association will be added
-//    static ReplenishmentItem createFromPicklistItem(PicklistItem picklistItem) {
-//        ReplenishmentItem replenishmentItem = new ReplenishmentItem()
-//
-//        return replenishmentItem
-//    }
+    static ReplenishmentItem createFromPicklistItem(PicklistItem picklistItem) {
+        ReplenishmentItem replenishmentItem = new ReplenishmentItem()
+        replenishmentItem.id = picklistItem.id
+        replenishmentItem.product = picklistItem?.inventoryItem?.product
+        replenishmentItem.inventoryItem = picklistItem?.inventoryItem
+        replenishmentItem.location = picklistItem?.orderItem?.order?.origin
+        replenishmentItem.replenishmentLocation  = picklistItem?.binLocation
+        replenishmentItem.binLocation = picklistItem?.orderItem?.destinationBinLocation
+        replenishmentItem.quantity = picklistItem?.quantity
+        replenishmentItem.status = getItemStatus(OrderItemStatusCode.COMPLETED)
+
+        return replenishmentItem
+    }
 
     static ReplenishmentStatus getItemStatus(OrderItemStatusCode orderItemStatusCode) {
         switch (orderItemStatusCode) {

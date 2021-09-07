@@ -133,4 +133,6 @@
     <include file="0.8.x/changelog-2021-07-27-1610-alter-table-inventory-levels-add-column-order-period.xml"/>
     <include file="0.8.x/changelog-2021-07-27-2153-alter-table-invoice-add-column-date-posted.xml"/>
     <include file="0.8.x/changelog-2021-08-02-1200-alter-table-product-add-column-lot-and-expiry-control.xml"/>
+    <include file="0.8.x/changelog-2021-09-02-1200-alter-table-picklist-add-column-order.xml"/>
+    <include file="0.8.x/changelog-2021-09-02-1215-alter-table-picklist-item-add-column-order-item.xml"/>
 </databaseChangeLog>

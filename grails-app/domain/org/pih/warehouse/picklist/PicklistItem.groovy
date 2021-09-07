@@ -12,6 +12,7 @@ package org.pih.warehouse.picklist
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
+import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.requisition.RequisitionItem
 
 class PicklistItem implements Serializable {
@@ -28,6 +29,7 @@ class PicklistItem implements Serializable {
 
     String id
     RequisitionItem requisitionItem
+    OrderItem orderItem
     InventoryItem inventoryItem
     Location binLocation
 
@@ -55,6 +57,7 @@ class PicklistItem implements Serializable {
         inventoryItem(nullable: true)
         binLocation(nullable: true)
         requisitionItem(nullable: true)
+        orderItem(nullable: true)
         quantity(nullable: false)
         status(nullable: true)
         reasonCode(nullable: true)
@@ -65,7 +68,7 @@ class PicklistItem implements Serializable {
     static transients = ['associatedLocation', 'associatedProducts', 'disableRefresh']
 
     String getAssociatedLocation() {
-        return requisitionItem?.requisition?.origin?.id
+        return requisitionItem ? requisitionItem?.requisition?.origin?.id : orderItem?.order?.origin?.id
     }
 
     List getAssociatedProducts() {
@@ -78,6 +81,7 @@ class PicklistItem implements Serializable {
                 version          : version,
                 status           : status,
                 requisitionItemId: requisitionItem?.id,
+                orderItemId      : orderItem?.id,
                 binLocationId    : binLocation?.id,
                 inventoryItemId  : inventoryItem?.id,
                 quantity         : quantity,

@@ -342,6 +342,11 @@ class UrlMappings {
             action = [DELETE: "removeItem"]
         }
 
+        "/api/replenishments/$id/picklists"(parseRequest: true) {
+            controller = { "replenishmentApi" }
+            action = [POST: "createPicklist", PUT: "updatePicklist", DELETE: "deletePicklist"]
+        }
+
         // Standard REST APIs
 
         "/api/${resource}s"(parseRequest: true) {
