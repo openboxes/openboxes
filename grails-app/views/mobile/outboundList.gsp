@@ -13,9 +13,28 @@
         <g:renderErrors bean="${commandInstance}" as="list" />
     </div>
 </g:hasErrors>
-<div class="clearfix">
+%{--<div class="clearfix">
     <button type="button" class="btn btn-outline-primary float-end"
             data-bs-toggle="modal" data-bs-target="#outboundModal"><i class="fa fa-file-import"></i> Import Orders</button>
+</div>--}%
+
+<div class="row g-0 mb-2">
+    <div class="col col-md-6">
+        <g:form controller="mobile" action="outboundList" method="GET">
+            <div class="form-group">
+                <g:select class="btn btn-outline-secondary"
+                          name="status" from="${['TRANSIT':'IN_TRANSIT', 'READY_TO_BE_PICKED':'READY_TO_BE_PICKED'].entrySet()}"
+                          value="${params.status}"
+                          optionKey="value" optionValue="value"
+                          noSelection="['':' - Choose a Status - ']"/>
+                <input type="submit" value="Filter" class="btn btn-outline-primary">
+            </div>
+        </g:form>
+    </div>
+    <div class="col col-md-6">
+        <button type="button" class="btn btn-outline-primary float-end"
+                data-bs-toggle="modal" data-bs-target="#outboundModal"><i class="fa fa-file-import"></i> Import Orders</button>
+    </div>
 </div>
 
 <div class="row g-0">
@@ -41,6 +60,11 @@
                                 <div class="badge bg-primary">
                                     ${stockMovement.shipment?.currentEvent?.eventType?.eventCode}
                                 </div>
+                                <g:if test="${stockMovement.stockMovementStatusCode < org.pih.warehouse.inventory.StockMovementStatusCode.PICKED }">
+                                    <div class="badge bg-info">
+                                        Ready To be Picked
+                                    </div>
+                                </g:if>
                                 <div>
                                     <small><g:formatDate date="${stockMovement.shipment?.currentEvent?.eventDate}" format="MMM dd hh:mm a"/></small>
                                 </div>
