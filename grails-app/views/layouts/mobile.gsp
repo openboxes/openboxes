@@ -19,12 +19,14 @@
         <g:include controller="mobile" action="menu"/>
     </header>
     <main class="flex-shrink-0">
-        <div class="container-fluid">
+        <div class="container">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><g:link controller="mobile">Home</g:link></li>
-                    <li class="breadcrumb-item"><g:link controller="mobile"
-                                                        action="chooseLocation">${session.warehouse.name}</g:link></li>
+                    <g:if test="${session.warehouse}">
+                        <li class="breadcrumb-item"><g:link controller="mobile"
+                                                            action="chooseLocation">${session?.warehouse?.name}</g:link></li>
+                    </g:if>
                     <li class="breadcrumb-item active" aria-current="page"><g:layoutTitle/></li>
                 </ol>
             </nav>
