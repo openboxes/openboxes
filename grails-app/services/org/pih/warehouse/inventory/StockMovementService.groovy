@@ -1949,6 +1949,7 @@ class StockMovementService {
             shipment = new Shipment()
         } else {
             createMissingShipmentItems(stockMovement.requisition, shipment)
+            shipmentService.validateShipment(shipment)
             return shipment
         }
 
@@ -1967,7 +1968,8 @@ class StockMovementService {
 
         shipment.name = stockMovement.generateName()
 
-        if (shipment.hasErrors() || !shipment.save(flush: true)) {
+        def quantitiesValid = shipmentService.validateShipment(shipment)
+        if (shipment.hasErrors() || !quantitiesValid || !shipment.save(flush: true)) {
             throw new ValidationException("Invalid shipment", shipment.errors)
         }
 
