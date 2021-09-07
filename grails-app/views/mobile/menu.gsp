@@ -1,5 +1,5 @@
 <header class="p-3 mb-3 border-bottom bg-light">
-    <div class="container-fluid">
+    <div class="container">
         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
             <g:link controller="mobile"
                     class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-decoration-none">
