@@ -29,8 +29,15 @@
                     </td>
                     <td class="col">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <g:link controller="mobile" action="messageProcess" params="[filename: message.filename]" class="btn btn-outline-primary">Process</g:link>
-                            <g:link controller="mobile" action="messageDetails" params="[filename: message.filename]" class="btn btn-outline-secondary">Download</g:link>
+                            <g:link controller="mobile" action="messageDetails"
+                                    params="[filename: message.filename]"
+                                    class="btn btn-outline-primary">Download</g:link>
+                            <g:link controller="mobile" action="messageProcess"
+                                    params="[filename: message.filename]"
+                                    class="btn btn-outline-secondary">Process</g:link>
+                            <g:link controller="mobile" action="messageDelete"
+                                    params="[filename: message.filename]"
+                                    class="btn btn-outline-danger">Delete</g:link>
                         </div>
                     </td>
                 </tr>
