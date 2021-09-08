@@ -107,7 +107,7 @@ const FIELDS = {
           formatValue: value => (value.quantityOnHand ? (value.quantityOnHand.toLocaleString('en-US')) : value.quantityOnHand),
         },
       },
-      quantityAvailableToPromise: {
+      quantityAvailable: {
         type: LabelField,
         label: 'react.stockMovement.available.label',
         defaultMessage: 'Available',
@@ -115,8 +115,8 @@ const FIELDS = {
         fieldKey: '',
         getDynamicAttr: ({ fieldValue }) => {
           let className = '';
-          if (fieldValue && (!fieldValue.quantityAvailableToPromise ||
-            fieldValue.quantityAvailableToPromise < fieldValue.quantityRequested)) {
+          if (fieldValue && (!fieldValue.quantityAvailable ||
+            fieldValue.quantityAvailable < fieldValue.quantityRequested)) {
             className = 'text-danger';
           }
           return {
@@ -124,7 +124,7 @@ const FIELDS = {
           };
         },
         attributes: {
-          formatValue: value => (value.quantityAvailableToPromise ? (value.quantityAvailableToPromise.toLocaleString('en-US')) : value.quantityAvailableToPromise),
+          formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
         },
       },
       quantityConsumed: {
@@ -244,8 +244,8 @@ function validateForSave(values) {
         quantityRevised: 'react.stockMovement.errors.sameRevisedQty.label',
       };
     }
-    if (!_.isEmpty(item.quantityRevised) && item.quantityAvailableToPromise >= 0 &&
-      (item.quantityRevised > item.quantityAvailableToPromise)) {
+    if (!_.isEmpty(item.quantityRevised) && item.quantityAvailable >= 0 &&
+      (item.quantityRevised > item.quantityAvailable)) {
       errors.editPageItems[key] = { quantityRevised: 'react.stockMovement.errors.higherQty.label' };
     }
     if (!_.isEmpty(item.quantityRevised) && (item.quantityRevised < 0)) {
@@ -259,7 +259,7 @@ function validate(values) {
   const errors = validateForSave(values);
 
   _.forEach(values.editPageItems, (item, key) => {
-    if (_.isNil(item.quantityRevised) && (item.quantityRequested > item.quantityAvailableToPromise) && (item.statusCode !== 'SUBSTITUTED')) {
+    if (_.isNil(item.quantityRevised) && (item.quantityRequested > item.quantityAvailable) && (item.statusCode !== 'SUBSTITUTED')) {
       errors.editPageItems[key] = { quantityRevised: 'react.stockMovement.errors.lowerQty.label' };
     }
   });
@@ -317,8 +317,8 @@ class EditItemsPage extends Component {
         ...val,
         disabled: true,
         quantityOnHand: val.quantityOnHand > 0 ? val.quantityOnHand : 0,
-        quantityAvailableToPromise:
-            val.quantityAvailableToPromise > 0 ? val.quantityAvailableToPromise : 0,
+        quantityAvailable:
+            val.quantityAvailable > 0 ? val.quantityAvailable : 0,
         product: {
           ...val.product,
           label: `${val.productCode} ${val.productName}`,
@@ -640,7 +640,7 @@ class EditItemsPage extends Component {
             $set: {
               ...editPageItem,
               quantityOnHand: editPageItem.quantityOnHand || 0,
-              quantityAvailableToPromise: editPageItem.quantityAvailableToPromise || 0,
+              quantityAvailable: editPageItem.quantityAvailable || 0,
               substitutionItems: _.map(editPageItem.substitutionItems, sub => ({
                 ...sub,
                 requisitionItemId: editPageItem.requisitionItemId,

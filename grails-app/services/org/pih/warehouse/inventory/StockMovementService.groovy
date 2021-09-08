@@ -802,7 +802,7 @@ class StockMovementService {
                 quantityCanceled            : it.quantity_canceled,
                 quantityConsumed            : it.quantity_demand,
                 quantityOnHand              : it.quantity_on_hand,
-                quantityAvailableToPromise  : (it.quantity_available_to_promise ?: 0) + picklistQtyForItem,
+                quantityAvailable           : (it.quantity_available_to_promise ?: 0) + picklistQtyForItem,
                 substitutionStatus          : it.substitution_status,
                 sortOrder                   : it.sort_order,
                 reasonCode                  : it.cancel_reason_code,

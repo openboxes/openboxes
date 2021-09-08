@@ -25,8 +25,8 @@ class StockMovementItem {
     RequisitionItem requisitionItem
 
     BigDecimal quantityRequested
-    BigDecimal quantityAvailable // quantity on hand
-    BigDecimal quantityAvailableToPromise
+    BigDecimal quantityOnHand
+    BigDecimal quantityAvailable
     BigDecimal quantityRevised
     BigDecimal quantityCanceled
     BigDecimal quantityPicked
@@ -83,8 +83,8 @@ class StockMovementItem {
         binLocation(nullable: true)
         quantityRequested(nullable: false)
         quantityAllowed(nullable: true)
+        quantityOnHand(nullable: true)
         quantityAvailable(nullable: true)
-        quantityAvailableToPromise(nullable: true)
         quantityRevised(nullable: true)
         quantityCanceled(nullable: true)
         quantityPicked(nullable: true)
@@ -119,8 +119,8 @@ class StockMovementItem {
                 statusCode                : statusCode,
                 quantityRequested         : quantityRequested,
                 quantityAllowed           : quantityAllowed,
+                quantityOnHand            : quantityOnHand,
                 quantityAvailable         : quantityAvailable,
-                quantityAvailableToPromise: quantityAvailableToPromise,
                 quantityCanceled          : quantityCanceled,
                 quantityRevised           : quantityRevised,
                 quantityPicked            : quantityPicked,
@@ -197,8 +197,8 @@ class StockMovementItem {
                 product: requisitionItem?.product,
                 inventoryItem: requisitionItem?.inventoryItem,
                 quantityRequested: requisitionItem.quantity,
+                quantityOnHand: null,
                 quantityAvailable: null,
-                quantityAvailableToPromise: null,
                 quantityCanceled: requisitionItem?.quantityCanceled,
                 quantityRevised: requisitionItem.calculateQuantityRevised(),
                 quantityPicked: requisitionItem?.totalQuantityPicked(),
@@ -447,13 +447,11 @@ class EditPageItem {
     List<SubstitutionItem> availableSubstitutions
     List<SubstitutionItem> substitutionItems
 
-    // This is quantity on hand
-    // TODO: refactor into quantity on hand when every stock movement type will display both QATP and QoH
-    Integer getQuantityAvailable() {
+    Integer getQuantityOnHand() {
         availableItems ? availableItems.sum { it.quantityOnHand } : null
     }
 
-    Integer getQuantityAvailableToPromise() {
+    Integer getQuantityAvailable() {
         availableItems ? availableItems.sum { it.quantityAvailable } : null
     }
 
@@ -512,8 +510,8 @@ class EditPageItem {
             quantityRequested           : quantityRequested,
             quantityRevised             : quantityRevised,
             quantityConsumed            : quantityConsumed,
-            quantityAvailableToPromise  : quantityAvailableToPromise,
             quantityAvailable           : quantityAvailable,
+            quantityOnHand              : quantityOnHand,
             totalMonthlyQuantity        : totalMonthlyQuantity,
             substitutionStatus          : substitutionStatusCode,
             availableSubstitutions      : availableSubstitutions,
