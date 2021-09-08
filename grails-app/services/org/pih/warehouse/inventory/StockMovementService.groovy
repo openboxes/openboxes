@@ -160,7 +160,10 @@ class StockMovementService {
                     case StockMovementStatusCode.PACKED:
                     case StockMovementStatusCode.CHECKING:
                     case StockMovementStatusCode.CHECKED:
-                        createShipment(stockMovement)
+                        def shipment = createShipment(stockMovement)
+                        if (stockMovement?.requisition?.picklist) {
+                            shipmentService.validateShipment(shipment)
+                        }
                         break
                     case StockMovementStatusCode.DISPATCHED:
                         issueRequisitionBasedStockMovement(stockMovement.id)
@@ -1949,7 +1952,6 @@ class StockMovementService {
             shipment = new Shipment()
         } else {
             createMissingShipmentItems(stockMovement.requisition, shipment)
-            shipmentService.validateShipment(shipment)
             return shipment
         }
 
@@ -1968,8 +1970,7 @@ class StockMovementService {
 
         shipment.name = stockMovement.generateName()
 
-        def quantitiesValid = shipmentService.validateShipment(shipment)
-        if (shipment.hasErrors() || !quantitiesValid || !shipment.save(flush: true)) {
+        if (shipment.hasErrors() || !shipment.save(flush: true)) {
             throw new ValidationException("Invalid shipment", shipment.errors)
         }
 
@@ -2579,5 +2580,17 @@ class StockMovementService {
             return g.message(code: "stockMovement.isDifferentLocation.message")
         }
     }
-}
 
+    Boolean validatePicklist(String stockMovementId) {
+        StockMovement stockMovement = getStockMovement(stockMovementId)
+        validatePicklist(stockMovement)
+    }
+
+    Boolean validatePicklist(StockMovement stockMovement) {
+        if (stockMovement?.requisition?.picklist) {
+            Shipment shipment = Shipment.findByRequisition(stockMovement?.requisition)
+            shipmentService.validateShipment(shipment)
+        }
+        return true
+    }
+}

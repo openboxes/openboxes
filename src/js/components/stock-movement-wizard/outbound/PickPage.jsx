@@ -405,6 +405,11 @@ class PickPage extends Component {
     return Promise.resolve();
   }
 
+  validatePicklist() {
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/validatePicklist`;
+    return apiClient.get(url);
+  }
+
   /**
    * Goes to the next stock movement step.
    * @param {object} formValues
@@ -412,8 +417,11 @@ class PickPage extends Component {
    */
   nextPage(formValues) {
     this.props.showSpinner();
-    this.transitionToNextStep()
-      .then(() => this.props.nextPage(formValues))
+    this.validatePicklist()
+      .then(() =>
+        this.transitionToNextStep()
+          .then(() => this.props.nextPage(formValues))
+          .catch(() => this.props.hideSpinner()))
       .catch(() => this.props.hideSpinner());
   }
 
