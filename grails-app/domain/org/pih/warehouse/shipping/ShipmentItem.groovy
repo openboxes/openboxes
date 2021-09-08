@@ -198,7 +198,7 @@ class ShipmentItem implements Comparable, Serializable {
         } else {
             quantityPicked = requisitionItem?.picklistItems?.findAll { it.inventoryItem == inventoryItem }?.sum { it.quantity }
         }
-        return quantityPicked
+        return quantityPicked?:quantity
     }
 
 
