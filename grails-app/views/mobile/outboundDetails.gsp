@@ -42,14 +42,20 @@
                         <li>
                             <a href="${createLink(controller: 'mobile', action: 'outboundDownload', id: stockMovement?.id)}"
                                class="dropdown-item" target="_blank">
-                                Generate Create Order (.xml)
+                                Download Delivery Order Request (.xml)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="${createLink(controller: 'mobile', action: 'outboundUpload', id: stockMovement?.id)}"
+                               class="dropdown-item" target="_blank">
+                                Upload Delivery Order Request (.xml)
                             </a>
                         </li>
 
                         <div class="dropdown-divider"></div>
                         <a href="${createLink(controller: 'mobile', action: 'outboundDelete', id: stockMovement?.id)}"
                            class="dropdown-item text-danger">
-                            Delete
+                            Delete Order
                         </a>
                     </ul>
                 </span>
