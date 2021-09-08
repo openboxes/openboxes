@@ -312,6 +312,12 @@ class MobileController {
         return
     }
 
+    def messageDelete = {
+        fileTransferService.deleteMessage(params.filename)
+        flash.message = "Message ${params.filename} deleted successfully"
+        redirect(action: "messageList")
+    }
+
     def messageUpload = {
         def messageFile = request.getFile('messageFile')
         if(messageFile) {
