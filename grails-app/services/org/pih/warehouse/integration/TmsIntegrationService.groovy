@@ -14,6 +14,7 @@ import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.User
+import org.pih.warehouse.integration.xml.acceptancestatus.AcceptanceStatus
 import org.pih.warehouse.integration.xml.order.Address
 import org.pih.warehouse.integration.xml.order.CargoDetails
 import org.pih.warehouse.integration.xml.order.ContactData
@@ -41,6 +42,9 @@ import org.pih.warehouse.integration.xml.order.UnitTypeQuantity
 import org.pih.warehouse.integration.xml.order.UnitTypeVolume
 import org.pih.warehouse.integration.xml.order.UnitTypeWeight
 
+import javax.xml.bind.JAXBContext
+import javax.xml.bind.Marshaller
+import javax.xml.bind.Unmarshaller
 import java.text.SimpleDateFormat
 
 class TmsIntegrationService {
@@ -48,12 +52,50 @@ class TmsIntegrationService {
     boolean transactional = true
 
     def grailsApplication
+    def fileTransferService
     def dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssX")
 
 
+    String serialize(final Object object, final Class clazz) {
+        try {
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()
+            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream)
+            Marshaller marshaller = JAXBContext.newInstance(clazz).createMarshaller()
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE)
+            marshaller.marshal(object, bufferedOutputStream)
+            bufferedOutputStream.flush()
+            return byteArrayOutputStream.toString()
+
+        } catch (Exception e) {
+            log.error("Error occurred while serializing object to XML: " + e.message, e)
+            throw e
+        }
+    }
+
+
+    Object deserialize(String xmlContents, final Class clazz) {
+        try {
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream()
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(byteArrayInputStream)
+            Unmarshaller unmarshaller = JAXBContext.newInstance(clazz).createUnmarshaller()
+            return unmarshaller.unmarshal(new StringReader(xmlContents))
+
+        } catch (Exception e) {
+            log.error("Error occurred while deserializing XML to object: " + e.message, e)
+            throw e
+        }
+    }
+
+    def uploadDeliveryOrder(StockMovement stockMovement) {
+        Object deliveryOrder = createDeliveryOrder(stockMovement)
+        String serializedOrder = serialize(deliveryOrder, org.pih.warehouse.integration.xml.order.Order.class)
+
+        // transfer file to sftp server
+        fileTransferService.storeMessage("CreateDeliveryOrder-${stockMovement?.identifier}.xml", serializedOrder)
+    }
+
+
     def createDeliveryOrder(StockMovement stockMovement) {
-
-
         Map config = grailsApplication.config.openboxes.integration.order
         def defaultCurrencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode
 

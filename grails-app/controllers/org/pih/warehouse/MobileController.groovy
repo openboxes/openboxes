@@ -277,18 +277,23 @@ class MobileController {
     }
 
     def outboundDownload = {
-
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         Object deliveryOrder = tmsIntegrationService.createDeliveryOrder(stockMovement)
+        String serializedOrder = tmsIntegrationService.serialize(deliveryOrder, org.pih.warehouse.integration.xml.order.Order.class)
+        response.outputStream << serializedOrder
 
-        JAXBContext jaxbContext = JAXBContext.newInstance(org.pih.warehouse.integration.xml.order.Order.class);
-        Marshaller marshaller = jaxbContext.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        marshaller.marshal(deliveryOrder, response.outputStream);
         response.setHeader "Content-disposition", "attachment;filename=\"CreateDeliveryOrder-${stockMovement?.identifier}.xml\""
         response.contentType = "application/xml"
         response.outputStream.flush()
     }
+
+    def outboundUpload = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        tmsIntegrationService.uploadDeliveryOrder(stockMovement)
+        flash.message = "Message uploaded successfully"
+        redirect(action: "outboundDetails", id: params.id)
+    }
+
 
     def outboundDelete = {
         stockMovementService.deleteStockMovement(params.id)

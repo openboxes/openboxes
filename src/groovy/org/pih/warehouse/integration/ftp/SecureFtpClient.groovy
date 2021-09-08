@@ -8,6 +8,7 @@ import net.schmizz.sshj.transport.TransportException
 import net.schmizz.sshj.transport.verification.OpenSSHKnownHosts
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier
 import net.schmizz.sshj.xfer.FileSystemFile
+import net.schmizz.sshj.xfer.InMemorySourceFile
 import org.apache.commons.logging.LogFactory
 
 
@@ -127,6 +128,27 @@ class SecureFtpClient {
     void storeFile(File file, String path) {
         try {
             sftpClient.put(new FileSystemFile(file.path), path);
+        } finally {
+            //sfptClient.close()
+        }
+    }
+
+
+    void storeFile(String filename, String contents, String path) {
+        try {
+            sftpClient.put(new InMemorySourceFile() {
+                @Override
+                public String getName() { return filename; }
+
+                @Override
+                public long getLength() { return contents?.size()?:0 }
+
+                @Override
+                public InputStream getInputStream() throws IOException {
+                    return new ByteArrayInputStream(contents.bytes)
+                }
+            }, path)
+
         } finally {
             //sfptClient.close()
         }

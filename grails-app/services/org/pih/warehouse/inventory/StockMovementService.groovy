@@ -178,7 +178,7 @@ class StockMovementService {
                 updateRequisitionStatus(stockMovement.id, requisitionStatus)
 
                 // Broadcast status change to event bus in case there's more work to be done
-
+                grailsApplication.mainContext.publishEvent(new StockMovementStatusEvent(stockMovement, status, rollback))
 
             }
         }
