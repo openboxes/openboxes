@@ -59,7 +59,17 @@ class FileTransferService {
         try {
             String directory = grailsApplication.config.openboxes.integration.ftp.directory
             String destination = "${directory}/${file.getName()}"
-            secureFtpClient.storeFile( file, destination)
+            secureFtpClient.storeFile(file, destination)
+        } finally {
+            secureFtpClient.disconnect()
+        }
+    }
+
+    def storeMessage(String filename, String contents) {
+        try {
+            String directory = grailsApplication.config.openboxes.integration.ftp.directory
+            String destination = "${directory}/${filename}"
+            secureFtpClient.storeFile(filename, contents, destination)
         } finally {
             secureFtpClient.disconnect()
         }
