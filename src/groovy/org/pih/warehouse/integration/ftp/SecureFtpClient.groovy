@@ -154,4 +154,12 @@ class SecureFtpClient {
         }
     }
 
+    void deleteFile(String filename) {
+        try {
+            sftpClient.rm(filename)
+        } finally {
+            //sfptClient.close()
+        }
+    }
+
 }

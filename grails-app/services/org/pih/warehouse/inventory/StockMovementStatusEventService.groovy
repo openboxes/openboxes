@@ -15,16 +15,16 @@ import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
 import org.springframework.context.ApplicationListener
 
-class StockMovementStatusEventService implements ApplicationListener<StockMovementStatusCode> {
+class StockMovementStatusEventService implements ApplicationListener<StockMovementStatusEvent> {
 
     boolean transactional = true
 
     def tmsIntegrationService
 
-    void onApplicationEvent(StockMovementStatusCode event) {
+    void onApplicationEvent(StockMovementStatusEvent event) {
         log.info "Application event ${event.source} has been published"
-        if (event.stockMovementStatusCode == StockMovementStatusCode.PICKING) {
-            tmsIntegrationService.sendDeliveryOrder(event.source)
+        if (event.stockMovementStatusCode == StockMovementStatusCode.PICKING && !event.rollback) {
+            tmsIntegrationService.uploadDeliveryOrder(event.source)
         }
     }
 }
