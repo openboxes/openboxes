@@ -75,4 +75,16 @@ class FileTransferService {
         }
     }
 
+    def deleteMessage(String filename) {
+        try {
+            String directory = grailsApplication.config.openboxes.integration.ftp.directory
+            String target = "${directory}/${filename}"
+            secureFtpClient.deleteFile(target)
+        } finally {
+            secureFtpClient.disconnect()
+        }
+
+
+    }
+
 }
