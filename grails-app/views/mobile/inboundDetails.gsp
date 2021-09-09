@@ -11,15 +11,39 @@
     <div class="card">
         <div class="card-header">
             <div class="row align-items-center">
-                <div class="col-1">
+                <div class="col-2">
                     <g:displayBarcode showData="${false}" data="${stockMovement.identifier}"/>
                 </div>
-                <div class="col-9 text-left">
+                <div class="col-7 text-left">
                     <h5 class="m-0">${stockMovement.identifier} ${stockMovement.name}</h5>
                 </div>
-                <div class="col-2 text-right">
+                <div class="col-1">
                     <span class="badge bg-primary mt-2 mr-2 pl-5">${stockMovement?.status}</span>
                 </div>
+                <div class="col-1">
+                    <span class="dropdown">
+                        <button type="button" id="actionMenu" class="btn dropdown-toggle"
+                                data-bs-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-cog"></i>
+                        </button>
+
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="${createLink(controller: 'stockMovement', action: 'show', id: stockMovement?.id)}"
+                                   class="dropdown-item">
+                                    View Details
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <a href="${createLink(controller: 'mobile', action: 'inboundDelete', id: stockMovement?.id)}"
+                               class="dropdown-item text-danger">
+                                Delete Order
+                            </a>
+                        </ul>
+                    </span>
+
+            </div>
             </div>
         </div>
 
@@ -45,12 +69,14 @@
                 </div>
                 <div class="col-12 col-sm-2 text-center time-info mt-3 mt-sm-0">
                     <span class="text-muted d-block">Expected Delivery</span>
+
                     <div class="text-5 font-weight-500 text-dark">
                         ${g.formatDate(date: stockMovement.expectedDeliveryDate)}
                     </div>
-                    <g:if test="${stockMovement.expectedDeliveryDate < new Date()}">
+                    <g:if test="${stockMovement?.expectedDeliveryDate && stockMovement.expectedDeliveryDate < new Date()}">
                         <div class="badge badge-pill bg-danger">Delayed - Expected ${prettyDateFormat(date: stockMovement?.expectedDeliveryDate)}</div>
                     </g:if>
+                    <g:else>Not Available</g:else>
                 </div>
                 <div class="col-12 col-sm-2 text-center time-info mt-3 mt-sm-0">
                     <span class="text-muted d-block">Tracking Number</span>
