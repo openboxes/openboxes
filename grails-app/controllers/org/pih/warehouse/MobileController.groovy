@@ -133,24 +133,14 @@ class MobileController {
     }
 
     def inboundList = {
-        Location destination = Location.get(params.origin?params.origin.id:session.warehouse.id)
-        StockMovement stockMovement = new StockMovement(destination: destination,
-                stockMovementType: StockMovementType.INBOUND, stockMovementStatusCode: StockMovementStatusCode.PENDING)
-        if(params.status == "IN_TRANSIT") {
-            params.receiptStatusCode = ["SHIPPED"]
-            stockMovement = new StockMovement(
-                    destination: destination,
-                    stockMovementType: StockMovementType.INBOUND,
-                    receiptStatusCodes: params.list("receiptStatusCode") as ShipmentStatusCode[]
-            )
-        }
+        Location destination = Location.get(session.warehouse.id)
 
+        StockMovement stockMovement = new StockMovement(destination: destination, stockMovementType: StockMovementType.INBOUND)
+        if (params.status) {
+            ShipmentStatusCode shipmentStatusCode = params.status as ShipmentStatusCode
+            stockMovement.stockMovementStatusCode = ShipmentStatusCode.toStockMovementStatus(shipmentStatusCode)
+        }
         def stockMovements = stockMovementService.getStockMovements(stockMovement, [max:params.max?:10, offset: params.offset?:0])
-
-        if ( params.status == "READY_TO_BE_PICKED") {
-            def tempStockMovements = stockMovements.findAll{ it.stockMovementStatusCode < StockMovementStatusCode.PICKED }
-            stockMovements = new PagedResultList(tempStockMovements, tempStockMovements.size())
-        }
         [stockMovements: stockMovements]
     }
 
