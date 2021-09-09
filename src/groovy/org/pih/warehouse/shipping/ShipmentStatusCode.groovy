@@ -9,6 +9,8 @@
  **/
 package org.pih.warehouse.shipping
 
+import org.pih.warehouse.inventory.StockMovementStatusCode
+
 enum ShipmentStatusCode {
 
     CREATED(0),
@@ -42,4 +44,39 @@ enum ShipmentStatusCode {
     String getName() { return name() }
 
     String toString() { return name() }
+
+static toStockMovementStatus(ShipmentStatusCode shipmentStatusCode) {
+        switch(shipmentStatusCode) {
+            case ShipmentStatusCode.PENDING:
+                return StockMovementStatusCode.PENDING
+            case ShipmentStatusCode.CREATED:
+                return StockMovementStatusCode.CREATED
+            case ShipmentStatusCode.SHIPPED:
+                return StockMovementStatusCode.DISPATCHED
+            case ShipmentStatusCode.PARTIALLY_RECEIVED:
+                return StockMovementStatusCode.DISPATCHED
+            case ShipmentStatusCode.RECEIVED:
+                return StockMovementStatusCode.DISPATCHED
+            case null:
+                return StockMovementStatusCode.PENDING
+            default:
+                return StockMovementStatusCode.valueOf(shipmentStatusCode.toString())
+        }
+    }
+
+    static fromStockMovementStatus(StockMovementStatusCode stockMovementStatus) {
+        switch(stockMovementStatus) {
+            case StockMovementStatusCode.PENDING:
+                return ShipmentStatusCode.PENDING
+
+            case StockMovementStatusCode.CREATED:
+                return ShipmentStatusCode.CREATED
+
+            case StockMovementStatusCode.DISPATCHED:
+                return ShipmentStatusCode.SHIPPED
+
+            default:
+                return ShipmentStatusCode.valueOf(stockMovementStatus.toString())
+        }
+    }
 }

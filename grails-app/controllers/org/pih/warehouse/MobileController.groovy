@@ -10,6 +10,7 @@
 package org.pih.warehouse
 
 import grails.orm.PagedResultList
+import net.schmizz.sshj.sftp.SFTPException
 import org.apache.commons.io.IOUtils
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementType
@@ -33,6 +34,7 @@ import org.pih.warehouse.integration.xml.acceptancestatus.AcceptanceStatus
 import org.pih.warehouse.integration.xml.pod.DocumentUpload
 import org.pih.warehouse.integration.xml.execution.Execution
 import org.pih.warehouse.shipping.ShipmentStatusCode
+import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest
 
 import javax.xml.bind.JAXBContext
@@ -175,69 +177,49 @@ class MobileController {
     }
 
     def importData = { ImportDataCommand command ->
-
-        log.info params
-        log.info command.location
-        log.info session
-        File localFile = null
-        if (request instanceof DefaultMultipartHttpServletRequest) {
-            def uploadFile = request.getFile("xlsFile")
-            if (!uploadFile.empty) {
-                try {
-                    localFile = uploadService.createLocalFile(uploadFile.originalFilename)
-                    uploadFile.transferTo(localFile)
-                    session.localFile = localFile
-                } catch (Exception e) {
-                    flash.message = "Unable to upload file due to exception: " + e.message
-                    return
-                }
-            } else {
-                flash.message = "${warehouse.message(code: 'inventoryItem.emptyFile.message')}"
-            }
-        } else {
-            localFile = session.localFile
-        }
         def dataImporter
-        if (localFile) {
-            command.importFile = localFile
-            command.filename = localFile.getAbsolutePath()
-            command.location = Location.get(session.warehouse.id)
+        if (request instanceof DefaultMultipartHttpServletRequest) {
+            MultipartFile xlsFile = request.getFile("xlsFile")
 
-            if (params.type == "outbound")
-                dataImporter = new OutboundStockMovementExcelImporter(command.filename)
-            else
-                dataImporter = new InboundStockMovementExcelImporter(command.filename)
 
-            if(dataImporter) {
-                println "Using data importer ${dataImporter.class.name}"
-                command.data = dataImporter.data
-                dataImporter.validateData(command)
-                command.columnMap = dataImporter.columnMap
-            }
+            if (xlsFile) {
+                command.importFile = xlsFile
+                command.filename = xlsFile.name
+                command.location = Location.get(session.warehouse.id)
 
-            if (command?.data?.isEmpty()) {
-                command.errors.reject("importFile", "${warehouse.message(code: 'inventoryItem.pleaseEnsureDate.message', args: [dataImporter.columnMap?.sheet?:'Sheet1', localFile.getAbsolutePath()])}")
-            }
+                if (params.type == "outbound")
+                    dataImporter = new OutboundStockMovementExcelImporter(command.filename, xlsFile.inputStream)
+                else
+                    dataImporter = new InboundStockMovementExcelImporter(command.filename, xlsFile.inputStream)
 
-            if (!command.hasErrors() ) {
-                println "data is about to be imported ..."
-                try {
-                    dataImporter.importData(command)
-                }catch (Exception e) {
-                    command.errors.reject(e.message)
+                if (dataImporter) {
+                    println "Using data importer ${dataImporter.class.name}"
+                    command.data = dataImporter.data
+                    dataImporter.validateData(command)
+                    command.columnMap = dataImporter.columnMap
                 }
-                if (!command.errors.hasErrors()) {
-                    flash.message = "${warehouse.message(code: 'inventoryItem.importSuccess.message', args: [localFile.getAbsolutePath()])}"
-                    redirect(action: "outboundList")
-                    return
+
+                if (command?.data?.isEmpty()) {
+                    command.errors.reject("importFile", "${warehouse.message(code: 'inventoryItem.pleaseEnsureDate.message', args: [dataImporter.columnMap?.sheet ?: 'Sheet1', localFile.getAbsolutePath()])}")
                 }
-                log.info "There were errors: " + command.errors
-            }else {
-                log.info "There are some errors ${command.errors}"
-                flash.message = "There are some validation errors"
+
+                if (!command.hasErrors()) {
+                    log.info "${command.data.size()} rows of data is about to be imported ..."
+                    try {
+                        dataImporter.importData(command)
+                    } catch (Exception e) {
+                        command.errors.reject(e.message)
+                    }
+                    if (!command.errors.hasErrors()) {
+                        flash.message = "${warehouse.message(code: 'inventoryItem.importSuccess.message', args: [xlsFile?.originalFilename])}"
+                    }
+                } else {
+                    log.info "There are some errors ${command.errors}"
+                    flash.message = "There are some validation errors"
+                }
             }
         }
-        redirect action: 'outboundList'
+        redirect  action: (params.type == "outbound" ? 'outboundList' : 'inboundList')
     }
 
     def inboundDetails = {
@@ -256,6 +238,12 @@ class MobileController {
 
         [stockMovement:stockMovement, events:events]
     }
+
+    def inboundDelete = {
+        stockMovementService.deleteStockMovement(params.id)
+        redirect(action: "inboundList")
+    }
+
 
     def outboundDetails = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
@@ -328,8 +316,8 @@ class MobileController {
                 fileTransferService.storeMessage(file)
                 flash.message = "File ${fileName} transferred successfully"
 
-            } catch (Exception e) {
-                log.error "Unable to upload message due to error: " + e.message, e
+            } catch (SFTPException e) {
+                log.error "Unable to upload message due to error ${e.statusCode}: " + e.message, e
                 flash.message = "File ${fileName} not transferred due to error: " + e.message
 
             }

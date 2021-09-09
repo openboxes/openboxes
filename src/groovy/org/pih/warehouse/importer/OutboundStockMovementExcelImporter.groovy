@@ -22,7 +22,7 @@ class OutboundStockMovementExcelImporter extends AbstractExcelImporter {
                     'D': 'productCode', // 'SKU Code',
                     'E': 'quantity', // 'Requested Quantity',
                     'H': 'requestedDeliveryDate', // 'Delivery Date',
-                    'I': 'requestNumber', // 'Load Code',
+                    'I': 'shipmentNumber', // 'Load Code',
                     'J': 'description' // 'Special Instructions'
             ]
     ]
@@ -33,13 +33,18 @@ class OutboundStockMovementExcelImporter extends AbstractExcelImporter {
             "productCode"       : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
             "quantity": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue: null]),
             "requestedDeliveryDate": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "requestNumber": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            "shipmentNumber": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
             "description": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null])
     ]
 
     OutboundStockMovementExcelImporter(String fileName) {
         super(fileName)
     }
+
+    OutboundStockMovementExcelImporter(String fileName, InputStream inputStream) {
+        super(fileName, inputStream)
+    }
+
 
     def getDataService() {
         return ApplicationHolder.getApplication().getMainContext().getBean("outboundStockMovementDataService")
