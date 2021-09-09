@@ -16,6 +16,8 @@ public class XmlXsdValidator {
 
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
            //  File xsd = ResourceUtils.getFile("classpath:" + xsdPath)
+            /*String xsdFileName = ResourceUtils.getFile("classpath:" + xsdPath )?.path
+            println "xsdFileName = $xsdFileName"*/
             File xsd = ResourceUtils.getFile(xsdPath)
             Schema schema = factory.newSchema(xsd)
             Validator validator = schema.newValidator()

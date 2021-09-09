@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified"
+    elementFormDefault="qualified"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:tns="http://www.etrucknow.com/edi/carrier/trip_execution/v1"
+    targetNamespace="http://www.etrucknow.com/edi/carrier/trip_execution/v1">
+    <xs:element name="Execution">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Header" type="tns:Header"/>
+                <xs:element name="TripID" type="tns:smallText"/>
+                <xs:element name="ExecutionStatus" type="tns:executionStatus" maxOccurs="unbounded"/>
+                <xs:element name="ExecutionSummary" type="tns:executionSummary" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="Header">
+        <xs:sequence>
+            <xs:element name="Version">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="V1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="Username" type="tns:smallText" minOccurs="0"/>
+            <xs:element name="Password" type="tns:largeText" minOccurs="0">
+		<xs:annotation>
+	        	<xs:documentation>
+	  		Username and password is mandatory incase of a request flow
+			</xs:documentation>
+        	</xs:annotation>
+	    </xs:element>
+            <xs:element name="SequenceNumber" type="tns:mediumText"/>
+            <xs:element name="SourceApp" minOccurs="0">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="ETRUCKNOW" />
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+	    <xs:element name="DestinationApp" minOccurs="0">
+		<xs:annotation>
+	            <xs:documentation>
+	  	    Incase of a request, it is mandatory to provide the SourceApp. Incase of a reponse, the DestinationApp must be provided.
+		    </xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="ETRUCKNOW"/>
+                    </xs:restriction>
+		</xs:simpleType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="executionStatus">
+        <xs:sequence>
+            <xs:element name="OrderID" type="tns:smallText"/>
+            <xs:element name="Status">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="ORIGIN_GATE_IN"/>
+                        <xs:enumeration value="PICKUP"/>
+                        <xs:enumeration value="ORIGIN_GATE_OUT"/>
+                        <xs:enumeration value="IN_TRANSIT"/>
+                        <xs:enumeration value="DESTINATION_GATE_IN"/>
+                        <xs:enumeration value="DELIVERY"/>
+                        <xs:enumeration value="DESTINATION_GATE_OUT"/>
+                        <xs:enumeration value="CLOSE"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="DateTime" type="tns:dateTime"/>
+            <xs:element name="GeoData" type="tns:geoData" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="executionSummary">
+        <xs:annotation>
+            <xs:documentation>
+            Execution summary is only applicable for notifications. This section will include all existing status executions of all orders belonging to the TripID
+          </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="ExecutionDetails" type="tns:executionStatus" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="geoData">
+        <xs:sequence>
+            <xs:element name="Latitude" type="xs:float"/>
+            <xs:element name="Longitude" type="xs:float"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="dateTime">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[0-9]{4}-(((01|03|05|07|08|10|12)-((0[1-9])|([1-2][0-9])|(3[0-1])))|((04|06|09|11)-((0[1-9])|([1-2][0-9])|30))|((02)-((0[1-9])|([1-2][0-9]))))T((([0-1][0-9])|(2[0-3]))(:([0-5][0-9])){2}((\+|-)(([0-1][0-9])|(2[0-3])):([0-5][0-9]))?)"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="mediumText">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="30"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="smallText">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="15"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="miniText">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="5"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="largeText">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="50"/>
+        </xs:restriction>
+    </xs:simpleType>
+</xs:schema>
