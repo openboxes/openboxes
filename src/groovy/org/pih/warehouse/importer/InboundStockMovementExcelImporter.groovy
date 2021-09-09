@@ -18,27 +18,32 @@ class InboundStockMovementExcelImporter extends AbstractExcelImporter {
             startRow : 1,
             columnMap : [
                     'A': 'origin', // 'Source',
-                    // 'B': 'destination', // 'Dest Venue Code',
+                    'B': 'destination', // 'Dest Venue Code',
+                    'C': 'productName',
                     'D': 'productCode', // 'SKU Code',
                     'E': 'quantity', // 'Requested Quantity',
-                    'H': 'requestedDeliveryDate', // 'Delivery Date',
-                    'I': 'requestNumber', // 'Load Code',
-                    'J': 'description' // 'Special Instructions'
+                    'H': 'deliveryDate', // 'Delivery Date',
+                    'I': 'shipmentNumber', // 'Load Code',
+                    'J': 'specialInstructions' // 'Special Instructions'
             ]
     ]
 
     static Map propertyMap = [
             "origin"    : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            // "destination"   : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            "destination"   : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
             "productCode"       : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
             "quantity": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue: null]),
-            "requestedDeliveryDate": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "requestNumber": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "description": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null])
+            "deliveryDate": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            "shipmentNumber": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            "specialInstructions": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null])
     ]
 
-    InboundStockMovementExcelImporter( String fileName) {
+    InboundStockMovementExcelImporter(String fileName) {
         super(fileName)
+    }
+
+    InboundStockMovementExcelImporter(String fileName, InputStream inputStream) {
+        super(fileName, inputStream)
     }
 
     def getDataService() {
