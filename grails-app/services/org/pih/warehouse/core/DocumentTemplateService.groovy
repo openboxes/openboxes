@@ -116,6 +116,8 @@ class DocumentTemplateService {
         order.subtotal = orderInstance.subtotal?:""
         order.totalAdjustments = orderInstance.totalAdjustments?:""
         order.description = orderInstance.description?:""
+        order.orderedBy = orderInstance.orderedBy?:""
+        order.paymentTerm = orderInstance.paymentTerm?:""
 
         def nullAddress = [address:"", address2: "", city: "", stateOrProvince: "", description: ""]
         Organization vendor = orderInstance.originParty
