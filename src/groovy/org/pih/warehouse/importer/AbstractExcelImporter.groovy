@@ -31,6 +31,14 @@ abstract class AbstractExcelImporter {
         evaluator = new HSSFFormulaEvaluator(workbook)
     }
 
+    AbstractExcelImporter(String fileName, InputStream inputStream) {
+        this.inFile = fileName
+        inStr = inputStream
+        workbook = new HSSFWorkbook(inStr)
+        evaluator = new HSSFFormulaEvaluator(workbook)
+
+    }
+
     def close() {
         inStr.close()
     }

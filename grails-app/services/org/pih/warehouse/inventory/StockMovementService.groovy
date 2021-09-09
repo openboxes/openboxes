@@ -376,6 +376,8 @@ class StockMovementService {
                     }
                 }
             }
+            if (criteria.stockMovementStatusCode) eq("currentStatus",
+                    ShipmentStatusCode.fromStockMovementStatus(criteria.stockMovementStatusCode))
             if (criteria.destination) eq("destination", criteria.destination)
             if (criteria.origin) eq("origin", criteria.origin)
             if (criteria.receiptStatusCodes) 'in'("currentStatus", criteria.receiptStatusCodes)

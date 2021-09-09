@@ -6,20 +6,23 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.data
 
 import org.joda.time.LocalDate
-import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.requisition.RequisitionItem
-import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.shipping.ShipmentType
 import org.springframework.validation.BeanPropertyBindingResult
 
 class InboundStockMovementDataService {
+
+    def shipmentService
 
     Boolean validateData(ImportDataCommand command) {
         log.info "Validate data " + command.filename
@@ -28,13 +31,12 @@ class InboundStockMovementDataService {
                 throw new IllegalArgumentException("Row ${index + 1}: Origin is required")
             }
             if (!params?.quantity) {
-                throw new IllegalArgumentException("Row ${index + 1}: Requested Quantity is required")
+                throw new IllegalArgumentException("Row ${index + 1}: Quantity is required")
             }
-            params.destination = command.location.id
-            RequisitionItem requisitionItem = buildRequisitionItem(params)
-            if (!requisitionItem.validate()) {
-                requisitionItem.errors.each { BeanPropertyBindingResult error ->
-                    command.errors.reject("${index + 1}: ${requisitionItem} ${error.getFieldError()}")
+            ShipmentItem shipmentItem = buildShipmentItem(params, command.location)
+            if (!shipmentItem.validate()) {
+                shipmentItem.errors.each { BeanPropertyBindingResult error ->
+                    command.errors.reject("${index + 1}: ${shipmentItem} ${error.getFieldError()}")
                 }
             }
         }
@@ -43,73 +45,72 @@ class InboundStockMovementDataService {
     void importData(ImportDataCommand command) {
         log.info "Import data " + command.filename
         command.data.eachWithIndex {params, index ->
-            params.destination = command.location.id
-            RequisitionItem requisitionItem = buildRequisitionItem(params)
-            if(requisitionItem.validate()){
-                requisitionItem.save(failOnError: true)
+            ShipmentItem shipmentItem = buildShipmentItem(params, command.location)
+            if(shipmentItem.validate()){
+                shipmentItem.save(failOnError: true)
             }
         }
     }
 
-    RequisitionItem buildRequisitionItem(Map params) {
+    ShipmentItem buildShipmentItem(Map params, Location location) {
+
+        log.info "Build shipment item " + params
+
         String productCode = params.productCode
         Product product = Product.findByProductCode(productCode)
         if(!product) {
             throw new IllegalArgumentException("Product not found for ${productCode}")
         }
 
-        def quantityRequested = params.quantity as Integer
-        if (!(quantityRequested > 0)) {
+        def quantity = params.quantity as Integer
+        if (!(quantity > 0)) {
             throw new IllegalArgumentException("Requested quantity should be greater than 0")
         }
 
-        def deliveryDate = params.requestedDeliveryDate
-        if (!isDateOneWeekFromNow(deliveryDate)) {
+        def expectedDeliveryDate = params.deliveryDate
+        if (!isDateOneWeekFromNow(expectedDeliveryDate)) {
             throw new IllegalArgumentException("Delivery date must be after seven days from now")
         }
 
-        def comments = params.destination
-        def requestNumber = params.requestNumber
-        def requisition = Requisition.findByRequestNumber(requestNumber)
-        if (!requisition) {
-            requisition = new Requisition(
-                    name: "Outbound Order ${requestNumber}",
-                    requestNumber: requestNumber,
-                    status: RequisitionStatus.CREATED
-            )
-
-            Location origin = Location.findByLocationNumber(params.origin)
-            if (!origin) {
-                throw new IllegalArgumentException("Location not found for origin ${params.origin}")
-            }
-            requisition.origin = origin
-
-            Location destination = Location.get(params.destination)
-            if (!destination) {
-                throw new IllegalArgumentException("Location not found for destination ${params.destination}")
-            }
-            requisition.destination = destination
-            requisition.requestedDeliveryDate = deliveryDate.toDate()
-            requisition.requestedBy = AuthService.currentUser.get()
-            requisition.save(failOnError: true)
+        def shipmentNumber = params.shipmentNumber
+        def shipment = Shipment.findByShipmentNumber(shipmentNumber)
+        if (!shipment) {
+            shipment = new Shipment()
+            shipment.name = "Inbound Order ${shipmentNumber}"
+            shipment.origin = findLocationByLocationNumber(params.origin)
+            shipment.destination = findLocationByLocationNumber(params.destination)
+            shipment.expectedShippingDate = new Date()
+            shipment.expectedDeliveryDate = params.expectedDeliveryDate
+            shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
+            shipment.shipmentNumber = shipmentNumber
+            shipment.save(failOnError: true)
+            shipmentService.createShipmentEvent(shipment, new Date(), EventCode.CREATED, location)
         }
 
-        def requisitionItem = RequisitionItem.createCriteria().get {
-            eq 'product' , product
-            eq "requisition", requisition
-        }
-        if (!requisitionItem) {
-            requisitionItem = new RequisitionItem()
+        ShipmentItem shipmentItem = ShipmentItem.createCriteria().get {
+            eq "product" , product
+            eq "shipment", shipment
         }
 
-        requisitionItem.product = product
-        requisitionItem.quantity = quantityRequested
-        requisitionItem.comment = comments
+        if (!shipmentItem) {
+            shipmentItem = new ShipmentItem()
+        }
 
-        requisition.addToRequisitionItems(requisitionItem)
+        shipmentItem.product = product
+        shipmentItem.quantity = quantity
+        shipment.addToShipmentItems(shipmentItem)
 
-        return requisitionItem
+        return shipmentItem
     }
+
+    Location findLocationByLocationNumber(String locationNumber) {
+        Location location = Location.findByLocationNumber(locationNumber)
+        if (!location) {
+            throw new IllegalArgumentException("Location not found for location number ${locationNumber}")
+        }
+        return location
+    }
+
 
     boolean isDateOneWeekFromNow(def date) {
         LocalDate today = LocalDate.now()
