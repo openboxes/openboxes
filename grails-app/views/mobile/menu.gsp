@@ -22,22 +22,22 @@
                 <li class="nav-item">
                     <g:link controller="mobile" action="inboundList" href="#"
                             class="nav-link text-black">
-                        <i class="fa fa-shopping-cart d-block mx-auto mb-1"></i>
+                        <i class="fa fa-dolly d-block mx-auto mb-1"></i>
                         Inbound
-                    </g:link>
-                </li>
-                <li class="nav-item">
-                    <g:link controller="mobile" action="outboundList" href="#"
-                            class="nav-link text-black">
-                        <i class="fa fa-truck d-block mx-auto mb-1"></i>
-                        Outbound
                     </g:link>
                 </li>
                 <li>
                     <g:link controller="mobile" action="productList" href="#"
                             class="nav-link text-black">
-                        <i class="fa fa-warehouse d-block mx-auto mb-1"></i>
+                        <i class="fa fa-box d-block mx-auto mb-1"></i>
                         Inventory
+                    </g:link>
+                </li>
+                <li class="nav-item">
+                    <g:link controller="mobile" action="outboundList" href="#"
+                            class="nav-link text-black">
+                        <i class="fa fa-truck-loading d-block mx-auto mb-1"></i>
+                        Outbound
                     </g:link>
                 </li>
                 <li class="nav-item">
@@ -46,11 +46,11 @@
                            id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
                             <g:if test="${session.user?.id}">
                                 <img src="${createLink(controller: 'user', action: 'viewThumb', id: session?.user?.id)}"
-                                     width="24" height="24" class="rounded-circle"/>
+                                     width="48" height="48" class="rounded-circle"/>
                             </g:if>
                             <g:else>
                                 <img src="${resource(dir: 'images/icons/user', file: 'default-avatar.jpg')}"
-                                     width="24" height="24" class="rounded-circle"/>
+                                     width="48" height="48" class="rounded-circle"/>
                             </g:else>
                             ${session?.user?.name}
                         </a>
