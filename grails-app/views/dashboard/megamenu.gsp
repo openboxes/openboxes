@@ -182,11 +182,13 @@
                 <warehouse:message code="order.purchasing.label" />
             </a>
             <div class="mm-item-content">
-                <div class="mm-menu-item">
-                    <g:link controller="purchaseOrder" action="index" class="create">
-                        <warehouse:message code="default.create.label" args="[warehouse.message(code:'purchaseOrder.label')]"/>
-                    </g:link>
-                </div>
+                <g:supports activityCode="${ActivityCode.PLACE_ORDER}">
+                    <div class="mm-menu-item">
+                        <g:link controller="purchaseOrder" action="index" class="create">
+                            <warehouse:message code="default.create.label" args="[warehouse.message(code:'purchaseOrder.label')]"/>
+                        </g:link>
+                    </div>
+                </g:supports>
                 <div class="mm-menu-item">
                     <g:link controller="order" action="list" params="[orderType:OrderTypeCode.PURCHASE_ORDER.name()]" class="list">
                         <warehouse:message code="order.listPurchase.label" default="List Purchase Orders" />

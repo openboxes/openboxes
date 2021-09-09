@@ -1,3 +1,4 @@
+<%@ page import="org.pih.warehouse.core.ActivityCode;" %>
 <%@ page import="org.pih.warehouse.core.Constants;" %>
 <%@ page import="org.pih.warehouse.order.OrderItemStatusCode;" %>
 <%@ page import="org.pih.warehouse.order.OrderType;" %>
@@ -26,10 +27,12 @@
 					<img src="${resource(dir: 'images/icons/silk', file: 'application_view_list.png')}" />&nbsp;
 					<warehouse:message code="default.list.label" args="[g.message(code: 'orders.label')]" default="List purchase order"/>
 				</g:link>
-				<g:link controller="order" action="create" class="button">
-					<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
-					<warehouse:message code="default.create.label" args="[g.message(code: 'order.label')]" default="Create purchase order" />
-				</g:link>
+				<g:supports activityCode="${ActivityCode.PLACE_ORDER}">
+					<g:link controller="order" action="create" class="button">
+						<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
+						<warehouse:message code="default.create.label" args="[g.message(code: 'order.label')]" default="Create purchase order" />
+					</g:link>
+				</g:supports>
 				<g:link controller="stockMovement" action="createCombinedShipments" class="button" params="[direction:'INBOUND']">
 					<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
 					<warehouse:message code="default.create.label" args="[warehouse.message(code: 'shipmentFromPO.label')]"/>
