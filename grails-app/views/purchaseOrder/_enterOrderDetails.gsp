@@ -1,3 +1,4 @@
+<%@ page import="org.pih.warehouse.core.ActivityCode" %>
 <%@ page import="org.pih.warehouse.order.OrderTypeCode" %>
 
 <html>
@@ -80,7 +81,7 @@
                                         <g:selectLocation class="chzn-select-deselect filter"
                                                           id="destination.id"
                                                           name="destination.id"
-                                                          activityCode="${org.pih.warehouse.core.ActivityCode.MANAGE_INVENTORY}"
+                                                          activityCode="${ActivityCode.RECEIVE_STOCK}"
                                                           noSelection="['':'']"
                                                           value="${order?.destination?.id}"/>
                                     </g:else>
