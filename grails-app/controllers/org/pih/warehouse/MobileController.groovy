@@ -10,6 +10,7 @@
 package org.pih.warehouse
 
 import grails.orm.PagedResultList
+import net.schmizz.sshj.sftp.SFTPException
 import org.apache.commons.io.IOUtils
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementType
@@ -32,7 +33,9 @@ import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.integration.xml.acceptancestatus.AcceptanceStatus
 import org.pih.warehouse.integration.xml.pod.DocumentUpload
 import org.pih.warehouse.integration.xml.execution.Execution
+import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.ShipmentStatusCode
+import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest
 
 import javax.xml.bind.JAXBContext
@@ -59,13 +62,9 @@ class MobileController {
         def productListUrl = g.createLink(controller: "mobile", action: "productList")
 
         StockMovement stockMovement = new StockMovement(destination: location,
-                stockMovementType: StockMovementType.INBOUND, stockMovementStatusCode: StockMovementStatusCode.PENDING)
+                stockMovementType: StockMovementType.INBOUND)
 
         def orderCount = stockMovementService.getStockMovements(stockMovement, [max:params.max?:10, offset: params.offset?:0]).size()
-
-        /*def orderCount = Shipment.createCriteria().count {
-            eq("destination", location)
-        }*/
 
         def requisitionCount = Requisition.createCriteria().count {
             eq("origin", location)
@@ -76,7 +75,7 @@ class MobileController {
 
         def readyToBePicked = stockMovement.findAll{ it.stockMovementStatusCode < StockMovementStatusCode.PICKED }
         def readyToBePickedCount = readyToBePicked.size()
-        def status =  'READY_TO_BE_PICKED'
+        def status =  RequisitionStatus.PICKING
         [
                 data: [
                         [name: "Inventory", class: "fa fa-box", count: productCount, url: g.createLink(controller: "mobile", action: "productList")],
@@ -131,113 +130,78 @@ class MobileController {
     }
 
     def inboundList = {
-        Location destination = Location.get(params.origin?params.origin.id:session.warehouse.id)
-        StockMovement stockMovement = new StockMovement(destination: destination,
-                stockMovementType: StockMovementType.INBOUND, stockMovementStatusCode: StockMovementStatusCode.PENDING)
-        if(params.status == "IN_TRANSIT") {
-            params.receiptStatusCode = ["SHIPPED"]
-            stockMovement = new StockMovement(
-                    destination: destination,
-                    stockMovementType: StockMovementType.INBOUND,
-                    receiptStatusCodes: params.list("receiptStatusCode") as ShipmentStatusCode[]
-            )
-        }
+        Location destination = Location.get(session.warehouse.id)
 
+        StockMovement stockMovement = new StockMovement(destination: destination, stockMovementType: StockMovementType.INBOUND)
+        if (params.status) {
+            ShipmentStatusCode shipmentStatusCode = params.status as ShipmentStatusCode
+            stockMovement.stockMovementStatusCode = ShipmentStatusCode.toStockMovementStatus(shipmentStatusCode)
+        }
         def stockMovements = stockMovementService.getStockMovements(stockMovement, [max:params.max?:10, offset: params.offset?:0])
-
-        if ( params.status == "READY_TO_BE_PICKED") {
-            def tempStockMovements = stockMovements.findAll{ it.stockMovementStatusCode < StockMovementStatusCode.PICKED }
-            stockMovements = new PagedResultList(tempStockMovements, tempStockMovements.size())
-        }
         [stockMovements: stockMovements]
     }
 
     def outboundList = {
         log.info "outboundList params ${params}"
         Location origin = Location.get(params.origin?params.origin.id:session.warehouse.id)
-        StockMovement stockMovement = new StockMovement(origin: origin, stockMovementType: StockMovementType.OUTBOUND, stockMovementStatusCode: StockMovementStatusCode.PENDING)
-        if(params.status == "IN_TRANSIT") {
-            params.receiptStatusCode = ["SHIPPED"]
-            stockMovement = new StockMovement(
-                    origin: origin,
-                    stockMovementType: StockMovementType.OUTBOUND,
-                    receiptStatusCodes: params.list("receiptStatusCode") as ShipmentStatusCode[]
-            )
-        }
-        def stockMovements = stockMovementService.getStockMovements(stockMovement, [max:params.max?:10, offset: params.offset?:0])
 
-        if(params.status == "READY_TO_BE_PICKED") {
-            def tempStockMovements = stockMovements.findAll{ it.stockMovementStatusCode < StockMovementStatusCode.PICKED }
-            stockMovements = new PagedResultList(tempStockMovements, tempStockMovements.size())
+        RequisitionStatus requisitionStatus = params.status ? params.status as RequisitionStatus : null
+        StockMovement stockMovement = new StockMovement(origin: origin,
+                stockMovementType: StockMovementType.OUTBOUND)
+        if (params.status) {
+            RequisitionStatus requisitionStatusCode = params.status as RequisitionStatus
+            stockMovement.stockMovementStatusCode = RequisitionStatus.toStockMovementStatus(requisitionStatusCode)
         }
+
+        def stockMovements = stockMovementService.getStockMovements(stockMovement, [max:params.max?:10, offset: params.offset?:0])
 
         [stockMovements:stockMovements]
     }
 
     def importData = { ImportDataCommand command ->
-
-        log.info params
-        log.info command.location
-        log.info session
-        File localFile = null
-        if (request instanceof DefaultMultipartHttpServletRequest) {
-            def uploadFile = request.getFile("xlsFile")
-            if (!uploadFile.empty) {
-                try {
-                    localFile = uploadService.createLocalFile(uploadFile.originalFilename)
-                    uploadFile.transferTo(localFile)
-                    session.localFile = localFile
-                } catch (Exception e) {
-                    flash.message = "Unable to upload file due to exception: " + e.message
-                    return
-                }
-            } else {
-                flash.message = "${warehouse.message(code: 'inventoryItem.emptyFile.message')}"
-            }
-        } else {
-            localFile = session.localFile
-        }
         def dataImporter
-        if (localFile) {
-            command.importFile = localFile
-            command.filename = localFile.getAbsolutePath()
-            command.location = Location.get(session.warehouse.id)
+        if (request instanceof DefaultMultipartHttpServletRequest) {
+            MultipartFile xlsFile = request.getFile("xlsFile")
 
-            if (params.type == "outbound")
-                dataImporter = new OutboundStockMovementExcelImporter(command.filename)
-            else
-                dataImporter = new InboundStockMovementExcelImporter(command.filename)
 
-            if(dataImporter) {
-                println "Using data importer ${dataImporter.class.name}"
-                command.data = dataImporter.data
-                dataImporter.validateData(command)
-                command.columnMap = dataImporter.columnMap
-            }
+            if (xlsFile) {
+                command.importFile = xlsFile
+                command.filename = xlsFile.name
+                command.location = Location.get(session.warehouse.id)
 
-            if (command?.data?.isEmpty()) {
-                command.errors.reject("importFile", "${warehouse.message(code: 'inventoryItem.pleaseEnsureDate.message', args: [dataImporter.columnMap?.sheet?:'Sheet1', localFile.getAbsolutePath()])}")
-            }
+                if (params.type == "outbound")
+                    dataImporter = new OutboundStockMovementExcelImporter(command.filename, xlsFile.inputStream)
+                else
+                    dataImporter = new InboundStockMovementExcelImporter(command.filename, xlsFile.inputStream)
 
-            if (!command.hasErrors() ) {
-                println "data is about to be imported ..."
-                try {
-                    dataImporter.importData(command)
-                }catch (Exception e) {
-                    command.errors.reject(e.message)
+                if (dataImporter) {
+                    println "Using data importer ${dataImporter.class.name}"
+                    command.data = dataImporter.data
+                    dataImporter.validateData(command)
+                    command.columnMap = dataImporter.columnMap
                 }
-                if (!command.errors.hasErrors()) {
-                    flash.message = "${warehouse.message(code: 'inventoryItem.importSuccess.message', args: [localFile.getAbsolutePath()])}"
-                    redirect(action: "outboundList")
-                    return
+
+                if (command?.data?.isEmpty()) {
+                    command.errors.reject("importFile", "${warehouse.message(code: 'inventoryItem.pleaseEnsureDate.message', args: [dataImporter.columnMap?.sheet ?: 'Sheet1', localFile.getAbsolutePath()])}")
                 }
-                log.info "There were errors: " + command.errors
-            }else {
-                log.info "There are some errors ${command.errors}"
-                flash.message = "There are some validation errors"
+
+                if (!command.hasErrors()) {
+                    log.info "${command.data.size()} rows of data is about to be imported ..."
+                    try {
+                        dataImporter.importData(command)
+                    } catch (Exception e) {
+                        command.errors.reject(e.message)
+                    }
+                    if (!command.errors.hasErrors()) {
+                        flash.message = "${warehouse.message(code: 'inventoryItem.importSuccess.message', args: [xlsFile?.originalFilename])}"
+                    }
+                } else {
+                    log.info "There are some errors ${command.errors}"
+                    flash.message = "There are some validation errors"
+                }
             }
         }
-        redirect action: 'outboundList'
+        redirect  action: (params.type == "outbound" ? 'outboundList' : 'inboundList')
     }
 
     def inboundDetails = {
@@ -256,6 +220,12 @@ class MobileController {
 
         [stockMovement:stockMovement, events:events]
     }
+
+    def inboundDelete = {
+        stockMovementService.deleteStockMovement(params.id)
+        redirect(action: "inboundList")
+    }
+
 
     def outboundDetails = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
@@ -328,8 +298,8 @@ class MobileController {
                 fileTransferService.storeMessage(file)
                 flash.message = "File ${fileName} transferred successfully"
 
-            } catch (Exception e) {
-                log.error "Unable to upload message due to error: " + e.message, e
+            } catch (SFTPException e) {
+                log.error "Unable to upload message due to error ${e.statusCode}: " + e.message, e
                 flash.message = "File ${fileName} not transferred due to error: " + e.message
 
             }

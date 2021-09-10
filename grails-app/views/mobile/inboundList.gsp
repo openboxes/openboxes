@@ -16,12 +16,14 @@
 
     <div class="col col-md-6">
         <g:form controller="mobile" action="inboundList" method="GET">
-            <div class="form-group">
-                <g:select class="btn btn-outline-secondary"
-                          name="status" from="${['TRANSIT':'IN_TRANSIT', 'READY_TO_BE_PICKED':'READY_TO_BE_PICKED'].entrySet()}"
+            <div class="form-group d-flex">
+                <g:select name="status" class="form-select"
+                          from="${org.pih.warehouse.shipping.ShipmentStatusCode.list()}"
+                          optionKey="name"
+                          optionValue="${format.metadata(obj:it)}"
                           value="${params.status}"
-                          optionKey="value" optionValue="value"
-                          noSelection="['':' - Choose a Status - ']"/>
+                          noSelection="['':warehouse.message(code:'default.all.label')]" />
+
                 <input type="submit" value="Filter" class="btn btn-outline-primary">
             </div>
         </g:form>
@@ -53,11 +55,6 @@
                                 <div class="badge bg-primary">
                                     ${stockMovement.shipment?.currentEvent?.eventType?.eventCode}
                                 </div>
-                                <g:if test="${stockMovement.stockMovementStatusCode < org.pih.warehouse.inventory.StockMovementStatusCode.PICKED }">
-                                    <div class="badge bg-info">
-                                        Ready To be Picked
-                                    </div>
-                                </g:if>
                                 <div>
                                     <small><g:formatDate date="${stockMovement.shipment?.currentEvent?.eventDate}" format="MMM dd hh:mm a"/></small>
                                 </div>
@@ -108,7 +105,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <input name="type" type="hidden" value="inbound"/>
+                    <g:hiddenField name="type" value="inbound"/>
                     <g:hiddenField name="location.id" value="${session.warehouse.id }"/>
                     <input class="form-control" type="file" name="xlsFile" required>
                 </div>
