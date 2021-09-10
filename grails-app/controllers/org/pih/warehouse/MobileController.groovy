@@ -33,6 +33,7 @@ import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.integration.xml.acceptancestatus.AcceptanceStatus
 import org.pih.warehouse.integration.xml.pod.DocumentUpload
 import org.pih.warehouse.integration.xml.execution.Execution
+import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest
@@ -61,13 +62,9 @@ class MobileController {
         def productListUrl = g.createLink(controller: "mobile", action: "productList")
 
         StockMovement stockMovement = new StockMovement(destination: location,
-                stockMovementType: StockMovementType.INBOUND, stockMovementStatusCode: StockMovementStatusCode.PENDING)
+                stockMovementType: StockMovementType.INBOUND)
 
         def orderCount = stockMovementService.getStockMovements(stockMovement, [max:params.max?:10, offset: params.offset?:0]).size()
-
-        /*def orderCount = Shipment.createCriteria().count {
-            eq("destination", location)
-        }*/
 
         def requisitionCount = Requisition.createCriteria().count {
             eq("origin", location)
@@ -78,7 +75,7 @@ class MobileController {
 
         def readyToBePicked = stockMovement.findAll{ it.stockMovementStatusCode < StockMovementStatusCode.PICKED }
         def readyToBePickedCount = readyToBePicked.size()
-        def status =  'READY_TO_BE_PICKED'
+        def status =  RequisitionStatus.PICKING
         [
                 data: [
                         [name: "Inventory", class: "fa fa-box", count: productCount, url: g.createLink(controller: "mobile", action: "productList")],
@@ -147,21 +144,16 @@ class MobileController {
     def outboundList = {
         log.info "outboundList params ${params}"
         Location origin = Location.get(params.origin?params.origin.id:session.warehouse.id)
-        StockMovement stockMovement = new StockMovement(origin: origin, stockMovementType: StockMovementType.OUTBOUND, stockMovementStatusCode: StockMovementStatusCode.PENDING)
-        if(params.status == "IN_TRANSIT") {
-            params.receiptStatusCode = ["SHIPPED"]
-            stockMovement = new StockMovement(
-                    origin: origin,
-                    stockMovementType: StockMovementType.OUTBOUND,
-                    receiptStatusCodes: params.list("receiptStatusCode") as ShipmentStatusCode[]
-            )
-        }
-        def stockMovements = stockMovementService.getStockMovements(stockMovement, [max:params.max?:10, offset: params.offset?:0])
 
-        if(params.status == "READY_TO_BE_PICKED") {
-            def tempStockMovements = stockMovements.findAll{ it.stockMovementStatusCode < StockMovementStatusCode.PICKED }
-            stockMovements = new PagedResultList(tempStockMovements, tempStockMovements.size())
+        RequisitionStatus requisitionStatus = params.status ? params.status as RequisitionStatus : null
+        StockMovement stockMovement = new StockMovement(origin: origin,
+                stockMovementType: StockMovementType.OUTBOUND)
+        if (params.status) {
+            RequisitionStatus requisitionStatusCode = params.status as RequisitionStatus
+            stockMovement.stockMovementStatusCode = RequisitionStatus.toStockMovementStatus(requisitionStatusCode)
         }
+
+        def stockMovements = stockMovementService.getStockMovements(stockMovement, [max:params.max?:10, offset: params.offset?:0])
 
         [stockMovements:stockMovements]
     }
