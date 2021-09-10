@@ -486,6 +486,10 @@ class StockMovementService {
                 }
             }
 
+            if (stockMovement.stockMovementStatusCode) {
+                eq("status", RequisitionStatus.fromStockMovementStatus(stockMovement.stockMovementStatusCode))
+            }
+
             if (stockMovement.destination == stockMovement?.origin) {
                 or {
                     if (stockMovement?.destination) {
