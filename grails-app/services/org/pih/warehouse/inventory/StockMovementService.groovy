@@ -55,6 +55,8 @@ import org.pih.warehouse.requisition.RequisitionItemType
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Container
+import org.pih.warehouse.shipping.ReferenceNumber
+import org.pih.warehouse.shipping.ReferenceNumberType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
@@ -552,6 +554,7 @@ class StockMovementService {
     }
 
     StockMovement getStockMovementByIdentifier(String identifier) {
+        log.info "Find by identifier ${identifier}"
         Requisition requisition = Requisition.findByRequestNumber(identifier)
         if (requisition) {
             return getStockMovement(requisition?.id)
@@ -2242,6 +2245,38 @@ class StockMovementService {
 
     }
 
+
+    ReferenceNumber createOrUpdateTrackingNumber(Shipment shipment, String trackingNumber) {
+        log.info "Create tracking number ${trackingNumber} for shipment ${shipment?.shipmentNumber} oh yeah"
+        ReferenceNumberType trackingNumberType = ReferenceNumberType.findById(Constants.TRACKING_NUMBER_TYPE_ID)
+        if (!trackingNumberType) {
+            throw new IllegalStateException("Must configure reference number type for Tracking Number with ID '${Constants.TRACKING_NUMBER_TYPE_ID}'")
+        }
+
+        // Needed to use ID since reference numbers is lazy loaded and equality operation was not working
+        ReferenceNumber referenceNumber = shipment.referenceNumbers.find { ReferenceNumber refNum ->
+            trackingNumberType?.id?.equals(refNum.referenceNumberType?.id)
+        }
+        log.info "found reference number ${referenceNumber}"
+        if (trackingNumber) {
+            // Create a new reference number
+            if (!referenceNumber) {
+                referenceNumber = new ReferenceNumber()
+                referenceNumber.identifier = trackingNumber
+                referenceNumber.referenceNumberType = trackingNumberType
+                shipment.addToReferenceNumbers(referenceNumber)
+            }
+            // Update the existing reference number
+            else {
+                referenceNumber.identifier = trackingNumber
+            }
+        }
+        // Reference number exists but the user-defined tracking number was empty so we should delete
+        else if (referenceNumber) {
+            shipment.removeFromReferenceNumbers(referenceNumber)
+        }
+        return referenceNumber
+    }
 
     Shipment updateShipmentOnRequisitionChange(StockMovement stockMovement) {
         Shipment shipment = Shipment.findByRequisition(stockMovement.requisition)

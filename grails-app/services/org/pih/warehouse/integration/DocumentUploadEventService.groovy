@@ -27,16 +27,13 @@ class DocumentUploadEventService implements ApplicationListener<DocumentUploadEv
         String fileName = documentUploadEvent.documentUpload.uploadDetails.sourceType.document.documentName
         String fileContents = documentUploadEvent.documentUpload.uploadDetails.sourceType.document.documentFile
 
-        // FIXME replace magic string
-        if (documentType == "POD") {
-            List<String> orderIds = documentUploadEvent.documentUpload.uploadDetails.orderId
-            orderIds.each { trackingNumber ->
-                log.info "Looking up stock movement by tracking number ${trackingNumber}"
-                StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber)
-                if (stockMovement) {
-                    log.info "Attaching document ${fileName} to ${stockMovement.identifier}"
-                    stockMovementService.attachDocument(stockMovement, fileName, fileContents)
-                }
+        List<String> orderIds = documentUploadEvent.documentUpload.uploadDetails.orderId
+        orderIds.each { trackingNumber ->
+            log.info "Looking up stock movement by tracking number ${trackingNumber}"
+            StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber)
+            if (stockMovement) {
+                log.info "Attaching document ${fileName} to ${stockMovement.identifier}"
+                stockMovementService.attachDocument(stockMovement, fileName, fileContents)
             }
         }
     }

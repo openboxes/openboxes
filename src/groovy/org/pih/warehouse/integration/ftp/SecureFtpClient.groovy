@@ -1,9 +1,11 @@
 package org.pih.warehouse.integration.ftp
 
 import net.schmizz.sshj.SSHClient
+import net.schmizz.sshj.sftp.FileMode
 import net.schmizz.sshj.sftp.RemoteFile
 import net.schmizz.sshj.sftp.RemoteResourceInfo
 import net.schmizz.sshj.sftp.SFTPClient
+import net.schmizz.sshj.sftp.SFTPException
 import net.schmizz.sshj.transport.TransportException
 import net.schmizz.sshj.transport.verification.OpenSSHKnownHosts
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier
@@ -98,11 +100,20 @@ class SecureFtpClient {
 
     Collection<String> listFiles(String path) {
         try {
+            LOG.info "Listing files from remote ${path}"
             List<RemoteResourceInfo> files = sftpClient.ls(path)
-            def filenames = files.collect { RemoteResourceInfo remoteResourceInfo ->
-                return remoteResourceInfo.name
-            }
+            LOG.info "Found ${files.size()} files"
+            def filenames = files.findAll { RemoteResourceInfo remoteResourceInfo ->
+                remoteResourceInfo.attributes.type == FileMode.Type.REGULAR
+            }.
+                    collect { RemoteResourceInfo remoteResourceInfo ->
+                        return remoteResourceInfo.name
+                    }
             return filenames
+        } catch (SFTPException e) {
+            LOG.error("SFTP exception while listing remote from ${path} due to error ${e.statusCode} ${e.message}", e)
+        } catch(Exception e) {
+            LOG.error("Exception while listing remote from ${path}: " + e.message, e)
         } finally {
             //sftpClient.close()
         }
@@ -110,6 +121,7 @@ class SecureFtpClient {
 
     void retrieveFile(String source, String destination) {
         try {
+            LOG.info "Retrieve remote ${source} to local ${destination}"
             sftpClient.get(source, new FileSystemFile(destination))
         } finally {
             //sftpClient.close();
@@ -118,6 +130,7 @@ class SecureFtpClient {
 
     InputStream retrieveFileAsInputStream(String source) {
         try {
+            LOG.info "Retrieve remote ${source}"
             RemoteFile remoteFile = sftpClient.SFTPEngine.open(source)
             return new RemoteFile.RemoteFileInputStream(remoteFile)
         } finally {
@@ -127,6 +140,7 @@ class SecureFtpClient {
 
     void storeFile(File file, String path) {
         try {
+            LOG.info "Put local ${file.path} to remote ${path}"
             sftpClient.put(new FileSystemFile(file.path), path);
         } finally {
             //sfptClient.close()
@@ -136,6 +150,7 @@ class SecureFtpClient {
 
     void storeFile(String filename, String contents, String path) {
         try {
+            LOG.info "Put in memory file ${filename} to remote ${path}"
             sftpClient.put(new InMemorySourceFile() {
                 @Override
                 public String getName() { return filename; }
@@ -156,6 +171,7 @@ class SecureFtpClient {
 
     void deleteFile(String filename) {
         try {
+            LOG.info "Delete remote file ${filename}"
             sftpClient.rm(filename)
         } finally {
             //sfptClient.close()
