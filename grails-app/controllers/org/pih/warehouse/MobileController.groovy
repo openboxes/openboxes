@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse
 
-import grails.orm.PagedResultList
 import net.schmizz.sshj.sftp.SFTPException
 import org.apache.commons.io.IOUtils
 import org.pih.warehouse.api.StockMovement
@@ -73,7 +72,7 @@ class MobileController {
         def messages = fileTransferService.listMessages()
         def messageCount = messages ? messages?.size() :0
 
-        def readyToBePicked = stockMovement.findAll{ it.stockMovementStatusCode < StockMovementStatusCode.PICKED }
+        def readyToBePicked = stockMovement.findAll{ it.stockMovementStatusCode == StockMovementStatusCode.PICKING }
         def readyToBePickedCount = readyToBePicked.size()
         def status =  RequisitionStatus.PICKING
         [
@@ -332,7 +331,8 @@ class MobileController {
             flash.message = "Message has been processed"
         }
         catch (Exception e) {
-            flash.message = e.message
+            log.error("Message not processed due to error: " + e.message, e)
+            flash.message = "Message not processed due to error: " + e.message
         }
 
         redirect(action: "messageList")

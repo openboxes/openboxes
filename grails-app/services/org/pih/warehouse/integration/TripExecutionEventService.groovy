@@ -28,17 +28,20 @@ class TripExecutionEventService implements ApplicationListener<TripExecutionEven
     def notificationService
 
     void onApplicationEvent(TripExecutionEvent tripExecutionEvent) {
-        log.info "Trip execution " + tripExecutionEvent.toString()
-        String trackingNumber = tripExecutionEvent.execution.tripID
-        StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber)
-        if (!stockMovement) {
-            throw new Exception("Unable to locate stock movement by tracking number ${trackingNumber}")
-        }
+        log.info "Trip execution " + tripExecutionEvent.execution.toString()
 
         SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssX")
-        Shipment shipment = stockMovement?.shipment
         tripExecutionEvent.execution.executionStatus.each { ExecutionStatus executionStatus ->
-            EventCode eventCode = EventCode.valueOf(executionStatus.status)?:EventCode.UNKNOWN
+
+            String trackingNumber = executionStatus.orderId
+            StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber)
+            if (!stockMovement) {
+                throw new Exception("Unable to locate stock movement by tracking number ${trackingNumber}")
+            }
+            Shipment shipment = stockMovement?.shipment
+
+            String statusCode = executionStatus.status
+            EventCode eventCode = statusCode ? EventCode.valueOf(statusCode) : EventCode.UNKNOWN
             EventType eventType = EventType.findByEventCode(eventCode)
             Date eventDate = dateFormatter.parse(executionStatus.dateTime)
             Event event = new Event(eventType: eventType, eventDate: eventDate)
