@@ -8,10 +8,40 @@
 
 <body>
 
-<div class="clearfix">
-    <button type="button" class="btn btn-outline-primary float-end" data-bs-toggle="modal"
-            data-bs-target="#messageUploadModal">Upload Message</button>
-</div>
+    <div class="clearfix">
+        <button type="button" class="btn btn-outline-primary float-end" data-bs-toggle="modal"
+                data-bs-target="#messageUploadModal">Upload Message</button>
+    </div>
+
+        <div class="card">
+            <div class="card-header">
+                Server Details
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-12 col-md-4 text-center time-info mt-3 mt-sm-0">
+                        <span class="text-muted d-block">Server</span>
+                        <span class="text-5 font-weight-500 text-dark">
+                            ${grailsApplication.config.openboxes.integration.ftp.server}
+                        </span>
+                    </div>
+
+                    <div class="col-sm-12 col-md-4 text-center company-info">
+                        <span class="text-muted d-block">User</span>
+                        <span class="text-5 font-weight-500 text-dark">
+                            ${grailsApplication.config.openboxes.integration.ftp.user}
+                        </span>
+                    </div>
+
+                    <div class="col-sm-12 col-md-4 text-center time-info mt-3 mt-sm-0">
+                        <span class="text-muted d-block">Directory</span>
+                        <span class="text-5 font-weight-500 text-dark">
+                            ${grailsApplication.config.openboxes.integration.ftp.directory}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     <div class="row g-0">
         <table class="table table-borderless table-striped">
@@ -31,10 +61,10 @@
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                             <g:link controller="mobile" action="messageDetails"
                                     params="[filename: message.filename]"
-                                    class="btn btn-outline-primary">Download</g:link>
+                                    class="btn btn-outline-primary">View</g:link>
                             <g:link controller="mobile" action="messageProcess"
                                     params="[filename: message.filename]"
-                                    class="btn btn-outline-secondary">Process</g:link>
+                                    class="btn btn-outline-success">Process</g:link>
                             <g:link controller="mobile" action="messageDelete"
                                     params="[filename: message.filename]"
                                     class="btn btn-outline-danger">Delete</g:link>
