@@ -60,4 +60,4 @@ union
           left join shipment_invoice on shipment_invoice.shipment_item_id = shipment_item.id
  where order_invoice.invoice_item_id is null
    and shipment_invoice.invoice_item_id is null
-   and shipment.current_status = 'SHIPPED');
+   and shipment.current_status in ('SHIPPED', 'PARTIALLY_RECEIVED', 'RECEIVED'));
