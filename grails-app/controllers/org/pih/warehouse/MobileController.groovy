@@ -160,7 +160,7 @@ class MobileController {
         }
 
         if (params.deliveryDate) {
-            def deliveryDate = Date.parse("MM/dd/yyyy", params.deliveryDate)
+            def deliveryDate = Date.parse("yyyy-MM-dd", params.deliveryDate)
             stockMovement.expectedDeliveryDate = deliveryDate
         }
 

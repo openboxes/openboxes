@@ -30,7 +30,7 @@
                 <g:selectLocation id="destination" name="destination.id" value="${params?.destination?.id}"
                                   noSelection="['null':'']"/>
                 <label for="deliveryDate" name="deliveryDate" class="col-form-label">Delivery</label>
-                <input type="text" name="deliveryDate" id="deliveryDate" value="${params.deliveryDate}">
+                <input type="date" name="deliveryDate" id="deliveryDate" value="${params.deliveryDate}">
 
                 <input type="submit" value="Filter" class="btn btn-outline-primary">
             </div>
