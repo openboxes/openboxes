@@ -334,6 +334,12 @@
                                     <a href="${document.uri}" target="_blank"
                                        class="btn btn-outline-primary">Download</a>
                                 </td>
+                                <td>
+                                    <g:if test="${document.id}">
+                                        <g:link action="documentDownload" id="${document.id}" target="_blank"
+                                           class="btn btn-outline-primary">Download</g:link>
+                                    </g:if>
+                                </td>
                             </tr>
                         </g:each>
                         </tbody>
