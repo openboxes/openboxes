@@ -255,4 +255,10 @@ class ProductApiController extends BaseDomainApiController {
         render([monthlyDemand: demand.monthlyDemand, quantityOnHand: quantityOnHand, quantityAvailable: quantityAvailable] as JSON)
     }
 
+    def search = {
+        def jsonObject = request.JSON
+        List<Product> products = productService.findProducts([jsonObject?.value])
+        render([data: products] as JSON)
+    }
+
 }
