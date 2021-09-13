@@ -17,19 +17,26 @@
 
 
 <div class="row g-0 mb-2">
-    <div class="col col-md-6">
+    <div class="col col-md-10">
         <g:form controller="mobile" action="outboundList" method="GET">
             <div class="form-group d-flex">
-                <g:select name="status" class="form-select"
+                <label for="status" class="col-md-1 col-form-label">Status</label>
+                <g:select id="status" name="status"
                           from="${['PICKING':'Ready for Picking', 'ISSUED':'In Transit'].entrySet()}"
                           value="${params.status}"
                           optionKey="key" optionValue="value"
                           noSelection="['':warehouse.message(code:'default.all.label')]"/>
+                <label for="destination" class="col-form-label px-2"><g:message code="stockMovement.destination.label"/></label>
+                <g:selectLocation id="destination" name="destination.id" value="${params?.destination?.id}"
+                                  noSelection="['null':'']"/>
+                <label for="deliveryDate" name="deliveryDate" class="col-form-label">Delivery</label>
+                <input type="text" name="deliveryDate" id="deliveryDate" value="${params.deliveryDate}">
+
                 <input type="submit" value="Filter" class="btn btn-outline-primary">
             </div>
         </g:form>
     </div>
-    <div class="col col-md-6">
+    <div class="col col-md-2">
         <button type="button" class="btn btn-outline-primary float-end"
                 data-bs-toggle="modal" data-bs-target="#outboundModal"><i class="fa fa-file-import"></i> Import Orders</button>
     </div>
@@ -39,15 +46,15 @@
     <div class="col">
         <table class="table table-borderless table-striped">
             <thead>
-                <tr>
-                    <th><g:message code="stockMovement.status.label"/></th>
-                    <th><g:message code="stockMovement.identifier.label"/></th>
-                    <th><g:message code="stockMovement.destination.label"/></th>
-                    <th><g:message code="stockMovement.requestedDeliveryDate.label" default="Requested Delivery Date"/></th>
-                    <th><g:message code="stockMovement.expectedDeliveryDate.label" default="Expected Delivery Date"/></th>
-                    <th><g:message code="stockMovement.trackingNumber.label" /></th>
-                    <th></th>
-                </tr>
+            <tr>
+                <th><g:message code="stockMovement.status.label"/></th>
+                <th><g:message code="stockMovement.identifier.label"/></th>
+                <th><g:message code="stockMovement.destination.label"/></th>
+                <th><g:message code="stockMovement.requestedDeliveryDate.label" default="Requested Delivery Date"/></th>
+                <th><g:message code="stockMovement.expectedDeliveryDate.label" default="Expected Delivery Date"/></th>
+                <th><g:message code="stockMovement.trackingNumber.label" /></th>
+                <th></th>
+            </tr>
             </thead>
             <tbody>
             <g:each var="stockMovement" in="${stockMovements}">
