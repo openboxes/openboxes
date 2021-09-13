@@ -2021,8 +2021,12 @@ class StockMovementService {
 
         shipment.name = stockMovement.generateName()
 
-        def quantitiesValid = shipmentService.validateShipment(shipment)
-        if (shipment.hasErrors() || !quantitiesValid || !shipment.save(flush: true)) {
+        // Validate shipment and validate shipment items should only add to the shipment's errors
+        // object or throw a validation exception
+        shipmentService.validateShipment(shipment)
+
+        //  Check if the shipment has errors
+        if (shipment.hasErrors() || !shipment.save(flush: true)) {
             throw new ValidationException("Invalid shipment", shipment.errors)
         }
 
