@@ -218,6 +218,7 @@ log4j = {
             'org.hibernate',
             'com.mchange',
             'org.pih.warehouse',
+            'net.schmizz.sshj',
             'grails.app',
             'grails.app.controller',
             'grails.app.bootstrap',

@@ -21,11 +21,13 @@ class AcceptanceStatusEventService implements ApplicationListener<AcceptanceStat
 
     void onApplicationEvent(AcceptanceStatusEvent acceptanceStatusEvent) {
         log.info "Acceptance status " + acceptanceStatusEvent.acceptanceStatus.tripDetails.toString()
-        String trackingNumber = acceptanceStatusEvent.acceptanceStatus.tripDetails.tripId
-        StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber)
-        if (!stockMovement) {
-            throw new Exception("Unable to locate stock movement by tracking number ${trackingNumber}")
+        List<String> trackingNumbers = acceptanceStatusEvent.acceptanceStatus.tripOrderDetails.orderId
+        trackingNumbers.each { String trackingNumber ->
+            StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber)
+            if (!stockMovement) {
+                throw new Exception("Unable to locate stock movement by tracking number ${trackingNumber}")
+            }
+            stockMovementService.acceptStockMovement(stockMovement)
         }
-        stockMovementService.acceptStockMovement(stockMovement)
     }
 }

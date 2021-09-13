@@ -49,7 +49,6 @@
                                           noSelection="['null':warehouse.message(code:'default.all.label')]"/>
                     </th>
                     <th>
-%{--                        <input type="date" name="deliveryDate" id="deliveryDate" value="${params.deliveryDate}" class="form-control"/>--}%
                     </th>
                     <th>
                     </th>

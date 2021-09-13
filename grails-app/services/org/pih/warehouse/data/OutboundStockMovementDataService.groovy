@@ -66,7 +66,7 @@ class OutboundStockMovementDataService {
             throw new IllegalArgumentException("Requested quantity should be greater than 0")
         }
 
-        def deliveryDate = params.requestedDeliveryDate
+        def deliveryDate = params.deliveryDate
         if (!isDateOneWeekFromNow(deliveryDate)) {
             throw new IllegalArgumentException("Delivery date must be after seven days from now")
         }
