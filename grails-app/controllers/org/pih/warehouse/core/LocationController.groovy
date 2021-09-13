@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.core
 
+import grails.plugin.springcache.annotations.CacheFlush
 import grails.validation.ValidationException
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.Order
@@ -65,6 +66,7 @@ class LocationController {
         }
     }
 
+    @CacheFlush(["megamenuCache"])
     def update = {
         def locationInstance = inventoryService.getLocation(params.id)
 
@@ -171,6 +173,7 @@ class LocationController {
         }
     }
 
+    @CacheFlush(["megamenuCache"])
     def resetSupportedActivities = {
         def location = Location.get(params.id)
         location.supportedActivities.clear()
