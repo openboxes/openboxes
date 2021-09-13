@@ -40,6 +40,7 @@ import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequ
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.Marshaller
 import javax.xml.bind.Unmarshaller
+import java.text.SimpleDateFormat
 
 class MobileController {
 
@@ -150,6 +151,16 @@ class MobileController {
         if (params.status) {
             RequisitionStatus requisitionStatusCode = params.status as RequisitionStatus
             stockMovement.stockMovementStatusCode = RequisitionStatus.toStockMovementStatus(requisitionStatusCode)
+        }
+
+        if (params.destination) {
+            Location destination = Location.get(params.destination.id)
+            stockMovement.destination = destination
+        }
+
+        if (params.deliveryDate) {
+            def deliveryDate = Date.parse("yyyy-MM-dd", params.deliveryDate)
+            stockMovement.expectedDeliveryDate = deliveryDate
         }
 
         def stockMovements = stockMovementService.getStockMovements(stockMovement, [max:params.max?:10, offset: params.offset?:0])
