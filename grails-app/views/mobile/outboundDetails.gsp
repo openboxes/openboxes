@@ -21,7 +21,16 @@
             </div>
 
             <div class="col-1">
-                <h1 class="badge bg-primary mt-2 mr-2 pl-5">${stockMovement?.status}</h1>
+                <a href="${createLink(controller: 'stockMovement', action: 'show', id: stockMovement?.id)}" class="text-decoration-none text-reset">
+                    <g:if test="${stockMovement?.shipment?.currentEvent?.eventType?.eventCode}">
+                        <div class="badge bg-primary">
+                            ${stockMovement.shipment?.currentEvent?.eventType?.eventCode}
+                        </div>
+                    </g:if>
+                    <g:else>
+                        <div class="badge bg-primary">${stockMovement?.status}</div>
+                    </g:else>
+                </a>
             </div>
 
             <div class="col-1">
@@ -102,7 +111,12 @@
             <div class="col-sm-12 col-md-2 text-center time-info mt-3 mt-sm-0">
                 <span class="text-muted d-block">Tracking Number</span>
                 <span class="text-5 font-weight-500 text-dark">
-                    ${stockMovement?.trackingNumber ?: "Not Available"}
+                    <g:if test="${stockMovement?.trackingNumber}">
+                        <g:link url="${stockMovement.trackingUri}">${stockMovement?.trackingNumber}</g:link>
+                    </g:if>
+                    <g:else>
+                        Not Available
+                    </g:else>
                 </span>
             </div>
         </div>

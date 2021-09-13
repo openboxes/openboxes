@@ -505,6 +505,7 @@ class StockMovementService {
     }
 
     StockMovement getStockMovementByIdentifier(String identifier) {
+        log.info "Find by identifier ${identifier}"
         Requisition requisition = Requisition.findByRequestNumber(identifier)
         if (requisition) {
             return getStockMovement(requisition?.id)
@@ -2164,6 +2165,7 @@ class StockMovementService {
 
 
     ReferenceNumber createOrUpdateTrackingNumber(Shipment shipment, String trackingNumber) {
+        log.info "Create tracking number ${trackingNumber} for shipment ${shipment?.shipmentNumber} oh yeah"
         ReferenceNumberType trackingNumberType = ReferenceNumberType.findById(Constants.TRACKING_NUMBER_TYPE_ID)
         if (!trackingNumberType) {
             throw new IllegalStateException("Must configure reference number type for Tracking Number with ID '${Constants.TRACKING_NUMBER_TYPE_ID}'")
@@ -2173,7 +2175,7 @@ class StockMovementService {
         ReferenceNumber referenceNumber = shipment.referenceNumbers.find { ReferenceNumber refNum ->
             trackingNumberType?.id?.equals(refNum.referenceNumberType?.id)
         }
-
+        log.info "found reference number ${referenceNumber}"
         if (trackingNumber) {
             // Create a new reference number
             if (!referenceNumber) {
