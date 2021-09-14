@@ -1,6 +1,7 @@
 package org.pih.warehouse.integration.xml
 
 import groovy.util.slurpersupport.GPathResult
+import org.springframework.core.io.ClassPathResource
 import org.springframework.util.ResourceUtils
 import org.xml.sax.SAXException
 
@@ -11,18 +12,13 @@ import javax.xml.validation.SchemaFactory
 import javax.xml.validation.Validator
 
 public class XmlXsdValidator {
-    public static boolean validateXmlSchema( String xsdPath, String xmlString ) {
+    public static boolean validateXmlSchema( String xsdPath, String xmlContents ) {
         try {
-
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
-           //  File xsd = ResourceUtils.getFile("classpath:" + xsdPath)
-            /*String xsdFileName = ResourceUtils.getFile("classpath:" + xsdPath )?.path
-            println "xsdFileName = $xsdFileName"*/
-            File xsd = ResourceUtils.getFile(xsdPath)
-            Schema schema = factory.newSchema(xsd)
+            File xsdFile = new ClassPathResource(xsdPath)?.file
+            Schema schema = factory.newSchema(xsdFile)
             Validator validator = schema.newValidator()
-            validator.validate(new StreamSource(new StringReader(sanitizeXmlString(xmlString))))
-
+            validator.validate(new StreamSource(new StringReader(XmlXsdValidator.sanitizeXmlString(xmlContents))))
         } catch (IOException e) {
             System.out.println("XSD Validator Error (" + xsdPath + "): " + e.getMessage())
             return false

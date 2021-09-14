@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 public class AcceptanceStatusTest {
     private AcceptanceStatus acceptanceStatus;
     // TODO: need to figure out a place for the XSDs
-    private final String ACCEPTANCE_STATUS_XSD = "src/java/org/pih/warehouse/integration/xml/acceptancestatus/acceptance_status_v1.xsd";
+    private final String ACCEPTANCE_STATUS_XSD = "xsd/AcceptanceStatus.xsd"
 
     @Before
     public void setUp() {

@@ -6,27 +6,37 @@ import javax.xml.bind.annotation.XmlType;
 import java.util.List;
 
 @XmlRootElement(name = "UploadDetails")
-@XmlType(propOrder = {"orderId", "sourceType"})
+@XmlType(propOrder = {"documentName", "url", "documentFile"})
 public class UploadDetails {
 
-    List<String> orderId;
-    SourceType sourceType;
+    String documentName;
+    String url;
+    String documentFile;
 
-    @XmlElement(name="OrderID")
-    public List<String> getOrderId() {
-        return orderId;
+    @XmlElement(name = "DocumentName")
+    public String getDocumentName() {
+        return documentName;
     }
 
-    public void setOrderId(List<String> orderId) {
-        this.orderId = orderId;
+    public void setDocumentName(String documentName) {
+        this.documentName = documentName;
     }
 
-    @XmlElement(name = "SourceType")
-    public SourceType getSourceType() {
-        return sourceType;
+    @XmlElement(name = "URL")
+    public String getUrl() {
+        return url;
     }
 
-    public void setSourceType(SourceType sourceType) {
-        this.sourceType = sourceType;
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    @XmlElement(name = "DocumentFile")
+    public String getDocumentFile() {
+        return documentFile;
+    }
+
+    public void setDocumentFile(String documentFile) {
+        this.documentFile = documentFile;
     }
 }

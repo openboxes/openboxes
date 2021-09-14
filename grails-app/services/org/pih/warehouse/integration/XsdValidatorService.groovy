@@ -13,35 +13,11 @@ import org.pih.warehouse.integration.xml.XmlXsdValidator
 
 class XsdValidatorService {
 
-    private String XSD_PATH = "src/java/org/pih/warehouse/integration/xml/"
-
-    boolean validateXml(def xmlFileContents) {
-        String VALIDATOR_XSD = ""
-        String rootNodeName = getXsdType(xmlFileContents)
-
-        switch (rootNodeName){
-            case "AcceptanceStatus" :
-                VALIDATOR_XSD = XSD_PATH + "acceptancestatus/acceptance_status_v1.xsd"
-                break
-            case "Execution" :
-                VALIDATOR_XSD = XSD_PATH + "execution/order_execution.xsd"
-                break
-            case "Order" :
-                VALIDATOR_XSD = XSD_PATH + "order/order_create_request.xsd"
-                break
-            case "DocumentUpload" :
-                VALIDATOR_XSD = XSD_PATH + "pod/document_upload.xsd"
-                break
-            case "Trip" :
-                VALIDATOR_XSD = XSD_PATH + "trip/trip_notification_v1.xsd"
-                break
-            default:
-                VALIDATOR_XSD = ""
-                return false
-        }
-
-        //validate
-        return XmlXsdValidator.validateXmlSchema(VALIDATOR_XSD, xmlFileContents)
+    boolean validateXml(String xmlContents) {
+        String rootElementName = getXsdType(xmlContents)
+        String xsdFileName = "xsd/${rootElementName}.xsd"
+        println "xsdFileName = $xsdFileName"
+        return XmlXsdValidator.validateXmlSchema(xsdFileName, xmlContents)
     }
 
     def getXsdType(String xmlFileContents) {
