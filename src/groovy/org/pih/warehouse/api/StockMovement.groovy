@@ -269,7 +269,7 @@ class StockMovement {
 
     String getTrackingUri() {
         final String uriTemplate = ConfigurationHolder.config.openboxes.integration.tracking.uri
-        return String.format(uriTemplate, trackingNumber)
+        return trackingNumber ? String.format(uriTemplate, trackingNumber) : null
     }
 
 
