@@ -195,6 +195,7 @@ class TmsIntegrationService {
             partyType.setContactData(new ContactData(contact.firstName, contact?.lastName,
                     new Phone(null, contact?.phoneNumber), contact?.email));
         }
+        return partyType
     }
 
     LocationInfo buildLocationInfo(String stopSequence, Location location, Date expectedDate, String driverInstructions) {
