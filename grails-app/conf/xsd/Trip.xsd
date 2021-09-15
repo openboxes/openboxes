@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema attributeFormDefault="unqualified"
-    elementFormDefault="qualified"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:tns="http://www.etrucknow.com/edi/carrier/trip_notification/v1"
-    targetNamespace="http://www.etrucknow.com/edi/carrier/trip_notification/v1">
+           elementFormDefault="qualified"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:tns="http://www.etrucknow.com/edi/carrier/trip_notification/v1"
+           targetNamespace="http://www.etrucknow.com/edi/carrier/trip_notification/v1">
     <xs:element name="Trip">
         <xs:complexType>
             <xs:sequence>
@@ -35,13 +35,13 @@
             </xs:element>
             <xs:element name="Username" type="tns:smallText" minOccurs="0"/>
             <xs:element name="Password" type="tns:largeText" minOccurs="0">
-		<xs:annotation>
-	        	<xs:documentation>
-	  		Username and password is mandatory incase of a request flow
-			</xs:documentation>
-        	</xs:annotation>
-	    </xs:element>
-	    <xs:element name="SequenceNumber" type="tns:mediumText" />
+                <xs:annotation>
+                    <xs:documentation>
+                        Username and password is mandatory incase of a request flow
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="SequenceNumber" type="tns:mediumText" />
             <xs:element name="SourceApp" minOccurs="0">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
@@ -50,16 +50,16 @@
                 </xs:simpleType>
             </xs:element>
             <xs:element name="DestinationApp" minOccurs="0">
-		<xs:annotation>
-	            <xs:documentation>
-	  	    Incase of a request, it is mandatory to provide the SourceApp. Incase of a reponse, the DestinationApp must be provided.
-		    </xs:documentation>
+                <xs:annotation>
+                    <xs:documentation>
+                        Incase of a request, it is mandatory to provide the SourceApp. Incase of a reponse, the DestinationApp must be provided.
+                    </xs:documentation>
                 </xs:annotation>
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
                         <xs:enumeration value="ETRUCKNOW"/>
                     </xs:restriction>
-		</xs:simpleType>
+                </xs:simpleType>
             </xs:element>
         </xs:sequence>
     </xs:complexType>
@@ -166,11 +166,11 @@
             </xs:element>
             <xs:element name="ServiceType" type="tns:smallText" minOccurs="0" />
             <xs:element name="DeliveryTerms" minOccurs="0" >
-	     	<xs:simpleType>
-            		<xs:restriction base="xs:string">
-        			<xs:maxLength value="60" />
-	          	</xs:restriction>
-	    	</xs:simpleType>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="60" />
+                    </xs:restriction>
+                </xs:simpleType>
             </xs:element>
             <xs:element name="GoodsValue" type="tns:GoodsValue" minOccurs="0" />
             <xs:element name="TypeOfBusiness">
@@ -184,11 +184,11 @@
             <xs:element name="TermsOfTrade" type="tns:TermsOfTrade" minOccurs="0" />
             <xs:element name="OrderParties">
                 <xs:complexType>
-        	<xs:annotation>
-	             <xs:documentation>
-	             It is mandatory for an order to contain a shipper, consignee and customer. An order may contain the following party types: 1 shipper, 1 consignor, 1 consignee, 1 pickup, and 1 delivery party. However an order may contain multiple notify parties.
-              	     </xs:documentation>
-	        </xs:annotation>
+                    <xs:annotation>
+                        <xs:documentation>
+                            It is mandatory for an order to contain a shipper, consignee and customer. An order may contain the following party types: 1 shipper, 1 consignor, 1 consignee, 1 pickup, and 1 delivery party. However an order may contain multiple notify parties.
+                        </xs:documentation>
+                    </xs:annotation>
                     <xs:sequence>
                         <xs:element name="PartyType" type="tns:PartyType" maxOccurs="unbounded" />
                     </xs:sequence>
@@ -228,12 +228,12 @@
     <xs:complexType name="GoodsValue">
         <xs:sequence>
             <xs:element name="Value" type="tns:decimal" />
-	    <xs:element name="Currency">
-	        <xs:annotation>
-        	    <xs:documentation>
-                	Please refer to the list of supported currencies and their currency codes
-        	      </xs:documentation>
-	        </xs:annotation>
+            <xs:element name="Currency">
+                <xs:annotation>
+                    <xs:documentation>
+                        Please refer to the list of supported currencies and their currency codes
+                    </xs:documentation>
+                </xs:annotation>
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
                         <xs:maxLength value="3" />
@@ -248,7 +248,7 @@
             <xs:documentation>
                 Please refer to the list of countries for the supported ISO Alpha 2 country codes
                 Please refer to the list of supported timezones based on the TZ Database
-              </xs:documentation>
+            </xs:documentation>
         </xs:annotation>
         <xs:sequence>
             <xs:element name="Name" type="tns:smallText" minOccurs="0" />
@@ -384,11 +384,11 @@
             <xs:element name="Address" type="tns:Address" />
             <xs:element name="PlannedDateTime" type="tns:PlannedDateTime" />
             <xs:element name="DriverInstructions" minOccurs="0" >
-	       	<xs:simpleType>
-            		<xs:restriction base="xs:string">
-        			<xs:maxLength value="1000" />
-	          	</xs:restriction>
-	    	</xs:simpleType>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="1000" />
+                    </xs:restriction>
+                </xs:simpleType>
             </xs:element>
         </xs:sequence>
     </xs:complexType>
@@ -401,19 +401,19 @@
             <xs:element name="Splittable" type="xs:boolean" minOccurs="0" />
             <xs:element name="DangerousGoodsFlag" type="xs:boolean" />
             <xs:element name="CargoDescription" minOccurs="0" >
-        	<xs:simpleType>
-              		<xs:restriction base="xs:string">
-        	  		<xs:maxLength value="200" />
-	    		</xs:restriction>
-	    	</xs:simpleType>
-   	    </xs:element>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="200" />
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
             <xs:element name="HandlingUnit" minOccurs="0" >
-        	<xs:simpleType>
-              		<xs:restriction base="xs:string">
-        	  		<xs:maxLength value="100" />
-	    		</xs:restriction>
-	    	</xs:simpleType>
-   	    </xs:element>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="100" />
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
             <xs:element name="Quantity" type="tns:decimal" minOccurs="0" />
             <xs:element name="Length" type="tns:unitTypeLength" minOccurs="0" />
             <xs:element name="Width" type="tns:unitTypeLength" minOccurs="0" />
@@ -438,7 +438,7 @@
             <xs:element name="CountryCode" minOccurs="0">
                 <xs:simpleType>
                     <xs:restriction base="xs:nonNegativeInteger">
-		        <xs:totalDigits value="5" />
+                        <xs:totalDigits value="5" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
@@ -539,14 +539,14 @@
     <xs:simpleType name="decimal">
         <xs:restriction base="xs:decimal">
             <xs:totalDigits value="10" />
-	    <xs:fractionDigits value="2" />
+            <xs:fractionDigits value="2" />
         </xs:restriction>
     </xs:simpleType>
 
     <xs:simpleType name="largeDecimal">
         <xs:restriction base="xs:decimal">
             <xs:totalDigits value="15" />
-	    <xs:fractionDigits value="2" />
+            <xs:fractionDigits value="2" />
         </xs:restriction>
     </xs:simpleType>
 
