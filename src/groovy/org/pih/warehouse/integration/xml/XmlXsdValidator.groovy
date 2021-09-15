@@ -1,9 +1,11 @@
 package org.pih.warehouse.integration.xml
 
 import groovy.util.slurpersupport.GPathResult
+import org.apache.commons.logging.LogFactory
 import org.springframework.core.io.ClassPathResource
-import org.springframework.util.ResourceUtils
+import org.springframework.util.xml.SimpleSaxErrorHandler
 import org.xml.sax.SAXException
+import org.xml.sax.SAXParseException
 
 import javax.xml.XMLConstants
 import javax.xml.transform.stream.StreamSource
@@ -12,22 +14,25 @@ import javax.xml.validation.SchemaFactory
 import javax.xml.validation.Validator
 
 public class XmlXsdValidator {
-    public static boolean validateXmlSchema( String xsdPath, String xmlContents ) {
+
+    static final LOG = LogFactory.getLog(this)
+
+    public static void validateXmlSchema(String xsdPath, String xmlContents) {
+        StringWriter stringWriter = new StringWriter()
         try {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
             File xsdFile = new ClassPathResource(xsdPath)?.file
             Schema schema = factory.newSchema(xsdFile)
             Validator validator = schema.newValidator()
+            validator.setErrorHandler(new SimpleSaxErrorHandler(LOG))
             validator.validate(new StreamSource(new StringReader(XmlXsdValidator.sanitizeXmlString(xmlContents))))
-        } catch (IOException e) {
-            System.out.println("XSD Validator Error (" + xsdPath + "): " + e.getMessage())
-            return false
+        } catch (SAXParseException e) {
+            LOG.error("Error occurred while validating XML against XSD (" + xsdPath + "): " + e.getMessage(), e)
+            throw e
         } catch (SAXException e) {
-            System.out.println("SAX Validation Error (" + xsdPath + "): " + e.getMessage())
-            return false
+            LOG.error("Error occurred while validating XML against XSD (" + xsdPath + "): " + e.getMessage(), e)
+            throw e
         }
-
-        return true
     }
 
     public static String sanitizeXmlString(String xmlIn) {
@@ -38,7 +43,7 @@ public class XmlXsdValidator {
         return (sanitizeXmlString(xmlHaystack).indexOf(sanitizeXmlString(needle)) != -1)
     }
 
-    public static GPathResult parseXML(String xmlIn) {
+    public static GPathResult parseXml(String xmlIn) {
         return new XmlSlurper().parseText(sanitizeXmlString(xmlIn))
     }
 
