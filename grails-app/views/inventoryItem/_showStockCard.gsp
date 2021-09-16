@@ -4,6 +4,9 @@
 <g:if test="${message}">
 	<div class="message">${message}</div>
 </g:if>
+<g:if test="${error}">
+	<div class="errors">${error}</div>
+</g:if>
 <g:hasErrors bean="${transaction}">
 	<div class="errors">
 		<g:renderErrors bean="${transaction}" as="list" />
