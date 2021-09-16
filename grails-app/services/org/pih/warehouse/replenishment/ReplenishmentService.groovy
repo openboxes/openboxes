@@ -40,6 +40,15 @@ class ReplenishmentService {
         return Requirement.createCriteria().list() {
             eq("location", location)
             eq("status", inventoryLevelStatus)
+            product {
+                order("productCode", "asc")
+                order("name", "asc")
+            }
+            binLocation {
+                order("zone", "asc")
+                order("name", "asc")
+            }
+            order("quantityInBin", "asc")
         }
     }
 

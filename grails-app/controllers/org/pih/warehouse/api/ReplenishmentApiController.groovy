@@ -60,7 +60,7 @@ class ReplenishmentApiController {
             throw new ValidationException("Invalid order", order.errors)
         }
 
-        render status: 201
+        render(status: 201, text: order.id)
     }
 
     def update = {
@@ -131,7 +131,7 @@ class ReplenishmentApiController {
 
     def statusOptions = {
         def options = InventoryLevelStatus.listReplenishmentOptions()?.collect {
-            [ id: it.name(), label: "${g.message(code: 'enum.InventoryLevelStatus.' + it.name())}" ]
+            [ id: it.name(), value: it.name(), label: "${g.message(code: 'enum.InventoryLevelStatus.' + it.name())}" ]
         }
         render([data: options] as JSON)
     }
@@ -142,7 +142,8 @@ class ReplenishmentApiController {
             throw new IllegalArgumentException("Can't find location with given id: ${params.location.id}")
         }
 
-        InventoryLevelStatus inventoryLevelStatus = InventoryLevelStatus.valueOf(params.inventoryLevelStatus) ?: InventoryLevelStatus.BELOW_MINIMUM
+        InventoryLevelStatus inventoryLevelStatus = params.inventoryLevelStatus ?
+            InventoryLevelStatus.valueOf(params.inventoryLevelStatus) : InventoryLevelStatus.BELOW_MINIMUM
         List<Requirement> requirements = replenishmentService.getRequirements(location, inventoryLevelStatus)
         render([data: requirements?.collect { it.toJson() }] as JSON)
     }
