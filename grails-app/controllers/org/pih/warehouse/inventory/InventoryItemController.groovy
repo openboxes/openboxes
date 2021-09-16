@@ -772,6 +772,13 @@ class InventoryItemController {
                     return
                 }
             }
+
+            if(itemInstance.product && itemInstance.product.lotAndExpiryControl && (!params.expirationDate || !params.lotNumber)) {
+                flash.error = "${warehouse.message(code: 'inventoryItem.lotAndExpiryControl.message')}"
+                redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
+                return
+            }
+
             itemInstance.properties = params
 
             // FIXME Temporary hack to handle a changed values for these two fields
