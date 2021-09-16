@@ -5,11 +5,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name="DocumentUpload")
-@XmlType(propOrder = {"header", "action", "documentType", "uploadDetails"})
+@XmlType(propOrder = {"header", "action", "documentType","orderId","uploadDetails"})
 public class DocumentUpload {
     private Header header;
     private String action;
     private String documentType;
+    private String orderId;
     private UploadDetails uploadDetails;
 
     @XmlElement(name = "Header")
@@ -37,6 +38,15 @@ public class DocumentUpload {
 
     public void setDocumentType(String documentType) {
         this.documentType = documentType;
+    }
+
+    @XmlElement(name = "OrderID")
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
     }
 
     @XmlElement(name = "UploadDetails")

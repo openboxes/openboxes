@@ -1,4 +1,4 @@
-package org.pih.warehouse.integration.xml.order;
+package org.pih.warehouse.integration.xml.tripcreate;
 
 import org.pih.warehouse.integration.xml.PlannedDateTimeBase;
 
