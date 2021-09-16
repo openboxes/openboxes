@@ -118,7 +118,8 @@ class TmsIntegrationService {
         String serializedOrder = serialize(deliveryOrder, org.pih.warehouse.integration.xml.order.Order.class)
 
         // transfer file to sftp server
-        fileTransferService.storeMessage("CreateDeliveryOrder-${stockMovement?.identifier}.xml", serializedOrder)
+        String destination = "${grailsApplication.config.openboxes.integration.ftp.directory}"
+        fileTransferService.storeMessage("CreateDeliveryOrder-${stockMovement?.identifier}.xml", serializedOrder, destination)
     }
 
 
