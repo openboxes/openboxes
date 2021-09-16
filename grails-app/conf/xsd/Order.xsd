@@ -2,9 +2,9 @@
 <xs:schema attributeFormDefault="unqualified"
     elementFormDefault="qualified"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:tns="http://www.etrucknow.com/edi/carrier/trip_notification/v1"
-    targetNamespace="http://www.etrucknow.com/edi/carrier/trip_notification/v1">
-    <xs:element name="Trip">
+    xmlns:tns="http://www.etrucknow.com/edi/business_partner/order_create/v1"
+    targetNamespace="http://www.etrucknow.com/edi/business_partner/order_create/v1">
+    <xs:element name="Order">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="Header" type="tns:Header" />
@@ -15,11 +15,8 @@
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>
-                <xs:element name="TripID" type="tns:smallText" />
-                <xs:element name="ExternalTripID" type="tns:smallText" minOccurs="0" />
-                <xs:element name="KNOrgDetails" type="tns:KNOrgDetails" />
-                <xs:element name="TripDetails" type="tns:TripDetails" />
-                <xs:element name="TripOrderDetails" type="tns:TripOrderDetails" minOccurs="0" />
+                <xs:element name="KNOrgDetails" type="tns:KNOrgDetails" />                
+                <xs:element name="OrderDetails" type="tns:OrderDetails" />
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -37,7 +34,7 @@
             <xs:element name="Password" type="tns:largeText" minOccurs="0">
 		<xs:annotation>
 	        	<xs:documentation>
-	  		Username and password is mandatory incase of a request flow
+	  		Username and password is not needed
 			</xs:documentation>
         	</xs:annotation>
 	    </xs:element>
@@ -75,81 +72,12 @@
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="TripDetails">
+    <xs:complexType name="OrderDetails">
         <xs:sequence>
-            <xs:element name="TripType">
-                <xs:simpleType>
-                    <xs:restriction base="xs:string">
-                        <xs:enumeration value="REGULAR" />
-                        <xs:enumeration value="RETURN" />
-                        <xs:enumeration value="EMPTY_TRIP" />
-                    </xs:restriction>
-                </xs:simpleType>
-            </xs:element>
-            <xs:element name="Carrier">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element name="PartyID" type="tns:partyID" />
-                        <xs:element name="ContactData" type="tns:contactData" minOccurs="0" />
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="CarrierInstructions" type="tns:extralargeText" minOccurs="0" />
-            <xs:element name="AdditionalConditions" type="tns:extraExtralargeText" minOccurs="0" />
-            <xs:element name="TemperatureRegime" type="tns:extraExtralargeText" minOccurs="0" />
-            <xs:element name="TimeForLoadingAndPenalty" type="tns:extraExtralargeText" minOccurs="0" />
-            <xs:element name="VehicleDetails" type="tns:VehicleDetails" minOccurs="0" />
-            <xs:element name="DriverDetails" type="tns:DriverDetails" minOccurs="0" />
-            <xs:element name="TripCargoSummary" type="tns:TripCargoSummary" minOccurs="0" />
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="TripOrderDetails">
-        <xs:sequence>
-            <xs:element name="Orders" type="tns:Orders" maxOccurs="unbounded" />
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="partyID">
-        <xs:sequence>
-            <xs:element name="ID" type="tns:smallText" />
-            <xs:element name="Name" type="tns:smallText" />
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="VehicleDetails">
-        <xs:sequence>
-            <xs:element name="VehicleTypeCode" type="tns:smallText" minOccurs="0" />
-            <xs:element name="VehicleModelCode" type="tns:smallText" minOccurs="0" />
-            <xs:element name="RegistrationNumber" type="tns:smallText" minOccurs="0" />
-            <xs:element name="License" type="tns:smallText" minOccurs="0" />
-            <xs:element name="ApplicableForDangerousGoods" type="tns:smallText" minOccurs="0" />
-            <xs:element name="Properties" type="tns:Properties" minOccurs="0" />
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="DriverDetails">
-        <xs:sequence>
-            <xs:element name="IDProof" type="tns:IDProof" minOccurs="0" />
-            <xs:element name="Address" type="tns:Address" minOccurs="0" />
-            <xs:element name="ContactData" type="tns:contactData" />
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="TripCargoSummary">
-        <xs:sequence>
-            <xs:element name="TotalQuantity" type="tns:unitTypeQuantity" />
-            <xs:element name="TotalVolume" type="tns:unitTypeVolume" />
-            <xs:element name="TotalWeight" type="tns:unitTypeWeight" />
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="Orders">
-        <xs:sequence>
-            <xs:element name="OrderID" type="tns:smallText" />
             <xs:element name="EXTOrderID" type="tns:smallText" minOccurs="0" />
             <xs:element name="DepartmentCode" type="tns:miniText" minOccurs="0" />
-            <xs:element name="OrderType" type="tns:smallText" />
+            <xs:element name="OrderType" type="tns:smallText" minOccurs="0" />
+            <xs:element name="OrderProductType" type="tns:smallText" minOccurs="0" />
             <xs:element name="ModeOfTransport">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
@@ -173,14 +101,6 @@
 	    	</xs:simpleType>
             </xs:element>
             <xs:element name="GoodsValue" type="tns:GoodsValue" minOccurs="0" />
-            <xs:element name="TypeOfBusiness">
-                <xs:simpleType>
-                    <xs:restriction base="xs:string">
-                        <xs:enumeration value="DOMESTIC" />
-                        <xs:enumeration value="CROSSBORDER" />
-                    </xs:restriction>
-                </xs:simpleType>
-            </xs:element>
             <xs:element name="TermsOfTrade" type="tns:TermsOfTrade" minOccurs="0" />
             <xs:element name="OrderParties">
                 <xs:complexType>
@@ -212,6 +132,13 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="partyID">
+        <xs:sequence>
+            <xs:element name="ID" type="tns:smallText" />
+            <xs:element name="Name" type="tns:smallText" />
         </xs:sequence>
     </xs:complexType>
 
@@ -274,23 +201,6 @@
             <xs:element name="LastName" type="tns:smallText" minOccurs="0" />
             <xs:element name="Phone" type="tns:Phone" minOccurs="0" />
             <xs:element name="EmailAddress" type="tns:mediumText" minOccurs="0" />
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="Properties">
-        <xs:sequence>
-            <xs:element name="Weight" type="tns:weightProperties" minOccurs="0" />
-            <xs:element name="Volume" type="tns:volumeProperties" minOccurs="0" />
-            <xs:element name="Length" type="tns:dimensionProperties" minOccurs="0" />
-            <xs:element name="Width" type="tns:dimensionProperties" minOccurs="0" />
-            <xs:element name="Height" type="tns:dimensionProperties" minOccurs="0" />
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="IDProof">
-        <xs:sequence>
-            <xs:element name="IDType" type="tns:smallText" minOccurs="0" />
-            <xs:element name="IDNumber" type="tns:smallText" minOccurs="0" />
         </xs:sequence>
     </xs:complexType>
 
@@ -380,7 +290,6 @@
 
     <xs:complexType name="LocationInfo">
         <xs:sequence>
-            <xs:element name="StopSequence" type="xs:nonNegativeInteger" />
             <xs:element name="Address" type="tns:Address" />
             <xs:element name="PlannedDateTime" type="tns:PlannedDateTime" />
             <xs:element name="DriverInstructions" minOccurs="0" >
@@ -420,6 +329,7 @@
             <xs:element name="Height" type="tns:unitTypeLength" minOccurs="0" />
             <xs:element name="Weight" type="tns:unitTypeWeight" minOccurs="0" />
             <xs:element name="ActualVolume" type="tns:unitTypeVolume" minOccurs="0" />
+            <xs:element name="Volume" type="tns:unitTypeVolume" minOccurs="0" />
             <xs:element name="ActualWeight" type="tns:unitTypeWeight" minOccurs="0" />
             <xs:element name="VolumetricWeight" type="tns:unitTypeWeight" minOccurs="0" />
             <xs:element name="LDM" type="tns:largeDecimal" minOccurs="0" />
@@ -438,7 +348,7 @@
             <xs:element name="CountryCode" minOccurs="0">
                 <xs:simpleType>
                     <xs:restriction base="xs:nonNegativeInteger">
-		        <xs:totalDigits value="5" />
+                        <xs:totalDigits value="5" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
