@@ -142,7 +142,7 @@ class TmsIntegrationService {
         orderDetails.setServiceType(config.orderDetails.serviceType);
         orderDetails.setDeliveryTerms(config.orderDetails.deliveryTerms);
 
-        orderDetails.setGoodsValue(new GoodsValue("${stockMovement.totalValue?:0}", defaultCurrencyCode));
+        orderDetails.setGoodsValue(new GoodsValue(stockMovement.totalValue?:0, defaultCurrencyCode));
 
         orderDetails.setTermsOfTrade(new TermsOfTrade(config.orderDetails.termsOfTrade.incoterm,
                 new FreightName( config.orderDetails.termsOfTrade.freightName.name, config.orderDetails.termsOfTrade.freightName.name)));
@@ -155,8 +155,8 @@ class TmsIntegrationService {
         orderDetails.setOrderParties(new OrderParties(partyTypes));
 
         // Start and end locations
-        orderDetails.setOrderStartLocation(buildLocationInfo("1", stockMovement?.origin, stockMovement?.expectedShippingDate, null));
-        orderDetails.setOrderEndLocation(buildLocationInfo("2", stockMovement?.destination, stockMovement?.expectedDeliveryDate, null));
+        orderDetails.setOrderStartLocation(buildLocationInfo(stockMovement?.origin, stockMovement?.expectedShippingDate, null));
+        orderDetails.setOrderEndLocation(buildLocationInfo(stockMovement?.destination, stockMovement?.expectedDeliveryDate, null));
 
         // Order cargo summary
         orderDetails.setOrderCargoSummary(new OrderCargoSummary(
@@ -208,7 +208,19 @@ class TmsIntegrationService {
 
 
     PartyType buildPartyType(Location location, User contactData, String type) {
-        return buildPartyType(location?.organization, contactData, type)
+        PartyType partyType = new PartyType();
+        partyType.setPartyID(new PartyID(location?.locationNumber, location?.name));
+        partyType.setType(type);
+
+        // Add contact information
+        User contact = contactData?:location?.manager
+        if (contact) {
+            partyType.setContactData(
+                    new ContactData(contact.firstName, contact?.lastName,
+                    new Phone(null, contact?.phoneNumber), contact?.email));
+        }
+        return partyType
+
     }
 
     PartyType buildPartyType(Organization organization, User contactData, String type) {
@@ -225,10 +237,9 @@ class TmsIntegrationService {
         return partyType
     }
 
-    LocationInfo buildLocationInfo(String stopSequence, Location location, Date expectedDate, String driverInstructions) {
+    LocationInfo buildLocationInfo(Location location, Date expectedDate, String driverInstructions) {
         String expectedDateString = expectedDate ? dateFormatter.format(expectedDate) : null
         return new LocationInfo(
-                stopSequence,
                 location?.address ? buildAddress(location?.address) : null,
                 new PlannedDateTime(expectedDateString, expectedDateString),
                 driverInstructions
