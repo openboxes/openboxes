@@ -19,7 +19,15 @@ CREATE OR REPLACE VIEW requirement AS (
       END AS status
 	FROM inventory_level i_l
     JOIN location loc on loc.inventory_id = i_l.inventory_id
-    JOIN product_availability pa_in_bin on (pa_in_bin.product_id = i_l.product_id and pa_in_bin.bin_location_id <=> i_l.internal_location_id and pa_in_bin.location_id = loc.id)
+    JOIN (
+      SELECT
+        pa_in_bin.product_id,
+        pa_in_bin.location_id,
+        pa_in_bin.bin_location_id,
+        sum(pa_in_bin.quantity_on_hand) as quantity_on_hand
+      FROM product_availability pa_in_bin
+      GROUP BY pa_in_bin.product_id, pa_in_bin.location_id, pa_in_bin.bin_location_id
+    ) pa_in_bin on (pa_in_bin.product_id = i_l.product_id and pa_in_bin.bin_location_id <=> i_l.internal_location_id and pa_in_bin.location_id = loc.id)
     JOIN (
       SELECT
         tpa.product_id,
@@ -29,4 +37,5 @@ CREATE OR REPLACE VIEW requirement AS (
       GROUP BY tpa.product_id, tpa.location_id
     ) total_pa on (total_pa.product_id = i_l.product_id and total_pa.location_id = loc.id)
 	WHERE i_l.max_quantity IS NOT NULL or i_l.min_quantity IS NOT NULL or i_l.reorder_quantity IS NOT NULL
+	ORDER BY i_l.last_updated DESC
 );
