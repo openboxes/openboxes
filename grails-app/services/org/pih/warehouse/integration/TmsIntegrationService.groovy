@@ -9,12 +9,14 @@
 **/
 package org.pih.warehouse.integration
 
+import org.apache.commons.io.IOUtils
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.User
 import org.pih.warehouse.integration.xml.acceptancestatus.AcceptanceStatus
+import org.pih.warehouse.integration.xml.execution.Execution
 import org.pih.warehouse.integration.xml.order.Address
 import org.pih.warehouse.integration.xml.order.CargoDetails
 import org.pih.warehouse.integration.xml.order.ContactData
@@ -41,6 +43,8 @@ import org.pih.warehouse.integration.xml.order.UnitTypeLength
 import org.pih.warehouse.integration.xml.order.UnitTypeQuantity
 import org.pih.warehouse.integration.xml.order.UnitTypeVolume
 import org.pih.warehouse.integration.xml.order.UnitTypeWeight
+import org.pih.warehouse.integration.xml.pod.DocumentUpload
+import org.pih.warehouse.integration.xml.trip.Trip
 
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.Marshaller
@@ -72,6 +76,13 @@ class TmsIntegrationService {
         }
     }
 
+    Object deserialize(String xmlContents) {
+        // Convert XML message to message object
+        JAXBContext jaxbContext = JAXBContext.newInstance("org.pih.warehouse.integration.xml.acceptancestatus:org.pih.warehouse.integration.xml.execution:org.pih.warehouse.integration.xml.pod:org.pih.warehouse.integration.xml.trip");
+        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        InputStream inputStream = IOUtils.toInputStream(xmlContents)
+        return unmarshaller.unmarshal(inputStream)
+    }
 
     Object deserialize(String xmlContents, final Class clazz) {
         try {
@@ -85,6 +96,22 @@ class TmsIntegrationService {
             throw e
         }
     }
+
+    def handleMessage(Object messageObject) {
+
+        // Publish message to event bus
+        if (messageObject instanceof DocumentUpload) {
+            grailsApplication.mainContext.publishEvent(new DocumentUploadEvent(messageObject))
+        } else if (messageObject instanceof AcceptanceStatus) {
+            grailsApplication.mainContext.publishEvent(new AcceptanceStatusEvent(messageObject))
+        } else if (messageObject instanceof Execution) {
+            grailsApplication.mainContext.publishEvent(new TripExecutionEvent(messageObject))
+        } else if (messageObject instanceof Trip) {
+            grailsApplication.mainContext.publishEvent(new TripNotificationEvent(messageObject))
+        }
+
+    }
+
 
     def uploadDeliveryOrder(StockMovement stockMovement) {
         Object deliveryOrder = createDeliveryOrder(stockMovement)

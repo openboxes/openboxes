@@ -10,7 +10,6 @@
 package org.pih.warehouse
 
 import net.schmizz.sshj.sftp.SFTPException
-import org.apache.commons.io.IOUtils
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.Document
@@ -20,27 +19,15 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.InboundStockMovementExcelImporter
 import org.pih.warehouse.importer.OutboundStockMovementExcelImporter
-import org.pih.warehouse.integration.AcceptanceStatusEvent
-import org.pih.warehouse.integration.DocumentUploadEvent
-import org.pih.warehouse.integration.TripExecutionEvent
-import org.pih.warehouse.integration.TripNotificationEvent
-import org.pih.warehouse.integration.xml.trip.Trip
 import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSummary
 import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.integration.xml.acceptancestatus.AcceptanceStatus
-import org.pih.warehouse.integration.xml.pod.DocumentUpload
-import org.pih.warehouse.integration.xml.execution.Execution
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest
 
-import javax.xml.bind.JAXBContext
-import javax.xml.bind.Marshaller
-import javax.xml.bind.Unmarshaller
-import java.text.SimpleDateFormat
 
 class MobileController {
 
@@ -54,6 +41,9 @@ class MobileController {
     def grailsApplication
     def uploadService
     def tmsIntegrationService
+    def messageHandlerService
+    def xsdValidatorService
+
 
     def index = {
 
@@ -318,36 +308,18 @@ class MobileController {
     }
 
     def messageProcess = {
-
-        // Retrive XML file
-        String xmlContents = fileTransferService.retrieveMessage(params.filename)
-
-        // Convert XML message to message object
-        JAXBContext jaxbContext = JAXBContext.newInstance("org.pih.warehouse.integration.xml.acceptancestatus:org.pih.warehouse.integration.xml.execution:org.pih.warehouse.integration.xml.pod:org.pih.warehouse.integration.xml.trip");
-        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        InputStream inputStream = IOUtils.toInputStream(xmlContents)
-        Object messageObject = unmarshaller.unmarshal(inputStream)
-
         try {
-            // Publish message to event bus
-            if (messageObject instanceof DocumentUpload) {
-                grailsApplication.mainContext.publishEvent(new DocumentUploadEvent(messageObject))
-            } else if (messageObject instanceof AcceptanceStatus) {
-                grailsApplication.mainContext.publishEvent(new AcceptanceStatusEvent(messageObject))
-            } else if (messageObject instanceof Execution) {
-                grailsApplication.mainContext.publishEvent(new TripExecutionEvent(messageObject))
-            } else if (messageObject instanceof Trip) {
-                grailsApplication.mainContext.publishEvent(new TripNotificationEvent(messageObject))
-            }
+            String xmlContents = fileTransferService.retrieveMessage(params.filename)
+            xsdValidatorService.validateXml(xmlContents)
+            Object messageObject = tmsIntegrationService.deserialize(xmlContents)
+            tmsIntegrationService.handleMessage(messageObject)
             flash.message = "Message has been processed"
         }
         catch (Exception e) {
             log.error("Message not processed due to error: " + e.message, e)
-            flash.message = "Message not processed due to error: " + e.message
+            flash.message = "Message not processed due to error: " + e?.cause?.message?:e.message
         }
-
         redirect(action: "messageList")
-
     }
 
     def documentDownload = {

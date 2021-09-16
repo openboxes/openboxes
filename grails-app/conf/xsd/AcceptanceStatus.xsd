@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified"
+           elementFormDefault="qualified"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:tns="http://www.etrucknow.com/edi/carrier/acceptance_status/v1"
+           targetNamespace="http://www.etrucknow.com/edi/carrier/acceptance_status/v1">
+    <xs:element name="AcceptanceStatus">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Header" type="tns:Header"/>
+                <xs:element name="Action">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="ACCEPT"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element name="TripDetails" type="tns:TripDetails"/>
+                <xs:element name="TripOrderDetails" type="tns:TripOrderDetails" minOccurs="0" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="Header">
+        <xs:sequence>
+            <xs:element name="Version">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="V1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="Username" type="tns:smallText" minOccurs="0"/>
+            <xs:element name="Password" type="tns:largeText" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>
+                        Username and password is mandatory incase of a request flow
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="SequenceNumber" type="tns:mediumText" />
+            <xs:element name="SourceApp" minOccurs="0">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="ETRUCKNOW" />
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="DestinationApp" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>
+                        Incase of a request, it is mandatory to provide the SourceApp. Incase of a reponse, the DestinationApp must be provided.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="ETRUCKNOW"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="TripDetails">
+        <xs:sequence>
+            <xs:element name="TripID" type="tns:smallText"/>
+            <xs:element name="Carrier" type="tns:partyID"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="TripOrderDetails">
+        <xs:sequence>
+            <xs:element name="OrderID" type="tns:smallText" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="partyID">
+        <xs:sequence>
+            <xs:element name="ID" type="tns:smallText" />
+            <xs:element name="Name" type="tns:smallText" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="smallText">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="15" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="mediumText">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="30" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="largeText">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="50" />
+        </xs:restriction>
+    </xs:simpleType>
+</xs:schema>
