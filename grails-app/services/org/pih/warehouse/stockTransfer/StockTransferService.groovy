@@ -33,6 +33,46 @@ class StockTransferService {
 
     boolean transactional = true
 
+    def getStockTransfers(Order orderTemplate, Date lastUpdatedStartDate, Date lastUpdatedEndDate, Map params) {
+        def orders = Order.createCriteria().list(params) {
+            and {
+                if (params.q) {
+                    or {
+                        ilike("name", "%" + params.q + "%")
+                        ilike("description", "%" + params.q + "%")
+                        ilike("orderNumber", "%" + params.q + "%")
+                    }
+                }
+                if (orderTemplate.orderType) {
+                    eq("orderType", orderTemplate.orderType)
+                }
+                if (orderTemplate.destination) {
+                    eq("destination", orderTemplate.destination)
+                }
+                if (orderTemplate.origin) {
+                    eq("origin", orderTemplate.origin)
+                }
+                if (orderTemplate.status) {
+                    eq("status", orderTemplate.status)
+                }
+                if (lastUpdatedStartDate) {
+                    ge("lastUpdated", lastUpdatedStartDate)
+                }
+                if (lastUpdatedEndDate) {
+                    le("lastUpdated", lastUpdatedEndDate)
+                }
+                if (orderTemplate.orderedBy) {
+                    eq("orderedBy", orderTemplate.orderedBy)
+                }
+                if (orderTemplate.createdBy) {
+                    eq("createdBy", orderTemplate.createdBy)
+                }
+            }
+            order("dateCreated", "desc")
+        }
+        return orders
+    }
+
     def getStockTransferCandidates(Location location) {
         List<StockTransferItem> stockTransferItems = []
 

@@ -113,6 +113,11 @@
                             </g:link>
                         </div>
                         <div class="mm-menu-item">
+                            <g:link controller="stockTransfer" action="list" class="list">
+                                <warehouse:message code="inventory.listStockTransfers.label" />
+                            </g:link>
+                        </div>
+                        <div class="mm-menu-item">
                             <g:link controller="replenishment" action="index" class="create">
                                 <warehouse:message code="inventory.createReplenishment.label" />
                             </g:link>
