@@ -29,7 +29,7 @@ enum OrderStatus {
     }
 
     static list() {
-        [PENDING, PLACED, PARTIALLY_RECEIVED, RECEIVED, COMPLETED, CANCELED, REJECTED]
+        [PENDING, APPROVED, PLACED, PARTIALLY_RECEIVED, RECEIVED, COMPLETED, CANCELED, REJECTED]
     }
 
     String toString() { return name() }
