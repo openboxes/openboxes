@@ -1081,7 +1081,7 @@ class ProductController {
         if (productCatalog && product) {
             log.info("product: " + product)
             log.info("productCatalog: " + productCatalog)
-            def list = productCatalog.productCatalogItems.findAll { it.product = product }
+            def list = productCatalog.productCatalogItems.findAll { it.product == product }
             list.toArray().each { productCatalogItem ->
                 productCatalog.removeFromProductCatalogItems(productCatalogItem)
                 productCatalogItem.delete()
