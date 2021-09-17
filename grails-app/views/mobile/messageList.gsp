@@ -19,30 +19,28 @@
         </div>
         <div class="card-body">
             <div class="row">
-                <div class="col-sm-12 col-md-3 text-center time-info mt-3 mt-sm-0">
+                <div class="col-sm-12 col-md-4 text-center time-info mt-3 mt-sm-0">
                     <span class="text-muted d-block">Server</span>
                     <span class="text-5 font-weight-500 text-dark">
                         ${grailsApplication.config.openboxes.integration.ftp.server}
                     </span>
                 </div>
 
-                <div class="col-sm-12 col-md-3 text-center company-info">
+                <div class="col-sm-12 col-md-4 text-center company-info">
                     <span class="text-muted d-block">User</span>
                     <span class="text-5 font-weight-500 text-dark">
                         ${grailsApplication.config.openboxes.integration.ftp.user}
                     </span>
                 </div>
 
-                <div class="col-sm-12 col-md-3 text-center time-info mt-3 mt-sm-0">
-                    <span class="text-muted d-block">Directory</span>
+                <div class="col-sm-12 col-md-4 text-center time-info mt-3 mt-sm-0">
+                    <span class="text-muted d-block">Polling Directories</span>
                     <span class="text-5 font-weight-500 text-dark">
-                        ${grailsApplication.config.openboxes.integration.ftp.directory}
-                    </span>
-                </div>
-                <div class="col-sm-12 col-md-3 text-center time-info mt-3 mt-sm-0">
-                    <span class="text-muted d-block">Subdirectories</span>
-                    <span class="text-5 font-weight-500 text-dark">
-                        ${grailsApplication.config.openboxes.integration.ftp.subdirectories}
+                        <ul class="list-group">
+                            <g:each var="subdirectory" in="${grailsApplication.config.openboxes.integration.ftp.inbound.subdirectories}">
+                                <li class="list-group-item">${grailsApplication.config.openboxes.integration.ftp.inbound.directory}/${subdirectory}</li>
+                            </g:each>
+                        </ul>
                     </span>
                 </div>
             </div>
@@ -76,7 +74,7 @@
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                                 <g:link controller="mobile" action="messageDetails"
                                         params="[path: message.path]"
-                                        class="btn btn-outline-primary">View</g:link>
+                                        class="btn btn-outline-primary">Download</g:link>
                                 <g:link controller="mobile" action="messageProcess"
                                         params="[path: message.path]"
                                         class="btn btn-outline-success">Process</g:link>
