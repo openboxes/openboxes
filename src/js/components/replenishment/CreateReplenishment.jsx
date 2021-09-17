@@ -139,12 +139,14 @@ class CreateReplenishment extends Component {
 
   updateRow(values, index) {
     const item = values.requirements[index];
-    this.setState({
-      values: update(values, {
-        requirements: { [index]: { $set: item } },
-      }),
-      isDirty: true,
-    });
+    if (item.quantity !== this.state.values.requirements[index].quantity) {
+      this.setState({
+        values: update(values, {
+          requirements: { [index]: { $set: item } },
+        }),
+        isDirty: true,
+      });
+    }
   }
 
   dataFetched = false;
