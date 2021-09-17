@@ -1432,22 +1432,22 @@ openboxes.integration.order.header.destinationApp = "ETRUCKNOW"
 openboxes.integration.order.action = "CREATE"
 
 // Default organization details
-openboxes.integration.order.organizationDetails.companyCode = "MYKN"
-openboxes.integration.order.organizationDetails.branchCode = "MYKUL"
+openboxes.integration.order.organizationDetails.companyCode = ""
+openboxes.integration.order.organizationDetails.branchCode = ""
 
 // Default order details
-openboxes.integration.order.orderDetails.departmentCode = "MYKUL"
+openboxes.integration.order.orderDetails.departmentCode = ""
 openboxes.integration.order.orderDetails.orderType = "NORMAL"
 openboxes.integration.order.orderDetails.orderProductType = "NORMAL"
 openboxes.integration.order.orderDetails.modeOfTransport = "FTL"
-openboxes.integration.order.orderDetails.serviceType = "Pharma"
+openboxes.integration.order.orderDetails.serviceType = ""
 openboxes.integration.order.orderDetails.deliveryTerms = ""
 
 // Default trade terms
 openboxes.integration.order.orderDetails.termsOfTrade.incoterm = "DAP"
 openboxes.integration.order.orderDetails.termsOfTrade.freightName.term = ""
 openboxes.integration.order.orderDetails.termsOfTrade.freightName.name = ""
-openboxes.integration.order.orderDetails.cargoDetails.cargoType = "GEN_CATEGORY"
+openboxes.integration.order.orderDetails.cargoDetails.cargoType = ""
 // Disable feature during development
 openboxes.shipping.splitPickItems.enabled = true
 
