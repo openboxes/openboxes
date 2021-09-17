@@ -306,6 +306,32 @@ body {
   }
 }
 
+.select-sm {
+  font-size: .875rem;
+  border-radius: .2rem;
+
+  .Select-control {
+    height: 32px;
+
+    .Select-value {
+      line-height: 32px !important;
+    }
+
+    .Select-placeholder {
+      line-height: 32px;
+    }
+
+    .Select-input {
+      height: 30px;
+
+      input {
+        padding: 0;
+        line-height: 32px;
+      }
+    }
+  }
+}
+
 .table-xs th,
 .table-xs td {
   padding: 0.3rem;

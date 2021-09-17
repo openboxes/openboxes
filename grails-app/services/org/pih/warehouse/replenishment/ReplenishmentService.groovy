@@ -37,9 +37,16 @@ class ReplenishmentService {
     boolean transactional = true
 
     def getRequirements(Location location, InventoryLevelStatus inventoryLevelStatus) {
-        return Requirement.createCriteria().list() {
+        def requirements = Requirement.createCriteria().list() {
             eq("location", location)
             eq("status", inventoryLevelStatus)
+        }
+
+        return requirements?.unique {[it.product, it.location, it.binLocation]}?.sort { a, b ->
+            a.product.productCode <=> b.product.productCode ?:
+                    a.binLocation.zone.name <=> b.binLocation.zone.name ?:
+                            a.binLocation.name <=> b.binLocation.name ?:
+                                    a.quantityInBin <=> b.quantityInBin
         }
     }
 
