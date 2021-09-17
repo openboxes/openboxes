@@ -95,6 +95,16 @@
                     ${g.formatDate(date: stockMovement.requisition.dateCreated)}
                 </span>
             </div>
+            <div class="col-sm-12 col-md-2 text-center time-info mt-3 mt-sm-0">
+                <span class="text-muted d-block">Expected Shipping</span>
+                <div class="text-5 font-weight-500 text-dark">
+                    ${g.formatDate(date: stockMovement.expectedShippingDate)}
+                </div>
+                <g:if test="${!stockMovement.isShipped && stockMovement?.expectedShippingDate && stockMovement.expectedShippingDate < new Date()}">
+                    <div class="badge badge-pill bg-danger">Delayed - Expected ${prettyDateFormat(date: stockMovement?.expectedShippingDate)}</div>
+                </g:if>
+                <g:else>Not Available</g:else>
+            </div>
 
             <div class="col-sm-12 col-md-2 text-center time-info mt-3 mt-sm-0">
                 <span class="text-muted d-block">Expected Delivery</span>
@@ -102,7 +112,7 @@
                 <div class="text-5 font-weight-500 text-dark">
                     ${g.formatDate(date: stockMovement.expectedDeliveryDate)}
                 </div>
-                <g:if test="${stockMovement?.expectedDeliveryDate && stockMovement.expectedDeliveryDate < new Date()}">
+                <g:if test="${!stockMovement?.isReceived && stockMovement?.expectedDeliveryDate && stockMovement.expectedDeliveryDate < new Date()}">
                     <div class="badge badge-pill bg-danger">Delayed - Expected ${prettyDateFormat(date: stockMovement?.expectedDeliveryDate)}</div>
                 </g:if>
                 <g:else>Not Available</g:else>

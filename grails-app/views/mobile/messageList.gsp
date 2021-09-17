@@ -107,7 +107,7 @@
                     <div class="modal-body">
                         <label for="subdirectory" class="form-label">Subdirectory</label>
                         <g:select name="subdirectory"  class="form-control"
-                                  from="${grailsApplication.config.openboxes.integration.ftp.subdirectories}"/>
+                                  from="${grailsApplication.config.openboxes.integration.ftp.inbound.subdirectories}"/>
 
                         <label for="messageFile" class="form-label">File</label>
                         <input class="form-control" type="file" name="messageFile" id="messageFile" required>

@@ -50,9 +50,8 @@ class FileTransferService {
                 return fileInfo
             }
             return messages
-            return files
         } catch (Exception e) {
-            log.error("Error doing something", e)
+            log.error("Error occurred while listing messages: " + e.message, e)
         }
         finally {
             secureFtpClient.disconnect()

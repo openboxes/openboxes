@@ -29,17 +29,14 @@ class TripExecutionEventService implements ApplicationListener<TripExecutionEven
 
     void onApplicationEvent(TripExecutionEvent tripExecutionEvent) {
         log.info "Trip execution " + tripExecutionEvent.execution.toString()
-
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssX")
+        SimpleDateFormat dateFormatter = new SimpleDateFormat(grailsApplication.config.openboxes.integration.defaultDateFormat)
         tripExecutionEvent.execution.executionStatus.each { ExecutionStatus executionStatus ->
-
             String trackingNumber = executionStatus.orderId
             StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber)
             if (!stockMovement) {
                 throw new Exception("Unable to locate stock movement by tracking number ${trackingNumber}")
             }
             Shipment shipment = stockMovement?.shipment
-
             String statusCode = executionStatus.status
             EventCode eventCode = statusCode ? EventCode.valueOf(statusCode) : EventCode.UNKNOWN
             EventType eventType = EventType.findByEventCode(eventCode)
@@ -48,6 +45,5 @@ class TripExecutionEventService implements ApplicationListener<TripExecutionEven
             shipment.addToEvents(event)
             shipment.save(flush:true)
         }
-
     }
 }

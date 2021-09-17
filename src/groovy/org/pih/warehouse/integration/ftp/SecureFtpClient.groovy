@@ -142,7 +142,7 @@ class SecureFtpClient {
         } catch(Exception e) {
             LOG.error("Exception while listing remote from ${path}: " + e.message, e)
         } finally {
-            //sftpClient.close()
+            sshClient.close()
         }
     }
 
@@ -170,7 +170,7 @@ class SecureFtpClient {
         } catch(Exception e) {
             LOG.error("Exception while listing remote from ${path}: " + e.message, e)
         } finally {
-            //sftpClient.close()
+            sshClient.close()
         }
     }
 
@@ -180,7 +180,7 @@ class SecureFtpClient {
             LOG.info "Retrieve remote ${source} to local ${destination}"
             sftpClient.get(source, new FileSystemFile(destination))
         } finally {
-            //sftpClient.close();
+            sshClient.close()
         }
     }
 
@@ -190,7 +190,7 @@ class SecureFtpClient {
             RemoteFile remoteFile = sftpClient.SFTPEngine.open(source)
             return new RemoteFile.RemoteFileInputStream(remoteFile)
         } finally {
-            //sftpClient.close()
+            //sshClient.close()
         }
     }
 
@@ -200,7 +200,7 @@ class SecureFtpClient {
             InputStream inputStream = retrieveFileAsInputStream(source)
             return IOUtils.toString(inputStream, StandardCharsets.UTF_8.name())
         } finally {
-            //sftpClient.close()
+            //sshClient.close()
         }
     }
 
@@ -209,7 +209,7 @@ class SecureFtpClient {
             LOG.info "Put local ${file.path} to remote ${path}"
             sftpClient.put(new FileSystemFile(file.path), path);
         } finally {
-            //sfptClient.close()
+            sshClient.close()
         }
     }
 
@@ -231,7 +231,7 @@ class SecureFtpClient {
             }, path)
 
         } finally {
-            //sfptClient.close()
+            sshClient.close()
         }
     }
 
@@ -240,7 +240,7 @@ class SecureFtpClient {
             LOG.info "Delete remote file ${filename}"
             sftpClient.rm(filename)
         } finally {
-            //sfptClient.close()
+            sshClient.close()
         }
     }
 

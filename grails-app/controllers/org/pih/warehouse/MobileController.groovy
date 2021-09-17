@@ -60,8 +60,8 @@ class MobileController {
             eq("origin", location)
         }
 
-        String directory = grailsApplication.config.openboxes.integration.ftp.directory
-        List<String> subdirectories = grailsApplication.config.openboxes.integration.ftp.subdirectories
+        String directory = grailsApplication.config.openboxes.integration.ftp.inbound.directory
+        List<String> subdirectories = grailsApplication.config.openboxes.integration.ftp.inbound.subdirectories
         def messages = fileTransferService.listMessages(directory, subdirectories)
         def messageCount = messages ? messages?.size() :0
 
@@ -272,8 +272,8 @@ class MobileController {
     }
 
     def messageList = {
-        String directory = grailsApplication.config.openboxes.integration.ftp.directory
-        List<String> subdirectories = grailsApplication.config.openboxes.integration.ftp.subdirectories
+        String directory = grailsApplication.config.openboxes.integration.ftp.inbound.directory
+        List<String> subdirectories = grailsApplication.config.openboxes.integration.ftp.inbound.subdirectories
         log.info "subdirectories: " + subdirectories
         def messages = fileTransferService.listMessages(directory, subdirectories)
 
@@ -289,7 +289,7 @@ class MobileController {
 
     def messageDelete = {
         fileTransferService.deleteMessage(params.path)
-        flash.message = "Message ${params.filename} deleted successfully"
+        flash.message = "Message ${params.path} deleted successfully"
         redirect(action: "messageList")
     }
 
@@ -300,7 +300,7 @@ class MobileController {
             File file = new File ("/tmp/${fileName}")
             messageFile.transferTo(file)
             try {
-                String directory = grailsApplication.config.openboxes.integration.ftp.directory
+                String directory = grailsApplication.config.openboxes.integration.ftp.inbound.directory
                 String subdirectory = params.subdirectory
                 String destination = "${directory}/${subdirectory}/${file.name}"
                 fileTransferService.storeMessage(file, destination)
@@ -318,7 +318,11 @@ class MobileController {
     def messageProcess = {
         try {
             String xmlContents = fileTransferService.retrieveMessage(params.path)
-            xsdValidatorService.validateXml(xmlContents)
+
+            Boolean validate = grailsApplication.config.openboxes.integration.inbound.validate?:true
+            if (validate) {
+                xsdValidatorService.validateXml(xmlContents)
+            }
             Object messageObject = tmsIntegrationService.deserialize(xmlContents)
             tmsIntegrationService.handleMessage(messageObject)
             flash.message = "Message has been processed"
