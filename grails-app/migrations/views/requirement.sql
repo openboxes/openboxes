@@ -19,7 +19,7 @@ CREATE OR REPLACE VIEW requirement AS (
       END AS status
 	FROM inventory_level i_l
     JOIN location loc on loc.inventory_id = i_l.inventory_id
-    JOIN (
+    LEFT OUTER JOIN (
       SELECT
         pa_in_bin.product_id,
         pa_in_bin.location_id,
@@ -28,7 +28,7 @@ CREATE OR REPLACE VIEW requirement AS (
       FROM product_availability pa_in_bin
       GROUP BY pa_in_bin.product_id, pa_in_bin.location_id, pa_in_bin.bin_location_id
     ) pa_in_bin on (pa_in_bin.product_id = i_l.product_id and pa_in_bin.bin_location_id <=> i_l.internal_location_id and pa_in_bin.location_id = loc.id)
-    JOIN (
+    LEFT OUTER JOIN (
       SELECT
         tpa.product_id,
         tpa.location_id,
