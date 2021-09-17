@@ -30,7 +30,8 @@ class MessageRetrievalJob {
         def startTime = System.currentTimeMillis()
 
         // Configuration
-        String directory = grailsApplication.config.openboxes.integration.ftp.directory
+        String directory = grailsApplication.config.openboxes.integration.ftp.inbound.directory
+        List<String> subdirectories = grailsApplication.config.openboxes.integration.ftp.inbound.subdirectories
 
         // Retrieve files by SFTP
         Map sftpConfig = grailsApplication.config.openboxes.integration.ftp.flatten()
