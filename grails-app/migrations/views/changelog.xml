@@ -76,9 +76,6 @@
     <sqlFile path="views/supplier-list.sql"/>
   </changeSet>
   <changeSet id="1580848680306-26" author="awalkowiak" runOnChange="true" runAlways="true" failOnError="true">
-    <sqlFile path="views/product-search.sql"/>
-  </changeSet>
-  <changeSet id="1580848680306-27" author="awalkowiak" runOnChange="true" runAlways="true" failOnError="true">
     <sqlFile path="views/requirement.sql"/>
   </changeSet>
 </databaseChangeLog>
