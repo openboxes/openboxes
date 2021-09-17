@@ -1411,18 +1411,25 @@ openboxes.generateName.separator = " - "
 openboxes.integration.ftp.server = "localhost"
 openboxes.integration.ftp.user = "sftpuser"
 openboxes.integration.ftp.password = "password"
-openboxes.integration.ftp.directory = "files"
+openboxes.integration.ftp.outbound.validate = true
+openboxes.integration.ftp.outbound.directory = "outbound"
+openboxes.integration.ftp.inbound.validate = true
+openboxes.integration.ftp.inbound.directory = "inbound"
+openboxes.integration.ftp.inbound.subdirectories = []
+
+// Defaults
+openboxes.integration.defaultTimeZone = "Europe/London"
+openboxes.integration.defaultDateFormat = "yyyy-MM-dd'T'hh:mm:ssXXX"
 
 openboxes.integration.tracking.uri = "https://tms.etrucknow.com/tracking/orderTracking/%s"
 
-// eTruckNow delivery order defaults
-openboxes.integration.order.address.timeZone = "Europe/London"
+openboxes.integration.order.filename = "Order-%s.xml"
 
 // Default order header
 openboxes.integration.order.header.version = "V1"
-openboxes.integration.order.header.username = "TestName"
-openboxes.integration.order.header.password = "TestPwd"
-openboxes.integration.order.header.sequenceNumber = "20201008154348_SG3009200527"
+openboxes.integration.order.header.username = ""
+openboxes.integration.order.header.password = ""
+openboxes.integration.order.header.sequenceNumber = ""
 openboxes.integration.order.header.destinationApp = "ETRUCKNOW"
 
 // Default action
@@ -1438,13 +1445,13 @@ openboxes.integration.order.orderDetails.orderType = "NORMAL"
 openboxes.integration.order.orderDetails.orderProductType = "NORMAL"
 openboxes.integration.order.orderDetails.modeOfTransport = "FTL"
 openboxes.integration.order.orderDetails.serviceType = "Pharma"
-openboxes.integration.order.orderDetails.deliveryTerms = "Shipper"
+openboxes.integration.order.orderDetails.deliveryTerms = ""
 
 // Default trade terms
 openboxes.integration.order.orderDetails.termsOfTrade.incoterm = "DAP"
-openboxes.integration.order.orderDetails.termsOfTrade.freightName.term = "10"
-openboxes.integration.order.orderDetails.termsOfTrade.freightName.name = "Shipper"
-
+openboxes.integration.order.orderDetails.termsOfTrade.freightName.term = ""
+openboxes.integration.order.orderDetails.termsOfTrade.freightName.name = ""
+openboxes.integration.order.orderDetails.cargoDetails.cargoType = "GEN_CATEGORY"
 // Disable feature during development
 openboxes.shipping.splitPickItems.enabled = true
 

@@ -10,6 +10,7 @@
 package org.pih.warehouse.integration
 
 import org.apache.commons.io.IOUtils
+import org.apache.commons.lang.StringUtils
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.core.Location
@@ -26,7 +27,6 @@ import org.pih.warehouse.integration.xml.order.Header
 import org.pih.warehouse.integration.xml.order.ItemDetails
 import org.pih.warehouse.integration.xml.order.KNOrgDetails
 import org.pih.warehouse.integration.xml.order.LocationInfo
-import org.pih.warehouse.integration.xml.order.ManageReferences
 import org.pih.warehouse.integration.xml.order.ManageRemarks
 import org.pih.warehouse.integration.xml.order.Order
 import org.pih.warehouse.integration.xml.order.OrderCargoSummary
@@ -36,7 +36,6 @@ import org.pih.warehouse.integration.xml.order.PartyID
 import org.pih.warehouse.integration.xml.order.PartyType
 import org.pih.warehouse.integration.xml.order.Phone
 import org.pih.warehouse.integration.xml.order.PlannedDateTime
-import org.pih.warehouse.integration.xml.order.RefType
 import org.pih.warehouse.integration.xml.order.Remark
 import org.pih.warehouse.integration.xml.order.TermsOfTrade
 import org.pih.warehouse.integration.xml.order.UnitTypeLength
@@ -57,8 +56,7 @@ class TmsIntegrationService {
 
     def grailsApplication
     def fileTransferService
-    def dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssX")
-
+    def xsdValidatorService
 
     String serialize(final Object object, final Class clazz) {
         try {
@@ -115,10 +113,18 @@ class TmsIntegrationService {
 
     def uploadDeliveryOrder(StockMovement stockMovement) {
         Object deliveryOrder = createDeliveryOrder(stockMovement)
-        String serializedOrder = serialize(deliveryOrder, org.pih.warehouse.integration.xml.order.Order.class)
+        String xmlContents = serialize(deliveryOrder, org.pih.warehouse.integration.xml.order.Order.class)
+
+        Boolean validate = grailsApplication.config.openboxes.integration.outbound.validate?:true
+        if (validate) {
+            xsdValidatorService.validateXml(xmlContents)
+        }
 
         // transfer file to sftp server
-        fileTransferService.storeMessage("CreateDeliveryOrder-${stockMovement?.identifier}.xml", serializedOrder)
+        String filenameTemplate = grailsApplication.config.openboxes.integration.order.filename
+        String destinationFile = String.format(filenameTemplate, stockMovement?.identifier?:stockMovement?.id)
+        String destinationDirectory = "${grailsApplication.config.openboxes.integration.ftp.outbound.directory}"
+        fileTransferService.storeMessage(destinationFile, xmlContents, destinationDirectory)
     }
 
 
@@ -155,8 +161,9 @@ class TmsIntegrationService {
         orderDetails.setOrderParties(new OrderParties(partyTypes));
 
         // Start and end locations
+        // FIXME Get the expected dates sorted out
         orderDetails.setOrderStartLocation(buildLocationInfo(stockMovement?.origin, stockMovement?.expectedShippingDate, null));
-        orderDetails.setOrderEndLocation(buildLocationInfo(stockMovement?.destination, stockMovement?.expectedDeliveryDate, null));
+        orderDetails.setOrderEndLocation(buildLocationInfo(stockMovement?.destination, stockMovement?.expectedDeliveryDate?:stockMovement?.expectedShippingDate, null));
 
         // Order cargo summary
         orderDetails.setOrderCargoSummary(new OrderCargoSummary(
@@ -170,7 +177,7 @@ class TmsIntegrationService {
         ArrayList itemList = new ArrayList<ItemDetails>();
         stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
             ItemDetails itemDetails = new ItemDetails();
-            itemDetails.setCargoType("GEN_CATEGORY");
+            itemDetails.setCargoType(config.orderDetails.cargoDetails.cargoType);
             itemDetails.setStackable("false");
             itemDetails.setSplittable("false");
             itemDetails.setDangerousGoodsFlag("false");
@@ -209,7 +216,7 @@ class TmsIntegrationService {
 
     PartyType buildPartyType(Location location, User contactData, String type) {
         PartyType partyType = new PartyType();
-        partyType.setPartyID(new PartyID(location?.locationNumber, location?.name));
+        partyType.setPartyID(new PartyID(location?.locationNumber, StringUtils.abbreviate(location?.name, 15)));
         partyType.setType(type);
 
         // Add contact information
@@ -225,7 +232,7 @@ class TmsIntegrationService {
 
     PartyType buildPartyType(Organization organization, User contactData, String type) {
         PartyType partyType = new PartyType();
-        partyType.setPartyID(new PartyID(organization?.code, organization?.name));
+        partyType.setPartyID(new PartyID(organization?.code, StringUtils.abbreviate(organization?.name, 15)));
         partyType.setType(type);
 
         // Add contact information
@@ -238,6 +245,7 @@ class TmsIntegrationService {
     }
 
     LocationInfo buildLocationInfo(Location location, Date expectedDate, String driverInstructions) {
+        def dateFormatter = new SimpleDateFormat(grailsApplication.config.openboxes.integration.defaultDateFormat)
         String expectedDateString = expectedDate ? dateFormatter.format(expectedDate) : null
         return new LocationInfo(
                 location?.address ? buildAddress(location?.address) : null,
@@ -247,10 +255,9 @@ class TmsIntegrationService {
     }
 
     Address buildAddress(org.pih.warehouse.core.Address address) {
-
-        def defaultTimeZone = grailsApplication.config.openboxes.integration.order.address.timeZone?:null
+        def defaultTimeZone = grailsApplication.config.openboxes.integration.defaultTimeZone?:null
         return new Address(
-                address.description,
+                StringUtils.abbreviate(address.description, 15),
                 address.address,
                 address.city,
                 address.stateOrProvince?:"",

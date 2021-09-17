@@ -13,68 +13,87 @@
                 data-bs-target="#messageUploadModal">Upload Message</button>
     </div>
 
-        <div class="card">
-            <div class="card-header">
-                Server Details
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-sm-12 col-md-4 text-center time-info mt-3 mt-sm-0">
-                        <span class="text-muted d-block">Server</span>
-                        <span class="text-5 font-weight-500 text-dark">
-                            ${grailsApplication.config.openboxes.integration.ftp.server}
-                        </span>
-                    </div>
+    <div class="card">
+        <div class="card-header">
+            Server Details
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-12 col-md-3 text-center time-info mt-3 mt-sm-0">
+                    <span class="text-muted d-block">Server</span>
+                    <span class="text-5 font-weight-500 text-dark">
+                        ${grailsApplication.config.openboxes.integration.ftp.server}
+                    </span>
+                </div>
 
-                    <div class="col-sm-12 col-md-4 text-center company-info">
-                        <span class="text-muted d-block">User</span>
-                        <span class="text-5 font-weight-500 text-dark">
-                            ${grailsApplication.config.openboxes.integration.ftp.user}
-                        </span>
-                    </div>
+                <div class="col-sm-12 col-md-3 text-center company-info">
+                    <span class="text-muted d-block">User</span>
+                    <span class="text-5 font-weight-500 text-dark">
+                        ${grailsApplication.config.openboxes.integration.ftp.user}
+                    </span>
+                </div>
 
-                    <div class="col-sm-12 col-md-4 text-center time-info mt-3 mt-sm-0">
-                        <span class="text-muted d-block">Directory</span>
-                        <span class="text-5 font-weight-500 text-dark">
-                            ${grailsApplication.config.openboxes.integration.ftp.directory}
-                        </span>
-                    </div>
+                <div class="col-sm-12 col-md-3 text-center time-info mt-3 mt-sm-0">
+                    <span class="text-muted d-block">Directory</span>
+                    <span class="text-5 font-weight-500 text-dark">
+                        ${grailsApplication.config.openboxes.integration.ftp.directory}
+                    </span>
+                </div>
+                <div class="col-sm-12 col-md-3 text-center time-info mt-3 mt-sm-0">
+                    <span class="text-muted d-block">Subdirectories</span>
+                    <span class="text-5 font-weight-500 text-dark">
+                        ${grailsApplication.config.openboxes.integration.ftp.subdirectories}
+                    </span>
                 </div>
             </div>
         </div>
-
-    <div class="row g-0">
-        <table class="table table-borderless table-striped">
-            <thead>
-                <tr>
-                    <th><g:message code="filename.label" default="Filename"/></th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-            <g:each var="message" in="${messages}">
-                <tr>
-                    <td>
-                        ${message.filename}
-                    </td>
-                    <td class="col">
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <g:link controller="mobile" action="messageDetails"
-                                    params="[filename: message.filename]"
-                                    class="btn btn-outline-primary">View</g:link>
-                            <g:link controller="mobile" action="messageProcess"
-                                    params="[filename: message.filename]"
-                                    class="btn btn-outline-success">Process</g:link>
-                            <g:link controller="mobile" action="messageDelete"
-                                    params="[filename: message.filename]"
-                                    class="btn btn-outline-danger">Delete</g:link>
-                        </div>
-                    </td>
-                </tr>
-            </g:each>
-            </tbody>
-        </table>
     </div>
+
+    <div class="card">
+        <div class="card-header">
+            Files
+        </div>
+        <div class="card-body">
+
+            <table class="table table-borderless table-striped">
+                <thead>
+                    <tr>
+                        <th><g:message code="default.id.label" /></th>
+                        <th><g:message code="message.path.label" default="Path" /></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                <g:each var="message" in="${messages}">
+                    <tr>
+                        <td>
+                            ${message.name}
+                        </td>
+                        <td>
+                            ${message.path}
+                        </td>
+                        <td class="col">
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <g:link controller="mobile" action="messageDetails"
+                                        params="[path: message.path]"
+                                        class="btn btn-outline-primary">View</g:link>
+                                <g:link controller="mobile" action="messageProcess"
+                                        params="[path: message.path]"
+                                        class="btn btn-outline-success">Process</g:link>
+                                <g:link controller="mobile" action="messageDelete"
+                                        params="[path: message.path]"
+                                        class="btn btn-outline-danger">Delete</g:link>
+                            </div>
+                        </td>
+                    </tr>
+                </g:each>
+                </tbody>
+            </table>
+
+
+        </div>
+    </div>
+
 
     <!-- Modal -->
     <div class="modal fade" id="messageUploadModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -86,7 +105,11 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <label for="messageFile" class="form-label"></label>
+                        <label for="subdirectory" class="form-label">Subdirectory</label>
+                        <g:select name="subdirectory"  class="form-control"
+                                  from="${grailsApplication.config.openboxes.integration.ftp.inbound.subdirectories}"/>
+
+                        <label for="messageFile" class="form-label">File</label>
                         <input class="form-control" type="file" name="messageFile" id="messageFile" required>
                     </div>
                     <div class="modal-footer">

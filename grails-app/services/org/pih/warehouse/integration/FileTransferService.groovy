@@ -9,14 +9,11 @@
 **/
 package org.pih.warehouse.integration
 
-import org.apache.commons.io.IOUtils
 import org.pih.warehouse.integration.ftp.SecureFtpClient
 
-import java.nio.charset.StandardCharsets
 
 class FileTransferService {
 
-    boolean transactional = true
     def grailsApplication
 
     SecureFtpClient getSecureFtpClient() {
@@ -24,61 +21,70 @@ class FileTransferService {
         return new SecureFtpClient(sftpConfig)
     }
 
-    def listMessages(boolean includeContent = false) {
+    def listMessages(String directory, boolean includeContent = false) {
         try {
-            String directory = grailsApplication.config.openboxes.integration.ftp.directory
-            def filenames = secureFtpClient.listFiles(directory)
-            def messages = filenames.collect { String filename ->
-                String source = "${directory}/${filename}"
+            def files = secureFtpClient.listFiles(directory)
+            def messages = files.collect { Map fileInfo ->
                 if (includeContent) {
-                    def inputStream = secureFtpClient.retrieveFileAsInputStream(source)
-                    String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name())
-                    return [filename: filename, content: content]
+                    fileInfo.content = secureFtpClient.retrieveFileAsString(fileInfo.path)
                 }
-                return [filename:filename]
+                return fileInfo
             }
             return messages
-        } catch (Exception e) { }
+        } catch (Exception e) {
+
+        }
         finally {
             secureFtpClient.disconnect()
         }
     }
 
-    def retrieveMessage(String filename) {
+    def listMessages(String directory, List<String> subdirectories, boolean includeContent = false) {
         try {
-            String directory = grailsApplication.config.openboxes.integration.ftp.directory
-            String source = "${directory}/${filename}"
-            def inputStream = secureFtpClient.retrieveFileAsInputStream(source)
-            return IOUtils.toString(inputStream, StandardCharsets.UTF_8.name())
+            def files = secureFtpClient.listFilesInSubdirectories(directory, subdirectories)
+            log.info "files ${files.size()}"
+            def messages = files.collect { Map fileInfo ->
+                if (includeContent) {
+                    fileInfo.content = secureFtpClient.retrieveFileAsString(fileInfo.path)
+                }
+                return fileInfo
+            }
+            return messages
+        } catch (Exception e) {
+            log.error("Error occurred while listing messages: " + e.message, e)
+        }
+        finally {
+            secureFtpClient.disconnect()
+        }
+
+    }
+
+    def retrieveMessage(String source) {
+        try {
+            secureFtpClient.retrieveFileAsString(source)
         } finally {
             secureFtpClient.disconnect()
         }
     }
 
-    def storeMessage(File file) {
+    def storeMessage(File file, String destination) {
         try {
-            String directory = grailsApplication.config.openboxes.integration.ftp.directory
-            String destination = "${directory}/${file.getName()}"
             secureFtpClient.storeFile(file, destination)
         } finally {
             secureFtpClient.disconnect()
         }
     }
 
-    def storeMessage(String filename, String contents) {
+    def storeMessage(String filename, String contents, String destination) {
         try {
-            String directory = grailsApplication.config.openboxes.integration.ftp.directory
-            String destination = "${directory}/${filename}"
             secureFtpClient.storeFile(filename, contents, destination)
         } finally {
             secureFtpClient.disconnect()
         }
     }
 
-    def deleteMessage(String filename) {
+    def deleteMessage(String target) {
         try {
-            String directory = grailsApplication.config.openboxes.integration.ftp.directory
-            String target = "${directory}/${filename}"
             secureFtpClient.deleteFile(target)
         } finally {
             secureFtpClient.disconnect()
