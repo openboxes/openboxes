@@ -169,9 +169,6 @@ class ProductAvailabilityService {
             }
             log.info "Saved ${binLocations?.size()} records for location ${location} in ${System.currentTimeMillis() - startTime}ms"
 
-            // Refresh inventory snapshot
-            refreshInventorySnapshot(location, product, forceRefresh)
-
         } catch (Exception e) {
             log.error("Error executing batch update for ${location.name}: " + e.message, e)
             publishEvent(new ApplicationExceptionEvent(e, location))
