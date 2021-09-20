@@ -75,7 +75,7 @@
 							<td class="middle">
 								<format:date obj="${orderInstance?.dateCreated}"/>
 							</td>
-							<td class="center middle">
+							<td class="middle">
 								<g:set var="lineItems" value="${orderInstance?.orderItems?.findAll { it.orderItemStatusCode != OrderItemStatusCode.CANCELED }}"/>
 								${lineItems.size()?:0}
 							</td>

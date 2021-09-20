@@ -40,8 +40,7 @@
                                     name="lastUpdatedStartDate"
                                     placeholder="Start date"
                                     size="40"
-                                    numberOfMonths="2"
-                                    changeMonthAndYear="false"
+                                    changeMonthAndYear="true"
                                     value="${params.lastUpdatedStartDate}"
                                     format="MM/dd/yyyy"/>
             </div>
@@ -53,7 +52,6 @@
                                     name="lastUpdatedEndDate"
                                     placeholder="End date"
                                     size="40"
-                                    numberOfMonths="2"
                                     changeMonthAndYear="true"
                                     value="${params.lastUpdatedEndDate}"
                                     format="MM/dd/yyyy"/>
