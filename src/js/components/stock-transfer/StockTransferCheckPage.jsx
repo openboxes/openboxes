@@ -163,7 +163,7 @@ class StockTransferSecondPage extends Component {
       .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.stockTransfer.alert.stockTransferCompleted.label', 'Stock transfer was successfully completed!'), { timeout: 3000 });
-        window.location = `/openboxes/order/show/${this.state.stockTransfer.id}`;
+        window.location = `/openboxes/stockTransfer/show/${this.state.stockTransfer.id}`;
       })
       .catch(() => this.props.hideSpinner());
   }

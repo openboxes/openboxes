@@ -1,3 +1,5 @@
+<%@ page import="org.pih.warehouse.order.OrderStatus" %>
+
 <div id="order-summary" class="summary">
     <table width="50%">
         <tbody>
@@ -23,7 +25,11 @@
             <warehouse:message code="default.list.label" args="[g.message(code: 'inventory.stockTransfers.label')]" default="List Stock Transfers"/>
         </g:link>
 
-        <g:link controller="stockTransfer" action="create" id="${orderInstance?.id}" class="button">
+        <g:set var="disabledMessage" value="${g.message(code:'inventory.stockTransfers.editCompleted')}"/>
+
+        <g:link controller="stockTransfer" action="create" id="${orderInstance?.id}" class="button"
+                disabled="${orderInstance?.status >= OrderStatus.COMPLETED}"
+                disabledMessage="${disabledMessage}">
             <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
             <warehouse:message code="inventory.editStockTransfer.label" default="Edit Stock Transfer"/>
         </g:link>
