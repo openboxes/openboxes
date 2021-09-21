@@ -20,7 +20,7 @@ class StockTransferController {
     def stockTransferService
 
     def index = {
-        redirect(action: "create", params: params)
+        redirect(action: "list", params: params)
     }
 
     def create = {
@@ -53,7 +53,13 @@ class StockTransferController {
     }
 
     def show = {
-        []
+        def orderInstance = Order.get(params.id)
+        if (!orderInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.stockTransfer.label', default: 'Stock Transfer'), params.id])}"
+            redirect(action: "list")
+        } else {
+            [orderInstance: orderInstance]
+        }
     }
 
     def print = {

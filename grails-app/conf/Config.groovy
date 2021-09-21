@@ -1094,7 +1094,7 @@ openboxes {
                     menuItems: [
                         [label: "inventory.manage.label", defaultLabel: "Manage Inventory", href: "/${appName}/inventory/manage"],
                         [label: "inventory.import.label", defaultLabel: "Import Inventory", href: "/${appName}/batch/importData?type=inventory&execution=e1s1"],
-                        [label: "inventory.createStockTransfer.label", defaultLabel: "Create Stock Transfer", href: "/${appName}/stockTransfer/index"],
+                        [label: "inventory.createStockTransfer.label", defaultLabel: "Create Stock Transfer", href: "/${appName}/stockTransfer/create"],
                         [label: "inventory.listStockTransfers.label", defaultLabel: "List Stock Transfers", href: "/${appName}/stockTransfer/list"],
                         [label: "inventory.createReplenishment.label", defaultLabel: "Create Replenishment", href: "/${appName}/replenishment/index"]
                     ]

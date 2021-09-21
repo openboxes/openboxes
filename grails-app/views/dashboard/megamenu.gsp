@@ -108,7 +108,7 @@
                             </g:link>
                         </div>
                         <div class="mm-menu-item">
-                            <g:link controller="stockTransfer" action="index" class="create">
+                            <g:link controller="stockTransfer" action="create" class="create">
                                 <warehouse:message code="inventory.createStockTransfer.label" />
                             </g:link>
                         </div>
