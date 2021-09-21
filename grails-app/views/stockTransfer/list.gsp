@@ -19,7 +19,7 @@
 			<img src="${resource(dir: 'images/icons/silk', file: 'application_view_list.png')}" />&nbsp;
 			<warehouse:message code="default.list.label" args="[g.message(code: 'inventory.stockTransfers.label')]" default="List Stock Transfers"/>
 		</g:link>
-		<g:link controller="stockTransfer" action="index" class="button">
+		<g:link controller="stockTransfer" action="create" class="button">
 			<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
 			<warehouse:message code="default.create.label" args="[warehouse.message(code: 'inventory.stockTransfer.label')]"/>
 		</g:link>
