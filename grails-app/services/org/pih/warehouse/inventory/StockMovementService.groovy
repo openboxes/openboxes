@@ -2015,7 +2015,8 @@ class StockMovementService {
         shipment.description = stockMovement.description
 
         // These values need defaults since they are not set until step 6
-        shipment.expectedShippingDate = new Date()
+        shipment.expectedShippingDate = requisition?.requestedDeliveryDate?:new Date()
+        shipment.expectedDeliveryDate = requisition?.requestedDeliveryDate
 
         // Set default shipment type so we can save to the database without user input
         shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)

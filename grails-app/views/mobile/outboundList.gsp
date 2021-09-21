@@ -33,9 +33,10 @@
                     <th><g:message code="stockMovement.identifier.label"/></th>
                     <th><g:message code="stockMovement.destination.label"/></th>
                     <th><g:message code="stockMovement.requestedDeliveryDate.label" default="Requested Delivery Date"/></th>
+                    <th><g:message code="stockMovement.expectedShippingDate.label" default="Expected Shipping Date"/></th>
                     <th><g:message code="stockMovement.expectedDeliveryDate.label" default="Expected Delivery Date"/></th>
                     <th><g:message code="stockMovement.trackingNumber.label" /></th>
-                    <th></th>
+                    <th class="col-1 text-center"></th>
                 </tr>
                 <tr>
                     <th>
@@ -48,13 +49,9 @@
                                           class="form-control"
                                           noSelection="['null':warehouse.message(code:'default.all.label')]"/>
                     </th>
-                    <th>
+                    <th colspan="4">
                     </th>
-                    <th>
-                    </th>
-                    <th>
-                    </th>
-                    <th class="col-1">
+                    <th class="col-1 text-center">
                         <button type="submit" class="btn btn-primary"><i class="fa fa-filter"></i> Filter</button>
                     </th>
                 </tr>
@@ -78,6 +75,7 @@
                             </a>
                         </td>
                         <td>
+
                             <a href="${createLink(controller: 'mobile', action: 'outboundDetails', id: stockMovement?.id)}" class="text-decoration-none text-reset">
                                 ${stockMovement.identifier}
                             </a>
@@ -86,7 +84,10 @@
                             ${stockMovement?.destination?.name} (${stockMovement?.destination?.locationNumber})
                         </td>
                         <td>
-                            <g:formatDate date="${stockMovement?.requisition?.requestedDeliveryDate}" format="dd MMM yyyy"/>
+                            <g:formatDate date="${stockMovement?.requestedDeliveryDate}" format="dd MMM yyyy"/>
+                        </td>
+                        <td>
+                            <g:formatDate date="${stockMovement?.expectedShippingDate}" format="dd MMM yyyy"/>
                         </td>
                         <td>
                             <g:formatDate date="${stockMovement?.expectedDeliveryDate}" format="dd MMM yyyy"/>
