@@ -40,21 +40,21 @@
                     <th class="col-1 text-center"></th>
                     </tr>
                     <tr>
-                    <th>
-                        <g:selectRequisitionStatus name="status" value="${params.status}"
-                                                   class="form-control" noSelection="['':warehouse.message(code:'default.all.label')]"/>
-                    </th>
-                    <th></th>
-                    <th>
-                        <g:selectLocation id="destination" name="destination.id" value="${params?.destination?.id}"
-                                          class="form-control"
-                                          noSelection="['null':warehouse.message(code:'default.all.label')]"/>
-                    </th>
+                        <th>
+                            <g:selectRequisitionStatus name="status" value="${params.status}"
+                                                       class="form-control" noSelection="['':warehouse.message(code:'default.all.label')]"/>
+                        </th>
+                        <th></th>
+                        <th>
+                            <g:selectLocation id="destination" name="destination.id" value="${params?.destination?.id}"
+                                              class="form-control"
+                                              noSelection="['null':warehouse.message(code:'default.all.label')]"/>
+                        </th>
                     <th colspan="4">
-                    </th>
+                        </th>
                     <th class="col-1 text-center">
-                        <button type="submit" class="btn btn-primary"><i class="fa fa-filter"></i> Filter</button>
-                    </th>
+                            <button type="submit" class="btn btn-primary"><i class="fa fa-filter"></i> Filter</button>
+                        </th>
                     </tr>
                     </thead>
                     <tbody>
@@ -85,31 +85,31 @@
                                 ${stockMovement?.destination?.name} (${stockMovement?.destination?.locationNumber})
                             </td>
                             <td>
-                                <g:formatDate date="${stockMovement?.requestedDeliveryDate}" format="dd MMM yyyy"/>
+                            <g:formatDate date="${stockMovement?.requestedDeliveryDate}" format="dd MMM yyyy"/>
+                        </td>
+                        <td>
+                            <g:formatDate date="${stockMovement?.expectedShippingDate}" format="dd MMM yyyy"/>
                             </td>
                             <td>
-                                <g:formatDate date="${stockMovement?.expectedShippingDate}" format="dd MMM yyyy"/>
-                                </td>
-                                <td>
-                                    <g:formatDate date="${stockMovement?.expectedDeliveryDate}" format="dd MMM yyyy"/>
-                                </td>
-                                <td>
-                                    <g:if test="${stockMovement?.trackingNumber}">
-                                        <g:link url="${stockMovement.trackingUri}">${stockMovement?.trackingNumber}</g:link>
-                                    </g:if>
-                                    <g:else>
-                                        Not Available
-                                    </g:else>
-                                </td>
-                                <td>
-                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                        <a href="${createLink(controller: 'mobile', action: 'outboundDetails', id: stockMovement?.id)}" class="btn btn-outline-primary">
-                                            Details
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        </g:each>
+                                <g:formatDate date="${stockMovement?.expectedDeliveryDate}" format="dd MMM yyyy"/>
+                            </td>
+                            <td>
+                                <g:if test="${stockMovement?.trackingNumber}">
+                                    <g:link url="${stockMovement.trackingUri}">${stockMovement?.trackingNumber}</g:link>
+                                </g:if>
+                                <g:else>
+                                    Not Available
+                                </g:else>
+                            </td>
+                            <td>
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <a href="${createLink(controller: 'mobile', action: 'outboundDetails', id: stockMovement?.id)}" class="btn btn-outline-primary">
+                                        Details
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </g:each>
                     </tbody>
                 </table>
             </div>
