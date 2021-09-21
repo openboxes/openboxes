@@ -343,6 +343,10 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         return quantityInvoicedInStandardUom / quantityPerUom
     }
 
+    def totalQuantityPicked() {
+        return PicklistItem.findAllByOrderItem(this).sum { it.quantity }
+    }
+
     Map toJson() {
         return [
                 id           : id,

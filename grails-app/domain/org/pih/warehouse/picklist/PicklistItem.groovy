@@ -77,16 +77,23 @@ class PicklistItem implements Serializable {
 
     Map toJson() {
         [
-                id               : id,
-                version          : version,
-                status           : status,
-                requisitionItemId: requisitionItem?.id,
-                orderItemId      : orderItem?.id,
-                binLocationId    : binLocation?.id,
-                inventoryItemId  : inventoryItem?.id,
-                quantity         : quantity,
-                reasonCode       : reasonCode,
-                comment          : comment
+            id                  : id,
+            version             : version,
+            status              : status,
+            requisitionItemId   : requisitionItem?.id,
+            orderItemId         : orderItem?.id,
+            binLocationId       : binLocation?.id,
+            inventoryItemId     : inventoryItem?.id,
+            quantity            : quantity,
+            reasonCode          : reasonCode,
+            comment             : comment,
+            // Used in Bin Replenishment feature
+            binLocation         : binLocation,
+            zone                : binLocation?.zone,
+            product             : inventoryItem?.product,
+            inventoryItem       : inventoryItem,
+            lotNumber           : inventoryItem?.lotNumber,
+            expirationDate      : inventoryItem?.expirationDate?.format("MM/dd/yyyy")
         ]
     }
 }
