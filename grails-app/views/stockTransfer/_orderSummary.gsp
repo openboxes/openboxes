@@ -28,7 +28,7 @@
 
             <tbody>
 
-            <g:each var="orderItem" in="${orderInstance?.orderItems?.sort { a,b -> a.dateCreated <=> b.dateCreated ?: a.orderIndex <=> b.orderIndex }}" status="i">
+            <g:each var="orderItem" in="${orderInstance?.orderItems?.findAll { !it.orderItems }?.sort { a,b -> a.dateCreated <=> b.dateCreated ?: a.orderIndex <=> b.orderIndex }}" status="i">
                 <tr class="order-item ${(i % 2) == 0 ? 'even' : 'odd'}" style="${isItemCanceled ? 'background-color: #ffcccb;' : ''}">
                     <td style="color: ${orderItem?.product?.color}">
                         ${orderItem?.product?.productCode}
