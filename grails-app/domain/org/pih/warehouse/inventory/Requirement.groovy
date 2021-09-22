@@ -46,7 +46,8 @@ class Requirement implements Serializable {
             quantityInBin           : quantityInBin,
             minQuantity             : minQuantity,
             maxQuantity             : maxQuantity,
-            totalQuantityOnHand     : totalQuantityOnHand
+            totalQuantityOnHand     : totalQuantityOnHand,
+            quantityNeeded          : maxQuantity - quantityInBin > 0 ? maxQuantity - quantityInBin : 0,
         ]
     }
 }

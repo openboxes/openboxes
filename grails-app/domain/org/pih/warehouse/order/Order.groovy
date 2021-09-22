@@ -14,6 +14,7 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.*
 import org.pih.warehouse.invoice.InvoiceItem
 import org.pih.warehouse.invoice.InvoiceTypeCode
+import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
 
@@ -113,6 +114,7 @@ class Order implements Serializable {
             events: Event,
             orderAdjustments: OrderAdjustment,
     ]
+    static hasOne = [picklist: Picklist]
     static mapping = {
         id generator: 'uuid'
         table "`order`"
@@ -147,6 +149,7 @@ class Order implements Serializable {
         dateCompleted(nullable: true)
         paymentMethodType(nullable: true)
         paymentTerm(nullable: true)
+        picklist(nullable: true)
         dateCreated(nullable: true)
         lastUpdated(nullable: true)
         createdBy(nullable: true)

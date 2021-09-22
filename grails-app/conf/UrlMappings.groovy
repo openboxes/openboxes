@@ -349,7 +349,7 @@ class UrlMappings {
 
         "/api/replenishments/$id/picklists"(parseRequest: true) {
             controller = { "replenishmentApi" }
-            action = [POST: "createPicklist", PUT: "updatePicklist", DELETE: "deletePicklist"]
+            action = [GET: "getPicklist", POST: "createPicklist", PUT: "updatePicklist", DELETE: "deletePicklist"]
         }
 
         // Standard REST APIs

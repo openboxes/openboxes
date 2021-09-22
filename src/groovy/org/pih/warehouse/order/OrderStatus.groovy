@@ -32,6 +32,11 @@ enum OrderStatus {
         [PENDING, APPROVED, PLACED, PARTIALLY_RECEIVED, RECEIVED, COMPLETED, CANCELED, REJECTED]
     }
 
+
+    static listPending() {
+        [PENDING, APPROVED, PLACED, PARTIALLY_RECEIVED]
+    }
+
     String toString() { return name() }
 
 }
