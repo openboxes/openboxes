@@ -86,7 +86,7 @@
       }
 
       const lotAndExpiryControl = $("#lotAndExpiryControl").val();
-      if (lotAndExpiryControl) {
+      if (lotAndExpiryControl === "true") {
         const lotNumber = $("#lotNumber").val();
         const expirationDate = $("#expirationDate").val();
         if (!lotNumber || !expirationDate) {
