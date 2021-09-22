@@ -15,6 +15,6 @@ CREATE OR REPLACE VIEW product_substitution_status AS
              LEFT OUTER JOIN
          inventory_item AS original_inventory_item ON original_inventory_item.product_id = p_a.product_id
 
-    WHERE p_a.code = 'SUBSTITUTE' AND p_s.quantity_on_hand > 0
+    WHERE p_a.code = 'SUBSTITUTE' AND p_s.quantity_available_to_promise > 0
 
     GROUP BY product_id, location_id;
