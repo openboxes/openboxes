@@ -39,7 +39,7 @@
 					<thead>
 					<tr>
 						<th>${warehouse.message(code: 'default.status.label')}</th>
-						<th>${warehouse.message(code: 'order.orderNumber.label')}</th>
+						<th>${warehouse.message(code: 'inventory.stockTransfers.orderNumber.label')}</th>
 						<th>${warehouse.message(code: 'order.createdBy.label')}</th>
 						<th>${warehouse.message(code: 'order.creationDate.label')}</th>
 						<th>${warehouse.message(code: 'order.orderItems.label')}</th>

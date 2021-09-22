@@ -32,6 +32,9 @@ enum OrderStatus {
         [PENDING, APPROVED, PLACED, PARTIALLY_RECEIVED, RECEIVED, COMPLETED, CANCELED, REJECTED]
     }
 
+    static listStockTransfer() {
+        [PENDING, APPROVED, COMPLETED, CANCELED]
+    }
 
     static listPending() {
         [PENDING, APPROVED, PLACED, PARTIALLY_RECEIVED]
