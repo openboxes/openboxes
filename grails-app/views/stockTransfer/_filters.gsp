@@ -14,7 +14,7 @@
                 <label>${warehouse.message(code: 'order.status.label')}</label>
                 <g:select id="status"
                           name="status"
-                          from="${OrderStatus.list()}"
+                          from="${OrderStatus.listStockTransfer()}"
                           class="select2"
                           optionValue="${{ format.metadata(obj: it) }}"
                           value="${params.status}"

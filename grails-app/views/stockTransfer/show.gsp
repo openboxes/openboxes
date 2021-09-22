@@ -1,6 +1,3 @@
-<%@ page import="org.pih.warehouse.order.OrderType" %>
-<%@ page import="org.pih.warehouse.order.OrderTypeCode" %>
-
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -35,7 +32,7 @@
                         <tbody>
                         <tr class="prop">
                             <td valign="top" class="name">
-                                <label><warehouse:message code="order.orderNumber.label"/></label>
+                                <label><warehouse:message code="inventory.stockTransfers.orderNumber.label"/></label>
                             </td>
                             <td valign="top" class="value">
                                 ${orderInstance?.orderNumber}
