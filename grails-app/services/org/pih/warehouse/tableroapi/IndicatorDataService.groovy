@@ -961,8 +961,8 @@ class IndicatorDataService {
 
     GraphData getPercentageAdHoc(Location location) {
         Calendar calendar = Calendar.instance
-        // we need to get all requisitions that were created from the first day of the current month
-        calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), 1, 0, 0, 0)
+        // we need to get all requisitions that were created from the first day of the previous month
+        calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) -1, 1, 0, 0, 0)
         def firstDayOfMonth = calendar.getTime()
 
         List<String> listLabels = []
