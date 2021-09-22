@@ -206,22 +206,22 @@
                                 </g:hasRoleFinance>
                             </td>
                         </tr>
+                        <g:if test="${stockMovement?.shipment?.orders}">
+                            <tr class="prop">
+                                <td class="name">
+                                    <g:message code="order.label"/>
+                                </td>
+                                <td class="value">
+                                    <g:each var="order" in="${stockMovement?.shipment?.orders}">
+                                        <g:link controller="order" action="show" id="${order?.id}" params="[override:true]">
+                                            ${g.message(code:'default.view.label', args: [g.message(code: 'order.label')])}
+                                            ${order.orderNumber}
+                                        </g:link>
+                                    </g:each>
+                                </td>
+                            </tr>
+                        </g:if>
                         <g:isSuperuser>
-                            <g:if test="${stockMovement?.shipment?.orders}">
-                                <tr class="prop">
-                                    <td class="name">
-                                        <g:message code="order.label"/>
-                                    </td>
-                                    <td class="value">
-                                        <g:each var="order" in="${stockMovement?.shipment?.orders}">
-                                            <g:link controller="order" action="show" id="${order?.id}" params="[override:true]">
-                                                ${g.message(code:'default.view.label', args: [g.message(code: 'order.label')])}
-                                                ${order.orderNumber}
-                                            </g:link>
-                                        </g:each>
-                                    </td>
-                                </tr>
-                            </g:if>
                             <g:if test="${stockMovement.requisition}">
                                 <tr class="prop">
                                     <td class="name">
