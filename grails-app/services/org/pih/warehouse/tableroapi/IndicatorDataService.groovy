@@ -961,9 +961,18 @@ class IndicatorDataService {
 
     GraphData getPercentageAdHoc(Location location) {
         Calendar calendar = Calendar.instance
-        // we need to get all requisitions that were created from the first day of the current month
+        // we need to get all requisitions that were created from the first day of the previous month
+        // current month is an edge case that we need to handle
+        if (calendar.get(Calendar.MONTH) == 0) {
+            calendar.set(calendar.get(Calendar.YEAR) -1, 11, 1, 0, 0, 0)
+        } else {
+            calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) -1, 1, 0, 0, 0)
+        }
+        def firstDayOfPreviousMonth = calendar.getTime()
+        // first day of current month is needed for time frames in the query
+        calendar = Calendar.instance
         calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), 1, 0, 0, 0)
-        def firstDayOfMonth = calendar.getTime()
+        def firstDayOfCurrentMonth = calendar.getTime()
 
         List<String> listLabels = []
         List<Integer> listData = []
@@ -972,12 +981,14 @@ class IndicatorDataService {
             select count(r.id), r.type
             from Requisition as r
             where r.origin.id = :location
-            and r.requestedDeliveryDate >= :firstDayOfMonth
+            and r.requestedDeliveryDate >= :firstDayOfPreviousMonth 
+            and r.requestedDeliveryDate < :firstDayOfCurrentMonth
             group by r.type
         """,
                 [
                         'location': location.id,
-                        'firstDayOfMonth': firstDayOfMonth,
+                        'firstDayOfPreviousMonth': firstDayOfPreviousMonth,
+                        'firstDayOfCurrentMonth': firstDayOfCurrentMonth,
                 ])
 
         percentageAdHoc.each {
