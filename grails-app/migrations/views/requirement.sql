@@ -5,9 +5,9 @@ CREATE OR REPLACE VIEW requirement AS (
 		loc.id as location_id,
 		i_l.internal_location_id as bin_location_id,
 		IFNULL(pa_in_bin.quantity_on_hand, 0) as quantity_in_bin,
-		i_l.min_quantity,
-		i_l.max_quantity,
-		i_l.reorder_quantity,
+		IFNULL(i_l.min_quantity, 0) as min_quantity,
+		IFNULL(i_l.max_quantity, 0) as max_quantity,
+		IFNULL(i_l.reorder_quantity, 0) as reorder_quantity,
 		IFNULL(total_pa.total_quantity_on_hand, 0) as total_quantity_on_hand,
       CASE
         WHEN IFNULL(pa_in_bin.quantity_on_hand, 0) < IFNULL(i_l.min_quantity, 0) THEN 'BELOW_MINIMUM'
