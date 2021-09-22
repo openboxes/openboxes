@@ -222,10 +222,10 @@ class ReplenishmentService {
             replenishmentItem.quantityInBin = quantityInBin
             replenishmentItem.totalQuantityOnHand = productAvailabilityService.getQuantityOnHand(replenishmentItem.product, replenishmentItem.location)
             def inventoryLevel = InventoryLevel.findByProductAndInternalLocation(replenishmentItem.product,replenishmentItem.binLocation)
-            replenishmentItem.minQuantity = inventoryLevel.minQuantity
-            replenishmentItem.maxQuantity = inventoryLevel.maxQuantity
-            replenishmentItem.quantityNeeded = inventoryLevel.maxQuantity - quantityInBin > 0 ?
-                    inventoryLevel.maxQuantity - quantityInBin : 0
+            replenishmentItem.minQuantity = inventoryLevel.minQuantity?:0
+            replenishmentItem.maxQuantity = inventoryLevel.maxQuantity?:0
+            replenishmentItem.quantityNeeded = (inventoryLevel.maxQuantity?:0) - quantityInBin > 0 ?
+                (inventoryLevel.maxQuantity?:0) - quantityInBin : 0
 
             // Get Picklist related data
             OrderItem orderItem = OrderItem.get(replenishmentItem.id)
