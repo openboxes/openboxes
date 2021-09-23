@@ -42,18 +42,27 @@ const FIELDS = {
         defaultMessage: 'Product',
         flexWidth: '2',
         headerAlign: 'left',
+        attributes: {
+          showValueTooltip: true,
+        },
       },
       'currentZone.name': {
         type: LabelField,
         label: 'react.replenishment.currentZone.label',
         defaultMessage: 'Current Zone',
         flexWidth: '0.5',
+        attributes: {
+          showValueTooltip: true,
+        },
       },
       'currentBinLocation.name': {
         type: LabelField,
         label: 'react.replenishment.currentBinLocation.label',
         defaultMessage: 'Current Bin Location',
         flexWidth: '1',
+        attributes: {
+          showValueTooltip: true,
+        },
         getDynamicAttr: ({ subfield }) => ({
           formatValue: (value) => {
             if (subfield || value) {
@@ -74,12 +83,18 @@ const FIELDS = {
         label: 'react.replenishment.zone.label',
         defaultMessage: 'Zone',
         flexWidth: '0.5',
+        attributes: {
+          showValueTooltip: true,
+        },
       },
       'binLocation.name': {
         type: LabelField,
         label: 'react.replenishment.bin.label',
         defaultMessage: 'Bin',
         flexWidth: '1',
+        attributes: {
+          showValueTooltip: true,
+        },
       },
       lotNumber: {
         type: LabelField,

@@ -212,19 +212,15 @@ class EditPickModal extends Component {
               binLocation: {
                 id: picklistItem['binLocation.id'],
                 name: picklistItem['binLocation.name'],
-                zoneName: picklistItem['binLocation.zoneName'],
+              },
+              zone: {
+                id: picklistItem['binLocation.zoneId'],
+                name: picklistItem['binLocation.zoneName'],
               },
             };
           }
 
-          return {
-            ...avItem,
-            binLocation: {
-              id: avItem['binLocation.id'],
-              name: avItem['binLocation.name'],
-              zoneName: avItem['binLocation.zoneName'],
-            },
-          };
+          return { ...avItem };
         });
 
         this.setState({
