@@ -326,6 +326,7 @@ class AvailableItem {
                 lotNumber               : inventoryItem?.lotNumber,
                 expirationDate          : inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
                 binLocation             : binLocation,
+                zone                    : binLocation?.zone,
                 quantityAvailable       : quantityAvailable,
                 quantityOnHand          : quantityOnHand,
                 status                  : status?.name(),
