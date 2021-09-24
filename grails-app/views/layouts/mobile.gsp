@@ -7,7 +7,7 @@
     <title><g:layoutTitle default="OpenBoxes"/></title>
     <r:layoutResources/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" rel="stylesheet"/>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
 
     <style>
@@ -54,9 +54,17 @@
 <body>
 <nav class="navbar navbar-light bg-light p-3">
     <div class="d-flex col-12 col-md-3 col-lg-2 mb-2 mb-lg-0 flex-wrap flex-md-nowrap justify-content-between">
-        <a class="navbar-brand" href="${createLink(controller: 'mobile', action: 'index')}">
-            KUEHNE+NAGEL
-        </a>
+        <g:link controller="mobile"
+                class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-decoration-none">
+            <g:if test="${session.warehouse}">
+                <g:displayLogo location="${session?.warehouse?.id}" includeLink="${false}"/>
+            </g:if>
+            <g:else>
+                <a class="navbar-brand" href="#">
+                    <img src="https://openboxes.com/img/logo_30.png" />
+                </a>
+            </g:else>
+        </g:link>
         <button class="navbar-toggler d-md-none collapsed mb-3" type="button" data-toggle="collapse" data-target="#sidebar" aria-controls="sidebar" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -77,7 +85,10 @@
     </div>
 </nav>
 <div class="container-fluid">
+
     <div class="row">
+
+        <!-- sidebar -->
         <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
             <div class="position-sticky">
                 <ul class="nav flex-column">
@@ -90,42 +101,44 @@
                 </ul>
             </div>
         </nav>
+
+        <!-- main content -->
         <main class="col-md-9 ml-sm-auto col-lg-10 px-md-4 py-4">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="${createLink(controller: 'mobile', action: 'index')}">Home</a></li>
+                    <li class="breadcrumb-item"><g:link controller="mobile">Home</g:link></li>
+                    <g:if test="${session.warehouse}">
+                        <li class="breadcrumb-item"><g:link controller="mobile"
+                                                            action="chooseLocation" class="text-capitalize">${session?.warehouse?.name?.toLowerCase()}</g:link></li>
+                    </g:if>
                     <li class="breadcrumb-item active" aria-current="page"><g:layoutTitle/></li>
                 </ol>
             </nav>
-            %{--<h1 class="h2"><g:layoutTitle/></h1>--}%
-            %{--<p>This is the homepage of a simple admin interface which is part of a tutorial written on Themesberg</p>--}%
+            <g:if test="${flash.message}">
+                <div class="alert alert-info">${flash.message}</div>
+            </g:if>
+
             <g:layoutBody />
-            <div class="row">
-                <div class="col-12 col-xl-8 mb-4 mb-lg-0">
-                </div>
-                <div class="col-12 col-xl-4">
-                    %{--<div class="card">
-                        <h5 class="card-header">Traffic last 6 months</h5>
-                        <div class="card-body">
-                            <div id="traffic-chart"></div>
-                        </div>
-                    </div>--}%
-                </div>
-            </div>
-            <footer class="pt-5 d-flex justify-content-between">
-                <span>Copyright © 2019-2020 <a href="https://openboxes.com">Openboxes</a></span>
-                <ul class="nav m-0">                </ul>
-            </footer>
         </main>
+
+        <!-- footer -->
+%{--        <footer class="pt-5 d-flex justify-content-between">--}%
+%{--            <span>Copyright © 2021 <a href="https://openboxes.com">Openboxes</a></span>--}%
+%{--            <ul class="nav m-0">--}%
+%{--                --}%
+%{--            </ul>--}%
+%{--        </footer>--}%
     </div>
 </div>
+
 <r:layoutResources/>
 <script
         src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
         integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="
         crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js" integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/js/all.min.js"></script>
 <script src="/openboxes/js/onScan/onScan.min.js" type="text/javascript"></script>
 <script>
