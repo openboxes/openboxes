@@ -88,21 +88,10 @@ const FIELDS = {
     defaultMessage: 'Destination',
     attributes: {
       required: true,
-      async: true,
       showValueTooltip: true,
-      openOnClick: false,
-      autoload: false,
-      cache: false,
-      options: [],
-      filterOptions: options => options,
     },
-    getDynamicAttr: props => ({
-      loadOptions: props.debouncedLocationsFetch,
-      onChange: (value) => {
-        if (value && props.origin && props.origin.id) {
-          props.fetchStockLists(props.origin, value);
-        }
-      },
+    getDynamicAttr: ({ destinations }) => ({
+      options: destinations,
     }),
   },
   requestedBy: {
@@ -175,9 +164,11 @@ class CreateStockMovement extends Component {
       setInitialValues: true,
       values: this.props.initialValues,
       requestTypes: [],
+      destinations: [],
     };
     this.fetchStockLists = this.fetchStockLists.bind(this);
     this.setRequestType = this.setRequestType.bind(this);
+    this.setDestination = this.setDestination.bind(this);
 
     this.debouncedUsersFetch =
       debounceUsersFetch(this.props.debounceTime, this.props.minSearchLength);
@@ -190,6 +181,7 @@ class CreateStockMovement extends Component {
     if (this.state.values.origin && this.state.values.destination) {
       this.fetchStockLists(this.state.values.origin, this.state.values.destination);
     }
+    this.fetchDestinations();
     this.fetchRequisitionTypes();
   }
 
@@ -205,6 +197,14 @@ class CreateStockMovement extends Component {
       values: update(values, {
         requestType: { $set: 'STOCK' },
         stocklist: { $set: stocklist },
+      }),
+    });
+  }
+
+  setDestination(values, destination) {
+    this.setState({
+      values: update(values, {
+        destination: { $set: destination },
       }),
     });
   }
@@ -240,6 +240,23 @@ class CreateStockMovement extends Component {
         this.setState({ requestTypes }, () => this.props.hideSpinner());
       })
       .catch(() => this.props.hideSpinner());
+  }
+
+  fetchDestinations() {
+    const url = '/openboxes/api/locations?name=&direction=OUTBOUND';
+    return apiClient.get(url)
+      .then((response) => {
+        const destinations = _.map(response.data.data, obj => ({
+          value: {
+            id: obj.id,
+            type: obj.locationType.locationTypeCode,
+            name: obj.name,
+            label: `${obj.name} - [${obj.locationType.locationTypeCode}]`,
+          },
+          label: `${obj.name} - [${obj.locationType.locationTypeCode}]`,
+        }));
+        this.setState({ destinations }, () => this.props.hideSpinner());
+      }).catch(() => this.props.hideSpinner());
   }
 
   checkStockMovementChange(newValues) {
@@ -406,6 +423,8 @@ class CreateStockMovement extends Component {
                   debouncedLocationsFetch: this.debouncedLocationsFetch,
                   requestTypes: this.state.requestTypes,
                   setRequestType: this.setRequestType,
+                  destinations: this.state.destinations,
+                  setDestination: this.setDestination,
                   values,
                 }),
               )}

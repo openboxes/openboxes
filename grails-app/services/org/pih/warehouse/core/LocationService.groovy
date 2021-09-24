@@ -92,6 +92,8 @@ class LocationService {
 
             if (params.name) {
                 ilike("name", "%" + params.name + "%")
+            } else {
+                ilike("name", "%")
             }
 
             if (params.locationTypeCode) {
