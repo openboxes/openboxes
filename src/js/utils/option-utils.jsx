@@ -34,13 +34,16 @@ export const debounceLocationsFetch = (
   fetchAll = false,
   withOrgCode = false,
   withTypeDescription = true,
+  showDefaultOptions = false,
 ) =>
   _.debounce((searchTerm, callback) => {
-    if (searchTerm && searchTerm.length >= minSearchLength) {
+    const showOptions = showDefaultOptions && searchTerm.length === 0;
+    if ((searchTerm && searchTerm.length >= minSearchLength) || showOptions) {
+      const paginationParams = (showOptions) ? '&max=25&offset=0' : '';
       const activityCodesParams = activityCodes ? activityCodes.map(activityCode => `&activityCodes=${activityCode}`).join('') : '';
       const { direction } = queryString.parse(window.location.search);
       const directionParam = fetchAll ? null : direction;
-      apiClient.get(`/openboxes/api/locations?name=${searchTerm}${directionParam ? `&direction=${directionParam}` : ''}${activityCodesParams}`)
+      apiClient.get(`/openboxes/api/locations?name=${searchTerm}${directionParam ? `&direction=${directionParam}` : ''}${activityCodesParams}${paginationParams}`)
         .then(result => callback(
           null,
           {

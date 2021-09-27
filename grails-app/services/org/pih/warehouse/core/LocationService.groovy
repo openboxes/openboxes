@@ -92,8 +92,6 @@ class LocationService {
 
             if (params.name) {
                 ilike("name", "%" + params.name + "%")
-            } else {
-                ilike("name", "%")
             }
 
             if (params.locationTypeCode) {
@@ -104,6 +102,13 @@ class LocationService {
 
             eq("active", Boolean.TRUE)
             isNull("parentLocation")
+
+            if(params.max) {
+                maxResults(Integer.parseInt(params.max))
+            }
+            if(params.offset) {
+                firstResult(Integer.parseInt(params.offset))
+            }
         }
         return locations
     }
