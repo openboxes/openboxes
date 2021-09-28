@@ -15,25 +15,29 @@ package org.pih.warehouse.shipping
 class ShipmentType implements java.io.Serializable {
 
     String id
+    String code
     String name
     String description
     Integer sortOrder = 0
     Date dateCreated
     Date lastUpdated
 
+    ShipmentTypeCode shipmentTypeCode = ShipmentTypeCode.DEFAULT
+
     static constraints = {
+        code(nullable: false)
         name(nullable: false, maxSize: 255)
         description(nullable: true, maxSize: 255)
         sortOrder(nullable: true)
         dateCreated(display: false)
         lastUpdated(display: false)
+        shipmentTypeCode(nullable: false)
     }
 
     static mapping = {
         id generator: 'uuid'
         sort "sortOrder"
     }
-
 
     String toString() { name }
 
