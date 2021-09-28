@@ -11,7 +11,7 @@ package org.pih.warehouse.data
 
 import org.joda.time.LocalDate
 import org.pih.warehouse.core.Constants
-import org.pih.warehouse.core.EventCode
+import org.pih.warehouse.core.EventTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.Product
@@ -84,7 +84,7 @@ class InboundStockMovementDataService {
             shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
             shipment.shipmentNumber = shipmentNumber
             shipment.save(failOnError: true)
-            shipmentService.createShipmentEvent(shipment, new Date(), EventCode.CREATED, location)
+            shipmentService.createShipmentEvent(shipment, new Date(), EventTypeCode.CREATED, location)
         }
 
         ShipmentItem shipmentItem = ShipmentItem.createCriteria().get {

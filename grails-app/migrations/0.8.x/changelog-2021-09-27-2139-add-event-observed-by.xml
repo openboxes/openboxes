@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="jmiranda (generated)" id="1632796809371-1">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="event" columnName="observed_by_id" />
+      </not>
+    </preConditions>
+    <addColumn tableName="event">
+      <column name="observed_by_id" type="CHAR(38)"/>
+    </addColumn>
+  </changeSet>
+
+  <changeSet author="jmiranda (generated)" id="1632796809371-2">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="FK5C6729A8B41C552" />
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="observed_by_id" baseTableName="event"
+      constraintName="FK5C6729A8B41C552" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="user"/>
+  </changeSet>
+
+
+</databaseChangeLog>

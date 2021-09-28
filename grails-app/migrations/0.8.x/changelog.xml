@@ -135,4 +135,9 @@
     <include file="0.8.x/changelog-2021-08-02-1200-alter-table-product-add-column-lot-and-expiry-control.xml"/>
     <include file="0.8.x/changelog-2021-09-02-1200-alter-table-picklist-add-column-order.xml"/>
     <include file="0.8.x/changelog-2021-09-02-1215-alter-table-picklist-item-add-column-order-item.xml"/>
+    <include file="0.8.x/changelog-2021-09-27-1555-alter-table-event-type-add-column-code.xml"/>
+    <include file="0.8.x/changelog-2021-09-27-2131-add-geo-location-data-to-event-and-address.xml"/>
+    <include file="0.8.x/changelog-2021-09-27-2139-add-event-observed-by.xml"/>
+    <include file="0.8.x/changelog-2021-09-27-2214-alter-table-shipment-type-add-column-code.xml"/>
+
 </databaseChangeLog>
