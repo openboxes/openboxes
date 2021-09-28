@@ -11,9 +11,8 @@ package org.pih.warehouse.integration
 
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.core.Event
-import org.pih.warehouse.core.EventCode
+import org.pih.warehouse.core.EventTypeCode
 import org.pih.warehouse.core.EventType
-import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.integration.xml.execution.ExecutionStatus
 import org.springframework.context.ApplicationListener
@@ -38,7 +37,7 @@ class TripExecutionEventService implements ApplicationListener<TripExecutionEven
             }
             Shipment shipment = stockMovement?.shipment
             String statusCode = executionStatus.status
-            EventCode eventCode = statusCode ? EventCode.valueOf(statusCode) : EventCode.UNKNOWN
+            EventTypeCode eventCode = statusCode ? EventTypeCode.valueOf(statusCode) : EventTypeCode.UNKNOWN
             EventType eventType = EventType.findByEventCode(eventCode)
             Date eventDate = dateFormatter.parse(executionStatus.dateTime)
             Event event = new Event(eventType: eventType, eventDate: eventDate)

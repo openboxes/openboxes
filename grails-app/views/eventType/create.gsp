@@ -1,5 +1,5 @@
 
-<%@ page import="org.pih.warehouse.core.EventType" %>
+<%@ page import="org.pih.warehouse.core.EventTypeCode; org.pih.warehouse.core.EventType" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -25,6 +25,23 @@
 					<h2><warehouse:message code="default.create.label" args="[entityName]" /></h2>
 					<table>
 						<tbody>
+							<tr class="prop">
+								<td valign="top" class="name">
+									<label for="eventCode"><warehouse:message code="eventType.eventCode.label" default="Event Status" /></label>
+								</td>
+								<td valign="top" class="value ${hasErrors(bean: eventTypeInstance, field: 'eventCode', 'errors')}">
+									<g:select name="eventCode" from="${org.pih.warehouse.core.EventTypeCode?.values()}" value="${eventTypeInstance?.eventCode}" noSelection="['': '']" class="chzn-select-deselect"/>
+								</td>
+							</tr>
+
+							<tr class="prop">
+								<td valign="top" class="name">
+								  <label for="name"><warehouse:message code="eventType.code.label" default="Code" /></label>
+								</td>
+								<td valign="top" class="value ${hasErrors(bean: eventTypeInstance, field: 'code', 'errors')}">
+									<g:textField name="code" value="${eventTypeInstance?.code}" class="text large"/>
+								</td>
+							</tr>
 
 							<tr class="prop">
 								<td valign="top" class="name">
@@ -52,25 +69,13 @@
 									<g:textField name="sortOrder" value="${fieldValue(bean: eventTypeInstance, field: 'sortOrder')}" class="text" size="100" />
 								</td>
 							</tr>
-
-							<tr class="prop">
-								<td valign="top" class="name">
-									<label for="eventCode"><warehouse:message code="eventType.eventCode.label" default="Event Status" /></label>
-								</td>
-								<td valign="top" class="value ${hasErrors(bean: eventTypeInstance, field: 'eventCode', 'errors')}">
-									<g:select name="eventCode" from="${org.pih.warehouse.core.EventCode?.values()}" value="${eventTypeInstance?.eventCode}" noSelection="['': '']" class="chzn-select-deselect"/>
-								</td>
-							</tr>
-
-
-
-
 						</tbody>
 						<tfoot>
 
 							<tr class="prop">
-								<td valign="top" colspan="2">
-									<div class="buttons">
+								<td></td>
+								<td valign="top">
+									<div class="buttons left">
 									   <g:submitButton name="create" class="button icon approve" value="${warehouse.message(code: 'default.button.create.label', default: 'Create')}" />
 
 									   <g:link action="list">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>

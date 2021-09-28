@@ -15,9 +15,9 @@
             	<div class="message">${flash.message}</div>
             </g:if>
             <div class="list">
-            
+
 				<div class="buttonBar">
-                    <g:link class="button icon add" action="create"><warehouse:message code="default.add.label" args="['eventType']"/></g:link>
+                    <g:link class="button" action="create"><warehouse:message code="default.create.label" args="[g.message(code: 'eventType.label', default: 'Event Type')]"/></g:link>
             	</div>
 
                 <div class="box">
