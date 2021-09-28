@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="jmiranda (generated)" id="1632798789382-1">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="shipment_type" columnName="code" />
+      </not>
+    </preConditions>
+    <addColumn tableName="shipment_type">
+      <column name="code" type="VARCHAR(255)" />
+    </addColumn>
+  </changeSet>
+
+  <changeSet author="jmiranda (generated)" id="1632798789382-2">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="shipment_type" columnName="shipment_type_code" />
+      </not>
+    </preConditions>
+    <addColumn tableName="shipment_type">
+      <column name="shipment_type_code" type="VARCHAR(255)" />
+    </addColumn>
+  </changeSet>
+
+  <changeSet author="jmiranda (generated)" id="1632798789382-3">
+    <comment>Set a default value for code column.</comment>
+    <sql>
+      update shipment_type set code = name where code is null;
+      update shipment_type set code = 'DEFAULT' where shipment_type_code is null;
+      update shipment_type set code = 'AIR', shipment_type_code = 'AIR' where id = 1;
+      update shipment_type set code = 'SEA', shipment_type_code = 'SEA' where id = 2;
+      update shipment_type set code = 'LAND', shipment_type_code = 'ROAD' where id = 3;
+      update shipment_type set code = 'SUITCASE', shipment_type_code = 'AIR' where id = 4;
+      update shipment_type set code = 'DEFAULT', shipment_type_code = 'DEFAULT' where id = 5;
+    </sql>
+  </changeSet>
+
+</databaseChangeLog>
