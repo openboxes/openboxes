@@ -16,7 +16,7 @@ import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Event
-import org.pih.warehouse.core.EventCode
+import org.pih.warehouse.core.EventTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
@@ -302,15 +302,15 @@ class Shipment implements Comparable, Serializable {
     }
 
     Boolean hasShipped() {
-        return events.any { it.eventType?.eventCode == EventCode.SHIPPED }
+        return events.any { it.eventType?.eventCode == EventTypeCode.SHIPPED }
     }
 
     Boolean wasReceived() {
-        return events.any { it.eventType?.eventCode == EventCode.RECEIVED }
+        return events.any { it.eventType?.eventCode == EventTypeCode.RECEIVED }
     }
 
     Boolean wasPartiallyReceived() {
-        return events.any { it.eventType?.eventCode == EventCode.PARTIALLY_RECEIVED }
+        return events.any { it.eventType?.eventCode == EventTypeCode.PARTIALLY_RECEIVED }
     }
 
     Boolean getIsFromPurchaseOrder() {
@@ -352,7 +352,7 @@ class Shipment implements Comparable, Serializable {
 
     Date getActualShippingDate() {
         for (event in events) {
-            if (event?.eventType?.eventCode == EventCode.SHIPPED) {
+            if (event?.eventType?.eventCode == EventTypeCode.SHIPPED) {
                 return event?.eventDate
             }
         }
@@ -361,7 +361,7 @@ class Shipment implements Comparable, Serializable {
 
     Date getActualDeliveryDate() {
         for (event in events) {
-            if (event?.eventType?.eventCode == EventCode.RECEIVED) {
+            if (event?.eventType?.eventCode == EventTypeCode.RECEIVED) {
                 return event?.eventDate
             }
         }
@@ -604,27 +604,27 @@ class Shipment implements Comparable, Serializable {
     }
 
     Date dateScheduled() {
-        Event event = events.find { Event event -> event?.eventType?.eventCode == EventCode.SCHEDULED }
+        Event event = events.find { Event event -> event?.eventType?.eventCode == EventTypeCode.SCHEDULED }
         return event?.eventDate ?: dateCreated
     }
 
     Date dateShipped() {
-        Event event = events.find { Event event -> event?.eventType?.eventCode == EventCode.SHIPPED }
+        Event event = events.find { Event event -> event?.eventType?.eventCode == EventTypeCode.SHIPPED }
         return event?.eventDate ?: actualShippingDate
     }
 
     Date dateDelivered() {
-        Event event = events.find { Event event -> event?.eventType?.eventCode == EventCode.RECEIVED || event?.eventType?.eventCode == EventCode.DELIVERED }
+        Event event = events.find { Event event -> event?.eventType?.eventCode == EventTypeCode.RECEIVED || event?.eventType?.eventCode == EventTypeCode.DELIVERED }
         return event?.eventDate ?: actualDeliveryDate
     }
 
     Date dateCustomsEntry() {
-        Event event = events.find { Event event -> event?.eventType?.eventCode == EventCode.CUSTOMS_ENTRY }
+        Event event = events.find { Event event -> event?.eventType?.eventCode == EventTypeCode.CUSTOMS_ENTRY }
         return event?.eventDate
     }
 
     Date dateCustomsRelease() {
-        Event event = events.find { Event event -> event?.eventType?.eventCode == EventCode.CUSTOMS_RELEASE }
+        Event event = events.find { Event event -> event?.eventType?.eventCode == EventTypeCode.CUSTOMS_RELEASE }
         return event?.eventDate
     }
 }

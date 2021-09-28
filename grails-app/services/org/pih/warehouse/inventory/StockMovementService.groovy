@@ -31,12 +31,11 @@ import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCode
 import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.Event
-import org.pih.warehouse.core.EventCode
+import org.pih.warehouse.core.EventTypeCode
 import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.RoleType
-import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.ShipOrderCommand
@@ -191,7 +190,7 @@ class StockMovementService {
 
     void acceptStockMovement(StockMovement stockMovement) {
         Shipment shipment = stockMovement?.shipment
-        EventType eventType = EventType.findByEventCode(EventCode.ACCEPTED)
+        EventType eventType = EventType.findByEventCode(EventTypeCode.ACCEPTED)
         Event event = new Event(eventType: eventType, eventDate: new Date())
         shipment.addToEvents(event)
         shipment.save(flush:true)
@@ -2457,7 +2456,7 @@ class StockMovementService {
             shipment = createShipment(stockMovement)
             shipment.expectedShippingDate = dateShipped
             createMissingShipmentItems(requisition, shipment)
-            shipmentService.createShipmentEvent(shipment, dateShipped, EventCode.SHIPPED, stockMovement.origin)
+            shipmentService.createShipmentEvent(shipment, dateShipped, EventTypeCode.SHIPPED, stockMovement.origin)
             outboundTransaction.outgoingShipment = shipment
             return
         }
@@ -2475,7 +2474,7 @@ class StockMovementService {
             createMissingShipmentItems(stockMovement)
 
             if (!shipment.hasShipped()) {
-                shipmentService.createShipmentEvent(shipment, dateShipped, EventCode.SHIPPED, stockMovement.origin)
+                shipmentService.createShipmentEvent(shipment, dateShipped, EventTypeCode.SHIPPED, stockMovement.origin)
             }
 
             outboundTransaction = shipment.outgoingTransactions ?

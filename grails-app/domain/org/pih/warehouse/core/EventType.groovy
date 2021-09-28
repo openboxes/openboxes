@@ -20,16 +20,18 @@ package org.pih.warehouse.core
 class EventType implements Comparable<EventType>, Serializable {
 
     String id
+    String code
     String name
     String description
     Integer sortOrder = 0
     Date dateCreated
     Date lastUpdated
 
-    EventCode eventCode        // CREATED, SHIPPED or RECEIVED
+    EventTypeCode eventCode        // CREATED, SHIPPED or RECEIVED
 
     static transients = ["optionValue"]
     static constraints = {
+        code(nullable: false, unique: true)
         name(nullable: false, maxSize: 255)
         description(nullable: true, maxSize: 255)
         sortOrder(nullable: true)
@@ -48,9 +50,7 @@ class EventType implements Comparable<EventType>, Serializable {
         return (description) ? description : name
     }
 
-
     String toString() { return "$name" }
-
 
     int compareTo(EventType other) {
         return sortOrder <=> other?.sortOrder ?: eventCode <=> other?.eventCode ?: name <=> other?.name
