@@ -21,6 +21,9 @@ class Address implements Serializable {
     String country
     String description
 
+    BigDecimal latitude
+    BigDecimal longitude
+
     // Audit fields
     Date dateCreated
     Date lastUpdated
@@ -37,5 +40,7 @@ class Address implements Serializable {
         postalCode(nullable: true, maxSize: 255)
         stateOrProvince(nullable: true, maxSize: 255)
         description(nullable: true, maxSize: 4000)
+        latitude(nullable: true)
+        longitude(nullalbe: true)
     }
 }
