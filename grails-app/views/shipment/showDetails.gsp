@@ -816,10 +816,10 @@
                                                 ${event?.eventLocation?.name}
                                             </td>
                                             <td style="text-align: right">
-                                                <g:if test="${event?.eventType?.eventCode == org.pih.warehouse.core.EventCode.SHIPPED }">
+                                                <g:if test="${event?.eventType?.eventCode == org.pih.warehouse.core.EventTypeCode.SHIPPED }">
 
                                                 </g:if>
-                                                <g:if test="${event?.eventType?.eventCode == org.pih.warehouse.core.EventCode.RECEIVED }">
+                                                <g:if test="${event?.eventType?.eventCode == org.pih.warehouse.core.EventTypeCode.RECEIVED }">
 
                                                 </g:if>
                                             </td>

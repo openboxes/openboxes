@@ -16,7 +16,7 @@ import org.pih.warehouse.api.PartialReceiptContainer
 import org.pih.warehouse.api.PartialReceiptItem
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Event
-import org.pih.warehouse.core.EventCode
+import org.pih.warehouse.core.EventTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.inventory.InventoryItem
@@ -291,7 +291,7 @@ class ReceiptService {
             if (!shipment.wasReceived()) {
                 shipmentService.createShipmentEvent(shipment,
                         receipt?.actualDeliveryDate,
-                        EventCode.RECEIVED,
+                        EventTypeCode.RECEIVED,
                         shipment.destination)
             }
         } else {
@@ -300,7 +300,7 @@ class ReceiptService {
             if (!shipment.wasPartiallyReceived()) {
                 shipmentService.createShipmentEvent(shipment,
                         receipt?.actualDeliveryDate,
-                        EventCode.PARTIALLY_RECEIVED,
+                        EventTypeCode.PARTIALLY_RECEIVED,
                         shipment.destination)
             }
         }
@@ -396,8 +396,8 @@ class ReceiptService {
 
         }
 
-        deleteEvent(shipment, EventCode.RECEIVED)
-        deleteEvent(shipment, EventCode.PARTIALLY_RECEIVED)
+        deleteEvent(shipment, EventTypeCode.RECEIVED)
+        deleteEvent(shipment, EventTypeCode.PARTIALLY_RECEIVED)
     }
 
     void rollbackLastReceipt(Shipment shipment) {
@@ -420,15 +420,15 @@ class ReceiptService {
             shipment.removeFromReceipts(lastReceipt)
             lastReceipt.delete()
 
-            deleteEvent(shipment, EventCode.RECEIVED)
+            deleteEvent(shipment, EventTypeCode.RECEIVED)
 
             if (receivedReceipts.size() <= 1) {
-                deleteEvent(shipment, EventCode.PARTIALLY_RECEIVED)
+                deleteEvent(shipment, EventTypeCode.PARTIALLY_RECEIVED)
             }
         }
     }
 
-    void deleteEvent(Shipment shipment, EventCode eventCode) {
+    void deleteEvent(Shipment shipment, EventTypeCode eventCode) {
         Event event = shipment.events.find { it.eventType?.eventCode == eventCode }
         if (event) {
             shipmentService.deleteEvent(shipment, event)

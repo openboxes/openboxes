@@ -24,7 +24,7 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Event
-import org.pih.warehouse.core.EventCode
+import org.pih.warehouse.core.EventTypeCode
 import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.ListCommand
 import org.pih.warehouse.core.Location
@@ -312,7 +312,7 @@ class ShipmentService {
                     eventType {
                         not {
                             // TODO This should really be a list managed by the EventCode enum e.g. EventCode.listPending()
-                            'in'("eventCode", [EventCode.SHIPPED, EventCode.RECEIVED])
+                            'in'("eventCode", [EventTypeCode.SHIPPED, EventTypeCode.RECEIVED])
                         }
                     }
                 }
@@ -1118,7 +1118,7 @@ class ShipmentService {
             }
 
             // Add a Shipped event to the shipment
-            createShipmentEvent(shipmentInstance, shipDate, EventCode.SHIPPED, locationInstance)
+            createShipmentEvent(shipmentInstance, shipDate, EventTypeCode.SHIPPED, locationInstance)
 
             // Save updated shipment instance (adding an event and comment)
             if (!shipmentInstance.hasErrors() && shipmentInstance.save()) {
@@ -1150,7 +1150,7 @@ class ShipmentService {
      * @param eventCode
      * @param location
      */
-    void createShipmentEvent(Shipment shipmentInstance, Date eventDate, EventCode eventCode, Location location) {
+    void createShipmentEvent(Shipment shipmentInstance, Date eventDate, EventTypeCode eventCode, Location location) {
         log.info "Creating shipment event ${eventDate} ${eventCode}"
 
         // Get the appropriate event type for the given event code
@@ -1204,7 +1204,7 @@ class ShipmentService {
     void markAsReceived(Shipment shipment, Location location) {
         try {
             // Add a Received event to the shipment
-            createShipmentEvent(shipment, new Date(), EventCode.RECEIVED, location)
+            createShipmentEvent(shipment, new Date(), EventTypeCode.RECEIVED, location)
 
             // Save updated shipment instance
             shipment.save()
@@ -1333,7 +1333,7 @@ class ShipmentService {
             }
 
             // Add a Received event to the shipment
-            createShipmentEvent(shipmentInstance, shipmentInstance.receipt.actualDeliveryDate, EventCode.RECEIVED, location)
+            createShipmentEvent(shipmentInstance, shipmentInstance.receipt.actualDeliveryDate, EventTypeCode.RECEIVED, location)
 
             // Save updated shipment instance
             shipmentInstance.save(flush: true)
@@ -1793,11 +1793,11 @@ class ShipmentService {
 
         try {
 
-            if (eventInstance?.eventType?.eventCode in [EventCode.RECEIVED, EventCode.PARTIALLY_RECEIVED]) {
+            if (eventInstance?.eventType?.eventCode in [EventTypeCode.RECEIVED, EventTypeCode.PARTIALLY_RECEIVED]) {
                 deleteReceipts(shipmentInstance)
                 deleteInboundTransactions(shipmentInstance)
                 deleteEvent(shipmentInstance, eventInstance)
-            } else if (eventInstance?.eventType?.eventCode == EventCode.SHIPPED) {
+            } else if (eventInstance?.eventType?.eventCode == EventTypeCode.SHIPPED) {
                 deleteReceipts(shipmentInstance)
                 deleteOutboundTransactions(shipmentInstance)
                 deleteEvent(shipmentInstance, eventInstance)
