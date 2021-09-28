@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="jmiranda (generated)" id="1632796349035-1">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="event_type" columnName="code" />
+      </not>
+    </preConditions>
+    <addColumn tableName="address">
+      <column name="latitude" type="DECIMAL(10,8)"/>
+    </addColumn>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1632796349035-2">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="event_type" columnName="code" />
+      </not>
+    </preConditions>
+    <addColumn tableName="address">
+      <column name="longitude" type="DECIMAL(11,8)"/>
+    </addColumn>
+  </changeSet>
+
+  <changeSet author="jmiranda (generated)" id="1632796349035-3">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="event_type" columnName="code" />
+      </not>
+    </preConditions>
+    <addColumn tableName="event">
+      <column name="latitude" type="DECIMAL(10,8)"/>
+    </addColumn>
+  </changeSet>
+  <changeSet author="jmiranda (generated)" id="1632796349035-4">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="event_type" columnName="code" />
+      </not>
+    </preConditions>
+    <addColumn tableName="event">
+      <column name="longitude" type="DECIMAL(11,8)"/>
+    </addColumn>
+  </changeSet>
+
+</databaseChangeLog>

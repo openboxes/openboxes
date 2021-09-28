@@ -15,15 +15,22 @@ package org.pih.warehouse.core
  * Examples might be:
  *
  *  Shipment #1 Departed from Boston on 1/1/2010:
- *{eventDate: 1/1/2010, eventLocation: Boston, eventType: SHIPPED}*
+ *      {eventDate: 1/1/2010, eventLocation: Boston, eventType: SHIPPED}
+ *
  *  Shipment #2 Arrived at Customs on 5/5/2010:
- *{eventDate: 5/5/2010, eventLocation: Customs, eventType: ARRIVED}*/
+ *      {eventDate: 5/5/2010, eventLocation: Customs, eventType: ARRIVED}
+ **/
 class Event implements Comparable, Serializable {
 
     String id
     Date eventDate                // The date and time on which the Event occurred
     EventType eventType            // The type of the Event
     Location eventLocation        // The Location at which the Event occurred
+    User observedBy
+
+    BigDecimal latitude
+    BigDecimal longitude
+
     Date dateCreated
     Date lastUpdated
 
@@ -31,11 +38,13 @@ class Event implements Comparable, Serializable {
         id generator: 'uuid'
     }
 
-
     static constraints = {
         eventDate(nullable: true)
         eventType(nullable: true)
         eventLocation(nullable: true)
+        observedBy(nullable: true)
+        latitude(nullable: true)
+        longitude(nullalbe: true)
     }
 
     String toString() { return "$eventType $eventLocation on $eventDate" }
