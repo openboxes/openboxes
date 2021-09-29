@@ -32,9 +32,9 @@
                     <th><g:message code="stockMovement.status.label"/></th>
                     <th><g:message code="stockMovement.identifier.label"/></th>
                     <th><g:message code="stockMovement.destination.label"/></th>
-                    <th><g:message code="stockMovement.requestedDeliveryDate.label" default="Requested Delivery Date"/></th>
-                    <th><g:message code="stockMovement.expectedShippingDate.label" default="Expected Shipping Date"/></th>
-                    <th><g:message code="stockMovement.expectedDeliveryDate.label" default="Expected Delivery Date"/></th>
+                    <th><g:message code="stockMovement.requestedDeliveryDate.label" default="Requested Delivery"/></th>
+                    <th><g:message code="stockMovement.expectedShippingDate.label" default="Expected Shipping"/></th>
+                    <th><g:message code="stockMovement.expectedDeliveryDate.label" default="Expected Delivery"/></th>
                     <th><g:message code="stockMovement.trackingNumber.label" /></th>
                     <th class="col-1 text-center"></th>
                 </tr>
