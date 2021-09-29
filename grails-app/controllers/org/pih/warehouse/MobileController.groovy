@@ -319,10 +319,10 @@ class MobileController {
         try {
             String xmlContents = fileTransferService.retrieveMessage(params.path)
 
-            Boolean validate = grailsApplication.config.openboxes.integration.inbound.validate?:true
-            if (validate) {
-                xsdValidatorService.validateXml(xmlContents)
-            }
+//            Boolean validate = grailsApplication.config.openboxes.integration.ftp.inbound.validate?:true
+//            if (validate) {
+//                xsdValidatorService.validateXml(xmlContents)
+//            }
             Object messageObject = tmsIntegrationService.deserialize(xmlContents)
             tmsIntegrationService.handleMessage(messageObject)
             flash.message = "Message has been processed"
