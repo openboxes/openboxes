@@ -21,8 +21,8 @@ class Address implements Serializable {
     String country
     String description
 
-    BigDecimal latitude
-    BigDecimal longitude
+    BigDecimal latitude = BigDecimal.ZERO
+    BigDecimal longitude = BigDecimal.ZERO
 
     // Audit fields
     Date dateCreated
