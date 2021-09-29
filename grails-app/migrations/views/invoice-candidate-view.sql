@@ -11,7 +11,6 @@ CREATE OR REPLACE VIEW invoice_item_candidate AS
         order_adjustment.description as description,
         1 as quantity,
         1 as quantity_to_invoice,
-        0 as quantity_from_invoice,
         order_item.quantity_uom_id as quantity_uom_id,
         order_item.unit_price as unit_price,
         order_item.quantity_per_uom as quantity_per_uom,
@@ -43,7 +42,6 @@ union
         else shipment_item.quantity/order_item.quantity_per_uom end as quantity,
 	    case when invoice_item.id is not null then (shipment_item.quantity/order_item.quantity_per_uom) - invoice_item.quantity
         else shipment_item.quantity/order_item.quantity_per_uom end as quantity_to_invoice,
-        invoice_item.quantity as quantity_from_invoice,
         order_item.quantity_uom_id as quantity_uom_id,
         order_item.unit_price as unit_price,
         order_item.quantity_per_uom as quantity_per_uom,
