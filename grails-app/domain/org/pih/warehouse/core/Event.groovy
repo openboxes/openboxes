@@ -28,8 +28,8 @@ class Event implements Comparable, Serializable {
     Location eventLocation        // The Location at which the Event occurred
     User observedBy
 
-    BigDecimal latitude
-    BigDecimal longitude
+    BigDecimal latitude = BigDecimal.ZERO
+    BigDecimal longitude = BigDecimal.ZERO
 
     Date dateCreated
     Date lastUpdated
