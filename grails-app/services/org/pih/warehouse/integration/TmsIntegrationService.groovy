@@ -115,10 +115,11 @@ class TmsIntegrationService {
         Object deliveryOrder = createDeliveryOrder(stockMovement)
         String xmlContents = serialize(deliveryOrder, org.pih.warehouse.integration.xml.order.Order.class)
 
-        Boolean validate = grailsApplication.config.openboxes.integration.outbound.validate?:true
-        if (validate) {
-            xsdValidatorService.validateXml(xmlContents)
-        }
+//        Boolean validationEnabled = grailsApplication.config.openboxes.integration.ftp.outbound.validate?:true
+//        log.info "Validation enabled: ${validationEnabled}"
+//        if (validationEnabled) {
+//            xsdValidatorService.validateXml(xmlContents)
+//        }
 
         // transfer file to sftp server
         String filenameTemplate = grailsApplication.config.openboxes.integration.order.filename
