@@ -21,14 +21,14 @@ class DocumentUploadEventService implements ApplicationListener<DocumentUploadEv
     def notificationService
 
     void onApplicationEvent(DocumentUploadEvent documentUploadEvent) {
-        log.info "Document upload: " + documentUploadEvent.documentUpload.uploadDetails.sourceType.document.documentFile
+        log.info "Document upload: " + documentUploadEvent.documentUpload
 
         String documentType = documentUploadEvent.documentUpload.documentType
-        String fileName = documentUploadEvent.documentUpload.uploadDetails.sourceType.document.documentName
-        String fileContents = documentUploadEvent.documentUpload.uploadDetails.sourceType.document.documentFile
+        String fileName = documentUploadEvent.documentUpload.uploadDetails.documentName
+        String fileContents = documentUploadEvent.documentUpload.uploadDetails.documentFile
 
-        List<String> orderIds = documentUploadEvent.documentUpload.uploadDetails.orderId
-        orderIds.each { trackingNumber ->
+        String trackingNumber = documentUploadEvent.documentUpload.orderId
+        if (trackingNumber) {
             log.info "Looking up stock movement by tracking number ${trackingNumber}"
             StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber)
             if (stockMovement) {
