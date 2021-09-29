@@ -25,6 +25,7 @@ class TripExecutionEventService implements ApplicationListener<TripExecutionEven
 
     def stockMovementService
     def notificationService
+    def grailsApplication
 
     void onApplicationEvent(TripExecutionEvent tripExecutionEvent) {
         log.info "Trip execution " + tripExecutionEvent.execution.toString()
