@@ -1,5 +1,6 @@
 package org.pih.warehouse.api
 
+import com.google.common.base.Enums
 import org.codehaus.groovy.grails.validation.Validateable
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -51,7 +52,7 @@ class StockTransfer {
     }
 
     static StockTransferStatus getStatus(OrderStatus orderStatus) {
-        StockTransferStatus stockTransferStatus = StockTransferStatus.valueOf(orderStatus.name())
+        StockTransferStatus stockTransferStatus = Enums.getIfPresent(StockTransferStatus, orderStatus.name()).orNull()
         return stockTransferStatus ?: StockTransferStatus.PENDING
     }
 
