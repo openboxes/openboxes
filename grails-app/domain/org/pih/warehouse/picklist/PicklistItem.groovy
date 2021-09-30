@@ -35,6 +35,10 @@ class PicklistItem implements Serializable {
 
     Integer quantity
 
+    //Person picker
+    //Date datePicked
+    //Integer quantityPicked
+
     String status
     String reasonCode
     String comment
@@ -77,16 +81,33 @@ class PicklistItem implements Serializable {
 
     Map toJson() {
         [
-                id               : id,
-                version          : version,
-                status           : status,
-                requisitionItemId: requisitionItem?.id,
-                orderItemId      : orderItem?.id,
-                binLocationId    : binLocation?.id,
-                inventoryItemId  : inventoryItem?.id,
-                quantity         : quantity,
-                reasonCode       : reasonCode,
-                comment          : comment
+                id                    : id,
+                version               : version,
+                status                : status,
+                "picklist.id"         : picklist?.id,
+                "requisitionItem.id"  : requisitionItem?.id,
+                "product.id"          : inventoryItem?.product?.id,
+                "product.name"        : inventoryItem?.product?.name,
+                "productCode"         : inventoryItem?.product?.productCode,
+                "inventoryItem.id"    : inventoryItem?.id,
+                lotNumber             : inventoryItem?.lotNumber,
+                expirationDate        : inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
+                "binLocation.id"      : binLocation?.id,
+                "binLocation.name"    : binLocation?.name,
+                "binLocation.zoneId"  : binLocation?.zone?.id,
+                "binLocation.zoneName": binLocation?.zone?.name,
+                requisitionItemId     : requisitionItem?.id,
+                orderItemId           : orderItem?.id,
+                binLocationId         : binLocation?.id,
+                inventoryItemId       : inventoryItem?.id,
+                quantity              : quantity,
+                quantityRequested     : requisitionItem?.quantity,
+                quantityToPick        : quantity,
+                quantityPicked        : 0,
+                "picker.id"           : null,
+                datePicked            : null,
+                reasonCode            : reasonCode,
+                comment               : comment
         ]
     }
 }
