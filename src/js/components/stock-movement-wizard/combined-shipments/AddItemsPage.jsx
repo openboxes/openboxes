@@ -264,7 +264,6 @@ class AddItemsPage extends Component {
     this.saveRequisitionItemsInCurrentStep = this.saveRequisitionItemsInCurrentStep.bind(this);
     this.importTemplate = this.importTemplate.bind(this);
     this.toggleDropdown = this.toggleDropdown.bind(this);
-    this.closeAlert = this.closeAlert.bind(this);
 
     this.debouncedProductsFetch = debounceProductsFetch(
       this.props.debounceTime,
@@ -286,14 +285,6 @@ class AddItemsPage extends Component {
       this.dataFetched = true;
 
       this.fetchAllData(false);
-    }
-  }
-
-  setAlertMessage(item) {
-    if (!this.state.alertMessage) {
-      this.setState({
-        alertMessage: `${item.productCode} ${item.product.name}  must have a lot and expiry date.`,
-      });
     }
   }
 
@@ -371,6 +362,7 @@ class AddItemsPage extends Component {
     const errors = {};
     errors.lineItems = [];
     const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
+    let alertMessage = '';
 
     _.forEach(values.lineItems, (item, key) => {
       if (!_.isNil(item.product) && (!item.quantityRequested || item.quantityRequested <= 0)) {
@@ -419,16 +411,24 @@ class AddItemsPage extends Component {
             expirationDate: LOT_AND_EXPIRY_ERROR,
             lotNumber: LOT_AND_EXPIRY_ERROR,
           };
-          this.setAlertMessage(item);
         } else if (!item.expirationDate) {
           errors.lineItems[key] = { expirationDate: LOT_AND_EXPIRY_ERROR };
-          this.setAlertMessage(item);
         } else if (_.isNil(item.lotNumber) || _.isEmpty(item.lotNumber)) {
           errors.lineItems[key] = { lotNumber: LOT_AND_EXPIRY_ERROR };
-          this.setAlertMessage(item);
+        }
+      }
+
+      if (errors.lineItems[key]) {
+        if (!alertMessage) {
+          alertMessage = `Following rows contain validation errors: Row ${key + 1}: ${item.productCode}`;
+        } else {
+          alertMessage += `, Row ${key + 1}: ${item.productCode}`;
         }
       }
     });
+
+    const { showAlert } = this.state;
+    this.setState({ alertMessage, showAlert: showAlert && !alertMessage ? false : showAlert });
     return errors;
   }
 
@@ -560,16 +560,7 @@ class AddItemsPage extends Component {
   nextPage(formValues) {
     const errors = this.validate(formValues).lineItems;
     if (errors.length) {
-      const hasLotAndExpiryError = _.find(
-        errors,
-        error => (
-          error && error.expirationDate && error.expirationDate === LOT_AND_EXPIRY_ERROR) ||
-          (error && error.lotNumber && error.lotNumber === LOT_AND_EXPIRY_ERROR),
-      );
-      if (hasLotAndExpiryError) {
-        this.setState({ showAlert: true });
-      }
-
+      this.setState({ showAlert: true });
       return;
     }
 
@@ -916,10 +907,6 @@ class AddItemsPage extends Component {
     });
   }
 
-  closeAlert() {
-    this.setState({ showAlert: false, alertMessage: '' });
-  }
-
   render() {
     const { showAlert, alertMessage } = this.state;
 
@@ -931,7 +918,7 @@ class AddItemsPage extends Component {
         initialValues={this.state.values}
         render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
-            <AlertMessage show={showAlert} message={alertMessage} close={this.closeAlert} danger />
+            <AlertMessage show={showAlert} message={alertMessage} danger />
             <span className="buttons-container">
               <label
                 htmlFor="csvInput"
