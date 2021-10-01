@@ -33,5 +33,5 @@ AlertMessage.defaultProps = {
   show: false,
   message: '',
   danger: false,
-  close: null,
+  close: () => null,
 };
