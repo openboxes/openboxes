@@ -122,7 +122,8 @@ grails.project.dependency.resolution = {
         // REST client
         compile 'org.apache.httpcomponents:httpclient:4.5.12'
 
-
+        // for com.google.common
+        compile 'com.google.guava:guava:12.0'
     }
     plugins {
 
