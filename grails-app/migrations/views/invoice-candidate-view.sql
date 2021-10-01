@@ -38,8 +38,8 @@ union
         product.gl_account_id as gl_account_id,
         product.product_code as product_code,
         product.name as description,
-        shipment_item.quantity/order_item.quantity_per_uom as quantity,
-        shipment_item.quantity/order_item.quantity_per_uom as quantity_to_invoice,
+        (shipment_item.quantity/order_item.quantity_per_uom) - IFNULL(shipment_invoice.quantity, 0) as quantity,
+	      (shipment_item.quantity/order_item.quantity_per_uom) - IFNULL(shipment_invoice.quantity, 0) as quantity_to_invoice,
         order_item.quantity_uom_id as quantity_uom_id,
         order_item.unit_price as unit_price,
         order_item.quantity_per_uom as quantity_per_uom,
@@ -57,7 +57,14 @@ union
           left join product_supplier on order_item.product_supplier_id = product_supplier.id
           join `order` on order_item.order_id = `order`.id
           left join order_invoice on order_invoice.order_item_id = order_item.id
-          left join shipment_invoice on shipment_invoice.shipment_item_id = shipment_item.id
+          left join (
+          	select
+          		shipment_invoice.shipment_item_id,
+          		IFNULL(sum(invoice_item.quantity), 0) as quantity
+            from shipment_invoice
+            left join invoice_item on shipment_invoice.invoice_item_id = invoice_item.id
+      		group by shipment_invoice.shipment_item_id
+          ) as shipment_invoice on shipment_invoice.shipment_item_id = shipment_item.id
  where order_invoice.invoice_item_id is null
-   and shipment_invoice.invoice_item_id is null
+   and (IFNULL(shipment_invoice.quantity, 0) < shipment_item.quantity/order_item.quantity_per_uom)
    and shipment.current_status in ('SHIPPED', 'PARTIALLY_RECEIVED', 'RECEIVED'));
