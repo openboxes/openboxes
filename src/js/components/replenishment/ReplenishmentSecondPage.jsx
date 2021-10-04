@@ -205,6 +205,7 @@ class ReplenishmentSecondPage extends Component {
       })
       .catch(() => this.props.hideSpinner());
   }
+
   checkForInitialPicksChanges(pickPageItem) {
     if (pickPageItem.picklistItems.length) {
       const initialPicks = [];
@@ -219,6 +220,7 @@ class ReplenishmentSecondPage extends Component {
         if (_.isEmpty(pick) || (pick.quantity !== suggestion.quantityPicked)) {
           initialPicks.push({
             ...suggestion,
+            quantity: suggestion.quantityPicked,
             initial: true,
           });
         }
