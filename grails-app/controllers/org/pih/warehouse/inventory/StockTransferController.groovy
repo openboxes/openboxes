@@ -27,6 +27,10 @@ class StockTransferController {
         render(template: "/common/react", params: params)
     }
 
+    def createReturns = {
+        render(template: "/common/react", params: params)
+    }
+
     def list = {
         Location currentLocation = Location.get(session.warehouse.id)
         params.origin = currentLocation

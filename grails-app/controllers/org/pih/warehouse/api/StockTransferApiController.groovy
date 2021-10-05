@@ -86,6 +86,10 @@ class StockTransferApiController {
             stockTransfer.stockTransferNumber = identifierService.generateOrderIdentifier()
         }
 
+        if (jsonObject.type) {
+            stockTransfer.type = OrderType.get(jsonObject.type)
+        }
+
         jsonObject.stockTransferItems.each { stockTransferItemMap ->
             StockTransferItem stockTransferItem = new StockTransferItem()
             bindData(stockTransferItem, stockTransferItemMap)
