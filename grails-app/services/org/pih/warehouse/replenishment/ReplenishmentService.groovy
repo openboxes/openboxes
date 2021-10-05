@@ -141,44 +141,20 @@ class ReplenishmentService {
         // Save the replenishment as an order
         Order order = createOrUpdateOrderFromReplenishment(replenishment)
 
-        // Process pick list items
-        processPicklistItems(replenishment)
-
-        replenishment.replenishmentItems.each { ReplenishmentItem replenishmentItem ->
+        order?.picklist?.picklistItems?.each { PicklistItem picklistItem ->
             TransferStockCommand command = new TransferStockCommand()
-            command.location = replenishmentItem?.binLocation?.parentLocation?:replenishment?.origin
-            command.binLocation = replenishmentItem.replenishmentLocation // origin
-            command.inventoryItem = replenishmentItem.inventoryItem
-            command.quantity = replenishmentItem.quantity
-            command.otherLocation = replenishmentItem.location
-            command.otherBinLocation = replenishmentItem.binLocation // destination
+            command.location = order?.origin
+            command.binLocation = picklistItem?.binLocation // origin
+            command.inventoryItem = picklistItem?.inventoryItem
+            command.quantity = picklistItem?.quantity
+            command.otherLocation = order?.origin
+            command.otherBinLocation = picklistItem?.orderItem?.destinationBinLocation // destination
             command.order = order
             command.transferOut = Boolean.TRUE
             inventoryService.transferStock(command)
         }
 
         return order
-    }
-
-    void processPicklistItems(Replenishment replenishment) {
-        replenishment.replenishmentItems.toArray().each { ReplenishmentItem oldReplenishmentItem ->
-
-            if (oldReplenishmentItem.picklistItems) {
-                // Iterate over picklist items and create new replenishment items for them
-                // NOTE: The only fields we change from the ReplenishmentItem are the replenishment destination bin and quantity.
-                oldReplenishmentItem.picklistItems.each { ReplenishmentItem picklistItem ->
-                    ReplenishmentItem newReplenishmentItem = new ReplenishmentItem()
-                    BeanUtils.copyProperties(newReplenishmentItem, oldReplenishmentItem)
-                    newReplenishmentItem.quantity = picklistItem.quantity
-                    newReplenishmentItem.location = picklistItem.location
-                    newReplenishmentItem.binLocation = picklistItem.binLocation
-                    replenishment.replenishmentItems.add(newReplenishmentItem)
-                }
-
-                // Remove the original replenishment item since it was replaced with the above
-                replenishment.replenishmentItems.remove(oldReplenishmentItem)
-            }
-        }
     }
 
     void validateReplenishment(Replenishment replenishment) {
