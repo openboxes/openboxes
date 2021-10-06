@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet id="1633402273161-1" author="jmiranda" runOnChange="true" runAlways="true" failOnError="true">
+    <comment>Views will be recreated after database migrations are executed.</comment>
+    <sql>
+      DROP VIEW IF EXISTS edit_page_item;
+      DROP VIEW IF EXISTS fill_rate;
+      DROP VIEW IF EXISTS invoice_item_candidate;
+      DROP VIEW IF EXISTS invoice_list;
+      DROP VIEW IF EXISTS on_order_order_item_summary;
+      DROP VIEW IF EXISTS on_order_shipment_item_summary;
+      DROP VIEW IF EXISTS on_order_summary;
+      DROP VIEW IF EXISTS order_item_status;
+      DROP VIEW IF EXISTS order_receipt_status;
+      DROP VIEW IF EXISTS order_payment_status_from_shipments;
+      DROP VIEW IF EXISTS order_payment_status_from_adjustments;
+      DROP VIEW IF EXISTS order_summary;
+      DROP VIEW IF EXISTS product_demand;
+      DROP VIEW IF EXISTS product_inventory_compare_view;
+      DROP VIEW IF EXISTS product_inventory_expiry_view;
+      DROP VIEW IF EXISTS product_inventory_extended_view;
+      DROP VIEW IF EXISTS product_inventory_pivot_view;
+      DROP VIEW IF EXISTS product_inventory_snapshot_view;
+      DROP VIEW IF EXISTS product_search;
+      DROP VIEW IF EXISTS product_snapshot;
+      DROP VIEW IF EXISTS product_stocklist;
+      DROP VIEW IF EXISTS product_stockout;
+      DROP VIEW IF EXISTS product_stockout_status;
+      DROP VIEW IF EXISTS product_substitution_status;
+      DROP VIEW IF EXISTS product_summary;
+      DROP VIEW IF EXISTS product_supplier_clean;
+      DROP VIEW IF EXISTS requirement;
+      DROP VIEW IF EXISTS stock_movement_item;
+      DROP VIEW IF EXISTS stocklist_item_list;
+      DROP VIEW IF EXISTS substitution_item;
+      DROP VIEW IF EXISTS supplier;
+    </sql>
+  </changeSet>
+</databaseChangeLog>
