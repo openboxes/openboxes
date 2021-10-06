@@ -15,6 +15,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
+import org.hibernate.ObjectNotFoundException
 import util.ConfigHelper
 
 class LocationService {
@@ -71,6 +72,17 @@ class LocationService {
                 'in'("locationTypeCode", LocationTypeCode.listInternalTypeCodes())
             }
         }
+    }
+
+    def getLocation(String idOrCode) {
+        Location location = Location.get(idOrCode)
+        if (!location) {
+            location = Location.findByNameOrLocationNumber(idOrCode, idOrCode)
+            if (!location) {
+                throw new ObjectNotFoundException(idOrCode, Location.class.simpleName)
+            }
+        }
+        return location
     }
 
     def getAllLocations() {

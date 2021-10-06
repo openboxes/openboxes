@@ -1394,17 +1394,17 @@ openboxes {
 openboxes.generateName.separator = " - "
 
 // OpenBoxes FTP server configuration
-openboxes.integration.ftp.server = "localhost"
-openboxes.integration.ftp.user = "sftpuser"
-openboxes.integration.ftp.password = "password"
-openboxes.integration.ftp.outbound.validate = true
-openboxes.integration.ftp.outbound.directory = "outbound"
-openboxes.integration.ftp.inbound.validate = true
-openboxes.integration.ftp.inbound.directory = "inbound"
+openboxes.integration.ftp.server =  System.env.FTP_SERVER ?: "localhost"
+openboxes.integration.ftp.user = System.env.FTP_USER ?: "sftpuser"
+openboxes.integration.ftp.password = System.env.FTP_PASSWORD ?: "password"
+openboxes.integration.ftp.outbound.validate = System.env.FTP_OUTBOUND_VALIDATE ?: true
+openboxes.integration.ftp.outbound.directory = System.env.FTP_OUTBOUND_DIRECTORY ?: "outbound"
+openboxes.integration.ftp.inbound.validate = System.env.FTP_INBOUND_VALIDATE ?: true
+openboxes.integration.ftp.inbound.directory = System.env.FTP_OUTBOUND_DIRECTORY ?: "inbound"
 openboxes.integration.ftp.inbound.subdirectories = []
 
 // Defaults
-openboxes.integration.defaultTimeZone = "Europe/London"
+openboxes.integration.defaultTimeZone = System.env.DEFAULT_TIME_ZONE ?: "Europe/London"
 openboxes.integration.defaultDateFormat = "yyyy-MM-dd'T'hh:mm:ssXXX"
 
 openboxes.integration.tracking.uri = "https://tms.etrucknow.com/tracking/orderTracking/%s"

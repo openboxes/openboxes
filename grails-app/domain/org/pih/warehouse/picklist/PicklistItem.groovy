@@ -10,6 +10,7 @@
 package org.pih.warehouse.picklist
 
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.pih.warehouse.order.OrderItem
@@ -35,9 +36,9 @@ class PicklistItem implements Serializable {
 
     Integer quantity
 
-    //Person picker
-    //Date datePicked
-    //Integer quantityPicked
+    Person picker
+    Date datePicked
+    Integer quantityPicked
 
     String status
     String reasonCode
@@ -63,6 +64,9 @@ class PicklistItem implements Serializable {
         requisitionItem(nullable: true)
         orderItem(nullable: true)
         quantity(nullable: false)
+        quantityPicked(nullable: true)
+        picker(nullable: true)
+        datePicked(nullable: true)
         status(nullable: true)
         reasonCode(nullable: true)
         comment(nullable: true)
@@ -100,12 +104,13 @@ class PicklistItem implements Serializable {
                 orderItemId           : orderItem?.id,
                 binLocationId         : binLocation?.id,
                 inventoryItemId       : inventoryItem?.id,
-                quantity              : quantity,
-                quantityRequested     : requisitionItem?.quantity,
-                quantityToPick        : quantity,
-                quantityPicked        : 0,
-                "picker.id"           : null,
-                datePicked            : null,
+                quantity              : quantity?:0,
+                quantityRequested     : requisitionItem?.quantity?:0,
+                quantityToPick        : quantity?:0,
+                quantityPicked        : quantityPicked?:0,
+                unitOfMeasure         : requisitionItem?.product?.unitOfMeasure?:"EA",
+                "picker.id"           : picker,
+                datePicked            : datePicked,
                 reasonCode            : reasonCode,
                 comment               : comment
         ]
