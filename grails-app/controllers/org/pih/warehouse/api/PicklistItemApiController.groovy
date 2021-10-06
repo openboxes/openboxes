@@ -10,9 +10,12 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.validation.ValidationException
 import org.apache.http.HttpStatus
 import org.json.JSONObject
 import org.pih.warehouse.picklist.PicklistItem
+import org.pih.warehouse.product.Product
+import org.pih.warehouse.core.User
 
 class PicklistItemApiController extends BaseDomainApiController {
 
@@ -31,7 +34,7 @@ class PicklistItemApiController extends BaseDomainApiController {
                         picklistItem.binLocation,
                         picklistItem.inventoryItem)
 
-        render data as JSON
+        render ([data: data] as JSON)
     }
 
 
@@ -43,8 +46,29 @@ class PicklistItemApiController extends BaseDomainApiController {
         PicklistItem picklistItem = PicklistItem.get(params.id)
 
         // Need to add validation and store quantityPicked if
+        if (!jsonObject["product.id"]) {
+            throw new IllegalArgumentException("Must scan valid product")
+        }
 
+        Product product = Product.get(jsonObject["product.id"])
+        if (product != picklistItem?.requisitionItem?.product) {
+            throw new IllegalArgumentException("Scanned product ${jsonObject.productCode} does not match picklist item ${picklistItem?.requisitionItem?.product?.productCode}")
+        }
 
+        BigDecimal quantityPicked = new BigDecimal(jsonObject.quantityPicked)
+
+        if (!picklistItem.quantityPicked) {
+            picklistItem.quantityPicked = 0
+        }
+        picklistItem.quantityPicked += quantityPicked
+        picklistItem.datePicked = new Date()
+        picklistItem.picker = User.get(session.user.id)
+        if (picklistItem.validate() && !picklistItem.hasErrors()) {
+            picklistItem.save(flush:true)
+        }
+        else {
+            throw new ValidationException("Unable to save picklist item", picklistItem.errors)
+        }
 
         render HttpStatus.SC_OK
     }
