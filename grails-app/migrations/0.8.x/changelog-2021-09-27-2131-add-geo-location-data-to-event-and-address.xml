@@ -34,6 +34,7 @@
       <column name="latitude" type="DECIMAL(10,8)"/>
     </addColumn>
   </changeSet>
+
   <changeSet author="jmiranda (generated)" id="1632796349035-4">
     <preConditions onFail="MARK_RAN">
       <not>
@@ -43,6 +44,50 @@
     <addColumn tableName="event">
       <column name="longitude" type="DECIMAL(11,8)"/>
     </addColumn>
+  </changeSet>
+
+  <changeSet author="jmiranda (generated)" id="1632796349035-5">
+    <preConditions onFail="CONTINUE">
+      <and>
+        <columnExists tableName="address" columnName="longitude" />
+      </and>
+    </preConditions>
+    <sql>
+      UPDATE address SET longitude = 0.0 WHERE longitude IS NULL;
+    </sql>
+  </changeSet>
+
+  <changeSet author="jmiranda (generated)" id="1632796349035-6">
+    <preConditions onFail="CONTINUE">
+      <and>
+        <columnExists tableName="address" columnName="latitude" />
+      </and>
+    </preConditions>
+    <sql>
+      UPDATE address SET latitude = 0.0 WHERE latitude IS NULL;
+    </sql>
+  </changeSet>
+
+  <changeSet author="jmiranda (generated)" id="1632796349035-7">
+    <preConditions onFail="CONTINUE">
+      <and>
+        <columnExists tableName="event" columnName="longitude" />
+      </and>
+    </preConditions>
+    <sql>
+      UPDATE event SET longitude = 0.0 WHERE longitude IS NULL;
+    </sql>
+  </changeSet>
+
+  <changeSet author="jmiranda (generated)" id="1632796349035-8">
+    <preConditions onFail="CONTINUE">
+      <and>
+        <columnExists tableName="event" columnName="latitude" />
+      </and>
+    </preConditions>
+    <sql>
+      UPDATE event SET latitude = 0.0 WHERE latitude IS NULL;
+    </sql>
   </changeSet>
 
 </databaseChangeLog>
