@@ -38,6 +38,10 @@ class LocationApiController extends BaseDomainApiController {
         render ([data:locations] as JSON)
      }
 
+    def read = {
+        Location location = locationService.getLocation(params.id)
+        render ([data:location] as JSON)
+    }
 
     def productSummary = {
         Location currentLocation = Location.load(session.warehouse.id)

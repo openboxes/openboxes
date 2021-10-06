@@ -151,8 +151,10 @@ class StockMovement {
                 requestedBy          : requestedBy,
                 lineItems            : lineItems,
                 lineItemCount        : lineItemCount,
+                picklist             : requisition.picklist,
                 associations         : [
                         requisition: [id: requisition?.id, requestNumber: requisition?.requestNumber, status: requisition?.status?.name()],
+                        picklist: requisition.picklist,
                         shipment   : [id: shipment?.id, shipmentNumber: shipment?.shipmentNumber, status: shipment?.currentStatus?.name()],
                         shipments  : requisition?.shipments?.collect {
                             [id: it?.id, shipmentNumber: it?.shipmentNumber, status: it?.currentStatus?.name()]
