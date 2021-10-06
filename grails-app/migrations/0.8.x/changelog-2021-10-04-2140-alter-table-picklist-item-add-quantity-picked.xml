@@ -3,21 +3,41 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
   <changeSet author="jmiranda (generated)" id="1633401602208-1">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="picklist_item" columnName="date_picked"/>
+      </not>
+    </preConditions>
     <addColumn tableName="picklist_item">
       <column name="date_picked" type="DATETIME"/>
     </addColumn>
   </changeSet>
   <changeSet author="jmiranda (generated)" id="1633401602208-2">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="picklist_item" columnName="picker_id"/>
+      </not>
+    </preConditions>
     <addColumn tableName="picklist_item">
       <column name="picker_id" type="CHAR(38)"/>
     </addColumn>
   </changeSet>
   <changeSet author="jmiranda (generated)" id="1633401602208-3">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="picklist_item" columnName="quantity_picked"/>
+      </not>
+    </preConditions>
     <addColumn tableName="picklist_item">
       <column name="quantity_picked" type="INT"/>
     </addColumn>
   </changeSet>
   <changeSet author="jmiranda (generated)" id="1633401602208-4">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="FKE7584B13A3E976BC" />
+      </not>
+    </preConditions>
     <addForeignKeyConstraint baseColumnNames="picker_id" baseTableName="picklist_item"
       constraintName="FKE7584B13A3E976BC" deferrable="false" initiallyDeferred="false"
       referencedColumnNames="id" referencedTableName="person"/>
