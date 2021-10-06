@@ -338,6 +338,11 @@
                                     <warehouse:message code="default.list.label" args="[warehouse.message(code: 'stockMovements.outbound.label')]"/>
                                 </g:link>
                             </div>
+                            <div class="mm-menu-item">
+                                <g:link controller="stockTransfer" action="createReturns">
+                                    <warehouse:message code="outboundReturns.create.label" />
+                                </g:link>
+                            </div>
                         </div>
                     </g:if>
                     <g:if test="${megamenuConfig.shipping.enabled}">

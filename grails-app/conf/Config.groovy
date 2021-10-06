@@ -743,6 +743,14 @@ breadcrumbsConfig {
             actionUrl = "/${appName}/replenishment/create/"
             listUrl = "/"
         }
+        returns {
+            actionLabel = "react.outboundReturns.createReturn.label"
+            defaultActionLabel = "Create Return"
+            listLabel = "react.outboundReturns.label"
+            defaultListLabel = "Outbound Returns"
+            actionUrl = "/${appName}/stockTransfer/createReturns/"
+            listUrl = "/"
+        }
 }
 
 // OpenBoxes identifier config
@@ -1168,7 +1176,8 @@ openboxes {
                     defaultLabel: "Stock Movement",
                     menuItems: [
                         [label: "outbound.create.label", defaultLabel: "Create Outbound Movements", href: "/${appName}/stockMovement/createOutbound?direction=OUTBOUND"],
-                        [label: "outbound.list.label", defaultLabel: "List Outbound Movements", href: "/${appName}/stockMovement/list?direction=OUTBOUND"]
+                        [label: "outbound.list.label", defaultLabel: "List Outbound Movements", href: "/${appName}/stockMovement/list?direction=OUTBOUND"],
+                        [label: "outboundReturns.create.label", defaultLabel: "Create Return", href: "/${appName}/stockTransfer/createReturns"]
                     ]
                 ]
             ]

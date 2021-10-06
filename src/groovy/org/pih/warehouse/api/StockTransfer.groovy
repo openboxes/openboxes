@@ -6,6 +6,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderStatus
+import org.pih.warehouse.order.OrderType
 
 @Validateable
 class StockTransfer {
@@ -16,6 +17,7 @@ class StockTransfer {
     String stockTransferNumber
     Date dateCreated
     Person orderedBy
+    OrderType type
 
     StockTransferStatus status = StockTransferStatus.PENDING
     List<StockTransferItem> stockTransferItems = []
@@ -28,6 +30,7 @@ class StockTransfer {
         stockTransferItems(nullable: true)
         dateCreated(nullable: true)
         orderedBy(nullable: true)
+        type(nullable: true)
     }
 
     static StockTransfer createFromOrder(Order order) {
@@ -38,7 +41,8 @@ class StockTransfer {
                 stockTransferNumber: order.orderNumber,
                 status: getStatus(order.status),
                 dateCreated: order.dateOrdered,
-                orderedBy: order.orderedBy
+                orderedBy: order.orderedBy,
+                type: order.orderType
         )
 
         // Add all order items to stock transfer
@@ -72,7 +76,8 @@ class StockTransfer {
                             a.originBinLocation?.zone?.name <=> b.originBinLocation?.zone?.name ?:
                                 a.originBinLocation?.name <=> b.originBinLocation?.name
                 }.collect { it?.toJson() },
-                orderedBy          : orderedBy?.name
+                orderedBy          : orderedBy?.name,
+                type               : type?.code
         ]
     }
 }
