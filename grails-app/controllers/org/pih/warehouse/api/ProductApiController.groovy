@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociation
@@ -25,6 +26,16 @@ class ProductApiController extends BaseDomainApiController {
     def grailsApplication
     def productAvailabilityService
 
+    def read = {
+        Product product = Product.get(params.id)
+        if (!product) {
+            product = Product.findByProductCode(params.id)
+            if (!product) {
+                throw new ObjectNotFoundException(params.id, Product.class.simpleName)
+            }
+        }
+        render ([data:product] as JSON)
+    }
 
     def details = {
         def product = Product.get(params.id)

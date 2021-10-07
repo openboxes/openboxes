@@ -10,6 +10,7 @@
 package org.pih.warehouse.picklist
 
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.pih.warehouse.order.OrderItem
@@ -35,6 +36,10 @@ class PicklistItem implements Serializable {
 
     Integer quantity
 
+    Person picker
+    Date datePicked
+    Integer quantityPicked
+
     String status
     String reasonCode
     String comment
@@ -59,13 +64,16 @@ class PicklistItem implements Serializable {
         requisitionItem(nullable: true)
         orderItem(nullable: true)
         quantity(nullable: false)
+        quantityPicked(nullable: true)
+        picker(nullable: true)
+        datePicked(nullable: true)
         status(nullable: true)
         reasonCode(nullable: true)
         comment(nullable: true)
         sortOrder(nullable: true)
     }
 
-    static transients = ['associatedLocation', 'associatedProducts', 'disableRefresh']
+    static transients = ['associatedLocation', 'associatedProducts', 'disableRefresh', "quantityRemaining"]
 
     String getAssociatedLocation() {
         return requisitionItem ? requisitionItem?.requisition?.origin?.id : orderItem?.order?.origin?.id
@@ -75,18 +83,42 @@ class PicklistItem implements Serializable {
         return [inventoryItem?.product?.id]
     }
 
+    Integer getQuantityRemaining() {
+        return (quantity?:0) - (quantityPicked?:0)
+    }
+
+
     Map toJson() {
         [
-                id               : id,
-                version          : version,
-                status           : status,
-                requisitionItemId: requisitionItem?.id,
-                orderItemId      : orderItem?.id,
-                binLocationId    : binLocation?.id,
-                inventoryItemId  : inventoryItem?.id,
-                quantity         : quantity,
-                reasonCode       : reasonCode,
-                comment          : comment
+                id                    : id,
+                version               : version,
+                status                : status,
+                "picklist.id"         : picklist?.id,
+                "requisitionItem.id"  : requisitionItem?.id,
+                "product.id"          : inventoryItem?.product?.id,
+                "product.name"        : inventoryItem?.product?.name,
+                "productCode"         : inventoryItem?.product?.productCode,
+                "inventoryItem.id"    : inventoryItem?.id,
+                lotNumber             : inventoryItem?.lotNumber,
+                expirationDate        : inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
+                "binLocation.id"      : binLocation?.id,
+                "binLocation.name"    : binLocation?.name,
+                "binLocation.zoneId"  : binLocation?.zone?.id,
+                "binLocation.zoneName": binLocation?.zone?.name,
+                requisitionItemId     : requisitionItem?.id,
+                orderItemId           : orderItem?.id,
+                binLocationId         : binLocation?.id,
+                inventoryItemId       : inventoryItem?.id,
+                quantity              : quantity?:0,
+                quantityRequested     : requisitionItem?.quantity?:0,
+                quantityRemaining     : quantityRemaining?:0,
+                quantityToPick        : quantity?:0,
+                quantityPicked        : quantityPicked?:0,
+                unitOfMeasure         : requisitionItem?.product?.unitOfMeasure?:"EA",
+                "picker.id"           : picker,
+                datePicked            : datePicked,
+                reasonCode            : reasonCode,
+                comment               : comment
         ]
     }
 }
