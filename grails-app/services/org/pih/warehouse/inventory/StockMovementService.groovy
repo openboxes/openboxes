@@ -409,8 +409,27 @@ class StockMovementService {
     }
 
     def getOutboundStockMovements(Integer maxResults, Integer offset, StockMovement stockMovement = null) {
-        if(!stockMovement) {
+        if (!stockMovement) {
             stockMovement = new StockMovement()
+        }
+        return getOutboundStockMovements(stockMovement, [maxResults: maxResults, offset: offset])
+    }
+
+    def getOutboundStockMovements(Integer maxResults, Integer offset, Map params = [:]) {
+        log.info("outbound stock filter param:${params}")
+        Location origin = null
+        if(params.origin.id){
+            origin = Location.get(params.origin.id)
+        }
+        StockMovement stockMovement = new StockMovement()
+        if(origin){
+            stockMovement.origin = origin
+        }
+        if(params?.name){
+            stockMovement.name = params?.name
+        }
+        if(params?.orderNumber){
+            stockMovement.identifier = params?.orderNumber
         }
         return getOutboundStockMovements(stockMovement, [maxResults:maxResults, offset:offset])
     }
