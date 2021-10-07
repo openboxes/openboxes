@@ -73,7 +73,7 @@ class PicklistItem implements Serializable {
         sortOrder(nullable: true)
     }
 
-    static transients = ['associatedLocation', 'associatedProducts', 'disableRefresh']
+    static transients = ['associatedLocation', 'associatedProducts', 'disableRefresh', "quantityRemaining"]
 
     String getAssociatedLocation() {
         return requisitionItem ? requisitionItem?.requisition?.origin?.id : orderItem?.order?.origin?.id
@@ -82,6 +82,11 @@ class PicklistItem implements Serializable {
     List getAssociatedProducts() {
         return [inventoryItem?.product?.id]
     }
+
+    Integer getQuantityRemaining() {
+        return (quantity?:0) - (quantityPicked?:0)
+    }
+
 
     Map toJson() {
         [
@@ -106,6 +111,7 @@ class PicklistItem implements Serializable {
                 inventoryItemId       : inventoryItem?.id,
                 quantity              : quantity?:0,
                 quantityRequested     : requisitionItem?.quantity?:0,
+                quantityRemaining     : quantityRemaining?:0,
                 quantityToPick        : quantity?:0,
                 quantityPicked        : quantityPicked?:0,
                 unitOfMeasure         : requisitionItem?.product?.unitOfMeasure?:"EA",
