@@ -142,6 +142,7 @@
     <include file="0.8.x/changelog-2021-09-27-2131-add-geo-location-data-to-event-and-address.xml"/>
     <include file="0.8.x/changelog-2021-09-27-2139-add-event-observed-by.xml"/>
     <include file="0.8.x/changelog-2021-09-27-2214-alter-table-shipment-type-add-column-code.xml"/>
+    <include file="0.8.x/changelog-2021-10-04-2140-alter-table-picklist-item-add-quantity-picked.xml"/>
 
 >>>>>>> OBKN-174 Add latitude and longitude to address and event
 </databaseChangeLog>
