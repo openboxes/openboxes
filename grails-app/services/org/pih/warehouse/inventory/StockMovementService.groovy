@@ -457,8 +457,11 @@ class StockMovementService {
         return new PagedResultList(stockMovements, shipments.totalCount)
     }
 
-    def getOutboundStockMovements(Integer maxResults, Integer offset) {
-        return getOutboundStockMovements(new StockMovement(), [maxResults:maxResults, offset:offset])
+    def getOutboundStockMovements(Integer maxResults, Integer offset, StockMovement stockMovement = null) {
+        if(!stockMovement) {
+            stockMovement = new StockMovement()
+        }
+        return getOutboundStockMovements(stockMovement, [maxResults:maxResults, offset:offset])
     }
 
     def getOutboundStockMovements(StockMovement stockMovement, Map params) {
