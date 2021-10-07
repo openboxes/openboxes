@@ -85,6 +85,8 @@
                                 <div class="${requisitionItem?.status}">
                                     ${requisitionItem?.product?.productCode}
                                 </div>
+                                <g:displayBarcode showData="${false}" data="${requisitionItem?.product?.productCode}"/>
+
                             </td>
                             <td class="center" rowspan="${numInventoryItem}">
                                 <g:if test="${requisitionItem?.parentRequisitionItem?.isSubstituted()}">
@@ -122,6 +124,9 @@
                             <g:if test="${picklistItems}">
                                 <div class="binLocation">
                                     ${picklistItems[j]?.binLocation?.name}
+                                    <g:if test="${picklistItems[j]?.binLocation?.locationNumber}">
+                                        <g:displayBarcode showData="${true}" data="${picklistItems[j]?.binLocation?.locationNumber}"/>
+                                    </g:if>
                                 </div>
                             </g:if>
                         </td>
