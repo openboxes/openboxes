@@ -411,10 +411,12 @@ class StockMovementService {
         return new PagedResultList(stockMovements, shipments.totalCount)
     }
 
-    def getOutboundStockMovements(Integer maxResults, Integer offset, StockMovement stockMovement = null) {
-        if(!stockMovement) {
-            stockMovement = new StockMovement()
-        }
+    def getOutboundStockMovements(Integer maxResults, Integer offset, Map params = [:]) {
+        log.info("outbound stock filter param:${params}")
+        StockMovement stockMovement = new StockMovement()
+        stockMovement.origin = params?.origin?.id ? Location.get(params.origin.id) : null
+        stockMovement.name = params?.name
+        stockMovement.identifier = params?.orderNumber
         return getOutboundStockMovements(stockMovement, [maxResults:maxResults, offset:offset])
     }
 
