@@ -52,7 +52,7 @@ To set up a development environment for hacking on OpenBoxes, please see the ins
 
 The idea of giving away software code for free may seem strange at first, but it's a great way to make the world a better place! OpenBoxes has users all over the world who are looking forward to your next contribution. If you're not sure how the open source philosphy works, here are some links to get you started:
 
-- [How to Contribute to an Open Source Project on GitHub](https://egghead.io/series/how-to-contribute-to-an-open-source-project-on-github)
+- [How to Contribute to an Open Source Project on GitHub](https://egghead.io/courses/how-to-contribute-to-an-open-source-project-on-github)
 - http://www.firsttimersonly.com/
 
 At this point, you're ready to make your changes! Feel free to ask for help; everyone is a beginner at first :smile_cat:
