@@ -14,6 +14,7 @@ class StockTransfer {
     String id
     Location origin
     Location destination
+    String description
     String stockTransferNumber
     Date dateCreated
     Person orderedBy
@@ -25,6 +26,7 @@ class StockTransfer {
     static constrants = {
         origin(nullable: true)
         destination(nullable: true)
+        description(nullable: true)
         stockTransferNumber(nullable: true)
         status(nullable: true)
         stockTransferItems(nullable: true)
@@ -38,6 +40,7 @@ class StockTransfer {
                 id: order.id,
                 origin: order.origin,
                 destination: order.destination,
+                description: order.name,
                 stockTransferNumber: order.orderNumber,
                 status: getStatus(order.status),
                 dateCreated: order.dateOrdered,
@@ -63,6 +66,7 @@ class StockTransfer {
     Map toJson() {
         return [
                 id                 : id,
+                description        : description,
                 stockTransferNumber: stockTransferNumber,
                 status             : status?.name(),
                 dateCreated        : dateCreated?.format("MMMM dd, yyyy"),

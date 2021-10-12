@@ -118,7 +118,17 @@ class StockTransferApiController {
             throw new IllegalArgumentException("Can't find location with given id: ${params.location.id}")
         }
 
-        List<StockTransferItem> stockTransferCandidates = stockTransferService.getStockTransferCandidates(location)
+        List<StockTransferItem> stockTransferCandidates = stockTransferService.getStockTransferCandidates(location, null)
+        render([data: stockTransferCandidates?.collect { it.toJson() }] as JSON)
+    }
+
+    def returnCandidates = {
+        Location location = Location.get(params.locationId)
+        if (!location) {
+            throw new IllegalArgumentException("Can't find location with given id: ${params.locationId}")
+        }
+
+        List<StockTransferItem> stockTransferCandidates = stockTransferService.getStockTransferCandidates(location, params)
         render([data: stockTransferCandidates?.collect { it.toJson() }] as JSON)
     }
 

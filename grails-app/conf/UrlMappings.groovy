@@ -315,7 +315,7 @@ class UrlMappings {
 
         "/api/stockTransfers/candidates"(parseRequest: true) {
             controller = { "stockTransferApi" }
-            action = [GET: "stockTransferCandidates"]
+            action = [GET: "stockTransferCandidates", POST: "returnCandidates"]
         }
 
         "/api/stockTransferItems/$id/"(parseRequest: true) {

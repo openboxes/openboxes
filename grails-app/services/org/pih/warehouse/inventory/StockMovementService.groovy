@@ -1213,7 +1213,7 @@ class StockMovementService {
                 it.status = AvailableItemStatus.AVAILABLE
             } else if (it.inventoryItem?.recalled) {
                 it.status = AvailableItemStatus.RECALLED
-            } else if (it.binLocation?.supports(ActivityCode.HOLD_STOCK)) {
+            } else if (it.binLocation?.isOnHold()) {
                 it.status = AvailableItemStatus.HOLD
             } else {
                 it.status = AvailableItemStatus.PICKED
