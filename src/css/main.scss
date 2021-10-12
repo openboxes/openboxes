@@ -21,6 +21,8 @@ $blue-epsilon: #bce7f7;
 
 $black-alpha: #212529;
 
+$orange-alpha: #fca714;
+
 body {
   overflow-x: hidden;
 }
@@ -654,6 +656,20 @@ tr.crossed-out td:before {
   background-color: $red-delta;
 }
 
+.on-hold {
+  background-color: $orange-alpha;
+}
+
+.recalled-and-on-hold {
+  background: repeating-linear-gradient(
+    135deg,
+    $orange-alpha,
+    $orange-alpha 10px,
+    $red-delta 10px,
+    $red-delta 20px
+  );;
+}
+
 .table-row {
   height: 28px;
 }
@@ -908,4 +924,15 @@ div.crossed-out .table-inner-row:before {
 
 .negative-value {
   background-color: $red-delta !important;
+}
+
+.returns-date-picker {
+  > div {
+    > .react-datepicker-wrapper {
+      width: 100%;
+      > div {
+        width: 100%;
+      }
+    }
+  }
 }

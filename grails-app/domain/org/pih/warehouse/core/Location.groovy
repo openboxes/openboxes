@@ -294,6 +294,10 @@ class Location implements Comparable<Location>, java.io.Serializable {
         return ConfigurationHolder.config.openboxes.accounting.enabled && supports(ActivityCode.REQUIRE_ACCOUNTING)
     }
 
+    Boolean isOnHold() {
+        return supports(ActivityCode.HOLD_STOCK)
+    }
+
     static PROPERTIES = [
             "name"          : "name",
             "locationNumber": "locationNumber",

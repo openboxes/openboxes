@@ -21,6 +21,8 @@ class OutboundReturns extends Component {
       values: this.props.initialValues,
       currentPage: 1,
     };
+
+    this.updateWizardValues = this.updateWizardValues.bind(this);
   }
 
   componentDidMount() {
@@ -74,23 +76,92 @@ class OutboundReturns extends Component {
 
   getWizardTitle() {
     const { values } = this.state;
-    return values.movementNumber ? values.movementNumber : '';
+    if (!values.stockTransferNumber || !values.origin || !values.destination) {
+      return '';
+    }
+
+    return [
+      {
+        text: 'Outbound Return',
+        color: '#000000',
+        delimeter: ' | ',
+      },
+      {
+        text: values.stockTransferNumber,
+        color: '#000000',
+        delimeter: ' - ',
+      },
+      {
+        text: values.origin.name,
+        color: '#004d40',
+        delimeter: ' to ',
+      },
+      {
+        text: values.destination.name,
+        color: '#01579b',
+        delimeter: '',
+      },
+    ];
   }
 
   dataFetched = false;
 
   fetchInitialValues() {
-    if (this.props.match.params.outboundReturnsId) {
+    if (this.props.match.params.outboundReturnId) {
       this.props.showSpinner();
-      const url = `/openboxes/api/stockTransfers/${this.props.match.params.outboundReturnsId}`;
+      const url = `/openboxes/api/stockTransfers/${this.props.match.params.outboundReturnId}`;
 
       apiClient.get(url)
         .then((response) => {
-          const outboundReturns = parseResponse(response.data.data);
-          this.setState({ values: { ...outboundReturns }, currentPage: outboundReturns.status === 'COMPLETED' ? 3 : 2 });
+          const outboundReturn = parseResponse(response.data.data);
+          this.setState({
+            values: {
+              ...outboundReturn,
+              origin: {
+                id: outboundReturn.origin.id,
+                name: outboundReturn.origin.name,
+                label: outboundReturn.origin.name,
+              },
+              destination: {
+                id: outboundReturn.destination.id,
+                name: outboundReturn.destination.name,
+                label: outboundReturn.destination.name,
+              },
+            },
+            currentPage: outboundReturn.status === 'COMPLETED' ? 3 : 2,
+          });
           this.props.hideSpinner();
         })
         .catch(() => this.props.hideSpinner());
+    }
+  }
+
+  updateWizardValues(currentPage, values) {
+    this.setState({
+      currentPage,
+      values: {
+        ...values,
+        origin: {
+          id: values.origin.id,
+          name: values.origin.name,
+          label: values.origin.name,
+        },
+        destination: {
+          id: values.destination.id,
+          name: values.destination.name,
+          label: values.destination.name,
+        },
+      },
+    });
+    if (values.stockTransferNumber && values.id) {
+      const {
+        actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
+      } = this.props.breadcrumbsConfig;
+      this.props.updateBreadcrumbs([
+        { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
+        { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
+        { label: values.stockTransferNumber, url: actionUrl, id: values.id },
+      ]);
     }
   }
 
@@ -99,6 +170,8 @@ class OutboundReturns extends Component {
     const title = this.getWizardTitle();
     const pageList = [CreateOutboundReturns, AddItemsPage, SendOutboundReturns];
     const stepList = this.getStepList();
+    const { location, history, match } = this.props;
+    const locationId = location.id;
 
     return (
       <Wizard
@@ -108,16 +181,21 @@ class OutboundReturns extends Component {
         title={title}
         currentPage={currentPage}
         prevPage={currentPage === 1 ? 1 : currentPage - 1}
+        additionalProps={{
+          locationId, location, history, match,
+        }}
+        updateWizardValues={this.updateWizardValues}
       />
     );
   }
 }
 
 const mapStateToProps = state => ({
+  breadcrumbsConfig: state.session.breadcrumbsConfig.returns,
   locale: state.session.activeLanguage,
+  location: state.session.currentLocation,
   outboundReturnsTranslationsFetched: state.session.fetchedTranslations.outboundReturns,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
-  breadcrumbsConfig: state.session.breadcrumbsConfig.returns,
 });
 
 export default connect(mapStateToProps, {
@@ -126,7 +204,7 @@ export default connect(mapStateToProps, {
 
 OutboundReturns.propTypes = {
   match: PropTypes.shape({
-    params: PropTypes.shape({ outboundReturnsId: PropTypes.string }),
+    params: PropTypes.shape({ outboundReturnId: PropTypes.string }),
   }).isRequired,
   showSpinner: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
@@ -147,6 +225,17 @@ OutboundReturns.propTypes = {
   }),
   updateBreadcrumbs: PropTypes.func.isRequired,
   fetchBreadcrumbsConfig: PropTypes.func.isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func,
+  }).isRequired,
+  location: PropTypes.shape({
+    name: PropTypes.string,
+    id: PropTypes.string,
+    locationType: PropTypes.shape({
+      description: PropTypes.string,
+      locationTypeCode: PropTypes.string,
+    }),
+  }).isRequired,
 };
 
 OutboundReturns.defaultProps = {

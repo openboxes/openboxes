@@ -11,6 +11,7 @@ import org.pih.warehouse.product.ProductAvailability
 @Validateable
 class StockTransferItem {
     String id
+    String productAvailabilityId
     Product product
     Location location
     Location originBinLocation
@@ -55,6 +56,7 @@ class StockTransferItem {
 
     static StockTransferItem createFromProductAvailability(ProductAvailability productAvailability) {
         StockTransferItem stockTransferItem = new StockTransferItem()
+        stockTransferItem.productAvailabilityId = productAvailability.id
         stockTransferItem.product = productAvailability.product
         stockTransferItem.inventoryItem = productAvailability.inventoryItem
         stockTransferItem.location = productAvailability.location
@@ -80,15 +82,18 @@ class StockTransferItem {
     Map toJson() {
         return [
                 id                              : id,
+                productAvailabilityId           : productAvailabilityId,
                 "product.id"                    : product?.id,
                 "product.productCode"           : product?.productCode,
                 "product.name"                  : product?.name,
                 "inventoryItem.id"              : inventoryItem?.id,
                 "lotNumber"                     : inventoryItem?.lotNumber,
                 "expirationDate"                : inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
+                "recalled"                      : inventoryItem?.isRecalled(),
                 "originBinLocation.id"          : originBinLocation?.id,
                 "originBinLocation.name"        : originBinLocation?.name,
                 "originZone"                    : originBinLocation?.zone?.name,
+                "onHold"                        : originBinLocation?.isOnHold(),
                 "destinationBinLocation.id"     : destinationBinLocation?.id,
                 "destinationBinLocation.name"   : destinationBinLocation?.name,
                 "destinationZone.id"            : destinationBinLocation?.zone?.id,

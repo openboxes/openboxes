@@ -93,7 +93,7 @@ class CreateOutboundReturns extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (!this.props.match.params.outboundReturnsId && this.state.setInitialValues
+    if (!this.props.match.params.outboundReturnId && this.state.setInitialValues
       && nextProps.location.id) {
       this.setInitialValues(nextProps.location);
     }
@@ -130,13 +130,13 @@ class CreateOutboundReturns extends Component {
         type: 'OUTBOUND_RETURNS',
       };
 
-      const url = `/openboxes/api/stockTransfers/${this.props.match.params.outboundReturnsId || ''}`;
+      const url = `/openboxes/api/stockTransfers/${this.props.match.params.outboundReturnId || ''}`;
 
       apiClient.post(url, payload)
         .then((response) => {
           if (response.data) {
             const resp = response.data.data;
-            this.props.history.push(`/openboxes/outboundReturns/createOutbound/${resp.id}`);
+            this.props.history.push(`/openboxes/stockTransfer/createReturns/${resp.id}`);
             this.props.nextPage({ ...resp });
           }
         })
@@ -231,7 +231,7 @@ export default withRouter(connect(mapStateToProps, {
 
 CreateOutboundReturns.propTypes = {
   match: PropTypes.shape({
-    params: PropTypes.shape({ outboundReturnsId: PropTypes.string }),
+    params: PropTypes.shape({ outboundReturnId: PropTypes.string }),
   }).isRequired,
   initialValues: PropTypes.shape({
     origin: PropTypes.shape({

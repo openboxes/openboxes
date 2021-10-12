@@ -851,7 +851,7 @@ class InventoryService implements ApplicationContextAware {
         Map quantityBinLocationMap = getQuantityByProductAndInventoryItemMap(entries, true)
         quantityBinLocationMap.keySet().each { Product product ->
             quantityBinLocationMap[product].keySet().each { inventoryItem ->
-                quantityBinLocationMap[product][inventoryItem].keySet().each { binLocation ->
+                quantityBinLocationMap[product][inventoryItem].keySet().each { Location binLocation ->
                     def quantity = quantityBinLocationMap[product][inventoryItem][binLocation]
                     def value = "Bin: " + binLocation?.name + ", Lot: " + (inventoryItem?.lotNumber ?: "") + ", Qty: " + quantity
 
@@ -866,7 +866,7 @@ class InventoryService implements ApplicationContextAware {
                             inventoryItem    : inventoryItem,
                             binLocation      : binLocation,
                             quantity         : quantity,
-                            isOnHold         : binLocation?.supports(ActivityCode.HOLD_STOCK)
+                            isOnHold         : binLocation?.isOnHold()
                         ]
                     }
                 }

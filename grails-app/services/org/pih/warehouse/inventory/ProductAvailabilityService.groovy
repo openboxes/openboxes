@@ -28,6 +28,8 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductActivityCode
 import org.pih.warehouse.product.ProductAvailability
 
+import java.text.SimpleDateFormat
+
 class ProductAvailabilityService {
 
     boolean transactional = true
@@ -222,7 +224,7 @@ class ProductAvailabilityService {
                 binLocation      : [id: it?.binLocation?.id, name: it?.binLocation?.name],
                 quantity         : it.quantity,
                 quantityAllocated: picked ? (picked.findAll { row -> row.binLocation == it?.binLocation?.id && row.inventoryItem == it?.inventoryItem?.id }?.sum { it.quantityAllocated } ?: 0) : 0,
-                quantityOnHold   : it?.binLocation?.supports(ActivityCode.HOLD_STOCK) || it?.inventoryItem?.lotStatus == LotStatusCode.RECALLED ? it.quantity : 0
+                quantityOnHold   : it?.binLocation?.isOnHold() || it?.inventoryItem?.lotStatus == LotStatusCode.RECALLED ? it.quantity : 0
             ]
         }
 
@@ -763,6 +765,40 @@ class ProductAvailabilityService {
             eq("location", location)
             binLocation {
                 ne("locationType", LocationType.get(Constants.RECEIVING_LOCATION_TYPE_ID))
+            }
+            gt("quantityOnHand", 0)
+        }
+    }
+
+    List<ProductAvailability> getStockTransferCandidates(Location location, Map params) {
+        if (!params) {
+            return getStockTransferCandidates(location)
+        }
+
+        Location bin = params.binLocationId ? Location.get(params.binLocationId) : null
+        Product product = params.productId ? Product.get(params.productId) : null
+        def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+        Date expirationDate = params.expirationDate ? dateFormat.parse(params.expirationDate) : null
+        return ProductAvailability.createCriteria().list {
+            eq("location", location)
+            binLocation {
+                ne("locationType", LocationType.get(Constants.RECEIVING_LOCATION_TYPE_ID))
+            }
+            or {
+                if (product) {
+                    eq("product", product)
+                }
+                if (bin) {
+                    eq("binLocation", bin)
+                }
+                if (params.lotNumber) {
+                    ilike("lotNumber", "%${params.lotNumber}%")
+                }
+                if (expirationDate) {
+                    inventoryItem {
+                        eq("expirationDate", expirationDate)
+                    }
+                }
             }
             gt("quantityOnHand", 0)
         }
