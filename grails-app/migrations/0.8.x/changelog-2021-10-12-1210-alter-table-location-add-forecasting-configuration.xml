@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="dbienkowska" id="1210202112100-0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="location" columnName="expected_lead_time_days"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="location">
+            <column name="expected_lead_time_days" type="DECIMAL(19,2)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="dbienkowska" id="1210202112100-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="location" columnName="replenishment_period_days"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="location">
+            <column name="replenishment_period_days" type="DECIMAL(19,2)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="dbienkowska" id="1210202112100-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="location" columnName="demand_time_period_days"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="location">
+            <column name="demand_time_period_days" type="DECIMAL(19,2)"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

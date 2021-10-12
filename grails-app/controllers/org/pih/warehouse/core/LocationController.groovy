@@ -338,6 +338,14 @@ class LocationController {
         }
     }
 
+    def showForecastingConfiguration = {
+        def locationInstance = Location.get(params.id)
+        if (!locationInstance) {
+            render "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
+        } else {
+            [locationInstance: locationInstance]
+        }
+    }
 
     def importBinLocations = {
         try {
