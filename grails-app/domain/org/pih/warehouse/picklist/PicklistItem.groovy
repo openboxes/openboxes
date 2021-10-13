@@ -111,7 +111,7 @@ class PicklistItem implements Serializable {
             product             : inventoryItem?.product,
             inventoryItem       : inventoryItem,
             lotNumber           : inventoryItem?.lotNumber,
-            expirationDate      : inventoryItem?.expirationDate?.format("MM/dd/yyyy")
+            expirationDate      : inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
 
             // Used in React Native app
             "picklist.id"         : picklist?.id,
