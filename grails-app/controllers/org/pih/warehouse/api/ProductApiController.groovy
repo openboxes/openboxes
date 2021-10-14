@@ -12,6 +12,7 @@ package org.pih.warehouse.api
 import fr.w3blog.zpl.utils.ZebraUtils
 import grails.converters.JSON
 import groovyx.net.http.HTTPBuilder
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCode
@@ -32,24 +33,17 @@ class ProductApiController extends BaseDomainApiController {
     def productAvailabilityService
 
     def read = {
-        Product product = Product.get(params.id)
-        if (!product) {
-            product = Product.findByProductCode(params.id)
-            if (!product) {
-                throw new ObjectNotFoundException(params.id, Product.class.simpleName)
-            }
-        }
+        Product product = productService.getProduct(params.id)
         render ([data:product] as JSON)
     }
 
     def details = {
-        def product = Product.get(params.id)
+        def product = productService.getProduct(params.id)
         def location = Location.get(session.warehouse.id)
-        def data = [product:product, location:location]
-
+        def data = product.toJson()
+        data.location = location
 
         List<AvailableItem> availableItems = inventoryService.getAvailableItems(location, product)
-
         Integer quantityAvailable = availableItems.collect { AvailableItem availableItem -> availableItem.quantityAvailable?:0 }.sum()
         Integer quantityOnHand = availableItems.collect { AvailableItem availableItem -> availableItem.quantityOnHand?:0 }.sum()
 
@@ -59,6 +53,13 @@ class ProductApiController extends BaseDomainApiController {
         data.quantityAllocated = 0
         data.quantityOnOrder = 0
         data.unitOfMeasure = product.unitOfMeasure?:"EA"
+
+        ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        List<Document> barcodeTemplates = Document.findAllByDocumentCode(DocumentCode.ZEBRA_TEMPLATE)
+        data.barcodeLabels = barcodeTemplates.collect { Document template ->
+            String url = String.format("/api/products/%s/labels/%s", product.id, template.id)
+            [id: template.id, name: template.name, url: g.createLink(uri: url, absolute: true)]
+        }
 
         data.images = product?.images?.collect {
             return [ id: it.id, name: it.filename, contentType: it.contentType, fileUri: it.fileUri?:it?.link ]
@@ -81,9 +82,9 @@ class ProductApiController extends BaseDomainApiController {
 
     def renderLabel = {
         Product product = productService.getProduct(params.id)
-        Document document = Document.findAllByDocumentCode(DocumentCode.ZEBRA_TEMPLATE).first()
+        Document document = Document.get(params.documentId)
         if (!document) {
-            throw new ObjectNotFoundException(null, Document.class.simpleName)
+            throw new ObjectNotFoundException(params.documentId, Document.class.simpleName)
         }
         Map model = [product: product]
         String body = templateService.renderTemplate(document, model)
@@ -97,9 +98,9 @@ class ProductApiController extends BaseDomainApiController {
     def printLabel = {
         try {
             Product product = productService.getProduct(params.id)
-            Document document = Document.findAllByDocumentCode(DocumentCode.ZEBRA_TEMPLATE).first()
+            Document document = Document.get(params.documentId)
             if (!document) {
-                throw new ObjectNotFoundException(null, Document.class.simpleName)
+                throw new ObjectNotFoundException(params.documentId, Document.class.simpleName)
             }
             Map model = [product: product]
             String renderedContent = templateService.renderTemplate(document, model)
