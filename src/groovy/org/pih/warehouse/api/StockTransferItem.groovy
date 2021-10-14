@@ -5,6 +5,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
+import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAvailability
 
@@ -21,6 +22,7 @@ class StockTransferItem {
     Integer quantity
     StockTransferStatus status = StockTransferStatus.PENDING
     List<StockTransferItem> splitItems = []
+    Set<PicklistItem> picklistItems = []
     Boolean delete = Boolean.FALSE
 
     static constraints = {
@@ -33,6 +35,7 @@ class StockTransferItem {
         quantityOnHand(nullable: true)
         quantity(nullable: true)
         splitItems(nullable: true)
+        picklistItems(nullable: true)
     }
 
     static StockTransferItem createFromOrderItem(OrderItem orderItem) {
@@ -51,6 +54,10 @@ class StockTransferItem {
             stockTransferItem.splitItems.add(createFromOrderItem(item))
         }
 
+        orderItem?.picklistItems?.each { PicklistItem picklistItem ->
+            stockTransferItem.picklistItems.add(createFromPicklistItem(picklistItem))
+        }
+
         return stockTransferItem
     }
 
@@ -64,6 +71,19 @@ class StockTransferItem {
         stockTransferItem.destinationBinLocation = productAvailability.binLocation
         stockTransferItem.quantity = productAvailability.quantityOnHand
         stockTransferItem.quantityOnHand = productAvailability.quantityOnHand
+
+        return stockTransferItem
+    }
+    static StockTransferItem createFromPicklistItem(PicklistItem picklistItem) {
+        StockTransferItem stockTransferItem = new StockTransferItem()
+        stockTransferItem.id = picklistItem.id
+        stockTransferItem.product = picklistItem?.inventoryItem?.product
+        stockTransferItem.inventoryItem = picklistItem?.inventoryItem
+        stockTransferItem.location = picklistItem?.orderItem?.order?.origin
+        stockTransferItem.originBinLocation  = picklistItem?.binLocation
+        stockTransferItem.destinationBinLocation = picklistItem?.orderItem?.destinationBinLocation
+        stockTransferItem.quantity = picklistItem?.quantity
+        stockTransferItem.status = getItemStatus(OrderItemStatusCode.COMPLETED)
 
         return stockTransferItem
     }
@@ -104,7 +124,11 @@ class StockTransferItem {
                 splitItems                      : splitItems.sort { a, b ->
                     a.destinationBinLocation?.name <=> b.destinationBinLocation?.name ?:
                         b.quantity <=> a.quantity
-                }.collect { it?.toJson() }
+                }.collect { it?.toJson() },
+                picklistItems                   : picklistItems.sort { a, b ->
+                    a.binLocation?.name <=> b.binLocation?.name ?:
+                            b.quantity <=> a.quantity
+                }.collect { it?.toJson() },
         ]
     }
 }

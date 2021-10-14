@@ -132,4 +132,5 @@ class Constants {
     static final String DEFAULT_BIN_LOCATION_NAME = "DEFAULT" // default product availability bin location name
 
     static final String PUTAWAY_ORDER = "PUTAWAY_ORDER"
+    static final String OUTBOUND_RETURNS = "OUTBOUND_RETURNS"
 }

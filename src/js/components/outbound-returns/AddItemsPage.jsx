@@ -8,6 +8,7 @@ import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
+import Alert from 'react-s-alert';
 
 import 'react-table/react-table.css';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -20,27 +21,26 @@ import TextField from '../form-elements/TextField';
 import Checkbox from '../../utils/Checkbox';
 import { showSpinner, hideSpinner } from '../../actions';
 import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
-import apiClient, { parseResponse } from '../../utils/apiClient';
+import apiClient, { flattenRequest, parseResponse } from '../../utils/apiClient';
 import { debounceAvailableItemsFetch } from '../../utils/option-utils';
 import renderHandlingIcons from '../../utils/product-handling-icons';
 
 const FIELDS = {
   returnItems: {
     type: ArrayField,
-    arrowsNavigation: true,
     maxTableHeight: 'calc(100vh - 500px)',
-    getDynamicRowAttr: ({ rowValues }) => {
+    getDynamicRowAttr: ({ rowValues, translate }) => {
       let className = '';
       let tooltip = '';
       if (rowValues.recalled && rowValues.onHold) {
         className = 'recalled-and-on-hold';
-        tooltip = 'recalled-and-on-hold';
+        tooltip = translate('react.outboundReturns.recalledAndOnHold.label');
       } else if (rowValues.recalled) {
         className = 'recalled';
-        tooltip = 'recalled';
+        tooltip = translate('react.outboundReturns.recalled.label');
       } else if (rowValues.onHold) {
         className = 'on-hold';
-        tooltip = 'on-hold';
+        tooltip = translate('react.outboundReturns.onHold.label');
       }
       return { className, tooltip };
     },
@@ -144,7 +144,7 @@ function validate(values) {
         _.toInteger(item.quantity) < 0
       )
     ) {
-      errors.returnItems[key] = { quantitiy: 'react.outboundReturns.errors.quantityToShip.label' };
+      errors.returnItems[key] = { quantity: 'react.outboundReturns.errors.quantityToReturn.label' };
     }
   });
 
@@ -237,7 +237,15 @@ class AddItemsPage extends Component {
       apiClient.get(url)
         .then((resp) => {
           const outboundReturn = parseResponse(resp.data.data);
-          this.setState({ outboundReturn }, () => this.props.hideSpinner());
+          const returnItems = _.map(
+            outboundReturn.stockTransferItems,
+            item => ({ ...item, checked: true }),
+          );
+          this.setState({
+            outboundReturn,
+            selectedItems: _.chain(returnItems).keyBy('productAvailabilityId').value(),
+            formValues: { returnItems },
+          }, () => this.props.hideSpinner());
         })
         .catch(() => this.props.hideSpinner());
     }
@@ -278,13 +286,45 @@ class AddItemsPage extends Component {
           this.setState({ formValues: { returnItems } }, () => this.props.hideSpinner());
         })
         .catch(() => this.props.hideSpinner());
+    } else if (
+      !selectedProductId &&
+      !selectedLotNumber &&
+      !selectedExpirationDate &&
+      !selectedBinLocation
+    ) {
+      this.setState({ formValues: { returnItems: _.values(this.state.selectedItems) } });
     }
   }
 
   dataFetched = false;
 
-  nextPage(values) {
-    this.props.nextPage(values);
+  saveAndTransition() {
+    const errors = validate({ returnItems: _.values(this.state.selectedItems) });
+    if (errors && errors.returnItems.length) {
+      Alert.error(this.props.translate('react.outboundReturns.errors.quantityToReturn.label'));
+      this.setState({
+        selectedProductId: '',
+        selectedLotNumber: '',
+        selectedExpirationDate: '',
+        selectedBinLocation: '',
+      }, () => this.fetchReturnCandidates());
+      return;
+    }
+
+    const payload = {
+      ...this.state.outboundReturn,
+      status: 'APPROVED',
+      stockTransferItems: _.values(this.state.selectedItems),
+    };
+    const url = '/openboxes/api/stockTransfers/';
+
+    apiClient.post(url, flattenRequest(payload))
+      .then((resp) => {
+        const outboundReturns = resp.data.data;
+        this.props.hideSpinner();
+        this.props.nextPage(outboundReturns);
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   previousPage(values) {
@@ -349,6 +389,8 @@ class AddItemsPage extends Component {
         selectedItems: {
           ...selectedItems,
           [formValues.returnItems[rowIndex].productAvailabilityId]: {
+            ...formValues.returnItems[rowIndex],
+            checked: true,
             quantity: value ? formValues.returnItems[rowIndex].quantityOnHand : '',
           },
         },
@@ -366,17 +408,25 @@ class AddItemsPage extends Component {
   }
 
   updateRow(values, index) {
-    const { selectedItems } = this.state;
+    let { selectedItems } = this.state;
     const item = values.returnItems[index];
-    item.checked = true;
+
+    if (item.quantity && item.quantity > 0) {
+      item.checked = true;
+      selectedItems = {
+        ...selectedItems,
+        [item.productAvailabilityId]: { ...item },
+      };
+    } else {
+      item.checked = false;
+      delete selectedItems[item.productAvailabilityId];
+    }
+
     this.setState({
       formValues: update(values, {
         returnItems: { [index]: { $set: item } },
       }),
-      selectedItems: {
-        ...selectedItems,
-        [item.productAvailabilityId]: { quantity: item.quantity },
-      },
+      selectedItems,
     });
   }
 
@@ -392,7 +442,7 @@ class AddItemsPage extends Component {
 
     return (
       <Form
-        onSubmit={() => null}
+        onSubmit={() => this.saveAndTransition()}
         mutators={{ ...arrayMutators }}
         initialValues={formValues}
         validate={validate}
@@ -404,7 +454,7 @@ class AddItemsPage extends Component {
                 placeholder={this.props.translate('react.outboundReturns.selectProduct.label', 'Select product...')}
                 options={[]}
                 classes=""
-                showValueTooltip
+                showValueltip
                 loadOptions={this.debounceAvailableItemsFetch}
                 onChange={value => this.setSelectedProduct(value)}
                 openOnClick={false}

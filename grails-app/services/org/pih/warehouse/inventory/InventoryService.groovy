@@ -53,7 +53,6 @@ class InventoryService implements ApplicationContextAware {
     def identifierService
     def messageService
     def locationService
-    def picklistService
 
     static transactional = true
 

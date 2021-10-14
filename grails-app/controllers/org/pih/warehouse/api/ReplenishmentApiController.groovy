@@ -25,6 +25,7 @@ class ReplenishmentApiController {
 
     def identifierService
     def replenishmentService
+    def picklistService
 
     def list = {
         List<Order> replenishments = Order.findAllByOrderType(OrderType.get(OrderTypeCode.TRANSFER_ORDER.name()))
@@ -60,7 +61,7 @@ class ReplenishmentApiController {
             throw new ValidationException("Invalid order", order.errors)
         }
 
-        replenishmentService.createPicklist(order)
+        picklistService.createPicklist(order)
 
         render(status: 201, text: order.id)
     }
@@ -177,9 +178,9 @@ class ReplenishmentApiController {
             throw new IllegalArgumentException("Can't find order item with given id: ${params.id}")
         }
 
-        replenishmentService.clearPicklist(orderItem)
+        picklistService.clearPicklist(orderItem)
 
-        replenishmentService.createPicklist(orderItem)
+        picklistService.createPicklist(orderItem)
 
         render status: 201
     }
@@ -197,7 +198,7 @@ class ReplenishmentApiController {
             throw new IllegalArgumentException("Must specifiy picklistItems")
         }
 
-        replenishmentService.updatePicklist(orderItem, picklistItems)
+        picklistService.updatePicklist(orderItem, picklistItems)
 
         render status: 200
     }
@@ -208,7 +209,7 @@ class ReplenishmentApiController {
             throw new IllegalArgumentException("Can't find order item with given id: ${params.id}")
         }
 
-        replenishmentService.clearPicklist(orderItem)
+        picklistService.clearPicklist(orderItem)
 
         render status: 200
     }

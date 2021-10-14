@@ -40,7 +40,7 @@ class StockTransfer {
                 id: order.id,
                 origin: order.origin,
                 destination: order.destination,
-                description: order.name,
+                description: order.description,
                 stockTransferNumber: order.orderNumber,
                 status: getStatus(order.status),
                 dateCreated: order.dateOrdered,
