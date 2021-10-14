@@ -311,6 +311,7 @@ class AddItemsPage extends Component {
       return;
     }
 
+    this.props.showSpinner();
     const payload = {
       ...this.state.outboundReturn,
       status: 'APPROVED',

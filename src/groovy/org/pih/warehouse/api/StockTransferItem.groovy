@@ -81,7 +81,6 @@ class StockTransferItem {
         stockTransferItem.inventoryItem = picklistItem?.inventoryItem
         stockTransferItem.location = picklistItem?.orderItem?.order?.origin
         stockTransferItem.originBinLocation  = picklistItem?.binLocation
-        stockTransferItem.destinationBinLocation = picklistItem?.orderItem?.destinationBinLocation
         stockTransferItem.quantity = picklistItem?.quantity
         stockTransferItem.status = getItemStatus(OrderItemStatusCode.COMPLETED)
 
