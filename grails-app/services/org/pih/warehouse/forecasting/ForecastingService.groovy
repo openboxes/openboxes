@@ -50,14 +50,14 @@ class ForecastingService {
                     totalDays    : demandPeriod,
                     dailyDemand  : dailyDemand,
                     monthlyDemand: "${NumberFormat.getIntegerInstance().format(monthlyDemand)}",
-                    onHandMonths: onHandMonths
+                    onHandMonths : onHandMonths
             ]
         }
     }
 
     def getDemandDetails(Location origin, Product product) {
         Date today = new Date()
-        Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod?:365
+        Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod ?: 365
         return getDemandDetails(origin, product, today - demandPeriod, today)
     }
 
@@ -175,7 +175,7 @@ class ForecastingService {
 
     def getDemandSummary(Location origin, Product product) {
         List data = []
-        Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod?:365
+        Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod ?: 365
         boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
         if (forecastingEnabled) {
             String query = """
@@ -375,4 +375,94 @@ class ForecastingService {
         return data
     }
 
+    def getProductExpirySummary(Location location, def daysBeforeExpiration) {
+        List data = []
+        Map params = [locationId: location.id, daysBeforeExpiration: daysBeforeExpiration]
+        String query = """
+            SELECT 
+                p_a.product_id,
+                p_a.location_id,
+                SUM(p_a.quantity_on_hand) AS quantity_on_hand
+            FROM product_availability AS p_a
+            JOIN inventory_item i ON i.id = p_a.inventory_item_id
+            WHERE i.expiration_date < DATE_ADD(CURRENT_DATE, INTERVAL :daysBeforeExpiration DAY)
+            AND p_a.location_id = :locationId
+            GROUP BY p_a.product_id, p_a.location_id
+            """
+
+        Sql sql = new Sql(dataSource)
+
+        try {
+            data = sql.rows(query, params)
+        } catch (Exception e) {
+            log.error("Unable to execute query: " + e.message, e)
+        }
+
+        return data
+    }
+
+    def getProductExpiryAndAverageDailyDemandSummary(Location location, def daysBeforeExpiration) {
+        List data = []
+        Map params = [locationId: location.id, daysBeforeExpiration: daysBeforeExpiration]
+        String query = """
+            SELECT 
+                product_id,
+                location_id,
+                expiration_date,
+                quantity_on_hand,
+                average_daily_demand
+            FROM product_expiry_summary
+            WHERE expiration_date < DATE_ADD(CURRENT_DATE, INTERVAL :daysBeforeExpiration DAY)
+            AND location_id = :locationId
+            """
+        Sql sql = new Sql(dataSource)
+        try {
+            data = sql.rows(query, params)
+        } catch (Exception e) {
+            log.error("Unable to execute query: " + e.message, e)
+        }
+
+        return data
+    }
+
+    def getProductExpiryProjectedSummary(Location location, def daysBeforeExpiration) {
+        def data = getProductExpiryAndAverageDailyDemandSummary(location, daysBeforeExpiration)
+        def stockByProduct = data.groupBy { it.product_id }
+
+        def productExpirySummary = stockByProduct.collect { prodId, items ->
+            def sortedItems = items.sort { it.expiration_date }
+            def startDate = new Date()
+            def qtyExpired = 0
+            def qtyCantUse = 0
+
+            sortedItems.each { item ->
+                def qtyCanUse = 0
+
+                if (item.expiration_date.after(startDate)) {
+                    use(TimeCategory) {
+                        def duration = item.expiration_date - startDate
+
+                        qtyCanUse = duration.days * item.average_daily_demand
+                    }
+
+                    startDate = item.expiration_date
+                }
+
+                qtyCantUse += item.quantity_on_hand - qtyCanUse
+
+                if (qtyCantUse > 0) {
+                    qtyExpired += qtyCantUse
+                    qtyCantUse = 0
+                }
+            }
+
+            return [
+                    productId      : items[0].product_id,
+                    locationId     : location.id,
+                    quantityExpired: qtyExpired
+            ]
+        }
+
+        return productExpirySummary
+    }
 }
