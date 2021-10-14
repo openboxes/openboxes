@@ -9,8 +9,12 @@
  **/
 package org.pih.warehouse.api
 
+import fr.w3blog.zpl.utils.ZebraUtils
 import grails.converters.JSON
+import groovyx.net.http.HTTPBuilder
 import org.hibernate.ObjectNotFoundException
+import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.DocumentCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociation
@@ -21,6 +25,7 @@ import org.pih.warehouse.product.ProductAvailability
 class ProductApiController extends BaseDomainApiController {
 
     def productService
+    def templateService
     def inventoryService
     def forecastingService
     def grailsApplication
@@ -71,11 +76,43 @@ class ProductApiController extends BaseDomainApiController {
             ]
         }
         data.availableItems = availableItems
-
         render([data: data] as JSON)
-
     }
 
+    def renderLabel = {
+        Product product = productService.getProduct(params.id)
+        Document document = Document.findAllByDocumentCode(DocumentCode.ZEBRA_TEMPLATE).first()
+        if (!document) {
+            throw new ObjectNotFoundException(null, Document.class.simpleName)
+        }
+        Map model = [product: product]
+        String body = templateService.renderTemplate(document, model)
+        String renderApiUrl = grailsApplication.config.openboxes.barcode.labelaryApi.url
+        def http = new HTTPBuilder(renderApiUrl)
+        def html = http.post(body: body)
+        response.contentType = "image/png"
+        response.outputStream << html
+    }
+
+    def printLabel = {
+        try {
+            Product product = productService.getProduct(params.id)
+            Document document = Document.findAllByDocumentCode(DocumentCode.ZEBRA_TEMPLATE).first()
+            if (!document) {
+                throw new ObjectNotFoundException(null, Document.class.simpleName)
+            }
+            Map model = [product: product]
+            String renderedContent = templateService.renderTemplate(document, model)
+            String ipAddress = grailsApplication.config.openboxes.barcode.printer.ipAddress
+            Integer port = grailsApplication.config.openboxes.barcode.printer.port
+            log.info "Printing ${renderedContent} to ${ipAddress}:${port}"
+            ZebraUtils.printZpl(renderedContent, ipAddress, port)
+            render([data: "Product label has been printed to ${ipAddress}:${port}"] as JSON)
+            return
+        } catch (Exception e) {
+            render([errorCode: 500, cause: e?.class, errorMessage: e?.message] as JSON)
+        }
+    }
 
     def demand = {
         def product = Product.get(params.id)
