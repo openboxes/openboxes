@@ -13,6 +13,7 @@ import org.apache.commons.beanutils.BeanUtils
 import org.pih.warehouse.api.StockTransfer
 import org.pih.warehouse.api.StockTransferItem
 import org.pih.warehouse.api.StockTransferStatus
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.TransferStockCommand
@@ -22,6 +23,7 @@ import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
+import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.ProductAvailability
 
 class StockTransferService {
@@ -29,6 +31,7 @@ class StockTransferService {
     def locationService
     def inventoryService
     def productAvailabilityService
+    def picklistService
     def grailsApplication
 
     boolean transactional = true
@@ -131,6 +134,7 @@ class StockTransferService {
         order.dateOrdered = new Date()
         order.origin = stockTransfer.origin
         order.destination = stockTransfer.destination
+        order.description = stockTransfer.description
 
         // Set auditing data on completion
         if (stockTransfer.status == StockTransferStatus.COMPLETED) {
@@ -140,6 +144,10 @@ class StockTransferService {
 
         // Generate name
         order.name = order.generateName()
+
+        // Remove order items that were removed from stock transfer items
+        def itemsToRemove = order?.orderItems?.findAll { OrderItem item -> !stockTransfer?.stockTransferItems?.find { it.id == item.id } }
+        itemsToRemove?.each { it -> deleteOrderItem(order, it) }
 
         stockTransfer.stockTransferItems.toArray().each { StockTransferItem stockTransferItem ->
 
@@ -177,8 +185,12 @@ class StockTransferService {
                 }
             }
         }
-
         order.save(failOnError: true)
+
+        if (order.orderType == OrderType.get(Constants.OUTBOUND_RETURNS) && order?.orderItems) {
+            picklistService.createPicklistFromItem(order)
+        }
+
         return order
     }
 
@@ -188,6 +200,10 @@ class StockTransferService {
             throw new IllegalArgumentException("No stockTransfer item found with ID ${id}")
         }
 
+        return deleteOrderItem(orderItem.order, orderItem)
+    }
+
+    Order deleteOrderItem(Order order, OrderItem orderItem) {
         def splitItems = orderItem.orderItems?.toArray()
 
         splitItems?.each { OrderItem item ->
@@ -196,8 +212,17 @@ class StockTransferService {
             item.delete()
         }
 
+        List<PicklistItem> picklistItems = PicklistItem.findAllByOrderItem(orderItem)
+        if (picklistItems) {
+            picklistItems.each { PicklistItem picklistItem ->
+                picklistItem.disableRefresh = Boolean.TRUE
+                picklistItem.picklist?.removeFromPicklistItems(picklistItem)
+                picklistItem.orderItem?.removeFromPicklistItems(picklistItem)
+                picklistItem.delete()
+            }
+        }
+
         OrderItem parentItem = orderItem?.parentOrderItem
-        Order order = orderItem.order
         order.removeFromOrderItems(orderItem)
         if (parentItem) {
             parentItem.removeFromOrderItems(orderItem)
@@ -309,7 +334,9 @@ class StockTransferService {
 
     def setQuantityOnHand(StockTransfer stockTransfer) {
         stockTransfer?.stockTransferItems?.each { StockTransferItem stockTransferItem ->
-            stockTransferItem.quantityOnHand = productAvailabilityService.getQuantityOnHandInBinLocation(stockTransferItem.inventoryItem, stockTransferItem.originBinLocation)
+            ProductAvailability pa = ProductAvailability.findByInventoryItemAndBinLocation(stockTransferItem.inventoryItem, stockTransferItem.originBinLocation)
+            stockTransferItem.quantityOnHand = pa ? pa.quantityOnHand : 0
+            stockTransferItem.productAvailabilityId = pa ? pa.id : stockTransferItem.id
         }
     }
 }

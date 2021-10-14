@@ -5,6 +5,7 @@ import { getTranslate } from 'react-localize-redux';
 
 import CreateOutboundReturns from './CreateOutboundReturns';
 import AddItemsPage from './AddItemsPage';
+import PickPage from './PickPage';
 import SendOutboundReturns from './SendOutboundReturns';
 import Wizard from '../wizard/Wizard';
 import apiClient, { parseResponse } from '../../utils/apiClient';
@@ -69,9 +70,12 @@ class OutboundReturns extends Component {
   }
 
   getStepList() {
-    return [this.props.translate('react.outboundReturns.create.label', 'Create'),
+    return [
+      this.props.translate('react.outboundReturns.create.label', 'Create'),
       this.props.translate('react.outboundReturns.addItems.label', 'Add items'),
-      this.props.translate('react.outboundReturns.send.label', 'Send')];
+      this.props.translate('react.outboundReturns.picks.label', 'Picks'),
+      this.props.translate('react.outboundReturns.send.label', 'Send'),
+    ];
   }
 
   getWizardTitle() {
@@ -114,6 +118,18 @@ class OutboundReturns extends Component {
       apiClient.get(url)
         .then((response) => {
           const outboundReturn = parseResponse(response.data.data);
+          let currentPage;
+          switch (outboundReturn.status) {
+            case 'PENDING':
+              currentPage = 2;
+              break;
+            case 'APPROVED':
+              currentPage = 3;
+              break;
+            default:
+              currentPage = 4;
+              break;
+          }
           this.setState({
             values: {
               ...outboundReturn,
@@ -128,7 +144,7 @@ class OutboundReturns extends Component {
                 label: outboundReturn.destination.name,
               },
             },
-            currentPage: outboundReturn.status === 'COMPLETED' ? 3 : 2,
+            currentPage,
           });
           this.props.hideSpinner();
         })
@@ -168,7 +184,7 @@ class OutboundReturns extends Component {
   render() {
     const { values, currentPage } = this.state;
     const title = this.getWizardTitle();
-    const pageList = [CreateOutboundReturns, AddItemsPage, SendOutboundReturns];
+    const pageList = [CreateOutboundReturns, AddItemsPage, PickPage, SendOutboundReturns];
     const stepList = this.getStepList();
     const { location, history, match } = this.props;
     const locationId = location.id;

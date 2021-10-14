@@ -24,9 +24,11 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
+import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductActivityCode
 import org.pih.warehouse.product.ProductAvailability
+import org.pih.warehouse.requisition.RequisitionStatus
 
 import java.text.SimpleDateFormat
 
@@ -40,7 +42,6 @@ class ProductAvailabilityService {
     def locationService
     def inventoryService
     def dataService
-    def picklistService
 
     def triggerRefreshProductAvailability(String locationId, List<String> productIds, Boolean forceRefresh) {
         log.info "Triggering refresh product availability"
@@ -138,16 +139,42 @@ class ProductAvailabilityService {
 
     def calculateBinLocations(Location location) {
         def binLocations = inventoryService.getBinLocationDetails(location)
-        def picked = picklistService.getQuantityPickedByProductAndLocation(location, null)
+        def picked = getQuantityPickedByProductAndLocation(location, null)
         binLocations = transformBinLocations(binLocations, picked)
         return binLocations
     }
 
     def calculateBinLocations(Location location, Product product) {
         def binLocations = inventoryService.getProductQuantityByBinLocation(location, product, Boolean.TRUE)
-        def picked = picklistService.getQuantityPickedByProductAndLocation(location, product)
+        def picked = getQuantityPickedByProductAndLocation(location, product)
         binLocations = transformBinLocations(binLocations, picked)
         return binLocations
+    }
+
+    def getQuantityPickedByProductAndLocation(Location location, Product product) {
+        Picklist.createCriteria().list {
+            projections {
+                picklistItems {
+                    groupProperty("binLocation.id", "binLocation")
+                    groupProperty("inventoryItem.id", "inventoryItem")
+                    sum("quantity", "quantity")
+                    groupProperty("sortOrder", "sortOrder")
+                }
+            }
+            requisition {
+                'in'("status", RequisitionStatus.listPending())
+                eq("origin", location)
+            }
+            picklistItems {
+                if (product) {
+                    requisitionItem {
+                        eq("product", product)
+                    }
+                }
+                order("binLocation")
+                order("inventoryItem")
+            }
+        }.collect { [binLocation: it[0], inventoryItem: it[1], quantityAllocated: it[2]] }
     }
 
     def saveProductAvailability(Location location, Product product, List binLocations, Boolean forceRefresh) {

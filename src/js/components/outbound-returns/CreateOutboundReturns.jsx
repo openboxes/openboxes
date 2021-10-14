@@ -4,18 +4,16 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { withRouter } from 'react-router-dom';
-import { confirmAlert } from 'react-confirm-alert';
-import { getTranslate } from 'react-localize-redux';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
 import TextField from '../form-elements/TextField';
 import SelectField from '../form-elements/SelectField';
 import { renderFormField } from '../../utils/form-utils';
-import apiClient from '../../utils/apiClient';
+import apiClient, { parseResponse } from '../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../actions';
 import { debounceLocationsFetch } from '../../utils/option-utils';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
+import Translate from '../../utils/Translate';
 
 function validate(values) {
   const errors = {};
@@ -40,6 +38,9 @@ const FIELDS = {
       required: true,
       autoFocus: true,
     },
+    getDynamicAttr: ({ outboundReturnId }) => ({
+      disabled: !!outboundReturnId,
+    }),
   },
   origin: {
     type: SelectField,
@@ -57,7 +58,7 @@ const FIELDS = {
     },
     getDynamicAttr: props => ({
       loadOptions: props.debouncedLocationsFetch,
-      disabled: !props.isSuperuser,
+      disabled: !!props.outboundReturnId,
     }),
   },
   destination: {
@@ -76,6 +77,7 @@ const FIELDS = {
     },
     getDynamicAttr: props => ({
       loadOptions: props.debouncedLocationsFetch,
+      disabled: !!props.outboundReturnId,
     }),
   },
 };
@@ -84,7 +86,6 @@ class CreateOutboundReturns extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      setInitialValues: true,
       values: this.props.initialValues,
     };
 
@@ -92,10 +93,22 @@ class CreateOutboundReturns extends Component {
       debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength);
   }
 
+  componentDidMount() {
+    if (this.props.outboundReturnsTranslationsFetched) {
+      this.dataFetched = true;
+      this.fetchOutboundReturn();
+    }
+  }
+
   componentWillReceiveProps(nextProps) {
-    if (!this.props.match.params.outboundReturnId && this.state.setInitialValues
-      && nextProps.location.id) {
-      this.setInitialValues(nextProps.location);
+    if (nextProps.outboundReturnsTranslationsFetched) {
+      if (!this.dataFetched) {
+        this.dataFetched = true;
+
+        this.fetchOutboundReturn();
+      } else if (this.props.location.id !== nextProps.location.id) {
+        this.fetchOutboundReturn();
+      }
     }
   }
 
@@ -110,17 +123,47 @@ class CreateOutboundReturns extends Component {
         label: `${name} [${locationType ? locationType.description : null}]`,
       },
     };
-    this.setState({ values, setInitialValues: false });
+    this.setState({ values });
   }
 
-  checkOutboundReturnsChange(newValues) {
-    const { destination } = this.props.initialValues;
-    return newValues.destination && destination ?
-      newValues.destination.id !== destination.id : false;
+  fetchOutboundReturn() {
+    if (this.props.match.params.outboundReturnId) {
+      this.props.showSpinner();
+      const url = `/openboxes/api/stockTransfers/${this.props.match.params.outboundReturnId}`;
+      apiClient.get(url)
+        .then((resp) => {
+          const values = parseResponse(resp.data.data);
+          this.setState({
+            values: {
+              ...values,
+              origin: {
+                id: values.origin.id,
+                name: values.origin.name,
+                label: values.origin.name,
+              },
+              destination: {
+                id: values.destination.id,
+                name: values.destination.name,
+                label: values.destination.name,
+              },
+            },
+          }, () => this.props.hideSpinner());
+        })
+        .catch(() => this.props.hideSpinner());
+    } else {
+      this.setInitialValues(this.props.location);
+    }
   }
+
+  dataFetched = false;
 
   saveOutboundReturns(values) {
-    if (values.origin && values.destination && values.description) {
+    if (
+      values.origin &&
+      values.destination &&
+      values.description &&
+      !this.props.match.params.outboundReturnId
+    ) {
       this.props.showSpinner();
 
       const payload = {
@@ -130,60 +173,28 @@ class CreateOutboundReturns extends Component {
         type: 'OUTBOUND_RETURNS',
       };
 
-      const url = `/openboxes/api/stockTransfers/${this.props.match.params.outboundReturnId || ''}`;
+      const url = '/openboxes/api/stockTransfers/';
 
       apiClient.post(url, payload)
         .then((response) => {
           if (response.data) {
             const resp = response.data.data;
             this.props.history.push(`/openboxes/stockTransfer/createReturns/${resp.id}`);
-            this.props.nextPage({ ...resp });
+            this.props.nextPage(resp);
           }
         })
         .catch(() => {
           this.props.hideSpinner();
-          return Promise.reject(new Error(this.props.translate('react.outboundReturns.error.createOutboundReturns.label', 'Could not create return')));
         });
-    }
-  }
-
-  resetToInitialValues() {
-    this.setState({
-      values: {},
-    }, () => this.setState({
-      values: this.props.initialValues,
-    }));
-  }
-
-  nextPage(values) {
-    const showModal = this.checkOutboundReturnsChange(values);
-    if (!showModal) {
-      this.saveOutboundReturns(values);
     } else {
-      confirmAlert({
-        title: this.props.translate('react.outboundReturns.message.confirmChange.label', 'Confirm change'),
-        message: this.props.translate(
-          'react.outboundReturns.confirmChange.message',
-          'Do you want to change stock movement data? Changing origin, destination or stock list can cause loss of your current work',
-        ),
-        buttons: [
-          {
-            label: this.props.translate('react.default.no.label', 'No'),
-            onClick: () => this.resetToInitialValues(),
-          },
-          {
-            label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => this.saveOutboundReturns(values),
-          },
-        ],
-      });
+      this.props.nextPage(values);
     }
   }
 
   render() {
     return (
       <Form
-        onSubmit={values => this.nextPage(values)}
+        onSubmit={values => this.saveOutboundReturns(values)}
         validate={validate}
         initialValues={this.state.values}
         mutators={{
@@ -201,6 +212,7 @@ class CreateOutboundReturns extends Component {
                   destination: values.destination,
                   isSuperuser: this.props.isSuperuser,
                   debouncedLocationsFetch: this.debouncedLocationsFetch,
+                  outboundReturnId: this.props.match.params.outboundReturnId,
                   values,
                 }),
               )}
@@ -220,9 +232,9 @@ class CreateOutboundReturns extends Component {
 const mapStateToProps = state => ({
   location: state.session.currentLocation,
   isSuperuser: state.session.isSuperuser,
-  translate: translateWithDefaultMessage(getTranslate(state.localize)),
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
+  outboundReturnsTranslationsFetched: state.session.fetchedTranslations.outboundReturns,
 });
 
 export default withRouter(connect(mapStateToProps, {
@@ -257,7 +269,7 @@ CreateOutboundReturns.propTypes = {
     }),
   }).isRequired,
   isSuperuser: PropTypes.bool.isRequired,
-  translate: PropTypes.func.isRequired,
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
+  outboundReturnsTranslationsFetched: PropTypes.bool.isRequired,
 };
