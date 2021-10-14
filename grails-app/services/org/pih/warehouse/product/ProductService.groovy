@@ -11,6 +11,7 @@ package org.pih.warehouse.product
 
 import grails.validation.ValidationException
 import groovy.xml.Namespace
+import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
@@ -230,6 +231,14 @@ class ProductService {
      */
     List<Product> getProducts(String query, Category category, List<Tag> tags, boolean includeInactive, params) {
         return getProducts(category, tags, includeInactive, params)
+    }
+
+    def getProduct(String idOrCode) {
+        Product product = Product.findByIdOrProductCode(idOrCode, idOrCode)
+        if (!product) {
+            throw new ObjectNotFoundException(idOrCode, Product.class.simpleName)
+        }
+        return product
     }
 
     /**
