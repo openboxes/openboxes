@@ -8,12 +8,26 @@
  * You must not remove this notice, or any other, from this software.
  **/
 package org.pih.warehouse.api
+
+import grails.converters.JSON
+import org.pih.warehouse.core.Location
+
 /**
  * Should not extend BaseDomainApiController since putawayItem is not a valid domain.
  */
 class PutawayItemApiController {
 
     def putawayService
+
+    def list = {
+        String locationId = params?.location?.id ?: session?.warehouse?.id
+        Location location = Location.get(locationId)
+        if (!location) {
+            throw new IllegalArgumentException("Must provide location.id as request parameter")
+        }
+        List putawayItems = putawayService.getPutawayCandidates(location)
+        render([data: putawayItems.collect { it.toJson() }] as JSON)
+    }
 
     def removingItem = {
         putawayService.deletePutawayItem(params.id)

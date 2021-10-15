@@ -3,7 +3,7 @@
 ## Get Putaway Candidates
 ```
 $ curl -b cookies.txt -X GET -H "Content-Type: application/json" \
-"https://openboxes.ngrok.io/openboxes/api/putaways?location.id=ff808181646b260401646b3f2ced0002"|jsonlint
+"https://openboxes.ngrok.io/openboxes/api/locations/ff808181646b260401646b3f2ced0002/putawayCandidates"|jsonlint
 {
   "data": [
     {
