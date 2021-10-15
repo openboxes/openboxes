@@ -15,6 +15,9 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderType
+import org.pih.warehouse.core.Constants
+import org.pih.warehouse.order.OrderStatus
 
 /**
  * Should not extend BaseDomainApiController since stocklist is not a valid domain.
@@ -22,17 +25,17 @@ import org.pih.warehouse.order.Order
 class PutawayApiController {
 
     def identifierService
+    def orderService
     def productAvailabilityService
     def putawayService
 
     def list = {
-        String locationId = params?.location?.id ?: session?.warehouse?.id
-        Location location = Location.get(locationId)
-        if (!location) {
-            throw new IllegalArgumentException("Must provide location.id as request parameter")
-        }
-        List putawayItems = putawayService.getPutawayCandidates(location)
-        render([data: putawayItems.collect { it.toJson() }] as JSON)
+        OrderType orderType = OrderType.findByCode(Constants.PUTAWAY_ORDER)
+        Order orderCriteria = new Order(orderType: orderType, status: OrderStatus.PENDING)
+        List<Order> orders = orderService.getOrders(orderCriteria)
+        List<Putaway> putaways = orders.collect {  Order order -> Putaway.createFromOrder(order) }
+
+        render([data: putaways.collect { it.toJson() }] as JSON)
     }
 
     def read = {
