@@ -178,9 +178,13 @@ class CreateOutboundReturns extends Component {
       apiClient.post(url, payload)
         .then((response) => {
           if (response.data) {
-            const resp = response.data.data;
-            this.props.history.push(`/openboxes/stockTransfer/createReturns/${resp.id}`);
-            this.props.nextPage(resp);
+            const resp = parseResponse(response.data.data);
+            this.setState({
+              values: resp,
+            }, () => {
+              this.props.history.push(`/openboxes/stockTransfer/createReturns/${this.state.values.id}`);
+              this.props.nextPage(this.state.values);
+            });
           }
         })
         .catch(() => {
