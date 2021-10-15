@@ -298,7 +298,7 @@ class AddItemsPage extends Component {
 
   dataFetched = false;
 
-  saveAndTransition() {
+  saveAndTransition(callback) {
     const errors = validate({ returnItems: _.values(this.state.selectedItems) });
     if (errors && errors.returnItems.length) {
       Alert.error(this.props.translate('react.outboundReturns.errors.quantityToReturn.label'));
@@ -323,13 +323,9 @@ class AddItemsPage extends Component {
       .then((resp) => {
         const outboundReturns = resp.data.data;
         this.props.hideSpinner();
-        this.props.nextPage(outboundReturns);
+        callback(outboundReturns);
       })
       .catch(() => this.props.hideSpinner());
-  }
-
-  previousPage(values) {
-    this.props.previousPage(values);
   }
 
   fetchBins() {
@@ -438,12 +434,11 @@ class AddItemsPage extends Component {
       bins,
       selectedBinLocation,
       formValues,
-      outboundReturn,
     } = this.state;
 
     return (
       <Form
-        onSubmit={() => this.saveAndTransition()}
+        onSubmit={() => this.saveAndTransition(this.props.nextPage)}
         mutators={{ ...arrayMutators }}
         initialValues={formValues}
         validate={validate}
@@ -529,7 +524,7 @@ class AddItemsPage extends Component {
               <div className="submit-buttons d-flex justify-content-between">
                 <button
                   type="button"
-                  onClick={() => this.previousPage(outboundReturn)}
+                  onClick={() => this.saveAndTransition(this.props.previousPage)}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                 ><Translate id="react.replenishment.next.label" defaultMessage="Previous" />
                 </button>
