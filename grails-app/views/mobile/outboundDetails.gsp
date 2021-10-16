@@ -12,7 +12,7 @@
         <div class="row align-items-center">
 
             <div class="col-2 text-center">
-                <g:displayBarcode showData="${false}" data="${qrCodeLink}"/>
+                <g:displayBarcode showData="${false}" data="${stockMovement.identifier}"/>
                 <span class="badge bg-secondary">${stockMovement.identifier}</span>
             </div>
 
@@ -75,27 +75,29 @@
 
     <div class="card-body">
         <div class="row">
-            <div class="col-sm-12 col-md-2 text-center time-info mt-3 mt-sm-0">
+
+            <div class="col-sm-12 col-md-3 text-center time-info mt-3 mt-sm-0">
                 <span class="text-muted d-block">Origin</span>
                 <span class="text-5 font-weight-500 text-dark">
                     ${stockMovement?.origin?.locationNumber}
                 </span>
             </div>
 
-            <div class="col-sm-12 col-md-2 text-center time-info mt-3 mt-sm-0">
+            <div class="col-sm-12 col-md-3 text-center time-info mt-3 mt-sm-0">
                 <span class="text-muted d-block">Destination</span>
                 <span class="text-4 font-weight-500 text-dark">
                     ${stockMovement?.destination?.locationNumber}
                 </span>
             </div>
 
-            <div class="col-sm-12 col-md-2 text-center company-info">
+            <div class="col-sm-12 col-md-3 text-center company-info">
                 <span class="text-muted d-block">Ordered On</span>
                 <span class="text-4 font-weight-500 text-dark mt-1 mt-lg-0">
                     ${g.formatDate(date: stockMovement.requisition.dateCreated, type: "datetime")}
                 </span>
             </div>
-            <div class="col-sm-12 col-md-2 text-center time-info mt-3 mt-sm-0">
+
+            <div class="col-sm-12 col-md-3 text-center time-info mt-3 mt-sm-0">
                 <span class="text-muted d-block">Expected Shipping</span>
                 <g:if test="${stockMovement?.expectedShippingDate}">
                     <div class="text-5 font-weight-500 text-dark">
@@ -108,7 +110,7 @@
                 <g:else>Not Available</g:else>
             </div>
 
-            <div class="col-sm-12 col-md-2 text-center time-info mt-3 mt-sm-0">
+            <div class="col-sm-12 col-md-3 text-center time-info mt-3 mt-sm-0">
                 <span class="text-muted d-block">Expected Delivery</span>
                 <g:if test="${stockMovement?.expectedDeliveryDate}">
                     <div class="text-5 font-weight-500 text-dark">
@@ -121,7 +123,7 @@
                 <g:else>Not Available</g:else>
             </div>
 
-            <div class="col-sm-12 col-md-2 text-center time-info mt-3 mt-sm-0">
+            <div class="col-sm-12 col-md-3 text-center time-info mt-3 mt-sm-0">
                 <span class="text-muted d-block">Tracking Number</span>
                 <span class="text-5 font-weight-500 text-dark">
                     <g:if test="${stockMovement?.trackingNumber}">
@@ -132,6 +134,14 @@
                     </g:else>
                 </span>
             </div>
+
+            <div class="col-sm-12 col-md-3 text-center time-info mt-3 mt-sm-0">
+                <span class="text-muted d-block">QR Code</span>
+                <span class="text-5 font-weight-500 text-dark">
+                    <g:displayBarcode showData="${false}" data="${qrCodeLink}" format="QR_CODE"/>
+                </span>
+            </div>
+
         </div>
 
         <!--
