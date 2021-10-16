@@ -6,7 +6,7 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.integration
 
 import org.pih.warehouse.integration.xml.XmlXsdValidator
@@ -16,8 +16,8 @@ class XsdValidatorService {
     boolean validateXml(String xmlContents) {
         String rootElementName = getXsdType(xmlContents)
         String xsdFileName = "xsd/${rootElementName}.xsd"
-        println "xsdFileName = $xsdFileName"
-        return XmlXsdValidator.validateXmlSchema(xsdFileName, xmlContents)
+        XmlXsdValidator.validateXmlSchema(xsdFileName, xmlContents)
+        return true
     }
 
     def getXsdType(String xmlFileContents) {

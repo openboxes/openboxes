@@ -115,11 +115,11 @@ class TmsIntegrationService {
         Object deliveryOrder = createDeliveryOrder(stockMovement)
         String xmlContents = serialize(deliveryOrder, org.pih.warehouse.integration.xml.order.Order.class)
 
-//        Boolean validationEnabled = grailsApplication.config.openboxes.integration.ftp.outbound.validate?:true
-//        log.info "Validation enabled: ${validationEnabled}"
-//        if (validationEnabled) {
-//            xsdValidatorService.validateXml(xmlContents)
-//        }
+        Boolean validationEnabled = grailsApplication.config.openboxes.integration.ftp.outbound.validate
+        log.info "Validation enabled: ${validationEnabled}"
+        if (validationEnabled) {
+            xsdValidatorService.validateXml(xmlContents)
+        }
 
         // transfer file to sftp server
         String filenameTemplate = grailsApplication.config.openboxes.integration.order.filename
@@ -163,8 +163,8 @@ class TmsIntegrationService {
 
         // Start and end locations
         // FIXME Get the expected dates sorted out
-        orderDetails.setOrderStartLocation(buildLocationInfo(stockMovement?.origin, stockMovement?.expectedShippingDate, null));
-        orderDetails.setOrderEndLocation(buildLocationInfo(stockMovement?.destination, stockMovement?.expectedDeliveryDate?:stockMovement?.expectedShippingDate, null));
+        orderDetails.setOrderStartLocation(buildLocationInfo(1, stockMovement?.origin, stockMovement?.expectedShippingDate, null));
+        orderDetails.setOrderEndLocation(buildLocationInfo(2, stockMovement?.destination, stockMovement?.expectedDeliveryDate?:stockMovement?.expectedShippingDate, null));
 
         // Order cargo summary
         orderDetails.setOrderCargoSummary(new OrderCargoSummary(
@@ -217,7 +217,7 @@ class TmsIntegrationService {
 
     PartyType buildPartyType(Location location, User contactData, String type) {
         PartyType partyType = new PartyType();
-        partyType.setPartyID(new PartyID(location?.locationNumber, StringUtils.abbreviate(location?.name, 15)));
+        partyType.setPartyID(new PartyID(location?.locationNumber, location.name));
         partyType.setType(type);
 
         // Add contact information
@@ -233,7 +233,7 @@ class TmsIntegrationService {
 
     PartyType buildPartyType(Organization organization, User contactData, String type) {
         PartyType partyType = new PartyType();
-        partyType.setPartyID(new PartyID(organization?.code, StringUtils.abbreviate(organization?.name, 15)));
+        partyType.setPartyID(new PartyID(organization?.code, organization?.name));
         partyType.setType(type);
 
         // Add contact information
@@ -245,11 +245,11 @@ class TmsIntegrationService {
         return partyType
     }
 
-    LocationInfo buildLocationInfo(Location location, Date expectedDate, String driverInstructions) {
+    LocationInfo buildLocationInfo(Integer stopSequence, Location location, Date expectedDate, String driverInstructions) {
         def dateFormatter = new SimpleDateFormat(grailsApplication.config.openboxes.integration.defaultDateFormat)
         String expectedDateString = expectedDate ? dateFormatter.format(expectedDate) : null
-        return new LocationInfo(
-                location?.address ? buildAddress(location?.address) : null,
+        return new LocationInfo(stopSequence,
+                location?.address ? buildAddress(location?.address) : defaultAddress(),
                 new PlannedDateTime(expectedDateString, expectedDateString),
                 driverInstructions
         );
@@ -258,7 +258,7 @@ class TmsIntegrationService {
     Address buildAddress(org.pih.warehouse.core.Address address) {
         def defaultTimeZone = grailsApplication.config.openboxes.integration.defaultTimeZone?:null
         return new Address(
-                StringUtils.abbreviate(address.description, 15),
+                address.description,
                 address.address,
                 address.city,
                 address.stateOrProvince?:"",
@@ -266,4 +266,17 @@ class TmsIntegrationService {
                 address.country?:"",
                 defaultTimeZone)
     }
+
+    Address defaultAddress() {
+        def defaultTimeZone = grailsApplication.config.openboxes.integration.defaultTimeZone?:null
+        return new Address(
+                "Null Address",
+                "Null Street Address",
+                "Null City",
+                "Null State",
+                "Null Zip",
+                "UK",
+                defaultTimeZone)
+    }
+
 }

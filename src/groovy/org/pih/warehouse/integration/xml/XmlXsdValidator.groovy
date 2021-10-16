@@ -18,7 +18,6 @@ public class XmlXsdValidator {
     static final LOG = LogFactory.getLog(this)
 
     public static void validateXmlSchema(String xsdPath, String xmlContents) {
-        StringWriter stringWriter = new StringWriter()
         try {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
             File xsdFile = new ClassPathResource(xsdPath)?.file
@@ -27,10 +26,10 @@ public class XmlXsdValidator {
             validator.setErrorHandler(new SimpleSaxErrorHandler(LOG))
             validator.validate(new StreamSource(new StringReader(XmlXsdValidator.sanitizeXmlString(xmlContents))))
         } catch (SAXParseException e) {
-            LOG.error("Error occurred while validating XML against XSD (" + xsdPath + "): " + e.getMessage(), e)
+            LOG.error("Error occurred while validating XML against XSD (" + xsdPath + "): " + e.message, e)
             throw e
         } catch (SAXException e) {
-            LOG.error("Error occurred while validating XML against XSD (" + xsdPath + "): " + e.getMessage(), e)
+            LOG.error("Error occurred while validating XML against XSD (" + xsdPath + "): " + e.message, e)
             throw e
         }
     }

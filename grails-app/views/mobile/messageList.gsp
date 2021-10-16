@@ -75,6 +75,9 @@
                                 <g:link controller="mobile" action="messageDetails"
                                         params="[path: message.path]"
                                         class="btn btn-outline-primary">Download</g:link>
+                                <g:link controller="mobile" action="messageValidate"
+                                        params="[path: message.path]"
+                                        class="btn btn-outline-success">Validate</g:link>
                                 <g:link controller="mobile" action="messageProcess"
                                         params="[path: message.path]"
                                         class="btn btn-outline-success">Process</g:link>
