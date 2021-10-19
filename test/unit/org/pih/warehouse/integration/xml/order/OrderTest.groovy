@@ -34,7 +34,7 @@ public class OrderTest {
         orderDetails.setModeOfTransport("FTL")
         orderDetails.setServiceType("Pharma")
         orderDetails.setDeliveryTerms("Shipper")
-        orderDetails.setGoodsValue(new GoodsValue("500", "EUR"))
+        orderDetails.setGoodsValue(new GoodsValue(500.00, "EUR"))
         orderDetails.setTermsOfTrade(new TermsOfTrade("DAP", new FreightName("10", "Shipper")))
 
         PartyType partyType = new PartyType()
@@ -60,13 +60,13 @@ public class OrderTest {
         orderDetails.setOrderParties(new OrderParties(partyTypes))
 
         Address dummyAddress = new Address("Main Address", "Test Street 1", "Test City", "Test State", "10500", "DC", "Asia/Kolkata" )
-        LocationInfo orderStartLocation = new LocationInfo(
+        LocationInfo orderStartLocation = new LocationInfo(1,
                 dummyAddress,
                 new PlannedDateTime("2020-10-08T15:43:48+01:00", "2020-10-08T15:43:48+01:00"),
                 "Instructions"
         )
         orderDetails.setOrderStartLocation(orderStartLocation)
-        LocationInfo orderEndLocation = new LocationInfo(
+        LocationInfo orderEndLocation = new LocationInfo(2,
                 dummyAddress,
                 new PlannedDateTime("2020-10-08T15:43:48+01:00", "2020-10-08T15:43:48+01:00"),
                 "Instructions"
