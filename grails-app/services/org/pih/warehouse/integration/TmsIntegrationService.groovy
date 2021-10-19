@@ -152,7 +152,7 @@ class TmsIntegrationService {
         orderDetails.setGoodsValue(new GoodsValue(stockMovement.totalValue?:0, defaultCurrencyCode));
 
         orderDetails.setTermsOfTrade(new TermsOfTrade(config.orderDetails.termsOfTrade.incoterm,
-                new FreightName( config.orderDetails.termsOfTrade.freightName.name, config.orderDetails.termsOfTrade.freightName.name)));
+                new FreightName( config.orderDetails.termsOfTrade.freightName.term, config.orderDetails.termsOfTrade.freightName.name)));
 
         // FIXME Fix magic strings
         ArrayList <PartyType> partyTypes = new ArrayList<PartyType>();
