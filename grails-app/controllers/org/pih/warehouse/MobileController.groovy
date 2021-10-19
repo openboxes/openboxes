@@ -315,14 +315,34 @@ class MobileController {
         redirect(action: "messageList")
     }
 
+    def messageValidate = {
+        try {
+            String xmlContents = fileTransferService.retrieveMessage(params.path)
+            Boolean validationEnabled = grailsApplication.config.openboxes.integration.ftp.inbound.validate
+            log.info "Validation enabled: ${validationEnabled}"
+            if (validationEnabled) {
+                xsdValidatorService.validateXml(xmlContents)
+                log.info "XML is valid"
+            }
+            flash.message = "Message has been validated"
+        }
+        catch (Exception e) {
+            log.error("Message not validated due to error: " + e.message, e)
+            flash.message = "Message not validated due to error: " + e?.cause?.message?:e.message
+        }
+        redirect(action: "messageList")
+    }
+
     def messageProcess = {
         try {
             String xmlContents = fileTransferService.retrieveMessage(params.path)
 
-//            Boolean validate = grailsApplication.config.openboxes.integration.ftp.inbound.validate?:true
-//            if (validate) {
-//                xsdValidatorService.validateXml(xmlContents)
-//            }
+            Boolean validationEnabled = grailsApplication.config.openboxes.integration.ftp.inbound.validate
+            log.info "Validation enabled: ${validationEnabled}"
+            if (validationEnabled) {
+                xsdValidatorService.validateXml(xmlContents)
+                log.info "XML is valid"
+            }
             Object messageObject = tmsIntegrationService.deserialize(xmlContents)
             tmsIntegrationService.handleMessage(messageObject)
             flash.message = "Message has been processed"

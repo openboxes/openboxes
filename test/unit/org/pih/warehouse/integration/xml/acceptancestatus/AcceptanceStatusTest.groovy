@@ -10,8 +10,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import org.junit.Assert
 import static org.junit.Assert.assertEquals
-import static org.junit.Assert.assertTrue;
 
 public class AcceptanceStatusTest {
     private AcceptanceStatus acceptanceStatus;
@@ -58,6 +58,11 @@ public class AcceptanceStatusTest {
 
         assertEquals( acceptanceStatus.getAction() , "ACCEPT");
         assertEquals( acceptanceStatus.getTripDetails().getCarrier().getId() , "MYSH01505");
-        assertTrue( XmlXsdValidator.validateXmlSchema(ACCEPTANCE_STATUS_XSD, xmlFileContents))
+        try {
+            XmlXsdValidator.validateXmlSchema(ACCEPTANCE_STATUS_XSD, xmlFileContents)
+        } catch (Exception e) {
+            e.printStackTrace()
+            Assert.fail("Should not throw exception")
+        }
     }
 }
