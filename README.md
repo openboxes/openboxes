@@ -72,11 +72,11 @@ https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1719435265/Push-button+dep
 ### Install Dependencies
 
 #### Required
-* Java 7 (must install Java 7)
+* [Java 7 (must install Java 7)](https://docs.openboxes.com/en/develop/installation/ubuntu1804/java/)
 * MySQL 5.7
 * [SDK Man](https://sdkman.io/install)
 * [Grails 1.3.9](https://grails.org/download.html)
-* NPM 6.13.7
+* NPM 6.14.6
 * Node 13.11.0
 
 #### Optional
@@ -215,7 +215,14 @@ To run new frontend (React) tests type:
 ```
 npm test
 ```
-#### 14. React documentation
+
+#### 14. Grails tests
+To run Grails tests type:
+```
+grails test-app
+```
+
+#### 15. React documentation
 Start a style guide dev server:
 ```
 npm run styleguide
