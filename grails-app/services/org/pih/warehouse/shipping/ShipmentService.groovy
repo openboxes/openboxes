@@ -2222,7 +2222,7 @@ class ShipmentService {
         shipment.expectedDeliveryDate = stockTransfer?.expectedDeliveryDate
 
         // Set default shipment type so we can save to the database without user input
-        shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
+        shipment.shipmentType = stockTransfer.shipmentType ?: ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
 
         shipment.name = generateName(stockTransfer)
 

@@ -51,7 +51,7 @@ export function flattenRequest(data) {
 
 const handleSuccess = response => response;
 
-const handleError = (error) => {
+export const handleError = (error) => {
   switch (error.response.status) {
     case 400:
       Alert.error(`Bad Request.</br> ${_.map(_.get(error, 'response.data.errorMessages', ''), errorMessage => `<div>${errorMessage}</div>`)}`);
