@@ -73,7 +73,7 @@ class OutboundReturns extends Component {
     return [
       this.props.translate('react.outboundReturns.create.label', 'Create'),
       this.props.translate('react.outboundReturns.addItems.label', 'Add items'),
-      this.props.translate('react.outboundReturns.picks.label', 'Picks'),
+      this.props.translate('react.outboundReturns.pick.label', 'Pick'),
       this.props.translate('react.outboundReturns.send.label', 'Send'),
     ];
   }

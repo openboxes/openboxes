@@ -32,7 +32,6 @@ import org.pih.warehouse.core.DocumentCode
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
-import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.ShipOrderCommand
@@ -985,6 +984,7 @@ class StockMovementService {
         createPicklist(stockMovement)
     }
 
+    // TODO: Refactor - Move entire picklist logic to the picklistService
     /**
      * Create an automated picklist for the given stock movement.
      *
@@ -1939,6 +1939,7 @@ class StockMovementService {
         }
     }
 
+    // TODO: Refactor - Move entire shipment logic to the shipmentService
     Shipment createShipment(StockMovement stockMovement) {
         log.info "create shipment " + (new JSONObject(stockMovement.toJson())).toString(4)
 
@@ -2022,7 +2023,7 @@ class StockMovementService {
             shipment.destination = stockMovement.destination
         }
 
-        createOrUpdateTrackingNumber(shipment, stockMovement.trackingNumber)
+        shipmentService.createOrUpdateTrackingNumber(shipment, stockMovement.trackingNumber)
         shipment.save()
     }
 
@@ -2072,7 +2073,7 @@ class StockMovementService {
         shipment.expectedDeliveryDate = stockMovement.expectedDeliveryDate ?: shipment.expectedDeliveryDate
         shipment.shipmentType = stockMovement.shipmentType ?: shipment.shipmentType
 
-        createOrUpdateTrackingNumber(shipment, stockMovement.trackingNumber)
+        shipmentService.createOrUpdateTrackingNumber(shipment, stockMovement.trackingNumber)
 
         if (shipment.hasErrors() || !shipment.save(flush: true)) {
             throw new ValidationException("Invalid shipment", shipment.errors)
@@ -2083,37 +2084,6 @@ class StockMovementService {
         return shipment
     }
 
-
-    ReferenceNumber createOrUpdateTrackingNumber(Shipment shipment, String trackingNumber) {
-        ReferenceNumberType trackingNumberType = ReferenceNumberType.findById(Constants.TRACKING_NUMBER_TYPE_ID)
-        if (!trackingNumberType) {
-            throw new IllegalStateException("Must configure reference number type for Tracking Number with ID '${Constants.TRACKING_NUMBER_TYPE_ID}'")
-        }
-
-        // Needed to use ID since reference numbers is lazy loaded and equality operation was not working
-        ReferenceNumber referenceNumber = shipment.referenceNumbers.find { ReferenceNumber refNum ->
-            trackingNumberType?.id?.equals(refNum.referenceNumberType?.id)
-        }
-
-        if (trackingNumber) {
-            // Create a new reference number
-            if (!referenceNumber) {
-                referenceNumber = new ReferenceNumber()
-                referenceNumber.identifier = trackingNumber
-                referenceNumber.referenceNumberType = trackingNumberType
-                shipment.addToReferenceNumbers(referenceNumber)
-            }
-            // Update the existing reference number
-            else {
-                referenceNumber.identifier = trackingNumber
-            }
-        }
-        // Reference number exists but the user-defined tracking number was empty so we should delete
-        else if (referenceNumber) {
-            shipment.removeFromReferenceNumbers(referenceNumber)
-        }
-        return referenceNumber
-    }
 
     Shipment updateShipmentOnRequisitionChange(StockMovement stockMovement) {
         Shipment shipment = Shipment.findByRequisition(stockMovement.requisition)

@@ -323,6 +323,11 @@ class UrlMappings {
             action = [DELETE: "removeItem"]
         }
 
+        "/api/stockTransfers/$id/sendShipment"(parseRequest: true) {
+            controller = { "stockTransferApi" }
+            action = [POST: "sendShipment"]
+        }
+
         // Requirement API
 
         "/api/requirements"(parseRequest: true) {

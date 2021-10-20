@@ -1,4 +1,6 @@
+<%@ page import="org.pih.warehouse.core.Constants" %>
 <%@ page import="org.pih.warehouse.order.OrderStatus" %>
+<%@ page import="org.pih.warehouse.order.OrderType" %>
 
 <div id="order-summary" class="summary">
     <table width="50%">
@@ -27,12 +29,22 @@
 
         <g:set var="disabledMessage" value="${g.message(code:'inventory.stockTransfers.editCompleted')}"/>
 
-        <g:link controller="stockTransfer" action="create" id="${orderInstance?.id}" class="button"
-                disabled="${orderInstance?.status >= OrderStatus.COMPLETED}"
-                disabledMessage="${disabledMessage}">
-            <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
-            <warehouse:message code="inventory.editStockTransfer.label" default="Edit Stock Transfer"/>
-        </g:link>
+        <g:if test="${orderInstance.orderType == OrderType.findByCode(Constants.OUTBOUND_RETURNS)}">
+            <g:link controller="stockTransfer" action="createReturns" id="${orderInstance?.id}" class="button"
+                    disabled="${orderInstance?.status >= OrderStatus.COMPLETED}"
+                    disabledMessage="${disabledMessage}">
+                <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
+                <warehouse:message code="inventory.editStockTransfer.label" default="Edit Stock Transfer"/>
+            </g:link>
+        </g:if>
+        <g:else>
+            <g:link controller="stockTransfer" action="create" id="${orderInstance?.id}" class="button"
+                    disabled="${orderInstance?.status >= OrderStatus.COMPLETED}"
+                    disabledMessage="${disabledMessage}">
+                <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
+                <warehouse:message code="inventory.editStockTransfer.label" default="Edit Stock Transfer"/>
+            </g:link>
+        </g:else>
 
         <div class="button-group right">
             <g:link controller="stockTransfer" action="print" id="${orderInstance?.id}" class="button" target="_blank">

@@ -1,5 +1,5 @@
 package org.pih.warehouse.api
 
 enum StockTransferStatus {
-    READY, PENDING, APPROVED, COMPLETED, CANCELED
+    READY, PENDING, APPROVED, PLACED, COMPLETED, CANCELED
 }

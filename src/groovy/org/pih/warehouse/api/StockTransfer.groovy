@@ -2,11 +2,15 @@ package org.pih.warehouse.api
 
 import com.google.common.base.Enums
 import org.codehaus.groovy.grails.validation.Validateable
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderType
+import org.pih.warehouse.shipping.ReferenceNumber
+import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentType
 
 @Validateable
 class StockTransfer {
@@ -19,6 +23,13 @@ class StockTransfer {
     Date dateCreated
     Person orderedBy
     OrderType type
+
+    Date dateShipped
+    Date expectedDeliveryDate
+    ShipmentType shipmentType
+    String trackingNumber
+    String driverName
+    String comments
 
     StockTransferStatus status = StockTransferStatus.PENDING
     List<StockTransferItem> stockTransferItems = []
@@ -33,6 +44,12 @@ class StockTransfer {
         dateCreated(nullable: true)
         orderedBy(nullable: true)
         type(nullable: true)
+        dateShipped(nullable: true)
+        expectedDeliveryDate(nullable: true)
+        shipmentType(nullable: true)
+        trackingNumber(nullable: true)
+        driverName(nullable: true)
+        comments(nullable: true)
     }
 
     static StockTransfer createFromOrder(Order order) {
@@ -55,6 +72,19 @@ class StockTransfer {
             }
         }
 
+        if (order?.shipments) {
+            Shipment shipment = order?.shipments?.first()
+            stockTransfer.dateShipped = shipment?.expectedShippingDate
+            stockTransfer.expectedDeliveryDate = shipment?.expectedDeliveryDate
+            stockTransfer.shipmentType = shipment?.shipmentType
+            ReferenceNumber trackingNumber = shipment?.referenceNumbers?.find { ReferenceNumber rn ->
+                rn.referenceNumberType.id == Constants.TRACKING_NUMBER_TYPE_ID
+            }
+            stockTransfer.trackingNumber = trackingNumber?.identifier
+            stockTransfer.driverName = shipment?.driverName
+            stockTransfer.comments = shipment?.additionalInformation
+        }
+
         return stockTransfer
     }
 
@@ -65,23 +95,29 @@ class StockTransfer {
 
     Map toJson() {
         return [
-                id                 : id,
-                description        : description,
-                stockTransferNumber: stockTransferNumber,
-                status             : status?.name(),
-                dateCreated        : dateCreated?.format("MMMM dd, yyyy"),
-                "origin.id"        : origin?.id,
-                "origin.name"      : origin?.name,
-                "destination.id"   : destination?.id,
-                "destination.name" : destination?.name,
-                stockTransferItems : stockTransferItems.sort { a, b ->
+                id                  : id,
+                description         : description,
+                stockTransferNumber : stockTransferNumber,
+                status              : status?.name(),
+                dateCreated         : dateCreated?.format("MMMM dd, yyyy"),
+                "origin.id"         : origin?.id,
+                "origin.name"       : origin?.name,
+                "destination.id"    : destination?.id,
+                "destination.name"  : destination?.name,
+                stockTransferItems  : stockTransferItems.sort { a, b ->
                     a.product?.productCode <=> b.product?.productCode ?:
                         a.inventoryItem?.lotNumber <=> b.inventoryItem?.lotNumber ?:
                             a.originBinLocation?.zone?.name <=> b.originBinLocation?.zone?.name ?:
                                 a.originBinLocation?.name <=> b.originBinLocation?.name
                 }.collect { it?.toJson() },
-                orderedBy          : orderedBy?.name,
-                type               : type?.code
+                orderedBy           : orderedBy?.name,
+                type                : type?.code,
+                dateShipped         : dateShipped,
+                expectedDeliveryDate: expectedDeliveryDate,
+                shipmentType        : shipmentType,
+                trackingNumber      : trackingNumber,
+                driverName          : driverName,
+                comments            : comments
         ]
     }
 }

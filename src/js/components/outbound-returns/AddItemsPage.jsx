@@ -317,9 +317,9 @@ class AddItemsPage extends Component {
       status: 'APPROVED',
       stockTransferItems: _.values(this.state.selectedItems),
     };
-    const url = '/openboxes/api/stockTransfers/';
+    const url = `/openboxes/api/stockTransfers/${this.props.match.params.outboundReturnId}`;
 
-    apiClient.post(url, flattenRequest(payload))
+    apiClient.put(url, flattenRequest(payload))
       .then((resp) => {
         const outboundReturns = resp.data.data;
         this.props.hideSpinner();

@@ -151,7 +151,7 @@ class StockTransferSecondPage extends Component {
    */
   save() {
     this.props.showSpinner();
-    const url = '/openboxes/api/stockTransfers';
+    const url = `/openboxes/api/stockTransfers/${this.props.match.params.stockTransferId}`;
 
     const payload = {
       ...this.state.stockTransfer,
@@ -159,7 +159,7 @@ class StockTransferSecondPage extends Component {
       status: COMPLETED,
     };
 
-    return apiClient.post(url, flattenRequest(payload))
+    return apiClient.put(url, flattenRequest(payload))
       .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.stockTransfer.alert.stockTransferCompleted.label', 'Stock transfer was successfully completed!'), { timeout: 3000 });
@@ -211,14 +211,14 @@ class StockTransferSecondPage extends Component {
 
   previousPage() {
     this.props.showSpinner();
-    const url = '/openboxes/api/stockTransfers';
+    const url = `/openboxes/api/stockTransfers/${this.props.match.params.stockTransferId}`;
 
     const payload = {
       ...this.state.stockTransfer,
       stockTransferItems: this.state.originalItems,
     };
 
-    return apiClient.post(url, flattenRequest(payload))
+    return apiClient.put(url, flattenRequest(payload))
       .then(() => {
         this.props.hideSpinner();
         this.props.previousPage(this.state.stockTransfer);

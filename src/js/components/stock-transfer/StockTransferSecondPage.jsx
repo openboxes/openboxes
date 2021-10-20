@@ -296,9 +296,9 @@ class StockTransferSecondPage extends Component {
    * @public
    */
   saveStockTransfer(data, callback) {
-    const url = '/openboxes/api/stockTransfers/';
+    const url = `/openboxes/api/stockTransfers/${this.props.match.params.stockTransferId}`;
     const payload = prepareRequest(data, APPROVED);
-    apiClient.post(url, flattenRequest(payload))
+    apiClient.put(url, flattenRequest(payload))
       .then((response) => {
         const stockTransfer = parseResponse(response.data.data);
         const stockTransferItems = extractStockTransferItems(stockTransfer);
