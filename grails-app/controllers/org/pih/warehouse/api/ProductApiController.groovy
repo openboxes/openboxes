@@ -98,7 +98,11 @@ class ProductApiController extends BaseDomainApiController {
     def printLabel = {
         try {
             Product product = productService.getProduct(params.id)
-            Document document = Document.get(params.documentId)
+
+            // FIXME OBKN-98 Temporarily default to first barcode template if documentId is not provided
+            Document document = (params.documentId) ?
+                    Document.get(params.documentId) :
+                    Document.findAllByDocumentCode(DocumentCode.ZEBRA_TEMPLATE).first()
             if (!document) {
                 throw new ObjectNotFoundException(params.documentId, Document.class.simpleName)
             }
