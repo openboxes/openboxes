@@ -38,6 +38,9 @@ class StockTransferApiController {
 
         StockTransfer stockTransfer = StockTransfer.createFromOrder(order)
         stockTransferService.setQuantityOnHand(stockTransfer)
+        if (order?.picklist) {
+            stockTransferService.getDocuments(stockTransfer)
+        }
         render([data: stockTransfer?.toJson()] as JSON)
     }
 

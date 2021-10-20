@@ -59,21 +59,21 @@ h3 { font-size: 17px;font-weight: normal; line-height: 20px; }
 #details-table tr { border-bottom: 1px solid lightgrey;}
 
 
-#requisition-items{
+#requisition-items, #order-items {
     margin-bottom: 10px;
 }
 
-#requisition-items {
+#requisition-items, #order-items {
     border-top: 2px solid lightgrey;
     border-bottom: 2px solid lightgrey;
     border-left: 2px solid lightgrey;
 }
 
-#requisition-items tr {
+#requisition-items tr, #order-items tr {
     height: 50px;
 }
 
-#requisition-items td, #requisition-items th {
+#requisition-items td, #requisition-items th, #order-items td, #order-items th {
     border-right: 2px solid lightgrey;
     border-bottom: 2px solid lightgrey;
 }
