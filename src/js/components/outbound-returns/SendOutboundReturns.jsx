@@ -18,7 +18,7 @@ import TextField from '../form-elements/TextField';
 import { renderFormField } from '../../utils/form-utils';
 
 import { showSpinner, hideSpinner } from '../../actions';
-import apiClient, { parseResponse, flattenRequest } from '../../utils/apiClient';
+import apiClient, { parseResponse, flattenRequest, handleError } from '../../utils/apiClient';
 import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
 
 const SHIPMENT_FIELDS = {
@@ -95,7 +95,6 @@ const SHIPMENT_FIELDS = {
     attributes: {
       dateFormat: 'MM/DD/YYYY',
       required: true,
-      showTimeSelect: false,
       autoComplete: 'off',
     },
     getDynamicAttr: ({ issued }) => ({
@@ -238,7 +237,12 @@ class SendMovementPage extends Component {
         const outboundReturn = parseResponse(resp.data.data);
         const picklistItems = _.flatten(_.map(outboundReturn.stockTransferItems, 'picklistItems'));
         this.setState({
-          values: { outboundReturn: { ...outboundReturn, picklistItems } },
+          values: {
+            outboundReturn: {
+              ...outboundReturn,
+              picklistItems,
+            },
+          },
         }, () => this.fetchShipmentTypes());
       })
       .catch(() => this.props.hideSpinner());
@@ -253,12 +257,18 @@ class SendMovementPage extends Component {
     const url = `/openboxes/api/stockTransfers/${this.props.match.params.outboundReturnId}/sendShipment`;
 
     this.saveValues(payload)
-      .then(() => apiClient.post(url, flattenRequest(payload))
-        .then(() => {
-          window.location = `/openboxes/stockTransfer/show/${this.props.match.params.outboundReturnId}`;
-          this.props.hideSpinner();
-        })
-        .catch(() => this.props.hideSpinner()))
+      .then(() => {
+        apiClient.post(url, flattenRequest(payload))
+          .then(() => {
+            window.location = `/openboxes/stockTransfer/show/${this.props.match.params.outboundReturnId}`;
+            this.props.hideSpinner();
+          })
+          .catch((error) => {
+            // TODO: Fix this request to get proper error handling from api client
+            handleError(error);
+            this.props.hideSpinner();
+          });
+      })
       .catch(() => this.props.hideSpinner());
   }
 
@@ -315,17 +325,18 @@ class SendMovementPage extends Component {
   }
 
   save(values) {
-    const payload = {
-      ...values,
-      status: 'COMPLETED',
-    };
-    this.saveValues(payload)
+    this.saveValues(values)
       .then((resp) => {
         const outboundReturn = parseResponse(resp.data.data);
         const picklistItems = _.flatten(_.map(outboundReturn.stockTransferItems, 'picklistItems'));
         this.setState({
-          values: { outboundReturn: { ...outboundReturn, picklistItems } },
-        }, () => this.fetchShipmentTypes());
+          values: {
+            outboundReturn: {
+              ...outboundReturn,
+              picklistItems,
+            },
+          },
+        }, () => this.props.hideSpinner());
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -335,13 +346,35 @@ class SendMovementPage extends Component {
     const url = `/openboxes/api/stockTransfers/${this.props.match.params.outboundReturnId}`;
     const payload = {
       ...values,
+      trackingNumber: values.trackingNumber || '',
+      driverName: values.driverName || '',
+      comments: values.comments || '',
+      dateShipped: values.dateShipped || '',
+      expectedDeliveryDate: values.expectedDeliveryDate || '',
     };
 
     return apiClient.put(url, flattenRequest(payload));
   }
 
-  previousPage(values) {
-    this.props.previousPage(values);
+  previousPage(values, invalid) {
+    if (!invalid) {
+      this.saveValues(values)
+        .then(() => this.props.previousPage(values));
+    } else {
+      confirmAlert({
+        title: this.props.translate('react.stockMovement.confirmPreviousPage.label', 'Validation error'),
+        message: this.props.translate('react.stockMovement.confirmPreviousPage.message.label', 'Cannot save due to validation error on page'),
+        buttons: [
+          {
+            label: this.props.translate('react.stockMovement.confirmPreviousPage.correctError.label', 'Correct error'),
+          },
+          {
+            label: this.props.translate('react.stockMovement.confirmPreviousPage.continue.label', 'Continue (lose unsaved work)'),
+            onClick: () => this.props.previousPage(values),
+          },
+        ],
+      });
+    }
   }
 
   render() {
@@ -408,7 +441,7 @@ class SendMovementPage extends Component {
                   type="submit"
                   onClick={() => this.sendOutboundReturn(values)}
                   className="btn btn-outline-success float-right btn-form btn-xs"
-                  disabled={values && values.status === 'COMPLETED'}
+                  disabled={invalid || (values && values.status === 'COMPLETED')}
                 ><Translate id="react.stockMovement.sendShipment.label" defaultMessage="Send shipment" />
                 </button>
               </div>

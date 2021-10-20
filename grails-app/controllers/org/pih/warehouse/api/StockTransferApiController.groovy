@@ -18,6 +18,9 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
+import org.pih.warehouse.shipping.ShipmentType
+
+import java.text.SimpleDateFormat
 
 class StockTransferApiController {
 
@@ -81,13 +84,12 @@ class StockTransferApiController {
         bindStockTransferData(stockTransfer, currentUser, currentLocation, jsonObject)
 
         Order order
-        if (stockTransfer?.status == StockTransferStatus.COMPLETED) {
-            if (stockTransfer.type == OrderType.findByCode(Constants.OUTBOUND_RETURNS)) {
-                order = stockTransferService.createOrUpdateOrderFromStockTransfer(stockTransfer)
-                shipmentService.createOrUpdateShipment(stockTransfer)
-            } else {
-                order = stockTransferService.completeStockTransfer(stockTransfer)
-            }
+        Boolean isReturnType = stockTransfer.type == OrderType.findByCode(Constants.OUTBOUND_RETURNS)
+        if (isReturnType && (stockTransfer?.status == StockTransferStatus.PLACED)) {
+            order = stockTransferService.createOrUpdateOrderFromStockTransfer(stockTransfer)
+            shipmentService.createOrUpdateShipment(stockTransfer)
+        } else if (!isReturnType && stockTransfer?.status == StockTransferStatus.COMPLETED) {
+            order = stockTransferService.completeStockTransfer(stockTransfer)
         } else {
             order = stockTransferService.createOrUpdateOrderFromStockTransfer(stockTransfer)
         }
@@ -122,6 +124,19 @@ class StockTransferApiController {
 
         if (jsonObject.type) {
             stockTransfer.type = OrderType.get(jsonObject.type)
+        }
+
+        if (jsonObject.shipmentType) {
+            stockTransfer.shipmentType = ShipmentType.get(jsonObject.shipmentType)
+        }
+
+        def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+        if (jsonObject.dateShipped) {
+            stockTransfer.dateShipped = dateFormat.parse(jsonObject.dateShipped)
+        }
+
+        if (jsonObject.expectedDeliveryDate) {
+            stockTransfer.expectedDeliveryDate = dateFormat.parse(jsonObject.expectedDeliveryDate)
         }
 
         jsonObject.stockTransferItems.each { stockTransferItemMap ->
