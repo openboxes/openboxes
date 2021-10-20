@@ -10,6 +10,7 @@
 package org.pih.warehouse.stockTransfer
 
 import org.apache.commons.beanutils.BeanUtils
+import org.pih.warehouse.api.DocumentGroupCode
 import org.pih.warehouse.api.StockTransfer
 import org.pih.warehouse.api.StockTransferItem
 import org.pih.warehouse.api.StockTransferStatus
@@ -338,5 +339,15 @@ class StockTransferService {
             stockTransferItem.quantityOnHand = pa ? pa.quantityOnHand : 0
             stockTransferItem.productAvailabilityId = pa ? pa.id : stockTransferItem.id
         }
+    }
+
+    def getDocuments(StockTransfer stockTransfer) {
+        def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        stockTransfer.documents = [[
+            name        : g.message(code: "picklist.button.download.label"),
+            documentType: DocumentGroupCode.PICKLIST.name(),
+            contentType : "application/pdf",
+            uri         : g.createLink(controller: 'picklist', action: "returnPrint", id: stockTransfer?.id, absolute: true),
+        ]]
     }
 }

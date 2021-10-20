@@ -34,6 +34,8 @@ class StockTransfer {
     StockTransferStatus status = StockTransferStatus.PENDING
     List<StockTransferItem> stockTransferItems = []
 
+    List documents
+
     static constrants = {
         origin(nullable: true)
         destination(nullable: true)
@@ -50,6 +52,7 @@ class StockTransfer {
         trackingNumber(nullable: true)
         driverName(nullable: true)
         comments(nullable: true)
+        documents(nullable: true)
     }
 
     static StockTransfer createFromOrder(Order order) {
@@ -117,7 +120,8 @@ class StockTransfer {
                 shipmentType        : shipmentType,
                 trackingNumber      : trackingNumber,
                 driverName          : driverName,
-                comments            : comments
+                comments            : comments,
+                documents           : documents
         ]
     }
 }

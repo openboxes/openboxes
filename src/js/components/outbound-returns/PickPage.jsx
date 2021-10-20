@@ -100,6 +100,7 @@ class PickPage extends Component {
     super(props);
     this.state = {
       values: { outboundReturn: { ...this.props.initialValues } },
+      printPicksUrl: '',
     };
 
     this.fetchOutboundReturn = this.fetchOutboundReturn.bind(this);
@@ -107,14 +108,14 @@ class PickPage extends Component {
   }
 
   componentDidMount() {
-    if (this.props.outboundReturnTranslationsFetched) {
+    if (this.props.outboundReturnsTranslationsFetched) {
       this.dataFetched = true;
       this.fetchOutboundReturn();
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.outboundReturnTranslationsFetched && !this.dataFetched) {
+    if (nextProps.outboundReturnsTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
       this.fetchOutboundReturn();
     }
@@ -129,8 +130,13 @@ class PickPage extends Component {
     return apiClient.get(url)
       .then((resp) => {
         const outboundReturn = resp.data.data;
+        const printPicks = _.find(
+          outboundReturn.documents,
+          doc => doc.documentType === 'PICKLIST',
+        );
         this.setState({
           values: { outboundReturn },
+          printPicksUrl: printPicks ? printPicks.uri : '/',
         }, () => this.props.hideSpinner());
       })
       .catch(() => this.props.hideSpinner());
@@ -168,6 +174,19 @@ class PickPage extends Component {
         initialValues={{ picklistItems }}
         render={({ handleSubmit }) => (
           <div className="d-flex flex-column">
+            <span className="buttons-container">
+              <a
+                href={this.state.printPicksUrl}
+                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span>
+                  <i className="fa fa-print pr-2" />
+                  <Translate id="react.stockMovement.printPicklist.label" defaultMessage="Print picklist" />
+                </span>
+              </a>
+            </span>
             <form onSubmit={handleSubmit} className="print-mt">
               <div className="table-form">
                 {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
@@ -199,7 +218,7 @@ class PickPage extends Component {
 }
 
 const mapStateToProps = state => ({
-  outboundReturnTranslationsFetched: state.session.fetchedTranslations.outboundReturn,
+  outboundReturnsTranslationsFetched: state.session.fetchedTranslations.outboundReturns,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
@@ -222,6 +241,6 @@ PickPage.propTypes = {
     }),
   }).isRequired,
   locationId: PropTypes.string.isRequired,
-  outboundReturnTranslationsFetched: PropTypes.bool.isRequired,
+  outboundReturnsTranslationsFetched: PropTypes.bool.isRequired,
   translate: PropTypes.func.isRequired,
 };
