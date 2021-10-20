@@ -19,6 +19,21 @@ import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
 const FIELDS = {
   picklistItems: {
     type: ArrayField,
+    getDynamicRowAttr: ({ rowValues, translate }) => {
+      let className = '';
+      let tooltip = '';
+      if (rowValues.recalled && rowValues.onHold) {
+        className = 'recalled-and-on-hold';
+        tooltip = translate('react.outboundReturns.recalledAndOnHold.label');
+      } else if (rowValues.recalled) {
+        className = 'recalled';
+        tooltip = translate('react.outboundReturns.recalled.label');
+      } else if (rowValues.onHold) {
+        className = 'on-hold';
+        tooltip = translate('react.outboundReturns.onHold.label');
+      }
+      return { className, tooltip };
+    },
     fields: {
       'product.productCode': {
         type: LabelField,
@@ -121,23 +136,21 @@ class PickPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
-  // eslint-disable-next-line class-methods-use-this
   nextPage() {
-    // TODO: Will be finished in OBAM-269
-    // if (this.state.values.outboundReturn.status === 'APPROVED') {
-    //   this.props.showSpinner();
-    //   const url = `/openboxes/api/outboundReturns/${this.props.match.params.outboundReturnId}`;
-    //   const payload = { status: 'PLACED' };
-    //   apiClient.post(url, payload)
-    //     .then((resp) => {
-    //       const outboundReturn = resp.data.data;
-    //       this.props.hideSpinner();
-    //       this.props.nextPage(outboundReturn);
-    //     })
-    //     .catch(() => this.props.hideSpinner());
-    // } else {
-    //   this.props.nextPage(this.state.values);
-    // }
+    this.props.showSpinner();
+    const url = `/openboxes/api/stockTransfers/${this.props.match.params.outboundReturnId}`;
+    const payload = {
+      ...this.state.values.outboundReturn,
+      status: 'PLACED',
+    };
+
+    apiClient.put(url, payload)
+      .then((resp) => {
+        const outboundReturn = resp.data.data;
+        this.props.hideSpinner();
+        this.props.nextPage(outboundReturn);
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   previousPage(values) {
@@ -169,7 +182,7 @@ class PickPage extends Component {
                   type="button"
                   onClick={() => this.previousPage(outboundReturn)}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
-                ><Translate id="react.outboundReturn.previous.label" defaultMessage="Provious" />
+                ><Translate id="react.outboundReturn.previous.label" defaultMessage="Previous" />
                 </button>
                 <button
                   type="submit"
@@ -200,7 +213,6 @@ export default connect(
 PickPage.propTypes = {
   showSpinner: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
-  // eslint-disable-next-line react/no-unused-prop-types
   nextPage: PropTypes.func.isRequired,
   previousPage: PropTypes.func.isRequired,
   initialValues: PropTypes.shape({}).isRequired,

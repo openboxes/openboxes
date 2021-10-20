@@ -32,6 +32,7 @@ class StockTransferService {
     def inventoryService
     def productAvailabilityService
     def picklistService
+    def shipmentService
     def grailsApplication
 
     boolean transactional = true
@@ -116,8 +117,7 @@ class StockTransferService {
         return stockTransferItems
     }
 
-    Order createOrderFromStockTransfer(StockTransfer stockTransfer) {
-
+    Order createOrUpdateOrderFromStockTransfer(StockTransfer stockTransfer) {
         Order order = Order.get(stockTransfer.id)
         if (!order) {
             order = new Order()
@@ -255,7 +255,7 @@ class StockTransferService {
         validateStockTransfer(stockTransfer)
 
         // Save the stockTransfer as an order
-        Order order = createOrderFromStockTransfer(stockTransfer)
+        Order order = createOrUpdateOrderFromStockTransfer(stockTransfer)
 
         // Need to process the split items
         processSplitItems(stockTransfer)

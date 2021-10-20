@@ -12,6 +12,7 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import grails.validation.ValidationException
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
@@ -21,6 +22,7 @@ import org.pih.warehouse.order.OrderTypeCode
 class StockTransferApiController {
 
     def identifierService
+    def shipmentService
     def stockTransferService
 
     def list = {
@@ -52,14 +54,43 @@ class StockTransferApiController {
 
         bindStockTransferData(stockTransfer, currentUser, currentLocation, jsonObject)
 
+        Order order = stockTransferService.createOrUpdateOrderFromStockTransfer(stockTransfer)
+        if (order.hasErrors() || !order.save(flush: true)) {
+            throw new ValidationException("Invalid order", order.errors)
+        }
+
+        stockTransfer = StockTransfer.createFromOrder(order)
+        stockTransferService.setQuantityOnHand(stockTransfer)
+        render([data: stockTransfer?.toJson()] as JSON)
+    }
+
+    def update = {
+        JSONObject jsonObject = request.JSON
+
+        User currentUser = User.get(session.user.id)
+        Location currentLocation = Location.get(session.warehouse.id)
+        if (!currentLocation || !currentUser) {
+            throw new IllegalArgumentException("User must be logged into a location to update stock transfer")
+        }
+
+        StockTransfer stockTransfer = new StockTransfer()
+
+        bindStockTransferData(stockTransfer, currentUser, currentLocation, jsonObject)
+
         Order order
         if (stockTransfer?.status == StockTransferStatus.COMPLETED) {
-            order = stockTransferService.completeStockTransfer(stockTransfer)
-        } else {
-            order = stockTransferService.createOrderFromStockTransfer(stockTransfer)
-            if (order.hasErrors() || !order.save(flush: true)) {
-                throw new ValidationException("Invalid order", order.errors)
+            if (stockTransfer.type == OrderType.findByCode(Constants.OUTBOUND_RETURNS)) {
+                order = stockTransferService.createOrUpdateOrderFromStockTransfer(stockTransfer)
+                shipmentService.createOrUpdateShipment(stockTransfer)
+            } else {
+                order = stockTransferService.completeStockTransfer(stockTransfer)
             }
+        } else {
+            order = stockTransferService.createOrUpdateOrderFromStockTransfer(stockTransfer)
+        }
+
+        if (order.hasErrors() || !order.save(flush: true)) {
+            throw new ValidationException("Invalid order", order.errors)
         }
 
         stockTransfer = StockTransfer.createFromOrder(order)
@@ -135,5 +166,15 @@ class StockTransferApiController {
     def removeItem = {
         Order order = stockTransferService.deleteStockTransferItem(params.id)
         render([data: StockTransfer.createFromOrder(order)?.toJson()] as JSON)
+    }
+
+    def sendShipment = {
+        Order order = Order.get(params.id)
+        if (!order) {
+            throw new IllegalArgumentException("Can't find order with given id: ${params.id}")
+        }
+
+        shipmentService.sendShipment(order)
+        render status: 200
     }
 }
