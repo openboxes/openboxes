@@ -65,6 +65,7 @@ class StockTransferApiController {
             throw new ValidationException("Invalid order", order.errors)
         }
 
+        // TODO: Refactor - Return only status
         stockTransfer = StockTransfer.createFromOrder(order)
         stockTransferService.setQuantityOnHand(stockTransfer)
         render([data: stockTransfer?.toJson()] as JSON)
@@ -98,6 +99,7 @@ class StockTransferApiController {
             throw new ValidationException("Invalid order", order.errors)
         }
 
+        // TODO: Refactor - Return only status
         stockTransfer = StockTransfer.createFromOrder(order)
         stockTransferService.setQuantityOnHand(stockTransfer)
         render([data: stockTransfer?.toJson()] as JSON)

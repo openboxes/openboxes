@@ -115,13 +115,13 @@ class StockTransfer {
                 }.collect { it?.toJson() },
                 orderedBy           : orderedBy?.name,
                 type                : type?.code,
-                dateShipped         : dateShipped.format("MM/dd/yyyy"),
-                expectedDeliveryDate: expectedDeliveryDate.format("MM/dd/yyyy"),
-                shipmentType        : shipmentType?.id,
-                trackingNumber      : trackingNumber,
-                driverName          : driverName,
-                comments            : comments,
-                documents           : documents
+                dateShipped         : dateShipped?.format("MM/dd/yyyy") ?: "",
+                expectedDeliveryDate: expectedDeliveryDate?.format("MM/dd/yyyy") ?: "",
+                shipmentType        : shipmentType?.id ?: "",
+                trackingNumber      : trackingNumber ?: "",
+                driverName          : driverName ?: "",
+                comments            : comments ?: "",
+                documents           : documents ?: ""
         ]
     }
 }
