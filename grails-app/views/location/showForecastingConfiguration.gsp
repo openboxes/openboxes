@@ -15,8 +15,8 @@
                             <warehouse:message code="location.expectedLeadTimeDays.label" default="Expected Lead Time Days"/>
                         </label>
                     </td>
-                    <td valign="top" class="value ${hasErrors(bean: locationInstance, field: 'expectedLeadTimeDays', 'errors')}">
-                        <g:textField name="expectedLeadTimeDays" value="${locationInstance?.expectedLeadTimeDays }" size="80"/>
+                    <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'expectedLeadTimeDays', 'errors')}">
+                        <g:textField name="expectedLeadTimeDays" value="${inventoryLevelInstance?.expectedLeadTimeDays }" size="80"/>
                     </td>
                 </tr>
                 <tr class="prop">
@@ -25,8 +25,8 @@
                             <warehouse:message code="location.replenishmentPeriodDays.label" default="Replenishment Period Days"/>
                         </label>
                     </td>
-                    <td valign="top" class="value ${hasErrors(bean: locationInstance, field: 'replenishmentPeriodDays', 'errors')}">
-                        <g:textField name="replenishmentPeriodDays" value="${locationInstance?.replenishmentPeriodDays }" size="80"/>
+                    <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'replenishmentPeriodDays', 'errors')}">
+                        <g:textField name="replenishmentPeriodDays" value="${inventoryLevelInstance?.replenishmentPeriodDays }" size="80"/>
                     </td>
                 </tr>
                 <tr class="prop">
@@ -35,8 +35,8 @@
                             <warehouse:message code="location.demandTimePeriodDays.label" default="Demand Time Period Days"/>
                         </label>
                     </td>
-                    <td valign="top" class="value ${hasErrors(bean: locationInstance, field: 'demandTimePeriodDays', 'errors')}">
-                        <g:textField name="demandTimePeriodDays" value="${locationInstance?.demandTimePeriodDays }" size="80"/>
+                    <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'demandTimePeriodDays', 'errors')}">
+                        <g:textField name="demandTimePeriodDays" value="${inventoryLevelInstance?.demandTimePeriodDays }" size="80"/>
                     </td>
                 </tr>
             </tbody>
@@ -46,9 +46,7 @@
                 </td>
                 <td>
                     <div class="buttons left">
-                        <button type="submit" class="button icon approve">
-                            <warehouse:message code="default.button.save.label"/>
-                        </button>
+                        <g:actionSubmit class="button icon approve" action="updateForecastingConfiguration" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
                         &nbsp;
                         <g:link action="list">
                             ${warehouse.message(code: 'default.button.cancel.label')}

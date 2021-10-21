@@ -60,15 +60,6 @@ class Location implements Comparable<Location>, java.io.Serializable {
     Date dateCreated
     Date lastUpdated
 
-    // Lead time in days
-    BigDecimal expectedLeadTimeDays
-
-    // Replenishment period in days
-    BigDecimal replenishmentPeriodDays
-
-    // Demand time period in days
-    BigDecimal demandTimePeriodDays
-
     static belongsTo = [parentLocation: Location, organization: Organization]
     static hasMany = [locations: Location, supportedActivities: String, employees: User]
     static mappedBy = [locations: "parentLocation"]
@@ -102,9 +93,6 @@ class Location implements Comparable<Location>, java.io.Serializable {
         dateCreated(display: false)
         lastUpdated(display: false)
         sortOrder(nullable: true)
-        expectedLeadTimeDays(nullable: true)
-        replenishmentPeriodDays(nullable: true)
-        demandTimePeriodDays(nullable: true)
     }
 
     static mapping = {
