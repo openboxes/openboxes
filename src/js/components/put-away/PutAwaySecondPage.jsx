@@ -405,7 +405,7 @@ class PutAwaySecondPage extends Component {
    */
   savePutAways(putAwayToSave, callback) {
     this.props.showSpinner();
-    const url = `/openboxes/api/locations/${this.state.location.id}/putawayCandidates`;
+    const url = `/openboxes/api/putaways/${this.state.putAway.id}`;
 
     return apiClient.post(url, flattenRequest(putAwayToSave))
       .then((response) => {

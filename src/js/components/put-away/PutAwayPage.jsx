@@ -212,7 +212,7 @@ class PutAwayPage extends Component {
    */
   createPutAway() {
     this.props.showSpinner();
-    const url = `/openboxes/api/locations/${this.props.locationId}/putawayCandidates`;
+    const url = '/openboxes/api/putaways';
     const items = _.filter(this.state.putawayItems, item =>
       _.includes([...this.state.selection], item._id));
     const payload = {

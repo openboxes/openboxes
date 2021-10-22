@@ -11,6 +11,7 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.order.OrderItem
 
 /**
  * Should not extend BaseDomainApiController since putawayItem is not a valid domain.
