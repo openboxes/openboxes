@@ -42,7 +42,7 @@ class OrderService {
     def stockMovementService
     def grailsApplication
 
-    def getOrders(Order orderTemplate, Date dateOrderedFrom, Date dateOrderedTo, Map params) {
+    def getOrders(Order orderTemplate, Date dateOrderedFrom = null, Date dateOrderedTo = null, Map params = [:]) {
         def orders = Order.createCriteria().list(params) {
             and {
                 if (params.q) {

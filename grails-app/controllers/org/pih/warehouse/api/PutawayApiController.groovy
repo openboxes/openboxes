@@ -15,6 +15,9 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderType
+import org.pih.warehouse.core.Constants
+import org.pih.warehouse.order.OrderStatus
 
 /**
  * Should not extend BaseDomainApiController since stocklist is not a valid domain.
@@ -22,21 +25,21 @@ import org.pih.warehouse.order.Order
 class PutawayApiController {
 
     def identifierService
+    def orderService
     def productAvailabilityService
     def putawayService
 
     def list = {
-        String locationId = params?.location?.id ?: session?.warehouse?.id
-        Location location = Location.get(locationId)
-        if (!location) {
-            throw new IllegalArgumentException("Must provide location.id as request parameter")
-        }
-        List putawayItems = putawayService.getPutawayCandidates(location)
-        render([data: putawayItems.collect { it.toJson() }] as JSON)
+        OrderType orderType = OrderType.findByCode(Constants.PUTAWAY_ORDER)
+        OrderStatus status = params.status ? params.status as OrderStatus : OrderStatus.PENDING
+        Order orderCriteria = new Order(orderType: orderType, status: status)
+        List<Order> orders = orderService.getOrders(orderCriteria)
+        List<Putaway> putaways = orders.collect {  Order order -> Putaway.createFromOrder(order) }
+        render([data: putaways.collect { it.toJson() }] as JSON)
     }
 
     def read = {
-        Order order = Order.get(params.id)
+        Order order = Order.findByIdOrOrderNumber(params.id, params.id)
         if (!order) {
             throw new IllegalArgumentException("No putaway found for order ID ${params.id}")
         }
@@ -52,8 +55,20 @@ class PutawayApiController {
         render([data: putaway?.toJson()] as JSON)
     }
 
+    def delete = {
+        Order order = Order.findByIdOrOrderNumber(params.id, params.id)
+        if (!order) {
+            throw new IllegalArgumentException("No putaway found for order ID ${params.id}")
+        }
+        order.delete()
+        render status: 204
+    }
 
     def create = {
+        forward(action: "update")
+    }
+
+    def update = {
         JSONObject jsonObject = request.JSON
 
         Location currentLocation = Location.get(session.warehouse.id)
@@ -70,21 +85,11 @@ class PutawayApiController {
         // Putaway stock
         if (putaway?.putawayStatus?.equals(PutawayStatus.COMPLETED)) {
             order = putawayService.completePutaway(putaway)
-            putaway = Putaway.createFromOrder(order)
         } else {
             order = putawayService.savePutaway(putaway)
-            putaway = Putaway.createFromOrder(order)
-            putaway.sortBy = jsonObject.sortBy
-            putaway?.putawayItems?.each { PutawayItem putawayItem ->
-                putawayItem.availableItems =
-                        productAvailabilityService.getAllAvailableBinLocations(putawayItem.currentFacility, putawayItem.product)
-                putawayItem.inventoryLevel = InventoryLevel.findByProductAndInventory(putawayItem.product, putaway.origin.inventory)
-                putawayItem.quantityAvailable = productAvailabilityService.getQuantityOnHandInBinLocation(putawayItem.inventoryItem, putawayItem.currentLocation)
-            }
         }
-        render([data: putaway?.toJson()] as JSON)
+        redirect(action: "read", id: order.id)
     }
-
 
     Putaway bindPutawayData(Putaway putaway, User currentUser, Location currentLocation, JSONObject jsonObject) {
         // Bind the putaway
