@@ -52,6 +52,12 @@ class UrlMappings {
             controller = { "productApi" }
             action = [POST: "search"]
         }
+
+        "/api/locations/$id/putawayCandidates" {
+            controller = { "putawayItemApi" }
+            action = [GET: "list"]
+        }
+
         "/api/locations/$id/$action" {
             controller = { "locationApi" }
         }

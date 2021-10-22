@@ -238,7 +238,7 @@ class PutAwayCheckPage extends Component {
 
   save() {
     this.props.showSpinner();
-    const url = `/openboxes/api/putaways?location.id=${this.state.location.id}`;
+    const url = `/openboxes/api/putaways/${this.state.putAway.id}`;
     const payload = {
       ...this.props.initialValues.putAway,
       putawayStatus: 'COMPLETED',
