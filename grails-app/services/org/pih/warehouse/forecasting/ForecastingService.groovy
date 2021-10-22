@@ -351,4 +351,28 @@ class ForecastingService {
         return data
     }
 
+    def getDailyDemand(Location location, def demandDays) {
+        List data = []
+        String query = """
+            SELECT
+                product_id,
+                origin_id AS location_id,
+                SUM(quantity_demand) / :demandDays AS average_daily_demand
+            FROM product_demand_details
+            WHERE origin_id = :locationId
+                AND date_issued > DATE_SUB(CURRENT_DATE, INTERVAL :demandDays DAY)
+            GROUP BY product_id, location_id
+            """
+
+        Sql sql = new Sql(dataSource)
+
+        try {
+            data = sql.rows(query, [locationId: location.id, demandDays: demandDays])
+        } catch (Exception e) {
+            log.error("Unable to execute query: " + e.message, e)
+        }
+
+        return data
+    }
+
 }
