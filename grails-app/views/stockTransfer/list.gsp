@@ -1,4 +1,5 @@
 <%@ page import="org.pih.warehouse.order.OrderItemStatusCode;" %>
+<%@ page import="org.pih.warehouse.order.OrderStatus;" %>
 
 <html>
 <head>
@@ -43,6 +44,7 @@
 						<th>${warehouse.message(code: 'order.createdBy.label')}</th>
 						<th>${warehouse.message(code: 'order.creationDate.label')}</th>
 						<th>${warehouse.message(code: 'order.orderItems.label')}</th>
+						<th></th>
 					</tr>
 					</thead>
 					<tbody>
@@ -79,6 +81,20 @@
 								<g:set var="lineItems" value="${orderInstance?.orderItems?.findAll { it.orderItemStatusCode != OrderItemStatusCode.CANCELED }}"/>
 								${lineItems.size()?:0}
 							</td>
+							<g:isUserInRole roles="[org.pih.warehouse.core.RoleType.ROLE_SUPERUSER, org.pih.warehouse.core.RoleType.ROLE_ADMIN, org.pih.warehouse.core.RoleType.ROLE_MANAGER]">
+                                <g:if test="${orderInstance?.status == OrderStatus.PENDING}">
+                                    <td class="middle">
+                                        <g:form controller="stockTransfer" action="delete">
+                                            <g:hiddenField name="id" value="${orderInstance?.id}" />
+                                            <g:actionSubmit class="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+                                        </g:form>
+                                    </td>
+                                </g:if>
+                                <g:else>
+                                    <td class="middle">
+                                    </td>
+                                </g:else>
+                            </g:isUserInRole>
 						</tr>
 					</g:each>
 					</tbody>

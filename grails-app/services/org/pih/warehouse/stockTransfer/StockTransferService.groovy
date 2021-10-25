@@ -35,6 +35,7 @@ class StockTransferService {
     def picklistService
     def shipmentService
     def grailsApplication
+    def orderService
 
     boolean transactional = true
 
@@ -235,6 +236,15 @@ class StockTransferService {
             parentItem.save()
         }
         return order
+    }
+
+    void deleteStockTransfer(String id) {
+        Order order = Order.get(id)
+        if (!order) {
+            throw new IllegalArgumentException("No stockTransfer item found with ID ${id}")
+        }
+
+        orderService.deleteOrder(order)
     }
 
     OrderItem updateOrderItem(StockTransferItem stockTransferItem, OrderItem orderItem) {

@@ -72,4 +72,13 @@ class StockTransferController {
         [stockTransfer: stockTransfer]
     }
 
+    def delete = {
+        def orderInstance = Order.get(params.id)
+        if (!orderInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.stockTransfer.label', default: 'Stock Transfer'), params.id])}"
+        } else {
+            stockTransferService.deleteStockTransfer(params.id)
+        }
+        redirect(action: "list")
+    }
 }
