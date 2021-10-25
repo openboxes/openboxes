@@ -12,7 +12,9 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import grails.validation.ValidationException
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderType
@@ -43,13 +45,12 @@ class StockTransferApiController {
         JSONObject jsonObject = request.JSON
 
         User currentUser = User.get(session.user.id)
-        Location currentLocation = Location.get(session.warehouse.id)
+        Location currentLocation = Location.get(session?.warehouse?.id)
         if (!currentLocation || !currentUser) {
             throw new IllegalArgumentException("User must be logged into a location to update stock transfer")
         }
 
         StockTransfer stockTransfer = new StockTransfer()
-
         bindStockTransferData(stockTransfer, currentUser, currentLocation, jsonObject)
 
         Order order
@@ -62,10 +63,47 @@ class StockTransferApiController {
             }
         }
 
-        stockTransfer = StockTransfer.createFromOrder(order)
-        stockTransferService.setQuantityOnHand(stockTransfer)
-        render([data: stockTransfer?.toJson()] as JSON)
+        forward(action: "read", id: order.id)
     }
+
+
+    def update = {
+        log.info "update transfer"
+        JSONObject jsonObject = request.JSON
+
+        Order order = Order.get(params.id)
+        if (!order) {
+            throw new IllegalArgumentException("No stock transfer found for order ID ${params.id}")
+        }
+        User currentUser = User.get(session.user.id)
+        Location currentLocation = Location.get(session.warehouse.id)
+        if (!currentLocation || !currentUser) {
+            throw new IllegalArgumentException("User must be logged into a location to update stock transfer")
+        }
+
+        StockTransfer stockTransfer = StockTransfer.createFromOrder(order)
+        bindStockTransferData(stockTransfer, currentUser, currentLocation, jsonObject)
+        if (stockTransfer?.status == StockTransferStatus.COMPLETED) {
+            order = stockTransferService.completeStockTransfer(stockTransfer)
+        } else {
+            order = stockTransferService.createOrderFromStockTransfer(stockTransfer)
+            if (order.hasErrors() || !order.save(flush: true)) {
+                throw new ValidationException("Invalid order", order.errors)
+            }
+        }
+        forward(action: "read", id: params.id)
+    }
+
+    def delete = {
+        Order order = Order.get(params.id)
+        if (!order) {
+            throw new ObjectNotFoundException(params.id, Order.class.simpleName)
+        } else {
+            order.delete(flush: true)
+            render status: 204
+        }
+    }
+
 
     StockTransfer bindStockTransferData(StockTransfer stockTransfer, User currentUser, Location currentLocation, JSONObject jsonObject) {
         bindData(stockTransfer, jsonObject)
@@ -93,6 +131,12 @@ class StockTransferApiController {
         jsonObject.stockTransferItems.each { stockTransferItemMap ->
             StockTransferItem stockTransferItem = new StockTransferItem()
             bindData(stockTransferItem, stockTransferItemMap)
+
+            if (!stockTransferItem.inventoryItem) {
+                stockTransferItem.inventoryItem =
+                        InventoryItem.findByProductAndLotNumberIsNull(stockTransferItem.product)
+            }
+
             if (!stockTransferItem.location) {
                 stockTransferItem.location = stockTransfer.origin
             }
