@@ -8,6 +8,7 @@ import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import moment from 'moment';
 
 import TextField from '../form-elements/TextField';
 import SelectField from '../form-elements/SelectField';
@@ -31,6 +32,11 @@ function validate(values) {
 
   if (!values.dateInvoiced) {
     errors.dateInvoiced = 'react.default.error.requiredField.label';
+  } else {
+    const dateInvoiced = moment(values.dateInvoiced, 'MM/DD/YYYY', true);
+    if (!dateInvoiced.isValid()) {
+      errors.dateInvoiced = 'react.default.error.invalid.date';
+    }
   }
 
   if (!values.currencyUom) {
