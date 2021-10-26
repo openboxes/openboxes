@@ -73,11 +73,11 @@ class StockTransferController {
     }
 
     def delete = {
-        def orderInstance = Order.get(params.id)
-        if (!orderInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.stockTransfer.label', default: 'Stock Transfer'), params.id])}"
-        } else {
+        try {
             stockTransferService.deleteStockTransfer(params.id)
+        } catch (IllegalArgumentException e) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.stockTransfer.label', default: 'Stock Transfer'), params.id])}"
+            redirect(action: "list")
         }
         redirect(action: "list")
     }
