@@ -50,8 +50,6 @@ import org.pih.warehouse.requisition.RequisitionItemType
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Container
-import org.pih.warehouse.shipping.ReferenceNumber
-import org.pih.warehouse.shipping.ReferenceNumberType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
@@ -737,7 +735,7 @@ class StockMovementService {
             def quantityOnHandRequestingMap = productAvailabilityService.getQuantityOnHand(editPageItems.collect { it.product }, requisition.destination)
                     .inject([:]) {map, item -> map << [(item.prod.id): item.quantityOnHand]}
 
-            editPageItems = editPageItems.collect { editPageItem ->
+            editPageItems.each { editPageItem ->
                 calculateFieldsForElectronicRequisitionItem(requisition, editPageItem, quantityOnHandRequestingMap)
             }
         }
