@@ -18,7 +18,7 @@ import TextField from '../form-elements/TextField';
 import { renderFormField } from '../../utils/form-utils';
 
 import { showSpinner, hideSpinner } from '../../actions';
-import apiClient, { parseResponse, flattenRequest, handleError } from '../../utils/apiClient';
+import apiClient, { parseResponse, flattenRequest } from '../../utils/apiClient';
 import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
 
 const SHIPMENT_FIELDS = {
@@ -263,9 +263,7 @@ class SendMovementPage extends Component {
             window.location = `/openboxes/stockTransfer/show/${this.props.match.params.outboundReturnId}`;
             this.props.hideSpinner();
           })
-          .catch((error) => {
-            // TODO: Fix this request to get proper error handling from api client
-            handleError(error);
+          .catch(() => {
             this.props.hideSpinner();
           });
       })
