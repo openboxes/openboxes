@@ -51,7 +51,7 @@ const LabelField = (props) => {
     return (
       <div className="form-group my-0">
         <Tooltip
-          html={tooltipValue || (<div>{formattedValue}</div>)}
+          html={tooltipValue || (<div className="text-truncate">{formattedValue}</div>)}
           disabled={!showValueTooltip}
           theme="transparent"
           delay="150"

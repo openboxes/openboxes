@@ -1209,6 +1209,10 @@ class StockMovementService {
         return availableItems?.collect {
             if (it.quantityAvailable > 0) {
                 it.status = AvailableItemStatus.AVAILABLE
+
+                def picklists = getPicklistByLocationAndProduct(it.binLocation, it.inventoryItem)
+                List<String> pickedRequisitionNumbers = picklists?.collect { it.requisition.requestNumber }?.unique()
+                it.pickedRequisitionNumbers = pickedRequisitionNumbers
             } else if (it.inventoryItem?.recalled) {
                 it.status = AvailableItemStatus.RECALLED
             } else if (it.binLocation?.isOnHold()) {
