@@ -136,4 +136,5 @@
     <include file="0.8.x/changelog-2021-09-02-1200-alter-table-picklist-add-column-order.xml"/>
     <include file="0.8.x/changelog-2021-09-02-1215-alter-table-picklist-item-add-column-order-item.xml"/>
     <include file="0.8.x/changelog-2021-10-05-1030-add-outbound-returns-order-type.xml"/>
+    <include file="0.8.x/changelog-2021-10-12-1210-alter-table-inventory-level-add-demand-period.xml"/>
 </databaseChangeLog>

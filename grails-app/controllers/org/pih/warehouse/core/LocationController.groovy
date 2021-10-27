@@ -11,6 +11,7 @@ package org.pih.warehouse.core
 
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.validation.ValidationException
+import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
@@ -338,6 +339,39 @@ class LocationController {
         }
     }
 
+    def showForecastingConfiguration = {
+        def locationInstance = Location.get(params.id)
+        if (!locationInstance) {
+            render "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
+        }
+
+        def inventoryLevelInstance = InventoryLevel.findByInventoryAndProductIsNull(locationInstance.inventory)
+
+        if (!inventoryLevelInstance) {
+            inventoryLevelInstance = new InventoryLevel(inventory: locationInstance.inventory)
+        }
+
+        [inventoryLevelInstance: inventoryLevelInstance]
+    }
+
+    def updateForecastingConfiguration = {
+        def locationInstance = Location.get(params.id)
+        if (!locationInstance) {
+            render "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
+        }
+
+        def inventoryLevelInstance = InventoryLevel.findByInventoryAndProductIsNull(locationInstance.inventory)
+
+        if (!inventoryLevelInstance) {
+            inventoryLevelInstance = new InventoryLevel(inventory: locationInstance.inventory)
+        }
+
+        inventoryLevelInstance.properties = params
+
+        inventoryLevelInstance.save()
+
+        redirect(action: "edit", id: locationInstance.id)
+    }
 
     def importBinLocations = {
         try {

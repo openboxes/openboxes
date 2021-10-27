@@ -58,7 +58,11 @@
                         <li><a href="${request.contextPath}/location/showContents/${locationInstance?.id}"><warehouse:message
                                 code="binLocation.contents.label" default="Contents"/></a></li>
                     </g:else>
-
+                    <li><a href="${request.contextPath}/location/showForecastingConfiguration/${locationInstance?.id}"
+                           id="location-forecastingConfiguration-tab">
+                        <g:message code="forecasting.label"
+                                   default="Forecasting"/></a>
+                    </li>
                 </ul>
 
                 <div id="location-details-tab">

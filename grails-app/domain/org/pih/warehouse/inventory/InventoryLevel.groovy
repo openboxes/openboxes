@@ -50,6 +50,9 @@ class InventoryLevel {
     // Replenishment period in days
     BigDecimal replenishmentPeriodDays
 
+    // Demand time period in days
+    BigDecimal demandTimePeriodDays
+
     // Preferred bin location
     Location preferredBinLocation
 
@@ -82,7 +85,7 @@ class InventoryLevel {
 
     static constraints = {
         status(nullable: true)
-        product(nullable: false, unique: ["inventory", "internalLocation"])
+        product(nullable: true, unique: ["inventory", "internalLocation"])
         internalLocation(nullable:true)
         minQuantity(nullable: true, range: 0..2147483646)
         reorderQuantity(nullable: true, range: 0..2147483646)
@@ -97,6 +100,7 @@ class InventoryLevel {
         preferred(nullable: true)
         comments(nullable: true)
         replenishmentPeriodDays(nullable: true)
+        demandTimePeriodDays(nullable: true)
     }
 
     Location getFacilityLocation() {
