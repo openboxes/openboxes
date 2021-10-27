@@ -248,26 +248,26 @@ class SendMovementPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
-  sendOutboundReturn(values) {
-    this.props.showSpinner();
-    const payload = {
-      ...values,
-      status: 'COMPLETED',
-    };
-    const url = `/openboxes/api/stockTransfers/${this.props.match.params.outboundReturnId}/sendShipment`;
+  sendOutboundReturn(values, invalid) {
+    if (!invalid) {
+      this.props.showSpinner();
+      const payload = {
+        ...values,
+      };
+      const url = `/openboxes/api/stockTransfers/${this.props.match.params.outboundReturnId}/sendShipment`;
 
-    this.saveValues(payload)
-      .then(() => {
-        apiClient.post(url, flattenRequest(payload))
-          .then(() => {
-            window.location = `/openboxes/stockTransfer/show/${this.props.match.params.outboundReturnId}`;
-            this.props.hideSpinner();
-          })
-          .catch(() => {
-            this.props.hideSpinner();
-          });
-      })
-      .catch(() => this.props.hideSpinner());
+      this.saveValues(payload)
+        .then(() => {
+          apiClient.post(url, flattenRequest(payload))
+            .then(() => {
+              window.location = `/openboxes/stockTransfer/show/${this.props.match.params.outboundReturnId}`;
+            })
+            .catch(() => {
+              this.props.hideSpinner();
+            });
+        })
+        .catch(() => this.props.hideSpinner());
+    }
   }
 
   validate(values) {
@@ -437,9 +437,9 @@ class SendMovementPage extends Component {
                 </button>
                 <button
                   type="submit"
-                  onClick={() => this.sendOutboundReturn(values)}
+                  onClick={() => this.sendOutboundReturn(values, invalid)}
                   className="btn btn-outline-success float-right btn-form btn-xs"
-                  disabled={invalid || (values && values.status === 'COMPLETED')}
+                  disabled={values && values.status === 'COMPLETED'}
                 ><Translate id="react.stockMovement.sendShipment.label" defaultMessage="Send shipment" />
                 </button>
               </div>
