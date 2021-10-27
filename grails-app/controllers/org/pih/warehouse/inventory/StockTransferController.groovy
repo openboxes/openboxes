@@ -72,4 +72,13 @@ class StockTransferController {
         [stockTransfer: stockTransfer]
     }
 
+    def delete = {
+        try {
+            stockTransferService.deleteStockTransfer(params.id)
+        } catch (IllegalArgumentException e) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.stockTransfer.label', default: 'Stock Transfer'), params.id])}"
+            redirect(action: "list")
+        }
+        redirect(action: "list")
+    }
 }
