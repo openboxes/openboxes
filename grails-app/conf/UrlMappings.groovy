@@ -328,34 +328,36 @@ class UrlMappings {
             action = [POST: "sendShipment"]
         }
 
-        // Requirement API
+        // OBPIH-4079: TEMPORARY DISABLED
 
-        "/api/requirements"(parseRequest: true) {
-            controller = { "replenishmentApi" }
-            action = [GET: "requirements"]
-        }
-
-        // Replenishment API
-
-        "/api/replenishments/statusOptions"(parseRequest: true) {
-            controller = "replenishmentApi"
-            action = [GET: "statusOptions"]
-        }
-
-        "/api/replenishments/$id/"(parseRequest: true) {
-            controller = { "replenishmentApi" }
-            action = [GET: "read", POST: "create", PUT: "update"]
-        }
-
-        "/api/replenishments/$id/removeItem"(parseRequest: true) {
-            controller = { "replenishmentApi" }
-            action = [DELETE: "removeItem"]
-        }
-
-        "/api/replenishments/$id/picklists"(parseRequest: true) {
-            controller = { "replenishmentApi" }
-            action = [GET: "getPicklist", POST: "createPicklist", PUT: "updatePicklist", DELETE: "deletePicklist"]
-        }
+//        // Requirement API
+//
+//        "/api/requirements"(parseRequest: true) {
+//            controller = { "replenishmentApi" }
+//            action = [GET: "requirements"]
+//        }
+//
+//        // Replenishment API
+//
+//        "/api/replenishments/statusOptions"(parseRequest: true) {
+//            controller = "replenishmentApi"
+//            action = [GET: "statusOptions"]
+//        }
+//
+//        "/api/replenishments/$id/"(parseRequest: true) {
+//            controller = { "replenishmentApi" }
+//            action = [GET: "read", POST: "create", PUT: "update"]
+//        }
+//
+//        "/api/replenishments/$id/removeItem"(parseRequest: true) {
+//            controller = { "replenishmentApi" }
+//            action = [DELETE: "removeItem"]
+//        }
+//
+//        "/api/replenishments/$id/picklists"(parseRequest: true) {
+//            controller = { "replenishmentApi" }
+//            action = [GET: "getPicklist", POST: "createPicklist", PUT: "updatePicklist", DELETE: "deletePicklist"]
+//        }
 
         // Standard REST APIs
 

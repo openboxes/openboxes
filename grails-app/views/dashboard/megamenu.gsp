@@ -117,11 +117,13 @@
                                 <warehouse:message code="inventory.listStockTransfers.label" />
                             </g:link>
                         </div>
-                        <div class="mm-menu-item">
-                            <g:link controller="replenishment" action="index" class="create">
-                                <warehouse:message code="inventory.createReplenishment.label" />
-                            </g:link>
-                        </div>
+
+                        %{-- OBPIH-4079: TEMPORARY DISABLED --}%
+                        %{--<div class="mm-menu-item">--}%
+                            %{--<g:link controller="replenishment" action="index" class="create">--}%
+                                %{--<warehouse:message code="inventory.createReplenishment.label" />--}%
+                            %{--</g:link>--}%
+                        %{--</div>--}%
                     </div>
                 </div>
             </li>
