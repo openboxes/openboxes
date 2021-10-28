@@ -375,7 +375,7 @@ class UserService {
     def authenticateUsingDatabase(username, password) {
         def userInstance = User.findByUsernameOrEmail(username, username)
         if (userInstance) {
-            return (userInstance.password == password.encodeAsPassword() || userInstance.password == password)
+            return (userInstance.password == password.encodeAsPassword() || userInstance.password == password) && userInstance.active
         }
         return false
     }
