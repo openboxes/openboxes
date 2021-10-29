@@ -72,7 +72,7 @@ class StockTransferController {
         [stockTransfer: stockTransfer]
     }
 
-    def delete = {
+    def eraseStockTransfer = {
         try {
             stockTransferService.deleteStockTransfer(params.id)
         } catch (IllegalArgumentException e) {
