@@ -77,6 +77,10 @@ class ProductApiController extends BaseDomainApiController {
             ]
         }
         data.availableItems = availableItems
+
+        data.inventoryItems = product.inventoryItems
+        data.defaultInventoryItem = product.inventoryItems.find { it.lotNumber == null }
+
         render([data: data] as JSON)
     }
 
