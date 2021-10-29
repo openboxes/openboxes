@@ -305,6 +305,40 @@ class Location implements Comparable<Location>, java.io.Serializable {
         return !onHold
     }
 
+    Map toJson() {
+        return [
+                id                         : id,
+                name                       : name,
+                description                : description,
+                locationNumber             : locationNumber,
+                locationGroup              : locationGroup,
+                parentLocation             : parentLocation,
+                locationType               : locationType,
+                sortOrder                  : sortOrder,
+                hasBinLocationSupport      : this.hasBinLocationSupport(),
+                hasPackingSupport          : this.supports(ActivityCode.PACK_SHIPMENT),
+                hasPartialReceivingSupport : this.supports(ActivityCode.PARTIAL_RECEIVING),
+                hasCentralPurchasingEnabled: this.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING),
+                organizationName           : organization?.name,
+                organizationCode           : organization?.code,
+                backgroundColor            : bgColor,
+                zoneName                   : zone?.name,
+                zoneId                     : zone?.id
+        ]
+    }
+
+    Map toJson(LocationTypeCode locationTypeCode)  {
+        switch (locationTypeCode) {
+            case LocationTypeCode.INTERNAL:
+            case LocationTypeCode.BIN_LOCATION:
+                return [id: id, name: name, locationTypeCode: locationType?.locationTypeCode?.name(), zoneId: zone?.id, zoneName: zone?.name]
+
+            default:
+                return toJson()
+        }
+    }
+
+
     static PROPERTIES = [
             "name"          : "name",
             "locationNumber": "locationNumber",

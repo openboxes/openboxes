@@ -1463,7 +1463,9 @@ openboxes.shipping.search.maxResults = 1000
 
 // Automatically create temporary receiving locations for shipments
 openboxes.receiving.createReceivingLocation.enabled = true
+openboxes.receiving.receivingLocation.name = Constants.DEFAULT_RECEIVING_LOCATION_NAME
 openboxes.receiving.receivingLocation.prefix = Constants.DEFAULT_RECEIVING_LOCATION_PREFIX
+openboxes.receiving.receivingLocation.defaultNames = ["Receiving", "Quarantine", "Hold"]
 
 // Pagination
 openboxes.api.pagination.enabled = true

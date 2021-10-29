@@ -535,6 +535,10 @@ class LocationService {
         return value?.trim()
     }
 
+    List getDefaultReceivingLocationNames() {
+        return grailsApplication.config.openboxes.receiving.receivingLocation.defaultNames
+    }
+
     String getReceivingLocationName(String identifier) {
         String receivingLocationPrefix = grailsApplication.config.openboxes.receiving.receivingLocation.prefix
         return "${receivingLocationPrefix}-${identifier}"

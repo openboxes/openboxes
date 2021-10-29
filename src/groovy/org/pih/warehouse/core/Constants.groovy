@@ -124,6 +124,7 @@ class Constants {
     static final String TRACKING_NUMBER_TYPE_ID = "10"
     static final String VENDOR_INVOICE_NUMBER_TYPE_ID = "VENDOR_INVOICE_NUMBER"
 
+    static final String DEFAULT_RECEIVING_LOCATION_NAME = "Receiving"
     static final String DEFAULT_RECEIVING_LOCATION_PREFIX = "R"
 
     static final String DEFAULT_DOCUMENT_TYPE_ID = "9"
