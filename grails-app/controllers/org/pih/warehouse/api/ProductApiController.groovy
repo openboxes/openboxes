@@ -61,11 +61,16 @@ class ProductApiController extends BaseDomainApiController {
             [id: template.id, name: template.name, url: g.createLink(uri: url, absolute: true)]
         }
 
+        data.defaultBarcodeLabelUrl = data.barcodeLabels ? data.barcodeLabels[0].url : null
+
         data.images = product?.images?.collect {
-            return [ id: it.id, name: it.filename, contentType: it.contentType, fileUri: it.fileUri?:it?.link ]
+            return [ id: it.id, name: it.filename, contentType: it.contentType, uri: it.fileUri?:it?.link ]
         }
+
+        data.defaultImageUrl = data.images ? data.images[0].uri : null
+
         data.documents = product?.documents?.collect {
-            return [ id: it.id, name: it.filename, contentType: it.contentType, fileUri: it.fileUri?:it?.link ]
+            return [ id: it.id, name: it.filename, contentType: it.contentType, uri: it.fileUri?:it?.link ]
         }
 
         data.attributes = product.attributes.collect { ProductAttribute productAttribute ->
@@ -77,6 +82,10 @@ class ProductApiController extends BaseDomainApiController {
             ]
         }
         data.availableItems = availableItems
+
+        data.inventoryItems = product.inventoryItems
+        data.defaultInventoryItem = product.inventoryItems.find { it.lotNumber == null }
+
         render([data: data] as JSON)
     }
 
