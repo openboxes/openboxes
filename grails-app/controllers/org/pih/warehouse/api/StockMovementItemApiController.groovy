@@ -148,7 +148,7 @@ class StockMovementItemApiController {
         render([data: stockMovementItem] as JSON)
     }
 
-    def removeItem = {
+    def eraseItem = {
         stockMovementService.removeStockMovementItem(params.id)
         render status: 204
     }
