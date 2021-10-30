@@ -572,6 +572,7 @@ class OrderController {
             csv += "${warehouse.message(code: 'product.productCode.label')}," +
                     "${warehouse.message(code: 'product.name.label')}," +
                     "${warehouse.message(code: 'product.vendorCode.label')}," +
+                    "${warehouse.message(code: 'product.manufacturerCode.label')}," +
                     "${warehouse.message(code: 'orderItem.quantity.label')}," +
                     "${warehouse.message(code: 'product.unitOfMeasure.label')}," +
                     "${warehouse.message(code: 'orderItem.unitPrice.label')}," +
@@ -590,7 +591,8 @@ class OrderController {
 
                 csv += "${orderItem?.product?.productCode}," +
                         "${StringEscapeUtils.escapeCsv(orderItem?.product?.name)}," +
-                        "${orderItem?.product?.vendorCode ?: ''}," +
+                        "${orderItem?.productSupplier?.supplierCode ?: ''}," +
+                        "${orderItem?.productSupplier?.manufacturerCode ?: ''}," +
                         "${StringEscapeUtils.escapeCsv(quantityString)}," +
                         "${orderItem?.unitOfMeasure}," +
                         "${StringEscapeUtils.escapeCsv(unitPriceString)}," +
