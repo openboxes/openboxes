@@ -627,5 +627,38 @@ class Shipment implements Comparable, Serializable {
         Event event = events.find { Event event -> event?.eventType?.eventCode == EventTypeCode.CUSTOMS_RELEASE }
         return event?.eventDate
     }
+
+    Map toJson() {
+        def containerList = []
+        def shipmentItemsByContainer = shipmentItems?.groupBy { it.container }
+        shipmentItemsByContainer.each { container, shipmentItems ->
+            containerList << [id: container?.id, name: container?.name, type: container?.containerType?.name, shipmentItems: shipmentItems]
+        }
+        return [
+                id                  : id,
+                name                : name,
+                shipmentNumber      : shipmentNumber,
+                status              : status?.code?.name(),
+                origin              : [
+                        id  : origin?.id,
+                        name: origin?.name,
+                        type: origin?.locationType?.locationTypeCode?.name()
+                ],
+                destination         : [
+                        id  : destination?.id,
+                        name: destination?.name,
+                        type: destination?.locationType?.locationTypeCode?.name()
+
+                ],
+                expectedShippingDate: expectedShippingDate?.format("MM/dd/yyyy HH:mm XXX"),
+                actualShippingDate  : actualShippingDate?.format("MM/dd/yyyy HH:mm XXX"),
+                expectedDeliveryDate: expectedDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),
+                actualDeliveryDate  : actualDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),
+                shippedCount        : shipmentItemCount,
+                receivedCount       : shipmentItems?.findAll { it.isFullyReceived() }.size(),
+                shipmentItems       : shipmentItems,
+                containers          : containerList
+        ]
+    }
 }
 

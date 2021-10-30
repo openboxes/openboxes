@@ -195,4 +195,18 @@ class Container implements Comparable, java.io.Serializable {
         }
     }
 
+
+    Map toJson() {
+        [
+                id             : container.id,
+                name           : container.name,
+                containerNumber: container.containerNumber,
+                containerType  : container.containerType,
+                recipient      : container.recipient,
+                sortOrder      : container.sortOrder,
+                shipmentItems  : container.shipmentItems
+        ]
+    }
+
+
 }

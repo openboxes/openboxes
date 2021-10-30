@@ -66,6 +66,11 @@ class ShipmentService {
     def productAvailabilityService
     GrailsApplication grailsApplication
 
+
+    Shipment getShipment(String idOrCode) {
+        return getShipmentInstance(idOrCode)
+    }
+
     /**
      * Returns the shipment referenced by the passed id parameter;
      * if id is null, returns a new Shipment object
@@ -88,7 +93,7 @@ class ShipmentService {
      */
     Shipment getShipmentInstance(String shipmentId, String shipmentType) {
         if (shipmentId) {
-            Shipment shipment = Shipment.get(shipmentId)
+            Shipment shipment = Shipment.findByIdOrShipmentNumber(shipmentId, shipmentId)
             if (!shipment) {
                 throw new Exception("No shipment found with shipmentId " + shipmentId)
             } else {
