@@ -131,25 +131,7 @@ class BootStrap {
         }
 
         JSON.registerObjectMarshaller(Location) { Location location ->
-            [
-                    id                   : location.id,
-                    name                 : location.name,
-                    description          : location.description,
-                    locationNumber       : location.locationNumber,
-                    locationGroup        : location.locationGroup,
-                    parentLocation       : location.parentLocation,
-                    locationType         : location.locationType,
-                    sortOrder            : location.sortOrder,
-                    hasBinLocationSupport: location.hasBinLocationSupport(),
-                    hasPackingSupport    : location.supports(ActivityCode.PACK_SHIPMENT),
-                    hasPartialReceivingSupport : location.supports(ActivityCode.PARTIAL_RECEIVING),
-                    hasCentralPurchasingEnabled : location.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING),
-                    organizationName     : location?.organization?.name,
-                    organizationCode     : location?.organization?.code,
-                    backgroundColor : location?.bgColor,
-                    zoneName : location?.zone?.name,
-                    zoneId : location?.zone?.id
-            ]
+            return location.toJson()
         }
 
         JSON.registerObjectMarshaller(Order) { Order order ->
