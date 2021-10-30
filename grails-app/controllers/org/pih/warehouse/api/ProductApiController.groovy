@@ -43,12 +43,12 @@ class ProductApiController extends BaseDomainApiController {
         def data = product.toJson()
         data.location = location
 
-        List<AvailableItem> availableItems = inventoryService.getAvailableItems(location, product)
-        Integer quantityAvailable = availableItems.collect { AvailableItem availableItem -> availableItem.quantityAvailable?:0 }.sum()
-        Integer quantityOnHand = availableItems.collect { AvailableItem availableItem -> availableItem.quantityOnHand?:0 }.sum()
+        List availableItems = productAvailabilityService.getAvailableItems(location, [product])
+        Integer quantityAvailable = availableItems.sum { it.quantityAvailableToPromise?:0 }
+        Integer quantityOnHand = availableItems.sum { it.quantityOnHand?:0 }
 
         data.status = quantityAvailable ? "In Stock" : "Out of Stock"
-        data.quantityAvailableToPromise = quantityAvailable
+        data.quantityAvailable = quantityAvailable
         data.quantityOnHand = quantityOnHand
         data.quantityAllocated = 0
         data.quantityOnOrder = 0
