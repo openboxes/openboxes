@@ -9,6 +9,7 @@ import fileDownload from 'js-file-download';
 import update from 'immutability-helper';
 import Alert from 'react-s-alert';
 import { confirmAlert } from 'react-confirm-alert';
+import axios from 'axios';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -19,10 +20,16 @@ import { renderFormField } from '../../../utils/form-utils';
 import EditPickModal from '../modals/EditPickModal';
 import { showSpinner, hideSpinner, fetchReasonCodes } from '../../../actions';
 import TableRowWithSubfields from '../../form-elements/TableRowWithSubfields';
-import apiClient, { parseResponse, flattenRequest } from '../../../utils/apiClient';
+import {
+  parseResponse,
+  flattenRequest,
+  handleSuccess,
+  handleError,
+} from '../../../utils/apiClient';
 import ButtonField from '../../form-elements/ButtonField';
 import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
 import renderHandlingIcons from '../../../utils/product-handling-icons';
+import AlertMessage from '../../../utils/AlertMessage';
 
 const FIELDS = {
   pickPageItems: {
@@ -180,6 +187,8 @@ const FIELDS = {
   },
 };
 
+const apiClient = axios.create({});
+
 /* eslint class-methods-use-this: ["error",{ "exceptMethods": ["checkForInitialPicksChanges"] }] */
 /**
  * The forth step of stock movement(for movements from a depot) where user
@@ -195,6 +204,8 @@ class PickPage extends Component {
       values: { ...this.props.initialValues, pickPageItems: [] },
       totalCount: 0,
       isFirstPageLoaded: false,
+      showAlert: false,
+      alertMessage: '',
     };
 
     this.revertUserPick = this.revertUserPick.bind(this);
@@ -205,6 +216,9 @@ class PickPage extends Component {
     this.isRowLoaded = this.isRowLoaded.bind(this);
     this.loadMoreRows = this.loadMoreRows.bind(this);
     this.recreatePicklist = this.recreatePicklist.bind(this);
+    this.handleValidationErrors = this.handleValidationErrors.bind(this);
+
+    apiClient.interceptors.response.use(handleSuccess, this.handleValidationErrors);
   }
 
   componentDidMount() {
@@ -410,6 +424,17 @@ class PickPage extends Component {
     return apiClient.get(url);
   }
 
+  handleValidationErrors(error) {
+    if (error.response.status === 400) {
+      const alertMessage = _.join(_.get(error, 'response.data.errorMessages', ''), ' ');
+      this.setState({ alertMessage, showAlert: true });
+
+      return Promise.reject(error);
+    }
+
+    return handleError(error);
+  }
+
   /**
    * Goes to the next stock movement step.
    * @param {object} formValues
@@ -577,6 +602,7 @@ class PickPage extends Component {
         initialValues={this.state.values}
         render={({ handleSubmit, values }) => (
           <div className="d-flex flex-column">
+            <AlertMessage show={this.state.showAlert} message={this.state.alertMessage} danger />
             { !showOnly ?
               <span className="buttons-container">
                 <label
