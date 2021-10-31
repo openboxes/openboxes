@@ -9,13 +9,14 @@ import arrayMutators from 'final-form-arrays';
 import { getTranslate } from 'react-localize-redux';
 import { confirmAlert } from 'react-confirm-alert';
 import { Tooltip } from 'react-tippy';
+import axios from 'axios';
 
 import moment from 'moment';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
 import { renderFormField } from '../../../utils/form-utils';
 import { showSpinner, hideSpinner } from '../../../actions';
-import apiClient from '../../../utils/apiClient';
+import { handleError, handleSuccess } from '../../../utils/apiClient';
 import DateField from '../../form-elements/DateField';
 import DocumentButton from '../../DocumentButton';
 import SelectField from '../../form-elements/SelectField';
@@ -25,6 +26,7 @@ import { debounceLocationsFetch } from '../../../utils/option-utils';
 import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
 import ArrayField from '../../form-elements/ArrayField';
 import renderHandlingIcons from '../../../utils/product-handling-icons';
+import AlertMessage from '../../../utils/AlertMessage';
 
 const SHIPMENT_FIELDS = {
   'origin.name': {
@@ -254,6 +256,8 @@ const FIELDS = {
   },
 };
 
+const apiClient = axios.create({});
+
 /**
  * The last step of stock movement where user can see the whole movement,
  * print documents, upload documents, add additional information and send it.
@@ -269,6 +273,8 @@ class SendMovementPage extends Component {
       totalCount: 0,
       isFirstPageLoaded: false,
       isDropdownVisible: false,
+      showAlert: false,
+      alertMessage: '',
     };
     this.props.showSpinner();
     this.onDrop = this.onDrop.bind(this);
@@ -276,9 +282,12 @@ class SendMovementPage extends Component {
     this.loadMoreRows = this.loadMoreRows.bind(this);
     this.toggleDropdown = this.toggleDropdown.bind(this);
     this.validate = this.validate.bind(this);
+    this.handleValidationErrors = this.handleValidationErrors.bind(this);
 
     this.debouncedLocationsFetch =
       debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength);
+
+    apiClient.interceptors.response.use(handleSuccess, this.handleValidationErrors);
   }
 
   componentDidMount() {
@@ -749,6 +758,17 @@ class SendMovementPage extends Component {
     return errors;
   }
 
+  handleValidationErrors(error) {
+    if (error.response.status === 400) {
+      const alertMessage = _.join(_.get(error, 'response.data.errorMessages', ''), ' ');
+      this.setState({ alertMessage, showAlert: true });
+
+      return Promise.reject(error);
+    }
+
+    return handleError(error);
+  }
+
   render() {
     const { showOnly } = this.props;
 
@@ -761,6 +781,11 @@ class SendMovementPage extends Component {
           initialValues={this.state.values}
           render={({ handleSubmit, values, invalid }) => (
             <form onSubmit={handleSubmit}>
+              <AlertMessage
+                show={this.state.showAlert}
+                message={this.state.alertMessage}
+                danger
+              />
               <div className="classic-form classic-form-condensed">
                 <span className="buttons-container classic-form-buttons">
                   <div className="dropzone float-right mb-1 btn btn-outline-secondary align-self-end btn-xs">
