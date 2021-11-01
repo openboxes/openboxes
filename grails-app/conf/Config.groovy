@@ -774,6 +774,7 @@ openboxes.identifier.organization.minSize = 2
 openboxes.identifier.organization.maxSize = 4
 
 openboxes.identifier.purchaseOrder.generatorType = IdentifierGeneratorTypeCode.SEQUENCE
+openboxes.identifier.purchaseOrder.sequenceNumber.format = Constants.DEFAULT_PO_SEQUENCE_NUMBER_FORMAT
 openboxes.identifier.purchaseOrder.format = "PO-\${destinationPartyCode}-\${sequenceNumber}"
 openboxes.identifier.purchaseOrder.properties = ["destinationPartyCode": "destinationParty.code"]
 

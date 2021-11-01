@@ -117,6 +117,7 @@ class Constants {
     static final String DEFAULT_TRANSACTION_NUMBER_FORMAT = "AAA-AAA-AAA"
     static final String DEFAULT_ORGANIZATION_NUMBER_FORMAT = "AAA"
     static final String DEFAULT_SEQUENCE_NUMBER_FORMAT = "00000"
+    static final String DEFAULT_PO_SEQUENCE_NUMBER_FORMAT = "000000"
     static final String DEFAULT_SEQUENCE_NUMBER_FORMAT_CHAR = "0"
     static final String DEFAULT_INVOICE_NUMBER_FORMAT = "NNNLLL"
 
