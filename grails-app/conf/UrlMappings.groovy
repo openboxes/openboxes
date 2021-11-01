@@ -97,7 +97,7 @@ class UrlMappings {
 
         "/api/stockMovementItems/$id/removeItem"(parseRequest: true) {
             controller = "stockMovementItemApi"
-            action = [DELETE: "removeItem"]
+            action = [DELETE: "eraseItem"]
         }
 
         "/api/stockMovements/$id/stockMovementItems"(parseRequest: true) {

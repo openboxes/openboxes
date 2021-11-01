@@ -39,8 +39,10 @@ const DELETE_BUTTON_FIELD = {
     fieldValue, removeItem, removeRow, updateTotalCount,
   }) => ({
     onClick: fieldValue && fieldValue.id ? () => {
-      removeItem(fieldValue.id).then(() => removeRow());
-      updateTotalCount(-1);
+      removeItem(fieldValue.id).then(() => {
+        removeRow();
+        updateTotalCount(-1);
+      });
     } : () => { updateTotalCount(-1); removeRow(); },
     disabled: fieldValue && fieldValue.statusCode === 'SUBSTITUTED',
   }),
