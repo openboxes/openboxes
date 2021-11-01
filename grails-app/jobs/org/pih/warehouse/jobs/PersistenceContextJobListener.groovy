@@ -55,13 +55,13 @@ public class PersistenceContextJobListener extends JobListenerSupport {
             } catch (Exception e) {
                 log.error("Exception occurred while flushing persistence context for job ${context.jobDetail.key}: " + e.message, e)
 				if (e.cause) {
-                	log.error("Exception was caused by: " + e?.cause?.message, e?.cause)
+                	log.fatal("Exception was caused by: " + e?.cause?.message, e?.cause)
 				}
             } finally {
                 try {
                     persistenceInterceptor.destroy()
                 } catch (Exception e) {
-                    log.error("Exception occurred while destroying persistence context for job ${context?.jobDetail?.key}: " + e.message, e)
+                    log.fatal("Exception occurred while destroying persistence context for job ${context?.jobDetail?.key}: " + e.message, e)
                 }
             }
 		}
