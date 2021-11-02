@@ -674,6 +674,10 @@ tr.crossed-out td:before {
   height: 28px;
 }
 
+.table-row.text-disabled {
+  background-color: #ddd9d9;
+}
+
 .table-inner-row {
   position: relative;
   height: 28px;

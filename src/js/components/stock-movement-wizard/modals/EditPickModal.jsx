@@ -16,8 +16,15 @@ import Translate, { translateWithDefaultMessage } from '../../../utils/Translate
 const FIELDS = {
   reasonCode: {
     type: SelectField,
-    label: 'react.stockMovement.reasonCode.label',
+    label: () => (
+      <label htmlFor="reasonCode" className="ml-3 text-center">
+        <Translate id="react.stockMovement.reasonCode.label" defaultMessage="Reason code" />
+      </label>
+    ),
     defaultMessage: 'Reason code',
+    attributes: {
+      className: 'mb-2',
+    },
     getDynamicAttr: props => ({
       options: props.reasonCodes,
     }),
@@ -35,11 +42,14 @@ const FIELDS = {
       status: {
         type: LabelField,
         fieldKey: '',
-        flexWidth: '8',
+        fixedWidth: '120px',
         getDynamicAttr: ({ translate }) => ({
           showValueTooltip: true,
           formatValue: (fieldValue) => {
-            if (!fieldValue.status || fieldValue.status === 'AVAILABLE') {
+            if (fieldValue.status === 'AVAILABLE' && fieldValue.pickedRequisitionNumbers.length !== 0) {
+              const status = translate('react.stockMovement.enum.AvailableItemStatus.PICKED', 'PICKED');
+              return status + (fieldValue.pickedRequisitionNumbers ? ` [${fieldValue.pickedRequisitionNumbers}]` : '');
+            } else if (!fieldValue.status || fieldValue.status === 'AVAILABLE') {
               return '';
             }
 
@@ -75,10 +85,19 @@ const FIELDS = {
             </div>),
         },
       },
+      quantityOnHand: {
+        type: LabelField,
+        label: 'react.stockMovement.onHand.label',
+        defaultMessage: 'On Hand',
+        fixedWidth: '150px',
+        attributes: {
+          formatValue: value => (value || value === 0 ? value.toLocaleString('en-US') : null),
+        },
+      },
       quantityAvailable: {
         type: LabelField,
-        label: 'react.stockMovement.quantityAvailable.label',
-        defaultMessage: 'Qty Available',
+        label: 'react.stockMovement.available.label',
+        defaultMessage: 'Available',
         fixedWidth: '150px',
         attributes: {
           formatValue: value => (value || value === 0 ? value.toLocaleString('en-US') : null),
@@ -87,8 +106,9 @@ const FIELDS = {
       quantityPicked: {
         type: TextField,
         fieldKey: '',
-        label: 'react.stockMovement.quantityPicked.label',
-        defaultMessage: 'Qty Picked',
+        label: 'react.stockMovement.picked.label',
+        defaultMessage: 'Picked',
+        headerAlign: 'left',
         fixedWidth: '120px',
         attributes: {
           type: 'number',
