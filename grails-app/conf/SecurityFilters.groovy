@@ -97,7 +97,7 @@ class SecurityFilters {
                     }
 
                     if (RequestUtil.isAjax(request)) {
-                        redirect(controller: "errors", action: "handleUnauthorized")
+                        response.status = 401
                         return false
                     }
 
@@ -110,7 +110,7 @@ class SecurityFilters {
                     session.user = null
 
                     if (RequestUtil.isAjax(request)) {
-                        redirect(controller: "errors", action: "handleUnauthorized")
+                        response.status = 401
                         return false
                     }
 
