@@ -725,13 +725,9 @@ class ShipmentService {
             log.info("Checking shipment item ${shipmentItem?.inventoryItem} quantity [" +
                     shipmentItem.quantity + "] <= quantity available to promise [" + quantityAvailableWithPicked + "]")
             if (duplicatedShipmentItemsQuantity > quantityAvailableWithPicked && origin.supports(ActivityCode.MANAGE_INVENTORY)) {
-                String errorMessage = "Shipping quantity (${shipmentItem.quantity}) can not exceed quantity available (${quantityAvailableWithPicked}) for " +
-                        "product code ''${shipmentItem.product.productCode}'' " +
-                        "and lot number ''${shipmentItem?.inventoryItem?.lotNumber}'' " +
-                        "at origin ''${origin.name}'' " +
-                        "bin ''${shipmentItem?.binLocation?.name ?: 'Default'}''. " +
-                        "This can occur if changes were made to inventory after this shipment was picked but before it shipped. " +
-                        "To move forward, please remove the lines above from the shipment or reduce to reflect current QOH."
+                String errorMessage = "The pick for product code(s) ${shipmentItem.product.productCode} is no longer valid. " +
+                        "This can occur if a stock count, transfer, or recall has been performed on the product since the initial pick was generated. " +
+                        "To address this issue, edit the pick to select a new lot or reduce the pick quantity and add a reason code."
                 shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedAvailableQuantity",
                         [
                                 shipmentItem.quantity + " " + shipmentItem?.product?.unitOfMeasure,
