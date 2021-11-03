@@ -31,19 +31,34 @@ class TripExecutionEventService implements ApplicationListener<TripExecutionEven
         log.info "Trip execution " + tripExecutionEvent.execution.toString()
         SimpleDateFormat dateFormatter = new SimpleDateFormat(grailsApplication.config.openboxes.integration.defaultDateFormat)
         tripExecutionEvent.execution.executionStatus.each { ExecutionStatus executionStatus ->
+
+            // Locate stock movement by tracking number
             String trackingNumber = executionStatus.orderId
             StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber)
             if (!stockMovement) {
-                throw new Exception("Unable to locate stock movement by tracking number ${trackingNumber}")
+                throw new IllegalArgumentException("Unable to locate stock movement by tracking number ${trackingNumber}")
             }
-            Shipment shipment = stockMovement?.shipment
+
+            // Identify event type associated with status
             String statusCode = executionStatus.status
-            EventTypeCode eventCode = statusCode ? EventTypeCode.valueOf(statusCode) : EventTypeCode.UNKNOWN
-            EventType eventType = EventType.findByEventCode(eventCode)
+            EventType eventType = EventType.findByCode(statusCode)
+            if (!eventType) {
+                throw new IllegalArgumentException("Status code ${statusCode} not associated with an event type")
+            }
+
+            // Validate status update
+            Shipment shipment = stockMovement?.shipment
+            if (eventType.eventCode == EventTypeCode.COMPLETED && !shipment.hasShipped()) {
+                throw IllegalStateException("Unable to complete a shipment until it has been shipped")
+            }
+
+            // Create new shipment event to represent status update
+            BigDecimal latitude = executionStatus?.geoData?.latitude
+            BigDecimal longitude = executionStatus?.geoData?.longitude
             Date eventDate = dateFormatter.parse(executionStatus.dateTime)
-            Event event = new Event(eventType: eventType, eventDate: eventDate)
+            Event event = new Event(eventType: eventType, eventDate: eventDate, longitude: longitude, latitude: latitude)
             shipment.addToEvents(event)
-            shipment.save(flush:true)
+            shipment.save(flush: true)
         }
     }
 }
