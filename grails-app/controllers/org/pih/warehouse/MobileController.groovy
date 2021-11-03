@@ -361,7 +361,6 @@ class MobileController {
 
         byte[] fileContents = document.fileContents
         if (Base64.isArrayByteBase64(fileContents)) {
-
             InputStream inputStream = new ByteArrayInputStream(fileContents)
             String contentType = URLConnection.guessContentTypeFromStream(inputStream)
             if (!contentType) {

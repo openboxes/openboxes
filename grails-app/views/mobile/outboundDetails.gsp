@@ -330,15 +330,15 @@
                                 <td>
                                     ${document.name}
                                 </td>
-                                <td class="text-right col-4">
-                                    <a href="${document.uri}" target="_blank"
-                                       class="btn btn-outline-primary">Download</a>
-                                </td>
                                 <td>
                                     <g:if test="${document.id}">
                                         <g:link action="documentDownload" id="${document.id}" target="_blank"
                                            class="btn btn-outline-primary">Download</g:link>
                                     </g:if>
+                                    <g:else>
+                                        <a href="${document.uri}" target="_blank"
+                                           class="btn btn-outline-primary">Download</a>
+                                    </g:else>
                                 </td>
                             </tr>
                         </g:each>
