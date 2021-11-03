@@ -10,6 +10,8 @@
 package org.pih.warehouse
 
 import net.schmizz.sshj.sftp.SFTPException
+import org.apache.commons.io.IOUtils
+import org.apache.commons.net.util.Base64
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.Document
@@ -356,8 +358,26 @@ class MobileController {
 
     def documentDownload = {
         Document document = Document.get(params.id)
+
+        byte[] fileContents = document.fileContents
+        if (Base64.isArrayByteBase64(fileContents)) {
+            InputStream inputStream = new ByteArrayInputStream(fileContents)
+            String contentType = URLConnection.guessContentTypeFromStream(inputStream)
+            if (!contentType) {
+                contentType = URLConnection.guessContentTypeFromName(document.name)
+            }
+            fileContents = Base64.decodeBase64(fileContents)
+
+            response.setHeader "Content-disposition", "attachment;filename=\"${document.name}\""
+            response.contentType = contentType
+            response.outputStream << fileContents
+            response.outputStream.flush()
+            return;
+        }
+        response.setHeader "Content-disposition", "attachment;filename=\"${document.name}\""
         response.contentType = document.contentType
         response.outputStream << document.fileContents
         response.outputStream.flush()
+
     }
 }
