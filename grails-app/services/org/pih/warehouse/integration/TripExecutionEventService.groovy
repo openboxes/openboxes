@@ -49,7 +49,7 @@ class TripExecutionEventService implements ApplicationListener<TripExecutionEven
             // Validate status update
             Shipment shipment = stockMovement?.shipment
             if (eventType.eventCode == EventTypeCode.COMPLETED && !shipment.hasShipped()) {
-                throw IllegalStateException("Unable to complete a shipment until it has been shipped")
+                throw new IllegalStateException("Unable to complete a shipment until it has been shipped")
             }
 
             // Create new shipment event to represent status update
