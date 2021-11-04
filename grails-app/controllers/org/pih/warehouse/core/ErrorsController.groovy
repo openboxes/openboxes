@@ -101,7 +101,6 @@ class ErrorsController {
             }
             render([errorCode: 400,
                     errorMessage: "Validation error. " + request?.exception?.cause?.fullMessage,
-                    data: errors?.allErrors,
                     errorMessages: errorMessages
             ] as JSON)
             return

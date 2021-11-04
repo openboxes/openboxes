@@ -250,18 +250,6 @@
 
                                 </td>
                             </tr>
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="local"><warehouse:message
-                                            code="warehouse.local.label"/></label>
-                                </td>
-                                <td valign="top"
-                                    class="value${hasErrors(bean: locationInstance, field: 'local', 'errors')}">
-                                    <g:checkBox name="local" value="${locationInstance?.local}"
-                                                title="${g.message(code: 'warehouse.local.message')}"/>
-                                </td>
-                            </tr>
-
 
                             <g:if test="${!locationInstance?.isInternalLocation() && !locationInstance?.isZoneLocation()}">
                                 <tr class="prop">
