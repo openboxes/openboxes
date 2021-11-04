@@ -1212,6 +1212,7 @@ class StockMovementService {
 
                 def picklists = getPicklistByLocationAndProduct(it.binLocation, it.inventoryItem)
                 List<String> pickedRequisitionNumbers = picklists?.collect { it.requisition.requestNumber }?.unique()
+                        .findAll {it != requisitionItem.requisition.requestNumber}
                 it.pickedRequisitionNumbers = pickedRequisitionNumbers
             } else if (it.inventoryItem?.recalled) {
                 it.status = AvailableItemStatus.RECALLED
