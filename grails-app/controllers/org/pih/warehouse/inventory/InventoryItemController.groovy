@@ -320,13 +320,13 @@ class InventoryItemController {
         requisitionItems = requisitionService.getPendingRequisitionItems(location, product)
         requisitionItems.groupBy { it.requisition }.collect { k, v ->
             itemsMap.put(k, [
+                    picklistItemsByLot: k?.picklist?.getPicklistItemsByLot(product),
                     quantityRequested: v.quantity.sum(),
                     quantityRequired: v.sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityRequired() },
                     quantityPicked: v.sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityPicked() },
             ]
             )
         }
-
 
         log.info "itemsMap: " + itemsMap
 
