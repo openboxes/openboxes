@@ -114,7 +114,9 @@ const FIELDS = {
           type: 'number',
         },
         getDynamicAttr: ({ fieldValue }) => ({
-          disabled: fieldValue && !fieldValue.quantityAvailable,
+          disabled: fieldValue
+              && !fieldValue.quantityAvailable
+              && !fieldValue.quantityPicked,
         }),
       },
     },
