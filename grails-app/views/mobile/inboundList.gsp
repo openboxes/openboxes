@@ -42,7 +42,7 @@
                     <th><g:message code="requisition.orderNumber.label"/></th>
                     <th><g:message code="stockMovement.origin.label"/></th>
                     <th><g:message code="stockMovement.destination.label" default="Destination"/></th>
-                    <th><g:message code="stockMovement.requestedDeliveryDate.label" default="Requested Delivery Date"/></th>
+                    <th><g:message code="stockMovement.expectedDeliveryDate.label" default="Expected Delivery Date"/></th>
                     <th></th>
                 </tr>
             </thead>

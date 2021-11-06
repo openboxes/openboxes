@@ -63,20 +63,20 @@ class InboundStockMovementDataService {
         String productCode = params.productCode
         Product product = Product.findByProductCode(productCode)
         if(!product) {
-            throw new IllegalArgumentException("Product not found for ${productCode}")
+            throw new IllegalArgumentException("Product not found for product code ${productCode}")
         }
 
         def quantity = params.quantity as Integer
         if (!(quantity > 0)) {
-            throw new IllegalArgumentException("Requested quantity should be greater than 0")
+            throw new IllegalArgumentException("Requested quantity (${params.quantity}) should be greater than 0")
         }
 
         if (!isDateOneWeekFromNow(params.deliveryDate)) {
-            throw new IllegalArgumentException("Delivery date must be after seven days from now")
+            throw new IllegalArgumentException("Delivery date ${params.shipmentNumber} must be after seven days from now")
         }
 
         def expectedDeliveryDate =
-                new SimpleDateFormat("yyyy-mm-dd").parse(params.deliveryDate.toString())
+                new SimpleDateFormat("yyyy-MM-dd").parse(params.deliveryDate.toString())
 
         def shipmentNumber = params.shipmentNumber
         def shipment = Shipment.findByShipmentNumber(shipmentNumber)
@@ -94,20 +94,22 @@ class InboundStockMovementDataService {
             shipmentService.createShipmentEvent(shipment, new Date(), EventTypeCode.CREATED, location)
         }
 
+        InventoryItem inventoryItem =
+                inventoryService.findOrCreateInventoryItem(product, null, null)
+
         ShipmentItem shipmentItem = ShipmentItem.createCriteria().get {
             eq "product" , product
+            eq "inventoryItem", inventoryItem
             eq "shipment", shipment
         }
 
         if (!shipmentItem) {
             shipmentItem = new ShipmentItem()
         }
-
-        InventoryItem inventoryItem =
-                inventoryService.findOrCreateInventoryItem(product, null, null)
-
         shipmentItem.product = product
         shipmentItem.inventoryItem = inventoryItem
+        shipmentItem.lotNumber = inventoryItem.lotNumber
+        shipmentItem.expirationDate = inventoryItem.expirationDate
         shipmentItem.quantity = quantity
         shipment.addToShipmentItems(shipmentItem)
 

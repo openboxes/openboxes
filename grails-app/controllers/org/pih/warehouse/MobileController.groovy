@@ -181,8 +181,12 @@ class MobileController {
                 if (dataImporter) {
                     println "Using data importer ${dataImporter.class.name}"
                     command.data = dataImporter.data
-                    dataImporter.validateData(command)
-                    command.columnMap = dataImporter.columnMap
+                    try {
+                        dataImporter.validateData(command)
+                        command.columnMap = dataImporter.columnMap
+                    } catch (Exception e) {
+                        flash.message = e.message
+                    }
                 }
 
                 if (command?.data?.isEmpty()) {
