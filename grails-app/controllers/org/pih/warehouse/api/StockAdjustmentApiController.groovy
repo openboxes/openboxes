@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.validation.ValidationException
 import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.core.Constants
@@ -37,11 +38,18 @@ class StockAdjustmentApiController {
         stockAdjustments.each { StockAdjustment stockAdjustment ->
             AdjustStockCommand adjustStockCommand = new AdjustStockCommand()
             adjustStockCommand.inventoryItem = stockAdjustment.inventoryItem
-            adjustStockCommand.quantity = stockAdjustment.quantityAdjusted
+            adjustStockCommand.currentQuantity = stockAdjustment.quantityAvailable
+            adjustStockCommand.newQuantity = stockAdjustment.quantityAdjusted
             adjustStockCommand.comment = stockAdjustment.comments
             adjustStockCommand.location = location
             adjustStockCommand.binLocation = stockAdjustment.binLocation
+            adjustStockCommand.reasonCode = stockAdjustment.reasonCode
             inventoryService.adjustStock(adjustStockCommand)
+
+            if (adjustStockCommand.hasErrors()) {
+                throw new ValidationException("Unable to adjust stock", adjustStockCommand.errors)
+            }
+
         }
 
         render([data: stockAdjustments] as JSON)
