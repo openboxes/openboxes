@@ -17,6 +17,8 @@ import org.pih.warehouse.core.LocationTypeCode
 class InternalLocationApiController {
 
     def locationService
+    def inventoryService
+    def productAvailabilityService
 
     def list = {
         String locationId = params?.location?.id ?: session?.warehouse?.id
@@ -54,8 +56,31 @@ class InternalLocationApiController {
     }
 
     def read = {
-        Location location = Location.get(params.id)
+        Location location = locationService.getLocation(params.id)
         render([data: location] as JSON)
+    }
+
+
+    def details = {
+        Location internalLocation = locationService.getLocation(params.id)
+        Map data = internalLocation.toJson()
+        def availableItems = productAvailabilityService.getAvailableItems(internalLocation.parentLocation, internalLocation)
+        data.availableItems = availableItems.collect { AvailableItem availableItem ->
+            [
+                    "product.id" : availableItem?.inventoryItem?.product?.id,
+                    "product.productCode" : availableItem?.inventoryItem?.product?.productCode,
+                    "product.name" : availableItem?.inventoryItem?.product?.name,
+                    "inventoryItem.id" : availableItem?.inventoryItem?.id,
+                    "inventoryItem.lotNumber" : availableItem?.inventoryItem?.lotNumber,
+                    "inventoryItem.expirationDate" : availableItem?.inventoryItem?.expirationDate,
+                    "binLocation.id" : availableItem?.binLocation?.id,
+                    "binLocation.name" : availableItem?.binLocation?.name,
+                    "quantityAvailable" : availableItem?.quantityAvailable,
+                    "quantityOnHand" : availableItem?.quantityOnHand,
+            ]
+        }
+        render([data: data] as JSON)
+
     }
 
 }

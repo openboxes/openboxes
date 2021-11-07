@@ -18,7 +18,7 @@ import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.hibernate.Criteria
 import org.pih.warehouse.api.AvailableItem
-import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.api.AvailableItemStatus
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -519,6 +519,38 @@ class ProductAvailabilityService {
             }
         }
         return data
+    }
+
+    List<AvailableItem> getAvailableItems(Location location, Location internalLocation) {
+        def data = []
+        if (location) {
+            def results = ProductAvailability.executeQuery("""
+						select 
+						    pa.product, 
+						    ii,
+						    pa.binLocation,
+						    pa.quantityOnHand,
+						    pa.quantityAvailableToPromise
+						from ProductAvailability pa
+						left outer join pa.inventoryItem ii
+						left outer join pa.binLocation bl
+						where pa.location = :location
+						and pa.binLocation = :internalLocation
+						""", [location: location, internalLocation: internalLocation])
+
+            data = results.collect {
+
+                return new AvailableItem(
+                        inventoryItem: it[1],
+                        binLocation: it[2],
+                        quantityAvailable: it[4],
+                        quantityOnHand: it[3],
+                        status: AvailableItemStatus.AVAILABLE
+                )
+            }
+        }
+        return data
+
     }
 
     Map<InventoryItem, Integer> getQuantityOnHandByInventoryItem(Location location) {
