@@ -330,9 +330,6 @@ class StockMovementService {
             def shipments = stockMovement?.requisition?.shipments
             shipments.toArray().each { Shipment shipment ->
                 stockMovement?.requisition.removeFromShipments(shipment)
-                if (!shipment?.events?.empty) {
-                    shipmentService.rollbackLastEvent(shipment)
-                }
                 shipmentService.deleteShipment(shipment)
             }
             requisitionService.deleteRequisition(stockMovement?.requisition)
