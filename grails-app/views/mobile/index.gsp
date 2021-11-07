@@ -12,10 +12,10 @@
         <div class="col col-md-12 float-end">
 
             <button type="button" class="btn btn-outline-primary"
-                data-bs-toggle="modal" data-bs-target="#inboundModal"><i class="fa fa-file-import"></i> Import Orders</button>
+                data-bs-toggle="modal" data-bs-target="#inboundModal"><i class="fa fa-file-import"></i> Import Inbound Orders</button>
 
             <button type="button" class="btn btn-outline-primary"
-                data-bs-toggle="modal" data-bs-target="#outboundModal"><i class="fa fa-file-import"></i> Import Orders</button>
+                data-bs-toggle="modal" data-bs-target="#outboundModal"><i class="fa fa-file-import"></i> Import Outbound Orders</button>
 
         </div>
     </div>

@@ -14,15 +14,19 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.EventTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentType
 import org.springframework.validation.BeanPropertyBindingResult
 
+import java.text.SimpleDateFormat
+
 class InboundStockMovementDataService {
 
     def shipmentService
+    def inventoryService
 
     Boolean validateData(ImportDataCommand command) {
         log.info "Validate data " + command.filename
@@ -59,44 +63,53 @@ class InboundStockMovementDataService {
         String productCode = params.productCode
         Product product = Product.findByProductCode(productCode)
         if(!product) {
-            throw new IllegalArgumentException("Product not found for ${productCode}")
+            throw new IllegalArgumentException("Product not found for product code ${productCode}")
         }
 
         def quantity = params.quantity as Integer
         if (!(quantity > 0)) {
-            throw new IllegalArgumentException("Requested quantity should be greater than 0")
+            throw new IllegalArgumentException("Requested quantity (${params.quantity}) should be greater than 0")
         }
 
-        def expectedDeliveryDate = params.deliveryDate
-        if (!isDateOneWeekFromNow(expectedDeliveryDate)) {
-            throw new IllegalArgumentException("Delivery date must be after seven days from now")
+        if (!isDateOneWeekFromNow(params.deliveryDate)) {
+            throw new IllegalArgumentException("Delivery date ${params.shipmentNumber} must be after seven days from now")
         }
+
+        def expectedDeliveryDate =
+                new SimpleDateFormat("yyyy-MM-dd").parse(params.deliveryDate.toString())
 
         def shipmentNumber = params.shipmentNumber
         def shipment = Shipment.findByShipmentNumber(shipmentNumber)
         if (!shipment) {
             shipment = new Shipment()
             shipment.name = "Inbound Order ${shipmentNumber}"
+            shipment.description = "Inbound Order ${shipmentNumber}"
             shipment.origin = findLocationByLocationNumber(params.origin)
             shipment.destination = findLocationByLocationNumber(params.destination)
-            shipment.expectedShippingDate = new Date()
-            shipment.expectedDeliveryDate = params.expectedDeliveryDate
+            shipment.expectedShippingDate = expectedDeliveryDate
+            shipment.expectedDeliveryDate = expectedDeliveryDate
             shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
             shipment.shipmentNumber = shipmentNumber
             shipment.save(failOnError: true)
             shipmentService.createShipmentEvent(shipment, new Date(), EventTypeCode.CREATED, location)
         }
 
+        InventoryItem inventoryItem =
+                inventoryService.findOrCreateInventoryItem(product, null, null)
+
         ShipmentItem shipmentItem = ShipmentItem.createCriteria().get {
             eq "product" , product
+            eq "inventoryItem", inventoryItem
             eq "shipment", shipment
         }
 
         if (!shipmentItem) {
             shipmentItem = new ShipmentItem()
         }
-
         shipmentItem.product = product
+        shipmentItem.inventoryItem = inventoryItem
+        shipmentItem.lotNumber = inventoryItem.lotNumber
+        shipmentItem.expirationDate = inventoryItem.expirationDate
         shipmentItem.quantity = quantity
         shipment.addToShipmentItems(shipmentItem)
 
