@@ -221,6 +221,11 @@ class UrlMappings {
             action = [GET: "listReceiving"]
         }
 
+        "/api/internalLocations/$id/details"(parseRequest: true) {
+            controller = "internalLocationApi"
+            action = [GET: "details"]
+        }
+
         // Stocklist Item API
 
         "/api/stocklistItems/availableStocklists"(parseRequest: true) {
