@@ -832,6 +832,13 @@ class ShipmentService {
      * @param shipment
      */
     void deleteShipment(Shipment shipment) {
+
+        // Remove all events
+        shipment?.events?.each {
+            rollbackLastEvent(shipment)
+        }
+
+        // Remove all shipment items
         shipment.shipmentItems.toArray().each { ShipmentItem shipmentItem ->
             shipment.removeFromShipmentItems(shipmentItem)
             shipmentItem.orderItems.toArray().flatten().each { OrderItem orderItem ->
@@ -839,6 +846,8 @@ class ShipmentService {
             }
             shipmentItem.delete()
         }
+
+        // Delete shipment
         shipment.delete()
     }
 
