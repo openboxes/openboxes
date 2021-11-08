@@ -676,7 +676,7 @@ class OrderService {
                     if (quantity == "") {
                         throw new IllegalArgumentException("Missing quantity.")
                     }
-                    Integer parsedQty = Integer.valueOf(quantity)
+                    Integer parsedQty = java.text.NumberFormat.instance.parse(quantity)
                     if (parsedQty <= 0) {
                         throw new IllegalArgumentException("Wrong quantity value: ${parsedQty}.")
                     }

@@ -800,13 +800,14 @@ class OrderController {
                 String quantityString = formatNumber(number: orderItem?.quantity, maxFractionDigits: 1, minFractionDigits: 1)
                 String unitPriceString = formatNumber(number: orderItem?.unitPrice, maxFractionDigits: 4, minFractionDigits: 2)
                 String totalPriceString = formatNumber(number: orderItem?.totalPrice(), maxFractionDigits: 2, minFractionDigits: 2)
-                String unitOfMeasure = orderItem?.quantityUom ? "${orderItem?.quantityUom?.code}/${orderItem?.quantityPerUom}" : orderItem?.unitOfMeasure
+                String quantityPerUom = formatNumber(number: orderItem?.quantityPerUom, maxFractionDigits: 2, minFractionDigits: 0)
+                String unitOfMeasure = orderItem?.quantityUom ? "${orderItem?.quantityUom?.code}/${quantityPerUom}" : orderItem?.unitOfMeasure
 
                 csv += "${orderItem?.id}," +
                         "${orderItem?.product?.productCode}," +
                         "${StringEscapeUtils.escapeCsv(orderItem?.product?.name)}," +
                         "${orderItem?.productSupplier?.code ?: ''}," +
-                        "${StringEscapeUtils.escapeCsv(orderItem?.productSupplier?.name)}," +
+                        "${StringEscapeUtils.escapeCsv(orderItem?.productSupplier?.name ?: '')}," +
                         "${orderItem?.productSupplier?.supplierCode ?: ''}," +
                         "${orderItem?.productSupplier?.manufacturer?.name ?: ''}," +
                         "${orderItem?.productSupplier?.manufacturerCode ?: ''}," +
