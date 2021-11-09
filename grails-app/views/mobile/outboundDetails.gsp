@@ -202,8 +202,6 @@
                             <th>
                             </th>
                             <th>
-                            </th>
-                            <th>
                                 <g:message code="product.productCode.label"/>
                             </th>
                             <th>
@@ -229,12 +227,9 @@
                                              class="img-fluid"/>
                                     </g:else>
                                 </td>
-                                <td class="col-1">
-                                    <g:displayBarcode showData="${false}"
-                                                      data="${item?.product?.productCode}"/>
-                                </td>
                                 <td class="col-2">
-                                    ${item?.product?.productCode}
+                                    <g:displayBarcode showData="${true}"
+                                                      data="${item?.product?.productCode}"/>
                                 </td>
                                 <td class="col-6">
                                     ${item?.product?.name}
