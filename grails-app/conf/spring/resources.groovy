@@ -19,10 +19,8 @@ beans = {
     /**
      * See OBS-863
      */
-    beans = {
-        quartzPersistenceContextJobListener(PersistenceContextJobListener) {
-            persistenceInterceptor = ref('persistenceInterceptor')
-        }
+    quartzPersistenceContextJobListener(PersistenceContextJobListener) {
+        persistenceInterceptor = ref('persistenceInterceptor')
     }
 
     /**
