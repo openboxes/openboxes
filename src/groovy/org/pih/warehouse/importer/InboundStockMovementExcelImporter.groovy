@@ -23,7 +23,7 @@ class InboundStockMovementExcelImporter extends AbstractExcelImporter {
                     'D': 'productCode', // 'SKU Code',
                     'E': 'quantity', // 'Requested Quantity',
                     'H': 'deliveryDate', // 'Delivery Date',
-                    'I': 'shipmentNumber', // 'Load Code',
+                    'I': 'loadCode', // 'Load Code',
                     'J': 'specialInstructions' // 'Special Instructions'
             ]
     ]
@@ -34,7 +34,7 @@ class InboundStockMovementExcelImporter extends AbstractExcelImporter {
             "productCode"       : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
             "quantity": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue: null]),
             "deliveryDate": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "shipmentNumber": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            "loadCode": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
             "specialInstructions": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null])
     ]
 

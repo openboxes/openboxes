@@ -125,8 +125,9 @@ class MobileController {
 
     def inboundList = {
         Location destination = Location.get(session.warehouse.id)
+        Location origin = params.origin?Location.get(params.origin.id):null
 
-        StockMovement stockMovement = new StockMovement(destination: destination, stockMovementType: StockMovementType.INBOUND)
+        StockMovement stockMovement = new StockMovement(origin: origin, destination: destination, stockMovementType: StockMovementType.INBOUND)
         if (params.status) {
             ShipmentStatusCode shipmentStatusCode = params.status as ShipmentStatusCode
             stockMovement.stockMovementStatusCode = ShipmentStatusCode.toStockMovementStatus(shipmentStatusCode)
@@ -179,37 +180,34 @@ class MobileController {
                     dataImporter = new InboundStockMovementExcelImporter(command.filename, xlsFile.inputStream)
 
                 if (dataImporter) {
-                    println "Using data importer ${dataImporter.class.name}"
-                    command.data = dataImporter.data
+                    log.info "Using data importer ${dataImporter.class.name}"
                     try {
+                        command.data = dataImporter.data
                         dataImporter.validateData(command)
                         command.columnMap = dataImporter.columnMap
-                    } catch (Exception e) {
-                        flash.message = e.message
-                    }
-                }
 
-                if (command?.data?.isEmpty()) {
-                    command.errors.reject("importFile", "${warehouse.message(code: 'inventoryItem.pleaseEnsureDate.message', args: [dataImporter.columnMap?.sheet ?: 'Sheet1', localFile.getAbsolutePath()])}")
-                }
+                        if (command?.data?.isEmpty()) {
+                            command.errors.reject("importFile", "${warehouse.message(code: 'inventoryItem.pleaseEnsureDate.message', args: [dataImporter.columnMap?.sheet ?: 'Sheet1', localFile.getAbsolutePath()])}")
+                        }
 
-                if (!command.hasErrors()) {
-                    log.info "${command.data.size()} rows of data is about to be imported ..."
-                    try {
-                        dataImporter.importData(command)
+                        if (!command.hasErrors()) {
+                            log.info "${command.data.size()} rows of data is about to be imported ..."
+                            dataImporter.importData(command)
+                            if (!command.errors.hasErrors()) {
+                                flash.message = "${warehouse.message(code: 'inventoryItem.importSuccess.message', args: [xlsFile?.originalFilename])}"
+                            }
+                        } else {
+                            flash.command = command
+                        }
                     } catch (Exception e) {
-                        command.errors.reject(e.message)
+                        log.error("An exception occurred while importing data " + e.message, e)
+                        flash.message = e?.message
                     }
-                    if (!command.errors.hasErrors()) {
-                        flash.message = "${warehouse.message(code: 'inventoryItem.importSuccess.message', args: [xlsFile?.originalFilename])}"
-                    }
-                } else {
-                    log.info "There are some errors ${command.errors}"
-                    flash.message = "There are some validation errors"
                 }
             }
         }
-        redirect  action: (params.type == "outbound" ? 'outboundList' : 'inboundList')
+        def action = (params.type == "outbound" ? 'outboundList' : 'inboundList')
+        redirect (action: action)
     }
 
     def inboundDetails = {

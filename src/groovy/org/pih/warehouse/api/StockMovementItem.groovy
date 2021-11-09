@@ -2,6 +2,7 @@ package org.pih.warehouse.api
 
 import org.apache.commons.lang.math.NumberUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.codehaus.groovy.grails.validation.Validateable
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -12,6 +13,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.ShipmentItem
 
+@Validateable
 class StockMovementItem {
 
     String id

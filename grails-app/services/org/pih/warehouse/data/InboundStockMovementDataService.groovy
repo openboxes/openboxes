@@ -10,16 +10,15 @@
 package org.pih.warehouse.data
 
 import org.joda.time.LocalDate
-import org.pih.warehouse.core.Constants
-import org.pih.warehouse.core.EventTypeCode
+import org.pih.warehouse.api.StockMovement
+import org.pih.warehouse.api.StockMovementItem
+import org.pih.warehouse.api.StockMovementType
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.ImportDataCommand
-import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.shipping.ShipmentItem
-import org.pih.warehouse.shipping.ShipmentType
-import org.springframework.validation.BeanPropertyBindingResult
+import org.pih.warehouse.requisition.RequisitionSourceType
+import org.pih.warehouse.requisition.RequisitionType
 
 import java.text.SimpleDateFormat
 
@@ -27,94 +26,91 @@ class InboundStockMovementDataService {
 
     def shipmentService
     def inventoryService
+    def stockMovementService
 
-    Boolean validateData(ImportDataCommand command) {
-        log.info "Validate data " + command.filename
-        command.data.eachWithIndex { params, index ->
-            if (!params?.origin) {
-                throw new IllegalArgumentException("Row ${index + 1}: Origin is required")
-            }
-            if (!params?.quantity) {
-                throw new IllegalArgumentException("Row ${index + 1}: Quantity is required")
-            }
-            ShipmentItem shipmentItem = buildShipmentItem(params, command.location)
-            if (!shipmentItem.validate()) {
-                shipmentItem.errors.each { BeanPropertyBindingResult error ->
-                    command.errors.reject("${index + 1}: ${shipmentItem} ${error.getFieldError()}")
+    void validateData(ImportDataCommand command) {
+        buildStockMovements(command)
+    }
+
+    void importData(ImportDataCommand command) {
+        buildStockMovements(command).each { StockMovement stockMovement ->
+            if (stockMovement.validate()) {
+                if (!stockMovement.id) {
+                    stockMovementService.createStockMovement(stockMovement)
+                }
+                else {
+                    stockMovementService.updateStockMovement(stockMovement)
                 }
             }
         }
     }
 
-    void importData(ImportDataCommand command) {
-        log.info "Import data " + command.filename
-        command.data.eachWithIndex {params, index ->
-            ShipmentItem shipmentItem = buildShipmentItem(params, command.location)
-            if(shipmentItem.validate()){
-                shipmentItem.save(failOnError: true)
+    List<StockMovement> buildStockMovements(ImportDataCommand command) {
+        log.info "building stock movements"
+        List<StockMovement> stockMovements = new ArrayList<StockMovement>()
+        command.data.groupBy { it.loadCode }.each { loadCode, rows ->
+            StockMovement stockMovement = buildStockMovement(command, rows[0])
+            rows.each { row ->
+                StockMovementItem stockMovementItem = buildStockMovementItem(command, row)
+                stockMovementItem.stockMovement = stockMovement
+                stockMovement.lineItems.add(stockMovementItem)
             }
+            stockMovements.add(stockMovement)
         }
+        return stockMovements
     }
 
-    ShipmentItem buildShipmentItem(Map params, Location location) {
 
-        log.info "Build shipment item " + params
+    StockMovement buildStockMovement(ImportDataCommand command, Map params) {
+        StockMovement stockMovement =
+                stockMovementService.getStockMovementByIdentifier(params.loadCode)
 
-        String productCode = params.productCode
-        Product product = Product.findByProductCode(productCode)
-        if(!product) {
-            throw new IllegalArgumentException("Product not found for product code ${productCode}")
-        }
-
-        def quantity = params.quantity as Integer
-        if (!(quantity > 0)) {
-            throw new IllegalArgumentException("Requested quantity (${params.quantity}) should be greater than 0")
+        if (!stockMovement) {
+            stockMovement = new StockMovement()
         }
 
         if (!isDateOneWeekFromNow(params.deliveryDate)) {
-            throw new IllegalArgumentException("Delivery date ${params.shipmentNumber} must be after seven days from now")
+            command.errors.reject("Delivery date ${params.deliveryDate} for ${params.loadCode} must be more than seven (7) days away from today")
         }
 
         def expectedDeliveryDate =
                 new SimpleDateFormat("yyyy-MM-dd").parse(params.deliveryDate.toString())
 
-        def shipmentNumber = params.shipmentNumber
-        def shipment = Shipment.findByShipmentNumber(shipmentNumber)
-        if (!shipment) {
-            shipment = new Shipment()
-            shipment.name = "Inbound Order ${shipmentNumber}"
-            shipment.description = "Inbound Order ${shipmentNumber}"
-            shipment.origin = findLocationByLocationNumber(params.origin)
-            shipment.destination = findLocationByLocationNumber(params.destination)
-            shipment.expectedShippingDate = expectedDeliveryDate
-            shipment.expectedDeliveryDate = expectedDeliveryDate
-            shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
-            shipment.shipmentNumber = shipmentNumber
-            shipment.save(failOnError: true)
-            shipmentService.createShipmentEvent(shipment, new Date(), EventTypeCode.CREATED, location)
-        }
 
-        InventoryItem inventoryItem =
-                inventoryService.findOrCreateInventoryItem(product, null, null)
-
-        ShipmentItem shipmentItem = ShipmentItem.createCriteria().get {
-            eq "product" , product
-            eq "inventoryItem", inventoryItem
-            eq "shipment", shipment
-        }
-
-        if (!shipmentItem) {
-            shipmentItem = new ShipmentItem()
-        }
-        shipmentItem.product = product
-        shipmentItem.inventoryItem = inventoryItem
-        shipmentItem.lotNumber = inventoryItem.lotNumber
-        shipmentItem.expirationDate = inventoryItem.expirationDate
-        shipmentItem.quantity = quantity
-        shipment.addToShipmentItems(shipmentItem)
-
-        return shipmentItem
+        stockMovement.identifier = params.loadCode
+        stockMovement.description = ""
+        stockMovement.stockMovementType = StockMovementType.INBOUND
+        stockMovement.requestType = RequisitionType.DEFAULT
+        stockMovement.sourceType = RequisitionSourceType.PAPER
+        stockMovement.origin = findLocationByLocationNumber(params.origin)
+        stockMovement.destination = findLocationByLocationNumber(params.destination)
+        stockMovement.dateRequested = new Date()
+        stockMovement.requestedBy = AuthService.currentUser.get()
+        stockMovement.requestedDeliveryDate = expectedDeliveryDate
+        stockMovement.expectedShippingDate = expectedDeliveryDate
+        stockMovement.expectedDeliveryDate = expectedDeliveryDate
+        return stockMovement
     }
+
+    StockMovementItem buildStockMovementItem(ImportDataCommand command, Map params) {
+        StockMovementItem stockMovementItem = new StockMovementItem()
+
+        String productCode = params.productCode
+        Product product = Product.findByProductCode(productCode)
+        if(!product) {
+            command.errors.reject("Product not found for product code ${productCode}")
+        }
+
+        def quantityRequested = params.quantity as Integer
+        if (!(quantityRequested > 0)) {
+            command.errors.reject("Requested quantity (${quantityRequested}) for ${productCode} should be greater than 0")
+        }
+
+        stockMovementItem.product = product
+        stockMovementItem.quantityRequested = quantityRequested
+        return stockMovementItem
+    }
+
 
     Location findLocationByLocationNumber(String locationNumber) {
         Location location = Location.findByLocationNumber(locationNumber)
