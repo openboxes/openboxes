@@ -65,7 +65,7 @@ class PicklistItem implements Serializable {
         sortOrder(nullable: true)
     }
 
-    static transients = ['associatedLocation', 'associatedProducts', 'disableRefresh']
+    static transients = ['associatedLocation', 'associatedProducts', 'disableRefresh', 'pickable']
 
     String getAssociatedLocation() {
         return requisitionItem ? requisitionItem?.requisition?.origin?.id : orderItem?.order?.origin?.id
@@ -73,6 +73,10 @@ class PicklistItem implements Serializable {
 
     List getAssociatedProducts() {
         return [inventoryItem?.product?.id]
+    }
+
+    Boolean isPickable() {
+        return (inventoryItem ? inventoryItem.pickable : true) && (binLocation ? binLocation.pickable : true)
     }
 
     Map toJson() {

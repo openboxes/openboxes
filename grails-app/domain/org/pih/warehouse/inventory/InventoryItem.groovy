@@ -54,7 +54,7 @@ class InventoryItem implements Serializable {
     Date dateCreated
     Date lastUpdated
 
-    static transients = ['quantity', 'quantityOnHand', 'quantityAvailableToPromise', 'expirationStatus', 'associatedProducts', 'disableRefresh', 'recalled', 'autoPickable']
+    static transients = ['quantity', 'quantityOnHand', 'quantityAvailableToPromise', 'expirationStatus', 'associatedProducts', 'disableRefresh', 'recalled', 'pickable']
 
     static belongsTo = [product: Product]
 
@@ -137,7 +137,7 @@ class InventoryItem implements Serializable {
         return lotStatus == LotStatusCode.RECALLED
     }
 
-    Boolean isAutoPickable() {
+    Boolean isPickable() {
         return !recalled
     }
 }

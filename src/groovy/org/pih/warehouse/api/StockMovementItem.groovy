@@ -313,8 +313,8 @@ class AvailableItem {
         quantityAvailable(nullable: true)
     }
 
-    Boolean isAutoPickable() {
-        return inventoryItem?.autoPickable
+    Boolean isPickable() {
+        return (inventoryItem ? inventoryItem.pickable : true) && (binLocation ? binLocation.pickable : true)
     }
 
     Map toJson() {
