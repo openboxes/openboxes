@@ -556,18 +556,17 @@ class StockMovementService {
 
     StockMovement getStockMovementByIdentifier(String identifier) {
         log.info "Find by identifier ${identifier}"
+        StockMovement stockMovement
         Requisition requisition = Requisition.findByRequestNumber(identifier)
         if (requisition) {
-            return getStockMovement(requisition?.id)
+            stockMovement = getStockMovement(requisition?.id)
         } else {
             Shipment shipment = Shipment.findByShipmentNumber(identifier)
             if (shipment) {
-                return getStockMovement(shipment?.id)
-            }
-            else {
-                throw new ObjectNotFoundException(id, StockMovement.class.toString())
+                stockMovement = getStockMovement(shipment?.id)
             }
         }
+        return stockMovement
     }
 
     StockMovement getStockMovement(String id) {
@@ -1626,6 +1625,9 @@ class StockMovementService {
         if (!stockMovement.identifier && !requisition.requestNumber) {
             requisition.requestNumber = identifierService.generateRequisitionIdentifier()
         }
+        else {
+            requisition.requestNumber = stockMovement.identifier
+        }
         requisition.type = stockMovement.requestType
         requisition.sourceType = stockMovement.sourceType
         requisition.requisitionTemplate = stockMovement.stocklist
@@ -1634,6 +1636,7 @@ class StockMovementService {
         requisition.origin = stockMovement.origin
         requisition.requestedBy = stockMovement.requestedBy
         requisition.dateRequested = stockMovement.dateRequested
+        requisition.requestedDeliveryDate = stockMovement.requestedDeliveryDate
         requisition.name = stockMovement.generateName()
         requisition.requisitionItems = []
 
