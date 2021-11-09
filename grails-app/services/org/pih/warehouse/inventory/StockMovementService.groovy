@@ -824,7 +824,7 @@ class StockMovementService {
                 .inject([:]) {map, item -> map << [(item.id): item]}
 
         Requisition requisition = Requisition.get(data.first()?.requisition_id)
-        def picklistItemsMap = requisition?.getPicklist()?.picklistItems?.groupBy { it.requisitionItem.product.id }
+        def picklistItemsMap = requisition?.picklist?.pickablePicklistItemsByProductId
 
         def editPageItems = data.collect {
             def substitutionItems = substitutionItemsMap[it.id]
