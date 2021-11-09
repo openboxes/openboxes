@@ -37,11 +37,9 @@ class InboundStockMovementDataService {
             if (stockMovement.validate()) {
                 if (!stockMovement.id) {
                     stockMovementService.createStockMovement(stockMovement)
-                    //stockMovementService.updateItems(stockMovement)
                 }
                 else {
-                    stockMovement = stockMovementService.updateStockMovement(stockMovement)
-                    stockMovementService.updateItems(stockMovement)
+                    stockMovementService.updateStockMovement(stockMovement)
                 }
             }
         }
