@@ -64,19 +64,18 @@
                 <div class="col-12 col-sm-2 text-center company-info">
                     <span class="text-muted d-block">Ordered On</span>
                     <span class="text-4 font-weight-500 text-dark mt-1 mt-lg-0">
-                        ${g.formatDate(date: stockMovement.dateCreated)}
+                        ${g.formatDate(date: stockMovement.dateRequested, type: "datetime")}
                     </span>
                 </div>
                 <div class="col-12 col-sm-2 text-center time-info mt-3 mt-sm-0">
                     <span class="text-muted d-block">Expected Delivery</span>
 
                     <div class="text-5 font-weight-500 text-dark">
-                        ${g.formatDate(date: stockMovement.expectedDeliveryDate)}
+                        ${g.formatDate(date: stockMovement.expectedDeliveryDate, type: "datetime")}
                     </div>
                     <g:if test="${stockMovement?.expectedDeliveryDate && stockMovement.expectedDeliveryDate < new Date()}">
                         <div class="badge badge-pill bg-danger">Delayed - Expected ${prettyDateFormat(date: stockMovement?.expectedDeliveryDate)}</div>
                     </g:if>
-                    <g:else>Not Available</g:else>
                 </div>
                 <div class="col-12 col-sm-2 text-center time-info mt-3 mt-sm-0">
                     <span class="text-muted d-block">Tracking Number</span>
@@ -141,8 +140,6 @@
                                     <th>
                                     </th>
                                     <th>
-                                    </th>
-                                    <th>
                                         <g:message code="product.productCode.label"/>
                                     </th>
                                     <th>
@@ -165,11 +162,8 @@
                                                 <img src="${resource(dir: 'images', file: 'default-product.png')}" class="img-fluid"/>
                                             </g:else>
                                         </td>
-                                        <td class="col-1">
-                                            <g:displayBarcode showData="${false}" data="${item?.product?.productCode}"/>
-                                        </td>
                                         <td class="col-2">
-                                            ${item?.product?.productCode}
+                                            <g:displayBarcode showData="${true}" data="${item?.product?.productCode}"/>
                                         </td>
                                         <td class="col-6">
                                             ${item?.product?.name}
