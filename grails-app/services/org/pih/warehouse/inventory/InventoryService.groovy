@@ -13,12 +13,10 @@ import grails.orm.PagedResultList
 import grails.validation.ValidationException
 import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringUtils
-import org.hibernate.Criteria
 import org.hibernate.criterion.CriteriaSpecification
 import org.joda.time.LocalDate
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
-import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
@@ -1567,6 +1565,11 @@ class InventoryService implements ApplicationContextAware {
             inventoryItem.lotNumber = lotNumber
             inventoryItem.expirationDate = expirationDate
             inventoryItem.product = product
+
+            if (!inventoryItem.validate()) {
+                throw new ValidationException("Inventory Item ${lotNumber} is invalid", inventoryItem.errors)
+            }
+
             inventoryItem.save(flush: true)
         }
         return inventoryItem
@@ -1582,6 +1585,7 @@ class InventoryService implements ApplicationContextAware {
             inventoryItem.product = product
         }
         inventoryItem.expirationDate = expirationDate
+        inventoryItem.disableRefresh = Boolean.TRUE
 
         return inventoryItem.save(flush: true)
     }

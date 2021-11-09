@@ -9,6 +9,8 @@
  **/
 package org.pih.warehouse.core
 
+import java.text.SimpleDateFormat
+
 
 class MessageService {
 
@@ -19,6 +21,14 @@ class MessageService {
     }
 
     String getMessage(String messageCode, Object[] args, String defaultMessage, Locale locale) {
-        return grailsApplication.getMainContext().getMessage(messageCode, args, defaultMessage, locale)
+        def arguments = args?.collect {
+            // messageSource will throw a NullPointerException if any of the arguments is a Date, as a workaround it can be changed to a String
+            if (it instanceof Date) {
+                def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+                return dateFormat.format(it)
+            }
+            return it
+        }?.toArray()
+        return grailsApplication.getMainContext().getMessage(messageCode, arguments, defaultMessage, locale)
     }
 }
