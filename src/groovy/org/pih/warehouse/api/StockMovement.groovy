@@ -202,6 +202,16 @@ class StockMovement {
         return itemsWithPrice.collect { it?.quantity * it?.product?.pricePerUnit }.sum() ?: 0
     }
 
+    Map getTotalVolume() {
+        Attribute attribute = Attribute.findByCode("VOLUME")
+        return [value: getAggregateNumericValue(attribute), unitOfMeasure: attribute?.unitOfMeasureClass?.baseUom]
+    }
+
+    Map getTotalWeight() {
+        Attribute attribute = Attribute.findByCode("WEIGHT")
+        return [value: getAggregateNumericValue(attribute), unitOfMeasure: attribute?.unitOfMeasureClass?.baseUom]
+    }
+
     BigDecimal getAggregateNumericValue(Attribute attribute) {
         return lineItems.sum { StockMovementItem stockMovementItem ->
             stockMovementItem.getNumericValue(attribute)
