@@ -833,7 +833,7 @@ class ProductAvailabilityService {
 
     // Get quantity available to promise (with negative values)
     def getQuantityAvailableToPromise(Location location, Location binLocation, InventoryItem inventoryItem) {
-        return ProductAvailability.createCriteria().get {
+         def quantityAvailableToPromise = ProductAvailability.createCriteria().get {
             projections {
                 sum("quantityAvailableToPromise")
             }
@@ -844,5 +844,7 @@ class ProductAvailabilityService {
                 eq("binLocation", binLocation)
             }
         }
+
+        return quantityAvailableToPromise ?: 0
     }
 }
