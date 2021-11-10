@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
@@ -62,7 +63,13 @@ class InternalLocationApiController {
 
 
     def details = {
-        Location internalLocation = locationService.getLocation(params.id)
+
+        String parentLocationId = params?.location?.id?:session?.warehouse?.id
+        Location internalLocation = locationService.getInternalLocation(parentLocationId, params.id)
+        if (!internalLocation) {
+           throw new ObjectNotFoundException(params.id, Location.class.simpleName)
+        }
+
         Map data = internalLocation.toJson()
         def availableItems = productAvailabilityService.getAvailableItems(internalLocation.parentLocation, internalLocation)
         data.availableItems = availableItems.collect { AvailableItem availableItem ->
