@@ -206,6 +206,15 @@
                                 </g:hasRoleFinance>
                             </td>
                         </tr>
+                        <tr class="prop">
+                            <td class="name">
+                                <warehouse:message code="stockMovement.totalVolume.label" default="Total Volume"/>
+                            </td>
+                            <td class="value">
+                                <g:formatNumber format="###,###,##0.00" number="${stockMovement?.totalVolume?.value ?: 0.00 }" />
+                                ${stockMovement?.totalVolume?.unitOfMeasure?.name}
+                            </td>
+                        </tr>
                         <g:if test="${stockMovement?.shipment?.orders}">
                             <tr class="prop">
                                 <td class="name">
