@@ -1354,7 +1354,11 @@ class InventoryService implements ApplicationContextAware {
                     // We could do this, but it keeps us from changing the lot number and description
                     cmd.errors.reject("transaction.noChanges", "There are no quantity changes in the current transaction")
                 } else {
-                    if (!transaction.hasErrors() && transaction.save()) {
+                    // Quantity available to promise will be manually calculated,
+                    // because we want to have the latest value on the Stock Card view
+                    // The calculation is done in the controller to avoid circular dependency (adding dependency to productAvailabilityService here)
+                    transaction.disableRefresh = Boolean.TRUE
+                    if (!transaction.hasErrors() && transaction.save(flush: true)) {
                         // We saved the transaction successfully
                     } else {
                         transaction.errors.allErrors.each { error ->
