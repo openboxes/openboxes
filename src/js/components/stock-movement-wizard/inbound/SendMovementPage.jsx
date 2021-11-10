@@ -366,12 +366,11 @@ class SendMovementPage extends Component {
               productName: val.productName ? val.productName : val.product.name,
             }),
           );
-          const uniqBy = this.state.values.origin.type === 'SUPPLIER' ? 'id' : 'shipmentItemId';
 
           this.setState({
             values: {
               ...this.state.values,
-              tableItems: _.uniqBy(_.concat(this.state.values.tableItems, tableItemsData), uniqBy),
+              tableItems: _.uniqBy(_.concat(this.state.values.tableItems, tableItemsData), 'id'),
             },
             isFirstPageLoaded: true,
           }, () => {
