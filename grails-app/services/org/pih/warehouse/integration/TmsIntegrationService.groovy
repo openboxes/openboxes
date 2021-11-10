@@ -161,18 +161,14 @@ class TmsIntegrationService {
         orderDetails.setOrderParties(new OrderParties(partyTypes));
 
         // Start and end locations
-        // FIXME Get the expected dates sorted out
-        orderDetails.setOrderStartLocation(buildLocationInfo(1, stockMovement?.origin, stockMovement?.expectedShippingDate, null));
-        orderDetails.setOrderEndLocation(buildLocationInfo(2, stockMovement?.destination, stockMovement?.expectedDeliveryDate?:stockMovement?.expectedShippingDate, null));
+        Date requestedDeliveryDate = stockMovement.requestedDeliveryDate
+        Date expectedShippingDate = stockMovement?.expectedShippingDate?:requestedDeliveryDate-1
+        Date expectedDeliveryDate = stockMovement?.expectedDeliveryDate?:requestedDeliveryDate
 
-        // Order cargo summary
-        orderDetails.setOrderCargoSummary(new OrderCargoSummary(
-                new UnitTypeQuantity("1.0"),
-                new UnitTypeVolume("1.0", "cbm"),
-                new UnitTypeWeight("1.0", "kg"),
-                "false",
-                "0"
-        ));
+        orderDetails.setOrderStartLocation(buildLocationInfo(1,
+                stockMovement?.origin, expectedShippingDate, null));
+        orderDetails.setOrderEndLocation(buildLocationInfo(2,
+                stockMovement?.destination, expectedDeliveryDate, null));
 
         // Calculate total volume for stock movement
         Attribute volumeAttribute = Attribute.findByCode("VOLUME")
