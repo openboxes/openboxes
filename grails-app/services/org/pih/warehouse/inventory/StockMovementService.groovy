@@ -136,6 +136,8 @@ class StockMovementService {
                         break
                     // RequisitionStatus.PICKING:
                     case StockMovementStatusCode.PICKING:
+                        validateQuantityRequested(stockMovement)
+
                         // Clear picklist
                         Boolean shouldClearPicklist = jsonObject.containsKey("clearPicklist") ?
                                 jsonObject.getBoolean("clearPicklist") : Boolean.FALSE
@@ -177,6 +179,47 @@ class StockMovementService {
         }
     }
 
+    void validateQuantityRequested(StockMovement stockMovement) {
+        stockMovement.lineItems?.each { StockMovementItem item ->
+            if (item.substitutionItems) {
+                item.substitutionItems.each {
+                    if (!validateQuantityRequested(it)) {
+                        stockMovement.errors.reject("stockMovement.invalidQtyRequested.message", [it.product?.name] as Object[], "Invalid quantity requested for product " + it.product?.name)
+                    }
+                }
+            } else {
+                if (!validateQuantityRequested(item)) {
+                    stockMovement.errors.reject("stockMovement.invalidQtyRequested.message", [item.product?.name] as Object[], "Invalid quantity requested for product " + item.product?.name)
+                }
+            }
+        }
+
+        if (!stockMovement.validate()) {
+            throw new ValidationException("Invalid stock movement", stockMovement.errors)
+        }
+    }
+
+    Boolean validateQuantityRequested(StockMovementItem item) {
+        RequisitionItem requisitionItem = item.requisitionItem
+        Location location = requisitionItem?.requisition?.origin
+        Integer quantityRequired = requisitionItem?.calculateQuantityRequired()
+
+        if (requisitionItem.modificationItem) {
+            requisitionItem = requisitionItem.modificationItem
+        }
+
+        //When picklist is created it will change the quantity ATP, so we need to add quantity picked to the quantity ATP,
+        //because the quantity required was already picked
+        def quantityAvailable = inventoryService.getQuantityAvailableToPromise(item.product, location)
+        def qtyPicked = requisitionItem.pickablePicklistItems?.sum { it.quantity }
+        quantityAvailable += (qtyPicked ?: 0)
+
+        if (quantityRequired > quantityAvailable) {
+            return false
+        }
+
+        return true
+    }
 
     void updateRequisitionStatus(String id, RequisitionStatus status) {
 
@@ -781,7 +824,7 @@ class StockMovementService {
                 .inject([:]) {map, item -> map << [(item.id): item]}
 
         Requisition requisition = Requisition.get(data.first()?.requisition_id)
-        def picklistItemsMap = requisition?.getPicklist()?.picklistItems?.groupBy { it.requisitionItem.product.id }
+        def picklistItemsMap = requisition?.picklist?.pickablePicklistItemsByProductId
 
         def editPageItems = data.collect {
             def substitutionItems = substitutionItemsMap[it.id]
@@ -1254,7 +1297,7 @@ class StockMovementService {
     List getSuggestedItems(List<AvailableItem> availableItems, Integer quantityRequested) {
 
         List suggestedItems = []
-        List<AvailableItem> autoPickableItems = availableItems?.findAll { it.quantityAvailable > 0 && it.autoPickable }
+        List<AvailableItem> autoPickableItems = availableItems?.findAll { it.quantityAvailable > 0 && it.pickable }
 
         // As long as quantity requested is less than the total available we can iterate through available items
         // and pick until quantity requested is 0. Otherwise, we don't suggest anything because the user must
