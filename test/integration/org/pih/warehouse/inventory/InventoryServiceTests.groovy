@@ -23,9 +23,9 @@ import testutils.DbHelper
 import org.junit.Test
 
 class InventoryServiceTests extends GroovyTestCase {
-	
+
 	def inventoryService
-	
+
     protected def transactionType_consumptionDebit
     protected def  transactionType_inventory
     protected def  transactionType_productInventory
@@ -57,7 +57,7 @@ class InventoryServiceTests extends GroovyTestCase {
     def level4
     def level5
 	def level6
-	
+
     private void basicTestFixture(){
         warehouseLocationType = LocationType.get(Constants.WAREHOUSE_LOCATION_TYPE_ID)
         supplierLocationType = LocationType.get(Constants.SUPPLIER_LOCATION_TYPE_ID)
@@ -86,7 +86,7 @@ class InventoryServiceTests extends GroovyTestCase {
 		advilProduct = DbHelper.createProductIfNotExists("Advil" + UUID.randomUUID().toString()[0..5])
 		ibuprofenProduct.description = "Ibuprofen is a nonsteroidal anti-inflammatory drug (NSAID)"
 		ibuprofenProduct.save(flush:true);
-				
+
 		tylenolProduct.brandName = "TYLENOL®"
 		tylenolProduct.manufacturer = "McNeil Consumer Healthcare"
 		tylenolProduct.manufacturerName = "Tylenol Extra Strength Acetaminophen 500 Mg 325 Caplets"
@@ -95,8 +95,8 @@ class InventoryServiceTests extends GroovyTestCase {
 		tylenolProduct.vendorCode = "025200"
 		tylenolProduct.vendorName = "Acetaminophen 325 mg, film coated"
 		tylenolProduct.save(flush:true);
-		
-		
+
+
         // create some inventory items
         aspirinItem1 = DbHelper.createInventoryItem(aspirinProduct, "1", new Date().plus(100))
         aspirinItem2 = DbHelper.createInventoryItem(aspirinProduct, "2", new Date().plus(10))
@@ -218,14 +218,14 @@ class InventoryServiceTests extends GroovyTestCase {
         level4 = new InventoryLevel(status: InventoryStatus.NOT_SUPPORTED, inventory: bostonInventory, product: ibuprofenProduct)
         level5 = new InventoryLevel(status: InventoryStatus.NOT_SUPPORTED, inventory: haitiInventory, product: ibuprofenProduct)
 		level6 = new InventoryLevel(status: InventoryStatus.SUPPORTED, inventory: haitiInventory, product: tylenolProduct)
-		
+
         bostonInventory.addToConfiguredProducts(level1)
         bostonInventory.addToConfiguredProducts(level2)
         bostonInventory.addToConfiguredProducts(level4)
         haitiInventory.addToConfiguredProducts(level3)
         haitiInventory.addToConfiguredProducts(level5)
 		haitiInventory.addToConfiguredProducts(level6)
-		
+
         bostonInventory.save(flush:true)
         haitiInventory.save(flush:true)
 
@@ -282,17 +282,17 @@ class InventoryServiceTests extends GroovyTestCase {
 		def terms = ["TYLENOL®"]
 		def result = inventoryService.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
 		println result
-		assert result.contains(tylenolProduct)		
+		assert result.contains(tylenolProduct)
 	}
 
 	@Test
-	void getProductsByTermsAndCategories_shouldFindByManufacturer() { 		
+	void getProductsByTermsAndCategories_shouldFindByManufacturer() {
 		inventoryLevelTestFixture()
 		def terms = ["McNeil"]
 		def result = inventoryService.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
 		println result
-		assert result.contains(tylenolProduct)		
-		
+		assert result.contains(tylenolProduct)
+
 		terms = ["TYL325"]
 		result = inventoryService.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
 		println result
@@ -306,23 +306,23 @@ class InventoryServiceTests extends GroovyTestCase {
 		def result = inventoryService.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
 		println result
 		assert result.contains(tylenolProduct)
-		
+
 		terms = ["025200"]
 		result = inventoryService.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
 		println result
 		assert result.contains(tylenolProduct)
-		
+
 		terms = ["Extra Strength"]
 		result = inventoryService.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
 		println result
 		assert result.contains(tylenolProduct)
-		
+
 	}
 
     private void productTagTestFixture() {
 		basicTestFixture()
 		User user = User.get(1)
-		assertNotNull user 
+		assertNotNull user
 		println user
 		aspirinProduct.addToTags(new Tag(tag: "thistag"))
 		aspirinProduct.save(flush:true, failOnError:true)
@@ -331,7 +331,7 @@ class InventoryServiceTests extends GroovyTestCase {
 		assertEquals 1, aspirinProduct.tags.size()
 		assertEquals 1, tylenolProduct.tags.size()
 		assertEquals 2, Tag.list().size()
-		
+
 	}
 
     void test_getQuantityByProductMap() {
@@ -378,12 +378,12 @@ class InventoryServiceTests extends GroovyTestCase {
 	void test_getProductsQuantityForInventoryWithEmptyProductArray(){
 		transactionEntryTestFixture()
 		//def inventoryService = new InventoryService()
-		def results = inventoryService.getQuantityForProducts(bostonInventory, [])		
+		def results = inventoryService.getQuantityForProducts(bostonInventory, [])
 		assert results == [:]
 	}
 
-	
-	
+
+
     void test_getQuantityByInventoryItemMap() {
 
         transactionEntryTestFixture()
@@ -427,15 +427,18 @@ class InventoryServiceTests extends GroovyTestCase {
         //def inventoryService = new InventoryService()
 
         // a transaction that isn't of transfer in or transfer out type shouldn't be marked as valid
-        assert inventoryService.isValidForLocalTransfer(transaction1) == false
+        inventoryService.validateForLocalTransfer(transaction1)
+        assert transaction1.errors.hasFieldErrors("transactionType")
 
         // a transaction that's source or destination isn't a warehouse shouldn't pass validation //todo: need revist later; by Peter
 //        assert inventoryService.isValidForLocalTransfer(transaction2) == false
 //        assert inventoryService.isValidForLocalTransfer(transaction3) == false
 
         // transfer in/transfer out transactions associated with warehouses should pass validation
-        assert inventoryService.isValidForLocalTransfer(transaction4) == true
-        assert inventoryService.isValidForLocalTransfer(transaction5) == true
+        inventoryService.validateForLocalTransfer(transaction4)
+        assert !transaction4.hasErrors()
+        inventoryService.validateForLocalTransfer(transaction5)
+        assert !transaction5.hasErrors()
     }
 
     void test_saveLocalTransfer_shouldCreateNewLocalTransfer() {
