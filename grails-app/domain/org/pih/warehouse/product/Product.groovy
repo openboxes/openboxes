@@ -416,6 +416,12 @@ class Product implements Comparable, Serializable {
         }
     }
 
+    BigDecimal getNumericValue(Attribute attribute) {
+        String value = attribute ? getProductAttribute(attribute)?.value : 0.0
+        return (value && value.number) ? value.toBigDecimal() : 0.0
+    }
+
+
     /**
      * Get the inventory level by location id.
      *

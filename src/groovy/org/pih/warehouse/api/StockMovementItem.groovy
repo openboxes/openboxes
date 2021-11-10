@@ -9,6 +9,7 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.picklist.PicklistItem
+import org.pih.warehouse.product.Attribute
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.ShipmentItem
@@ -74,6 +75,10 @@ class StockMovementItem {
             it?.product?.productCode == requisitionItem?.product?.productCode
         }
         return stocklistItem?.quantity ?: null
+    }
+
+    BigDecimal getNumericValue(Attribute attribute) {
+        return attribute ? product?.getNumericValue(attribute) * quantityRequired : 0.0
     }
 
 
