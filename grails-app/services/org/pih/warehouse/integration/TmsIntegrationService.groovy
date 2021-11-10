@@ -38,12 +38,10 @@ import org.pih.warehouse.integration.xml.order.Phone
 import org.pih.warehouse.integration.xml.order.PlannedDateTime
 import org.pih.warehouse.integration.xml.order.Remark
 import org.pih.warehouse.integration.xml.order.TermsOfTrade
-import org.pih.warehouse.integration.xml.order.UnitTypeLength
-import org.pih.warehouse.integration.xml.order.UnitTypeQuantity
 import org.pih.warehouse.integration.xml.order.UnitTypeVolume
-import org.pih.warehouse.integration.xml.order.UnitTypeWeight
 import org.pih.warehouse.integration.xml.pod.DocumentUpload
 import org.pih.warehouse.integration.xml.trip.Trip
+import org.pih.warehouse.product.Attribute
 
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.Marshaller
@@ -133,6 +131,7 @@ class TmsIntegrationService {
         Map config = grailsApplication.config.openboxes.integration.order
         def defaultCurrencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode
 
+        // Create Order
         Order order = new Order();
         Header header = new Header(config.header.version, config.header.username,
                 config.header.password, config.header.sequenceNumber, config.header.destinationApp);
@@ -140,6 +139,7 @@ class TmsIntegrationService {
         order.setAction(config.action);
         order.setKnOrgDetails(new KNOrgDetails(config.organizationDetails.companyCode, config.organizationDetails.branchCode));
 
+        // Order Details
         OrderDetails orderDetails = new OrderDetails();
         orderDetails.setExtOrderId(stockMovement?.identifier);
         orderDetails.setDepartmentCode(config.orderDetails.departmentCode);
@@ -148,12 +148,11 @@ class TmsIntegrationService {
         orderDetails.setModeOfTransport(config.orderDetails.modeOfTransport);
         orderDetails.setServiceType(config.orderDetails.serviceType);
         orderDetails.setDeliveryTerms(config.orderDetails.deliveryTerms);
-
         orderDetails.setGoodsValue(new GoodsValue(stockMovement.totalValue?:0, defaultCurrencyCode));
-
         orderDetails.setTermsOfTrade(new TermsOfTrade(config.orderDetails.termsOfTrade.incoterm,
                 new FreightName( config.orderDetails.termsOfTrade.freightName.term, config.orderDetails.termsOfTrade.freightName.name)));
 
+        // Party Types
         // FIXME Fix magic strings
         ArrayList <PartyType> partyTypes = new ArrayList<PartyType>();
         partyTypes.add(buildPartyType(stockMovement?.origin, stockMovement?.origin?.manager, "SHIPPER"))
@@ -175,35 +174,20 @@ class TmsIntegrationService {
                 "0"
         ));
 
-        ArrayList itemList = new ArrayList<ItemDetails>();
-        stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
-            ItemDetails itemDetails = new ItemDetails();
-            itemDetails.setCargoType(config.orderDetails.cargoDetails.cargoType);
-            itemDetails.setStackable("false");
-            itemDetails.setSplittable("false");
-            itemDetails.setDangerousGoodsFlag("false");
-            itemDetails.setDescription(stockMovementItem?.product?.name);
-            itemDetails.setHandlingUnit("DEFAULT");
-            itemDetails.setQuantity(stockMovementItem.quantityShipped);
-            itemDetails.setLength(new UnitTypeLength("1.0", "m"));
-            itemDetails.setWidth(new UnitTypeLength("1.0", "m"));
-            itemDetails.setHeight(new UnitTypeLength("1.0", "m"));
-            itemDetails.setWeight(new UnitTypeWeight("1.0", "kg"));
-            itemDetails.setActualVolume(new UnitTypeVolume("1.0", "cbm"));
-            itemDetails.setActualWeight(new UnitTypeWeight("1.0", "kg"));
-            itemDetails.setLdm("25");
-            itemList.add(itemDetails)
-        }
+        // Calculate total volume for stock movement
+        Attribute volumeAttribute = Attribute.findByCode("VOLUME")
+        BigDecimal totalVolume = stockMovement.getAggregateNumericValue(volumeAttribute)
+        String volumeUom = volumeAttribute?.unitOfMeasureClass?.baseUom?.code?:"cbm"
 
+        // Cargo Summary
+        UnitTypeVolume unitTypeVolume = new UnitTypeVolume(totalVolume.toString(), volumeUom)
+        orderDetails.setOrderCargoSummary(buildOrderCargoSummary(stockMovement.hasHazardousMaterial(), unitTypeVolume))
+
+        // Cargo Details
+        List<ItemDetails> itemList = buildItemList(stockMovement, unitTypeVolume)
         orderDetails.setOrderCargoDetails(new CargoDetails(itemList));
 
-//        RefType refType = new RefType("z09", "TEST REFERENCE");
-//        RefType refType1 = new RefType("ADE", "A12345");
-//        ArrayList<RefType> refTypes = new ArrayList<RefType>();
-//        refTypes.add(refType);
-//        refTypes.add(refType1);
-//        orderDetails.setManageReferences(new ManageReferences(refTypes));
-
+        // Remarks
         if (stockMovement.comments) {
             Remark remark = new Remark(stockMovement.comments);
             ArrayList<Remark> remarks = new ArrayList<Remark>(Arrays.asList(remark));
@@ -214,6 +198,50 @@ class TmsIntegrationService {
         return order;
     }
 
+    List<ItemDetails> buildItemList(StockMovement stockMovement, UnitTypeVolume unitTypeVolume) {
+        List itemList = new ArrayList<ItemDetails>();
+
+        Map config = grailsApplication.config.openboxes.integration.order
+        if (config.orderDetails.cargoDetails.enabled) {
+            Attribute volumeAttribute = Attribute.findByCode("VOLUME")
+            String volumeUom = volumeAttribute?.unitOfMeasureClass?.baseUom?.code?:"cbm"
+            stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
+                ItemDetails itemDetails = new ItemDetails();
+                itemDetails.setCargoType(config.orderDetails.cargoDetails.cargoType);
+                itemDetails.setStackable("${config.orderDetails.cargoDetails.stackable}");
+                itemDetails.setSplittable("${config.orderDetails.cargoDetails.splittable}");
+                itemDetails.setDangerousGoodsFlag("${stockMovementItem?.product?.hazardousMaterial}");
+                itemDetails.setDescription(stockMovementItem?.product?.name);
+                itemDetails.setHandlingUnit(config.orderDetails.cargoDetails.handlingUnit);
+                itemDetails.setQuantity("${stockMovementItem?.quantityShipped?:stockMovementItem.quantityRequired}");
+
+                BigDecimal volumeValue = stockMovementItem.getNumericValue(volumeAttribute)
+                itemDetails.setActualVolume(new UnitTypeVolume(volumeValue.toString(), volumeUom));
+                itemList.add(itemDetails)
+            }
+        }
+        else {
+            ItemDetails itemDetails = new ItemDetails();
+            itemDetails.setCargoType(config.orderDetails.cargoDetails.cargoType);
+            itemDetails.setStackable("${config.orderDetails.cargoDetails.stackable}");
+            itemDetails.setSplittable("${config.orderDetails.cargoDetails.splittable}");
+            itemDetails.setDangerousGoodsFlag("${stockMovement.hasHazardousMaterial()}");
+            itemDetails.setDescription(stockMovement?.description);
+            itemDetails.setHandlingUnit(config.orderDetails.cargoDetails.handlingUnit);
+            itemDetails.setQuantity("${stockMovement?.lineItems?.size()?:0}");
+            itemDetails.setActualVolume(unitTypeVolume);
+            itemList.add(itemDetails)
+        }
+        return itemList
+    }
+
+
+    OrderCargoSummary buildOrderCargoSummary(Boolean dangerousGoodsFlag, UnitTypeVolume totalVolume) {
+        OrderCargoSummary orderCargoSummary = new OrderCargoSummary()
+        orderCargoSummary.setDangerousGoodsFlag(dangerousGoodsFlag.toString())
+        orderCargoSummary.setTotalVolume(totalVolume)
+        return orderCargoSummary
+    }
 
     PartyType buildPartyType(Location location, User contactData, String type) {
         PartyType partyType = new PartyType();
