@@ -11,6 +11,8 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItemStatusCode
+import org.pih.warehouse.product.Attribute
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionSourceType
@@ -199,6 +201,28 @@ class StockMovement {
         def itemsWithPrice = shipment?.shipmentItems?.findAll { it.product.pricePerUnit }
         return itemsWithPrice.collect { it?.quantity * it?.product?.pricePerUnit }.sum() ?: 0
     }
+
+    Map getTotalVolume() {
+        Attribute attribute = Attribute.findByCode("VOLUME")
+        return [value: getAggregateNumericValue(attribute), unitOfMeasure: attribute?.unitOfMeasureClass?.baseUom]
+    }
+
+    Map getTotalWeight() {
+        Attribute attribute = Attribute.findByCode("WEIGHT")
+        return [value: getAggregateNumericValue(attribute), unitOfMeasure: attribute?.unitOfMeasureClass?.baseUom]
+    }
+
+    BigDecimal getAggregateNumericValue(Attribute attribute) {
+        return lineItems.sum { StockMovementItem stockMovementItem ->
+            stockMovementItem.getNumericValue(attribute)
+        }
+    }
+
+    Boolean hasHazardousMaterial() {
+        return lineItems.collect { StockMovementItem stockMovementItem -> stockMovementItem.product }.
+                any { Product product -> product.hazardousMaterial }
+    }
+
 
     Boolean isPending() {
         return shipment?.currentStatus == ShipmentStatusCode.PENDING

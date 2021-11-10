@@ -1450,7 +1450,14 @@ openboxes.integration.order.orderDetails.deliveryTerms = ""
 openboxes.integration.order.orderDetails.termsOfTrade.incoterm = "DAP"
 openboxes.integration.order.orderDetails.termsOfTrade.freightName.term = ""
 openboxes.integration.order.orderDetails.termsOfTrade.freightName.name = ""
-openboxes.integration.order.orderDetails.cargoDetails.cargoType = ""
+
+// Cargo details
+openboxes.integration.order.orderDetails.cargoDetails.enabled = true
+openboxes.integration.order.orderDetails.cargoDetails.cargoType = "Unknown"
+openboxes.integration.order.orderDetails.cargoDetails.stackable = false
+openboxes.integration.order.orderDetails.cargoDetails.splittable = false
+openboxes.integration.order.orderDetails.cargoDetails.handlingUnit = "Unknown"
+
 // Disable feature during development
 openboxes.shipping.splitPickItems.enabled = true
 
