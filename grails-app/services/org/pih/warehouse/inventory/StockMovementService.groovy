@@ -458,8 +458,8 @@ class StockMovementService {
         log.info("outbound stock filter param:${params}")
         StockMovement stockMovement = new StockMovement()
         stockMovement.origin = params?.origin?.id ? Location.get(params.origin.id) : null
-        stockMovement.name = params?.name
-        stockMovement.identifier = params?.orderNumber
+        stockMovement.name = params.name ? "%" + params?.name + "%" : null
+        stockMovement.identifier = params.identifier ? params?.identifier + "%" : null
         return getOutboundStockMovements(stockMovement, [maxResults:maxResults, offset:offset])
     }
 
