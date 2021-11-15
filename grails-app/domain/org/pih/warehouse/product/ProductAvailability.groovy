@@ -32,6 +32,7 @@ class ProductAvailability {
     Integer quantityAllocated
     Integer quantityOnHold
     Integer quantityAvailableToPromise
+    Integer quantityNotPicked
 
     // Auditing
     Date dateCreated
@@ -39,6 +40,7 @@ class ProductAvailability {
 
     static mapping = {
         id generator: "assigned"
+        quantityNotPicked formula: "quantity_on_hand - quantity_allocated"
     }
 
     static constraints = {
@@ -50,5 +52,6 @@ class ProductAvailability {
         quantityAllocated(nullable: true)
         quantityOnHold(nullable: true)
         quantityAvailableToPromise(nullable: true)
+        quantityNotPicked(nullable: true)
     }
 }

@@ -87,8 +87,8 @@ class StockTransferSecondPage extends Component {
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: <Translate id="react.stockTransfer.quantityOnHand.label" defaultMessage="QOH" />,
-      accessor: 'quantityOnHand',
+      Header: <Translate id="react.stockTransfer.quantityOnShelf.label" defaultMessage="Quantity on Shelf" />,
+      accessor: 'quantityNotPicked',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
@@ -118,7 +118,7 @@ class StockTransferSecondPage extends Component {
               (sum + (val.quantity ? _.toInteger(val.quantity) : 0)),
             0,
           );
-          if (quantityToTransfer > props.original.quantityOnHand) {
+          if (quantityToTransfer > props.original.quantityNotPicked) {
             _.forEach(stockTransferItems, (lineItem) => {
               _.forEach(splitItems, (splitItem) => {
                 if (lineItem === splitItem) {
@@ -132,7 +132,7 @@ class StockTransferSecondPage extends Component {
             });
           }
         } else if (splitItems.length === 1 &&
-          props.original.quantityOnHand < _.toInteger(props.value)) {
+          props.original.quantityNotPicked < _.toInteger(props.value)) {
           disabled = true;
           disabledMessage = this.props.translate(
             'react.stockTransfer.higherQuantity.label',
@@ -146,7 +146,7 @@ class StockTransferSecondPage extends Component {
             'react.stockTransfer.selectOrDeleteLine.label',
             'Please select a quantity or delete the line',
           );
-        } else if (_.toInteger(props.value) > props.original.quantityOnHand) {
+        } else if (_.toInteger(props.value) > props.original.quantityNotPicked) {
           disabled = true;
           disabledMessage = this.props.translate(
             'react.stockTransfer.higherThanQoH.label',
@@ -432,7 +432,7 @@ class StockTransferSecondPage extends Component {
         ...stockTransfer,
         stockTransferItems: _.map(stockTransfer.stockTransferItems, item => ({
           ...item,
-          quantity: item.quantityOnHand,
+          quantity: item.quantityNotPicked,
         })),
       },
     });
@@ -442,9 +442,9 @@ class StockTransferSecondPage extends Component {
     const { stockTransferItems } = this.state.stockTransfer;
 
     return stockTransferItems && !!stockTransferItems.find((item) => {
-      const { quantity, quantityOnHand, status } = item;
+      const { quantity, quantityNotPicked, status } = item;
 
-      if (status !== 'CANCELED' && (!quantity || quantity > quantityOnHand || quantity <= 0)) {
+      if (status !== 'CANCELED' && (!quantity || quantity > quantityNotPicked || quantity <= 0)) {
         return true;
       }
 
@@ -457,7 +457,7 @@ class StockTransferSecondPage extends Component {
             (sum + (val.quantity ? _.toInteger(val.quantity) : 0)),
           0,
         );
-        if (quantityToTransfer > quantityOnHand) {
+        if (quantityToTransfer > quantityNotPicked) {
           return true;
         }
       }

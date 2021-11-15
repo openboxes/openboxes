@@ -248,7 +248,7 @@ class StockTransferService {
             parentItem.orderItemStatusCode = OrderItemStatusCode.PENDING
             parentItem.save()
         }
-        return order
+        return order.save(flush: true)
     }
 
     void deleteStockTransfer(String id) {
@@ -360,6 +360,7 @@ class StockTransferService {
         stockTransfer?.stockTransferItems?.each { StockTransferItem stockTransferItem ->
             ProductAvailability pa = ProductAvailability.findByInventoryItemAndBinLocation(stockTransferItem.inventoryItem, stockTransferItem.originBinLocation)
             stockTransferItem.quantityOnHand = pa ? pa.quantityOnHand : 0
+            stockTransferItem.quantityNotPicked = pa && pa.quantityNotPicked > 0 ? pa.quantityNotPicked: 0
             stockTransferItem.productAvailabilityId = pa ? pa.id : stockTransferItem.id
         }
     }
