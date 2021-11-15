@@ -1972,6 +1972,9 @@ class StockMovementService {
             picklistItem.delete()
         }
 
+        // Save requisition item before PA refresh
+        requisitionItem.save(flush: true)
+
         productAvailabilityService.refreshProductsAvailability(requisitionItem?.requisition?.origin?.id, [requisitionItem?.product?.id], false)
     }
 
