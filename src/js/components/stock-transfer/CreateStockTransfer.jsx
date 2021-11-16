@@ -107,7 +107,7 @@ class CreateStockTransfer extends Component {
       Cell: props => <span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>,
       Filter,
     }, {
-      Header: <Translate id="react.stockTransfer.quantityOnShelf.label" defaultMessage="Quantity on Shelf" />,
+      Header: <Translate id="react.stockTransfer.quantityAvailableToTransfer.label" defaultMessage="Quantity Available to Transfer" />,
       accessor: 'quantityNotPicked',
       style: { whiteSpace: 'normal' },
       Cell: props => <span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>,

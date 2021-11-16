@@ -85,9 +85,10 @@ class StockTransferSecondPage extends Component {
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: <Translate id="react.stockTransfer.quantityOnShelf.label" defaultMessage="Quantity on Shelf" />,
+      Header: <Translate id="react.stockTransfer.quantityAvailableToTransfer.label" defaultMessage="Quantity Available to Transfer" />,
       accessor: 'quantityNotPicked',
       style: { whiteSpace: 'normal' },
+      width: 220,
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.currentZone.label" defaultMessage="Current Zone" />,
