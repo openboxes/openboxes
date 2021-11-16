@@ -12,7 +12,7 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import grails.validation.ValidationException
 import org.apache.http.HttpStatus
-import org.json.JSONObject
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.core.User
@@ -41,7 +41,6 @@ class PicklistItemApiController extends BaseDomainApiController {
     def update = {
         JSONObject jsonObject = request.JSON
         log.info "save " + jsonObject
-
 
         PicklistItem picklistItem = PicklistItem.get(params.id)
 
