@@ -634,6 +634,10 @@ class Shipment implements Comparable, Serializable {
         shipmentItemsByContainer.each { container, shipmentItems ->
             containerList << [id: container?.id, name: container?.name, type: container?.containerType?.name, shipmentItems: shipmentItems]
         }
+        def availableContainers = containers.collect { Container container ->
+            [id: container?.id, name: container?.name, containerNumber: container?.containerNumber, containerType: container?.containerType]
+        }
+
         return [
                 id                  : id,
                 name                : name,
@@ -657,7 +661,8 @@ class Shipment implements Comparable, Serializable {
                 shippedCount        : shipmentItemCount,
                 receivedCount       : shipmentItems?.findAll { it.isFullyReceived() }.size(),
                 shipmentItems       : shipmentItems,
-                containers          : containerList
+                containers          : containerList,
+                availableContainers : availableContainers,
         ]
     }
 }
