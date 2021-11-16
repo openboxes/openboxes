@@ -19,6 +19,7 @@ class StockTransferItem {
     Location destinationBinLocation
     InventoryItem inventoryItem
     Integer quantityOnHand
+    Integer quantityNotPicked
     Integer quantity
     StockTransferStatus status = StockTransferStatus.PENDING
     List<StockTransferItem> splitItems = []
@@ -33,6 +34,7 @@ class StockTransferItem {
         destinationBinLocation(nullable: true)
         inventoryItem(nullable: true)
         quantityOnHand(nullable: true)
+        quantityNotPicked(nullable: true)
         quantity(nullable: true)
         splitItems(nullable: true)
         picklistItems(nullable: true)
@@ -47,7 +49,9 @@ class StockTransferItem {
         stockTransferItem.originBinLocation = orderItem.originBinLocation
         stockTransferItem.destinationBinLocation = orderItem.destinationBinLocation
         stockTransferItem.quantity = orderItem.quantity
+        // Temporarily set to quantity, should be pulled from PA
         stockTransferItem.quantityOnHand = orderItem.quantity
+        stockTransferItem.quantityNotPicked = orderItem.quantity
         stockTransferItem.status = getItemStatus(orderItem.orderItemStatusCode)
 
         orderItem.orderItems?.each { item ->
@@ -71,6 +75,7 @@ class StockTransferItem {
         stockTransferItem.destinationBinLocation = productAvailability.binLocation
         stockTransferItem.quantity = productAvailability.quantityOnHand
         stockTransferItem.quantityOnHand = productAvailability.quantityOnHand
+        stockTransferItem.quantityNotPicked = productAvailability.quantityNotPicked > 0 ? productAvailability.quantityNotPicked : 0
 
         return stockTransferItem
     }
@@ -119,6 +124,7 @@ class StockTransferItem {
                 "destinationZone.name"          : destinationBinLocation?.zone?.name,
                 quantity                        : quantity,
                 quantityOnHand                  : quantityOnHand,
+                quantityNotPicked               : quantityNotPicked,
                 status                          : status.name(),
                 splitItems                      : splitItems.sort { a, b ->
                     a.destinationBinLocation?.name <=> b.destinationBinLocation?.name ?:

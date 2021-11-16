@@ -106,6 +106,12 @@ class CreateStockTransfer extends Component {
       style: { whiteSpace: 'normal' },
       Cell: props => <span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>,
       Filter,
+    }, {
+      Header: <Translate id="react.stockTransfer.quantityAvailableToTransfer.label" defaultMessage="Quantity Available to Transfer" />,
+      accessor: 'quantityNotPicked',
+      style: { whiteSpace: 'normal' },
+      Cell: props => <span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>,
+      Filter,
     },
   ];
 
@@ -182,7 +188,9 @@ class CreateStockTransfer extends Component {
     const nodes = getNodes(currentRecords);
     // we just push all the IDs onto the selection array
     nodes.forEach((item) => {
-      selection.push(item._id);
+      if (item && item.quantityNotPicked !== 0) {
+        selection.push(item._id);
+      }
     });
     this.toggleSelection(selection, selectAll);
     this.setState({ selectAll });
@@ -271,6 +279,7 @@ class CreateStockTransfer extends Component {
                 <input
                   type={selectType}
                   checked={checked}
+                  disabled={row && row.quantityNotPicked === 0}
                   onChange={() => {}}
                   onClick={(e) => {
                     const { shiftKey } = e;

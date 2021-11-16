@@ -85,9 +85,10 @@ class StockTransferSecondPage extends Component {
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: <Translate id="react.stockTransfer.quantityOnHand.label" defaultMessage="QOH" />,
-      accessor: 'quantityOnHand',
+      Header: <Translate id="react.stockTransfer.quantityAvailableToTransfer.label" defaultMessage="Quantity Available to Transfer" />,
+      accessor: 'quantityNotPicked',
       style: { whiteSpace: 'normal' },
+      width: 220,
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.currentZone.label" defaultMessage="Current Zone" />,
@@ -175,7 +176,7 @@ class StockTransferSecondPage extends Component {
   completeStockTransfer() {
     const itemsWithLowerQuantity = _.filter(
       this.state.stockTransfer.stockTransferItems,
-      stockTransferItem => stockTransferItem.transferQty < stockTransferItem.quantityOnHand,
+      stockTransferItem => stockTransferItem.transferQty < stockTransferItem.quantityNotPicked,
     );
 
     if (!_.isEmpty(itemsWithLowerQuantity)) {
@@ -194,7 +195,7 @@ class StockTransferSecondPage extends Component {
       title: this.props.translate('react.stockTransfer.message.confirmStockTransfer.label', 'Confirm Stock Transfer'),
       message: _.map(items, item =>
         (
-          <p>Qty {item.quantityOnHand - item.transferQty} {this.props.translate('react.stockTransfer.alert.lowerQty1.label', 'of item')} {' '}
+          <p>Qty {item.quantityNotPicked - item.transferQty} {this.props.translate('react.stockTransfer.alert.lowerQty1.label', 'of item')} {' '}
             {item.productName} {this.props.translate('react.stockTransfer.alert.lowerQty2.label', 'is still in the receiving bin. Do you want to continue?')}
           </p>)),
       buttons: [
