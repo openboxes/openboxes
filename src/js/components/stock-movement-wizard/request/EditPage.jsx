@@ -413,7 +413,7 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
       quantityOnHand: {
         type: LabelField,
         label: 'react.stockMovement.quantityOnHand.label',
-        defaultMessage: 'QOH Available',
+        defaultMessage: 'QOH',
         flexWidth: '1',
         fieldKey: '',
         headerClassName: 'left-border',
@@ -675,7 +675,7 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
       quantityOnHand: {
         type: LabelField,
         label: 'react.stockMovement.quantityOnHand.label',
-        defaultMessage: 'QOH Available',
+        defaultMessage: 'QOH',
         flexWidth: '1',
         fieldKey: '',
         headerClassName: 'left-border',
