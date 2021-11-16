@@ -699,6 +699,7 @@ class StockMovementService {
     def getAddPageItem(Requisition requisition, def stockMovementItem) {
         if (stockMovementItem && requisition && requisition.sourceType == RequisitionSourceType.ELECTRONIC) {
             def quantityOnHand = productAvailabilityService.getQuantityOnHand(stockMovementItem.product, requisition.destination)
+            def quantityAvailable = inventoryService.getQuantityAvailableToPromise(stockMovementItem.product, requisition.destination)
             def template = requisition.requisitionTemplate
             if (!template || (template && template.replenishmentTypeCode == ReplenishmentTypeCode.PULL)) {
                 def demand = forecastingService.getDemand(requisition.destination, stockMovementItem.product)
@@ -707,6 +708,7 @@ class StockMovementService {
                         product                         : stockMovementItem.product,
                         productCode                     : stockMovementItem.productCode,
                         quantityOnHand                  : quantityOnHand ?: 0,
+                        quantityAvailable               : quantityAvailable ?: 0,
                         quantityAllowed                 : stockMovementItem.quantityAllowed,
                         comments                        : stockMovementItem.comments,
                         quantityRequested               : stockMovementItem.quantityRequested,
@@ -721,6 +723,7 @@ class StockMovementService {
                         product             : stockMovementItem.product,
                         productCode         : stockMovementItem.productCode,
                         quantityOnHand      : quantityOnHand ?: 0,
+                        quantityAvailable   : quantityAvailable ?: 0,
                         quantityAllowed     : stockMovementItem.quantityAllowed,
                         comments            : stockMovementItem.comments,
                         quantityRequested   : stockMovementItem.quantityRequested,

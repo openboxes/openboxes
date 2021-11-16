@@ -847,17 +847,4 @@ class ProductAvailabilityService {
 
         return quantityAvailableToPromise ?: 0
     }
-
-    Integer getQuantityAvailable(Product product, Location location) {
-        def quantityAvailable = ProductAvailability.createCriteria().get {
-            projections {
-                sum("quantityAvailableToPromise")
-            }
-
-            eq("location", location)
-            eq("product", product)
-        }
-
-        return quantityAvailable ?: 0
-    }
 }
