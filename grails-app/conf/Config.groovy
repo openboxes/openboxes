@@ -942,7 +942,7 @@ openboxes.barcode.printer.ipAddress = "127.0.0.1"
 openboxes.barcode.printer.port = 9100
 
 // Labelary API
-openboxes.barcode.labelaryApi.url = "https://api.labelary.com/v1/printers/12dpmm/labels/2x1/0/"
+openboxes.barcode.labelaryApi.url = "https://api.labelary.com/v1/printers/12dpmm/labels/4x6/0/"
 
 // Default delay and min length for typeahead components
 openboxes.typeahead.delay = 300

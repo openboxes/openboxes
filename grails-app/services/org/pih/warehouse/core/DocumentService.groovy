@@ -27,13 +27,10 @@ import org.docx4j.XmlUtils
 import org.docx4j.convert.out.pdf.PdfConversion
 import org.docx4j.convert.out.pdf.viaXSLFO.Conversion
 import org.docx4j.jaxb.Context
-import org.docx4j.openpackaging.io.SaveToZipFile
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart
 import org.docx4j.openpackaging.parts.relationships.Namespaces
-import org.docx4j.wml.Body
 import org.docx4j.wml.BooleanDefaultTrue
-import org.docx4j.wml.Document
 import org.docx4j.wml.P
 import org.docx4j.wml.R
 import org.docx4j.wml.RPr
@@ -41,9 +38,7 @@ import org.docx4j.wml.Tbl
 import org.docx4j.wml.TblGrid
 import org.docx4j.wml.TblGridCol
 import org.docx4j.wml.TblPr
-import org.docx4j.wml.TblWidth
 import org.docx4j.wml.Tc
-import org.docx4j.wml.TcPr
 import org.docx4j.wml.Text
 import org.docx4j.wml.Tr
 import org.docx4j.wml.TrPr
@@ -52,8 +47,10 @@ import org.pih.warehouse.api.Stocklist
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemSortByCode
+import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.Shipment
 
@@ -75,6 +72,37 @@ class DocumentService {
 
     private getFormatTagLib() {
         return grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
+    }
+
+    Map getProductBarcodeLabel(Product product) {
+        return getBarcodeLabel(Constants.DEFAULT_PRODUCT_LABEL_DOCUMENT_NUMBER,
+                "/api/products/%s/labels/%s", product?.productCode)
+    }
+
+    Map getInternalLocationBarcodeLabel(Location location) {
+        return getBarcodeLabel(Constants.DEFAULT_INTERNAL_LOCATION_LABEL_DOCUMENT_NUMBER,
+                "/api/internalLocations/%s/labels/%s", location?.id)
+    }
+
+    Map getContainerBarcodeLabel(Container container) {
+        return getBarcodeLabel(Constants.DEFAULT_CONTAINER_LABEL_DOCUMENT_NUMBER,
+                "/api/containers/%s/labels/%s", container?.id)
+    }
+
+    Map getBarcodeLabel(String documentNumber, String urlTemplate, String objectId) {
+        def g = ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        Document document = getDocument(DocumentCode.ZEBRA_TEMPLATE, documentNumber)
+        String url = String.format(urlTemplate, objectId, document?.id)
+        return document ? [id: document.id, name: document.name, url: g.createLink(uri: url, absolute: true)] : null
+    }
+
+    Document getDocument(DocumentCode documentCode, String documentNumber) {
+        return Document.createCriteria().get {
+            documentType {
+                eq("documentCode", documentCode)
+            }
+            eq("documentNumber", documentNumber)
+        }
     }
 
 

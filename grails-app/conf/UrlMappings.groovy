@@ -62,6 +62,16 @@ class UrlMappings {
             controller = { "locationApi" }
         }
 
+        "/api/containers/$id/details"(parseRequest: true) {
+            controller = "containerApi"
+            action = [GET: "details"]
+        }
+        "/api/containers/$id/labels/$documentId**?" {
+            controller = { "containerApi" }
+            action = [GET: "renderLabel", POST: "printLabel", PUT: "printLabel"]
+        }
+
+
         // Stock Movement Item API
 
         "/api/stockMovementItems"(parseRequest: true) {
@@ -224,6 +234,10 @@ class UrlMappings {
         "/api/internalLocations/$id/details"(parseRequest: true) {
             controller = "internalLocationApi"
             action = [GET: "details"]
+        }
+        "/api/internalLocations/$id/labels/$documentId**?" {
+            controller = { "internalLocationApi" }
+            action = [GET: "renderLabel", POST: "printLabel", PUT: "printLabel"]
         }
 
         // Stocklist Item API
