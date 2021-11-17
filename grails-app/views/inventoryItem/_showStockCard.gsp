@@ -75,7 +75,7 @@
 			<li><a href="${request.contextPath}/inventoryItem/showSuppliers/${commandInstance?.product?.id}"><warehouse:message code="product.sources.label" default="Sources"/></a></li>
 			<li><a href="${request.contextPath}/inventoryItem/showAlternativeProducts/${commandInstance?.product?.id}"><warehouse:message code="product.substitutions.label" default="Substitution"/></a></li>
 			<li><a href="${request.contextPath}/inventoryItem/showPendingInbound/${commandInstance?.product?.id}"><warehouse:message code="stockCard.pendingInbound.label" default="Pending Inbound"/></a></li>
-			<li><a href="${request.contextPath}/inventoryItem/showPendingOutbound/${commandInstance?.product?.id}"><warehouse:message code="stockCard.pendingOutbound.label" default="Pending Outbound"/></a></li>
+			<li><a id="showPendingOutboundTabLink" href="${request.contextPath}/inventoryItem/showPendingOutbound/${commandInstance?.product?.id}"><warehouse:message code="stockCard.pendingOutbound.label" default="Pending Outbound"/></a></li>
             <li><a href="${request.contextPath}/inventoryItem/showDemand/${commandInstance?.product?.id}"><warehouse:message code="forecasting.demand.label" default="Demand"/></a></li>
             <li><a href="${request.contextPath}/inventoryItem/showInventorySnapshot/${commandInstance?.product?.id}"><warehouse:message code="inventory.snapshot.label" default="Snapshot"/></a></li>
             <li><a href="${request.contextPath}/inventoryItem/showDocuments/${commandInstance?.product?.id}"><warehouse:message code="document.documents.label" default="Documents"/></a></li>

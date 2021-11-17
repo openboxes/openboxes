@@ -304,7 +304,6 @@ class AvailableItem {
     BigDecimal quantityAvailable
     BigDecimal quantityOnHand
 
-    AvailableItemStatus status
     List<String> pickedRequisitionNumbers
 
     static constraints = {
@@ -313,8 +312,30 @@ class AvailableItem {
         quantityAvailable(nullable: true)
     }
 
+    AvailableItemStatus getStatus() {
+        if (quantityAvailable > 0) {
+            return AvailableItemStatus.AVAILABLE
+        }
+        if (inventoryItem?.recalled) {
+            return AvailableItemStatus.RECALLED
+        }
+        if (binLocation?.onHold) {
+            return AvailableItemStatus.HOLD
+        }
+
+        return AvailableItemStatus.PICKED
+    }
+
     Boolean isPickable() {
         return (inventoryItem ? inventoryItem.pickable : true) && (binLocation ? binLocation.pickable : true)
+    }
+
+    Boolean isOnHold() {
+        return binLocation?.onHold
+    }
+
+    Boolean isRecalled() {
+        return inventoryItem?.recalled
     }
 
     Map toJson() {

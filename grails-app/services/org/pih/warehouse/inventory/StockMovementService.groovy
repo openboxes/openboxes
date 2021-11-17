@@ -1253,24 +1253,10 @@ class StockMovementService {
 
     List<AvailableItem> calculateAvailableItemsStatus(RequisitionItem requisitionItem, List<AvailableItem> availableItems) {
         return availableItems?.collect {
-            if (it.quantityAvailable > 0) {
-                it.status = AvailableItemStatus.AVAILABLE
-
+            if (it.status == AvailableItemStatus.AVAILABLE || it.status == AvailableItemStatus.PICKED) {
                 def picklists = getPicklistByLocationAndProduct(it.binLocation, it.inventoryItem)
-                List<String> pickedRequisitionNumbers = picklists?.collect { it.requisition.requestNumber }?.unique()
-                        .findAll {it != requisitionItem.requisition.requestNumber}
-                it.pickedRequisitionNumbers = pickedRequisitionNumbers
-            } else if (it.inventoryItem?.recalled) {
-                it.status = AvailableItemStatus.RECALLED
-            } else if (it.binLocation?.isOnHold()) {
-                it.status = AvailableItemStatus.HOLD
-            } else {
-                it.status = AvailableItemStatus.PICKED
-
-                Requisition requisition = requisitionItem.requisition
-
-                def picklists = getPicklistByLocationAndProduct(it.binLocation, it.inventoryItem)
-                List<String> pickedRequisitionNumbers = picklists?.collect { it.requisition.requestNumber }?.unique()
+                List<String> pickedRequisitionNumbers = picklists?.collect { it.requisition.requestNumber }?.unique()?.findAll {
+                    it != requisitionItem.requisition.requestNumber }
 
                 it.pickedRequisitionNumbers = pickedRequisitionNumbers
             }
