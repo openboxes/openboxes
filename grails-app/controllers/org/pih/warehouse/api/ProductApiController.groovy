@@ -9,13 +9,9 @@
  **/
 package org.pih.warehouse.api
 
-import fr.w3blog.zpl.utils.ZebraUtils
 import grails.converters.JSON
-import groovyx.net.http.HTTPBuilder
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Document
-import org.pih.warehouse.core.DocumentCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociation
@@ -25,7 +21,9 @@ import org.pih.warehouse.product.ProductAvailability
 
 class ProductApiController extends BaseDomainApiController {
 
+    def zebraService
     def productService
+    def documentService
     def templateService
     def inventoryService
     def forecastingService
@@ -54,14 +52,8 @@ class ProductApiController extends BaseDomainApiController {
         data.quantityOnOrder = 0
         data.unitOfMeasure = product.unitOfMeasure?:"EA"
 
-        ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
-        List<Document> barcodeTemplates = Document.findAllByDocumentCode(DocumentCode.ZEBRA_TEMPLATE)
-        data.barcodeLabels = barcodeTemplates.collect { Document template ->
-            String url = String.format("/api/products/%s/labels/%s", product.id, template.id)
-            [id: template.id, name: template.name, url: g.createLink(uri: url, absolute: true)]
-        }
 
-        data.defaultBarcodeLabelUrl = data.barcodeLabels ? data.barcodeLabels[0].url : null
+        data.defaultBarcodeLabelUrl = documentService.getProductBarcodeLabel(product)
 
         data.images = product?.images?.collect {
             return [ id: it.id, name: it.filename, contentType: it.contentType, uri: it.fileUri?:it?.link ]
@@ -95,33 +87,20 @@ class ProductApiController extends BaseDomainApiController {
         if (!document) {
             throw new ObjectNotFoundException(params.documentId, Document.class.simpleName)
         }
-        Map model = [product: product]
-        String body = templateService.renderTemplate(document, model)
-        String renderApiUrl = grailsApplication.config.openboxes.barcode.labelaryApi.url
-        def http = new HTTPBuilder(renderApiUrl)
-        def html = http.post(body: body)
         response.contentType = "image/png"
-        response.outputStream << html
+        response.outputStream << zebraService.renderDocument(document, [product:product])
     }
 
     def printLabel = {
         try {
             Product product = productService.getProduct(params.id)
-
-            // FIXME OBKN-98 Temporarily default to first barcode template if documentId is not provided
-            Document document = (params.documentId) ?
-                    Document.get(params.documentId) :
-                    Document.findAllByDocumentCode(DocumentCode.ZEBRA_TEMPLATE).first()
+            Document document = Document.get(params.documentId)
             if (!document) {
                 throw new ObjectNotFoundException(params.documentId, Document.class.simpleName)
             }
-            Map model = [product: product]
-            String renderedContent = templateService.renderTemplate(document, model)
-            String ipAddress = grailsApplication.config.openboxes.barcode.printer.ipAddress
-            Integer port = grailsApplication.config.openboxes.barcode.printer.port
-            log.info "Printing ${renderedContent} to ${ipAddress}:${port}"
-            ZebraUtils.printZpl(renderedContent, ipAddress, port)
-            render([data: "Product label has been printed to ${ipAddress}:${port}"] as JSON)
+            zebraService.printDocument(document, [product:product])
+
+            render([data: "Product label has been printed"] as JSON)
             return
         } catch (Exception e) {
             render([errorCode: 500, cause: e?.class, errorMessage: e?.message] as JSON)
