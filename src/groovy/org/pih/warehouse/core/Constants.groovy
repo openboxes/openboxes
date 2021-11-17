@@ -127,6 +127,9 @@ class Constants {
     static final String DEFAULT_RECEIVING_LOCATION_PREFIX = "R"
 
     static final String DEFAULT_DOCUMENT_TYPE_ID = "9"
+    static final String DEFAULT_CONTAINER_LABEL_DOCUMENT_NUMBER = "barcodeLabel:container"
+    static final String DEFAULT_INTERNAL_LOCATION_LABEL_DOCUMENT_NUMBER = "barcodeLabel:internalLocation"
+    static final String DEFAULT_PRODUCT_LABEL_DOCUMENT_NUMBER = "barcodeLabel:product"
     static final String PREPAYMENT_INVOICE_SUFFIX = "-PREPAYMENT"
 
     static final String DEFAULT_LOT_NUMBER = "DEFAULT" // default product availability lot number
