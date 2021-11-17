@@ -541,6 +541,16 @@
                 </tr>
                 <tr class="prop">
                     <td valign="top" class="name">
+                        <label for="name"><warehouse:message code="location.locationNumber.label"/></label>
+                    </td>
+                    <td valign="top"
+                        class="value ${hasErrors(bean: locationInstance, field: 'locationNumber', 'errors')}">
+                        <g:textField name="locationNumber" value="${binLocation?.locationNumber}" class="text"
+                                     size="80"/>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td valign="top" class="name">
 
                     </td>
                     <td valign="top" class="value">
