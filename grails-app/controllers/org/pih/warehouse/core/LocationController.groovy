@@ -11,6 +11,7 @@ package org.pih.warehouse.core
 
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.validation.ValidationException
+import org.apache.commons.lang.StringUtils
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
@@ -83,6 +84,11 @@ class LocationController {
             }
 
             locationInstance.properties = params
+
+            // Set default location number for internal locations
+            if (locationInstance?.parentLocation && !locationInstance?.locationNumber) {
+                locationInstance?.locationNumber = StringUtils.upperCase(locationInstance?.name)
+            }
 
             if (!locationInstance.id && !locationInstance.organization) {
                 if (locationInstance?.locationType?.locationTypeCode == LocationTypeCode.SUPPLIER) {
