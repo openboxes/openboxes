@@ -18,7 +18,6 @@ import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.hibernate.Criteria
 import org.pih.warehouse.api.AvailableItem
-import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -586,6 +585,8 @@ class ProductAvailabilityService {
             )
         }
 
+        availableItems = availableItems.findAll { it.quantityOnHand > 0 }
+
         availableItems = sortAvailableItems(availableItems)
         return availableItems
     }
@@ -610,8 +611,6 @@ class ProductAvailabilityService {
      * Sorting used by first expiry, first out algorithm
      */
     List<AvailableItem> sortAvailableItems(List<AvailableItem> availableItems) {
-        availableItems = availableItems.findAll { it.quantityOnHand > 0 }
-
         // Sort bins  by available quantity
         availableItems = availableItems.sort { a, b ->
             a?.quantityAvailable <=> b?.quantityAvailable

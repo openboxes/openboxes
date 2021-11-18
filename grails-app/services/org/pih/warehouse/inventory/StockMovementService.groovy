@@ -837,6 +837,12 @@ class StockMovementService {
 
             def picklistQtyForItem = (!picklistItemsMap || !picklistItemsMap[it.product_id]) ? 0 : picklistItemsMap[it.product_id].sum { it.quantity }
 
+            def quantityAvailable = (it.quantity_available_to_promise ?: 0) + picklistQtyForItem
+
+            if (quantityAvailable > it.quantity_on_hand) {
+                quantityAvailable = it.quantity_on_hand
+            }
+
             [
                 product                     : productsMap[it.product_id],
                 productName                 : it.name,
@@ -848,7 +854,7 @@ class StockMovementService {
                 quantityCanceled            : it.quantity_canceled,
                 quantityConsumed            : it.quantity_demand,
                 quantityOnHand              : it.quantity_on_hand,
-                quantityAvailable           : (it.quantity_available_to_promise ?: 0) + picklistQtyForItem,
+                quantityAvailable           : quantityAvailable,
                 substitutionStatus          : it.substitution_status,
                 sortOrder                   : it.sort_order,
                 reasonCode                  : it.cancel_reason_code,
@@ -857,12 +863,18 @@ class StockMovementService {
                 substitutionItems           : substitutionItems.collect {
                     def picklistQtyForSubstitution = !picklistItemsMap[it.product_id] ? 0 : picklistItemsMap[it.product_id].sum { it.quantity }
 
+                    def qtyAvailable = (it.quantity_available_to_promise ?: 0) + picklistQtyForSubstitution
+
+                    if (qtyAvailable > it.quantity_on_hand) {
+                        qtyAvailable = it.quantity_on_hand
+                    }
+
                     [
                         product             : Product.get(it.product_id),
                         productId           : it.product_id,
                         productCode         : it.product_code,
                         productName         : it.name,
-                        quantityAvailable   : (it.quantity_available_to_promise ?: 0) + picklistQtyForSubstitution,
+                        quantityAvailable   : qtyAvailable,
                         quantityOnHand      : it.quantity_on_hand,
                         quantityConsumed    : it.quantity_demand,
                         quantitySelected    : it.quantity,
@@ -1225,6 +1237,7 @@ class StockMovementService {
         List<AvailableItem> availableItems = productAvailabilityService.getAllAvailableBinLocations(location, requisitionItem.product)
         def picklistItems = getPicklistItems(requisitionItem)
 
+        availableItems = availableItems.findAll { it.quantityOnHand > 0 }
         availableItems = calculateQuantityAvailableToPromise(availableItems, picklistItems)
 
         if (calculateStatus) {
@@ -1245,13 +1258,13 @@ class StockMovementService {
                         inventoryItem: picklistItem.inventoryItem,
                         binLocation: picklistItem.binLocation,
                         quantityAvailable: 0,
-                        quantityOnHand: picklistItem.quantity
+                        quantityOnHand: 0
                 )
 
                 availableItems.add(availableItem)
+            } else {
+                availableItem.quantityAvailable += picklistItem.quantity
             }
-
-            availableItem.quantityAvailable += picklistItem.quantity
         }
 
         return productAvailabilityService.sortAvailableItems(availableItems)
@@ -1355,6 +1368,7 @@ class StockMovementService {
                             .collect { it.picklistItems }?.flatten()
 
                     availableItems = productAvailabilityService.getAllAvailableBinLocations(location, associatedProduct)
+                    availableItems = availableItems.findAll { it.quantityOnHand > 0 }
                     availableItems = calculateQuantityAvailableToPromise(availableItems, picklistItems)
                 } else {
                     availableItems = productAvailabilityService.getAvailableBinLocations(location, associatedProduct)
