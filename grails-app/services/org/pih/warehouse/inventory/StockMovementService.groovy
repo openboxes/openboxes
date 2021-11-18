@@ -1636,7 +1636,7 @@ class StockMovementService {
         requisition.origin = stockMovement.origin
         requisition.requestedBy = stockMovement.requestedBy
         requisition.dateRequested = stockMovement.dateRequested
-        requisition.requestedDeliveryDate = stockMovement.requestedDeliveryDate
+        requisition.requestedDeliveryDate = stockMovement.requestedDeliveryDate?:stockMovement?.dateRequested
         requisition.name = stockMovement.generateName()
         requisition.requisitionItems = []
 
