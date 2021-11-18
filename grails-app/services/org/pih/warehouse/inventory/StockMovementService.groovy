@@ -1025,7 +1025,13 @@ class StockMovementService {
      */
     void createPicklist(String id) {
         StockMovement stockMovement = getStockMovement(id)
+        for (RequisitionItem requisitionItem : stockMovement.requisition.requisitionItems) {
+            removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
+        }
         createPicklist(stockMovement)
+        for (RequisitionItem requisitionItem : stockMovement.requisition.requisitionItems) {
+            createMissingShipmentItem(requisitionItem)
+        }
     }
 
     // TODO: Refactor - Move entire picklist logic to the picklistService
