@@ -212,7 +212,7 @@ class PicklistService {
         List<AvailableItem> availableItems = productAvailabilityService.getAllAvailableBinLocations(location, orderItem.product)
         def picklistItems = getPicklistItems(orderItem)
 
-        availableItems = availableItems.findAll { it.inventoryItem != orderItem.inventoryItem && it.binLocation != orderItem.destinationBinLocation }
+        availableItems = availableItems.findAll { it.quantityOnHand > 0 && it.inventoryItem != orderItem.inventoryItem && it.binLocation != orderItem.destinationBinLocation }
         availableItems = calculateQuantityAvailableToPromise(availableItems, picklistItems)
 
         return availableItems
@@ -241,13 +241,13 @@ class PicklistService {
                         inventoryItem: picklistItem.inventoryItem,
                         binLocation: picklistItem.binLocation,
                         quantityAvailable: 0,
-                        quantityOnHand: picklistItem.quantity
+                        quantityOnHand: 0
                 )
 
                 availableItems.add(availableItem)
+            } else {
+                availableItem.quantityAvailable += picklistItem.quantity
             }
-
-            availableItem.quantityAvailable += picklistItem.quantity
         }
 
         return productAvailabilityService.sortAvailableItems(availableItems)
