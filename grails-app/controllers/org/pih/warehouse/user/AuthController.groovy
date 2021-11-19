@@ -149,13 +149,18 @@ class AuthController {
      * Allow user to register a new account
      */
     def signup = {
-        Boolean enabled = grailsApplication.config.openboxes.signup.enabled
+        Boolean enabled = grailsApplication.config.openboxes.signup.enabled?:false
         if (!enabled) {
-            flash.message = "Apologies, but the signup feature is disabled on your system. "  +
+            flash.message = "Apologies, but the signup feature is disabled on your system. " +
                     "Please contact a system administrator for access."
             redirect(controller: "auth", action: "login")
         }
-
+        Boolean configured = grailsApplication.config.openboxes.signup.recaptcha.v2.secretKey?.trim()
+        if (!configured) {
+            flash.message = "Apologies, but reCAPTCHA is not set up on this system. " +
+                    "Please contact a system administrator for access."
+            redirect(controller: "auth", action: "login")
+        }
     }
 
     /**
