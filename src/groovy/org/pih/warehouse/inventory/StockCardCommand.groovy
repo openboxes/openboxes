@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.inventory
 
+import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
@@ -34,7 +35,7 @@ class StockCardCommand {
     Map<Transaction, List<TransactionEntry>> transactionEntriesByTransactionMap
     Map<InventoryItem, List<TransactionEntry>> transactionEntriesByInventoryItemMap
     Map<InventoryItem, Integer> quantityByInventoryItemMap
-    List quantityByBinLocation
+    List<AvailableItem> availableItems
 
     Map requisitionMap = [:]
     Map orderMap = [:]

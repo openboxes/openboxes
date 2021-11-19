@@ -46,7 +46,7 @@
             <g:if test="${totalQuantityAvailableToPromise >= 0}">
                 <tr class="prop">
                     <td class="label">
-                        <label><warehouse:message code="product.quantityAvailableToPromise.label" default="Quantity ATP"/></label>
+                        <label><warehouse:message code="product.quantityAvailableToPromise.label" default="Quantity Available"/></label>
                     </td>
                     <td class="value">
                         <div>

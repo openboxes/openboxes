@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.inventory.LotStatusCode" %>
+<%@ page import="org.pih.warehouse.api.AvailableItemStatus; org.pih.warehouse.inventory.LotStatusCode" %>
 <div class="box">
     <h2>
         <g:message code="inventory.currentStock.label" default="Current Stock"/>
@@ -20,10 +20,12 @@
                     <warehouse:message code="default.expires.label"/>
                 </th>
                 <th>
-                    <g:message code="default.comments.label"/>
+                    <warehouse:message code="stockCard.qtyOnHand.label"/>
                 </th>
                 <th>
-                    <warehouse:message code="default.quantity.label"/>
+                    <warehouse:message code="stockCard.qtyAvailable.label"/>
+                </th>
+                <th>
                 </th>
             </tr>
         </thead>
@@ -32,12 +34,12 @@
             <g:isSuperuser>
                 <g:set var="isSuperuser" value="${true}"/>
             </g:isSuperuser>
-            <g:each var="entry" in="${commandInstance.quantityByBinLocation.sort { it?.inventoryItem?.expirationDate }}" status="status">
-                <g:set var="styleClass" value="${(status%2==0)?'even':'odd' } ${entry?.inventoryItem?.lotStatus == LotStatusCode.RECALLED ? 'recalled' : (entry?.isOnHold ? 'restricted' : '')}"/>
-                <tr class="prop ${styleClass}" title="${entry?.inventoryItem?.lotStatus == LotStatusCode.RECALLED ? warehouse.message(code: 'inventoryItem.recalledLot.label') : (entry?.isOnHold ?  warehouse.message(code: 'inventoryItem.restrictedBin.label') : '')}">
+            <g:each var="entry" in="${commandInstance.availableItems}" status="status">
+                <g:set var="styleClass" value="${(status%2==0)?'even':'odd' } ${entry?.recalled ? 'recalled' : (entry?.onHold ? 'restricted' : '')}"/>
+                <tr class="prop ${styleClass}" title="${entry?.inventoryItem?.lotStatus == LotStatusCode.RECALLED ? warehouse.message(code: 'inventoryItem.recalledLot.label') : (entry?.onHold ?  warehouse.message(code: 'inventoryItem.restrictedBin.label') : '')}">
                     <td class="middle" style="text-align: left; width: 10%" nowrap="nowrap">
                         <g:render template="actionsCurrentStock"
-                                  model="[commandInstance:commandInstance,binLocation:entry.binLocation,itemInstance:entry.inventoryItem,itemQuantity:entry.quantity,isSuperuser:isSuperuser]" />
+                                  model="[commandInstance:commandInstance,binLocation:entry.binLocation,itemInstance:entry.inventoryItem,itemQuantity:entry.quantityOnHand,isSuperuser:isSuperuser]" />
                     </td>
                     <td>
                         <div class="line">
@@ -62,17 +64,27 @@
                     <td>
                         <g:expirationDate date="${entry?.inventoryItem?.expirationDate}"/>
                     </td>
-
                     <td>
-                        ${entry?.inventoryItem?.comments}
+                        ${g.formatNumber(number: entry?.quantityOnHand, format: '###,###,###') }
+                        ${entry?.inventoryItem?.product?.unitOfMeasure}
                     </td>
                     <td>
-                        ${g.formatNumber(number: entry?.quantity, format: '###,###,###') }
-                        ${entry?.product?.unitOfMeasure}
+                        ${g.formatNumber(number: entry?.quantityAvailable, format: '###,###,###') }
+                        ${entry?.inventoryItem?.product?.unitOfMeasure}
+                    </td>
+                    <td>
+                        <g:if test="${entry?.status == AvailableItemStatus.PICKED}">
+                            <a href="javascript:void(0);" onclick="$('#showPendingOutboundTabLink').click();">
+                                <warehouse:message code="stockCard.enum.AvailableItemStatus.${entry?.status}"/>
+                            </a>
+                        </g:if>
+                        <g:elseif test="${entry?.status && entry.status != AvailableItemStatus.AVAILABLE}">
+                            <warehouse:message code="stockCard.enum.AvailableItemStatus.${entry?.status}"/>
+                        </g:elseif>
                     </td>
                 </tr>
             </g:each>
-            <g:unless test="${commandInstance.quantityByBinLocation}">
+            <g:unless test="${commandInstance.availableItems}">
                 <tr>
                     <td colspan="6">
                         <div class="fade empty center">
@@ -85,7 +97,7 @@
         </tbody>
         <tfoot>
             <tr class="odd" style="border-top: 1px solid lightgrey; border-bottom: 0px solid lightgrey">
-                <td colspan="5" class="right">
+                <td colspan="4" class="right">
                     <!-- This space intentially left blank -->
                 </td>
                 <td>
@@ -106,6 +118,28 @@
                             </g:else>
                         </span>
                     </div>
+                </td>
+                <td>
+                    <div class="large">
+                        <g:set var="styleClass" value="color: black;"/>
+                        <g:if test="${commandInstance.totalQuantityAvailableToPromise < 0}">
+                            <g:set var="styleClass" value="color: red;"/>
+                        </g:if>
+                        <span style="${styleClass }" id="totalQuantityAvailableToPromise">
+                            ${g.formatNumber(number: commandInstance.totalQuantityAvailableToPromise, format: '###,###,###') }
+                        </span>
+                        <span class="">
+                            <g:if test="${commandInstance?.product?.unitOfMeasure }">
+                                <format:metadata obj="${commandInstance?.product?.unitOfMeasure}"/>
+                            </g:if>
+                            <g:else>
+                                ${warehouse.message(code:'default.each.label') }
+                            </g:else>
+                        </span>
+                    </div>
+                </td>
+                <td>
+                    <!-- This space intentially left blank -->
                 </td>
                 <g:hasErrors bean="${flash.itemInstance}">
                     <td style="border: 0px;">

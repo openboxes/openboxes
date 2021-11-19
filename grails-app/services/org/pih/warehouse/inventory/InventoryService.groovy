@@ -1207,11 +1207,72 @@ class InventoryService implements ApplicationContextAware {
         cmd.quantityByInventoryItemMap = getQuantityByInventoryItemMap(cmd.transactionEntryList)
 
         // Used in the current stock tab
-        cmd.quantityByBinLocation = getQuantityByBinLocation(cmd.transactionEntryList)
+        def quantityAvailableInventoryItemMap = getQuantityAvailableByProductAndInventoryItemMap(cmd.product, cmd.warehouse)
+        cmd.availableItems = getAvailableItems(cmd.transactionEntryList, quantityAvailableInventoryItemMap)
 
         cmd.totalQuantityAvailableToPromise = getQuantityAvailableToPromise(cmd.product, cmd.warehouse)
 
         return cmd
+    }
+
+    List<AvailableItem> getAvailableItems(List<TransactionEntry> entries, def quantityAvailableInventoryItemMap) {
+        def availableItems = []
+
+        // first get the quantity and inventory item map
+        Map quantityBinLocationMap = getQuantityByProductAndInventoryItemMap(entries, true)
+        quantityBinLocationMap.keySet().each { Product product ->
+            quantityBinLocationMap[product].keySet().each { inventoryItem ->
+                quantityBinLocationMap[product][inventoryItem].keySet().each { Location binLocation ->
+                    def quantityOnHand = quantityBinLocationMap[product][inventoryItem][binLocation]
+
+                    def quantityAvailableMap = quantityAvailableInventoryItemMap[product][inventoryItem]
+                    def quantityAvailable = quantityAvailableMap ? quantityAvailableMap[binLocation] : 0
+
+                    // We don't want to show the negative values on the frontend
+                    quantityAvailable = quantityAvailable > 0 ? quantityAvailable : 0
+
+                    // Exclude bin locations with quantity 0 (include negative quantity for data quality purposes)
+                    if (quantityOnHand != 0) {
+                        availableItems << new AvailableItem(
+                                inventoryItem: inventoryItem,
+                                binLocation: binLocation,
+                                quantityOnHand: quantityOnHand,
+                                quantityAvailable: quantityAvailable
+                        )
+                    }
+                }
+            }
+        }
+
+        // Sort by expiration date, then bin location
+        availableItems = availableItems.sort { a, b ->
+            a?.inventoryItem?.expirationDate <=> b?.inventoryItem?.expirationDate ?: a?.binLocation?.name <=> b.binLocation?.name
+        }
+
+        return availableItems
+    }
+
+    def getQuantityAvailableByProductAndInventoryItemMap(Product product, Location location) {
+        def productAvailability = ProductAvailability.createCriteria().list {
+            eq("location", location)
+            eq("product", product)
+        }
+
+        def quantityAvailableMap = [:]
+        quantityAvailableMap[product] = [:]
+
+        productAvailability?.each {
+            InventoryItem inventoryItem = it.inventoryItem
+            Location binLocation = it.binLocation
+
+            if (!quantityAvailableMap[product][inventoryItem]) {
+                quantityAvailableMap[product][inventoryItem] = [:]
+            }
+
+            quantityAvailableMap[product][inventoryItem][binLocation] = it.quantityAvailableToPromise
+        }
+
+        return quantityAvailableMap
     }
 
     Integer getQuantityAvailableToPromise(Product product, Location location) {
