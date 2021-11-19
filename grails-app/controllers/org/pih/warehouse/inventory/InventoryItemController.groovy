@@ -17,6 +17,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.requisition.RequisitionItem
@@ -289,7 +290,7 @@ class InventoryItemController {
             )
         }
         orderItems = orderService.getPendingInboundOrderItems(location, product)
-        orderItems.collect {
+        orderItems.findAll {orderItem -> orderItem.orderItemStatusCode != OrderItemStatusCode.CANCELED}.collect {
             def existingItem = itemsMap.find {k, v -> k instanceof OrderItem && k.actualReadyDate == it.actualReadyDate && k.order == it.order}
             if (!existingItem) {
                 itemsMap.put(it, [
