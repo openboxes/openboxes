@@ -435,19 +435,43 @@ class PickPage extends Component {
     return handleError(error);
   }
 
+  validateReasonCodes(lineItems) {
+    const { pickPageItems } = lineItems;
+    const invalidItem = _.find(
+      pickPageItems,
+      pickPageItem => pickPageItem.quantityRequired > pickPageItem.quantityPicked && _.find(
+        pickPageItem.picklistItems,
+        item => !item.reasonCode,
+      ),
+    );
+
+    if (invalidItem) {
+      this.setState({
+        showAlert: true,
+        alertMessage: `Product ${invalidItem.productCode} requires a reason code for the pick value. 
+        Please add a reason code through the Edit Pick.`,
+      });
+      return false;
+    }
+
+    return true;
+  }
+
   /**
    * Goes to the next stock movement step.
    * @param {object} formValues
    * @public
    */
   nextPage(formValues) {
-    this.props.showSpinner();
-    this.validatePicklist()
-      .then(() =>
-        this.transitionToNextStep()
-          .then(() => this.props.nextPage(formValues))
-          .catch(() => this.props.hideSpinner()))
-      .catch(() => this.props.hideSpinner());
+    if (this.validateReasonCodes(formValues)) {
+      this.props.showSpinner();
+      this.validatePicklist()
+        .then(() =>
+          this.transitionToNextStep()
+            .then(() => this.props.nextPage(formValues))
+            .catch(() => this.props.hideSpinner()))
+        .catch(() => this.props.hideSpinner());
+    }
   }
 
   /**
