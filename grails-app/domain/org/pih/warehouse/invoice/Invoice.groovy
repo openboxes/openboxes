@@ -12,6 +12,7 @@ package org.pih.warehouse.invoice
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.UnitOfMeasureConversion
@@ -64,19 +65,24 @@ class Invoice implements Serializable {
     User createdBy
     User updatedBy
 
-    static hasMany = [referenceNumbers: ReferenceNumber, invoiceItems: InvoiceItem]
+    static hasMany = [
+            referenceNumbers : ReferenceNumber,
+            invoiceItems     : InvoiceItem,
+            documents : Document,
+    ]
 
     static mapping = {
         id generator: 'uuid'
         referenceNumbers cascade: "all-delete-orphan"
         invoiceItems cascade: "all-delete-orphan"
+        documents joinTable: [name: 'invoice_document', column: 'document_id', key: 'invoice_id']
     }
 
     static transients = [
             'vendorInvoiceNumber',
             'totalValue',
             'totalValueNormalized',
-            'documents',
+            'orderDocuments',
             'status',
             'hasPrepaymentInvoice',
             'totalPrepaymentValue',
@@ -138,7 +144,7 @@ class Invoice implements Serializable {
         return totalValue * (currentExchangeRate ?: 1.0)
     }
 
-    def getDocuments() {
+    def getOrderDocuments() {
         def documents = []
         invoiceItems.each {invoiceItem ->
             if (invoiceItem?.order?.documents) {
@@ -225,7 +231,7 @@ class Invoice implements Serializable {
             invoiceType: invoiceType?.code?.name(),
             hasPrepaymentInvoice: hasPrepaymentInvoice,
             isPrepaymentInvoice: isPrepaymentInvoice,
-            documents: documents,
+            documents: orderDocuments,
         ]
     }
 }
