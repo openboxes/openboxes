@@ -823,11 +823,13 @@ class StockMovementService {
                     where parent_requisition_item_id in (${editItemsIds})
                     """).groupBy { it.parent_requisition_item_id }
 
-        def productsMap = Product.findAllByIdInList(data.collect { it.product_id })
-                .inject([:]) {map, item -> map << [(item.id): item]}
+        def products = Product.findAllByIdInList(data.collect { it.product_id })
+        def productsMap = products.inject([:]) { map, item -> map << [(item.id): item] }
 
         Requisition requisition = Requisition.get(data.first()?.requisition_id)
         def picklistItemsMap = requisition?.picklist?.pickablePicklistItemsByProductId
+
+        def availableItemsMap = productAvailabilityService.getAllAvailableBinLocations(requisition.origin, products).groupBy { it?.inventoryItem?.product?.id }
 
         def editPageItems = data.collect {
             def substitutionItems = substitutionItemsMap[it.id]
@@ -835,13 +837,11 @@ class StockMovementService {
             def statusCode = substitutionItems ? RequisitionItemStatus.SUBSTITUTED :
                     it.quantity_revised != null ? RequisitionItemStatus.CHANGED : RequisitionItemStatus.APPROVED
 
-            def picklistQtyForItem = (!picklistItemsMap || !picklistItemsMap[it.product_id]) ? 0 : picklistItemsMap[it.product_id].sum { it.quantity }
+            List<AvailableItem> availableItems = availableItemsMap[it.product_id]
+            availableItems = calculateQuantityAvailableToPromise(availableItems, picklistItemsMap[it.product_id])
 
-            def quantityAvailable = (it.quantity_available_to_promise ?: 0) + picklistQtyForItem
-
-            if (quantityAvailable > it.quantity_on_hand) {
-                quantityAvailable = it.quantity_on_hand
-            }
+            def quantityAvailable = availableItems?.sum { it.quantityAvailable }
+            def quantityOnHand = availableItems?.sum { it.quantityOnHand }
 
             [
                 product                     : productsMap[it.product_id],
@@ -853,29 +853,28 @@ class StockMovementService {
                 quantityRevised             : it.quantity_revised,
                 quantityCanceled            : it.quantity_canceled,
                 quantityConsumed            : it.quantity_demand,
-                quantityOnHand              : it.quantity_on_hand,
-                quantityAvailable           : quantityAvailable,
+                quantityOnHand              : (quantityOnHand && quantityOnHand > 0 ? quantityOnHand : 0),
+                quantityAvailable           : (quantityAvailable && quantityAvailable > 0 ? quantityAvailable : 0),
                 substitutionStatus          : it.substitution_status,
                 sortOrder                   : it.sort_order,
                 reasonCode                  : it.cancel_reason_code,
                 comments                    : it.comments,
                 statusCode                  : statusCode.name(),
                 substitutionItems           : substitutionItems.collect {
-                    def picklistQtyForSubstitution = !picklistItemsMap[it.product_id] ? 0 : picklistItemsMap[it.product_id].sum { it.quantity }
+                    Product product = Product.get(it.product_id)
+                    List<AvailableItem> availableItemsForSubstitution = productAvailabilityService.getAllAvailableBinLocations(requisition.origin, product)
+                    availableItemsForSubstitution = calculateQuantityAvailableToPromise(availableItemsForSubstitution, picklistItemsMap[it.product_id])
 
-                    def qtyAvailable = (it.quantity_available_to_promise ?: 0) + picklistQtyForSubstitution
-
-                    if (qtyAvailable > it.quantity_on_hand) {
-                        qtyAvailable = it.quantity_on_hand
-                    }
+                    def qtyAvailable = availableItemsForSubstitution?.sum { it.quantityAvailable }
+                    def qtyOnHand = availableItemsForSubstitution?.sum { it.quantityOnHand }
 
                     [
-                        product             : Product.get(it.product_id),
+                        product             : product,
                         productId           : it.product_id,
                         productCode         : it.product_code,
                         productName         : it.name,
-                        quantityAvailable   : qtyAvailable,
-                        quantityOnHand      : it.quantity_on_hand,
+                        quantityAvailable   : (qtyAvailable && qtyAvailable > 0 ? qtyAvailable : 0),
+                        quantityOnHand      : (qtyOnHand && qtyOnHand > 0 ? qtyOnHand : 0),
                         quantityConsumed    : it.quantity_demand,
                         quantitySelected    : it.quantity,
                         quantityRequested   : it.quantity
@@ -1244,7 +1243,7 @@ class StockMovementService {
             return calculateAvailableItemsStatus(requisitionItem, availableItems)
         }
 
-        return availableItems
+        return productAvailabilityService.sortAvailableItems(availableItems)
     }
 
     List<AvailableItem> calculateQuantityAvailableToPromise(List<AvailableItem> availableItems, def picklistItems) {
@@ -1267,7 +1266,7 @@ class StockMovementService {
             }
         }
 
-        return productAvailabilityService.sortAvailableItems(availableItems)
+        return availableItems
     }
 
     List<AvailableItem> calculateAvailableItemsStatus(RequisitionItem requisitionItem, List<AvailableItem> availableItems) {
@@ -1370,6 +1369,7 @@ class StockMovementService {
                     availableItems = productAvailabilityService.getAllAvailableBinLocations(location, associatedProduct)
                     availableItems = availableItems.findAll { it.quantityOnHand > 0 }
                     availableItems = calculateQuantityAvailableToPromise(availableItems, picklistItems)
+                    availableItems = productAvailabilityService.sortAvailableItems(availableItems)
                 } else {
                     availableItems = productAvailabilityService.getAvailableBinLocations(location, associatedProduct)
                 }
