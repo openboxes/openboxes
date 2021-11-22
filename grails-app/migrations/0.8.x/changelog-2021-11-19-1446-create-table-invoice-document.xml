@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="MagdaToczek" id="1911202114460-1">
+    <createTable tableName="invoice_document">
+      <column name="invoice_id" type="CHAR(38)"/>
+      <column name="document_id" type="CHAR(38)"/>
+    </createTable>
+  </changeSet>
+  <changeSet author="MagdaToczek" id="1911202114460-2">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_invoice_document_invoice"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="invoice_id"
+                             baseTableName="invoice_document"
+                             constraintName="fk_invoice_document_invoice" deferrable="false"
+                             initiallyDeferred="false" referencedColumnNames="id" referencedTableName="invoice"/>
+  </changeSet>
+  <changeSet author="MagdaToczek" id="1911202114460-3">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_invoice_document_document"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="document_id"
+                             baseTableName="invoice_document"
+                             constraintName="fk_invoice_document_document" deferrable="false"
+                             initiallyDeferred="false" referencedColumnNames="id" referencedTableName="document"/>
+  </changeSet>
+</databaseChangeLog>
