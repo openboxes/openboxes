@@ -111,8 +111,15 @@ class FieldArrayComponent extends Component {
                     }}
                   >
                     <Tooltip
-                      html={(config.label &&
-                        <div>{this.props.translate(config.label, config.defaultMessage)}</div>)}
+                      html={config.headerTooltip ? (
+                        <div>
+                          {this.props.translate(config.headerTooltip, config.headerDefaultTooltip)}
+                        </div>
+                      ) : (config.label &&
+                        <div>
+                          {this.props.translate(config.label, config.defaultMessage)}
+                        </div>
+                      )}
                       theme="transparent"
                       arrow="true"
                       delay="150"
