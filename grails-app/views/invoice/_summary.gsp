@@ -45,6 +45,10 @@
                     <g:message code="default.button.delete.label"/>
                 </g:link>
             </g:if>
+            <g:link controller="invoice" action="addDocument" id="${invoiceInstance?.id}" class="button">
+                <img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />&nbsp;
+                <warehouse:message code="invoice.addDocument.label" default="Add document"/>
+            </g:link>
         </g:hasRoleInvoice>
     </div>
 </div>
