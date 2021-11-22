@@ -841,7 +841,7 @@ class StockMovementService {
             def picklist = (picklistItemsMap && picklistItemsMap[it.product_id]) ? picklistItemsMap[it.product_id] : []
             availableItems = calculateQuantityAvailableToPromise(availableItems, picklist)
 
-            def quantityAvailable = availableItems?.sum { it.quantityAvailable }
+            def quantityAvailable = availableItems?.findAll { it.quantityAvailable > 0 }?.sum { it.quantityAvailable }
             def quantityOnHand = availableItems?.sum { it.quantityOnHand }
 
             [
@@ -867,7 +867,7 @@ class StockMovementService {
                     def picklistForSubstitution = (picklistItemsMap && picklistItemsMap[it.product_id]) ? picklistItemsMap[it.product_id] : []
                     availableItemsForSubstitution = calculateQuantityAvailableToPromise(availableItemsForSubstitution, picklistForSubstitution)
 
-                    def qtyAvailable = availableItemsForSubstitution?.sum { it.quantityAvailable }
+                    def qtyAvailable = availableItemsForSubstitution?.findAll { it.quantityAvailable > 0 }?.sum { it.quantityAvailable }
                     def qtyOnHand = availableItemsForSubstitution?.sum { it.quantityOnHand }
 
                     [
