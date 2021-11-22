@@ -755,10 +755,10 @@ class ShipmentService {
         }
 
         def origin = Location.get(shipmentItem?.shipment?.origin?.id)
-        def quantityOnHand = productAvailabilityService.getQuantityOnHandInBinLocation(shipmentItem.inventoryItem, shipmentItem.binLocation)
+        def quantityAvailableToReturn = productAvailabilityService.getQuantityNotPickedInBinLocation(shipmentItem.inventoryItem, shipmentItem.binLocation)
 
-        if (shipmentItem.quantity > quantityOnHand) {
-            String errorMessage = "Shipping quantity (${shipmentItem.quantity}) can not exceed quantity on hand (${quantityOnHand}) for " +
+        if (shipmentItem.quantity > quantityAvailableToReturn) {
+            String errorMessage = "Shipping quantity (${shipmentItem.quantity}) can not exceed quantity on hand (${quantityAvailableToReturn}) for " +
                     "product code ''${shipmentItem.product.productCode}'' " +
                     "and lot number ''${shipmentItem?.inventoryItem?.lotNumber}'' " +
                     "at origin ''${origin.name}'' " +
@@ -768,7 +768,7 @@ class ShipmentService {
             shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedAvailableQuantity",
                     [
                             shipmentItem.quantity + " " + shipmentItem?.product?.unitOfMeasure,
-                            quantityOnHand + " " + shipmentItem?.product?.unitOfMeasure,
+                            quantityAvailableToReturn + " " + shipmentItem?.product?.unitOfMeasure,
                             shipmentItem?.product?.productCode,
                             shipmentItem?.inventoryItem?.lotNumber,
                             origin.name,

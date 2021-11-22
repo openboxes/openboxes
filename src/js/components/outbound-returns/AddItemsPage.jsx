@@ -96,6 +96,14 @@ const FIELDS = {
         defaultMessage: 'QOH',
         flexWidth: '1',
       },
+      quantityNotPicked: {
+        type: LabelField,
+        label: 'react.outboundReturns.qtyNotPicked.label',
+        defaultMessage: 'Quantity Available to Return',
+        headerTooltip: 'react.outboundReturns.qtyNotPickedTooltip.label',
+        headerDefaultTooltip: 'This is the quantity on hand that is not currently picked in a shipment',
+        flexWidth: '1',
+      },
       originZone: {
         type: LabelField,
         label: 'react.outboundReturns.zone.label',
@@ -140,7 +148,7 @@ function validate(values) {
     if (
       item.checked &&
       (
-        (_.toInteger(item.quantity) > item.quantityOnHand) ||
+        (_.toInteger(item.quantity) > item.quantityNotPicked) ||
         _.toInteger(item.quantity) < 0
       )
     ) {
@@ -367,7 +375,7 @@ class AddItemsPage extends Component {
             return {
               ...item,
               checked: value,
-              quantity: value ? item.quantityOnHand : '',
+              quantity: value ? item.quantityNotPicked : '',
             };
           }
           return { ...item };

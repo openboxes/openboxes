@@ -385,6 +385,18 @@ class ProductAvailabilityService {
         return quantityOnHand
     }
 
+    def getQuantityNotPickedInBinLocation(InventoryItem inventoryItem, Location binLocation) {
+        def quantityOnHand = ProductAvailability.createCriteria().get {
+            projections {
+                sum("quantityNotPicked")
+            }
+            eq("inventoryItem", inventoryItem)
+            eq("binLocation", binLocation)
+        }
+
+        return quantityOnHand
+    }
+
     Map<Product, Integer> getCurrentInventory(Location location) {
         return getQuantityOnHandByProduct(location)
     }
