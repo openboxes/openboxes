@@ -1314,7 +1314,7 @@ class StockMovementService {
         Integer quantityAvailable = autoPickableItems ? autoPickableItems?.sum {
             it.quantityAvailable
         } : 0
-        if (quantityRequested <= quantityAvailable) {
+        if (quantityAvailable > 0) {
 
             for (AvailableItem availableItem : autoPickableItems) {
                 if (quantityRequested == 0)
