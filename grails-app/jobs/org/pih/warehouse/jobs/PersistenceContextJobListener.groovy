@@ -21,9 +21,8 @@ import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.grails.support.PersistenceContextInterceptor
 import org.quartz.JobExecutionContext
 import org.quartz.JobExecutionException
-import org.quartz.listeners.JobListenerSupport
 
-public class PersistenceContextJobListener extends JobListenerSupport {
+public class PersistenceContextJobListener extends grails.plugin.quartz2.PersistenceContextJobListener {
 	private static final transient Log log = LogFactory.getLog(PersistenceContextJobListener.class);
     PersistenceContextInterceptor persistenceInterceptor
 	public static final transient String PERSITENCE_INIT = "gormSession";
