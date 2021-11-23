@@ -8,6 +8,7 @@ import Alert from 'react-s-alert';
 import update from 'immutability-helper';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
+import axios from 'axios';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -16,12 +17,17 @@ import TextField from '../../form-elements/TextField';
 import { renderFormField } from '../../../utils/form-utils';
 import LabelField from '../../form-elements/LabelField';
 import SelectField from '../../form-elements/SelectField';
-import apiClient, { flattenRequest } from '../../../utils/apiClient';
+import {
+  flattenRequest,
+  handleSuccess,
+  handleError,
+} from '../../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../../actions';
 import PackingSplitLineModal from '../modals/PackingSplitLineModal';
 import { debounceUsersFetch } from '../../../utils/option-utils';
 import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
 import renderHandlingIcons from '../../../utils/product-handling-icons';
+import AlertMessage from '../../../utils/AlertMessage';
 
 const FIELDS = {
   packPageItems: {
@@ -166,6 +172,8 @@ const FIELDS = {
   },
 };
 
+const apiClient = axios.create({});
+
 function validate(values) {
   const errors = {};
   errors.packPageItems = [];
@@ -190,11 +198,16 @@ class PackingPage extends Component {
       values: { ...this.props.initialValues, packPageItems: [] },
       totalCount: 0,
       isFirstPageLoaded: false,
+      showAlert: false,
+      alertMessage: '',
     };
 
     this.saveSplitLines = this.saveSplitLines.bind(this);
     this.isRowLoaded = this.isRowLoaded.bind(this);
     this.loadMoreRows = this.loadMoreRows.bind(this);
+    this.handleValidationErrors = this.handleValidationErrors.bind(this);
+
+    apiClient.interceptors.response.use(handleSuccess, this.handleValidationErrors);
 
     this.debouncedUsersFetch =
       debounceUsersFetch(this.props.debounceTime, this.props.minSearchLength);
@@ -363,6 +376,17 @@ class PackingPage extends Component {
     return apiClient.get(url);
   }
 
+  handleValidationErrors(error) {
+    if (error.response.status === 400) {
+      const alertMessage = _.join(_.get(error, 'response.data.errorMessages', ''), ' ');
+      this.setState({ alertMessage, showAlert: true });
+
+      return Promise.reject(error);
+    }
+
+    return handleError(error);
+  }
+
   /**
    * Saves current stock movement progress (line items) and goes to the next stock movement step.
    * @param {object} formValues
@@ -437,6 +461,7 @@ class PackingPage extends Component {
         validate={validate}
         render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
+            <AlertMessage show={this.state.showAlert} message={this.state.alertMessage} danger />
             { !showOnly ?
               <span className="buttons-container">
                 <button
