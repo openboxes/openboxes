@@ -192,7 +192,7 @@ class StockTransferService {
         }
         order.save(failOnError: true)
 
-        if (order.orderType == OrderType.get(Constants.OUTBOUND_RETURNS) && order?.orderItems) {
+        if (order.orderType == OrderType.get(Constants.RETURN_ORDER) && order?.orderItems) {
             picklistService.createPicklistFromItem(order)
         }
 

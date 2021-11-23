@@ -139,4 +139,5 @@
     <include file="0.8.x/changelog-2021-10-12-1210-alter-table-inventory-level-add-demand-period.xml"/>
     <include file="0.8.x/changelog-2021-11-04-1535-alter-table-location-drop-local-column.xml"/>
     <include file="0.8.x/changelog-2021-11-19-1446-create-table-invoice-document.xml"/>
+    <include file="0.8.x/changelog-2021-11-22-1530-rename-outbound-returns-order-type.xml"/>
 </databaseChangeLog>

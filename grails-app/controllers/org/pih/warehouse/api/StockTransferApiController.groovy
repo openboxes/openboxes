@@ -85,7 +85,7 @@ class StockTransferApiController {
         bindStockTransferData(stockTransfer, currentUser, currentLocation, jsonObject)
 
         Order order
-        Boolean isReturnType = stockTransfer.type == OrderType.findByCode(Constants.OUTBOUND_RETURNS)
+        Boolean isReturnType = stockTransfer.type == OrderType.findByCode(Constants.RETURN_ORDER)
         if (isReturnType && (stockTransfer?.status == StockTransferStatus.PLACED)) {
             order = stockTransferService.createOrUpdateOrderFromStockTransfer(stockTransfer)
             shipmentService.createOrUpdateShipment(stockTransfer)
