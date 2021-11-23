@@ -851,9 +851,6 @@ class ProductAvailabilityService {
         Date expirationDate = params.expirationDate ? dateFormat.parse(params.expirationDate) : null
         return ProductAvailability.createCriteria().list {
             eq("location", location)
-            binLocation {
-                ne("locationType", LocationType.get(Constants.RECEIVING_LOCATION_TYPE_ID))
-            }
             or {
                 if (product) {
                     eq("product", product)
