@@ -10,13 +10,15 @@
 package org.pih.warehouse.shipping
 
 import grails.converters.JSON
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.BaseDomainApiController
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 
-class ContainerApiController extends BaseDomainApiController {
+class ContainerApiController  {
 
     def zebraService
     def documentService
@@ -51,6 +53,27 @@ class ContainerApiController extends BaseDomainApiController {
             return
         } catch (Exception e) {
             render([errorCode: 500, cause: e?.class, errorMessage: e?.message] as JSON)
+        }
+    }
+
+    def save = {
+        try {
+            JSONObject jsonObject = request.JSON
+            Shipment shipment = shipmentService.getShipment(jsonObject.getString("shipment.id"))
+            if(!jsonObject.containsKey("container.name") && !jsonObject.containsKey("container.containerNumber")){
+                render shipmentService.initializeContainerFromShipment(shipment) as JSON
+            }else{
+                Container container = new Container(shipment: shipment)
+                container.name = jsonObject.getString("container.name")
+                container.containerNumber = jsonObject.getString("container.containerNumber")
+                container.containerType = ContainerType.findById(Constants.BOX_CONTAINER_TYPE_ID)
+                container.save(flush: true, failOnError: true)
+                shipment.addToContainers(container)
+                shipment.save(flush: true)
+                render container as JSON
+            }
+        }catch(Exception ex){
+            render([errorCode: 500, cause: ex?.class, errorMessage: ex?.message] as JSON)
         }
     }
 

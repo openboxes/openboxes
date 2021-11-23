@@ -62,6 +62,11 @@ class UrlMappings {
             controller = { "locationApi" }
         }
 
+        "/api/containers"(parseRequest: true){
+            controller = "containerApi"
+            action = [POST: "save"]
+        }
+
         "/api/containers/$id/details"(parseRequest: true) {
             controller = "containerApi"
             action = [GET: "details"]

@@ -15,6 +15,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.FetchMode
 import org.pih.warehouse.core.ActivityCode
@@ -2155,4 +2156,28 @@ class ShipmentService {
             throw new ValidationException("Invalid shipment", shipment.errors)
         }
     }
+
+    Container initializeContainerFromShipment(Shipment shipment){
+        Container container = new Container()
+        container.shipment = shipment
+        container.name = generateContainerNumber(shipment)
+        container.containerNumber = container.name
+        container.discard()
+        return container
+    }
+
+    Integer getNextContainerNumberSequence(Shipment shipment){
+        return (shipment?.containers ? shipment?.containers?.size() : 0) + 1
+    }
+
+    String generateContainerNumber(Shipment shipment){
+        Integer sequenceNumber = getNextContainerNumberSequence(shipment)
+        String sequenceNumberStr = identifierService.generateSequenceNumber(sequenceNumber.toString())
+        Map model = [:]
+        model.put("shipmentNumber", shipment.id)
+        model.put("sequenceNumber", sequenceNumberStr)
+        String template = ConfigurationHolder.config.openboxes.identifier.container.format
+        return identifierService.renderTemplate(template, model)
+    }
+
 }
