@@ -231,7 +231,7 @@ class Invoice implements Serializable {
             invoiceType: invoiceType?.code?.name(),
             hasPrepaymentInvoice: hasPrepaymentInvoice,
             isPrepaymentInvoice: isPrepaymentInvoice,
-            documents: orderDocuments,
+            orderDocuments: orderDocuments,
         ]
     }
 }
