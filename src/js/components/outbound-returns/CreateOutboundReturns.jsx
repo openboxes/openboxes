@@ -170,7 +170,7 @@ class CreateOutboundReturns extends Component {
         description: values.description,
         'origin.id': values.origin.id,
         'destination.id': values.destination.id,
-        type: 'OUTBOUND_RETURNS',
+        type: 'RETURN_ORDER',
       };
 
       const url = '/openboxes/api/stockTransfers/';

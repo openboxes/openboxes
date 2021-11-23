@@ -29,7 +29,7 @@
 
         <g:set var="disabledMessage" value="${g.message(code:'inventory.stockTransfers.editCompleted')}"/>
 
-        <g:if test="${orderInstance.orderType == OrderType.findByCode(Constants.OUTBOUND_RETURNS)}">
+        <g:if test="${orderInstance.orderType == OrderType.findByCode(Constants.RETURN_ORDER)}">
             <g:link controller="stockTransfer" action="createReturns" id="${orderInstance?.id}" class="button"
                     disabled="${orderInstance?.status >= OrderStatus.COMPLETED}"
                     disabledMessage="${disabledMessage}">

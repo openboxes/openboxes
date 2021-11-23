@@ -676,7 +676,7 @@ class ShipmentService {
 
 
     boolean validateShipment(Shipment shipment) {
-        if (shipment?.orders && shipment?.orders?.first()?.orderType == OrderType.findByCode(Constants.OUTBOUND_RETURNS)) {
+        if (shipment?.orders && shipment?.orders?.first()?.orderType == OrderType.findByCode(Constants.RETURN_ORDER)) {
             shipment?.shipmentItems?.each { ShipmentItem shipmentItem ->
                 validateReturnShipmentItem(shipmentItem)
             }
