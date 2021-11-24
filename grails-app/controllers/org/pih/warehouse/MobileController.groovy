@@ -10,7 +10,6 @@
 package org.pih.warehouse
 
 import net.schmizz.sshj.sftp.SFTPException
-import org.apache.commons.io.IOUtils
 import org.apache.commons.net.util.Base64
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementType
@@ -246,10 +245,7 @@ class MobileController {
         }
         events = events.sort { it.date }
 
-        // Generate QR Code link for stock movement
-        def qrCodeLink = "${createLink(controller: "mobile", action: "outboundDetails", id: stockMovement.id, absolute: true)}"
-
-        [stockMovement:stockMovement, qrCodeLink: qrCodeLink, events:events]
+        [stockMovement:stockMovement, events:events]
     }
 
     def outboundDownload = {
