@@ -12,6 +12,7 @@ package org.pih.warehouse.core
 import grails.converters.JSON
 import org.pih.warehouse.util.RequestUtil
 import org.springframework.validation.BeanPropertyBindingResult
+import org.springframework.validation.ObjectError
 import util.ConfigHelper
 
 class ErrorsController {
@@ -96,13 +97,17 @@ class ErrorsController {
         if (RequestUtil.isAjax(request)) {
             response.status = 400
             BeanPropertyBindingResult errors = request?.exception?.cause?.errors
-            def errorMessages = errors.allErrors.collect {
-                return messageSource.getMessage(it.codes[0], it.arguments, it.defaultMessage, null)
+            def errorMessages = errors.allErrors.collect { ObjectError error ->
+                try {
+                    return messageSource.getMessage(error, Locale.default)
+                } catch (Exception e) {
+                    return error.toString()
+                }
             }
             render([errorCode: 400,
-                    errorMessage: "Validation error. " + request?.exception?.cause?.fullMessage,
-                    data: errors?.allErrors,
-                    errorMessages: errorMessages
+                    errorMessage: "Validation error(s): " + errorMessages.join(","),
+                    errorMessages: errorMessages,
+                    locale: Locale.default
             ] as JSON)
             return
         }
