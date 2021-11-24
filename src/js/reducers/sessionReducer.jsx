@@ -37,6 +37,7 @@ const initialState = {
     stockTransfer: false,
     replenishment: false,
     outboundReturns: false,
+    inboundReturns: false,
   },
   searchConfig: {
     debounceTime: 500,

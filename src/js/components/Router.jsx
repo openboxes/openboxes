@@ -81,7 +81,12 @@ const AsyncStockTransfer = Loadable({
 //    path="/**/replenishment/create/:replenishmentId?" component={AsyncReplenishment} />
 
 const AsyncOutboundReturns = Loadable({
-  loader: () => import('./outbound-returns/OutboundReturnsWizard'),
+  loader: () => import('./returns/outbound/OutboundReturnsWizard'),
+  loading: Loading,
+});
+
+const AsyncInboundReturns = Loadable({
+  loader: () => import('./returns/inbound/InboundReturnsWizard'),
   loading: Loading,
 });
 
@@ -100,7 +105,8 @@ const Router = props => (
         <MainLayoutRoute path="/**/stocklistManagement/index/:productId?" component={AsyncManagement} />
         <MainLayoutRoute path="/**/invoice/create/:invoiceId?" component={AsyncInvoice} />
         <MainLayoutRoute path="/**/stockTransfer/create/:stockTransferId?" component={AsyncStockTransfer} />
-        <MainLayoutRoute path="/**/stockTransfer/createReturns/:outboundReturnId?" component={AsyncOutboundReturns} />
+        <MainLayoutRoute path="/**/stockTransfer/createOutboundReturn/:outboundReturnId?" component={AsyncOutboundReturns} />
+        <MainLayoutRoute path="/**/stockTransfer/createInboundReturn/:inboundReturnId?" component={AsyncInboundReturns} />
         <MainLayoutRoute path="/**/" component={AsyncTablero} />
       </Switch>
     </BrowserRouter>

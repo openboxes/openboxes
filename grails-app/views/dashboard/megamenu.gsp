@@ -266,6 +266,11 @@
                                     <warehouse:message code="default.list.label" args="[warehouse.message(code: 'stockMovements.inbound.label')]"/>
                                 </g:link>
                             </div>
+                            <div class="mm-menu-item">
+                                <g:link controller="stockTransfer" action="createInboundReturn">
+                                    <warehouse:message code="inboundReturns.create.label" />
+                                </g:link>
+                            </div>
                         </div>
                     </g:if>
                     <g:if test="${megamenuConfig.putaways.enabled}">
@@ -341,7 +346,7 @@
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">
-                                <g:link controller="stockTransfer" action="createReturns">
+                                <g:link controller="stockTransfer" action="createOutboundReturn">
                                     <warehouse:message code="outboundReturns.create.label" />
                                 </g:link>
                             </div>

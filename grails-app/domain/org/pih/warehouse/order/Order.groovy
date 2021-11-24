@@ -95,6 +95,7 @@ class Order implements Serializable {
             "isPrepaymentInvoiceAllowed",
             "isPrepaymentRequired",
             "canGenerateInvoice",
+            "isReturnOrder",
             // Statuses
             "pending",
             "placed",
@@ -422,6 +423,20 @@ class Order implements Serializable {
 
     def getActiveOrderAdjustments() {
         return orderAdjustments.findAll {!it.canceled }
+    }
+
+    Boolean isReturnOrder() {
+        return orderType?.isReturnOrder()
+    }
+
+    // isInbound is temporary distinction between outbound and inbound used only for Outbound and Inbound Returns
+    Boolean isInbound(Location currentLocation) {
+        return returnOrder && destination == currentLocation && origin != currentLocation
+    }
+
+    // isOutbound is temporary distinction between outbound and inbound used only for Outbound and Inbound Returns
+    Boolean isOutbound(Location currentLocation) {
+        return returnOrder && origin == currentLocation && destination != currentLocation
     }
 
     Map toJson() {

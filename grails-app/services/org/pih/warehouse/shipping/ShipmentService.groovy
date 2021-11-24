@@ -671,7 +671,6 @@ class ShipmentService {
             shipmentItem.binLocation = null
         }
         return shipment.save()
-
     }
 
 

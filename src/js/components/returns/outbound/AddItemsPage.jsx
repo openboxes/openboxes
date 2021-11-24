@@ -13,17 +13,17 @@ import Alert from 'react-s-alert';
 import 'react-table/react-table.css';
 import 'react-datepicker/dist/react-datepicker.css';
 
-import { renderFormField } from '../../utils/form-utils';
-import LabelField from '../form-elements/LabelField';
-import Select from '../../utils/Select';
-import ArrayField from '../form-elements/ArrayField';
-import TextField from '../form-elements/TextField';
-import Checkbox from '../../utils/Checkbox';
-import { showSpinner, hideSpinner } from '../../actions';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
-import apiClient, { flattenRequest, parseResponse } from '../../utils/apiClient';
-import { debounceAvailableItemsFetch } from '../../utils/option-utils';
-import renderHandlingIcons from '../../utils/product-handling-icons';
+import { renderFormField } from '../../../utils/form-utils';
+import LabelField from '../../form-elements/LabelField';
+import Select from '../../../utils/Select';
+import ArrayField from '../../form-elements/ArrayField';
+import TextField from '../../form-elements/TextField';
+import Checkbox from '../../../utils/Checkbox';
+import { showSpinner, hideSpinner } from '../../../actions';
+import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
+import apiClient, { flattenRequest, parseResponse } from '../../../utils/apiClient';
+import { debounceAvailableItemsFetch } from '../../../utils/option-utils';
+import renderHandlingIcons from '../../../utils/product-handling-icons';
 
 const FIELDS = {
   returnItems: {
