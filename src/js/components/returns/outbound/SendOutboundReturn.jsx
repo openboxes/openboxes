@@ -10,16 +10,16 @@ import { confirmAlert } from 'react-confirm-alert';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-import ArrayField from '../form-elements/ArrayField';
-import DateField from '../form-elements/DateField';
-import LabelField from '../form-elements/LabelField';
-import SelectField from '../form-elements/SelectField';
-import TextField from '../form-elements/TextField';
-import { renderFormField } from '../../utils/form-utils';
+import ArrayField from '../../form-elements/ArrayField';
+import DateField from '../../form-elements/DateField';
+import LabelField from '../../form-elements/LabelField';
+import SelectField from '../../form-elements/SelectField';
+import TextField from '../../form-elements/TextField';
+import { renderFormField } from '../../../utils/form-utils';
 
-import { showSpinner, hideSpinner } from '../../actions';
-import apiClient, { parseResponse, flattenRequest } from '../../utils/apiClient';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
+import { showSpinner, hideSpinner } from '../../../actions';
+import apiClient, { parseResponse, flattenRequest } from '../../../utils/apiClient';
+import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
 
 const SHIPMENT_FIELDS = {
   'origin.name': {
