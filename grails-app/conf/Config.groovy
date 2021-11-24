@@ -1441,6 +1441,10 @@ openboxes.integration.order.action = "CREATE"
 // Default organization details
 openboxes.integration.order.organizationDetails.companyCode = ""
 openboxes.integration.order.organizationDetails.branchCode = ""
+openboxes.integration.order.organizationDetails.physicalReceiver = ""
+openboxes.integration.order.organizationDetails.logicalReceiver = ""
+openboxes.integration.order.organizationDetails.physicalSender = ""
+openboxes.integration.order.organizationDetails.logicalSender = ""
 
 // Default order details
 openboxes.integration.order.orderDetails.departmentCode = ""
@@ -1461,6 +1465,12 @@ openboxes.integration.order.orderDetails.cargoDetails.cargoType = "Unknown"
 openboxes.integration.order.orderDetails.cargoDetails.stackable = false
 openboxes.integration.order.orderDetails.cargoDetails.splittable = false
 openboxes.integration.order.orderDetails.cargoDetails.handlingUnit = "Unknown"
+
+openboxes.integration.partyType.contactData.firstName = ""
+openboxes.integration.partyType.contactData.lastName = ""
+openboxes.integration.partyType.contactData.phone.countryCode = ""
+openboxes.integration.partyType.contactData.phone.contactNumber = ""
+openboxes.integration.partyType.contactData.emailAddress = ""
 
 // Disable feature during development
 openboxes.shipping.splitPickItems.enabled = true
