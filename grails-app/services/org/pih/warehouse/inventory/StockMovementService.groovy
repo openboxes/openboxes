@@ -2588,8 +2588,7 @@ class StockMovementService {
                             documentType: DocumentGroupCode.PACKING_LIST.name(),
                             contentType : "text/html",
                             stepNumber  : null,
-                            uri         : g.createLink(controller: 'stockMovement', action: "printPackingList", id: stockMovement?.id, absolute: true),
-                            hidden      : !stockMovement?.shipment?.receipt
+                            uri         : g.createLink(controller: 'stockMovement', action: "printPackingList", id: stockMovement?.id, absolute: true)
                     ]
             ])
         }
