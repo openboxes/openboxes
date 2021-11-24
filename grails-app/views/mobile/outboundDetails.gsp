@@ -128,6 +128,7 @@
                 <span class="text-5 font-weight-500 text-dark">
                     <g:if test="${stockMovement?.trackingNumber}">
                         <g:link url="${stockMovement.trackingUri}">${stockMovement?.trackingNumber}</g:link>
+                        <g:displayBarcode showData="${false}" data="${stockMovement.trackingUri}" format="QR_CODE"/>
                     </g:if>
                     <g:else>
                         Not Available
@@ -138,7 +139,8 @@
             <div class="col-sm-12 col-md-3 text-center time-info mt-3 mt-sm-0">
                 <span class="text-muted d-block">QR Code</span>
                 <span class="text-5 font-weight-500 text-dark">
-                    <g:displayBarcode showData="${false}" data="${qrCodeLink}" format="QR_CODE"/>
+                    ${stockMovement.identifier}
+                    <g:displayBarcode showData="${false}" data="${stockMovement.generateLink()}" format="QR_CODE"/>
                 </span>
             </div>
 

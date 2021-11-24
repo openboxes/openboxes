@@ -12,13 +12,14 @@
           crossorigin="anonymous">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
           rel="stylesheet"/>
-
-
 </head>
 
 <body>
-    <g:include controller="mobile" action="menu"/>
-    <h1><g:layoutTitle/></h1>
+    <g:set var="includeHeader" value="${pageProperty(name: 'page.includeHeader')}"/>
+    <g:if test="${!includeHeader}">
+        <g:include controller="mobile" action="menu"/>
+        <h1><g:layoutTitle/></h1>
+    </g:if>
     <g:layoutBody/>
     <script
       src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
