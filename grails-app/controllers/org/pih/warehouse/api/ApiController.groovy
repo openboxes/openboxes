@@ -26,10 +26,11 @@ class ApiController {
 
     def dataSource
     def userService
-    def localizationService
+    def messageSource
+    def searchService
     def megamenuService
     def grailsApplication
-    def messageSource
+    def localizationService
 
     def login = {
         def username = request.JSON.username
@@ -212,4 +213,15 @@ class ApiController {
         }
         render([data: requestTypes] as JSON)
     }
+
+    def globalSearch = {
+        Object object = searchService.globalSearch(params.id)
+        if (object) {
+            render([data: object] as JSON)
+        }
+        else {
+            throw new IllegalStateException("Unable to locate object with identifier ${params.id}")
+        }
+    }
+
 }
