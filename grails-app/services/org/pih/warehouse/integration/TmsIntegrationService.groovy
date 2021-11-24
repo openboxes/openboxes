@@ -27,6 +27,7 @@ import org.pih.warehouse.integration.xml.order.Header
 import org.pih.warehouse.integration.xml.order.ItemDetails
 import org.pih.warehouse.integration.xml.order.KNOrgDetails
 import org.pih.warehouse.integration.xml.order.LocationInfo
+import org.pih.warehouse.integration.xml.order.ManageReferences
 import org.pih.warehouse.integration.xml.order.ManageRemarks
 import org.pih.warehouse.integration.xml.order.Order
 import org.pih.warehouse.integration.xml.order.OrderCargoSummary
@@ -36,12 +37,15 @@ import org.pih.warehouse.integration.xml.order.PartyID
 import org.pih.warehouse.integration.xml.order.PartyType
 import org.pih.warehouse.integration.xml.order.Phone
 import org.pih.warehouse.integration.xml.order.PlannedDateTime
+import org.pih.warehouse.integration.xml.order.RefType
 import org.pih.warehouse.integration.xml.order.Remark
 import org.pih.warehouse.integration.xml.order.TermsOfTrade
 import org.pih.warehouse.integration.xml.order.UnitTypeVolume
+import org.pih.warehouse.integration.xml.order.UnitTypeWeight
 import org.pih.warehouse.integration.xml.pod.DocumentUpload
 import org.pih.warehouse.integration.xml.trip.Trip
 import org.pih.warehouse.product.Attribute
+import org.pih.warehouse.shipping.ReferenceNumber
 
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.Marshaller
@@ -137,7 +141,9 @@ class TmsIntegrationService {
                 config.header.password, config.header.sequenceNumber, config.header.destinationApp);
         order.setHeader(header);
         order.setAction(config.action);
-        order.setKnOrgDetails(new KNOrgDetails(config.organizationDetails.companyCode, config.organizationDetails.branchCode));
+        order.setKnOrgDetails(buildOrganizationDetails(config));
+
+
 
         // Order Details
         OrderDetails orderDetails = new OrderDetails();
@@ -166,41 +172,78 @@ class TmsIntegrationService {
         Date expectedDeliveryDate = stockMovement?.expectedDeliveryDate?:requestedDeliveryDate
 
         orderDetails.setOrderStartLocation(buildLocationInfo(1,
-                stockMovement?.origin, expectedShippingDate, null));
+                stockMovement?.origin, expectedShippingDate, stockMovement.comments?:"N/A"));
+
         orderDetails.setOrderEndLocation(buildLocationInfo(2,
-                stockMovement?.destination, expectedDeliveryDate, null));
+                stockMovement?.destination, expectedDeliveryDate, stockMovement.comments?:"N/A"));
 
         // Calculate total volume for stock movement
         Attribute volumeAttribute = Attribute.findByCode("VOLUME")
-        BigDecimal totalVolume = stockMovement.getAggregateNumericValue(volumeAttribute)
+        BigDecimal totalVolume = stockMovement.getAggregateNumericValue(volumeAttribute)?:0
         String volumeUom = volumeAttribute?.unitOfMeasureClass?.baseUom?.code?:"cbm"
+
+        // Calculate total volume for stock movement
+        Attribute volumeWeight = Attribute.findByCode("WEIGHT")
+        BigDecimal totalWeight = stockMovement.getAggregateNumericValue(volumeWeight)?:0
+        String weightUom = volumeWeight?.unitOfMeasureClass?.baseUom?.code?:"kg"
 
         // Cargo Summary
         UnitTypeVolume unitTypeVolume = new UnitTypeVolume(totalVolume.toString(), volumeUom)
-        orderDetails.setOrderCargoSummary(buildOrderCargoSummary(stockMovement.hasHazardousMaterial(), unitTypeVolume))
+        UnitTypeWeight unitTypeWeight = new UnitTypeWeight(totalWeight.toString(), weightUom)
+        orderDetails.setOrderCargoSummary(buildOrderCargoSummary(stockMovement.hasHazardousMaterial(),
+                unitTypeVolume,
+                unitTypeWeight))
 
         // Cargo Details
-        List<ItemDetails> itemList = buildItemList(stockMovement, unitTypeVolume)
+        List<ItemDetails> itemList = buildItemList(stockMovement, unitTypeVolume, unitTypeWeight)
         orderDetails.setOrderCargoDetails(new CargoDetails(itemList));
 
         // Remarks
+        List<Remark> remarks = []
         if (stockMovement.comments) {
-            Remark remark = new Remark(stockMovement.comments);
-            ArrayList<Remark> remarks = new ArrayList<Remark>(Arrays.asList(remark));
-            orderDetails.setManageRemarks(new ManageRemarks(remarks));
+            remarks << new Remark(stockMovement.comments);
         }
+        else {
+            remarks << new Remark("No remarks")
+        }
+        orderDetails.setManageRemarks(new ManageRemarks(remarks));
+
+        List<RefType> referenceTypes = []
+        if (stockMovement?.identifier) {
+            referenceTypes << new RefType("extOrderId", stockMovement?.identifier)
+        }
+        if (stockMovement?.shipment?.referenceNumbers) {
+            stockMovement?.shipment?.referenceNumbers?.collect { ReferenceNumber referenceNumber ->
+                referenceTypes << new RefType(referenceNumber.referenceNumberType.name, referenceNumber?.identifier)
+            }
+        }
+
+        orderDetails.setManageReferences(new ManageReferences(referenceTypes))
         order.setOrderDetails(orderDetails);
 
         return order;
     }
 
-    List<ItemDetails> buildItemList(StockMovement stockMovement, UnitTypeVolume unitTypeVolume) {
+    KNOrgDetails buildOrganizationDetails(Map config) {
+        KNOrgDetails knOrgDetails = new KNOrgDetails(config.organizationDetails.companyCode, config.organizationDetails.branchCode)
+        knOrgDetails.setLogicalReceiver(config.organizationDetails.logicalReceiver)
+        knOrgDetails.setPhysicalReceiver(config.organizationDetails.physicalReceiver)
+        knOrgDetails.setLogicalSender(config.organizationDetails.logicalSender)
+        knOrgDetails.setPhysicalSender(config.organizationDetails.physicalSender)
+        return knOrgDetails
+    }
+
+    List<ItemDetails> buildItemList(StockMovement stockMovement, UnitTypeVolume unitTypeVolume, UnitTypeWeight unitTypeWeight) {
         List itemList = new ArrayList<ItemDetails>();
 
         Map config = grailsApplication.config.openboxes.integration.order
         if (config.orderDetails.cargoDetails.enabled) {
             Attribute volumeAttribute = Attribute.findByCode("VOLUME")
             String volumeUom = volumeAttribute?.unitOfMeasureClass?.baseUom?.code?:"cbm"
+
+            Attribute weightAttribute = Attribute.findByCode("WEIGHT")
+            String weightUom = weightAttribute?.unitOfMeasureClass?.baseUom?.code?:"kg"
+
             stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
                 ItemDetails itemDetails = new ItemDetails();
                 itemDetails.setCargoType(config.orderDetails.cargoDetails.cargoType);
@@ -211,8 +254,12 @@ class TmsIntegrationService {
                 itemDetails.setHandlingUnit(config.orderDetails.cargoDetails.handlingUnit);
                 itemDetails.setQuantity("${stockMovementItem?.quantityShipped?:stockMovementItem.quantityRequired}");
 
-                BigDecimal volumeValue = stockMovementItem.getNumericValue(volumeAttribute)
+                BigDecimal volumeValue = stockMovementItem.getNumericValue(volumeAttribute)?:0
                 itemDetails.setActualVolume(new UnitTypeVolume(volumeValue.toString(), volumeUom));
+
+                BigDecimal weightValue = stockMovementItem.getNumericValue(weightAttribute)?:0
+                itemDetails.setVolumetricWeight(new UnitTypeWeight(weightValue.toString(), weightUom));
+
                 itemList.add(itemDetails)
             }
         }
@@ -226,16 +273,18 @@ class TmsIntegrationService {
             itemDetails.setHandlingUnit(config.orderDetails.cargoDetails.handlingUnit);
             itemDetails.setQuantity("${stockMovement?.lineItems?.size()?:0}");
             itemDetails.setActualVolume(unitTypeVolume);
+            itemDetails.setVolumetricWeight(unitTypeWeight);
             itemList.add(itemDetails)
         }
         return itemList
     }
 
 
-    OrderCargoSummary buildOrderCargoSummary(Boolean dangerousGoodsFlag, UnitTypeVolume totalVolume) {
+    OrderCargoSummary buildOrderCargoSummary(Boolean dangerousGoodsFlag, UnitTypeVolume totalVolume, UnitTypeWeight totalWeight) {
         OrderCargoSummary orderCargoSummary = new OrderCargoSummary()
         orderCargoSummary.setDangerousGoodsFlag(dangerousGoodsFlag.toString())
         orderCargoSummary.setTotalVolume(totalVolume)
+        orderCargoSummary.setTotalWeight(totalWeight)
         return orderCargoSummary
     }
 
@@ -245,14 +294,28 @@ class TmsIntegrationService {
         partyType.setType(type);
 
         // Add contact information
-        User contact = contactData?:location?.manager
-        if (contact) {
-            partyType.setContactData(
-                    new ContactData(contact.firstName, contact?.lastName,
-                    new Phone(null, contact?.phoneNumber), contact?.email));
-        }
+        partyType.setContactData(buildContactData(contactData?:location?.manager))
         return partyType
 
+    }
+
+    ContactData buildContactData(User user) {
+        Map config = grailsApplication.config.openboxes.integration.partyType.contactData
+        if (user) {
+            return new ContactData(
+                    user.firstName,
+                    user?.lastName,
+                    new Phone(config.phone.countryCode, user?.phoneNumber),
+                    user?.email
+            );
+        }
+        else {
+            return new ContactData(
+                    config.firstName,
+                    config.lastName,
+                    new Phone(config.phone.countryCode, config.phone.contactNumber),
+                    config.emailAddress)
+        }
     }
 
     PartyType buildPartyType(Organization organization, User contactData, String type) {
@@ -285,7 +348,7 @@ class TmsIntegrationService {
                 address.description,
                 address.address,
                 address.city,
-                address.stateOrProvince?:"",
+                address.stateOrProvince?:address?.city,
                 address.postalCode?:"",
                 address.country?:"",
                 defaultTimeZone)
