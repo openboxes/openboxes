@@ -2582,6 +2582,13 @@ class StockMovementService {
                             stepNumber  : null,
                             uri         : g.createLink(controller: 'goodsReceiptNote', action: "print", id: stockMovement?.shipment?.id, absolute: true),
                             hidden      : !stockMovement?.shipment?.receipt
+                    ],
+                    [
+                            name        : g.message(code: "packingList.label", default: "Packing List"),
+                            documentType: DocumentGroupCode.PACKING_LIST.name(),
+                            contentType : "text/html",
+                            stepNumber  : null,
+                            uri         : g.createLink(controller: 'stockMovement', action: "printPackingList", id: stockMovement?.id, absolute: true)
                     ]
             ])
         }

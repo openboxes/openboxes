@@ -2,6 +2,7 @@ package org.pih.warehouse.api
 
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.codehaus.groovy.grails.validation.Validateable
 import org.pih.warehouse.core.ActivityCode
@@ -297,6 +298,11 @@ class StockMovement {
     String getTrackingUri() {
         final String uriTemplate = ConfigurationHolder.config.openboxes.integration.tracking.uri
         return trackingNumber ? String.format(uriTemplate, trackingNumber) : null
+    }
+
+    String generateLink() {
+        def g = ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        return "${g.createLink(controller: "mobile", action: "outboundDetails", id: id, absolute: true)}"
     }
 
 
