@@ -90,12 +90,14 @@ class StockTransferService {
             stockTransferItems << StockTransferItem.createFromProductAvailability(productAvailability)
         }
 
-        List<StockTransferItem> pendingStockTransferItems = getPendingItems(location)
+        if (!params) {
+            List<StockTransferItem> pendingStockTransferItems = getPendingItems(location)
 
-        stockTransferItems.removeAll { StockTransferItem item ->
-            pendingStockTransferItems.find {
-                item.location?.id == it.location?.id && item.inventoryItem?.id == it.inventoryItem?.id &&
-                        item.product?.id == it.product?.id
+            stockTransferItems.removeAll { StockTransferItem item ->
+                pendingStockTransferItems.find {
+                    item.location?.id == it.location?.id && item.inventoryItem?.id == it.inventoryItem?.id &&
+                            item.product?.id == it.product?.id
+                }
             }
         }
 
