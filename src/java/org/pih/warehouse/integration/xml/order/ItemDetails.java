@@ -4,7 +4,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType(propOrder = {"cargoType", "stackable", "grounded", "splittable", "dangerousGoodsFlag", "description",
-        "handlingUnit", "quantity", "length", "width", "height", "weight", "actualVolume", "actualWeight",
+        "quantity", "handlingUnit", "length", "width", "height", "weight", "actualVolume", "actualWeight",
         "volumetricWeight", "ldm"})
 public class ItemDetails {
     private String cargoType;

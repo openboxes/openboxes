@@ -40,6 +40,8 @@ import org.pih.warehouse.integration.xml.order.PlannedDateTime
 import org.pih.warehouse.integration.xml.order.RefType
 import org.pih.warehouse.integration.xml.order.Remark
 import org.pih.warehouse.integration.xml.order.TermsOfTrade
+import org.pih.warehouse.integration.xml.order.UnitTypeLength
+import org.pih.warehouse.integration.xml.order.UnitTypeQuantity
 import org.pih.warehouse.integration.xml.order.UnitTypeVolume
 import org.pih.warehouse.integration.xml.order.UnitTypeWeight
 import org.pih.warehouse.integration.xml.pod.DocumentUpload
@@ -50,6 +52,7 @@ import org.pih.warehouse.shipping.ReferenceNumber
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.Marshaller
 import javax.xml.bind.Unmarshaller
+import javax.xml.validation.SchemaFactory
 import java.text.SimpleDateFormat
 
 class TmsIntegrationService {
@@ -66,6 +69,12 @@ class TmsIntegrationService {
             BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream)
             Marshaller marshaller = JAXBContext.newInstance(clazz).createMarshaller()
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE)
+            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE)
+            marshaller.setProperty("com.sun.xml.internal.bind.xmlHeaders", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            //SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            //schema = factory.newSchema((new File(xsdLocation)));
+
+
             marshaller.marshal(object, bufferedOutputStream)
             bufferedOutputStream.flush()
             return byteArrayOutputStream.toString()
@@ -137,13 +146,11 @@ class TmsIntegrationService {
 
         // Create Order
         Order order = new Order();
-        Header header = new Header(config.header.version, config.header.username,
-                config.header.password, config.header.sequenceNumber, config.header.destinationApp);
+        Header header = new Header(config.header.version, null, null,
+                config.header.sequenceNumber, config.header.destinationApp);
         order.setHeader(header);
         order.setAction(config.action);
         order.setKnOrgDetails(buildOrganizationDetails(config));
-
-
 
         // Order Details
         OrderDetails orderDetails = new OrderDetails();
@@ -161,9 +168,9 @@ class TmsIntegrationService {
         // Party Types
         // FIXME Fix magic strings
         ArrayList <PartyType> partyTypes = new ArrayList<PartyType>();
-        partyTypes.add(buildPartyType(stockMovement?.origin, stockMovement?.origin?.manager, "SHIPPER"))
-        partyTypes.add(buildPartyType(stockMovement?.destination, stockMovement?.destination?.manager, "CONSIGNEE"))
         partyTypes.add(buildPartyType(stockMovement?.destination?.organization, stockMovement?.destination?.manager, "CUSTOMER"))
+        partyTypes.add(buildPartyType(stockMovement?.destination, stockMovement?.destination?.manager, "CONSIGNEE"))
+        partyTypes.add(buildPartyType(stockMovement?.origin, stockMovement?.origin?.manager, "SHIPPER"))
         orderDetails.setOrderParties(new OrderParties(partyTypes));
 
         // Start and end locations
@@ -190,7 +197,8 @@ class TmsIntegrationService {
         // Cargo Summary
         UnitTypeVolume unitTypeVolume = new UnitTypeVolume(totalVolume.toString(), volumeUom)
         UnitTypeWeight unitTypeWeight = new UnitTypeWeight(totalWeight.toString(), weightUom)
-        orderDetails.setOrderCargoSummary(buildOrderCargoSummary(stockMovement.hasHazardousMaterial(),
+        orderDetails.setOrderCargoSummary(buildOrderCargoSummary(config,
+                stockMovement.hasHazardousMaterial(),
                 unitTypeVolume,
                 unitTypeWeight))
 
@@ -247,12 +255,19 @@ class TmsIntegrationService {
             stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
                 ItemDetails itemDetails = new ItemDetails();
                 itemDetails.setCargoType(config.orderDetails.cargoDetails.cargoType);
-                itemDetails.setStackable("${config.orderDetails.cargoDetails.stackable}");
-                itemDetails.setSplittable("${config.orderDetails.cargoDetails.splittable}");
-                itemDetails.setDangerousGoodsFlag("${stockMovementItem?.product?.hazardousMaterial}");
+                itemDetails.setGrounded(config.orderDetails.cargoDetails.grounded);
+                itemDetails.setStackable(config.orderDetails.cargoDetails.stackable);
+                itemDetails.setSplittable(config.orderDetails.cargoDetails.splittable);
+                itemDetails.setDangerousGoodsFlag(config.orderDetails.cargoDetails.dangerousGoodsFlag);
                 itemDetails.setDescription(stockMovementItem?.product?.name);
-                itemDetails.setHandlingUnit(config.orderDetails.cargoDetails.handlingUnit);
                 itemDetails.setQuantity("${stockMovementItem?.quantityShipped?:stockMovementItem.quantityRequired}");
+                itemDetails.setHandlingUnit(config.orderDetails.cargoDetails.handlingUnit);
+                itemDetails.setLength(new UnitTypeLength("1.0", "m"))
+                itemDetails.setWidth(new UnitTypeLength("1.0", "m"))
+                itemDetails.setHeight(new UnitTypeLength("1.0", "m"))
+                itemDetails.setWeight(new UnitTypeWeight("1.0", "kg"))
+                itemDetails.setActualWeight(new UnitTypeWeight("1.0", "kg"))
+                itemDetails.setLdm("0")
 
                 BigDecimal volumeValue = stockMovementItem.getNumericValue(volumeAttribute)?:0
                 itemDetails.setActualVolume(new UnitTypeVolume(volumeValue.toString(), volumeUom));
@@ -266,23 +281,34 @@ class TmsIntegrationService {
         else {
             ItemDetails itemDetails = new ItemDetails();
             itemDetails.setCargoType(config.orderDetails.cargoDetails.cargoType);
-            itemDetails.setStackable("${config.orderDetails.cargoDetails.stackable}");
-            itemDetails.setSplittable("${config.orderDetails.cargoDetails.splittable}");
-            itemDetails.setDangerousGoodsFlag("${stockMovement.hasHazardousMaterial()}");
+            itemDetails.setGrounded(config.orderDetails.cargoDetails.grounded);
+            itemDetails.setStackable(config.orderDetails.cargoDetails.stackable);
+            itemDetails.setSplittable(config.orderDetails.cargoDetails.splittable);
+            itemDetails.setDangerousGoodsFlag(config.orderDetails.cargoDetails.dangerousGoodsFlag);
             itemDetails.setDescription(stockMovement?.description);
-            itemDetails.setHandlingUnit(config.orderDetails.cargoDetails.handlingUnit);
             itemDetails.setQuantity("${stockMovement?.lineItems?.size()?:0}");
+            itemDetails.setHandlingUnit(config.orderDetails.cargoDetails.handlingUnit);
+            itemDetails.setLength(new UnitTypeLength("1.0", "m"))
+            itemDetails.setWidth(new UnitTypeLength("1.0", "m"))
+            itemDetails.setHeight(new UnitTypeLength("1.0", "m"))
+            itemDetails.setWeight(new UnitTypeWeight("1.0", "kg"))
+            itemDetails.setActualWeight(new UnitTypeWeight("1.0", "kg"))
+            itemDetails.setLdm("0")
+
             itemDetails.setActualVolume(unitTypeVolume);
             itemDetails.setVolumetricWeight(unitTypeWeight);
+
             itemList.add(itemDetails)
         }
         return itemList
     }
 
 
-    OrderCargoSummary buildOrderCargoSummary(Boolean dangerousGoodsFlag, UnitTypeVolume totalVolume, UnitTypeWeight totalWeight) {
+    OrderCargoSummary buildOrderCargoSummary(Map config, Boolean dangerousGoodsFlag, UnitTypeVolume totalVolume, UnitTypeWeight totalWeight) {
         OrderCargoSummary orderCargoSummary = new OrderCargoSummary()
-        orderCargoSummary.setDangerousGoodsFlag(dangerousGoodsFlag.toString())
+        orderCargoSummary.setDangerousGoodsFlag(config.orderDetails.cargoDetails.dangerousGoodsFlag)
+        orderCargoSummary.setTotalPackagesOfDangerousGoods("0")
+        orderCargoSummary.setTotalQuantity(new UnitTypeQuantity("1.0"))
         orderCargoSummary.setTotalVolume(totalVolume)
         orderCargoSummary.setTotalWeight(totalWeight)
         return orderCargoSummary
@@ -338,7 +364,7 @@ class TmsIntegrationService {
         return new LocationInfo(stopSequence,
                 location?.address ? buildAddress(location?.address) : defaultAddress(),
                 new PlannedDateTime(expectedDateString, expectedDateString),
-                driverInstructions
+                driverInstructions?:""
         );
     }
 
