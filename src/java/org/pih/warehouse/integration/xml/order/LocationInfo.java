@@ -3,20 +3,20 @@ package org.pih.warehouse.integration.xml.order;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-@XmlType(propOrder = {"stopSequence", "address", "plannedDateTime", "diverInstructions"})
+@XmlType(propOrder = {"stopSequence", "address", "plannedDateTime", "driverInstructions"})
 public class LocationInfo {
     private Integer stopSequence;
     private Address address;
     private PlannedDateTime plannedDateTime;
-    private String diverInstructions;
+    private String driverInstructions;
 
     public LocationInfo() { }
 
-    public LocationInfo(Integer stopSequence, Address address, PlannedDateTime plannedDateTime, String diverInstructions) {
+    public LocationInfo(Integer stopSequence, Address address, PlannedDateTime plannedDateTime, String driverInstructions) {
         this.stopSequence = stopSequence;
         this.address = address;
         this.plannedDateTime = plannedDateTime;
-        this.diverInstructions = diverInstructions;
+        this.driverInstructions = driverInstructions;
     }
 
     @XmlElement(name = "StopSequence")
@@ -47,11 +47,11 @@ public class LocationInfo {
     }
 
     @XmlElement(name = "DriverInstructions")
-    public String getDiverInstructions() {
-        return diverInstructions;
+    public String getDriverInstructions() {
+        return driverInstructions;
     }
 
-    public void setDiverInstructions(String diverInstructions) {
-        this.diverInstructions = diverInstructions;
+    public void setDriverInstructions(String driverInstructions) {
+        this.driverInstructions = driverInstructions;
     }
 }
