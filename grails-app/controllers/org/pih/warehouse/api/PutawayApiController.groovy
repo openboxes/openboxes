@@ -30,9 +30,10 @@ class PutawayApiController {
     def putawayService
 
     def list = {
+        Location location = params["location.id"] ? Location.get(params["location.id"]) : Location.load(session.warehouse.id)
         OrderType orderType = OrderType.findByCode(Constants.PUTAWAY_ORDER)
         OrderStatus status = params.status ? params.status as OrderStatus : OrderStatus.PENDING
-        Order orderCriteria = new Order(orderType: orderType, status: status)
+        Order orderCriteria = new Order(orderType: orderType, status: status, origin: location, destination: location)
         List<Order> orders = orderService.getOrders(orderCriteria)
         List<Putaway> putaways = orders.collect {  Order order -> Putaway.createFromOrder(order) }
         render([data: putaways.collect { it.toJson() }] as JSON)
