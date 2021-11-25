@@ -1428,45 +1428,47 @@ openboxes.integration.order.filename = "Order-%s.xml"
 openboxes.integration.order.header.version = "V1"
 openboxes.integration.order.header.username = ""
 openboxes.integration.order.header.password = ""
-openboxes.integration.order.header.sequenceNumber = ""
+openboxes.integration.order.header.sequenceNumber = "20201008154348_SG3009200527"
 openboxes.integration.order.header.destinationApp = "ETRUCKNOW"
 
 // Default action
 openboxes.integration.order.action = "CREATE"
 
 // Default organization details
-openboxes.integration.order.organizationDetails.companyCode = ""
-openboxes.integration.order.organizationDetails.branchCode = ""
-openboxes.integration.order.organizationDetails.physicalReceiver = ""
-openboxes.integration.order.organizationDetails.logicalReceiver = ""
-openboxes.integration.order.organizationDetails.physicalSender = ""
-openboxes.integration.order.organizationDetails.logicalSender = ""
+openboxes.integration.order.organizationDetails.companyCode = "UKKN-CG"
+openboxes.integration.order.organizationDetails.branchCode = "Main-UKKN-CG"
+openboxes.integration.order.organizationDetails.physicalReceiver = "KNETR09"
+openboxes.integration.order.organizationDetails.logicalReceiver = "KNETR09"
+openboxes.integration.order.organizationDetails.physicalSender = "OPENBOX01"
+openboxes.integration.order.organizationDetails.logicalSender = "OPENBOX01"
 
 // Default order details
-openboxes.integration.order.orderDetails.departmentCode = ""
+openboxes.integration.order.orderDetails.departmentCode = "UKKN-CG-D1"
 openboxes.integration.order.orderDetails.orderType = "NORMAL"
-openboxes.integration.order.orderDetails.orderProductType = "NORMAL"
+openboxes.integration.order.orderDetails.orderProductType = "LTL/FTL"
 openboxes.integration.order.orderDetails.modeOfTransport = "FTL"
-openboxes.integration.order.orderDetails.serviceType = ""
-openboxes.integration.order.orderDetails.deliveryTerms = ""
+openboxes.integration.order.orderDetails.serviceType = "Full Truck Load"
+openboxes.integration.order.orderDetails.deliveryTerms = "Shipper"
 
 // Default trade terms
 openboxes.integration.order.orderDetails.termsOfTrade.incoterm = "DAP"
-openboxes.integration.order.orderDetails.termsOfTrade.freightName.term = ""
-openboxes.integration.order.orderDetails.termsOfTrade.freightName.name = ""
+openboxes.integration.order.orderDetails.termsOfTrade.freightName.term = "10"
+openboxes.integration.order.orderDetails.termsOfTrade.freightName.name = "Shipper"
 
 // Cargo details
-openboxes.integration.order.orderDetails.cargoDetails.enabled = true
-openboxes.integration.order.orderDetails.cargoDetails.cargoType = "Unknown"
-openboxes.integration.order.orderDetails.cargoDetails.stackable = false
-openboxes.integration.order.orderDetails.cargoDetails.splittable = false
-openboxes.integration.order.orderDetails.cargoDetails.handlingUnit = "Unknown"
+openboxes.integration.order.orderDetails.cargoDetails.enabled = false
+openboxes.integration.order.orderDetails.cargoDetails.cargoType = "EUROPALLET"
+openboxes.integration.order.orderDetails.cargoDetails.grounded = null
+openboxes.integration.order.orderDetails.cargoDetails.splittable = null
+openboxes.integration.order.orderDetails.cargoDetails.stackable = null
+openboxes.integration.order.orderDetails.cargoDetails.dangerousGoodsFlag = null
+openboxes.integration.order.orderDetails.cargoDetails.handlingUnit = "BLUE-PALLETS"
 
-openboxes.integration.partyType.contactData.firstName = ""
-openboxes.integration.partyType.contactData.lastName = ""
-openboxes.integration.partyType.contactData.phone.countryCode = ""
-openboxes.integration.partyType.contactData.phone.contactNumber = ""
-openboxes.integration.partyType.contactData.emailAddress = ""
+openboxes.integration.partyType.contactData.firstName = "First Name"
+openboxes.integration.partyType.contactData.lastName = "Last Name"
+openboxes.integration.partyType.contactData.phone.countryCode = "44"
+openboxes.integration.partyType.contactData.phone.contactNumber = "987654321"
+openboxes.integration.partyType.contactData.emailAddress = "cgw@cgw.com"
 
 // Disable feature during development
 openboxes.shipping.splitPickItems.enabled = true
