@@ -13,6 +13,7 @@ import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
 import grails.util.GrailsUtil
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
@@ -217,7 +218,11 @@ class ApiController {
     def globalSearch = {
         Object object = searchService.globalSearch(params.id)
         if (object) {
-            render([data: object] as JSON)
+            // FIXME OBKN-235 Ugly but wasn't sure how to add the type without modifying all of the toJson methods
+            def json = [data: object] as JSON
+            def jsonObject = new JSONObject(json.toString())
+            jsonObject.type = object?.class?.simpleName
+            render(jsonObject as JSON)
         }
         else {
             throw new IllegalStateException("Unable to locate object with identifier ${params.id}")
