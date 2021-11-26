@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.requisition.RequisitionStatus; org.pih.warehouse.shipping.ShipmentStatusCode" %>
+<%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -105,6 +105,16 @@
                 </a>
             </g:isSuperuser>
         </div>
+        <g:hasRoleInvoice>
+            <g:if test="${stockMovement?.shipment?.hasShipped()}">
+                <div class="button-group">
+                    <g:link controller="invoice" action="generateSalesInvoiceFromShipment" class="button" id="${stockMovement?.id}">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />&nbsp;
+                        <warehouse:message code="stockMovement.generateSalesInvoice.label" />
+                    </g:link>
+                </div>
+            </g:if>
+        </g:hasRoleInvoice>
     </div>
     <div class="yui-gf">
         <div class="yui-u first">

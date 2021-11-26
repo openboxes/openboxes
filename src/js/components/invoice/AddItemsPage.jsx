@@ -153,6 +153,108 @@ const FIELDS = {
   },
 };
 
+const SALES_INVOICE_FIELDS = {
+  invoiceItems: {
+    type: ArrayField,
+    virtualized: true,
+    totalCount: ({ totalCount }) => totalCount,
+    isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
+    loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
+    isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
+    fields: {
+      orderNumber: {
+        type: LabelField,
+        label: 'react.invoice.orderNumber.label',
+        defaultMessage: 'PO Number',
+        flexWidth: '1',
+        getDynamicAttr: ({ values, rowIndex }) => {
+          const orderId = values && values.invoiceItems
+              && values.invoiceItems[rowIndex]
+              && values.invoiceItems[rowIndex].orderId;
+          return { url: orderId ? `/openboxes/order/show/${orderId}` : '' };
+        },
+      },
+      shipmentNumber: {
+        type: LabelField,
+        label: 'react.invoice.shipmentNumber.label',
+        defaultMessage: 'Shipment Number',
+        flexWidth: '1',
+        getDynamicAttr: ({ values, rowIndex }) => {
+          const shipmentId = values && values.invoiceItems
+              && values.invoiceItems[rowIndex]
+              && values.invoiceItems[rowIndex].shipmentId;
+          return { url: shipmentId ? `/openboxes/stockMovement/show/${shipmentId}` : '' };
+        },
+      },
+      budgetCode: {
+        type: LabelField,
+        label: 'react.invoice.budgetCode.label',
+        defaultMessage: 'Budget Code',
+        flexWidth: '1',
+      },
+      glCode: {
+        type: LabelField,
+        label: 'react.invoice.glCode.label',
+        defaultMessage: 'GL Code',
+        flexWidth: '1',
+      },
+      productCode: {
+        type: LabelField,
+        label: 'react.invoice.itemNo.label',
+        defaultMessage: 'Item No',
+        flexWidth: '1',
+      },
+      description: {
+        type: LabelField,
+        label: 'react.invoice.description.label',
+        defaultMessage: 'Description',
+        flexWidth: '5',
+        attributes: {
+          className: 'text-left',
+        },
+      },
+      quantity: {
+        type: LabelField,
+        label: 'react.invoice.qty.label',
+        defaultMessage: 'Qty',
+        flexWidth: '1',
+        attributes: {
+          type: 'number',
+        },
+        getDynamicAttr: ({ rowIndex, values, updateRow }) => ({
+          onBlur: () => updateRow(values, rowIndex),
+        }),
+      },
+      uom: {
+        type: LabelField,
+        label: 'react.invoice.uom.label',
+        defaultMessage: 'UOM',
+        flexWidth: '1',
+      },
+      unitPrice: {
+        type: LabelField,
+        label: 'react.invoice.unitPrice.label',
+        defaultMessage: 'Unit Price',
+        flexWidth: '1',
+        attributes: {
+          formatValue: value => (value ? accountingFormat(value) : value),
+        },
+      },
+      totalAmount: {
+        type: LabelField,
+        label: 'react.invoice.totalPrice.label',
+        defaultMessage: 'Total Price',
+        flexWidth: '1',
+        attributes: {
+          formatValue: value => (value ? accountingFormat(value) : value),
+        },
+      },
+    },
+  },
+};
+
+const SALES_INVOICE = 'SALES_INVOICE';
+
 class AddItemsPage extends Component {
   constructor(props) {
     super(props);
@@ -167,6 +269,18 @@ class AddItemsPage extends Component {
     this.removeItem = this.removeItem.bind(this);
     this.updateRow = this.updateRow.bind(this);
     this.saveInvoiceItems = this.saveInvoiceItems.bind(this);
+  }
+
+  /**
+   * Returns proper fields depending on invoice type.
+   * @public
+   */
+  getFields() {
+    if (this.state.values.invoiceType === SALES_INVOICE) {
+      return SALES_INVOICE_FIELDS;
+    }
+
+    return FIELDS;
   }
 
   /**
@@ -351,7 +465,7 @@ class AddItemsPage extends Component {
             </span>
             <form onSubmit={handleSubmit}>
               <div className="table-form">
-                {_.map(FIELDS, (fieldConfig, fieldName) =>
+                {_.map(this.getFields(), (fieldConfig, fieldName) =>
                   renderFormField(fieldConfig, fieldName, {
                     values,
                     totalCount: this.state.values.totalCount,
@@ -373,6 +487,7 @@ class AddItemsPage extends Component {
                 <button
                   onClick={() => this.previousPage(values)}
                   className="btn btn-outline-primary btn-form btn-xs"
+                  disabled={this.state.values.invoiceType === SALES_INVOICE}
                 >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>

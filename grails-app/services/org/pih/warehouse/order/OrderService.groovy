@@ -309,6 +309,31 @@ class OrderService {
         }
     }
 
+    Order createOrderFromShipment(Shipment shipment, Location location) {
+        def order = new Order()
+        order.orderType = OrderType.findByCode(OrderTypeCode.SALES_ORDER.name())
+        order.name = "Created from shipment"
+        order.origin = shipment.origin
+        order.destination = shipment.destination
+        order.destinationParty = location.organization
+        order.orderedBy = shipment.createdBy
+        order.dateOrdered = shipment.dateCreated
+        order.currencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode
+
+        for ( ShipmentItem shipmentItem : shipment.shipmentItems) {
+            OrderItem orderItem = new OrderItem()
+            orderItem.unitPrice = shipmentItem.inventoryItem.product.pricePerUnit
+            orderItem.inventoryItem = shipmentItem.inventoryItem
+            orderItem.product = shipmentItem.inventoryItem.product
+            orderItem.quantity = shipmentItem.quantity
+            orderItem.addToShipmentItems(shipmentItem)
+
+            order.addToOrderItems(orderItem)
+        }
+
+        saveOrder(order)
+    }
+
     Order placeOrder(String id, String userId) {
         def orderInstance = Order.get(id)
         def userInstance = User.get(userId)

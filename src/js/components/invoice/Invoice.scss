@@ -40,7 +40,7 @@
         position: relative;
         display: flex;
         flex-wrap: wrap;
-        justify-content: space-between;
+        justify-content: flex-start;
         width: 100%;
 
         .form-title {
@@ -135,19 +135,10 @@
     }
 
     .classic-form-condensed {
-        &::after {
-            content: "";
-            width: 22%;
-
-            @media (max-width: 730px) {
-                width: 45% !important;
-            }
-        }
-
         .form-group {
             min-width: unset !important;
             width: 32% !important;
-            margin-right: 0 !important;
+            margin-right: 20px !important;
 
             @media (max-width: 730px) {
                 width: 45% !important;
@@ -274,7 +265,7 @@
 
     .classic-form-buttons {
         position: absolute;
-        right: calc(24px - 8px);
+        right: 26px;
         padding: 0 !important;
 
         .btn-xs {

@@ -284,7 +284,7 @@ class InvoiceService {
         invoice.party = order.origin.organization
         invoice.dateInvoiced = LocalDate.now().toDate()
         invoice.currencyUom = UnitOfMeasure.findByCode(order.currencyCode)
-        invoice.invoiceType = InvoiceType.findByCode(InvoiceTypeCode.INVOICE)
+        invoice.invoiceType = InvoiceType.findByCode(InvoiceTypeCode.PURCHASE_INVOICE)
         return invoice
     }
 

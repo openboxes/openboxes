@@ -336,7 +336,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     }
 
     Boolean getHasRegularInvoice() {
-        return invoices.any { it.invoiceType == null || it.invoiceType?.code == InvoiceTypeCode.INVOICE }
+        return invoices.any { it.invoiceType == null || it.invoiceType?.code in [InvoiceTypeCode.INVOICE, InvoiceTypeCode.PURCHASE_INVOICE, InvoiceTypeCode.SALES_INVOICE] }
     }
 
     Integer getQuantityInvoiced() {

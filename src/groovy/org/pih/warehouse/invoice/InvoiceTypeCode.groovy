@@ -13,14 +13,16 @@ enum InvoiceTypeCode {
 
     INVOICE,
     CREDIT_NOTE,
-    PREPAYMENT_INVOICE
+    PREPAYMENT_INVOICE,
+    SALES_INVOICE,
+    PURCHASE_INVOICE
 
     String toString() {
         return name()
     }
 
     static list() {
-        [INVOICE, CREDIT_NOTE, PREPAYMENT_INVOICE]
+        [INVOICE, CREDIT_NOTE, PREPAYMENT_INVOICE, SALES_INVOICE, PURCHASE_INVOICE]
     }
 }
 

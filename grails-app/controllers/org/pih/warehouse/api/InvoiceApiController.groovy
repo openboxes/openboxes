@@ -90,7 +90,7 @@ class InvoiceApiController {
         }
 
         if (!invoice.invoiceType) {
-            invoice.invoiceType = InvoiceType.findByCode(InvoiceTypeCode.INVOICE)
+            invoice.invoiceType = InvoiceType.findByCode(InvoiceTypeCode.PURCHASE_INVOICE)
         }
 
         invoice.party = Organization.get(jsonObject?.vendor)

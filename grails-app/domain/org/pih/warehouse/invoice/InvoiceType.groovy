@@ -32,7 +32,7 @@ class InvoiceType implements Serializable {
     String id
     String name
     String description
-    InvoiceTypeCode code = InvoiceTypeCode.INVOICE
+    InvoiceTypeCode code = InvoiceTypeCode.PURCHASE_INVOICE
 
     // Audit fields
     Date dateCreated

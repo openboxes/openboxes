@@ -72,6 +72,53 @@ const INVOICE_HEADER_FIELDS = {
   },
 };
 
+const SALES_INVOICE_HEADER_FIELDS = {
+  invoiceNumber: {
+    type: TextField,
+    label: 'react.invoice.invoiceNumber.label',
+    defaultMessage: 'Invoice number',
+    attributes: {
+      disabled: true,
+    },
+  },
+  vendorName: {
+    type: TextField,
+    label: 'react.Invoice.customer.label',
+    defaultMessage: 'Customer',
+    attributes: {
+      disabled: true,
+    },
+  },
+  dateInvoiced: {
+    type: DateField,
+    label: 'react.invoice.invoiceDate.label',
+    defaultMessage: 'Invoice Date',
+    attributes: {
+      disabled: true,
+      dateFormat: 'MM/DD/YYYY',
+    },
+  },
+  'currencyUom.code': {
+    type: TextField,
+    label: 'react.invoice.currency.label',
+    defaultMessage: 'Currency',
+    attributes: {
+      disabled: true,
+    },
+  },
+  totalValue: {
+    type: TextField,
+    label: 'react.invoice.total.label',
+    defaultMessage: 'Total',
+    attributes: {
+      disabled: true,
+    },
+    getDynamicAttr: ({ values }) => ({
+      className: values && values.totalValue && (values.totalValue < 0 || values.totalValue.startsWith('(')) ? 'negative-value' : '',
+    }),
+  },
+};
+
 const INVOICE_ITEMS = {
   invoiceItems: {
     type: ArrayField,
@@ -207,6 +254,7 @@ const INVOICE_ITEMS = {
 };
 
 const PREPAYMENT_INVOICE = 'PREPAYMENT_INVOICE';
+const SALES_INVOICE = 'SALES_INVOICE';
 
 class ConfirmInvoicePage extends Component {
   constructor(props) {
@@ -223,6 +271,18 @@ class ConfirmInvoicePage extends Component {
 
   componentDidMount() {
     this.fetchInvoiceData();
+  }
+
+  /**
+   * Returns proper fields depending on invoice type.
+   * @public
+   */
+  getFields() {
+    if (this.state.values.invoiceType === SALES_INVOICE) {
+      return SALES_INVOICE_HEADER_FIELDS;
+    }
+
+    return INVOICE_HEADER_FIELDS;
   }
 
   /**
@@ -407,7 +467,7 @@ class ConfirmInvoicePage extends Component {
                   </span>
                 </span>
                 <div className="form-title"><Translate id="react.invoice.options.label" defaultMessage="Invoice options" /></div>
-                {_.map(INVOICE_HEADER_FIELDS, (fieldConfig, fieldName) =>
+                {_.map(this.getFields(), (fieldConfig, fieldName) =>
                   renderFormField(fieldConfig, fieldName, {
                     values,
                     totalCount: this.state.values.totalCount,
