@@ -1027,7 +1027,7 @@ class StockMovementService {
 
     void createMissingPicklistItems(StockMovementItem stockMovementItem) {
         if (!stockMovementItem.requisitionItem?.picklistItems) {
-            createPicklist(stockMovementItem)
+            createPicklist(stockMovementItem, false)
         }
     }
 
@@ -1057,19 +1057,19 @@ class StockMovementService {
         for (StockMovementItem stockMovementItem : stockMovement.lineItems) {
             if (stockMovementItem.statusCode == 'SUBSTITUTED') {
                 for (StockMovementItem subStockMovementItem : stockMovementItem.substitutionItems) {
-                    createPicklist(subStockMovementItem)
+                    createPicklist(subStockMovementItem, true)
                 }
             } else {
-                createPicklist(stockMovementItem)
+                createPicklist(stockMovementItem, true)
             }
         }
     }
 
-    void createPicklist(StockMovementItem stockMovementItem) {
+    void createPicklist(StockMovementItem stockMovementItem, Boolean validateQtyAvailable) {
         log.info "Create picklist for stock movement item ${stockMovementItem.toJson()}"
 
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
-        createPicklist(requisitionItem)
+        createPicklist(requisitionItem, validateQtyAvailable)
     }
 
     /**
@@ -1077,7 +1077,7 @@ class StockMovementService {
      *
      * @param id
      */
-    void createPicklist(RequisitionItem requisitionItem) {
+    void createPicklist(RequisitionItem requisitionItem, validateQtyAvailable) {
         Location location = requisitionItem?.requisition?.origin
         Integer quantityRequired = requisitionItem?.calculateQuantityRequired()
 
@@ -1100,6 +1100,13 @@ class StockMovementService {
                             null,
                             null)
                 }
+            }
+            if (validateQtyAvailable && !suggestedItems) {
+                String errorMessage = "Product " + requisitionItem.product.productCode + " has no available inventory. Please go back to edit page and revise quantity"
+                requisitionItem.errors.rejectValue("picklistItems", errorMessage, [
+                        requisitionItem?.product?.productCode,
+                ].toArray(), errorMessage)
+                throw new ValidationException(errorMessage, requisitionItem.errors)
             }
         }
     }
@@ -1412,7 +1419,7 @@ class StockMovementService {
 
         if (!requisitionItem.picklistItems || (requisitionItem.picklistItems && requisitionItem.totalQuantityPicked() != requisitionItem.quantity &&
                 !requisitionItem.picklistItems.reasonCode)) {
-            createPicklist(requisitionItem)
+            createPicklist(requisitionItem, false)
         }
         PickPageItem pickPageItem = new PickPageItem(requisitionItem: requisitionItem,
                 picklistItems: requisitionItem.picklistItems)
@@ -1993,7 +2000,7 @@ class StockMovementService {
         stockMovement?.lineItems?.each { StockMovementItem stockMovementItem ->
             if (stockMovementItem.productCode == adjustedProductCode) {
                 removeShipmentAndPicklistItemsForModifiedRequisitionItem(stockMovementItem.requisitionItem)
-                createPicklist(stockMovementItem)
+                createPicklist(stockMovementItem, false)
                 createMissingShipmentItem(stockMovementItem.requisitionItem)
             }
         }
@@ -2620,6 +2627,7 @@ class StockMovementService {
         if (stockMovement?.requisition?.picklist) {
             Shipment shipment = Shipment.findByRequisition(stockMovement?.requisition)
             shipmentService.validateShipment(shipment)
+            validateQuantityRequested(stockMovement)
         }
         return true
     }
