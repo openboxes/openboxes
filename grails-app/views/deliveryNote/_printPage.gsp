@@ -45,7 +45,12 @@
                 <g:set var="backgroundColor" value="${(i % 2) == 0 ? '#fff' : '#f7f7f7'}"/>
                 <g:set var="j" value="${0}"/>
                 <g:while test="${j < numInventoryItem}">
-                    <g:set var="inventoryItem" value="${picklistItemsGroup[j]?.first()?.inventoryItem}" />
+                    <g:if test="${picklistItemsGroup}">
+                        <g:set var="inventoryItem" value="${picklistItemsGroup[j]?.first()?.inventoryItem}" />
+                    </g:if>
+                    <g:else>
+                        <g:set var="inventoryItem" value="${requisitionItem?.shipmentItems?.toList()?.first()?.inventoryItem}" />
+                    </g:else>
                     <tr class="prop" style="background-color: ${backgroundColor}">
                         <g:if test="${j==0}">
                             <td class="center middle" rowspan="${numInventoryItem}">
@@ -114,12 +119,12 @@
                             </td>
                         </g:if>
                         <td class="middle center">
-                            <g:if test="${picklistItemsGroup}">
+                            <g:if test="${inventoryItem}">
                                 ${inventoryItem?.lotNumber}
                             </g:if>
                         </td>
                         <td class="middle center">
-                            <g:if test="${picklistItemsGroup}">
+                            <g:if test="${inventoryItem}">
                                 <g:formatDate date="${inventoryItem?.expirationDate}" format="d MMM yyyy"/>
                             </g:if>
                         </td>
