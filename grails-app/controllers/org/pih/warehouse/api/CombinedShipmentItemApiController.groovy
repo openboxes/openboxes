@@ -106,7 +106,6 @@ class CombinedShipmentItemApiController {
                 shipmentItem.product = orderItem.product
                 shipmentItem.inventoryItem = orderItem.inventoryItem
                 shipmentItem.product = orderItem.product
-                shipmentItem.quantity = orderItem.quantity
                 shipmentItem.recipient = orderItem.recipient
                 shipmentItem.quantity = it.quantityToShip * orderItem.quantityPerUom
                 shipmentItem.sortOrder = shipment.shipmentItems ? shipment.shipmentItems.size() * 100 : 0

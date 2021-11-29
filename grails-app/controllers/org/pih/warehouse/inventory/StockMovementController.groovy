@@ -265,7 +265,7 @@ class StockMovementController {
                     expirationDate: expirationDate,
                     status: picklistItem?.requisitionItem?.status,
                     requested: picklistItem?.requisitionItem?.quantity,
-                    picked: picklistItem?.quantity,
+                    picked: picklistItem?.quantityPicked,
                     pickReasonCode: picklistItem?.reasonCode,
                     editReasonCode: picklistItem?.requisitionItem?.cancelReasonCode
             ]

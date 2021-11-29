@@ -134,10 +134,10 @@ const FIELDS = {
         },
         getDynamicAttr: ({
           fieldValue, subfield, updatePickPageItem,
-          reasonCodes, hasBinLocationSupport, showOnly,
+          reasonCodes, hasBinLocationSupport, showOnly, requiresMobilePicking,
         }) => ({
           itemId: _.get(fieldValue, 'requisitionItem.id'),
-          btnOpenDisabled: showOnly,
+          btnOpenDisabled: showOnly || requiresMobilePicking,
           subfield,
           btnOpenText: fieldValue && fieldValue.hasChangedPick ? '' : 'react.default.button.edit.label',
           btnOpenDefaultText: fieldValue && fieldValue.hasChangedPick ? '' : 'Edit',
@@ -463,7 +463,16 @@ class PickPage extends Component {
    * @public
    */
   nextPage(formValues) {
-    if (this.validateReasonCodes(formValues)) {
+    // FIXME Artur could you please review this
+    if (this.props.requiresMobilePicking && _.find(
+      formValues.pickPageItems,
+      item => item.quantityRemaining > 0 && item.quantityAvailable >= item.quantityRemaining,
+    )) {
+      Alert.warning(this.props.translate(
+        'react.stockMovement.alert.requiresMobilePicking.label',
+        'Picking process in your location has to be done on mobile device',
+      ));
+    } else if (this.validateReasonCodes(formValues)) {
       this.props.showSpinner();
       this.validatePicklist()
         .then(() =>
@@ -618,7 +627,7 @@ class PickPage extends Component {
   }
 
   render() {
-    const { showOnly } = this.props;
+    const { showOnly, requiresMobilePicking } = this.props;
     return (
       <Form
         onSubmit={values => this.nextPage(values)}
@@ -644,6 +653,7 @@ class PickPage extends Component {
                       event.target.value = null;
                     }}
                     accept=".csv"
+                    disabled={requiresMobilePicking}
                   />
                 </label>
                 <button
@@ -664,6 +674,7 @@ class PickPage extends Component {
                 <button
                   type="button"
                   onClick={() => this.refresh()}
+                  disabled={requiresMobilePicking}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
                 >
                   <span><i className="fa fa-refresh pr-2" /><Translate id="react.default.button.refresh.label" defaultMessage="Reload" /></span>
@@ -672,6 +683,7 @@ class PickPage extends Component {
                   type="button"
                   onClick={() => { window.location = `/openboxes/stockMovement/show/${values.stockMovementId}`; }}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
+                  disabled={requiresMobilePicking}
                 >
                   <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
                 </button>
@@ -703,6 +715,7 @@ class PickPage extends Component {
                   reasonCodes: this.props.reasonCodes,
                   translate: this.props.translate,
                   hasBinLocationSupport: this.props.hasBinLocationSupport,
+                  requiresMobilePicking: this.props.requiresMobilePicking,
                   totalCount: this.state.totalCount,
                   loadMoreRows: this.loadMoreRows,
                   isRowLoaded: this.isRowLoaded,
@@ -733,6 +746,7 @@ const mapStateToProps = state => ({
   reasonCodes: state.reasonCodes.data,
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
+  requiresMobilePicking: state.session.currentLocation.requiresMobilePicking,
   isPaginated: state.session.isPaginated,
   pageSize: state.session.pageSize,
 });
@@ -763,6 +777,7 @@ PickPage.propTypes = {
   translate: PropTypes.func.isRequired,
   /** Is true when currently selected location supports bins */
   hasBinLocationSupport: PropTypes.bool.isRequired,
+  requiresMobilePicking: PropTypes.bool.isRequired,
   /** Return true if pagination is enabled */
   isPaginated: PropTypes.bool.isRequired,
   /** Return true if show only */

@@ -144,7 +144,7 @@ class ReplenishmentService {
             command.location = order?.origin
             command.binLocation = picklistItem?.binLocation // origin
             command.inventoryItem = picklistItem?.inventoryItem
-            command.quantity = picklistItem?.quantity
+            command.quantity = picklistItem?.quantityPicked
             command.otherLocation = order?.origin
             command.otherBinLocation = picklistItem?.orderItem?.destinationBinLocation // destination
             command.order = order
@@ -165,7 +165,7 @@ class ReplenishmentService {
         def quantity = replenishmentItem.quantity
 
         if (replenishmentItem.picklistItems) {
-            quantity = replenishmentItem.picklistItems.sum { it.quantity }
+            quantity = replenishmentItem.picklistItems.sum { it.quantityPicked }
         }
 
         validateQuantityAvailable(replenishmentItem.replenishmentLocation, replenishmentItem.inventoryItem, quantity)
