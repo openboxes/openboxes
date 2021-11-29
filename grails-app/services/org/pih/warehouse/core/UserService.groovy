@@ -9,29 +9,11 @@
  **/
 package org.pih.warehouse.core
 
-import com.unboundid.ldap.sdk.BindRequest
-import com.unboundid.ldap.sdk.BindResult
-import com.unboundid.ldap.sdk.DN
-import com.unboundid.ldap.sdk.DNEntrySource
-import com.unboundid.ldap.sdk.DereferencePolicy
-import com.unboundid.ldap.sdk.Entry
-import com.unboundid.ldap.sdk.Filter
-import com.unboundid.ldap.sdk.LDAPConnection
-import com.unboundid.ldap.sdk.LDAPException
-import com.unboundid.ldap.sdk.ResultCode
-import com.unboundid.ldap.sdk.SearchRequest
-import com.unboundid.ldap.sdk.SearchResult
-import com.unboundid.ldap.sdk.SearchResultEntry
-import com.unboundid.ldap.sdk.SearchScope
-import com.unboundid.ldap.sdk.SimpleBindRequest
+
 import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.apache.commons.collections.ListUtils
 import org.pih.warehouse.auth.AuthService
-import util.StringUtil
-
-import javax.net.SocketFactory
-import java.security.GeneralSecurityException
 
 class UserService {
 
@@ -398,7 +380,16 @@ class UserService {
                     configChanged = true
                 }
             }
-            if(!configChanged) updateConfig("number", config, userConfig)
+            if (!configChanged) {
+                config = [
+                        enabled         : config.enabled,
+                        configurations  : config.configurations,
+                        endpoints       : [
+                                graph   : config.endpoints.graph,
+                                number  : updateConfigEndpoints(config.endpoints.number, userConfig.number)
+                        ]
+                ]
+            }
 
             // Reset configChanged to false to check the other part of the config
             configChanged = false
@@ -409,32 +400,48 @@ class UserService {
                     configChanged = true
                 }
             }
-            if(!configChanged) updateConfig("graph", config, userConfig)
+            if (!configChanged) {
+                config = [
+                        enabled         : config.enabled,
+                        configurations  : config.configurations,
+                        endpoints       : [
+                                number   : config.endpoints.number,
+                                graph  : updateConfigEndpoints(config.endpoints.graph, userConfig.graph)
+                        ]
+                ]
+            }
         }
 
         return config
     }
 
-    private def updateConfig(type, config, customConfig) {
-        customConfig[type].each { key, value ->
+    private def updateConfigEndpoints(endpoints, customEndpoints) {
+        def config = [:]
+        endpoints.each { key, value ->
+            def endpoint = [:]
+            value.each { k, v -> endpoint[k] = v }
+            config[key] = endpoint
+
             // Update order
-            config["endpoints"][type][key]["order"] = value["order"]
+            endpoint.order = customEndpoints[key]?.order ?: endpoint.order
+            def archived = value.archived?.collect { it }
+            endpoint.archived = archived
 
             // If the indicator should be archived but it currently isn't
-            boolean archivedInConfig = config["endpoints"][type][key]["archived"].indexOf("personal") != -1
-            if (value["archived"] && !archivedInConfig) {
-                config["endpoints"][type][key]["archived"].add("personal")
+            boolean archivedInConfig = archived.indexOf("personal") != -1
+            if (customEndpoints[key]?.archived && !archivedInConfig) {
+                archived.add("personal")
             }
 
             // If the indicator shouldn't be archived but it currently is
-            if (!value["archived"] && archivedInConfig) {
-                config["endpoints"][type][key]["archived"].remove("personal")
+            if (customEndpoints[key] && !customEndpoints[key]?.archived && archivedInConfig) {
+                archived.remove("personal")
             }
         }
 
         // Fix to ensure each order appears only once
-        for (int order = 1; order <= config["endpoints"][type].size(); order++) {
-            List indicators = config["endpoints"][type].findAll { key, value ->
+        for (int order = 1; order <= endpoints.size(); order++) {
+            List indicators = endpoints.findAll { key, value ->
                 value.order == order
             }.collect { key, value ->
                 key
@@ -442,10 +449,12 @@ class UserService {
 
             if (indicators.size() > 1) {
                 for (int i = 1; i < indicators.size(); i++) {
-                    config["endpoints"][type][indicators[i]]["order"] = order + i
+                    endpoints[indicators[i]].order = order + i
                 }
             }
         }
+
+        return config
     }
 
     def updateDashboardConfig(User user, Object config) {
