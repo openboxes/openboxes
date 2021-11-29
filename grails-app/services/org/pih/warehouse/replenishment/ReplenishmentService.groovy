@@ -146,7 +146,7 @@ class ReplenishmentService {
             command.location = order?.origin
             command.binLocation = picklistItem?.binLocation // origin
             command.inventoryItem = picklistItem?.inventoryItem
-            command.quantity = picklistItem?.quantity
+            command.quantity = picklistItem?.quantityPicked
             command.otherLocation = order?.origin
             command.otherBinLocation = picklistItem?.orderItem?.destinationBinLocation // destination
             command.order = order
@@ -167,7 +167,7 @@ class ReplenishmentService {
         def quantity = replenishmentItem.quantity
 
         if (replenishmentItem.picklistItems) {
-            quantity = replenishmentItem.picklistItems.sum { it.quantity }
+            quantity = replenishmentItem.picklistItems.sum { it.quantityPicked }
         }
 
         validateQuantityAvailable(replenishmentItem.replenishmentLocation, replenishmentItem.inventoryItem, quantity)
@@ -279,7 +279,7 @@ class ReplenishmentService {
 
     void createOrUpdatePicklistItem(OrderItem orderItem, PicklistItem picklistItem,
                                     InventoryItem inventoryItem, Location binLocation,
-                                    Integer quantity) {
+                                    Integer quantityPicked) {
 
         Order order = orderItem.order
 
@@ -296,7 +296,7 @@ class ReplenishmentService {
         }
 
         // Remove from picklist
-        if (quantity == null) {
+        if (quantityPicked == null) {
             picklist.removeFromPicklistItems(picklistItem)
         }
         // Populate picklist item
@@ -304,7 +304,8 @@ class ReplenishmentService {
             orderItem.addToPicklistItems(picklistItem)
             picklistItem.inventoryItem = inventoryItem
             picklistItem.binLocation = binLocation
-            picklistItem.quantity = quantity
+            picklistItem.quantity = orderItem.quantity
+            picklistItem.quantityPicked = quantityPicked
             picklistItem.sortOrder = orderItem.orderIndex
             picklistItem.disableRefresh = Boolean.TRUE
         }

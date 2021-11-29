@@ -194,9 +194,9 @@ class ShipmentItem implements Comparable, Serializable {
     Integer getQuantityPicked() {
         Integer quantityPicked
         if (binLocation) {
-            quantityPicked = requisitionItem?.picklistItems?.findAll { it.inventoryItem == inventoryItem && it.binLocation == binLocation }?.sum { it.quantity }
+            quantityPicked = requisitionItem?.picklistItems?.findAll { it.inventoryItem == inventoryItem && it.binLocation == binLocation }?.sum { it.quantityPicked }
         } else {
-            quantityPicked = requisitionItem?.picklistItems?.findAll { it.inventoryItem == inventoryItem }?.sum { it.quantity }
+            quantityPicked = requisitionItem?.picklistItems?.findAll { it.inventoryItem == inventoryItem }?.sum { it.quantityPicked }
         }
         return quantityPicked?:quantity
     }

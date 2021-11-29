@@ -1081,11 +1081,12 @@ class StockMovementService {
             clearPicklist(requisitionItem)
             if (suggestedItems) {
                 for (SuggestedItem suggestedItem : suggestedItems) {
+                    Integer quantityPicked = location.requiresMobilePicking() ? 0 : suggestedItem.quantityPicked.intValueExact()
                     createOrUpdatePicklistItem(requisitionItem,
                             null,
                             suggestedItem.inventoryItem,
                             suggestedItem.binLocation,
-                            suggestedItem.quantityPicked.intValueExact(),
+                            quantityPicked,
                             null,
                             null)
                 }
@@ -1095,15 +1096,15 @@ class StockMovementService {
 
     void createOrUpdatePicklistItem(StockMovementItem stockMovementItem, PicklistItem picklistItem,
                                     InventoryItem inventoryItem, Location binLocation,
-                                    Integer quantity, String reasonCode, String comment) {
+                                    Integer quantityPicked, String reasonCode, String comment) {
 
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
-        createOrUpdatePicklistItem(requisitionItem, picklistItem, inventoryItem, binLocation, quantity, reasonCode, comment)
+        createOrUpdatePicklistItem(requisitionItem, picklistItem, inventoryItem, binLocation, quantityPicked, reasonCode, comment)
     }
 
     void createOrUpdatePicklistItem(RequisitionItem requisitionItem, PicklistItem picklistItem,
                                     InventoryItem inventoryItem, Location binLocation,
-                                    Integer quantity, String reasonCode, String comment) {
+                                    Integer quantityPicked, String reasonCode, String comment) {
 
         Requisition requisition = requisitionItem.requisition
 
@@ -1125,7 +1126,7 @@ class StockMovementService {
         }
 
         // Remove from picklist
-        if (quantity == null) {
+        if (quantityPicked == null) {
             picklist.removeFromPicklistItems(picklistItem)
         }
         // Populate picklist item
@@ -1138,7 +1139,8 @@ class StockMovementService {
             requisitionItem.addToPicklistItems(picklistItem)
             picklistItem.inventoryItem = inventoryItem
             picklistItem.binLocation = binLocation
-            picklistItem.quantity = quantity
+            picklistItem.quantity = requisitionItem.quantity
+            picklistItem.quantityPicked = quantityPicked
             picklistItem.reasonCode = reasonCode
             picklistItem.comment = comment
             picklistItem.sortOrder = requisitionItem.orderIndex
@@ -2238,6 +2240,7 @@ class StockMovementService {
         shipmentItem.inventoryItem = inventoryItem
         shipmentItem.lotNumber = inventoryItem.lotNumber
         shipmentItem.expirationDate = inventoryItem.expirationDate
+        // shipment quantity = requested quantity, because there is no picklist behind requisitionItem (Inbound SM case)
         shipmentItem.quantity = requisitionItem.quantity
         shipmentItem.recipient = requisitionItem.recipient
         shipmentItem.sortOrder = requisitionItem.orderIndex
@@ -2317,12 +2320,12 @@ class StockMovementService {
         }
 
         requisitionItem?.picklistItems?.each { PicklistItem picklistItem ->
-            if (picklistItem.quantity > 0) {
+            if (picklistItem.quantityPicked > 0) {
                 ShipmentItem shipmentItem = new ShipmentItem()
                 shipmentItem.lotNumber = picklistItem?.inventoryItem?.lotNumber
                 shipmentItem.expirationDate = picklistItem?.inventoryItem?.expirationDate
                 shipmentItem.product = picklistItem?.inventoryItem?.product
-                shipmentItem.quantity = picklistItem?.quantity
+                shipmentItem.quantity = picklistItem?.quantityPicked
                 shipmentItem.requisitionItem = picklistItem.requisitionItem
                 shipmentItem.recipient = picklistItem?.requisitionItem?.recipient ?:
                         picklistItem?.requisitionItem?.parentRequisitionItem?.recipient
