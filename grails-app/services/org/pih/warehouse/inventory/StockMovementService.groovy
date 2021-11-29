@@ -2489,15 +2489,18 @@ class StockMovementService {
                             stepNumber  : 4,
                             uri         : g.createLink(controller: 'picklist', action: "renderPdf", id: stockMovement?.requisition?.id, absolute: true),
                             hidden      : true
-                    ],
-                    [
-                            name        : g.message(code: "deliveryNote.label", default: "Delivery Note"),
-                            documentType: DocumentGroupCode.DELIVERY_NOTE.name(),
-                            contentType : "text/html",
-                            stepNumber  : 5,
-                            uri         : g.createLink(controller: 'deliveryNote', action: "print", id: stockMovement?.requisition?.id, absolute: true)
                     ]
             ])
+
+            if (!stockMovement?.origin?.isSupplier() && stockMovement?.origin?.supports(ActivityCode.MANAGE_INVENTORY)) {
+                documentList.add([
+                        name        : g.message(code: "deliveryNote.label", default: "Delivery Note"),
+                        documentType: DocumentGroupCode.DELIVERY_NOTE.name(),
+                        contentType : "text/html",
+                        stepNumber  : 5,
+                        uri         : g.createLink(controller: 'deliveryNote', action: "print", id: stockMovement?.requisition?.id, absolute: true)
+                ])
+            }
         }
 
         if (stockMovement?.shipment) {
