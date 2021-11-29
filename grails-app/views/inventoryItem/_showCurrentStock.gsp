@@ -78,7 +78,7 @@
                                 <warehouse:message code="stockCard.enum.AvailableItemStatus.${entry?.status}"/>
                             </a>
                         </g:if>
-                        <g:elseif test="${entry?.status && entry.status != AvailableItemStatus.AVAILABLE}">
+                        <g:elseif test="${entry?.status && entry.status != AvailableItemStatus.AVAILABLE && entry.status != AvailableItemStatus.NOT_AVAILABLE}">
                             <warehouse:message code="stockCard.enum.AvailableItemStatus.${entry?.status}"/>
                         </g:elseif>
                     </td>
