@@ -24,6 +24,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.ValidationCode
+import org.pih.warehouse.importer.CsvUtil
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.shipping.Shipment
@@ -582,12 +583,16 @@ class OrderController {
 
             def totalPrice = 0.0
 
+            String lastCurrencyCode = null
             orderInstance?.listOrderItems()?.each { orderItem ->
                 totalPrice += orderItem.totalPrice() ?: 0
 
-                String quantityString = formatNumber(number: orderItem?.quantity, maxFractionDigits: 1, minFractionDigits: 1)
-                String unitPriceString = formatNumber(number: orderItem?.unitPrice, maxFractionDigits: 4, minFractionDigits: 2)
-                String totalPriceString = formatNumber(number: orderItem?.totalPrice(), maxFractionDigits: 2, minFractionDigits: 2)
+                String quantityString = CsvUtil.formatInteger(number: orderItem?.quantity, groupingUsed: false, type: "number")
+                String unitPriceString = CsvUtil.formatCurrency(number: orderItem?.unitPrice, currencyCode: orderItem?.currencyCode, isUnitPrice: true)
+                String totalPriceString = CsvUtil.formatCurrency(number: orderItem?.totalPrice(), currencyCode: orderItem?.currencyCode)
+                if (orderItem?.currencyCode != null) {
+                    lastCurrencyCode = orderItem?.currencyCode
+                }
 
                 csv += "${orderItem?.product?.productCode}," +
                         "${StringEscapeUtils.escapeCsv(orderItem?.product?.name)}," +
@@ -601,7 +606,7 @@ class OrderController {
                         "\n"
             }
 
-            String totalPriceString = formatNumber(number: totalPrice, maxFractionDigits: 2, minFractionDigits: 2)
+            String totalPriceString = CsvUtil.formatCurrency(number: totalPrice, currencyCode: lastCurrencyCode)
             csv += ",,,,,,${StringEscapeUtils.escapeCsv(totalPriceString)}\n"
             render csv
 
@@ -726,23 +731,18 @@ class OrderController {
     def getOrderItems = {
         def orderInstance = Order.get(params.id)
         def orderItems = orderInstance.orderItems.collect {
-
-            String quantityUom = "${it?.quantityUom?.code?:g.message(code:'default.ea.label')?.toUpperCase()}"
-            String quantityPerUom = "${g.formatNumber(number: it?.quantityPerUom?:1, maxFractionDigits: 0)}"
-            String unitOfMeasure = "${quantityUom}/${quantityPerUom}"
-
             [
                     id: it.id,
                     product: it.product,
                     quantity: it.quantity,
-                    quantityUom: quantityUom,
-                    quantityPerUom: quantityPerUom,
-                    unitOfMeasure: unitOfMeasure,
+                    quantityUom: it?.quantityUom?.code,
+                    quantityPerUom: it?.quantityPerUom,
+                    unitOfMeasure: it?.unitOfMeasure,
                     totalQuantity: (it?.quantity?:1) * (it?.quantityPerUom?:1),
                     productPackage: it?.productPackage,
                     currencyCode: it?.order?.currencyCode,
-                    unitPrice:  g.formatNumber(number: it.unitPrice),
-                    totalPrice: g.formatNumber(number: it.totalPrice()),
+                    unitPrice: CsvUtil.formatCurrency(number: it.unitPrice, currencyCode: it.currencyCode, isUnitPrice: true),
+                    totalPrice: CsvUtil.formatCurrency(number: it.totalPrice(), currencyCode: it.currencyCode),
                     estimatedReadyDate: g.formatDate(date: it.estimatedReadyDate, format: Constants.DEFAULT_DATE_FORMAT),
                     actualReadyDate: g.formatDate(date: it.actualReadyDate, format: Constants.DEFAULT_DATE_FORMAT),
                     productSupplier: it.productSupplier,
@@ -797,11 +797,9 @@ class OrderController {
             orderInstance?.listOrderItems()?.each { orderItem ->
                 totalPrice += orderItem.totalPrice() ?: 0
 
-                String quantityString = formatNumber(number: orderItem?.quantity, maxFractionDigits: 1, minFractionDigits: 1)
-                String unitPriceString = formatNumber(number: orderItem?.unitPrice, maxFractionDigits: 4, minFractionDigits: 2)
-                String totalPriceString = formatNumber(number: orderItem?.totalPrice(), maxFractionDigits: 2, minFractionDigits: 2)
-                String quantityPerUom = formatNumber(number: orderItem?.quantityPerUom, maxFractionDigits: 2, minFractionDigits: 0)
-                String unitOfMeasure = orderItem?.quantityUom ? "${orderItem?.quantityUom?.code}/${quantityPerUom}" : orderItem?.unitOfMeasure
+                String quantityString = CsvUtil.formatInteger(number: orderItem?.quantity, groupingUsed: false, type: "number")
+                String unitPriceString = CsvUtil.formatCurrency(number: orderItem?.unitPrice, currencyCode: orderItem?.currencyCode, isUnitPrice: true)
+                String totalPriceString = CsvUtil.formatCurrency(number: orderItem?.totalPrice(), currencyCode: orderItem?.currencyCode)
 
                 csv += "${orderItem?.id}," +
                         "${orderItem?.product?.productCode}," +
@@ -812,7 +810,7 @@ class OrderController {
                         "${orderItem?.productSupplier?.manufacturer?.name ?: ''}," +
                         "${orderItem?.productSupplier?.manufacturerCode ?: ''}," +
                         "${StringEscapeUtils.escapeCsv(quantityString)}," +
-                        "${unitOfMeasure}," +
+                        "${orderItem?.unitOfMeasure}," +
                         "${StringEscapeUtils.escapeCsv(unitPriceString)}," +
                         "${StringEscapeUtils.escapeCsv(totalPriceString)}," +
                         "${orderItem?.recipient?.name ?: ''}," +
