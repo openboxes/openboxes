@@ -401,6 +401,27 @@ class ProductAvailabilityService {
         return getQuantityOnHandByProduct(location)
     }
 
+    def getInventoryByProduct(Location location) {
+        def quantityMap = [:]
+        if (location) {
+            def results = ProductAvailability.executeQuery("""
+						select pa.product, sum(pa.quantityOnHand),
+						 sum(case when pa.quantityAvailableToPromise > 0 then pa.quantityAvailableToPromise else 0 end)
+						from ProductAvailability pa
+						where pa.location = :location
+						group by pa.product
+						""", [location: location])
+            results.each {
+                quantityMap[it[0]] = [
+                        quantityOnHand              : it[1],
+                        quantityAvailableToPromise  : it[2]
+                ]
+            }
+        }
+
+        return quantityMap
+    }
+
     Map<Product, Integer> getQuantityOnHandByProduct(Location location) {
         def quantityMap = [:]
         if (location) {
