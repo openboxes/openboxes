@@ -185,7 +185,9 @@ class StockTransferApiController {
 
     def removeItem = {
         Order order = stockTransferService.deleteStockTransferItem(params.id)
-        render([data: StockTransfer.createFromOrder(order)?.toJson()] as JSON)
+        StockTransfer stockTransfer = StockTransfer.createFromOrder(order)
+        stockTransferService.setQuantityOnHand(stockTransfer)
+        render([data: stockTransfer?.toJson()] as JSON)
     }
 
     def sendShipment = {
