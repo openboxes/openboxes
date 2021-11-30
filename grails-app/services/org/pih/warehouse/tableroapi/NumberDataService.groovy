@@ -2,7 +2,6 @@ package org.pih.warehouse.tableroapi
 
 import org.joda.time.LocalDate
 import org.pih.warehouse.core.Constants
-import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.order.Order
@@ -205,22 +204,18 @@ class NumberDataService {
 
     NumberData getProductWithNegativeInventory(def location) {
 
-        Date tomorrow = LocalDate.now().plusDays(1).toDate();
-        Integer numberOfProducts = 0;
-
-        def productsWithNegativeInventory = InventorySnapshot.executeQuery("""
-            SELECT i.productCode, i.product.name, i.lotNumber, i.binLocationName, i.quantityOnHand FROM InventorySnapshot i
-            WHERE i.location = :location
-            AND i.quantityOnHand < 0
-            AND i.date = :tomorrow
-            ORDER BY i.quantityOnHand ASC
+        def productsWithNegativeInventory = ProductAvailability.executeQuery("""
+            SELECT pa.productCode, pa.product.name, pa.lotNumber, pa.binLocationName, pa.quantityOnHand
+            FROM ProductAvailability pa
+            WHERE pa.location = :location
+            AND pa.quantityOnHand < 0
+            ORDER BY pa.quantityOnHand ASC
             """,
                 [
-                        'location': location,
-                        'tomorrow': tomorrow
-                ]);
+                        'location': location
+                ])
 
-        numberOfProducts = productsWithNegativeInventory.size()
+        def numberOfProducts = productsWithNegativeInventory.size()
 
         String tooltipData = null
 
