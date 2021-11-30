@@ -298,6 +298,10 @@ class Location implements Comparable<Location>, java.io.Serializable {
         return supports(ActivityCode.HOLD_STOCK)
     }
 
+    Boolean requiresMobilePicking() {
+        return supports(ActivityCode.REQUIRE_MOBILE_PICKING)
+    }
+
     Map toJson() {
         return [
                 id                         : id,
@@ -312,6 +316,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
                 hasPackingSupport          : this.supports(ActivityCode.PACK_SHIPMENT),
                 hasPartialReceivingSupport : this.supports(ActivityCode.PARTIAL_RECEIVING),
                 hasCentralPurchasingEnabled: this.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING),
+                requiresMobilePicking      : requiresMobilePicking(),
                 organizationName           : organization?.name,
                 organizationCode           : organization?.code,
                 backgroundColor            : bgColor,

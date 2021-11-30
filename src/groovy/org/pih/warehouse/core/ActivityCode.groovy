@@ -52,7 +52,11 @@ enum ActivityCode {
     REQUIRE_ACCOUNTING('REQUIRE_ACCOUNTING'),
 
     // Central purchasing
-    ENABLE_CENTRAL_PURCHASING('ENABLE_CENTRAL_PURCHASING')
+    ENABLE_CENTRAL_PURCHASING('ENABLE_CENTRAL_PURCHASING'),
+
+    // Requires picking on mobile device
+    REQUIRE_MOBILE_PICKING('REQUIRE_MOBILE_PICKING')
+
 
     final String id
 
@@ -80,7 +84,8 @@ enum ActivityCode {
                 PARTIAL_RECEIVING,
                 REQUIRE_ACCOUNTING,
                 ENABLE_CENTRAL_PURCHASING,
-                HOLD_STOCK
+                HOLD_STOCK,
+                REQUIRE_MOBILE_PICKING
         ]
     }
 }
