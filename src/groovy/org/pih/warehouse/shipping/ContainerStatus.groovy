@@ -12,14 +12,20 @@ package org.pih.warehouse.shipping
 enum ContainerStatus {
 
     OPEN('Open'),
-    CLOSED('Closed');
+    PACKING('Packing'),
+    PACKED('Packed'),
+    LOADED('Loaded'),
+    UNLOADED('Unloaded'),
+    UNPACKING('Unpacking'),
+    UNPACKED('Unpacked'),
+    CLOSED('Closed')
 
     String name
 
     ContainerStatus(String name) { this.name = name }
 
     static list() {
-        [OPEN, CLOSED]
+        [OPEN, PACKING, PACKED, LOADED, UNLOADED, UNPACKING, UNPACKED, CLOSED]
     }
 }
 
