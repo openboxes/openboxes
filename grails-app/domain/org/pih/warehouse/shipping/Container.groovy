@@ -34,7 +34,7 @@ class Container implements Comparable, java.io.Serializable {
     Date lastUpdated
 
     ContainerType containerType            // Type of container
-    ContainerStatus containerStatus        // Status of the container (open, closed)
+    ContainerStatus containerStatus = ContainerStatus.OPEN       // Status of the container (open, closed)
     Container parentContainer
 
     // Added parentContainer to belongsTo in order to allow automatic cascade-delete of children when deleting a container
@@ -42,7 +42,7 @@ class Container implements Comparable, java.io.Serializable {
     static hasMany = [containers: Container]
 
 
-    static transients = ["optionValue", "shipmentItems"]
+    static transients = ["optionValue", "shipmentItems", "fullName"]
     static mapping = {
         id generator: 'uuid'
     }
@@ -105,6 +105,11 @@ class Container implements Comparable, java.io.Serializable {
         )
 
     }
+
+    String getFullName() {
+        return [parentContainer?.name, name].findAll { it }.join(" > ")
+    }
+
 
     List<ShipmentItem> getShipmentItems() {
         return ShipmentItem.findAllByContainer(this)
@@ -195,13 +200,14 @@ class Container implements Comparable, java.io.Serializable {
         }
     }
 
-
     Map toJson() {
         [
                 id             : id,
                 name           : name,
+                fullName       : fullName,
                 containerNumber: containerNumber,
                 containerType  : containerType,
+                containerStatus: [id: containerStatus?.name(), name: containerStatus?.name],
                 "shipment.id"  : shipment?.id,
                 recipient      : recipient,
                 sortOrder      : sortOrder,
