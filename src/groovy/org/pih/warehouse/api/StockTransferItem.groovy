@@ -2,6 +2,7 @@ package org.pih.warehouse.api
 
 import org.codehaus.groovy.grails.validation.Validateable
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
@@ -25,6 +26,7 @@ class StockTransferItem {
     List<StockTransferItem> splitItems = []
     Set<PicklistItem> picklistItems = []
     Boolean delete = Boolean.FALSE
+    Person recipient
 
     static constraints = {
         id(nullable: true)
@@ -38,6 +40,7 @@ class StockTransferItem {
         quantity(nullable: true)
         splitItems(nullable: true)
         picklistItems(nullable: true)
+        recipient(nullable: true)
     }
 
     static StockTransferItem createFromOrderItem(OrderItem orderItem) {
@@ -48,6 +51,7 @@ class StockTransferItem {
         stockTransferItem.location = orderItem?.order?.origin
         stockTransferItem.originBinLocation = orderItem.originBinLocation
         stockTransferItem.destinationBinLocation = orderItem.destinationBinLocation
+        stockTransferItem.recipient = orderItem.recipient
         stockTransferItem.quantity = orderItem.quantity
         // Temporarily set to quantity, should be pulled from PA
         stockTransferItem.quantityOnHand = orderItem.quantity
@@ -127,6 +131,7 @@ class StockTransferItem {
                 quantityOnHand                  : quantityOnHand,
                 quantityNotPicked               : quantityNotPicked,
                 status                          : status.name(),
+                recipient                       : recipient,
                 splitItems                      : splitItems.sort { a, b ->
                     a.destinationBinLocation?.name <=> b.destinationBinLocation?.name ?:
                         b.quantity <=> a.quantity

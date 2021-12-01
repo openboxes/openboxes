@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat
 class StockTransferApiController {
 
     def identifierService
+    def inventoryService
     def shipmentService
     def stockTransferService
 
@@ -155,6 +156,16 @@ class StockTransferApiController {
                     splitItem.location = stockTransfer.origin
                 }
                 stockTransferItem.splitItems.add(splitItem)
+            }
+
+            // For inbound returns
+            if (stockTransferItemMap.lotNumber || stockTransferItemMap.expirationDate) {
+                Date expirationDate = stockTransferItemMap.expirationDate ? Constants.EXPIRATION_DATE_FORMATTER.parse(stockTransferItemMap.expirationDate) : null
+                stockTransferItem.inventoryItem = inventoryService.findAndUpdateOrCreateInventoryItem(
+                    stockTransferItem.product,
+                    stockTransferItemMap.lotNumber,
+                    expirationDate
+                )
             }
 
             stockTransfer.stockTransferItems.add(stockTransferItem)
