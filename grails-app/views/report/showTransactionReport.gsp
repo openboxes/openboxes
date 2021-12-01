@@ -71,10 +71,6 @@
 													value="${command?.endDate }"
 													format="MM/dd/yyyy"
 													autocomplete="off"/>
-								<label>
-									<g:checkBox id="refreshBalances" name="refreshBalances" value="${params?.refreshBalances}" checked="false"/>
-									<warehouse:message code="transactionReport.refreshBalances.label" default="Refresh balances (slow)"/>
-								</label>
 							</div>
 							<div class="filter-list-item">
 								<label>
@@ -224,9 +220,6 @@
 				data.push({ name: "category", value: $("#category").val() });
 				data.push({ name: "tags", value: $("#tags").val() });
 				data.push({ name: "catalogs", value: $("#catalogs").val() });
-				if($('#refreshBalances').is(':checked')) {
-					data.push({name: "refreshBalances", value: $("#refreshBalances").val()});
-				}
 				if($('#includeCategoryChildren').is(':checked')) {
 					data.push({ name: "includeCategoryChildren", value: $("#includeCategoryChildren").val() });
 				}
