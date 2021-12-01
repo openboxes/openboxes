@@ -178,7 +178,6 @@ class AddItemsPage extends Component {
     this.removeItem = this.removeItem.bind(this);
     this.getSortOrder = this.getSortOrder.bind(this);
     this.confirmSave = this.confirmSave.bind(this);
-    this.confirmTransition = this.confirmTransition.bind(this);
     this.validate = this.validate.bind(this);
     this.updateRow = this.updateRow.bind(this);
 
@@ -237,9 +236,6 @@ class AddItemsPage extends Component {
       if (!_.isNil(item.product) && (!item.quantity || item.quantity < 0)) {
         errors.returnItems[key] = { quantity: 'react.inboundReturns.error.enterQuantity.label' };
       }
-      if (!_.isEmpty(item.boxName) && _.isEmpty(item.palletName)) {
-        errors.returnItems[key] = { boxName: 'react.inboundReturns.error.boxWithoutPallet.label' };
-      }
       const dateRequested = moment(item.expirationDate, 'MM/DD/YYYY');
       if (date.diff(dateRequested) > 0) {
         errors.returnItems[key] = { expirationDate: 'react.inboundReturns.error.invalidDate.label' };
@@ -282,23 +278,6 @@ class AddItemsPage extends Component {
     });
   }
 
-  confirmTransition(onConfirm, items) {
-    confirmAlert({
-      title: this.props.translate('react.inboundReturns.confirmTransition.label', 'You have entered the same code twice. Do you want to continue?'),
-      message: _.map(items, item =>
-        <p key={item.sortOrder}>{item.product.label} {item.quantity}</p>),
-      buttons: [
-        {
-          label: this.props.translate('react.default.yes.label', 'Yes'),
-          onClick: onConfirm,
-        },
-        {
-          label: this.props.translate('react.default.no.label', 'No'),
-        },
-      ],
-    });
-  }
-
   fetchInboundReturn() {
     if (this.props.match.params.inboundReturnId) {
       this.props.showSpinner();
@@ -328,13 +307,13 @@ class AddItemsPage extends Component {
 
     if (_.some(returnItems, item => !item.quantity || item.quantity === '0')) {
       this.confirmSave(() =>
-        this.saveStockTransfer(returnItems, this.state.inboundReturn.status !== 'APPROVED' ? 'APPROVED' : null)
+        this.saveStockTransfer(returnItems, this.state.inboundReturn.status !== 'PLACED' ? 'PLACED' : null)
           .then(() => {
             this.props.nextPage(this.state.inboundReturn);
           })
           .catch(() => this.props.hideSpinner()));
     } else {
-      this.saveStockTransfer(returnItems, this.state.inboundReturn.status !== 'APPROVED' ? 'APPROVED' : null)
+      this.saveStockTransfer(returnItems, this.state.inboundReturn.status !== 'PLACED' ? 'PLACED' : null)
         .then(() => {
           this.props.nextPage(this.state.inboundReturn);
         })
@@ -361,12 +340,16 @@ class AddItemsPage extends Component {
     }
 
     if (payload.stockTransferItems.length) {
+      this.props.showSpinner();
       return apiClient.post(updateItemsUrl, flattenRequest(payload))
         .then(() => this.fetchInboundReturn())
-        .catch(() => Promise.reject(new Error(this.props.translate('react.inboundReturns.error.saveRequisitionItems.label', 'Could not save requisition items'))));
+        .catch(() => {
+          this.props.hideSpinner();
+          return Promise.reject(new Error(this.props.translate('react.inboundReturns.error.saveOrderItems.label', 'Could not save order items')));
+        });
     }
 
-    return Promise.resolve();
+    return Promise.reject();
   }
 
   save(formValues) {
@@ -388,7 +371,7 @@ class AddItemsPage extends Component {
         });
     } else {
       confirmAlert({
-        title: this.props.translate('react.inboundReturns.confirmExit.label', 'Confirm save'),
+        title: this.props.translate('react.inboundReturns.confirmSave.label', 'Confirm save'),
         message: this.props.translate(
           'react.inboundReturns.confirmExit.message',
           'Validation errors occurred. Are you sure you want to exit and lose unsaved data?',
@@ -442,25 +425,19 @@ class AddItemsPage extends Component {
     return apiClient.delete(removeItemsUrl)
       .catch(() => {
         this.props.hideSpinner();
-        return Promise.reject(new Error('react.inboundReturns.error.deleteRequisitionItem.label'));
+        return Promise.reject(new Error('react.inboundReturns.error.deleteOrderItem.label'));
       });
   }
 
   removeAll() {
+    this.props.showSpinner();
     const removeItemsUrl = `/openboxes/api/stockTransfers/${this.props.match.params.inboundReturnId}/removeAllItems`;
 
     return apiClient.delete(removeItemsUrl)
-      .then(() => {
-        this.setState({
-          formValues: {
-            ...this.state.formValues,
-            returnItems: new Array(1).fill({ sortOrder: 100 }),
-          },
-        });
-      })
+      .then(() => this.fetchInboundReturn())
       .catch(() => {
-        this.fetchInboundReturn();
-        return Promise.reject(new Error('react.inboundReturns.error.deleteRequisitionItem.label'));
+        this.props.hideSpinner();
+        return Promise.reject(new Error('react.inboundReturns.error.deleteOrderItem.label'));
       });
   }
 
@@ -471,7 +448,7 @@ class AddItemsPage extends Component {
     } else {
       confirmAlert({
         title: this.props.translate('react.inboundReturns.confirmPreviousPage.label', 'Validation error'),
-        message: this.props.translate('react.inboundReturns.confirmPreviousPage.message.label', 'Cannot save due to validation error on page'),
+        message: this.props.translate('react.inboundReturns.confirmPreviousPage.message', 'Cannot save due to validation error on page'),
         buttons: [
           {
             label: this.props.translate('react.inboundReturns.confirmPreviousPage.correctError.label', 'Correct error'),
