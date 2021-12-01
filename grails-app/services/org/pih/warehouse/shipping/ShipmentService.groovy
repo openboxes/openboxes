@@ -38,7 +38,6 @@ import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderStatus
-import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.ShipOrderCommand
 import org.pih.warehouse.order.ShipOrderItemCommand
 import org.pih.warehouse.picklist.PicklistItem
@@ -675,9 +674,9 @@ class ShipmentService {
 
 
     boolean validateShipment(Shipment shipment) {
-        if (shipment?.orders && shipment?.orders?.first()?.orderType == OrderType.findByCode(Constants.RETURN_ORDER)) {
+        if (shipment?.orders && shipment?.orders?.first()?.orderType?.isReturnOrder()) {
             shipment?.shipmentItems?.each { ShipmentItem shipmentItem ->
-                validateReturnShipmentItem(shipmentItem)
+                validateReturnShipmentItem(shipmentItem, shipmentItem.binLocation ? true : false)
             }
         } else {
             shipment?.shipmentItems?.each { ShipmentItem shipmentItem ->
@@ -748,13 +747,18 @@ class ShipmentService {
      * @param shipmentItem shipment item to validate
      * @return boolean
      */
-    boolean validateReturnShipmentItem(ShipmentItem shipmentItem) {
+    boolean validateReturnShipmentItem(ShipmentItem shipmentItem, Boolean withBinLocation) {
         if (!shipmentItem.validate()) {
             throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
         }
 
         def origin = Location.get(shipmentItem?.shipment?.origin?.id)
-        def quantityAvailableToReturn = productAvailabilityService.getQuantityNotPickedInBinLocation(shipmentItem.inventoryItem, shipmentItem.binLocation)
+        def quantityAvailableToReturn
+        if (withBinLocation) {
+            quantityAvailableToReturn = productAvailabilityService.getQuantityNotPickedInBinLocation(shipmentItem.inventoryItem, shipmentItem.binLocation)
+        } else {
+            quantityAvailableToReturn = productAvailabilityService.getQuantityNotPickedInLocation(shipmentItem.product, origin)
+        }
 
         if (shipmentItem.quantity > quantityAvailableToReturn) {
             String errorMessage = "Shipping quantity (${shipmentItem.quantity}) can not exceed quantity on hand (${quantityAvailableToReturn}) for " +
@@ -2247,18 +2251,23 @@ class ShipmentService {
     }
 
     def createShipmentItems(OrderItem orderItem) {
-        def shipmentItems = orderItem.shipmentItems
+        def shipmentItems = orderItem.shipmentItems ?: []
+        def currentLocation = AuthService?.currentLocation?.get()
         if (shipmentItems) {
             shipmentItems.each { ShipmentItem shipmentItem ->
-                PicklistItem picklistItem = orderItem.picklistItems?.find {
-                    shipmentItem.inventoryItem == it.inventoryItem && shipmentItem.binLocation == it.binLocation
+                if (orderItem?.order?.isOutbound(currentLocation)) {
+                    PicklistItem picklistItem = orderItem.picklistItems?.find {
+                        shipmentItem.inventoryItem == it.inventoryItem && shipmentItem.binLocation == it.binLocation
+                    }
+                    shipmentItem.quantity = picklistItem?.quantity ?: shipmentItem.quantity
+                } else {
+                    shipmentItem.quantity = orderItem.quantity
                 }
-                shipmentItem.quantity = picklistItem?.quantity ?: shipmentItem.quantity
             }
             return shipmentItems
         }
 
-        if (orderItem?.order?.isOutbound()) {
+        if (orderItem?.order?.isOutbound(currentLocation)) {
             orderItem?.picklistItems?.each { PicklistItem picklistItem ->
                 if (picklistItem.quantity > 0) {
                     ShipmentItem shipmentItem = new ShipmentItem()
@@ -2270,7 +2279,7 @@ class ShipmentService {
                             picklistItem?.orderItem?.parentOrderItem?.recipient
                     shipmentItem.inventoryItem = picklistItem?.inventoryItem
                     shipmentItem.binLocation = picklistItem?.binLocation
-                    shipmentItem.sortOrder = shipmentItems.size()
+                    shipmentItem.sortOrder = shipmentItems?.size()
 
                     shipmentItem.addToOrderItems(picklistItem.orderItem)
                     shipmentItems.add(shipmentItem)
@@ -2280,11 +2289,11 @@ class ShipmentService {
             ShipmentItem shipmentItem = new ShipmentItem()
             shipmentItem.lotNumber = orderItem?.inventoryItem?.lotNumber
             shipmentItem.expirationDate = orderItem?.inventoryItem?.expirationDate
-            shipmentItem.product = orderItem?.inventoryItem?.product
+            shipmentItem.product = orderItem?.product
             shipmentItem.quantity = orderItem?.quantity
             shipmentItem.recipient = orderItem?.recipient
             shipmentItem.inventoryItem = orderItem?.inventoryItem
-            shipmentItem.sortOrder = shipmentItems.size()
+            shipmentItem.sortOrder = shipmentItems?.size()
 
             shipmentItem.addToOrderItems(orderItem)
             shipmentItems.add(shipmentItem)

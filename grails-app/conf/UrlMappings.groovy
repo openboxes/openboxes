@@ -328,6 +328,11 @@ class UrlMappings {
             action = [POST: "sendShipment"]
         }
 
+        "/api/stockTransfers/$id/removeAllItems"(parseRequest: true) {
+            controller = { "stockTransferApi" }
+            action = [DELETE: "removeAllItems"]
+        }
+
         // OBPIH-4079: TEMPORARY DISABLED
 
 //        // Requirement API

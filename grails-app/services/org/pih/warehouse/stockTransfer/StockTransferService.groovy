@@ -15,7 +15,6 @@ import org.pih.warehouse.api.StockTransfer
 import org.pih.warehouse.api.StockTransferItem
 import org.pih.warehouse.api.StockTransferStatus
 import org.pih.warehouse.auth.AuthService
-import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.TransferStockCommand
@@ -209,6 +208,18 @@ class StockTransferService {
         }
 
         return deleteOrderItem(orderItem.order, orderItem)
+    }
+
+    Order deleteAllStockTransferItems(String id) {
+        Order order = Order.get(id)
+        if (!order) {
+            throw new IllegalArgumentException("No stockTransfer found with ID ${id}")
+        }
+
+        def itemsToRemove = order.orderItems?.findAll { it }
+        itemsToRemove?.each { it -> deleteOrderItem(order, it) }
+
+        return order
     }
 
     Order deleteOrderItem(Order order, OrderItem orderItem) {
