@@ -27,7 +27,11 @@ class StockTransferController {
         render(template: "/common/react", params: params)
     }
 
-    def createReturns = {
+    def createOutboundReturn = {
+        render(template: "/common/react", params: params)
+    }
+
+    def createInboundReturn = {
         render(template: "/common/react", params: params)
     }
 

@@ -7,13 +7,13 @@ import { withRouter } from 'react-router-dom';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-import TextField from '../form-elements/TextField';
-import SelectField from '../form-elements/SelectField';
-import { renderFormField } from '../../utils/form-utils';
-import apiClient, { parseResponse } from '../../utils/apiClient';
-import { showSpinner, hideSpinner } from '../../actions';
-import { debounceLocationsFetch } from '../../utils/option-utils';
-import Translate from '../../utils/Translate';
+import TextField from '../../form-elements/TextField';
+import SelectField from '../../form-elements/SelectField';
+import { renderFormField } from '../../../utils/form-utils';
+import apiClient, { parseResponse } from '../../../utils/apiClient';
+import { showSpinner, hideSpinner } from '../../../actions';
+import { debounceLocationsFetch } from '../../../utils/option-utils';
+import Translate from '../../../utils/Translate';
 
 function validate(values) {
   const errors = {};
@@ -32,19 +32,19 @@ function validate(values) {
 const FIELDS = {
   description: {
     type: TextField,
-    label: 'react.outboundReturns.description.label',
+    label: 'react.inboundReturns.description.label',
     defaultMessage: 'Description',
     attributes: {
       required: true,
       autoFocus: true,
     },
-    getDynamicAttr: ({ outboundReturnId }) => ({
-      disabled: !!outboundReturnId,
+    getDynamicAttr: ({ inboundReturnId }) => ({
+      disabled: !!inboundReturnId,
     }),
   },
   origin: {
     type: SelectField,
-    label: 'react.outboundReturns.origin.label',
+    label: 'react.inboundReturns.origin.label',
     defaultMessage: 'Origin',
     attributes: {
       required: true,
@@ -58,12 +58,12 @@ const FIELDS = {
     },
     getDynamicAttr: props => ({
       loadOptions: props.debouncedLocationsFetch,
-      disabled: !!props.outboundReturnId,
+      disabled: !!props.inboundReturnId,
     }),
   },
   destination: {
     type: SelectField,
-    label: 'react.outboundReturns.destination.label',
+    label: 'react.inboundReturns.destination.label',
     defaultMessage: 'Destination',
     attributes: {
       required: true,
@@ -77,12 +77,12 @@ const FIELDS = {
     },
     getDynamicAttr: props => ({
       loadOptions: props.debouncedLocationsFetch,
-      disabled: !!props.outboundReturnId,
+      disabled: !!props.inboundReturnId || !props.isSuperuser,
     }),
   },
 };
 
-class CreateOutboundReturns extends Component {
+class CreateInboundReturn extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -90,24 +90,24 @@ class CreateOutboundReturns extends Component {
     };
 
     this.debouncedLocationsFetch =
-      debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength);
+        debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength);
   }
 
   componentDidMount() {
-    if (this.props.outboundReturnsTranslationsFetched && this.props.location.id) {
+    if (this.props.inboundReturnsTranslationsFetched && this.props.location.id) {
       this.dataFetched = true;
-      this.fetchOutboundReturn(this.props);
+      this.fetchInboundReturn(this.props);
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.outboundReturnsTranslationsFetched && nextProps.location.id) {
+    if (nextProps.inboundReturnsTranslationsFetched && nextProps.location.id) {
       if (!this.dataFetched) {
         this.dataFetched = true;
 
-        this.fetchOutboundReturn(nextProps);
+        this.fetchInboundReturn(nextProps);
       } else if (this.props.location.id !== nextProps.location.id) {
-        this.fetchOutboundReturn(nextProps);
+        this.fetchInboundReturn(nextProps);
       }
     }
   }
@@ -116,7 +116,7 @@ class CreateOutboundReturns extends Component {
     const { id, locationType, name } = location;
 
     const values = {
-      origin: {
+      destination: {
         id,
         type: locationType ? locationType.locationTypeCode : null,
         name,
@@ -126,10 +126,10 @@ class CreateOutboundReturns extends Component {
     this.setState({ values });
   }
 
-  fetchOutboundReturn(props) {
-    if (props.match.params.outboundReturnId) {
+  fetchInboundReturn(props) {
+    if (props.match.params.inboundReturnId) {
       props.showSpinner();
-      const url = `/openboxes/api/stockTransfers/${props.match.params.outboundReturnId}`;
+      const url = `/openboxes/api/stockTransfers/${props.match.params.inboundReturnId}`;
       apiClient.get(url)
         .then((resp) => {
           const values = parseResponse(resp.data.data);
@@ -157,12 +157,12 @@ class CreateOutboundReturns extends Component {
 
   dataFetched = false;
 
-  saveOutboundReturns(values) {
+  saveInboundReturns(values) {
     if (
       values.origin &&
       values.destination &&
       values.description &&
-      !this.props.match.params.outboundReturnId
+      !this.props.match.params.inboundReturnId
     ) {
       this.props.showSpinner();
 
@@ -170,7 +170,7 @@ class CreateOutboundReturns extends Component {
         description: values.description,
         'origin.id': values.origin.id,
         'destination.id': values.destination.id,
-        type: 'OUTBOUND_RETURNS',
+        type: 'RETURN_ORDER',
       };
 
       const url = '/openboxes/api/stockTransfers/';
@@ -182,7 +182,7 @@ class CreateOutboundReturns extends Component {
             this.setState({
               values: resp,
             }, () => {
-              this.props.history.push(`/openboxes/stockTransfer/createReturns/${this.state.values.id}`);
+              this.props.history.push(`/openboxes/stockTransfer/createInboundReturn/${this.state.values.id}`);
               this.props.nextPage(this.state.values);
             });
           }
@@ -198,7 +198,7 @@ class CreateOutboundReturns extends Component {
   render() {
     return (
       <Form
-        onSubmit={values => this.saveOutboundReturns(values)}
+        onSubmit={values => this.saveInboundReturns(values)}
         validate={validate}
         initialValues={this.state.values}
         mutators={{
@@ -216,7 +216,7 @@ class CreateOutboundReturns extends Component {
                   destination: values.destination,
                   isSuperuser: this.props.isSuperuser,
                   debouncedLocationsFetch: this.debouncedLocationsFetch,
-                  outboundReturnId: this.props.match.params.outboundReturnId,
+                  inboundReturnId: this.props.match.params.inboundReturnId,
                   values,
                 }),
               )}
@@ -238,16 +238,16 @@ const mapStateToProps = state => ({
   isSuperuser: state.session.isSuperuser,
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
-  outboundReturnsTranslationsFetched: state.session.fetchedTranslations.outboundReturns,
+  inboundReturnsTranslationsFetched: state.session.fetchedTranslations.inboundReturns,
 });
 
 export default withRouter(connect(mapStateToProps, {
   showSpinner, hideSpinner,
-})(CreateOutboundReturns));
+})(CreateInboundReturn));
 
-CreateOutboundReturns.propTypes = {
+CreateInboundReturn.propTypes = {
   match: PropTypes.shape({
-    params: PropTypes.shape({ outboundReturnId: PropTypes.string }),
+    params: PropTypes.shape({ inboundReturnId: PropTypes.string }),
   }).isRequired,
   initialValues: PropTypes.shape({
     origin: PropTypes.shape({
@@ -275,5 +275,5 @@ CreateOutboundReturns.propTypes = {
   isSuperuser: PropTypes.bool.isRequired,
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
-  outboundReturnsTranslationsFetched: PropTypes.bool.isRequired,
+  inboundReturnsTranslationsFetched: PropTypes.bool.isRequired,
 };

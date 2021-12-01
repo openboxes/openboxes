@@ -3,16 +3,16 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 
-import CreateOutboundReturns from './CreateOutboundReturns';
+import CreateOutboundReturn from './CreateOutboundReturn';
 import AddItemsPage from './AddItemsPage';
 import PickPage from './PickPage';
-import SendOutboundReturns from './SendOutboundReturns';
-import Wizard from '../wizard/Wizard';
-import apiClient, { parseResponse } from '../../utils/apiClient';
-import { showSpinner, hideSpinner, fetchTranslations, updateBreadcrumbs, fetchBreadcrumbsConfig } from '../../actions';
-import { translateWithDefaultMessage } from '../../utils/Translate';
+import SendOutboundReturns from './SendOutboundReturn';
+import Wizard from '../../wizard/Wizard';
+import apiClient, { parseResponse } from '../../../utils/apiClient';
+import { showSpinner, hideSpinner, fetchTranslations, updateBreadcrumbs, fetchBreadcrumbsConfig } from '../../../actions';
+import { translateWithDefaultMessage } from '../../../utils/Translate';
 
-import '../stock-movement-wizard/StockMovement.scss';
+import '../../stock-movement-wizard/StockMovement.scss';
 
 class OutboundReturns extends Component {
   constructor(props) {
@@ -184,7 +184,7 @@ class OutboundReturns extends Component {
   render() {
     const { values, currentPage } = this.state;
     const title = this.getWizardTitle();
-    const pageList = [CreateOutboundReturns, AddItemsPage, PickPage, SendOutboundReturns];
+    const pageList = [CreateOutboundReturn, AddItemsPage, PickPage, SendOutboundReturns];
     const stepList = this.getStepList();
     const { location, history, match } = this.props;
     const locationId = location.id;

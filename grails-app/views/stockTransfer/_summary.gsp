@@ -29,14 +29,22 @@
 
         <g:set var="disabledMessage" value="${g.message(code:'inventory.stockTransfers.editCompleted')}"/>
 
-        <g:if test="${orderInstance.orderType == OrderType.findByCode(Constants.OUTBOUND_RETURNS)}">
-            <g:link controller="stockTransfer" action="createReturns" id="${orderInstance?.id}" class="button"
+        <g:if test="${orderInstance.isOutbound(session?.warehouse)}">
+            <g:link controller="stockTransfer" action="createOutboundReturn" id="${orderInstance?.id}" class="button"
                     disabled="${orderInstance?.status >= OrderStatus.COMPLETED}"
                     disabledMessage="${disabledMessage}">
                 <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
                 <warehouse:message code="inventory.editStockTransfer.label" default="Edit Stock Transfer"/>
             </g:link>
         </g:if>
+        <g:elseif test="${orderInstance.isInbound(session?.warehouse)}">
+            <g:link controller="stockTransfer" action="createInboundReturn" id="${orderInstance?.id}" class="button"
+                    disabled="${orderInstance?.status >= OrderStatus.COMPLETED}"
+                    disabledMessage="${disabledMessage}">
+                <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
+                <warehouse:message code="inventory.editStockTransfer.label" default="Edit Stock Transfer"/>
+            </g:link>
+        </g:elseif>
         <g:else>
             <g:link controller="stockTransfer" action="create" id="${orderInstance?.id}" class="button"
                     disabled="${orderInstance?.status >= OrderStatus.COMPLETED}"

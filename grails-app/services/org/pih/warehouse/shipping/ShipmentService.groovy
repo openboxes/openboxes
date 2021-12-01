@@ -671,12 +671,11 @@ class ShipmentService {
             shipmentItem.binLocation = null
         }
         return shipment.save()
-
     }
 
 
     boolean validateShipment(Shipment shipment) {
-        if (shipment?.orders && shipment?.orders?.first()?.orderType == OrderType.findByCode(Constants.OUTBOUND_RETURNS)) {
+        if (shipment?.orders && shipment?.orders?.first()?.orderType == OrderType.findByCode(Constants.RETURN_ORDER)) {
             shipment?.shipmentItems?.each { ShipmentItem shipmentItem ->
                 validateReturnShipmentItem(shipmentItem)
             }
@@ -2259,22 +2258,36 @@ class ShipmentService {
             return shipmentItems
         }
 
-        orderItem?.picklistItems?.each { PicklistItem picklistItem ->
-            if (picklistItem.quantity > 0) {
-                ShipmentItem shipmentItem = new ShipmentItem()
-                shipmentItem.lotNumber = picklistItem?.inventoryItem?.lotNumber
-                shipmentItem.expirationDate = picklistItem?.inventoryItem?.expirationDate
-                shipmentItem.product = picklistItem?.inventoryItem?.product
-                shipmentItem.quantity = picklistItem?.quantity
-                shipmentItem.recipient = picklistItem?.orderItem?.recipient ?:
-                        picklistItem?.orderItem?.parentOrderItem?.recipient
-                shipmentItem.inventoryItem = picklistItem?.inventoryItem
-                shipmentItem.binLocation = picklistItem?.binLocation
-                shipmentItem.sortOrder = shipmentItems.size()
+        if (orderItem?.order?.isOutbound()) {
+            orderItem?.picklistItems?.each { PicklistItem picklistItem ->
+                if (picklistItem.quantity > 0) {
+                    ShipmentItem shipmentItem = new ShipmentItem()
+                    shipmentItem.lotNumber = picklistItem?.inventoryItem?.lotNumber
+                    shipmentItem.expirationDate = picklistItem?.inventoryItem?.expirationDate
+                    shipmentItem.product = picklistItem?.inventoryItem?.product
+                    shipmentItem.quantity = picklistItem?.quantity
+                    shipmentItem.recipient = picklistItem?.orderItem?.recipient ?:
+                            picklistItem?.orderItem?.parentOrderItem?.recipient
+                    shipmentItem.inventoryItem = picklistItem?.inventoryItem
+                    shipmentItem.binLocation = picklistItem?.binLocation
+                    shipmentItem.sortOrder = shipmentItems.size()
 
-                shipmentItem.addToOrderItems(picklistItem.orderItem)
-                shipmentItems.add(shipmentItem)
+                    shipmentItem.addToOrderItems(picklistItem.orderItem)
+                    shipmentItems.add(shipmentItem)
+                }
             }
+        } else {
+            ShipmentItem shipmentItem = new ShipmentItem()
+            shipmentItem.lotNumber = orderItem?.inventoryItem?.lotNumber
+            shipmentItem.expirationDate = orderItem?.inventoryItem?.expirationDate
+            shipmentItem.product = orderItem?.inventoryItem?.product
+            shipmentItem.quantity = orderItem?.quantity
+            shipmentItem.recipient = orderItem?.recipient
+            shipmentItem.inventoryItem = orderItem?.inventoryItem
+            shipmentItem.sortOrder = shipmentItems.size()
+
+            shipmentItem.addToOrderItems(orderItem)
+            shipmentItems.add(shipmentItem)
         }
 
         return shipmentItems

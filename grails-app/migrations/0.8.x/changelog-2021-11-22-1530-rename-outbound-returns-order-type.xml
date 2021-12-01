@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="awalkowiak" id="2211202115300-0">
+    <preConditions onFail="MARK_RAN">
+      <and>
+        <tableExists tableName="order_type"/>
+        <sqlCheck expectedResult="0">
+          SELECT COUNT(*) FROM order_type WHERE id = 'RETURN_ORDER'
+        </sqlCheck>
+      </and>
+    </preConditions>
+    <sql>
+      INSERT INTO order_type
+      (id, name, description, code, order_type_code, date_created, last_updated, version) VALUES
+      ('RETURN_ORDER', 'Return Order', '', 'RETURN_ORDER', 'TRANSFER_ORDER', current_timestamp, current_timestamp, '0');
+    </sql>
+  </changeSet>
+
+  <changeSet author="awalkowiak" id="2211202115300-1">
+    <preConditions onFail="MARK_RAN">
+      <and>
+        <tableExists tableName="order_type"/>
+        <not>
+          <sqlCheck expectedResult="0">
+            SELECT COUNT(*) FROM `order` WHERE order_type_id = 'OUTBOUND_RETURNS'
+          </sqlCheck>
+        </not>
+      </and>
+    </preConditions>
+    <sql>
+      UPDATE `order` SET order_type_id = 'RETURN_ORDER' WHERE order_type_id = 'OUTBOUND_RETURNS';
+    </sql>
+  </changeSet>
+
+  <changeSet author="awalkowiak" id="2211202115300-2">
+    <preConditions onFail="MARK_RAN">
+      <and>
+        <tableExists tableName="order_type"/>
+        <not>
+          <sqlCheck expectedResult="0">
+            SELECT COUNT(*) FROM order_type WHERE id = 'OUTBOUND_RETURNS'
+          </sqlCheck>
+        </not>
+      </and>
+    </preConditions>
+    <sql>
+      DELETE FROM order_type WHERE id = 'OUTBOUND_RETURNS';
+    </sql>
+  </changeSet>
+</databaseChangeLog>

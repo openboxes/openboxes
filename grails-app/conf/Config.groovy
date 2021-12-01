@@ -743,12 +743,20 @@ breadcrumbsConfig {
             actionUrl = "/${appName}/replenishment/create/"
             listUrl = "/"
         }
-        returns {
+        outboundReturns {
             actionLabel = "react.outboundReturns.createReturn.label"
-            defaultActionLabel = "Create Return"
+            defaultActionLabel = "Create Outbound Return"
             listLabel = "react.outboundReturns.label"
             defaultListLabel = "Outbound Returns"
-            actionUrl = "/${appName}/stockTransfer/createReturns/"
+            actionUrl = "/${appName}/stockTransfer/createOutboundReturn/"
+            listUrl = "/"
+        }
+        inboundReturns {
+            actionLabel = "react.inboundReturns.createReturn.label"
+            defaultActionLabel = "Create Inbound Return"
+            listLabel = "react.inboundReturns.label"
+            defaultListLabel = "Inbound Returns"
+            actionUrl = "/${appName}/stockTransfer/createInboundReturn/"
             listUrl = "/"
         }
 }
@@ -1155,7 +1163,8 @@ openboxes {
                             menuItems: [
                                     [label: "inbound.create.label", defaultLabel: "Create Inbound Movement", href: "/${appName}/stockMovement/createInbound?direction=INBOUND"],
                                     [label: "stockRequest.create.label", defaultLabel: "Create Stock Request", href: "/${appName}/stockMovement/createRequest"],
-                                    [label: "inbound.list.label", defaultLabel: "List Inbound Movements", href: "/${appName}/stockMovement/list?direction=INBOUND"]
+                                    [label: "inbound.list.label", defaultLabel: "List Inbound Movements", href: "/${appName}/stockMovement/list?direction=INBOUND"],
+                                    [label: "inboundReturns.create.label", defaultLabel: "Create Inbound Return", href: "/${appName}/stockTransfer/createInboundReturn"]
                             ]
                     ],
                     [
@@ -1179,7 +1188,7 @@ openboxes {
                     menuItems: [
                         [label: "outbound.create.label", defaultLabel: "Create Outbound Movements", href: "/${appName}/stockMovement/createOutbound?direction=OUTBOUND"],
                         [label: "outbound.list.label", defaultLabel: "List Outbound Movements", href: "/${appName}/stockMovement/list?direction=OUTBOUND"],
-                        [label: "outboundReturns.create.label", defaultLabel: "Create Return", href: "/${appName}/stockTransfer/createReturns"]
+                        [label: "outboundReturns.create.label", defaultLabel: "Create Outbound Return", href: "/${appName}/stockTransfer/createOutboundReturn"]
                     ]
                 ]
             ]

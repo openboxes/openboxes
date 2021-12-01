@@ -8,13 +8,13 @@ import { getTranslate } from 'react-localize-redux';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-import ArrayField from '../form-elements/ArrayField';
-import LabelField from '../form-elements/LabelField';
-import { renderFormField } from '../../utils/form-utils';
+import ArrayField from '../../form-elements/ArrayField';
+import LabelField from '../../form-elements/LabelField';
+import { renderFormField } from '../../../utils/form-utils';
 
-import { showSpinner, hideSpinner } from '../../actions';
-import apiClient from '../../utils/apiClient';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
+import { showSpinner, hideSpinner } from '../../../actions';
+import apiClient from '../../../utils/apiClient';
+import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
 
 const FIELDS = {
   picklistItems: {
