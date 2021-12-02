@@ -18,6 +18,7 @@ import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.hibernate.Criteria
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -151,6 +152,24 @@ class ProductAvailabilityService {
     }
 
     def getQuantityPickedByProductAndLocation(Location location, Product product) {
+//        def results = Picklist.executeQuery("""
+//            select pli.binLocation, pli.inventoryItem, sum(pli.quantity)
+//            from Picklist pl
+//            left outer join pl.requisition r
+//            left outer join pl.picklistItems pli
+//            join pli.binLocation.supportedActivities sa
+//            where r.status in :statuses
+//            and r.origin = :location
+//            and IF (:product) { ( pli.requisitionItem.product = :product
+//                or pli.orderItem.product = :product)
+//            }
+//            and pli.orderItem <> NULL
+//            or ( pli.requisitionItem <> NULL
+//                and pli.inventoryItem.lotStatus <> :lotStatus
+//                and NOT pli.binLocation.supportedActivities
+//            order by pli.binLocation, pli.inventoryItem
+//        """, [statuses: RequisitionStatus.listPending(), location: location, product: product, lotStatus: LotStatusCode.RECALLED])
+
         Picklist.createCriteria().list {
             projections {
                 picklistItems {
@@ -166,8 +185,29 @@ class ProductAvailabilityService {
             }
             picklistItems {
                 if (product) {
-                    requisitionItem {
-                        eq("product", product)
+                    or {
+                        requisitionItem {
+                            eq("product", product)
+                        }
+                        orderItem {
+                            eq("product", product)
+                        }
+                    }
+                }
+                or {
+                    orderItem {
+                        isNotNull("id")
+                    }
+                    and {
+                        requisitionItem {
+                            isNotNull("id")
+                        }
+                        inventoryItem {
+                            ne("lotStatus", LotStatusCode.RECALLED)
+                        }
+//                        binLocation {
+//                            not { 'in'("supportedActivities", ActivityCode.HOLD_STOCK)}
+//                        }
                     }
                 }
                 order("binLocation")
