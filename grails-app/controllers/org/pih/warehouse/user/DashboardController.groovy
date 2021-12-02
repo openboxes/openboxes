@@ -184,7 +184,6 @@ class DashboardController {
             if (user) {
                 //userInstance.rememberLastLocation = Boolean.valueOf(params.rememberLastLocation)
                 user.lastLoginDate = new Date()
-                user.warehouse = warehouse
                 user.save(flush: true)
                 session.user = user
             }
