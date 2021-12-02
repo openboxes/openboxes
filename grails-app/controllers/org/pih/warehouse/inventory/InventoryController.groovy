@@ -320,12 +320,27 @@ class InventoryController {
         def quantityMap = inventoryService.getQuantityOnHandAsOfDate(command.location, command.startDate, command.tags)
         if (quantityMap) {
             def statusMap = dashboardService.getInventoryStatus(command.location)
+            def inventoryItems = []
+
+            quantityMap.each { Product product, quantity ->
+                def inventoryLevel = product.getInventoryLevel(command.location?.id)
+                def quantityAvailableToPromise = inventoryService.getQuantityAvailableToPromise(product, command.location)
+
+                inventoryItems << [
+                        status: statusMap[product],
+                        product: product,
+                        quantity: quantity,
+                        quantityAvailableToPromise: quantityAvailableToPromise,
+                        inventoryLevel: inventoryLevel
+                ]
+            }
+
             def filename = "Stock report - " +
                     (command?.tag ? command?.tag?.tag : "All Products") + " - " +
                     command?.location?.name + " - " +
                     command?.startDate?.format("yyyyMMMdd") + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: getCsvForProductMap(quantityMap, statusMap))
+            render(contentType: "text/csv", text: getCsvForProductMap(inventoryItems))
             return
         }
         flash.message = "There are no search results available to download - please try again."
@@ -467,158 +482,143 @@ class InventoryController {
     def list = {
         println "List " + params
         def location = Location.get(session.warehouse.id)
-        def quantityMap = productAvailabilityService.getCurrentInventory(location)
-        def statusMap = dashboardService.getInventoryStatus(location)
+        def inventoryItems = dashboardService.getInventoryItems(location)
+
         if (params.format == "csv") {
             def filename = "${location.name} - ${status}.csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: getCsvForProductMap(quantityMap, statusMap))
+            render(contentType: "text/csv", text: getCsvForProductMap(inventoryItems))
             return
         }
 
-        [quantityMap: quantityMap, statusMap: statusMap]
+        [availableItems: inventoryItems]
     }
 
 
     def listReconditionedStock = {
         def location = Location.get(session.warehouse.id)
-        def quantityMap = dashboardService.getReconditionedStock(location)
-        def statusMap = dashboardService.getInventoryStatus(location)
+        def inventoryItems = dashboardService.getReconditionedStock(location)
+
         if (params.format == "csv") {
             def filename = "Reconditioned stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: getCsvForProductMap(quantityMap, statusMap))
+            render(contentType: "text/csv", text: getCsvForProductMap(inventoryItems))
             return
         }
-        render(view: "list", model: [quantityMap: quantityMap, statusMap: statusMap])
+        render(view: "list", model: [availableItems: inventoryItems])
     }
 
 
     def listTotalStock = {
         def location = Location.get(session.warehouse.id)
-        def quantityMap = dashboardService.getTotalStock(location)
-        def statusMap = dashboardService.getInventoryStatus(location)
+        def inventoryItems = dashboardService.getTotalStock(location)
+
         if (params.format == "csv") {
             def filename = "Total stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: getCsvForProductMap(quantityMap, statusMap))
+            render(contentType: "text/csv", text: getCsvForProductMap(inventoryItems))
             return
         }
 
-        render(view: "list", model: [quantityMap: quantityMap, statusMap: statusMap])
+        render(view: "list", model: [availableItems: inventoryItems])
 
     }
 
     def listInStock = {
         def location = Location.get(session.warehouse.id)
-        def quantityMap = dashboardService.getInStock(location)
-        def statusMap = dashboardService.getInventoryStatus(location)
-        def availableItems = []
+        def inventoryItems = dashboardService.getInStock(location)
 
         if (params.format == "csv") {
             def filename = "In stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: getCsvForProductMap(quantityMap, statusMap))
+            render(contentType: "text/csv", text: getCsvForProductMap(inventoryItems))
             return
-        } else {
-            quantityMap.each { Product product, quantity ->
-                def inventoryLevel = product.getInventoryLevel(session.warehouse.id)
-                def quantityAvailableToPromise = inventoryService.getQuantityAvailableToPromise(product, location)
-                availableItems << [
-                        status: statusMap[product],
-                        product: product,
-                        quantity: quantity,
-                        quantityAvailableToPromise: quantityAvailableToPromise,
-                        inventoryLevel: inventoryLevel
-                ]
-            }
         }
 
-        render(view: "list", model: [availableItems: availableItems])
+        render(view: "list", model: [availableItems: inventoryItems])
     }
 
     def listLowStock = {
         def location = Location.get(session.warehouse.id)
-        def quantityMap = dashboardService.getLowStock(location)
-        def statusMap = dashboardService.getInventoryStatus(location)
+        def inventoryItems = dashboardService.getLowStock(location)
+
         if (params.format == "csv") {
             def filename = "Low stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: getCsvForProductMap(quantityMap, statusMap))
+            render(contentType: "text/csv", text: getCsvForProductMap(inventoryItems))
             return
         }
-        render(view: "list", model: [quantityMap: quantityMap, statusMap: statusMap])
+        render(view: "list", model: [availableItems: inventoryItems])
     }
 
     def listReorderStock = {
         def location = Location.get(session.warehouse.id)
-        def quantityMap = dashboardService.getReorderStock(location)
-        def statusMap = dashboardService.getInventoryStatus(location)
+        def inventoryItems = dashboardService.getReorderStock(location)
+
         if (params.format == "csv") {
             def filename = "Reorder stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: getCsvForProductMap(quantityMap, statusMap))
+            render(contentType: "text/csv", text: getCsvForProductMap(inventoryItems))
             return
         }
 
-        render(view: "list", model: [quantityMap: quantityMap, statusMap: statusMap])
+        render(view: "list", model: [availableItems: inventoryItems])
     }
 
 
     def listQuantityOnHandZero = {
         def location = Location.get(session.warehouse.id)
-        def quantityMap = dashboardService.getQuantityOnHandZero(location)
-        def statusMap = dashboardService.getInventoryStatus(location)
+        def inventoryItems = dashboardService.getQuantityOnHandZero(location)
+
         if (params.format == "csv") {
             def filename = "Out of stock  - all - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: getCsvForProductMap(quantityMap, statusMap))
+            render(contentType: "text/csv", text: getCsvForProductMap(inventoryItems))
             return
         }
 
-        render(view: "list", model: [quantityMap: quantityMap, statusMap: statusMap])
+        render(view: "list", model: [availableItems: inventoryItems])
     }
 
     def listHealthyStock = {
         def location = Location.get(session.warehouse.id)
-        def quantityMap = dashboardService.getHealthyStock(location)
-        def statusMap = dashboardService.getInventoryStatus(location)
+        def inventoryItems = dashboardService.getHealthyStock(location)
+
         if (params.format == "csv") {
             def filename = "Overstock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: getCsvForProductMap(quantityMap, statusMap))
+            render(contentType: "text/csv", text: getCsvForProductMap(inventoryItems))
             return
         }
 
-        render(view: "list", model: [quantityMap: quantityMap, statusMap: statusMap])
+        render(view: "list", model: [availableItems: inventoryItems])
     }
-
 
     def listOverStock = {
         def location = Location.get(session.warehouse.id)
-        def quantityMap = dashboardService.getOverStock(location)
-        def statusMap = dashboardService.getInventoryStatus(location)
+        def inventoryItems = dashboardService.getOverStock(location)
+
         if (params.format == "csv") {
             def filename = "Overstock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: getCsvForProductMap(quantityMap, statusMap))
+            render(contentType: "text/csv", text: getCsvForProductMap(inventoryItems))
             return
         }
 
-        render(view: "list", model: [quantityMap: quantityMap, statusMap: statusMap])
+        render(view: "list", model: [availableItems: inventoryItems])
     }
 
     def listOutOfStock = {
         def location = Location.get(session.warehouse.id)
-        def quantityMap = dashboardService.getOutOfStock(location, params.abcClass)
-        def statusMap = dashboardService.getInventoryStatus(location)
+        def inventoryItems = dashboardService.getOutOfStock(location, params.abcClass)
+
         if (params.format == "csv") {
             def filename = "Out of stock - supported - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: getCsvForProductMap(quantityMap, statusMap))
+            render(contentType: "text/csv", text: getCsvForProductMap(inventoryItems))
             return
         }
-        render(view: "list", model: [quantityMap: quantityMap, statusMap: statusMap])
+        render(view: "list", model: [availableItems: inventoryItems])
     }
 
 
@@ -726,13 +726,8 @@ class InventoryController {
         return csv
     }
 
-    def getCsvForProductMap(map) {
-        return getCsvForProductMap(map, [:])
-    }
-
-    def getCsvForProductMap(map, statusMap) {
+    def getCsvForProductMap(inventoryItems) {
         def hasRoleFinance = userService.hasRoleFinance(session.user)
-        def location = Location.get(session.warehouse.id)
 
         def csv = ""
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.status.label')}" + '"' + ","
@@ -753,12 +748,14 @@ class InventoryController {
         csv += '"' + "${warehouse.message(code: 'product.totalValue.label')}" + '"'
         csv += "\n"
 
-        map.sort().each { product, quantity ->
-            InventoryLevel inventoryLevel = product?.getInventoryLevel(session.warehouse.id)
-            def status = statusMap[product]
+        inventoryItems.each { inventoryItem ->
+            Product product = inventoryItem.product
+            def quantity = inventoryItem.quantity
+            InventoryLevel inventoryLevel = inventoryItem.inventoryLevel
+            def status = inventoryItem.status
             def totalValue = (product?.pricePerUnit ?: 0) * (quantity ?: 0)
             def statusMessage = "${warehouse.message(code: 'enum.InventoryLevelStatusCsv.' + status)}"
-            def quantityAvailableToPromise = inventoryService.getQuantityAvailableToPromise(product, location)
+
             csv += '"' + (statusMessage ?: "") + '"' + ","
             csv += '"' + (product.productCode ?: "") + '"' + ","
             csv += StringEscapeUtils.escapeCsv(product?.name) + ","
@@ -772,7 +769,7 @@ class InventoryController {
             csv += (inventoryLevel?.maxQuantity ?: "") + ","
             csv += (inventoryLevel?.forecastQuantity ?: "") + ","
             csv += (quantity ?: "0") + ","
-            csv += (quantityAvailableToPromise ?: "0") + ","
+            csv += (inventoryItem.quantityAvailableToPromise ?: "0") + ","
             csv += (hasRoleFinance ? (product?.pricePerUnit ?: "") : "") + ","
             csv += (hasRoleFinance ? (totalValue ?: "") : "")
             csv += "\n"
