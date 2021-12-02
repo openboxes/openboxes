@@ -75,10 +75,11 @@ class StockTransferItem {
         stockTransferItem.destinationBinLocation = productAvailability.binLocation
         stockTransferItem.quantity = productAvailability.quantityOnHand
         stockTransferItem.quantityOnHand = productAvailability.quantityOnHand
-        stockTransferItem.quantityNotPicked = productAvailability.quantityNotPicked > 0 ? productAvailability.quantityNotPicked : 0
+        stockTransferItem.quantityNotPicked = productAvailability.quantityNotPicked > 0 && productAvailability?.isPickable() ? productAvailability.quantityNotPicked : 0
 
         return stockTransferItem
     }
+
     static StockTransferItem createFromPicklistItem(PicklistItem picklistItem) {
         StockTransferItem stockTransferItem = new StockTransferItem()
         stockTransferItem.id = picklistItem.id
