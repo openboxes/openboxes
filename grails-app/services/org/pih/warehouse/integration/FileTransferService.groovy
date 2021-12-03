@@ -111,4 +111,20 @@ class FileTransferService {
         }
     }
 
+    def moveMessage(String oldPath, String newPath) {
+        SecureFtpCommand command
+        try {
+            SFTPClient sftpClient
+            try {
+                command = getSecureFtpCommand()
+                sftpClient = command.createNewSftpClient()
+                log.info "Move remote file ${oldPath} to destination ${newPath}"
+                sftpClient.rename(oldPath, newPath)
+            } finally {
+                IOUtils.closeQuietly(sftpClient)
+            }
+        } finally {
+            IOUtils.closeQuietly(command)
+        }
+    }
 }

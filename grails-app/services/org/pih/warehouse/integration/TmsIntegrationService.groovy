@@ -9,8 +9,9 @@
 **/
 package org.pih.warehouse.integration
 
+import org.apache.commons.io.FilenameUtils
 import org.apache.commons.io.IOUtils
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang.exception.ExceptionUtils
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.core.Location
@@ -52,7 +53,6 @@ import org.pih.warehouse.shipping.ReferenceNumber
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.Marshaller
 import javax.xml.bind.Unmarshaller
-import javax.xml.validation.SchemaFactory
 import java.text.SimpleDateFormat
 
 class TmsIntegrationService {
@@ -137,6 +137,29 @@ class TmsIntegrationService {
         String destinationFile = String.format(filenameTemplate, stockMovement?.identifier?:stockMovement?.id)
         String destinationDirectory = "${grailsApplication.config.openboxes.integration.ftp.outbound.directory}"
         fileTransferService.storeMessage(destinationFile, xmlContents, destinationDirectory)
+    }
+
+    def failMessage(String filePath, Exception exception) {
+        try {
+            log.info "Path ${filePath}"
+            String stacktrace = ExceptionUtils.getStackTrace(exception);
+            def filename = FilenameUtils.getBaseName(filePath)
+            def path = FilenameUtils.getFullPathNoEndSeparator(filePath)
+            def destination = "${path}/${filename}-stacktrace.log"
+            log.info "Storing error message to ${filename}.log in directory ${destination}"
+            fileTransferService.storeMessage("${filename}-stacktrace.log", stacktrace, destination)
+        } catch (Exception e) {
+            log.error("Unable to write error file to ftp server: " + e.message, e)
+        }
+    }
+
+    def archiveMessage(String oldPath) {
+        log.info "Path ${oldPath}"
+        def filename = FilenameUtils.getName(oldPath)
+        def destination = FilenameUtils.getFullPathNoEndSeparator(oldPath)
+        def newPath = "${destination}/archive/${filename}"
+        log.info("Archive message ${oldPath} to ${newPath}")
+        fileTransferService.moveMessage(oldPath, newPath)
     }
 
 

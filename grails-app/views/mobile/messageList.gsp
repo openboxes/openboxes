@@ -10,8 +10,8 @@
 
     <div class="clearfix">
         <button type="button" class="btn btn-outline-primary float-end" data-bs-toggle="modal"
-                data-bs-target="#messageUploadModal">Upload Message</button>
-    </div>
+                    data-bs-target="#messageUploadModal">Upload Message</button>
+        </div>
 
     <div class="card">
         <div class="card-header">
@@ -56,8 +56,9 @@
             <table class="table table-borderless table-striped">
                 <thead>
                     <tr>
-                        <th><g:message code="default.id.label" /></th>
-                        <th><g:message code="message.path.label" default="Path" /></th>
+                        <th><g:message code="message.label" default="Message"/></th>
+                        <th><g:message code="message.atime.label" default="Access Time" /></th>
+                        <th><g:message code="message.mtime.label" default="Modified Time" /></th>
                         <th></th>
                     </tr>
                 </thead>
@@ -66,12 +67,16 @@
                     <tr>
                         <td>
                             ${message.name}
+                            <div class="text-sm-left text-muted">${message.path}</div>
                         </td>
                         <td>
-                            ${message.path}
+                            ${message.atime}
+                        </td>
+                        <td>
+                            ${message.mtime}
                         </td>
                         <td class="col">
-                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end btn-group">
                                 <g:link controller="mobile" action="messageDetails"
                                         params="[path: message.path]"
                                         class="btn btn-outline-primary">Download</g:link>
