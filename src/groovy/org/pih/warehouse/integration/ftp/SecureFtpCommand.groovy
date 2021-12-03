@@ -1,7 +1,6 @@
 package org.pih.warehouse.integration.ftp
 
 import net.schmizz.sshj.SSHClient
-import net.schmizz.sshj.sftp.FileMode
 import net.schmizz.sshj.sftp.RemoteFile
 import net.schmizz.sshj.sftp.RemoteResourceFilter
 import net.schmizz.sshj.sftp.RemoteResourceInfo
@@ -17,8 +16,7 @@ import org.apache.commons.logging.LogFactory
 
 import java.nio.charset.StandardCharsets
 
-
-class SecureFtpClient {
+class SecureFtpCommand implements Closeable {
 
     static final LOG = LogFactory.getLog(this)
 
@@ -63,14 +61,14 @@ class SecureFtpClient {
         ]
     }
 
-    SecureFtpClient(String server, int port, String user, String password) {
+    SecureFtpCommand(String server, int port, String user, String password) {
         this.server = server
         this.port = port
         this.user = user
         this.password = password
     }
 
-    SecureFtpClient(Map config) {
+    SecureFtpCommand(Map config) {
         this.server = config.server
         this.port = config.port?:22
         this.user = config.user?:null
@@ -83,7 +81,7 @@ class SecureFtpClient {
     }
 
 
-    SFTPClient getSftpClient() throws IOException {
+    SFTPClient createNewSftpClient() throws IOException {
         try {
             sshClient = new SSHClient()
 
@@ -112,8 +110,8 @@ class SecureFtpClient {
 
             sshClient.connect(server)
 
-            // Set heartbeat interval
-            sshClient.transport.heartbeatInterval = heartbeatInterval
+            // Set keepalive interval
+            sshClient.connection.keepAlive.keepAliveInterval = heartbeatInterval
 
             if (user && password) {
                 sshClient.authPassword(user, password)
@@ -125,14 +123,16 @@ class SecureFtpClient {
         }
     }
 
-    void disconnect() throws IOException {
+    void close() {
         if (sshClient) {
             sshClient.disconnect()
         }
     }
 
     Collection<String> listFiles(String path) {
+        SFTPClient sftpClient
         try {
+            sftpClient = createNewSftpClient()
             LOG.info "Listing files from remote ${path}"
             List<RemoteResourceInfo> files = sftpClient.ls(path, xmlFileFilter)
             LOG.info "Found ${files.size()} files"
@@ -142,12 +142,14 @@ class SecureFtpClient {
         } catch(Exception e) {
             LOG.error("Exception while listing remote from ${path}: " + e.message, e)
         } finally {
-            sshClient.close()
+            IOUtils.closeQuietly(sftpClient)
         }
     }
 
     Collection listFilesInSubdirectories(String path, List<String> subdirectories) {
+        SFTPClient sftpClient
         try {
+            sftpClient = createNewSftpClient()
             LOG.info "Listing directories from remote ${path}"
             List<RemoteResourceInfo> directories = sftpClient.ls(path, directoryFilter)
             LOG.info "Found ${directories.size()} directories: " + directories*.name
@@ -170,52 +172,70 @@ class SecureFtpClient {
         } catch(Exception e) {
             LOG.error("Exception while listing remote from ${path}: " + e.message, e)
         } finally {
-            sshClient.close()
+            IOUtils.closeQuietly(sftpClient)
         }
     }
 
 
     void retrieveFile(String source, String destination) {
+        SFTPClient sftpClient
         try {
+            sftpClient = createNewSftpClient()
             LOG.info "Retrieve remote ${source} to local ${destination}"
             sftpClient.get(source, new FileSystemFile(destination))
         } finally {
-            sshClient.close()
+            IOUtils.closeQuietly(sftpClient)
         }
     }
 
     InputStream retrieveFileAsInputStream(String source) {
+        SFTPClient sftpClient
+        RemoteFile remoteFile
+        InputStream inputStream
         try {
+            sftpClient = createNewSftpClient()
             LOG.info "Retrieve remote ${source}"
-            RemoteFile remoteFile = sftpClient.SFTPEngine.open(source)
+            remoteFile = sftpClient.open(source)
             return new RemoteFile.RemoteFileInputStream(remoteFile)
         } finally {
-            //sshClient.close()
+            IOUtils.closeQuietly(remoteFile)
+            IOUtils.closeQuietly(sftpClient)
         }
     }
 
     String retrieveFileAsString(String source) {
+        SFTPClient sftpClient
+        RemoteFile remoteFile
+        InputStream inputStream
         try {
+            sftpClient = createNewSftpClient()
             LOG.info "Retrieve remote ${source}"
-            InputStream inputStream = retrieveFileAsInputStream(source)
+            remoteFile = sftpClient.open(source)
+            inputStream = new RemoteFile.RemoteFileInputStream(remoteFile)
             return IOUtils.toString(inputStream, StandardCharsets.UTF_8.name())
         } finally {
-            //sshClient.close()
+            IOUtils.closeQuietly(remoteFile)
+            IOUtils.closeQuietly(inputStream)
+            IOUtils.closeQuietly(sftpClient)
         }
     }
 
     void storeFile(File file, String path) {
+        SFTPClient sftpClient
         try {
+            sftpClient = createNewSftpClient()
             LOG.info "Put local ${file.path} to remote ${path}"
             sftpClient.put(new FileSystemFile(file.path), path);
         } finally {
-            sshClient.close()
+            IOUtils.closeQuietly(sftpClient)
         }
     }
 
 
     void storeFile(String filename, String contents, String path) {
+        SFTPClient sftpClient
         try {
+            sftpClient = createNewSftpClient()
             LOG.info "Put in memory file ${filename} to remote ${path}"
             sftpClient.put(new InMemorySourceFile() {
                 @Override
@@ -231,16 +251,18 @@ class SecureFtpClient {
             }, path)
 
         } finally {
-            sshClient.close()
+            IOUtils.closeQuietly(sftpClient)
         }
     }
 
     void deleteFile(String filename) {
+        SFTPClient sftpClient
         try {
+            sftpClient = createNewSftpClient()
             LOG.info "Delete remote file ${filename}"
             sftpClient.rm(filename)
         } finally {
-            sshClient.close()
+            IOUtils.closeQuietly(sftpClient)
         }
     }
 
