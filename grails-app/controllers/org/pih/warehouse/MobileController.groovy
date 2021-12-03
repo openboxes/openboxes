@@ -282,8 +282,15 @@ class MobileController {
 
     def messageDetails = {
         def content = fileTransferService.retrieveMessage(params.path)
-        //def xml = new XML(content)
-        render text: content, contentType: 'text/xml', encoding: 'UTF-8'
+        if (params.path.endsWith(".xml")) {
+            render text: content, contentType: 'text/xml', encoding: 'UTF-8'
+        }
+        else if (params.path.endsWith(".log")) {
+            render text: "<pre>" + content + "</pre>"
+        }
+        else {
+            render text: content
+        }
         return
     }
 
@@ -346,10 +353,12 @@ class MobileController {
             Object messageObject = tmsIntegrationService.deserialize(xmlContents)
             tmsIntegrationService.handleMessage(messageObject)
             flash.message = "Message has been processed"
+            tmsIntegrationService.archiveMessage(params.path)
         }
         catch (Exception e) {
             log.error("Message not processed due to error: " + e.message, e)
             flash.message = "Message not processed due to error: " + e?.cause?.message?:e.message
+            tmsIntegrationService.failMessage(params.path, e)
         }
         redirect(action: "messageList")
     }
