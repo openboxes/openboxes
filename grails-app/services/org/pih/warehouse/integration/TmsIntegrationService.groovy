@@ -49,10 +49,12 @@ import org.pih.warehouse.integration.xml.pod.DocumentUpload
 import org.pih.warehouse.integration.xml.trip.Trip
 import org.pih.warehouse.product.Attribute
 import org.pih.warehouse.shipping.ReferenceNumber
+import org.pih.warehouse.util.LocalizationUtil
 
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.Marshaller
 import javax.xml.bind.Unmarshaller
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 
 class TmsIntegrationService {
@@ -184,7 +186,7 @@ class TmsIntegrationService {
         orderDetails.setModeOfTransport(config.orderDetails.modeOfTransport);
         orderDetails.setServiceType(config.orderDetails.serviceType);
         orderDetails.setDeliveryTerms(config.orderDetails.deliveryTerms);
-        orderDetails.setGoodsValue(new GoodsValue(stockMovement.totalValue?:0, defaultCurrencyCode));
+        orderDetails.setGoodsValue(new GoodsValue(stockMovement.totalValue?:0.00, defaultCurrencyCode));
         orderDetails.setTermsOfTrade(new TermsOfTrade(config.orderDetails.termsOfTrade.incoterm,
                 new FreightName( config.orderDetails.termsOfTrade.freightName.term, config.orderDetails.termsOfTrade.freightName.name)));
 
@@ -209,17 +211,17 @@ class TmsIntegrationService {
 
         // Calculate total volume for stock movement
         Attribute volumeAttribute = Attribute.findByCode("VOLUME")
-        BigDecimal totalVolume = stockMovement.getAggregateNumericValue(volumeAttribute)?:0
+        BigDecimal totalVolume = stockMovement.getAggregateNumericValue(volumeAttribute)?:0.0
         String volumeUom = volumeAttribute?.unitOfMeasureClass?.baseUom?.code?:"cbm"
 
         // Calculate total volume for stock movement
-        Attribute volumeWeight = Attribute.findByCode("WEIGHT")
-        BigDecimal totalWeight = stockMovement.getAggregateNumericValue(volumeWeight)?:0
-        String weightUom = volumeWeight?.unitOfMeasureClass?.baseUom?.code?:"kg"
+        Attribute weightAttribute = Attribute.findByCode("WEIGHT")
+        BigDecimal totalWeight = stockMovement.getAggregateNumericValue(weightAttribute)?:0.0
+        String weightUom = weightAttribute?.unitOfMeasureClass?.baseUom?.code?:"kg"
 
         // Cargo Summary
-        UnitTypeVolume unitTypeVolume = new UnitTypeVolume(totalVolume.toString(), volumeUom)
-        UnitTypeWeight unitTypeWeight = new UnitTypeWeight(totalWeight.toString(), weightUom)
+        UnitTypeVolume unitTypeVolume = new UnitTypeVolume(formatDecimal(totalVolume), volumeUom)
+        UnitTypeWeight unitTypeWeight = new UnitTypeWeight(formatDecimal(totalWeight), weightUom)
         orderDetails.setOrderCargoSummary(buildOrderCargoSummary(config,
                 stockMovement.hasHazardousMaterial(),
                 unitTypeVolume,
@@ -292,11 +294,11 @@ class TmsIntegrationService {
                 itemDetails.setActualWeight(new UnitTypeWeight("1.0", "kg"))
                 itemDetails.setLdm("0")
 
-                BigDecimal volumeValue = stockMovementItem.getNumericValue(volumeAttribute)?:0
-                itemDetails.setActualVolume(new UnitTypeVolume(volumeValue.toString(), volumeUom));
+                BigDecimal volumeValue = stockMovementItem.getNumericValue(volumeAttribute)?:0.0
+                itemDetails.setActualVolume(new UnitTypeVolume(formatDecimal(volumeValue), volumeUom));
 
-                BigDecimal weightValue = stockMovementItem.getNumericValue(weightAttribute)?:0
-                itemDetails.setVolumetricWeight(new UnitTypeWeight(weightValue.toString(), weightUom));
+                BigDecimal weightValue = stockMovementItem.getNumericValue(weightAttribute)?:0.0
+                itemDetails.setVolumetricWeight(new UnitTypeWeight(formatDecimal(weightValue), weightUom));
 
                 itemList.add(itemDetails)
             }
@@ -345,8 +347,18 @@ class TmsIntegrationService {
         // Add contact information
         partyType.setContactData(buildContactData(contactData?:location?.manager))
         return partyType
-
     }
+
+    PartyType buildPartyType(Organization organization, User contactData, String type) {
+        PartyType partyType = new PartyType();
+        partyType.setPartyID(new PartyID(organization?.code, organization?.name));
+        partyType.setType(type);
+
+        // Add contact information
+        partyType.setContactData(buildContactData(contactData?:organization?.defaultLocation?.manager))
+        return partyType
+    }
+
 
     ContactData buildContactData(User user) {
         Map config = grailsApplication.config.openboxes.integration.partyType.contactData
@@ -365,20 +377,6 @@ class TmsIntegrationService {
                     new Phone(config.phone.countryCode, config.phone.contactNumber),
                     config.emailAddress)
         }
-    }
-
-    PartyType buildPartyType(Organization organization, User contactData, String type) {
-        PartyType partyType = new PartyType();
-        partyType.setPartyID(new PartyID(organization?.code, organization?.name));
-        partyType.setType(type);
-
-        // Add contact information
-        User contact = contactData?:organization?.defaultLocation?.manager
-        if (contact) {
-            partyType.setContactData(new ContactData(contact.firstName, contact?.lastName,
-                    new Phone(null, contact?.phoneNumber), contact?.email));
-        }
-        return partyType
     }
 
     LocationInfo buildLocationInfo(Integer stopSequence, Location location, Date expectedDate, String driverInstructions) {
@@ -413,6 +411,12 @@ class TmsIntegrationService {
                 "Null Zip",
                 "UK",
                 defaultTimeZone)
+    }
+
+    String formatDecimal(Number number) {
+        DecimalFormat format = DecimalFormat.getNumberInstance(LocalizationUtil.localizationService.currentLocale)
+        format.setMinimumFractionDigits(1)
+        format.format(number)
     }
 
 }
