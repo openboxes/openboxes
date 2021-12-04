@@ -9,24 +9,28 @@
 **/
 package org.pih.warehouse.integration
 
-import org.pih.warehouse.integration.ftp.SecureFtpClient
-
+import net.schmizz.sshj.sftp.SFTPClient
+import org.apache.commons.io.IOUtils
+import org.pih.warehouse.integration.ftp.SecureFtpCommand
 
 class FileTransferService {
 
     def grailsApplication
 
-    SecureFtpClient getSecureFtpClient() {
+    SecureFtpCommand getSecureFtpCommand() {
         Map sftpConfig = grailsApplication.config.openboxes.integration.ftp.flatten()
-        return new SecureFtpClient(sftpConfig)
+        return new SecureFtpCommand(sftpConfig)
     }
 
     def listMessages(String directory, boolean includeContent = false) {
+        SecureFtpCommand command
         try {
-            def files = secureFtpClient.listFiles(directory)
+            command = getSecureFtpCommand()
+            def files = command.listFiles(directory)
             def messages = files.collect { Map fileInfo ->
                 if (includeContent) {
-                    fileInfo.content = secureFtpClient.retrieveFileAsString(fileInfo.path)
+                    log.info "Retrieve content for ${fileInfo.path}"
+                    fileInfo.content = command.retrieveFileAsString(fileInfo.path)
                 }
                 return fileInfo
             }
@@ -35,62 +39,92 @@ class FileTransferService {
 
         }
         finally {
-            secureFtpClient.disconnect()
+            IOUtils.closeQuietly(command)
         }
     }
 
     def listMessages(String directory, List<String> subdirectories, boolean includeContent = false) {
+
+        SecureFtpCommand command
         try {
-            def files = secureFtpClient.listFilesInSubdirectories(directory, subdirectories)
-            log.info "files ${files.size()}"
+            command = getSecureFtpCommand()
+            def files = command.listFilesInSubdirectories(directory, subdirectories)
+            log.info "Returned ${files?.size()?:0} files"
+
             def messages = files.collect { Map fileInfo ->
                 if (includeContent) {
-                    fileInfo.content = secureFtpClient.retrieveFileAsString(fileInfo.path)
+                    log.info "Retrieve content for ${fileInfo.path}"
+                    fileInfo.content = command.retrieveFileAsString(fileInfo.path)
                 }
                 return fileInfo
             }
+
+            messages = messages.findAll { !it.isDirectory }.sort { it.mtime }
+
             return messages
         } catch (Exception e) {
             log.error("Error occurred while listing messages: " + e.message, e)
         }
         finally {
-            secureFtpClient.disconnect()
+            IOUtils.closeQuietly(command)
         }
 
     }
 
     def retrieveMessage(String source) {
-        try {
-            secureFtpClient.retrieveFileAsString(source)
+        SecureFtpCommand command
+        try  {
+            command = getSecureFtpCommand()
+            command.retrieveFileAsString(source)
         } finally {
-            secureFtpClient.disconnect()
+            IOUtils.closeQuietly(command)
         }
     }
 
     def storeMessage(File file, String destination) {
+        SecureFtpCommand command
         try {
-            secureFtpClient.storeFile(file, destination)
+            command = getSecureFtpCommand()
+            command.storeFile(file, destination)
         } finally {
-            secureFtpClient.disconnect()
+            IOUtils.closeQuietly(command)
         }
     }
 
     def storeMessage(String filename, String contents, String destination) {
+        SecureFtpCommand command
         try {
-            secureFtpClient.storeFile(filename, contents, destination)
+            command = getSecureFtpCommand()
+            command.storeFile(filename, contents, destination)
         } finally {
-            secureFtpClient.disconnect()
+            IOUtils.closeQuietly(command)
         }
     }
 
     def deleteMessage(String target) {
+        SecureFtpCommand command
         try {
-            secureFtpClient.deleteFile(target)
+            command = getSecureFtpCommand()
+            command.deleteFile(target)
         } finally {
-            secureFtpClient.disconnect()
+            IOUtils.closeQuietly(command)
         }
-
-
     }
 
+    def moveMessage(String oldPath, String newPath) {
+        SecureFtpCommand command
+        try {
+            SFTPClient sftpClient
+            try {
+                command = getSecureFtpCommand()
+                sftpClient = command.createNewSftpClient()
+                log.info "Move remote file ${oldPath} to destination ${newPath}"
+                sftpClient.rename(oldPath, newPath)
+            } finally {
+                IOUtils.closeQuietly(sftpClient)
+            }
+        } finally {
+            IOUtils.closeQuietly(command)
+        }
+    }
 }

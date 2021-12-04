@@ -4,7 +4,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-@XmlRootElement(name = "AcceptanceStatus")
+@XmlRootElement(name = "Acceptance_Status")
 @XmlType(propOrder = {"header", "action", "tripDetails", "tripOrderDetails"})
 public class AcceptanceStatus {
     public AcceptanceStatus() {}
