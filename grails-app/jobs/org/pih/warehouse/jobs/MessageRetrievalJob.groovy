@@ -1,9 +1,7 @@
 package org.pih.warehouse.jobs
 
 import net.schmizz.sshj.connection.ConnectionException
-import org.apache.commons.io.IOUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
-import org.pih.warehouse.integration.ftp.SecureFtpClient
 import org.quartz.DisallowConcurrentExecution
 
 import java.nio.charset.StandardCharsets
