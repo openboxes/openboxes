@@ -112,7 +112,9 @@ class Container implements Comparable, java.io.Serializable {
 
 
     List<ShipmentItem> getShipmentItems() {
-        return ShipmentItem.findAllByContainer(this)
+        if(this.id) {
+            return ShipmentItem.findAllByContainer(this)
+        }
     }
 
     /**
