@@ -26,6 +26,7 @@ class XsdValidatorServiceUnitTests extends GrailsUnitTestCase{
             <OrderID>10032021-B</OrderID>
           </TripOrderDetails>
         </AcceptanceStatus>'''
+    String noNamespaceXml = "/tmp/failing_xml.xml"
 
     protected void setUp() {
         super.setUp()
@@ -37,5 +38,9 @@ class XsdValidatorServiceUnitTests extends GrailsUnitTestCase{
 
     void testAcceptanceStatusValidator() {
         assertTrue(xsdValidatorService.validateXml(acceptanceStatusXML))
+    }
+
+    void testResolveNameSpace( ) {
+        xsdValidatorService.resolveEmptyNamespace(noNamespaceXml)
     }
 }
