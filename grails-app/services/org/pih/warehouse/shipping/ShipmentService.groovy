@@ -2161,6 +2161,7 @@ class ShipmentService {
         Container container = new Container()
         container.shipment = shipment
         container.name = generateContainerNumber(shipment)
+        container.containerType = ContainerType.findById(Constants.PALLET_CONTAINER_TYPE_ID)
         container.containerNumber = container.name
         container.discard()
         return container
@@ -2173,9 +2174,7 @@ class ShipmentService {
     String generateContainerNumber(Shipment shipment){
         Integer sequenceNumber = getNextContainerNumberSequence(shipment)
         String sequenceNumberStr = identifierService.generateSequenceNumber(sequenceNumber.toString())
-        Map model = [:]
-        model.put("shipmentNumber", shipment.id)
-        model.put("sequenceNumber", sequenceNumberStr)
+        Map model = ["shipmentNumber": shipment.shipmentNumber, "sequenceNumber": sequenceNumberStr]
         String template = ConfigurationHolder.config.openboxes.identifier.container.format
         return identifierService.renderTemplate(template, model)
     }

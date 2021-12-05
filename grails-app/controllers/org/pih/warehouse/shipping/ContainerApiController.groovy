@@ -18,7 +18,7 @@ import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 
-class ContainerApiController  {
+class ContainerApiController extends BaseDomainApiController {
 
     def zebraService
     def documentService
@@ -56,25 +56,26 @@ class ContainerApiController  {
         }
     }
 
-    def save = {
+    def create = {
         try {
             JSONObject jsonObject = request.JSON
             Shipment shipment = shipmentService.getShipment(jsonObject.getString("shipment.id"))
-            if(!jsonObject.containsKey("container.name") && !jsonObject.containsKey("container.containerNumber")){
+            if(!jsonObject.containsKey("name") && !jsonObject.containsKey("containerNumber")){
                 render shipmentService.initializeContainerFromShipment(shipment) as JSON
-            }else{
-                Container container = new Container(shipment: shipment)
-                container.name = jsonObject.getString("container.name")
-                container.containerNumber = jsonObject.getString("container.containerNumber")
-                container.containerType = ContainerType.findById(Constants.BOX_CONTAINER_TYPE_ID)
-                container.save(flush: true, failOnError: true)
+            }
+            else{
+                Container container = new Container()
+                container.name = jsonObject.name
+                container.containerNumber = jsonObject.containerNumber
+                container.containerType = jsonObject.containerType.id ?
+                        ContainerType.get(jsonObject.containerType.id) :
+                        ContainerType.findById(Constants.PALLET_CONTAINER_TYPE_ID)
                 shipment.addToContainers(container)
                 shipment.save(flush: true)
                 render container as JSON
             }
-        }catch(Exception ex){
-            render([errorCode: 500, cause: ex?.class, errorMessage: ex?.message] as JSON)
+        } catch(Exception e) {
+            render([errorCode: 500, cause: e?.class, errorMessage: e?.message] as JSON)
         }
     }
-
 }
