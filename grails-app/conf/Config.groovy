@@ -775,7 +775,7 @@ openboxes.identifier.organization.minSize = 2
 openboxes.identifier.organization.maxSize = 4
 
 openboxes.identifier.container.generatorType = IdentifierGeneratorTypeCode.SEQUENCE
-openboxes.identifier.container.format = "\${shipmentNumber}-\${sequenceNumber}"
+openboxes.identifier.container.format = "LPN-\${shipmentNumber}-\${sequenceNumber}"
 
 openboxes.identifier.purchaseOrder.generatorType = IdentifierGeneratorTypeCode.SEQUENCE
 openboxes.identifier.purchaseOrder.format = "PO-\${destinationPartyCode}-\${sequenceNumber}"
