@@ -774,6 +774,9 @@ openboxes.identifier.organization.format = Constants.DEFAULT_ORGANIZATION_NUMBER
 openboxes.identifier.organization.minSize = 2
 openboxes.identifier.organization.maxSize = 4
 
+openboxes.identifier.container.generatorType = IdentifierGeneratorTypeCode.SEQUENCE
+openboxes.identifier.container.format = "LPN-\${shipmentNumber}-\${sequenceNumber}"
+
 openboxes.identifier.purchaseOrder.generatorType = IdentifierGeneratorTypeCode.SEQUENCE
 openboxes.identifier.purchaseOrder.sequenceNumber.format = Constants.DEFAULT_PO_SEQUENCE_NUMBER_FORMAT
 openboxes.identifier.purchaseOrder.format = "PO-\${destinationPartyCode}-\${sequenceNumber}"

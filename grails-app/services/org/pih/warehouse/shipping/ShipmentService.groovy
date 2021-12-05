@@ -2343,4 +2343,27 @@ class ShipmentService {
         }
         return referenceNumber
     }
+
+    Container initializeContainerFromShipment(Shipment shipment){
+        Container container = new Container()
+        container.shipment = shipment
+        container.name = generateContainerNumber(shipment)
+        container.containerType = ContainerType.findById(Constants.PALLET_CONTAINER_TYPE_ID)
+        container.containerNumber = container.name
+        container.discard()
+        return container
+    }
+
+    Integer getNextContainerNumberSequence(Shipment shipment){
+        return (shipment?.containers ? shipment?.containers?.size() : 0) + 1
+    }
+
+    String generateContainerNumber(Shipment shipment){
+        Integer sequenceNumber = getNextContainerNumberSequence(shipment)
+        String sequenceNumberStr = identifierService.generateSequenceNumber(sequenceNumber.toString())
+        Map model = ["shipmentNumber": shipment.shipmentNumber, "sequenceNumber": sequenceNumberStr]
+        String template = ConfigurationHolder.config.openboxes.identifier.container.format
+        return identifierService.renderTemplate(template, model)
+    }
+
 }
