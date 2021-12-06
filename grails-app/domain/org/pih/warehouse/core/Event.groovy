@@ -44,7 +44,7 @@ class Event implements Comparable, Serializable {
         eventLocation(nullable: true)
         observedBy(nullable: true)
         latitude(nullable: true)
-        longitude(nullalbe: true)
+        longitude(nullable: true)
     }
 
     String toString() { return "$eventType $eventLocation on $eventDate" }
