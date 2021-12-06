@@ -112,7 +112,7 @@ class CombinedShipmentService {
                 valid = false
             }
 
-            if (orderItem.product != product) {
+            if (orderItem && product && orderItem.product != product) {
                 line.errors << "Product code ${line.productCode} does not match product on the order item with given id ${line.id}"
                 valid = false
             }
