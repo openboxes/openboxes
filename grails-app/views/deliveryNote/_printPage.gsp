@@ -49,7 +49,7 @@
                         <g:set var="inventoryItem" value="${picklistItemsGroup[j]?.first()?.inventoryItem}" />
                     </g:if>
                     <g:else>
-                        <g:set var="inventoryItem" value="${requisitionItem?.shipmentItems?.toList()?.first()?.inventoryItem}" />
+                        <g:set var="inventoryItem" value="${requisitionItem?.shipmentItems?.size() > 0 ? requisitionItem?.shipmentItems?.toList()?.first()?.inventoryItem : null}" />
                     </g:else>
                     <tr class="prop" style="background-color: ${backgroundColor}">
                         <g:if test="${j==0}">
