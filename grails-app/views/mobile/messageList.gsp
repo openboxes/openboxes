@@ -64,7 +64,7 @@
                 </thead>
                 <tbody>
                 <g:each var="message" in="${messages}">
-                    <tr>
+                    <tr class="${message.name.endsWith('log')?'table-danger':''}">
                         <td>
                             ${message.name}
                             <div class="text-sm-left text-muted">${message.path}</div>
