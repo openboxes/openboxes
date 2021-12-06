@@ -4,7 +4,7 @@ import javax.xml.bind.annotation.*;
 import java.util.List;
 
 @XmlType (name="",propOrder={"header","tripID","executionStatus"})
-@XmlRootElement(name = "Execution")
+@XmlRootElement(name = "execution")
 public class Execution {
 
     private String tripID;
@@ -36,7 +36,7 @@ public class Execution {
         return header;
     }
 
-    @XmlElement(name = "ExecutionStatus")
+    @XmlElement(name = "executionStatus")
     public List <ExecutionStatus> getExecutionStatus() {
         return executionStatus;
     }

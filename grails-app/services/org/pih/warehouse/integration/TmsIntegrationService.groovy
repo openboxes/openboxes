@@ -91,8 +91,11 @@ class TmsIntegrationService {
         // Convert XML message to message object
         JAXBContext jaxbContext = JAXBContext.newInstance("org.pih.warehouse.integration.xml.acceptancestatus:org.pih.warehouse.integration.xml.execution:org.pih.warehouse.integration.xml.pod:org.pih.warehouse.integration.xml.trip");
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        InputStream inputStream = IOUtils.toInputStream(xmlContents)
-        return unmarshaller.unmarshal(inputStream)
+
+        // OBKN-372 Hack to allow JAXB to deserialize XML without xmlns
+        InputStream inputStream = new ByteArrayInputStream(xmlContents.bytes)
+        String xmlContentsWithNamespace = xsdValidatorService.resolveEmptyNamespace(inputStream)
+        return unmarshaller.unmarshal(IOUtils.toInputStream(xmlContentsWithNamespace))
     }
 
     Object deserialize(String xmlContents, final Class clazz) {
@@ -100,7 +103,11 @@ class TmsIntegrationService {
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream()
             BufferedInputStream bufferedInputStream = new BufferedInputStream(byteArrayInputStream)
             Unmarshaller unmarshaller = JAXBContext.newInstance(clazz).createUnmarshaller()
-            return unmarshaller.unmarshal(new StringReader(xmlContents))
+
+            // OBKN-372 Hack to allow JAXB to deserialize XML without xmlns
+            InputStream inputStream = new ByteArrayInputStream(xmlContents.bytes)
+            String xmlContentsWithNamespace = xsdValidatorService.resolveEmptyNamespace(inputStream)
+            return unmarshaller.unmarshal(new StringReader(xmlContentsWithNamespace))
 
         } catch (Exception e) {
             log.error("Error occurred while deserializing XML to object: " + e.message, e)
@@ -156,12 +163,16 @@ class TmsIntegrationService {
     }
 
     def archiveMessage(String oldPath) {
-        log.info "Path ${oldPath}"
-        def filename = FilenameUtils.getName(oldPath)
-        def destination = FilenameUtils.getFullPathNoEndSeparator(oldPath)
-        def newPath = "${destination}/archive/${filename}"
-        log.info("Archive message ${oldPath} to ${newPath}")
-        fileTransferService.moveMessage(oldPath, newPath)
+        try {
+            log.info "Path ${oldPath}"
+            def filename = FilenameUtils.getName(oldPath)
+            def destination = FilenameUtils.getFullPathNoEndSeparator(oldPath)
+            def newPath = "${destination}/archive/${filename}"
+            log.info("Archive message ${oldPath} to ${newPath}")
+            fileTransferService.moveMessage(oldPath, newPath)
+        } catch (Exception e) {
+            log.error("Unable to archive message " + e.message, e)
+        }
     }
 
 

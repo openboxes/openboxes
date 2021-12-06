@@ -25,6 +25,8 @@ class XsdValidatorService {
 
     def namespaceMap = [
             'execution': 'http://www.etrucknow.com/edi/carrier/trip_execution/v1',
+            'Execution': 'http://www.etrucknow.com/edi/carrier/trip_execution/v1',
+            'AcceptanceStatus': 'http://www.etrucknow.com/edi/carrier/acceptance_status/v1',
             'Acceptance_Status': 'http://www.etrucknow.com/edi/carrier/acceptance_status/v1',
             'Trip':  'http://www.etrucknow.com/edi/carrier/trip_notification/v1',
             'Order': 'http://www.etrucknow.com/edi/business_partner/order_create/v1',
@@ -43,27 +45,33 @@ class XsdValidatorService {
         return xmlRootNode.name()
     }
 
-    def resolveEmptyNamespace (String path) {
-        File xmlFile = new File(path)
-        //Parse XML
+    String resolveEmptyNamespace(InputStream inputStream) {
+
+        // Parse document
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
         factory.setNamespaceAware(true)
         DocumentBuilder builder = factory.newDocumentBuilder()
-        Document document = builder.parse(new FileInputStream(xmlFile))
+        Document document = builder.parse(inputStream)
 
+        // Fix the namespace attribute
         Node root = document.getFirstChild()
         NamedNodeMap attr = root.getAttributes()
         Node node = attr.getNamedItem("xmlns")
 
-        if(node.nodeValue == "" ) {
-            def rootNodeName = root.getNodeName()
-            node.setTextContent(namespaceMap.getAt(rootNodeName))
-            // write to xml
-            TransformerFactory tf = TransformerFactory.newInstance()
-            Transformer transformer = tf.newTransformer()
-            DOMSource src = new DOMSource(document)
-            StreamResult res = new StreamResult(new File(path))
-            transformer.transform(src, res)
+        // Add xmlns attribute if its not already there
+        if(node && !node?.nodeValue) {
+            node.setTextContent(namespaceMap.getAt(root.getNodeName()))
         }
+
+        // Rewrite XML document
+        StringWriter writer = new StringWriter();
+        DOMSource domSource = new DOMSource(document)
+        StreamResult result = new StreamResult(writer);
+        TransformerFactory tf = TransformerFactory.newInstance()
+        Transformer transformer = tf.newTransformer()
+        transformer.transform(domSource, result)
+
+        return writer.toString()
     }
+
 }
