@@ -28,6 +28,8 @@
 
                                 <g:sortableColumn property="id" title="${warehouse.message(code: 'eventType.id.label', default: 'Id')}" />
 
+                                <g:sortableColumn property="code" title="${warehouse.message(code: 'eventType.code.label', default: 'Code')}" />
+
                                 <g:sortableColumn property="name" title="${warehouse.message(code: 'eventType.name.label', default: 'Name')}" />
 
                                 <g:sortableColumn property="description" title="${warehouse.message(code: 'eventType.description.label', default: 'Description')}" />
@@ -43,6 +45,8 @@
                             <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
                                 <td><g:link action="edit" id="${eventTypeInstance.id}">${fieldValue(bean: eventTypeInstance, field: "id")}</g:link></td>
+
+                                <td>${fieldValue(bean: eventTypeInstance, field: "code")}</td>
 
                                 <td>${fieldValue(bean: eventTypeInstance, field: "name")}</td>
 
