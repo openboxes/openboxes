@@ -56,7 +56,11 @@ class TripExecutionEventService implements ApplicationListener<TripExecutionEven
             BigDecimal latitude = executionStatus?.geoData?.latitude
             BigDecimal longitude = executionStatus?.geoData?.longitude
             Date eventDate = dateFormatter.parse(executionStatus.dateTime)
+
+            // OBKN-378 TransientObjectException: object references an unsaved transient instance
             Event event = new Event(eventType: eventType, eventDate: eventDate, longitude: longitude, latitude: latitude)
+            event.save(flush:true, failOnError: true)
+
             shipment.addToEvents(event)
             shipment.save(flush: true)
         }
