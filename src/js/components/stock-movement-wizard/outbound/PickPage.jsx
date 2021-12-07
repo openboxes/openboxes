@@ -441,7 +441,7 @@ class PickPage extends Component {
       pickPageItems,
       pickPageItem => pickPageItem.quantityRequired > pickPageItem.quantityPicked && _.find(
         pickPageItem.picklistItems,
-        item => !item.reasonCode,
+        item => !item.reasonCode && !item.initial,
       ),
     );
 
