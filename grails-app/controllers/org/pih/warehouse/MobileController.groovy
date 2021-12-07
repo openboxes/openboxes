@@ -11,6 +11,7 @@ package org.pih.warehouse
 
 import net.schmizz.sshj.sftp.SFTPException
 import org.apache.commons.net.util.Base64
+import org.apache.poi.poifs.filesystem.OfficeXmlFileException
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.Document
@@ -173,14 +174,15 @@ class MobileController {
                 command.filename = xlsFile.name
                 command.location = Location.get(session.warehouse.id)
 
-                if (params.type == "outbound")
-                    dataImporter = new OutboundStockMovementExcelImporter(command.filename, xlsFile.inputStream)
-                else
-                    dataImporter = new InboundStockMovementExcelImporter(command.filename, xlsFile.inputStream)
+                try {
 
-                if (dataImporter) {
-                    log.info "Using data importer ${dataImporter.class.name}"
-                    try {
+                    if (params.type == "outbound")
+                        dataImporter = new OutboundStockMovementExcelImporter(command.filename, xlsFile.inputStream)
+                    else
+                        dataImporter = new InboundStockMovementExcelImporter(command.filename, xlsFile.inputStream)
+
+                    if (dataImporter) {
+                        log.info "Using data importer ${dataImporter.class.name}"
                         command.data = dataImporter.data
                         dataImporter.validateData(command)
                         command.columnMap = dataImporter.columnMap
@@ -198,10 +200,13 @@ class MobileController {
                         } else {
                             flash.command = command
                         }
-                    } catch (Exception e) {
-                        log.error("An exception occurred while importing data " + e.message, e)
-                        flash.message = e?.message
                     }
+                } catch (OfficeXmlFileException e) {
+                    log.error("An exception occurred while loading Excel file: " + e.message, e)
+                    flash.message = "Detected invalid Excel .xlsx format - please import .xls files instead"
+                } catch (Exception e) {
+                    log.error("An exception occurred while importing data: " + e.message, e)
+                    flash.message = e?.message
                 }
             }
         }
