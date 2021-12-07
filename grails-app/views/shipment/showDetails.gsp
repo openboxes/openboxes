@@ -234,7 +234,7 @@
 
                                                 </td>
                                             </tr>
-                                            <g:each in="${shipmentInstance.documents + shipmentWorkflow.documentTemplates}" var="document" status="i">
+                                            <g:each in="${shipmentInstance.documents + shipmentWorkflow?.documentTemplates}" var="document" status="i">
                                                 <tr id="document-${document.id}" class="${i%2==0?'even':'odd'}">
                                                     <td class="middle">
                                                     <g:if test="${!document?.fileUri}">
@@ -600,7 +600,7 @@
 
                                         </td>
                                     </tr>
-                                    <g:each in="${shipmentInstance.documents + shipmentWorkflow.documentTemplates}" var="document" status="i">
+                                    <g:each in="${shipmentInstance?.documents + shipmentWorkflow?.documentTemplates}" var="document" status="i">
                                         <tr id="document-${document.id}" class="${i%2==0?'odd':'even'}">
                                             <td class="middle">
                                             <g:if test="${!document?.fileUri}">

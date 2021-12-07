@@ -277,7 +277,6 @@ class StockMovementService {
         }
     }
 
-
     StockMovement updateStockMovement(StockMovement stockMovement) {
         if (!stockMovement.validate()) {
             throw new ValidationException("Invalid stock movement", stockMovement.errors)

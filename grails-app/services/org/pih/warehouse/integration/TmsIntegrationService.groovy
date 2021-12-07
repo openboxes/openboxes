@@ -14,11 +14,19 @@ import org.apache.commons.io.IOUtils
 import org.apache.commons.lang.exception.ExceptionUtils
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
+import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.DocumentType
+import org.pih.warehouse.core.Event
+import org.pih.warehouse.core.EventType
+import org.pih.warehouse.core.EventTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.integration.xml.acceptancestatus.AcceptanceStatus
 import org.pih.warehouse.integration.xml.execution.Execution
+import org.pih.warehouse.integration.xml.execution.ExecutionStatus
 import org.pih.warehouse.integration.xml.order.Address
 import org.pih.warehouse.integration.xml.order.CargoDetails
 import org.pih.warehouse.integration.xml.order.ContactData
@@ -46,9 +54,11 @@ import org.pih.warehouse.integration.xml.order.UnitTypeQuantity
 import org.pih.warehouse.integration.xml.order.UnitTypeVolume
 import org.pih.warehouse.integration.xml.order.UnitTypeWeight
 import org.pih.warehouse.integration.xml.pod.DocumentUpload
+import org.pih.warehouse.integration.xml.trip.Orders
 import org.pih.warehouse.integration.xml.trip.Trip
 import org.pih.warehouse.product.Attribute
 import org.pih.warehouse.shipping.ReferenceNumber
+import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.util.LocalizationUtil
 
 import javax.xml.bind.JAXBContext
@@ -64,6 +74,7 @@ class TmsIntegrationService {
     def grailsApplication
     def fileTransferService
     def xsdValidatorService
+    def stockMovementService
 
     String serialize(final Object object, final Class clazz) {
         try {
@@ -73,10 +84,6 @@ class TmsIntegrationService {
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE)
             marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE)
             marshaller.setProperty("com.sun.xml.internal.bind.xmlHeaders", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            //SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            //schema = factory.newSchema((new File(xsdLocation)));
-
-
             marshaller.marshal(object, bufferedOutputStream)
             bufferedOutputStream.flush()
             return byteArrayOutputStream.toString()
@@ -115,37 +122,134 @@ class TmsIntegrationService {
         }
     }
 
-    def handleMessage(Object messageObject) {
-
-        // Publish message to event bus
-        if (messageObject instanceof DocumentUpload) {
-            grailsApplication.mainContext.publishEvent(new DocumentUploadEvent(messageObject))
-        } else if (messageObject instanceof AcceptanceStatus) {
-            grailsApplication.mainContext.publishEvent(new AcceptanceStatusEvent(messageObject))
-        } else if (messageObject instanceof Execution) {
-            grailsApplication.mainContext.publishEvent(new TripExecutionEvent(messageObject))
-        } else if (messageObject instanceof Trip) {
-            grailsApplication.mainContext.publishEvent(new TripNotificationEvent(messageObject))
+    boolean validateMessage(String xmlContents, Boolean forceValidation = Boolean.FALSE) {
+        Boolean validationEnabled = grailsApplication.config.openboxes.integration.ftp.inbound.validate
+        log.info "Validation enabled: ${validationEnabled}"
+        if (validationEnabled || forceValidation) {
+            return xsdValidatorService.validateXml(xmlContents)
         }
-
+        return true
     }
 
 
-    def uploadDeliveryOrder(StockMovement stockMovement) {
-        Object deliveryOrder = createDeliveryOrder(stockMovement)
-        String xmlContents = serialize(deliveryOrder, org.pih.warehouse.integration.xml.order.Order.class)
+    def handleMessage(DocumentUpload documentUpload) {
+        log.info "Document upload: " + documentUpload
+        String documentType = documentUpload.documentType
+        String fileName = documentUpload.uploadDetails.documentName
+        String fileContents = documentUpload.uploadDetails.documentFile
+        String trackingNumber = documentUpload.orderId
+        attachDocument(trackingNumber, documentType, fileName, fileContents)
+    }
 
-        Boolean validationEnabled = grailsApplication.config.openboxes.integration.ftp.outbound.validate
-        log.info "Validation enabled: ${validationEnabled}"
-        if (validationEnabled) {
-            xsdValidatorService.validateXml(xmlContents)
+    def handleMessage(AcceptanceStatus acceptanceStatus) {
+        log.info "Acceptance status " + acceptanceStatus.tripDetails.toString()
+        List<String> trackingNumbers = acceptanceStatus.tripOrderDetails.orderId
+        trackingNumbers.each { String trackingNumber ->
+            acceptDeliveryOrder(trackingNumber)
+        }
+    }
+
+    def handleMessage(Execution execution) {
+        log.info "Trip execution " + execution.toString()
+        SimpleDateFormat dateFormatter = new SimpleDateFormat(grailsApplication.config.openboxes.integration.defaultDateFormat)
+
+        execution.executionStatus.each { ExecutionStatus executionStatus ->
+
+            // Locate stock movement by tracking number
+            String trackingNumber = executionStatus.orderId
+            StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber)
+            if (!stockMovement) {
+                throw new IllegalArgumentException("Unable to locate stock movement by tracking number ${trackingNumber}")
+            }
+
+            // Identify event type associated with status
+            String statusCode = executionStatus.status
+            EventType eventType = EventType.findByCode(statusCode)
+            if (!eventType) {
+                throw new IllegalArgumentException("Status code ${statusCode} not associated with an event type")
+            }
+
+            // Validate status update
+            Shipment shipment = stockMovement?.shipment
+            if (eventType.eventCode == EventTypeCode.COMPLETED && !shipment.hasShipped()) {
+                throw new IllegalStateException("Unable to complete a shipment until it has been shipped")
+            }
+
+            // Create new shipment event to represent status update
+            BigDecimal latitude = executionStatus?.geoData?.latitude
+            BigDecimal longitude = executionStatus?.geoData?.longitude
+            Date eventDate = dateFormatter.parse(executionStatus.dateTime)
+
+            // OBKN-378 TransientObjectException: object references an unsaved transient instance
+            Event event = new Event(eventType: eventType, eventDate: eventDate, longitude: longitude, latitude: latitude)
+            event.save(flush:true, failOnError: true)
+
+            shipment.addToEvents(event)
+            shipment.save(flush: true)
+        }
+    }
+
+    def handleMessage(Trip trip) {
+        log.info "Trip notification Orders Count" + trip?.tripOrderDetails?.orders?.size()
+        List<Orders> orders = trip.tripOrderDetails.orders
+        orders.each { Orders deliveryOrder ->
+            log.info "Trip notification order" + deliveryOrder.toString()
+            String identifier = deliveryOrder.extOrderId
+            String trackingNumber = deliveryOrder.orderId
+            associateStockMovementAndDeliveryOrder(identifier, trackingNumber)
+        }
+    }
+
+    void associateStockMovementAndDeliveryOrder(String identifier, String trackingNumber) {
+        // FIXME Need to ensure that stock movement is ready to receive notification i.e. shipment has been created
+        StockMovement stockMovement = stockMovementService.getStockMovementByIdentifier(identifier)
+        if (!stockMovement?.shipment) {
+            stockMovement?.shipment = stockMovementService.createShipment(stockMovement, false)
+        }
+        stockMovementService.createOrUpdateTrackingNumber(stockMovement?.shipment, trackingNumber)
+    }
+
+    void acceptDeliveryOrder(String trackingNumber) {
+        StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber)
+        if (!stockMovement) {
+            throw new Exception("Unable to locate stock movement by tracking number ${trackingNumber}")
         }
 
-        // transfer file to sftp server
-        String filenameTemplate = grailsApplication.config.openboxes.integration.order.filename
-        String destinationFile = String.format(filenameTemplate, stockMovement?.identifier?:stockMovement?.id)
-        String destinationDirectory = "${grailsApplication.config.openboxes.integration.ftp.outbound.directory}"
-        fileTransferService.storeMessage(destinationFile, xmlContents, destinationDirectory)
+        Shipment shipment = stockMovement?.shipment
+        EventType eventType = EventType.findByEventCode(EventTypeCode.ACCEPTED)
+        Event event = new Event(eventType: eventType, eventDate: new Date())
+        shipment.addToEvents(event)
+        shipment.save(flush:true)
+        notificationService.sendShipmentAcceptedNotification(shipment, shipment.origin, [RoleType.ROLE_SHIPMENT_NOTIFICATION])
+    }
+
+    void attachDocument(String trackingNumber, String documentType, String fileName, String fileContents) {
+        if (trackingNumber) {
+            log.info "Looking up stock movement by tracking number ${trackingNumber}"
+            StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber)
+            if (stockMovement) {
+                log.info "Attaching document ${fileName} to ${stockMovement.identifier}"
+                Document document = new Document()
+                if (documentType) {
+                    document.documentNumber = "${documentType}-${trackingNumber}"
+                }
+                document.documentType = DocumentType.get(Constants.DEFAULT_DOCUMENT_TYPE_ID)
+                document.name = fileName
+                document.filename = fileName
+                document.fileContents = fileContents.bytes
+
+                throw new IllegalStateException("unable to save document")
+
+                // FIXME we need to figure out a way to detect the mimetype of the file
+                document.contentType = "application/octet-stream"
+                document.save(flush:true, failOnError: true)
+
+                stockMovement.shipment.addToDocuments(document)
+                stockMovement.shipment.save(flush:true)
+
+            }
+        }
+
     }
 
     def failMessage(String filePath, Exception exception) {
@@ -175,6 +279,22 @@ class TmsIntegrationService {
         }
     }
 
+    def uploadDeliveryOrder(StockMovement stockMovement) {
+        Object deliveryOrder = createDeliveryOrder(stockMovement)
+        String xmlContents = serialize(deliveryOrder, org.pih.warehouse.integration.xml.order.Order.class)
+
+        Boolean validationEnabled = grailsApplication.config.openboxes.integration.ftp.outbound.validate
+        log.info "Validation enabled: ${validationEnabled}"
+        if (validationEnabled) {
+            xsdValidatorService.validateXml(xmlContents)
+        }
+
+        // transfer file to sftp server
+        String filenameTemplate = grailsApplication.config.openboxes.integration.order.filename
+        String destinationFile = String.format(filenameTemplate, stockMovement?.identifier?:stockMovement?.id)
+        String destinationDirectory = "${grailsApplication.config.openboxes.integration.ftp.outbound.directory}"
+        fileTransferService.storeMessage(destinationFile, xmlContents, destinationDirectory)
+    }
 
     def createDeliveryOrder(StockMovement stockMovement) {
         Map config = grailsApplication.config.openboxes.integration.order

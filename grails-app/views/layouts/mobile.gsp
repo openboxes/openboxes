@@ -27,14 +27,21 @@
                         <li class="breadcrumb-item"><g:link controller="mobile"
                                                             action="chooseLocation">${session?.warehouse?.name}</g:link></li>
                     </g:if>
+                    <g:if test="${actionName == 'outboundDetails'}">
+                        <li class="breadcrumb-item"><g:link controller="mobile"
+                                                            action="outboundList">Outbound List</g:link></li>
+                    </g:if>
+                    <g:elseif test="${actionName == 'inboundDetails'}">
+                        <li class="breadcrumb-item"><g:link controller="mobile"
+                                                            action="inboundList">Inbound List</g:link></li>
+                    </g:elseif>
+
                     <li class="breadcrumb-item active" aria-current="page"><g:layoutTitle/></li>
                 </ol>
             </nav>
             <g:if test="${flash.message}">
                 <div class="alert alert-info">${flash.message}</div>
             </g:if>
-
-            <h2><g:layoutTitle/></h2>
             <g:layoutBody/>
         </div>
     </main>
