@@ -184,12 +184,14 @@ class StockMovementService {
             if (item.substitutionItems) {
                 item.substitutionItems.each {
                     if (!validateQuantityRequested(it)) {
-                        stockMovement.errors.reject("stockMovement.invalidQtyRequested.message", [it.product?.name] as Object[], "Invalid quantity requested for product " + it.product?.name)
+                        String errorMessage = "Product " + it.product?.productCode + " has no available inventory. Please go back to edit page and revise quantity"
+                        stockMovement.errors.reject("stockMovement.invalidQtyRequested.message", [it.product?.name] as Object[], errorMessage)
                     }
                 }
             } else {
                 if (!validateQuantityRequested(item)) {
-                    stockMovement.errors.reject("stockMovement.invalidQtyRequested.message", [item.product?.name] as Object[], "Invalid quantity requested for product " + item.product?.name)
+                    String errorMessage = "Product " + item.product?.productCode + " has no available inventory. Please go back to edit page and revise quantity"
+                    stockMovement.errors.reject("stockMovement.invalidQtyRequested.message", [item.product?.name] as Object[], errorMessage)
                 }
             }
         }
