@@ -15,13 +15,9 @@ CREATE OR REPLACE VIEW edit_page_item AS
         stock_movement_item.order_index as sort_order,
         stock_movement_item.cancel_reason_code,
         stock_movement_item.comments,
-        product_stocklist.quantity_demand,
         IF(product_substitution_status.substitution_status IS NULL, 'NO', product_substitution_status.substitution_status) AS substitution_status
     FROM
         stock_movement_item
-            LEFT OUTER JOIN
-        product_stocklist ON product_stocklist.product_id = stock_movement_item.product_id
-            AND product_stocklist.origin_id = stock_movement_item.origin_id
             LEFT OUTER JOIN
         product_substitution_status ON product_substitution_status.product_id = stock_movement_item.product_id
             AND product_substitution_status.location_id = stock_movement_item.origin_id;

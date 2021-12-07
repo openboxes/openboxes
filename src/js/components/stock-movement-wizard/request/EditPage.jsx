@@ -105,7 +105,7 @@ const AD_HOCK_FIELDS = {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
         },
       },
-      quantityDemand: {
+      quantityDemandRequesting: {
         type: LabelField,
         label: 'react.stockMovement.quantityDemand.label',
         defaultMessage: 'Demand',
@@ -190,7 +190,7 @@ const AD_HOCK_FIELDS = {
           formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
         },
       },
-      quantityDemandPerMonth: {
+      quantityDemandFulfilling: {
         type: LabelField,
         label: 'react.stockMovement.demandPerMonth.label',
         defaultMessage: 'Demand per Month',
@@ -452,7 +452,7 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
           formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
         },
       },
-      quantityDemandPerMonth: {
+      quantityDemandFulfilling: {
         type: LabelField,
         label: 'react.stockMovement.demandPerMonth.label',
         defaultMessage: 'Demand per Month',
@@ -714,7 +714,7 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
           formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
         },
       },
-      quantityDemandPerMonth: {
+      quantityDemandFulfilling: {
         type: LabelField,
         label: 'react.stockMovement.demandPerMonth.labe',
         defaultMessage: 'Demand per Month',
