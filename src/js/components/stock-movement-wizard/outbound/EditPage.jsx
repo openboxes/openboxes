@@ -127,10 +127,10 @@ const FIELDS = {
           formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
         },
       },
-      quantityConsumed: {
+      quantityDemandPerMonth: {
         type: LabelField,
-        label: 'react.stockMovement.monthlyQuantity.label',
-        defaultMessage: 'Monthly stocklist qty',
+        label: 'react.stockMovement.demandPerMonth.label',
+        defaultMessage: 'Demand peMonth',
         flexWidth: '1.5',
         getDynamicAttr: ({ hasStockList, translate, subfield }) => ({
           formatValue: (value) => {
