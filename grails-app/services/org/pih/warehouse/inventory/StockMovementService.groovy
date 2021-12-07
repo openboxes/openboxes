@@ -797,7 +797,7 @@ class StockMovementService {
         if (!template || (template && template.replenishmentTypeCode == ReplenishmentTypeCode.PULL)) {
             def quantityDemand = forecastingService.getDemand(requisition.destination, editPageItem.product)
             editPageItem << [
-                    quantityDemand                  : quantityDemand?.monthlyDemand?:0,
+                    quantityDemandRequesting        : quantityDemand?.monthlyDemand?:0,
                     demandPerReplenishmentPeriod    : Math.ceil((quantityDemand?.dailyDemand?:0) * (template?.replenishmentPeriod?:30))
             ]
         } else {
@@ -843,6 +843,7 @@ class StockMovementService {
 
             def quantityAvailable = availableItems?.findAll { it.quantityAvailable > 0 }?.sum { it.quantityAvailable }
             def quantityOnHand = availableItems?.sum { it.quantityOnHand }
+            def quantityDemandFulfilling = forecastingService.getDemand(requisition.origin, productsMap[it.product_id])
 
             [
                 product                     : productsMap[it.product_id],
@@ -853,7 +854,7 @@ class StockMovementService {
                 quantityRequested           : it.quantity,
                 quantityRevised             : it.quantity_revised,
                 quantityCanceled            : it.quantity_canceled,
-                quantityConsumed            : it.quantity_demand,
+                quantityDemandFulfilling    : quantityDemandFulfilling ? quantityDemandFulfilling.monthlyDemand : 0,
                 quantityOnHand              : (quantityOnHand && quantityOnHand > 0 ? quantityOnHand : 0),
                 quantityAvailable           : (quantityAvailable && quantityAvailable > 0 ? quantityAvailable : 0),
                 substitutionStatus          : it.substitution_status,
@@ -877,7 +878,6 @@ class StockMovementService {
                         productName         : it.name,
                         quantityAvailable   : (qtyAvailable && qtyAvailable > 0 ? qtyAvailable : 0),
                         quantityOnHand      : (qtyOnHand && qtyOnHand > 0 ? qtyOnHand : 0),
-                        quantityConsumed    : it.quantity_demand,
                         quantitySelected    : it.quantity,
                         quantityRequested   : it.quantity
                     ]

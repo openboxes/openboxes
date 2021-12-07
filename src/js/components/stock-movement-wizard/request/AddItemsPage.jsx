@@ -135,7 +135,7 @@ const NO_STOCKLIST_FIELDS = {
       },
       monthlyDemand: {
         type: LabelField,
-        label: 'react.stockMovement.demandPerMonth',
+        label: 'react.stockMovement.demandPerMonth.label',
         defaultMessage: 'Demand per Month',
         flexWidth: '1.7',
         attributes: {

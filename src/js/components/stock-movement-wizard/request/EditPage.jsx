@@ -105,7 +105,7 @@ const AD_HOCK_FIELDS = {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
         },
       },
-      quantityDemand: {
+      quantityDemandRequesting: {
         type: LabelField,
         label: 'react.stockMovement.quantityDemand.label',
         defaultMessage: 'Demand',
@@ -190,10 +190,10 @@ const AD_HOCK_FIELDS = {
           formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
         },
       },
-      quantityConsumed: {
+      quantityDemandFulfilling: {
         type: LabelField,
-        label: 'react.stockMovement.monthlyQuantity.label',
-        defaultMessage: 'Monthly stocklist qty',
+        label: 'react.stockMovement.demandPerMonth.label',
+        defaultMessage: 'Demand per Month',
         flexWidth: '1',
         getDynamicAttr: ({ hasStockList, translate, subfield }) => ({
           formatValue: (value) => {
@@ -452,10 +452,10 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
           formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
         },
       },
-      quantityConsumed: {
+      quantityDemandFulfilling: {
         type: LabelField,
-        label: 'react.stockMovement.monthlyQuantity.label',
-        defaultMessage: 'Monthly stocklist qty',
+        label: 'react.stockMovement.demandPerMonth.label',
+        defaultMessage: 'Demand per Month',
         flexWidth: '1',
         getDynamicAttr: ({ hasStockList, translate, subfield }) => ({
           formatValue: (value) => {
@@ -581,7 +581,7 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
       availability: {
         label: 'react.verifyRequest.availability.label',
         defaultLabel: 'Availability',
-        flexWidth: 1 + 1, // = Sum of fields flexWidth
+        flexWidth: 1 + 1 + 1, // = Sum of fields flexWidth
       },
       edit: {
         label: 'react.verifyRequest.edit.label',
@@ -713,6 +713,26 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
         attributes: {
           formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
         },
+      },
+      quantityDemandFulfilling: {
+        type: LabelField,
+        label: 'react.stockMovement.demandPerMonth.labe',
+        defaultMessage: 'Demand per Month',
+        flexWidth: '1',
+        getDynamicAttr: ({ hasStockList, translate, subfield }) => ({
+          formatValue: (value) => {
+            if (value && value !== '0') {
+              return value.toLocaleString('en-US');
+            } else if (hasStockList && !subfield) {
+              return translate('react.stockMovement.replenishmentPeriodNotFound.label', 'Replenishment period not found');
+            } else if (subfield) {
+              return '';
+            }
+
+            return '0';
+          },
+          showValueTooltip: true,
+        }),
       },
       substituteButton: {
         label: 'react.stockMovement.substitution.label',
