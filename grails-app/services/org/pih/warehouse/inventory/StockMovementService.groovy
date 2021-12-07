@@ -843,6 +843,7 @@ class StockMovementService {
 
             def quantityAvailable = availableItems?.findAll { it.quantityAvailable > 0 }?.sum { it.quantityAvailable }
             def quantityOnHand = availableItems?.sum { it.quantityOnHand }
+            def quantityDemandFulfilling = forecastingService.getDemand(requisition.origin, productsMap[it.product_id])
 
             [
                 product                     : productsMap[it.product_id],
@@ -854,6 +855,7 @@ class StockMovementService {
                 quantityRevised             : it.quantity_revised,
                 quantityCanceled            : it.quantity_canceled,
                 quantityConsumed            : it.quantity_demand,
+                quantityDemandPerMonth      : quantityDemandFulfilling ? quantityDemandFulfilling.monthlyDemand : 0,
                 quantityOnHand              : (quantityOnHand && quantityOnHand > 0 ? quantityOnHand : 0),
                 quantityAvailable           : (quantityAvailable && quantityAvailable > 0 ? quantityAvailable : 0),
                 substitutionStatus          : it.substitution_status,
