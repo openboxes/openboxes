@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="mobile"/>
-    <title><g:message code="default.outbound.label" default="Outbound"/></title>
+    <title><g:message code="default.outbound.label" default="Outbound"/> ${stockMovement.identifier}</title>
 </head>
 
 <body>

@@ -67,16 +67,19 @@ class MobileController {
         def messages = fileTransferService.listMessages(directory, subdirectories)
         def messageCount = messages ? messages?.size() :0
 
-        def readyToBePicked = stockMovement.findAll{ it.stockMovementStatusCode == StockMovementStatusCode.PICKING }
-        def readyToBePickedCount = readyToBePicked.size()
-        def status =  RequisitionStatus.PICKING
+        def readyToBePickedCount = stockMovement.findAll{ it.stockMovementStatusCode == StockMovementStatusCode.PICKING }?.size()?:0
+        def readyToBePackedCount = stockMovement.findAll{ it.stockMovementStatusCode == StockMovementStatusCode.PICKED }?.size()?:0
+        def readyToBeLoadedCount = stockMovement.findAll{ it.stockMovementStatusCode == StockMovementStatusCode.PACKED }?.size()?:0
+
         [
                 data: [
-                        [name: "Inventory", class: "fa fa-box", count: productCount, url: g.createLink(controller: "mobile", action: "productList")],
+                        [name: "Inventory Items", class: "fa fa-box", count: productCount, url: g.createLink(controller: "mobile", action: "productList")],
                         [name: "Inbound Orders", class: "fa fa-shopping-cart", count: orderCount, url: g.createLink(controller: "mobile", action: "inboundList", params: ['origin.id', location.id])],
                         [name: "Outbound Orders", class: "fa fa-truck", count: requisitionCount, url: g.createLink(controller: "mobile", action: "outboundList", params: ['origin.id', location.id])],
+                        [name: "Ready to be picked", class: "fa fa-cart-plus", count: readyToBePickedCount, url: g.createLink(controller: "mobile", action: "outboundList", params: [status: RequisitionStatus.PICKING])],
+                        [name: "Ready to be packed", class: "fa fa-box-open", count: readyToBePackedCount, url: g.createLink(controller: "mobile", action: "outboundList", params: [status: RequisitionStatus.PICKED])],
+                        [name: "Ready to be loaded", class: "fa fa-truck-loading", count: readyToBeLoadedCount, url: g.createLink(controller: "mobile", action: "outboundList", params: [status: RequisitionStatus.PICKED])],
                         [name: "Messages", class: "fa fa-envelope", count: messageCount, url: g.createLink(controller: "mobile", action: "messageList", params: ['origin.id', location.id])],
-                        [name: "Ready to be Picked", class: "fa fa-truck-pickup", count: readyToBePickedCount, url: g.createLink(controller: "mobile", action: "outboundList", params: [status: status])],
                 ]
         ]
     }
@@ -330,17 +333,12 @@ class MobileController {
     def messageValidate = {
         try {
             String xmlContents = fileTransferService.retrieveMessage(params.path)
-            Boolean validationEnabled = grailsApplication.config.openboxes.integration.ftp.inbound.validate
-            log.info "Validation enabled: ${validationEnabled}"
-            if (validationEnabled) {
-                xsdValidatorService.validateXml(xmlContents)
-                log.info "XML is valid"
-            }
+            tmsIntegrationService.validateMessage(xmlContents, Boolean.TRUE)
             flash.message = "Message has been validated"
         }
         catch (Exception e) {
             log.error("Message not validated due to error: " + e.message, e)
-            flash.message = "Message not validated due to error: " + e?.cause?.message?:e.message
+            flash.message = "Message not validated due to error: " + e.message?:e?.cause?.message
         }
         redirect(action: "messageList")
     }
@@ -348,21 +346,15 @@ class MobileController {
     def messageProcess = {
         try {
             String xmlContents = fileTransferService.retrieveMessage(params.path)
-
-            Boolean validationEnabled = grailsApplication.config.openboxes.integration.ftp.inbound.validate
-            log.info "Validation enabled: ${validationEnabled}"
-            if (validationEnabled) {
-                xsdValidatorService.validateXml(xmlContents)
-                log.info "XML is valid"
-            }
+            tmsIntegrationService.validateMessage(xmlContents)
             Object messageObject = tmsIntegrationService.deserialize(xmlContents)
             tmsIntegrationService.handleMessage(messageObject)
-            flash.message = "Message has been processed"
+            flash.message = "Message ${params.path} has been processed successfully"
             tmsIntegrationService.archiveMessage(params.path)
         }
         catch (Exception e) {
             log.error("Message not processed due to error: " + e.message, e)
-            flash.message = "Message not processed due to error: " + e?.cause?.message?:e.message
+            flash.message = "Message ${params.path} was not processed due to error: " + e.message
             tmsIntegrationService.failMessage(params.path, e)
         }
         redirect(action: "messageList")

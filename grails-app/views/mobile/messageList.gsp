@@ -49,7 +49,7 @@
 
     <div class="card">
         <div class="card-header">
-            Files
+            Messages <div class="badge badge-primary bg-primary">${messages.size()?:0}</div>
         </div>
         <div class="card-body">
 
@@ -57,7 +57,6 @@
                 <thead>
                     <tr>
                         <th><g:message code="message.label" default="Message"/></th>
-                        <th><g:message code="message.atime.label" default="Access Time" /></th>
                         <th><g:message code="message.mtime.label" default="Modified Time" /></th>
                         <th></th>
                     </tr>
@@ -65,17 +64,16 @@
                 <tbody>
                 <g:each var="message" in="${messages}">
                     <tr class="${message.name.endsWith('log')?'table-danger':''}">
-                        <td>
+                        <td class="col col-md-6">
                             ${message.name}
                             <div class="text-sm-left text-muted">${message.path}</div>
                         </td>
-                        <td>
-                            ${message.atime}
+                        <td class="col col-md-2">
+                            <div class="" data-bs-toggle="tooltip" data-bs-placement="top" title="${g.formatDate(date: message.mtime)}">
+                                <g:prettyDateFormat date="${message.mtime}"/>
+                            </div>
                         </td>
-                        <td>
-                            ${message.mtime}
-                        </td>
-                        <td class="col">
+                        <td class="col col-md-4">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end btn-group">
                                 <g:link controller="mobile" action="messageDetails"
                                         params="[path: message.path]"

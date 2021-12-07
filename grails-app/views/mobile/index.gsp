@@ -9,13 +9,16 @@
 <body>
 
     <div class="row g-0 mb-2">
-        <div class="col col-md-12 float-end">
+        <div class="col col-md-12">
 
-            <button type="button" class="btn btn-outline-primary"
-                data-bs-toggle="modal" data-bs-target="#inboundModal"><i class="fa fa-file-import"></i> Import Inbound Orders</button>
+            <div class="float-end">
 
-            <button type="button" class="btn btn-outline-primary"
-                data-bs-toggle="modal" data-bs-target="#outboundModal"><i class="fa fa-file-import"></i> Import Outbound Orders</button>
+                <button type="button" class="btn btn-outline-primary"
+                    data-bs-toggle="modal" data-bs-target="#inboundModal"><i class="fa fa-dolly"></i> Import Inbound</button>
+
+                <button type="button" class="btn btn-outline-primary"
+                    data-bs-toggle="modal" data-bs-target="#outboundModal"><i class="fa fa-truck-loading"></i> Import Outbound</button>
+            </div>
 
         </div>
     </div>
