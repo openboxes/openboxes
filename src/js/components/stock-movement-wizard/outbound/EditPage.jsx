@@ -127,7 +127,7 @@ const FIELDS = {
           formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
         },
       },
-      quantityDemandPerMonth: {
+      quantityDemandFulfilling: {
         type: LabelField,
         label: 'react.stockMovement.demandPerMonth.label',
         defaultMessage: 'Demand peMonth',
