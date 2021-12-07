@@ -79,7 +79,7 @@ class StockMovementItemApiController {
         stockMovementService.removeShipmentItemsForModifiedRequisitionItem(stockMovementItem)
 
         log.debug "Creating picklist for stock movement item ${stockMovementItem}"
-        stockMovementService.createPicklist(stockMovementItem)
+        stockMovementService.createPicklist(stockMovementItem, false)
 
         RequisitionItem requisitionItem = RequisitionItem.get(params.id)
         stockMovementService.createMissingShipmentItem(requisitionItem)
