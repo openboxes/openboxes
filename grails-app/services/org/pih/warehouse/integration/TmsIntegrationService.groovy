@@ -244,7 +244,7 @@ class TmsIntegrationService {
 
     void associateStockMovementAndDeliveryOrder(String identifier, String trackingNumber) {
         // FIXME Need to ensure that stock movement is ready to receive notification i.e. shipment has been created
-        StockMovement stockMovement = stockMovementService.getStockMovementByIdentifier(identifier)
+        StockMovement stockMovement = stockMovementService.getStockMovementByIdentifier(identifier, Boolean.FALSE)
         if (!stockMovement?.shipment) {
             stockMovement?.shipment = stockMovementService.createShipment(stockMovement, false)
         }
