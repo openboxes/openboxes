@@ -428,7 +428,7 @@ class StockMovementService {
     }
 
     def getOutboundStockMovements(StockMovement stockMovement, Map params) {
-        log.info "Stock movement: ${stockMovement?.shipmentStatusCode}"
+        log.info "Stock movement: ${stockMovement?.currentStatus}"
 
         def requisitions = Requisition.createCriteria().list(max: params.max, offset: params.offset) {
             eq("isTemplate", Boolean.FALSE)

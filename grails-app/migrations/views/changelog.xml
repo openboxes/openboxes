@@ -81,4 +81,7 @@
   <changeSet id="1580848680306-27" author="pmuchowski" runOnChange="true" runAlways="true" failOnError="true">
     <sqlFile path="views/product-expiry-summary.sql"/>
   </changeSet>
+  <changeSet id="1580848680306-28" author="pmuchowski" runOnChange="true" runAlways="true" failOnError="true">
+    <sqlFile path="views/stock-movement.sql"/>
+  </changeSet>
 </databaseChangeLog>

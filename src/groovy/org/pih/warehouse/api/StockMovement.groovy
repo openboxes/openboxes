@@ -175,16 +175,6 @@ class StockMovement {
     }
 
     /**
-     * Return the receipt status of the associated stock movement.
-     *
-     * @return
-     */
-    ShipmentStatusCode getShipmentStatusCode() {
-        return shipment?.status?.code ?: ShipmentStatusCode.PENDING
-
-    }
-
-    /**
      * Return total value of the issued shipment
      *
      * @return
