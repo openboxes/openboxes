@@ -523,9 +523,11 @@ class StockMovementService {
         }
     }
 
-    StockMovement getShipmentBasedStockMovement(Shipment shipment) {
+    StockMovement getShipmentBasedStockMovement(Shipment shipment, Boolean includeDocuments = Boolean.TRUE) {
         StockMovement stockMovement = StockMovement.createFromShipment(shipment)
-        stockMovement.documents = getDocuments(stockMovement)
+        if (includeDocuments) {
+            stockMovement.documents = getDocuments(stockMovement)
+        }
         return stockMovement
     }
 
@@ -2125,7 +2127,7 @@ class StockMovementService {
         return shipment
     }
 
-    StockMovement findByTrackingNumber(String trackingNumber) {
+    StockMovement findByTrackingNumber(String trackingNumber, Boolean includeDocuments = Boolean.TRUE) {
         ReferenceNumberType trackingNumberType = ReferenceNumberType.findById(Constants.TRACKING_NUMBER_TYPE_ID)
         ReferenceNumber referenceNumber = ReferenceNumber.findByReferenceNumberTypeAndIdentifier(trackingNumberType, trackingNumber)
         log.info "reference number ${referenceNumber}"
@@ -2144,7 +2146,7 @@ class StockMovementService {
             }
         }
 
-        return getShipmentBasedStockMovement(shipment)
+        return getShipmentBasedStockMovement(shipment, includeDocuments)
 
     }
 

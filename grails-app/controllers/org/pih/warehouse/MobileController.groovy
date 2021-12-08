@@ -288,6 +288,12 @@ class MobileController {
         [messages:messages]
     }
 
+    def messageListProcess = {
+        tmsIntegrationService.handleMessages()
+
+        redirect(action: "messageList")
+    }
+
     def messageDetails = {
         def content = fileTransferService.retrieveMessage(params.path)
         if (params.path.endsWith(".xml")) {
