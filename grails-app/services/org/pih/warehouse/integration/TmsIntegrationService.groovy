@@ -146,7 +146,7 @@ class TmsIntegrationService {
                     String xmlContents = fileTransferService.retrieveMessage(message.path)
                     log.info "Handling message ${message}:\n${xmlContents}"
                     handleMessage(xmlContents)
-                    //archiveMessage(message.path)
+                    archiveMessage(message.path)
                 }
             }
         }
