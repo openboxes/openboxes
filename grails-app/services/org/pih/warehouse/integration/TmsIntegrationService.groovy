@@ -193,7 +193,6 @@ class TmsIntegrationService {
             Date eventDate = dateFormatter.parse(executionStatus.dateTime)
             createEvent(trackingNumber, statusCode, latitude, longitude, eventDate)
         }
-
     }
 
     def handleMessage(Trip trip) {
@@ -321,7 +320,7 @@ class TmsIntegrationService {
     def uploadDeliveryOrder(StockMovement stockMovement) {
         Object deliveryOrder = createDeliveryOrder(stockMovement)
         String xmlContents = serialize(deliveryOrder, org.pih.warehouse.integration.xml.order.Order.class)
-
+        log.info "Uploading delivery order:\n" + xmlContents
         Boolean validationEnabled = grailsApplication.config.openboxes.integration.ftp.outbound.validate
         log.info "Validation enabled: ${validationEnabled}"
         if (validationEnabled) {
@@ -584,7 +583,7 @@ class TmsIntegrationService {
     }
 
     String formatDecimal(Number number) {
-        DecimalFormat format = DecimalFormat.getNumberInstance(LocalizationUtil.localizationService.currentLocale)
+        DecimalFormat format = DecimalFormat.getNumberInstance()
         format.setMinimumFractionDigits(1)
         format.format(number)
     }

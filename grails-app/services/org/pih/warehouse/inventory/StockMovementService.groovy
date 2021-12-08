@@ -553,38 +553,38 @@ class StockMovementService {
         return new PagedResultList(stockMovements, requisitions.totalCount)
     }
 
-    StockMovement getStockMovementByIdentifier(String identifier) {
+    StockMovement getStockMovementByIdentifier(String identifier, Boolean includeDocuments = Boolean.TRUE) {
         log.info "Find by identifier ${identifier}"
         StockMovement stockMovement
         Requisition requisition = Requisition.findByRequestNumber(identifier)
         if (requisition) {
-            stockMovement = getStockMovement(requisition?.id)
+            stockMovement = getStockMovement(requisition?.id, includeDocuments)
         } else {
             Shipment shipment = Shipment.findByShipmentNumber(identifier)
             if (shipment) {
-                stockMovement = getStockMovement(shipment?.id)
+                stockMovement = getStockMovement(shipment?.id, includeDocuments)
             }
         }
         return stockMovement
     }
 
-    StockMovement getStockMovement(String id) {
-        return getStockMovement(id, (String) null)
+    StockMovement getStockMovement(String id, Boolean includeDocuments = Boolean.TRUE) {
+        return getStockMovement(id, (String) null, includeDocuments)
     }
 
-    StockMovement getStockMovement(String id, String stepNumber) {
+    StockMovement getStockMovement(String id, String stepNumber, Boolean includeDocuments = Boolean.TRUE) {
         Requisition requisition = Requisition.get(id)
         if (requisition) {
-            return getRequisitionBasedStockMovement(requisition, stepNumber)
+            return getRequisitionBasedStockMovement(requisition, stepNumber, includeDocuments)
         } else {
             Shipment shipment = Shipment.get(id)
             if (shipment?.requisition) {
                 log.info "Shipment.requisition ${shipment.requisition}"
-                return getRequisitionBasedStockMovement(shipment.requisition, stepNumber)
+                return getRequisitionBasedStockMovement(shipment.requisition, stepNumber, includeDocuments)
             }
             else if (shipment) {
                 log.info "Shipment ${shipment}"
-                return getShipmentBasedStockMovement(shipment)
+                return getShipmentBasedStockMovement(shipment, includeDocuments)
             }
             else {
                 throw new ObjectNotFoundException(id, StockMovement.class.toString())
@@ -600,9 +600,11 @@ class StockMovementService {
         return stockMovement
     }
 
-    StockMovement getRequisitionBasedStockMovement(Requisition requisition, String stepNumber) {
+    StockMovement getRequisitionBasedStockMovement(Requisition requisition, String stepNumber, Boolean includeDocuments = Boolean.TRUE) {
         StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
-        stockMovement.documents = getDocuments(stockMovement)
+        if (includeDocuments) {
+            stockMovement.documents = getDocuments(stockMovement)
+        }
         return stockMovement
     }
 
