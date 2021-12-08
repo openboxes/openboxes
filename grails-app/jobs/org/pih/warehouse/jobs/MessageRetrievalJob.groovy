@@ -10,11 +10,12 @@ import java.nio.charset.StandardCharsets
 class MessageRetrievalJob {
 
     def grailsApplication
+    def tmsIntegrationService
 
     // cron job needs to be triggered
     static triggers = {
         cron name: 'messageRetrievalCronTrigger',
-                cronExpression: CH.config.openboxes.jobs.messageRetrievalJob.cronExpression?:"0/5 * * * * ?"
+                cronExpression: CH.config.openboxes.jobs.messageRetrievalJob.cronExpression?:"0 0/5 * * * ?"
     }
 
     def execute(context) {
@@ -23,38 +24,12 @@ class MessageRetrievalJob {
         if (!enabled) {
             return
         }
-
-        log.info "Starting message retrieval job at ${new Date()}"
         def startTime = System.currentTimeMillis()
-
-        // Configuration
-        String directory = grailsApplication.config.openboxes.integration.ftp.inbound.directory
-        List<String> subdirectories = grailsApplication.config.openboxes.integration.ftp.inbound.subdirectories
-
-        // Retrieve files by SFTP
-        Map sftpConfig = grailsApplication.config.openboxes.integration.ftp.flatten()
-        //SecureFtpClient sftpClient = new SecureFtpClient(sftpConfig)
         try {
-//            // Get filenames
-//            def filenames = sftpClient.listFiles(directory)
-//            log.info "Processing ${filenames.size()} files"
-//
-//            // Process each file individually
-//            filenames.each { String filename ->
-//                String source = "${directory}/${filename}"
-//                log.info "retrieving file ${source} ..."
-//                def inputStream = sftpClient.retrieveFileAsInputStream(source)
-//                log.info "source: ${source}"
-//
-//                String messageContent = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name())
-//                // TODO Pass messageContent to be message pipeline to be validated and processed
-//            }
-
+            log.info "Starting message retrieval job at ${new Date()}"
+            tmsIntegrationService.handleMessages()
         } catch(ConnectionException e) {
             log.error "Unable to retrieve message due to exception: " + e.message, e
-        }
-        finally {
-            //sftpClient.disconnect()
         }
         log.info "Finished message retrieval job in " + (System.currentTimeMillis() - startTime) + " ms"
     }

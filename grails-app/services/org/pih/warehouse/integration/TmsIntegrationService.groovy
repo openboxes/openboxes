@@ -74,6 +74,7 @@ class TmsIntegrationService {
     def grailsApplication
     def fileTransferService
     def xsdValidatorService
+    def notificationService
     def stockMovementService
 
     String serialize(final Object object, final Class clazz) {
@@ -131,6 +132,37 @@ class TmsIntegrationService {
         return true
     }
 
+    def handleMessages() {
+        def message
+        try {
+            String directory = grailsApplication.config.openboxes.integration.ftp.inbound.directory
+            List<String> subdirectories = grailsApplication.config.openboxes.integration.ftp.inbound.subdirectories
+            def messages = fileTransferService.listMessages(directory, subdirectories)
+            log.info "Messages " + messages
+            messages = messages.findAll { it.isRegularFile && it.name.endsWith(".xml")}
+            if (messages) {
+                message = messages.pop()
+                if (message) {
+                    String xmlContents = fileTransferService.retrieveMessage(message.path)
+                    log.info "Handling message ${message}:\n${xmlContents}"
+                    handleMessage(xmlContents)
+                    //archiveMessage(message.path)
+                }
+            }
+        }
+        catch (Exception e) {
+            log.error("Message ${message?.name} not processed due to error: " + e.message, e)
+            if (message) {
+                failMessage(message?.path, e)
+            }
+        }
+    }
+
+    def handleMessage(String xmlContents) {
+        validateMessage(xmlContents)
+        Object messageObject = deserialize(xmlContents)
+        handleMessage(messageObject)
+    }
 
     def handleMessage(DocumentUpload documentUpload) {
         log.info "Document upload: " + documentUpload
@@ -154,39 +186,14 @@ class TmsIntegrationService {
         SimpleDateFormat dateFormatter = new SimpleDateFormat(grailsApplication.config.openboxes.integration.defaultDateFormat)
 
         execution.executionStatus.each { ExecutionStatus executionStatus ->
-
-            // Locate stock movement by tracking number
             String trackingNumber = executionStatus.orderId
-            StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber)
-            if (!stockMovement) {
-                throw new IllegalArgumentException("Unable to locate stock movement by tracking number ${trackingNumber}")
-            }
-
-            // Identify event type associated with status
             String statusCode = executionStatus.status
-            EventType eventType = EventType.findByCode(statusCode)
-            if (!eventType) {
-                throw new IllegalArgumentException("Status code ${statusCode} not associated with an event type")
-            }
-
-            // Validate status update
-            Shipment shipment = stockMovement?.shipment
-            if (eventType.eventCode == EventTypeCode.COMPLETED && !shipment.hasShipped()) {
-                throw new IllegalStateException("Unable to complete a shipment until it has been shipped")
-            }
-
-            // Create new shipment event to represent status update
             BigDecimal latitude = executionStatus?.geoData?.latitude
             BigDecimal longitude = executionStatus?.geoData?.longitude
             Date eventDate = dateFormatter.parse(executionStatus.dateTime)
-
-            // OBKN-378 TransientObjectException: object references an unsaved transient instance
-            Event event = new Event(eventType: eventType, eventDate: eventDate, longitude: longitude, latitude: latitude)
-            event.save(flush:true, failOnError: true)
-
-            shipment.addToEvents(event)
-            shipment.save(flush: true)
+            createEvent(trackingNumber, statusCode, latitude, longitude, eventDate)
         }
+
     }
 
     def handleMessage(Trip trip) {
@@ -200,6 +207,42 @@ class TmsIntegrationService {
         }
     }
 
+    void createEvent(String trackingNumber, String statusCode, BigDecimal latitude, BigDecimal longitude, Date eventDate) {
+
+    // Locate stock movement by tracking number
+        StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber, Boolean.FALSE)
+        if (!stockMovement) {
+            throw new IllegalArgumentException("Unable to locate stock movement by tracking number ${trackingNumber}")
+        }
+
+        // Identify event type associated with status
+        EventType eventType = EventType.findByCode(statusCode)
+        if (!eventType) {
+            throw new IllegalArgumentException("Status code ${statusCode} not associated with an event type")
+        }
+
+        // Validate status update - temporarily disabled
+        Shipment shipment = stockMovement?.shipment
+        //if (eventType.eventCode == EventTypeCode.COMPLETED && !shipment.hasShipped()) {
+        //    throw new IllegalStateException("Unable to complete a shipment until it has been shipped")
+        //}
+
+        // Create new shipment event to represent status update
+        def eventExists = shipment.events.find { it.eventType == eventType && it.eventDate == eventDate}
+        if (!eventExists) {
+            log.info "Event does not exist"
+            // OBKN-378 TransientObjectException: object references an unsaved transient instance
+            Event event = new Event(eventType: eventType, eventDate: eventDate, longitude: longitude, latitude: latitude)
+            event.save(flush: true, failOnError: true)
+            shipment.addToEvents(event)
+            shipment.save(flush: true)
+        }
+        else {
+            log.info "Event exists"
+        }
+
+    }
+
     void associateStockMovementAndDeliveryOrder(String identifier, String trackingNumber) {
         // FIXME Need to ensure that stock movement is ready to receive notification i.e. shipment has been created
         StockMovement stockMovement = stockMovementService.getStockMovementByIdentifier(identifier)
@@ -210,7 +253,7 @@ class TmsIntegrationService {
     }
 
     void acceptDeliveryOrder(String trackingNumber) {
-        StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber)
+        StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber, Boolean.FALSE)
         if (!stockMovement) {
             throw new Exception("Unable to locate stock movement by tracking number ${trackingNumber}")
         }
@@ -226,7 +269,7 @@ class TmsIntegrationService {
     void attachDocument(String trackingNumber, String documentType, String fileName, String fileContents) {
         if (trackingNumber) {
             log.info "Looking up stock movement by tracking number ${trackingNumber}"
-            StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber)
+            StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber, Boolean.FALSE)
             if (stockMovement) {
                 log.info "Attaching document ${fileName} to ${stockMovement.identifier}"
                 Document document = new Document()
@@ -238,8 +281,6 @@ class TmsIntegrationService {
                 document.filename = fileName
                 document.fileContents = fileContents.bytes
 
-                throw new IllegalStateException("unable to save document")
-
                 // FIXME we need to figure out a way to detect the mimetype of the file
                 document.contentType = "application/octet-stream"
                 document.save(flush:true, failOnError: true)
@@ -249,7 +290,6 @@ class TmsIntegrationService {
 
             }
         }
-
     }
 
     def failMessage(String filePath, Exception exception) {
@@ -258,9 +298,8 @@ class TmsIntegrationService {
             String stacktrace = ExceptionUtils.getStackTrace(exception);
             def filename = FilenameUtils.getBaseName(filePath)
             def path = FilenameUtils.getFullPathNoEndSeparator(filePath)
-            def destination = "${path}/${filename}-stacktrace.log"
-            log.info "Storing error message to ${filename}.log in directory ${destination}"
-            fileTransferService.storeMessage("${filename}-stacktrace.log", stacktrace, destination)
+            log.info "Storing error message to ${filename} in directory ${path}"
+            fileTransferService.storeMessage("${filename}-stacktrace.log", stacktrace, path)
         } catch (Exception e) {
             log.error("Unable to write error file to ftp server: " + e.message, e)
         }

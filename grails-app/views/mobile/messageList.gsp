@@ -9,9 +9,18 @@
 <body>
 
     <div class="clearfix">
-        <button type="button" class="btn btn-outline-primary float-end" data-bs-toggle="modal"
-                    data-bs-target="#messageUploadModal">Upload Message</button>
+    </div>
+
+    <div class="row g-0 mb-2">
+        <div class="col col-md-12">
+            <div class="float-end">
+                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
+                            data-bs-target="#messageUploadModal">Upload Message</button>
+
+                <g:link controller="mobile" action="messageListProcess" class="btn btn-outline-success">Process Messages</g:link>
+            </div>
         </div>
+    </div>
 
     <div class="card">
         <div class="card-header">
