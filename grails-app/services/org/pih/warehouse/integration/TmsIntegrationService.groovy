@@ -146,7 +146,10 @@ class TmsIntegrationService {
                     String xmlContents = fileTransferService.retrieveMessage(message.path)
                     log.info "Handling message ${message}:\n${xmlContents}"
                     handleMessage(xmlContents)
-                    archiveMessage(message.path)
+                    Boolean archiveOnSuccess = grailsApplication.config.openboxes.integration.ftp.archiveOnSuccess
+                    if (archiveOnSuccess) {
+                        archiveMessage(message.path)
+                    }
                 }
             }
         }
@@ -154,6 +157,10 @@ class TmsIntegrationService {
             log.error("Message ${message?.name} not processed due to error: " + e.message, e)
             if (message) {
                 failMessage(message?.path, e)
+                Boolean archiveOnFailure = grailsApplication.config.openboxes.integration.ftp.archiveOnFailure
+                if (archiveOnFailure) {
+                    archiveMessage(message.path)
+                }
             }
         }
     }

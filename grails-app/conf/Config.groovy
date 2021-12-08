@@ -213,7 +213,7 @@ log4j = {
             'org.apache.ddlutils'
 
     info 'org.liquibase',
-            'org.codehaus.groovy.grails.web.pages',        // GSP			'com.mchange',
+            'org.codehaus.groovy.grails.web.pages',        // GSP
             'org.springframework',
             'org.hibernate',
             'com.mchange',
@@ -1418,6 +1418,8 @@ openboxes.integration.ftp.outbound.directory = System.env.FTP_OUTBOUND_DIRECTORY
 openboxes.integration.ftp.inbound.validate = System.env.FTP_INBOUND_VALIDATE ?: true
 openboxes.integration.ftp.inbound.directory = System.env.FTP_OUTBOUND_DIRECTORY ?: "inbound"
 openboxes.integration.ftp.inbound.subdirectories = []
+openboxes.integration.ftp.archiveOnSuccess = Boolean.TRUE
+openboxes.integration.ftp.archiveOnFailure = Boolean.FALSE
 
 // OpenBoxes / eTN Integration default configuration
 openboxes.integration.defaultTimeZone = System.env.DEFAULT_TIME_ZONE ?: "Europe/London"
