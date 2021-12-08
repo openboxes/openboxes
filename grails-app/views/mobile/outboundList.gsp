@@ -61,21 +61,23 @@
                     <tr>
                         <td>
                             <a href="${createLink(controller: 'stockMovement', action: 'show', id: stockMovement?.id)}" class="text-decoration-none text-reset">
-                                <g:if test="${stockMovement?.shipment?.mostRecentEvent?.eventType?.eventCode}">
+                                <g:if test="${stockMovement?.shipment?.mostRecentEvent?.eventType}">
                                     <div class="badge bg-primary">
-                                        ${stockMovement.shipment?.mostRecentEvent?.eventType?.eventCode}
+                                        ${stockMovement.shipment?.mostRecentEvent?.eventType?.name?.toUpperCase()}
                                     </div>
-                                    <div>
+                                    <div class="text-muted">
                                         <small><g:formatDate date="${stockMovement.shipment?.currentEvent?.eventDate}" format="MMM dd hh:mm a"/></small>
                                     </div>
                                 </g:if>
                                 <g:else>
                                     <div class="badge bg-primary">${stockMovement?.status}</div>
+                                    <div class="text-muted">
+                                        <small><g:formatDate date="${stockMovement.lastUpdated}" format="MMM dd hh:mm a"/></small>
+                                    </div>
                                 </g:else>
                             </a>
                         </td>
                         <td>
-
                             <a href="${createLink(controller: 'mobile', action: 'outboundDetails', id: stockMovement?.id)}" class="text-decoration-none text-reset">
                                 ${stockMovement.identifier}
                             </a>

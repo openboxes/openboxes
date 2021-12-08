@@ -10,6 +10,7 @@
 package org.pih.warehouse.data
 
 import org.joda.time.LocalDate
+import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.Product
@@ -21,6 +22,9 @@ import org.springframework.validation.BeanPropertyBindingResult
 import org.pih.warehouse.auth.AuthService
 
 class OutboundStockMovementDataService {
+
+    def stockMovementService
+    def tmsIntegrationService
 
     Boolean validateData(ImportDataCommand command) {
         log.info "Validate data " + command.filename
@@ -45,10 +49,20 @@ class OutboundStockMovementDataService {
 
     void importData(ImportDataCommand command) {
         log.info "Import data " + command.filename
+        Set<String> identifiers = new HashSet<String>()
         command.data.eachWithIndex {params, index ->
             RequisitionItem requisitionItem = buildRequisitionItem(params)
             if(requisitionItem.validate()){
                 requisitionItem.save(failOnError: true)
+            }
+            identifiers.add(requisitionItem.requisition.requestNumber)
+        }
+
+        // Generate hypothetical delivery order for newly created stock movements
+        if (identifiers) {
+            identifiers.each { String identifier ->
+                StockMovement stockMovement = stockMovementService.getStockMovementByIdentifier(identifier, Boolean.FALSE)
+                tmsIntegrationService.uploadDeliveryOrder(stockMovement)
             }
         }
     }
