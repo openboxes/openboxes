@@ -9,10 +9,6 @@
  **/
 package org.pih.warehouse.inventory
 
-import org.pih.warehouse.core.RoleType
-import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.shipping.ShipmentStatusCode
-import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
 import org.springframework.context.ApplicationListener
 
 class StockMovementStatusEventService implements ApplicationListener<StockMovementStatusEvent> {
