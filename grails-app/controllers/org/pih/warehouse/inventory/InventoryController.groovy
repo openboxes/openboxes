@@ -1078,6 +1078,13 @@ class InventoryController {
         def transaction = command?.transactionInstance
         def warehouseInstance = Location.get(session?.warehouse?.id)
 
+        // Quantity cannot be changed to be less than 0
+        command.transactionEntries.each {
+            if (it.quantity < 0) {
+                transaction.errors.rejectValue("transactionEntries", "transactionEntry.quantity.invalid", [it?.inventoryItem?.lotNumber] as Object[], "")
+            }
+        }
+
         // Check to see if there are errors, if not save the transaction
         if (!transaction.hasErrors()) {
             try {
@@ -1114,8 +1121,8 @@ class InventoryController {
             // Get the list of products that the user selected from the inventory browser
             if (params.product?.id) {
                 def productIds = params.list('product.id')
-                def products = productIds.collect { String.valueOf(it) }
-                command.productInventoryItems = inventoryService.getInventoryItemsByProducts(warehouseInstance, products)
+                def products = Product.findAllByIdInList(productIds)
+                command.productInventoryItems = inventoryService.getInventoryItemsByProducts(warehouseInstance, productIds)
                 command.binLocations = inventoryService.getProductQuantityByBinLocation(warehouseInstance, products)
             }
             // If given a list of inventory items, we just return those inventory items
