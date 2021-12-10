@@ -479,6 +479,7 @@ class ReportController {
                     "Estimated Goods Ready Date" { it.estimatedGoodsReadyDate }
                     "Shipment Number" { it.shipmentNumber }
                     "Ship Date" { it.shipDate }
+                    "Expected Delivery Date" { it.expectedDeliveryDate }
                     "Shipment Type" { it.shipmentType }
                 })
 
@@ -499,6 +500,7 @@ class ReportController {
                             estimatedGoodsReadyDate  : isOrderItem ? it.actualReadyDate?.format("MM/dd/yyyy") : '',
                             shipmentNumber  : isOrderItem ? '' : it.shipment.shipmentNumber,
                             shipDate  : isOrderItem ? '' : it.shipment.expectedShippingDate?.format("MM/dd/yyyy"),
+                            expectedDeliveryDate  : isOrderItem ? '' : it.shipment.expectedDeliveryDate?.format("MM/dd/yyyy"),
                             shipmentType  : isOrderItem ? '' : it.shipment.shipmentType.name
                     ]
                 }
