@@ -367,10 +367,12 @@ class SendMovementPage extends Component {
             }),
           );
 
+          const uniqBy = _.find(tableItemsData, 'id') ? 'id' : 'shipmentItemId';
+
           this.setState({
             values: {
               ...this.state.values,
-              tableItems: _.uniqBy(_.concat(this.state.values.tableItems, tableItemsData), 'id'),
+              tableItems: _.uniqBy(_.concat(this.state.values.tableItems, tableItemsData), uniqBy),
             },
             isFirstPageLoaded: true,
           }, () => {
