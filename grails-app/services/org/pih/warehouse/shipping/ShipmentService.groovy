@@ -748,36 +748,39 @@ class ShipmentService {
      * @return boolean
      */
     boolean validateReturnShipmentItem(ShipmentItem shipmentItem, Boolean withBinLocation) {
-        if (!shipmentItem.validate()) {
-            throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
-        }
-
         def origin = Location.get(shipmentItem?.shipment?.origin?.id)
-        def quantityAvailableToReturn
-        if (withBinLocation) {
-            quantityAvailableToReturn = productAvailabilityService.getQuantityNotPickedInBinLocation(shipmentItem.inventoryItem, shipmentItem.binLocation)
-        } else {
-            quantityAvailableToReturn = productAvailabilityService.getQuantityNotPickedInLocation(shipmentItem.product, origin)
-        }
 
-        if (shipmentItem.quantity > quantityAvailableToReturn) {
-            String errorMessage = "Shipping quantity (${shipmentItem.quantity}) can not exceed quantity on hand (${quantityAvailableToReturn}) for " +
-                    "product code ''${shipmentItem.product.productCode}'' " +
-                    "and lot number ''${shipmentItem?.inventoryItem?.lotNumber}'' " +
-                    "at origin ''${origin.name}'' " +
-                    "bin ''${shipmentItem?.binLocation?.name ?: 'Default'}''. " +
-                    "This can occur if changes were made to inventory after this shipment was picked but before it shipped. " +
-                    "To move forward, please remove the lines above from the shipment or reduce to reflect current QOH."
-            shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedAvailableQuantity",
-                    [
-                            shipmentItem.quantity + " " + shipmentItem?.product?.unitOfMeasure,
-                            quantityAvailableToReturn + " " + shipmentItem?.product?.unitOfMeasure,
-                            shipmentItem?.product?.productCode,
-                            shipmentItem?.inventoryItem?.lotNumber,
-                            origin.name,
-                            shipmentItem?.binLocation?.name ?: 'Default'
-                    ].toArray(), errorMessage)
-            throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
+        if (origin.requiresOutboundQuantityValidation()) {
+            if (!shipmentItem.validate()) {
+                throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
+            }
+
+            def quantityAvailableToReturn
+            if (withBinLocation) {
+                quantityAvailableToReturn = productAvailabilityService.getQuantityNotPickedInBinLocation(shipmentItem.inventoryItem, shipmentItem.binLocation)
+            } else {
+                quantityAvailableToReturn = productAvailabilityService.getQuantityNotPickedInLocation(shipmentItem.product, origin)
+            }
+
+            if (shipmentItem.quantity > quantityAvailableToReturn) {
+                String errorMessage = "Shipping quantity (${shipmentItem.quantity}) can not exceed quantity on hand (${quantityAvailableToReturn}) for " +
+                        "product code ''${shipmentItem.product.productCode}'' " +
+                        "and lot number ''${shipmentItem?.inventoryItem?.lotNumber}'' " +
+                        "at origin ''${origin.name}'' " +
+                        "bin ''${shipmentItem?.binLocation?.name ?: 'Default'}''. " +
+                        "This can occur if changes were made to inventory after this shipment was picked but before it shipped. " +
+                        "To move forward, please remove the lines above from the shipment or reduce to reflect current QOH."
+                shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedAvailableQuantity",
+                        [
+                                shipmentItem.quantity + " " + shipmentItem?.product?.unitOfMeasure,
+                                quantityAvailableToReturn + " " + shipmentItem?.product?.unitOfMeasure,
+                                shipmentItem?.product?.productCode,
+                                shipmentItem?.inventoryItem?.lotNumber,
+                                origin.name,
+                                shipmentItem?.binLocation?.name ?: 'Default'
+                        ].toArray(), errorMessage)
+                throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
+            }
         }
         return true
     }
