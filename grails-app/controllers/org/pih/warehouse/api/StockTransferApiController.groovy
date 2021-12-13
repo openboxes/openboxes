@@ -174,6 +174,9 @@ class StockTransferApiController {
     }
 
     def returnCandidates = {
+        // OBPIH-4199: TEMPORARILY DISABLED
+        throw new UnsupportedOperationException("${warehouse.message(code: 'outboundReturns.temporaryDisabled.message')}")
+
         Location location = Location.get(params.locationId)
         if (!location) {
             throw new IllegalArgumentException("Can't find location with given id: ${params.locationId}")

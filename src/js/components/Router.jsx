@@ -80,10 +80,15 @@ const AsyncStockTransfer = Loadable({
 // <MainLayoutRoute
 //    path="/**/replenishment/create/:replenishmentId?" component={AsyncReplenishment} />
 
-const AsyncOutboundReturns = Loadable({
-  loader: () => import('./outbound-returns/OutboundReturnsWizard'),
-  loading: Loading,
-});
+// OBPIH-4199 TEMPORARILY DISABLED
+// const AsyncOutboundReturns = Loadable({
+//   loader: () => import('./outbound-returns/OutboundReturnsWizard'),
+//   loading: Loading,
+// });
+
+// TODO: when outbound returns will be enabled, then move this line into Router Switch below
+// <MainLayoutRoute
+// path="/**/stockTransfer/createReturns/:outboundReturnId?" component={AsyncOutboundReturns} />
 
 const Router = props => (
   <div>
@@ -100,7 +105,6 @@ const Router = props => (
         <MainLayoutRoute path="/**/stocklistManagement/index/:productId?" component={AsyncManagement} />
         <MainLayoutRoute path="/**/invoice/create/:invoiceId?" component={AsyncInvoice} />
         <MainLayoutRoute path="/**/stockTransfer/create/:stockTransferId?" component={AsyncStockTransfer} />
-        <MainLayoutRoute path="/**/stockTransfer/createReturns/:outboundReturnId?" component={AsyncOutboundReturns} />
         <MainLayoutRoute path="/**/" component={AsyncTablero} />
       </Switch>
     </BrowserRouter>

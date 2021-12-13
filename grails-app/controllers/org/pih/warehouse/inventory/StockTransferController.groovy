@@ -28,6 +28,9 @@ class StockTransferController {
     }
 
     def createReturns = {
+        // OBPIH-4199: TEMPORARILY DISABLED
+        throw new UnsupportedOperationException("${warehouse.message(code: 'outboundReturns.temporaryDisabled.message')}")
+
         render(template: "/common/react", params: params)
     }
 
