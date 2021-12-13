@@ -1,0 +1,6 @@
+name: "OpenBoxes CodeQL config"
+paths:
+  - .
+paths-ignore:
+  - node_modules
+  - web-app/js
