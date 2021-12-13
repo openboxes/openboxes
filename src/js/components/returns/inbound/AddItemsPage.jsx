@@ -293,9 +293,13 @@ class AddItemsPage extends Component {
                 label: `${item.product.productCode} ${item.product.name}`,
               },
             })) : new Array(1).fill({ sortOrder: 100 });
+
+          const sortOrder = _.toInteger(_.last(returnItems).sortOrder) + 100;
+
           this.setState({
             inboundReturn,
             formValues: { returnItems },
+            sortOrder,
           }, () => this.props.hideSpinner());
         })
         .catch(() => this.props.hideSpinner());

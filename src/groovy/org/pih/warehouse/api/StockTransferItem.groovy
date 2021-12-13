@@ -28,6 +28,8 @@ class StockTransferItem {
     Boolean delete = Boolean.FALSE
     Person recipient
 
+    Integer orderIndex = 0
+
     static constraints = {
         id(nullable: true)
         product(nullable: true)
@@ -41,6 +43,7 @@ class StockTransferItem {
         splitItems(nullable: true)
         picklistItems(nullable: true)
         recipient(nullable: true)
+        orderIndex(nullable: true)
     }
 
     static StockTransferItem createFromOrderItem(OrderItem orderItem) {
@@ -57,6 +60,7 @@ class StockTransferItem {
         stockTransferItem.quantityOnHand = orderItem.quantity
         stockTransferItem.quantityNotPicked = orderItem.quantity
         stockTransferItem.status = getItemStatus(orderItem.orderItemStatusCode)
+        stockTransferItem.orderIndex = orderItem.orderIndex
 
         orderItem.orderItems?.each { item ->
             stockTransferItem.splitItems.add(createFromOrderItem(item))
@@ -139,6 +143,7 @@ class StockTransferItem {
                     a.binLocation?.name <=> b.binLocation?.name ?:
                             b.quantity <=> a.quantity
                 }.collect { it?.toJson() },
+                sortOrder                       : orderIndex
         ]
     }
 }
