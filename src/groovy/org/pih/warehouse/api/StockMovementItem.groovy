@@ -313,14 +313,17 @@ class AvailableItem {
     }
 
     AvailableItemStatus getStatus() {
-        if (quantityAvailable > 0) {
-            return AvailableItemStatus.AVAILABLE
-        }
         if (inventoryItem?.recalled) {
             return AvailableItemStatus.RECALLED
         }
         if (binLocation?.onHold) {
             return AvailableItemStatus.HOLD
+        }
+        if (quantityAvailable > 0 && quantityAvailable < quantityOnHand) {
+            return AvailableItemStatus.PICKED
+        }
+        if (quantityAvailable > 0) {
+            return AvailableItemStatus.AVAILABLE
         }
         if (quantityOnHand <= 0) {
             return AvailableItemStatus.NOT_AVAILABLE
