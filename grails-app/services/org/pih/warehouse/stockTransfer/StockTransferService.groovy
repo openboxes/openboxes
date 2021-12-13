@@ -288,6 +288,7 @@ class StockTransferService {
         orderItem.originBinLocation = stockTransferItem.originBinLocation
         orderItem.destinationBinLocation = stockTransferItem.destinationBinLocation
         orderItem.recipient = stockTransferItem.recipient
+        orderItem.orderIndex = stockTransferItem.orderIndex
         return orderItem
     }
 
