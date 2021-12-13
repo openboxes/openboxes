@@ -2,6 +2,8 @@ import _ from 'lodash';
 import queryString from 'query-string';
 import apiClient from './apiClient';
 
+const INBOUND = 'INBOUND';
+
 export const debounceUsersFetch = (waitTime, minSearchLength) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
@@ -39,7 +41,7 @@ export const debounceLocationsFetch = (
     if (searchTerm && searchTerm.length >= minSearchLength) {
       const activityCodesParams = activityCodes ? activityCodes.map(activityCode => `&activityCodes=${activityCode}`).join('') : '';
       const { direction } = queryString.parse(window.location.search);
-      const directionParam = fetchAll ? null : direction;
+      const directionParam = fetchAll ? null : (direction || INBOUND);
       apiClient.get(`/openboxes/api/locations?name=${searchTerm}${directionParam ? `&direction=${directionParam}` : ''}${activityCodesParams}`)
         .then(result => callback(
           null,
