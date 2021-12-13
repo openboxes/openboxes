@@ -43,8 +43,6 @@ class ProductAvailability {
         quantityNotPicked formula: "quantity_on_hand - quantity_allocated"
     }
 
-    static transients = ["pickable", "recalled"]
-
     static constraints = {
         product(nullable:false)
         location(nullable:false)
@@ -55,9 +53,5 @@ class ProductAvailability {
         quantityOnHold(nullable: true)
         quantityAvailableToPromise(nullable: true)
         quantityNotPicked(nullable: true)
-    }
-
-    Boolean isPickable() {
-        return (inventoryItem ? inventoryItem.pickable : true) && (binLocation ? binLocation.pickable : true)
     }
 }
