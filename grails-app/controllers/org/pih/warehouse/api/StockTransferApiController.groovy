@@ -168,6 +168,10 @@ class StockTransferApiController {
                 )
             }
 
+            if (stockTransferItemMap.sortOrder) {
+                stockTransferItem.orderIndex = stockTransferItemMap.sortOrder
+            }
+
             stockTransfer.stockTransferItems.add(stockTransferItem)
         }
 
