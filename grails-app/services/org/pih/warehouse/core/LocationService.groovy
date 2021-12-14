@@ -20,6 +20,7 @@ import util.ConfigHelper
 class LocationService {
 
     def grailsApplication
+    def userService
     boolean transactional = true
 
 
@@ -220,10 +221,18 @@ class LocationService {
     Map getLoginLocationsMap(User user, Location currentLocation) {
         log.info "Get login locations for user ${user} and location ${currentLocation})"
         def locationMap = [:]
+        def locations
         def nullHigh = new NullComparator(true)
-        def locations = getLoginLocations(currentLocation)
+
+        List locationRolesForRequestor = user.locationRoles.findAll {it.role.roleType == RoleType.ROLE_REQUESTOR}
+
+        if (locationRolesForRequestor) {
+            locations = locationRolesForRequestor.collect {it.location}
+            locations = locations.findAll {it -> it.supports(ActivityCode.SUBMIT_REQUEST) && !it.supports(ActivityCode.MANAGE_INVENTORY)}
+        } else {
+            locations = getLoginLocations(currentLocation)
+        }
         if (locations) {
-            locations = locations.findAll { Location location -> user.hasPrimaryRole(location) }
             locations = locations.collect { Location location ->
                 [
                         id              : location?.id,
