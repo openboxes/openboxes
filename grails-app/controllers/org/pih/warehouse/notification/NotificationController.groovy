@@ -12,34 +12,30 @@ package org.pih.warehouse.notification
 import com.amazonaws.auth.AWSStaticCredentialsProvider
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.regions.Regions
-import com.amazonaws.services.sns.AmazonSNSClient
 import com.amazonaws.services.sns.AmazonSNSClientBuilder
 import com.amazonaws.services.sns.model.ConfirmSubscriptionRequest
 import com.amazonaws.services.sns.model.ConfirmSubscriptionResult
-import com.amazonaws.services.sns.model.CreateTopicRequest
-import com.amazonaws.services.sns.model.CreateTopicResult
 import com.amazonaws.services.sns.model.PublishRequest
 import com.amazonaws.services.sns.model.SubscribeRequest
 import com.amazonaws.services.sns.model.SubscribeResult
-import com.amazonaws.services.sns.util.SignatureChecker
 import org.apache.commons.lang3.time.DateUtils
 import org.json.JSONArray
 import org.json.JSONObject
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
-import org.pih.warehouse.util.DateUtil
 
 class NotificationController {
-//    String TOPIC_ARN = "arn:aws:sns:eu-central-1:073660486765:ProductCreateUpdateDev"
-    String TOPIC_ARN = "arn:aws:sns:us-east-1:854009746153:MyTopic"
-    String notifyUrl = "https://6e483957afe7.ngrok.io/openboxes/api/notifications/products"
-    String accessKey = "AKIA4NVXSSLUSNA373UD"
-    String secretKey = "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"
+
+    def grailsApplication
+
+    String PRODUCT_TOPIC_ARN = grailsApplication.config.aws.sns.product.arn
+    String notifyUrl = grailsApplication.config.aws.sns.product.notify.url
+    String accessKey = grailsApplication.config.aws.sns.access.key
+    String secretKey = grailsApplication.config.aws.sns.access.secretKey
 
     def productService
 
@@ -131,7 +127,7 @@ class NotificationController {
         "components": []
     }]
 }"""
-        PublishRequest publishRequest = new PublishRequest(TOPIC_ARN, message, "Demo publish")
+        PublishRequest publishRequest = new PublishRequest(PRODUCT_TOPIC_ARN, message, "Demo publish")
         def result = amazonSnsClient().publish(publishRequest)
         log.info "result::${result?.dump()}"
         render "published"
@@ -144,7 +140,7 @@ class NotificationController {
         if(json.has("Type") && json.getString("Type") == "SubscriptionConfirmation"){
             String token = json.getString("Token")
             try {
-                ConfirmSubscriptionRequest request = new ConfirmSubscriptionRequest(TOPIC_ARN, token)
+                ConfirmSubscriptionRequest request = new ConfirmSubscriptionRequest(PRODUCT_TOPIC_ARN, token)
                 ConfirmSubscriptionResult result = amazonSnsClient().confirmSubscription(request);
                 log.info "result::${result?.toString()}"
             } catch (Exception e) {
@@ -155,9 +151,9 @@ class NotificationController {
     }
 
     def subscribe = {
-        log.info "Subscribiing topic:${TOPIC_ARN}"
+        log.info "Subscribiing topic:${PRODUCT_TOPIC_ARN}"
         try {
-            SubscribeRequest subscribeRequest = new SubscribeRequest(TOPIC_ARN, "https",  notifyUrl)
+            SubscribeRequest subscribeRequest = new SubscribeRequest(PRODUCT_TOPIC_ARN, "https",  notifyUrl)
             subscribeRequest.returnSubscriptionArn = true
             SubscribeResult result = amazonSnsClient().subscribe(subscribeRequest);
             log.info("Subscription ARN is " + result.subscriptionArn);
@@ -174,7 +170,7 @@ class NotificationController {
         if(json.has("Type") && json.getString("Type") == "SubscriptionConfirmation"){
             String token = json.getString("Token")
             try {
-                ConfirmSubscriptionRequest request = new ConfirmSubscriptionRequest(TOPIC_ARN, token)
+                ConfirmSubscriptionRequest request = new ConfirmSubscriptionRequest(PRODUCT_TOPIC_ARN, token)
                 ConfirmSubscriptionResult result = amazonSnsClient().confirmSubscription(request);
                 log.info "result::${result?.toString()}"
             } catch (Exception e) {
@@ -234,7 +230,7 @@ class NotificationController {
         if(json.has("Type") && json.getString("Type") == "SubscriptionConfirmation"){
             String token = json.getString("Token")
             try {
-                ConfirmSubscriptionRequest request = new ConfirmSubscriptionRequest(TOPIC_ARN, token)
+                ConfirmSubscriptionRequest request = new ConfirmSubscriptionRequest(PRODUCT_TOPIC_ARN, token)
                 ConfirmSubscriptionResult result = amazonSnsClient().confirmSubscription(request);
                 log.info "result::${result?.toString()}"
             } catch (Exception e) {
