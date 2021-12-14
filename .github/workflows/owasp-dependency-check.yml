@@ -1,0 +1,58 @@
+name: "OWASP dependency check"
+
+on:
+  push:
+    branches: [ develop, master, release/0.8.* ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ develop, master, release/0.8.* ]
+  schedule:
+    - cron: '0 0 * * 1-5'
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        curl -sL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+        curl -sL https://get.sdkman.io | bash
+        export NVM_DIR=$HOME/.nvm
+        . $NVM_DIR/nvm.sh
+        . $HOME/.sdkman/bin/sdkman-init.sh
+        nvm install 13.11.0
+        npm install -g npm@6.14.6
+        sdk install grails 1.3.9
+        npm config set engine-strict true
+        npm install
+        # FIXME: dep-check requires Java 8+ -- build warfile once we support it
+
+    - name: OWASP dependency check
+      uses: dependency-check/Dependency-Check_Action@main
+      with:
+        project: 'OpenBoxes'
+        path: '.'
+        format: 'HTML'
+        args: >
+          --disableAssembly
+          --enableRetired
+          --failOnCVSS 11  # FIXME: we should at least get rid of level-10 issues
+          --nodeAuditSkipDevDependencies
+          --nodePackageSkipDevDependencies
+          --suppression .github/config/owasp-dependency-check.xml
+
+    - name: Upload report
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: OWASP dependency check report
+        path: ${{github.workspace}}/reports
