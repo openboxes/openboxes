@@ -1421,7 +1421,7 @@ openboxes.integration.ftp.inbound.subdirectories = []
 
 // OpenBoxes / eTN Integration default configuration
 openboxes.integration.defaultTimeZone = System.env.DEFAULT_TIME_ZONE ?: "Europe/London"
-openboxes.integration.defaultDateFormat = "yyyy-MM-dd'T'hh:mm:ssXXX"
+openboxes.integration.defaultDateFormat = "yyyy-MM-dd'T'HH:mm:ssXXX"
 
 openboxes.integration.tracking.uri = "https://tms.etrucknow.com/tracking/orderTracking/%s"
 
