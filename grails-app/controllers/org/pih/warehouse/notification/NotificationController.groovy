@@ -32,10 +32,8 @@ class NotificationController {
 
     def grailsApplication
 
-    String PRODUCT_TOPIC_ARN = grailsApplication.config.aws.sns.product.arn
-    String notifyUrl = grailsApplication.config.aws.sns.product.notify.url
-    String accessKey = grailsApplication.config.aws.sns.access.key
-    String secretKey = grailsApplication.config.aws.sns.access.secretKey
+//    String accessKey = grailsApplication.config.aws.sns.access.key
+//    String secretKey = grailsApplication.config.aws.sns.access.secretKey
 
     def productService
 
@@ -48,8 +46,8 @@ class NotificationController {
                 .withCredentials(
                         new AWSStaticCredentialsProvider(
                                 new BasicAWSCredentials(
-                                        accessKey,
-                                        secretKey
+                                        grailsApplication.config.aws.sns.access.key?.toString(),
+                                        grailsApplication.config.aws.sns.access.secretKey?.toString()
                                 )
                         )
                 ).build()
@@ -127,6 +125,7 @@ class NotificationController {
         "components": []
     }]
 }"""
+        String PRODUCT_TOPIC_ARN = grailsApplication.config.aws.sns.product.arn
         PublishRequest publishRequest = new PublishRequest(PRODUCT_TOPIC_ARN, message, "Demo publish")
         def result = amazonSnsClient().publish(publishRequest)
         log.info "result::${result?.dump()}"
@@ -140,6 +139,7 @@ class NotificationController {
         if(json.has("Type") && json.getString("Type") == "SubscriptionConfirmation"){
             String token = json.getString("Token")
             try {
+                String PRODUCT_TOPIC_ARN = grailsApplication.config.aws.sns.product.arn
                 ConfirmSubscriptionRequest request = new ConfirmSubscriptionRequest(PRODUCT_TOPIC_ARN, token)
                 ConfirmSubscriptionResult result = amazonSnsClient().confirmSubscription(request);
                 log.info "result::${result?.toString()}"
@@ -151,8 +151,11 @@ class NotificationController {
     }
 
     def subscribe = {
+        String PRODUCT_TOPIC_ARN = grailsApplication.config.aws.sns.product.arn?.toString()
+
         log.info "Subscribiing topic:${PRODUCT_TOPIC_ARN}"
         try {
+            String notifyUrl = grailsApplication.config.aws.sns.product.notify.url?.toString()
             SubscribeRequest subscribeRequest = new SubscribeRequest(PRODUCT_TOPIC_ARN, "https",  notifyUrl)
             subscribeRequest.returnSubscriptionArn = true
             SubscribeResult result = amazonSnsClient().subscribe(subscribeRequest);
@@ -170,6 +173,7 @@ class NotificationController {
         if(json.has("Type") && json.getString("Type") == "SubscriptionConfirmation"){
             String token = json.getString("Token")
             try {
+                String PRODUCT_TOPIC_ARN = grailsApplication.config.aws.sns.product.arn
                 ConfirmSubscriptionRequest request = new ConfirmSubscriptionRequest(PRODUCT_TOPIC_ARN, token)
                 ConfirmSubscriptionResult result = amazonSnsClient().confirmSubscription(request);
                 log.info "result::${result?.toString()}"
@@ -230,6 +234,7 @@ class NotificationController {
         if(json.has("Type") && json.getString("Type") == "SubscriptionConfirmation"){
             String token = json.getString("Token")
             try {
+                String PRODUCT_TOPIC_ARN = grailsApplication.config.aws.sns.product.arn
                 ConfirmSubscriptionRequest request = new ConfirmSubscriptionRequest(PRODUCT_TOPIC_ARN, token)
                 ConfirmSubscriptionResult result = amazonSnsClient().confirmSubscription(request);
                 log.info "result::${result?.toString()}"
