@@ -405,6 +405,17 @@ class UrlMappings {
             action = [GET: "read", POST: "update", PUT: "update", DELETE: "delete"]
         }
 
+        "/api/notifications/products"{
+            controller = "notification"
+            action = [POST: "createProduct"]
+        }
+        "/api/notifications/orders"{
+            controller = "notification"
+            action = [POST: "createOrder"]
+        }
+        "/notification/subscribe"(controller: "notification", action: "subscribe")
+        "/notification/publish"(controller: "notification", action: "publish")
+
         // Error handling
 
         "401"(controller: "errors", action: "handleUnauthorized")
