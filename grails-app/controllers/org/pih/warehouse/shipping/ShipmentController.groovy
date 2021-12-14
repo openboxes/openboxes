@@ -9,11 +9,19 @@
  **/
 package org.pih.warehouse.shipping
 
-import au.com.bytecode.opencsv.CSVWriter
 import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.krysalis.barcode4j.impl.code128.Code128Bean
-import org.pih.warehouse.core.*
+import org.pih.warehouse.core.Comment
+import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.Event
+import org.pih.warehouse.core.EventType
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.MailService
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.core.User
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionException
 import org.pih.warehouse.product.Product
@@ -25,14 +33,12 @@ class ShipmentController {
     def scaffold = Shipment
     def shipmentService
     def userService
-    def reportService
     def identifierService
     def inventoryService
     MailService mailService
 
     def barcode4jService
 
-    def dataSource
     def sessionFactory
 
 
@@ -687,33 +693,25 @@ class ShipmentController {
 				and shipment_item.product_id = product.id 
 				and shipment.id = ${params.id}"""
 
-            StringWriter sw = new StringWriter()
-            CSVWriter writer = new CSVWriter(sw)
             Sql sql = new Sql(sessionFactory.currentSession.connection())
-
-            String[] colArray = new String[6]
-            colArray.putAt(0, "unit")
-            colArray.putAt(1, "dimensions")
-            colArray.putAt(2, "weight")
-            colArray.putAt(3, "qty")
-            colArray.putAt(4, "item")
-            colArray.putAt(5, "serial number")
-            writer.writeNext(colArray)
-            sql.eachRow(query) { row ->
-
-                def rowArray = new String[6]
-                rowArray.putAt(0, row[0])
-                rowArray.putAt(1, (row[1]) ? row[1] : "0" + "x" + (row[2]) ? row[2] : "0" + "x" + (row[3]) ? row[3] : "0" + " " + (row[4]) ? row[4] : "")
-                rowArray.putAt(2, row[5] + " " + row[6])
-                rowArray.putAt(3, row[7])
-                rowArray.putAt(4, row[8])
-                rowArray.putAt(5, row[9])
-                writer.writeNext(rowArray)
+            def records = []
+            try {
+                sql.eachRow(query) { row ->
+                    records << [
+                        unit: row[0],
+                        dimensions: "${row[1] ?: 0}x${row[2] ?: 0}x${row[3] ?: 0} ${row[4] ?: ''}",
+                        weight: "${row[5]} ${row[6]}",
+                        qty: row[7],
+                        item: row[8],
+                        'serial number': row[9]
+                    ]
+                }
+            } finally {
+                sql.close()
             }
-            log.info "results: " + sw.toString()
-            response.setHeader("Content-disposition", "attachment; filename=\"PackingList.csv\"")
-            render(contentType: "text/csv", text: sw.toString())
-            sql.close()
+
+            response.setHeader('Content-disposition', 'attachment; filename="PackingList.csv"')
+            render(contentType: 'text/csv', text: CSVUtils.dumpMaps(records))
         }
     }
 
@@ -1211,6 +1209,3 @@ class ReceiveShipmentCommand implements Serializable {
     }
 
 }
-
-
-

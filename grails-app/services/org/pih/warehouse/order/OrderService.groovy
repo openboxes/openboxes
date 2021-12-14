@@ -10,9 +10,7 @@
 package org.pih.warehouse.order
 
 import grails.validation.ValidationException
-import java.math.RoundingMode
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
-import org.grails.plugins.csv.CSVMapReader
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.Constants
@@ -39,7 +37,8 @@ import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentException
 import org.pih.warehouse.shipping.ShipmentItem
-import util.ReportUtil
+
+import java.math.RoundingMode
 
 class OrderService {
 
@@ -52,7 +51,6 @@ class OrderService {
     def inventoryService
     def productSupplierDataService
     def personDataService
-    def stockMovementService
     def grailsApplication
 
     def getOrders(Order orderTemplate, Date dateOrderedFrom, Date dateOrderedTo, Map params) {
@@ -764,13 +762,9 @@ class OrderService {
      * @return
      */
     List parseOrderItems(String text) {
-
-        List orderItems = []
-
-        try {
-            def settings = [skipLines: 1]
-            def csvMapReader = new CSVMapReader(new StringReader(text), settings)
-            csvMapReader.fieldKeys = [
+        final orderItems = CSVUtils.parseRecords(
+            text,
+            [
                 'id',
                 'productCode',
                 'productName',
@@ -786,13 +780,10 @@ class OrderService {
                 'recipient',
                 'estimatedReadyDate',
                 'actualReadyDate',
-                'budgetCode'
-            ]
-            orderItems = csvMapReader.toList()
-
-        } catch (Exception e) {
-            throw new RuntimeException("Error parsing order item CSV: " + e.message, e)
-        }
+                'budgetCode',
+            ],
+            overrideHeaders: true,
+        )*.toMap()
 
         // FIXME it's not entirely clear why we reformat strings here like this
         orderItems.each { orderItem ->
@@ -801,7 +792,7 @@ class OrderService {
                 def quantityUom = CSVUtils.parseNumber(uomParts[1], "unitOfMeasure")
                 orderItem.unitOfMeasure = "${uomParts[0]}/${quantityUom}"
             }
-            orderItem.unitPrice = orderItem.unitPrice ? CSVUtils.parseNumber(orderItem.unitPrice, "unitPrice").setScale(4, RoundingMode.FLOOR).toString() : ''
+            orderItem.unitPrice = orderItem.unitPrice ? CSVUtils.parseNumber(orderItem.unitPrice, 'unitPrice').setScale(4, RoundingMode.FLOOR).toString() : ''
         }
 
         return orderItems
@@ -917,23 +908,20 @@ class OrderService {
     }
 
     String exportOrderItems(List<OrderItem> orderItems) {
-        def rows = []
-        orderItems.each { orderItem ->
-            def row = [
-                    'Order Item ID'       : orderItem?.id,
-                    'Pack level 1'        : '',
-                    'Pack level 2'        : '',
-                    'Code'                : orderItem?.product?.productCode,
-                    'Product'             : orderItem?.product?.name,
-                    'UOM'                 : orderItem?.unitOfMeasure,
-                    'Lot'                 : '',
-                    'Expiry (mm/dd/yyyy)' : '',
-                    'Qty to ship'         : orderItem.quantityRemaining,
+        def records = orderItems.collect { orderItem ->
+            [
+                'Order Item ID': orderItem?.id,
+                'Pack level 1': null,
+                'Pack level 2': null,
+                Code: orderItem?.product?.productCode,
+                Product: orderItem?.product?.name,
+                UOM: orderItem?.unitOfMeasure,
+                Lot: null,
+                'Expiry (mm/dd/yyyy)': null,
+                'Qty to ship': orderItem?.quantityRemaining,
             ]
-
-            rows << row
         }
-        return ReportUtil.getCsvForListOfMapEntries(rows)
+        return CSVUtils.dumpMaps(records)
     }
 
     def canManageAdjustments(Order order, User user) {

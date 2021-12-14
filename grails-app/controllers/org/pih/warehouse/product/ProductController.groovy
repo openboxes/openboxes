@@ -849,7 +849,6 @@ class ProductController {
         def localFile
         def uploadFile = command?.importFile
 
-        def existingProductsMap = [:]
         def tag = ""
 
         if (request.method == "POST") {
@@ -1133,6 +1132,3 @@ class ProductController {
         render(view: "addDocument", model: [productInstance: productInstance, documentInstance: documentInstance])
     }
 }
-
-
-

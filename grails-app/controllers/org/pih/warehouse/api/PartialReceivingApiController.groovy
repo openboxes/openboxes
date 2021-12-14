@@ -12,6 +12,7 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ShipmentItem
@@ -19,8 +20,6 @@ import org.pih.warehouse.shipping.ShipmentItem
 class PartialReceivingApiController {
 
     def receiptService
-    def shipmentService
-    def dataService
 
     def list = {
         render([data: []] as JSON)
@@ -72,53 +71,47 @@ class PartialReceivingApiController {
                             a.receiptItem?.sortOrder <=> b.receiptItem?.sortOrder
         }.collect {
             [
-                    "Receipt item id" : it?.receiptItem?.id ?: "",
-                    "Shipment item id": it?.shipmentItem?.id ?: "",
-                    Code              : it?.shipmentItem?.product?.productCode ?: "",
-                    Name              : it?.shipmentItem?.product?.name ?: "",
-                    "Lot/Serial No."  : it?.lotNumber ?: "",
-                    "Expiration date" : it?.expirationDate?.format("MM/dd/yyyy") ?: "",
-                    "Bin Location"    : it?.binLocation ?: "",
-                    Recipient         : it?.recipient?.id ?: "",
-                    Shipped           : it?.quantityShipped ?: "",
-                    Received          : it?.quantityReceived ?: "",
-                    "To receive"      : it?.quantityRemaining ?: "",
-                    "Receiving now"   : it?.quantityReceiving ?: "",
-                    Comment           : it?.comment ?: ""
+                'Receipt item id': it?.receiptItem?.id,
+                'Shipment item id': it?.shipmentItem?.id,
+                Code: it?.shipmentItem?.product?.productCode,
+                Name: it?.shipmentItem?.product?.name,
+                'Lot/Serial No.': it?.lotNumber,
+                'Expiration date': it?.expirationDate?.format('MM/dd/yyyy'),
+                'Bin Location': it?.binLocation,
+                Recipient: it?.recipient?.id,
+                Shipped: it?.quantityShipped,
+                Received: it?.quantityReceived,
+                'To receive': it?.quantityRemaining,
+                'Receiving now': it?.quantityReceiving,
+                Comment: it?.comment,
             ]
         }
 
-        String csv = dataService.generateCsv(lineItems)
         response.setHeader("Content-disposition", "attachment; filename=\"PartialReceiving-${params.id}.csv\"")
-        render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
+        render(contentType: 'text/csv', text: CSVUtils.dumpMaps(lineItems))
     }
 
     def importCsv = { ImportDataCommand command ->
 
         try {
             PartialReceipt partialReceipt = receiptService.getPartialReceipt(params.id, "1")
+            final records = CSVUtils.parseRecords(
+                command.importFile,
+                [
+                    'receiptItemId',
+                    'shipmentItemId',
+                    'code',
+                    'lotNumber',
+                    'expirationDate',
+                    'binLocation',
+                    'recipientId',
+                    'quantityReceiving',
+                    'comment',
+                ],
+                overrideHeaders: true,
+            )
 
-            def importFile = command.importFile
-            if (importFile.isEmpty()) {
-                throw new IllegalArgumentException("File cannot be empty")
-            }
-
-            if (importFile.fileItem.contentType != "text/csv") {
-                throw new IllegalArgumentException("File must be in CSV format")
-            }
-
-            String csv = new String(importFile.bytes)
-            def settings = [separatorChar: ',', skipLines: 1]
-            csv.toCsvReader(settings).eachLine { tokens ->
-                String receiptItemId = tokens[0] ?: null
-                String shipmentItemId = tokens[1] ?: null
-                String code = tokens[2] ?: null
-                String lotNumber = tokens[4] ?: null
-                String expirationDate = tokens[5] ?: null
-                String binLocation = tokens[6] ?: null
-                String recipientId = tokens[7] ?: null
-                Integer quantityReceiving = tokens[11] ? tokens[11].toInteger() : null
-                String comment = tokens[12] ? tokens[12] : null
+            records.each { record ->
 
                 List<PartialReceiptItem> partialReceiptItems = []
                 partialReceipt.partialReceiptItems.each {
@@ -126,24 +119,27 @@ class PartialReceivingApiController {
                 }
 
                 PartialReceiptItem partialReceiptItem = partialReceiptItems.find {
-                    receiptItemId ? it?.receiptItem?.id == receiptItemId : it?.shipmentItem?.id == shipmentItemId
+                    record.get('receiptItemId') ? it?.receiptItem?.id == record.get('receiptItemId') : it?.shipmentItem?.id == record.get('shipmentItemId')
                 }
 
-                if ((expirationDate && Constants.EXPIRATION_DATE_FORMATTER.parse(expirationDate).format(Constants.EXPIRATION_DATE_FORMAT) != partialReceiptItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT))
-                        || ((recipientId && recipientId != partialReceiptItem?.recipient?.id) || (!recipientId && partialReceiptItem.recipient))
-                        || ((lotNumber && lotNumber != partialReceiptItem.lotNumber) || (!lotNumber && partialReceiptItem.lotNumber))
-                        || ((binLocation && binLocation != partialReceiptItem.binLocation.name) || (!binLocation && partialReceiptItem.binLocation))
-                        || ((code && code != partialReceiptItem.product.productCode) || (!code && partialReceiptItem.product.productCode))) {
-                    throw new IllegalArgumentException("You can only import the Receiving Now and the Comment fields. To make other changes, please use the edit line feature. You can then export and import the template again.")
+                if ((record.get('expirationDate') && Constants.EXPIRATION_DATE_FORMATTER.parse(record.get('expirationDate')).format(Constants.EXPIRATION_DATE_FORMAT) != partialReceiptItem?.expirationDate?.format(Constants.EXPIRATION_DATE_FORMAT))
+                    || (record.get('recipientId') != partialReceiptItem?.recipient?.id)
+                    || (!record.get('recipientId') && partialReceiptItem?.recipient)
+                    || (record.get('lotNumber') != partialReceiptItem?.lotNumber)
+                    || (record.get('binLocation') != partialReceiptItem?.binLocation?.name)
+                    || (!record.get('binLocation') && partialReceiptItem?.binLocation)
+                    || (record.get('code') != partialReceiptItem?.product?.productCode)
+                ) {
+                    throw new IllegalArgumentException('You can only import the quantityReceiving and comment fields. To make other changes, please use the edit line feature. You can then export and import the template again.')
                 }
 
                 if (!partialReceiptItem) {
-                    throw new IllegalArgumentException("Receipt item id: ${receiptItemId} not found")
+                    throw new IllegalArgumentException("Receipt item id: ${record.get('receiptItemId')} shipment item id: ${record.get('shipmentItemId')} not found")
                 }
 
-                partialReceiptItem.quantityReceiving = quantityReceiving
-                partialReceiptItem.comment = comment
-                partialReceiptItem.shouldSave = quantityReceiving != null
+                partialReceiptItem.quantityReceiving = CSVUtils.parseInteger(record.get('quantityReceiving'))
+                partialReceiptItem.comment = record.get('comment')
+                partialReceiptItem.shouldSave = record.get('quantityReceiving') != null
             }
 
             receiptService.savePartialReceipt(partialReceipt, false)
@@ -210,5 +206,3 @@ class PartialReceivingApiController {
         }
     }
 }
-
-

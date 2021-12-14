@@ -16,6 +16,7 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.StockMovementService
@@ -228,18 +229,17 @@ class StockMovementApiController {
 
         def lineItems = picklistItems.collect {
             [
-                    "${g.message(code: 'default.id.label')}": it?.requisitionItem?.id ?: "",
-                    "${g.message(code: 'product.productCode.label')}": it?.requisitionItem?.product?.productCode ?: "",
-                    "${g.message(code: 'product.name.label')}": it?.requisitionItem?.product?.name ?: "",
-                    "${g.message(code: 'inventoryItem.lotNumber.label')}": it?.inventoryItem?.lotNumber ?: "",
-                    "${g.message(code: 'inventoryItem.expirationDate.label')}": it?.inventoryItem?.expirationDate ? it.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
-                    "${g.message(code: 'inventoryItem.binLocation.label')}": it?.binLocation?.name ?: "",
-                    "${g.message(code: 'default.quantity.label')}": it?.quantity ?: "",
+                (g.message(code: 'default.id.label')): it?.requisitionItem?.id,
+                (g.message(code: 'product.productCode.label')): it?.requisitionItem?.product?.productCode,
+                (g.message(code: 'product.name.label')): it?.requisitionItem?.product?.name,
+                (g.message(code: 'inventoryItem.lotNumber.label')): it?.inventoryItem?.lotNumber,
+                (g.message(code: 'inventoryItem.expirationDate.label')): it?.inventoryItem?.expirationDate?.format(Constants.EXPIRATION_DATE_FORMAT),
+                (g.message(code: 'inventoryItem.binLocation.label')): it?.binLocation?.name,
+                (g.message(code: 'default.quantity.label')): it?.quantity,
             ]
         }
-        String csv = dataService.generateCsv(lineItems)
         response.setHeader("Content-disposition", "attachment; filename=\"StockMovementItems-${params.id}.csv\"")
-        render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
+        render(contentType: 'text/csv', text: CSVUtils.dumpMaps(lineItems))
     }
 
     def importPickListItems = { ImportDataCommand command ->
@@ -248,18 +248,7 @@ class StockMovementApiController {
             StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
             List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null )
 
-            def importFile = command.importFile
-            if (importFile.isEmpty()) {
-                throw new IllegalArgumentException("File cannot be empty")
-            }
-
-            if (importFile.fileItem.contentType != "text/csv") {
-                throw new IllegalArgumentException("File must be in CSV format")
-            }
-
-            String csv = new String(importFile.bytes)
-            def settings = [separatorChar: ',', skipLines: 1]
-            csv.toCsvReader(settings).eachLine { tokens ->
+            CSVUtils.parseRecords(command.importFile) { tokens ->
                 String requisitionItemId = tokens[0]
                 String lotNumber = tokens[3] ?: null
                 String expirationDate = tokens[4] ?: null

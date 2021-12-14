@@ -12,7 +12,7 @@ package org.pih.warehouse.data
 import grails.converters.JSON
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCode
-import org.pih.warehouse.core.DocumentType
+import org.pih.warehouse.importer.CSVUtils
 
 import java.nio.charset.Charset
 
@@ -26,16 +26,15 @@ class DataExportController {
 
     def render = {
         Document document = Document.get(params.id)
-        String query = new String(document.fileContents, Charset.defaultCharset());
+        String query = new String(document.fileContents, Charset.defaultCharset())
         if (query) {
             def data = dataService.executeQuery(query)
             if (params.format == "csv") {
-                String csv = dataService.generateCsv(data)
                 response.setHeader("Content-disposition", "attachment; filename=\"${document.name}.csv\"")
-                render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
+                render(contentType: 'text/csv', text: CSVUtils.dumpMaps(data))
                 return
             }
-            render dataService.executeQuery(query) as JSON
+            render data as JSON
             return
         }
         render document as JSON

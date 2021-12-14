@@ -11,11 +11,10 @@
 package org.pih.warehouse.inventory
 
 import grails.converters.JSON
-import org.grails.plugins.csv.CSVWriter
+import org.apache.commons.collections.IteratorUtils
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.api.StockMovementItem
-import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.BulkDocumentCommand
 import org.pih.warehouse.core.Constants
@@ -23,6 +22,7 @@ import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCommand
 import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.picklist.PicklistItem
@@ -198,40 +198,24 @@ class StockMovementController {
         }
 
         if (params.format && stockMovements) {
-
-            def sw = new StringWriter()
-            def csv = new CSVWriter(sw, {
-                "Status" { it.status }
-                "Receipt Status" { it.receiptStatus }
-                "Identifier" { it.id }
-                "Name" { it.name }
-                "Origin" { it.origin }
-                "Destination" { it.destination }
-                "Stocklist" { it.stocklist }
-                "Requested by" { it.requestedBy }
-                "Date Requested" { it.dateRequested }
-                "Date Created" { it.dateCreated }
-                "Date Shipped" { it.dateShipepd }
-            })
-
-            stockMovements.each { stockMov ->
-                csv << [
-                        status       : stockMov.status,
-                        receiptStatus: stockMov.shipment?.status,
-                        id           : stockMov.identifier,
-                        name         : stockMov.description,
-                        origin       : stockMov.origin?.name ?: "",
-                        destination  : stockMov.destination?.name ?: "",
-                        stocklist    : stockMov.stocklist?.name ?: "",
-                        requestedBy  : stockMov.requestedBy ?: warehouse.message(code: 'default.none.label'),
-                        dateRequested: stockMov.dateRequested.format("MM-dd-yyyy") ?: "",
-                        dateCreated  : stockMov.requisition?.dateCreated?.format("MM-dd-yyyy") ?: "",
-                        dateShipepd  : stockMov.shipment?.expectedShippingDate?.format("MM-dd-yyyy") ?: "",
+            def records = stockMovements.collect { stockMov ->
+                [
+                    Status: stockMov?.status,
+                    'Receipt Status': stockMov?.shipment?.status,
+                    Identifier: stockMov?.identifier,
+                    Name: stockMov?.description,
+                    Origin: stockMov?.origin?.name,
+                    Destination: stockMov?.destination?.name,
+                    Stocklist: stockMov?.stocklist?.name,
+                    'Requested by': stockMov?.requestedBy ?: warehouse.message(code: 'default.none.label'),
+                    'Date Requested': CSVUtils.formatDate(stockMov?.dateRequested?.format),
+                    'Date Created': CSVUtils.formatDate(stockMov?.requisition?.dateCreated),
+                    'Date Shipped': CSVUtils.formatDate(stockMov?.shipment?.expectedShippingDate)
                 ]
             }
 
             response.setHeader("Content-disposition", "attachment; filename=\"StockMovements-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
-            render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
+            render(contentType: 'text/csv', text: CSVUtils.dumpMaps(records))
         }
 
         if (params.submitted) {
@@ -430,9 +414,8 @@ class StockMovementController {
     def exportCsv = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         List lineItems = stockMovementService.buildStockMovementItemList(stockMovement)
-        String csv = dataService.generateCsv(lineItems)
         response.setHeader("Content-disposition", "attachment; filename=\"StockMovementItems-${params.id}.csv\"")
-        render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
+        render(contentType: 'text/csv', text: CSVUtils.dumpMaps(lineItems))
     }
 
 
@@ -441,19 +424,10 @@ class StockMovementController {
         try {
             StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
-            def importFile = command.importFile
-            if (importFile.isEmpty()) {
-                throw new IllegalArgumentException("File cannot be empty")
-            }
-
-            if (importFile.fileItem.contentType != "text/csv") {
-                throw new IllegalArgumentException("File must be in CSV format")
-            }
-
-            String csv = new String(importFile.bytes)
-            def settings = [separatorChar: ',', skipLines: 1]
             Integer sortOrder = 0
-            csv.toCsvReader(settings).eachLine { tokens ->
+
+            CSVUtils.parseRecords(command.importFile).each {
+                List<String> tokens = IteratorUtils.toList(it.iterator())
 
                 StockMovementItem stockMovementItem = StockMovementItem.createFromTokens(tokens)
                 stockMovementItem.stockMovement = stockMovement
@@ -481,96 +455,55 @@ class StockMovementController {
         shipments.findAll {
             it.currentStatus == ShipmentStatusCode.SHIPPED || it.currentStatus == ShipmentStatusCode.PARTIALLY_RECEIVED
         }.each { shipment ->
-            shipment.shipmentItems.findAll { it.quantityRemaining > 0 }.groupBy {
+            shipment.shipmentItems.findAll {
+                it.quantityRemaining > 0
+            }.groupBy {
                 it.product
             }.each { product, value ->
                 shipmentItems << [
-                        productCode         : product.productCode,
-                        productName         : product.name,
-                        quantity            : value.sum { it.quantityRemaining },
-                        expectedShippingDate: formatDate(date: shipment.expectedShippingDate, format: "dd-MMM-yy"),
-                        expectedDeliveryDate: formatDate(date: shipment.expectedDeliveryDate, format: "dd-MMM-yy"),
-                        shipmentNumber      : shipment.shipmentNumber,
-                        shipmentName        : shipment.name,
-                        origin              : shipment.origin,
-                        destination         : shipment.destination,
+                    Code: product?.productCode,
+                    'Product Name': product?.name,
+                    'Quantity Incoming': value.sum { it?.quantityRemaining },
+                    'Expected Shipping Date': CSVUtils.formatDate(shipment?.expectedShippingDate),
+                    'Expected Delivery Date': CSVUtils.formatDate(shipment?.expectedDeliveryDate),
+                    'Shipment Number': shipment?.shipmentNumber,
+                    'Shipment Name': shipment?.name,
+                    Origin: shipment?.origin,
+                    Destination: shipment?.destination,
                 ]
             }
         }
 
-
-        if (shipmentItems) {
-            def date = new Date()
-            def sw = new StringWriter()
-
-            def csv = new CSVWriter(sw, {
-                "Code" { it.productCode }
-                "Product Name" { it.productName }
-                "Quantity Incoming" { it.quantity }
-                "Expected Shipping Date" { it.expectedShippingDate }
-                "Expected Delivery Date" { it.expectedDeliveryDate }
-                "Shipment Number" { it.shipmentNumber }
-                "Shipment Name" { it.shipmentName }
-                "Origin" { it.origin }
-                "Destination" { it.destination }
-            })
-
-            shipmentItems.each { shipmentItem ->
-                csv << [
-                        productCode         : shipmentItem.productCode,
-                        productName         : shipmentItem.productName,
-                        quantity            : shipmentItem.quantity,
-                        expectedShippingDate: shipmentItem.expectedShippingDate,
-                        expectedDeliveryDate: shipmentItem.expectedDeliveryDate,
-                        shipmentNumber      : shipmentItem.shipmentNumber,
-                        shipmentName        : shipmentItem.shipmentName,
-                        origin              : shipmentItem.origin,
-                        destination         : shipmentItem.destination,
-                ]
-            }
-            response.contentType = "text/csv"
-            response.setHeader("Content-disposition", "attachment; filename=\"Items shipped not received_${session.warehouse.name}_${date.format("yyyyMMdd-hhmmss")}.csv\"")
-            render(contentType: "text/csv", text: csv.writer.toString())
-            return
-        } else {
+        if (!shipmentItems) {
             render(text: 'No shipments found', status: 404)
         }
+
+        response.contentType = 'text/csv'
+        response.setHeader('Content-disposition', "attachment; filename=\"Items shipped not received_${session.warehouse.name}_${date.format('yyyyMMdd-hhmmss')}.csv\"")
+        render(contentType: 'text/csv', text: CSVUtils.dumpMaps(shipmentItems))
     }
 
     def exportPendingRequisitionItems = {
+        def records = []
         Location currentLocation = Location.get(session?.warehouse?.id)
-
         def pendingRequisitionItems = stockMovementService.getPendingRequisitionItems(currentLocation)
 
-        def sw = new StringWriter()
-        def csv = new CSVWriter(sw, {
-            "Shipment Number" { it.shipmentNumber }
-            "Description" { it.description }
-            "Destination" { it.destination }
-            "Status" { it.status }
-            "Product Code" { it.productCode }
-            "Product" { it.productName }
-            "Qty Picked" { it.quantityPicked }
-        })
         pendingRequisitionItems.each { requisitionItem ->
             def quantityPicked = requisitionItem?.totalQuantityPicked()
             if (quantityPicked) {
-                csv << [
-                        shipmentNumber  : requisitionItem?.requisition?.requestNumber,
-                        description     : requisitionItem?.requisition?.description ?: '',
-                        destination     : requisitionItem?.requisition?.destination,
-                        status          : requisitionItem?.requisition?.status,
-                        productCode     : requisitionItem?.product?.productCode,
-                        productName     : requisitionItem?.product?.name,
-                        quantityPicked  : quantityPicked,
+                records << [
+                    'Shipment Number': requisitionItem?.requisition?.requestNumber,
+                    Description: requisitionItem?.requisition?.description,
+                    Destination: requisitionItem?.requisition?.destination,
+                    Status: requisitionItem?.requisition?.status,
+                    'Product Code': requisitionItem?.product?.productCode,
+                    Product: requisitionItem?.product?.name,
+                    'Qty Picked': quantityPicked
                 ]
             }
         }
 
-        response.setHeader("Content-disposition", "attachment; filename=\"PendingShipmentItems-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
-        render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
-
+        response.setHeader('Content-disposition', "attachment; filename=\"PendingShipmentItems-${new Date().format('yyyyMMdd-hhmmss')}.csv\"")
+        render(contentType: 'text/csv', text: CSVUtils.dumpMaps(records))
     }
-
 }
-

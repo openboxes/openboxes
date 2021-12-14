@@ -13,10 +13,8 @@ import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
 import groovy.time.TimeCategory
-import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.StringUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
-import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Localization
@@ -26,6 +24,7 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.ValidationCode
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.inventory.Transaction
@@ -57,7 +56,6 @@ import java.text.SimpleDateFormat
 
 class JsonController {
 
-    def dataSource
     def dataService
     def dashboardService
     def inventoryService
@@ -1477,9 +1475,8 @@ class JsonController {
                 inventorySnapshotService.getTransactionReportSummary(location, categories, tagList, catalogList, startDate, endDate)
 
         if (params.format == "text/csv") {
-            String csv = dataService.generateCsv(data)
             response.setHeader("Content-disposition", "attachment; filename=\"Transaction-Report-${startDate.format("yyyyMMdd")}-${(endDate - 1).format("yyyyMMdd")}.csv\"")
-            render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
+            render(contentType: 'text/csv', text: CSVUtils.dumpMaps(data))
             return
         }
         render(["aaData": data] as JSON)
@@ -1812,42 +1809,25 @@ class JsonController {
             params.endDate = dateFormat.parse(params.endDate)
             def data = forecastingService.getRequestDetailReport(params)
             if (params.format == "text/csv") {
-                def sw = new StringWriter()
-
-                def csv = new CSVWriter(sw, {
-                    "Request Number" { it.requestNumber }
-                    "Date Requested" { it.dateRequested }
-                    "Date Issued" { it.dateIssued }
-                    "Origin" { it.origin }
-                    "Destination" { it.destination }
-                    "Product Code" { it.productCode }
-                    "Product Name" { it.productName }
-                    "Quantity Requested" { it.qtyRequested }
-                    "Quantity Issued" { it.qtyIssued }
-                    "Quantity Demand" { it.qtyDemand }
-                    "Reason Code" { it.reasonCode }
-                    "Reason Code Classification" { it.reasonCodeClassification }
-                })
-
-                data.each {
-                    csv << [
-                            requestNumber           : it.requestNumber,
-                            dateRequested           : it.dateRequested,
-                            dateIssued              : it.dateIssued,
-                            origin                  : StringEscapeUtils.escapeCsv(it.origin),
-                            destination             : StringEscapeUtils.escapeCsv(it.destination),
-                            productCode             : it.productCode,
-                            productName             : StringEscapeUtils.escapeCsv(it.productName),
-                            qtyRequested            : it.quantityRequested,
-                            qtyIssued               : it.quantityIssued,
-                            qtyDemand               : it.quantityDemand,
-                            reasonCode              : it.reasonCode,
-                            reasonCodeClassification: it.reasonCodeClassification,
+                def records = data.collect {
+                    [
+                        'Request Number': it?.requestNumber,
+                        'Date Requested': CSVUtils.formatDate(it?.dateRequested),
+                        'Date Issued': CSVUtils.formatDate(it?.dateIssued),
+                        Origin: it?.origin,
+                        Destination: it?.destination,
+                        'Product Code': it?.productCode,
+                        'Product Name': it?.productName,
+                        'Quantity Requested': it?.quantityRequested,
+                        'Quantity Issued': it?.quantityIssued,
+                        'Quantity Demand': it?.quantityDemand,
+                        'Reason Code': it?.reasonCode,
+                        'Reason Code Classification': it?.reasonCodeClassification
                     ]
                 }
 
-                response.setHeader("Content-disposition", "attachment; filename=\"Request-Detail-Report.csv\"")
-                render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
+                response.setHeader('Content-disposition', 'attachment; filename="Request-Detail-Report.csv"')
+                render(contentType: 'text/csv', text: CSVUtils.dumpMaps(records))
                 return
             }
             render([aaData: data] as JSON)
@@ -1883,8 +1863,6 @@ class InventorySnapshotCommand {
     InventoryItem inventoryItem
     Location binLocation
     BigDecimal quantity
-
-
 }
 
 class TransactionReportCommand {

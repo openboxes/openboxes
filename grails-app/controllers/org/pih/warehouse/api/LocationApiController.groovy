@@ -231,18 +231,7 @@ class LocationApiController extends BaseDomainApiController {
     }
 
     def importCsv = { ImportDataCommand command ->
-        def importFile = command.importFile
-
-        if (importFile.isEmpty()) {
-            throw new IllegalArgumentException("File cannot be empty")
-        }
-
-        if (importFile.fileItem.contentType != "text/csv") {
-            throw new IllegalArgumentException("File must be in CSV format")
-        }
-
         locationService.importLocationCsv(command)
-
         render status: 200
     }
 

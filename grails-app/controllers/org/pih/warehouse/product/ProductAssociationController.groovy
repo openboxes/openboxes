@@ -10,6 +10,7 @@
 package org.pih.warehouse.product
 
 import grails.orm.PagedResultList
+import org.pih.warehouse.importer.CSVUtils
 
 class ProductAssociationController {
 
@@ -53,11 +54,9 @@ class ProductAssociationController {
         }
 
         if (params.format && productAssociations) {
-            def filename = "productAssociations.csv"
             def data = productAssociations ? dataService.transformObjects(productAssociations, ProductAssociation.PROPERTIES) : [[:]]
-            def text = dataService.generateCsv(data)
-            response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: text)
+            response.setHeader('Content-disposition', 'attachment; filename="productAssociations.csv"')
+            render(contentType: 'text/csv', text: CSVUtils.dumpMaps(data))
             return
         }
 
@@ -208,10 +207,8 @@ class ProductAssociationController {
     def export = {
         def productAssociations = ProductAssociation.list()
         def data = productAssociations ? dataService.transformObjects(productAssociations, ProductAssociation.PROPERTIES) : [[:]]
-        response.setHeader("Content-disposition",
-                "attachment; filename=\"productAssociations.csv\"")
-        response.contentType = "text/csv"
-        render dataService.generateCsv(data)
+        response.setHeader('Content-disposition', 'attachment; filename="productAssociations.csv"')
+        render(contentType: 'text/csv', text: CSVUtils.dumpMaps(data))
     }
 
     void bindMutualAssociationData(ProductAssociation mutualAssociation, Map params) {

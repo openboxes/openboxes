@@ -15,6 +15,7 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionType
@@ -277,9 +278,8 @@ class MigrationController {
 
         def data = migrationService.getCurrentInventory([location])
         if (params.format == "csv") {
-            def csv = dataService.generateCsv(data)
-            response.setHeader("Content-disposition", "attachment; filename='CurrentInventory_${location.name}.csv'")
-            render(contentType: "text/csv", text: csv)
+            response.setHeader('Content-disposition', "attachment; filename=\"CurrentInventory_${location.name}.csv\"")
+            render(contentType: 'text/csv', text: CSVUtils.dumpMaps(data))
             return
         }
         render([responseTime: (System.currentTimeMillis() - startTime), count: data.size(), results: data] as JSON)
@@ -343,9 +343,8 @@ class MigrationController {
 
         if (params.format == "csv") {
             results.remove("stockHistory")
-            def data = dataService.generateCsv(results)
             response.setHeader("Content-disposition", "attachment; filename='MigrateInventoryTransactions.csv'")
-            render(contentType: "text/csv", text: data)
+            render(contentType: 'text/csv', text: CSVUtils.dumpMaps(results))
             return
         }
 

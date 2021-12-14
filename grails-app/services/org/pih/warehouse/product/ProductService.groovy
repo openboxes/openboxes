@@ -11,6 +11,7 @@ package org.pih.warehouse.product
 
 import grails.validation.ValidationException
 import groovy.xml.Namespace
+import org.apache.commons.collections.IteratorUtils
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ApiException
@@ -19,8 +20,8 @@ import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
-import util.ReportUtil
 
 import java.text.SimpleDateFormat
 /**
@@ -539,7 +540,7 @@ class ProductService {
         def products = new ArrayList<Product>()
 
         // Iterate over each line and either update an existing product or create a new product
-        csv.toCsvReader(['skipLines': 1, 'separatorChar': delimiter]).eachLine { tokens ->
+        CSVUtils.parseRecords(csv, delimiter: delimiter).each { tokens ->
             def product = Product.findByIdOrProductCode(tokens[0], tokens[1])
             println "GET EXISTING PRODUCT " + tokens[0] + " OR " + tokens[1]
             if (product) {
@@ -560,8 +561,8 @@ class ProductService {
      *
      * @param csv
      */
-    List validateProducts(String csv) {
-        return validateProducts(csv, getDelimiter(csv))
+    List validateProducts(dataSource) {
+        return validateProducts(dataSource, getDelimiter(csv))
     }
 
     /**
@@ -571,26 +572,20 @@ class ProductService {
      * @param saveToDatabase
      * @return
      */
-    List validateProducts(String csv, String delimiter) {
+    List validateProducts(dataSource, String delimiter) {
 
         def products = []
-        if (!csv) {
-            throw new RuntimeException("CSV cannot be empty")
-        }
-
-        // Check to make sure the format is comma-separated
-        def lines = csv.split("\n")
-        def columns = lines[0].split(delimiter)
-        if (columns.size() != Constants.EXPORT_PRODUCT_COLUMNS.size()) {
-            throw new RuntimeException("Invalid data format")
-        }
-
         int rowCount = 1
 
         Location currentLocation = AuthService?.currentLocation?.get()
 
         // Iterate over each line and either update an existing product or create a new product
-        csv.toCsvReader(['skipLines': 1, 'separatorChar': delimiter]).eachLine { tokens ->
+        CSVUtils.parseRecords(
+            dataSource,
+            delimiter: delimiter,
+            overrideHeaders: true,
+            requiredColumnNames: Constants.EXPORT_PRODUCT_COLUMNS,
+        ).each { tokens ->
 
             rowCount++
             println "Processing line: " + tokens
@@ -605,7 +600,7 @@ class ProductService {
             def productTags = tokens[8]?.split(",")
             def pricePerUnit
             try {
-                pricePerUnit = tokens[9] ? Float.valueOf(tokens[9]) : null
+                pricePerUnit = tokens[9] ? CSVUtils.parseNumber(tokens[9]) : null
             } catch (NumberFormatException e) {
                 throw new RuntimeException("Unit price for product '${productCode}' at row ${rowCount} must be a valid decimal (value = '${tokens[9]}')", e)
             }
@@ -801,7 +796,7 @@ class ProductService {
             }
             rows << row
         }
-        return ReportUtil.getCsvForListOfMapEntries(rows)
+        return CSVUtils.dumpMaps(rows)
     }
 
     /**
@@ -1129,16 +1124,12 @@ class ProductService {
         List rows = []
 
         // Iterate over each line and either update an existing product or create a new product
-        csv.toCsvReader(['skipLines': 1]).eachLine { tokens ->
+        CSVUtils.parseRecords(csv, ['Catalog Code', 'Category', 'Product Code', 'Product Name']).each {
 
-            if (tokens.length != 4) {
-                throw new IllegalArgumentException("Expected columns: Catalog Code, Category, Product Code, Product Name")
-            }
-
-            def productCatalogCode = tokens[0]
+            def productCatalogCode = it.get('Catalog Code')
             def productCatalog = ProductCatalog.findByCode(productCatalogCode)
 
-            def productCode = tokens[1]
+            def productCode = it.get('Product Code')
             def product = Product.findByIdOrProductCode(productCode, productCode)
 
             rows << [productCatalog: productCatalog, product: product]
@@ -1285,8 +1276,7 @@ class ProductService {
             }
 
             // TODO: get this part working with [classpath:, file://, https://] (currently it does not support classpath)
-            def fileContent = new URL(categoryOptionConfig.fileUrl).getBytes()
-            String csv = new String(fileContent)
+            def dataSource = new URL(categoryOptionConfig.fileUrl)
 
             // Find existing root category or create one with the configured root name or the Constants.ROOT_CATEGORY_NAME
             def rootCategoryName = categoryOptionConfig.rootCategoryName ?: Constants.ROOT_CATEGORY_NAME
@@ -1294,30 +1284,35 @@ class ProductService {
             def categoryNameColumnIndex = categoryOptionConfig.categoryNameColumnIndex ?: 0
             def parentCategoryNameColumnIndex = categoryOptionConfig.parentCategoryNameColumnIndex ?: 1
 
-            importCategoryCsv(csv, rootCategoryName, categoryNameColumnIndex, parentCategoryNameColumnIndex)
+            importCategoryCsv(dataSource, rootCategoryName, categoryNameColumnIndex, parentCategoryNameColumnIndex)
         } else if (enabled && !categoryOption) {
             // TODO OBDS-86: This is for excel import done by user
         }
     }
 
-    def importCategoryCsv(String csv) {
-        importCategoryCsv(csv, Constants.ROOT_CATEGORY_NAME, 0, 1)
+    /**
+     * @param dataSource can be any type accepted by CSVUtils.parseRecords(), q.v.
+     */
+    def importCategoryCsv(dataSource) {
+        importCategoryCsv(dataSource, Constants.ROOT_CATEGORY_NAME, 0, 1)
     }
 
-    def importCategoryCsv(String csv, def rootCategoryName, def categoryNameColumnIndex, def parentCategoryNameColumnIndex) {
+    /**
+     * @param dataSource can be any type accepted by CSVUtils.parseRecords(), q.v.
+     */
+    def importCategoryCsv(dataSource, def rootCategoryName, def categoryNameColumnIndex, def parentCategoryNameColumnIndex) {
         def rootCategory = findOrCreateRootCategory(rootCategoryName)
 
-        def settings = [separatorChar: ',', skipLines: 1]
-        csv.toCsvReader(settings).eachLine { tokens ->
+        CSVUtils.parseRecords(dataSource).each {
+            def tokens = IteratorUtils.toList(it.iterator())
             def categoryName = tokens[categoryNameColumnIndex]
             def parentCategoryName = tokens[parentCategoryNameColumnIndex]
 
-            def category
             if (parentCategoryName.toUpperCase() == rootCategoryName) {
-                category = findOrCreateCategoryWithParentCategory(categoryName, rootCategory)
+                findOrCreateCategoryWithParentCategory(categoryName, rootCategory)
             } else {
                 def parentCategory = Category.findByName(parentCategoryName)
-                category = findOrCreateCategoryWithParentCategory(categoryName, parentCategory)
+                findOrCreateCategoryWithParentCategory(categoryName, parentCategory)
             }
         }
     }
@@ -1337,10 +1332,7 @@ class ProductService {
             }
 
             // TODO: get this part working with [classpath:, file://, https://] (currently it does not support classpath)
-            def fileContent = new URL(productOptionConfig.fileUrl).getBytes()
-            String csv = new String(fileContent)
-
-            def products = validateProducts(csv)
+            def products = validateProducts(new URL(productOptionConfig.fileUrl))
 
             importProducts(products)
         }

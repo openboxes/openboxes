@@ -9,16 +9,15 @@
  * */
 package org.pih.warehouse.requisition
 
-import org.apache.commons.lang.StringEscapeUtils
-import org.grails.plugins.csv.CSVWriter
+import org.apache.commons.collections.IteratorUtils
+import org.apache.commons.csv.CSVRecord
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.product.Product
 
 class RequisitionTemplateController {
 
     def requisitionService
-    def inventoryService
-    def productService
     def userService
 
     static allowedMethods = [save: "POST", update: "POST"]
@@ -62,70 +61,76 @@ class RequisitionTemplateController {
             def hasRoleFinance = userService.hasRoleFinance(session?.user)
 
             requisitionService.getRequisitionTemplatesItems(requisitions).groupBy {
-                it.product
-            }.collect { product, value ->
+                it?.product
+            }.each { product, value ->
                 def totalCost = 0
                 if (hasRoleFinance) {
                     requisitions.each { requisition ->
-                        totalCost = product?.pricePerUnit ? totalCost + (requisition.getQuantityByProduct(product) * product?.pricePerUnit) : ""
+                        if (product?.pricePerUnit) {
+                            totalCost += requisition.getQuantityByProduct(product) * product?.pricePerUnit
+                        }
                     }
                 }
                 requisitionItems << [
-                        product     : product,
-                        productCode : product.productCode ?: "",
-                        productName : product.name ?: "",
-                        category    : product?.category?.name ?: "",
-                        pricePerUnit: hasRoleFinance ? product?.pricePerUnit ?: "" : "",
-                        totalCost   : hasRoleFinance ? totalCost : "",
+                    product: product,
+                    productCode: product?.productCode,
+                    productName: product?.name,
+                    category: product?.category?.name,
+                    pricePerUnit: hasRoleFinance ? product?.pricePerUnit : null,
+                    totalCost: hasRoleFinance ? totalCost : null,
                 ]
             }
 
-            def sw = new StringWriter()
+            def csv = CSVUtils.getCSVPrinter()
 
             try {
                 if (requisitionItems) {
-                    sw.append(g.message(code: 'product.code.label')).append(",")
-                    sw.append(g.message(code: 'product.description.label')).append(",")
-                    sw.append(g.message(code: 'product.primaryCategory.label')).append(",")
+                    def csvHeader = [
+                        g.message(code: 'product.code.label'),
+                        g.message(code: 'product.description.label'),
+                        g.message(code: 'product.primaryCategory.label')
+                    ]
 
-                    requisitions.each { requisition ->
-                        String stocklistName = StringEscapeUtils.escapeCsv(requisition?.name)
-                        sw.append(stocklistName).append(" [").append(requisition?.isPublished ? "Published" : "Draft").append("]").append(",")
+                    requisitions?.collect(csvHeader) {
+                        "${it?.name} [${it?.isPublished ? 'Published' : 'Draft'}]"
                     }
 
                     if (hasRoleFinance) {
-                        sw.append(g.message(code: 'product.unitCost.label')).append(",")
-                        sw.append(g.message(code: 'product.totalValue.label'))
+                        csvHeader.addAll(
+                            g.message(code: 'product.unitCost.label'),
+                            g.message(code: 'product.totalValue.label')
+                        )
                     }
 
-                    sw.append("\n")
+                    csv.printRecord(csvHeader)
+
                     requisitionItems.each { requisitionItem ->
+                        def csvRow = [
+                            requisitionItem?.productCode,
+                            requisitionItem?.productName,
+                            requisitionItem?.category
+                        ]
 
-                        sw.append(StringEscapeUtils.escapeCsv(requisitionItem?.productCode)).append(",")
-                        sw.append(StringEscapeUtils.escapeCsv(requisitionItem?.productName)).append(",")
-                        sw.append(StringEscapeUtils.escapeCsv(requisitionItem?.category)).append(",")
-
-
-                        requisitions?.each { requisition ->
-                            sw.append((requisition?.getQuantityByProduct(requisitionItem.product) ?: "").toString()).append(",")
+                        requisitions?.collect(csvRow) {
+                            it?.getQuantityByProduct(requisitionItem?.product)
                         }
 
                         if (hasRoleFinance) {
-                            sw.append(requisitionItem?.pricePerUnit.toString()).append(",")
-                            sw.append(requisitionItem?.totalCost.toString()).append(",")
+                            csvRow.addAll(
+                                requisitionItem?.pricePerUnit,
+                                requisitionItem?.totalCost)
                         }
 
-                        sw.append("\n")
+                        csv.printRecord(csvRow)
                     }
                 }
 
             } catch (RuntimeException e) {
                 log.error(e.message)
-                sw.append(e.message)
             }
 
             response.setHeader("Content-disposition", "attachment; filename=\"Stocklists-items-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
-            render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
+            render(contentType: 'text/csv', text: csv.out.toString())
         }
 
         render(view: "list", model: [requisitions: requisitions])
@@ -400,37 +405,35 @@ class RequisitionTemplateController {
 
         if (requisition) {
             def date = new Date()
-            def sw = new StringWriter()
-
-            def csv = new CSVWriter(sw, {
-                "Product Code" { it.productCode }
-                "Product Name" { it.productName }
-                "Quantity" { it.quantity }
-                "UOM" { it.unitOfMeasure }
-                hasRoleFinance ? "Unit cost" { it.unitCost } : null
-                hasRoleFinance ? "Total cost" { it.totalCost } : null
-            })
 
             if (requisition.requisitionItems) {
                 RequisitionItemSortByCode sortByCode = requisition.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX
 
-                requisition."${sortByCode.methodName}".each { requisitionItem ->
-                    csv << [
-                            productCode  : requisitionItem.product.productCode,
-                            productName  : StringEscapeUtils.escapeCsv(requisitionItem.product.name),
-                            quantity     : requisitionItem.quantity,
-                            unitOfMeasure: "EA/1",
-                            unitCost     : hasRoleFinance ? formatNumber(number: requisitionItem.product.pricePerUnit ?: 0, format: '###,###,##0.00##') : null,
-                            totalCost    : hasRoleFinance ? formatNumber(number: requisitionItem.totalCost ?: 0, format: '###,###,##0.00##') : null
+                records = requisition."${sortByCode.methodName}".collect { requisitionItem ->
+                    [
+                        'Product Code': requisitionItem.product.productCode,
+                        'Product Name': requisitionItem.product.name,
+                        Quantity: requisitionItem.quantity,
+                        UOM: 'EA/1',  // FIXME should this ...
+                        'Unit cost': hasRoleFinance ? CSVUtils.formatCurrency(number: requisitionItem.product.pricePerUnit ?: 0, isUnitPrice: true) : null,
+                        'Total cost': hasRoleFinance ? CSVUtils.formatCurrency(number: requisitionItem.totalCost ?: 0) : null
                     ]
                 }
             } else {
-                csv << [productCode: "", productName: "", quantity: "", unitOfMeasure: "", unitCost: "", totalCost: ""]
+                records = [
+                    [
+                        'Product Code': null,
+                        'Product Name': null,
+                        Quantity: null,
+                        UOM: null,
+                        'Unit cost': null,
+                        'Total cost': null
+                    ]
+                ]
             }
 
-            response.contentType = "text/csv"
             response.setHeader("Content-disposition", "attachment; filename=\"Stock List - ${requisition?.destination?.name} - ${date.format("yyyyMMdd-hhmmss")}.csv\"")
-            render(contentType: "text/csv", text: csv.writer.toString())
+            render(contentType: 'text/csv', text: CSVUtils.dumpMaps(records))
             return
         } else {
             render(text: 'No requisition found', status: 404)
@@ -445,61 +448,51 @@ class RequisitionTemplateController {
         [requisition: requisition]
     }
 
-
     def importAsString = {
-        def lines = []
         def data = []
 
-        def requisition = Requisition.get(params.id)
-        if (requisition) {
-            def delimiter = params.delimiter
-            if (delimiter) {
-                if (params.csv) {
-
-                    println "CSV " + params.csv
-                    params?.csv?.toCsvReader('separatorChar': delimiter, 'skipLines': params.skipLines ?: 0).eachLine { tokens ->
-                        println "line: " + tokens + " delimiter=" + delimiter
-                        println "ROW " + tokens
-                        if (tokens) {
-                            data << tokens
-                        }
-                    }
-                }
-            } else {
-                flash.message = "Please choose a delimiter"
-            }
+        if (params.skipLines > 1) {
+            flash.message = 'Skipping > 1 lines is no longer supported'
+        } else if (!params.csv) {
+            flash.message = 'No CSV data provided'
+        } else {
+            data << doParse(params, params.csv)
         }
+
         session.data = data
         render(view: "batch", model: [requisition: requisition, data: data])
     }
 
     def importAsFile = {
-
-        def skipLines = params.skipLines ?: 0
-        def delimiter = params.delimiter ?: ","
-        def requisition = Requisition.get(params.id)
         def data = []
-        if (requisition) {
-            def file = request.getFile('file')
 
-            if (!file) {
-                throw new IllegalArgumentException("Must specify a file")
-            }
-
-            file.inputStream.toCsvReader('separatorChar': delimiter, 'skipLines': skipLines).eachLine { tokens ->
-                println "line: " + tokens + " delimiter=" + delimiter
-                println "ROW " + tokens
-                if (tokens) {
-                    data << tokens[0..3]
-                }
-            }
-
-            log.info "Data: " + data
-
+        if (params.skipLines > 1) {
+            flash.message = 'Skipping > 1 lines is no longer supported'
+        } else if (!request.getFile('file')) {
+            flash.message = 'Must specify a file'
+        } else {
+            data << doParse(params, request.getFile('file'))
         }
+
         session.data = data
         render(view: "batch", model: [requisition: requisition, data: data])
+    }
 
+    private static List<List<String>> doParse(params, dataSource) {
+        def data = []
+
+        def requisition = Requisition.get(params.id)
+        if (requisition) {
+            CSVUtils.parseRecords(
+                dataSource,
+                hasHeaders: params.skipLines != 0,
+                delimiter: params.delimiter ?: ',',
+            ).collect(data) {
+                CSVRecord record -> IteratorUtils.toList(record.iterator())
+            }
+        }
+
+        return data
     }
 
     def doImport = {

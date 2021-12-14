@@ -13,6 +13,7 @@ import grails.converters.JSON
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.data.DataService
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.jobs.RefreshInventorySnapshotJob
 import org.pih.warehouse.product.Product
 
@@ -85,11 +86,10 @@ class InventorySnapshotController {
 
         def data = inventorySnapshotService.findInventorySnapshotByDateAndLocation(date, location)
 
-        def csv = dataService.generateCsv(data)
         println "CSV: " + csv
         def filename = "Stock-${location?.name}-${date.format("dd MMM yyyy")}.csv"
         response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-        render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
+        render(contentType: 'text/csv', text: CSVUtils.dumpMaps(data))
 
     }
 

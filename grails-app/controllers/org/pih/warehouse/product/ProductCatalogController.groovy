@@ -9,16 +9,14 @@
  **/
 package org.pih.warehouse.product
 
-
 import org.pih.warehouse.core.UploadService
-import org.pih.warehouse.data.DataService
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 
 class ProductCatalogController {
 
     UploadService uploadService
     ProductService productService
-    DataService dataService
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -215,17 +213,16 @@ class ProductCatalogController {
             def date = new Date()
             response.setHeader("Content-disposition",
                     "attachment; filename=\"ProductCatalog-${date.format("yyyyMMdd-hhmmss")}.csv\"")
-            response.contentType = "text/csv"
 
             def data = productCatalog.productCatalogItems.collect {
-                return [
-                        "Catalog Code": it.productCatalog?.code,
-                        "Product Code": it?.product?.productCode,
-                        "Product Name": it?.product?.name,
-                        "Category": it?.product?.category?.name,
+                [
+                    'Catalog Code': it?.productCatalog?.code,
+                    'Product Code': it?.product?.productCode,
+                    'Product Name': it?.product?.name,
+                    Category: it?.product?.category?.name,
                 ]
             }
-            render dataService.generateCsv(data)
+            render(contentType: 'text/csv', text: CSVUtils.dumpMaps(data))
         } else {
             response.sendError(404)
         }

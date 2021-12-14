@@ -12,10 +12,10 @@ package org.pih.warehouse.reporting
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import org.apache.commons.lang.StringEscapeUtils
-import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.OrderItem
@@ -23,10 +23,8 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.report.ChecklistReportCommand
 import org.pih.warehouse.report.InventoryReportCommand
 import org.pih.warehouse.report.MultiLocationInventoryReportCommand
-
 import org.quartz.JobKey
 import org.quartz.impl.StdScheduler
-import util.ReportUtil
 
 import java.math.RoundingMode
 import java.text.DateFormat
@@ -102,78 +100,29 @@ class ReportController {
         render([responseTime: responseTime] as JSON)
     }
 
-    def binLocationCsvHeader = { binLocation ->
-        String csv = ""
-        if (binLocation) {
-            csv += g.message(code: 'default.status.label') + ","
-            csv += g.message(code: 'product.productCode.label') + ","
-            csv += g.message(code: 'product.label') + ","
-            csv += g.message(code: 'category.label') + ","
-            csv += g.message(code: 'product.formulary.label') + ","
-            csv += g.message(code: 'tag.label') + ","
-            csv += g.message(code: 'inventoryItem.lotNumber.label') + ","
-            csv += g.message(code: 'inventoryItem.expirationDate.label') + ","
-            csv += g.message(code: 'location.zone.label') + ","
-            csv += g.message(code: 'location.binLocation.label') + ","
-            csv += g.message(code: 'default.quantity.label') + ","
-            csv += g.message(code: 'default.quantityAvailableToPromise.label') + ","
-            csv += g.message(code: 'product.unitCost.label') + ","
-            csv += g.message(code: 'product.totalValue.label')
-            csv += "\n"
-        }
-        return csv
-
-    }
-
-    def binLocationCsvRow = { binLocation ->
-        String csv = ""
-        if (binLocation) {
-            String defaultBinLocation = g.message(code: 'default.label')
-            String expirationDate = g.formatDate(date: binLocation?.inventoryItem?.expirationDate, format: "dd/MMM/yyyy")
-            csv += binLocation.status + ","
-            csv += StringEscapeUtils.escapeCsv(binLocation?.product?.productCode) + ","
-            csv += StringEscapeUtils.escapeCsv(binLocation?.product?.name) + ","
-            csv += StringEscapeUtils.escapeCsv(binLocation?.product?.category?.name) + ","
-            csv += StringEscapeUtils.escapeCsv(binLocation?.product?.productCatalogsToString()) + ","
-            csv += StringEscapeUtils.escapeCsv(binLocation?.product?.tagsToString()) + ","
-            csv += StringEscapeUtils.escapeCsv(binLocation?.inventoryItem?.lotNumber) + ","
-            csv += StringEscapeUtils.escapeCsv(expirationDate) + ","
-            csv += StringEscapeUtils.escapeCsv(binLocation?.binLocation?.zone?.name ?: '') + ","
-            csv += StringEscapeUtils.escapeCsv(binLocation?.binLocation?.name ?: defaultBinLocation) + ","
-            csv += binLocation.quantity + ","
-            csv += binLocation.quantityAvailableToPromise + ","
-            csv += binLocation.unitCost + ","
-            csv += binLocation.totalValue
-            csv += "\n"
-        }
-        return csv
-    }
-
-
     def exportBinLocation = {
         long startTime = System.currentTimeMillis()
         log.info "Export by bin location " + params
         Location location = Location.get(session.warehouse.id)
         List binLocations = inventoryService.getQuantityByBinLocation(location)
         def products = binLocations.collect { it.product.productCode }.unique()
-        binLocations = binLocations.collect {
+        data = binLocations.collect {
             [
-                    productCode   : it.product.productCode,
-                    productName   : it.product.name,
-                    lotNumber     : it.inventoryItem.lotNumber,
-                    expirationDate: it.inventoryItem.expirationDate,
-                    binLocation   : it?.binLocation?.name ?: "Default Bin",
-                    quantity      : formatNumber(number: it.quantity),
-                    unitCost      : formatNumber(number: it.unitCost),
-                    totalValue     : formatNumber(number: it.totalValue)
+                productCode: it?.product?.productCode,
+                productName: it?.product?.name,
+                lotNumber: it?.inventoryItem?.lotNumber,
+                expirationDate: CSVUtils.formatDate(it?.inventoryItem?.expirationDate),
+                binLocation: it?.binLocation?.name ?: "Default Bin",
+                quantity: CSVUtils.formatInteger(it?.quantity),
+                unitCost: CSVUtils.formatInteger(it?.unitCost),
+                totalValue: CSVUtils.formatInteger(it?.totalValue)
             ]
         }
 
         if (params.downloadFormat == "csv") {
-            String csv = ReportUtil.getCsvForListOfMapEntries(binLocations)
             def filename = "Bin Locations - ${location.name}.csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: csv)
+            render(contentType: 'text/csv', text: CSVUtils.dumpMaps(data))
             return
         }
 
@@ -186,10 +135,9 @@ class ReportController {
         Location location = Location.get(session.warehouse.id)
         def data = forecastingService.getDemandDetails(location, null)
         if (params.downloadFormat == "csv") {
-            String csv = ReportUtil.getCsvForListOfMapEntries(data)
             def filename = "Product Demand - ${location.name}.csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: csv)
+            render(contentType: 'text/csv', text: CSVUtils.dumpMaps(data))
             return
         }
         render([responseTime: (System.currentTimeMillis() - startTime), count: data.size(), data: data] as JSON)
@@ -198,20 +146,28 @@ class ReportController {
 
     def exportInventoryReport = {
         println "Export inventory report " + params
-        def map = []
+        def records = []
         def location = Location.get(session.warehouse.id)
         if (params.list("status")) {
             def data = reportService.calculateQuantityOnHandByProductGroup(location.id)
-            params.list("status").each {
-                println it
-                map += data.productGroupDetails[it].values()
+            params.list('status').collect(records) {
+                Map<String, Map> details = data.productGroupDetails[it]
+                [
+                    Status: details?.status,
+                    'Product group': details?.name,
+                    'Product codes': details?.productCodes?.join(','),
+                    Min: details?.minQuantity,
+                    Reorder: details?.reorderQuantity,
+                    Max: details?.maxQuantity,
+                    QoH: details?.onHandQuantity,
+                    Value: details?.totalValue,
+                ]
             }
-            map.unique()
         }
 
         def filename = "Stock report - " + location.name + ".csv"
         response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-        render(contentType: "text/csv", text: ReportUtil.getCsv(map))
+        render(contentType: "text/csv", text: CSVUtils.dumpMaps(records.unique()))
         return
     }
 
@@ -220,45 +176,28 @@ class ReportController {
 
     def showInventorySamplingReport = {
 
-        def sw = new StringWriter()
         def count = (params.n ?: 10).toInteger()
         def location = Location.get(session.warehouse.id)
-        def inventoryItems = []
+        def records = []
 
         try {
-            inventoryItems = inventoryService.getInventorySampling(location, count)
-
-            if (inventoryItems) {
-
-                println inventoryItems
-                //sw.append(csvrows[0].keySet().join(",")).append("\n")
-                sw.append("Product Code").append(",")
-                sw.append("Product").append(",")
-                sw.append("Lot number").append(",")
-                sw.append("Expiration date").append(",")
-                sw.append("Bin location").append(",")
-                sw.append("On hand quantity").append(",")
-                sw.append("\n")
-                inventoryItems.each { inventoryItem ->
-                    if (inventoryItem) {
-                        def inventoryLevel = inventoryItem?.product?.getInventoryLevel(location.id)
-                        sw.append('"' + (inventoryItem?.product?.productCode ?: "").toString()?.replace('"', '""') + '"').append(",")
-                        sw.append('"' + (inventoryItem?.product?.name ?: "").toString()?.replace('"', '""') + '"').append(",")
-                        sw.append('"' + (inventoryItem?.lotNumber ?: "").toString()?.replace('"', '""') + '"').append(",")
-                        sw.append('"' + inventoryItem?.expirationDate.toString()?.replace('"', '""') + '"').append(",")
-                        sw.append('"' + (inventoryLevel?.binLocation ?: "")?.toString()?.replace('"', '""') + '"').append(",")
-                        sw.append("\n")
-                    }
-                }
+            def inventoryItems = inventoryService.getInventorySampling(location, count)
+            inventoryItems.collect(records) {
+                [
+                    'Product Code': it?.product?.productCode,
+                    Product: it?.product?.name,
+                    'Lot number': it?.lotNumber,
+                    'Expiration date': CSVUtils.formatDate(it?.expirationDate),
+                    'Bin location': it?.product?.getInventoryLevel(location?.id)?.binLocation,
+                    'On hand quantity': null,  // FIXME previous implementation skipped this column
+                ]
             }
-
         } catch (RuntimeException e) {
             log.error(e.message)
-            sw.append(e.message)
         }
 
         response.setHeader("Content-disposition", "attachment; filename=\"Inventory-sampling-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
-        render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
+        render(contentType: 'text/csv', text: CSVUtils.dumpMaps(records))
 
     }
 
@@ -423,28 +362,43 @@ class ReportController {
                     binLocations = binLocations.findAll { it.status == params.status }
                 }
 
-                String csv = ReportUtil.getCsvForListOfMapEntries(binLocations, binLocationCsvHeader, binLocationCsvRow)
+                def output = binLocations.collect { binLocation ->
+                    [
+                        (g.message(code: 'default.status.label')): binLocation?.status,
+                        (g.message(code: 'product.productCode.label')): binLocation?.product?.productCode,
+                        (g.message(code: 'product.label')): binLocation?.product?.name,
+                        (g.message(code: 'category.label')): binLocation?.product?.category?.name,
+                        (g.message(code: 'product.formulary.label')): binLocation?.product?.productCatalogsToString(),
+                        (g.message(code: 'tag.label')): binLocation?.product?.tagsToString(),
+                        (g.message(code: 'inventoryItem.lotNumber.label')): binLocation?.inventoryItem?.lotNumber,
+                        (g.message(code: 'inventoryItem.expirationDate.label')): CSVUtils.formatDate(binLocation?.inventoryItem?.expirationDate),
+                        (g.message(code: 'location.zone.label')): binLocation?.binLocation?.zone?.name,
+                        (g.message(code: 'location.binLocation.label')): binLocation?.binLocation?.name ?: g.message(code: 'default.label'),
+                        (g.message(code: 'default.quantity.label')): binLocation?.quantity,
+                        (g.message(code: 'default.quantityAvailableToPromise.label')): binLocation?.quantityAvailableToPromise,
+                        (g.message(code: 'product.unitCost.label')): binLocation?.unitCost,
+                        (g.message(code: 'product.totalValue.label')): binLocation?.totalValue
+                    ]
+                }
+
                 def filename = "Bin Location Report - ${location?.name} - ${params.status ?: 'All'}.csv"
                 response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-                render(contentType: "text/csv", text: csv)
+                render(contentType: 'text/csv', text: CSVUtils.dumpMaps(output))
                 return
             }
             else if (params.downloadAction == "downloadStockMovement") {
 
                 StockMovement stockMovement = new StockMovement()
                 def entries = productAvailabilityService.getQuantityOnHandByBinLocation(location)
-                entries = entries.findAll { entry -> entry.quantity > 0 }
-                entries = entries.groupBy { it.product }
-                entries.each { k, v ->
-                    def quantity = v.sum { it.quantity }
-                    stockMovement.lineItems.add(
-                            new StockMovementItem(product: k,
-                                    quantityRequested: quantity))
-                }
+                entries.findAll { entry -> entry.quantity > 0 }
+                    .groupBy { it.product }
+                    .each { k, v ->
+                        def quantity = v.sum { it.quantity }
+                        stockMovement.lineItems.add(new StockMovementItem(product: k, quantityRequested: quantity))
+                    }
                 List lineItems = stockMovementService.buildStockMovementItemList(stockMovement)
-                String csv = dataService.generateCsv(lineItems)
-                response.setHeader("Content-disposition", "attachment; filename=\"StockMovementItems-CurrentStock.csv\"")
-                render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
+                response.setHeader('Content-disposition', 'attachment; filename="StockMovementItems-CurrentStock.csv"')
+                render(contentType: 'text/csv', text: CSVUtils.dumpMaps(lineItems))
                 return
             }
         } catch (Exception e) {
@@ -468,128 +422,103 @@ class ReportController {
             items += shipmentService.getPendingInboundShipmentItems(location)
 
             if (items) {
-
-                def sw = new StringWriter()
-                def csv = new CSVWriter(sw, {
-                    "Code" { it.productCode }
-                    "Product" { it.productName }
-                    "Quantity Ordered Not Shipped" { it.qtyOrderedNotShipped }
-                    "Quantity Shipped Not Received" { it.qtyShippedNotReceived }
-                    "PO Number" { it.orderNumber }
-                    "PO Description" { it.orderDescription }
-                    "Supplier Organization" { it.supplierOrganization }
-                    "Supplier Location" { it.supplierLocation }
-                    "Supplier Location Group" { it.supplierLocationGroup }
-                    "Estimated Goods Ready Date" { it.estimatedGoodsReadyDate }
-                    "Shipment Number" { it.shipmentNumber }
-                    "Ship Date" { it.shipDate }
-                    "Expected Delivery Date" { it.expectedDeliveryDate }
-                    "Shipment Type" { it.shipmentType }
-                })
-
-                items.sort { a,b ->
+                def records = []
+                items.sort { a, b ->
                     a.product?.productCode <=> b.product?.productCode
                 }.each {
                     def isOrderItem = it instanceof OrderItem
-                    csv << [
-                            productCode  : it.product?.productCode,
-                            productName  : it.product?.name,
-                            qtyOrderedNotShipped : isOrderItem ? it.quantityRemaining * it.quantityPerUom : '',
-                            qtyShippedNotReceived : isOrderItem ? '' : it.quantityRemaining,
-                            orderNumber  : isOrderItem ? it.order.orderNumber : (it.shipment.isFromPurchaseOrder ? it.orderNumber : ''),
-                            orderDescription  : isOrderItem ? it.order.name : (it.shipment.isFromPurchaseOrder ? it.orderName : ''),
-                            supplierOrganization  : isOrderItem ? it.order?.origin?.organization?.name : it.shipment?.origin?.organization?.name,
-                            supplierLocation  : isOrderItem ? it.order.origin.name : it.shipment.origin.name,
-                            supplierLocationGroup  : isOrderItem ? it.order?.origin?.locationGroup?.name : it.shipment?.origin?.locationGroup?.name,
-                            estimatedGoodsReadyDate  : isOrderItem ? it.actualReadyDate?.format("MM/dd/yyyy") : '',
-                            shipmentNumber  : isOrderItem ? '' : it.shipment.shipmentNumber,
-                            shipDate  : isOrderItem ? '' : it.shipment.expectedShippingDate?.format("MM/dd/yyyy"),
-                            expectedDeliveryDate  : isOrderItem ? '' : it.shipment.expectedDeliveryDate?.format("MM/dd/yyyy"),
-                            shipmentType  : isOrderItem ? '' : it.shipment.shipmentType.name
+                    records << [
+                        Code: it?.product.productCode,
+                        Product: it?.product.name,
+                        'Quantity Ordered Not Shipped': isOrderItem ? it?.quantityRemaining * it?.quantityPerUom : '',
+                        'Quantity Shipped Not Received': isOrderItem ? '' : it?.quantityRemaining,
+                        'PO Number': isOrderItem ? it?.order?.orderNumber : (it?.shipment?.isFromPurchaseOrder ? it?.orderNumber : ''),
+                        'PO Description': isOrderItem ? it?.order?.name : (it.shipment.isFromPurchaseOrder ? it.orderName : ''),
+                        'Supplier Organization': isOrderItem ? it?.order?.origin?.organization?.name : it.shipment?.origin?.organization?.name,
+                        'Supplier Location': isOrderItem ? it?.order?.origin?.name : it?.shipment?.origin?.name,
+                        'Supplier Location Group': isOrderItem ? it?.order?.origin?.locationGroup?.name : it.shipment?.origin?.locationGroup?.name,
+                        'Estimated Goods Ready Date': isOrderItem ? CSVUtils.formatDate(it?.actualReadyDate) : '',
+                        'Shipment Number': isOrderItem ? '' : it?.shipment?.shipmentNumber,
+                        'Ship Date': isOrderItem ? '' : CSVUtils.formatDate(it?.shipment?.expectedShippingDate),
+                        'Expected Delivery Date': isOrderItem ? '' : CSVUtils.formatDate(it?.shipment?.expectedDeliveryDate),
+                        'Shipment Type': isOrderItem ? '' : it?.shipment?.shipmentType?.name,
                     ]
                 }
 
-                response.setHeader("Content-disposition", "attachment; filename=\"Detailed-Order-Report-${new Date().format("MM/dd/yyyy")}.csv\"")
-                render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
+                response.setHeader("Content-disposition", "attachment; filename=\"Detailed-Order-Report-${new Date().format('MM/dd/yyyy')}.csv\"")
+                render(contentType: 'text/csv', text: CSVUtils.dumpMaps(records))
             }
         } else if(params.downloadAction == "downloadSummaryOnOrderReport") {
             def location = Location.get(session.warehouse.id)
             def data = reportService.getOnOrderSummary(location)
+
             if (data) {
-
-                def sw = new StringWriter()
-                def csv = new CSVWriter(sw, {
-                    "Code" { it.productCode }
-                    "Product" { it.productName }
-                    "Quantity Ordered Not Shipped" { it.qtyOrderedNotShipped }
-                    "Quantity Shipped Not Received" { it.qtyShippedNotReceived }
-                    "Total On Order" { it.totalOnOrder }
-                    "Total On Hand" { it.totalOnHand }
-                    "Total On Hand and On Order" { it.totalOnHandAndOnOrder }
-                })
-
-                data = data.sort { it.productCode }
-                csv.writeAll(data)
-                response.setHeader("Content-disposition", "attachment; filename=\"Detailed-Order-Report-${new Date().format("MM/dd/yyyy")}.csv\"")
-                render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
+                def records = data.sort {
+                    it.productCode
+                }.collect {
+                    [
+                        Code: it?.productCode,
+                        Product: it?.productName,
+                        'Quantity Ordered Not Shipped': it?.qtyOrderedNotShipped,
+                        'Quantity Shipped Not Received': it?.qtyShippedNotReceived,
+                        'Total On Order': it?.totalOnOrder,
+                        'Total On Hand': it?.totalOnHand,
+                        'Total On Hand and On Order': it?.totalOnHandAndOnOrder,
+                    ]
+                }
+                response.setHeader('Content-disposition', "attachment; filename=\"Detailed-Order-Report-${new Date().format('MM/dd/yyyy')}.csv\"")
+                render(contentType: 'text/csv', text: CSVUtils.dumpMaps(records))
             }
         }
     }
 
     def showInventoryByLocationReport = { MultiLocationInventoryReportCommand command ->
         command.entries = productAvailabilityService.getQuantityOnHandByProduct(command.locations)
+        def csv = CSVUtils.getCSVPrinter()
 
         if (params.button == "download") {
-            def sw = new StringWriter()
-
             try {
                 if (command.entries) {
-                    sw.append("Code").append(",")
-                    sw.append("Product").append(",")
-                    sw.append("Category").append(",")
-                    sw.append("Formularies").append(",")
-                    sw.append("Tags").append(",")
+                    def csvHeader = [
+                        'Code',
+                        'Product',
+                        'Category',
+                        'Formularies',
+                        'Tags'
+                    ]
 
-                    command.locations?.each { location ->
-                        String locationName = StringEscapeUtils.escapeCsv(location?.name)
-                        sw.append(locationName).append(",")
-                    }
+                    command.locations?.collect(csvHeader) { it?.name }
+                    csvHeader.addAll(
+                        'QoH Total',
+                        'Quantity Available Total'
+                    )
 
-                    sw.append("QoH Total").append(",")
-                    sw.append("Quantity Available Total")
-                    sw.append("\n")
-                    command.entries.each { entry ->
-                        if (entry.key) {
-                            def totalQuantity = entry.value?.values()?.quantityOnHand?.sum()
-                            def totalQuantityAvailableToPromise = entry.value?.values()?.quantityAvailableToPromise?.sum()
-                            def form = entry.key?.getProductCatalogs()?.collect {
-                                it.name
-                            }?.join(",")
+                    csv.printRecord(csvHeader)
 
-                            sw.append('"' + (entry.key?.productCode ?: "").toString()?.replace('"', '""') + '"').append(",")
-                            sw.append('"' + (entry.key?.name ?: "").toString()?.replace('"', '""') + '"').append(",")
-                            sw.append('"' + (entry.key?.category?.name ?: "").toString()?.replace('"', '""') + '"').append(",")
-                            sw.append('"' + (form ?: "").toString()?.replace('"', '""') + '"').append(",")
-                            sw.append('"' + (entry.key?.tagsToString() ?: "")?.toString()?.replace('"', '""') + '"').append(",")
+                    command.entries.each { k, v ->
+                        def csvRow = [
+                            k?.productCode,
+                            k?.name,
+                            k?.category?.name,
+                            k?.getProductCatalogs()?.collect { it.name }?.join(','),
+                            k?.tagsToString()
+                        ]
 
-                            command.locations?.each { location ->
-                                sw.append('"' + (entry.value[location?.id] != null ? entry.value[location?.id]?.quantityOnHand?:0 : "").toString() + '"').append(",")
-                            }
-
-                            sw.append('"' + (totalQuantity != null ? totalQuantity : "").toString() + '"').append(",")
-                            sw.append('"' + (totalQuantityAvailableToPromise != null ? totalQuantityAvailableToPromise : "").toString() + '"')
-                            sw.append("\n")
-                        }
+                        command.locations?.collect(csvRow) { v[it?.id]?.quantityOnHand ?: 0 }
+                        csvRow.addAll(
+                            v?.values()?.quantityOnHand?.sum(),
+                            v?.values()?.quantityAvailableToPromise?.sum()
+                        )
+                        csv.printRecord(csvRow)
                     }
                 }
 
             } catch (RuntimeException e) {
                 log.error(e.message)
-                sw.append(e.message)
             }
 
-            response.setHeader("Content-disposition", "attachment; filename=\"Inventory-by-location-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
-            render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
+            response.setHeader('Content-disposition', "attachment; filename=\"Inventory-by-location-${new Date().format('yyyyMMdd-hhmmss')}.csv\"")
+            render(contentType: 'text/csv', text: csv.out.toString())
         }
 
         render(view: 'showInventoryByLocationReport', model: [command: command])

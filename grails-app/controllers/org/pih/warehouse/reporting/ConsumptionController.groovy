@@ -19,6 +19,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UserService
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.Transaction
@@ -28,16 +29,13 @@ import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.product.ProductService
 import org.pih.warehouse.report.ConsumptionService
 import org.pih.warehouse.report.ReportService
 import org.pih.warehouse.requisition.Requisition
 
 class ConsumptionController {
 
-    def dataService
     ReportService reportService
-    ProductService productService
     InventoryService inventoryService
     ConsumptionService consumptionService
     UserService userService
@@ -302,57 +300,54 @@ class ConsumptionController {
         // Export as CSV
         if (params.format == "csv") {
 
-            def csvrows = []
-            command.rows.each { key, ShowConsumptionRowCommand row ->
+            def csvrows = command.rows.collect { key, ShowConsumptionRowCommand row ->
                 def valueConsumed = (row?.totalConsumptionQuantity ?: 0) * (row.product?.pricePerUnit ?: 0)
 
                 def csvrow = [
-                        'Product code'                                : row.product.productCode ?: '',
-                        'Product'                                     : row.product.name,
-                        'Category'                                    : row.product?.category?.name,
-                        'Formulary'                                   : row.product?.productCatalogsToString(),
-                        'Tag'                                         : row.product?.tagsToString(),
-                        'Unit Price'                                  : g.formatNumber(number: row.product.pricePerUnit, format: '###.#', maxFractionDigits: 2) ?: '',
-                        'UoM'                                         : row.product.unitOfMeasure ?: '',
-                        'Qty Issued'                                  : g.formatNumber(number: row.issuedQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
-                        'Qty Consumed'                                : g.formatNumber(number: row.consumedQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
-                        'Qty Returned'                                : g.formatNumber(number: row.returnedQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
-                        'Total Consumption (Issued+Consumed-Returned)': g.formatNumber(number: row.totalConsumptionQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
-                        'Value Consumed'                              : g.formatNumber(number: valueConsumed, format: '###.#', maxFractionDigits: 1),
-                        'Average Monthly Consumption'                 : g.formatNumber(number: row.monthlyQuantity, format: '###.#', maxFractionDigits: 4) ?: '',
-                        'Quantity on hand'                            : g.formatNumber(number: row.onHandQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
-                        'Months remaining'                            : g.formatNumber(number: row.numberOfMonthsRemaining, format: '###.#', maxFractionDigits: 0) ?: '',
+                    'Product code': row?.product?.productCode,
+                    Product: row?.product?.name,
+                    Category: row?.product?.category?.name,
+                    Formulary: row?.product?.productCatalogsToString(),
+                    Tag: row?.product?.tagsToString(),
+                    'Unit Price': CSVUtils.formatCurrency(product?.pricePerUnit),
+                    UoM: row?.product?.unitOfMeasure,
+                    'Qty Issued': CSVUtils.formatNumber(number: row?.issuedQuantity, maxFractionDigits: 1),
+                    'Qty Consumed': CSVUtils.formatNumber(number: row?.consumedQuantity, maxFractionDigits: 1),
+                    'Qty Returned': CSVUtils.formatNumber(number: row?.returnedQuantity, maxFractionDigits: 1),
+                    'Total Consumption (Issued+Consumed-Returned)': CSVUtils.formatNumber(number: row?.totalConsumptionQuantity, maxFractionDigits: 1),
+                    'Value Consumed': CSVUtils.formatNumber(number: valueConsumed, maxFractionDigits: 1),
+                    'Average Monthly Consumption': CSVUtils.formatNumber(number: row?.monthlyQuantity, maxFractionDigits: 4),
+                    'Quantity on hand': CSVUtils.formatNumber(number: row?.onHandQuantity, maxFractionDigits: 1),
+                    'Months remaining': CSVUtils.formatInteger(Math.floor(row.numberOfMonthsRemaining)),
                 ]
 
                 if (command.selectedProperties) {
                     command.selectedProperties.each { property ->
-                        csvrow[property] = row.product."${property}"
+                        csvrow[property] = row?.product?."${property}"
                     }
                 }
 
                 if (command.includeMonthlyBreakdown) {
                     command.selectedDates.each { date ->
-                        csvrow[date.toString()] = row.transferOutMonthlyMap[date] ?: ""
+                        csvrow[date.toString()] = row?.transferOutMonthlyMap[date]
                     }
                 }
 
                 if (command.includeLocationBreakdown) {
                     command.selectedLocations.each { location ->
-                        csvrow[location.locationNumber ?: location?.name] = row.transferOutMap[location] ?: ""
+                        csvrow[location?.locationNumber ?: location?.name] = row.transferOutMap[location]
                     }
                 }
 
-                csvrows << csvrow
-
+                return row
             }
 
             csvrows.sort { it["Product code"] }
 
-            def csv = dataService.generateCsv(csvrows)
             response.setHeader("Content-disposition", "attachment; filename=\"Consumption-" +
-                    "${!fromLocationsEmpty && command.fromLocations.size() > 1 ? command.fromLocations : command.fromLocations.first()}" +
-                    "-${new Date().format("dd MMM yyyy hhmmss")}.csv\"")
-            render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
+                "${!fromLocationsEmpty && command.fromLocations.size() > 1 ? command.fromLocations : command.fromLocations.first()}" +
+                "-${new Date().format('dd MMM yyyy hhmmss')}.csv\"")
+            render(contentType: 'text/csv', text: CSVUtils.dumpMaps(csvrows))
             return
         } else {
             println "Render as HTML " + params
@@ -407,9 +402,8 @@ class ConsumptionController {
             def data = consumptionService.listConsumption(command.location, command.category, command.startDate, command.endDate)
             def crosstab = consumptionService.generateCrossTab(data, command.startDate, command.endDate, null)
             log.info "crosstab " + crosstab
-            String csv = dataService.generateCsv(crosstab)
             response.setHeader("Content-disposition", "attachment; filename=Consumption-${location.name}-${new Date().format("dd-MMM-yyyy-hhmmss")}.csv")
-            render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
+            render(contentType: 'text/csv', text: CSVUtils.dumpMaps(crosstab))
             return
         }
 

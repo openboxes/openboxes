@@ -21,33 +21,28 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.ImporterUtil
 import org.pih.warehouse.importer.InventoryExcelImporter
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAvailability
-import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.shipping.ShipmentItem
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.springframework.validation.Errors
 
 import java.sql.Timestamp
-import java.text.NumberFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
 
 class InventoryService implements ApplicationContextAware {
 
-    def sessionFactory
     def persistenceInterceptor
     def grailsApplication
 
-    def dataService
-    def productService
     def identifierService
     def messageService
     def locationService
@@ -2624,29 +2619,28 @@ class InventoryService implements ApplicationContextAware {
      */
     String exportBaselineQoH(products, quantityMapByDate) {
         def csvrows = []
-        NumberFormat numberFormat = NumberFormat.getNumberInstance()
         products.each { product ->
             def csvrow = [
-                    'Product code'     : product.productCode ?: '',
-                    'Product'          : product.name,
-                    'UOM'              : product.unitOfMeasure,
-                    'Generic product'  : product?.genericProduct?.name ?: "",
-                    'Category'         : product?.category?.name,
-                    'Manufacturer'     : product?.manufacturer ?: "",
-                    'Manufacturer code': product?.manufacturerCode ?: "",
-                    'Vendor'           : product?.vendor ?: "",
-                    'Vendor code'      : product?.vendorCode ?: ""
+                'Product code': product?.productCode,
+                Product: product?.name,
+                UOM: product?.unitOfMeasure,
+                'Generic product': product?.genericProduct?.name,
+                Category: product?.category?.name,
+                Manufacturer: product?.manufacturer,
+                'Manufacturer code': product?.manufacturerCode,
+                Vendor: product?.vendor,
+                'Vendor code': product?.vendorCode,
             ]
 
             if (quantityMapByDate) {
                 quantityMapByDate.each { key, value ->
-                    csvrow[key.format("dd-MMM-yyyy")] = quantityMapByDate[key][product] ? numberFormat.format(quantityMapByDate[key][product]) : ""
+                    csvrow[key.format('dd-MMM-yyyy')] = CSVUtils.formatInteger(value.get(product))
                 }
             }
 
             csvrows << csvrow
         }
-        return dataService.generateCsv(csvrows)
+        return CSVUtils.dumpMaps(csvrows)
     }
 
 

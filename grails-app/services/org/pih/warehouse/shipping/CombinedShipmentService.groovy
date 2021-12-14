@@ -9,9 +9,9 @@
  **/
 package org.pih.warehouse.shipping
 
-import org.grails.plugins.csv.CSVMapReader
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.UnitOfMeasure
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
@@ -34,32 +34,25 @@ class CombinedShipmentService {
      * @param inputStream
      * @return
      */
-    List parseOrderItemsFromTemplateImport(String text) {
-        List orderItems = []
-        try {
-            def settings = [skipLines: 1]
-            def csvMapReader = new CSVMapReader(new StringReader(text), settings)
-            csvMapReader.fieldKeys = [
-                    'orderNumber',
-                    'id',
-                    'productCode',
-                    'productName',
-                    'lotNumber',
-                    'expiry',
-                    'quantityToShip',
-                    'unitOfMeasure',
-                    'palletName', // pack level 1
-                    'boxName', // pack level 2]
-                    'recipient',
-                    'budgetCode',
-            ]
-            orderItems = csvMapReader.toList()
-
-        } catch (Exception e) {
-            throw new RuntimeException("Error parsing order item CSV: " + e.message, e)
-        }
-
-        return orderItems
+    List parseOrderItemsFromTemplateImport(dataSource) {
+        return CSVUtils.parseRecords(
+            dataSource,
+            [
+                'orderNumber',
+                'id',
+                'productCode',
+                'productName',
+                'lotNumber',
+                'expiry',
+                'quantityToShip',
+                'unitOfMeasure',
+                'palletName', // pack level 1
+                'boxName', // pack level 2
+                'recipient',
+                'budgetCode'
+            ],
+            overrideHeaders: true,
+        )*.toMap()
     }
 
     boolean validateItemsFromTemplateImport(Shipment shipment, List lineItems) {

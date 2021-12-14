@@ -102,10 +102,6 @@ class Constants {
     static final String DEFAULT_NAME_SEPARATOR = "-"
     static final String DEFAULT_IDENTIFIER_SEPARATOR = "-"
 
-    // Default character used to separate columns and newlines in exports
-    static final String DEFAULT_COLUMN_SEPARATOR = ","
-    static final String DEFAULT_LINE_SEPARATOR = "\n"
-
     // Characters that should be included with each of the random number types
     static final String RANDOM_IDENTIFIER_ALPHABETIC_CHARACTERS = "ABCDEFGHJKMNPQRSTUVXYZ"
     static final String RANDOM_IDENTIFIER_ALPHANUMERIC_CHARACTERS = "0123456789ABCDEFGHJKMNPQRSTUVWXYZ"

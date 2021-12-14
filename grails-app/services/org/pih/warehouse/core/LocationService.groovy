@@ -15,7 +15,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
-import org.grails.plugins.csv.CSVMapReader
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import util.ConfigHelper
 
@@ -597,17 +597,13 @@ class LocationService {
         }
     }
 
-    def importLocationCsv(ImportDataCommand command) {
-        String csv = new String(command.importFile.bytes)
-        def settings = [separatorChar: ',']
-        CSVMapReader csvReader = new CSVMapReader(new StringReader(csv), settings)
-        command.data = csvReader.readAll()
-
+    def importLocationCsv(ImportDataCommand command, URL csvURL = null) {
+        command.data = CSVUtils.parseRecords(csvURL ?: command.importFile, [])*.toMap()
         command.errors = null
         locationDataService.validateData(command)
 
         if (command.errors.allErrors) {
-            throw new ValidationException("Failed to import template due to validation errors", command.errors)
+            throw new ValidationException('Failed to import locations due to validation errors', command.errors)
         }
 
         locationDataService.importData(command)

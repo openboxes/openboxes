@@ -12,9 +12,11 @@ package org.pih.warehouse.product
 import grails.validation.ValidationException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.PreferenceType
+import org.pih.warehouse.core.ProductPrice
+import org.pih.warehouse.importer.CSVUtils
+
 import java.math.RoundingMode
 import java.text.SimpleDateFormat
-import org.pih.warehouse.core.ProductPrice
 
 class ProductSupplierController {
 
@@ -309,14 +311,13 @@ class ProductSupplierController {
                         "attachment; filename=\"ProductSuppliers-${new Date().format("yyyyMMdd-hhmmss")}.xls\""
                 documentService.generateExcel(response.outputStream, data)
                 response.outputStream.flush()
-                return;
+                return
             default:
-                response.contentType = "text/csv"
                 response.setHeader("Content-disposition",
                     "attachment; filename=\"ProductSuppliers-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
-                render dataService.generateCsv(data)
+                render(contentType: 'text/csv', text: CSVUtils.dumpMaps(data))
                 response.outputStream.flush()
-                return;
+                return
         }
     }
 

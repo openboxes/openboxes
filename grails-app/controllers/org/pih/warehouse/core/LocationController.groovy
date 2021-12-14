@@ -11,6 +11,7 @@ package org.pih.warehouse.core
 
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.validation.ValidationException
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.Order
@@ -22,7 +23,6 @@ class LocationController {
 
     def inventoryService
     def locationService
-    def dataService
     def organizationService
 
     /**
@@ -423,19 +423,18 @@ class LocationController {
         if (binLocations) {
             def date = new Date()
             response.setHeader("Content-disposition",
-                    "attachment; filename=\"BinLocations-${location?.name}-${date.format("yyyyMMdd-hhmmss")}.csv\"")
-            response.contentType = "text/csv"
+                "attachment; filename=\"BinLocations-${location?.name}-${date.format('yyyyMMdd-hhmmss')}.csv\"")
             def csvrows = binLocations.collect { binLocation ->
-                return [
-                        "id"            : binLocation.id ?: "",
-                        "locationType"  : binLocation?.locationType?.locationTypeCode ?: "",
-                        "locationNumber": binLocation?.locationNumber ?: "",
-                        "locationName"  : binLocation?.name ?: "",
-                        "zoneName"      : binLocation?.zone?.name ?: ""
+                [
+                    id: binLocation?.id,
+                    locationType: binLocation?.locationType?.locationTypeCode,
+                    locationNumber: binLocation?.locationNumber,
+                    locationName: binLocation?.name,
+                    zoneName: binLocation?.zone?.name,
                 ]
             }
 
-            render dataService.generateCsv(csvrows)
+            render(contentType: 'text/csv', text: CSVUtils.dumpMaps(csvrows))
         } else {
             flash.message = "No bin locations for location ${location.name}"
             redirect(action: "edit", id: params.id)

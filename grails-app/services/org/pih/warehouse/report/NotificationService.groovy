@@ -11,8 +11,6 @@ package org.pih.warehouse.report
 
 import org.apache.commons.mail.EmailException
 import org.apache.commons.validator.EmailValidator
-import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
 import org.codehaus.groovy.grails.plugins.web.taglib.RenderTagLib
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.codehaus.groovy.grails.web.errors.GrailsWrappedRuntimeException
@@ -22,6 +20,7 @@ import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.shipping.Shipment
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.support.WebApplicationContextUtils
@@ -78,7 +77,7 @@ class NotificationService {
             return
         }
         def subscribers = userService.findUsersByRoleTypes(location, roleTypes)
-        def csv = dataService.generateCsv(expiryAlerts)
+        def csv = CSVUtils.dumpMaps(expiryAlerts)
         def expired = expiryAlerts.findAll { it.days_until_expiry <= 0 }
         def expiring = expiryAlerts.findAll { it.days_until_expiry > 0 }
         def model = [location: location, expiring: expiring, expired: expired, daysUntilExpiry: daysUntilExpiry]
@@ -96,7 +95,7 @@ class NotificationService {
         }
         def subscribers = userService.findUsersByRoleTypes(location, roleTypes)
         def model = [location: location, status: status, products: products]
-        def csv = dataService.generateCsv(products)
+        def csv = CSVUtils.dumpMaps(products)
         log.info "Sending ${products.size()} ${subject} alerts and ${subscribers.size()} subscribers for location ${location} "
         sendAlerts(subject, "/email/stockAlerts", model, subscribers, csv)
     }

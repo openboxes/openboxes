@@ -12,12 +12,12 @@ package org.pih.warehouse.user
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
-import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
@@ -233,46 +233,31 @@ class DashboardController {
         def location = Location.get(session?.warehouse?.id)
         def genericProductSummary = inventoryService.getGenericProductSummary(location)
 
-        def data = (params.status == "ALL") ?
-                genericProductSummary.values().flatten() :
-                genericProductSummary[params.status]
+        def summaries = (params.status == "ALL") ?
+            genericProductSummary.values().flatten() :
+            genericProductSummary[params.status]
 
         // Rename columns and filter out debugging columns
-        data = data.collect {
-            ["Status"         : it.status,
-             "Generic Product": it.name,
-             "Minimum Qty"    : it.minQuantity,
-             "Reorder Qty"    : it.reorderQuantity,
-             "Maximum Qty"    : it.maxQuantity,
-             "Available Qty"  : it.currentQuantity]
+        data = summaries.collect {
+            [
+                Status: it?.status,
+                'Generic Product': it?.name,
+                'Minimum Qty': it?.minQuantity,
+                'Reorder Qty': it?.reorderQuantity,
+                'Maximum Qty': it?.maxQuantity,
+                'Available Qty': it?.currentQuantity,
+            ]
         }
 
-        def sw = new StringWriter()
-        if (data) {
-            def columns = data[0].keySet().collect { value -> StringEscapeUtils.escapeCsv(value) }
-            sw.append(columns.join(",")).append("\n")
-            data.each { row ->
-                def values = row.values().collect { value ->
-                    if (value?.toString()?.isNumber()) {
-                        value
-                    } else if (value instanceof Collection) {
-                        StringEscapeUtils.escapeCsv(value.toString())
-                    } else {
-                        StringEscapeUtils.escapeCsv(value.toString())
-                    }
-                }
-                sw.append(values.join(","))
-                sw.append("\n")
-            }
-        }
-        response.setHeader("Content-disposition", "attachment; filename=\"GenericProductSummary-${params.status}-${location.name}-${new Date().format("yyyyMMdd-hhmm")}.csv\"")
-        render(contentType: "text/csv", text: sw.toString())
+        response.setHeader('Content-disposition', "attachment; filename=\"GenericProductSummary-${params.status}-${location.name}-${new Date().format('yyyyMMdd-hhmm')}.csv\"")
+        render(contentType: 'text/csv', text: CSVUtils.dumpMaps(data))
         return
     }
 
     def downloadFastMoversAsCsv = {
-        println "exportFastMoversAsCsv: " + params
         def location = Location.get(params?.location?.id ?: session?.warehouse?.id)
+        String contentType
+        String response
 
         def date = new Date()
         if (params.date) {
@@ -282,34 +267,16 @@ class DashboardController {
         }
 
         def data = dashboardService.getFastMovers(location, date, params.max)
-        def sw = new StringWriter()
         if (data?.results) {
-            // Write column headers
-            def columns = data?.results[0]?.keySet()?.collect { value -> StringEscapeUtils.escapeCsv(value) }
-            sw.append(columns?.join(",")).append("\n")
-
-            // Write all data
-            data.results.each { row ->
-                def values = row.values().collect { value ->
-                    if (value?.toString()?.isNumber()) {
-                        value
-                    } else if (value instanceof Collection) {
-                        StringEscapeUtils.escapeCsv(value.toString())
-                    } else {
-                        StringEscapeUtils.escapeCsv(value.toString())
-                    }
-                }
-                sw.append(values?.join(","))
-                sw.append("\n")
-            }
+            contentType = "text/csv"
+            response = CSVUtils.dumpMaps(data.results)
         } else {
-            sw.append("${warehouse.message(code: 'fastMovers.empty.message')}")
+            contentType = "text/plain"
+            response = warehouse.message(code: 'fastMovers.empty.message')
         }
-        response.setHeader("Content-disposition", "attachment; filename=\"FastMovers-${location.name}-${new Date().format("yyyyMMdd-hhmm")}.csv\"")
-        render(contentType: "text/csv", text: sw.toString())
+        response.setHeader('Content-disposition', "attachment; filename=\"FastMovers-${location.name}-${new Date().format('yyyyMMdd-hhmm')}.csv\"")
+        render(contentType: contentType, text: response)
         return
     }
 
 }
-
-

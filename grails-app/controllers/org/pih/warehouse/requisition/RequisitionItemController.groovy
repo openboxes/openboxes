@@ -10,9 +10,8 @@
 package org.pih.warehouse.requisition
 
 import grails.validation.ValidationException
-import org.apache.commons.lang.StringEscapeUtils
-import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
@@ -403,40 +402,23 @@ class RequisitionItemController {
         }
 
         if (requisitionItems) {
-            def sw = new StringWriter()
-
-            def csv = new CSVWriter(sw, {
-
-                "Requisition number" { it.requisitionNumber }
-                "Requisition name" { it.requisitionName }
-                "Requested date" { it.requisitionDate }
-                "Requested by" { it.requestedBy }
-                "Product code" { it.productCode }
-                "Product name" { it.productName }
-                "Product group" { it.productGroup }
-                "Reason code" { it.cancelReasonCode }
-                "Quantity canceled" { it.quantityCanceled }
-                "Quantity requested" { it.quantityRequested }
-                "UOM" { it.unitOfMeasure }
-            })
-            requisitionItems.each { requisitionItem ->
-                csv << [
-                        requisitionNumber: requisitionItem.requisition.requestNumber,
-                        requisitionName  : StringEscapeUtils.escapeCsv(requisitionItem.requisition.name),
-                        requisitionDate  : formatDate(date: requisitionItem.requisition.dateRequested, format: "dd/MMM/yyyy"),
-                        requestedBy      : requisitionItem.requisition.requestedBy.name,
-                        productCode      : requisitionItem.product.productCode,
-                        productName      : StringEscapeUtils.escapeCsv(requisitionItem.product.name),
-                        productGroup     : StringEscapeUtils.escapeCsv(requisitionItem.product?.genericProduct?.name) ?: "",
-                        cancelReasonCode : requisitionItem.cancelReasonCode ?: "",
-                        quantityCanceled : requisitionItem.quantityCanceled ?: "",
-                        quantityRequested: requisitionItem.quantity ?: "",
-                        unitOfMeasure    : "EA/1"
+            def records = requisitionItems.collect { requisitionItem ->
+                [
+                    'Requisition number': requisitionItem?.requisition?.requestNumber,
+                    'Requisition name': requisitionItem?.requisition?.name,
+                    'Requested date': CSVUtils.formatDate(requisitionItem?.requisition?.dateRequested),
+                    'Requested by': requisitionItem?.requisition?.requestedBy?.name,
+                    'Product code': requisitionItem?.product?.productCode,
+                    'Product name': requisitionItem?.product?.name,
+                    'Product group': requisitionItem?.product?.genericProduct?.name,
+                    'Reason code': requisitionItem?.cancelReasonCode,
+                    'Quantity canceled': requisitionItem?.quantityCanceled,
+                    'Quantity requested': requisitionItem?.quantity,
+                    UOM: 'EA/1'  // FIXME should this pull from the item itself?
                 ]
             }
-            response.contentType = "text/csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}.csv\"")
-            render(contentType: "text/csv", text: csv.writer.toString())
+            render(contentType: 'text/csv', text: CSVUtils.dumpMaps(records))
             return
         } else {
             render(text: 'No requisition items found', status: 404)
