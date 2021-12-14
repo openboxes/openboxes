@@ -37,8 +37,6 @@ class NotificationController {
 
     def productService
 
-    //AKIARCJUB2RW2HAHADW5
-    //r0TBQ2cNRpNpSAz2RZkl/xtntA0E+xD8cYKkILR3
     private def amazonSnsClient() {
         return AmazonSNSClientBuilder
                 .standard()
