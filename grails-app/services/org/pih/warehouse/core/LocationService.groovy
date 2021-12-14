@@ -122,6 +122,18 @@ class LocationService {
             }
         }
 
+        if (params.isReturnOrder) {
+            if (isSuperuser) {
+                return locations.findAll { Location it ->
+                    !it.supports(ActivityCode.MANAGE_INVENTORY)
+                }
+            } else {
+                return locations.findAll { Location it ->
+                    !it.supports(ActivityCode.MANAGE_INVENTORY) && it.locationGroup == currentLocation.locationGroup
+                }
+            }
+        }
+
         if (!isSuperuser) {
             if (direction == "INBOUND") {
                 return locations.findAll {
