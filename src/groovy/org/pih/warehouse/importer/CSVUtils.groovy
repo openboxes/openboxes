@@ -9,6 +9,8 @@
  */
 package org.pih.warehouse.importer
 
+import org.apache.commons.csv.CSVFormat
+import org.apache.commons.csv.CSVPrinter
 import org.pih.warehouse.util.LocalizationUtil
 
 import java.text.DecimalFormat
@@ -25,7 +27,7 @@ import java.text.NumberFormat
  * These functions are locale-aware, and, for unit prices, support at
  * least four decimal places.
  */
-class CsvUtil {
+class CSVUtils {
 
     /* support fractional cents in unit prices */
     static int UNIT_PRICE_MIN_DECIMAL_PLACES = 4
@@ -62,7 +64,7 @@ class CsvUtil {
      * @param number an integer, or a decimal/double/float representing an int
      * @return a string representation of `number` suitable for CSV export
      *
-     * Unlike Grails's formatNumber, this method skips grouping punctuation:
+     * Unlike Grails's formatNumber, this method omits grouping punctuation:
      * output is "1234567", not "1,234,567".
      *
      * It is the caller's responsibility to call escapeCsv() if appropriate.
@@ -119,5 +121,22 @@ class CsvUtil {
     /* FIXME replace with @NamedVariant after grails migration */
     static String formatCurrency(Map args) {
         return formatCurrency(args.get("number"), args.get("currencyCode"), args.get("isUnitPrice", false))
+    }
+
+    /**
+     * Format unit of measure information for CSV as a single column.
+     */
+    static String formatUnitOfMeasure(String quantityUom, Number quantityPerUom) {
+        // FIXME default value should be localized, but presently is "EA" everywhere
+        def numerator = quantityUom ?: "EA"
+        def denominator = formatInteger(quantityPerUom ?: 1)
+        return "${quantityUom}/${quantityPerUom}"
+    }
+
+    /**
+     * Create a CSVPrinter object with sensible defaults.
+     */
+    static CSVPrinter getCSVPrinter() {
+        return new CSVPrinter(new StringBuilder(), CSVFormat.DEFAULT)
     }
 }

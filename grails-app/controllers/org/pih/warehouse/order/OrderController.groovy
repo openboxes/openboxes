@@ -12,8 +12,6 @@ package org.pih.warehouse.order
 import fr.opensagres.xdocreport.converter.ConverterTypeTo
 import grails.converters.JSON
 import grails.validation.ValidationException
-import org.apache.commons.lang.StringEscapeUtils
-import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.BudgetCode
@@ -24,7 +22,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.ValidationCode
-import org.pih.warehouse.importer.CsvUtil
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.shipping.Shipment
@@ -75,69 +73,69 @@ class OrderController {
 
         if (params.format && orders) {
 
-            def sw = new StringWriter()
-            def csv = new CSVWriter(sw, {
-                "Supplier organization" { it.supplierOrganization }
-                "Supplier location" { it.supplierLocation }
-                "Destination" { it.destinationLocation }
-                "PO Number" { it.number }
-                "PO Description" { it.description }
-                "PO Status" { it.status }
-                "Code" { it.code }
-                "Product" { it.productName }
-                "Item Status" {it.itemStatus}
-                "Source Code" { it.sourceCode }
-                "Supplier Code" { it.supplierCode }
-                "Manufacturer" { it.manufacturer }
-                "Manufacturer Code" { it.manufacturerCode }
-                "Unit of Measure" { it.unitOfMeasure }
-                "Qty per UOM" { it.quantityPerUom }
-                "Quantity Ordered" { it.quantityOrdered }
-                "Quantity Shipped" { it.quantityShipped}
-                "Quantity Received" { it.quantityReceived}
-                "Quantity Invoiced" { it.quantityInvoiced}
-                "Unit Price" { it.unitPrice}
-                "Total Cost" { it.totalCost}
-                "Currency" { it.currency }
-                "Recipient" { it.recipient}
-                "Estimated Ready Date" { it.estimatedReadyDate}
-                "Actual Ready Date" { it.actualReadyDate}
-                "Budget Code" { it.budgetCode }
-            })
+            def csv = CSVUtils.getCSVPrinter()
+            csv.printRecord(
+                    "Supplier organization",
+                    "Supplier location",
+                    "Destination",
+                    "PO Number",
+                    "PO Description",
+                    "PO Status",
+                    "Code",
+                    "Product",
+                    "Item Status",
+                    "Source Code",
+                    "Supplier Code",
+                    "Manufacturer",
+                    "Manufacturer Code",
+                    "Unit of Measure",
+                    "Qty per UOM",
+                    "Quantity Ordered",
+                    "Quantity Shipped",
+                    "Quantity Received",
+                    "Quantity Invoiced",
+                    "Unit Price",
+                    "Total Cost",
+                    "Currency",
+                    "Recipient",
+                    "Estimated Ready Date",
+                    "Actual Ready Date",
+                    "Budget Code"
+            )
 
             orders*.orderItems*.each { orderItem ->
-                csv << [
-                        supplierOrganization: orderItem?.order?.origin?.organization?.code + " - " + orderItem?.order?.origin?.organization?.name,
-                        supplierLocation: orderItem?.order?.origin?.name,
-                        destinationLocation: orderItem?.order?.destination?.name,
-                        number       : orderItem?.order?.orderNumber,
-                        description       : orderItem?.order?.name ?: '',
-                        status       : orderItem?.order?.displayStatus,
-                        code       : orderItem?.product?.productCode,
-                        productName       : orderItem?.product?.name,
-                        itemStatus        : OrderItemStatusCode.CANCELED == orderItem?.orderItemStatusCode ? orderItem?.orderItemStatusCode?.name() : '',
-                        sourceCode       : orderItem?.productSupplier?.code ?: '',
-                        supplierCode       : orderItem?.productSupplier?.supplierCode ?: '',
-                        manufacturer       : orderItem?.productSupplier?.manufacturer?.name ?: '',
-                        manufacturerCode       : orderItem?.productSupplier?.manufacturerCode ?: '',
-                        unitOfMeasure: orderItem.quantityUom?.code ?: '',
-                        quantityPerUom: orderItem.quantityPerUom ?: '',
-                        quantityOrdered: orderItem.quantity,
-                        quantityShipped: orderItem.quantityShipped,
-                        quantityReceived: orderItem.quantityReceived,
-                        quantityInvoiced: orderItem.quantityInvoicedInStandardUom,
-                        unitPrice:  orderItem.unitPrice ?: '',
-                        totalCost: orderItem.total ?: '',
-                        currency: orderItem?.order?.currencyCode,
-                        recipient: orderItem.recipient ?: '',
-                        estimatedReadyDate: orderItem.estimatedReadyDate?.format("MM/dd/yyyy") ?: '',
-                        actualReadyDate: orderItem.actualReadyDate?.format("MM/dd/yyyy") ?: '',
-                        budgetCode: orderItem.budgetCode?.code ?: '',
-                ]
+                csv.printRecord(
+                        orderItem?.order?.origin?.organization?.code + " - " + orderItem?.order?.origin?.organization?.name,
+                        orderItem?.order?.origin?.name,
+                        orderItem?.order?.destination?.name,
+                        orderItem?.order?.orderNumber,
+                        orderItem?.order?.name,
+                        orderItem?.order?.displayStatus,
+                        orderItem?.product?.productCode,
+                        orderItem?.product?.name,
+                        OrderItemStatusCode.CANCELED == orderItem?.orderItemStatusCode ? orderItem?.orderItemStatusCode?.name() : '',
+                        orderItem?.productSupplier?.code,
+                        orderItem?.productSupplier?.supplierCode,
+                        orderItem?.productSupplier?.manufacturer?.name,
+                        orderItem?.productSupplier?.manufacturerCode,
+                        orderItem?.quantityUom?.code,
+                        orderItem?.quantityPerUom,
+                        orderItem?.quantity,
+                        orderItem?.quantityShipped,
+                        orderItem?.quantityReceived,
+                        orderItem?.quantityInvoicedInStandardUom,
+                        orderItem?.unitPrice,
+                        orderItem?.total,
+                        orderItem?.order?.currencyCode,
+                        orderItem?.recipient,
+                        orderItem?.estimatedReadyDate?.format("MM/dd/yyyy"),
+                        orderItem?.actualReadyDate?.format("MM/dd/yyyy"),
+                        orderItem?.budgetCode?.code,
+                )
             }
 
             response.setHeader("Content-disposition", "attachment; filename=\"Orders-${new Date().format("MM/dd/yyyy")}.csv\"")
-            render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
+            render(contentType: "text/csv", text: csv.out.toString())
         }
 
         def totalPrice = orders?.sum { it.totalNormalized?:0.0 } ?:0.0
@@ -559,56 +557,51 @@ class OrderController {
             redirect(action: "list")
 
         } else {
-
             def date = new Date()
             response.setHeader("Content-disposition", "attachment; filename=\"${orderInstance?.orderNumber?.encodeAsHTML()}-${date.format("MM-dd-yyyy")}.csv\"")
             response.contentType = "text/csv"
-            def csv = "PO Number,${orderInstance?.orderNumber}\n" +
-                    "Description,${StringEscapeUtils.escapeCsv(orderInstance?.name)}\n" +
-                    "Vendor,${StringEscapeUtils.escapeCsv(orderInstance?.origin.name)}\n" +
-                    "Ship to,${orderInstance?.destination?.name}\n" +
-                    "Ordered by,${orderInstance?.orderedBy?.name} ${orderInstance?.orderedBy?.email}\n" +
-                    "\n"
 
-            csv += "${warehouse.message(code: 'product.productCode.label')}," +
-                    "${warehouse.message(code: 'product.name.label')}," +
-                    "${warehouse.message(code: 'product.vendorCode.label')}," +
-                    "${warehouse.message(code: 'product.manufacturerCode.label')}," +
-                    "${warehouse.message(code: 'orderItem.quantity.label')}," +
-                    "${warehouse.message(code: 'product.unitOfMeasure.label')}," +
-                    "${warehouse.message(code: 'orderItem.unitPrice.label')}," +
-                    "${warehouse.message(code: 'orderItem.totalPrice.label')}," +
-                    "${warehouse.message(code: 'orderItem.budgetCode.label')}" +
-                    "\n"
+            def csv = CSVUtils.getCSVPrinter()
+            csv.printRecord("PO Number", orderInstance?.orderNumber)
+            csv.printRecord("Description", orderInstance?.name)
+            csv.printRecord("Vendor", orderInstance?.origin.name)
+            csv.printRecord("Ship to", orderInstance?.destination?.name)
+            csv.printRecord("Ordered by", "${orderInstance?.orderedBy?.name} ${orderInstance?.orderedBy?.email}")
+            csv.println()  // print a newline between text (above) and column headers (immediately following)
+            csv.printRecord(
+                    warehouse.message(code: 'product.productCode.label'),
+                    warehouse.message(code: 'product.name.label'),
+                    warehouse.message(code: 'product.vendorCode.label'),
+                    warehouse.message(code: 'orderItem.quantity.label'),
+                    warehouse.message(code: 'product.unitOfMeasure.label'),
+                    warehouse.message(code: 'orderItem.unitPrice.label'),
+                    warehouse.message(code: 'orderItem.totalPrice.label'),
+                    warehouse.message(code: 'orderItem.budgetCode.label')
+            )
 
             def totalPrice = 0.0
 
             String lastCurrencyCode = null
             orderInstance?.listOrderItems()?.each { orderItem ->
                 totalPrice += orderItem.totalPrice() ?: 0
-
-                String quantityString = CsvUtil.formatInteger(number: orderItem?.quantity, groupingUsed: false, type: "number")
-                String unitPriceString = CsvUtil.formatCurrency(number: orderItem?.unitPrice, currencyCode: orderItem?.currencyCode, isUnitPrice: true)
-                String totalPriceString = CsvUtil.formatCurrency(number: orderItem?.totalPrice(), currencyCode: orderItem?.currencyCode)
                 if (orderItem?.currencyCode != null) {
                     lastCurrencyCode = orderItem?.currencyCode
                 }
 
-                csv += "${orderItem?.product?.productCode}," +
-                        "${StringEscapeUtils.escapeCsv(orderItem?.product?.name)}," +
-                        "${orderItem?.productSupplier?.supplierCode ?: ''}," +
-                        "${orderItem?.productSupplier?.manufacturerCode ?: ''}," +
-                        "${StringEscapeUtils.escapeCsv(quantityString)}," +
-                        "${orderItem?.unitOfMeasure}," +
-                        "${StringEscapeUtils.escapeCsv(unitPriceString)}," +
-                        "${StringEscapeUtils.escapeCsv(totalPriceString)}," +
-                        "${orderItem?.budgetCode?.code}," +
-                        "\n"
+                csv.printRecord(
+                        orderItem?.product?.productCode,
+                        orderItem?.product?.name,
+                        orderItem?.product?.vendorCode,
+                        CSVUtils.formatInteger(number: orderItem?.quantity),
+                        CSVUtils.formatUnitOfMeasure(orderItem?.quantityUom?.code, orderItem?.quantityPerUom),
+                        CSVUtils.formatCurrency(number: orderItem?.unitPrice, currencyCode: orderItem?.currencyCode, isUnitPrice: true),
+                        CSVUtils.formatCurrency(number: orderItem?.totalPrice(), currencyCode: orderItem?.currencyCode),
+                        orderItem?.budgetCode?.code
+                )
             }
 
-            String totalPriceString = CsvUtil.formatCurrency(number: totalPrice, currencyCode: lastCurrencyCode)
-            csv += ",,,,,,${StringEscapeUtils.escapeCsv(totalPriceString)}\n"
-            render csv
+            csv.printRecord(null, null, null, null, null, null, CSVUtils.formatCurrency(number: totalPrice, currencyCode: lastCurrencyCode), null)
+            render(contentType: "text/csv", text: csv.out.toString())
 
         }
     }
@@ -741,8 +734,8 @@ class OrderController {
                     totalQuantity: (it?.quantity?:1) * (it?.quantityPerUom?:1),
                     productPackage: it?.productPackage,
                     currencyCode: it?.order?.currencyCode,
-                    unitPrice: CsvUtil.formatCurrency(number: it.unitPrice, currencyCode: it.currencyCode, isUnitPrice: true),
-                    totalPrice: CsvUtil.formatCurrency(number: it.totalPrice(), currencyCode: it.currencyCode),
+                    unitPrice: CSVUtils.formatCurrency(number: it.unitPrice, currencyCode: it.currencyCode, isUnitPrice: true),
+                    totalPrice: CSVUtils.formatCurrency(number: it.totalPrice(), currencyCode: it.currencyCode),
                     estimatedReadyDate: g.formatDate(date: it.estimatedReadyDate, format: Constants.DEFAULT_DATE_FORMAT),
                     actualReadyDate: g.formatDate(date: it.actualReadyDate, format: Constants.DEFAULT_DATE_FORMAT),
                     productSupplier: it.productSupplier,
@@ -772,54 +765,48 @@ class OrderController {
             def date = new Date()
             response.setHeader("Content-disposition", "attachment; filename=\"${orderInstance.orderNumber}-${date.format("MM-dd-yyyy")}.csv\"")
             response.contentType = "text/csv"
-            def csv = ""
 
-            csv += "${warehouse.message(code: 'orderItem.id.label')}," + // code
-                    "${warehouse.message(code: 'product.productCode.label')}," + // Product
-                    "${warehouse.message(code: 'product.name.label')}," + // Product
-                    "${warehouse.message(code: 'product.sourceCode.label')}," + // source Code
-                    "${warehouse.message(code: 'product.sourceName.label')}," + // source name
-                    "${warehouse.message(code: 'product.supplierCode.label')}," + // supplier code
-                    "${warehouse.message(code: 'product.manufacturer.label')}," + // manufacturer
-                    "${warehouse.message(code: 'product.manufacturerCode.label')}," + // manufacturer code
-                    "${warehouse.message(code: 'default.quantity.label')}," + // qty
-                    "${warehouse.message(code: 'default.unitOfMeasure.label')}," + // UoM
-                    "${warehouse.message(code: 'default.cost.label')}," + // unit price
-                    "${warehouse.message(code: 'orderItem.totalCost.label')}," + // total cost
-                    "${warehouse.message(code: 'order.recipient.label')}," + // recipient
-                    "${warehouse.message(code: 'orderItem.estimatedReadyDate.label')}," + // estimated ready date
-                    "${warehouse.message(code: 'orderItem.actualReadyDate.label')}," + // actual ready date
-                    "${warehouse.message(code: 'orderItem.budgetCode.label')}," +
-                    "\n"
-
-            def totalPrice = 0.0
+            def csv = CSVUtils.getCSVPrinter()
+            csv.printRecord(
+                    warehouse.message(code: 'orderItem.id.label'),
+                    warehouse.message(code: 'product.productCode.label'),
+                    warehouse.message(code: 'product.name.label'),
+                    warehouse.message(code: 'product.sourceCode.label'),
+                    warehouse.message(code: 'product.sourceName.label'),
+                    warehouse.message(code: 'product.supplierCode.label'),
+                    warehouse.message(code: 'product.manufacturer.label'),
+                    warehouse.message(code: 'product.manufacturerCode.label'),
+                    warehouse.message(code: 'default.quantity.label'),
+                    warehouse.message(code: 'default.unitOfMeasure.label'),
+                    warehouse.message(code: 'default.cost.label'),
+                    warehouse.message(code: 'orderItem.totalCost.label'),
+                    warehouse.message(code: 'order.recipient.label'),
+                    warehouse.message(code: 'orderItem.estimatedReadyDate.label'),
+                    warehouse.message(code: 'orderItem.actualReadyDate.label'),
+                    warehouse.message(code: 'orderItem.budgetCode.label')
+            )
 
             orderInstance?.listOrderItems()?.each { orderItem ->
-                totalPrice += orderItem.totalPrice() ?: 0
-
-                String quantityString = CsvUtil.formatInteger(number: orderItem?.quantity, groupingUsed: false, type: "number")
-                String unitPriceString = CsvUtil.formatCurrency(number: orderItem?.unitPrice, currencyCode: orderItem?.currencyCode, isUnitPrice: true)
-                String totalPriceString = CsvUtil.formatCurrency(number: orderItem?.totalPrice(), currencyCode: orderItem?.currencyCode)
-
-                csv += "${orderItem?.id}," +
-                        "${orderItem?.product?.productCode}," +
-                        "${StringEscapeUtils.escapeCsv(orderItem?.product?.name)}," +
-                        "${orderItem?.productSupplier?.code ?: ''}," +
-                        "${StringEscapeUtils.escapeCsv(orderItem?.productSupplier?.name ?: '')}," +
-                        "${orderItem?.productSupplier?.supplierCode ?: ''}," +
-                        "${orderItem?.productSupplier?.manufacturer?.name ?: ''}," +
-                        "${orderItem?.productSupplier?.manufacturerCode ?: ''}," +
-                        "${StringEscapeUtils.escapeCsv(quantityString)}," +
-                        "${orderItem?.unitOfMeasure}," +
-                        "${StringEscapeUtils.escapeCsv(unitPriceString)}," +
-                        "${StringEscapeUtils.escapeCsv(totalPriceString)}," +
-                        "${orderItem?.recipient?.name ?: ''}," +
-                        "${orderItem?.estimatedReadyDate?.format("MM/dd/yyyy") ?: ''}," +
-                        "${orderItem?.actualReadyDate?.format("MM/dd/yyyy") ?: ''}," +
-                        "${orderItem?.budgetCode?.code ?: ''}," +
-                        "\n"
+                csv.printRecord(
+                        orderItem?.id,
+                        orderItem?.product?.productCode,
+                        orderItem?.product?.name,
+                        orderItem?.productSupplier?.code,
+                        orderItem?.productSupplier?.name,
+                        orderItem?.productSupplier?.supplierCode,
+                        orderItem?.productSupplier?.manufacturer?.name,
+                        orderItem?.productSupplier?.manufacturerCode,
+                        CSVUtils.formatInteger(number: orderItem?.quantity),
+                        orderItem?.unitOfMeasure,
+                        CSVUtils.formatCurrency(number: orderItem?.unitPrice, currencyCode: orderItem?.currencyCode, isUnitPrice: true),
+                        CSVUtils.formatCurrency(number: orderItem?.totalPrice(), currencyCode: orderItem?.currencyCode),
+                        orderItem?.recipient?.name,
+                        orderItem?.estimatedReadyDate?.format("MM/dd/yyyy"),
+                        orderItem?.actualReadyDate?.format("MM/dd/yyyy"),
+                        orderItem?.budgetCode?.code
+                )
             }
-            render csv
+            render(contentType: "text/csv", text: csv.out.toString())
         }
     }
 
@@ -952,7 +939,7 @@ class OrderController {
             response.setHeader("Content-disposition",
                     "attachment; filename=\"PO - ${order.id} - shipment import template.csv\"")
             response.contentType = "text/csv"
-            render csv
+            render(contentType: "text/csv", text: csv)
         } else {
             render(text: 'No order items found', status: 404)
         }

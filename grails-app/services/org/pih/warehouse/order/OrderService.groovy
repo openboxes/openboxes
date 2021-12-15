@@ -27,7 +27,7 @@ import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.UpdateUnitPriceMethodCode
 import org.pih.warehouse.core.User
-import org.pih.warehouse.importer.CsvUtil
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.product.Product
@@ -688,7 +688,7 @@ class OrderService {
                     if (quantity == "") {
                         throw new IllegalArgumentException("Missing quantity.")
                     }
-                    Integer parsedQty = CsvUtil.parseInteger(quantity)
+                    Integer parsedQty = CSVUtils.parseInteger(quantity)
                     if (parsedQty <= 0) {
                         throw new IllegalArgumentException("Wrong quantity value: ${parsedQty}.")
                     }
@@ -696,7 +696,7 @@ class OrderService {
                     if (unitPrice == "") {
                         throw new IllegalArgumentException("Missing unit price.")
                     }
-                    BigDecimal parsedUnitPrice = CsvUtil.parseNumber(unitPrice)
+                    BigDecimal parsedUnitPrice = CSVUtils.parseNumber(unitPrice)
                     if (parsedUnitPrice < 0) {
                         throw new IllegalArgumentException("Wrong unit price value: ${parsedUnitPrice}.")
                     }
@@ -797,7 +797,7 @@ class OrderService {
         orderItems.each { orderItem ->
             if (orderItem.unitOfMeasure) {
                 String[] uomParts = orderItem.unitOfMeasure.split("/")
-                def quantityUom = CsvUtil.parseInteger(uomParts[1])
+                def quantityUom = CSVUtils.parseInteger(uomParts[1])
                 orderItem.unitOfMeasure = "${uomParts[0]}/${quantityUom}"
             }
         }
