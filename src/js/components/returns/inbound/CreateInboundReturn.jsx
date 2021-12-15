@@ -57,7 +57,7 @@ const FIELDS = {
       filterOptions: options => options,
     },
     getDynamicAttr: props => ({
-      loadOptions: props.debouncedLocationsFetch,
+      loadOptions: props.debouncedOriginLocationsFetch,
       disabled: !!props.inboundReturnId,
     }),
   },
@@ -76,7 +76,7 @@ const FIELDS = {
       filterOptions: options => options,
     },
     getDynamicAttr: props => ({
-      loadOptions: props.debouncedLocationsFetch,
+      loadOptions: props.debouncedDestinationLocationsFetch,
       disabled: !!props.inboundReturnId || !props.isSuperuser,
     }),
   },
@@ -89,8 +89,24 @@ class CreateInboundReturn extends Component {
       values: this.props.initialValues,
     };
 
-    this.debouncedLocationsFetch =
-        debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength);
+    this.debouncedOriginLocationsFetch =
+      debounceLocationsFetch(
+        this.props.debounceTime,
+        this.props.minSearchLength,
+        [], // activityCodes
+        false, // fetchAll
+        false, // withOrgCode
+        true, // withTypeDescription
+        true, // isReturnOrder
+      );
+
+    this.debouncedDestinationLocationsFetch =
+      debounceLocationsFetch(
+        this.props.debounceTime,
+        this.props.minSearchLength,
+        [], // activityCodes
+        true, // fetchAll
+      );
   }
 
   componentDidMount() {
@@ -215,7 +231,8 @@ class CreateInboundReturn extends Component {
                   origin: values.origin,
                   destination: values.destination,
                   isSuperuser: this.props.isSuperuser,
-                  debouncedLocationsFetch: this.debouncedLocationsFetch,
+                  debouncedOriginLocationsFetch: this.debouncedOriginLocationsFetch,
+                  debouncedDestinationLocationsFetch: this.debouncedDestinationLocationsFetch,
                   inboundReturnId: this.props.match.params.inboundReturnId,
                   values,
                 }),

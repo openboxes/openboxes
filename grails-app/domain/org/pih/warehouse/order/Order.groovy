@@ -134,11 +134,11 @@ class Order implements Serializable {
         currencyCode(nullable:true)
         exchangeRate(nullable:true)
         origin(nullable: false, validator: { Location origin, Order obj ->
-            return !origin?.organization ? ['validator.organization.required'] : true
+            return !origin.isWard() && !origin?.organization ? ['validator.organization.required'] : true
         })
         originParty(nullable:true)
         destination(nullable: false, validator: { Location destination, Order obj ->
-            return !destination?.organization ? ['validator.organization.required'] : true
+            return !destination.isWard() && !destination?.organization ? ['validator.organization.required'] : true
         })
         destinationParty(nullable:true)
         recipient(nullable: true)
