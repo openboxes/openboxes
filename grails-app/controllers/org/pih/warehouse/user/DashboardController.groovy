@@ -217,7 +217,7 @@ class DashboardController {
     def changeLocation = {
         User user = User.get(session.user.id)
         Map loginLocationsMap = locationService.getLoginLocationsMap(user, null)
-        List savedLocations = [user?.warehouse, session?.warehouse].unique()
+        List savedLocations = [user?.warehouse, session?.warehouse].unique() - null
         render(template: "loginLocations", model: [savedLocations: savedLocations, loginLocationsMap: loginLocationsMap])
     }
 
