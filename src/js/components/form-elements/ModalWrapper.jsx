@@ -42,15 +42,28 @@ class ModalWrapper extends Component {
 
     return (
       <div>
-        <button
-          type="button"
-          className={`btn-xs ${this.props.btnOpenClassName}`}
-          style={this.props.btnOpenStyle}
-          disabled={this.props.btnOpenDisabled}
-          onClick={() => this.openModal()}
-        >
-          <Translate id={this.props.btnOpenText} defaultMessage={this.props.btnOpenDefaultText} />
-        </button>
+        {this.props.btnOpenAsIcon ? (
+          <div
+            role="button"
+            className={`btn-xs ${this.props.btnOpenClassName}`}
+            style={this.props.btnOpenStyle}
+            onClick={() => this.openModal()}
+            onKeyPress={() => this.openModal()}
+            tabIndex={0}
+          >
+            <i className={`fa ${this.props.btnOpenIcon ? this.props.btnOpenIcon : 'fa-search'}`} />
+          </div>
+        ) : (
+          <button
+            type="button"
+            className={`btn-xs ${this.props.btnOpenClassName}`}
+            style={this.props.btnOpenStyle}
+            disabled={this.props.btnOpenDisabled}
+            onClick={() => this.openModal()}
+          >
+            <Translate id={this.props.btnOpenText} defaultMessage={this.props.btnOpenDefaultText} />
+          </button>
+        )}
         <Modal
           isOpen={this.props.showModal || this.state.showModal}
           onRequestClose={this.closeModal}
@@ -136,6 +149,8 @@ ModalWrapper.propTypes = {
   btnOpenClassName: PropTypes.string,
   btnOpenStyle: PropTypes.shape({}),
   btnOpenDisabled: PropTypes.bool,
+  btnOpenAsIcon: PropTypes.bool,
+  btnOpenIcon: PropTypes.string,
 
   /** Modal title property */
   title: PropTypes.oneOfType([
@@ -189,6 +204,8 @@ ModalWrapper.defaultProps = {
   btnOpenClassName: 'btn btn-outline-primary',
   btnOpenStyle: {},
   btnOpenDisabled: false,
+  btnOpenAsIcon: false,
+  btnOpenIcon: '',
 
   children: null,
   bodyContainerClassName: 'modal-body-container',

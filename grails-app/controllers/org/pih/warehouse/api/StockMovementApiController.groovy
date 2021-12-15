@@ -331,6 +331,18 @@ class StockMovementApiController {
         render([data: "Data will be imported successfully"] as JSON)
     }
 
+    def getPendingRequisitionDetails = {
+        Location origin = Location.get(params.origin.id)
+        Product product = Product.get(params.product.id)
+
+        if (!origin || !product) {
+            throw new IllegalArgumentException("Both origin location and product are required!")
+        }
+
+        def pendingRequisitionDetails = stockMovementService.getPendingRequisitionDetails(origin, product)
+        render([data: pendingRequisitionDetails] as JSON)
+    }
+
     /**
      * Bind the date field value to the date object.
      *

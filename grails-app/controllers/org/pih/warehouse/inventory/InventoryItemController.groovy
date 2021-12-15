@@ -353,7 +353,7 @@ class InventoryItemController {
         DateFormat monthFormat = new SimpleDateFormat("MMM yyyy")
         monthFormat.timeZone = TimeZone.default
 
-        def requisitionItemsDemandDetails = forecastingService.getDemandDetailsForDemandTab(
+        def requisitionItemsDemandDetails = forecastingService.getDemandDetails(
             cmd.warehouse,
             destination,
             commandInstance?.product,

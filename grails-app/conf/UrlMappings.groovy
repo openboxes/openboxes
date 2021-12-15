@@ -167,6 +167,11 @@ class UrlMappings {
             action = [GET: "createPickList"]
         }
 
+        "/api/stockMovements/pendingRequisitionDetails"(parseRequest: true) {
+            controller = "stockMovementApi"
+            action = [GET: "getPendingRequisitionDetails"]
+        }
+
         "/api/stockMovements/$id/updateAdjustedItems"(parseRequest: true) {
             controller = "stockMovementApi"
             action = [POST: "updateAdjustedItems"]
