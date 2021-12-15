@@ -1890,6 +1890,12 @@ class StockMovementService {
         requisitionItem.undoChanges()
         requisitionItem.quantityApproved = requisitionItem.quantity
         requisitionItem.save(flush: true)
+    }
+
+    def revertItemAndCreateMissingPicklist(StockMovementItem stockMovementItem) {
+        revertItem(stockMovementItem)
+
+        RequisitionItem requisitionItem = stockMovementItem.requisitionItem
 
         createMissingPicklistForStockMovementItem(StockMovementItem.createFromRequisitionItem(requisitionItem))
         createMissingShipmentItem(requisitionItem)
@@ -1977,12 +1983,17 @@ class StockMovementService {
 
         removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
 
+        // Find all products for which qty ATP needs to be recalculated
+        def productsToRefresh = []
+        productsToRefresh.add(requisitionItem?.product?.id)
+
         // Find all picklist items associated with the given requisition item
         List<PicklistItem> picklistItems = PicklistItem.findAllByRequisitionItem(requisitionItem)
 
         // Find all picklist items associated with the given requisition item's children
         requisitionItem?.requisitionItems?.each { RequisitionItem item ->
             picklistItems.addAll(PicklistItem.findAllByRequisitionItem(item))
+            productsToRefresh.add(item?.product?.id)
         }
 
         picklistItems.each { PicklistItem picklistItem ->
@@ -1995,7 +2006,7 @@ class StockMovementService {
         // Save requisition item before PA refresh
         requisitionItem.save(flush: true)
 
-        productAvailabilityService.refreshProductsAvailability(requisitionItem?.requisition?.origin?.id, [requisitionItem?.product?.id], false)
+        productAvailabilityService.refreshProductsAvailability(requisitionItem?.requisition?.origin?.id, productsToRefresh, false)
     }
 
     void updateAdjustedItems(StockMovement stockMovement, String adjustedProductCode) {
