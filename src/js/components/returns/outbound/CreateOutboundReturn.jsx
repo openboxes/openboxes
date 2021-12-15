@@ -90,7 +90,12 @@ class CreateOutboundReturn extends Component {
     };
 
     this.debouncedLocationsFetch =
-      debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength);
+      debounceLocationsFetch(
+        this.props.debounceTime,
+        this.props.minSearchLength,
+        [], // activityCodes
+        true, // fetchAll
+      );
   }
 
   componentDidMount() {
