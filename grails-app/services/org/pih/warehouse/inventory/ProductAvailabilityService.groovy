@@ -23,6 +23,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
+import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductActivityCode
@@ -151,29 +152,32 @@ class ProductAvailabilityService {
     }
 
     def getQuantityPickedByProductAndLocation(Location location, Product product) {
-        Picklist.createCriteria().list {
-            projections {
-                picklistItems {
-                    groupProperty("binLocation.id", "binLocation")
-                    groupProperty("inventoryItem.id", "inventoryItem")
-                    sum("quantity", "quantity")
-                    groupProperty("sortOrder", "sortOrder")
-                }
-            }
-            requisition {
-                'in'("status", RequisitionStatus.listPending())
-                eq("origin", location)
-            }
-            picklistItems {
-                if (product) {
-                    requisitionItem {
-                        eq("product", product)
-                    }
-                }
-                order("binLocation")
-                order("inventoryItem")
-            }
-        }.collect { [binLocation: it[0], inventoryItem: it[1], quantityAllocated: it[2]] }
+        def results = Picklist.executeQuery("""
+            SELECT
+                pli.binLocation,
+                pli.inventoryItem,
+                sum(pli.quantity)
+            FROM Picklist pl
+            INNER JOIN pl.picklistItems pli
+            LEFT JOIN pl.requisition r
+            LEFT JOIN pl.order o
+            LEFT JOIN pli.requisitionItem ri
+            LEFT JOIN pli.orderItem oi
+            LEFT JOIN pli.inventoryItem ii
+            LEFT JOIN pli.binLocation l
+            LEFT JOIN l.supportedActivities s
+            WHERE ((r.origin = :location AND r.status IN (:pendingRequisitionStatus)) OR (o.origin = :location AND o.status IN (:pendingOrderStatus)))
+              AND (oi IS NOT NULL OR (ri IS NOT NULL AND (ii.lotStatus IS NULL OR ii.lotStatus != 'RECALLED') AND NOT ('HOLD_STOCK' IN ELEMENTS(l.supportedActivities))))
+              AND (:product = '' OR ri.product.id = :product OR oi.product.id = :product)
+            GROUP BY pli.binLocation, pli.inventoryItem
+        """, [
+                location                    : location,
+                pendingRequisitionStatus    : RequisitionStatus.listPending(),
+                pendingOrderStatus          : OrderStatus.listPending(),
+                product                     : product?.id ?: ''
+        ])
+
+        return results.collect { [binLocation: it[0]?.id, inventoryItem: it[1]?.id, quantityAllocated: it[2]] }
     }
 
     def saveProductAvailability(Location location, Product product, List binLocations, Boolean forceRefresh) {
