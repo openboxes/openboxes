@@ -195,14 +195,10 @@ const AD_HOCK_FIELDS = {
         label: 'react.stockMovement.demandPerMonth.label',
         defaultMessage: 'Demand per Month',
         flexWidth: '1',
-        getDynamicAttr: ({ hasStockList, translate, subfield }) => ({
+        getDynamicAttr: () => ({
           formatValue: (value) => {
             if (value && value !== '0') {
               return value.toLocaleString('en-US');
-            } else if (hasStockList && !subfield) {
-              return translate('react.stockMovement.replenishmentPeriodNotFound.label', 'Replenishment period not found');
-            } else if (subfield) {
-              return '';
             }
 
             return '0';
@@ -457,14 +453,10 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
         label: 'react.stockMovement.demandPerMonth.label',
         defaultMessage: 'Demand per Month',
         flexWidth: '1',
-        getDynamicAttr: ({ hasStockList, translate, subfield }) => ({
+        getDynamicAttr: () => ({
           formatValue: (value) => {
             if (value && value !== '0') {
               return value.toLocaleString('en-US');
-            } else if (hasStockList && !subfield) {
-              return translate('react.stockMovement.replenishmentPeriodNotFound.label', 'Replenishment period not found');
-            } else if (subfield) {
-              return '';
             }
 
             return '0';
@@ -719,14 +711,10 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
         label: 'react.stockMovement.demandPerMonth.labe',
         defaultMessage: 'Demand per Month',
         flexWidth: '1',
-        getDynamicAttr: ({ hasStockList, translate, subfield }) => ({
+        getDynamicAttr: () => ({
           formatValue: (value) => {
             if (value && value !== '0') {
               return value.toLocaleString('en-US');
-            } else if (hasStockList && !subfield) {
-              return translate('react.stockMovement.replenishmentPeriodNotFound.label', 'Replenishment period not found');
-            } else if (subfield) {
-              return '';
             }
 
             return '0';
