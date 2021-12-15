@@ -466,6 +466,7 @@ class StockMovementController {
                         productName         : product.name,
                         quantity            : value.sum { it.quantityRemaining },
                         expectedShippingDate: formatDate(date: shipment.expectedShippingDate, format: "dd-MMM-yy"),
+                        expectedDeliveryDate: formatDate(date: shipment.expectedDeliveryDate, format: "dd-MMM-yy"),
                         shipmentNumber      : shipment.shipmentNumber,
                         shipmentName        : shipment.name,
                         origin              : shipment.origin,
@@ -484,6 +485,7 @@ class StockMovementController {
                 "Product Name" { it.productName }
                 "Quantity Incoming" { it.quantity }
                 "Expected Shipping Date" { it.expectedShippingDate }
+                "Expected Delivery Date" { it.expectedDeliveryDate }
                 "Shipment Number" { it.shipmentNumber }
                 "Shipment Name" { it.shipmentName }
                 "Origin" { it.origin }
@@ -496,6 +498,7 @@ class StockMovementController {
                         productName         : shipmentItem.productName,
                         quantity            : shipmentItem.quantity,
                         expectedShippingDate: shipmentItem.expectedShippingDate,
+                        expectedDeliveryDate: shipmentItem.expectedDeliveryDate,
                         shipmentNumber      : shipmentItem.shipmentNumber,
                         shipmentName        : shipmentItem.shipmentName,
                         origin              : shipmentItem.origin,
