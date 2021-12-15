@@ -26,7 +26,11 @@ grails.project.dependency.resolution = {
     inherits("global") {
         // uncomment to disable ehcache
         // excludes 'ehcache'
-        excludes "xml-apis", "xmlbeans"
+        excludes(
+                "commons-logging",  // use jcl-over-slf4j instead
+                "xml-apis",
+                "xmlbeans"
+        )
     }
     log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
     repositories {
@@ -54,7 +58,7 @@ grails.project.dependency.resolution = {
 
         // Required by docx4j functionality
         compile('org.docx4j:docx4j:2.8.1') {
-            excludes 'commons-logging:commons-logging:1.0.4', 'commons-codec', 'commons-io'
+            excludes 'commons-codec', 'commons-io'
         }
 
         // Required for barcode4j
@@ -117,7 +121,7 @@ grails.project.dependency.resolution = {
         // Unknown
         build('org.jboss.tattletale:tattletale-ant:1.2.0.Beta2') { excludes "ant", "javassist" }
         compile('org.codehaus.groovy.modules.http-builder:http-builder:0.6') {
-            excludes "xercesImpl", "groovy", "commons-lang", "commons-codec"
+            excludes "commons-codec", "commons-lang", "groovy", "xercesImpl"
         }
 
         // REST client
