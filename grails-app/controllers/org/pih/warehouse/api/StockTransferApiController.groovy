@@ -15,9 +15,11 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
+import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ShipmentType
 
 import java.text.SimpleDateFormat
@@ -106,6 +108,10 @@ class StockTransferApiController {
         render([data: stockTransfer?.toJson()] as JSON)
     }
 
+    Boolean isNull(Object objectValue) {
+        return objectValue == JSONObject.NULL || objectValue == null || objectValue?.equals("")
+    }
+
     StockTransfer bindStockTransferData(StockTransfer stockTransfer, User currentUser, Location currentLocation, JSONObject jsonObject) {
         bindData(stockTransfer, jsonObject)
 
@@ -144,7 +150,18 @@ class StockTransferApiController {
 
         jsonObject.stockTransferItems.each { stockTransferItemMap ->
             StockTransferItem stockTransferItem = new StockTransferItem()
-            bindData(stockTransferItem, stockTransferItemMap)
+            stockTransferItem.id = !isNull(stockTransferItemMap["id"]) ? stockTransferItemMap["id"] : null
+            stockTransferItem.productAvailabilityId = !isNull(stockTransferItemMap["productAvailabilityId"]) ? stockTransferItemMap["productAvailabilityId"] : null
+            stockTransferItem.product = !isNull(stockTransferItemMap["product.id"]) ? Product.load(stockTransferItemMap["product.id"]) : null
+            stockTransferItem.originBinLocation = !isNull(stockTransferItemMap["originBinLocation.id"]) ? Location.load(stockTransferItemMap["originBinLocation.id"]) : null
+            stockTransferItem.destinationBinLocation = !isNull(stockTransferItemMap["destinationBinLocation.id"]) ? Location.load(stockTransferItemMap["destinationBinLocation.id"]) : null
+            stockTransferItem.inventoryItem = !isNull(stockTransferItemMap["inventoryItem.id"]) ? InventoryItem.load(stockTransferItemMap["inventoryItem.id"]) : null
+            stockTransferItem.quantityOnHand = stockTransferItemMap["quantityOnHand"] ? stockTransferItemMap["quantityOnHand"] : 0
+            stockTransferItem.quantityNotPicked = stockTransferItemMap["quantityNotPicked"] ? stockTransferItemMap["quantityNotPicked"] : 0
+            stockTransferItem.quantity = stockTransferItemMap["quantity"] ? new BigDecimal(stockTransferItemMap["quantity"]) : 0
+            stockTransferItem.status = stockTransferItemMap["status"] ? stockTransferItemMap["status"] : null
+            stockTransferItem.recipient = !isNull(stockTransferItemMap["recipient"]) ? stockTransferItemMap["recipient"] : null
+
             if (!stockTransferItem.location) {
                 stockTransferItem.location = stockTransfer.origin
             }
