@@ -376,6 +376,7 @@ class StockMovement {
             identifier: requisition.requestNumber,
             description: requisition.description,
             statusCode: RequisitionStatus.toStockMovementStatus(requisition.status)?.name(),
+            stockMovementStatusCode: RequisitionStatus.toStockMovementStatus(requisition.status),
             origin: requisition.origin,
             destination: requisition.destination,
             dateRequested: requisition.dateRequested,
