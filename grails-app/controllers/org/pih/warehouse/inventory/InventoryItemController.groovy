@@ -144,7 +144,7 @@ class InventoryItemController {
             quantityAvailableMap = productAvailabilityService.getQuantityAvailableToPromiseByProduct(location, products)
         }
 
-        def totalQuantity = quantityAvailableMap.values().sum() > 0 ?: 0
+        def totalQuantity = quantityAvailableMap.values().sum() ?: 0
 
         log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
 

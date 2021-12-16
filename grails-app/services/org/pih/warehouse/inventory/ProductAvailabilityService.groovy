@@ -461,12 +461,13 @@ class ProductAvailabilityService {
         def quantityMap = [:]
         if (location) {
             def results = ProductAvailability.executeQuery("""
-						select pa.product, sum(pa.quantityAvailableToPromise)
+						select pa.product, sum(case when pa.quantityAvailableToPromise > 0 then pa.quantityAvailableToPromise else 0 end)
 						from ProductAvailability pa
 						where pa.location = :location
 						and pa.product in (:products)
 						group by pa.product
 						""", [location: location, products:products])
+
             results.each {
                 quantityMap[it[0]] = it[1]
             }
