@@ -11,6 +11,7 @@ package org.pih.warehouse.importer
 
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVPrinter
+import org.apache.commons.lang.StringUtils
 import org.pih.warehouse.util.LocalizationUtil
 
 import java.text.DecimalFormat
@@ -38,7 +39,10 @@ class CSVUtils {
      * This method correctly handles grouping punctuation so long as it
      * matches the current locale.
      */
-    static BigDecimal parseNumber(String s) {
+    static BigDecimal parseNumber(String s, String fieldName = "unknown_field") {
+        if (StringUtils.isBlank(s)) {
+            throw new IllegalArgumentException("${fieldName} is empty or unset")
+        }
         DecimalFormat format = DecimalFormat.getNumberInstance(LocalizationUtil.localizationService.currentLocale)
         format.parseBigDecimal = true
         /*
@@ -46,16 +50,22 @@ class CSVUtils {
          * used daggers as grouping punctuation. No parser expects this behavior,
          * so to read our own old exports we need to filter them out ourselves.
          */
-        return format.parse(s.replace("†", ""))
+        try {
+            return format.parse(s.replace("†", ""))
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Unable to parse expected numeric value ${fieldName}=${s}")
+        }
     }
 
     /**
      * Parse a string into an integer, even with grouping punctuation.
-     *
-     * @raise ArithmeticException if not an integer.
      */
-    static int parseInteger(String s) {
-        return parseNumber(s).intValueExact()
+    static int parseInteger(String s, String fieldName = "unknown_field") {
+        try {
+            return parseNumber(s, fieldName).intValueExact()
+        } catch (ArithmeticException e) {
+            throw new IllegalArgumentException("Expected integer value for ${fieldName}=${s}")
+        }
     }
 
     /**

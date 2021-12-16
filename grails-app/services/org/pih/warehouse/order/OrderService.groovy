@@ -10,6 +10,7 @@
 package org.pih.warehouse.order
 
 import grails.validation.ValidationException
+import java.math.RoundingMode
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.grails.plugins.csv.CSVMapReader
 import org.hibernate.criterion.CriteriaSpecification
@@ -678,25 +679,19 @@ class OrderService {
                             throw new IllegalArgumentException("Could not find provided Unit of Measure: ${unitOfMeasure}.")
                         }
                         UnitOfMeasure uom = uomParts.length > 1 ? UnitOfMeasure.findByCodeOrName(uomParts[0], uomParts[0]) : null
-                        BigDecimal qtyPerUom = uomParts.length > 1 ? BigDecimal.valueOf(Double.valueOf(uomParts[1])) : null
+                        BigDecimal qtyPerUom = uomParts.length > 1 ? CSVUtils.parseNumber(uomParts[1], "unitOfMeasure"): null
                         orderItem.quantityUom = uom
                         orderItem.quantityPerUom = qtyPerUom
                     } else {
                         throw new IllegalArgumentException("Missing unit of measure.")
                     }
 
-                    if (quantity == "") {
-                        throw new IllegalArgumentException("Missing quantity.")
-                    }
-                    Integer parsedQty = CSVUtils.parseInteger(quantity)
+                    Integer parsedQty = CSVUtils.parseInteger(quantity, "quantity")
                     if (parsedQty <= 0) {
                         throw new IllegalArgumentException("Wrong quantity value: ${parsedQty}.")
                     }
 
-                    if (unitPrice == "") {
-                        throw new IllegalArgumentException("Missing unit price.")
-                    }
-                    BigDecimal parsedUnitPrice = CSVUtils.parseNumber(unitPrice)
+                    BigDecimal parsedUnitPrice = CSVUtils.parseNumber(unitPrice, "unitPrice")
                     if (parsedUnitPrice < 0) {
                         throw new IllegalArgumentException("Wrong unit price value: ${parsedUnitPrice}.")
                     }
@@ -794,12 +789,14 @@ class OrderService {
             throw new RuntimeException("Error parsing order item CSV: " + e.message, e)
         }
 
+        // FIXME it's not entirely clear why we reformat strings here like this
         orderItems.each { orderItem ->
             if (orderItem.unitOfMeasure) {
                 String[] uomParts = orderItem.unitOfMeasure.split("/")
-                def quantityUom = CSVUtils.parseInteger(uomParts[1])
+                def quantityUom = CSVUtils.parseNumber(uomParts[1], "unitOfMeasure")
                 orderItem.unitOfMeasure = "${uomParts[0]}/${quantityUom}"
             }
+            orderItem.unitPrice = orderItem.unitPrice ? CSVUtils.parseNumber(orderItem.unitPrice, "unitPrice").setScale(4, RoundingMode.FLOOR).toString() : ''
         }
 
         return orderItems
@@ -821,8 +818,10 @@ class OrderService {
             propertiesMap.each {
                 def excludedProperties = it.deny
                 excludedProperties.each { property ->
-                    if (order.status == it.status && (existingOrderItem.toImport()."${property}" != orderItem."${property}")) {
-                        throw new IllegalArgumentException("Can't edit the field ${property} of item ${orderItem.productCode} via import")
+                    def existingValue = existingOrderItem.toImport()."${property}"
+                    def importedValue = orderItem."${property}"
+                    if (order.status == it.status && (existingValue != importedValue)) {
+                        throw new IllegalArgumentException("Import must not change ${property} of item ${orderItem.productCode}, before: ${existingValue}, after: ${importedValue}")
                     }
                 }
             }
