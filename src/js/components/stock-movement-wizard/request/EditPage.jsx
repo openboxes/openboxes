@@ -17,6 +17,7 @@ import TextField from '../../form-elements/TextField';
 import { renderFormField } from '../../../utils/form-utils';
 import LabelField from '../../form-elements/LabelField';
 import SelectField from '../../form-elements/SelectField';
+import DetailsModal from '../modals/DetailsModal';
 import SubstitutionsModal from '../modals/SubstitutionsModal';
 import apiClient from '../../../utils/apiClient';
 import TableRowWithSubfields from '../../form-elements/TableRowWithSubfields';
@@ -57,7 +58,7 @@ const AD_HOCK_FIELDS = {
       availability: {
         label: 'react.verifyRequest.availability.label',
         defaultLabel: 'Availability',
-        flexWidth: 1 + 1 + 1, // = Sum of fields flexWidth
+        flexWidth: 1 + 1 + 1 + 1, // = Sum of fields flexWidth
       },
       edit: {
         label: 'react.verifyRequest.edit.label',
@@ -206,6 +207,30 @@ const AD_HOCK_FIELDS = {
           showValueTooltip: true,
         }),
       },
+      detailsButton: {
+        label: 'react.stockMovement.details.label',
+        defaultMessage: 'Details',
+        type: DetailsModal,
+        flexWidth: '1',
+        fieldKey: '',
+        attributes: {
+          title: 'react.stockMovement.pendingRequisitionDetails.label',
+          defaultTitleMessage: 'Pending Requisition Details',
+        },
+        getDynamicAttr: ({ fieldValue, values }) => ({
+          productId: fieldValue && fieldValue.product && fieldValue.product.id,
+          productCode: fieldValue && fieldValue.product && fieldValue.product.productCode,
+          productName: fieldValue && fieldValue.product && fieldValue.product.name,
+          originId: values && values.origin && values.origin.id,
+          btnOpenText: 'react.stockMovement.details.label',
+          btnOpenDefaultText: 'Details',
+          btnCancelText: 'Close',
+          btnSaveStyle: { display: 'none' },
+          btnContainerClassName: 'float-right',
+          btnOpenAsIcon: true,
+          btnOpenStyle: { border: 'none', cursor: 'pointer' },
+        }),
+      },
       substituteButton: {
         label: 'react.stockMovement.substitution.label',
         defaultMessage: 'Substitution',
@@ -315,7 +340,7 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
       availability: {
         label: 'react.verifyRequest.availability.label',
         defaultLabel: 'Availability',
-        flexWidth: 1 + 1 + 1, // = Sum of fields flexWidth
+        flexWidth: 1 + 1 + 1 + 1, // = Sum of fields flexWidth
       },
       edit: {
         label: 'react.verifyRequest.edit.label',
@@ -464,6 +489,30 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
           showValueTooltip: true,
         }),
       },
+      detailsButton: {
+        label: 'react.stockMovement.details.label',
+        defaultMessage: 'Details',
+        type: DetailsModal,
+        flexWidth: '1',
+        fieldKey: '',
+        attributes: {
+          title: 'react.stockMovement.pendingRequisitionDetails.label',
+          defaultTitleMessage: 'Pending Requisition Details',
+        },
+        getDynamicAttr: ({ fieldValue, values }) => ({
+          productId: fieldValue && fieldValue.product && fieldValue.product.id,
+          productCode: fieldValue && fieldValue.product && fieldValue.product.productCode,
+          productName: fieldValue && fieldValue.product && fieldValue.product.name,
+          originId: values && values.origin && values.origin.id,
+          btnOpenText: 'react.stockMovement.details.label',
+          btnOpenDefaultText: 'Details',
+          btnCancelText: 'Close',
+          btnSaveStyle: { display: 'none' },
+          btnContainerClassName: 'float-right',
+          btnOpenAsIcon: true,
+          btnOpenStyle: { border: 'none', cursor: 'pointer' },
+        }),
+      },
       substituteButton: {
         label: 'react.stockMovement.substitution.label',
         defaultMessage: 'Substitution',
@@ -573,7 +622,7 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
       availability: {
         label: 'react.verifyRequest.availability.label',
         defaultLabel: 'Availability',
-        flexWidth: 1 + 1 + 1, // = Sum of fields flexWidth
+        flexWidth: 1 + 1 + 1 + 1, // = Sum of fields flexWidth
       },
       edit: {
         label: 'react.verifyRequest.edit.label',
@@ -720,6 +769,30 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
             return '0';
           },
           showValueTooltip: true,
+        }),
+      },
+      detailsButton: {
+        label: 'react.stockMovement.details.label',
+        defaultMessage: 'Details',
+        type: DetailsModal,
+        fieldKey: '',
+        flexWidth: '1',
+        attributes: {
+          title: 'react.stockMovement.pendingRequisitionDetails.label',
+          defaultTitleMessage: 'Pending Requisition Details',
+        },
+        getDynamicAttr: ({ fieldValue, values }) => ({
+          productId: fieldValue && fieldValue.product && fieldValue.product.id,
+          productCode: fieldValue && fieldValue.product && fieldValue.product.productCode,
+          productName: fieldValue && fieldValue.product && fieldValue.product.name,
+          originId: values && values.origin && values.origin.id,
+          btnOpenText: 'react.stockMovement.details.label',
+          btnOpenDefaultText: 'Details',
+          btnCancelText: 'Close',
+          btnSaveStyle: { display: 'none' },
+          btnContainerClassName: 'float-right',
+          btnOpenAsIcon: true,
+          btnOpenStyle: { border: 'none', cursor: 'pointer' },
         }),
       },
       substituteButton: {

@@ -577,6 +577,37 @@ class StockMovementService {
         return requisitionItems
     }
 
+    def getPendingRequisitionDetails(Location origin, Product product) {
+        def results = []
+        def demandDetailsMap = [:]
+        def pendingRequisitionDetails = requisitionService.getPendingRequisitionItems(origin, product)
+        pendingRequisitionDetails.groupBy { it.requisition }.collect { Requisition requisition, List<RequisitionItem> requisitionItems ->
+            def demandDetails
+            if (demandDetailsMap.get(requisition.destination)){
+                demandDetails = demandDetailsMap.get(requisition.destination)
+            } else {
+                demandDetails = forecastingService.getDemand(origin, requisition.destination, product)
+                if (requisition.destination.isDepot()) {
+                    def quantityOnHandAtDestination = productAvailabilityService.getQuantityOnHand(product, requisition.destination)
+                    demandDetails << [quantityOnHandAtDestination: quantityOnHandAtDestination]
+                }
+                demandDetailsMap.put(requisition.destination, demandDetails)
+            }
+
+            results << [
+                id                          : requisition.id,
+                requestNumber               : requisition.requestNumber,
+                'destination.name'          : requisition.destination.name,
+                quantityOnHandAtDestination : demandDetails.quantityOnHandAtDestination,
+                averageMonthlyDemand        : demandDetails.monthlyDemand as Integer,
+                quantityRequested           : requisitionItems.quantity.sum(),
+                quantityPicked              : requisitionItems.sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityPicked() },
+            ]
+        }
+
+        return results
+    }
+
     def getStockMovementItem(String id, String stepNumber) {
         return getStockMovementItem(id, stepNumber, false)
     }
@@ -702,7 +733,7 @@ class StockMovementService {
             def quantityAvailable = inventoryService.getQuantityAvailableToPromise(stockMovementItem.product, requisition.destination)
             def template = requisition.requisitionTemplate
             if (!template || (template && template.replenishmentTypeCode == ReplenishmentTypeCode.PULL)) {
-                def demand = forecastingService.getDemand(requisition.destination, stockMovementItem.product)
+                def demand = forecastingService.getDemand(requisition.destination, null, stockMovementItem.product)
                 return [
                         id                              : stockMovementItem.id,
                         product                         : stockMovementItem.product,
@@ -795,7 +826,7 @@ class StockMovementService {
 
         def template = requisition.requisitionTemplate
         if (!template || (template && template.replenishmentTypeCode == ReplenishmentTypeCode.PULL)) {
-            def quantityDemand = forecastingService.getDemand(requisition.destination, editPageItem.product)
+            def quantityDemand = forecastingService.getDemand(requisition.destination, null, editPageItem.product)
             editPageItem << [
                     quantityDemandRequesting        : quantityDemand?.monthlyDemand?:0,
                     demandPerReplenishmentPeriod    : Math.ceil((quantityDemand?.dailyDemand?:0) * (template?.replenishmentPeriod?:30))
@@ -843,7 +874,7 @@ class StockMovementService {
 
             def quantityAvailable = availableItems?.findAll { it.quantityAvailable > 0 }?.sum { it.quantityAvailable }
             def quantityOnHand = availableItems?.sum { it.quantityOnHand }
-            def quantityDemandFulfilling = forecastingService.getDemand(requisition.origin, productsMap[it.product_id])
+            def quantityDemandFulfilling = forecastingService.getDemand(requisition.origin, null, productsMap[it.product_id])
 
             [
                 product                     : productsMap[it.product_id],

@@ -30,7 +30,7 @@ class ProductApiController extends BaseDomainApiController {
         def data = [:]
         data.location = location
         data.product = product
-        data.demand = forecastingService.getDemand(location, product)
+        data.demand = forecastingService.getDemand(location, null, product)
 
         render([data: data] as JSON)
     }
@@ -209,7 +209,7 @@ class ProductApiController extends BaseDomainApiController {
         Location location = Location.get(params.locationId)
         def quantityOnHand = productAvailabilityService.getQuantityOnHand(product, location)
         def quantityAvailable = inventoryService.getQuantityAvailableToPromise(product, location)
-        def demand = forecastingService.getDemand(location, product)
+        def demand = forecastingService.getDemand(location, null, product)
         render([monthlyDemand: demand.monthlyDemand, quantityOnHand: quantityOnHand, quantityAvailable: quantityAvailable] as JSON)
     }
 

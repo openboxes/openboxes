@@ -1741,7 +1741,7 @@ class JsonController {
     def getForecastingData = {
         Product product = Product.get(params.product.id)
         Location location = Location.get(params.location.id)
-        def demandData = forecastingService.getDemand(location, product)
+        def demandData = forecastingService.getDemand(location, null, product)
         render demandData as JSON
     }
 
