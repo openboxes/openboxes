@@ -56,6 +56,7 @@ import org.pih.warehouse.integration.xml.order.UnitTypeWeight
 import org.pih.warehouse.integration.xml.pod.DocumentUpload
 import org.pih.warehouse.integration.xml.trip.Orders
 import org.pih.warehouse.integration.xml.trip.Trip
+import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.product.Attribute
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.Shipment
@@ -72,6 +73,7 @@ class TmsIntegrationService {
     boolean transactional = true
 
     def grailsApplication
+    def shipmentService
     def fileTransferService
     def xsdValidatorService
     def notificationService
@@ -215,6 +217,8 @@ class TmsIntegrationService {
             BigDecimal longitude = executionStatus?.geoData?.longitude
             Date eventDate = dateFormatter.parse(executionStatus.dateTime)
             createEvent(trackingNumber, statusCode, latitude, longitude, eventDate)
+            triggerOutboundInventoryUpdates(trackingNumber, statusCode)
+            triggerInboundInventoryUpdates(trackingNumber, statusCode)
         }
     }
 
@@ -310,6 +314,42 @@ class TmsIntegrationService {
         }
     }
 
+    def triggerOutboundInventoryUpdates(String trackingNumber, String status) {
+        List outboundTransactionTriggerStatuses = grailsApplication.config.openboxes.integration.createOutboundTransactionOnStatusUpdate
+        log.info "Triggering outbound inventory update ${trackingNumber} if ${status} in ${outboundTransactionTriggerStatuses}"
+        if (status in outboundTransactionTriggerStatuses) {
+            StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber, Boolean.FALSE)
+            log.info ("Stock movement ${stockMovement?.identifier} with status ${stockMovement?.status} will be shipped")
+            if (!stockMovement.hasBeenShipped() && stockMovement.stockMovementStatusCode >= StockMovementStatusCode.PACKED) {
+                stockMovementService.transitionRequisitionBasedStockMovement(stockMovement, StockMovementStatusCode.DISPATCHED)
+            }
+            else {
+                log.warn ("Stock movement ${stockMovement.identifier} with status ${stockMovement.status} cannot be dispatched")
+            }
+        }
+    }
+
+    def triggerInboundInventoryUpdates(String trackingNumber, String status) {
+        List inboundTransactionTriggerStatuses = grailsApplication.config.openboxes.integration.createInboundTransactionOnStatusUpdate
+        log.info "Triggering inbound inventory update ${trackingNumber} if ${status} in ${inboundTransactionTriggerStatuses}"
+        if (status in inboundTransactionTriggerStatuses) {
+            StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber, Boolean.FALSE)
+            log.info "stockmovement ${stockMovement.hasBeenShipped()} ${stockMovement.isReceived} ${stockMovement?.stockMovementStatusCode}"
+            if(stockMovement.hasBeenShipped() && !stockMovement.isReceived) {
+                log.info ("Stock movement ${stockMovement.identifier} with status ${stockMovement.status} will be received")
+                Shipment shipment = stockMovement.shipment
+                if (shipment) {
+                    String comment = "Shipment ${shipment.shipmentNumber} has been automatically received into ${shipment.destination}"
+                    shipmentService.receiveShipments([shipment.id], comment, shipment?.createdBy?.id, shipment?.destination?.id, true)
+                }
+            }
+            else {
+                log.warn ("Stock movement ${stockMovement.identifier} with status ${stockMovement.status} has already been received")
+            }
+
+        }
+    }
+
     def failMessage(String filePath, Exception exception) {
         try {
             log.info "Path ${filePath}"
@@ -325,11 +365,10 @@ class TmsIntegrationService {
 
     def archiveMessage(String oldPath) {
         try {
-            log.info "Path ${oldPath}"
             def filename = FilenameUtils.getName(oldPath)
             def destination = FilenameUtils.getFullPathNoEndSeparator(oldPath)
             def newPath = "${destination}/archive/${filename}"
-            log.info("Archive message ${oldPath} to ${newPath}")
+            log.info("Archiving message ${oldPath} to ${newPath}")
             fileTransferService.moveMessage(oldPath, newPath)
         } catch (Exception e) {
             log.error("Unable to archive message " + e.message, e)

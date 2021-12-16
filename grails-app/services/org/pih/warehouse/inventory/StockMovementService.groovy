@@ -112,7 +112,25 @@ class StockMovementService {
                 jsonObject.containsKey("status") ? jsonObject.status as StockMovementStatusCode : null
 
         Boolean statusOnly =
-                jsonObject.containsKey("statusOnly") ? jsonObject.getBoolean("statusOnly") : false
+                jsonObject.containsKey("statusOnly") ? jsonObject.getBoolean("statusOnly") : Boolean.FALSE
+
+        Boolean rollback =
+                    jsonObject.containsKey("rollback") ? jsonObject.getBoolean("rollback") : Boolean.FALSE
+
+        Boolean shouldCreatePicklist = jsonObject.containsKey("createPicklist") ?
+                                jsonObject.getBoolean("createPicklist") : Boolean.FALSE
+
+        Boolean shouldClearPicklist = jsonObject.containsKey("clearPicklist") ?
+                                jsonObject.getBoolean("clearPicklist") : Boolean.FALSE
+
+        transitionRequisitionBasedStockMovement(stockMovement, status, statusOnly, rollback, shouldCreatePicklist, shouldClearPicklist)
+
+    }
+
+
+    void transitionRequisitionBasedStockMovement(StockMovement stockMovement, StockMovementStatusCode status,
+                                                 Boolean statusOnly = Boolean.FALSE, Boolean rollback = Boolean.FALSE,
+                                                 Boolean shouldCreatePicklist = Boolean.FALSE, Boolean shouldClearPicklist = Boolean.FALSE) {
 
         // Update status only
         if (status && statusOnly) {
@@ -123,9 +141,6 @@ class StockMovementService {
         else {
 
             // Determine whether we need to rollback changes
-            Boolean rollback =
-                    jsonObject.containsKey("rollback") ? jsonObject.getBoolean("rollback") : false
-
             if (rollback) {
                 rollbackStockMovement(stockMovement.id)
             }
@@ -145,17 +160,9 @@ class StockMovementService {
                     case StockMovementStatusCode.PICKING:
                         validateQuantityRequested(stockMovement)
 
-                        // Clear picklist
-                        Boolean shouldClearPicklist = jsonObject.containsKey("clearPicklist") ?
-                                jsonObject.getBoolean("clearPicklist") : Boolean.FALSE
-
                         if (shouldClearPicklist) {
                             clearPicklist(stockMovement)
                         }
-
-                        // Create picklist
-                        Boolean shouldCreatePicklist = jsonObject.containsKey("createPicklist") ?
-                                jsonObject.getBoolean("createPicklist") : Boolean.FALSE
 
                         if (shouldCreatePicklist) {
                             createPicklist(stockMovement)
@@ -259,8 +266,8 @@ class StockMovementService {
 
     void updateRequisitionStatus(String id, RequisitionStatus status) {
 
-        log.info "Update status ${id} " + status
         Requisition requisition = Requisition.get(id)
+        log.info "Update status id=${id} requisition=${requisition} status=${status}"
         if (status == RequisitionStatus.CHECKING) {
             Shipment shipment = requisition.shipment
             shipment?.expectedShippingDate = new Date()
@@ -2240,7 +2247,7 @@ class StockMovementService {
     StockMovement findByTrackingNumber(String trackingNumber, Boolean includeDocuments = Boolean.TRUE) {
         ReferenceNumberType trackingNumberType = ReferenceNumberType.findById(Constants.TRACKING_NUMBER_TYPE_ID)
         ReferenceNumber referenceNumber = ReferenceNumber.findByReferenceNumberTypeAndIdentifier(trackingNumberType, trackingNumber)
-        log.info "reference number ${referenceNumber}"
+        log.info "tracking number ${referenceNumber}"
 
         // FIXME Figure out the best way to handle the case where the eTN identifier has not been properly mapped to an OB shipment
         if (!referenceNumber) {
@@ -2256,7 +2263,7 @@ class StockMovementService {
             }
         }
 
-        return getShipmentBasedStockMovement(shipment, includeDocuments)
+        return getRequisitionBasedStockMovement(shipment.requisition, null, includeDocuments)
 
     }
 
@@ -2491,7 +2498,7 @@ class StockMovementService {
     void issueRequisitionBasedStockMovement(String id) {
 
         User user = AuthService.currentUser.get()
-        StockMovement stockMovement = getStockMovement(id)
+        StockMovement stockMovement = getStockMovement(id, Boolean.FALSE)
         Requisition requisition = stockMovement.requisition
         def shipment = requisition.shipment
 
