@@ -70,7 +70,7 @@ class ProductApiController extends BaseDomainApiController {
         if(params.availableItems) {
             products = productService.searchProducts(terms, [])
             def location = Location.get(session.warehouse.id)
-            def availableItems = inventoryService.getAvailableBinLocations(location, products).groupBy { it.inventoryItem?.product?.productCode }
+            def availableItems = productAvailabilityService.getAvailableBinLocations(location, products).groupBy { it.inventoryItem?.product?.productCode }
             products = []
             availableItems.each { k, v ->
                 products += [
