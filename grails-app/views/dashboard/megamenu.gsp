@@ -418,11 +418,12 @@
                             <warehouse:message code="report.cycleCount.label" default="Cycle Count Report"/>
                         </g:link>
                     </div>
-                    <div class="mm-menu-item">
-                        <g:link controller="inventory" action="show">
-                            <warehouse:message code="report.baselineQohReport.label" default="Baseline QoH Report"/>
-                        </g:link>
-                    </div>
+%{--                    OBPIH-4213 TEMPORARILY DISABLED--}%
+%{--                    <div class="mm-menu-item">--}%
+%{--                        <g:link controller="inventory" action="show">--}%
+%{--                            <warehouse:message code="report.baselineQohReport.label" default="Baseline QoH Report"/>--}%
+%{--                        </g:link>--}%
+%{--                    </div>--}%
                     <div class="mm-menu-item">
                         <g:link controller="report" action="showOnOrderReport">
                             <warehouse:message code="report.onOrderReport.label" default="On Order Report"/>
