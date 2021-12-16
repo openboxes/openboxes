@@ -10,15 +10,15 @@
                     <warehouse:message code="product.name.label"/>
                 </th>
                 <th class="center middle" >
-                    <warehouse:message code="default.qty.label"/>
+                    <warehouse:message code="product.quantityAvailableToPromise.label"/>
                 </th>
             </tr>
         </thead>
         <tbody>
-            <g:if test="${quantityMap}">
-                <g:each var="entrySet" in="${quantityMap}" status="status">
+            <g:if test="${quantityAvailableMap}">
+                <g:each var="entrySet" in="${quantityAvailableMap}" status="status">
                     <g:set var="product" value="${entrySet.key}"/>
-                    <g:set var="quantity" value="${entrySet.value}"/>
+                    <g:set var="quantityAvailable" value="${entrySet.value}"/>
                     <tr class="${(status%2)?'odd':'even'}">
                         <td>${product?.productCode}</td>
                         <td>
@@ -27,13 +27,13 @@
                             </g:link>
                         </td>
                         <td class="center">
-                            ${quantity}
+                            ${quantityAvailable > 0 ?: 0}
                             ${product.unitOfMeasure}
                         </td>
                     </tr>
                 </g:each>
             </g:if>
-            <g:unless test="${quantityMap}">
+            <g:unless test="${quantityAvailableMap}">
                 <tr>
                     <td colspan="8">
                         <div class="fade empty center">

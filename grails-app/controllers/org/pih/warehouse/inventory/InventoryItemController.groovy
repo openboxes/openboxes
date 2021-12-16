@@ -139,15 +139,16 @@ class InventoryItemController {
 
         def products = product.alternativeProducts() as List
         log.info "Products " + products
-        def quantityMap = [:]
+        def quantityAvailableMap = [:]
         if (!products.isEmpty()) {
-            quantityMap = inventoryService.getQuantityByProductMap(location, products)
+            quantityAvailableMap = productAvailabilityService.getQuantityAvailableToPromiseByProduct(location, products)
         }
-        def totalQuantity = quantityMap.values().sum() ?: 0
+
+        def totalQuantity = quantityAvailableMap.values().sum() > 0 ?: 0
 
         log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
 
-        render(template: "showProductGroups", model: [product: product, totalQuantity: totalQuantity, quantityMap: quantityMap])
+        render(template: "showProductGroups", model: [product: product, totalQuantity: totalQuantity, quantityAvailableMap: quantityAvailableMap])
     }
 
 
