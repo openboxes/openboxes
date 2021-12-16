@@ -1426,6 +1426,8 @@ openboxes.integration.defaultTimeZone = System.env.DEFAULT_TIME_ZONE ?: "Europe/
 openboxes.integration.defaultDateFormat = "yyyy-MM-dd'T'HH:mm:ssXXX"
 openboxes.integration.resolveEmptyNamespace.enabled = false
 openboxes.integration.tracking.uri = "https://tms.etrucknow.com/tracking/orderTracking/%s"
+openboxes.integration.createOutboundTransactionOnStatusUpdate = ["PICKUP"]
+openboxes.integration.createInboundTransactionOnStatusUpdate = ["DELIVERY"]
 
 // Default order header
 openboxes.integration.order.filename = "Order-%s.xml"
