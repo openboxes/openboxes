@@ -67,6 +67,8 @@ class ForecastingService {
             Map params = [startDate: startDate, endDate: endDate]
             String query = """
                 select 
+                    request_id,
+                    request_item_id,
                     request_status,
                     request_number,
                     DATE_FORMAT(date_issued, '%b %Y') as month_year,
