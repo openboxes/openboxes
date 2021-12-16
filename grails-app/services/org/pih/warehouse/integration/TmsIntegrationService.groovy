@@ -101,9 +101,12 @@ class TmsIntegrationService {
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
         // OBKN-372 Hack to allow JAXB to deserialize XML without xmlns
-        InputStream inputStream = new ByteArrayInputStream(xmlContents.bytes)
-        String xmlContentsWithNamespace = xsdValidatorService.resolveEmptyNamespace(inputStream)
-        return unmarshaller.unmarshal(IOUtils.toInputStream(xmlContentsWithNamespace))
+        Boolean resolveEmptyNamespace = grailsApplication.config.openboxes.integration.ftp.resolveEmptyNamespace.enabled
+        if (resolveEmptyNamespace) {
+            InputStream inputStream = new ByteArrayInputStream(xmlContents.bytes)
+            xmlContents = xsdValidatorService.resolveEmptyNamespace(inputStream)
+        }
+        return unmarshaller.unmarshal(IOUtils.toInputStream(xmlContents))
     }
 
     Object deserialize(String xmlContents, final Class clazz) {
@@ -113,9 +116,12 @@ class TmsIntegrationService {
             Unmarshaller unmarshaller = JAXBContext.newInstance(clazz).createUnmarshaller()
 
             // OBKN-372 Hack to allow JAXB to deserialize XML without xmlns
-            InputStream inputStream = new ByteArrayInputStream(xmlContents.bytes)
-            String xmlContentsWithNamespace = xsdValidatorService.resolveEmptyNamespace(inputStream)
-            return unmarshaller.unmarshal(new StringReader(xmlContentsWithNamespace))
+            Boolean resolveEmptyNamespace = grailsApplication.config.openboxes.integration.ftp.resolveEmptyNamespace.enabled
+            if (resolveEmptyNamespace) {
+                InputStream inputStream = new ByteArrayInputStream(xmlContents.bytes)
+                xmlContents = xsdValidatorService.resolveEmptyNamespace(inputStream)
+            }
+            return unmarshaller.unmarshal(new StringReader(xmlContents))
 
         } catch (Exception e) {
             log.error("Error occurred while deserializing XML to object: " + e.message, e)
@@ -138,7 +144,11 @@ class TmsIntegrationService {
             String directory = grailsApplication.config.openboxes.integration.ftp.inbound.directory
             List<String> subdirectories = grailsApplication.config.openboxes.integration.ftp.inbound.subdirectories
             def messages = fileTransferService.listMessages(directory, subdirectories)
-            log.info "Messages " + messages
+
+            messages.eachWithIndex { msg, index ->
+                log.info "Message ${index}: " + msg
+            }
+
             messages = messages.findAll { it.isRegularFile && it.name.endsWith(".xml")}
             if (messages) {
                 message = messages.pop()
@@ -146,7 +156,13 @@ class TmsIntegrationService {
                     String xmlContents = fileTransferService.retrieveMessage(message.path)
                     log.info "Handling message ${message}:\n${xmlContents}"
                     handleMessage(xmlContents)
-                    archiveMessage(message.path)
+
+                    // Archive message on success so that other messages can be processed
+                    Boolean archiveMessageOnSuccess = grailsApplication.config.openboxes.integration.ftp.inbound.archiveOnSuccess.enabled
+                    if (archiveMessageOnSuccess) {
+                        log.info "Archiving message ${message}"
+                        archiveMessage(message.path)
+                    }
                 }
             }
         }
@@ -154,6 +170,13 @@ class TmsIntegrationService {
             log.error("Message ${message?.name} not processed due to error: " + e.message, e)
             if (message) {
                 failMessage(message?.path, e)
+
+                // Archive message on failure so that other messages can be processed
+                // Not recommended as this can lead to unexpected outcomes given that this will allow other messages to be processed
+                Boolean archiveOnFailure = grailsApplication.config.openboxes.integration.ftp.inbound.archiveOnFailure.enabled
+                if (archiveOnFailure) {
+                    archiveMessage(message.path)
+                }
             }
         }
     }
@@ -236,10 +259,6 @@ class TmsIntegrationService {
             shipment.addToEvents(event)
             shipment.save(flush: true)
         }
-        else {
-            log.info "Event exists"
-        }
-
     }
 
     void associateStockMovementAndDeliveryOrder(String identifier, String trackingNumber) {
