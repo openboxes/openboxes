@@ -1323,7 +1323,6 @@ class EditItemsPage extends Component {
                 </button>
                 <button
                   type="button"
-                  disabled={invalid}
                   onClick={() => this.save(values)}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                 >
@@ -1335,7 +1334,6 @@ class EditItemsPage extends Component {
                 </button>
                 <button
                   type="button"
-                  disabled={invalid}
                   onClick={() => this.saveAndExit(values)}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
                 >
