@@ -1418,13 +1418,13 @@ openboxes.integration.ftp.outbound.directory = System.env.FTP_OUTBOUND_DIRECTORY
 openboxes.integration.ftp.inbound.validate = System.env.FTP_INBOUND_VALIDATE ?: true
 openboxes.integration.ftp.inbound.directory = System.env.FTP_OUTBOUND_DIRECTORY ?: "inbound"
 openboxes.integration.ftp.inbound.subdirectories = []
-openboxes.integration.ftp.archiveOnSuccess = Boolean.TRUE
-openboxes.integration.ftp.archiveOnFailure = Boolean.FALSE
+openboxes.integration.ftp.inbound.archiveOnSuccess.enabled = Boolean.TRUE
+openboxes.integration.ftp.inbound.archiveOnFailure.enabled = Boolean.FALSE
 
 // OpenBoxes / eTN Integration default configuration
 openboxes.integration.defaultTimeZone = System.env.DEFAULT_TIME_ZONE ?: "Europe/London"
 openboxes.integration.defaultDateFormat = "yyyy-MM-dd'T'HH:mm:ssXXX"
-
+openboxes.integration.resolveEmptyNamespace.enabled = false
 openboxes.integration.tracking.uri = "https://tms.etrucknow.com/tracking/orderTracking/%s"
 
 // Default order header
