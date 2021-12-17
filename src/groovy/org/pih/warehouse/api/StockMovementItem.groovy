@@ -409,7 +409,7 @@ class SubstitutionItem {
     }
 
     Integer getQuantityAvailable() {
-        availableItems ? availableItems.sum { it.quantityAvailable } : 0
+        availableItems ? availableItems.sum { it.quantityAvailable < 0 ? 0 : it.quantityAvailable } : 0
     }
 
     Integer getQuantityOnHand() {
