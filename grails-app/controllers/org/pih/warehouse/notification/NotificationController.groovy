@@ -30,102 +30,29 @@ import org.pih.warehouse.requisition.RequisitionItem
 
 class NotificationController {
 
+    def productService
     def grailsApplication
 
-//    String accessKey = grailsApplication.config.aws.sns.access.key
-//    String secretKey = grailsApplication.config.aws.sns.access.secretKey
-
-    def productService
-
-    private def amazonSnsClient() {
+    private def getAmazonSnsClient() {
         return AmazonSNSClientBuilder
                 .standard()
-                .withRegion(Regions.US_EAST_1)
+                .withRegion(grailsApplication.config.awssdk.sns.region)
                 .withCredentials(
                         new AWSStaticCredentialsProvider(
                                 new BasicAWSCredentials(
-                                        grailsApplication.config.aws.sns.access.key?.toString(),
-                                        grailsApplication.config.aws.sns.access.secretKey?.toString()
+                                        grailsApplication.config.awssdk.sns.accessKey,
+                                        grailsApplication.config.awssdk.sns.secretKey
                                 )
                         )
                 ).build()
     }
 
-    /*TODO remove this after testing*/
     def publish = {
-        log.info "Publishing message"
-        String message = """{
-    "locationNumber": "SOF00001",
-    "products": [{
-        "id": "142",
-        "dateCreated": "2021-11-24T15:53:35.325213400Z",
-        "lastUpdated": "2021-11-24T15:53:35.325213400Z",
-        "productCode": "Test SKU2",
-        "name": "Test name",
-        "pricePerUnit": 150.0,
-        "description": "Test description",
-        "unitOfMeasure": null,
-        "brandName": null,
-        "category": "FMCG",
-        "attributes": [{
-            "code": "vat",
-            "value": "20.0"
-        }, {
-            "code": "country",
-            "value": "Bulgaria"
-        }, {
-            "code": "principalCompany",
-            "value": "Test principal company"
-        }, {
-            "code": "strength",
-            "value": ""
-        }, {
-            "code": "packSize",
-            "value": "Pack size"
-        }, {
-            "code": "productForm",
-            "value": "Form of product"
-        }, {
-            "code": "size",
-            "value": "Size"
-        }, {
-            "code": "color",
-            "value": "Color"
-        }, {
-            "code": "weight",
-            "value": "Weight"
-        }, {
-            "code": "packageInformation",
-            "value": "Package information"
-        }, {
-            "code": "dimensions",
-            "value": "Dimensions"
-        }, {
-            "code": "barcode",
-            "value": "Test barcode"
-        }, {
-            "code": "category",
-            "value": "Acne & Sensitive Skin"
-        }, {
-            "code": "subcategory",
-            "value": "Subcategory 1"
-        }, {
-            "code": "ingredients",
-            "value": ""
-        }],
-        "documents": [{
-            "fileUri": "link2.com"
-        }, {
-            "fileUri": "link1.com"
-        }, {
-            "fileUri": "videolink.com"
-        }],
-        "components": []
-    }]
-}"""
-        String PRODUCT_TOPIC_ARN = grailsApplication.config.aws.sns.product.arn
+        String message = request.JSON.toString()
+        log.info "Publishing message " + message
+        String PRODUCT_TOPIC_ARN = grailsApplication.config.awssdk.sns.product.arn
         PublishRequest publishRequest = new PublishRequest(PRODUCT_TOPIC_ARN, message, "Demo publish")
-        def result = amazonSnsClient().publish(publishRequest)
+        def result = amazonSnsClient.publish(publishRequest)
         log.info "result::${result?.dump()}"
         render "published"
     }
@@ -137,9 +64,9 @@ class NotificationController {
         if(json.has("Type") && json.getString("Type") == "SubscriptionConfirmation"){
             String token = json.getString("Token")
             try {
-                String PRODUCT_TOPIC_ARN = grailsApplication.config.aws.sns.product.arn
+                String PRODUCT_TOPIC_ARN = grailsApplication.config.awssdk.sns.product.arn
                 ConfirmSubscriptionRequest request = new ConfirmSubscriptionRequest(PRODUCT_TOPIC_ARN, token)
-                ConfirmSubscriptionResult result = amazonSnsClient().confirmSubscription(request);
+                ConfirmSubscriptionResult result = amazonSnsClient.confirmSubscription(request);
                 log.info "result::${result?.toString()}"
             } catch (Exception e) {
                 System.err.println(e.printStackTrace());
@@ -149,17 +76,17 @@ class NotificationController {
     }
 
     def subscribe = {
-        String PRODUCT_TOPIC_ARN = grailsApplication.config.aws.sns.product.arn?.toString()
-
+        String PRODUCT_TOPIC_ARN = grailsApplication.config.awssdk.sns.product.arn
         log.info "Subscribiing topic:${PRODUCT_TOPIC_ARN}"
         try {
-            String notifyUrl = grailsApplication.config.aws.sns.product.notify.url?.toString()
-            SubscribeRequest subscribeRequest = new SubscribeRequest(PRODUCT_TOPIC_ARN, "https",  notifyUrl)
+            String subscribeUrl = g.createLink(uri: "/api/notifications/products", absolute: true)
+            SubscribeRequest subscribeRequest = new SubscribeRequest(PRODUCT_TOPIC_ARN, "https",  subscribeUrl)
             subscribeRequest.returnSubscriptionArn = true
-            SubscribeResult result = amazonSnsClient().subscribe(subscribeRequest);
+            SubscribeResult result = amazonSnsClient.subscribe(subscribeRequest);
             log.info("Subscription ARN is " + result.subscriptionArn);
+            render "subscribed ${result}"
         } catch (Exception e) {
-            log.error(e.printStackTrace());
+            log.error("Error occurred while subscribing to ${PRODUCT_TOPIC_ARN}: " + e.message, e);
         }
         render "subscribed"
     }
@@ -167,13 +94,13 @@ class NotificationController {
 
     def createProduct = {
         JSONObject json = request.getJSON() as JSONObject
-        println "json::${json}"
+        log.info "json::${json}"
         if(json.has("Type") && json.getString("Type") == "SubscriptionConfirmation"){
             String token = json.getString("Token")
             try {
-                String PRODUCT_TOPIC_ARN = grailsApplication.config.aws.sns.product.arn
+                String PRODUCT_TOPIC_ARN = grailsApplication.config.awssdk.sns.product.arn
                 ConfirmSubscriptionRequest request = new ConfirmSubscriptionRequest(PRODUCT_TOPIC_ARN, token)
-                ConfirmSubscriptionResult result = amazonSnsClient().confirmSubscription(request);
+                ConfirmSubscriptionResult result = amazonSnsClient.confirmSubscription(request);
                 log.info "result::${result?.toString()}"
             } catch (Exception e) {
                 System.err.println(e.printStackTrace());
@@ -198,9 +125,8 @@ class NotificationController {
             Product productInstance = Product.findByProductCode(pJson.getString("productCode"))
             if(!productInstance){
                 productInstance = new Product()
+                productInstance.productCode = pJson.getString("productCode")
             }
-            productInstance.productCode = pJson.getString("productCode")
-            productInstance.productCode = pJson.getString("productCode")
             productInstance.name = pJson.getString("name")
             productInstance.description = pJson.getString("description")
             productInstance.pricePerUnit = pJson.getDouble("pricePerUnit")
@@ -232,12 +158,12 @@ class NotificationController {
         if(json.has("Type") && json.getString("Type") == "SubscriptionConfirmation"){
             String token = json.getString("Token")
             try {
-                String PRODUCT_TOPIC_ARN = grailsApplication.config.aws.sns.product.arn
-                ConfirmSubscriptionRequest request = new ConfirmSubscriptionRequest(PRODUCT_TOPIC_ARN, token)
-                ConfirmSubscriptionResult result = amazonSnsClient().confirmSubscription(request);
+                String ORDER_TOPIC_ARN = grailsApplication.config.awssdk.sns.order.arn
+                ConfirmSubscriptionRequest request = new ConfirmSubscriptionRequest(ORDER_TOPIC_ARN, token)
+                ConfirmSubscriptionResult result = amazonSnsClient.confirmSubscription(request);
                 log.info "result::${result?.toString()}"
             } catch (Exception e) {
-                System.err.println(e.printStackTrace());
+                log.error "Error in saving order: " + e.message, e
             }
             render "subscribed"
             return

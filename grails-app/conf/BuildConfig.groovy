@@ -124,6 +124,10 @@ grails.project.dependency.resolution = {
 
         // for com.google.common
         compile 'com.google.guava:guava:12.0'
+
+        // amazon sdk
+        compile 'com.amazonaws:aws-java-sdk-sns:1.12.128'
+
     }
     plugins {
 

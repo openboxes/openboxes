@@ -404,12 +404,11 @@ class UrlMappings {
             controller = "genericApi"
             action = [GET: "read", POST: "update", PUT: "update", DELETE: "delete"]
         }
-
-        "/api/notifications/products"{
+        "/api/notifications/products" {
             controller = "notification"
             action = [POST: "createProduct"]
         }
-        "/api/notifications/orders"{
+        "/api/notifications/orders" {
             controller = "notification"
             action = [POST: "createOrder"]
         }
