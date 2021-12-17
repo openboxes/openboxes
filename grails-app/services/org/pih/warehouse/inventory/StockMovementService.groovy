@@ -463,6 +463,7 @@ class StockMovementService {
     def getOutboundStockMovements(Integer maxResults, Integer offset, Map params = [:]) {
         log.info("outbound stock filter param:${params}")
         StockMovement stockMovement = new StockMovement()
+        stockMovement.stockMovementStatusCode = params?.status ? params?.status as StockMovementStatusCode : null
         stockMovement.origin = params?.origin?.id ? Location.get(params.origin.id) : null
         stockMovement.name = params.name ? "%" + params?.name + "%" : null
         stockMovement.identifier = params.identifier ? params?.identifier + "%" : null
