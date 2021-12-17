@@ -116,7 +116,7 @@
                     ${itemsMap.values()["quantityRequired"].sum()} ${product?.unitOfMeasure}
                 </td>
                 <td>
-                    ${itemsMap.values()["quantityPicked"].sum()} ${product?.unitOfMeasure}
+                    ${itemsMap.values()["picklistItemsByLot"]*.values()["quantity"]?.flatten()?.sum() ?: 0} ${product?.unitOfMeasure}
                 </td>
                 <td></td>
             </tr>
