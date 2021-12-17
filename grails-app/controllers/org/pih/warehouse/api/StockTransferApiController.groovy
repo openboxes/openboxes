@@ -176,8 +176,8 @@ class StockTransferApiController {
             }
 
             // For inbound returns
-            if (stockTransferItemMap.lotNumber || stockTransferItemMap.expirationDate) {
-                Date expirationDate = stockTransferItemMap.expirationDate ? Constants.EXPIRATION_DATE_FORMATTER.parse(stockTransferItemMap.expirationDate) : null
+            if ((stockTransferItemMap.lotNumber && stockTransferItemMap.lotNumber != JSONObject.NULL) || (stockTransferItemMap.expirationDate && stockTransferItemMap.expirationDate != JSONObject.NULL)) {
+                Date expirationDate = stockTransferItemMap.expirationDate && stockTransferItemMap.expirationDate != JSONObject.NULL ? Constants.EXPIRATION_DATE_FORMATTER.parse(stockTransferItemMap.expirationDate) : null
                 stockTransferItem.inventoryItem = inventoryService.findAndUpdateOrCreateInventoryItem(
                     stockTransferItem.product,
                     stockTransferItemMap.lotNumber,
