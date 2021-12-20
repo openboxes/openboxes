@@ -62,7 +62,8 @@ const Input = ({
         const { value } = event.target;
         onChange(value);
       }}
-      className={`form-control form-control-xs ${className}`}
+      /* eslint-disable-next-line react/prop-types */
+      className={`form-control form-control-xs ${className} ${props.type === 'number' ? 'text-right mr-2' : ''}`}
       {...props}
       onChange={handleChange}
       onFocus={handleFocus}

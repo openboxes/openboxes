@@ -43,9 +43,11 @@ const AD_HOCK_FIELDS = {
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     rowComponent: TableRowWithSubfields,
-    getDynamicRowAttr: ({ rowValues, subfield }) => {
+    getDynamicRowAttr: ({ rowValues }) => {
       let className = rowValues.statusCode === 'SUBSTITUTED' ? 'crossed-out ' : '';
-      if (!subfield) { className += 'font-weight-bold'; }
+      if (rowValues.quantityAvailable < rowValues.quantityRequested) {
+        className += 'font-weight-bold';
+      }
       return { className };
     },
     subfieldKey: 'substitutionItems',
@@ -104,6 +106,7 @@ const AD_HOCK_FIELDS = {
         flexWidth: '1',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+          numberField: true,
         },
       },
       quantityDemandRequesting: {
@@ -113,6 +116,7 @@ const AD_HOCK_FIELDS = {
         flexWidth: '1',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+          numberField: true,
         },
       },
       quantityRequested: {
@@ -147,6 +151,7 @@ const AD_HOCK_FIELDS = {
         flexWidth: '1',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+          numberField: true,
         },
       },
       quantityOnHand: {
@@ -156,19 +161,10 @@ const AD_HOCK_FIELDS = {
         flexWidth: '1',
         fieldKey: '',
         headerClassName: 'left-border',
-        getDynamicAttr: ({ fieldValue }) => {
-          let className = '';
-          if (fieldValue && (!fieldValue.quantityOnHand ||
-              fieldValue.quantityOnHand < fieldValue.quantityRequested)) {
-            className = 'text-danger';
-          }
-          return {
-            className,
-          };
-        },
         attributes: {
-          cellClassName: 'left-border',
           formatValue: value => (value.quantityOnHand ? (value.quantityOnHand.toLocaleString('en-US')) : value.quantityOnHand),
+          numberField: true,
+          className: 'left-border',
         },
       },
       quantityAvailable: {
@@ -181,7 +177,7 @@ const AD_HOCK_FIELDS = {
           let className = '';
           if (fieldValue && (!fieldValue.quantityAvailable ||
               fieldValue.quantityAvailable < fieldValue.quantityRequested)) {
-            className = 'text-danger';
+            className += 'text-danger';
           }
           return {
             className,
@@ -189,6 +185,7 @@ const AD_HOCK_FIELDS = {
         },
         attributes: {
           formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
+          numberField: true,
         },
       },
       quantityDemandFulfilling: {
@@ -206,6 +203,9 @@ const AD_HOCK_FIELDS = {
           },
           showValueTooltip: true,
         }),
+        attributes: {
+          numberField: true,
+        },
       },
       detailsButton: {
         label: 'react.stockMovement.details.label',
@@ -325,9 +325,11 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     rowComponent: TableRowWithSubfields,
-    getDynamicRowAttr: ({ rowValues, subfield }) => {
+    getDynamicRowAttr: ({ rowValues }) => {
       let className = rowValues.statusCode === 'SUBSTITUTED' ? 'crossed-out ' : '';
-      if (!subfield) { className += 'font-weight-bold'; }
+      if (rowValues.quantityAvailable < rowValues.quantityRequested) {
+        className += 'font-weight-bold';
+      }
       return { className };
     },
     subfieldKey: 'substitutionItems',
@@ -386,6 +388,7 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
         flexWidth: '1',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+          numberField: true,
         },
       },
       quantityOnHandRequesting: {
@@ -395,6 +398,7 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
         flexWidth: '1',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+          numberField: true,
         },
       },
       quantityRequested: {
@@ -429,6 +433,7 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
         flexWidth: '1',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+          numberField: true,
         },
       },
       quantityOnHand: {
@@ -438,19 +443,10 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
         flexWidth: '1',
         fieldKey: '',
         headerClassName: 'left-border',
-        getDynamicAttr: ({ fieldValue }) => {
-          let className = '';
-          if (fieldValue && (!fieldValue.quantityOnHand ||
-            fieldValue.quantityOnHand < fieldValue.quantityRequested)) {
-            className = 'text-danger';
-          }
-          return {
-            className,
-          };
-        },
         attributes: {
-          cellClassName: 'left-border',
           formatValue: value => (value.quantityOnHand ? (value.quantityOnHand.toLocaleString('en-US')) : value.quantityOnHand),
+          numberField: true,
+          className: 'left-border',
         },
       },
       quantityAvailable: {
@@ -463,7 +459,7 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
           let className = '';
           if (fieldValue && (!fieldValue.quantityAvailable ||
               fieldValue.quantityAvailable < fieldValue.quantityRequested)) {
-            className = 'text-danger';
+            className += 'text-danger';
           }
           return {
             className,
@@ -471,6 +467,7 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
         },
         attributes: {
           formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
+          numberField: true,
         },
       },
       quantityDemandFulfilling: {
@@ -488,6 +485,9 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
           },
           showValueTooltip: true,
         }),
+        attributes: {
+          numberField: true,
+        },
       },
       detailsButton: {
         label: 'react.stockMovement.details.label',
@@ -607,9 +607,11 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     rowComponent: TableRowWithSubfields,
-    getDynamicRowAttr: ({ rowValues, subfield }) => {
+    getDynamicRowAttr: ({ rowValues }) => {
       let className = rowValues.statusCode === 'SUBSTITUTED' ? 'crossed-out ' : '';
-      if (!subfield) { className += 'font-weight-bold'; }
+      if (rowValues.quantityAvailable < rowValues.quantityRequested) {
+        className += 'font-weight-bold';
+      }
       return { className };
     },
     subfieldKey: 'substitutionItems',
@@ -668,6 +670,7 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
         flexWidth: '1',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+          numberField: true,
         },
       },
       quantityOnHandRequesting: {
@@ -677,6 +680,7 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
         flexWidth: '1',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+          numberField: true,
         },
       },
       quantityRequested: {
@@ -711,6 +715,7 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
         flexWidth: '1',
         attributes: {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+          numberField: true,
         },
       },
       quantityOnHand: {
@@ -720,19 +725,10 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
         flexWidth: '1',
         fieldKey: '',
         headerClassName: 'left-border',
-        getDynamicAttr: ({ fieldValue }) => {
-          let className = '';
-          if (fieldValue && (!fieldValue.quantityOnHand ||
-            fieldValue.quantityOnHand < fieldValue.quantityRequested)) {
-            className = 'text-danger';
-          }
-          return {
-            className,
-          };
-        },
         attributes: {
-          cellClassName: 'left-border',
           formatValue: value => (value.quantityOnHand ? (value.quantityOnHand.toLocaleString('en-US')) : value.quantityOnHand),
+          numberField: true,
+          className: 'left-border',
         },
       },
       quantityAvailable: {
@@ -745,7 +741,7 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
           let className = '';
           if (fieldValue && (!fieldValue.quantityAvailable ||
               fieldValue.quantityAvailable < fieldValue.quantityRequested)) {
-            className = 'text-danger';
+            className += 'text-danger';
           }
           return {
             className,
@@ -753,6 +749,7 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
         },
         attributes: {
           formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
+          numberField: true,
         },
       },
       quantityDemandFulfilling: {
@@ -770,6 +767,9 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
           },
           showValueTooltip: true,
         }),
+        attributes: {
+          numberField: true,
+        },
       },
       detailsButton: {
         label: 'react.stockMovement.details.label',
@@ -1409,8 +1409,8 @@ class EditItemsPage extends Component {
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                 >
                   <span><i className="fa fa-save pr-2" /><Translate
-                    id="react.default.button.save.label"
-                    defaultMessage="Save"
+                    id="react.default.button.saveProgress.label"
+                    defaultMessage="Save Progress"
                   />
                   </span>
                 </button>
@@ -1469,7 +1469,7 @@ class EditItemsPage extends Component {
                   }}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                 >
-                  <Translate id="react.default.button.next.label" defaultMessage="Next" />
+                  <Translate id="react.stockMovement.button.generatePicklist.label" defaultMessage="Generate Picklist" />
                 </button>
               </div>
             </form>
