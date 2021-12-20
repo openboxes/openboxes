@@ -69,6 +69,7 @@ const Input = ({
       onDragStart={(event) => {
         event.preventDefault();
       }}
+      onWheel={() => document.activeElement.blur()}
     />
   );
 };
