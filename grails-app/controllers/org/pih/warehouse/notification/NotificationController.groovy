@@ -123,13 +123,13 @@ class NotificationController {
                 category.name = pJson.getString("category")
                 category.save()
             }
-            Product productInstance = Product.findByProductCode(pJson.getString("productCode"))
+            Product productInstance = Product.findByUpc(pJson.getString("id"))
             if (!productInstance) {
                 productInstance = new Product()
-                productInstance.productCode = pJson.getString("productCode")
+                productInstance.upc = pJson.getString("id")
             }
-            productInstance.id = pJson.getString("id")
             productInstance.name = pJson.getString("name")
+            productInstance.productCode = pJson.getString("productCode")
             productInstance.description = pJson.getString("description")
             productInstance.pricePerUnit = pJson.getDouble("pricePerUnit")
             productInstance.unitOfMeasure = pJson.getString("unitOfMeasure")
