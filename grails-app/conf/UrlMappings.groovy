@@ -412,7 +412,7 @@ class UrlMappings {
             controller = "notification"
             action = [POST: "createOrder"]
         }
-        "/notification/subscribe"(controller: "notification", action: "subscribe")
+        "/notification/subscribe-product"(controller: "notification", action: "subscribeProduct")
         "/notification/publish"(controller: "notification", action: "publish")
 
         // Error handling

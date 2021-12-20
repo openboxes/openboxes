@@ -50,8 +50,9 @@ class NotificationController {
     def publish = {
         String message = request.JSON.toString()
         log.info "Publishing message " + message
-        String PRODUCT_TOPIC_ARN = grailsApplication.config.awssdk.sns.product.arn
-        PublishRequest publishRequest = new PublishRequest(PRODUCT_TOPIC_ARN, message, "Demo publish")
+        String TOPIC_ARN = grailsApplication.config.awssdk.sns.product.arn
+//        String TOPIC_ARN = grailsApplication.config.awssdk.sns.order.arn
+        PublishRequest publishRequest = new PublishRequest(TOPIC_ARN, message, "Demo publish")
         def result = amazonSnsClient.publish(publishRequest)
         log.info "result::${result?.dump()}"
         render "published"
@@ -61,7 +62,7 @@ class NotificationController {
         log.info "Notifi Topic: params:${params}"
         JSONObject json = request.getJSON() as JSONObject
         log.info "Notifi Topic: json:${json}"
-        if(json.has("Type") && json.getString("Type") == "SubscriptionConfirmation"){
+        if (json.has("Type") && json.getString("Type") == "SubscriptionConfirmation") {
             String token = json.getString("Token")
             try {
                 String PRODUCT_TOPIC_ARN = grailsApplication.config.awssdk.sns.product.arn
@@ -75,12 +76,13 @@ class NotificationController {
         render "notified"
     }
 
-    def subscribe = {
+    def subscribeProduct = {
         String PRODUCT_TOPIC_ARN = grailsApplication.config.awssdk.sns.product.arn
         log.info "Subscribiing topic:${PRODUCT_TOPIC_ARN}"
         try {
             String subscribeUrl = g.createLink(uri: "/api/notifications/products", absolute: true)
-            SubscribeRequest subscribeRequest = new SubscribeRequest(PRODUCT_TOPIC_ARN, "https",  subscribeUrl)
+//            String subscribeUrl = grailsApplication.config.grails.serverURL + "/api/notifications/products"
+            SubscribeRequest subscribeRequest = new SubscribeRequest(PRODUCT_TOPIC_ARN, "https", subscribeUrl)
             subscribeRequest.returnSubscriptionArn = true
             SubscribeResult result = amazonSnsClient.subscribe(subscribeRequest);
             log.info("Subscription ARN is " + result.subscriptionArn);
@@ -91,11 +93,10 @@ class NotificationController {
         render "subscribed"
     }
 
-
     def createProduct = {
         JSONObject json = request.getJSON() as JSONObject
         log.info "json::${json}"
-        if(json.has("Type") && json.getString("Type") == "SubscriptionConfirmation"){
+        if (json.has("Type") && json.getString("Type") == "SubscriptionConfirmation") {
             String token = json.getString("Token")
             try {
                 String PRODUCT_TOPIC_ARN = grailsApplication.config.awssdk.sns.product.arn
@@ -112,149 +113,46 @@ class NotificationController {
         String message = json.getString("Message")
         JSONObject productsJson = new JSONObject(message)
         JSONArray products = productsJson.getJSONArray("products")
-        for(int i = 0;i<products.length();i++){
+        for (int i = 0; i < products.length(); i++) {
             JSONObject pJson = products.getJSONObject(i)
             log.info "PRODUCT JSON ${pJson} at index:${pJson}"
             Category category = Category.findById(pJson.getString("category"))
-            if(!category){
+            if (!category) {
                 category = new Category()
                 category.id = pJson.getString("category")
                 category.name = pJson.getString("category")
                 category.save()
             }
             Product productInstance = Product.findByProductCode(pJson.getString("productCode"))
-            if(!productInstance){
+            if (!productInstance) {
                 productInstance = new Product()
                 productInstance.productCode = pJson.getString("productCode")
             }
+            productInstance.id = pJson.getString("id")
             productInstance.name = pJson.getString("name")
             productInstance.description = pJson.getString("description")
             productInstance.pricePerUnit = pJson.getDouble("pricePerUnit")
             productInstance.unitOfMeasure = pJson.getString("unitOfMeasure")
             productInstance.brandName = pJson.getString("brandName")
             productInstance.category = category
-            if (!productInstance?.id || productInstance.validate()) {
+//            if (!productInstance?.id || productInstance.validate()) {
                 if (!productInstance.productCode) {
                     productInstance.productCode = productService.generateProductIdentifier(productInstance.productType)
                 }
-            }
-            try{
-                if(!productInstance?.validate() || productInstance?.hasErrors()){
+//            }
+            try {
+                if (!productInstance?.validate() || productInstance?.hasErrors()) {
                     productInstance?.errors?.allErrors?.each {
                         log.error("ERR:${it}")
                     }
-                }else{
+                } else {
                     productInstance.save(flush: true, failOnError: true)
                 }
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 log.error "Error in saving PRODUCT:${ex?.message}"
             }
         }
     }
 
-    def createOrder = {
-        JSONObject json = request.getJSON() as JSONObject
-        log.info "Create order JSON:${json}"
-        if(json.has("Type") && json.getString("Type") == "SubscriptionConfirmation"){
-            String token = json.getString("Token")
-            try {
-                String ORDER_TOPIC_ARN = grailsApplication.config.awssdk.sns.order.arn
-                ConfirmSubscriptionRequest request = new ConfirmSubscriptionRequest(ORDER_TOPIC_ARN, token)
-                ConfirmSubscriptionResult result = amazonSnsClient.confirmSubscription(request);
-                log.info "result::${result?.toString()}"
-            } catch (Exception e) {
-                log.error "Error in saving order: " + e.message, e
-            }
-            render "subscribed"
-            return
-        }
-        String message = json.getString("Message")
-        JSONObject productsJson = new JSONObject(message)
-        JSONArray orders = productsJson.getJSONArray("orders")
-        for(int i = 0;i<orders.length();i++){
-            JSONObject oJson = orders.getJSONObject(i)
-            log.info "ORDER JSON ${oJson} at index:${oJson}"
-            Requisition requisition = new Requisition()
-            if(oJson.has("name")){
-                requisition.name = oJson.getString("name")
-            }else{
-                requisition.name = "DEFAULT"
-            }
-            try{
-                if(oJson.has("origin") && oJson.getString("origin")) {
-                    Location location = Location.findByLocationNumber(oJson.getString("origin"))
-                    requisition.origin = location
-                }
-            }catch(Exception ex){
-                log.error "Error in reading origin from order json:${oJson}"
-            }
-            try {
-                if (oJson.has("destination") && oJson.getString("destination")) {
-                    JSONObject jsonObject = oJson.getJSONObject("destination")
-                    Location location = Location.findByLocationNumber(oJson.getString(jsonObject.getString("id")))
-                    requisition.destination = location
-                }
-            } catch (Exception ex) {
-                log.error "Error in reading destination from order json:${oJson}"
-            }
-            try{
-                if(oJson.has("requestedBy") && oJson.getString("requestedBy")){
-                    User requestedBy = User.findByUsername(oJson.getString("requestedBy"))
-                    requisition.requestedBy = requestedBy
-                }
-            }catch(Exception ex){
-                log.error "Error in reading requestedBy from order json:${oJson}"
-            }
-            try{
-                if(oJson.has("dateRequested") && oJson.getString("dateRequested")){
-                    Date dateRequested = DateUtils.parseDate(oJson.getString("dateRequested"), "yyyy-MM-dd")
-                    requisition.dateRequested = dateRequested
-                }else{
-                    requisition.dateRequested = new Date()
-                }
-            }catch(Exception ex){
-                log.error "Error in reading dateRequested from order json:${oJson}"
-            }
-            try{
-                if(oJson.has("requestedDeliveryDate") && oJson.getString("requestedDeliveryDate")){
-                    Date dateRequested = DateUtils.parseDate(oJson.getString("requestedDeliveryDate"), "yyyy-MM-dd")
-                    requisition.dateRequested = dateRequested
-                }else{
-                    requisition.requestedDeliveryDate = new Date()
-                }
-            }catch(Exception ex){
-                log.error "Error in reading dateRequested from order json:${oJson}"
-            }
-            Boolean lineItemHasError = false
-            JSONArray orderLineItemsArray = oJson.getJSONArray("orderItems")
-            for(int lIndex = 0;lIndex < orderLineItemsArray?.length();lIndex++){
-                JSONObject lineItem = orderLineItemsArray.getJSONObject(lIndex)
-                log.info "Reading LineItem:${lineItem} for Order index:${i}"
-                try{
-                    RequisitionItem requisitionItem = new RequisitionItem()
-                    Product product = Product.findById(lineItem.getString("productId"))
-                    Integer quantity = lineItem.getInt("orderedQuantity")
-                    requisitionItem.product = product
-                    requisitionItem.quantity = quantity
-                    requisition.addToRequisitionItems(requisitionItem)
-                }catch(Exception ex){
-                    log.error "Error in reading Order Line Item:${lineItem}"
-                    lineItemHasError = true
-                }
-            }
-            try {
-                if (!lineItemHasError) {
-                    if (requisition.validate() && !requisition.hasErrors()) {
-                        requisition.save(flush: true, failOnError: true)
-                    } else {
-                        requisition?.errors?.allErrors?.each {
-                            log.error("ERR:${it}")
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                log.error "Error in saving ORDER:${ex?.message}"
-            }
-        }
-    }
+
 }
