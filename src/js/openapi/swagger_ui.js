@@ -1,5 +1,5 @@
 import SwaggerUI from 'swagger-ui-dist'
-import 'swagger-ui/dist/swagger-ui.css';
+import 'swagger-ui-dist/swagger-ui.css';
 
 const spec = require('../../../grails-app/conf/openapi.yaml');
 
