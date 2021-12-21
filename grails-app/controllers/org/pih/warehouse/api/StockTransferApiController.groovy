@@ -14,6 +14,7 @@ import grails.validation.ValidationException
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
@@ -160,7 +161,7 @@ class StockTransferApiController {
             stockTransferItem.quantityNotPicked = stockTransferItemMap["quantityNotPicked"] ? stockTransferItemMap["quantityNotPicked"] : 0
             stockTransferItem.quantity = stockTransferItemMap["quantity"] ? new BigDecimal(stockTransferItemMap["quantity"]) : 0
             stockTransferItem.status = stockTransferItemMap["status"] ? stockTransferItemMap["status"] : null
-            stockTransferItem.recipient = !isNull(stockTransferItemMap["recipient"]) ? stockTransferItemMap["recipient"] : null
+            stockTransferItem.recipient = !isNull(stockTransferItemMap["recipient"]) ? Person.load(stockTransferItemMap["recipient"]) : null
 
             if (!stockTransferItem.location) {
                 stockTransferItem.location = stockTransfer.origin
