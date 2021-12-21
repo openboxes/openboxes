@@ -211,6 +211,7 @@ class Container implements Comparable, java.io.Serializable {
                 containerType  : containerType,
                 containerStatus: [id: containerStatus?.name(), name: containerStatus?.name],
                 "shipment.id"  : shipment?.id,
+                shipmentNumber : shipment?.shipmentNumber,
                 recipient      : recipient,
                 sortOrder      : sortOrder,
                 shipmentItems  : shipmentItems
