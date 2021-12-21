@@ -406,6 +406,16 @@ class UrlMappings {
             controller = "genericApi"
             action = [GET: "read", POST: "update", PUT: "update", DELETE: "delete"]
         }
+        "/api/notifications/products" {
+            controller = "notification"
+            action = [POST: "createProduct"]
+        }
+        "/api/notifications/orders" {
+            controller = "notification"
+            action = [POST: "createOrder"]
+        }
+        "/notification/subscribe-product"(controller: "notification", action: "subscribeProduct")
+        "/notification/publish"(controller: "notification", action: "publish")
 
         // Error handling
 

@@ -16,6 +16,7 @@ import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.UpdateUnitPriceMethodCode
 import org.pih.warehouse.order.OrderStatus
+import com.amazonaws.regions.*
 
 // Locations to search for config files that get merged into the main config
 // config files can either be Java properties files or ConfigSlurper scripts
@@ -852,6 +853,16 @@ springcache {
 // (namely, openboxes-config.properties or openboxes-config.groovy)
 grails.plugins.raven.active = false
 grails.plugin.raven.dsn = "https://{PUBLIC_KEY}:{SECRET_KEY}@app.getsentry.com/{PROJECT_ID}"
+
+// AWS SDK default configuration
+awssdk.sns.accessKey = ""
+awssdk.sns.secretKey = ""
+awssdk.sns.region = Regions.US_EAST_1
+awssdk.sns.product.arn = ""
+awssdk.sns.order.arn = ""
+awssdk.sns.productAvailability.arn = ""
+
+
 
 // Default Ajax request timeout
 openboxes.ajaxRequest.timeout = 120000
