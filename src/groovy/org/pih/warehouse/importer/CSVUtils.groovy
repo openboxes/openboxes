@@ -9,6 +9,9 @@
  */
 package org.pih.warehouse.importer
 
+import org.apache.commons.csv.CSVFormat
+import org.apache.commons.csv.CSVPrinter
+import org.apache.commons.lang.StringUtils
 import org.pih.warehouse.util.LocalizationUtil
 
 import java.text.DecimalFormat
@@ -25,7 +28,7 @@ import java.text.NumberFormat
  * These functions are locale-aware, and, for unit prices, support at
  * least four decimal places.
  */
-class CsvUtil {
+class CSVUtils {
 
     /* support fractional cents in unit prices */
     static int UNIT_PRICE_MIN_DECIMAL_PLACES = 4
@@ -36,7 +39,10 @@ class CsvUtil {
      * This method correctly handles grouping punctuation so long as it
      * matches the current locale.
      */
-    static BigDecimal parseNumber(String s) {
+    static BigDecimal parseNumber(String s, String fieldName = "unknown_field") {
+        if (StringUtils.isBlank(s)) {
+            throw new IllegalArgumentException("${fieldName} is empty or unset")
+        }
         DecimalFormat format = DecimalFormat.getNumberInstance(LocalizationUtil.localizationService.currentLocale)
         format.parseBigDecimal = true
         /*
@@ -44,16 +50,22 @@ class CsvUtil {
          * used daggers as grouping punctuation. No parser expects this behavior,
          * so to read our own old exports we need to filter them out ourselves.
          */
-        return format.parse(s.replace("†", ""))
+        try {
+            return format.parse(s.replace("†", ""))
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Unable to parse expected numeric value ${fieldName}=${s}")
+        }
     }
 
     /**
      * Parse a string into an integer, even with grouping punctuation.
-     *
-     * @raise ArithmeticException if not an integer.
      */
-    static int parseInteger(String s) {
-        return parseNumber(s).intValueExact()
+    static int parseInteger(String s, String fieldName = "unknown_field") {
+        try {
+            return parseNumber(s, fieldName).intValueExact()
+        } catch (ArithmeticException e) {
+            throw new IllegalArgumentException("Expected integer value for ${fieldName}=${s}")
+        }
     }
 
     /**
@@ -62,7 +74,7 @@ class CsvUtil {
      * @param number an integer, or a decimal/double/float representing an int
      * @return a string representation of `number` suitable for CSV export
      *
-     * Unlike Grails's formatNumber, this method skips grouping punctuation:
+     * Unlike Grails's formatNumber, this method omits grouping punctuation:
      * output is "1234567", not "1,234,567".
      *
      * It is the caller's responsibility to call escapeCsv() if appropriate.
@@ -119,5 +131,22 @@ class CsvUtil {
     /* FIXME replace with @NamedVariant after grails migration */
     static String formatCurrency(Map args) {
         return formatCurrency(args.get("number"), args.get("currencyCode"), args.get("isUnitPrice", false))
+    }
+
+    /**
+     * Format unit of measure information for CSV as a single column.
+     */
+    static String formatUnitOfMeasure(String quantityUom, Number quantityPerUom) {
+        // FIXME default value should be localized, but presently is "EA" everywhere
+        def numerator = quantityUom ?: "EA"
+        def denominator = formatInteger(quantityPerUom ?: 1)
+        return "${quantityUom}/${quantityPerUom}"
+    }
+
+    /**
+     * Create a CSVPrinter object with sensible defaults.
+     */
+    static CSVPrinter getCSVPrinter() {
+        return new CSVPrinter(new StringBuilder(), CSVFormat.DEFAULT)
     }
 }
