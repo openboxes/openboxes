@@ -33,6 +33,7 @@ buildscript {
 plugins {
     id "com.moowork.node" version "0.12"
     id "com.virgo47.ClasspathJar" version "1.0.0"
+    id "io.swagger.core.v3.swagger-gradle-plugin" version "2.1.11"
 }
 
 //grails.project.class.dir = "target/classes"
@@ -318,4 +319,14 @@ task prepareDocker(type: Copy, dependsOn: assemble) {
     from 'build/libs/openboxes.war'
 
     into dockerBuildDir
+}
+
+resolve {
+    classpath = sourceSets.main.runtimeClasspath
+    openApiFile = file('grails-app/conf/openapi.yaml')
+    outputFileName = 'openboxes_api'
+    outputDir = file('build/openapi')
+    outputFormat = 'JSONANDYAML'
+    prettyPrint = 'TRUE'
+    resourcePackages = ['org.openboxes', 'org.pih']
 }
