@@ -1,0 +1,130 @@
+openapi: 3.0.3
+info:
+  contact:
+    name: OpenBoxes discussion board
+    url: https://discuss.openboxes.com
+  description: |
+    [OpenBoxes](https://openboxes.org) is an open-source LMIS application
+    that increases stock visibility, reduces the risk of stock-outs and
+    stock wastage, and offers tools to improve forecasting and traceability.
+
+    **Notice**
+    The following API documentation is a work in progress.
+
+    ---
+  license:
+    name: Eclipse Public License 1.0
+    url: http://opensource.org/licenses/eclipse-1.0.php
+  termsOfService: https://www.pih.org/pages/terms
+  title: OpenBoxes API specification
+  # FIXME get this from git
+  version: "0.8.17"
+components:
+  #
+  # Providing examples in-line via ExampleObject annotations is easy,
+  # but reusing them is not: the only way I could reference one example
+  # from multiple places is to declare it as a string literal here.
+  # See also https://swagger.io/docs/specification/adding-examples/
+  # as well as https://github.com/swagger-api/swagger-core/issues/3029
+  #
+  parameters:
+    product_id_in_path:
+      description: database id of a product
+      examples:
+        ibuprofen:
+          summary: Ibuprofen, 400mg tablet
+          value: "10282"
+        covid test:
+          summary: Test, COVID-19, rapid
+          value: "21103"
+        stethoscope:
+          summary: Stethoscope, dual-head
+          value: "12588"
+      in: path
+      name: id
+      required: true
+  securitySchemes:
+    cookie:
+      type: apiKey
+      in: cookie
+      name: JSESSIONID
+paths:
+  /api/login:
+    post:
+      summary: Retrieve a cookie for authentication
+      description: |-
+        Supply a username and password in the usual way to authenticate
+        (`application/x-www-form-urlencoded`, like `curl -d`). You may
+        optionally supply the identifier of a warehouse via a `location`
+        field; this is an implicit parameter to many subsequent queries.
+        If no location is specified, OpenBoxes will use the last one
+        the authenticating user selected in its web UI.
+
+        ---
+
+        Note that SwaggerHub's UI may not report the `JSESSIONID`, depending
+        on browser settings (see
+        [this document](https://swagger.io/docs/specification/authentication/cookie-authentication/)
+        for more details). In that event, to authenticate this page and allow
+        the "Try it out" button to work elsewhere, please try the following.
+
+        1. Press the "Try it out" button below and to the right of this text.
+        2. Press the blue "Execute" button that appears beneath the json editor, below.
+        3. Copy the `curl` code snippet, add the `-i` flag, then run it in a local terminal.
+        4. Press the green "Authorize" button near the top of this page.
+        5. Copy the `JSESSIONID` field from `curl` output into the field that appears.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  format: email
+                  type: string
+                password:
+                  format: password
+                  type: string
+                location:
+                  format: id
+                  type: string
+              required:
+                - username
+                - password
+            examples:
+              "authenticate and select a busy warehouse":
+                value:
+                  username: nobody
+                  password: "********"
+                  location: 8a8a9e96687c94ce0168b86793c81a68
+              "authenticate and select the last-used warehouse":
+                value:
+                  username: nobody
+                  password: "********"
+
+      responses:
+        '200':
+          description: >-
+            Successfully authenticated.
+            The session ID is returned in a cookie named `JSESSIONID`.
+            Include this cookie in requests requiring authentication.
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: JSESSIONID=1A530637289A03B07199A44E8D531427; Path=/openboxes; Secure; HttpOnly
+      tags:
+        - Authentication
+servers:
+- url: https://obdev.pih-emr.org/openboxes
+  description: Dev instance
+- url: https://obnavstage.pih-emr.org/openboxes
+  description: Staging instance
+- url: https://obnav.pih-emr.org/openboxes
+  description: Production instance
+tags:
+  - name: Authentication
+  - name: Product
+  - name: Location
+  - name: User

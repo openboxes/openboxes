@@ -10,52 +10,91 @@
 package org.pih.warehouse.core
 
 import grails.util.Holders
+import io.swagger.v3.oas.annotations.Hidden
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.models.media.Schema as SchemaObject
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
-import grails.util.Holders
 
-/**
- * A location can be a customer, warehouse, or supplier.
- */
+@Schema(description="A location can be a customer, warehouse, supplier, etc.")
 class Location implements Comparable<Location>, java.io.Serializable {
 
+    @Hidden
     def publishPersistenceEvent = {
         Holders.grailsApplication.mainContext.publishEvent(new InventorySnapshotEvent(this))
     }
 
+    @Hidden
     def afterInsert = publishPersistenceEvent
+    @Hidden
     def afterUpdate = publishPersistenceEvent
+    @Hidden
     def afterDelete = publishPersistenceEvent
 
-
+    @Schema(description="database identifier, may be uuid or numeric string", format="uuid", readOnly=true, required=true)
     String id
+
+    @Schema(description="the name of the location", maxLength=255, required=true)
     String name
+
+    @Schema(description="a description for the location", maxLength=255, nullable=true)
     String description
+
+    @Schema(maxLength=255, nullable=true)
     String locationNumber
 
-    byte[] logo                // logo
+    @Hidden
+    byte[] logo
+
+    @Hidden
+    @Schema(nullable=true)
     Address address
+
+    @Hidden
     String fgColor = "000000"
+
+    @Schema(name="backgroundColor", nullable=true)
     String bgColor = "FFFFFF"
 
+    @Schema(nullable=true)
     Location parentLocation
+
+    @Schema(required=true)
     LocationType locationType
+
+    @Schema(nullable=true)
     LocationGroup locationGroup
+
+    @Hidden
+    @Schema(nullable=true)
     Organization organization
 
-    User manager                                // the person in charge of the warehouse
-    Inventory inventory                            // each warehouse has a single inventory
+    @Hidden
+    @Schema(description="the person in charge of the warehouse", nullable=true)
+    User manager
+
+    @Hidden
+    @Schema(description="each warehouse has exactly one inventory")
+    Inventory inventory
+
+    @Hidden
+    @Schema(description="indicates whether this warehouse is being managed on the locally deployed system", nullable=true)
     Boolean local = Boolean.TRUE
-    // indicates whether this warehouse is being managed on the locally deployed system
+
+    @Hidden
+    @Schema(description="indicates whether this warehouse is currently active", required=true)
     Boolean active = Boolean.TRUE
-    // indicates whether this warehouse is currently active
+
+    @Schema(nullable=true)
     Integer sortOrder
 
+    @Hidden
     Date dateCreated
+    @Hidden
     Date lastUpdated
 
     static belongsTo = [parentLocation: Location, organization: Organization]
@@ -98,16 +137,17 @@ class Location implements Comparable<Location>, java.io.Serializable {
 
     static transients = ["transactions", "events", "shipments", "requests", "orders"]
 
+    @Hidden
     List getTransactions() { return Transaction.findAllByDestinationOrSource(this, this) }
-
+    @Hidden
     List getEvents() { return Event.findAllByEventLocation(this) }
-
+    @Hidden
     List getShipments() { return Shipment.findAllByOriginOrDestination(this, this) }
-
+    @Hidden
     List getRequests() { return Requisition.findAllByOriginOrDestination(this, this) }
-
+    @Hidden
     List getOrders() { return Order.findAllByOriginOrDestination(this, this) }
-
+    @Hidden
     List getUsers() { return User.findAllByWarehouse(this) }
 
     String toString() { return this.name }
@@ -172,6 +212,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
      * @deprecated use{@link #isDepot()} instead.
      */
     @Deprecated
+    @Hidden
     Boolean isWarehouse() {
         return locationType.locationTypeCode == LocationTypeCode.DEPOT ||
                 // FIXME Keep for backwards compatibility or until we migrate all locations
@@ -183,6 +224,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
      * @return true if location is a ward or pharmacy
      */
     @Deprecated
+    @Hidden
     Boolean isWardOrPharmacy() {
         return (locationType.locationTypeCode in [LocationTypeCode.DISPENSARY, LocationTypeCode.WARD] ||
                 // FIXME Keep for backwards compatibility or until we migrate all locations
@@ -193,40 +235,49 @@ class Location implements Comparable<Location>, java.io.Serializable {
      * @return true if location is a depot, ward, or pharmacy
      */
     @Deprecated
+    @Hidden
     Boolean isDepotWardOrPharmacy() {
         return (locationType.locationTypeCode in [LocationTypeCode.DEPOT, LocationTypeCode.DISPENSARY, LocationTypeCode.WARD] ||
                 // FIXME Keep for backwards compatibility or until we migrate all locations
                 locationType.description in ["Depot", "Pharmacy", "Ward"])
     }
 
+    @Hidden
     Boolean isDepot() {
         return locationType.locationTypeCode == LocationTypeCode.DEPOT
     }
 
+    @Hidden
     Boolean isWard() {
         return locationType.locationTypeCode == LocationTypeCode.WARD
     }
 
+    @Hidden
     Boolean isDispensary() {
         return locationType.locationTypeCode == LocationTypeCode.DISPENSARY
     }
 
+    @Hidden
     Boolean isBinLocation() {
         return locationType.locationTypeCode == LocationTypeCode.BIN_LOCATION
     }
 
+    @Hidden
     Boolean isSupplier() {
         return locationType.locationTypeCode == LocationTypeCode.SUPPLIER
     }
 
+    @Hidden
     Boolean isDonor() {
         return locationType.locationTypeCode == LocationTypeCode.DONOR
     }
 
+    @Hidden
     Boolean isVirtual() {
         return locationType.locationTypeCode == LocationTypeCode.VIRTUAL
     }
 
+    @Schema(description="override")
     Boolean hasBinLocationSupport() {
         ActivityCode[] requiredActivities = [ActivityCode.PICK_STOCK, ActivityCode.PUTAWAY_STOCK]
         return supportsAny(requiredActivities) && !binLocations?.empty
@@ -245,6 +296,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
      *
      * @return a sorted list of bin locations
      */
+    @Hidden
     List<Location> getBinLocations() {
         return getInternalLocations([LocationTypeCode.BIN_LOCATION])
     }
@@ -266,8 +318,25 @@ class Location implements Comparable<Location>, java.io.Serializable {
         return internalLocations
     }
 
+    @Hidden
     Boolean isAccountingRequired() {
         return Holders.config.openboxes.accounting.enabled && supports(ActivityCode.REQUIRE_ACCOUNTING)
     }
 
+    /**
+     * Add Location fields to a Swagger schema object that Swagger can't detect.
+     *
+     * N.B., These fields are all defined in BootStrap.groovy, which, it
+     * seems, neither Swagger nor this author can parse correctly. ;-)
+     *
+     * @param schema a Swagger schema object (*not* a Schema annotation!)
+     * @return a Swagger schema object with implicit fields added
+     */
+    static SchemaObject postProcessSchema(SchemaObject schema) {
+        schema.addProperties("hasBinLocationSupport", new SchemaObject().name("hasBinLocationSupport").type("boolean"))
+        schema.addProperties("hasPackingSupport", new SchemaObject().name("hasPackingSupport").type("boolean"))
+        schema.addProperties("hasPartialReceivingSupport", new SchemaObject().name("hasPartialReceivingSupport").type("boolean"))
+        schema.addProperties("organizationName", new SchemaObject().name("organizationName").type("string"))
+        return schema
+    }
 }

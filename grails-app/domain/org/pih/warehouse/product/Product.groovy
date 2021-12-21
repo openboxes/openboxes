@@ -9,12 +9,21 @@
  * */
 package org.pih.warehouse.product
 
+import grails.util.Holders
+import io.swagger.v3.oas.annotations.ExternalDocumentation
+import io.swagger.v3.oas.annotations.Hidden
+import io.swagger.v3.oas.annotations.media.Schema
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.NotImplementedException
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.pih.warehouse.auth.AuthService
-import org.pih.warehouse.core.*
+import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.GlAccount
+import org.pih.warehouse.core.Synonym
+import org.pih.warehouse.core.Tag
+import org.pih.warehouse.core.UnitOfMeasure
+import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
@@ -22,25 +31,22 @@ import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.shipping.ShipmentItem
-import grails.util.Holders
 
+@Schema(description='''\
+A product is an instance of a generic. For instance, the product might be
+Ibuprofen, but the product [sic.] is Advil 200mg.
 
-/**
- * An product is an instance of a generic.  For instance,
- * the product might be Ibuprofen, but the product is Advil 200mg
- *
- * We only track products and lots in the warehouse.  Generics help us
- * report on product availability across a generic product like Ibuprofen
- * no matter what size or shape it is.
- *
- * We will just support "1 unit" for now.  Variations of products will
- * eventually be stored as product variants (e.g. a 200 count bottle of
- * 20 mg tablets vs a 50 count bottle of 20 mg tablets will both be stored
- * as 20 mg tablets).
- */
+We *only* track products and lots in the warehouse. Generics help us report
+on product availability across a generic product like Ibuprofen no matter
+what size or shape it is.
+
+We will just support "1 unit" for now. Variations of products will eventually
+be stored as product variants (e.g. a 200 count bottle of 20 mg tablets vs a
+50 count bottle of 20 mg tablets will both be stored as 20 mg tablets).'''
+)
 class Product implements Comparable, Serializable {
 
-
+    @Hidden
     def beforeInsert = {
         User.withNewSession {
             def currentUser = AuthService.currentUser.get()
@@ -50,6 +56,8 @@ class Product implements Comparable, Serializable {
             }
         }
     }
+
+    @Hidden
     def beforeUpdate = {
         User.withNewSession {
             def currentUser = AuthService.currentUser.get()
@@ -59,125 +67,177 @@ class Product implements Comparable, Serializable {
         }
     }
 
+    @Hidden
     def publishPersistenceEvent = {
         Holders.grailsApplication.mainContext.publishEvent(new InventorySnapshotEvent(this))
     }
 
+    @Hidden
     def afterInsert = publishPersistenceEvent
+    @Hidden
     def afterUpdate = publishPersistenceEvent
+    @Hidden
     def afterDelete = publishPersistenceEvent
 
-
-    // Base product information
+    @Schema(description="database identifier, may be uuid or numeric string", format="uuid", readOnly=true, required=true)
     String id
 
-    // Specific description for the product
+    @Schema(description="name of the product", maxLength=255, required=true)
     String name
 
-    // Details product description
+    @Schema(description="a more detailed description of the product", maxLength=255, nullable=true)
     String description
 
-    // Internal product code identifier (or SKU)
-    // http://en.wikipedia.org/wiki/Stock_keeping_unit
+    @Schema(
+            description="Internal product code identifier (or SKU)",
+            externalDocs=@ExternalDocumentation(url="http://en.wikipedia.org/wiki/Stock_keeping_unit"),
+            nullable=true
+    )
     String productCode
 
-    // Type of product (good, service, fixed asset)
+    @Hidden
+    @Schema(description="Type of product (good, service, fixed asset)")
     ProductType productType
 
-    // Price per unit (global for the entire system)
+    @Hidden
+    @Schema(description="Price per unit (global for the entire system)", nullable=true)
     BigDecimal pricePerUnit
 
-    // Cost per unit
+    // FIXME what's the difference between cost and price here?
+    @Hidden
+    @Schema(description="Cost per unit", nullable=true)
     BigDecimal costPerUnit
 
-    // Controlled Substances
-    // http://en.wikipedia.org/wiki/Controlled_Substances_Act
-    // http://bfa.sdsu.edu/ehs/deapp1.htm
+    @Hidden
+    @Schema(
+            description="whether the product is a controlled substance",
+            externalDocs=@ExternalDocumentation(url="http://en.wikipedia.org/wiki/Controlled_Substances_Act"),
+            nullable=true
+    )
     Boolean controlledSubstance = Boolean.FALSE
-    //ControlledSubstanceClass controlledSubstanceClass
-    // SCHEDULE_I
-    // SCHEDULE_II
-    // SCHEDULE_III
-    // SCHEDULE_IV
-    // SCHEDULE_V
 
-    // Hazardous Materia
+    @Hidden
+    @Schema(
+            description="whether the product is a hazardous material",
+            externalDocs=@ExternalDocumentation(url="http://www.fmcsa.dot.gov/facts-research/research-technology/visorcards/yellowcard.pdf"),
+            nullable=true
+    )
     Boolean hazardousMaterial = Boolean.FALSE
-    // http://www.fmcsa.dot.gov/facts-research/research-technology/visorcards/yellowcard.pdf
-    // HazardousMaterialClass hazardousMaterialClass
-    // CLASS_1_EXPLOSIVES
-    // CLASS_2_GASES
-    // CLASS_3_FLAMMABLE_LIQUIDS
-    // CLASS_4_FLAMMABLE_SOLIDS
-    // CLASS_5_OXIDIZERS_AND_ORGANIC_PEROXIDES
-    // CLASS_6_TOXIC_MATERIALS_AND_INFECTIOUS_SUBSTANCES
-    // CLASS_7_RADIOACTIVE_MATERIALS
-    // CLASS_8_CORROSIVE_MATERIALS
-    // CLASS_9_MISCELLANEOUS
-    // DANGEROUS
 
-    // Indicates whether the product is active.  Setting a product as inactive is the same
-    // as removing from the database (it cannot be used if it is active).  However, we do
-    // not want to delete the product because it may be referenced in existing transactions
-    // shipments, requisitions, inventory items, etc.
+    @Hidden
+    @Schema(description='''\
+            Indicates whether the product is active. Setting a product as
+            inactive is similar to removing from the database (it cannot be
+            used if it is not active). However, we may not want to delete the
+            product, because it may be referenced in existing transactions,
+            shipments, requisitions, inventory items, etc.''')
     Boolean active = Boolean.TRUE
 
-    // Indicates whether the product requires temperature-controlled supply chain
-    // http://en.wikipedia.org/wiki/Cold_chain
+    @Hidden
+    @Schema(
+            description="whether the product requires temperature-controlled supply chain",
+            externalDocs=@ExternalDocumentation(url="http://en.wikipedia.org/wiki/Cold_chain"),
+            nullable=true
+    )
     Boolean coldChain = Boolean.FALSE
 
     // Allows tracking of inventory by serial number (includes products such as computers and electronics).
     // A serialized product has a qty = 1 per serial number
+    @Hidden
     Boolean serialized = Boolean.FALSE
 
     // Allows tracking of inventory by lot or batch number (primary medicines and medical suppies)
     // http://docs.oracle.com/cd/A60725_05/html/comnls/us/inv/lotcntrl.htm
+    @Hidden
     Boolean lotControl = Boolean.TRUE
 
     // Used to indicate that the product is an essential med (as defined by the WHO, MSPP, or PIH).
     // WHO Model Lists of Essential Medicines - http://www.who.int/medicines/publications/essentialmedicines/en/
+    @Hidden
     Boolean essential = Boolean.TRUE
 
     // Used to indicate that the product is to be reconditioned
+    @Hidden
     Boolean reconditioned = Boolean.FALSE
 
-    // primary category
+    @Hidden
+    @Schema(description="primary category", required=true)
     Category category
 
-    // Default ABC Classification
+    @Hidden
+    @Schema(description="Default ABC Classification", nullable=true)
     String abcClass
 
     // For better or worse, unit of measure and dosage form are used somewhat interchangeably
     // (e.g. each, tablet, pill, bottle, box)
     // http://help.sap.com/saphelp_45b/helpdata/en/c6/f83bb94afa11d182b90000e829fbfe/content.htm
+    @Hidden
+    @Schema(
+            description='''\
+            For better or worse, unit of measure and dosage form are used
+            somewhat interchangeably (e.g. each, tablet, pill, bottle, box)
+            ''',
+            externalDocs=@ExternalDocumentation(url="http://help.sap.com/saphelp_45b/helpdata/en/c6/f83bb94afa11d182b90000e829fbfe/content.htm"),
+            nullable=true
+    )
     String unitOfMeasure
 
     // The default unit of measure used for this product
     // Not used at the moment, but this should actually be separated into multiple field
     // stockkeeping UoM, purchasing UoM, shipping UoM, dispensing UoM, requisition UoM,
     // issuing UoM, and reporting UoM.
+    @Hidden
     UnitOfMeasure defaultUom
     // UnitOfMeasure shippingUom
     // UnitOfMeasure UoM
     // UnitOfMeasure issuingUom
 
-    // Universal product code - http://en.wikipedia.org/wiki/Universal_Product_Code
+    @Hidden
+    @Schema(
+            description="Universal product code identifier (UPC)",
+            externalDocs=@ExternalDocumentation(url="http://en.wikipedia.org/wiki/Universal_Product_Code"),
+            nullable=true
+    )
     String upc
 
-    // National drug code - http://en.wikipedia.org/wiki/National_Drug_Code
+    @Hidden
+    @Schema(
+            description="national drug code identifier (NDC)",
+            externalDocs=@ExternalDocumentation(url="http://en.wikipedia.org/wiki/National_Drug_Code"),
+            nullable=true
+    )
     String ndc
 
-    // Manufacturer details
-    String manufacturer        // Manufacturer
-    String manufacturerCode // Manufacturer's product code (e.g. catalog code)
-    String manufacturerName // Manufacturer's product name
-    String brandName        // Manufacturer's brand name
-    String modelNumber        // Manufacturer's model number
+    @Hidden
+    @Schema(description="manufacturer name", maxLength=255, nullable=true)
+    String manufacturer
 
-    // Vendor details
-    String vendor             // Vendor
-    String vendorCode        // Vendor's product code
-    String vendorName        // Vendor's product name
+    @Hidden
+    @Schema(description="manufacturer's product name or catalog code", maxLength=255, nullable=true)
+    String manufacturerCode
+
+    @Hidden
+    @Schema(description="what the manufacturer calls the product", maxLength=255, nullable=true)
+    String manufacturerName
+
+    @Hidden
+    @Schema(description="manufacturer's brand name for the product", maxLength=255, nullable=true)
+    String brandName
+
+    @Hidden
+    @Schema(description="manufacturer's model number (OK to contain letters)'", maxLength=255, nullable=true)
+    String modelNumber
+
+    @Hidden
+    @Schema(description="vendor name", maxLength=255, nullable=true)
+    String vendor
+
+    @Hidden
+    @Schema(description="vendor's product name or catalog code", maxLength=255, nullable=true)
+    String vendorCode
+    @Hidden
+    @Schema(description="what the vendor calls the product", maxLength=255, nullable=true)
+    String vendorName
 
     // Almost all products will have a packageSize = 1
     // The product package association *should* be used to represent packages.
@@ -186,6 +246,7 @@ class Product implements Comparable, Serializable {
     // size because the system does not currently support quantities at
     // multiple levels, so we'll need to convert from the EA product to the
     // product with a packageSize > 1.
+    @Hidden
     Integer packageSize = 1
 
     // Figure out how we want to handle multiple names
@@ -207,22 +268,31 @@ class Product implements Comparable, Serializable {
     // Associations
 
     // Custom product attributes
+    @Hidden
     List attributes = new ArrayList()
 
     // Secondary categories (currently not used)
+    @Hidden
     List categories = new ArrayList()
 
     // List of product components - bill of materials
+    @Hidden
     List productComponents
 
+    @Hidden
     GlAccount glAccount
 
     // Auditing
+    @Hidden
     Date dateCreated
+    @Hidden
     Date lastUpdated
+    @Hidden
     User createdBy
+    @Hidden
     User updatedBy
 
+    @Hidden
     String productColor
 
     static transients = ["rootCategory",
@@ -313,6 +383,7 @@ class Product implements Comparable, Serializable {
      *
      * @return
      */
+    @Hidden
     def getCategoriesList() {
         return LazyList.decorate(categories,
                 FactoryUtils.instantiateFactory(Category.class))
@@ -323,6 +394,7 @@ class Product implements Comparable, Serializable {
      *
      * @return
      */
+    @Hidden
     Category getRootCategory() {
         Category rootCategory = new Category()
         rootCategory.categories = this.categories
@@ -334,6 +406,7 @@ class Product implements Comparable, Serializable {
      *
      * @return
      */
+    @Hidden
     Collection getImages() {
         return documents?.findAll { it.contentType.startsWith("image") }
     }
@@ -343,6 +416,7 @@ class Product implements Comparable, Serializable {
      *
      * @return
      */
+    @Hidden
     Document getThumbnail() {
         return this?.images ? this.images?.sort()?.first() : null
     }
@@ -362,11 +436,12 @@ class Product implements Comparable, Serializable {
      * Get the first generic product (product group) associated with this product.
      * @return
      */
+    @Hidden
     ProductGroup getGenericProduct() {
         return productGroups ? productGroups?.sort()?.first() : null
     }
 
-
+    @Hidden
     List<ProductAssociation> getSubstitutions() {
         return ProductAssociation.findAllByProductAndCode(this, ProductAssociationTypeCode.SUBSTITUTE)
     }
@@ -379,7 +454,7 @@ class Product implements Comparable, Serializable {
         }
     }
 
-
+    @Hidden
     List<ProductCatalog> getProductCatalogs() {
         return this.productCatalogItems?.productCatalog?.unique()
     }
@@ -597,6 +672,7 @@ class Product implements Comparable, Serializable {
         return false
     }
 
+    @Schema(nullable=true, readOnly=true)
     def getColor() {
         def results = ProductCatalogItem.executeQuery("select pci.productCatalog.color " +
                 " from ProductCatalogItem pci where pci.product = :product " +
@@ -605,10 +681,12 @@ class Product implements Comparable, Serializable {
         return results ? results[0] : null
     }
 
+    @Hidden
     def getApplicationTagLib() {
         return Holders.grailsApplication.mainContext.getBean( ApplicationTagLib )
     }
 
+    @Hidden
     def getHandlingIcons() {
         def g = getApplicationTagLib()
         def handlingIcons = []

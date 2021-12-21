@@ -13,8 +13,9 @@ import com.google.zxing.BarcodeFormat
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
-import org.apache.commons.io.FilenameUtils
 import grails.web.context.ServletContextHolder
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import org.apache.commons.io.FilenameUtils
 import org.hibernate.Criteria
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
@@ -31,6 +32,7 @@ import org.springframework.web.servlet.support.RequestContextUtils as RCU
 
 import javax.activation.MimetypesFileTypeMap
 
+@SecurityRequirement(name="cookie")
 @Transactional
 class ProductController {
 

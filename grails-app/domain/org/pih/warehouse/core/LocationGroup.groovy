@@ -8,20 +8,23 @@
  * You must not remove this notice, or any other, from this software.
  **/
 package org.pih.warehouse.core
+import io.swagger.v3.oas.annotations.Hidden
+import io.swagger.v3.oas.annotations.media.Schema
 
-
-/**
- * Represents a logical grouping of locations (e.g. a site 
- * that has multiple facilities like depots, pharmacies, etc).
- */
+@Schema(description="Represents a logical grouping of locations (e.g., a site that has multiple facilities like depots, pharmacies, etc.).")
 class LocationGroup implements Serializable, Comparable<LocationGroup> {
 
+    @Schema(description="database identifier, may be uuid or numeric string", format="uuid", readOnly=true, required=true)
     String id
+    @Schema(maxLength=255, nullable=true)
     String name
 
+    @Hidden
     Address address
 
+    @Hidden
     Date dateCreated
+    @Hidden
     Date lastUpdated
 
     static mapping = {
@@ -29,7 +32,6 @@ class LocationGroup implements Serializable, Comparable<LocationGroup> {
     }
 
     static hasMany = [locations: Location]
-
 
     static constraints = {
         name(nullable: true, maxSize: 255)

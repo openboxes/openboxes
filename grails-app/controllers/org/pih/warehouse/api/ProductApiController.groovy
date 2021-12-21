@@ -10,14 +10,38 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import io.swagger.v3.oas.annotations.ExternalDocumentation
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.enums.Explode
+import io.swagger.v3.oas.annotations.enums.ParameterIn
+import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociation
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.product.ProductAvailability
-import grails.core.GrailsApplication
 
+import javax.ws.rs.GET
+import javax.ws.rs.Path
+import javax.ws.rs.Produces
+
+@SecurityRequirement(name="cookie")
+@Tag(
+        description="API for products",
+        externalDocs=@ExternalDocumentation(
+                description="wiki",
+                url="https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1291288624/Configure+Products"
+        ),
+        name="Product"
+)
 @Transactional
 class ProductApiController extends BaseDomainApiController {
 
@@ -27,38 +51,124 @@ class ProductApiController extends BaseDomainApiController {
     GrailsApplication grailsApplication
     def productAvailabilityService
 
+    class ProductDemand implements Serializable {
+        Product product
+        Location location
+        Map demand
+    }
+
+    @GET
+    @Operation(
+            summary = "Calculate demand for one product at the currently-selected warehouse",
+            description = """\
+This entry point reports daily, monthly, and yearly demand, as well as a
+calculation of how long current stock will last. It also provides detailed
+information on the the requested product and currently-selected warehouse.""",
+            parameters = [@Parameter(ref = "product_id_in_path")]
+    )
+    @ApiResponse(
+            content = @Content(
+                    schema = @Schema(implementation=ProductDemand),
+                    mediaType = "application/json"
+            ),
+            responseCode="200"
+    )
+    @Path("/api/products/{id}/demand")
+    @Produces("text/json")
     def demand() {
-        def product = Product.get(params.id)
-        def location = Location.get(session.warehouse.id)
-        def data = [:]
-        data.location = location
-        data.product = product
-        data.demand = forecastingService.getDemand(location, product)
-
+        def data = new ProductDemand()
+        data.product = Product.get(params.id)
+        data.location = Location.get(session.warehouse.id)
+        data.demand = forecastingService.getDemand(data.location, data.product)
         render([data: data] as JSON)
     }
 
+    @GET
+    @Operation(
+            summary = "Report demand history for one product at the currently-selected warehouse",
+            parameters = [ @Parameter(ref = "product_id_in_path") ]
+    )
+    @ApiResponse(
+            content = @Content(mediaType="application/json"),
+            description="undocumented schema",
+            responseCode="200"
+    )
+    @Path("/api/products/{id}/demandSummary")
+    @Produces("text/json")
     def demandSummary() {
-        def product = Product.get(params.id)
-        def location = Location.get(session.warehouse.id)
-        def data = forecastingService.getDemandSummary(location, product)
+        def data = new ProductDemand()
+        data.product = Product.get(params.id)
+        data.location = Location.get(session.warehouse.id)
+        data.demand = forecastingService.getDemandSummary(data.location, data.product)
         render([data: data] as JSON)
     }
 
-    def productSummary = {
+    @GET
+    @Operation(
+            summary = "Report the current quantity of one product at the currently-selected warehouse",
+            parameters = [ @Parameter(ref = "product_id_in_path") ]
+    )
+    @ApiResponse(
+            content = @Content(mediaType="application/json"),
+            description="undocumented schema",
+            responseCode="200"
+    )
+    @Path("/api/products/{id}/productSummary")
+    @Produces("text/json")
+    def productSummary() {
         def product = Product.load(params.id)
         def location = Location.load(session.warehouse.id)
         def quantityOnHand = ProductAvailability.findAllByProductAndLocation(product, location).sum { it.quantityOnHand }
         render([data: [product:[id: product.id], location: [id: location.id], quantityOnHand: quantityOnHand]] as JSON)
     }
 
-    def productAvailability = {
+    @GET
+    @Operation(
+            summary = "Get detailed availability for one product at the currently-selected warehouse",
+            parameters = [ @Parameter(ref = "product_id_in_path") ]
+    )
+    @ApiResponse(
+            content = @Content(
+                    array = @ArraySchema(
+                            schema = @Schema(implementation=ProductAvailability),
+                            uniqueItems = true
+                    ),
+                    mediaType = "application/json"
+            ),
+            responseCode="200"
+    )
+    @Path("/api/products/{id}/productAvailability")
+    @Produces("text/json")
+    def productAvailability() {
         def product = Product.load(params.id)
         def location = Location.load(session.warehouse.id)
         def data = ProductAvailability.findAllByProductAndLocation(product, location)
         render([data: data] as JSON)
     }
 
+    @GET
+    @Operation(
+        summary = "List all products tracked in OpenBoxes",
+        description = """\
+## Warning!
+
+Do _not_ use Swagger's "Try it out" feature on this entry point!
+
+OpenBoxes tracks a large number of products; the full list can
+[make this page unresponsive](https://github.com/swagger-api/swagger-ui/issues/3832).
+""")
+    @ApiResponse(
+            content = @Content(
+                    array = @ArraySchema(
+                            schema = @Schema(implementation=Product),
+                            uniqueItems = true
+                    ),
+                    mediaType = "application/json"
+            ),
+            responseCode="200"
+    )
+    @Path("/api/products")
+    @Produces("text/json")
     def list() {
 
         def minLength = grailsApplication.config.openboxes.typeahead.minLength
@@ -93,6 +203,38 @@ class ProductApiController extends BaseDomainApiController {
         render([data: products] as JSON)
     }
 
+    @GET
+    @Operation(
+            summary = "Retrieve bin locations and quantities for one or more products",
+            parameters = [
+                    @Parameter(ref = "product_id_in_path"),
+                    @Parameter(
+                            description = "optionally specify additional product ids. This field may be specified more than once",
+                            example = "12588",
+                            explode = Explode.TRUE,
+                            in = ParameterIn.QUERY,
+                            name = "product.id"
+                    ),
+                    @Parameter(
+                            description = "optionally specify the id of a warehouse to query",
+                            example = "8a8a9e96687c94ce0168b86793c81a68",
+                            in = ParameterIn.QUERY,
+                            name = "location.id"
+                    )
+            ]
+    )
+    @ApiResponse(
+            content = @Content(
+                    array = @ArraySchema(
+                            schema = @Schema(implementation=AvailableItem),
+                            uniqueItems = true
+                    ),
+                    mediaType = "application/json"
+            ),
+            responseCode="200"
+    )
+    @Path("/api/products/{id}/availableItems")
+    @Produces("text/json")
     def availableItems() {
         def productIds = params.list("product.id") + params.list("id")
         String locationId = params?.location?.id ?: session?.warehouse?.id
@@ -203,12 +345,40 @@ class ProductApiController extends BaseDomainApiController {
         ]] as JSON)
     }
 
-    def productAvailabilityAndDemand = {
-        Product product = Product.get(params.id)
-        Location location = Location.get(params.locationId)
-        def quantityOnHand = productAvailabilityService.getQuantityOnHand(product, location)
-        def demand = forecastingService.getDemand(location, product)
-        render([monthlyDemand: demand.monthlyDemand, quantityOnHand: quantityOnHand] as JSON)
+    class ProductAvailabilityAndDemand implements Serializable {
+        int monthlyDemand
+        int quantityOnHand
     }
 
+    @GET
+    @Operation(
+            summary = "Get the monthly demand for, and current quantity of, one product at the currently-selected warehouse",
+            parameters = [
+                    @Parameter(ref = "product_id_in_path"),
+                    @Parameter(
+                            description = "the id of a warehouse to query",
+                            example = "8a8a9e96687c94ce0168b86793c81a68",
+                            in=ParameterIn.QUERY,
+                            name="locationId",
+                            required=true
+                    )
+            ]
+    )
+    @ApiResponse(
+            content = @Content(
+                    mediaType="application/json",
+                    schema=@Schema(implementation=ProductAvailabilityAndDemand)
+            ),
+            responseCode="200"
+    )
+    @Path("/api/products/{id}/productAvailabilityAndDemand")
+    @Produces("text/json")
+    def productAvailabilityAndDemand() {
+        Product product = Product.get(params.id)
+        Location location = Location.get(params.locationId)
+        def response = new ProductAvailabilityAndDemand()
+        response.quantityOnHand = productAvailabilityService.getQuantityOnHand(product, location)
+        response.monthlyDemand = forecastingService.getDemand(location, product).monthlyDemand
+        render(response as JSON)
+    }
 }

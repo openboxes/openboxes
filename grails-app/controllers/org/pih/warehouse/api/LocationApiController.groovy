@@ -10,13 +10,29 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import org.hibernate.Criteria
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.enums.ParameterIn
+import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import io.swagger.v3.oas.annotations.tags.Tag
+import org.hibernate.Criteria
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.ProductAvailability
-import grails.core.GrailsApplication
 
+import javax.ws.rs.GET
+import javax.ws.rs.Path
+import javax.ws.rs.Produces
+
+@SecurityRequirement(name="cookie")
+@Tag(name="Location", description="API for locations")
 @Transactional
 class LocationApiController extends BaseDomainApiController {
 
@@ -24,8 +40,38 @@ class LocationApiController extends BaseDomainApiController {
     def userService
     GrailsApplication grailsApplication
 
-    def list() {
+    @GET
+    @Operation(
+            summary = "Get a list of locations",
+            description = """\
+## Warning!
 
+Do _not_ use Swagger's "Try it out" feature on this entry point without setting `locationTypeCode`!
+
+OpenBoxes tracks a large number of locations; the full list can
+[make this page unresponsive](https://github.com/swagger-api/swagger-ui/issues/3832).""",
+            parameters = [
+                    @Parameter(
+                            description = "optionally restrict the search to a particular type of location",
+                            in = ParameterIn.QUERY,
+                            name = "locationTypeCode",
+                            schema = @Schema(implementation=LocationTypeCode)
+                    )
+            ]
+    )
+    @ApiResponse(
+            content = @Content(
+                    array = @ArraySchema(
+                            schema = @Schema(implementation=Location),
+                            uniqueItems = true
+                    ),
+                    mediaType = "application/json"
+            ),
+            responseCode="200"
+    )
+    @Path("/api/locations")
+    @Produces("text/json")
+    def list() {
         def minLength = grailsApplication.config.openboxes.typeahead.minLength
         if (params.name && params.name.size() < minLength) {
             render([data: []])
@@ -57,6 +103,5 @@ class LocationApiController extends BaseDomainApiController {
             eq("location", currentLocation)
         }
         render ([data:data] as JSON)
-
     }
 }

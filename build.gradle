@@ -10,40 +10,38 @@
 
 buildscript {
     repositories {
-        mavenLocal()
-        //mavenCentral()
-        maven { url "https://repo1.maven.org/maven2" }
-        //maven { url "https://repo.grails.org/grails/core" }
-        maven { url "https://repo.grails.org/grails/plugins/" }
-        maven { url "https://repo.grails.org/grails/plugins-releases/" }
+        mavenCentral()
         maven { url "https://repo.grails.org/grails/core/" }
     }
     dependencies {
-        classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-        classpath "org.grails.plugins:hibernate5:${gormVersion-".RELEASE"}"
-        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.15.1"
-        classpath "gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:2.2.0"
-        classpath 'org.grails.plugins:database-migration:3.1.0.RC1'
-        classpath "gradle.plugin.com.virgo47.gradle:ClasspathJar:1.0.0"
-
+        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:${assetPipelineVersion}"
+        classpath "io.swagger.core.v3:swagger-gradle-plugin:${swaggerCoreVersion}"
+        classpath "org.grails:grails-gradle-plugin:${grailsPluginVersion}"
     }
 }
 
-//include gradle-node plugin
 plugins {
-    id "com.moowork.node" version "0.12"
+    id "eclipse"
+    id "idea"
+    id "java"
+    id "war"
+    id "com.gorylenko.gradle-git-properties" version "2.2.0"
+    id "com.moowork.node" version "1.2.0"
     id "com.virgo47.ClasspathJar" version "1.0.0"
 }
 
-//grails.project.class.dir = "target/classes"
-//grails.project.docs.output.dir = "web-app/docs"
-//grails.project.test.class.dir = "target/test-classes"
-//grails.project.test.reports.dir = "target/test-reports"
-//
-//grails.plugin.location.liquibase = "liquibase/"
+apply plugin: "com.bertramlabs.asset-pipeline"
+apply plugin: "io.swagger.core.v3.swagger-gradle-plugin"
+apply plugin: "org.grails.grails-web"
+apply plugin: "org.grails.grails-gsp"
 
-version "0.9.0-SNAPSHOT"
+version "0.9.0-SNAPSHOT"  // FIXME get this from git
 group "com.openboxes"
+sourceCompatibility = 1.8
+
+File secretsFile = file("${System.properties["user.home"]}/build.secrets")
+def secrets = new Properties()
+secrets.load(new FileInputStream(secretsFile))
 
 node {
     version = '10.12.0'
@@ -52,26 +50,10 @@ node {
     download = true
 }
 
-apply plugin:"eclipse"
-apply plugin:"idea"
-apply plugin:"war"
-apply plugin:"org.grails.grails-web"
-apply plugin:"asset-pipeline"
-apply plugin:"org.grails.grails-gsp"
-apply plugin:"com.gorylenko.gradle-git-properties"
-
 repositories {
-    mavenLocal()
-    //mavenCentral()
-    //maven { url "https://repo.grails.org/grails/core" }
-    maven { url "https://repo1.maven.org/maven2" }
-    maven { url "https://repo.grails.org/grails/plugins/" }
-    maven { url "https://repo.grails.org/grails/plugins-releases/" }
-    maven { url "https://repo.grails.org/grails/core/" }
-//    grailsPlugins()
-//    grailsHome()
-//    grailsCentral()
-//
+    mavenCentral()
+    maven { url "https://repo.grails.org/grails/core" }
+    maven { url "https://repo.grails.org/grails/plugins" }
 }
 
 dependencies {
@@ -80,6 +62,12 @@ dependencies {
     compile "org.grails:grails-core"
     compile "org.springframework.boot:spring-boot-starter-actuator"
     provided "org.springframework.boot:spring-boot-starter-tomcat"
+
+    implementation "javax.ws.rs:javax.ws.rs-api:2.1.1"
+    implementation "io.swagger.core.v3:swagger-annotations:${swaggerCoreVersion}"
+    implementation "io.swagger.core.v3:swagger-core:${swaggerCoreVersion}"
+    compile "io.swagger.core.v3:swagger-models:${swaggerCoreVersion}"
+
     compile "org.grails:grails-web-boot"
     compile "org.grails:grails-logging"
     compile "org.grails:grails-plugin-rest"
@@ -92,7 +80,7 @@ dependencies {
     compile "org.grails.plugins:async"
     compile "org.grails.plugins:scaffolding"
     compile "org.grails.plugins:events"
-    compile "org.grails.plugins:hibernate5"
+    compile "org.grails.plugins:hibernate5:${gormVersion-'.RELEASE'}"
     compile "org.hibernate:hibernate-core:5.1.16.Final"
     compile "org.grails.plugins:gsp"
     console "org.grails:grails-console"
@@ -100,7 +88,7 @@ dependencies {
     runtime "org.glassfish.web:el-impl:2.1.2-b03"
     runtime "com.h2database:h2"
     runtime "org.apache.tomcat:tomcat-jdbc"
-    runtime "com.bertramlabs.plugins:asset-pipeline-grails:2.15.1"
+    runtime "com.bertramlabs.plugins:asset-pipeline-grails:${assetPipelineVersion}"
     testCompile "org.grails:grails-test-mixins:3.3.0"
     testCompile "org.grails:grails-plugin-testing"
     testCompile "org.grails:grails-gorm-testing-support"
@@ -216,8 +204,6 @@ dependencies {
     testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
     testCompile 'org.spockframework:spock-spring:1.1-groovy-2.4'
     compile group: 'org.grails.plugins', name: 'rest-client-builder', version: '2.1.1'
-
-
 }
 
 sourceSets {
@@ -227,7 +213,6 @@ sourceSets {
         }
     }
 }
-
 
 war {
     archiveName = "openboxes.war"
@@ -304,7 +289,33 @@ buildProperties.doLast {
         properties.store(it,null)
     }
 }
-apply plugin: "com.virgo47.ClasspathJar"
+
+/*
+ * Swagger generates a number of mysterious errors if its Jackson dependency
+ * is older than 2.9; turns out a number of other parts of our build chain
+ * predate that release and introduce hard dependencies on previous versions.
+ * Surveying its release notes, 2.9 should work just fine with 2.8-expecting
+ * client code: https://github.com/FasterXML/jackson/wiki/Jackson-Release-2.9
+ *
+ * FIXME remove this block once we migrate to a more modern Gradle release.
+ */
+configurations.all {
+    def min_jackson_version = "2.9.10"
+    def min_jackson_databind_version = "2.9.10.8"  // security fixes
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        if (details.requested.group.startsWith("com.fasterxml.jackson")) {
+            def too_old = VersionNumber.parse(details.requested.version) <= VersionNumber.parse(min_jackson_version)
+            if (too_old) {
+                if (details.requested.name == "jackson-databind") {
+                    details.useVersion(min_jackson_databind_version)
+                } else {
+                    details.useVersion(min_jackson_version)
+                }
+                // details.because "Swagger requires Jackson 2.9+"
+            }
+        }
+    }
+}
 
 ext {
     dockerBuildDir = mkdir("${buildDir}/docker")
@@ -318,4 +329,60 @@ task prepareDocker(type: Copy, dependsOn: assemble) {
     from 'build/libs/openboxes.war'
 
     into dockerBuildDir
+}
+
+// "resolve" is swagger-gradle-plugin's funky name for "build swagger docs"
+resolve {
+    classpath = sourceSets.main.runtimeClasspath
+    filterClass = "org.pih.warehouse.api.SwaggerFilter"
+    openApiFile = file("${project.projectDir}/grails-app/conf/openapi_static.yml")
+    outputDir = file("${project.projectDir}/build/openapi")
+    outputFileName = "openboxes_api"
+    outputFormat = "JSONANDYAML"
+    prettyPrint = true
+    /*
+     * FIXME It would be considerably cleaner to use something like
+     * FIXME resourcePackages = [ "org.pih.warehouse.api" ]
+     * FIXME but that option doesn't seem to find any annotations.
+     */
+    resourceClasses = [
+        "org.pih.warehouse.api.LocationApiController",
+        "org.pih.warehouse.api.PersonApiController",
+        "org.pih.warehouse.api.ProductApiController",
+        "org.pih.warehouse.product.Category",
+        "org.pih.warehouse.user.AuthController"
+    ]
+    sortOutput = false
+}
+
+/*
+ * Post-process swagger output so it's easier to navigate via Swagger UI.
+ *
+ * When resolve.sortOutput is true, *all* keys are sorted in Swagger yaml.
+ * In general, we want to expose domain fields in declaration order,
+ * although alphabetizing domains and paths (API endpoints) makes sense.
+ * Swagger doesn't offer fine-grained sort options, but yq certainly does.
+ */
+task swaggerCleanup(dependsOn: resolve, type: Exec) {
+    commandLine(
+        "yq",
+        "-i",
+        "eval",
+        ".components.schemas |= sort_keys(.) | .paths |= sort_keys(.)",
+        "openboxes_api.yaml"
+    )
+    workingDir file("${project.projectDir}/build/openapi")
+}
+
+task swaggerhubUpdate(dependsOn: swaggerCleanup, type: Exec) {
+    commandLine(
+            "${project.projectDir}/node_modules/.bin/swaggerhub",
+            "api:update",
+            "openboxes/api",
+            "--file",
+            "openboxes_api.yaml",
+            "--visibility=public"
+    )
+    environment("SWAGGERHUB_API_KEY", secrets["swaggerhub_api_key"])
+    workingDir file("${project.projectDir}/build/openapi")
 }

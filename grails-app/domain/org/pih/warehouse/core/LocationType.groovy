@@ -7,22 +7,34 @@
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
  **/
+
 package org.pih.warehouse.core
 
+import io.swagger.v3.oas.annotations.Hidden
+import io.swagger.v3.oas.annotations.media.Schema
 
-/**
- * Represents the type of a Location
- *
- */
+@Schema(description="Identifies the type of a given Location instance (depot, supplier, etc.).")
 class LocationType implements Comparable, Serializable {
 
+    @Schema(description="database identifier, may be uuid or numeric string", format="uuid", readOnly=true, required=true)
     String id
+
+    @Schema(maxLength=255, required=true)
     String name
+
+    @Schema(maxLength=255, nullable=true)
     String description
+
+    @Hidden
+    @Schema(nullable=true)
     Integer sortOrder = 0
+
+    @Hidden
     Date dateCreated
+    @Hidden
     Date lastUpdated
 
+    @Schema(nullable=true)
     LocationTypeCode locationTypeCode
 
     static hasMany = [supportedActivities: String]
@@ -92,7 +104,6 @@ class LocationType implements Comparable, Serializable {
 
     }
 
-
     String toString() {
         return "${name}"
     }
@@ -101,38 +112,47 @@ class LocationType implements Comparable, Serializable {
         return description <=> obj?.description
     }
 
+    @Hidden
     Boolean isDepot() {
         return locationTypeCode == LocationTypeCode.DEPOT
     }
 
+    @Hidden
     Boolean isWard() {
         return locationTypeCode == LocationTypeCode.WARD
     }
 
+    @Hidden
     Boolean isDispensary() {
         return locationTypeCode == LocationTypeCode.DISPENSARY
     }
 
+    @Hidden
     Boolean isBinLocation() {
         return locationTypeCode == LocationTypeCode.BIN_LOCATION
     }
 
+    @Hidden
     Boolean isSupplier() {
         return locationTypeCode == LocationTypeCode.SUPPLIER
     }
 
+    @Hidden
     Boolean isDonor() {
         return locationTypeCode == LocationTypeCode.DONOR
     }
 
+    @Hidden
     Boolean isVirtual() {
         return locationTypeCode == LocationTypeCode.VIRTUAL
     }
 
+    @Hidden
     Boolean isWardOrPharmacy() {
         return (locationTypeCode in [LocationTypeCode.DISPENSARY, LocationTypeCode.WARD])
     }
 
+    @Hidden
     Boolean isDepotWardOrPharmacy() {
         return (locationTypeCode in [LocationTypeCode.DEPOT, LocationTypeCode.DISPENSARY, LocationTypeCode.WARD])
     }
