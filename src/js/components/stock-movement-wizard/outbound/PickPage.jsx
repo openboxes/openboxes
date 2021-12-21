@@ -111,9 +111,30 @@ const FIELDS = {
         label: 'react.stockMovement.quantityPicked.label',
         defaultMessage: 'Qty picked',
         flexWidth: '0.7',
-        attributes: {
-          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
-        },
+        getDynamicAttr: ({
+          fieldName, requiresMobilePicking, values, subfield,
+        }) => ({
+          formatValue: (value) => {
+            if (requiresMobilePicking) {
+              const quantityPicked = value ? (value.toLocaleString('en-US')) : value;
+
+              const fieldNameParts = _.split(fieldName, '.');
+              fieldNameParts.pop();
+              const accessor = fieldNameParts.join('.');
+              const rowValues = _.get(values, accessor);
+              let quantityToPick = 0;
+              if (subfield) {
+                quantityToPick = rowValues && rowValues.quantityToPick ? (rowValues.quantityToPick.toLocaleString('en-US')) : 0;
+              } else {
+                quantityToPick = rowValues && rowValues.quantityRequired ? (rowValues.quantityRequired.toLocaleString('en-US')) : 0;
+              }
+
+              return `${quantityPicked} / ${quantityToPick}`;
+            }
+
+            return (value ? (value.toLocaleString('en-US')) : value);
+          },
+        }),
       },
       buttonEditPick: {
         label: 'react.stockMovement.editPick.label',
@@ -283,7 +304,7 @@ class PickPage extends Component {
    * @public
    */
   checkForInitialPicksChanges(pickPageItem) {
-    if (pickPageItem.picklistItems.length) {
+    if (pickPageItem.picklistItems.length && !this.props.requiresMobilePicking) {
       const initialPicks = [];
       _.forEach(pickPageItem.suggestedItems, (suggestion) => {
         // search if suggested picks are inside picklist
@@ -293,7 +314,7 @@ class PickPage extends Component {
           pickPageItem.picklistItems,
           item => _.get(suggestion, 'inventoryItem.id') === _.get(item, 'inventoryItem.id') && _.get(item, 'binLocation.id') === _.get(suggestion, 'binLocation.id'),
         );
-        if (_.isEmpty(pick) || (pick.quantityPicked !== suggestion.quantityPicked)) {
+        if (_.isEmpty(pick) || (pick.quantityPicked !== suggestion.quantityToPick)) {
           initialPicks.push({
             ...suggestion,
             initial: true,
@@ -625,7 +646,6 @@ class PickPage extends Component {
                 <button
                   type="button"
                   onClick={() => this.refresh()}
-                  disabled={requiresMobilePicking}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
                 >
                   <span><i className="fa fa-refresh pr-2" /><Translate id="react.default.button.refresh.label" defaultMessage="Reload" /></span>
@@ -673,6 +693,7 @@ class PickPage extends Component {
                   isPaginated: this.props.isPaginated,
                   showOnly,
                   isFirstPageLoaded: this.state.isFirstPageLoaded,
+                  values,
                 }))}
               </div>
               <div className="d-print-none submit-buttons">

@@ -353,16 +353,16 @@ enum AvailableItemStatus {
 class SuggestedItem extends AvailableItem {
 
     BigDecimal quantityRequested
-    BigDecimal quantityPicked
+    BigDecimal quantityToPick
 
     static constraints = {
         quantityRequested(nullable: true)
-        quantityPicked(nullable: true)
+        quantityToPick(nullable: true)
     }
 
     Map toJson() {
         Map json = super.toJson()
-        json << [quantityRequested: quantityRequested, quantityPicked: quantityPicked]
+        json << [quantityRequested: quantityRequested, quantityToPick: quantityToPick]
         return json
     }
 }

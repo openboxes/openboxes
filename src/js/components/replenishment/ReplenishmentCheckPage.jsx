@@ -176,10 +176,10 @@ class ReplenishmentSecondPage extends Component {
           pickPageItem.picklistItems,
           item => _.get(suggestion, 'inventoryItem.id') === _.get(item, 'inventoryItem.id') && _.get(item, 'binLocation.id') === _.get(suggestion, 'binLocation.id'),
         );
-        if (_.isEmpty(pick) || (pick.quantity !== suggestion.quantityPicked)) {
+        if (_.isEmpty(pick) || (pick.quantity !== suggestion.quantityToPick)) {
           initialPicks.push({
             ...suggestion,
-            quantity: suggestion.quantityPicked,
+            quantity: suggestion.quantityToPick,
             initial: true,
           });
         }

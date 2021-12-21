@@ -1070,14 +1070,13 @@ class StockMovementService {
             clearPicklist(requisitionItem)
             if (suggestedItems) {
                 for (SuggestedItem suggestedItem : suggestedItems) {
-                    Integer quantityPicked = location.requiresMobilePicking() ? 0 : suggestedItem.quantityPicked.intValueExact()
                     createOrUpdatePicklistItem(requisitionItem,
-                            null,
-                            suggestedItem.inventoryItem,
-                            suggestedItem.binLocation,
-                            quantityPicked,
-                            null,
-                            null)
+                        null,
+                        suggestedItem.inventoryItem,
+                        suggestedItem.binLocation,
+                        suggestedItem.quantityToPick.intValueExact(),
+                        null,
+                        null)
                 }
             }
         }
@@ -1093,7 +1092,7 @@ class StockMovementService {
 
     void createOrUpdatePicklistItem(RequisitionItem requisitionItem, PicklistItem picklistItem,
                                     InventoryItem inventoryItem, Location binLocation,
-                                    Integer quantityPicked, String reasonCode, String comment) {
+                                    Integer quantityToPick, String reasonCode, String comment) {
 
         Requisition requisition = requisitionItem.requisition
 
@@ -1115,7 +1114,7 @@ class StockMovementService {
         }
 
         // Remove from picklist
-        if (quantityPicked == null) {
+        if (quantityToPick == null) {
             picklist.removeFromPicklistItems(picklistItem)
         }
         // Populate picklist item
@@ -1128,8 +1127,8 @@ class StockMovementService {
             requisitionItem.addToPicklistItems(picklistItem)
             picklistItem.inventoryItem = inventoryItem
             picklistItem.binLocation = binLocation
-            picklistItem.quantity = requisitionItem.quantity
-            picklistItem.quantityPicked = quantityPicked
+            picklistItem.quantity = quantityToPick // quantity = quantity to pick
+            picklistItem.quantityPicked = requisition.origin.requiresMobilePicking() ? 0 : quantityToPick
             picklistItem.reasonCode = reasonCode
             picklistItem.comment = comment
             picklistItem.sortOrder = requisitionItem.orderIndex
@@ -1310,16 +1309,16 @@ class StockMovementService {
 
                 // The quantity to pick is either the quantity available (if less than requested) or
                 // the quantity requested (if less than available).
-                int quantityPicked = (quantityRequested >= availableItem.quantityAvailable) ?
+                int quantityToPick = (quantityRequested >= availableItem.quantityAvailable) ?
                         availableItem.quantityAvailable : quantityRequested
 
-                log.info "Suggested quantity ${quantityPicked}"
+                log.info "Suggested quantity ${quantityToPick}"
                 suggestedItems << new SuggestedItem(inventoryItem: availableItem?.inventoryItem,
-                        binLocation: availableItem?.binLocation,
-                        quantityAvailable: availableItem?.quantityAvailable,
-                        quantityRequested: quantityRequested,
-                        quantityPicked: quantityPicked)
-                quantityRequested -= quantityPicked
+                    binLocation: availableItem?.binLocation,
+                    quantityAvailable: availableItem?.quantityAvailable,
+                    quantityRequested: quantityRequested,
+                    quantityToPick: quantityToPick)
+                quantityRequested -= quantityToPick
             }
         }
         return suggestedItems
