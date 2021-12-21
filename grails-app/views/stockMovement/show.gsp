@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.requisition.RequisitionStatus; org.pih.warehouse.shipping.ShipmentStatusCode" %>
+<%@ page import="org.pih.warehouse.inventory.StockMovementStatusCode; org.pih.warehouse.requisition.RequisitionStatus; org.pih.warehouse.shipping.ShipmentStatusCode" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -80,7 +80,8 @@
                         <warehouse:message code="stockMovement.rollbackLastReceipt.label" />
                     </g:link>
                 </g:if>
-                <g:elseif test="${stockMovement?.hasBeenIssued() || ((stockMovement?.hasBeenShipped() ||
+                <g:elseif test="${stockMovement?.stockMovementStatusCode == org.pih.warehouse.inventory.StockMovementStatusCode.PICKING ||
+                        stockMovement?.hasBeenIssued() || ((stockMovement?.hasBeenShipped() ||
                         stockMovement?.hasBeenPartiallyReceived()) && stockMovement?.isFromOrder)}">
                     <g:link controller="stockMovement" action="rollback" id="${stockMovement.id}" class="button">
                         <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;

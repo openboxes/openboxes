@@ -430,6 +430,14 @@ class RequisitionService {
                 }
                 requisition.save()
             }
+            else if (requisition.status == RequisitionStatus.PICKING) {
+                clearPicklist(requisition)
+                requisition.status = RequisitionStatus.VERIFYING
+            }
+            else {
+                throw new IllegalStateException("Unable to rollback requisition with status ${requisition.status}")
+            }
+
         } catch (Exception e) {
             throw new RuntimeException(e)
         }
