@@ -17,9 +17,9 @@ const LabelField = (props) => {
   const dynamicAttr = getDynamicAttr ? getDynamicAttr(props) : {};
   const attr = { ...attributes, ...dynamicAttr };
   const {
-    formatValue, tooltipValue, showValueTooltip, url, ...otherAttr
+    formatValue, tooltipValue, showValueTooltip, url, numberField, ...otherAttr
   } = attr;
-  const className = `text-truncate ${otherAttr.className ? otherAttr.className : ''}`;
+  const className = `text-truncate ${otherAttr.className ? otherAttr.className : ''} ${numberField ? 'text-right mr-2' : ''}`;
 
   if (otherAttr.cellClassName) {
     delete otherAttr.cellClassName;
@@ -96,9 +96,11 @@ LabelField.propTypes = {
   arrayField: PropTypes.bool,
   fieldValue: PropTypes.oneOfType([PropTypes.string,
     PropTypes.shape({}), PropTypes.any]),
+  numberField: PropTypes.bool,
 };
 
 LabelField.defaultProps = {
   arrayField: false,
   fieldValue: null,
+  numberField: false,
 };
