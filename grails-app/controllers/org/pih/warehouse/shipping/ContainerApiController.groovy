@@ -15,8 +15,6 @@ import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.BaseDomainApiController
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.product.Product
 
 class ContainerApiController extends BaseDomainApiController {
 
@@ -57,24 +55,33 @@ class ContainerApiController extends BaseDomainApiController {
     }
 
     def create = {
+        JSONObject jsonObject = request.JSON
         try {
-            JSONObject jsonObject = request.JSON
+
+            if (jsonObject.isNull("containerType.id")) {
+                throw new IllegalArgumentException("Container type is a required property")
+            }
+
+            if (jsonObject.isNull("shipment.id")) {
+                throw new IllegalArgumentException("Shipment is a required property")
+            }
+
             Shipment shipment = shipmentService.getShipment(jsonObject.getString("shipment.id"))
-            if(!jsonObject.containsKey("name") && !jsonObject.containsKey("containerNumber")){
-                render shipmentService.initializeContainerFromShipment(shipment) as JSON
-            }
-            else{
-                Container container = new Container()
-                container.name = jsonObject.name
-                container.containerNumber = jsonObject.containerNumber
-                container.containerType = jsonObject.containerType.id ?
-                        ContainerType.get(jsonObject.containerType.id) :
-                        ContainerType.findById(Constants.PALLET_CONTAINER_TYPE_ID)
-                shipment.addToContainers(container)
-                shipment.save(flush: true)
-                render container as JSON
-            }
+            Container container = !jsonObject.isNull("containerNumber") ? Container.findByContainerNumber(jsonObject.containerNumber) : new Container()
+            String containerNumber = shipmentService.generateContainerNumber(shipment)
+            container.name = !jsonObject.isNull("name") ? jsonObject.name : containerNumber
+            container.containerNumber = !jsonObject.isNull("containerNumber") ? jsonObject.containerNumber : containerNumber
+
+            container.containerType = jsonObject["containerType.id"] ?
+                    ContainerType.get(jsonObject["containerType.id"]) :
+                    ContainerType.findById(Constants.PALLET_CONTAINER_TYPE_ID)
+
+            container.save(flush:true)
+            shipment.addToContainers(container)
+            shipment.save(flush:true)
+            render ([data: container] as JSON)
         } catch(Exception e) {
+            log.error ("Error saving container " + e.message, e)
             render([errorCode: 500, cause: e?.class, errorMessage: e?.message] as JSON)
         }
     }
