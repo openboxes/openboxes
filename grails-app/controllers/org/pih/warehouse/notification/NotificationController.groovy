@@ -19,8 +19,8 @@ import com.amazonaws.services.sns.model.PublishRequest
 import com.amazonaws.services.sns.model.SubscribeRequest
 import com.amazonaws.services.sns.model.SubscribeResult
 import org.apache.commons.lang3.time.DateUtils
-import org.json.JSONArray
-import org.json.JSONObject
+import org.codehaus.groovy.grails.web.json.JSONArray
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Category
@@ -95,11 +95,12 @@ class NotificationController {
 
     def createProduct = {
         JSONObject json = request.getJSON() as JSONObject
-        log.info "json::${json}"
+        log.info "json for create Product::${json}"
         if (json.has("Type") && json.getString("Type") == "SubscriptionConfirmation") {
             String token = json.getString("Token")
             try {
                 String PRODUCT_TOPIC_ARN = grailsApplication.config.awssdk.sns.product.arn
+                log.info "PRODUCT_TOPIC_ARN::${PRODUCT_TOPIC_ARN}, confirmation Token:${token}"
                 ConfirmSubscriptionRequest request = new ConfirmSubscriptionRequest(PRODUCT_TOPIC_ARN, token)
                 ConfirmSubscriptionResult result = amazonSnsClient.confirmSubscription(request);
                 log.info "result::${result?.toString()}"
