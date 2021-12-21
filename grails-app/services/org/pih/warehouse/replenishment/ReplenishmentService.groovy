@@ -270,7 +270,7 @@ class ReplenishmentService {
                         null,
                         suggestedItem.inventoryItem,
                         suggestedItem.binLocation,
-                        suggestedItem.quantityPicked.intValueExact()
+                        suggestedItem.quantityToPick.intValueExact()
                     )
                 }
             }
@@ -279,7 +279,7 @@ class ReplenishmentService {
 
     void createOrUpdatePicklistItem(OrderItem orderItem, PicklistItem picklistItem,
                                     InventoryItem inventoryItem, Location binLocation,
-                                    Integer quantityPicked) {
+                                    Integer quantityToPick) {
 
         Order order = orderItem.order
 
@@ -296,7 +296,7 @@ class ReplenishmentService {
         }
 
         // Remove from picklist
-        if (quantityPicked == null) {
+        if (quantityToPick == null) {
             picklist.removeFromPicklistItems(picklistItem)
         }
         // Populate picklist item
@@ -305,7 +305,7 @@ class ReplenishmentService {
             picklistItem.inventoryItem = inventoryItem
             picklistItem.binLocation = binLocation
             picklistItem.quantity = orderItem.quantity
-            picklistItem.quantityPicked = quantityPicked
+            picklistItem.quantityPicked = quantityToPick
             picklistItem.sortOrder = orderItem.orderIndex
             picklistItem.disableRefresh = Boolean.TRUE
         }
@@ -341,16 +341,16 @@ class ReplenishmentService {
 
                 // The quantity to pick is either the quantity available (if less than requested) or
                 // the quantity requested (if less than available).
-                int quantityPicked = (quantityRequested >= availableItem.quantityAvailable) ?
+                int quantityToPick = (quantityRequested >= availableItem.quantityAvailable) ?
                         availableItem.quantityAvailable : quantityRequested
 
-                log.info "Suggested quantity ${quantityPicked}"
+                log.info "Suggested quantity ${quantityToPick}"
                 suggestedItems << new SuggestedItem(inventoryItem: availableItem?.inventoryItem,
-                        binLocation: availableItem?.binLocation,
-                        quantityAvailable: availableItem?.quantityAvailable,
-                        quantityRequested: quantityRequested,
-                        quantityPicked: quantityPicked)
-                quantityRequested -= quantityPicked
+                    binLocation: availableItem?.binLocation,
+                    quantityAvailable: availableItem?.quantityAvailable,
+                    quantityRequested: quantityRequested,
+                    quantityToPick: quantityToPick)
+                quantityRequested -= quantityToPick
             }
         }
         return suggestedItems
