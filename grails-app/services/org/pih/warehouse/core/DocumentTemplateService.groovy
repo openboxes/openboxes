@@ -19,12 +19,13 @@ import fr.opensagres.xdocreport.template.TemplateEngineKind
 import fr.opensagres.xdocreport.template.formatter.FieldsMetadata
 import groovy.text.Template
 import org.codehaus.groovy.grails.web.pages.GroovyPagesTemplateEngine
+import org.jxls.common.Context
+import org.jxls.util.JxlsHelper
+import org.pih.warehouse.invoice.Invoice
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
-import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.shipping.ShipmentItem
 
 class DocumentTemplateService {
 
@@ -37,6 +38,14 @@ class DocumentTemplateService {
         Template template = groovyPagesTemplateEngine.createTemplate(templateContents, documentTemplate.name)
         template.make(model).writeTo(output)
         return output.toString()
+    }
+
+    def renderInvoiceTemplate(Document documentTemplate, Invoice invoiceInstance, ByteArrayOutputStream outputStream) {
+        InputStream inputStream = new ByteArrayInputStream(documentTemplate.fileContents)
+        Context context = new Context()
+        context.putVar("invoice", invoiceInstance)
+        context.putVar("invoiceItems", invoiceInstance?.invoiceItems)
+        JxlsHelper.getInstance().processTemplateAtCell(inputStream, outputStream, context, "Result!A1")
     }
 
     def renderOrderDocumentTemplate(Document documentTemplate, Order orderInstance, ConverterTypeTo targetDocumentType, OutputStream outputStream) {

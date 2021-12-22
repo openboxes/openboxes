@@ -16,7 +16,11 @@
                 <tbody>
                 <g:each var="documentInstance" in="${invoiceInstance?.documents?.findAll { !it.fileUri }}">
                     <tr>
-                        <td>${documentInstance?.filename} (<g:link controller="document" action="download" id="${documentInstance.id}">download</g:link>)</td>
+                        <td>
+                            ${documentInstance?.filename}
+                            (<g:link controller="document" action="download" id="${documentInstance.id}">download</g:link>)
+                            (<g:link controller="invoice" action="downloadTemplateDocument" params="['invoice.id': invoiceInstance?.id, 'document.id': documentInstance?.id]">download Template</g:link>)
+                        </td>
                         <td><format:metadata obj="${documentInstance?.documentType}"/></td>
                         <td>${documentInstance?.name}</td>
                         <td>${documentInstance?.size} bytes</td>
