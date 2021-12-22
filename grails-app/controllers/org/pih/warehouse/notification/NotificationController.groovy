@@ -231,7 +231,7 @@ class NotificationController {
                 JSONObject destinationJsonObject = oJson.getJSONObject("destination")
                 log.info "Destination location Json:${destinationJsonObject}"
                 Location location = Location.findByLocationNumber(destinationJsonObject.getString("locationNumber"))
-                if (!location) {
+                if (!location && grailsApplication.config?.openboxes?.integration?.locationMapping) {
                     log.info "Location Mapping::${grailsApplication.config?.openboxes?.integration?.locationMapping}"
                     location = getLocationByLocationMapping(destinationJsonObject)
                 }
@@ -245,7 +245,7 @@ class NotificationController {
             if (oJson.has("requestedBy") && oJson.getString("requestedBy")) {
                 User requestedBy = User.findByUsername(oJson.getString("requestedBy"))
                 if (!requestedBy) {
-                    JSONObject userMapping = toJson(grailsApplication.config?.openboxes?.integration?.userMapping)
+                    JSONObject userMapping = toJson(grailsApplication.config?.openboxes?.integration?.userMapping ?: null)
                     log.info "UserMapping:${userMapping}"
                     if(userMapping) {
                         String requestedByString = oJson.getString("requestedBy")
@@ -292,7 +292,7 @@ class NotificationController {
                 RequisitionItem requisitionItem = new RequisitionItem()
                 Product product = Product.findByUpc(lineItem.getString("productId"))
                 if (!product) {
-                    JSONObject productMapping = toJson(grailsApplication.config?.openboxes?.integration?.productMapping)
+                    JSONObject productMapping = toJson(grailsApplication.config?.openboxes?.integration?.productMapping ?: null)
                     log.info "ProductMapping:${productMapping}"
                     if(productMapping) {
                         String productId = lineItem.getString("productId")
@@ -303,7 +303,7 @@ class NotificationController {
                     }
                 }
                 log.info "product:${product} for lineItem index:${lIndex}"
-                Integer quantity = lineItem.getInt("orderedQuantity")
+                Integer quantity = lineItem.getInt("quantity")
                 requisitionItem.product = product
                 requisitionItem.quantity = quantity
                 requisition.addToRequisitionItems(requisitionItem)
@@ -329,17 +329,23 @@ class NotificationController {
     }
 
     JSONObject toJson(String value) {
-        try{
-            JSONObject jsonObject = new JSONObject(value)
-            return jsonObject
-        }catch(Exception ex){
+        try {
+            if (value) {
+                value = value.trim()
+                if(value != "" && value != "null") {
+                    JSONObject jsonObject = new JSONObject(value)
+                    return jsonObject
+                }
+            }
+        } catch (Exception ex) {
             log.error "Exception:${ex} while parsing ${value} in JSON"
-            return null
         }
+
+        return null
     }
 
     Location getLocationByLocationMapping(JSONObject locationJsonObject){
-        JSONObject locationMapping = toJson(grailsApplication.config?.openboxes?.integration?.locationMapping)
+        JSONObject locationMapping = toJson(grailsApplication.config?.openboxes?.integration?.locationMapping ?: null)
         log.info "LocationMapping JSON:${locationMapping}"
         Location location = null
         if(locationMapping) {
