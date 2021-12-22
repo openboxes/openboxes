@@ -10,12 +10,20 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import org.hibernate.Criteria
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import org.hibernate.Criteria
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.ProductAvailability
-import grails.core.GrailsApplication
+
+import javax.ws.rs.GET
+import javax.ws.rs.Path
+import javax.ws.rs.Produces
 
 @Transactional
 class LocationApiController extends BaseDomainApiController {
@@ -24,8 +32,24 @@ class LocationApiController extends BaseDomainApiController {
     def userService
     GrailsApplication grailsApplication
 
+    // @Path("/api/locations")  // raises jackson errors if used with other annotations, see OBDS-73 for details
+    @GET
+    @Operation(
+            summary = "Get locations",
+            description = "Get list of locations",
+            responses = [
+                    @ApiResponse(
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation=Location.class)
+                            )
+                    ),
+                    @ApiResponse(responseCode="400", description="Invalid ID supplied"),
+                    @ApiResponse(responseCode="404", description="Not found")
+            ]
+    )
+    @Produces("text/json")
     def list() {
-
         def minLength = grailsApplication.config.openboxes.typeahead.minLength
         if (params.name && params.name.size() < minLength) {
             render([data: []])
@@ -57,6 +81,5 @@ class LocationApiController extends BaseDomainApiController {
             eq("location", currentLocation)
         }
         render ([data:data] as JSON)
-
     }
 }

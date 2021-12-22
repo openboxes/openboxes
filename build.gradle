@@ -81,6 +81,12 @@ dependencies {
     compile "org.grails:grails-core"
     compile "org.springframework.boot:spring-boot-starter-actuator"
     provided "org.springframework.boot:spring-boot-starter-tomcat"
+
+    implementation "javax.ws.rs:javax.ws.rs-api:2.1.1"
+    implementation "io.swagger.core.v3:swagger-annotations:2.1.11"
+    implementation "io.swagger.core.v3:swagger-jaxrs2:2.1.11"
+    implementation "io.swagger.core.v3:swagger-jaxrs2-servlet-initializer-v2:2.1.11"
+
     compile "org.grails:grails-web-boot"
     compile "org.grails:grails-logging"
     compile "org.grails:grails-plugin-rest"
@@ -323,10 +329,13 @@ task prepareDocker(type: Copy, dependsOn: assemble) {
 
 resolve {
     classpath = sourceSets.main.runtimeClasspath
-    openApiFile = file('grails-app/conf/openapi.yaml')
-    outputFileName = 'openboxes_api'
-    outputDir = file('build/openapi')
-    outputFormat = 'JSONANDYAML'
-    prettyPrint = 'TRUE'
-    resourcePackages = ['org.openboxes', 'org.pih']
+    openApiFile = file("${project.projectDir}/grails-app/conf/openapi_static.yml")
+    outputFileName = "openboxes_api"
+    outputDir = file("${project.projectDir}/build/openapi5")
+    outputFormat = "JSONANDYAML"
+    prettyPrint = true
+    sortOutput = true
+    resourceClasses = [
+            "org.pih.warehouse.api.LocationApiController"
+    ]
 }
