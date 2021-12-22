@@ -30,7 +30,7 @@ public class ExecutionStatus {
         this.orderId = orderId;
     }
 
-    @XmlElement(name = "status")
+    @XmlElement(name = "Status")
     public String getStatus() {
         return status;
     }
@@ -48,7 +48,7 @@ public class ExecutionStatus {
         this.dateTime = dateTime;
     }
 
-    @XmlElement(name = "geoData")
+    @XmlElement(name = "GeoData")
     public GeoData getGeoData() {
         return geoData;
     }

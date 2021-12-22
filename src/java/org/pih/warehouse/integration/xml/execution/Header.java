@@ -25,7 +25,7 @@ public class Header {
         this.sourceApp = sourceApp;
     }
 
-    @XmlElement(name = "version")
+    @XmlElement(name = "Version")
     String getVersion() {
         return version;
     }
