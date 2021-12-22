@@ -94,6 +94,7 @@ nav:
       - Publish: developer-guide/release/publish.md
       - Deploy: developer-guide/release/deploy.md
       - Cleanup: developer-guide/release/cleanup.md
+    - Hotfix Lifecycle: developer-guide/hotfix/index.md
   - API Guide:
     - Overview: api-guide/index.md
     - Generic API: api-guide/generic.md

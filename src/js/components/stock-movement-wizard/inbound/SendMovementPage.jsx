@@ -366,7 +366,8 @@ class SendMovementPage extends Component {
               productName: val.productName ? val.productName : val.product.name,
             }),
           );
-          const uniqBy = this.state.values.origin.type === 'SUPPLIER' ? 'id' : 'shipmentItemId';
+
+          const uniqBy = _.find(tableItemsData, 'id') ? 'id' : 'shipmentItemId';
 
           this.setState({
             values: {
@@ -670,7 +671,7 @@ class SendMovementPage extends Component {
     if (!values.expectedDeliveryDate) {
       errors.expectedDeliveryDate = 'react.default.error.requiredField.label';
     }
-    if (moment().startOf('day').diff(expectedDeliveryDate) > 0) {
+    if (moment(dateShipped).diff(expectedDeliveryDate) > 0) {
       errors.expectedDeliveryDate = 'react.stockMovement.error.pastDate.label';
     }
 

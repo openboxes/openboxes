@@ -1,5 +1,11 @@
+<%@page import="org.pih.warehouse.inventory.LotStatusCode" %>
 <g:set var="shipmentInstance" value="${stockMovement?.shipment}"/>
 <g:set var="shipmentItemsByContainer" value="${shipmentInstance?.shipmentItems?.groupBy { it.container } }"/>
+<style>
+    .recalled {
+        background-color: #ffcccb;
+    }
+</style>
 <div id="packingList" class="box dialog">
     <h2>
         <img src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}" alt="contents" style="vertical-align: middle"/>
@@ -7,6 +13,7 @@
     </h2>
     <table>
         <tr>
+            <th></th>
             <th><warehouse:message code="shipping.container.label"/></th>
             <g:if test="${shipmentInstance?.isFromPurchaseOrder}">
                 <th><warehouse:message code="order.orderNumber.label"/></th>
@@ -40,9 +47,17 @@
             <g:each var="shipmentItem" in="${shipmentInstance.sortShipmentItemsBySortOrder()}" status="i">
                 <g:set var="rowspan" value="${shipmentItemsByContainer[shipmentItem?.container]?.size() }"/>
                 <g:set var="newContainer" value="${previousContainer != shipmentItem?.container }"/>
-                <tr class="prop ${(count++ % 2 == 0)?'odd':'even'} ${newContainer?'new-container':''} shipmentItem">
+                <tr class="prop ${(count++ % 2 == 0)?'odd':'even'} ${newContainer?'new-container':''} ${shipmentItem?.hasRecalledLot?'recalled':''} shipmentItem">
+                    <td>
+                        <g:if test="${shipmentItem?.hasRecalledLot}">
+                            <div data-toggle="tooltip" data-placement="top" title="${g.message(code:'inventoryItem.recalledLot.label')}">
+                                %{-- &#x24C7; = hexadecimal circled letter R --}%
+                                <b>&#x24C7;</b>
+                            </div>
+                        </g:if>
+                    </td>
                     <g:if test="${newContainer }">
-                        <td class="top left packing-unit" rowspan="${rowspan}">
+                        <td class="top left" rowspan="${rowspan}">
                             <g:set var="container" value="${shipmentItem?.container}"/>
                             <label><g:if test="${container?.parentContainer}">${container?.parentContainer?.name }&nbsp;&rsaquo;&nbsp;</g:if><g:if test="${container?.name }">${container?.name }</g:if><g:else><warehouse:message code="shipping.unpacked.label"/></g:else></label>
                             <g:if test="${showDetails}">

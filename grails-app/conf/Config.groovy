@@ -709,7 +709,7 @@ breadcrumbsConfig {
             listLabel = "react.breadcrumbs.order.label"
             defaultListLabel = "Order"
             actionUrl = "/${appName}/putAway/create/"
-            listUrl = "/${appName}/order/list?orderTypeCode=TRANSFER_ORDER&status=PENDING"
+            listUrl = "/${appName}/order/list?orderType=PUTAWAY_ORDER&status=PENDING"
         }
         combinedShipments {
             actionLabel = "shipmentFromPO.label"
@@ -735,6 +735,22 @@ breadcrumbsConfig {
             actionUrl = "/${appName}/stockTransfer/create/"
             listUrl = "/"
         }
+        replenishment {
+            actionLabel = "react.replenishment.createReplenishment.label"
+            defaultActionLabel = "Create Replenishment"
+            listLabel = "react.replenishment.label"
+            defaultListLabel = "Replenishment"
+            actionUrl = "/${appName}/replenishment/create/"
+            listUrl = "/"
+        }
+        returns {
+            actionLabel = "react.outboundReturns.createReturn.label"
+            defaultActionLabel = "Create Return"
+            listLabel = "react.outboundReturns.label"
+            defaultListLabel = "Outbound Returns"
+            actionUrl = "/${appName}/stockTransfer/createReturns/"
+            listUrl = "/"
+        }
 }
 
 // OpenBoxes identifier config
@@ -758,6 +774,7 @@ openboxes.identifier.organization.minSize = 2
 openboxes.identifier.organization.maxSize = 4
 
 openboxes.identifier.purchaseOrder.generatorType = IdentifierGeneratorTypeCode.SEQUENCE
+openboxes.identifier.purchaseOrder.sequenceNumber.format = Constants.DEFAULT_PO_SEQUENCE_NUMBER_FORMAT
 openboxes.identifier.purchaseOrder.format = "PO-\${destinationPartyCode}-\${sequenceNumber}"
 openboxes.identifier.purchaseOrder.properties = ["destinationPartyCode": "destinationParty.code"]
 
@@ -1086,7 +1103,10 @@ openboxes {
                     menuItems: [
                         [label: "inventory.manage.label", defaultLabel: "Manage Inventory", href: "/${appName}/inventory/manage"],
                         [label: "inventory.import.label", defaultLabel: "Import Inventory", href: "/${appName}/batch/importData?type=inventory&execution=e1s1"],
-                        [label: "inventory.createStockTransfer.label", defaultLabel: "Create Stock Transfer", href: "/${appName}/stockTransfer/index"]
+                        [label: "inventory.createStockTransfer.label", defaultLabel: "Create Stock Transfer", href: "/${appName}/stockTransfer/create"],
+                        [label: "inventory.listStockTransfers.label", defaultLabel: "List Stock Transfers", href: "/${appName}/stockTransfer/list"],
+//                        OBPIH-4079: TEMPORARY DISABLED
+//                        [label: "inventory.createReplenishment.label", defaultLabel: "Create Replenishment", href: "/${appName}/replenishment/index"]
                     ]
                 ]
             ]
@@ -1100,8 +1120,8 @@ openboxes {
                     label: "",
                     defaultLabel: "Purchasing",
                     menuItems: [
-                            [label: "order.createPurchase.label", defaultLabel: "Create Purchase Order", href: "/${appName}/purchaseOrder/index"],
-                            [label: "order.listPurchase.label", defaultLabel: "List Purchase Orders", href: "/${appName}/order/list?orderTypeCode=PURCHASE_ORDER"],
+                            [label: "order.createPurchase.label", defaultLabel: "Create Purchase Order", href: "/${appName}/purchaseOrder/index", requiredActivities: [ActivityCode.PLACE_ORDER]],
+                            [label: "order.listPurchase.label", defaultLabel: "List Purchase Orders", href: "/${appName}/order/list?orderType=PURCHASE_ORDER"],
                             [label: "location.listSuppliers.label", defaultLabel: "List Suppliers", href: "/${appName}/supplier/list"],
                             [label: "shipment.shipfromPO.label", defaultLabel: "Ship from Purchase Order", href: "/${appName}/stockMovement/createCombinedShipments?direction=INBOUND"]
                     ]
@@ -1143,7 +1163,7 @@ openboxes {
                             defaultLabel: "Putaways",
                             menuItems: [
                                     [label: "react.putAway.createPutAway.label", defaultLabel: "Create Putaway", href: "/${appName}/putAway/index"],
-                                    [label: "react.putAway.list.label", defaultLabel: "List Putaways", href: "/${appName}/order/list?orderTypeCode=TRANSFER_ORDER&status=PENDING"]
+                                    [label: "react.putAway.list.label", defaultLabel: "List Putaways", href: "/${appName}/order/list?orderType=PUTAWAY_ORDER&status=PENDING"]
                             ]
                     ]
             ]
@@ -1158,7 +1178,9 @@ openboxes {
                     defaultLabel: "Stock Movement",
                     menuItems: [
                         [label: "outbound.create.label", defaultLabel: "Create Outbound Movements", href: "/${appName}/stockMovement/createOutbound?direction=OUTBOUND"],
-                        [label: "outbound.list.label", defaultLabel: "List Outbound Movements", href: "/${appName}/stockMovement/list?direction=OUTBOUND"]
+                        [label: "outbound.list.label", defaultLabel: "List Outbound Movements", href: "/${appName}/stockMovement/list?direction=OUTBOUND"],
+//                        OBPIH-4199: TEMPORARILY DISABLED
+//                        [label: "outboundReturns.create.label", defaultLabel: "Create Return", href: "/${appName}/stockTransfer/createReturns"]
                     ]
                 ]
             ]
@@ -1178,7 +1200,8 @@ openboxes {
                         [label: "report.expiringStockReport.label", defaultLabel: "Expiring Stock Report", href: "/${appName}/inventory/listExpiringStock"],
                         [label: "report.inventoryByLocationReport.label", defaultLabel: "Inventory By Location Report", href: "/${appName}/report/showInventoryByLocationReport"],
                         [label: "report.cycleCount.label", defaultLabel: "Cycle Count Report", href: "/${appName}/report/showCycleCountReport"],
-                        [label: "report.baselineQohReport.label", defaultLabel: "Baseline QoH Report", href: "/${appName}/inventory/show"],
+//                        OPBIH-4213: TEMPORARILY DISABLED
+//                        [label: "report.baselineQohReport.label", defaultLabel: "Baseline QoH Report", href: "/${appName}/inventory/show"],
                         [label: "report.onOrderReport.label", defaultLabel: "Order Report", href: "/${appName}/report/showOnOrderReport"]
                     ]
                 ],
@@ -1201,7 +1224,8 @@ openboxes {
                         [label: "export.inventoryLevels.label", defaultLabel: "Export inventory levels", href: "/${appName}/inventoryLevel/export"],
                         [label: "export.requisitions.label", defaultLabel: "Export requisitions", href: "/${appName}/requisition/export"],
                         [label: "export.binLocations.label", defaultLabel: "Export bin locations", href: "/${appName}/report/exportBinLocation?downloadFormat=csv"],
-                        [label: "export.productDemand.label", defaultLabel: "Export product demand", href: "/${appName}/report/exportDemandReport?downloadFormat=csv"]
+                        [label: "export.productDemand.label", defaultLabel: "Export product demand", href: "/${appName}/report/exportDemandReport?downloadFormat=csv"],
+                        [label: "export.custom.label", defaultLabel: "Custom data exports", href: "/${appName}/dataExport/index"]
                     ]
                 ]
             ]

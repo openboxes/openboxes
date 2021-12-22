@@ -19,6 +19,7 @@ enum DocumentCode {
     SHIPPING_TEMPLATE,
     ZEBRA_TEMPLATE,
     EMAIL_TEMPLATE,
+    DATA_EXPORT,
 
     static list() {
         [
@@ -30,6 +31,7 @@ enum DocumentCode {
                 SHIPPING_TEMPLATE,
                 ZEBRA_TEMPLATE,
                 EMAIL_TEMPLATE,
+                DATA_EXPORT,
         ]
     }
 

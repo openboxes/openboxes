@@ -14,6 +14,10 @@ class RoleFilters {
                                 'update', 'importData', 'receive', 'showRecordInventory', 'withdraw', 'cancel', 'change', 'toggle', 'exportAsCsv']
     def static changeControllers = ['createProductFromTemplate']
 
+    def static managerActions = [
+            'stockMovementItemApi': ['eraseItem']
+    ]
+
     def static adminControllers = ['createProduct', 'createProductFromTemplate', 'admin']
     def static adminActions = [
             'product'      : ['create'],
@@ -84,7 +88,7 @@ class RoleFilters {
     static Boolean needManager(controllerName, actionName) {
         changeActions.any {
             actionName?.startsWith(it)
-        } || controllerName?.contains("Workflow") || changeControllers?.contains(controllerName)
+        } || controllerName?.contains("Workflow") || changeControllers?.contains(controllerName) || managerActions[controllerName]?.contains(actionName)
     }
 
     static Boolean needInvoice(controllerName, actionName) {

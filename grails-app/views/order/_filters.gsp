@@ -1,4 +1,8 @@
-<%@ page import="org.pih.warehouse.core.ActivityCode; org.pih.warehouse.order.OrderTypeCode" %>
+<%@ page import="org.pih.warehouse.core.ActivityCode;" %>
+<%@ page import="org.pih.warehouse.core.Constants;" %>
+<%@ page import="org.pih.warehouse.order.OrderStatus;" %>
+<%@ page import="org.pih.warehouse.order.OrderType;" %>
+<%@ page import="org.pih.warehouse.order.OrderTypeCode;" %>
 <div class="box">
     <h2><warehouse:message code="default.filters.label"/></h2>
     <g:form id="listForm" action="list" method="GET">
@@ -12,19 +16,20 @@
             </div>
             <div class="filter-list-item">
                 <label>${warehouse.message(code: 'order.orderTypeCode.label')}</label>
-                <g:select id="orderTypeCode"
-                          name="orderTypeCode"
-                          from="${org.pih.warehouse.order.OrderTypeCode.list()}"
+                <g:select id="orderType"
+                          name="orderType"
+                          from="${OrderType.list()}"
                           class="select2"
-                          optionValue="${{ format.metadata(obj: it) }}"
-                          value="${params?.orderTypeCode}"
+                          optionValue="name"
+                          optionKey="code"
+                          value="${params?.orderType}"
                           noSelection="['': '']"/>
             </div>
             <div class="filter-list-item">
                 <label>${warehouse.message(code: 'order.status.label')}</label>
                 <g:select id="status"
                           name="status"
-                          from="${org.pih.warehouse.order.OrderStatus.list()}"
+                          from="${OrderStatus.list()}"
                           class="select2"
                           optionValue="${{ format.metadata(obj: it) }}"
                           value="${params.status}"
@@ -41,7 +46,7 @@
                                          data-allow-clear="true"
                                          data-ajax--cache="true"/>
             </div>
-            <g:if test="${params.orderTypeCode == OrderTypeCode.PURCHASE_ORDER}">
+            <g:if test="${params.orderType == OrderTypeCode.PURCHASE_ORDER.name()}">
                 <div class="filter-list-item">
                     <label><warehouse:message code="order.destination.label"/></label>
                     <g:selectLocationViaAjax id="destination"
@@ -63,7 +68,7 @@
                                           disabled="${isCentralPurchasingEnabled}" />
                 </div>
             </g:if>
-            <g:elseif test="${params.orderTypeCode == OrderTypeCode.TRANSFER_ORDER}">
+            <g:elseif test="${params.orderType == Constants.PUTAWAY_ORDER}">
                 <div class="filter-list-item">
                     <label><warehouse:message code="order.destination.label"/></label>
                     <g:selectLocationViaAjax id="destination"

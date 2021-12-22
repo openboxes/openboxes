@@ -15,8 +15,11 @@ import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.FetchMode
+import org.pih.warehouse.api.StockTransfer
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
@@ -34,16 +37,17 @@ import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.order.OrderStatus
+import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.ShipOrderCommand
 import org.pih.warehouse.order.ShipOrderItemCommand
+import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptStatusCode
-import org.pih.warehouse.requisition.RequisitionStatus
 import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.Errors
-import org.springframework.validation.ObjectError
 
 import javax.mail.internet.InternetAddress
 import java.math.RoundingMode
@@ -59,6 +63,7 @@ class ShipmentService {
     def identifierService
     def documentService
     def personDataService
+    def productAvailabilityService
     GrailsApplication grailsApplication
 
     /**
@@ -671,8 +676,14 @@ class ShipmentService {
 
 
     boolean validateShipment(Shipment shipment) {
-        shipment?.shipmentItems?.each { ShipmentItem shipmentItem ->
-            validateShipmentItem(shipmentItem)
+        if (shipment?.orders && shipment?.orders?.first()?.orderType == OrderType.findByCode(Constants.OUTBOUND_RETURNS)) {
+            shipment?.shipmentItems?.each { ShipmentItem shipmentItem ->
+                validateReturnShipmentItem(shipmentItem)
+            }
+        } else {
+            shipment?.shipmentItems?.each { ShipmentItem shipmentItem ->
+                validateShipmentItem(shipmentItem)
+            }
         }
     }
 
@@ -704,26 +715,23 @@ class ShipmentService {
                 throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
             }
 
-            // Check whether there's any stock in the bin location for the given inventory item
-            def quantityOnHand = getQuantityOnHand(origin, shipmentItem.binLocation, shipmentItem.inventoryItem, binLocationRequired)
+            def quantityAvailableToPromise = productAvailabilityService.getQuantityAvailableToPromise(origin, shipmentItem.binLocation, shipmentItem.inventoryItem)
+            def quantityAvailableWithPicked = quantityAvailableToPromise + shipmentItem.quantityPicked
+
             def duplicatedShipmentItemsQuantity = getDuplicatedShipmentItemsQuantity(shipmentItem.shipment, shipmentItem.binLocation, shipmentItem.inventoryItem)
 
-            log.info "Shipment item quantity ${shipmentItem.quantity} vs quantity on hand ${quantityOnHand} vs duplicated shipment items quantity ${duplicatedShipmentItemsQuantity}"
+            log.info "Shipment item quantity ${shipmentItem.quantity} vs quantity available to promise ${quantityAvailableWithPicked} vs duplicated shipment items quantity ${duplicatedShipmentItemsQuantity}"
 
             log.info("Checking shipment item ${shipmentItem?.inventoryItem} quantity [" +
-                    shipmentItem.quantity + "] <= quantity on hand [" + quantityOnHand + "]")
-            if (duplicatedShipmentItemsQuantity > quantityOnHand && origin.supports(ActivityCode.MANAGE_INVENTORY)) {
-                String errorMessage = "Shipping quantity (${shipmentItem.quantity}) can not exceed on hand quantity (${quantityOnHand}) for " +
-                        "product code ''${shipmentItem.product.productCode}'' " +
-                        "and lot number ''${shipmentItem?.inventoryItem?.lotNumber}'' " +
-                        "at origin ''${origin.name}'' " +
-                        "bin ''${shipmentItem?.binLocation?.name ?: 'Default'}''. " +
-                        "This can occur if changes were made to inventory after this shipment was picked but before it shipped. " +
-                        "To move forward, please remove the lines above from the shipment or reduce to reflect current QOH."
+                    shipmentItem.quantity + "] <= quantity available to promise [" + quantityAvailableWithPicked + "]")
+            if (duplicatedShipmentItemsQuantity > quantityAvailableWithPicked && origin.supports(ActivityCode.MANAGE_INVENTORY)) {
+                String errorMessage = "The pick for product code(s) ${shipmentItem.product.productCode} is no longer valid. " +
+                        "This can occur if a stock count, transfer, or recall has been performed on the product since the initial pick was generated. " +
+                        "To address this issue, edit the pick to select a new lot or reduce the pick quantity and add a reason code."
                 shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedAvailableQuantity",
                         [
                                 shipmentItem.quantity + " " + shipmentItem?.product?.unitOfMeasure,
-                                quantityOnHand + " " + shipmentItem?.product?.unitOfMeasure,
+                                quantityAvailableWithPicked + " " + shipmentItem?.product?.unitOfMeasure,
                                 shipmentItem?.product?.productCode,
                                 shipmentItem?.inventoryItem?.lotNumber,
                                 origin.name,
@@ -731,6 +739,42 @@ class ShipmentService {
                         ].toArray(), errorMessage)
                 throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
             }
+        }
+        return true
+    }
+
+    /**
+     * Validate the shipment item for outbound returns
+     *
+     * @param shipmentItem shipment item to validate
+     * @return boolean
+     */
+    boolean validateReturnShipmentItem(ShipmentItem shipmentItem) {
+        if (!shipmentItem.validate()) {
+            throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
+        }
+
+        def origin = Location.get(shipmentItem?.shipment?.origin?.id)
+        def quantityAvailableToReturn = productAvailabilityService.getQuantityNotPickedInBinLocation(shipmentItem.inventoryItem, shipmentItem.binLocation)
+
+        if (shipmentItem.quantity > quantityAvailableToReturn) {
+            String errorMessage = "Shipping quantity (${shipmentItem.quantity}) can not exceed quantity on hand (${quantityAvailableToReturn}) for " +
+                    "product code ''${shipmentItem.product.productCode}'' " +
+                    "and lot number ''${shipmentItem?.inventoryItem?.lotNumber}'' " +
+                    "at origin ''${origin.name}'' " +
+                    "bin ''${shipmentItem?.binLocation?.name ?: 'Default'}''. " +
+                    "This can occur if changes were made to inventory after this shipment was picked but before it shipped. " +
+                    "To move forward, please remove the lines above from the shipment or reduce to reflect current QOH."
+            shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedAvailableQuantity",
+                    [
+                            shipmentItem.quantity + " " + shipmentItem?.product?.unitOfMeasure,
+                            quantityAvailableToReturn + " " + shipmentItem?.product?.unitOfMeasure,
+                            shipmentItem?.product?.productCode,
+                            shipmentItem?.inventoryItem?.lotNumber,
+                            origin.name,
+                            shipmentItem?.binLocation?.name ?: 'Default'
+                    ].toArray(), errorMessage)
+            throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
         }
         return true
     }
@@ -774,55 +818,6 @@ class ShipmentService {
         }
 
         return results[0] ?: 0
-    }
-
-    /**
-     * Get quantity on hand for the given bin location and inventory item stored at the given location.
-     *
-     * @param location
-     * @param binLocation
-     * @param inventoryItem
-     * @return
-     */
-    Integer getQuantityOnHand(Location location, Location binLocation, InventoryItem inventoryItem, boolean binLocationRequired) {
-        List transactionEntries = getTransactionEntries(location, inventoryItem?.product)
-        List binLocations = inventoryService.getQuantityByBinLocation(transactionEntries)
-
-        // Filter by inventory item
-        if (inventoryItem) {
-            binLocations = binLocations.findAll { it.inventoryItem == inventoryItem }
-        }
-
-        // Bin location validation is required when picking to ensure that we don't
-        // pick from the Default bin if it doesn't have any stock
-        if (binLocationRequired) {
-            binLocations = binLocations.findAll { it.binLocation == binLocation }
-        }
-
-        def quantityOnHand = binLocations.sum { it.quantity }
-        return quantityOnHand ?: 0
-    }
-
-
-    /**
-     * Get all transaction entries for the given bin location and inventory item.
-     *
-     * @param inventoryInstance
-     * @return
-     */
-    List getTransactionEntries(Location location, Product product) {
-        def criteria = TransactionEntry.createCriteria()
-        def transactionEntries = criteria.list {
-            inventoryItem {
-                eq("product", product)
-            }
-            transaction {
-                eq("inventory", location.inventory)
-                order("transactionDate", "asc")
-                order("dateCreated", "asc")
-            }
-        }
-        return transactionEntries
     }
 
 
@@ -1060,6 +1055,23 @@ class ShipmentService {
                     it.lotNumber == lotNumber &&
                     it.inventoryItem == inventoryItem
         }
+    }
+
+    void sendShipment(Order order) {
+        def shipments = order.shipments
+
+        if (!shipments) {
+            throw new IllegalArgumentException("Can't find shipment for given order: ${order.id}")
+        }
+
+        User user = AuthService.currentUser.get()
+
+        shipments.each { Shipment shipment ->
+            sendShipment(shipment, null, user, order.origin, shipment?.dateShipped() ?: new Date())
+        }
+
+        order.status = OrderStatus.COMPLETED
+        order.save()
     }
 
     /**
@@ -2189,5 +2201,132 @@ class ShipmentService {
         if (shipment.hasErrors() || !shipment.save()) {
             throw new ValidationException("Invalid shipment", shipment.errors)
         }
+    }
+
+    Shipment createOrUpdateShipment(StockTransfer stockTransfer) {
+        Order order = Order.get(stockTransfer.id)
+        // For outbound returns there should be one shipment for the given order
+        Shipment shipment = order?.shipments ? order?.shipments?.first() : null
+
+        if (!shipment) {
+            shipment = new Shipment()
+        }
+
+        shipment.shipmentNumber = order.orderNumber
+        shipment.origin = order.origin
+        shipment.destination = order.destination
+        shipment.description = order.description
+        shipment.driverName = stockTransfer.driverName
+        shipment.additionalInformation = stockTransfer.comments
+        shipment.expectedShippingDate = stockTransfer?.dateShipped ?: new Date()
+        shipment.expectedDeliveryDate = stockTransfer?.expectedDeliveryDate
+
+        // Set default shipment type so we can save to the database without user input
+        shipment.shipmentType = stockTransfer.shipmentType ?: ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
+
+        shipment.name = generateName(stockTransfer)
+
+        createMissingShipmentItems(order, shipment)
+
+        if (shipment.hasErrors() || !shipment.save(flush: true)) {
+            throw new ValidationException("Invalid shipment", shipment.errors)
+        }
+
+        createOrUpdateTrackingNumber(shipment, stockTransfer.trackingNumber)
+
+        return shipment
+    }
+
+    void createMissingShipmentItems(Order order, Shipment shipment) {
+        order.orderItems?.each { OrderItem orderItem ->
+            def shipmentItems = createShipmentItems(orderItem)
+
+            shipmentItems.each { ShipmentItem shipmentItem ->
+                shipment.addToShipmentItems(shipmentItem)
+            }
+        }
+    }
+
+    def createShipmentItems(OrderItem orderItem) {
+        def shipmentItems = orderItem.shipmentItems
+        if (shipmentItems) {
+            shipmentItems.each { ShipmentItem shipmentItem ->
+                PicklistItem picklistItem = orderItem.picklistItems?.find {
+                    shipmentItem.inventoryItem == it.inventoryItem && shipmentItem.binLocation == it.binLocation
+                }
+                shipmentItem.quantity = picklistItem?.quantity ?: shipmentItem.quantity
+            }
+            return shipmentItems
+        }
+
+        orderItem?.picklistItems?.each { PicklistItem picklistItem ->
+            if (picklistItem.quantity > 0) {
+                ShipmentItem shipmentItem = new ShipmentItem()
+                shipmentItem.lotNumber = picklistItem?.inventoryItem?.lotNumber
+                shipmentItem.expirationDate = picklistItem?.inventoryItem?.expirationDate
+                shipmentItem.product = picklistItem?.inventoryItem?.product
+                shipmentItem.quantity = picklistItem?.quantity
+                shipmentItem.recipient = picklistItem?.orderItem?.recipient ?:
+                        picklistItem?.orderItem?.parentOrderItem?.recipient
+                shipmentItem.inventoryItem = picklistItem?.inventoryItem
+                shipmentItem.binLocation = picklistItem?.binLocation
+                shipmentItem.sortOrder = shipmentItems.size()
+
+                shipmentItem.addToOrderItems(picklistItem.orderItem)
+                shipmentItems.add(shipmentItem)
+            }
+        }
+
+        return shipmentItems
+    }
+
+    /**
+     * “FROM.TO.DATEREQUESTED.TRACKING#.DESCRIPTION”
+     *
+     * @return
+     */
+    String generateName(StockTransfer stockTransfer) {
+        final String separator =
+                ConfigurationHolder.config.openboxes.generateName.separator ?: Constants.DEFAULT_NAME_SEPARATOR
+
+        String originIdentifier = stockTransfer.origin?.locationNumber ?: stockTransfer.origin?.name
+        String destinationIdentifier = stockTransfer.destination?.locationNumber ?: stockTransfer.destination?.name
+        String name = "${originIdentifier}${separator}${destinationIdentifier}"
+        if (stockTransfer.dateCreated) name += "${separator}${stockTransfer.dateOrdered?.format("ddMMMyyyy")}"
+        if (stockTransfer?.trackingNumber) name += "${separator}${stockTransfer?.trackingNumber}"
+        if (stockTransfer?.description) name += "${separator}${stockTransfer?.description}"
+        name = name.replace(" ", "")
+        return name
+    }
+
+    ReferenceNumber createOrUpdateTrackingNumber(Shipment shipment, String trackingNumber) {
+        ReferenceNumberType trackingNumberType = ReferenceNumberType.findById(Constants.TRACKING_NUMBER_TYPE_ID)
+        if (!trackingNumberType) {
+            throw new IllegalStateException("Must configure reference number type for Tracking Number with ID '${Constants.TRACKING_NUMBER_TYPE_ID}'")
+        }
+
+        // Needed to use ID since reference numbers is lazy loaded and equality operation was not working
+        ReferenceNumber referenceNumber = shipment.referenceNumbers.find { ReferenceNumber refNum ->
+            trackingNumberType?.id?.equals(refNum.referenceNumberType?.id)
+        }
+
+        if (trackingNumber) {
+            // Create a new reference number
+            if (!referenceNumber) {
+                referenceNumber = new ReferenceNumber()
+                referenceNumber.identifier = trackingNumber
+                referenceNumber.referenceNumberType = trackingNumberType
+                shipment.addToReferenceNumbers(referenceNumber)
+            }
+            // Update the existing reference number
+            else {
+                referenceNumber.identifier = trackingNumber
+            }
+        }
+        // Reference number exists but the user-defined tracking number was empty so we should delete
+        else if (referenceNumber) {
+            shipment.removeFromReferenceNumbers(referenceNumber)
+        }
+        return referenceNumber
     }
 }

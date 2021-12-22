@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <!-- migrate existing order.order_type_code into order.order_type -->
+  <changeSet author="awalkowiak" id="2406202118300-0">
+    <preConditions onFail="MARK_RAN">
+      <and>
+        <columnExists tableName="order" columnName="order_type_code"/>
+        <columnExists tableName="order" columnName="order_type_id"/>
+      </and>
+    </preConditions>
+    <sql>
+      UPDATE `order` o
+        INNER JOIN order_type o_t on o_t.id = o.order_type_code
+        SET o.order_type_id = o_t.id WHERE o.order_type_id IS NULL AND o.order_type_code != 'TRANSFER_ORDER';
+
+      UPDATE `order` o
+        INNER JOIN order_type o_t on o_t.id = 'PUTAWAY_ORDER'
+        SET o.order_type_id = o_t.id WHERE o.order_type_id IS NULL AND o.order_type_code = 'TRANSFER_ORDER';
+    </sql>
+  </changeSet>
+
+  <!-- remove redundant order.order_type_code column  -->
+  <changeSet author="awalkowiak" id="2406202118300-1">
+    <preConditions onFail="MARK_RAN">
+      <columnExists tableName="order" columnName="order_type_code"/>
+    </preConditions>
+    <dropColumn tableName="order" columnName="order_type_code"/>
+  </changeSet>
+</databaseChangeLog>

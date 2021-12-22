@@ -70,6 +70,26 @@ const AsyncStockTransfer = Loadable({
   loading: Loading,
 });
 
+// OBPIH-4079: TEMPORARY DISABLED
+// const AsyncReplenishment = Loadable({
+//   loader: () => import('./replenishment/ReplenishmentWizard'),
+//   loading: Loading,
+// });
+
+// TODO: when replenishment will be enabled, then move this line into Router Switch below
+// <MainLayoutRoute
+//    path="/**/replenishment/create/:replenishmentId?" component={AsyncReplenishment} />
+
+// OBPIH-4199 TEMPORARILY DISABLED
+// const AsyncOutboundReturns = Loadable({
+//   loader: () => import('./outbound-returns/OutboundReturnsWizard'),
+//   loading: Loading,
+// });
+
+// TODO: when outbound returns will be enabled, then move this line into Router Switch below
+// <MainLayoutRoute
+// path="/**/stockTransfer/createReturns/:outboundReturnId?" component={AsyncOutboundReturns} />
+
 const Router = props => (
   <div>
     <BrowserRouter>

@@ -1146,6 +1146,7 @@ class ProductService {
             product.controlled_substance as controlledSubstance, 
             product.hazardous_material as hazardousMaterial, 
             product.reconditioned,
+            product.lot_and_expiry_control as lotAndExpiryControl,
             (
                 select max(pc.color) 
                 from product_catalog_item pci 
@@ -1153,7 +1154,10 @@ class ProductService {
                 where pci.product_id = product.id 
                 group by pci.product_id
             ) as productColor
-            from product
+            from product """
+
+        if (terms && terms.size() > 0) {
+            query += """
             left outer join product_supplier 
                 on product.id = product_supplier.product_id
             left outer join party manufacturer 
@@ -1183,6 +1187,9 @@ class ProductService {
                 or supplier.id is not null
                 or inventory_item.id is not null)
             group by product.id, product.name, productCode, coldChain, controlledSubstance, hazardousMaterial, reconditioned, productColor"""
+        } else {
+            query += " where product.active = 1 "
+        }
 
         def results = dataService.executeQuery(query)
 

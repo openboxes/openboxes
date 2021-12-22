@@ -71,6 +71,10 @@ class CombinedShipmentService {
                 valid = false
             }
             Order order = Order.findByOrderNumber(line.orderNumber)
+            if (!order) {
+                line.errors << "There is no order with number: ${line.orderNumber}"
+                valid = false
+            }
 
             if (order && (order.origin != shipment.origin || order.destination != shipment.destination)) {
                 line.errors << "Order must be from the same origin and destination as shipment"
@@ -88,6 +92,11 @@ class CombinedShipmentService {
                 valid = false
             }
 
+            if (product && product.lotAndExpiryControl && (!line.expiry || !line.lotNumber)) {
+                line.errors << "Both lot number and expiry date are required for the '${line.productCode} ${line.productName}' product."
+                valid = false
+            }
+
             if (!line.id) {
                 def codes = lineItems.findAll { it.productCode == line.productCode }
                 if (codes.size() > 1) {
@@ -100,6 +109,11 @@ class CombinedShipmentService {
             }
             if (!orderItem) {
                 line.errors << "Order item does not exit"
+                valid = false
+            }
+
+            if (orderItem && product && orderItem.product != product) {
+                line.errors << "Product code ${line.productCode} does not match product on the order item with given id ${line.id}"
                 valid = false
             }
 

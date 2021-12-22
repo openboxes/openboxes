@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="awalkowiak" id="2406202118150-0">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="order" columnName="order_type_id"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="order">
+      <column name="order_type_id" type="CHAR(38)"/>
+    </addColumn>
+  </changeSet>
+</databaseChangeLog>

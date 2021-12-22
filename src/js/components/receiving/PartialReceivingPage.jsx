@@ -5,13 +5,14 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { Form } from 'react-final-form';
+import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import { fetchUsers, hideSpinner, showSpinner } from '../../actions';
 import apiClient, { flattenRequest, parseResponse } from '../../utils/apiClient';
 import Checkbox from '../../utils/Checkbox';
 import { renderFormField } from '../../utils/form-utils';
 import Select from '../../utils/Select';
-import Translate from '../../utils/Translate';
+import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
 import ArrayField from '../form-elements/ArrayField';
 import LabelField from '../form-elements/LabelField';
 import SelectField from '../form-elements/SelectField';
@@ -79,12 +80,24 @@ const TABLE_FIELDS = {
     rowComponent: TableRowWithSubfields,
     headerFontSize: '0.775rem',
     subfieldKey: 'shipmentItems',
-    getDynamicRowAttr: ({ rowValues, subfield }) => {
+    getDynamicRowAttr: ({ rowValues, subfield, translate }) => {
       let className = '';
-      if (isReceived(subfield, rowValues)) {
+      let tooltip = null;
+      const received = isReceived(subfield, rowValues);
+      const receiving = isReceiving(subfield, rowValues);
+      if (received) {
         className = 'text-disabled';
       }
-      return { className };
+      if (!received && receiving && rowValues.product && rowValues.product.lotAndExpiryControl) {
+        if (!rowValues.lotNumber || !rowValues.expirationDate) {
+          tooltip = translate('react.partialReceiving.error.lotAndExpiryControl.label');
+          className += ' has-control-error';
+        }
+      }
+      return {
+        className,
+        tooltip,
+      };
     },
     fields: {
       autofillLine: {
@@ -313,7 +326,26 @@ function validate(values) {
     errors.containers[key] = { shipmentItems: [] };
     _.forEach(container.shipmentItems, (item, key2) => {
       if (item.quantityReceiving < 0) {
-        errors.containers[key].shipmentItems[key2] = { quantityReceiving: 'react.partialReceiving.error.quantityToReceiveNegative.label' };
+        errors.containers[key].shipmentItems[key2] = {
+          quantityReceiving: 'react.partialReceiving.error.quantityToReceiveNegative.label',
+        };
+      }
+      const receiving = !_.isNil(item.quantityReceiving) && item.quantityReceiving !== '';
+      if (receiving && !_.isNil(item.product) && item.product.lotAndExpiryControl) {
+        if (!item.expirationDate && (_.isNil(item.lotNumber) || _.isEmpty(item.lotNumber))) {
+          errors.containers[key].shipmentItems[key2] = {
+            expirationDate: 'react.partialReceiving.error.lotAndExpiryControl.label',
+            lotNumber: 'react.partialReceiving.error.lotAndExpiryControl.label',
+          };
+        } else if (!item.expirationDate) {
+          errors.containers[key].shipmentItems[key2] = {
+            expirationDate: 'react.partialReceiving.error.lotAndExpiryControl.label',
+          };
+        } else if (_.isNil(item.lotNumber) || _.isEmpty(item.lotNumber)) {
+          errors.containers[key].shipmentItems[key2] = {
+            lotNumber: 'react.partialReceiving.error.lotAndExpiryControl.label',
+          };
+        }
       }
     });
   });
@@ -704,6 +736,7 @@ class PartialReceivingPage extends Component {
                         shipmentReceived: this.state.values.shipmentStatus === 'RECEIVED',
                         values,
                         hasPartialReceivingSupport: this.props.hasPartialReceivingSupport,
+                        translate: this.props.translate,
                       }))}
                   </div>
                   <div className="submit-buttons">
@@ -727,6 +760,7 @@ const mapStateToProps = state => ({
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
   partialReceivingTranslationsFetched: state.session.fetchedTranslations.partialReceiving,
   hasPartialReceivingSupport: state.session.currentLocation.hasPartialReceivingSupport,
+  translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
 export default connect(mapStateToProps, {
@@ -759,6 +793,7 @@ PartialReceivingPage.propTypes = {
   nextPage: PropTypes.func.isRequired,
   /** Is true when currently selected location supports partial receiving */
   hasPartialReceivingSupport: PropTypes.bool.isRequired,
+  translate: PropTypes.func.isRequired,
 };
 
 PartialReceivingPage.defaultProps = {

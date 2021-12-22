@@ -13,6 +13,7 @@ import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.NotImplementedException
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.hibernate.Criteria
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.GlAccount
@@ -136,6 +137,8 @@ class Product implements Comparable, Serializable {
     // Allows tracking of inventory by lot or batch number (primary medicines and medical suppies)
     // http://docs.oracle.com/cd/A60725_05/html/comnls/us/inv/lotcntrl.htm
     Boolean lotControl = Boolean.TRUE
+
+    Boolean lotAndExpiryControl = Boolean.FALSE
 
     // Used to indicate that the product is an essential med (as defined by the WHO, MSPP, or PIH).
     // WHO Model Lists of Essential Medicines - http://www.who.int/medicines/publications/essentialmedicines/en/
@@ -286,6 +289,7 @@ class Product implements Comparable, Serializable {
         hazardousMaterial(nullable: true)
         serialized(nullable: true)
         lotControl(nullable: true)
+        lotAndExpiryControl(nullable: true)
         essential(nullable: true)
 
         defaultUom(nullable: true)
@@ -457,12 +461,23 @@ class Product implements Comparable, Serializable {
     }
 
     /**
-     * Currently not implement since it would require coupling InventoryService to Product.
+     * Get quantity available to promise for this product given the location
      *
      * @param locationId
      */
-    def getQuantityAvailableToPromise(Integer locationId) {
-        throw new NotImplementedException()
+    def getQuantityAvailableToPromise(String locationId) {
+        def productAvailability = ProductAvailability.createCriteria().list {
+
+            projections {
+                sum("quantityAvailableToPromise", "quantityAvailableToPromise")
+            }
+            location {
+                eq("id", locationId)
+            }
+            eq("product", this)
+        }
+
+        return productAvailability ? productAvailability?.get(0) : 0
     }
 
 
@@ -640,17 +655,18 @@ class Product implements Comparable, Serializable {
 
     Map toJson() {
         [
-                id           : id,
-                productCode  : productCode,
-                name         : name,
-                description  : description,
-                category     : category,
-                unitOfMeasure: unitOfMeasure,
-                pricePerUnit : pricePerUnit,
-                dateCreated  : dateCreated,
-                lastUpdated  : lastUpdated,
-                color        : color,
-                handlingIcons: handlingIcons
+                id                  : id,
+                productCode         : productCode,
+                name                : name,
+                description         : description,
+                category            : category,
+                unitOfMeasure       : unitOfMeasure,
+                pricePerUnit        : pricePerUnit,
+                dateCreated         : dateCreated,
+                lastUpdated         : lastUpdated,
+                color               : color,
+                handlingIcons       : handlingIcons,
+                lotAndExpiryControl : lotAndExpiryControl,
         ]
     }
 }

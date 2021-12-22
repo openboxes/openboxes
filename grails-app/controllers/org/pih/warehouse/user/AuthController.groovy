@@ -22,6 +22,7 @@ class AuthController {
     def grailsApplication
     def recaptchaService
     def ravenClient
+    def userAgentIdentService
 
     static allowedMethods = [login: "GET", doLogin: "POST", logout: "GET"]
 
@@ -29,7 +30,6 @@ class AuthController {
      * Show index page - just a redirect to the list page.
      */
     def index = {
-        log.info "auth controller index"
         redirect(action: "login", params: params)
     }
 
@@ -50,6 +50,11 @@ class AuthController {
         if (session.user) {
             flash.message = "You have already logged in."
             redirect(controller: "dashboard", action: "index")
+        }
+
+        if (userAgentIdentService.isMobile()) {
+            redirect(controller: "mobile", action: "login")
+            return
         }
 
     }
@@ -144,13 +149,18 @@ class AuthController {
      * Allow user to register a new account
      */
     def signup = {
-        Boolean enabled = grailsApplication.config.openboxes.signup.enabled
+        Boolean enabled = grailsApplication.config.openboxes.signup.enabled?:false
         if (!enabled) {
-            flash.message = "Apologies, but the signup feature is disabled on your system. "  +
+            flash.message = "Apologies, but the signup feature is disabled on your system. " +
                     "Please contact a system administrator for access."
             redirect(controller: "auth", action: "login")
         }
-
+        Boolean configured = grailsApplication.config.openboxes.signup.recaptcha.v2.secretKey?.trim()
+        if (!configured) {
+            flash.message = "Apologies, but reCAPTCHA is not set up on this system. " +
+                    "Please contact a system administrator for access."
+            redirect(controller: "auth", action: "login")
+        }
     }
 
     /**

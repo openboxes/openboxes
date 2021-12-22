@@ -1042,7 +1042,7 @@ class JsonController {
         // Only calculate quantities if there are products - otherwise this will calculate quantities for all products in the system
         def location = Location.get(session.warehouse.id)
         def quantityMap = products ?
-                productAvailabilityService.getQuantityOnHandByProduct(location, products) : []
+                productAvailabilityService.getQuantityAvailableToPromiseByProduct(location, products) : []
 
         if (terms) {
             products = products.sort() {
@@ -1353,25 +1353,28 @@ class JsonController {
         // Flatten the data to make it easier to display
         data = data.collect {
             def quantity = it?.quantity ?: 0
+            def quantityAvailableToPromise = it?.quantityAvailableToPromise ?: 0
             def unitCost = hasRoleFinance ? (it?.product?.pricePerUnit ?: 0.0) : null
             def totalValue = hasRoleFinance ? g.formatNumber(number: quantity * unitCost) : null
             [
-                    id            : it.product?.id,
-                    status        : g.message(code: "binLocationSummary.${it.status}.label"),
-                    productCode   : it.product?.productCode,
-                    productName   : it?.product?.name,
-                    productGroup  : it?.product?.genericProduct?.name,
-                    category      : it?.product?.category?.name,
-                    lotNumber     : it?.inventoryItem?.lotNumber,
-                    lotStatus     : it?.inventoryItem?.lotStatus?.toString(),
-                    expirationDate: g.formatDate(date: it?.inventoryItem?.expirationDate, format: "dd/MMM/yyyy"),
-                    unitOfMeasure : it?.product?.unitOfMeasure,
-                    zone          : it?.binLocation?.zone?.name ?: "",
-                    binLocation   : it?.binLocation?.name ?: "Default",
-                    quantity      : quantity,
-                    unitCost      : unitCost,
-                    totalValue    : totalValue,
-                    handlingIcons : it.product?.getHandlingIcons()
+                    id                          : it.product?.id,
+                    status                      : g.message(code: "binLocationSummary.${it.status}.label"),
+                    productCode                 : it.product?.productCode,
+                    productName                 : it?.product?.name,
+                    productGroup                : it?.product?.genericProduct?.name,
+                    category                    : it?.product?.category?.name,
+                    lotNumber                   : it?.inventoryItem?.lotNumber,
+                    lotStatus                   : it?.inventoryItem?.lotStatus?.toString(),
+                    expirationDate              : g.formatDate(date: it?.inventoryItem?.expirationDate, format: "dd/MMM/yyyy"),
+                    unitOfMeasure               : it?.product?.unitOfMeasure,
+                    zone                        : it?.binLocation?.zone?.name ?: "",
+                    binLocation                 : it?.binLocation?.name ?: "Default",
+                    isOnHold                    : it?.binLocation?.isOnHold(),
+                    quantity                    : quantity,
+                    quantityAvailableToPromise  : quantityAvailableToPromise,
+                    unitCost                    : unitCost,
+                    totalValue                  : totalValue,
+                    handlingIcons               : it.product?.getHandlingIcons()
             ]
         }
         render(["aaData": data] as JSON)
@@ -1465,11 +1468,9 @@ class JsonController {
             throw new IllegalArgumentException("End date must occur on or before today")
         }
 
-        if (command.refreshBalances) {
-            log.info "Refreshing inventory snapshot for startDate=${startDate}, endDate=${endDate}, and location=${location}"
-            inventorySnapshotService.populateInventorySnapshots(startDate, command.location, false)
-            inventorySnapshotService.populateInventorySnapshots(endDate, command.location, false)
-        }
+        log.info "Refreshing inventory snapshot for startDate=${startDate}, endDate=${endDate}, and location=${location}"
+        inventorySnapshotService.populateInventorySnapshots(startDate, command.location, false)
+        inventorySnapshotService.populateInventorySnapshots(endDate, command.location, false)
 
         def data = (params.format == "text/csv") ?
                 inventorySnapshotService.getTransactionReportDetails(location, categories, tagList, catalogList, startDate, endDate) :
@@ -1892,5 +1893,4 @@ class TransactionReportCommand {
     Location location
     List<TransactionType> transactionTypes
     Category category
-    Boolean refreshBalances = Boolean.FALSE
 }

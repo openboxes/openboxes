@@ -139,6 +139,16 @@
                 </tr>
                 <tr class="prop">
                     <td valign="top" class="name">
+                        <label for="expectedOrderPeriodDays">
+                            <warehouse:message code="inventoryLevel.replenishmentPeriodDays.label" default="Replenishment Period Days"/>
+                        </label>
+                    </td>
+                    <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'replenishmentPeriodDays', 'errors')}">
+                        <g:textField name="replenishmentPeriodDays" value="${inventoryLevelInstance?.replenishmentPeriodDays }" class="text large"/>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td valign="top" class="name">
                         <label for="replenishmentLocation">
                             <warehouse:message code="inventoryLevel.replenishmentLocation.label" default="Default Replenishment Source"/>
                         </label>

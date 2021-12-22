@@ -32,6 +32,7 @@ enum ActivityCode {
     CROSS_DOCKING('CROSS_DOCKING'),
     PUTAWAY_STOCK('PUTAWAY_STOCK'),
     PICK_STOCK('PICK_STOCK'),
+    HOLD_STOCK('HOLD_STOCK'),
 
     // Requisition reason codes
     SUBSTITUTE_REQUISITION_ITEM('SUBSTITUTE_REQUISITION_ITEM'),
@@ -79,6 +80,7 @@ enum ActivityCode {
                 PARTIAL_RECEIVING,
                 REQUIRE_ACCOUNTING,
                 ENABLE_CENTRAL_PURCHASING,
+                HOLD_STOCK
         ]
     }
 }

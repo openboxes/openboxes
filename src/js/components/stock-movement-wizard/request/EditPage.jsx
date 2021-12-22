@@ -57,7 +57,7 @@ const AD_HOCK_FIELDS = {
       availability: {
         label: 'react.verifyRequest.availability.label',
         defaultLabel: 'Availability',
-        flexWidth: 1 + 1, // = Sum of fields flexWidth
+        flexWidth: 1 + 1 + 1, // = Sum of fields flexWidth
       },
       edit: {
         label: 'react.verifyRequest.edit.label',
@@ -148,13 +148,34 @@ const AD_HOCK_FIELDS = {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
         },
       },
-      quantityAvailable: {
+      quantityOnHand: {
         type: LabelField,
         label: 'react.stockMovement.quantityOnHand.label',
         defaultMessage: 'QOH',
         flexWidth: '1',
         fieldKey: '',
         headerClassName: 'left-border',
+        getDynamicAttr: ({ fieldValue }) => {
+          let className = '';
+          if (fieldValue && (!fieldValue.quantityOnHand ||
+              fieldValue.quantityOnHand < fieldValue.quantityRequested)) {
+            className = 'text-danger';
+          }
+          return {
+            className,
+          };
+        },
+        attributes: {
+          cellClassName: 'left-border',
+          formatValue: value => (value.quantityOnHand ? (value.quantityOnHand.toLocaleString('en-US')) : value.quantityOnHand),
+        },
+      },
+      quantityAvailable: {
+        type: LabelField,
+        label: 'react.stockMovement.available.label',
+        defaultMessage: 'Available',
+        flexWidth: '1',
+        fieldKey: '',
         getDynamicAttr: ({ fieldValue }) => {
           let className = '';
           if (fieldValue && (!fieldValue.quantityAvailable ||
@@ -166,7 +187,6 @@ const AD_HOCK_FIELDS = {
           };
         },
         attributes: {
-          cellClassName: 'left-border',
           formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
         },
       },
@@ -299,7 +319,7 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
       availability: {
         label: 'react.verifyRequest.availability.label',
         defaultLabel: 'Availability',
-        flexWidth: 1 + 1, // = Sum of fields flexWidth
+        flexWidth: 1 + 1 + 1, // = Sum of fields flexWidth
       },
       edit: {
         label: 'react.verifyRequest.edit.label',
@@ -390,17 +410,17 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
         },
       },
-      quantityAvailable: {
+      quantityOnHand: {
         type: LabelField,
         label: 'react.stockMovement.quantityOnHand.label',
-        defaultMessage: 'QOH Available',
+        defaultMessage: 'QOH',
         flexWidth: '1',
         fieldKey: '',
         headerClassName: 'left-border',
         getDynamicAttr: ({ fieldValue }) => {
           let className = '';
-          if (fieldValue && (!fieldValue.quantityAvailable ||
-            fieldValue.quantityAvailable < fieldValue.quantityRequested)) {
+          if (fieldValue && (!fieldValue.quantityOnHand ||
+            fieldValue.quantityOnHand < fieldValue.quantityRequested)) {
             className = 'text-danger';
           }
           return {
@@ -409,6 +429,26 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
         },
         attributes: {
           cellClassName: 'left-border',
+          formatValue: value => (value.quantityOnHand ? (value.quantityOnHand.toLocaleString('en-US')) : value.quantityOnHand),
+        },
+      },
+      quantityAvailable: {
+        type: LabelField,
+        label: 'react.stockMovement.available.label',
+        defaultMessage: 'Available',
+        flexWidth: '1',
+        fieldKey: '',
+        getDynamicAttr: ({ fieldValue }) => {
+          let className = '';
+          if (fieldValue && (!fieldValue.quantityAvailable ||
+              fieldValue.quantityAvailable < fieldValue.quantityRequested)) {
+            className = 'text-danger';
+          }
+          return {
+            className,
+          };
+        },
+        attributes: {
           formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
         },
       },
@@ -541,7 +581,7 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
       availability: {
         label: 'react.verifyRequest.availability.label',
         defaultLabel: 'Availability',
-        flexWidth: 1, // = Sum of fields flexWidth
+        flexWidth: 1 + 1, // = Sum of fields flexWidth
       },
       edit: {
         label: 'react.verifyRequest.edit.label',
@@ -632,17 +672,17 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
         },
       },
-      quantityAvailable: {
+      quantityOnHand: {
         type: LabelField,
         label: 'react.stockMovement.quantityOnHand.label',
-        defaultMessage: 'QOH Available',
+        defaultMessage: 'QOH',
         flexWidth: '1',
         fieldKey: '',
         headerClassName: 'left-border',
         getDynamicAttr: ({ fieldValue }) => {
           let className = '';
-          if (fieldValue && (!fieldValue.quantityAvailable ||
-            fieldValue.quantityAvailable < fieldValue.quantityRequested)) {
+          if (fieldValue && (!fieldValue.quantityOnHand ||
+            fieldValue.quantityOnHand < fieldValue.quantityRequested)) {
             className = 'text-danger';
           }
           return {
@@ -651,6 +691,26 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
         },
         attributes: {
           cellClassName: 'left-border',
+          formatValue: value => (value.quantityOnHand ? (value.quantityOnHand.toLocaleString('en-US')) : value.quantityOnHand),
+        },
+      },
+      quantityAvailable: {
+        type: LabelField,
+        label: 'react.stockMovement.available.label',
+        defaultMessage: 'Available',
+        flexWidth: '1',
+        fieldKey: '',
+        getDynamicAttr: ({ fieldValue }) => {
+          let className = '';
+          if (fieldValue && (!fieldValue.quantityAvailable ||
+              fieldValue.quantityAvailable < fieldValue.quantityRequested)) {
+            className = 'text-danger';
+          }
+          return {
+            className,
+          };
+        },
+        attributes: {
           formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
         },
       },
@@ -828,7 +888,9 @@ class EditItemsPage extends Component {
       val => ({
         ...val,
         disabled: true,
-        quantityAvailable: val.quantityAvailable > 0 ? val.quantityAvailable : 0,
+        quantityOnHand: val.quantityOnHand > 0 ? val.quantityOnHand : 0,
+        quantityAvailable:
+            val.quantityAvailable > 0 ? val.quantityAvailable : 0,
         product: {
           ...val.product,
           label: `${val.productCode} ${val.productName}`,
@@ -925,7 +987,7 @@ class EditItemsPage extends Component {
             ...this.state.values,
             editPageItems: _.map(data, item => ({
               ...item,
-              quantityAvailable: item.quantityAvailable || 0,
+              quantityOnHand: item.quantityOnHand || 0,
               substitutionItems: _.map(item.substitutionItems, sub => ({
                 ...sub,
                 requisitionItemId: item.requisitionItemId,
@@ -1085,6 +1147,10 @@ class EditItemsPage extends Component {
           onClick: () => {
             this.setState({
               revisedItems: [],
+              values: { ...this.props.initialValues, editPageItems: [] },
+              hasItemsLoaded: false,
+              totalCount: 0,
+              isFirstPageLoaded: false,
             });
             this.fetchAllData(true);
           },
@@ -1157,6 +1223,7 @@ class EditItemsPage extends Component {
             $set: {
               ...values.editPageItems[editPageItemIndex],
               ...editPageItem,
+              quantityOnHand: editPageItem.quantityOnHand || 0,
               quantityAvailable: editPageItem.quantityAvailable || 0,
               substitutionItems: _.map(editPageItem.substitutionItems, sub => ({
                 ...sub,
@@ -1212,13 +1279,19 @@ class EditItemsPage extends Component {
   revertItem(values, itemId) {
     this.props.showSpinner();
     const revertItemsUrl = `/openboxes/api/stockMovementItems/${itemId}/revertItem`;
+    const itemsUrl = `/openboxes/api/stockMovementItems/${itemId}?stepNumber=3`;
 
     return apiClient.post(revertItemsUrl)
-      .then((response) => {
-        const editPageItem = response.data.data;
-        this.updateEditPageItem(values, editPageItem);
-        this.props.hideSpinner();
-      })
+      .then(() => apiClient.get(itemsUrl)
+        .then((response) => {
+          const editPageItem = response.data.data;
+          this.updateEditPageItem(values, editPageItem);
+          this.props.hideSpinner();
+        })
+        .catch(() => {
+          this.props.hideSpinner();
+          return Promise.reject(new Error(this.props.translate('react.stockMovement.error.revertRequisitionItem.label', 'Could not revert requisition items')));
+        }))
       .catch(() => {
         this.props.hideSpinner();
         return Promise.reject(new Error(this.props.translate('react.stockMovement.error.revertRequisitionItem.label', 'Could not revert requisition items')));
@@ -1250,7 +1323,6 @@ class EditItemsPage extends Component {
                 </button>
                 <button
                   type="button"
-                  disabled={invalid}
                   onClick={() => this.save(values)}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                 >
@@ -1262,7 +1334,6 @@ class EditItemsPage extends Component {
                 </button>
                 <button
                   type="button"
-                  disabled={invalid}
                   onClick={() => this.saveAndExit(values)}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
                 >

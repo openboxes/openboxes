@@ -112,6 +112,7 @@ class ReportController {
             csv += g.message(code: 'location.zone.label') + ","
             csv += g.message(code: 'location.binLocation.label') + ","
             csv += g.message(code: 'default.quantity.label') + ","
+            csv += g.message(code: 'default.quantityAvailableToPromise.label') + ","
             csv += g.message(code: 'product.unitCost.label') + ","
             csv += g.message(code: 'product.totalValue.label')
             csv += "\n"
@@ -136,6 +137,7 @@ class ReportController {
             csv += StringEscapeUtils.escapeCsv(binLocation?.binLocation?.zone?.name ?: '') + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.binLocation?.name ?: defaultBinLocation) + ","
             csv += binLocation.quantity + ","
+            csv += binLocation.quantityAvailableToPromise + ","
             csv += binLocation.unitCost + ","
             csv += binLocation.totalValue
             csv += "\n"
@@ -439,7 +441,7 @@ class ReportController {
                 String csv = dataService.generateCsv(lineItems)
                 response.setHeader("Content-disposition", "attachment; filename=\"StockMovementItems-CurrentStock.csv\"")
                 render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
-                return;
+                return
             }
         } catch (Exception e) {
             log.error("Unable to generate bin location report due to error: " + e.message, e)
@@ -547,11 +549,13 @@ class ReportController {
                         sw.append(locationName).append(",")
                     }
 
-                    sw.append("QoH Total")
+                    sw.append("QoH Total").append(",")
+                    sw.append("Quantity Available Total")
                     sw.append("\n")
                     command.entries.each { entry ->
                         if (entry.key) {
-                            def totalQuantity = entry.value?.values()?.sum()
+                            def totalQuantity = entry.value?.values()?.quantityOnHand?.sum()
+                            def totalQuantityAvailableToPromise = entry.value?.values()?.quantityAvailableToPromise?.sum()
                             def form = entry.key?.getProductCatalogs()?.collect {
                                 it.name
                             }?.join(",")
@@ -563,10 +567,11 @@ class ReportController {
                             sw.append('"' + (entry.key?.tagsToString() ?: "")?.toString()?.replace('"', '""') + '"').append(",")
 
                             command.locations?.each { location ->
-                                sw.append('"' + (entry.value[location?.id] != null ? entry.value[location?.id] : "").toString() + '"').append(",")
+                                sw.append('"' + (entry.value[location?.id] != null ? entry.value[location?.id]?.quantityOnHand?:0 : "").toString() + '"').append(",")
                             }
 
-                            sw.append('"' + (totalQuantity != null ? totalQuantity : "").toString() + '"')
+                            sw.append('"' + (totalQuantity != null ? totalQuantity : "").toString() + '"').append(",")
+                            sw.append('"' + (totalQuantityAvailableToPromise != null ? totalQuantityAvailableToPromise : "").toString() + '"')
                             sw.append("\n")
                         }
                     }

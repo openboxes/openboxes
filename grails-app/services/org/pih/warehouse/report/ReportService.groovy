@@ -478,7 +478,7 @@ class ReportService implements ApplicationContextAware {
             join date_dimension transaction_date_dimension on transaction_date_dimension.date = date(transaction.transaction_date)
             join transaction_type_dimension on transaction_type_dimension.transaction_type_id = transaction_type.id
             where transaction.order_id is null 
-            or `order`.order_type_code not in ('TRANSFER_ORDER') ;
+            or `order`.order_type_id not in ('PUTAWAY_ORDER') ;
         """
         dataService.executeStatements([deleteStatement, insertStatement])
     }

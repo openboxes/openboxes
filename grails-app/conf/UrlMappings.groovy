@@ -60,6 +60,11 @@ class UrlMappings {
             action = [GET: "read"]
         }
 
+        "/api/stockMovementItems/$id/details"(parseRequest: true) {
+            controller = "stockMovementItemApi"
+            action = [GET: "details"]
+        }
+
         "/api/stockMovementItems/$id/updatePicklist"(parseRequest: true) {
             controller = "stockMovementItemApi"
             action = [POST: "updatePicklist"]
@@ -92,7 +97,7 @@ class UrlMappings {
 
         "/api/stockMovementItems/$id/removeItem"(parseRequest: true) {
             controller = "stockMovementItemApi"
-            action = [DELETE: "removeItem"]
+            action = [DELETE: "eraseItem"]
         }
 
         "/api/stockMovements/$id/stockMovementItems"(parseRequest: true) {
@@ -142,6 +147,11 @@ class UrlMappings {
             action = [POST: "updateShipment"]
         }
 
+        "/api/stockMovements/$id/validatePicklist"(parseRequest: true) {
+            controller = "stockMovementApi"
+            action = [GET: "validatePicklist"]
+        }
+
         "/api/stockMovements/importPickListItems/$id"(parseRequest: true) {
             controller = "stockMovementApi"
             action = [POST: "importPickListItems"]
@@ -150,6 +160,11 @@ class UrlMappings {
         "/api/stockMovements/exportPickListItems/$id"(parseRequest: true) {
             controller = "stockMovementApi"
             action = [GET: "exportPickListItems"]
+        }
+
+        "/api/stockMovements/createPickList/$id"(parseRequest: true) {
+            controller = "stockMovementApi"
+            action = [GET: "createPickList"]
         }
 
         "/api/stockMovements/$id/updateAdjustedItems"(parseRequest: true) {
@@ -296,6 +311,55 @@ class UrlMappings {
             action = [GET: "getPrepaymentItems"]
         }
 
+        // Stock Transfer API
+
+        "/api/stockTransfers/candidates"(parseRequest: true) {
+            controller = { "stockTransferApi" }
+            action = [GET: "stockTransferCandidates"]
+//            OBPIH-4199 TEMPORARILY DISABLED
+//            , POST: "returnCandidates"]
+        }
+
+        "/api/stockTransferItems/$id/"(parseRequest: true) {
+            controller = { "stockTransferApi" }
+            action = [DELETE: "removeItem"]
+        }
+
+        "/api/stockTransfers/$id/sendShipment"(parseRequest: true) {
+            controller = { "stockTransferApi" }
+            action = [POST: "sendShipment"]
+        }
+
+        // OBPIH-4079: TEMPORARY DISABLED
+
+//        // Requirement API
+//
+//        "/api/requirements"(parseRequest: true) {
+//            controller = { "replenishmentApi" }
+//            action = [GET: "requirements"]
+//        }
+//
+//        // Replenishment API
+//
+//        "/api/replenishments/statusOptions"(parseRequest: true) {
+//            controller = "replenishmentApi"
+//            action = [GET: "statusOptions"]
+//        }
+//
+//        "/api/replenishments/$id/"(parseRequest: true) {
+//            controller = { "replenishmentApi" }
+//            action = [GET: "read", POST: "create", PUT: "update"]
+//        }
+//
+//        "/api/replenishments/$id/removeItem"(parseRequest: true) {
+//            controller = { "replenishmentApi" }
+//            action = [DELETE: "removeItem"]
+//        }
+//
+//        "/api/replenishments/$id/picklists"(parseRequest: true) {
+//            controller = { "replenishmentApi" }
+//            action = [GET: "getPicklist", POST: "createPicklist", PUT: "updatePicklist", DELETE: "deletePicklist"]
+//        }
 
         // Standard REST APIs
 

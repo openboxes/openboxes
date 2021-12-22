@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.inventory
 
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.picklist.PicklistItem
 import org.springframework.context.ApplicationEvent
 
@@ -18,6 +19,7 @@ class RefreshProductAvailabilityEvent extends ApplicationEvent {
     List productIds
     Boolean forceRefresh = Boolean.FALSE
     Boolean disableRefresh = Boolean.FALSE
+    Boolean synchronousRequired = Boolean.FALSE
 
     RefreshProductAvailabilityEvent(Transaction source) {
         super(source)
@@ -27,16 +29,26 @@ class RefreshProductAvailabilityEvent extends ApplicationEvent {
         this.disableRefresh = source.disableRefresh
     }
 
+    RefreshProductAvailabilityEvent(Location source) {
+        super(source)
+        this.locationId = source?.isBinLocation() ?source?.parentLocation?.id : source?.id
+        this.productIds = []
+        this.forceRefresh = forceRefresh
+        this.disableRefresh = disableRefresh
+    }
+
     RefreshProductAvailabilityEvent(InventoryItem source) {
         super(source)
         this.locationId = null
         this.productIds = source.associatedProducts
+        this.disableRefresh = source.disableRefresh
     }
 
     RefreshProductAvailabilityEvent(PicklistItem source) {
         super(source)
         this.locationId = source.associatedLocation
         this.productIds = source.associatedProducts
+        this.disableRefresh = source.disableRefresh
     }
 
     RefreshProductAvailabilityEvent(Transaction source, Boolean forceRefresh) {

@@ -208,7 +208,7 @@
                                         <g:elseif test="${stockHistoryEntry?.transaction?.order }">
                                             <g:link controller="order" action="show" id="${stockHistoryEntry?.transaction?.order?.id }">
                                                 <div title="${stockHistoryEntry?.transaction?.order?.name }">
-                                                    <format:metadata obj="${stockHistoryEntry?.transaction?.order?.orderTypeCode }"/>
+                                                    <format:metadata obj="${stockHistoryEntry?.transaction?.order?.orderType?.code }"/>
                                                     &rsaquo;
                                                     ${stockHistoryEntry?.transaction?.order?.orderNumber }
                                                 </div>

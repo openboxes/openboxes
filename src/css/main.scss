@@ -21,6 +21,8 @@ $blue-epsilon: #bce7f7;
 
 $black-alpha: #212529;
 
+$orange-alpha: #fca714;
+
 body {
   overflow-x: hidden;
 }
@@ -306,6 +308,32 @@ body {
   }
 }
 
+.select-sm {
+  font-size: .875rem;
+  border-radius: .2rem;
+
+  .Select-control {
+    height: 32px;
+
+    .Select-value {
+      line-height: 32px !important;
+    }
+
+    .Select-placeholder {
+      line-height: 32px;
+    }
+
+    .Select-input {
+      height: 30px;
+
+      input {
+        padding: 0;
+        line-height: 32px;
+      }
+    }
+  }
+}
+
 .table-xs th,
 .table-xs td {
   padding: 0.3rem;
@@ -343,6 +371,10 @@ body {
 
 .has-error {
   color: red;
+}
+
+.has-control-error {
+  background-color: $red-gamma !important;
 }
 
 .has-error .help-block,
@@ -620,8 +652,30 @@ tr.crossed-out td:before {
   background-color: $white-alpha;
 }
 
+.recalled {
+  background-color: $red-delta;
+}
+
+.on-hold {
+  background-color: $orange-alpha;
+}
+
+.recalled-and-on-hold {
+  background: repeating-linear-gradient(
+    135deg,
+    $orange-alpha,
+    $orange-alpha 10px,
+    $red-delta 10px,
+    $red-delta 20px
+  );;
+}
+
 .table-row {
   height: 28px;
+}
+
+.table-row.text-disabled {
+  background-color: #ddd9d9;
 }
 
 .table-inner-row {
@@ -874,4 +928,15 @@ div.crossed-out .table-inner-row:before {
 
 .negative-value {
   background-color: $red-delta !important;
+}
+
+.returns-date-picker {
+  > div {
+    > .react-datepicker-wrapper {
+      width: 100%;
+      > div {
+        width: 100%;
+      }
+    }
+  }
 }

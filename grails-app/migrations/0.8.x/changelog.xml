@@ -125,6 +125,18 @@
     <include file="0.8.x/changelog-2021-06-07-1930-alter-table-inventory-item-add-column-lot-status.xml"/>
     <include file="0.8.x/changelog-2021-06-11-1700-alter-table-product-availability-add-column-quantity-on-hold.xml"/>
     <include file="0.8.x/changelog-2021-06-24-1100-alter-table-product-availability-add-column-quantity-available-to-promise.xml"/>
+    <include file="0.8.x/changelog-2021-06-24-1800-create-table-order-type.xml"/>
+    <include file="0.8.x/changelog-2021-06-24-1815-alter-table-order-add-column-order-type.xml"/>
+    <include file="0.8.x/changelog-2021-06-24-1830-migrate-order-type-code-into-order-type.xml"/>
     <include file="0.8.x/changelog-2021-06-25-1810-alter-table-invoice-item-add-column-unit-price.xml"/>
+    <include file="0.8.x/changelog-2021-07-08-1530-add-hold-location-type.xml"/>
+    <include file="0.8.x/changelog-2021-07-27-1610-alter-table-inventory-levels-add-column-order-period.xml"/>
     <include file="0.8.x/changelog-2021-07-27-2153-alter-table-invoice-add-column-date-posted.xml"/>
+    <include file="0.8.x/changelog-2021-08-02-1200-alter-table-product-add-column-lot-and-expiry-control.xml"/>
+    <include file="0.8.x/changelog-2021-09-02-1200-alter-table-picklist-add-column-order.xml"/>
+    <include file="0.8.x/changelog-2021-09-02-1215-alter-table-picklist-item-add-column-order-item.xml"/>
+    <include file="0.8.x/changelog-2021-10-05-1030-add-outbound-returns-order-type.xml"/>
+    <include file="0.8.x/changelog-2021-10-12-1210-alter-table-inventory-level-add-demand-period.xml"/>
+    <include file="0.8.x/changelog-2021-11-04-1535-alter-table-location-drop-local-column.xml"/>
+    <include file="0.8.x/changelog-2021-11-19-1446-create-table-invoice-document.xml"/>
 </databaseChangeLog>

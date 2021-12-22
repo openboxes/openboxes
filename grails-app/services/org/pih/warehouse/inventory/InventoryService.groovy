@@ -13,7 +13,6 @@ import grails.orm.PagedResultList
 import grails.validation.ValidationException
 import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringUtils
-import org.hibernate.Criteria
 import org.hibernate.criterion.CriteriaSpecification
 import org.joda.time.LocalDate
 import org.pih.warehouse.api.AvailableItem
@@ -52,7 +51,6 @@ class InventoryService implements ApplicationContextAware {
     def identifierService
     def messageService
     def locationService
-    def picklistService
 
     static transactional = true
 
@@ -850,7 +848,7 @@ class InventoryService implements ApplicationContextAware {
         Map quantityBinLocationMap = getQuantityByProductAndInventoryItemMap(entries, true)
         quantityBinLocationMap.keySet().each { Product product ->
             quantityBinLocationMap[product].keySet().each { inventoryItem ->
-                quantityBinLocationMap[product][inventoryItem].keySet().each { binLocation ->
+                quantityBinLocationMap[product][inventoryItem].keySet().each { Location binLocation ->
                     def quantity = quantityBinLocationMap[product][inventoryItem][binLocation]
                     def value = "Bin: " + binLocation?.name + ", Lot: " + (inventoryItem?.lotNumber ?: "") + ", Qty: " + quantity
 
@@ -864,7 +862,8 @@ class InventoryService implements ApplicationContextAware {
                             product          : product,
                             inventoryItem    : inventoryItem,
                             binLocation      : binLocation,
-                            quantity         : quantity
+                            quantity         : quantity,
+                            isOnHold         : binLocation?.isOnHold()
                         ]
                     }
                 }
@@ -1208,24 +1207,86 @@ class InventoryService implements ApplicationContextAware {
         cmd.quantityByInventoryItemMap = getQuantityByInventoryItemMap(cmd.transactionEntryList)
 
         // Used in the current stock tab
-        cmd.quantityByBinLocation = getQuantityByBinLocation(cmd.transactionEntryList)
+        def quantityAvailableInventoryItemMap = getQuantityAvailableByProductAndInventoryItemMap(cmd.product, cmd.warehouse)
+        cmd.availableItems = getAvailableItems(cmd.transactionEntryList, quantityAvailableInventoryItemMap)
 
         cmd.totalQuantityAvailableToPromise = getQuantityAvailableToPromise(cmd.product, cmd.warehouse)
 
         return cmd
     }
 
-    Integer getQuantityAvailableToPromise(Product product, Location location) {
-        def productAvailability = ProductAvailability.createCriteria().list {
-            resultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
-            projections {
-                sum("quantityAvailableToPromise", "quantityAvailableToPromise")
+    List<AvailableItem> getAvailableItems(List<TransactionEntry> entries, def quantityAvailableInventoryItemMap) {
+        def availableItems = []
+
+        // first get the quantity and inventory item map
+        Map quantityBinLocationMap = getQuantityByProductAndInventoryItemMap(entries, true)
+        quantityBinLocationMap.keySet().each { Product product ->
+            quantityBinLocationMap[product].keySet().each { inventoryItem ->
+                quantityBinLocationMap[product][inventoryItem].keySet().each { Location binLocation ->
+                    def quantityOnHand = quantityBinLocationMap[product][inventoryItem][binLocation]
+
+                    def quantityAvailableMap = quantityAvailableInventoryItemMap[product][inventoryItem]
+                    def quantityAvailable = quantityAvailableMap ? quantityAvailableMap[binLocation] : 0
+
+                    // We don't want to show the negative values on the frontend
+                    quantityAvailable = quantityAvailable > 0 ? quantityAvailable : 0
+
+                    // Exclude bin locations with quantity 0 (include negative quantity for data quality purposes)
+                    if (quantityOnHand != 0) {
+                        availableItems << new AvailableItem(
+                                inventoryItem: inventoryItem,
+                                binLocation: binLocation,
+                                quantityOnHand: quantityOnHand,
+                                quantityAvailable: quantityAvailable
+                        )
+                    }
+                }
             }
+        }
+
+        // Sort by expiration date, then bin location
+        availableItems = availableItems.sort { a, b ->
+            a?.inventoryItem?.expirationDate <=> b?.inventoryItem?.expirationDate ?: a?.binLocation?.name <=> b.binLocation?.name
+        }
+
+        return availableItems
+    }
+
+    def getQuantityAvailableByProductAndInventoryItemMap(Product product, Location location) {
+        def productAvailability = ProductAvailability.createCriteria().list {
             eq("location", location)
             eq("product", product)
         }
 
-        return productAvailability?.get(0)?.quantityAvailableToPromise ?: 0
+        def quantityAvailableMap = [:]
+        quantityAvailableMap[product] = [:]
+
+        productAvailability?.each {
+            InventoryItem inventoryItem = it.inventoryItem
+            Location binLocation = it.binLocation
+
+            if (!quantityAvailableMap[product][inventoryItem]) {
+                quantityAvailableMap[product][inventoryItem] = [:]
+            }
+
+            quantityAvailableMap[product][inventoryItem][binLocation] = it.quantityAvailableToPromise
+        }
+
+        return quantityAvailableMap
+    }
+
+    Integer getQuantityAvailableToPromise(Product product, Location location) {
+        def productAvailability = ProductAvailability.createCriteria().get {
+            projections {
+                sum("quantityAvailableToPromise")
+            }
+            eq("location", location)
+            eq("product", product)
+            // Filter out negative quantity available to promise (in a case when a record was picked and then recalled)
+            ge("quantityAvailableToPromise", 0)
+        }
+
+        return productAvailability ?: 0
     }
 
 
@@ -1302,6 +1363,13 @@ class InventoryService implements ApplicationContextAware {
                         row.error = true
                         return cmd
                     }
+
+                    if(cmd.product && cmd.product.lotAndExpiryControl && (!row.expirationDate || !row.lotNumber)) {
+                        cmd.errors.reject("inventoryItem.invalid", "Both lot number and expiry date are required for this product.")
+                        row.error = true
+                        return cmd
+                    }
+
                     // 1. Find an existing inventory item for the given lot number and product and description
                     def inventoryItem =
                             findInventoryItemByProductAndLotNumber(cmd.product, row.lotNumber)
@@ -1347,7 +1415,11 @@ class InventoryService implements ApplicationContextAware {
                     // We could do this, but it keeps us from changing the lot number and description
                     cmd.errors.reject("transaction.noChanges", "There are no quantity changes in the current transaction")
                 } else {
-                    if (!transaction.hasErrors() && transaction.save()) {
+                    // Quantity available to promise will be manually calculated,
+                    // because we want to have the latest value on the Stock Card view
+                    // The calculation is done in the controller to avoid circular dependency (adding dependency to productAvailabilityService here)
+                    transaction.disableRefresh = Boolean.TRUE
+                    if (!transaction.hasErrors() && transaction.save(flush: true)) {
                         // We saved the transaction successfully
                     } else {
                         transaction.errors.allErrors.each { error ->
@@ -1558,6 +1630,11 @@ class InventoryService implements ApplicationContextAware {
             inventoryItem.lotNumber = lotNumber
             inventoryItem.expirationDate = expirationDate
             inventoryItem.product = product
+
+            if (!inventoryItem.validate()) {
+                throw new ValidationException("Inventory Item ${lotNumber} is invalid", inventoryItem.errors)
+            }
+
             inventoryItem.save(flush: true)
         }
         return inventoryItem
@@ -1573,6 +1650,7 @@ class InventoryService implements ApplicationContextAware {
             inventoryItem.product = product
         }
         inventoryItem.expirationDate = expirationDate
+        inventoryItem.disableRefresh = Boolean.TRUE
 
         return inventoryItem.save(flush: true)
     }
@@ -1870,32 +1948,27 @@ class InventoryService implements ApplicationContextAware {
      * @param transaction
      * @return
      */
-    Boolean isValidForLocalTransfer(Transaction transaction) {
+    void validateForLocalTransfer(Transaction transaction) {
         // make sure that the transaction is of a valid type
         if (transaction?.transactionType?.id != Constants.TRANSFER_IN_TRANSACTION_TYPE_ID &&
                 transaction?.transactionType?.id != Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID) {
-            return false
+            transaction.errors.rejectValue("transactionType", "transaction.localTransfer.invalidType", "Transaction have invalid type for local transfer")
         }
 
         // make sure we are operating only on locally managed warehouses
         if (transaction?.source) {
-            if (!(transaction?.source instanceof Location)) {
+            if (!(transaction?.source instanceof Location) || !transaction?.source?.managedLocally) {
                 //todo: should use source.isWarehouse()? hibernate always set source to a location
-                return false
-            } else if (!transaction?.source.local) {
-                return false
-            }
-        }
-        if (transaction?.destination) {
-            if (!(transaction?.destination instanceof Location)) {
-                //todo: should use destination.isWarehouse()? hibernate always set destination to a location
-                return false
-            } else if (!transaction?.destination.local) {
-                return false
+                transaction.errors.rejectValue("source", "transaction.localTransfer.invalidSource", "Transaction source location is not managed locally")
             }
         }
 
-        return true
+        if (transaction?.destination) {
+            if (!(transaction?.destination instanceof Location) || !transaction?.destination?.managedLocally) {
+                //todo: should use destination.isWarehouse()? hibernate always set destination to a location
+                transaction.errors.rejectValue("destination", "transaction.localTransfer.invalidDestination", "Transaction destination location is not managed locally")
+            }
+        }
     }
 
     /**
@@ -1936,13 +2009,11 @@ class InventoryService implements ApplicationContextAware {
         // if there is an error, we want to throw an exception so the whole transaction is rolled back
         // (we can trap these exceptions if we want in the calling controller)
 
-        if (!isValidForLocalTransfer(baseTransaction)) {
-            throw new RuntimeException("Invalid transaction for creating a local transaction")
-        }
+        validateForLocalTransfer(baseTransaction)
 
         // first save the base transaction
-        if (!baseTransaction.save(flush: true)) {
-            throw new RuntimeException("Unable to save base transaction " + baseTransaction?.id)
+        if (baseTransaction.hasErrors() || !baseTransaction.save(flush: true)) {
+            throw new ValidationException("Invalid transaction for creating a local transaction", baseTransaction.errors)
         }
 
         // try to fetch any existing local transfer
@@ -2647,6 +2718,13 @@ class InventoryService implements ApplicationContextAware {
 
                 if (row.expirationDate && !row.lotNumber) {
                     command.errors.reject("error.lotNumber.notExists", "Row ${rowIndex}: Items with an expiry date must also have a lot number")
+                }
+
+                if (product.lotAndExpiryControl && (!row.expirationDate || !row.lotNumber)) {
+                    command.errors.reject(
+                        "error.lotAndExpiryControl.required",
+                        "Row ${rowIndex}: Both lot number and expiry date are required for the '${product.productCode} ${product.name}' product."
+                    )
                 }
 
                 def expirationDate = null

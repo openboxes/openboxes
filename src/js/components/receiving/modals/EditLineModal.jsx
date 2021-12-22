@@ -213,6 +213,18 @@ class EditLineModal extends Component {
       if (line.expirationDate && (_.isNil(line.lotNumber) || _.isEmpty(line.lotNumber))) {
         errors.lines[key] = { lotNumber: 'react.partialReceiving.error.expiryWithoutLot.label' };
       }
+      if (!_.isNil(line.product) && line.product.lotAndExpiryControl) {
+        if (!line.expirationDate && (_.isNil(line.lotNumber) || _.isEmpty(line.lotNumber))) {
+          errors.lines[key] = {
+            expirationDate: 'react.partialReceiving.error.lotAndExpiryControl.label',
+            lotNumber: 'react.partialReceiving.error.lotAndExpiryControl.label',
+          };
+        } else if (!line.expirationDate) {
+          errors.lines[key] = { expirationDate: 'react.partialReceiving.error.lotAndExpiryControl.label' };
+        } else if (_.isNil(line.lotNumber) || _.isEmpty(line.lotNumber)) {
+          errors.lines[key] = { lotNumber: 'react.partialReceiving.error.lotAndExpiryControl.label' };
+        }
+      }
     });
 
     return errors;

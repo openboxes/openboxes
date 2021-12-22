@@ -11,12 +11,15 @@ import 'react-table/react-table.css';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
 import customTreeTableHOC from '../../utils/CustomTreeTable';
-import apiClient from '../../utils/apiClient';
+import apiClient, { flattenRequest, parseResponse } from '../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../actions';
 import Filter from '../../utils/Filter';
 import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
+import { extractNonCanceledItems } from './utils';
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
+
+const COMPLETED = 'COMPLETED';
 
 /**
  * The second page of stock transfer where user can choose qty and bin to transfer
@@ -63,12 +66,12 @@ class StockTransferSecondPage extends Component {
   getColumns = () => [
     {
       Header: <Translate id="react.stockTransfer.code.label" defaultMessage="Code" />,
-      accessor: 'productCode',
+      accessor: 'product.productCode',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.product.label" defaultMessage="Product" />,
-      accessor: 'productName',
+      accessor: 'product.name',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
@@ -82,28 +85,29 @@ class StockTransferSecondPage extends Component {
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
-      Header: <Translate id="react.stockTransfer.quantityOnHand.label" defaultMessage="QOH" />,
-      accessor: 'quantityOnHand',
+      Header: <Translate id="react.stockTransfer.quantityAvailableToTransfer.label" defaultMessage="Quantity Available to Transfer" />,
+      accessor: 'quantityNotPicked',
       style: { whiteSpace: 'normal' },
+      width: 220,
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.currentZone.label" defaultMessage="Current Zone" />,
-      accessor: 'zone',
+      accessor: 'originZone',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.currentBinLocation.label" defaultMessage="Current Bin Location" />,
-      accessor: 'binLocation',
+      accessor: 'originBinLocation.name',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.qtyToTransfer.label" defaultMessage="Qty to Transfer" />,
-      accessor: 'transferQty',
+      accessor: 'quantity',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.transferTo.label" defaultMessage="Transfer to" />,
-      accessor: 'transferBin',
+      accessor: 'destinationBinLocation.name',
       style: { whiteSpace: 'normal' },
       Filter,
     },
@@ -119,74 +123,28 @@ class StockTransferSecondPage extends Component {
 
   fetchStockTransfer() {
     this.props.showSpinner();
-
-    const url = `/openboxes/api/stockTransfer/${this.props.match.params.id}`;
+    const url = `/openboxes/api/stockTransfers/${this.props.match.params.stockTransferId}`;
 
     apiClient.get(url)
-      .then(() => {
-        // TODO add after fetching API is done, using mocks for testing purposes
-      })
-      .catch(() => {
-        const stockTransferItems = [{
-          id: 1,
-          productCode: 'code2',
-          productName: 'product1',
-          lotNumber: 'lot3',
-          expirationDate: '7/11/2021',
-          zone: 'zone2',
-          binLocation: 'bin2',
-          quantityOnHand: 45,
-          transferQty: 45,
-          transferBin: 'transfer bin 1',
-        }, {
-          id: 2,
-          productCode: 'code2',
-          productName: 'product1',
-          lotNumber: 'lot2',
-          expirationDate: '7/1/2021',
-          zone: 'zone1',
-          binLocation: 'bin1',
-          quantityOnHand: 51,
-          transferQty: 21,
-          transferBin: 'transfer bin 2',
-        }, {
-          id: 3,
-          productCode: 'code2',
-          productName: 'product2',
-          lotNumber: 'lot3',
-          expirationDate: '7/22/2021',
-          zone: 'zone2',
-          binLocation: 'bin1',
-          quantityOnHand: 88,
-          transferQty: 88,
-          transferBin: 'transfer bin 3',
-        }, {
-          id: 4,
-          productCode: 'code2',
-          productName: 'product3',
-          lotNumber: 'lot2',
-          expirationDate: '7/25/2021',
-          zone: 'zone3',
-          binLocation: 'bin1',
-          quantityOnHand: 41,
-          transferQty: 20,
-          transferBin: 'transfer bin 4',
-        }, {
-          id: 5,
-          productCode: 'code2',
-          productName: 'product2',
-          lotNumber: 'lot3',
-          expirationDate: '7/2/2021',
-          zone: 'zone3',
-          binLocation: 'bin1',
-          quantityOnHand: 43,
-          transferQty: 43,
-          transferBin: 'transfer bin 5',
-        }];
+      .then((response) => {
+        const stockTransfer = parseResponse(response.data.data);
+        const stockTransferItems = extractNonCanceledItems(stockTransfer);
 
-        this.setState({ stockTransfer: { stockTransferItems } }, () => this.props.hideSpinner());
-      });
+        this.setState(
+          {
+            stockTransfer: { ...stockTransfer, stockTransferItems },
+            originalItems: stockTransfer.stockTransferItems,
+          },
+          () => this.props.hideSpinner(),
+        );
+      })
+      .catch(() => this.props.hideSpinner());
   }
+
+  filterMethod = (filter, row) => {
+    const val = row[filter.id];
+    return _.toString(val).toLowerCase().includes(filter.value.toLowerCase());
+  };
 
   /**
    * Sends all changes made by user in this step of stock transfer to API and updates data.
@@ -194,25 +152,31 @@ class StockTransferSecondPage extends Component {
    */
   save() {
     this.props.showSpinner();
-    const url = `/openboxes/api/stockTransfers?id=${this.state.stockTransfer.id}`;
+    const url = `/openboxes/api/stockTransfers/${this.props.match.params.stockTransferId}`;
 
-    return apiClient.post(url)
+    const payload = {
+      ...this.state.stockTransfer,
+      stockTransferItems: this.state.originalItems,
+      status: COMPLETED,
+    };
+
+    return apiClient.put(url, flattenRequest(payload))
       .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.stockTransfer.alert.stockTransferCompleted.label', 'Stock transfer was successfully completed!'), { timeout: 3000 });
-        window.location = `/openboxes/order/show/${this.state.stockTransfer.id}`;
+        window.location = `/openboxes/stockTransfer/show/${this.state.stockTransfer.id}`;
       })
       .catch(() => this.props.hideSpinner());
   }
 
   /**
-   * Sends all changes made by user in this step of put-away to API and updates data.
+   * Sends all changes made by user in this step of stock transfer to API and updates data.
    * @public
    */
   completeStockTransfer() {
     const itemsWithLowerQuantity = _.filter(
       this.state.stockTransfer.stockTransferItems,
-      stockTransferItem => stockTransferItem.transferQty < stockTransferItem.quantityOnHand,
+      stockTransferItem => stockTransferItem.transferQty < stockTransferItem.quantityNotPicked,
     );
 
     if (!_.isEmpty(itemsWithLowerQuantity)) {
@@ -231,7 +195,7 @@ class StockTransferSecondPage extends Component {
       title: this.props.translate('react.stockTransfer.message.confirmStockTransfer.label', 'Confirm Stock Transfer'),
       message: _.map(items, item =>
         (
-          <p>Qty {item.quantityOnHand - item.transferQty} {this.props.translate('react.stockTransfer.alert.lowerQty1.label', 'of item')} {' '}
+          <p>Qty {item.quantityNotPicked - item.transferQty} {this.props.translate('react.stockTransfer.alert.lowerQty1.label', 'of item')} {' '}
             {item.productName} {this.props.translate('react.stockTransfer.alert.lowerQty2.label', 'is still in the receiving bin. Do you want to continue?')}
           </p>)),
       buttons: [
@@ -246,6 +210,23 @@ class StockTransferSecondPage extends Component {
     });
   }
 
+  previousPage() {
+    this.props.showSpinner();
+    const url = `/openboxes/api/stockTransfers/${this.props.match.params.stockTransferId}`;
+
+    const payload = {
+      ...this.state.stockTransfer,
+      stockTransferItems: this.state.originalItems,
+    };
+
+    return apiClient.put(url, flattenRequest(payload))
+      .then(() => {
+        this.props.hideSpinner();
+        this.props.previousPage(this.state.stockTransfer);
+      })
+      .catch(() => this.props.hideSpinner());
+  }
+
   render() {
     const {
       columns, pivotBy,
@@ -257,6 +238,19 @@ class StockTransferSecondPage extends Component {
 
     return (
       <div className="stock-transfer">
+        {this.state.stockTransfer && this.state.stockTransfer.status === 'COMPLETED' &&
+          <div className="submit-buttons d-flex justify-content-end mb-3 mt-0">
+            <button
+              type="button"
+              onClick={() => {
+                window.location = `/openboxes/stockTransfer/show/${this.state.stockTransfer.id}`;
+              }}
+              className="btn btn-outline-primary btn-form btn-xs"
+              hidden={this.state.stockTransfer.status !== 'COMPLETED'}
+            ><Translate id="react.default.button.exit.label" defaultMessage="Exit" />
+            </button>
+          </div>
+        }
         {
           this.state.stockTransfer.stockTransferItems ?
             <SelectTreeTable
@@ -269,20 +263,23 @@ class StockTransferSecondPage extends Component {
               minRows={0}
               showPaginationBottom={false}
               filterable
+              defaultFilterMethod={this.filterMethod}
             />
             : null
         }
         <div className="submit-buttons">
           <button
             type="button"
-            onClick={() => this.props.previousPage(this.state.stockTransfer)}
+            onClick={() => this.previousPage()}
             className="btn btn-outline-primary btn-form btn-xs"
+            disabled={this.state.stockTransfer.status === 'COMPLETED'}
           ><Translate id="react.default.button.previous.label" defaultMessage="Previous" />
           </button>
           <button
             type="button"
             onClick={() => this.completeStockTransfer()}
             className="btn btn-outline-success float-right btn-xs mr-3"
+            disabled={this.state.stockTransfer.status === 'COMPLETED'}
           ><Translate id="react.stockTransfer.completeStockTransfer.label" defaultMessage="Complete Stock Transfer" />
           </button>
         </div>
@@ -319,7 +316,7 @@ StockTransferSecondPage.propTypes = {
   }).isRequired,
   match: PropTypes.shape({
     params: PropTypes.shape({
-      id: PropTypes.string,
+      stockTransferId: PropTypes.string,
     }),
   }).isRequired,
   /** Location (currently chosen). To be used in internalLocations and stock transfer requests. */

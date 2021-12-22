@@ -165,7 +165,7 @@ class StockMovementApiController {
     def reviseItems = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         bindStockMovement(stockMovement, request.JSON)
-        List<EditPageItem> revisedItems = stockMovementService.reviseItems(stockMovement)
+        def revisedItems = stockMovementService.reviseItems(stockMovement)
         render([data: revisedItems] as JSON)
     }
 
@@ -209,6 +209,18 @@ class StockMovementApiController {
         stockMovement = stockMovementService.getStockMovement(params.id)
 
         render([data: stockMovement] as JSON)
+    }
+
+    def createPickList = {
+        stockMovementService.createPicklist(params.id)
+
+        render status: 200
+    }
+
+    def validatePicklist = {
+        stockMovementService.validatePicklist(params.id)
+
+        render status: 200
     }
 
     def exportPickListItems = {

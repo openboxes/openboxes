@@ -70,7 +70,7 @@ class ProductApiController extends BaseDomainApiController {
         if(params.availableItems) {
             products = productService.searchProducts(terms, [])
             def location = Location.get(session.warehouse.id)
-            def availableItems = inventoryService.getAvailableBinLocations(location, products).groupBy { it.inventoryItem?.product?.productCode }
+            def availableItems = productAvailabilityService.getAvailableBinLocations(location, products).groupBy { it.inventoryItem?.product?.productCode }
             products = []
             availableItems.each { k, v ->
                 products += [
@@ -208,8 +208,9 @@ class ProductApiController extends BaseDomainApiController {
         Product product = Product.get(params.id)
         Location location = Location.get(params.locationId)
         def quantityOnHand = productAvailabilityService.getQuantityOnHand(product, location)
+        def quantityAvailable = inventoryService.getQuantityAvailableToPromise(product, location)
         def demand = forecastingService.getDemand(location, product)
-        render([monthlyDemand: demand.monthlyDemand, quantityOnHand: quantityOnHand] as JSON)
+        render([monthlyDemand: demand.monthlyDemand, quantityOnHand: quantityOnHand, quantityAvailable: quantityAvailable] as JSON)
     }
 
 }

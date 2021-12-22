@@ -117,6 +117,7 @@ class Constants {
     static final String DEFAULT_TRANSACTION_NUMBER_FORMAT = "AAA-AAA-AAA"
     static final String DEFAULT_ORGANIZATION_NUMBER_FORMAT = "AAA"
     static final String DEFAULT_SEQUENCE_NUMBER_FORMAT = "00000"
+    static final String DEFAULT_PO_SEQUENCE_NUMBER_FORMAT = "000000"
     static final String DEFAULT_SEQUENCE_NUMBER_FORMAT_CHAR = "0"
     static final String DEFAULT_INVOICE_NUMBER_FORMAT = "NNNLLL"
 
@@ -130,4 +131,7 @@ class Constants {
 
     static final String DEFAULT_LOT_NUMBER = "DEFAULT" // default product availability lot number
     static final String DEFAULT_BIN_LOCATION_NAME = "DEFAULT" // default product availability bin location name
+
+    static final String PUTAWAY_ORDER = "PUTAWAY_ORDER"
+    static final String OUTBOUND_RETURNS = "OUTBOUND_RETURNS"
 }

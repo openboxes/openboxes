@@ -14,6 +14,7 @@ enum ProductField {
     RECONDITIONED('reconditioned'),
     SERIALIZED('serialized'),
     LOT_CONTROL('lotControl'),
+    LOT_AND_EXPIRY_CONTROL('lotAndExpiryControl'),
     ABC_CLASS('abcClass'),
     UPC('upc'),
     NDC('ndc'),

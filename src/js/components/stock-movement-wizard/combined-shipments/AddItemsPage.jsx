@@ -22,6 +22,7 @@ import DateField from '../../form-elements/DateField';
 import { renderFormField } from '../../../utils/form-utils';
 import { showSpinner, hideSpinner, fetchUsers } from '../../../actions';
 import apiClient from '../../../utils/apiClient';
+import AlertMessage from '../../../utils/AlertMessage';
 import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
 import { debounceProductsFetch } from '../../../utils/option-utils';
 import CombinedShipmentItemsModal from '../modals/CombinedShipmentItemsModal';
@@ -38,8 +39,10 @@ const DELETE_BUTTON_FIELD = {
     fieldValue, removeItem, removeRow, updateTotalCount,
   }) => ({
     onClick: fieldValue && fieldValue.id ? () => {
-      removeItem(fieldValue.id).then(() => removeRow());
-      updateTotalCount(-1);
+      removeItem(fieldValue.id).then(() => {
+        removeRow();
+        updateTotalCount(-1);
+      });
     } : () => { updateTotalCount(-1); removeRow(); },
     disabled: fieldValue && fieldValue.statusCode === 'SUBSTITUTED',
   }),
@@ -225,6 +228,8 @@ const FIELDS = {
   },
 };
 
+const LOT_AND_EXPIRY_ERROR = 'react.stockMovement.error.lotAndExpiryControl.label';
+
 /* eslint class-methods-use-this: ["error",{ "exceptMethods": ["getLineItemsToBeSaved"] }] */
 /**
  * The second step of stock movement where user can add items to stock list.
@@ -245,6 +250,8 @@ class AddItemsPage extends Component {
       values: { ...this.props.initialValues, lineItems: [] },
       totalCount: 0,
       isFirstPageLoaded: false,
+      showAlert: false,
+      alertMessage: '',
     };
 
     this.props.showSpinner();
@@ -357,6 +364,7 @@ class AddItemsPage extends Component {
     const errors = {};
     errors.lineItems = [];
     const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
+    let alertMessage = '';
 
     _.forEach(values.lineItems, (item, key) => {
       if (!_.isNil(item.product) && (!item.quantityRequested || item.quantityRequested <= 0)) {
@@ -399,7 +407,30 @@ class AddItemsPage extends Component {
         item && item.quantityAvailable < _.toInteger(item.quantityRequested)) {
         errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.higherQuantity.label' };
       }
+      if (!_.isNil(item.product) && item.product.lotAndExpiryControl) {
+        if (!item.expirationDate && (_.isNil(item.lotNumber) || _.isEmpty(item.lotNumber))) {
+          errors.lineItems[key] = {
+            expirationDate: LOT_AND_EXPIRY_ERROR,
+            lotNumber: LOT_AND_EXPIRY_ERROR,
+          };
+        } else if (!item.expirationDate) {
+          errors.lineItems[key] = { expirationDate: LOT_AND_EXPIRY_ERROR };
+        } else if (_.isNil(item.lotNumber) || _.isEmpty(item.lotNumber)) {
+          errors.lineItems[key] = { lotNumber: LOT_AND_EXPIRY_ERROR };
+        }
+      }
+
+      if (errors.lineItems[key]) {
+        if (!alertMessage) {
+          alertMessage = `Following rows contain validation errors: Row ${key + 1}: ${item.productCode}`;
+        } else {
+          alertMessage += `, Row ${key + 1}: ${item.productCode}`;
+        }
+      }
     });
+
+    const { showAlert } = this.state;
+    this.setState({ alertMessage, showAlert: showAlert && !alertMessage ? false : showAlert });
     return errors;
   }
 
@@ -529,6 +560,12 @@ class AddItemsPage extends Component {
    * @public
    */
   nextPage(formValues) {
+    const errors = this.validate(formValues).lineItems;
+    if (errors.length) {
+      this.setState({ showAlert: true });
+      return;
+    }
+
     const lineItems = _.filter(formValues.lineItems, val => !_.isEmpty(val) && val.product);
 
     if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
@@ -873,6 +910,8 @@ class AddItemsPage extends Component {
   }
 
   render() {
+    const { showAlert, alertMessage } = this.state;
+
     return (
       <Form
         onSubmit={() => {}}
@@ -881,6 +920,7 @@ class AddItemsPage extends Component {
         initialValues={this.state.values}
         render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
+            <AlertMessage show={showAlert} message={alertMessage} danger />
             <span className="buttons-container">
               <label
                 htmlFor="csvInput"
@@ -991,11 +1031,7 @@ class AddItemsPage extends Component {
                 </button>
                 <button
                   type="submit"
-                  onClick={() => {
-                    if (!invalid) {
-                      this.nextPage(values);
-                    }
-                  }}
+                  onClick={() => this.nextPage(values)}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                   disabled={!_.some(values.lineItems, item => !_.isEmpty(item))}
                 ><Translate id="react.default.button.next.label" defaultMessage="Next" />

@@ -11,15 +11,15 @@ package org.pih.warehouse.inventory
 
 import grails.converters.JSON
 import grails.validation.ValidationException
-import org.grails.plugins.csv.CSVWriter
 import groovy.time.TimeCategory
+import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductException
-import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
@@ -139,15 +139,16 @@ class InventoryItemController {
 
         def products = product.alternativeProducts() as List
         log.info "Products " + products
-        def quantityMap = [:]
+        def quantityAvailableMap = [:]
         if (!products.isEmpty()) {
-            quantityMap = inventoryService.getQuantityByProductMap(location, products)
+            quantityAvailableMap = productAvailabilityService.getQuantityAvailableToPromiseByProduct(location, products)
         }
-        def totalQuantity = quantityMap.values().sum() ?: 0
+
+        def totalQuantity = quantityAvailableMap.values().sum() ?: 0
 
         log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
 
-        render(template: "showProductGroups", model: [product: product, totalQuantity: totalQuantity, quantityMap: quantityMap])
+        render(template: "showProductGroups", model: [product: product, totalQuantity: totalQuantity, quantityAvailableMap: quantityAvailableMap])
     }
 
 
@@ -290,7 +291,7 @@ class InventoryItemController {
             )
         }
         orderItems = orderService.getPendingInboundOrderItems(location, product)
-        orderItems.collect {
+        orderItems.findAll {orderItem -> orderItem.orderItemStatusCode != OrderItemStatusCode.CANCELED}.collect {
             def existingItem = itemsMap.find {k, v -> k instanceof OrderItem && k.actualReadyDate == it.actualReadyDate && k.order == it.order}
             if (!existingItem) {
                 itemsMap.put(it, [
@@ -320,13 +321,13 @@ class InventoryItemController {
         requisitionItems = requisitionService.getPendingRequisitionItems(location, product)
         requisitionItems.groupBy { it.requisition }.collect { k, v ->
             itemsMap.put(k, [
+                    picklistItemsByLot: k?.picklist?.getPicklistItemsByLot(product),
                     quantityRequested: v.quantity.sum(),
                     quantityRequired: v.sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityRequired() },
                     quantityPicked: v.sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityPicked() },
             ]
             )
         }
-
 
         log.info "itemsMap: " + itemsMap
 
@@ -519,6 +520,10 @@ class InventoryItemController {
         log.info("Before saving record inventory " + params)
         inventoryService.saveRecordInventoryCommand(commandInstance, params)
         if (!commandInstance.hasErrors()) {
+            // Recalculate product availability after the changes in the inventory
+            productAvailabilityService.refreshProductsAvailability(commandInstance?.inventory?.warehouse?.id,
+                    [commandInstance?.product?.id], false)
+
             redirect(action: "showStockCard", params: ['product.id': commandInstance.product.id])
             return
         }
@@ -772,6 +777,13 @@ class InventoryItemController {
                     return
                 }
             }
+
+            if(itemInstance.product && itemInstance.product.lotAndExpiryControl && (!params.expirationDate || !params.lotNumber)) {
+                flash.error = "${warehouse.message(code: 'inventoryItem.lotAndExpiryControl.message')}"
+                redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
+                return
+            }
+
             itemInstance.properties = params
 
             // FIXME Temporary hack to handle a changed values for these two fields
@@ -984,6 +996,14 @@ class InventoryItemController {
         if (userService.isUserAdmin(session.user)) {
             if (inventoryItem.lotNumber) {
                 inventoryItem.lotStatus = LotStatusCode.RECALLED
+
+                // Disable the refresh event, the quantity available calculation will be done manually
+                // to display the latest value on the Stock Card
+                inventoryItem.disableRefresh = Boolean.TRUE
+                inventoryItem.save(flush: true)
+
+                productAvailabilityService.refreshProductsAvailability(null, [inventoryItem?.product?.id], false)
+
                 flash.message = "${warehouse.message(code: 'inventoryItem.recall.message')}"
             } else {
                 flash.message = "${warehouse.message(code: 'inventoryItem.recallError.message')}"
@@ -998,6 +1018,14 @@ class InventoryItemController {
         InventoryItem inventoryItem = InventoryItem.get(params.id)
         if (userService.isUserAdmin(session.user)) {
             inventoryItem.lotStatus = null
+
+            // Disable the refresh event, the quantity available calculation will be done manually
+            // to display the latest value on the Stock Card
+            inventoryItem.disableRefresh = Boolean.TRUE
+            inventoryItem.save(flush: true)
+
+            productAvailabilityService.refreshProductsAvailability(null, [inventoryItem?.product?.id], false)
+
             flash.message = "${warehouse.message(code: 'inventoryItem.revertRecall.message')}"
         } else {
             flash.message = "${warehouse.message(code: 'errors.noPermissions.label')}"

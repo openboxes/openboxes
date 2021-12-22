@@ -9,6 +9,7 @@ import fileDownload from 'js-file-download';
 import update from 'immutability-helper';
 import Alert from 'react-s-alert';
 import { confirmAlert } from 'react-confirm-alert';
+import axios from 'axios';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -19,10 +20,16 @@ import { renderFormField } from '../../../utils/form-utils';
 import EditPickModal from '../modals/EditPickModal';
 import { showSpinner, hideSpinner, fetchReasonCodes } from '../../../actions';
 import TableRowWithSubfields from '../../form-elements/TableRowWithSubfields';
-import apiClient, { parseResponse, flattenRequest } from '../../../utils/apiClient';
+import {
+  parseResponse,
+  flattenRequest,
+  handleSuccess,
+  handleError,
+} from '../../../utils/apiClient';
 import ButtonField from '../../form-elements/ButtonField';
 import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
 import renderHandlingIcons from '../../../utils/product-handling-icons';
+import AlertMessage from '../../../utils/AlertMessage';
 
 const FIELDS = {
   pickPageItems: {
@@ -126,13 +133,12 @@ const FIELDS = {
           defaultTitleMessage: 'Edit Pick',
         },
         getDynamicAttr: ({
-          fieldValue, subfield, stockMovementId, updatePickPageItem,
+          fieldValue, subfield, updatePickPageItem,
           reasonCodes, hasBinLocationSupport, showOnly,
         }) => ({
-          fieldValue: flattenRequest(fieldValue),
+          itemId: _.get(fieldValue, 'requisitionItem.id'),
           btnOpenDisabled: showOnly,
           subfield,
-          stockMovementId,
           btnOpenText: fieldValue && fieldValue.hasChangedPick ? '' : 'react.default.button.edit.label',
           btnOpenDefaultText: fieldValue && fieldValue.hasChangedPick ? '' : 'Edit',
           btnOpenClassName: fieldValue && fieldValue.hasChangedPick ? ' btn fa fa-check btn-outline-success' : 'btn btn-outline-primary',
@@ -181,6 +187,8 @@ const FIELDS = {
   },
 };
 
+const apiClient = axios.create({});
+
 /* eslint class-methods-use-this: ["error",{ "exceptMethods": ["checkForInitialPicksChanges"] }] */
 /**
  * The forth step of stock movement(for movements from a depot) where user
@@ -196,6 +204,8 @@ class PickPage extends Component {
       values: { ...this.props.initialValues, pickPageItems: [] },
       totalCount: 0,
       isFirstPageLoaded: false,
+      showAlert: false,
+      alertMessage: '',
     };
 
     this.revertUserPick = this.revertUserPick.bind(this);
@@ -205,6 +215,10 @@ class PickPage extends Component {
     this.importTemplate = this.importTemplate.bind(this);
     this.isRowLoaded = this.isRowLoaded.bind(this);
     this.loadMoreRows = this.loadMoreRows.bind(this);
+    this.recreatePicklist = this.recreatePicklist.bind(this);
+    this.handleValidationErrors = this.handleValidationErrors.bind(this);
+
+    apiClient.interceptors.response.use(handleSuccess, this.handleValidationErrors);
   }
 
   componentDidMount() {
@@ -265,6 +279,15 @@ class PickPage extends Component {
     this.fetchPickPageData();
     if (!this.props.isPaginated) {
       this.fetchPickPageItems();
+    } else if (forceFetch) {
+      this.setState({
+        values: {
+          ...this.state.values,
+          pickPageItems: [],
+        },
+      }, () => {
+        this.loadMoreRows({ startIndex: 0 });
+      });
     }
   }
 
@@ -396,16 +419,59 @@ class PickPage extends Component {
     return Promise.resolve();
   }
 
+  validatePicklist() {
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/validatePicklist`;
+    return apiClient.get(url);
+  }
+
+  handleValidationErrors(error) {
+    if (error.response.status === 400) {
+      const alertMessage = _.join(_.get(error, 'response.data.errorMessages', ''), ' ');
+      this.setState({ alertMessage, showAlert: true });
+
+      return Promise.reject(error);
+    }
+
+    return handleError(error);
+  }
+
+  validateReasonCodes(lineItems) {
+    const { pickPageItems } = lineItems;
+    const invalidItem = _.find(
+      pickPageItems,
+      pickPageItem => pickPageItem.quantityRequired > pickPageItem.quantityPicked && _.find(
+        pickPageItem.picklistItems,
+        item => !item.reasonCode && !item.initial,
+      ),
+    );
+
+    if (invalidItem) {
+      this.setState({
+        showAlert: true,
+        alertMessage: `Product ${invalidItem.productCode} requires a reason code for the pick value. 
+        Please add a reason code through the Edit Pick.`,
+      });
+      return false;
+    }
+
+    return true;
+  }
+
   /**
    * Goes to the next stock movement step.
    * @param {object} formValues
    * @public
    */
   nextPage(formValues) {
-    this.props.showSpinner();
-    this.transitionToNextStep()
-      .then(() => this.props.nextPage(formValues))
-      .catch(() => this.props.hideSpinner());
+    if (this.validateReasonCodes(formValues)) {
+      this.props.showSpinner();
+      this.validatePicklist()
+        .then(() =>
+          this.transitionToNextStep()
+            .then(() => this.props.nextPage(formValues))
+            .catch(() => this.props.hideSpinner()))
+        .catch(() => this.props.hideSpinner());
+    }
   }
 
   /**
@@ -437,14 +503,19 @@ class PickPage extends Component {
   revertUserPick(itemId) {
     this.props.showSpinner();
 
-    const itemsUrl = `/openboxes/api/stockMovementItems/${itemId}/createPicklist`;
+    const createPicklistUrl = `/openboxes/api/stockMovementItems/${itemId}/createPicklist`;
+    const itemsUrl = `/openboxes/api/stockMovementItems/${itemId}?stepNumber=4`;
 
-    apiClient.post(itemsUrl)
-      .then((resp) => {
-        const pickPageItem = resp.data.data;
+    apiClient.post(createPicklistUrl)
+      .then(() => {
+        apiClient.get(itemsUrl)
+          .then((resp) => {
+            const pickPageItem = resp.data.data;
 
-        this.updatePickPageItem(pickPageItem);
-        this.props.hideSpinner();
+            this.updatePickPageItem(pickPageItem);
+            this.props.hideSpinner();
+          })
+          .catch(() => { this.props.hideSpinner(); });
       })
       .catch(() => { this.props.hideSpinner(); });
   }
@@ -512,6 +583,15 @@ class PickPage extends Component {
       });
   }
 
+  recreatePicklist() {
+    const url = `/openboxes/api/stockMovements/createPickList/${this.state.values.stockMovementId}`;
+    this.props.showSpinner();
+
+    apiClient.get(url)
+      .then(() => this.fetchAllData(true))
+      .catch(() => this.props.hideSpinner());
+  }
+
   /**
    * Refetch the data, all not saved changes will be lost.
    * @public
@@ -521,13 +601,13 @@ class PickPage extends Component {
       title: this.props.translate('react.stockMovement.message.confirmRefresh.label', 'Confirm refresh'),
       message: this.props.translate(
         'react.stockMovement.confirmPickRefresh.message',
-        'This button will redo the autopick on all items that have not been previously edited. Are you sure you want to continue?',
+        'This button will redo the autopick on all items. Are you sure you want to continue?',
       ),
       buttons: [
         {
           label: this.props.translate('react.default.yes.label', 'Yes'),
           onClick: () => {
-            this.fetchAllData(true);
+            this.recreatePicklist();
           },
         },
         {
@@ -546,6 +626,7 @@ class PickPage extends Component {
         initialValues={this.state.values}
         render={({ handleSubmit, values }) => (
           <div className="d-flex flex-column">
+            <AlertMessage show={this.state.showAlert} message={this.state.alertMessage} danger />
             { !showOnly ?
               <span className="buttons-container">
                 <label

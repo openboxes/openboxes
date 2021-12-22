@@ -81,6 +81,7 @@
                                     <tr style="height: 100px;">
                                         <th></th>
                                         <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" class="bottom"/>
+                                        <g:sortableColumn property="locationNumber" title="${warehouse.message(code: 'location.locationNumber.label')}" class="bottom"/>
                                         <g:sortableColumn property="locationType" title="${warehouse.message(code: 'location.locationType.label')}" class="bottom"/>
                                         <g:sortableColumn property="locationGroup" title="${warehouse.message(code: 'location.locationGroup.label')}" class="bottom"/>
                                         <th class="bottom"><span class="vertical-text"><warehouse:message code="warehouse.active.label" /></span></th>
@@ -100,6 +101,9 @@
                                             </td>
                                             <td class="middle">
                                                 <g:link action="edit" id="${locationInstance.id}">${fieldValue(bean: locationInstance, field: "name")}</g:link>
+                                            </td>
+                                            <td class="middle">
+                                                <g:link action="edit" id="${locationInstance.id}">${fieldValue(bean: locationInstance, field: "locationNumber")}</g:link>
                                             </td>
                                             <td class="left middle"><format:metadata obj="${locationInstance?.locationType}"/></td>
                                             <td class="left middle">${locationInstance?.locationGroup?:warehouse.message(code:'default.none.label')}</td>

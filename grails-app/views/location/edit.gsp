@@ -58,7 +58,11 @@
                         <li><a href="${request.contextPath}/location/showContents/${locationInstance?.id}"><warehouse:message
                                 code="binLocation.contents.label" default="Contents"/></a></li>
                     </g:else>
-
+                    <li><a href="${request.contextPath}/location/showForecastingConfiguration/${locationInstance?.id}"
+                           id="location-forecastingConfiguration-tab">
+                        <g:message code="forecasting.label"
+                                   default="Forecasting"/></a>
+                    </li>
                 </ul>
 
                 <div id="location-details-tab">
@@ -246,18 +250,6 @@
 
                                 </td>
                             </tr>
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="local"><warehouse:message
-                                            code="warehouse.local.label"/></label>
-                                </td>
-                                <td valign="top"
-                                    class="value${hasErrors(bean: locationInstance, field: 'local', 'errors')}">
-                                    <g:checkBox name="local" value="${locationInstance?.local}"
-                                                title="${g.message(code: 'warehouse.local.message')}"/>
-                                </td>
-                            </tr>
-
 
                             <g:if test="${!locationInstance?.isInternalLocation() && !locationInstance?.isZoneLocation()}">
                                 <tr class="prop">

@@ -21,9 +21,8 @@ import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.grails.support.PersistenceContextInterceptor
 import org.quartz.JobExecutionContext
 import org.quartz.JobExecutionException
-import org.quartz.listeners.JobListenerSupport
 
-public class PersistenceContextJobListener extends JobListenerSupport {
+public class PersistenceContextJobListener extends grails.plugin.quartz2.PersistenceContextJobListener {
 	private static final transient Log log = LogFactory.getLog(PersistenceContextJobListener.class);
     PersistenceContextInterceptor persistenceInterceptor
 	public static final transient String PERSITENCE_INIT = "gormSession";
@@ -55,13 +54,13 @@ public class PersistenceContextJobListener extends JobListenerSupport {
             } catch (Exception e) {
                 log.error("Exception occurred while flushing persistence context for job ${context.jobDetail.key}: " + e.message, e)
 				if (e.cause) {
-                	log.error("Exception was caused by: " + e?.cause?.message, e?.cause)
+                	log.fatal("Exception was caused by: " + e?.cause?.message, e?.cause)
 				}
             } finally {
                 try {
                     persistenceInterceptor.destroy()
                 } catch (Exception e) {
-                    log.error("Exception occurred while destroying persistence context for job ${context?.jobDetail?.key}: " + e.message, e)
+                    log.fatal("Exception occurred while destroying persistence context for job ${context?.jobDetail?.key}: " + e.message, e)
                 }
             }
 		}

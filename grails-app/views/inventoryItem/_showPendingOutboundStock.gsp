@@ -20,9 +20,6 @@
                     ${warehouse.message(code: 'default.name.label')}
                 </th>
                 <th>
-                    ${warehouse.message(code: 'requisition.origin.label')}
-                </th>
-                <th>
                     ${warehouse.message(code: 'requisition.destination.label')}
                 </th>
                 <th>
@@ -33,6 +30,9 @@
                 </th>
                 <th>
                     ${warehouse.message(code: 'requisition.quantityPicked.label')}
+                </th>
+                <th>
+                    ${warehouse.message(code: 'default.lotSerialNo.label')}
                 </th>
             </tr>
 
@@ -64,9 +64,6 @@
                         </g:link>
                     </td>
                     <td>
-                        ${item?.origin?.name}
-                    </td>
-                    <td>
                         ${item?.destination?.name }
                     </td>
                     <td>
@@ -75,9 +72,27 @@
                     <td>
                         ${entry.value["quantityRequired"]} ${product?.unitOfMeasure}
                     </td>
-                    <td>
-                        ${entry.value["quantityPicked"]} ${product?.unitOfMeasure}
-                    </td>
+                    <g:each var="piEntry" in="${entry.value.picklistItemsByLot}" status="index">
+                        <g:if test="${index != 0}">
+                            <tr>
+                            <td colspan="8"></td>
+                        </g:if>
+                            <td>
+                                ${piEntry.value.quantity.sum()} ${product?.unitOfMeasure}
+                            </td>
+                            <td>
+                                ${piEntry.key}
+                            </td>
+                        <g:if test="${index != 0}">
+                            </tr>
+                        </g:if>
+                    </g:each>
+                    <g:if test="${!entry.value.picklistItemsByLot}">
+                        <td>
+                            0 ${product?.unitOfMeasure}
+                        </td>
+                        <td></td>
+                    </g:if>
                 </tr>
             </g:each>
             <g:if test="${!itemsMap}">
@@ -93,7 +108,7 @@
             </tbody>
             <tfoot>
             <tr>
-                <td colspan="7"></td>
+                <td colspan="6"></td>
                 <td>
                     ${itemsMap.values()["quantityRequested"].sum()} ${product?.unitOfMeasure}
                 </td>
@@ -101,8 +116,9 @@
                     ${itemsMap.values()["quantityRequired"].sum()} ${product?.unitOfMeasure}
                 </td>
                 <td>
-                    ${itemsMap.values()["quantityPicked"].sum()} ${product?.unitOfMeasure}
+                    ${itemsMap.values()["picklistItemsByLot"]*.values()["quantity"]?.flatten()?.sum() ?: 0} ${product?.unitOfMeasure}
                 </td>
+                <td></td>
             </tr>
             </tfoot>
         </table>

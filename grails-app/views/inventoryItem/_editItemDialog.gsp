@@ -1,9 +1,10 @@
 <div class="dialog">
 
-	<g:form name="editInventoryItem" controller="inventoryItem" action="update" onsubmit="return checkIfExistsInOtherLocation();">
+	<g:form name="editInventoryItem" controller="inventoryItem" action="update" onsubmit="return validate();">
 		<g:hiddenField name="id" value="${inventoryItem?.id}"/>
 		<g:hiddenField name="inventory.id" value="${inventoryInstance?.id}"/>
 		<g:hiddenField name="product.id" value="${inventoryItem?.product?.id}"/>
+		<g:hiddenField name="lotAndExpiryControl" id="lotAndExpiryControl" value="${inventoryItem?.product?.lotAndExpiryControl}"/>
 		<g:hiddenField name="inventoryItem.id" value="${inventoryItem?.id}"/>
 		<g:hiddenField name="existsInOtherLocation" id="existsInOtherLocation" value="${existsInOtherLocation}"/>
 		<g:isSuperuser>
@@ -30,7 +31,7 @@
 					<tr class="prop">
 						<td valign="top" class="name"><label><warehouse:message code="product.lotNumber.label"/></label></td>
 						<td valign="top" class="value">
-							<g:textField name="lotNumber" value="${inventoryItem?.lotNumber}" class="text lotNumber"/>
+							<g:textField name="lotNumber" id="lotNumber" value="${inventoryItem?.lotNumber}" class="text lotNumber"/>
 						</td>
 					</tr>
 				</g:if>
@@ -47,9 +48,9 @@
 					<td valign="top" class="name"><label><warehouse:message code="product.expirationDate.label"/></label></td>
 					<td valign="top" class="">
 						<g:set var="currentYear" value="${new Date()[Calendar.YEAR]}"/>
-						<g:set var="minimumYear" value="${grailsApplication.config.openboxes.expirationDate.minValue[Calendar.YEAR]}"/>
-						<g:datePicker name="expirationDate" precision="day" default="none" years="${minimumYear..currentYear + 20}"
-									  value="${inventoryItem?.expirationDate }" noSelection="['':'']"/>
+						<g:set var="minimumDate" value="${grailsApplication.config.openboxes.expirationDate.minValue}"/>
+						<g:jqueryDatePicker name="expirationDate" id="expirationDate" minDate="${minimumDate}" maxDate="${currentYear + 20}"
+									  value="${inventoryItem?.expirationDate}" format="MM/dd/yyyy" autocomplete="off"/>
 					</td>
 				</tr>
 				<tr class="prop">
@@ -65,6 +66,10 @@
 						<button type="submit" name="addItem" class="button">
 							<img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}"/> <warehouse:message code="default.button.save.label"/>
 						</button>
+						<button class="btn-close-dialog button">
+							<img src="${resource(dir: 'images/icons/silk', file: 'decline.png')}"/>
+							<warehouse:message code="default.button.close.label"/>
+						</button>
 					</td>
 				</tr>
 			</tfoot>
@@ -73,12 +78,22 @@
 
 </div>
 <script>
-	function checkIfExistsInOtherLocation() {
-		if ($("#existsInOtherLocation").val() === "true") {
-			if (!confirm('${warehouse.message(code: 'inventoryItem.existsInOtherLocation.label', default: 'Inventory item exists in other location, do you want to continue?')}')) {
-				return false
-			}
+	function validate() {
+      if ($("#existsInOtherLocation").val() === "true") {
+        if (!confirm('${warehouse.message(code: 'inventoryItem.existsInOtherLocation.label', default: 'Inventory item exists in other location, do you want to continue?')}')) {
+          return false;
+        }
+      }
+
+      const lotAndExpiryControl = $("#lotAndExpiryControl").val();
+      if (lotAndExpiryControl === "true") {
+        const lotNumber = $("#lotNumber").val();
+        const expirationDate = $("#expirationDate").val();
+        if (!lotNumber || !expirationDate) {
+          $.notify("Both lot number and expiry date are required for this item.");
+          return false;
 		}
-	}
+      }
+    }
 </script>
 

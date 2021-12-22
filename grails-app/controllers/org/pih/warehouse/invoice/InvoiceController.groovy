@@ -10,6 +10,7 @@
 
 package org.pih.warehouse.invoice
 
+import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.order.Order
 
@@ -60,8 +61,7 @@ class InvoiceController {
             redirect(action: "list")
         } else {
             invoiceInstance.datePosted = null
-
-            if (params.refreshInvoice) {
+            if (params.refreshInvoice && invoiceInstance.isPrepaymentInvoice) {
                 invoiceService.refreshInvoiceItems(invoiceInstance)
             }
 
@@ -115,5 +115,52 @@ class InvoiceController {
 
         Invoice invoice = invoiceService.generateInvoice(order)
         redirect(action: "create", params: [id: invoice.id])
+    }
+
+    def addDocument = {
+        def invoiceInstance = Invoice.get(params.id)
+        if (!invoiceInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'invoice.label', default: 'Invoice'), params.id])}"
+            redirect(action: "list")
+        } else {
+            return [invoiceInstance: invoiceInstance]
+        }
+    }
+
+    def editDocument = {
+        def invoiceInstance = Invoice.get(params?.invoice?.id)
+        if (!invoiceInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'invoice.label', default: 'Invoice'), params.invoice.id])}"
+            redirect(action: "list")
+        } else {
+            def documentInstance = Document.get(params?.id)
+            if (!documentInstance) {
+                flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label', default: 'Document'), documentInstance.id])}"
+                redirect(action: "show", id: invoiceInstance?.id)
+            }
+            render(view: "addDocument", model: [invoiceInstance: invoiceInstance, documentInstance: documentInstance])
+        }
+    }
+
+    def deleteDocument = {
+        def invoiceInstance = Invoice.get(params?.invoice?.id)
+        if (!invoiceInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'invoice.label', default: 'Invoice'), params.invoice.id])}"
+            redirect(action: "list")
+        } else {
+            def documentInstance = Document.get(params?.id)
+            if (!documentInstance) {
+                flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'comment.label', default: 'Document'), params.id])}"
+                redirect(action: "show", id: invoiceInstance?.id)
+            } else {
+                invoiceInstance.removeFromDocuments(documentInstance)
+                if (!invoiceInstance.hasErrors() && invoiceInstance.save(flush: true)) {
+                    flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'invoice.label', default: 'Invoice'), invoiceInstance.id])}"
+                    redirect(action: "show", id: invoiceInstance.id)
+                } else {
+                    render(view: "show", model: [invoiceInstance: invoiceInstance])
+                }
+            }
+        }
     }
 }

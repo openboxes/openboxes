@@ -37,8 +37,10 @@ const DELETE_BUTTON_FIELD = {
     fieldValue, removeItem, removeRow, updateTotalCount,
   }) => ({
     onClick: fieldValue && fieldValue.id ? () => {
-      removeItem(fieldValue.id).then(() => removeRow());
-      updateTotalCount(-1);
+      removeItem(fieldValue.id).then(() => {
+        updateTotalCount(-1);
+        removeRow();
+      });
     } : () => { updateTotalCount(-1); removeRow(); },
   }),
   attributes: {
@@ -117,6 +119,15 @@ const NO_STOCKLIST_FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.quantityOnHand.label',
         defaultMessage: 'QoH',
+        flexWidth: '1.7',
+        attributes: {
+          type: 'number',
+        },
+      },
+      quantityAvailable: {
+        type: LabelField,
+        label: 'react.stockMovement.available.label',
+        defaultMessage: 'Available',
         flexWidth: '1.7',
         attributes: {
           type: 'number',
@@ -259,6 +270,15 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
           type: 'number',
         },
       },
+      quantityAvailable: {
+        type: LabelField,
+        label: 'react.stockMovement.available.label',
+        defaultMessage: 'Available',
+        flexWidth: '1.7',
+        attributes: {
+          type: 'number',
+        },
+      },
       quantityRequested: {
         type: TextField,
         label: 'react.stockMovement.neededQuantity.label',
@@ -381,6 +401,15 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
         type: LabelField,
         label: 'react.stockMovement.quantityOnHand.label',
         defaultMessage: 'QoH',
+        flexWidth: '1.7',
+        attributes: {
+          type: 'number',
+        },
+      },
+      quantityAvailable: {
+        type: LabelField,
+        label: 'react.stockMovement.available.label',
+        defaultMessage: 'Available',
         flexWidth: '1.7',
         attributes: {
           type: 'number',
@@ -573,8 +602,9 @@ class AddItemsPage extends Component {
       lineItemsData = _.map(
         data,
         (val) => {
-          const { quantityRequested, demandPerReplenishmentPeriod, quantityOnHand } = val;
-          const qtyRequested = quantityRequested || demandPerReplenishmentPeriod - quantityOnHand;
+          const { quantityRequested, demandPerReplenishmentPeriod, quantityAvailable } = val;
+          const qtyRequested =
+              quantityRequested || demandPerReplenishmentPeriod - quantityAvailable;
           return {
             ...val,
             disabled: true,
@@ -1197,14 +1227,15 @@ class AddItemsPage extends Component {
       apiClient.get(url)
         .then((response) => {
           const monthlyDemand = parseFloat(response.data.monthlyDemand.replace(',', ''));
-          const quantityRequested = monthlyDemand - response.data.quantityOnHand > 0 ?
-            monthlyDemand - response.data.quantityOnHand : 0;
+          const quantityRequested = monthlyDemand - response.data.quantityAvailable > 0 ?
+            monthlyDemand - response.data.quantityAvailable : 0;
           this.setState({
             values: update(values, {
               lineItems: {
                 [index]: {
                   product: { $set: product },
                   quantityOnHand: { $set: response.data.quantityOnHand },
+                  quantityAvailable: { $set: response.data.quantityAvailable },
                   monthlyDemand: { $set: monthlyDemand },
                   quantityRequested: { $set: quantityRequested },
                 },
@@ -1220,6 +1251,7 @@ class AddItemsPage extends Component {
             [index]: {
               product: { $set: null },
               quantityOnHand: { $set: '' },
+              quantityAvailable: { $set: '' },
               monthlyDemand: { $set: '' },
               quantityRequested: { $set: '' },
             },

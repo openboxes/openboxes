@@ -55,6 +55,9 @@ You must not remove this notice, or any other, from this software.
 
 *Deploy to Azure* button will bring you to Azure portal, where after filling a few of the properties you can get your OpenBoxes environment in a matter of minutes. In the Azure setup screen, look at each property's tooltip description to understand its purpose.
 
+For more information and step-by-step instructions go to:
+https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1719435265/Push-button+deployment
+
 *Deploy to Azure* uses the ARM template defined in [openboxes-devops](https://github.com/openboxes/openboxes-devops/tree/master/arm-template) repository.
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fopenboxes%2Fopenboxes-devops%2Fmaster%2Farm-template%2Fopenboxes-arm.json)
@@ -69,11 +72,11 @@ You must not remove this notice, or any other, from this software.
 ### Install Dependencies
 
 #### Required
-* Java 7 (must install Java 7)
+* [Java 7 (must install Java 7)](https://docs.openboxes.com/en/develop/installation/ubuntu1804/java/)
 * MySQL 5.7
 * [SDK Man](https://sdkman.io/install)
 * [Grails 1.3.9](https://grails.org/download.html)
-* NPM 6.13.7
+* NPM 6.14.6
 * Node 13.11.0
 
 #### Optional
@@ -212,7 +215,14 @@ To run new frontend (React) tests type:
 ```
 npm test
 ```
-#### 14. React documentation
+
+#### 14. Grails tests
+To run Grails tests type:
+```
+grails test-app
+```
+
+#### 15. React documentation
 Start a style guide dev server:
 ```
 npm run styleguide
