@@ -18,6 +18,7 @@ import com.amazonaws.services.sns.model.ConfirmSubscriptionResult
 import com.amazonaws.services.sns.model.PublishRequest
 import com.amazonaws.services.sns.model.SubscribeRequest
 import com.amazonaws.services.sns.model.SubscribeResult
+import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.time.DateUtils
 import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -37,7 +38,7 @@ class NotificationController {
     private def getAmazonSnsClient() {
         String accessKey = grailsApplication.config.awssdk.sns.accessKey
         String secretKey = grailsApplication.config.awssdk.sns.secretKey
-        log.info "AccessKey:${StringUtil.partialMaskString(accessKey, 0, accessKey.length()-5, '*')}, SecretKey:${StringUtil.partialMaskString(secretKey, 0, secretKey.length()-10, '*')}"
+        log.info "AccessKey:${StringUtils.overlay(accessKey, StringUtils.repeat("*", accessKey.length()-4), 0, accessKey.length()-4)}, SecretKey:${StringUtils.overlay(secretKey, StringUtils.repeat("*", secretKey.length()-4), 0, secretKey.length()-4)}"
         return AmazonSNSClientBuilder
                 .standard()
                 .withRegion(grailsApplication.config.awssdk.sns.region)
@@ -85,7 +86,10 @@ class NotificationController {
         log.info "Subscribiing topic:${PRODUCT_TOPIC_ARN}"
         try {
             String subscribeUrl = g.createLink(uri: "/api/notifications/products", absolute: true)
-//            String subscribeUrl = grailsApplication.config.grails.serverURL + "/api/notifications/products"
+            if (grailsApplication.config.openboxes.integration.sns.products.subscribeUrl) {
+                subscribeUrl = grailsApplication.config.openboxes.integration.sns.products.subscribeUrl
+            }
+            log.info "Product subscribeUrl::${subscribeUrl}"
             SubscribeRequest subscribeRequest = new SubscribeRequest(PRODUCT_TOPIC_ARN, "https", subscribeUrl)
             subscribeRequest.returnSubscriptionArn = true
             SubscribeResult result = amazonSnsClient.subscribe(subscribeRequest);
@@ -164,8 +168,11 @@ class NotificationController {
 
         log.info "Subscribiing topic:${ORDER_TOPIC_ARN}"
         try {
-            String subscribeUrl = grailsApplication.config.grails.serverURL + "/api/notifications/orders"
-            println "subscribeUrl::${subscribeUrl}"
+            String subscribeUrl = g.createLink(uri: "/api/notifications/orders", absolute: true)
+            if (grailsApplication.config.openboxes.integration.sns.orders.subscribeUrl) {
+                subscribeUrl = grailsApplication.config.openboxes.integration.sns.orders.subscribeUrl
+            }
+            log.info "Order subscribeUrl::${subscribeUrl}"
             SubscribeRequest subscribeRequest = new SubscribeRequest(ORDER_TOPIC_ARN, "https", subscribeUrl)
             subscribeRequest.returnSubscriptionArn = true
             SubscribeResult result = amazonSnsClient.subscribe(subscribeRequest);
@@ -206,22 +213,12 @@ class NotificationController {
         }
         try {
             if (oJson.has("origin") && oJson.getString("origin")) {
-                JSONObject jsonObject = oJson.getJSONObject("origin")
-                log.info "Origin location Json:${jsonObject}"
-                Location location = Location.findByLocationNumber(jsonObject.getString("id"))
-                if (!location && grailsApplication.config?.openboxes?.integration?.destinationMapping) {
-                    log.info "Location Mapping::${grailsApplication.config?.openboxes?.integration?.destinationMapping}"
-                    JSONObject destinationMapping = toJson(grailsApplication.config?.openboxes?.integration?.destinationMapping)
-                    log.info "DestinationMapping JSON:${destinationMapping}"
-                    if(destinationMapping) {
-                        String originId = jsonObject?.getString("id")
-                        if(destinationMapping.has(originId)) {
-                            log.info "OriginId:${originId}, LocationMapping[$originId]:${destinationMapping.getString(originId)}"
-                            if (destinationMapping.getString(originId)) {
-                                location = Location.findById(destinationMapping.getString(originId))
-                            }
-                        }
-                    }
+                JSONObject originJsonObject = oJson.getJSONObject("origin")
+                log.info "Origin location Json:${originJsonObject}"
+                Location location = Location.findByLocationNumber(originJsonObject.getString("locationNumber"))
+                if (!location && grailsApplication.config?.openboxes?.integration?.locationMapping) {
+                    log.info "Location Mapping::${grailsApplication.config?.openboxes?.integration?.locationMapping}"
+                    location = getLocationByLocationMapping(originJsonObject)
                 }
                 log.info "Origin location::${location}"
                 requisition.origin = location
@@ -231,25 +228,12 @@ class NotificationController {
         }
         try {
             if (oJson.has("destination") && oJson.getString("destination")) {
-                JSONObject jsonObject = oJson.getJSONObject("destination")
-                log.info "Destination location Json:${jsonObject}"
-                Location location = Location.findById(jsonObject.getString("id"))
+                JSONObject destinationJsonObject = oJson.getJSONObject("destination")
+                log.info "Destination location Json:${destinationJsonObject}"
+                Location location = Location.findByLocationNumber(destinationJsonObject.getString("locationNumber"))
                 if (!location) {
-                    log.info "Location Mapping::${grailsApplication.config?.openboxes?.integration?.destinationMapping}"
-                    location = Location.findByLocationNumber(jsonObject.getString("name"))
-                    if (!location && grailsApplication.config?.openboxes?.integration?.destinationMapping) {
-                        JSONObject destinationMapping = toJson(grailsApplication.config?.openboxes?.integration?.destinationMapping)
-                        log.info "DestinationMapping JSON:${destinationMapping}"
-                        if(destinationMapping) {
-                            String destinationId = jsonObject?.getString("id")
-                            if(destinationMapping.has(destinationId)) {
-                                log.info "DestinationId:${destinationId}, destinationMapping[$destinationId]:${destinationMapping.getString(destinationId)}"
-                                if (destinationMapping[destinationId]) {
-                                    location = Location.findById(destinationMapping[destinationId]?.toString())
-                                }
-                            }
-                        }
-                    }
+                    log.info "Location Mapping::${grailsApplication.config?.openboxes?.integration?.locationMapping}"
+                    location = getLocationByLocationMapping(destinationJsonObject)
                 }
                 log.info "Destination location::${location}"
                 requisition.destination = location
@@ -352,6 +336,22 @@ class NotificationController {
             log.error "Exception:${ex} while parsing ${value} in JSON"
             return null
         }
+    }
+
+    Location getLocationByLocationMapping(JSONObject locationJsonObject){
+        JSONObject locationMapping = toJson(grailsApplication.config?.openboxes?.integration?.locationMapping)
+        log.info "LocationMapping JSON:${locationMapping}"
+        Location location = null
+        if(locationMapping) {
+            String locationId = locationJsonObject?.getString("id")
+            if(locationMapping.has(locationId)) {
+                log.info "LocationId:${locationId}, LocationMapping[$locationId]:${locationMapping.getString(locationId)}"
+                if (locationMapping.getString(locationId)) {
+                    location = Location.findById(locationMapping.getString(locationId))
+                }
+            }
+        }
+        return location
     }
 
 
