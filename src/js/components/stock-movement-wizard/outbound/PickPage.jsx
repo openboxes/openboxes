@@ -194,11 +194,11 @@ const FIELDS = {
         buttonLabel: 'react.default.button.undoEdit.label',
         buttonDefaultMessage: 'Undo edit',
         getDynamicAttr: ({
-          fieldValue, revertUserPick, subfield, showOnly,
+          fieldValue, revertUserPick, subfield, showOnly, requiresMobilePicking,
         }) => ({
           onClick: flattenRequest(fieldValue)['requisitionItem.id'] ? () => revertUserPick(flattenRequest(fieldValue)['requisitionItem.id']) : () => null,
           hidden: subfield,
-          disabled: showOnly,
+          disabled: showOnly || requiresMobilePicking,
         }),
         attributes: {
           className: 'btn btn-outline-danger',
@@ -661,7 +661,7 @@ class PickPage extends Component {
               <span className="buttons-container">
                 <label
                   htmlFor="csvInput"
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                  className={`float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs ${requiresMobilePicking ? 'disabled' : ''}`}
                 >
                   <span><i className="fa fa-download pr-2" /><Translate id="react.default.button.importTemplate.label" defaultMessage="Import template" /></span>
                   <input
@@ -703,7 +703,6 @@ class PickPage extends Component {
                   type="button"
                   onClick={() => { window.location = `/openboxes/stockMovement/show/${values.stockMovementId}`; }}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
-                  disabled={requiresMobilePicking}
                 >
                   <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
                 </button>
