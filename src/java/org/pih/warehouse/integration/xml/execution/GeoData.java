@@ -14,7 +14,7 @@ public class GeoData {
 
     public GeoData() { }
 
-    @XmlElement(name = "latitude")
+    @XmlElement(name = "Latitude")
     public Float getLatitude() {
         return latitude;
     }
@@ -23,7 +23,7 @@ public class GeoData {
         this.latitude = latitude;
     }
 
-    @XmlElement(name = "longitude")
+    @XmlElement(name = "Longitude")
     public Float getLongitude() {
         return longitude;
     }
