@@ -834,7 +834,7 @@ class ShipmentService {
     void deleteShipment(Shipment shipment) {
 
         // Remove all events
-        shipment?.events?.each {
+        shipment?.events?.toArray().each {
             rollbackLastEvent(shipment)
         }
 
