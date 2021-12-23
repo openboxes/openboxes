@@ -10,13 +10,13 @@
 package org.pih.warehouse.core
 
 import grails.util.Holders
+import io.swagger.v3.oas.annotations.media.Schema
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
-import grails.util.Holders
 
 /**
  * A location can be a customer, warehouse, or supplier.
@@ -30,7 +30,6 @@ class Location implements Comparable<Location>, java.io.Serializable {
     def afterInsert = publishPersistenceEvent
     def afterUpdate = publishPersistenceEvent
     def afterDelete = publishPersistenceEvent
-
 
     String id
     String name
@@ -47,12 +46,18 @@ class Location implements Comparable<Location>, java.io.Serializable {
     LocationGroup locationGroup
     Organization organization
 
-    User manager                                // the person in charge of the warehouse
-    Inventory inventory                            // each warehouse has a single inventory
+    @Schema(description="the person in charge of the warehouse")
+    User manager
+
+    @Schema(description="each warehouse has exactly one inventory")
+    Inventory inventory
+
+    @Schema(description=" indicates whether this warehouse is being managed on the locally deployed system")
     Boolean local = Boolean.TRUE
-    // indicates whether this warehouse is being managed on the locally deployed system
+
+    @Schema(description="indicates whether this warehouse is currently active")
     Boolean active = Boolean.TRUE
-    // indicates whether this warehouse is currently active
+
     Integer sortOrder
 
     Date dateCreated
