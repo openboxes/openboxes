@@ -13,6 +13,7 @@ import grails.converters.JSON
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -32,7 +33,6 @@ class LocationApiController extends BaseDomainApiController {
     def userService
     GrailsApplication grailsApplication
 
-    // @Path("/api/locations")  // raises jackson errors if used with other annotations, see OBDS-73 for details
     @GET
     @Operation(
             summary = "Get locations",
@@ -40,14 +40,18 @@ class LocationApiController extends BaseDomainApiController {
             responses = [
                     @ApiResponse(
                             content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation=Location.class)
+                                    array = @ArraySchema(
+                                            schema = @Schema(implementation=Location.class),
+                                            uniqueItems = true
+                                    ),
+                                    mediaType = "application/json"
                             )
                     ),
                     @ApiResponse(responseCode="400", description="Invalid ID supplied"),
                     @ApiResponse(responseCode="404", description="Not found")
             ]
     )
+    @Path("/api/locations")
     @Produces("text/json")
     def list() {
         def minLength = grailsApplication.config.openboxes.typeahead.minLength
