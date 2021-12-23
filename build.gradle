@@ -313,6 +313,33 @@ buildProperties.doLast {
 }
 apply plugin: "com.virgo47.ClasspathJar"
 
+/*
+ * Swagger generates a number of mysterious errors if its Jackson dependency
+ * is older than 2.9; turns out a number of other parts of our build chain
+ * predate that release and introduce hard dependencies on previous versions.
+ * Surveying the release notes, 2.9 should work just fine with 2.8-expecting
+ * client code: https://github.com/FasterXML/jackson/wiki/Jackson-Release-2.9
+ *
+ * FIXME remove this block once we migrate to a more modern Gradle build.
+ */
+configurations.all {
+    def min_jackson_version = "2.9.10"
+    def min_jackson_databind_version = "2.9.10.8"  // security fixes
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        if (details.requested.group.startsWith("com.fasterxml.jackson")) {
+            def too_old = VersionNumber.parse(details.requested.version) <= VersionNumber.parse(min_jackson_version)
+            if (too_old) {
+                if (details.requested.name == "jackson-databind") {
+                    details.useVersion(min_jackson_databind_version)
+                } else {
+                    details.useVersion(min_jackson_version)
+                }
+                // details.because "Swagger requires Jackson 2.9+"
+            }
+        }
+    }
+}
+
 ext {
     dockerBuildDir = mkdir("${buildDir}/docker")
 }
