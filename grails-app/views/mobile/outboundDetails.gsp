@@ -287,8 +287,7 @@
                                                             id="${event?.id}"
                                                             params="[shipmentId: stockMovement?.shipment?.id]">${event?.name ?: 'Unspecified'}</g:link>
                                                 </div>
-
-                                                <div class="text-muted">${formatDate(date: event?.date, format: "MMM dd, yyyy hh:mm:ss")}</div>
+                                                <div class="text-muted">${formatDate(date: event?.date, format: "MMM dd, yyyy HH:mm:ss z")}</div>
                                             </div>
                                         </div>
                                     </div>
