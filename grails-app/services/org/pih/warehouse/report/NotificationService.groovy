@@ -9,6 +9,12 @@
 **/
 package org.pih.warehouse.report
 
+import com.amazonaws.auth.AWSStaticCredentialsProvider
+import com.amazonaws.auth.BasicAWSCredentials
+import com.amazonaws.services.sns.AmazonSNSClientBuilder
+import com.amazonaws.services.sns.model.ConfirmSubscriptionRequest
+import com.amazonaws.services.sns.model.ConfirmSubscriptionResult
+import org.apache.commons.lang3.StringUtils
 import org.apache.commons.mail.EmailException
 import org.apache.commons.validator.EmailValidator
 import org.codehaus.groovy.grails.commons.ApplicationHolder
@@ -16,7 +22,9 @@ import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
 import org.codehaus.groovy.grails.plugins.web.taglib.RenderTagLib
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.codehaus.groovy.grails.web.errors.GrailsWrappedRuntimeException
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.api.PartialReceipt
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.Person
@@ -224,6 +232,46 @@ class NotificationService {
         } catch (EmailException e) {
             log.error("Unable to send confirmation email: " + e.message, e)
         }
+    }
+
+    def getAmazonSnsClient() {
+        String accessKey = grailsApplication.config.awssdk.sns.accessKey
+        String secretKey = grailsApplication.config.awssdk.sns.secretKey
+        log.info "AccessKey:${StringUtils.overlay(accessKey, StringUtils.repeat("*", accessKey.length()-4), 0, accessKey.length()-4)}, SecretKey:${StringUtils.overlay(secretKey, StringUtils.repeat("*", secretKey.length()-4), 0, secretKey.length()-4)}"
+        return AmazonSNSClientBuilder
+                .standard()
+                .withRegion(grailsApplication.config.awssdk.sns.region)
+                .withCredentials(
+                        new AWSStaticCredentialsProvider(
+                                new BasicAWSCredentials(
+                                        accessKey,
+                                        secretKey
+                                )
+                        )
+                ).build()
+    }
+
+    Boolean confirmSubscription(JSONObject json, String topicType) {
+        log.info "json for create Product::${json}"
+        if (json.has("Type") && json.getString("Type") == "SubscriptionConfirmation") {
+            String token = json.getString("Token")
+            try {
+                String TOPIC_ARN = null
+                if (topicType == Constants.ARN_TOPIC_PRODUCT_CREATE_UPDATE_TYPE) {
+                    TOPIC_ARN = grailsApplication.config.awssdk.sns.product.arn
+                } else if (topicType == Constants.ARN_TOPIC_ORDER_CREATE_TYPE) {
+                    TOPIC_ARN = grailsApplication.config.awssdk.sns.orders.arn
+                }
+                log.info "TOPIC_ARN::${TOPIC_ARN}, confirmation Token:${token}"
+                ConfirmSubscriptionRequest request = new ConfirmSubscriptionRequest(TOPIC_ARN, token)
+                ConfirmSubscriptionResult result = amazonSnsClient.confirmSubscription(request);
+                log.info "result::${result?.toString()}"
+            } catch (Exception e) {
+                System.err.println(e.printStackTrace());
+            }
+            return true
+        }
+        return false
     }
 
 }

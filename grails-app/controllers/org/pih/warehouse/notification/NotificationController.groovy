@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.time.DateUtils
 import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Category
@@ -34,31 +35,16 @@ class NotificationController {
 
     def productService
     def grailsApplication
+    def notificationService
 
-    private def getAmazonSnsClient() {
-        String accessKey = grailsApplication.config.awssdk.sns.accessKey
-        String secretKey = grailsApplication.config.awssdk.sns.secretKey
-        log.info "AccessKey:${StringUtils.overlay(accessKey, StringUtils.repeat("*", accessKey.length()-4), 0, accessKey.length()-4)}, SecretKey:${StringUtils.overlay(secretKey, StringUtils.repeat("*", secretKey.length()-4), 0, secretKey.length()-4)}"
-        return AmazonSNSClientBuilder
-                .standard()
-                .withRegion(grailsApplication.config.awssdk.sns.region)
-                .withCredentials(
-                        new AWSStaticCredentialsProvider(
-                                new BasicAWSCredentials(
-                                        accessKey,
-                                        secretKey
-                                )
-                        )
-                ).build()
-    }
 
     def publish = {
         String message = request.JSON.toString()
         log.info "Publishing message " + message
-        String TOPIC_ARN = grailsApplication.config.awssdk.sns.product.arn
-//        String TOPIC_ARN = grailsApplication.config.awssdk.sns.order.arn
+//        String TOPIC_ARN = grailsApplication.config.awssdk.sns.product.arn
+        String TOPIC_ARN = grailsApplication.config.awssdk.sns.order.arn
         PublishRequest publishRequest = new PublishRequest(TOPIC_ARN, message, "Demo publish")
-        def result = amazonSnsClient.publish(publishRequest)
+        def result = notificationService.amazonSnsClient.publish(publishRequest)
         log.info "result::${result?.dump()}"
         render "published"
     }
@@ -72,7 +58,7 @@ class NotificationController {
             try {
                 String PRODUCT_TOPIC_ARN = grailsApplication.config.awssdk.sns.product.arn
                 ConfirmSubscriptionRequest request = new ConfirmSubscriptionRequest(PRODUCT_TOPIC_ARN, token)
-                ConfirmSubscriptionResult result = amazonSnsClient.confirmSubscription(request);
+                ConfirmSubscriptionResult result = notificationService.amazonSnsClient.confirmSubscription(request);
                 log.info "result::${result?.toString()}"
             } catch (Exception e) {
                 System.err.println(e.printStackTrace());
@@ -92,7 +78,7 @@ class NotificationController {
             log.info "Product subscribeUrl::${subscribeUrl}"
             SubscribeRequest subscribeRequest = new SubscribeRequest(PRODUCT_TOPIC_ARN, "https", subscribeUrl)
             subscribeRequest.returnSubscriptionArn = true
-            SubscribeResult result = amazonSnsClient.subscribe(subscribeRequest);
+            SubscribeResult result = notificationService.amazonSnsClient.subscribe(subscribeRequest);
             log.info("Subscription ARN is " + result.subscriptionArn);
             render "subscribed ${result}"
         } catch (Exception e) {
@@ -104,62 +90,16 @@ class NotificationController {
     def createProduct = {
         JSONObject json = request.getJSON() as JSONObject
         log.info "json for create Product::${json}"
-        if (json.has("Type") && json.getString("Type") == "SubscriptionConfirmation") {
-            String token = json.getString("Token")
-            try {
-                String PRODUCT_TOPIC_ARN = grailsApplication.config.awssdk.sns.product.arn
-                log.info "PRODUCT_TOPIC_ARN::${PRODUCT_TOPIC_ARN}, confirmation Token:${token}"
-                ConfirmSubscriptionRequest request = new ConfirmSubscriptionRequest(PRODUCT_TOPIC_ARN, token)
-                ConfirmSubscriptionResult result = amazonSnsClient.confirmSubscription(request);
-                log.info "result::${result?.toString()}"
-            } catch (Exception e) {
-                System.err.println(e.printStackTrace());
-            }
+        if (notificationService.confirmSubscription(json, Constants.ARN_TOPIC_PRODUCT_CREATE_UPDATE_TYPE)){
             render "subscribed"
             return
         }
-
         String message = json.getString("Message")
         JSONObject productsJson = new JSONObject(message)
         JSONArray products = productsJson.getJSONArray("products")
         for (int i = 0; i < products.length(); i++) {
             JSONObject pJson = products.getJSONObject(i)
-            log.info "PRODUCT JSON ${pJson} at index:${pJson}"
-            Category category = Category.findById(pJson.getString("category"))
-            if (!category) {
-                category = new Category()
-                category.id = pJson.getString("category")
-                category.name = pJson.getString("category")
-                category.save()
-            }
-            Product productInstance = Product.findByUpc(pJson.getString("id"))
-            if (!productInstance) {
-                productInstance = new Product()
-                productInstance.upc = pJson.getString("id")
-            }
-            productInstance.name = pJson.getString("name")
-            productInstance.productCode = pJson.getString("productCode")
-            productInstance.description = pJson.getString("description")
-            productInstance.pricePerUnit = pJson.getDouble("pricePerUnit")
-            productInstance.unitOfMeasure = pJson.getString("unitOfMeasure")
-            productInstance.brandName = pJson.getString("brandName")
-            productInstance.category = category
-//            if (!productInstance?.id || productInstance.validate()) {
-                if (!productInstance.productCode) {
-                    productInstance.productCode = productService.generateProductIdentifier(productInstance.productType)
-                }
-//            }
-            try {
-                if (!productInstance?.validate() || productInstance?.hasErrors()) {
-                    productInstance?.errors?.allErrors?.each {
-                        log.error("ERR:${it}")
-                    }
-                } else {
-                    productInstance.save(flush: true, failOnError: true)
-                }
-            } catch (Exception ex) {
-                log.error "Error in saving PRODUCT:${ex?.message}"
-            }
+            Product productInstance = productService.createFromJson(pJson)
         }
     }
 
@@ -175,7 +115,7 @@ class NotificationController {
             log.info "Order subscribeUrl::${subscribeUrl}"
             SubscribeRequest subscribeRequest = new SubscribeRequest(ORDER_TOPIC_ARN, "https", subscribeUrl)
             subscribeRequest.returnSubscriptionArn = true
-            SubscribeResult result = amazonSnsClient.subscribe(subscribeRequest);
+            SubscribeResult result = notificationService.amazonSnsClient.subscribe(subscribeRequest);
             log.info("Subscription ARN is " + result.subscriptionArn);
         } catch (Exception e) {
             log.error(e.printStackTrace());
@@ -186,16 +126,7 @@ class NotificationController {
     def createOrder = {
         JSONObject json = request.getJSON() as JSONObject
         log.info "Create order JSON:${json}"
-        if (json.has("Type") && json.getString("Type") == "SubscriptionConfirmation") {
-            String token = json.getString("Token")
-            try {
-                String ORDER_TOPIC_ARN = grailsApplication.config.awssdk.sns.order.arn
-                ConfirmSubscriptionRequest request = new ConfirmSubscriptionRequest(ORDER_TOPIC_ARN, token)
-                ConfirmSubscriptionResult result = amazonSnsClient.confirmSubscription(request);
-                log.info "result::${result?.toString()}"
-            } catch (Exception e) {
-                log.error "Error in saving order: " + e.message, e
-            }
+        if (notificationService.confirmSubscription(json, Constants.ARN_TOPIC_ORDER_CREATE_TYPE)){
             render "subscribed"
             return
         }

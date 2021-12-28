@@ -134,4 +134,7 @@ class Constants {
 
     static final String PUTAWAY_ORDER = "PUTAWAY_ORDER"
     static final String RETURN_ORDER = "RETURN_ORDER"
+
+    static final String ARN_TOPIC_PRODUCT_CREATE_UPDATE_TYPE = "PRODUCT_CREATE_UPDATE"
+    static final String ARN_TOPIC_ORDER_CREATE_TYPE = "ORDER_CREATE"
 }
