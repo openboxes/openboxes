@@ -15,9 +15,7 @@
 </head>
 
 <body class="d-flex flex-column h-100">
-    <header>
-        <g:include controller="mobile" action="menu"/>
-    </header>
+    <g:include controller="mobile" action="menu"/>
     <main class="flex-shrink-0">
         <div class="container">
             <nav aria-label="breadcrumb">
