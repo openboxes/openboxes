@@ -24,7 +24,6 @@ import org.pih.warehouse.importer.OutboundStockMovementExcelImporter
 import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSummary
-import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.springframework.web.multipart.MultipartFile
@@ -53,34 +52,39 @@ class MobileController {
         def productCount = ProductSummary.countByLocation(location)
         def productListUrl = g.createLink(controller: "mobile", action: "productList")
 
-        StockMovement stockMovement = new StockMovement(destination: location,
-                stockMovementType: StockMovementType.INBOUND)
+        StockMovement inboundCriteria = new StockMovement(destination: location, stockMovementType: StockMovementType.INBOUND)
+        def inboundOrders = stockMovementService.getStockMovements(inboundCriteria, [max:params.max?:10, offset: params.offset?:0])
+        def inboundCount = inboundOrders.size()?:0
+        def inboundPending = inboundOrders.findAll { !it.isReceived }
 
-        def orderCount = stockMovementService.getStockMovements(stockMovement, [max:params.max?:10, offset: params.offset?:0]).size()
+        StockMovement outboundCriteria = new StockMovement(origin: location, stockMovementType: StockMovementType.OUTBOUND)
+        def outboundOrders = stockMovementService.getStockMovements(outboundCriteria, [max:params.max?:10, offset: params.offset?:0])
+        def outboundCount = outboundOrders.size()?:0
 
-        def requisitionCount = Requisition.createCriteria().count {
-            eq("origin", location)
+        def outboundPending = outboundOrders.findAll { it.stockMovementStatusCode < StockMovementStatusCode.DISPATCHED }
+        def readyToBePicked = outboundOrders.findAll{ it.stockMovementStatusCode == StockMovementStatusCode.PICKING }
+        def readyToBePacked = outboundOrders.findAll{ it.stockMovementStatusCode == StockMovementStatusCode.PICKED }
+        def inTransit = outboundOrders.findAll{ it.isShipped && !it.isReceived }
+
+        def inventorySummary = ProductSummary.createCriteria().list(max: params.max ?: 10, offset: params.offset ?: 0) {
+            eq("location", location)
+            order("product", "asc")
         }
 
-        String directory = grailsApplication.config.openboxes.integration.ftp.inbound.directory
-        List<String> subdirectories = grailsApplication.config.openboxes.integration.ftp.inbound.subdirectories
-        def messages = fileTransferService.listMessages(directory, subdirectories)
-        def messageCount = messages ? messages?.size() :0
-
-        def readyToBePickedCount = stockMovement.findAll{ it.stockMovementStatusCode == StockMovementStatusCode.PICKING }?.size()?:0
-        def readyToBePackedCount = stockMovement.findAll{ it.stockMovementStatusCode == StockMovementStatusCode.PICKED }?.size()?:0
-        def readyToBeLoadedCount = stockMovement.findAll{ it.stockMovementStatusCode == StockMovementStatusCode.PACKED }?.size()?:0
 
         [
-                data: [
+                indicators: [
                         [name: "Inventory Items", class: "fa fa-box", count: productCount, url: g.createLink(controller: "mobile", action: "productList")],
-                        [name: "Inbound Orders", class: "fa fa-shopping-cart", count: orderCount, url: g.createLink(controller: "mobile", action: "inboundList", params: ['origin.id', location.id])],
-                        [name: "Outbound Orders", class: "fa fa-truck", count: requisitionCount, url: g.createLink(controller: "mobile", action: "outboundList", params: ['origin.id', location.id])],
-                        [name: "Ready to be picked", class: "fa fa-cart-plus", count: readyToBePickedCount, url: g.createLink(controller: "mobile", action: "outboundList", params: [status: RequisitionStatus.PICKING])],
-                        [name: "Ready to be packed", class: "fa fa-box-open", count: readyToBePackedCount, url: g.createLink(controller: "mobile", action: "outboundList", params: [status: RequisitionStatus.PICKED])],
-                        [name: "Ready to be loaded", class: "fa fa-truck-loading", count: readyToBeLoadedCount, url: g.createLink(controller: "mobile", action: "outboundList", params: [status: RequisitionStatus.PICKED])],
-                        [name: "Messages", class: "fa fa-envelope", count: messageCount, url: g.createLink(controller: "mobile", action: "messageList", params: ['origin.id', location.id])],
-                ]
+                        [name: "Inbound Orders", class: "fa fa-shopping-cart", count: inboundCount, url: g.createLink(controller: "mobile", action: "inboundList", params: ['origin.id', location.id])],
+                        [name: "Outbound Orders", class: "fa fa-truck", count: outboundCount, url: g.createLink(controller: "mobile", action: "outboundList", params: ['origin.id', location.id])],
+                        [name: "Ready to be picked", class: "fa fa-cart-plus", count: readyToBePicked?.size()?:0, url: g.createLink(controller: "mobile", action: "outboundList", params: [status: RequisitionStatus.PICKING])],
+                        [name: "Ready to be packed", class: "fa fa-box-open", count: readyToBePacked?.size()?:0, url: g.createLink(controller: "mobile", action: "outboundList", params: [status: RequisitionStatus.PICKED])]
+                ],
+                inboundPending: inboundPending,
+                outboundPending: outboundPending,
+                readyToBePicked: readyToBePicked,
+                inTransit: inTransit,
+                inventorySummary: inventorySummary,
         ]
     }
 
