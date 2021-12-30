@@ -90,6 +90,7 @@ class NotificationController {
     def createProduct = {
         JSONObject json = request.getJSON() as JSONObject
         log.info "json for create Product::${json}"
+
         if (notificationService.confirmSubscription(json, Constants.ARN_TOPIC_PRODUCT_CREATE_UPDATE_TYPE)){
             render "subscribed"
             return
@@ -127,6 +128,203 @@ class NotificationController {
         JSONObject json = request.getJSON() as JSONObject
         log.info "Create order JSON:${json}"
         if (notificationService.confirmSubscription(json, Constants.ARN_TOPIC_ORDER_CREATE_TYPE)){
+            render "subscribed"
+            return
+        }
+        String message = json.getString("Message")
+        JSONObject oJson = new JSONObject(message)
+//        JSONArray orders = productsJson.getJSONArray("orders")
+//        for(int i = 0;i<orders.length();i++){
+//            JSONObject oJson = orders.getJSONObject(i)
+        log.info "ORDER JSON ${oJson}"
+        Requisition requisition = new Requisition()
+        if (oJson.has("name")) {
+            requisition.name = oJson.getString("name")
+        } else {
+            requisition.name = "DEFAULT"
+        }
+        try {
+            if (oJson.has("origin") && oJson.getString("origin")) {
+                JSONObject originJsonObject = oJson.getJSONObject("origin")
+                log.info "Origin location Json:${originJsonObject}"
+                Location location = Location.findByLocationNumber(originJsonObject.getString("locationNumber"))
+                if (!location && grailsApplication.config?.openboxes?.integration?.locationMapping) {
+                    log.info "Location Mapping::${grailsApplication.config?.openboxes?.integration?.locationMapping}"
+                    location = getLocationByLocationMapping(originJsonObject)
+                }
+                log.info "Origin location::${location}"
+                requisition.origin = location
+            }
+        } catch (Exception ex) {
+            log.error "Error in reading origin from order json:${oJson}"
+        }
+        try {
+            if (oJson.has("destination") && oJson.getString("destination")) {
+                JSONObject destinationJsonObject = oJson.getJSONObject("destination")
+                log.info "Destination location Json:${destinationJsonObject}"
+                Location location = Location.findByLocationNumber(destinationJsonObject.getString("locationNumber"))
+                if (!location && grailsApplication.config?.openboxes?.integration?.locationMapping) {
+                    log.info "Location Mapping::${grailsApplication.config?.openboxes?.integration?.locationMapping}"
+                    location = getLocationByLocationMapping(destinationJsonObject)
+                }
+                log.info "Destination location::${location}"
+                requisition.destination = location
+            }
+        } catch (Exception ex) {
+            log.error "Error:${ex.printStackTrace()} in reading destination from order json:${oJson}"
+        }
+        try {
+            if (oJson.has("requestedBy") && oJson.getString("requestedBy")) {
+                User requestedBy = User.findByUsername(oJson.getString("requestedBy"))
+                if (!requestedBy) {
+                    JSONObject userMapping = toJson(grailsApplication.config?.openboxes?.integration?.userMapping ?: null)
+                    log.info "UserMapping:${userMapping}"
+                    if(userMapping) {
+                        String requestedByString = oJson.getString("requestedBy")
+                        if(userMapping.has(requestedByString)) {
+                            String username = userMapping.getString(requestedByString)
+                            log.info "RequestedByString:${requestedByString}, userMapping[$requestedByString]:${username}"
+                            requestedBy = User.findByUsername(username)
+                        }
+                    }
+                }
+                requisition.requestedBy = requestedBy
+            }
+        } catch (Exception ex) {
+            log.error "Error:${ex.printStackTrace()} in reading requestedBy from order json:${oJson}"
+        }
+        try {
+            if (oJson.has("dateRequested") && oJson.getString("dateRequested")) {
+                Date dateRequested = DateUtils.parseDate(oJson.getString("dateRequested"), "yyyy-MM-dd")
+                requisition.dateRequested = dateRequested
+            } else {
+                requisition.dateRequested = new Date()
+            }
+        } catch (Exception ex) {
+            log.error "Error:${ex.printStackTrace()} in reading dateRequested from order json:${oJson}"
+            requisition.dateRequested = new Date()
+        }
+        try {
+            if (oJson.has("requestedDeliveryDate") && oJson.getString("requestedDeliveryDate")) {
+                Date dateRequested = DateUtils.parseDate(oJson.getString("requestedDeliveryDate"), "yyyy-MM-dd")
+                requisition.dateRequested = dateRequested
+            } else {
+                requisition.requestedDeliveryDate = new Date()
+            }
+        } catch (Exception ex) {
+            log.error "Error in reading dateRequested from order json:${oJson}"
+            requisition.requestedDeliveryDate = new Date()
+        }
+        Boolean lineItemHasError = false
+        JSONArray orderLineItemsArray = oJson.getJSONArray("orderItems")
+        for (int lIndex = 0; lIndex < orderLineItemsArray?.length(); lIndex++) {
+            JSONObject lineItem = orderLineItemsArray.getJSONObject(lIndex)
+            log.info "Reading LineItem:${lineItem} for Order"
+            try {
+                RequisitionItem requisitionItem = new RequisitionItem()
+                Product product = Product.findByUpc(lineItem.getString("productId"))
+                if (!product) {
+                    JSONObject productMapping = toJson(grailsApplication.config?.openboxes?.integration?.productMapping ?: null)
+                    log.info "ProductMapping:${productMapping}"
+                    if(productMapping) {
+                        String productId = lineItem.getString("productId")
+                        log.info "Reading productId:${productId}"
+                        if(productMapping.has(productId)) {
+                            product = Product.findByProductCode(productMapping.getString(productId))
+                        }
+                    }
+                }
+                log.info "product:${product} for lineItem index:${lIndex}"
+                Integer quantity = lineItem.getInt("quantity")
+                requisitionItem.product = product
+                requisitionItem.quantity = quantity
+                requisition.addToRequisitionItems(requisitionItem)
+            } catch (Exception ex) {
+                log.error "Error:${ex.printStackTrace()} in reading Order Line Item:${lineItem}"
+                lineItemHasError = true
+            }
+        }
+        try {
+            if (!lineItemHasError) {
+                if (requisition.validate() && !requisition.hasErrors()) {
+                    requisition.save(flush: true, failOnError: true)
+                } else {
+                    requisition?.errors?.allErrors?.each {
+                        log.error("ERR:${it}")
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            log.error "Error:${ex.printStackTrace()} in saving ORDER:${ex?.message}"
+        }
+//        }
+    }
+
+    JSONObject toJson(String value) {
+        try {
+            if (value) {
+                value = value.trim()
+                if(value != "" && value != "null") {
+                    JSONObject jsonObject = new JSONObject(value)
+                    return jsonObject
+                }
+            }
+        } catch (Exception ex) {
+            log.error "Exception:${ex} while parsing ${value} in JSON"
+        }
+
+        return null
+    }
+
+    Location getLocationByLocationMapping(JSONObject locationJsonObject){
+        JSONObject locationMapping = toJson(grailsApplication.config?.openboxes?.integration?.locationMapping ?: null)
+        log.info "LocationMapping JSON:${locationMapping}"
+        Location location = null
+        if(locationMapping) {
+            String locationId = locationJsonObject?.getString("id")
+            if(locationMapping.has(locationId)) {
+                log.info "LocationId:${locationId}, LocationMapping[$locationId]:${locationMapping.getString(locationId)}"
+                if (locationMapping.getString(locationId)) {
+                    location = Location.findById(locationMapping.getString(locationId))
+                }
+            }
+        }
+        return location
+    }
+
+    def subscribeOrder = {
+        String ORDER_TOPIC_ARN = grailsApplication.config.awssdk.sns.order.arn?.toString()
+
+        log.info "Subscribiing topic:${ORDER_TOPIC_ARN}"
+        try {
+            String subscribeUrl = g.createLink(uri: "/api/notifications/orders", absolute: true)
+            if (grailsApplication.config.openboxes.integration.sns.orders.subscribeUrl) {
+                subscribeUrl = grailsApplication.config.openboxes.integration.sns.orders.subscribeUrl
+            }
+            log.info "Order subscribeUrl::${subscribeUrl}"
+            SubscribeRequest subscribeRequest = new SubscribeRequest(ORDER_TOPIC_ARN, "https", subscribeUrl)
+            subscribeRequest.returnSubscriptionArn = true
+            SubscribeResult result = amazonSnsClient.subscribe(subscribeRequest);
+            log.info("Subscription ARN is " + result.subscriptionArn);
+        } catch (Exception e) {
+            log.error(e.printStackTrace());
+        }
+        render "subscribed"
+    }
+
+    def createOrder = {
+        JSONObject json = request.getJSON() as JSONObject
+        log.info "Create order JSON:${json}"
+        if (json.has("Type") && json.getString("Type") == "SubscriptionConfirmation") {
+            String token = json.getString("Token")
+            try {
+                String ORDER_TOPIC_ARN = grailsApplication.config.awssdk.sns.order.arn
+                ConfirmSubscriptionRequest request = new ConfirmSubscriptionRequest(ORDER_TOPIC_ARN, token)
+                ConfirmSubscriptionResult result = amazonSnsClient.confirmSubscription(request);
+                log.info "result::${result?.toString()}"
+            } catch (Exception e) {
+                log.error "Error in saving order: " + e.message, e
+            }
             render "subscribed"
             return
         }
