@@ -665,7 +665,7 @@ class ReportController {
         params.origin = origin.name
 
         // Export as XLS
-        if (params.format == "text/csv") {
+        if (params.format == "text/csv" && params.print) {
             params.originId = session.warehouse.id
             DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy")
             if (params.startDate && params.endDate) {
@@ -680,25 +680,28 @@ class ReportController {
             def data = reportService.getForecastReport(params)
 
             def rows = []
-            data.groupBy { it.productId }.collect { productId, items ->
+            data.collect { item ->
+                def product = Product.get(item.productId)
                 def inventoryLevel
                 if (!params.replenishmentPeriodDays || !params.leadTimeDays) {
-                    inventoryLevel = InventoryLevel.findByProduct(Product.load(productId))
+                    inventoryLevel = InventoryLevel.findByProduct(product)
                 }
                 def replenishmentPeriodDays = params.replenishmentPeriodDays ?: inventoryLevel && inventoryLevel.replenishmentPeriodDays ? inventoryLevel.replenishmentPeriodDays : 365
                 def leadTimeDays = params.leadTimeDays ?: inventoryLevel && inventoryLevel.expectedLeadTimeDays ? inventoryLevel.expectedLeadTimeDays : 365
-                def productExpiry = forecastingService.getProductExpiry(Location.load(params.originId), replenishmentPeriodDays + leadTimeDays, productId)
-                def qtyOnOrder = items.qtyOnOrder.sum() ?: 0
-                def qtyOnHand = items.qtyOnHand.sum() ?: 0
+                def productExpiry = forecastingService.getProductExpiry(Location.load(params.originId), replenishmentPeriodDays + leadTimeDays, item.productId)
+                def qtyOnOrder = item?.totalOnOrder ?: 0
+                def qtyOnHand = item?.totalOnHand ?: 0
                 def qtyExpiring = productExpiry.collect {it.quantity_on_hand}.sum() ?: 0
                 def qtyAvailable = qtyOnOrder + qtyOnHand - qtyExpiring ?: 0
-                def avgDemand = productExpiry.collect {it.average_daily_demand}.size() > 0 ? productExpiry.collect {it.average_daily_demand}.get(0).setScale(1, RoundingMode.HALF_UP) : 0
+                def avgDemand = productExpiry.collect {it.average_daily_demand}.size() > 0 ? productExpiry.collect {it.average_daily_demand}.get(0).setScale(1, RoundingMode.HALF_UP) * 30 : 0
                 def monthsOfStock = ((replenishmentPeriodDays.toInteger() + leadTimeDays.toInteger())/30).setScale(1, RoundingMode.HALF_UP) ?: 0
                 def qtyNeeded = avgDemand * monthsOfStock ?: 0
+                def qtyToOrder = BigDecimal.ZERO.max(qtyNeeded - qtyOnHand)
+                def unitPrice = product?.pricePerUnit ?: 0
 
                 def printRow = [
-                        'Product code'                    : items[0].productCode ?: '',
-                        'Name'                            : items[0].productName,
+                        'Product code'                    : product.productCode ?: '',
+                        'Name'                            : product.name,
                         'Order Period (Days)'             : replenishmentPeriodDays,
                         'Lead Time (Days)'                : leadTimeDays,
                         'Qty On Order'                    : qtyOnOrder,
@@ -708,7 +711,8 @@ class ReportController {
                         'Average Demand/Month'            : avgDemand,
                         'Months of Stock Needed (order period + lead time in months)'  : monthsOfStock,
                         'Qty Needed'                      : qtyNeeded,
-                        'Qty to Order'                    : BigDecimal.ZERO.max(qtyNeeded - qtyOnHand),
+                        'Qty to Order'                    : qtyToOrder,
+                        'Estimated Cost'                  : unitPrice * qtyToOrder,
                 ]
 
                 rows << printRow

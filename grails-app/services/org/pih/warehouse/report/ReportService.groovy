@@ -688,22 +688,41 @@ class ReportService implements ApplicationContextAware {
         return data
     }
 
+    List getOnOrderData(String locationId, List<String> productIds) {
+        String query = """
+            select
+                oos.product_id as productId,
+                oos.quantity_ordered_not_shipped as qtyOrderedNotShipped,
+                oos.quantity_shipped_not_received as qtyShippedNotReceived, 
+                ps.quantity_on_hand as qtyOnHand
+            from on_order_summary oos
+            join product on oos.product_id = product.id
+            left outer join product_snapshot ps on (product.id = ps.product_id 
+                and ps.location_id = oos.destination_id)
+            where destination_id = :locationId and oos.product_id in (${productIds.collect { "'$it'" }.join(',')})
+            """
+        def results = dataService.executeQuery(query, [locationId: locationId])
+        def data = results.collect {
+            def qtyOnHand = it.qtyOnHand ? it.qtyOnHand.toInteger() : 0
+            def qtyOrderedNotShipped = it.qtyOrderedNotShipped ? it.qtyOrderedNotShipped.toInteger() : 0
+            def qtyShippedNotReceived = it.qtyShippedNotReceived ? it.qtyShippedNotReceived : 0
+            [
+                    productId            : it.productId,
+                    totalOnOrder         : qtyOrderedNotShipped + qtyShippedNotReceived,
+                    totalOnHand          : qtyOnHand,
+            ]
+        }
+        return data
+    }
+
     def getForecastReport(Map params) {
         List data = []
         boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
         if (forecastingEnabled) {
             String query = """
             select 
-                pdd.product_id,
-                pdd.product_code,
-                pdd.product_name,
-                oos.quantity_ordered_not_shipped as qtyOrderedNotShipped,
-                oos.quantity_shipped_not_received as qtyShippedNotReceived,
-                ps.quantity_on_hand as qtyOnHand
+                pdd.product_id
             FROM product_demand_details pdd
-            join on_order_summary oos on pdd.product_id = oos.product_id
-            left outer join product_snapshot ps on (pdd.product_id = ps.product_id
-                    and pdd.destination_id = oos.destination_id)
             """
 
             if (params.category && params.category != "null") {
@@ -718,10 +737,10 @@ class ReportService implements ApplicationContextAware {
 
             query += " WHERE date_issued BETWEEN :startDate AND :endDate AND pdd.origin_id = :originId"
 
-            if (params.locations && params.locations != "undefined") {
+            if (params.locations && params.locations != "null") {
                 def destinations = []
                 params.locations.getClass().isArray() ? params.locations.each { destinations << it } : destinations << params.locations
-                query += " AND destination_id in (${destinations.collect { "'$it'" }.join(',')})"
+                query += " AND pdd.destination_id in (${destinations.collect { "'$it'" }.join(',')})"
             }
 
             if (params.category && params.category != "null") {
@@ -759,18 +778,7 @@ class ReportService implements ApplicationContextAware {
             }
 
             def results = dataService.executeQuery(query, params)
-            data = results.collect {
-                def qtyOnHand = it.qtyOnHand ? it.qtyOnHand.toInteger() : 0
-                def qtyOrderedNotShipped = it.qtyOrderedNotShipped ? it.qtyOrderedNotShipped.toInteger() : 0
-                def qtyShippedNotReceived = it.qtyShippedNotReceived ? it.qtyShippedNotReceived : 0
-                [
-                        productId               : it?.product_id,
-                        productCode             : it?.product_code,
-                        productName             : it?.product_name,
-                        qtyOnOrder              : qtyOrderedNotShipped + qtyShippedNotReceived,
-                        qtyOnHand               : qtyOnHand,
-                ]
-            }
+            data = getOnOrderData(params.originId, results.collect{it.product_id}.unique())
         }
         return data
     }
