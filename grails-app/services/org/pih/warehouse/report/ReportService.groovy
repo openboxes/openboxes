@@ -721,7 +721,8 @@ class ReportService implements ApplicationContextAware {
         if (forecastingEnabled) {
             String query = """
             select 
-                pdd.product_id
+                pdd.product_id,
+                pdd.quantity_demand
             FROM product_demand_details pdd
             """
 
@@ -778,8 +779,20 @@ class ReportService implements ApplicationContextAware {
             }
 
             def results = dataService.executeQuery(query, params)
-            data = getOnOrderData(params.originId, results.collect{it.product_id}.unique())
+            if (results) {
+                def productGrupedResults = results.groupBy { it.product_id}
+                def monthsInPeriod = (params.endDate - params.startDate) / 30
+                data = getOnOrderData(params.originId, results.collect{it.product_id}.unique()).collect { onOrderDataItem ->
+                    [
+                            productId             : onOrderDataItem.productId,
+                            totalOnOrder          : onOrderDataItem.totalOnOrder,
+                            totalOnHand           : onOrderDataItem.totalOnHand,
+                            averageMonthlyDemand : productGrupedResults[onOrderDataItem.productId].collect {it.quantity_demand}.sum() / monthsInPeriod
+                    ]
+                }
+            }
         }
+
         return data
     }
 }
