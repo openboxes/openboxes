@@ -430,4 +430,27 @@ class ForecastingService {
 
         return productExpirySummary
     }
+
+    def getProductExpiry(Location location, def daysBeforeExpiration, def productId) {
+        List data = []
+        Map params = [locationId: location.id, daysBeforeExpiration: daysBeforeExpiration, productId: productId]
+        String query = """
+            SELECT 
+                product_id,
+                quantity_on_hand,
+                average_daily_demand
+            FROM product_expiry_summary
+            WHERE expiration_date < DATE_ADD(CURRENT_DATE, INTERVAL :daysBeforeExpiration DAY)
+            AND location_id = :locationId
+            AND product_id = :productId
+            """
+        Sql sql = new Sql(dataSource)
+        try {
+            data = sql.rows(query, params)
+        } catch (Exception e) {
+            log.error("Unable to execute query: " + e.message, e)
+        }
+
+        return data
+    }
 }

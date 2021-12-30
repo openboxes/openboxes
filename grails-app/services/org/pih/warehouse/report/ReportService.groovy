@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse.report
 
-
 import org.apache.http.client.HttpClient
 import org.apache.http.client.ResponseHandler
 import org.apache.http.client.methods.HttpGet
@@ -20,6 +19,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.reporting.DateDimension
 import org.springframework.context.ApplicationContext
@@ -684,6 +684,93 @@ class ReportService implements ApplicationContextAware {
                     totalOnHand          : qtyOnHand,
                     totalOnHandAndOnOrder: qtyOrderedNotShipped + qtyShippedNotReceived + qtyOnHand,
             ]
+        }
+        return data
+    }
+
+    def getForecastReport(Map params) {
+        List data = []
+        boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
+        if (forecastingEnabled) {
+            String query = """
+            select 
+                pdd.product_id,
+                pdd.product_code,
+                pdd.product_name,
+                oos.quantity_ordered_not_shipped as qtyOrderedNotShipped,
+                oos.quantity_shipped_not_received as qtyShippedNotReceived,
+                ps.quantity_on_hand as qtyOnHand
+            FROM product_demand_details pdd
+            join on_order_summary oos on pdd.product_id = oos.product_id
+            left outer join product_snapshot ps on (pdd.product_id = ps.product_id
+                    and pdd.destination_id = oos.destination_id)
+            """
+
+            if (params.category && params.category != "null") {
+                query += " JOIN product ON product.id = pdd.product_id"
+            }
+            if (params.tags && params.tags != "null") {
+                query += " LEFT JOIN product_tag ON product_tag.product_id = pdd.product_id"
+            }
+            if (params.catalogs && params.catalogs != "null") {
+                query += " LEFT JOIN product_catalog_item ON product_catalog_item.product_id = pdd.product_id"
+            }
+
+            query += " WHERE date_issued BETWEEN :startDate AND :endDate AND pdd.origin_id = :originId"
+
+            if (params.locations && params.locations != "undefined") {
+                def destinations = []
+                params.locations.getClass().isArray() ? params.locations.each { destinations << it } : destinations << params.locations
+                query += " AND destination_id in (${destinations.collect { "'$it'" }.join(',')})"
+            }
+
+            if (params.category && params.category != "null") {
+                def categories = []
+                if (params.category.getClass().isArray()) {
+                    params.category.each {
+                        def category = Category.get(it)
+                        if (category) {
+                            categories += category.children
+                            categories << category
+                        }
+                    }
+                } else {
+                    def category = Category.get(params.category)
+                    if (category) {
+                        categories += category.children
+                        categories << category
+                    }
+                }
+
+                categories = categories.unique()
+                query += " AND product.category_id in (${categories.collect { "'$it.id'" }.join(',')})"
+            }
+
+            if (params.tags && params.tags != "null") {
+                def tags = []
+                params.tags.getClass().isArray() ? params.tags.each { tags << it } : tags << params.tags
+                query += " AND product_tag.tag_id in (${tags.collect { "'$it'" }.join(',')})"
+            }
+
+            if (params.catalogs && params.catalogs != "null") {
+                def catalogs = []
+                params.catalogs.getClass().isArray() ? params.catalogs.each { catalogs << it } : catalogs << params.catalogs
+                query += " AND product_catalog_item.product_catalog_id in (${catalogs.collect { "'$it'" }.join(',')})"
+            }
+
+            def results = dataService.executeQuery(query, params)
+            data = results.collect {
+                def qtyOnHand = it.qtyOnHand ? it.qtyOnHand.toInteger() : 0
+                def qtyOrderedNotShipped = it.qtyOrderedNotShipped ? it.qtyOrderedNotShipped.toInteger() : 0
+                def qtyShippedNotReceived = it.qtyShippedNotReceived ? it.qtyShippedNotReceived : 0
+                [
+                        productId               : it?.product_id,
+                        productCode             : it?.product_code,
+                        productName             : it?.product_name,
+                        qtyOnOrder              : qtyOrderedNotShipped + qtyShippedNotReceived,
+                        qtyOnHand               : qtyOnHand,
+                ]
+            }
         }
         return data
     }
