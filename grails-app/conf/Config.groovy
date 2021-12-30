@@ -942,6 +942,11 @@ openboxes.barcode.printer.name = "printer-thermalprinter"
 // Print barcode labels via RAW
 openboxes.barcode.printer.ipAddress = "127.0.0.1"
 openboxes.barcode.printer.port = 9100
+openboxes.barcode.printer.zpl = "^XA\n" +
+        "^FO50,60^A0,40^FDMy Product^FS\n" +
+        "^FO60,120^BY3^BCN,60,,,,A^FD1234ABC^FS\n" +
+        "^FO25,25^GB380,200,2^FS\n" +
+        "^XZ"
 
 // Labelary API
 openboxes.barcode.labelaryApi.url = "https://api.labelary.com/v1/printers/12dpmm/labels/4x6/0/"

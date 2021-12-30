@@ -656,7 +656,12 @@
                             </div>
                             <div class="mm-menu-item">
                                 <g:link controller="admin" action="sendMail" class="list">
-                                    <g:message code="config.sendMail.label" default="Email"/>
+                                    <g:message code="config.sendMail.label" default="Send Email"/>
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
+                                <g:link controller="admin" action="sendZpl" class="list">
+                                    <g:message code="config.sendZpl.label" default="Send ZPL"/>
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">

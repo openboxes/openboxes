@@ -9,18 +9,16 @@
  **/
 package org.pih.warehouse.admin
 
+import fr.w3blog.zpl.utils.ZebraUtils
 import grails.util.GrailsUtil
+import groovyx.net.http.HTTPBuilder
 import net.sf.ehcache.Cache
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.jobs.SendStockAlertsJob
 import org.springframework.web.multipart.MultipartFile
 
-import javax.print.Doc
-import javax.print.DocFlavor
-import javax.print.DocPrintJob
 import javax.print.PrintService
-import javax.print.SimpleDoc
 import java.awt.print.PrinterJob
 import java.util.concurrent.FutureTask
 
@@ -33,6 +31,7 @@ class AdminController {
     def quartzScheduler
     def springcacheService
     def dataService
+    def zebraService
 
     def index = {}
 
@@ -140,8 +139,34 @@ class AdminController {
                 flash.message = "Unable to send email due to error: " + e.message
             }
         }
+    }
 
+    def sendZpl = {
+        log.info "sendZpl: " + params
 
+        if (request.method == "POST") {
+            try {
+                withForm {
+                    if (params.print) {
+                        ZebraUtils.printZpl(params.body, params.ipAddress, params.port as int)
+                        flash.message = "Successfully printed ZPL ${params.body} to ${params.ipAddress}:${params.port}"
+                    }
+                    else if (params.render) {
+                        def url = grailsApplication.config.openboxes.barcode.labelaryApi.url
+                        def http = new HTTPBuilder(url.toString())
+                        def html = http.post(body: params.body)
+                        response.contentType = "image/png"
+                        response.outputStream << html
+                        return
+                    }
+                }.invalidToken {
+                    flash.message = "Invalid token"
+                }
+            } catch (Exception e) {
+                log.error("Error " + e.message, e)
+                flash.message = "Unable to process request due to error: " + e.message
+            }
+        }
     }
 
 
