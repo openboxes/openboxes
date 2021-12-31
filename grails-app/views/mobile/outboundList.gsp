@@ -14,8 +14,6 @@
     </div>
 </g:hasErrors>
 
-
-
 <div class="row g-0 mb-2">
     <div class="col col-md-12">
         <button type="button" class="btn btn-outline-primary float-end"

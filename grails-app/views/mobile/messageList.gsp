@@ -8,15 +8,11 @@
 
 <body>
 
-    <div class="clearfix">
-    </div>
-
     <div class="row g-0 mb-2">
         <div class="col col-md-12">
             <div class="float-end">
                 <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
                             data-bs-target="#messageUploadModal">Upload Message</button>
-
                 <g:link controller="mobile" action="messageListProcess" class="btn btn-outline-success">Process Messages</g:link>
             </div>
         </div>
@@ -24,7 +20,7 @@
 
     <div class="card">
         <div class="card-header">
-            Server Details
+            Message Queue Details
         </div>
         <div class="card-body">
             <div class="row">
@@ -58,7 +54,7 @@
 
     <div class="card">
         <div class="card-header">
-            Messages <div class="badge badge-primary bg-primary">${messages.size()?:0}</div>
+            Message Queue <div class="badge badge-primary bg-primary">${messages.size()?:0}</div>
         </div>
         <div class="card-body">
 
@@ -73,37 +69,37 @@
                 <tbody>
                 <g:each var="message" in="${messages}">
                     <tr class="${message.name.endsWith('log')?'table-danger':''}">
-                        <td class="col col-md-6">
+                        <td class="col col-md-8">
                             ${message.name}
                             <div class="text-sm-left text-muted">${message.path}</div>
                         </td>
-                        <td class="col col-md-2">
-                            <div class="" data-bs-toggle="tooltip" data-bs-placement="top" title="${g.formatDate(date: message.mtime)}">
+                        <td class="col col-md-3">
+                            <div data-bs-toggle="tooltip" data-bs-placement="top" title="${g.formatDate(date: message.mtime)}">
                                 <g:prettyDateFormat date="${message.mtime}"/>
                             </div>
                         </td>
-                        <td class="col col-md-4">
-                            <div class="d-grid gap-2 d-md-flex justify-content-md-end btn-group">
-                                <g:link controller="mobile" action="messageDetails"
-                                        params="[path: message.path]"
-                                        class="btn btn-outline-primary">Download</g:link>
-                                <g:link controller="mobile" action="messageValidate"
-                                        params="[path: message.path]"
-                                        class="btn btn-outline-success">Validate</g:link>
-                                <g:link controller="mobile" action="messageProcess"
-                                        params="[path: message.path]"
-                                        class="btn btn-outline-success">Process</g:link>
-                                <g:link controller="mobile" action="messageDelete"
-                                        params="[path: message.path]"
-                                        class="btn btn-outline-danger">Delete</g:link>
-                            </div>
+                        <td class="col col-md-1">
+                            <div class="dropdown">
+                                <button class="btn btn-outline-primary dropdown-toggle" type="button"
+                                        id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Actions
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <li><g:link controller="mobile" action="messageDetails"
+                                                class="dropdown-item" params="[path: message.path]">Download</g:link></li>
+                                    <li><g:link controller="mobile" action="messageValidate"
+                                                class="dropdown-item" params="[path: message.path]">Validate</g:link></li>
+                                    <li><g:link controller="mobile" action="messageProcess"
+                                                class="dropdown-item" params="[path: message.path]">Process</g:link></li>
+                                    <li><g:link controller="mobile" action="messageDelete"
+                                                class="dropdown-item text-danger" params="[path: message.path]">Delete</g:link></li>
+                                    </ul>
+                                </div>
                         </td>
                     </tr>
                 </g:each>
                 </tbody>
             </table>
-
-
         </div>
     </div>
 

@@ -41,11 +41,11 @@
                     <table class="table table-borderless table-striped">
                         <thead>
                             <tr>
-                                <th class="col-2">Order Number</th>
+                                <th class="col-1">Order Number</th>
                                 <th class="col-3">Supplier</th>
                                 <th class="col-3">Delivery for FA</th>
                                 <th class="col-2">Delivery Date</th>
-                                <th class="col-1">Status</th>
+                                <th class="col-2">Status</th>
                                 <th class="col-1">Details</th>
                             </tr>
                         </thead>
@@ -79,7 +79,7 @@
                     <table class="table table-borderless table-hover table-striped">
                         <thead>
                             <tr>
-                                <th class="col-2">Order Number</th>
+                                <th class="col-1">Order Number</th>
                                 <th class="col-3">Delivery for FA</th>
                                 <th class="col-3">Venue</th>
                                 <th class="col-2">Delivery Date</th>
@@ -117,11 +117,11 @@
                     <table class="table table-borderless table-striped">
                         <thead>
                             <tr>
-                                <th class="col-2">Order Number</th>
+                                <th class="col-1">Order Number</th>
                                 <th class="col-3">FA</th>
                                 <th class="col-3">Delivery Destination (Venue)</th>
                                 <th class="col-2">Delivery Date</th>
-                                <th class="col-1">Status</th>
+                                <th class="col-2">Status</th>
                                 <th class="col-1">Details</th>
                             </tr>
                         </thead>
@@ -156,11 +156,11 @@
                     <table class="table table-borderless table-hover table-striped">
                         <thead>
                             <tr>
-                                <th class="col-2">Order Number</th>
+                                <th class="col-1">Order Number</th>
                                 <th class="col-3">Delivery for FA</th>
                                 <th class="col-3">Venue</th>
                                 <th class="col-2">Delivery Date</th>
-                                <th class="col-1">Status</th>
+                                <th class="col-2">Status</th>
                                 <th class="col-1">Tracking</th>
                             </tr>
                         </thead>
@@ -203,13 +203,11 @@
                     <table class="table table-borderless table-striped">
                         <thead>
                             <tr>
-                                <th>SKU Code</th>
-                                <th>Item Description</th>
-                                <th>Item Quantity</th>
-                                <th>No. Pallets</th>
-                                <th>Pallet LPU</th>
-                                <th>Warehouse / Venue Location</th>
-                                <th>Status</th>
+                                <th class="col-2">SKU Code</th>
+                                <th class="col-4">Description</th>
+                                <th class="col-1">On Hand</th>
+                                <th class="col-1">On Order</th>
+                                <th class="col-2">Status</th>
                                 <th>Shipment Details</th>
                             </tr>
                         </thead>
@@ -226,25 +224,23 @@
                                         ${product.name}
                                     </td>
                                     <td>
-                                        <a href="${createLink(controller: 'mobile', action: 'productDetails', id: product?.id)}" class="text-decoration-none text-reset">
-                                            <g:formatNumber number="${productSummary.quantityOnHand}" maxFractionDigits="0"/>
-                                            <small>${product?.unitOfMeasure?:"EA"}</small>
-                                        </a>
+                                        <g:formatNumber number="${productSummary.quantityOnHand}" maxFractionDigits="0"/>
+                                        <small>${product?.unitOfMeasure?:"EA"}</small>
                                     </td>
                                     <td>
-                                        ???
+                                        <g:formatNumber number="${productSummary.quantityOnOrder}" maxFractionDigits="0"/>
+                                        <small>${product?.unitOfMeasure?:"EA"}</small>
                                     </td>
                                     <td>
-                                        ???
+                                        <g:if test="${productSummary?.quantityOnHand > 0}">
+                                            In stock
+                                        </g:if>
+                                        <g:else>
+                                            Out of stock
+                                        </g:else>
                                     </td>
                                     <td>
-                                        ???
-                                    </td>
-                                    <td>
-                                        TBD
-                                    </td>
-                                    <td>
-                                        ???
+
                                     </td>
                                 </tr>
                             </g:each>
