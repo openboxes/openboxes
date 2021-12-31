@@ -397,6 +397,5 @@ class MobileController {
         response.contentType = document.contentType
         response.outputStream << document.fileContents
         response.outputStream.flush()
-
     }
 }

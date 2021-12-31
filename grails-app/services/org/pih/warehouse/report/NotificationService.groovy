@@ -17,6 +17,7 @@ import org.codehaus.groovy.grails.plugins.web.taglib.RenderTagLib
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.codehaus.groovy.grails.web.errors.GrailsWrappedRuntimeException
 import org.pih.warehouse.api.PartialReceipt
+import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.Person
@@ -156,6 +157,17 @@ class NotificationService {
         sendShipmentNotifications(shipmentInstance, users, template, subject)
     }
 
+    def sendShipmentStatusNotification(Shipment shipment, Event event, Location location, List<RoleType> roleTypes) {
+        try {
+            def users = userService.findUsersByRoleTypes(location, roleTypes)
+            String subject = "Shipment ${shipment?.shipmentNumber} status has been updated to ${event?.eventType?.name}"
+            String template = "/email/shipmentStatusChanged"
+            sendShipmentNotifications(shipment, users, template, subject)
+        } catch (Exception e) {
+            log.error ("Unable to send shipment status notification " + e.message, e)
+        }
+    }
+
     def sendShipmentItemsShippedNotification(Shipment shipmentInstance) {
         def emailValidator = EmailValidator.getInstance()
         def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
@@ -170,10 +182,14 @@ class NotificationService {
     }
 
     def sendShipmentNotifications(Shipment shipmentInstance, List<User> users, String template, String subject) {
-        String body = renderTemplate(template, [shipmentInstance: shipmentInstance])
-        List emails = users.collect { it.email }
-        if (!emails.empty) {
-            mailService.sendHtmlMail(subject, body, emails)
+        try {
+            String body = renderTemplate(template, [shipmentInstance: shipmentInstance])
+            List emails = users.collect { it.email }
+            if (!emails.empty) {
+                mailService.sendHtmlMail(subject, body, emails)
+            }
+        } catch (Exception e) {
+            log.error("Unable to send shipment notifications " + e.message, e)
         }
     }
 

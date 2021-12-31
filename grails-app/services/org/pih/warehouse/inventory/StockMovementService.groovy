@@ -449,6 +449,10 @@ class StockMovementService {
                     eq("origin", stockMovement.origin)
                 }
             }
+
+            if (stockMovement.requestedDeliveryDate) {
+                eq("requestedDeliveryDate", stockMovement.requestedDeliveryDate)
+            }
             if (stockMovement.requisitionStatusCodes) {
                 'in'("status", stockMovement.requisitionStatusCodes)
             }

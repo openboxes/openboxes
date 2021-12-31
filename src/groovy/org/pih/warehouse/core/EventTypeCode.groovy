@@ -12,10 +12,11 @@ package org.pih.warehouse.core
 enum EventTypeCode {
 
     CREATED,
+    UPLOADED,
+    ACCEPTED,
     SCHEDULED,
     PICKED,
     PACKED,
-    ACCEPTED,
     STAGING,
     PICKUP,
     GATE_IN,

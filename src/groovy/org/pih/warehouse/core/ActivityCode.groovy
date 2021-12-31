@@ -55,7 +55,10 @@ enum ActivityCode {
     ENABLE_CENTRAL_PURCHASING('ENABLE_CENTRAL_PURCHASING'),
 
     // Requires picking on mobile device
-    REQUIRE_MOBILE_PICKING('REQUIRE_MOBILE_PICKING')
+    REQUIRE_MOBILE_PICKING('REQUIRE_MOBILE_PICKING'),
+
+    // Enable etrucknow integration features
+    ENABLE_ETRUCKNOW_INTEGRATION('ENABLE_ETRUCKNOW_INTEGRATION')
 
 
     final String id
@@ -85,7 +88,8 @@ enum ActivityCode {
                 REQUIRE_ACCOUNTING,
                 ENABLE_CENTRAL_PURCHASING,
                 HOLD_STOCK,
-                REQUIRE_MOBILE_PICKING
+                REQUIRE_MOBILE_PICKING,
+                ENABLE_ETRUCKNOW_INTEGRATION,
         ]
     }
 }

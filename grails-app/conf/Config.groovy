@@ -958,6 +958,11 @@ openboxes.typeahead.minLength = 3
 // Allow system administrators to disable refresh on startup
 openboxes.refreshAnalyticsDataOnStartup.enabled = true
 
+// Create Order message job
+openboxes.jobs.uploadDeliveryOrdersJob.enabled = true
+openboxes.jobs.uploadDeliveryOrdersJob.cronExpression = "0 0 0/12 * * ?" // every twelve hours
+openboxes.jobs.uploadDeliveryOrdersJob.numberOfDaysInAdvance = 7
+
 // Message retrieval job
 openboxes.jobs.messageRetrievalJob.enabled = true
 openboxes.jobs.messageRetrievalJob.cronExpression = "0 */5 * * * ?" // every five minutes
