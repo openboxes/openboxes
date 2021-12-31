@@ -62,9 +62,13 @@
                             ${session?.user?.name}
                         </a>
                         <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
-                            <li><g:link controller="user" action="edit" id="${session?.user?.id}"
-                                        class="dropdown-item" href="#">Profile</g:link></li>
-                            <li><hr class="dropdown-divider"></li>
+                            <g:isSuperuser>
+                                <li><g:link controller="dashboard" action="index"
+                                            class="dropdown-item" href="#">Manage Warehouse</g:link></li>
+                                <li><g:link controller="user" action="edit" id="${session?.user?.id}"
+                                            class="dropdown-item" href="#">Edit Profile</g:link></li>
+                                <li><hr class="dropdown-divider"></li>
+                            </g:isSuperuser>
                             <li><g:link controller="auth" action="logout" class="dropdown-item"
                                         href="#">Sign out</g:link></li>
                         </ul>

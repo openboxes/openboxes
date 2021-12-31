@@ -16,21 +16,9 @@
                 <span class="badge bg-secondary">${stockMovement.identifier}</span>
             </div>
 
-            <div class="col-6">
-                <h5 class="ml-5 d-inline">${stockMovement.name}</h5>
-            </div>
+            <div class="col-9">
+                <h5 class="ml-5">${stockMovement.name}</h5>
 
-            <div class="col-2">
-                <a href="${createLink(controller: 'stockMovement', action: 'show', id: stockMovement?.id)}" class="text-decoration-none text-reset">
-                    <g:if test="${stockMovement?.shipment?.currentEvent?.eventType?.eventCode}">
-                        <div class="badge bg-primary">
-                            ${stockMovement.shipment?.mostRecentEvent?.eventType?.name}
-                        </div>
-                    </g:if>
-                    <g:else>
-                        <div class="badge bg-primary">${stockMovement?.status}</div>
-                    </g:else>
-                </a>
             </div>
 
             <div class="col-1">
@@ -76,48 +64,64 @@
     <div class="card-body">
         <div class="row">
 
-            <div class="col-sm-12 col-md-3 text-center time-info mt-3 mt-sm-0">
+            <div class="col-sm-12 col-md-3 text-center time-info mb-3 mt-sm-0">
+                <span class="text-muted d-block">Status</span>
+                <span class="text-5 font-weight-500 text-dark">
+                    <div class="badge bg-primary">
+                        <a href="${createLink(controller: 'stockMovement', action: 'show', id: stockMovement?.id)}" class="text-decoration-none text-reset">
+                            <g:if test="${stockMovement?.shipment?.mostRecentEvent?.eventType?.eventCode}">
+                                ${stockMovement.shipment?.mostRecentEvent?.eventType?.name}
+                            </g:if>
+                            <g:else>
+                                ${stockMovement?.status}
+                            </g:else>
+                        </a>
+                    </div>
+                </span>
+            </div>
+
+            <div class="col-sm-12 col-md-3 text-center mb-3 mt-sm-0">
                 <span class="text-muted d-block">Origin</span>
                 <span class="text-5 font-weight-500 text-dark">
                     ${stockMovement?.origin?.locationNumber}
                 </span>
             </div>
 
-            <div class="col-sm-12 col-md-3 text-center time-info mt-3 mt-sm-0">
+            <div class="col-sm-12 col-md-3 text-center mt-3 mt-sm-0">
                 <span class="text-muted d-block">Destination</span>
                 <span class="text-4 font-weight-500 text-dark">
                     ${stockMovement?.destination?.locationNumber}
                 </span>
             </div>
 
-            <div class="col-sm-12 col-md-3 text-center company-info">
+            <div class="col-sm-12 col-md-3 text-center">
                 <span class="text-muted d-block">Ordered On</span>
                 <span class="text-4 font-weight-500 text-dark mt-1 mt-lg-0">
                     ${g.formatDate(date: stockMovement.requisition.dateCreated, type: "datetime")}
                 </span>
             </div>
 
-            <div class="col-sm-12 col-md-3 text-center time-info mt-3 mt-sm-0">
+            <div class="col-sm-12 col-md-3 text-center mb-3 mt-sm-0">
                 <span class="text-muted d-block">Expected Shipping</span>
                 <g:if test="${stockMovement?.expectedShippingDate}">
                     <div class="text-5 font-weight-500 text-dark">
                         ${g.formatDate(date: stockMovement.expectedShippingDate, type: "datetime")}
                     </div>
                     <g:if test="${!stockMovement.isShipped && stockMovement.expectedShippingDate < new Date()}">
-                        <div class="badge badge-pill bg-danger">Delayed - Expected ${prettyDateFormat(date: stockMovement?.expectedShippingDate)}</div>
+                        <div class="badge badge-pill bg-danger">Expected ${prettyDateFormat(date: stockMovement?.expectedShippingDate)}</div>
                     </g:if>
                 </g:if>
                 <g:else>Not Available</g:else>
             </div>
 
-            <div class="col-sm-12 col-md-3 text-center time-info mt-3 mt-sm-0">
+            <div class="col-sm-12 col-md-3 text-center mb-3 mt-sm-0">
                 <span class="text-muted d-block">Expected Delivery</span>
                 <g:if test="${stockMovement?.expectedDeliveryDate}">
                     <div class="text-5 font-weight-500 text-dark">
                         ${g.formatDate(date: stockMovement.expectedDeliveryDate, type: "datetime")}
                     </div>
                     <g:if test="${!stockMovement?.isReceived && stockMovement.expectedDeliveryDate < new Date()}">
-                        <div class="badge badge-pill bg-danger">Delayed - Expected ${prettyDateFormat(date: stockMovement?.expectedDeliveryDate)}</div>
+                        <div class="badge badge-pill bg-danger">Expected ${prettyDateFormat(date: stockMovement?.expectedDeliveryDate)}</div>
                     </g:if>
                 </g:if>
                 <g:else>Not Available</g:else>
@@ -145,23 +149,6 @@
             </div>
 
         </div>
-
-        <!--
-            <div class="row">
-                <div class="col-sm-4"><strong class="font-weight-600">Label</strong>
-                    <p>Value</p>
-                </div>
-
-                <div class="col-sm-4"><strong class="font-weight-600">Label</strong>
-                    <p>Value</p>
-                </div>
-                <div class="col-sm-4"><strong class="font-weight-600">Label</strong>
-                    <p><span class="badge badge-pill badge-dark badge-success alert-success py-1 px-2 font-weight-normal">Confirmed <i
-                            class="fas fa-check-circle"></i></span></p>
-                </div>
-            </div>
-            -->
-
     </div>
 </div>
 
@@ -177,10 +164,6 @@
         <li class="nav-item" role="presentation">
             <a class="nav-link" id="documents-tab" href="#documents"
                data-bs-toggle="tab">Documents</a>
-        </li>
-        <li class="nav-item" role="presentation">
-            <a class="nav-link" id="properties-tab" href="#properties"
-               data-bs-toggle="tab">Properties</a>
         </li>
     </ul>
 
@@ -245,11 +228,8 @@
                     </table>
                 </div>
             </div>
-
         </div>
-
         <div class="tab-pane fade" id="events" role="tabpanel" aria-labelledby="events-tab">
-
             <div class="card">
                 <div class="card-header">
                     <div class="row align-items-center trip-title">
@@ -308,7 +288,6 @@
                 </div>
 
                 <div class="card-body">
-
                     <table class="table table-striped table-borderless">
                         <thead>
                         <tr>
@@ -321,7 +300,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <g:each var="document" in="${stockMovement.documents}">
+                        <g:each var="document" in="${stockMovement.documents.findAll { it.id }}">
                             <tr>
                                 <td>
                                     ${document.name}
@@ -340,46 +319,15 @@
                         </g:each>
                         </tbody>
                     </table>
+                    <g:unless test="${stockMovement.documents.findAll { it.id }}">
+                        <div class="alert alert-primary text-center text-muted">
+                            There are no documents
+                        </div>
+                    </g:unless>
                 </div>
             </div>
         </div>
-
-        <div class="tab-pane fade" id="properties" role="tabpanel" aria-labelledby="properties-tab">
-
-            <div class="card">
-                <div class="card-header">
-                    <div class="row align-items-center">
-                        <h5 class="h5">Properties</h5>
-                    </div>
-                </div>
-
-                <div class="card-body">
-                    <table class="table table-bordered table-striped">
-                        <thead>
-                        <tr>
-                            <th class="col-9">
-                                <g:message code="default.property.label" default="Property"/>
-                            </th>
-                            <th class="text-right">
-                                <g:message code="default.value.label" default="Value"/>
-                            </th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <g:each var="property" in="${stockMovement.properties}">
-                            <tr>
-                                <td>${property.key}</td>
-                                <td>${property.value}</td>
-                            </tr>
-                        </g:each>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
     </div>
-
 </div>
 </body>
 </html>
