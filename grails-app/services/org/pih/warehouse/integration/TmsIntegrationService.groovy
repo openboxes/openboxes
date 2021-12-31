@@ -14,6 +14,8 @@ import org.apache.commons.io.IOUtils
 import org.apache.commons.lang.exception.ExceptionUtils
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
+import org.pih.warehouse.api.StockMovementType
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentType
@@ -60,7 +62,6 @@ import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.product.Attribute
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.util.LocalizationUtil
 
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.Marshaller
@@ -77,6 +78,7 @@ class TmsIntegrationService {
     def fileTransferService
     def xsdValidatorService
     def notificationService
+    def locationService
     def stockMovementService
 
     String serialize(final Object object, final Class clazz) {
@@ -216,7 +218,7 @@ class TmsIntegrationService {
             BigDecimal latitude = executionStatus?.geoData?.latitude
             BigDecimal longitude = executionStatus?.geoData?.longitude
             Date eventDate = dateFormatter.parse(executionStatus.dateTime)
-            createEvent(trackingNumber, statusCode, latitude, longitude, eventDate)
+            createEvent(trackingNumber, statusCode, eventDate, latitude, longitude)
             triggerOutboundInventoryUpdates(trackingNumber, statusCode)
             triggerInboundInventoryUpdates(trackingNumber, statusCode)
         }
@@ -233,9 +235,32 @@ class TmsIntegrationService {
         }
     }
 
-    void createEvent(String trackingNumber, String statusCode, BigDecimal latitude, BigDecimal longitude, Date eventDate) {
+    void uploadDeliveryOrders(Date requestedDeliveryDate) {
+        // FIXME This should be replaced a getter that returns locations with a supported activity
+        List<Location> locations = locationService.getLocationsSupportingActivity(ActivityCode.ENABLE_ETRUCKNOW_INTEGRATION)
+        locations.each { Location origin ->
+            List<StockMovement> stockMovements = getEligibleOutboundStockMovements(origin, requestedDeliveryDate)
+            if (stockMovements) {
+                log.info "Location ${origin} has ${stockMovements.size()} stock movements"
+                stockMovements.each { StockMovement stockMovement ->
+                    log.info "Upload delivery order for stock movement ${stockMovement.identifier} ${stockMovement.requestedDeliveryDate}"
+                    uploadDeliveryOrder(stockMovement)
+                }
+            }
+        }
+    }
 
-    // Locate stock movement by tracking number
+    List<StockMovement> getEligibleOutboundStockMovements(Location origin, Date requestedDeliveryDate) {
+        StockMovement criteria = new StockMovement(origin: origin,
+                stockMovementType: StockMovementType.OUTBOUND,
+                requestedDeliveryDate: requestedDeliveryDate)
+        List<StockMovement> stockMovements = stockMovementService.getStockMovements(criteria, [:])
+        return stockMovements.findAll { StockMovement stockMovement -> !stockMovement.trackingNumber }
+    }
+
+    void createEvent(String trackingNumber, String statusCode, Date eventDate, BigDecimal latitude = null, BigDecimal longitude = null) {
+
+        // Locate stock movement by tracking number
         StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber, Boolean.FALSE)
         if (!stockMovement) {
             throw new IllegalArgumentException("Unable to locate stock movement by tracking number ${trackingNumber}")
@@ -247,8 +272,22 @@ class TmsIntegrationService {
             throw new IllegalArgumentException("Status code ${statusCode} not associated with an event type")
         }
 
-        // Validate status update - temporarily disabled
+        createEvent(stockMovement, eventType, eventDate, latitude, longitude)
+    }
+
+    void createEvent(StockMovement stockMovement, EventTypeCode eventTypeCode, Date eventDate, BigDecimal latitude = null, BigDecimal longitude = null) {
+        EventType eventType = EventType.findByEventCode(eventTypeCode)
+        if (!eventType) {
+            throw new IllegalArgumentException("No event type associated with event type code ${eventTypeCode}")
+        }
+        createEvent(stockMovement, eventType, eventDate, latitude, longitude)
+    }
+
+    void createEvent(StockMovement stockMovement, EventType eventType, Date eventDate, BigDecimal latitude = null, BigDecimal longitude = null) {
+
         Shipment shipment = stockMovement?.shipment
+
+        // Validate status update - temporarily disabled
         //if (eventType.eventCode == EventTypeCode.COMPLETED && !shipment.hasShipped()) {
         //    throw new IllegalStateException("Unable to complete a shipment until it has been shipped")
         //}
@@ -262,6 +301,9 @@ class TmsIntegrationService {
             event.save(flush: true, failOnError: true)
             shipment.addToEvents(event)
             shipment.save(flush: true)
+
+            // If successful, send shipment status notification
+            notificationService.sendShipmentStatusNotification(shipment, event, shipment.origin, [RoleType.ROLE_SHIPMENT_NOTIFICATION])
         }
     }
 
@@ -280,11 +322,7 @@ class TmsIntegrationService {
             throw new Exception("Unable to locate stock movement by tracking number ${trackingNumber}")
         }
 
-        Shipment shipment = stockMovement?.shipment
-        EventType eventType = EventType.findByEventCode(EventTypeCode.ACCEPTED)
-        Event event = new Event(eventType: eventType, eventDate: new Date())
-        shipment.addToEvents(event)
-        shipment.save(flush:true)
+        createEvent(stockMovement, EventTypeCode.ACCEPTED, new Date())
         notificationService.sendShipmentAcceptedNotification(shipment, shipment.origin, [RoleType.ROLE_SHIPMENT_NOTIFICATION])
     }
 
@@ -390,6 +428,7 @@ class TmsIntegrationService {
         String destinationFile = String.format(filenameTemplate, stockMovement?.identifier?:stockMovement?.id)
         String destinationDirectory = "${grailsApplication.config.openboxes.integration.ftp.outbound.directory}"
         fileTransferService.storeMessage(destinationFile, xmlContents, destinationDirectory)
+        createEvent(stockMovement, EventTypeCode.UPLOADED, new Date())
     }
 
     def createDeliveryOrder(StockMovement stockMovement) {
