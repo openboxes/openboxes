@@ -160,7 +160,7 @@ class NotificationService {
     def sendShipmentStatusNotification(Shipment shipment, Event event, Location location, List<RoleType> roleTypes) {
         try {
             def users = userService.findUsersByRoleTypes(location, roleTypes)
-            String subject = "Shipment ${shipment?.shipmentNumber} status has been updated to ${event?.eventType?.name}"
+            String subject = "Shipment ${shipment?.shipmentNumber} status has been changed to ${event?.eventType?.name}"
             String template = "/email/shipmentStatusChanged"
             sendShipmentNotifications(shipment, users, template, subject)
         } catch (Exception e) {
