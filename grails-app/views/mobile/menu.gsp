@@ -40,13 +40,15 @@
                         Outbound
                     </g:link>
                 </li>
-                <li class="nav-item">
-                    <g:link controller="mobile" action="messageList" href="#"
-                            class="nav-link text-black">
-                        <i class="fa fa-envelope d-block mx-auto mb-1"></i>
-                        Messages
-                    </g:link>
-                </li>
+                <g:isSuperuser>
+                    <li class="nav-item">
+                        <g:link controller="mobile" action="messageList" href="#"
+                                class="nav-link text-black">
+                            <i class="fa fa-envelope d-block mx-auto mb-1"></i>
+                            Messages
+                        </g:link>
+                    </li>
+                </g:isSuperuser>
                 <li class="nav-item">
                     <div class="dropdown text-end">
                         <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle"

@@ -68,18 +68,16 @@
                 <g:each var="stockMovement" in="${stockMovements}">
                     <tr>
                         <td>
-                            <a href="${createLink(controller: 'stockMovement', action: 'show', id: stockMovement?.id)}" class="text-decoration-none text-reset">
-                                <g:if test="${stockMovement?.shipment?.mostRecentEvent?.eventType}">
-                                    <div class="badge bg-primary">
-                                        ${stockMovement.shipment?.mostRecentEvent?.eventType?.name?.toUpperCase()}
-                                    </div>
-                                    <p class="small text-muted"><g:formatDate date="${stockMovement.shipment?.currentEvent?.eventDate}" format="MMM dd HH:mm"/></p>
-                                </g:if>
-                                <g:else>
-                                    <div class="badge bg-primary">${stockMovement?.status}</div>
-                                    <p class="small text-muted"><g:formatDate date="${stockMovement.lastUpdated}" format="MMM dd HH:mm"/></p>
-                                </g:else>
-                            </a>
+                            <g:if test="${stockMovement?.shipment?.mostRecentEvent?.eventType}">
+                                <div class="badge bg-primary">
+                                    ${stockMovement.shipment?.mostRecentEvent?.eventType?.name?.toUpperCase()}
+                                </div>
+                                <p class="small text-muted"><g:formatDate date="${stockMovement.shipment?.currentEvent?.eventDate}" format="MMM dd HH:mm"/></p>
+                            </g:if>
+                            <g:else>
+                                <div class="badge bg-primary">${stockMovement?.status}</div>
+                                <p class="small text-muted"><g:formatDate date="${stockMovement.lastUpdated}" format="MMM dd HH:mm"/></p>
+                            </g:else>
                         </td>
                         <td>
                             <a href="${createLink(controller: 'mobile', action: 'outboundDetails', id: stockMovement?.id)}" class="text-decoration-none text-reset">
