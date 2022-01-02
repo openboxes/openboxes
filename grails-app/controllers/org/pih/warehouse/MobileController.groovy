@@ -22,6 +22,7 @@ import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.InboundStockMovementExcelImporter
 import org.pih.warehouse.importer.OutboundStockMovementExcelImporter
 import org.pih.warehouse.inventory.StockMovementStatusCode
+import org.pih.warehouse.jobs.UploadDeliveryOrdersJob
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSummary
 import org.pih.warehouse.requisition.RequisitionStatus
@@ -374,6 +375,14 @@ class MobileController {
         }
         redirect(action: "messageList")
     }
+
+    def uploadDeliveryOrders = {
+        log.info "upload delivery orders " + params
+        UploadDeliveryOrdersJob.triggerNow([requestedDeliveryDate:params.requestedDeliveryDate])
+        flash.message = "Successfully triggered upload delivery orders job"
+        redirect(action: "outboundList")
+    }
+
 
     def documentDownload = {
         Document document = Document.get(params.id)
