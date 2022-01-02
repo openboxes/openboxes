@@ -15,9 +15,20 @@
 </g:hasErrors>
 
 <div class="row g-0 mb-2">
-    <div class="col col-md-12">
-        <button type="button" class="btn btn-outline-primary float-end"
-                data-bs-toggle="modal" data-bs-target="#outboundModal"><i class="fa fa-file-import"></i> Import Orders</button>
+    <div class="col col-md-12 ">
+
+        <div class="btn-group float-end">
+            <button type="button" class="btn btn-outline-primary "
+                    data-bs-toggle="modal" data-bs-target="#outboundModal"><i class="fa fa-file-import"></i> Import Delivery Orders</button>
+
+            <g:isSuperuser>
+                <button type="button" class="btn btn-outline-secondary "
+                        data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="fa fa-file-upload"></i> Send Delivery Orders
+                    <label class="badge bg-danger">debug</label>
+                </button>
+            </g:isSuperuser>
+
+        </div>
     </div>
 </div>
 
@@ -30,7 +41,6 @@
                     <th><g:message code="stockMovement.status.label"/></th>
                     <th><g:message code="stockMovement.identifier.label"/></th>
                     <th><g:message code="stockMovement.destination.label"/></th>
-                    <th><g:message code="stockMovement.requestedDeliveryDate.label" default="Requested Delivery"/></th>
                     <th><g:message code="stockMovement.expectedShippingDate.label" default="Expected Shipping"/></th>
                     <th><g:message code="stockMovement.expectedDeliveryDate.label" default="Expected Delivery"/></th>
                     <th><g:message code="stockMovement.trackingNumber.label" /></th>
@@ -47,7 +57,7 @@
                                           class="form-control"
                                           noSelection="['null':warehouse.message(code:'default.all.label')]"/>
                     </th>
-                    <th colspan="4">
+                    <th colspan="3">
                     </th>
                     <th class="col-1 text-center">
                         <button type="submit" class="btn btn-primary"><i class="fa fa-filter"></i> Filter</button>
@@ -63,15 +73,11 @@
                                     <div class="badge bg-primary">
                                         ${stockMovement.shipment?.mostRecentEvent?.eventType?.name?.toUpperCase()}
                                     </div>
-                                    <div class="text-muted">
-                                        <small><g:formatDate date="${stockMovement.shipment?.currentEvent?.eventDate}" format="MMM dd hh:mm a"/></small>
-                                    </div>
+                                    <p class="small text-muted"><g:formatDate date="${stockMovement.shipment?.currentEvent?.eventDate}" format="MMM dd HH:mm"/></p>
                                 </g:if>
                                 <g:else>
                                     <div class="badge bg-primary">${stockMovement?.status}</div>
-                                    <div class="text-muted">
-                                        <small><g:formatDate date="${stockMovement.lastUpdated}" format="MMM dd hh:mm a"/></small>
-                                    </div>
+                                    <p class="small text-muted"><g:formatDate date="${stockMovement.lastUpdated}" format="MMM dd HH:mm"/></p>
                                 </g:else>
                             </a>
                         </td>
@@ -84,13 +90,18 @@
                             ${stockMovement?.destination?.name} (${stockMovement?.destination?.locationNumber})
                         </td>
                         <td>
-                            <g:formatDate date="${stockMovement?.requestedDeliveryDate}" format="dd MMM yyyy"/>
-                        </td>
-                        <td>
                             <g:formatDate date="${stockMovement?.expectedShippingDate}" format="dd MMM yyyy"/>
                         </td>
                         <td>
-                            <g:formatDate date="${stockMovement?.expectedDeliveryDate}" format="dd MMM yyyy"/>
+                            <g:if test="${stockMovement?.requestedDeliveryDate == stockMovement?.expectedDeliveryDate}">
+                                <g:formatDate date="${stockMovement?.expectedDeliveryDate}" format="dd MMM yyyy"/>
+                            </g:if>
+                            <g:else>
+                                <del>
+                                    <g:formatDate date="${stockMovement?.requestedDeliveryDate}" format="dd MMM yyyy"/>
+                                </del>
+                                <g:formatDate date="${stockMovement?.requestedDeliveryDate}" format="dd MMM yyyy"/>
+                            </g:else>
                         </td>
                         <td>
                             <g:if test="${stockMovement?.trackingNumber}">
@@ -140,6 +151,45 @@
         </div>
     </g:uploadForm>
 </div>
+
+<div class="modal fade" id="uploadModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <g:form class="needs-validation" action="uploadDeliveryOrders">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Send Delivery Orders</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <g:set var="numberOfDaysInAdvance" value="${grailsApplication.config.openboxes.jobs.uploadDeliveryOrdersJob.numberOfDaysInAdvance}"/>
+                    <g:set var="requestedDeliveryDate" value="${(new Date() + numberOfDaysInAdvance)}"/>
+                    <p>Send all delivery orders to eTruckNow that have a requested delivery date that is ${numberOfDaysInAdvance} days from now. </p>
+
+                    <g:isSuperuser>
+                        <g:set var="isSuperuser" value="true"/>
+                    </g:isSuperuser>
+                    <g:if test="${isSuperuser}">
+                        <div class="text-center">
+                            <g:datePicker name="requestedDeliveryDate" precision="day" value="${requestedDeliveryDate}" />
+                        </div>
+                    </g:if>
+                    <g:else>
+                        <div class="text-center">
+                            ${requestedDeliveryDate.format("MMMMM dd, yyyy")}
+                        </div>
+                    </g:else>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Send</button>
+                </div>
+            </div>
+        </div>
+    </g:form>
+</div>
+
+
 
 </body>
 </html>

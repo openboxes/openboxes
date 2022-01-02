@@ -9,6 +9,7 @@
 **/
 package org.pih.warehouse.integration
 
+import net.schmizz.sshj.sftp.SFTPException
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang.exception.ExceptionUtils
@@ -243,9 +244,12 @@ class TmsIntegrationService {
             if (stockMovements) {
                 log.info "Location ${origin} has ${stockMovements.size()} stock movements"
                 stockMovements.each { StockMovement stockMovement ->
-                    log.info "Upload delivery order for stock movement ${stockMovement.identifier} ${stockMovement.requestedDeliveryDate}"
+                    log.info "Send delivery order for stock movement ${stockMovement.identifier} ${stockMovement.requestedDeliveryDate}"
                     uploadDeliveryOrder(stockMovement)
                 }
+            }
+            else {
+                log.info "There are no delivery orders for location ${origin} on ${requestedDeliveryDate}"
             }
         }
     }
@@ -293,18 +297,19 @@ class TmsIntegrationService {
         //}
 
         // Create new shipment event to represent status update
-        def eventExists = shipment.events.find { it.eventType == eventType && it.eventDate == eventDate}
-        if (!eventExists) {
-            log.info "Event does not exist"
+        Event event = shipment.events.find { it.eventType == eventType && it.eventDate == eventDate}
+        if (!event) {
+            log.info "Creating new event ${eventType} since it does not exist"
             // OBKN-378 TransientObjectException: object references an unsaved transient instance
-            Event event = new Event(eventType: eventType, eventDate: eventDate, longitude: longitude, latitude: latitude)
+            event = new Event(eventType: eventType, eventDate: eventDate, longitude: longitude, latitude: latitude)
             event.save(flush: true, failOnError: true)
             shipment.addToEvents(event)
             shipment.save(flush: true)
-
-            // If successful, send shipment status notification
-            notificationService.sendShipmentStatusNotification(shipment, event, shipment.origin, [RoleType.ROLE_SHIPMENT_NOTIFICATION])
         }
+
+        // If successful, send shipment status notification
+        notificationService.sendShipmentStatusNotification(shipment, event, shipment.origin, [RoleType.ROLE_SHIPMENT_NOTIFICATION])
+
     }
 
     void associateStockMovementAndDeliveryOrder(String identifier, String trackingNumber) {
@@ -414,21 +419,26 @@ class TmsIntegrationService {
     }
 
     def uploadDeliveryOrder(StockMovement stockMovement) {
-        Object deliveryOrder = createDeliveryOrder(stockMovement)
-        String xmlContents = serialize(deliveryOrder, org.pih.warehouse.integration.xml.order.Order.class)
-        log.info "Uploading delivery order:\n" + xmlContents
-        Boolean validationEnabled = grailsApplication.config.openboxes.integration.ftp.outbound.validate
-        log.info "Validation enabled: ${validationEnabled}"
-        if (validationEnabled) {
-            xsdValidatorService.validateXml(xmlContents)
-        }
+        try {
+            Object deliveryOrder = createDeliveryOrder(stockMovement)
+            String xmlContents = serialize(deliveryOrder, org.pih.warehouse.integration.xml.order.Order.class)
+            log.info "Uploading delivery order:\n" + xmlContents
+            Boolean validationEnabled = grailsApplication.config.openboxes.integration.ftp.outbound.validate
+            log.info "Validation enabled: ${validationEnabled}"
+            if (validationEnabled) {
+                xsdValidatorService.validateXml(xmlContents)
+            }
 
-        // transfer file to sftp server
-        String filenameTemplate = grailsApplication.config.openboxes.integration.order.filename
-        String destinationFile = String.format(filenameTemplate, stockMovement?.identifier?:stockMovement?.id)
-        String destinationDirectory = "${grailsApplication.config.openboxes.integration.ftp.outbound.directory}"
-        fileTransferService.storeMessage(destinationFile, xmlContents, destinationDirectory)
-        createEvent(stockMovement, EventTypeCode.UPLOADED, new Date())
+            // transfer file to sftp server
+            String filenameTemplate = grailsApplication.config.openboxes.integration.order.filename
+            String destinationFile = String.format(filenameTemplate, stockMovement?.identifier ?: stockMovement?.id)
+            String destinationDirectory = "${grailsApplication.config.openboxes.integration.ftp.outbound.directory}"
+            fileTransferService.storeMessage(destinationFile, xmlContents, destinationDirectory)
+            createEvent(stockMovement, EventTypeCode.UPLOADED, new Date())
+        } catch (SFTPException e) {
+            log.error("Unable to upload delivery to order to ftp server due to " + e.statusCode, e)
+            throw e
+        }
     }
 
     def createDeliveryOrder(StockMovement stockMovement) {
