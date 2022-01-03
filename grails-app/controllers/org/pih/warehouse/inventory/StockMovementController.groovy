@@ -93,7 +93,7 @@ class StockMovementController {
         else if (stockMovementType == StockMovementType.INBOUND) {
             if (stockMovement.isFromOrder) {
                 redirect(action: "createCombinedShipments", params: params)
-            } else if (stockMovement.requisition.sourceType == RequisitionSourceType.ELECTRONIC) {
+            } else if (stockMovement.requisition?.sourceType == RequisitionSourceType.ELECTRONIC) {
                 if (stockMovement.requisition?.status == RequisitionStatus.CREATED) {
                     redirect(action: "createRequest", params: params)
                 } else {
