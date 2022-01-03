@@ -96,6 +96,7 @@ class StockTransferService {
             stockTransferItems.removeAll { StockTransferItem item ->
                 pendingStockTransferItems.find {
                     item.location?.id == it.location?.id && item.inventoryItem?.id == it.inventoryItem?.id &&
+                            item.originBinLocation?.id == it.originBinLocation?.id &&
                             item.product?.id == it.product?.id
                 }
             }

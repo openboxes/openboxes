@@ -21,7 +21,6 @@ import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.picklist.Picklist
@@ -813,9 +812,6 @@ class ProductAvailabilityService {
     List<ProductAvailability> getStockTransferCandidates(Location location) {
         return ProductAvailability.createCriteria().list {
             eq("location", location)
-            binLocation {
-                ne("locationType", LocationType.get(Constants.RECEIVING_LOCATION_TYPE_ID))
-            }
             gt("quantityOnHand", 0)
         }
     }
