@@ -788,6 +788,12 @@ class InventoryItemController {
             // FIXME Temporary hack to handle a changed values for these two fields
             itemInstance.lotNumber = params?.lotNumber
 
+            if (!itemInstance.product.lotAndExpiryControl && !itemInstance.lotNumber) {
+                flash.error = "${warehouse.message(code: 'inventoryItem.blankLot.message')}"
+                redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
+                return
+            }
+
             if (!itemInstance.hasErrors() && itemInstance.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), itemInstance.id])}"
             } else {
