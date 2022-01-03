@@ -345,7 +345,6 @@
               clearOrderItems();
               loadOrderItems();
               $('#orderItems').html('<option></option>').trigger('change');
-              getTotalPrice();
             },
             error: function (jqXHR, textStatus, errorThrown) {
               if (jqXHR.responseText) {
@@ -367,7 +366,6 @@
             success: function () {
               clearOrderAdjustments();
               loadOrderAdjustments();
-              getTotalAdjustments();
             },
             error: function (jqXHR, textStatus, errorThrown) {
               if (jqXHR.responseText) {
@@ -603,6 +601,8 @@
                         allowClear: true,
                         tokenSeparators: [","],
                     });
+
+                    getTotalPrice();
                 }
             });
         }
@@ -625,6 +625,9 @@
 
               // Style table rows
               $("#orderAdjustmentsTable > tbody tr").removeClass("odd").filter(":odd").addClass("odd");
+
+              getTotalPrice();
+              getTotalAdjustments();
             }
           });
         }
