@@ -692,11 +692,14 @@ class AddItemsPage extends Component {
    */
   save(formValues) {
     const lineItems = _.filter(formValues.lineItems, item => !_.isEmpty(item));
-
-    if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
-      this.confirmSave(() => this.saveItems(lineItems));
+    if (lineItems.length > 0) {
+      if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
+        this.confirmSave(() => this.saveItems(lineItems));
+      } else {
+        this.saveItems(lineItems);
+      }
     } else {
-      this.saveItems(lineItems);
+      Alert.error(this.props.translate('react.stockMovement.error.noShipmentItems.label', 'Cannot save shipment from PO with no items.'), { timeout: 2000 });
     }
   }
 
@@ -706,29 +709,35 @@ class AddItemsPage extends Component {
    * @public
    */
   saveAndExit(formValues) {
-    const errors = this.validate(formValues).lineItems;
-    if (!errors.length) {
-      this.saveRequisitionItemsInCurrentStep(formValues.lineItems)
-        .then(() => {
-          window.location = `/openboxes/stockMovement/show/${formValues.stockMovementId}`;
+    if (formValues.lineItems.length > 0) {
+      const errors = this.validate(formValues).lineItems;
+      if (!errors.length) {
+        this.saveRequisitionItemsInCurrentStep(formValues.lineItems)
+          .then(() => {
+            window.location = `/openboxes/stockMovement/show/${formValues.stockMovementId}`;
+          });
+      } else {
+        confirmAlert({
+          title: this.props.translate('react.stockMovement.confirmExit.label', 'Confirm save'),
+          message: this.props.translate(
+            'react.stockMovement.confirmExit.message',
+            'Validation errors occurred. Are you sure you want to exit and lose unsaved data?',
+          ),
+          buttons: [
+            {
+              label: this.props.translate('react.default.yes.label', 'Yes'),
+              onClick: () => {
+                window.location = `/openboxes/stockMovement/show/${formValues.stockMovementId}`;
+              },
+            },
+            {
+              label: this.props.translate('react.default.no.label', 'No'),
+            },
+          ],
         });
+      }
     } else {
-      confirmAlert({
-        title: this.props.translate('react.stockMovement.confirmExit.label', 'Confirm save'),
-        message: this.props.translate(
-          'react.stockMovement.confirmExit.message',
-          'Validation errors occurred. Are you sure you want to exit and lose unsaved data?',
-        ),
-        buttons: [
-          {
-            label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = `/openboxes/stockMovement/show/${formValues.stockMovementId}`; },
-          },
-          {
-            label: this.props.translate('react.default.no.label', 'No'),
-          },
-        ],
-      });
+      Alert.error(this.props.translate('react.stockMovement.error.noShipmentItems.label', 'Cannot save shipment from PO with no items.'), { timeout: 2000 });
     }
   }
 
