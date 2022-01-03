@@ -669,9 +669,11 @@
                   return null;
                 }
               })
-              .append(new Option(CREATE_NEW, CREATE_NEW, false, false))
               .trigger('change')
               .removeAttr("disabled");
+              if (!$('#productSupplier').find("option[value='" + CREATE_NEW + "']").length) {
+                  $('#productSupplier').append(new Option(CREATE_NEW, CREATE_NEW, false, false)).trigger('change');
+              }
               if (sourceId) {
                 $('#productSupplier').val(sourceId).trigger('change');
               }
