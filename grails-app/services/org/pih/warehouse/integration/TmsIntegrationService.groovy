@@ -297,19 +297,20 @@ class TmsIntegrationService {
         //}
 
         // Create new shipment event to represent status update
-        Event event = shipment.events.find { it.eventType == eventType && it.eventDate == eventDate}
-        if (!event) {
-            log.info "Creating new event ${eventType} since it does not exist"
-            // OBKN-378 TransientObjectException: object references an unsaved transient instance
-            event = new Event(eventType: eventType, eventDate: eventDate, longitude: longitude, latitude: latitude)
-            event.save(flush: true, failOnError: true)
-            shipment.addToEvents(event)
-            shipment.save(flush: true)
+        if (shipment) {
+            Event event = shipment?.events?.find { it.eventType == eventType && it.eventDate == eventDate }
+            if (!event) {
+                log.info "Creating new event ${eventType} since it does not exist"
+                // OBKN-378 TransientObjectException: object references an unsaved transient instance
+                event = new Event(eventType: eventType, eventDate: eventDate, longitude: longitude, latitude: latitude)
+                event.save(flush: true, failOnError: true)
+                shipment.addToEvents(event)
+                shipment.save(flush: true)
+            }
+
+            // If successful, send shipment status notification
+            notificationService.sendShipmentStatusNotification(shipment, event, shipment.origin, [RoleType.ROLE_SHIPMENT_NOTIFICATION])
         }
-
-        // If successful, send shipment status notification
-        notificationService.sendShipmentStatusNotification(shipment, event, shipment.origin, [RoleType.ROLE_SHIPMENT_NOTIFICATION])
-
     }
 
     void associateStockMovementAndDeliveryOrder(String identifier, String trackingNumber) {
@@ -437,6 +438,9 @@ class TmsIntegrationService {
             createEvent(stockMovement, EventTypeCode.UPLOADED, new Date())
         } catch (SFTPException e) {
             log.error("Unable to upload delivery to order to ftp server due to " + e.statusCode, e)
+            throw e
+        } catch (Exception e) {
+            log.error("Unable to upload delivery to order to ftp server due to " + e.message, e)
             throw e
         }
     }
