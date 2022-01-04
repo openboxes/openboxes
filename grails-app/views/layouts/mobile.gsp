@@ -12,6 +12,8 @@
           crossorigin="anonymous">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
           rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
 </head>
 
 <body class="d-flex flex-column h-100">
@@ -43,48 +45,67 @@
             <g:layoutBody/>
         </div>
     </main>
-%{--    <footer class="footer mt-auto py-3 bg-light">--}%
-%{--        <div class="container-fluid">--}%
-%{--            <span class="text-muted">Place sticky footer content here.</span>--}%
-%{--        </div>--}%
-%{--    </footer>--}%
+    <script
+            src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+            integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/js/all.min.js"></script>
+    <script src="/openboxes/js/onScan/onScan.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script>
+      $(document)
+      .ready(function () {
+        // Enable scan events for the entire document
+        console.log("initialize onScan");
+        onScan.attachTo(document, {
+          minLength: 3,
+          suffixKeyCodes: [13], // enter-key expected at the end of a scan
+          //reactToPaste: true, // Compatibility to built-in scanners in paste-mode (as opposed to keyboard-mode)
+          onScan: function (scanned, count) {
+            console.log('Scanned: ', count, 'x ', scanned);
+            alert("Scanned " + scanned)
+          },
+          onKeyDetect: function (keyCode, event) {
+            console.log('Pressed: ', keyCode, event);
+          },
+          onScanError: function (obj) {
+            console.log('onScanError: ', obj);
+          },
+          onScanButtonLongPress: function (obj) {
+            console.log('onScanButtonLongPress: ', obj);
+          },
+          onKeyProcess: function (char, event) {
+            console.log('onKeyProcess: ', char, event);
+          }
+        });
 
-<script
-        src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
-        integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="
-        crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
-        crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/js/all.min.js"></script>
-<script src="/openboxes/js/onScan/onScan.min.js" type="text/javascript"></script>
-<script>
-  $(document)
-  .ready(function () {
-    // Enable scan events for the entire document
-    console.log("initialize onScan");
-    onScan.attachTo(document, {
-      minLength: 3,
-      suffixKeyCodes: [13], // enter-key expected at the end of a scan
-      //reactToPaste: true, // Compatibility to built-in scanners in paste-mode (as opposed to keyboard-mode)
-      onScan: function (scanned, count) {
-        console.log('Scanned: ', count, 'x ', scanned);
-        alert("Scanned " + scanned)
-      },
-      onKeyDetect: function (keyCode, event) {
-        console.log('Pressed: ', keyCode, event);
-      },
-      onScanError: function (obj) {
-        console.log('onScanError: ', obj);
-      },
-      onScanButtonLongPress: function (obj) {
-        console.log('onScanButtonLongPress: ', obj);
-      },
-      onKeyProcess: function (char, event) {
-        console.log('onKeyProcess: ', char, event);
-      }
-    });
-  });
-</script>
+        $('input.date-filter').daterangepicker({
+          autoUpdateInput: false,
+          autoApply: false,
+          clearBtn: true,
+          ranges: {
+            'Today': [moment(), moment()],
+            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Next Month': [moment().add(1, 'month').startOf('month'), moment().add(1, 'month').endOf('month')],
+            'Next 7 Days': [moment(), moment().add(6, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+        }
+        });
+        $('input.date-filter').on('apply.daterangepicker', function(event, picker) {
+          $(this).val(picker.startDate.format('DD/MMM/YYYY') + ' - ' + picker.endDate.format('DD/MMM/YYYY'));
+        });
+        $('input.date-filter').on('cancel.daterangepicker', function(event, picker) {
+          $(this).val('');
+        });
+
+
+      });
+    </script>
 </body>
 </html>

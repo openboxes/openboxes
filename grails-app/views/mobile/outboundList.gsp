@@ -38,12 +38,12 @@
             <table class="table table-borderless table-striped">
                 <thead>
                 <tr>
-                    <th><g:message code="stockMovement.status.label"/></th>
+                    <th><g:message code="stockMovement.orderStatus.label" default="WMS Status"/></th>
                     <th><g:message code="stockMovement.identifier.label"/></th>
                     <th><g:message code="stockMovement.destination.label"/></th>
-                    <th><g:message code="stockMovement.expectedShippingDate.label" default="Expected Shipping"/></th>
-                    <th><g:message code="stockMovement.expectedDeliveryDate.label" default="Expected Delivery"/></th>
+                    <th><g:message code="stockMovement.dateRequested.label" default="Requested Delivery"/></th>
                     <th><g:message code="stockMovement.trackingNumber.label" /></th>
+                    <th><g:message code="stockMovement.shippingStatus.label" default="TMS Status"/></th>
                     <th class="col-1 text-center"></th>
                 </tr>
                 <tr>
@@ -51,13 +51,23 @@
                         <g:selectRequisitionStatus name="status" value="${params.status}"
                                                    class="form-control" noSelection="['':warehouse.message(code:'default.all.label')]"/>
                     </th>
-                    <th></th>
+                    <th>
+                        <g:textField name="identifier" value="${params.identifier}" class="form-control" size="3"/>
+                    </th>
                     <th>
                         <g:selectLocation id="destination" name="destination.id" value="${params?.destination?.id}"
                                           class="form-control"
                                           noSelection="['null':warehouse.message(code:'default.all.label')]"/>
                     </th>
-                    <th colspan="3">
+                    <th>
+                        <g:textField name="requestedDeliveryDateFilter" class="date-filter form-control" size="10"
+                                     value="${params.requestedDeliveryDateFilter}"/>
+                    </th>
+                    <th>
+                        <g:textField name="trackingNumber" value="${params.trackingNumber}" class="form-control" size="8"/>
+                    </th>
+                    <th>
+                        <g:selectEventType name="eventType" value="${params.eventType}" class="form-control" noSelection="['':warehouse.message(code:'default.all.label')]" />
                     </th>
                     <th class="col-1 text-center">
                         <button type="submit" class="btn btn-primary"><i class="fa fa-filter"></i> Filter</button>
@@ -68,16 +78,8 @@
                 <g:each var="stockMovement" in="${stockMovements}">
                     <tr>
                         <td>
-                            <g:if test="${stockMovement?.shipment?.mostRecentEvent?.eventType}">
-                                <div class="badge bg-primary">
-                                    ${stockMovement.shipment?.mostRecentEvent?.eventType?.name?.toUpperCase()}
-                                </div>
-                                <p class="small text-muted"><g:formatDate date="${stockMovement.shipment?.currentEvent?.eventDate}" format="MMM dd HH:mm"/></p>
-                            </g:if>
-                            <g:else>
-                                <div class="badge bg-primary">${stockMovement?.status}</div>
-                                <p class="small text-muted"><g:formatDate date="${stockMovement.lastUpdated}" format="MMM dd HH:mm"/></p>
-                            </g:else>
+                            <div class="badge bg-primary">${stockMovement?.status}</div>
+                            <p class="small text-muted"><g:formatDate date="${stockMovement.lastUpdated}" format="MMM dd HH:mm"/></p>
                         </td>
                         <td>
                             <a href="${createLink(controller: 'mobile', action: 'outboundDetails', id: stockMovement?.id)}" class="text-decoration-none text-reset">
@@ -85,20 +87,17 @@
                             </a>
                         </td>
                         <td>
-                            ${stockMovement?.destination?.name} (${stockMovement?.destination?.locationNumber})
+                            ${stockMovement?.destination?.name}
                         </td>
-                        <td>
-                            <g:formatDate date="${stockMovement?.expectedShippingDate}" format="dd MMM yyyy"/>
-                        </td>
-                        <td>
+                        <td class="text-center">
                             <g:if test="${stockMovement?.requestedDeliveryDate == stockMovement?.expectedDeliveryDate}">
-                                <g:formatDate date="${stockMovement?.expectedDeliveryDate}" format="dd MMM yyyy"/>
+                                <g:formatDate date="${stockMovement?.expectedDeliveryDate}" format="dd/MMM/yyyy HH:mm"/>
                             </g:if>
                             <g:else>
                                 <del>
-                                    <g:formatDate date="${stockMovement?.requestedDeliveryDate}" format="dd MMM yyyy"/>
+                                    <g:formatDate date="${stockMovement?.requestedDeliveryDate}" format="dd/MMM/yyyy HH:mm"/>
                                 </del>
-                                <g:formatDate date="${stockMovement?.requestedDeliveryDate}" format="dd MMM yyyy"/>
+                                <g:formatDate date="${stockMovement?.requestedDeliveryDate}" format="dd/MMM/yyyy HH:mm"/>
                             </g:else>
                         </td>
                         <td>
@@ -110,9 +109,17 @@
                             </g:else>
                         </td>
                         <td>
+                            <g:if test="${stockMovement?.shipment?.mostRecentEvent?.eventType}">
+                                <div class="badge bg-secondary">
+                                    ${stockMovement.shipment?.mostRecentEvent?.eventType?.name?.toUpperCase()}
+                                </div>
+                                <p class="small text-muted"><g:formatDate date="${stockMovement.shipment?.currentEvent?.eventDate}" format="MMM dd HH:mm"/></p>
+                            </g:if>
+                        </td>
+                        <td>
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                                 <a href="${createLink(controller: 'mobile', action: 'outboundDetails', id: stockMovement?.id)}" class="btn btn-outline-primary">
-                                    Details
+                                    Details <i class="fa fa-chevron-right"></i>
                                 </a>
                             </div>
                         </td>
@@ -186,8 +193,5 @@
         </div>
     </g:form>
 </div>
-
-
-
 </body>
 </html>
