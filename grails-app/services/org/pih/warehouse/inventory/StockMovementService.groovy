@@ -471,7 +471,7 @@ class StockMovementService {
     }
 
     def getOutboundStockMovements(StockMovement stockMovement, Map params) {
-        log.info "Stock movement: ${stockMovement?.shipmentStatusCode}"
+        log.info "criteria: ${stockMovement.toJson()}, params: ${params}"
 
         def requisitions = Requisition.createCriteria().list(max: params.max, offset: params.offset) {
             eq("isTemplate", Boolean.FALSE)
@@ -492,6 +492,27 @@ class StockMovementService {
                     }
                     if (stockMovement?.description) {
                         ilike("description", stockMovement.description)
+                    }
+                }
+            }
+
+            if (stockMovement.trackingNumber) {
+                ReferenceNumberType trackingNumberType = ReferenceNumberType.findById(Constants.TRACKING_NUMBER_TYPE_ID)
+                shipments {
+                    referenceNumbers {
+                        and {
+                            eq("referenceNumberType", trackingNumberType)
+                            ilike("identifier", stockMovement.trackingNumber)
+                        }
+                    }
+                }
+            }
+
+            if (params.eventType) {
+                EventType eventType = EventType.get(params.eventType)
+                shipments {
+                    currentEvent {
+                        eq("eventType", eventType)
                     }
                 }
             }
@@ -521,6 +542,11 @@ class StockMovementService {
             if (stockMovement.requestedDeliveryDate) {
                 eq("requestedDeliveryDate", stockMovement.requestedDeliveryDate)
             }
+
+            if (params.requestedDeliveryDates && params.list("requestedDeliveryDates").size() == 2) {
+                between("requestedDeliveryDate", params.requestedDeliveryDates[0], params.requestedDeliveryDates[1])
+            }
+
             if (stockMovement.requisitionStatusCodes) {
                 'in'("status", stockMovement.requisitionStatusCodes)
             }

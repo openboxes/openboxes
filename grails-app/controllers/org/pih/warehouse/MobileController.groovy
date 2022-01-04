@@ -27,6 +27,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSummary
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.ShipmentStatusCode
+import org.pih.warehouse.util.DateUtil
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest
 
@@ -149,8 +150,21 @@ class MobileController {
         Location origin = Location.get(params.origin?params.origin.id:session.warehouse.id)
 
         RequisitionStatus requisitionStatus = params.status ? params.status as RequisitionStatus : null
-        StockMovement stockMovement = new StockMovement(origin: origin,
+        StockMovement stockMovement = new StockMovement(
+                origin: origin,
                 stockMovementType: StockMovementType.OUTBOUND)
+
+        params.max = params.max?:10
+        params.offset = params.offset?:0
+
+        if (params.identifier) {
+           stockMovement.identifier = "%" + params.identifier + "%"
+        }
+
+        if (params.trackingNumber) {
+            stockMovement.trackingNumber = "%" + params.trackingNumber + "%"
+        }
+
         if (params.status) {
             RequisitionStatus requisitionStatusCode = params.status as RequisitionStatus
             stockMovement.stockMovementStatusCode = RequisitionStatus.toStockMovementStatus(requisitionStatusCode)
@@ -166,7 +180,11 @@ class MobileController {
             stockMovement.expectedDeliveryDate = deliveryDate
         }
 
-        def stockMovements = stockMovementService.getStockMovements(stockMovement, [max:params.max?:10, offset: params.offset?:0])
+        if (params.requestedDeliveryDateFilter) {
+            params.requestedDeliveryDates = DateUtil.parseDateRange(params.requestedDeliveryDateFilter, "dd/MMM/yyyy", " - ")
+        }
+
+        def stockMovements = stockMovementService.getStockMovements(stockMovement, params)
 
         [stockMovements:stockMovements]
     }

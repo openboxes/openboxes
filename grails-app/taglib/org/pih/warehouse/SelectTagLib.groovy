@@ -15,6 +15,7 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.EntityTypeCode
+import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.GlAccountType
 import org.pih.warehouse.core.Location
@@ -224,6 +225,13 @@ class SelectTagLib {
 
     def selectPreferenceType = { attrs, body ->
         attrs.from = PreferenceType.list()
+        attrs.optionKey = "id"
+        attrs.optionValue = { it.name }
+        out << g.select(attrs)
+    }
+
+    def selectEventType = { attrs, body ->
+        attrs.from = EventType.list()
         attrs.optionKey = "id"
         attrs.optionValue = { it.name }
         out << g.select(attrs)
