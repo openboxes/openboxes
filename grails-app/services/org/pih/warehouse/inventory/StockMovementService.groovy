@@ -2609,15 +2609,16 @@ class StockMovementService {
             log.info "Shipment workflow " + shipmentWorkflow
             if (shipmentWorkflow) {
                 shipmentWorkflow.documentTemplates.each { Document documentTemplate ->
+                    def action = documentTemplate.documentType.documentCode == DocumentCode.INVOICE_TEMPLATE ? "download" : "render"
                     documentList << [
                             name        : documentTemplate?.name,
                             documentType: documentTemplate?.documentType?.name,
                             contentType : documentTemplate?.contentType,
                             stepNumber  : null,
-                            uri         : documentTemplate?.fileUri ?: g.createLink(controller: 'document', action: "render",
+                            uri         : documentTemplate?.fileUri ?: g.createLink(controller: 'document', action: action,
                                     id: documentTemplate?.id, params: [shipmentId: stockMovement?.shipment?.id],
                                     absolute: true, title: documentTemplate?.filename),
-                            fileUri    : documentTemplate?.fileUri
+                            fileUri     : documentTemplate?.fileUri
                     ]
                 }
             }
