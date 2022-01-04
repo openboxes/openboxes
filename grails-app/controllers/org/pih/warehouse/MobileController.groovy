@@ -192,39 +192,40 @@ class MobileController {
     def importData = { ImportDataCommand command ->
         def dataImporter
         if (request instanceof DefaultMultipartHttpServletRequest) {
-            MultipartFile xlsFile = request.getFile("xlsFile")
 
-
-            if (xlsFile) {
-                command.importFile = xlsFile
-                command.filename = xlsFile.name
-                command.location = Location.get(session.warehouse.id)
+            List<MultipartFile> xlsFiles = request.getFiles("xlsFile[]")
+            if (xlsFiles) {
 
                 try {
+                    xlsFiles.each { xlsFile ->
 
-                    if (params.type == "outbound")
-                        dataImporter = new OutboundStockMovementExcelImporter(command.filename, xlsFile.inputStream)
-                    else
-                        dataImporter = new InboundStockMovementExcelImporter(command.filename, xlsFile.inputStream)
+                        command.importFile = xlsFile
+                        command.filename = xlsFile.name
+                        command.location = Location.get(session.warehouse.id)
 
-                    if (dataImporter) {
-                        log.info "Using data importer ${dataImporter.class.name}"
-                        command.data = dataImporter.data
-                        dataImporter.validateData(command)
-                        command.columnMap = dataImporter.columnMap
+                        dataImporter = (params.type == "outbound") ?
+                                new OutboundStockMovementExcelImporter(command.filename, xlsFile.inputStream) :
+                                new InboundStockMovementExcelImporter(command.filename, xlsFile.inputStream)
 
-                        if (command?.data?.isEmpty()) {
-                            command.errors.reject("importFile", "${warehouse.message(code: 'inventoryItem.pleaseEnsureDate.message', args: [dataImporter.columnMap?.sheet ?: 'Sheet1', localFile.getAbsolutePath()])}")
-                        }
+                        if (dataImporter) {
+                            log.info "Using data importer ${dataImporter.class.name}"
+                            command.data = dataImporter.data
+                            dataImporter.validateData(command)
+                            command.columnMap = dataImporter.columnMap
 
-                        if (!command.hasErrors()) {
-                            log.info "${command.data.size()} rows of data is about to be imported ..."
-                            dataImporter.importData(command)
-                            if (!command.errors.hasErrors()) {
-                                flash.message = "${warehouse.message(code: 'inventoryItem.importSuccess.message', args: [xlsFile?.originalFilename])}"
+                            if (command?.data?.isEmpty()) {
+                                command.errors.reject("importFile", "${warehouse.message(code: 'inventoryItem.pleaseEnsureDate.message', args: [dataImporter.columnMap?.sheet ?: 'Sheet1', localFile.getAbsolutePath()])}")
                             }
-                        } else {
-                            flash.command = command
+
+                            if (!command.hasErrors()) {
+                                log.info "${command.data.size()} rows of data is about to be imported ..."
+                                dataImporter.importData(command)
+                                if (!command.hasErrors()) {
+                                    flash.message = "${warehouse.message(code: 'inventoryItem.importSuccess.message', args: [xlsFile?.originalFilename])}"
+                                }
+                            } else {
+                                flash.command = command
+                            }
                         }
                     }
                 } catch (OfficeXmlFileException e) {
@@ -232,12 +233,11 @@ class MobileController {
                     flash.message = "Detected invalid Excel .xlsx format - please import .xls files instead"
                 } catch (Exception e) {
                     log.error("An exception occurred while importing data: " + e.message, e)
-                    flash.message = e?.message
+                    flash.message = e.message
                 }
             }
         }
-        def action = (params.type == "outbound" ? 'outboundList' : 'inboundList')
-        redirect (action: action)
+        redirect (action: (params.type == "outbound" ? 'outboundList' : 'inboundList'))
     }
 
     def inboundDetails = {
