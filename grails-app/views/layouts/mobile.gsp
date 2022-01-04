@@ -87,6 +87,9 @@
           autoUpdateInput: false,
           autoApply: false,
           clearBtn: true,
+          locale: {
+            format: 'DD/MMM/YYYY'
+          },
           ranges: {
             'Today': [moment(), moment()],
             'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
@@ -94,7 +97,7 @@
             'This Month': [moment().startOf('month'), moment().endOf('month')],
             'Next Month': [moment().add(1, 'month').startOf('month'), moment().add(1, 'month').endOf('month')],
             'Next 7 Days': [moment(), moment().add(6, 'days')],
-            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()]
         }
         });
         $('input.date-filter').on('apply.daterangepicker', function(event, picker) {

@@ -403,7 +403,7 @@ class StockMovementService {
     }
 
     def getOutboundStockMovements(StockMovement stockMovement, Map params) {
-        log.info "criteria: ${stockMovement.toJson()}, params: ${params}"
+        log.info "criteria: ${stockMovement?.properties}, params: ${params}"
 
         def requisitions = Requisition.createCriteria().list(max: params.max, offset: params.offset) {
             eq("isTemplate", Boolean.FALSE)
