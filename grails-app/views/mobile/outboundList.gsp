@@ -90,14 +90,18 @@
                             ${stockMovement?.destination?.name}
                         </td>
                         <td class="text-center">
-                            <g:if test="${stockMovement?.requestedDeliveryDate == stockMovement?.expectedDeliveryDate}">
-                                <g:formatDate date="${stockMovement?.expectedDeliveryDate}" format="dd/MMM/yyyy HH:mm"/>
+                            <g:if test="${stockMovement?.requestedDeliveryDate == stockMovement?.expectedDeliveryDate || !stockMovement?.expectedDeliveryDate}">
+                                <p>
+                                    <g:formatDate date="${stockMovement?.requestedDeliveryDate}" format="dd/MMM/yyyy HH:mm"/>
+                                </p>
                             </g:if>
                             <g:else>
-                                <del>
+                                <del class="text-muted">
                                     <g:formatDate date="${stockMovement?.requestedDeliveryDate}" format="dd/MMM/yyyy HH:mm"/>
                                 </del>
-                                <g:formatDate date="${stockMovement?.requestedDeliveryDate}" format="dd/MMM/yyyy HH:mm"/>
+                                <p>
+                                    <g:formatDate date="${stockMovement?.expectedDeliveryDate}" format="dd/MMM/yyyy HH:mm"/>
+                                </p>
                             </g:else>
                         </td>
                         <td>
