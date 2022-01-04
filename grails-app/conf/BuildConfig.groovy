@@ -29,7 +29,7 @@ grails.project.dependency.resolution = {
                 "commons-logging",  // use jcl-over-slf4j instead
                 "log4j",  // use reload4j instead
                 "slf4j-log4j12",  // use slf4j-reload4j instead
-                "xml-apis",
+                "xml-apis"
         )
     }
     log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
@@ -46,7 +46,7 @@ grails.project.dependency.resolution = {
         mavenRepo "https://repo.grails.org/grails/plugins/"
         mavenRepo "https://repo.grails.org/grails/core/"
         mavenRepo "https://oss.sonatype.org/content/repositories/snapshots/"
-        mavenRepo "http://repo1.maven.org/maven2/"
+        mavenRepo "https://repo1.maven.org/maven2/"
     }
 
     dependencies {
@@ -62,8 +62,6 @@ grails.project.dependency.resolution = {
         compile "org.slf4j:slf4j-reload4j:1.7.33"
         compile "ch.qos.reload4j:reload4j:1.2.18.2"
         // override hidden grails dependencies to work with reload4j
-        build "org.slf4j:slf4j-api:1.7.33"
-        compile "org.slf4j:slf4j-api:1.7.33"
         runtime "org.slf4j:jcl-over-slf4j:1.7.33"
         runtime "org.slf4j:jul-to-slf4j:1.7.33"
 
@@ -147,30 +145,8 @@ grails.project.dependency.resolution = {
         // for com.google.common
         compile 'com.google.guava:guava:12.0'
 
-        // TODO OBAM-308: Get rid of unnecessary compile/build/runtime lines below during development of this feature
-
         compile 'org.jxls:jxls:2.8.1' // TODO: This is the last version for java 7. After migration to Java 8 upgrade this to 2.9+
-        build 'org.jxls:jxls:2.8.1' // TODO: This is the last version for java 7. After migration to Java 8 upgrade this to 2.9+
         compile 'org.jxls:jxls-poi:1.0.9' // this one supports apache poi v3 (anything above is for v4, which is Java 8)
-        build 'org.jxls:jxls-poi:1.0.9' // this one supports apache poi v3 (anything above is for v4, which is Java 8)
-        compile 'org.apache.commons:commons-jexl:2.1.1'
-
-        // This one is the one that works with Java 7 (3.15 throws a unsupported major minor version)
-        compile 'org.apache.poi:poi:3.12'
-        runtime 'org.apache.poi:poi:3.12'
-        build 'org.apache.poi:poi:3.12'
-
-        compile 'org.apache.xmlbeans:xmlbeans:3.0.2'
-        runtime 'org.apache.xmlbeans:xmlbeans:3.0.2'
-        build 'org.apache.xmlbeans:xmlbeans:3.0.2'
-
-        compile 'org.apache.poi:poi-ooxml:3.12'
-        runtime 'org.apache.poi:poi-ooxml:3.12'
-        build 'org.apache.poi:poi-ooxml:3.12'
-
-        compile 'org.apache.poi:poi-ooxml-schemas:3.12'
-        runtime 'org.apache.poi:poi-ooxml-schemas:3.12'
-        build 'org.apache.poi:poi-ooxml-schemas:3.12'
 
         compile 'org.slf4j:slf4j-api:1.7.26'
         compile 'org.slf4j:slf4j-log4j12:1.7.26'

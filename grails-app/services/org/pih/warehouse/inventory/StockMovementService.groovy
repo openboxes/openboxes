@@ -2586,6 +2586,13 @@ class StockMovementService {
                             uri         : g.createLink(controller: 'doc4j', action: "downloadCertificateOfDonation", id: stockMovement?.shipment?.id, absolute: true)
                     ],
                     [
+                            name        : g.message(code: "shipping.invoiceTemplate.label"),
+                            documentType: DocumentGroupCode.INVOICE.name(),
+                            contentType : "application/vnd.ms-excel",
+                            stepNumber  : 5,
+                            uri         : g.createLink(controller: 'shipment', action: "downloadInvoiceTemplateDocument", params: ['shipment.id': stockMovement?.shipment?.id], absolute: true)
+                    ],
+                    [
                             name        : g.message(code: "goodsReceiptNote.label"),
                             documentType: DocumentGroupCode.GOODS_RECEIPT_NOTE.name(),
                             contentType : "text/html",

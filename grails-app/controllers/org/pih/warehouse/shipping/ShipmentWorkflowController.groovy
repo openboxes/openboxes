@@ -107,7 +107,7 @@ class ShipmentWorkflowController {
 
 
     List getDocumentTemplates() {
-        def documentTypes = DocumentType.findAllByDocumentCode(DocumentCode.SHIPPING_TEMPLATE)
+        def documentTypes = DocumentType.findAllByDocumentCodeInList([DocumentCode.SHIPPING_TEMPLATE, DocumentCode.INVOICE_TEMPLATE])
         Document.findAllByDocumentTypeInList(documentTypes)
     }
 }

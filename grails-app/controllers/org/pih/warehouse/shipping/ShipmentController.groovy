@@ -20,6 +20,8 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 
+import static org.springframework.util.StringUtils.stripFilenameExtension
+
 class ShipmentController {
 
     def scaffold = Shipment
@@ -29,6 +31,7 @@ class ShipmentController {
     def identifierService
     def inventoryService
     MailService mailService
+    def documentTemplateService
 
     def barcode4jService
 
@@ -1189,6 +1192,33 @@ class ShipmentController {
         redirect(controller: "shipment", action: "showDetails", id: params.id)
     }
 
+    def downloadInvoiceTemplateDocument = {
+        Shipment shipmentInstance = Shipment.get(params.shipment.id)
+
+        if (!shipmentInstance) {
+            throw new Exception("Unable to locate shipment with ID ${params.id}")
+        }
+
+        ShipmentWorkflow shipmentWorkflow = shipmentService.getShipmentWorkflow(shipmentInstance)
+        def documentInstance = shipmentWorkflow.documentTemplates?.find {it.documentType?.documentCode == DocumentCode.INVOICE_TEMPLATE}
+
+        if (!documentInstance) {
+            throw new Exception("Unable to locate document with type ${DocumentCode.INVOICE_TEMPLATE}. Please add ${DocumentCode.INVOICE_TEMPLATE} document to shipment workflow.")
+        }
+
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
+            documentTemplateService.renderInvoiceTemplate(documentInstance, shipmentInstance, outputStream)
+            response.setHeader("Content-disposition",
+                    "attachment; filename=\"${stripFilenameExtension(documentInstance.filename)}-${shipmentInstance.shipmentNumber}.${documentInstance.extension}\"")
+            response.setContentType(documentInstance.contentType)
+            outputStream.writeTo(response.outputStream)
+            response.outputStream.flush()
+        } catch (Exception e) {
+            log.error("Unable to render document template ${documentInstance.name} for shipment ${shipmentInstance?.id}", e)
+            throw e
+        }
+    }
 }
 
 class ReceiveShipmentCommand implements Serializable {

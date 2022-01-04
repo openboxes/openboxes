@@ -21,11 +21,11 @@ import groovy.text.Template
 import org.codehaus.groovy.grails.web.pages.GroovyPagesTemplateEngine
 import org.jxls.common.Context
 import org.jxls.util.JxlsHelper
-import org.pih.warehouse.invoice.Invoice
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
+import org.pih.warehouse.shipping.Shipment
 
 class DocumentTemplateService {
 
@@ -40,11 +40,12 @@ class DocumentTemplateService {
         return output.toString()
     }
 
-    def renderInvoiceTemplate(Document documentTemplate, Invoice invoiceInstance, ByteArrayOutputStream outputStream) {
+    def renderInvoiceTemplate(Document documentTemplate, Shipment shipmentInstance, ByteArrayOutputStream outputStream) {
         InputStream inputStream = new ByteArrayInputStream(documentTemplate.fileContents)
         Context context = new Context()
-        context.putVar("invoice", invoiceInstance)
-        context.putVar("invoiceItems", invoiceInstance?.invoiceItems)
+        context.putVar("invoiceItems", shipmentInstance?.shipmentItems)
+        context.putVar("datePrinted", Constants.EUROPEAN_DATE_FORMATTER.format(new Date()))
+        context.putVar("requisition", shipmentInstance?.requisition?.requestNumber ?: '')
         JxlsHelper.getInstance().processTemplateAtCell(inputStream, outputStream, context, "Result!A1")
     }
 
