@@ -268,7 +268,7 @@
                     <div class="modal-body">
                         <input name="type" type="hidden" value="outbound"/>
                         <g:hiddenField name="location.id" value="${session.warehouse.id }"/>
-                        <input class="form-control" type="file" name="xlsFile" required>
+                        <input class="form-control" type="file" name="xlsFile[]" multiple required>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -291,7 +291,7 @@
                     <div class="modal-body">
                         <g:hiddenField name="type" value="inbound"/>
                         <g:hiddenField name="location.id" value="${session.warehouse.id }"/>
-                        <input class="form-control" type="file" name="xlsFile" required>
+                        <input class="form-control" type="file" name="xlsFile[]" multiple required>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

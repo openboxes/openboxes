@@ -29,6 +29,7 @@ class OutboundStockMovementDataService {
     Boolean validateData(ImportDataCommand command) {
         log.info "Validate data " + command.filename
         command.data.eachWithIndex { params, index ->
+
             if (!params?.origin) {
                 throw new IllegalArgumentException("Row ${index + 1}: Origin is required")
             }
@@ -38,6 +39,10 @@ class OutboundStockMovementDataService {
             if (!params?.quantity) {
                 throw new IllegalArgumentException("Row ${index + 1}: Requested Quantity is required")
             }
+            if(command?.location?.locationNumber != params.origin) {
+                throw new IllegalArgumentException("Row ${index + 1}: Origin location (${params.origin}) must match the current location (${command?.location?.locationNumber})")
+            }
+
             RequisitionItem requisitionItem = buildRequisitionItem(params)
             if (!requisitionItem.validate()) {
                 requisitionItem.errors.each { BeanPropertyBindingResult error ->
