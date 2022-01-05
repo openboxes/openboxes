@@ -21,13 +21,6 @@
             <button type="button" class="btn btn-outline-primary "
                     data-bs-toggle="modal" data-bs-target="#outboundModal"><i class="fa fa-file-import"></i> Import Delivery Orders</button>
 
-            <g:isSuperuser>
-                <button type="button" class="btn btn-outline-secondary "
-                        data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="fa fa-file-upload"></i> Send Delivery Orders
-                    <label class="badge bg-danger">debug</label>
-                </button>
-            </g:isSuperuser>
-
         </div>
     </div>
 </div>

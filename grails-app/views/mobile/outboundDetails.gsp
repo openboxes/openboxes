@@ -37,6 +37,12 @@
                                 </a>
                             </li>
                             <li>
+                                <a href="${createLink(controller: 'mobile', action: 'exportData', id: stockMovement?.id)}"
+                                   class="dropdown-item">
+                                    Export Order
+                                </a>
+                            </li>
+                            <li>
                                 <a href="${createLink(controller: 'mobile', action: 'outboundDownload', id: stockMovement?.id)}"
                                    class="dropdown-item" target="_blank">
                                     Download Delivery Order Request (.xml)
