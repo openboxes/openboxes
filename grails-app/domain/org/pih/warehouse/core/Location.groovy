@@ -20,9 +20,7 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 
-/**
- * A location can be a customer, warehouse, or supplier.
- */
+@Schema(description="A location can be a customer, warehouse, supplier, etc.")
 class Location implements Comparable<Location>, java.io.Serializable {
 
     @Hidden
@@ -316,7 +314,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
      * @param schema a Swagger schema object (*not* a Schema annotation!)
      * @return a Swagger schema object with implicit fields added
      */
-    static SchemaObject addImplicitSwaggerFields(SchemaObject schema) {
+    static SchemaObject addImplicitProperties(SchemaObject schema) {
         schema.addProperties("hasBinLocationSupport", new SchemaObject().name("hasBinLocationSupport").type("boolean"))
         schema.addProperties("hasPackingSupport", new SchemaObject().name("hasPackingSupport").type("boolean"))
         schema.addProperties("hasPartialReceivingSupport", new SchemaObject().name("hasPartialReceivingSupport").type("boolean"))
