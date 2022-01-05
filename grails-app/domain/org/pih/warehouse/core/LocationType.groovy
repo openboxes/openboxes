@@ -7,8 +7,9 @@
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
  **/
-package org.pih.warehouse.core
 
+package org.pih.warehouse.core
+import io.swagger.v3.oas.annotations.Hidden
 
 /**
  * Represents the type of a Location
@@ -19,8 +20,12 @@ class LocationType implements Comparable, Serializable {
     String id
     String name
     String description
+
+    @Hidden
     Integer sortOrder = 0
+    @Hidden
     Date dateCreated
+    @Hidden
     Date lastUpdated
 
     LocationTypeCode locationTypeCode

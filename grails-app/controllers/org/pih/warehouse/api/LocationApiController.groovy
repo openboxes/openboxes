@@ -45,7 +45,9 @@ class LocationApiController extends BaseDomainApiController {
                                             uniqueItems = true
                                     ),
                                     mediaType = "application/json"
-                            )
+                            ),
+                            description="It worked",
+                            responseCode="200"
                     ),
                     @ApiResponse(responseCode="400", description="Invalid ID supplied"),
                     @ApiResponse(responseCode="404", description="Not found")

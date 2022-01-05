@@ -364,6 +364,7 @@ task prepareDocker(type: Copy, dependsOn: assemble) {
 
 resolve {
     classpath = sourceSets.main.runtimeClasspath
+    filterClass = "org.pih.warehouse.api.SwaggerFilter"
     openApiFile = file("${project.projectDir}/grails-app/conf/openapi_static.yml")
     outputFileName = "openboxes_api"
     outputDir = file("${project.projectDir}/build/openapi")
