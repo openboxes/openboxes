@@ -319,10 +319,15 @@ class TmsIntegrationService {
     void associateStockMovementAndDeliveryOrder(String identifier, String trackingNumber) {
         // FIXME Need to ensure that stock movement is ready to receive notification i.e. shipment has been created
         StockMovement stockMovement = stockMovementService.getStockMovementByIdentifier(identifier, Boolean.FALSE)
-        if (!stockMovement?.shipment) {
-            stockMovement?.shipment = stockMovementService.createShipment(stockMovement, false)
+        if (stockMovement) {
+            if (!stockMovement?.shipment) {
+                stockMovement.shipment = stockMovementService.createShipment(stockMovement, false)
+            }
+            stockMovementService.createOrUpdateTrackingNumber(stockMovement?.shipment, trackingNumber)
         }
-        stockMovementService.createOrUpdateTrackingNumber(stockMovement?.shipment, trackingNumber)
+        else {
+            log.warn("Unable to locate a stock movement with identifier ${identifier}")
+        }
     }
 
     void acceptDeliveryOrder(String trackingNumber) {
