@@ -46,7 +46,7 @@ class ProductNotificationController {
     }
 
     def handleMessage = {
-        JSONObject json = request.getJSON() as JSONObject
+        JSONObject json = request.getJSON()
         log.info "json for create Product::${json}"
         if (notificationService.confirmSubscription(json, Constants.ARN_TOPIC_PRODUCT_CREATE_UPDATE_TYPE)){
             render "subscribed"

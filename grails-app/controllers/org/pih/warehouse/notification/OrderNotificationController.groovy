@@ -51,7 +51,7 @@ class OrderNotificationController {
     }
 
     def handleMessage = {
-        JSONObject json = request.getJSON() as JSONObject
+        JSONObject json = request.getJSON()
         log.info "Create order JSON:${json}"
         if (notificationService.confirmSubscription(json, Constants.ARN_TOPIC_ORDER_CREATE_TYPE)){
             render "subscribed"
