@@ -225,6 +225,17 @@ class ProductService {
         return searchResults
     }
 
+    Product findProduct(String identifier){
+        return Product.createCriteria().get {
+            or {
+                eq("id", identifier)
+                eq("productCode", identifier)
+                eq("upc", identifier)
+                eq("ndc", identifier)
+            }
+        }
+    }
+
     /**
      * @deprecated
      * @return
@@ -1211,7 +1222,7 @@ class ProductService {
             category.name = productJson.getString("category")
             category.save()
         }
-        Product productInstance = findProductByUpc(productJson.getString("id"))
+        Product productInstance = findProduct(productJson.getString("id"))
         if (!productInstance) {
             productInstance = new Product()
             productInstance.upc = productJson.getString("id")
@@ -1224,7 +1235,7 @@ class ProductService {
         productInstance.brandName = productJson.getString("brandName")
         productInstance.category = category
         if (!productInstance.productCode) {
-            productInstance.productCode = productService.generateProductIdentifier(productInstance.productType)
+            productInstance.productCode = generateProductIdentifier(productInstance.productType)
         }
         try {
             if (!productInstance?.validate() || productInstance?.hasErrors()) {

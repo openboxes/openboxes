@@ -10,6 +10,7 @@
 package util
 
 import groovy.text.SimpleTemplateEngine
+import org.codehaus.groovy.grails.web.json.JSONObject
 
 import java.text.DateFormat
 import java.text.MessageFormat
@@ -76,6 +77,22 @@ class StringUtil {
             DateFormat dateFormat = new SimpleDateFormat(format)
             return dateFormat.format(date)
         }
+        return null
+    }
+
+    static JSONObject toJson(String value) {
+        try {
+            if (value) {
+                value = value.trim()
+                if(value != "" && value != "null") {
+                    JSONObject jsonObject = new JSONObject(value)
+                    return jsonObject
+                }
+            }
+        } catch (Exception ex) {
+            println "Exception:${ex} while parsing ${value} in JSON"
+        }
+
         return null
     }
 

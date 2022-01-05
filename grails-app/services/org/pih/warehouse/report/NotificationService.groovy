@@ -14,6 +14,9 @@ import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.services.sns.AmazonSNSClientBuilder
 import com.amazonaws.services.sns.model.ConfirmSubscriptionRequest
 import com.amazonaws.services.sns.model.ConfirmSubscriptionResult
+import com.amazonaws.services.sns.model.PublishRequest
+import com.amazonaws.services.sns.model.SubscribeRequest
+import com.amazonaws.services.sns.model.SubscribeResult
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.mail.EmailException
 import org.apache.commons.validator.EmailValidator
@@ -249,6 +252,26 @@ class NotificationService {
                                 )
                         )
                 ).build()
+    }
+
+    Boolean publish(String topicArn, String message, String subject){
+        PublishRequest publishRequest = new PublishRequest(topicArn, message, subject)
+        def result = amazonSnsClient.publish(publishRequest)
+        log.info "result::${result?.dump()}"
+        return true
+    }
+
+    Boolean subscribeTopic(String topicArn, String subscribeUrl){
+        try {
+        SubscribeRequest subscribeRequest = new SubscribeRequest(topicArn, "https", subscribeUrl)
+        subscribeRequest.returnSubscriptionArn = true
+        SubscribeResult result = amazonSnsClient.subscribe(subscribeRequest);
+        log.info("Subscription ARN is " + result.subscriptionArn);
+        } catch (Exception e) {
+            log.error("Error occurred while subscribing to ${topicArn}: " + e.message, e);
+            return false
+        }
+        return true
     }
 
     Boolean confirmSubscription(JSONObject json, String topicType) {
