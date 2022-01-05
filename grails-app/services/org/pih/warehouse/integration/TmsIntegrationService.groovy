@@ -148,25 +148,28 @@ class TmsIntegrationService {
         try {
             String directory = grailsApplication.config.openboxes.integration.ftp.inbound.directory
             List<String> subdirectories = grailsApplication.config.openboxes.integration.ftp.inbound.subdirectories
-            def messages = fileTransferService.listMessages(directory, subdirectories)
 
-            messages.eachWithIndex { msg, index ->
-                log.info "Message ${index}: " + msg
-            }
+            subdirectories.each { subdirectory ->
 
-            messages = messages.findAll { it.isRegularFile && it.name.endsWith(".xml")}
-            if (messages) {
-                message = messages.pop()
-                if (message) {
-                    String xmlContents = fileTransferService.retrieveMessage(message.path)
-                    log.info "Handling message ${message}:\n${xmlContents}"
-                    handleMessage(xmlContents)
+                def messages = fileTransferService.listMessages(directory, [subdirectory])
+                messages.eachWithIndex { msg, index ->
+                    log.info "Message ${index}: " + msg
+                }
 
-                    // Archive message on success so that other messages can be processed
-                    Boolean archiveMessageOnSuccess = grailsApplication.config.openboxes.integration.ftp.inbound.archiveOnSuccess.enabled
-                    if (archiveMessageOnSuccess) {
-                        log.info "Archiving message ${message}"
-                        archiveMessage(message.path)
+                messages = messages.findAll { it.isRegularFile && it.name.endsWith(".xml")}
+                if (messages) {
+                    message = messages.pop()
+                    if (message) {
+                        String xmlContents = fileTransferService.retrieveMessage(message.path)
+                        log.info "Handling message ${message}:\n${xmlContents}"
+                        handleMessage(xmlContents)
+
+                        // Archive message on success so that other messages can be processed
+                        Boolean archiveMessageOnSuccess = grailsApplication.config.openboxes.integration.ftp.inbound.archiveOnSuccess.enabled
+                        if (archiveMessageOnSuccess) {
+                            log.info "Archiving message ${message}"
+                            archiveMessage(message.path)
+                        }
                     }
                 }
             }
