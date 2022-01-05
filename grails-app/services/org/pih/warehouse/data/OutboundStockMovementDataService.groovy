@@ -43,6 +43,25 @@ class OutboundStockMovementDataService {
                 throw new IllegalArgumentException("Row ${index + 1}: Origin location (${params.origin}) must match the current location (${command?.location?.locationNumber})")
             }
 
+            // validate requisition
+            Requisition requisition = Requisition.findByRequestNumber(params.requestNumber)
+            if (command.id) {
+
+                if (!requisition) {
+                    throw new IllegalArgumentException("Row ${index + 1}: Cannot locate outbound order with identifier ${params.requestNumber}")
+                }
+
+                Requisition targetRequisition = Requisition.get(command.id)
+                if (!requisition || command.id != requisition.id) {
+                    throw new IllegalArgumentException("Row ${index + 1}: Cannot include line items from other outbound orders (${requisition.requestNumber}) when editing an order (${targetRequisition.requestNumber})")
+                }
+            }
+
+            if (requisition.status >= RequisitionStatus.EDITING) {
+                throw new IllegalArgumentException("Row ${index + 1}: Cannot edit outbound order with identifier ${requisition.requestNumber} with status ${requisition?.status}")
+            }
+
+
             RequisitionItem requisitionItem = buildRequisitionItem(params)
             if (!requisitionItem.validate()) {
                 requisitionItem.errors.each { BeanPropertyBindingResult error ->
@@ -97,17 +116,16 @@ class OutboundStockMovementDataService {
             requisition = new Requisition(
                     name: name,
                     requestNumber: requestNumber,
-                    status: RequisitionStatus.CREATED
+                    dateRequested: new Date(),
+                    type: RequisitionType.DEFAULT,
+                    status: RequisitionStatus.CREATED,
+                    requestedBy: AuthService.currentUser.get()
             )
-            requisition.origin = findLocationByLocationNumber(params.origin)
-            requisition.destination = findLocationByLocationNumber(params.destination)
-            requisition.type = RequisitionType.DEFAULT
-            requisition.description = name
-            requisition.requestedDeliveryDate = deliveryDate.toDate()
-            requisition.dateRequested = new Date()
-            requisition.requestedBy = AuthService.currentUser.get()
-            requisition.save(failOnError: true)
         }
+        requisition.origin = findLocationByLocationNumber(params.origin)
+        requisition.destination = findLocationByLocationNumber(params.destination)
+        requisition.requestedDeliveryDate = deliveryDate.toDate()
+        requisition.save(failOnError: true)
 
         def requisitionItem = RequisitionItem.createCriteria().get {
             eq 'product' , product

@@ -206,7 +206,7 @@ class MobileController {
                         "Pallet Spaces"       : "",
                         "Delivery Date"       : stockMovement?.requestedDeliveryDate,
                         "Load Code"           : stockMovement?.identifier,
-                        "Special Instructions": stockMovementItem.description,
+                        "Special Instructions": stockMovementItem.requisitionItem?.description,
                 ]
             }
 
@@ -269,7 +269,14 @@ class MobileController {
                 }
             }
         }
-        redirect (action: (params.type == "outbound" ? 'outboundList' : 'inboundList'))
+
+        if (params.redirectUrl) {
+            redirect(url: params.redirectUrl)
+        }
+        else {
+            redirect (action: (params.type == "outbound" ? 'outboundList' : 'inboundList'))
+        }
+
     }
 
     def inboundDetails = {

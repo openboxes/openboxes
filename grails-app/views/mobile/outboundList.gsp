@@ -31,12 +31,12 @@
             <table class="table table-borderless table-striped">
                 <thead>
                 <tr>
-                    <th><g:message code="stockMovement.orderStatus.label" default="WMS Status"/></th>
+                    <th><g:message code="stockMovement.orderStatus.label" default="Order Status"/></th>
                     <th><g:message code="stockMovement.identifier.label"/></th>
                     <th><g:message code="stockMovement.destination.label"/></th>
-                    <th><g:message code="stockMovement.dateRequested.label" default="Requested Delivery"/></th>
+                    <th><g:message code="stockMovement.requestedDeliveryDate.label" default="Requested Delivery"/></th>
                     <th><g:message code="stockMovement.trackingNumber.label" /></th>
-                    <th><g:message code="stockMovement.shippingStatus.label" default="TMS Status"/></th>
+                    <th><g:message code="stockMovement.shippingStatus.label" default="Shipping Status"/></th>
                     <th class="col-1 text-center"></th>
                 </tr>
                 <tr>
@@ -85,7 +85,7 @@
                         <td class="text-center">
                             <g:if test="${stockMovement?.requestedDeliveryDate == stockMovement?.expectedDeliveryDate || !stockMovement?.expectedDeliveryDate}">
                                 <p>
-                                    <g:formatDate date="${stockMovement?.requestedDeliveryDate}" format="dd/MMM/yyyy HH:mm"/>
+                                    <g:formatDate date="${stockMovement?.requestedDeliveryDate}" format="dd/MMM/yyyy"/>
                                 </p>
                             </g:if>
                             <g:else>
