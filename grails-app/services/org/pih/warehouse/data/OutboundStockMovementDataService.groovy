@@ -90,7 +90,6 @@ class OutboundStockMovementDataService {
             throw new IllegalArgumentException("Delivery date must be after seven days from now")
         }
 
-        def comments = params.destination
         def requestNumber = params.requestNumber
         def requisition = Requisition.findByRequestNumber(requestNumber)
         if (!requisition) {
@@ -120,7 +119,7 @@ class OutboundStockMovementDataService {
 
         requisitionItem.product = product
         requisitionItem.quantity = quantityRequested
-        requisitionItem.comment = comments
+        requisitionItem.description = params.description
 
         requisition.addToRequisitionItems(requisitionItem)
 
