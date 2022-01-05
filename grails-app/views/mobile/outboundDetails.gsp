@@ -227,9 +227,15 @@
                                 </td>
                                 <td class="col-6">
                                     ${item?.product?.name}
+                                    <g:if test="${item?.requisitionItem?.description}">
+                                        <div class="text-muted">
+                                            Special Instructions: ${item.requisitionItem?.description}
+                                        </div>
+                                    </g:if>
                                 </td>
                                 <td class="col-1 text-center">
                                     ${item.quantityRequested}
+                                    ${item?.product?.unitOfMeasure?:"EA"}
                                 </td>
                             </tr>
                         </g:each>
