@@ -12,8 +12,15 @@
         <div class="col col-md-12">
             <div class="float-end">
                 <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
-                            data-bs-target="#messageUploadModal">Upload Message</button>
-                <g:link controller="mobile" action="messageListProcess" class="btn btn-outline-success">Process Messages</g:link>
+                            data-bs-target="#messageUploadModal">
+                    <i class="fa fa-file-upload"></i> Upload Message
+                </button>
+                <g:link controller="mobile" action="messageListProcess" class="btn btn-outline-success">
+                    <i class="fa fa-bullseye"></i> Process Messages
+                </g:link>
+                <button type="button" class="btn btn-outline-secondary"
+                        data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="fa fa-paper-plane"></i> Send Delivery Orders
+                </button>
             </div>
         </div>
     </div>
