@@ -13,6 +13,7 @@ import net.schmizz.sshj.sftp.SFTPException
 import org.apache.commons.net.util.Base64
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException
 import org.pih.warehouse.api.StockMovement
+import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Event
@@ -39,6 +40,7 @@ class MobileController {
     def inventoryService
     def locationService
     def megamenuService
+    def documentService
     def stockMovementService
     def fileTransferService
     def grailsApplication
@@ -187,6 +189,36 @@ class MobileController {
         def stockMovements = stockMovementService.getStockMovements(stockMovement, params)
 
         [stockMovements:stockMovements]
+    }
+
+    def exportData = {
+
+        try {
+            StockMovement stockMovement = stockMovementService.getStockMovement(params.id, false)
+            def data = stockMovement.lineItems.collect { StockMovementItem stockMovementItem ->
+                return [
+                        "Origin"              : stockMovement?.origin?.locationNumber,
+                        "Dest Venue Code"     : stockMovement?.destination?.locationNumber,
+                        "Item Description"    : stockMovementItem.product?.name,
+                        "SKU Code"            : stockMovementItem.product?.productCode,
+                        "Requested Quantity"  : stockMovementItem.quantityRequested,
+                        "Pallet Quantity"     : "",
+                        "Pallet Spaces"       : "",
+                        "Delivery Date"       : stockMovement?.requestedDeliveryDate,
+                        "Load Code"           : stockMovement?.identifier,
+                        "Special Instructions": stockMovementItem.description,
+                ]
+            }
+
+            response.contentType = "application/vnd.ms-excel"
+            response.setHeader 'Content-disposition', "attachment; filename=\"${stockMovement?.identifier}.xls\""
+            documentService.generateExcel(response.outputStream, data)
+            response.outputStream.flush()
+            return
+        } catch (Exception e) {
+            flash.message = e.message
+        }
+        redirect(action: "outboundDetails", id: params.id)
     }
 
     def importData = { ImportDataCommand command ->

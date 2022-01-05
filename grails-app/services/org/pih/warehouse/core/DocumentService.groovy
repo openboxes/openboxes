@@ -416,10 +416,10 @@ class DocumentService {
     void generateExcel(OutputStream outputStream, List<Map> data) {
         try {
             Workbook workbook = new HSSFWorkbook()
-            HSSFSheet sheet = workbook.createSheet("Sheet1")
+            Sheet sheet = workbook.createSheet("Sheet1")
             createExcelHeader(sheet, 0, data.get(0).keySet().toList())
             data.eachWithIndex { Map dataRow, index ->
-                createExcelRow(sheet, index + 1, dataRow)
+                createExcelRow(workbook, sheet, index + 1, dataRow)
             }
             workbook.write(outputStream)
             outputStream.close()
@@ -428,22 +428,29 @@ class DocumentService {
         }
     }
 
-    void createExcelHeader(HSSFSheet sheet, int rowNumber, List columnNames) {
+    void createExcelHeader(Sheet sheet, int rowNumber, List columnNames) {
         Row excelRow = sheet.createRow(rowNumber)
         columnNames.eachWithIndex { columnName, index ->
             excelRow.createCell(index).setCellValue(columnName)
         }
     }
 
-    void createExcelRow(HSSFSheet sheet, int rowNumber, Map dataRow) {
+    void createExcelRow(Workbook workbook, Sheet sheet, int rowNumber, Map dataRow) {
         Row excelRow = sheet.createRow(rowNumber)
         dataRow.keySet().eachWithIndex { columnName, index ->
+
+            Cell cell = excelRow.createCell(index)
             def cellValue = dataRow.get(columnName) ?: ""
             // POI can't handle objects so we need to convert all objects to strings unless they are numeric
-            if (!(cellValue instanceof Number)) {
+            if (cellValue instanceof Date) {
+                CellStyle cellStyle = workbook.createCellStyle();
+                cellStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat("m/d/yyyy"))
+                cell.setCellStyle(cellStyle)
+            }
+            else if (!(cellValue instanceof Number)) {
                 cellValue = cellValue.toString()
             }
-            excelRow.createCell(index).setCellValue(cellValue)
+            cell.setCellValue(cellValue)
         }
     }
 
