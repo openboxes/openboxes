@@ -18,6 +18,9 @@
 
             <div class="col-9">
                 <h5 class="ml-5">${stockMovement.name}</h5>
+                <div class="small text-muted">
+                    Last updated by ${stockMovement.updatedBy?.name} on ${g.formatDate(date: stockMovement.shipment?.mostRecentEvent?.eventDate?:stockMovement.lastUpdated, type: "datetime")}
+                </div>
             </div>
 
             <g:isSuperuser>
@@ -34,6 +37,11 @@
                                 <a href="${createLink(controller: 'stockMovement', action: 'show', id: stockMovement?.id)}"
                                    class="dropdown-item">
                                     View Details
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#outboundModal">
+                                    Import Order
                                 </a>
                             </li>
                             <li>
@@ -111,18 +119,14 @@
                 </span>
             </div>
 
-            <div class="col-sm-12 col-md-3 text-center">
-                <span class="text-muted d-block">Date Created</span>
-                <span class="text-4 font-weight-500 text-dark mt-1 mt-lg-0">
-                    ${g.formatDate(date: stockMovement.requisition.dateCreated, type: "datetime")}
-                </span>
-            </div>
-
-            <div class="col-sm-12 col-md-3 text-center">
-                <span class="text-muted d-block">Last Updated</span>
-                <span class="text-4 font-weight-500 text-dark mt-1 mt-lg-0">
-                    ${g.formatDate(date: stockMovement.shipment?.mostRecentEvent?.eventDate?:stockMovement.lastUpdated, type: "datetime")}
-                </span>
+            <div class="col-sm-12 col-md-3 text-center mb-3 mt-sm-0">
+                <span class="text-muted d-block">Requested Delivery</span>
+                <g:if test="${stockMovement?.requestedDeliveryDate}">
+                    <div class="text-5 font-weight-500 text-dark">
+                        ${g.formatDate(date: stockMovement.requestedDeliveryDate, type: "date")}
+                    </div>
+                </g:if>
+                <g:else>Not Available</g:else>
             </div>
 
             <div class="col-sm-12 col-md-3 text-center mb-3 mt-sm-0">
@@ -135,7 +139,7 @@
                         <div class="badge badge-pill bg-danger">Expected ${prettyDateFormat(date: stockMovement?.expectedShippingDate)}</div>
                     </g:if>
                 </g:if>
-                <g:else>Not Available</g:else>
+                <g:else>TBD</g:else>
             </div>
 
             <div class="col-sm-12 col-md-3 text-center mb-3 mt-sm-0">
@@ -148,7 +152,7 @@
                         <div class="badge badge-pill bg-danger">Expected ${prettyDateFormat(date: stockMovement?.expectedDeliveryDate)}</div>
                     </g:if>
                 </g:if>
-                <g:else>Not Available</g:else>
+                <g:else>TBD</g:else>
             </div>
         </div>
     </div>
@@ -403,5 +407,33 @@
         </div>
     </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="outboundModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <g:uploadForm class="needs-validation" action="importData" enctype="multipart/form-data">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Edit Outbound Order ${stockMovement.identifier}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input name="type" type="hidden" value="outbound"/>
+                    <input name="id" type="hidden" value="${params.id}"/>
+                    <input name="redirectUrl" type="hidden" value="${g.createLink(controller: 'mobile', action: 'outboundDetails', id: params.id)}"/>
+                    <g:hiddenField name="location.id" value="${session.warehouse.id }"/>
+                    <input class="form-control" type="file" name="xlsFile[]" required>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </div>
+            </div>
+        </div>
+    </g:uploadForm>
+</div>
+
+
 </body>
 </html>

@@ -12,6 +12,8 @@ package org.pih.warehouse.importer
 import org.pih.warehouse.core.Location
 
 class ImportDataCommand {
+
+    def id
     def filename
     def importFile
     def type
@@ -27,6 +29,7 @@ class ImportDataCommand {
     def transaction
 
     static constraints = {
+        id(nullable:true)
         date(nullable: true)
         filename(nullable: true)
         importFile(nullable: true)
