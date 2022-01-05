@@ -1,12 +1,24 @@
-openapi: 3.0.1
+openapi: 3.0.3
 info:
   contact:
-    email: mpearson@pih.org
-  description: "This is a very short api specification"
+    name: OpenBoxes discussion board
+    url: https://discuss.openboxes.com
+  description: |
+    [OpenBoxes](https://openboxes.org) is an open-source LMIS application
+    that increases stock visibility, reduces the risk of stock-outs and
+    stock wastage, and offers tools to improve forecasting and traceability.
+    The following API documentation is a work in progress.
   license:
     name: Eclipse Public License 1.0
     url: http://opensource.org/licenses/eclipse-1.0.php
   sortOutput: true
-  termsOfService: http://swagger.io/terms/
+  termsOfService: https://www.pih.org/pages/terms
   title: OpenBoxes API specification
-  version: "1.0"
+  version: "0.8.17"
+servers:
+#- url: https://obdev.pih-emr.org
+#  description: Dev instance
+- url: https://obnavstage.pih-emr.org
+  description: Staging instance
+- url: https://obnav.pih-emr.org
+  description: Production instance
