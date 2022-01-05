@@ -82,17 +82,24 @@
                             <div class="dropdown">
                                 <button class="btn btn-outline-primary dropdown-toggle" type="button"
                                         id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Actions
+                                    <i class="fa fa-cog"></i> Actions
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                     <li><g:link controller="mobile" action="messageDetails"
-                                                class="dropdown-item" params="[path: message.path]">Download</g:link></li>
+                                                class="dropdown-item" params="[path: message.path]">
+                                        <i class="fa fa-file-download"></i> Download</g:link></li>
                                     <li><g:link controller="mobile" action="messageValidate"
-                                                class="dropdown-item" params="[path: message.path]">Validate</g:link></li>
+                                                class="dropdown-item" params="[path: message.path]">
+                                        <i class="fa fa-spell-check"></i> Validate</g:link></li>
                                     <li><g:link controller="mobile" action="messageProcess"
-                                                class="dropdown-item" params="[path: message.path]">Process</g:link></li>
+                                                class="dropdown-item" params="[path: message.path]">
+                                        <i class="fa fa-bullseye"></i> Process</g:link></li>
+                                    <li><g:link controller="mobile" action="messageArchive"
+                                                class="dropdown-item" params="[path: message.path]">
+                                        <i class="fa fa-archive"></i> Archive</g:link></li>
                                     <li><g:link controller="mobile" action="messageDelete"
-                                                class="dropdown-item text-danger" params="[path: message.path]">Delete</g:link></li>
+                                                class="dropdown-item text-danger" params="[path: message.path]">
+                                        <i class="fa fa-ban"></i> Delete</g:link></li>
                                     </ul>
                                 </div>
                         </td>

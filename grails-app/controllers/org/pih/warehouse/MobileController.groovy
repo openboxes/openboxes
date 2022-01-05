@@ -379,11 +379,10 @@ class MobileController {
             Object messageObject = tmsIntegrationService.deserialize(xmlContents)
             tmsIntegrationService.handleMessage(messageObject)
             flash.message = "Message ${params.path} has been processed successfully"
-            tmsIntegrationService.archiveMessage(params.path)
 
             Boolean archiveOnSuccess = grailsApplication.config.openboxes.integration.ftp.archiveOnSuccess
             if (archiveOnSuccess) {
-                archiveMessage(params.path)
+                tmsIntegrationService.archiveMessage(params.path)
             }
         }
         catch (Exception e) {
@@ -393,6 +392,20 @@ class MobileController {
         }
         redirect(action: "messageList")
     }
+
+    def messageArchive = {
+        try {
+            tmsIntegrationService.archiveMessage(params.path)
+            flash.message = "Message ${params.path} has been archived successfully"
+        }
+        catch (Exception e) {
+            log.error("Message was not processed due to error: " + e.message, e)
+            flash.message = "Message ${params.path} was not processed due to error: " + e.message
+            tmsIntegrationService.failMessage(params.path, e)
+        }
+        redirect(action: "messageList")
+    }
+
 
     def uploadDeliveryOrders = {
         log.info "upload delivery orders " + params
