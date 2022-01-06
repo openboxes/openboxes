@@ -40,18 +40,21 @@ class InboundStockMovementDataService {
                 }
                 else {
                     stockMovementService.updateStockMovement(stockMovement)
+                    stockMovementService.updateItems(stockMovement)
                 }
             }
         }
     }
 
     List<StockMovement> buildStockMovements(ImportDataCommand command) {
-        log.info "building stock movements"
         List<StockMovement> stockMovements = new ArrayList<StockMovement>()
         command.data.groupBy { it.loadCode }.each { loadCode, rows ->
             StockMovement stockMovement = buildStockMovement(command, rows[0])
             rows.each { row ->
+                Product product = Product.findByProductCode(row.productCode)
+                StockMovementItem existingStockMovementItem = stockMovement.lineItems.find { it.product == product }
                 StockMovementItem stockMovementItem = buildStockMovementItem(command, row)
+                stockMovementItem.id = existingStockMovementItem?.id
                 stockMovementItem.stockMovement = stockMovement
                 stockMovement.lineItems.add(stockMovementItem)
             }
@@ -59,7 +62,6 @@ class InboundStockMovementDataService {
         }
         return stockMovements
     }
-
 
     StockMovement buildStockMovement(ImportDataCommand command, Map params) {
         StockMovement stockMovement =
@@ -75,7 +77,6 @@ class InboundStockMovementDataService {
 
         def expectedDeliveryDate =
                 new SimpleDateFormat("yyyy-MM-dd").parse(params.deliveryDate.toString())
-
 
         stockMovement.identifier = params.loadCode
         stockMovement.description = ""
@@ -102,12 +103,13 @@ class InboundStockMovementDataService {
         }
 
         def quantityRequested = params.quantity as Integer
-        if (!(quantityRequested > 0)) {
-            command.errors.reject("Requested quantity (${quantityRequested}) for ${productCode} should be greater than 0")
+        if (quantityRequested < 0) {
+            command.errors.reject("Requested quantity (${quantityRequested}) for ${productCode} should be greater than or equal to 0")
         }
 
         stockMovementItem.product = product
         stockMovementItem.quantityRequested = quantityRequested
+        stockMovementItem.comments = params.specialInstructions
         return stockMovementItem
     }
 

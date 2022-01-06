@@ -7,21 +7,27 @@
 </head>
 
 <body>
-
+    <g:hasErrors bean="${flash.command}">
+        <div class="alert alert-danger">
+            <g:renderErrors bean="${flash.command}" as="list" />
+        </div>
+    </g:hasErrors>
     <div class="card">
         <div class="card-header">
             <div class="row align-items-center">
-                <div class="col-2">
+                <div class="col-2 text-center">
                     <g:displayBarcode showData="${false}" data="${stockMovement.identifier}"/>
+                    <span class="badge bg-secondary">${stockMovement.identifier}</span>
                 </div>
-                <div class="col-7 text-left">
-                    <h5 class="m-0">${stockMovement.identifier} ${stockMovement.name}</h5>
+                <div class="col-9 text-left">
+                    <h5 class="ml-5">${stockMovement.name}</h5>
+                    <div class="small text-muted">
+                        Last updated by ${stockMovement.updatedBy?.name} on ${g.formatDate(date: stockMovement.shipment?.mostRecentEvent?.eventDate?:stockMovement.lastUpdated, type: "datetime")}
+                    </div>
                 </div>
+
                 <div class="col-1">
-                    <span class="badge bg-primary mt-2 mr-2 pl-5">${stockMovement?.status}</span>
-                </div>
-                <div class="col-1">
-                    <span class="dropdown">
+                    <span class="dropdown float-end">
                         <button type="button" id="actionMenu" class="btn dropdown-toggle"
                                 data-bs-toggle="dropdown"
                                 aria-haspopup="true" aria-expanded="false">
@@ -29,10 +35,23 @@
                         </button>
 
                         <ul class="dropdown-menu">
+                            <g:isSuperuser>
+                                <li>
+                                    <a href="${createLink(controller: 'stockMovement', action: 'show', id: stockMovement?.id)}"
+                                       class="dropdown-item">
+                                        View Details
+                                    </a>
+                                </li>
+                            </g:isSuperuser>
                             <li>
-                                <a href="${createLink(controller: 'stockMovement', action: 'show', id: stockMovement?.id)}"
+                                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#inboundModal">
+                                    Import Order
+                                </a>
+                            </li>
+                            <li>
+                                <a href="${createLink(controller: 'mobile', action: 'exportData', id: stockMovement?.id)}"
                                    class="dropdown-item">
-                                    View Details
+                                    Export Order
                                 </a>
                             </li>
                             <div class="dropdown-divider"></div>
@@ -42,32 +61,45 @@
                             </a>
                         </ul>
                     </span>
-
-            </div>
+                </div>
             </div>
         </div>
 
         <div class="card-body">
             <div class="row">
-                <div class="col-12 col-sm-2 text-center time-info mt-3 mt-sm-0">
+                <div class="col-12 col-sm-2 col-md-4 text-center time-info mb-3 mt-sm-0">
+                    <span class="text-muted d-block">Status</span>
+                    <span class="text-5 font-weight-500 text-dark">
+                        <div class="badge bg-primary">
+                            <g:if test="${stockMovement?.shipment?.mostRecentEvent?.eventType}">
+                                ${stockMovement.shipment?.mostRecentEvent?.eventType?.name?.toUpperCase()}
+                            </g:if>
+                            <g:else>
+                                ${stockMovement?.status}
+                            </g:else>
+                        </div>
+                    </span>
+                </div>
+
+                <div class="col-12 col-sm-2 col-md-4 text-center time-info mb-3 mt-sm-0">
                     <span class="text-muted d-block">Origin</span>
                     <span class="text-5 font-weight-500 text-dark">
                         ${stockMovement?.origin?.locationNumber}
                     </span>
                 </div>
-                <div class="col-12 col-sm-2 text-center time-info mt-3 mt-sm-0">
+                <div class="col-12 col-sm-2 col-md-4 text-center mb-3 mt-sm-0">
                     <span class="text-muted d-block">Destination</span>
                     <span class="text-4 font-weight-500 text-dark">
                         ${stockMovement?.destination?.locationNumber}
                     </span>
                 </div>
-                <div class="col-12 col-sm-2 text-center company-info">
+                <div class="col-12 col-sm-2 col-md-4 text-center mb-3">
                     <span class="text-muted d-block">Ordered On</span>
                     <span class="text-4 font-weight-500 text-dark mt-1 mt-lg-0">
                         ${g.formatDate(date: stockMovement.dateRequested, type: "datetime")}
                     </span>
                 </div>
-                <div class="col-12 col-sm-2 text-center time-info mt-3 mt-sm-0">
+                <div class="col-12 col-sm-2 col-md-4 text-center mb-3 mt-sm-0">
                     <span class="text-muted d-block">Expected Delivery</span>
 
                     <div class="text-5 font-weight-500 text-dark">
@@ -77,7 +109,7 @@
                         <div class="badge badge-pill bg-danger">Delayed - Expected ${prettyDateFormat(date: stockMovement?.expectedDeliveryDate)}</div>
                     </g:if>
                 </div>
-                <div class="col-12 col-sm-2 text-center time-info mt-3 mt-sm-0">
+                <div class="col-12 col-sm-2 col-md-4 text-center mb-3 mt-sm-0">
                     <span class="text-muted d-block">Tracking Number</span>
                     <span class="text-5 font-weight-500 text-dark">
                         ${stockMovement?.trackingNumber?:"Not Available"}
@@ -117,13 +149,9 @@
             <li class="nav-item" role="presentation">
                 <a class="nav-link" id="documents-tab" href="#documents" data-bs-toggle="tab">Documents</a>
             </li>
-            <li class="nav-item" role="presentation">
-                <a class="nav-link" id="properties-tab" href="#properties" data-bs-toggle="tab">Properties</a>
-            </li>
         </ul>
         <div class="tab-content">
             <div class="tab-pane fade show active" id="details" role="tabpanel" data-bs-toggle="tab" aria-labelledby="details-tab">
-
                 <div class="card">
                     <div class="card-header">
                         <div class="row align-items-center trip-title">
@@ -132,7 +160,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="card-body">
                         <table class="table table-borderless table-striped">
                             <thead>
@@ -163,18 +190,30 @@
                                             </g:else>
                                         </td>
                                         <td class="col-2">
-                                            <g:displayBarcode showData="${true}" data="${item?.product?.productCode}"/>
+                                            <g:displayBarcode showData="${true}" data="${item?.product?.productCode}" />
                                         </td>
                                         <td class="col-6">
                                             ${item?.product?.name}
+                                            <g:if test="${item?.comments}">
+                                                <div class="text-muted">
+                                                    Special Instructions: ${item?.comments}
+                                                </div>
+                                            </g:if>
                                         </td>
                                         <td class="col-1 text-center">
                                             ${item.quantityRequested}
+                                            ${item?.product?.unitOfMeasure?:"EA"}
                                         </td>
                                     </tr>
                                 </g:each>
                             </tbody>
                         </table>
+                        <g:unless test="${stockMovement.lineItems}">
+                            <div class="alert alert-primary text-center text-muted">
+                                There are no items
+                            </div>
+                        </g:unless>
+
                     </div>
                 </div>
 
@@ -243,7 +282,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <g:each var="document" in="${stockMovement.documents}">
+                                <g:each var="document" in="${stockMovement.documents.findAll { it.id }}">
                                     <tr>
                                         <td>
                                             ${document.name}
@@ -258,41 +297,33 @@
                     </div>
                 </div>
             </div>
-            <div class="tab-pane fade" id="properties" role="tabpanel" aria-labelledby="properties-tab">
+        </div>
+    </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <div class="row align-items-center">
-                        <h5 class="h5">Properties</h5>
-                    </div>
+<!-- Modal -->
+<div class="modal fade" id="inboundModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <g:uploadForm class="needs-validation" action="importData" enctype="multipart/form-data">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Edit Outbound Order ${stockMovement.identifier}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="card-body">
-                    <table class="table table-bordered table-striped">
-                        <thead>
-                            <tr>
-                                <th class="col-9">
-                                    <g:message code="default.property.label" default="Property"/>
-                                </th>
-                                <th class="text-right">
-                                    <g:message code="default.value.label" default="Value"/>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <g:each var="property" in="${stockMovement.properties}">
-                                <tr>
-                                    <td>${property.key}</td>
-                                    <td>${property.value}</td>
-                                </tr>
-                            </g:each>
-                        </tbody>
-                    </table>
+                <div class="modal-body">
+                    <input name="type" type="hidden" value="inbound"/>
+                    <input name="id" type="hidden" value="${params.id}"/>
+                    <input name="redirectUrl" type="hidden" value="${g.createLink(controller: 'mobile', action: 'inboundDetails', id: params.id)}"/>
+                    <g:hiddenField name="location.id" value="${session.warehouse.id }"/>
+                    <input class="form-control" type="file" name="xlsFile[]" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Upload</button>
                 </div>
             </div>
         </div>
+    </g:uploadForm>
+</div>
 
-        </div>
-
-    </div>
 </body>
 </html>

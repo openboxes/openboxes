@@ -74,12 +74,13 @@
                                     <div class="badge bg-primary">
                                         ${stockMovement.shipment?.currentEvent?.eventType?.eventCode}
                                     </div>
-                                    <div>
-                                        <small><g:formatDate date="${stockMovement.shipment?.currentEvent?.eventDate}" format="MMM dd hh:mm a"/></small>
-                                    </div>
+                                    <p class="small text-muted">
+                                        <g:formatDate date="${stockMovement.shipment?.currentEvent?.eventDate}" format="MMM dd hh:mm a"/>
+                                    </p>
                                 </g:if>
                                 <g:else>
                                     <div class="badge bg-primary">${stockMovement?.status}</div>
+                                    <p class="small text-muted"><g:formatDate date="${stockMovement.lastUpdated}" format="MMM dd HH:mm"/></p>
                                 </g:else>
                             </a>
                         </td>

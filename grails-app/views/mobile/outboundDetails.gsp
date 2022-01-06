@@ -23,31 +23,31 @@
                 </div>
             </div>
 
-            <g:isSuperuser>
-                <div class="col-1">
-                    <span class="dropdown">
-                        <button type="button" id="actionMenu" class="btn dropdown-toggle"
-                                data-bs-toggle="dropdown"
-                                aria-haspopup="true" aria-expanded="false">
-                            <i class="fa fa-cog"></i>
-                        </button>
-
-                        <ul class="dropdown-menu">
+            <div class="col-1">
+                <div class="dropdown float-end">
+                    <button type="button" id="actionMenu" class="btn dropdown-toggle float-end"
+                            data-bs-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-cog"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#outboundModal">
+                                Import Order
+                            </a>
+                        </li>
+                        <li>
+                            <a href="${createLink(controller: 'mobile', action: 'exportData', id: stockMovement?.id)}"
+                               class="dropdown-item">
+                                Export Order
+                            </a>
+                        </li>
+                        <g:isSuperuser>
+                            <div class="dropdown-divider"></div>
                             <li>
                                 <a href="${createLink(controller: 'stockMovement', action: 'show', id: stockMovement?.id)}"
                                    class="dropdown-item">
                                     View Details
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#outboundModal">
-                                    Import Order
-                                </a>
-                            </li>
-                            <li>
-                                <a href="${createLink(controller: 'mobile', action: 'exportData', id: stockMovement?.id)}"
-                                   class="dropdown-item">
-                                    Export Order
                                 </a>
                             </li>
                             <li>
@@ -62,16 +62,16 @@
                                     Upload Delivery Order Request (.xml)
                                 </a>
                             </li>
+                        </g:isSuperuser>
 
-                            <div class="dropdown-divider"></div>
-                            <a href="${createLink(controller: 'mobile', action: 'outboundDelete', id: stockMovement?.id)}"
-                               class="dropdown-item text-danger">
-                                Delete Order
-                            </a>
-                        </ul>
-                    </span>
+                        <div class="dropdown-divider"></div>
+                        <a href="${createLink(controller: 'mobile', action: 'outboundDelete', id: stockMovement?.id)}"
+                           class="dropdown-item text-danger">
+                            Delete Order
+                        </a>
+                    </ul>
                 </div>
-            </g:isSuperuser>
+            </div>
         </div>
     </div>
 
@@ -211,40 +211,45 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <g:each var="item" in="${stockMovement.lineItems}">
-                            <tr>
-                                <td class="col-1">
-                                    <g:if test="${item?.product?.images}">
-                                        <g:set var="image"
-                                               value="${item?.product?.images?.sort()?.first()}"/>
-                                        <img src="${createLink(controller: 'product', action: 'renderImage', id: image?.id)}"
-                                             class="img-fluid"/>
-                                    </g:if>
-                                    <g:else>
-                                        <img src="${resource(dir: 'images', file: 'default-product.png')}"
-                                             class="img-fluid"/>
-                                    </g:else>
-                                </td>
-                                <td class="col-2">
-                                    <g:displayBarcode showData="${true}"
-                                                      data="${item?.product?.productCode}"/>
-                                </td>
-                                <td class="col-6">
-                                    ${item?.product?.name}
-                                    <g:if test="${item?.requisitionItem?.description}">
-                                        <div class="text-muted">
-                                            Special Instructions: ${item.requisitionItem?.description}
-                                        </div>
-                                    </g:if>
-                                </td>
-                                <td class="col-1 text-center">
-                                    ${item.quantityRequested}
-                                    ${item?.product?.unitOfMeasure?:"EA"}
-                                </td>
-                            </tr>
-                        </g:each>
+                            <g:each var="item" in="${stockMovement.lineItems}">
+                                <tr>
+                                    <td class="col-1">
+                                        <g:if test="${item?.product?.images}">
+                                            <g:set var="image"
+                                                   value="${item?.product?.images?.sort()?.first()}"/>
+                                            <img src="${createLink(controller: 'product', action: 'renderImage', id: image?.id)}"
+                                                 class="img-fluid"/>
+                                        </g:if>
+                                        <g:else>
+                                            <img src="${resource(dir: 'images', file: 'default-product.png')}"
+                                                 class="img-fluid"/>
+                                        </g:else>
+                                    </td>
+                                    <td class="col-2">
+                                        <g:displayBarcode showData="${true}"
+                                                          data="${item?.product?.productCode}"/>
+                                    </td>
+                                    <td class="col-6">
+                                        ${item?.product?.name}
+                                        <g:if test="${item?.requisitionItem?.description}">
+                                            <div class="text-muted">
+                                                Special Instructions: ${item.requisitionItem?.description}
+                                            </div>
+                                        </g:if>
+                                    </td>
+                                    <td class="col-1 text-center">
+                                        ${item.quantityRequested}
+                                        ${item?.product?.unitOfMeasure?:"EA"}
+                                    </td>
+                                </tr>
+                            </g:each>
                         </tbody>
                     </table>
+                    <g:unless test="${stockMovement.lineItems}">
+                        <div class="alert alert-primary text-center text-muted">
+                            There are no item
+                        </div>
+                    </g:unless>
                 </div>
             </div>
         </div>
