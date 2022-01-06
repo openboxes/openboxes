@@ -57,7 +57,7 @@ class OutboundStockMovementDataService {
                 }
             }
 
-            if (requisition.status >= RequisitionStatus.EDITING) {
+            if (requisition && requisition.status >= RequisitionStatus.EDITING) {
                 throw new IllegalArgumentException("Row ${index + 1}: Cannot edit outbound order with identifier ${requisition.requestNumber} with status ${requisition?.status}")
             }
 
