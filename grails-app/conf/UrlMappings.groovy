@@ -407,15 +407,15 @@ class UrlMappings {
             action = [GET: "read", POST: "update", PUT: "update", DELETE: "delete"]
         }
         "/api/notifications/products" {
-            controller = "notification"
-            action = [POST: "createProduct"]
+            controller = "productNotification"
+            action = [POST: "handleMessage"]
         }
         "/api/notifications/orders" {
-            controller = "notification"
-            action = [POST: "createOrder"]
+            controller = "orderNotification"
+            action = [POST: "handleMessage"]
         }
-        "/notification/subscribe-product"(controller: "notification", action: "subscribeProduct")
-        "/notification/subscribe-order"(controller: "notification", action: "subscribeOrder")
+        "/notification/subscribe-product"(controller: "productNotification", action: "subscribe")
+        "/notification/subscribe-order"(controller: "orderNotification", action: "subscribe")
         "/notification/publish"(controller: "notification", action: "publish")
 
         // Error handling

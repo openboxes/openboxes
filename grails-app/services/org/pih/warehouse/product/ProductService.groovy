@@ -11,6 +11,7 @@ package org.pih.warehouse.product
 
 import grails.validation.ValidationException
 import groovy.xml.Namespace
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
@@ -222,6 +223,17 @@ class ProductService {
         // }
         // }
         return searchResults
+    }
+
+    Product findProduct(String identifier){
+        return Product.createCriteria().get {
+            or {
+                eq("id", identifier)
+                eq("productCode", identifier)
+                eq("upc", identifier)
+                eq("ndc", identifier)
+            }
+        }
     }
 
     /**
@@ -1194,5 +1206,48 @@ class ProductService {
         def results = dataService.executeQuery(query)
 
         return results.collect { new ProductSearchDto(it) }
+    }
+
+    Product findProductByUpc(String upc){
+        Product productInstance = Product.findByUpc(upc)
+        return productInstance
+    }
+
+    Product createFromJson(JSONObject productJson){
+        log.info "PRODUCT JSON ${productJson} at index:${productJson}"
+        Category category = Category.findById(productJson.getString("category"))
+        if (!category) {
+            category = new Category()
+            category.id = productJson.getString("category")
+            category.name = productJson.getString("category")
+            category.save()
+        }
+        Product productInstance = findProduct(productJson.getString("id"))
+        if (!productInstance) {
+            productInstance = new Product()
+            productInstance.upc = productJson.getString("id")
+        }
+        productInstance.name = productJson.getString("name")
+        productInstance.productCode = productJson.getString("productCode")
+        productInstance.description = productJson.getString("description")
+        productInstance.pricePerUnit = productJson.getDouble("pricePerUnit")
+        productInstance.unitOfMeasure = productJson.getString("unitOfMeasure")
+        productInstance.brandName = productJson.getString("brandName")
+        productInstance.category = category
+        if (!productInstance.productCode) {
+            productInstance.productCode = generateProductIdentifier(productInstance.productType)
+        }
+        try {
+            if (!productInstance?.validate() || productInstance?.hasErrors()) {
+                productInstance?.errors?.allErrors?.each {
+                    log.error("ERR:${it}")
+                }
+            } else {
+                productInstance.save(flush: true, failOnError: true)
+            }
+        } catch (Exception ex) {
+            log.error "Error in saving PRODUCT:${ex?.message}"
+        }
+        return productInstance
     }
 }
