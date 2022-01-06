@@ -265,7 +265,7 @@ class MobileController {
                     flash.message = "Detected invalid Excel .xlsx format - please import .xls files instead"
                 } catch (Exception e) {
                     log.error("An exception occurred while importing data: " + e.message, e)
-                    flash.message = e.message
+                    flash.message = "An error occurred while importing data: " + e.message
                 }
             }
         }
