@@ -36,8 +36,8 @@ class OutboundStockMovementDataService {
             if (!params?.destination) {
                 throw new IllegalArgumentException("Row ${index + 1}: Destination is required")
             }
-            if (!params?.quantity) {
-                throw new IllegalArgumentException("Row ${index + 1}: Requested Quantity is required")
+            if (params?.quantity < 0) {
+                throw new IllegalArgumentException("Row ${index + 1}: Requested quantity (${params.quantity}) is required")
             }
             if(command?.location?.locationNumber != params.origin) {
                 throw new IllegalArgumentException("Row ${index + 1}: Origin location (${params.origin}) must match the current location (${command?.location?.locationNumber})")
@@ -77,9 +77,22 @@ class OutboundStockMovementDataService {
         command.data.eachWithIndex {params, index ->
             RequisitionItem requisitionItem = buildRequisitionItem(params)
             if(requisitionItem.validate()){
-                requisitionItem.save(failOnError: true)
+
+                // Keep track of all requisition updated
+                identifiers.add(requisitionItem.requisition.requestNumber)
+
+                // Delete requisition item with quantity = 0
+                if (!requisitionItem.quantity) {
+                    Requisition requisition = requisitionItem.requisition
+                    requisition.removeFromRequisitionItems(requisitionItem)
+                    requisitionItem.delete()
+                    requisition.save()
+                }
+                // otherwise update requisition item
+                else {
+                    requisitionItem.save(failOnError: true)
+                }
             }
-            identifiers.add(requisitionItem.requisition.requestNumber)
         }
 
         // Generate hypothetical delivery order for newly created stock movements
@@ -100,8 +113,8 @@ class OutboundStockMovementDataService {
         }
 
         def quantityRequested = params.quantity as Integer
-        if (!(quantityRequested > 0)) {
-            throw new IllegalArgumentException("Requested quantity should be greater than 0")
+        if (quantityRequested < 0) {
+            throw new IllegalArgumentException("Requested quantity should be greater than or equal to 0")
         }
 
         def deliveryDate = params.deliveryDate
