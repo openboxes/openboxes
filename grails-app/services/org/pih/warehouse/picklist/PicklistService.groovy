@@ -59,23 +59,27 @@ class PicklistService {
         return picklist.save()
     }
 
-
     def updatePicklistItem(String picklistItemId, String productId, BigDecimal quantityPicked, String pickerId) {
         PicklistItem picklistItem = PicklistItem.get(picklistItemId)
 
         Product product = Product.get(productId)
         if (product != picklistItem?.requisitionItem?.product) {
-            throw new IllegalArgumentException("Picked product ${product?.productCode} does not match picklist item ${picklistItem?.requisitionItem?.product?.productCode}")
+            picklistItem.errors.reject("Picked product ${product?.productCode} does not match picklist item ${picklistItem?.requisitionItem?.product?.productCode}")
         }
 
         // Initialize quantity picked
         if (!picklistItem.quantityPicked) {
             picklistItem.quantityPicked = 0
         }
+
+        if (quantityPicked > picklistItem?.quantityRemaining) {
+            picklistItem.errors.rejectValue("quantityPicked","Quantity picked (${quantityPicked}) cannot exceed quantity remaining (${picklistItem?.quantityRemaining})")
+        }
+
         picklistItem.quantityPicked += quantityPicked
         picklistItem.datePicked = new Date()
         picklistItem.picker = User.load(pickerId)
-        if (!picklistItem.save(flush:true)) {
+        if (picklistItem.hasErrors() || !picklistItem.save(flush:true)) {
             throw new ValidationException("Unable to save picklist item", picklistItem.errors)
         }
     }
