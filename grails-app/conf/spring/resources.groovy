@@ -17,13 +17,9 @@ beans = {
 
     customPropertyEditorRegistrar(util.CustomPropertyEditorRegistrar)
 
-    /**
-     * See OBS-863
-     */
-    beans = {
-        quartzPersistenceContextJobListener(PersistenceContextJobListener) {
-            persistenceInterceptor = ref('persistenceInterceptor')
-        }
+    // See OBS-863, OBPIH-4108
+    quartzPersistenceContextJobListener(PersistenceContextJobListener) {
+        persistenceInterceptor = ref('persistenceInterceptor')
     }
 
     /**

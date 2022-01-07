@@ -197,15 +197,6 @@ class StockMovementService {
         }
     }
 
-    void acceptStockMovement(StockMovement stockMovement) {
-        Shipment shipment = stockMovement?.shipment
-        EventType eventType = EventType.findByEventCode(EventTypeCode.ACCEPTED)
-        Event event = new Event(eventType: eventType, eventDate: new Date())
-        shipment.addToEvents(event)
-        shipment.save(flush:true)
-        notificationService.sendShipmentAcceptedNotification(shipment, shipment.origin, [RoleType.ROLE_SHIPMENT_NOTIFICATION])
-    }
-
     void validateQuantityRequested(StockMovement stockMovement) {
         stockMovement.lineItems?.each { StockMovementItem item ->
             if (item.substitutionItems) {
@@ -248,20 +239,6 @@ class StockMovementService {
         }
 
         return true
-    }
-
-    void attachDocument(StockMovement stockMovement, String fileName, String fileContents) {
-        Document document = new Document()
-        document.documentType = DocumentType.get(Constants.DEFAULT_DOCUMENT_TYPE_ID)
-        document.name = fileName
-        document.filename = fileName
-        document.fileContents = fileContents.bytes
-
-        // FIXME we need to figure out a way to detect the mimetype of the file
-        document.contentType = "application/octet-stream"
-
-        stockMovement.shipment.addToDocuments(document)
-        stockMovement.shipment.save(flush:true)
     }
 
     void updateRequisitionStatus(String id, RequisitionStatus status) {
@@ -2158,7 +2135,7 @@ class StockMovementService {
 
         // Validate shipment and validate shipment items should only add to the shipment's errors
         // object or throw a validation exception
-        //shipmentService.validateShipment(shipment)
+        shipmentService.validateShipment(shipment)
 
         //  Check if the shipment has errors
         if (shipment.hasErrors() || !shipment.save(flush: true)) {

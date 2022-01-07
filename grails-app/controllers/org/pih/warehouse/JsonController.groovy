@@ -74,12 +74,6 @@ class JsonController {
     def translationService
     def orderService
 
-    def sampleService
-
-    def checkSomething = {
-        sampleService.serviceMethod()
-    }
-
     def evaluateIndicator = {
         def indicator = Indicator.get(params.id)
         if (indicator) {
