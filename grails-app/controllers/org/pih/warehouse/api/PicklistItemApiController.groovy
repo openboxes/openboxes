@@ -19,6 +19,7 @@ import org.pih.warehouse.core.User
 
 class PicklistItemApiController extends BaseDomainApiController {
 
+    def picklistService
     def productAvailabilityService
 
     def read = {
@@ -41,33 +42,12 @@ class PicklistItemApiController extends BaseDomainApiController {
     def update = {
         JSONObject jsonObject = request.JSON
         log.info "save " + jsonObject
-
-        PicklistItem picklistItem = PicklistItem.get(params.id)
-
-        // Need to add validation and store quantityPicked if
-        if (!jsonObject["product.id"]) {
-            throw new IllegalArgumentException("Must scan valid product")
-        }
-
-        Product product = Product.get(jsonObject["product.id"])
-        if (product != picklistItem?.requisitionItem?.product) {
-            throw new IllegalArgumentException("Scanned product ${jsonObject.productCode} does not match picklist item ${picklistItem?.requisitionItem?.product?.productCode}")
-        }
-
+        String id = params.id
+        String productId = jsonObject["product.id"]
+        String productCode = jsonObject.productCode
         BigDecimal quantityPicked = new BigDecimal(jsonObject.quantityPicked)
 
-        if (!picklistItem.quantityPicked) {
-            picklistItem.quantityPicked = 0
-        }
-        picklistItem.quantityPicked += quantityPicked
-        picklistItem.datePicked = new Date()
-        picklistItem.picker = User.get(session.user.id)
-        if (picklistItem.validate() && !picklistItem.hasErrors()) {
-            picklistItem.save(flush:true)
-        }
-        else {
-            throw new ValidationException("Unable to save picklist item", picklistItem.errors)
-        }
+        picklistService.updatePicklistItem(id, productId, productCode, quantityPicked)
 
         render HttpStatus.SC_OK
     }

@@ -9,9 +9,9 @@
  **/
 package org.pih.warehouse.picklist
 
+import grails.validation.ValidationException
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.LotStatusCode
+import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
@@ -50,6 +50,48 @@ class PicklistService {
         }
         return picklist.save()
     }
+
+    def updatePicklistItem(String id, String productId, String productCode, BigDecimal quantityPicked) {
+
+        PicklistItem picklistItem = PicklistItem.get(id)
+        Product product = Product.get(productId)
+        if (product != picklistItem?.requisitionItem?.product) {
+            throw new IllegalArgumentException("Scanned product ${productCode} does not match picklist item ${picklistItem?.requisitionItem?.product?.productCode}")
+        }
+
+        // Initialize quantity picked
+        if (!picklistItem.quantityPicked) {
+            picklistItem.quantityPicked = 0
+        }
+        picklistItem.quantityPicked += quantityPicked
+        picklistItem.datePicked = new Date()
+        picklistItem.picker = User.get(session.user.id)
+        if (!picklistItem.save(flush:true)) {
+            throw new ValidationException("Unable to save picklist item", picklistItem.errors)
+        }
+    }
+
+    def triggerPicklistStatusUpdate(Picklist picklist) {
+
+        Requisition requisition = picklist.requisition
+        if (!requisition) {
+            throw new IllegalStateException("Picklist should exist without a requisition")
+        }
+
+        // If requisition is in picking, but is fully picked, then transition to PICKED status
+        if (requisition.status == RequisitionStatus.PICKING) {
+            boolean stillPicking = picklist.picklistItems.any { PicklistItem picklistItem ->
+                picklistItem.quantityRemaining > 0
+            }
+            if (!stillPicking) {
+                requisition.status = Requisition.PICKED
+                requisition.save(flush:true)
+            }
+        }
+
+    }
+
+
 
     def getQuantityPickedByProductAndLocation(Location location, Product product) {
         Picklist.createCriteria().list {

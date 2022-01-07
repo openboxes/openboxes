@@ -12,6 +12,7 @@ package org.pih.warehouse.picklist
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.PicklistItemStatusEvent
 import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.requisition.RequisitionItem
@@ -20,6 +21,7 @@ class PicklistItem implements Serializable {
 
     def publishRefreshEvent = {
         publishEvent(new RefreshProductAvailabilityEvent(this))
+        publishEvent(new PicklistItemStatusEvent(this))
     }
 
     def afterInsert = publishRefreshEvent
