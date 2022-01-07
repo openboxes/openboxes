@@ -154,42 +154,5 @@
         </div>
     </g:uploadForm>
 </div>
-
-<div class="modal fade" id="uploadModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-    <g:form class="needs-validation" action="uploadDeliveryOrders">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Send Delivery Orders</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <g:set var="numberOfDaysInAdvance" value="${grailsApplication.config.openboxes.jobs.uploadDeliveryOrdersJob.numberOfDaysInAdvance}"/>
-                    <g:set var="requestedDeliveryDate" value="${(new Date() + numberOfDaysInAdvance)}"/>
-                    <p>Send all delivery orders to eTruckNow that have a requested delivery date that is ${numberOfDaysInAdvance} days from now. </p>
-
-                    <g:isSuperuser>
-                        <g:set var="isSuperuser" value="true"/>
-                    </g:isSuperuser>
-                    <g:if test="${isSuperuser}">
-                        <div class="text-center">
-                            <g:datePicker name="requestedDeliveryDate" precision="day" value="${requestedDeliveryDate}" />
-                        </div>
-                    </g:if>
-                    <g:else>
-                        <div class="text-center">
-                            ${requestedDeliveryDate.format("MMMMM dd, yyyy")}
-                        </div>
-                    </g:else>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Send</button>
-                </div>
-            </div>
-        </div>
-    </g:form>
-</div>
 </body>
 </html>
