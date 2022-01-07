@@ -154,6 +154,10 @@
                 </g:if>
                 <g:else>TBD</g:else>
             </div>
+            <div class="col-sm-12 col-md-3 text-center mb-3 mt-sm-0">
+                <span class="text-muted d-block">Line Items</span>
+                ${stockMovement?.lineItems?.size()?:0}
+            </div>
         </div>
     </div>
 </div>
