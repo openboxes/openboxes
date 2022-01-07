@@ -9,9 +9,11 @@
  **/
 package org.pih.warehouse.picklist
 
+import grails.validation.ValidationException
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.order.Order
@@ -55,6 +57,51 @@ class PicklistService {
             it.delete()
         }
         return picklist.save()
+    }
+
+
+    def updatePicklistItem(String picklistItemId, String productId, BigDecimal quantityPicked, String pickerId) {
+        PicklistItem picklistItem = PicklistItem.get(picklistItemId)
+
+        Product product = Product.get(productId)
+        if (product != picklistItem?.requisitionItem?.product) {
+            throw new IllegalArgumentException("Picked product ${product?.productCode} does not match picklist item ${picklistItem?.requisitionItem?.product?.productCode}")
+        }
+
+        // Initialize quantity picked
+        if (!picklistItem.quantityPicked) {
+            picklistItem.quantityPicked = 0
+        }
+        picklistItem.quantityPicked += quantityPicked
+        picklistItem.datePicked = new Date()
+        picklistItem.picker = User.load(pickerId)
+        if (!picklistItem.save(flush:true)) {
+            throw new ValidationException("Unable to save picklist item", picklistItem.errors)
+        }
+    }
+
+    def triggerPicklistStatusUpdate(String picklistId) {
+
+        Picklist picklist = Picklist.get(picklistId)
+        if (!picklist) {
+            throw new IllegalStateException("Picklist ${picklistId} does not exist")
+        }
+
+        Requisition requisition = picklist.requisition
+        if (!requisition) {
+            throw new IllegalStateException("Picklist should exist without a requisition")
+        }
+
+        // If requisition is in picking, but is fully picked, then transition to PICKED status
+        if (requisition.status == RequisitionStatus.PICKING) {
+            boolean quantityRemaining = picklist.picklistItems.any { PicklistItem picklistItem ->
+                picklistItem.quantityRemaining > 0
+            }
+            if (!quantityRemaining) {
+                requisition.status = RequisitionStatus.PICKED
+                requisition.save(flush:true)
+            }
+        }
     }
 
     void clearPicklist(Order order) {
