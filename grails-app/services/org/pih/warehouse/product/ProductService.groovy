@@ -13,8 +13,10 @@ import grails.validation.ValidationException
 import groovy.xml.Namespace
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.criterion.CriteriaSpecification
+import org.codehaus.groovy.grails.web.json.JSONArray
 import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
@@ -1244,6 +1246,45 @@ class ProductService {
                 }
             } else {
                 productInstance.save(flush: true, failOnError: true)
+                if(productJson.containsKey("attributes")){
+                    JSONArray attributesJsonArray = productJson.getJSONArray("attributes")
+                    for(int i=0;i<attributesJsonArray.length();i++){
+                        JSONObject attributeJson = attributesJsonArray.getJSONObject(i)
+                        Attribute attribute = Attribute.findByCode(attributeJson.getString("code"))
+                        ProductAttribute productAttribute = null
+                        if(!attribute){
+                            attribute = new Attribute(code: attributeJson.getString("code"), name:attributeJson.getString("code"))
+                            attribute.save(flush: true, failOnError: true)
+                        }else{
+                            productAttribute = ProductAttribute.findByAttribute(attribute)
+                        }
+                        if(!productAttribute){
+                            productAttribute = new ProductAttribute(attribute: attribute, value: attributeJson.getString("value"))
+                        }else{
+                            productAttribute.value = attributeJson.getString("value")
+                        }
+                        productAttribute.save(flush: true, failOnError: true)
+                        productInstance.addToAttributes(productAttribute)
+                    }
+                }
+                if(productJson.containsKey("documents")) {
+                    JSONArray documentsJsonArray = productJson.getJSONArray("documents")
+//                    List<Document> documents = productInstance.documents?.toList()
+                    for (int i = 0; i < documentsJsonArray.length(); i++) {
+                        JSONObject documentJson = documentsJsonArray.getJSONObject(i)
+                        String fileUri = documentJson.getString("fileUri")
+                        Boolean alreadyExistDocument = Document.countByFileUri(fileUri) > 0
+                        if (alreadyExistDocument) {
+                            Document document = Document.findByFileUri(fileUri)
+                            if (!document) {
+                                document = new Document(fileUri: fileUri)
+                                document.save(flush: true)
+                            }
+                            productInstance.addToDocuments(document)
+                        }
+                    }
+                    productInstance.save(flush: true)
+                }
             }
         } catch (Exception ex) {
             log.error "Error in saving PRODUCT:${ex?.message}"
