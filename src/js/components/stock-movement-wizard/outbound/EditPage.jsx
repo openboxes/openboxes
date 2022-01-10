@@ -42,10 +42,10 @@ const FIELDS = {
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     rowComponent: TableRowWithSubfields,
-    getDynamicRowAttr: ({ rowValues, subfield }) => {
+    getDynamicRowAttr: ({ rowValues, subfield, showOnlyErroredItems }) => {
       let className = rowValues.statusCode === 'SUBSTITUTED' ? 'crossed-out ' : '';
       if (!subfield) { className += 'font-weight-bold'; }
-      return { className };
+      return { className, hideRow: showOnlyErroredItems && !rowValues.hasError };
     },
     subfieldKey: 'substitutionItems',
     fields: {
@@ -276,17 +276,6 @@ function validateForSave(values) {
   return errors;
 }
 
-function validate(values) {
-  const errors = validateForSave(values);
-
-  _.forEach(values.editPageItems, (item, key) => {
-    if (_.isNil(item.quantityRevised) && (item.quantityRequested > item.quantityAvailable) && (item.statusCode !== 'SUBSTITUTED')) {
-      errors.editPageItems[key] = { quantityRevised: 'react.stockMovement.errors.lowerQty.label' };
-    }
-  });
-  return errors;
-}
-
 /**
  * The third step of stock movement(for movements from a depot) where user can see the
  * stock available and adjust quantities or make substitutions based on that information.
@@ -302,6 +291,7 @@ class EditItemsPage extends Component {
       hasItemsLoaded: false,
       totalCount: 0,
       isFirstPageLoaded: false,
+      showOnlyErroredItems: false,
     };
 
     this.revertItem = this.revertItem.bind(this);
@@ -310,6 +300,8 @@ class EditItemsPage extends Component {
     this.isRowLoaded = this.isRowLoaded.bind(this);
     this.loadMoreRows = this.loadMoreRows.bind(this);
     this.updateRow = this.updateRow.bind(this);
+    this.markErroredLines = this.markErroredLines.bind(this);
+    this.validate = this.validate.bind(this);
     this.props.showSpinner();
   }
 
@@ -369,6 +361,41 @@ class EditItemsPage extends Component {
         this.loadMoreRows({ startIndex: startIndex + this.props.pageSize });
       }
       this.props.hideSpinner();
+    });
+  }
+
+  validate(values) {
+    const errors = validateForSave(values);
+
+    _.forEach(values.editPageItems, (item, key) => {
+      if (_.isNil(item.quantityRevised) && (item.quantityRequested > item.quantityAvailable) && (item.statusCode !== 'SUBSTITUTED')) {
+        errors.editPageItems[key] = { quantityRevised: 'react.stockMovement.errors.lowerQty.label' };
+      }
+    });
+
+    this.markErroredLines(values, errors);
+
+    return errors;
+  }
+
+  markErroredLines(values, errors) {
+    let updatedValues = values;
+
+    _.forEach(this.state.values.editPageItems, (item, itemIdx) => {
+      updatedValues = update(updatedValues, {
+        editPageItems: {
+          [itemIdx]: {
+            hasError: {
+              $set: !!_.find(errors.editPageItems, (error, errorIdx) => itemIdx === errorIdx),
+            },
+          },
+        },
+      });
+    });
+
+    this.setState({
+      values: updatedValues,
+      showOnlyErroredItems: !errors.editPageItems.length ? false : this.state.showOnlyErroredItems,
     });
   }
 
@@ -773,17 +800,25 @@ class EditItemsPage extends Component {
   }
 
   render() {
+    const { showOnlyErroredItems } = this.state;
     const { showOnly } = this.props;
     return (
       <Form
         onSubmit={() => {}}
-        validate={validate}
+        validate={this.validate}
         mutators={{ ...arrayMutators }}
         initialValues={this.state.values}
         render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
             { !showOnly ?
               <span className="buttons-container">
+                <button
+                  type="button"
+                  onClick={() => this.setState({ showOnlyErroredItems: !showOnlyErroredItems })}
+                  className={`float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs ${showOnlyErroredItems ? 'active' : ''}`}
+                >
+                  <span>{this.state.values && this.state.values.editPageItems.length > 0 ? _.filter(this.state.values.editPageItems, item => item.hasError).length : '0'} item(s) require your attention</span>
+                </button>
                 <button
                   type="button"
                   onClick={() => this.refresh()}
@@ -832,13 +867,13 @@ class EditItemsPage extends Component {
               <div className="table-form">
                 {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
                   stockMovementId: values.stockMovementId,
-                  hasStockList: !!_.get(values.stocklist, 'id'),
                   translate: this.props.translate,
                   reasonCodes: this.props.reasonCodes,
                   onResponse: this.fetchEditPageItems,
                   revertItem: this.revertItem,
                   reviseRequisitionItems: this.reviseRequisitionItems,
                   totalCount: this.state.totalCount,
+                  showOnlyErroredItems,
                   loadMoreRows: this.loadMoreRows,
                   isRowLoaded: this.isRowLoaded,
                   isPaginated: this.props.isPaginated,
