@@ -43,7 +43,7 @@ class TableBodyVirtualized extends Component {
         const subfields = field[subfieldKey];
 
         if (dynamicAttr.hideRow) {
-          return;
+          return; // Lodash's forEach version of continue
         }
 
         if (!height) {
@@ -102,7 +102,7 @@ class TableBodyVirtualized extends Component {
       const dynamicRowAttr = fieldsConfig.getDynamicRowAttr ?
         fieldsConfig.getDynamicRowAttr({
           ...properties,
-          rowValues: _.filter(fields.value, v => !v.hideRow)[index],
+          rowValues: fields.value[index],
         }) : {};
 
       if (dynamicRowAttr.hideRow) {
