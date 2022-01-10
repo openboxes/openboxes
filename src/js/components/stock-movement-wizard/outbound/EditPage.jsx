@@ -802,6 +802,7 @@ class EditItemsPage extends Component {
   render() {
     const { showOnlyErroredItems } = this.state;
     const { showOnly } = this.props;
+    const erroredItemsCount = this.state.values && this.state.values.editPageItems.length > 0 ? _.filter(this.state.values.editPageItems, item => item.hasError).length : '0';
     return (
       <Form
         onSubmit={() => {}}
@@ -817,7 +818,7 @@ class EditItemsPage extends Component {
                   onClick={() => this.setState({ showOnlyErroredItems: !showOnlyErroredItems })}
                   className={`float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs ${showOnlyErroredItems ? 'active' : ''}`}
                 >
-                  <span>{this.state.values && this.state.values.editPageItems.length > 0 ? _.filter(this.state.values.editPageItems, item => item.hasError).length : '0'} item(s) require your attention</span>
+                  <span>{erroredItemsCount} <Translate id="react.stockMovement.erroredItemsCount.label" defaultMessage="item(s) require your attention" /></span>
                 </button>
                 <button
                   type="button"
@@ -873,7 +874,6 @@ class EditItemsPage extends Component {
                   revertItem: this.revertItem,
                   reviseRequisitionItems: this.reviseRequisitionItems,
                   totalCount: this.state.totalCount,
-                  showOnlyErroredItems,
                   loadMoreRows: this.loadMoreRows,
                   isRowLoaded: this.isRowLoaded,
                   isPaginated: this.props.isPaginated,
@@ -881,6 +881,7 @@ class EditItemsPage extends Component {
                   isFirstPageLoaded: this.state.isFirstPageLoaded,
                   values,
                   showOnly,
+                  showOnlyErroredItems,
                 }))}
               </div>
               <div className="submit-buttons">
