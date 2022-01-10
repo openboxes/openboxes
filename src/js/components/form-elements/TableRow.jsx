@@ -73,6 +73,10 @@ class TableRow extends Component {
     const className = `table-row ${rowIndex % 2 === 0 ? 'even-row' : ''} ${dynamicRowAttr.className ? dynamicRowAttr.className : ''}`;
     const tooltip = dynamicRowAttr.tooltip ? dynamicRowAttr.tooltip : null;
 
+    if (dynamicRowAttr.hideRow) {
+      return null;
+    }
+
     return (
       <div {...dynamicRowAttr} className={className}>
         {tooltip && (
