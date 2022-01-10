@@ -17,10 +17,10 @@ import org.pih.warehouse.util.RequestUtil
 
 class SecurityFilters {
 
-    static ArrayList controllersWithAuthUserNotRequired = ['test', 'errors', 'notification']
+    static ArrayList controllersWithAuthUserNotRequired = ['test', 'errors', 'productNotification', 'orderNotification']
     static ArrayList actionsWithAuthUserNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'changeLocation', 'menu']
 
-    static ArrayList controllersWithLocationNotRequired = ['categoryApi', 'productApi', 'genericApi', 'api', 'notification']
+    static ArrayList controllersWithLocationNotRequired = ['categoryApi', 'productApi', 'genericApi', 'api', 'productNotification', 'orderNotification']
     static ArrayList actionsWithLocationNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'chooseLocation', 'menu']
 
     def authService
