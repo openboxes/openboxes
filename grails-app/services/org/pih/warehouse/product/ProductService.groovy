@@ -1225,10 +1225,11 @@ class ProductService {
             category.name = productJson.getString("category")
             category.save()
         }
-        Product productInstance = findProduct(productJson.getString("id"))
+        String productId = productJson.getString("id")
+        Product productInstance = findProduct(productId)
         if (!productInstance) {
             productInstance = new Product()
-            productInstance.upc = productJson.getString("id")
+            productInstance.upc = productId
         }
         productInstance.name = productJson.getString("name")
         productInstance.productCode = productJson.getString("productCode")
@@ -1253,14 +1254,15 @@ class ProductService {
                     for(int i=0;i<attributesJsonArray.length();i++){
                         JSONObject attributeJson = attributesJsonArray.getJSONObject(i)
                         log.info "Attribute Object json:${attributeJson?.toString()}"
-                        Attribute attribute = Attribute.findByCode(attributeJson.getString("code"))
+                        String attributeCode = attributeJson.getString("code")
+                        Attribute attribute = Attribute.findByCode(attributeCode)
                         ProductAttribute productAttribute = null
                         if(!attribute){
-                            log.info "Attribute NOT FOUND, with code:${attributeJson.getString("code")}"
-                            attribute = new Attribute(code: attributeJson.getString("code"), name:attributeJson.getString("code"), allowOther: true)
+                            log.info "Attribute NOT FOUND, with code:${attributeCode}"
+                            attribute = new Attribute(code: attributeCode, name:attributeCode, allowOther: true)
                             attribute.save(flush: true, failOnError: true)
                         }else{
-                            log.info "Attribute found:${attribute}, with code:${attributeJson.getString("code")}"
+                            log.info "Attribute found:${attribute}, with code:$attributeCode}"
                             productAttribute = ProductAttribute.findByAttributeAndProduct(attribute, productInstance)
                         }
                         if(!productAttribute){
@@ -1284,18 +1286,13 @@ class ProductService {
                         JSONObject documentJson = documentsJsonArray.getJSONObject(i)
                         log.info "Document Object JSON:${documentJson?.toString()} at index:${i}"
                         String fileUri = documentJson.getString("fileUri")
-                        Boolean alreadyExistDocument = Document.countByFileUri(fileUri) > 0
-                        Document document = null
-                        if (alreadyExistDocument) {
-                            document = Document.findByFileUri(fileUri)
-                            log.info "Document:${document} found with fileUri:${fileUri}"
-                        }
+                        Document document = productInstance?.documents?.find{it.fileUri == fileUri}
                         if (!document) {
-                            log.info "Document NOT found with fileUri:${fileUri}"
+                            log.info "Document NOT found with fileUri:${fileUri}, so creating new"
                             document = new Document(fileUri: fileUri)
                             document.save(flush: true)
+                            productInstance.addToDocuments(document)
                         }
-                        productInstance.addToDocuments(document)
                     }
                     productInstance.save(flush: true)
                 }
