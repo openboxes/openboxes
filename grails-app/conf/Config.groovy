@@ -1218,7 +1218,8 @@ openboxes {
                     menuItems: [
                         [label: "report.showTransactionReport.label", defaultLabel: "Transaction Report", href: "/${appName}/report/showTransactionReport"],
                         [label: "report.consumption.label", defaultLabel: "Consumption Report", href: "/${appName}/consumption/show"],
-                        [label: "report.requestDetailReport.label", defaultLabel: "Request Detail Report", href: "/${appName}/report/showRequestDetailReport"]
+                        [label: "report.requestDetailReport.label", defaultLabel: "Request Detail Report", href: "/${appName}/report/showRequestDetailReport"],
+                        [label: "report.forecastReport.label", defaultLabel: "Forecast Report", href: "/${appName}/report/showForecastReport"]
                     ]
                 ],
                 [

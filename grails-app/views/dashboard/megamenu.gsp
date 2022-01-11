@@ -450,6 +450,11 @@
                             <warehouse:message code="report.requestDetailReport.label" default="Request Detail Report"/>
                         </g:link>
                     </div>
+                    <div class="mm-menu-item">
+                        <g:link controller="report" action="showForecastReport">
+                            <warehouse:message code="report.forecastReport.label" default="Forecast Report"/>
+                        </g:link>
+                    </div>
                 </div>
                 <div class="mm-content-section">
                     <h3><warehouse:message code="dataExports.label" default="Data Exports" /></h3>
