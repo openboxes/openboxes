@@ -9,18 +9,29 @@
  **/
 package org.pih.warehouse.inventory
 
+import org.pih.warehouse.api.StockMovement
+import org.pih.warehouse.core.RoleType
 import org.springframework.context.ApplicationListener
 
 class StockMovementStatusEventService implements ApplicationListener<StockMovementStatusEvent> {
 
     boolean transactional = true
-
+    def notificationService
     def tmsIntegrationService
 
     void onApplicationEvent(StockMovementStatusEvent event) {
         log.info "Application event ${event.source} has been published"
+
+        // Push delivery order update to eTruckNow
         if (event.stockMovementStatusCode == StockMovementStatusCode.PICKING && !event.rollback) {
             tmsIntegrationService.uploadDeliveryOrder(event.source)
+        }
+
+        // Send notification for status updates on outbound stock movements
+        StockMovement stockMovement = event.source
+        if (stockMovement?.requisition && stockMovement?.origin?.managedLocally) {
+            notificationService.sendRequisitionStatusNotification(stockMovement?.requisition,
+                    stockMovement?.origin, [RoleType.ROLE_SHIPMENT_NOTIFICATION])
         }
     }
 }

@@ -20,8 +20,6 @@ class RefreshPicklistStatusEventService implements ApplicationListener<RefreshPi
     void onApplicationEvent(RefreshPicklistStatusEvent event) {
         log.info "Application event $event has been published! " + event.properties
         Picklist picklist = event?.source
-        if (picklist) {
-            picklistService.triggerPicklistStatusUpdate(picklist?.id)
-        }
+        picklistService.triggerPicklistStatusUpdate(picklist)
     }
 }

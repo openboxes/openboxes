@@ -12,6 +12,7 @@ package org.pih.warehouse.picklist
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
+import org.pih.warehouse.inventory.RefreshPicklistStatusEvent
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
@@ -21,10 +22,15 @@ import org.pih.warehouse.requisition.Requisition
  * picklist could be generated automatically via an automated algorithm
  * (e.g. FEFO, FIFO) or by hand.
  *
- *
  * @author jmiranda*
  */
 class Picklist implements Serializable {
+
+    def publishRefreshEvent = {
+        publishEvent(new RefreshPicklistStatusEvent(this))
+    }
+
+    def afterUpdate = publishRefreshEvent
 
     def beforeInsert = {
         def currentUser = AuthService.currentUser.get()

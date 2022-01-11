@@ -21,7 +21,6 @@ class PicklistItem implements Serializable {
 
     def publishRefreshEvent = {
         publishEvent(new RefreshProductAvailabilityEvent(this))
-        publishEvent(new RefreshPicklistStatusEvent(picklist))
     }
 
     def afterInsert = publishRefreshEvent
