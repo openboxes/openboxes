@@ -757,9 +757,11 @@ class ShipmentService {
 
             def quantityAvailableToReturn
             if (withBinLocation) {
-                quantityAvailableToReturn = productAvailabilityService.getQuantityNotPickedInBinLocation(shipmentItem.inventoryItem, shipmentItem.binLocation)
+                // Picked value added to compensate value already subtracted
+                quantityAvailableToReturn = productAvailabilityService.getQuantityNotPickedInBinLocation(shipmentItem.inventoryItem, shipmentItem.binLocation) + shipmentItem.getQuantityPickedFromOrders()
             } else {
-                quantityAvailableToReturn = productAvailabilityService.getQuantityNotPickedInLocation(shipmentItem.product, origin)
+                // Picked value added to compensate value already subtracted
+                quantityAvailableToReturn = productAvailabilityService.getQuantityNotPickedInLocation(shipmentItem.product, origin) + shipmentItem.getQuantityPickedFromOrders()
             }
 
             if (shipmentItem.quantity > quantityAvailableToReturn) {
