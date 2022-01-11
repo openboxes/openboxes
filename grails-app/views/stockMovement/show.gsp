@@ -23,6 +23,22 @@
     <div class="button-bar ">
         <g:if test="${stockMovement?.documents}">
             <div class="right">
+
+                <div class="button-group">
+                    <g:if test="${stockMovement.stockMovementStatusCode >= StockMovementStatusCode.PICKING}">
+                        <g:link class="button" controller="picklist" action="print" id="${stockMovement?.id}" target="_blank">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'map_clipboard.png')}" />
+                            &nbsp;${warehouse.message(code: 'picklist.label', default: 'Picklist')}
+                        </g:link>
+                    </g:if>
+                    <g:if test="${stockMovement.stockMovementStatusCode >= StockMovementStatusCode.PICKING}">
+                        <g:link class="button" controller="stockMovement" action="printPackingList" id="${stockMovement?.id}" target="_blank">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'picture_clipboard.png')}" />
+                            &nbsp;${warehouse.message(code: "packingList.label", default: "Packing List")}
+                        </g:link>
+                    </g:if>
+                </div>
+
                 <div class="button-group">
                     <g:link controller="stockMovement" action="addDocument" class="button" id="${stockMovement?.id}">
                         <img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />&nbsp;
@@ -89,10 +105,12 @@
             </g:isUserAdmin>
         </div>
         <div class="button-group">
-            <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
-                <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
-                <warehouse:message code="default.button.receive.label" />
-            </g:link>
+            <g:if test="${stockMovement?.hasBeenShipped()}">
+                <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
+                    <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
+                    <warehouse:message code="default.button.receive.label" />
+                </g:link>
+            </g:if>
             <g:if test="${stockMovement?.hasBeenReceived() || stockMovement?.hasBeenPartiallyReceived()}">
                 <g:link controller="partialReceiving" action="rollbackLastReceipt" id="${stockMovement?.shipment?.id}" class="button">
                     <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
@@ -100,27 +118,6 @@
                 </g:link>
             </g:if>
         </div>
-        <g:if test="${stockMovement.stockMovementStatusCode >= StockMovementStatusCode.PICKING}">
-            <div class="button-group">
-                <g:link class="button" controller="picklist" action="print" id="${stockMovement?.id}" target="_blank">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'text_list_numbers.png')}" />
-                    &nbsp;${warehouse.message(code: 'picklist.button.print.label', default: 'Print picklist')}
-                </g:link>
-            </div>
-        </g:if>
-        <g:isSuperuser>
-            <div class="button-group">
-                <a href="javascript:void(0);" class="button btn-show-dialog"
-                    data-height="600" data-width="1000"
-                   data-title="${g.message(code:'default.button.synchronize.label', default: 'Synchronize')}"
-                   data-url="${request.contextPath}/stockMovement/synchronizeDialog/${stockMovement?.id}">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'arrow_join.png')}" />&nbsp;
-                    <g:message code="default.button.synchronize.label" default="Synchronize"/>
-                </a>
-            </div>
-        </g:isSuperuser>
-
-
     </div>
     <div class="yui-gf">
         <div class="yui-u first">

@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="org.pih.warehouse.inventory.StockMovementStatusCode;" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -63,11 +64,20 @@
                                 </a>
                             </li>
                         </g:isSuperuser>
-
+                        <div class="dropdown-divider"></div>
+                        <li>
+                            <g:link class="dropdown-item" controller="picklist" action="print" id="${stockMovement?.id}" target="_blank">
+                                Download ${warehouse.message(code: 'picklist.label', default: 'Picklist')}
+                            </g:link>
+                        </li>
+                        <li>
+                            <g:link class="dropdown-item" controller="stockMovement" action="printPackingList" id="${stockMovement?.id}" target="_blank">
+                                Download ${warehouse.message(code: "packingList.label", default: "Packing List")}
+                            </g:link>
+                        </li>
                         <div class="dropdown-divider"></div>
                         <a href="${createLink(controller: 'mobile', action: 'outboundDelete', id: stockMovement?.id)}"
-                           class="dropdown-item text-danger">
-                            Delete Order
+                           class="dropdown-item text-danger">Delete Order
                         </a>
                     </ul>
                 </div>
