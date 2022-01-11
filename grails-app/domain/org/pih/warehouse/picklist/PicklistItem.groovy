@@ -89,7 +89,8 @@ class PicklistItem implements Serializable {
     }
 
     Integer getQuantityRemaining() {
-        return (quantity?:0) - (quantityPicked?:0)
+        Integer quantityRemaining = (quantity?:0) - (quantityPicked?:0)
+        return (quantityRemaining > 0) ? quantityRemaining : 0
     }
 
 
