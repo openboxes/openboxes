@@ -548,7 +548,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return canChooseSubstitute
     }
 
-    def calculateQuantityPicked() {
+    def calculateQuantityToPick() {
         long startTime = System.currentTimeMillis()
         def quantityPicked = 0
         try {
@@ -558,6 +558,23 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
                 }
             } else {
                 quantityPicked = PicklistItem.findAllByRequisitionItem(this).sum { it.quantity }
+            }
+        } catch (Exception e) {
+
+        }
+        return quantityPicked ?: 0
+    }
+
+    def calculateQuantityPicked() {
+        long startTime = System.currentTimeMillis()
+        def quantityPicked = 0
+        try {
+            if (substitutionItems) {
+                substitutionItems.each { substitutionItem ->
+                    quantityPicked += PicklistItem.findAllByRequisitionItem(substitutionItem).sum { it.quantityPicked }
+                }
+            } else {
+                quantityPicked = PicklistItem.findAllByRequisitionItem(this).sum { it.quantityPicked }
             }
         } catch (Exception e) {
 

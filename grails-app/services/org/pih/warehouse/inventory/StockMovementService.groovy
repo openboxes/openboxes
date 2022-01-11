@@ -1960,6 +1960,12 @@ class StockMovementService {
         createMissingShipmentItem(requisitionItem)
     }
 
+    def revertAllItems(StockMovement stockMovement) {
+        stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
+            revertItem(stockMovementItem)
+        }
+    }
+
     def revertItem(StockMovementItem stockMovementItem) {
         removeShipmentAndPicklistItemsForModifiedRequisitionItem(stockMovementItem)
 
@@ -2548,8 +2554,29 @@ class StockMovementService {
         Shipment shipment = stockMovement?.requisition?.shipment ?: stockMovement?.shipment
         if (shipment && shipment.currentStatus > ShipmentStatusCode.PENDING) {
             shipmentService.rollbackLastEvent(shipment)
-            if (requisition) {
-                requisitionService.rollbackRequisition(requisition)
+        } else {
+            switch (stockMovement.requisition.status) {
+                case RequisitionStatus.ISSUED:
+                    requisitionService.rollbackRequsition(stockMovement.requisition)
+                    requisition.save()
+                    break;
+                case RequisitionStatus.PICKING:
+                    clearPicklist(stockMovement)
+                    requisition.status = RequisitionStatus.VERIFYING
+                    requisition.save()
+                    break;
+                case RequisitionStatus.VERIFYING:
+                    revertAllItems(stockMovement)
+                    requisition.status = RequisitionStatus.EDITING
+                    requisition.save()
+                    break;
+                case RequisitionStatus.EDITING:
+                    requisitionService.clearRequisition(stockMovement.requisition)
+                    requisition.status = RequisitionStatus.CREATED
+                    requisition.save()
+                    break;
+                default:
+                    throw new IllegalStateException("Cannot rollback to status ${stockMovement?.stockMovementStatusCode}")
             }
         }
     }

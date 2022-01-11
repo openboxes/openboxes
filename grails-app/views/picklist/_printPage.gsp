@@ -18,7 +18,7 @@
     <table id="requisition-items" class="fs-repeat-header" border="0">
         <thead style="display: table-row-group">
             <tr class="">
-                <td colspan="10">
+                <td colspan="11">
                     <h4 class="title">${groupName}</h4>
                 </td>
             </tr>
@@ -30,7 +30,8 @@
                 <th class="center" style="min-width: 150px;">${warehouse.message(code: 'inventoryItem.lotNumber.label')}</th>
                 <th class="center">${warehouse.message(code: 'inventoryItem.expirationDate.label')}</th>
                 <th class="center">${warehouse.message(code: 'inventoryLevel.binLocation.label')}</th>
-                <th class="center">${warehouse.message(code: 'requisitionItem.suggestedPick.label')}</th>
+                <th class="center">${warehouse.message(code: 'picklistItem.quantityRequired.label', default: 'Required')}</th>
+                <th class="center">${warehouse.message(code:'picklistItem.quantityPicked.label', default: 'Picked')}</th>
                 <th class="center">${warehouse.message(code:'requisitionItem.confirmedPick.label')}</th>
                 <th class="center" style="min-width: 100px">${warehouse.message(code:'stockMovement.comments.label')}</th>
             </tr>
@@ -133,6 +134,12 @@
                         <td class="middle center">
                             <g:if test="${picklistItems}">
                                 ${picklistItems[j]?.quantity ?: 0}
+                                ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
+                            </g:if>
+                        </td>
+                        <td class="middle center">
+                            <g:if test="${picklistItems}">
+                                ${picklistItems[j]?.quantityPicked ?: 0}
                                 ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
                             </g:if>
                         </td>
