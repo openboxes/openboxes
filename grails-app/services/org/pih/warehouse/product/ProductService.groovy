@@ -20,6 +20,7 @@ import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
+import org.springframework.validation.ObjectError
 import util.ReportUtil
 
 import java.text.SimpleDateFormat
@@ -1216,7 +1217,7 @@ class ProductService {
     }
 
     Product createFromJson(JSONObject productJson){
-        log.info "PRODUCT JSON ${productJson} at index:${productJson}"
+        log.info "PRODUCT JSON ${productJson?.toString()}"
         Category category = Category.findById(productJson.getString("category"))
         if (!category) {
             category = new Category()
@@ -1248,40 +1249,53 @@ class ProductService {
                 productInstance.save(flush: true, failOnError: true)
                 if(productJson.containsKey("attributes")){
                     JSONArray attributesJsonArray = productJson.getJSONArray("attributes")
+                    log.info "Attributes json:${attributesJsonArray?.toString()}"
                     for(int i=0;i<attributesJsonArray.length();i++){
                         JSONObject attributeJson = attributesJsonArray.getJSONObject(i)
+                        log.info "Attribute Object json:${attributeJson?.toString()}"
                         Attribute attribute = Attribute.findByCode(attributeJson.getString("code"))
                         ProductAttribute productAttribute = null
                         if(!attribute){
-                            attribute = new Attribute(code: attributeJson.getString("code"), name:attributeJson.getString("code"))
+                            log.info "Attribute NOT FOUND, with code:${attributeJson.getString("code")}"
+                            attribute = new Attribute(code: attributeJson.getString("code"), name:attributeJson.getString("code"), allowOther: true)
                             attribute.save(flush: true, failOnError: true)
                         }else{
-                            productAttribute = ProductAttribute.findByAttribute(attribute)
+                            log.info "Attribute found:${attribute}, with code:${attributeJson.getString("code")}"
+                            productAttribute = ProductAttribute.findByAttributeAndProduct(attribute, productInstance)
                         }
                         if(!productAttribute){
                             productAttribute = new ProductAttribute(attribute: attribute, value: attributeJson.getString("value"))
+                            log.info "PRODUCT Attribute NOT found:"
                         }else{
+                            log.info "Found product attribute:${productAttribute}:"
                             productAttribute.value = attributeJson.getString("value")
                         }
-                        productAttribute.save(flush: true, failOnError: true)
+                        log.info("Product instance:"+productInstance?.id)
+                        productAttribute.product = productInstance
                         productInstance.addToAttributes(productAttribute)
+                        productInstance.save(flush: true, failOnError: true)
                     }
                 }
                 if(productJson.containsKey("documents")) {
                     JSONArray documentsJsonArray = productJson.getJSONArray("documents")
+                    log.info "Documents array json:${documentsJsonArray?.toString()}"
 //                    List<Document> documents = productInstance.documents?.toList()
                     for (int i = 0; i < documentsJsonArray.length(); i++) {
                         JSONObject documentJson = documentsJsonArray.getJSONObject(i)
+                        log.info "Document Object JSON:${documentJson?.toString()} at index:${i}"
                         String fileUri = documentJson.getString("fileUri")
                         Boolean alreadyExistDocument = Document.countByFileUri(fileUri) > 0
+                        Document document = null
                         if (alreadyExistDocument) {
-                            Document document = Document.findByFileUri(fileUri)
-                            if (!document) {
-                                document = new Document(fileUri: fileUri)
-                                document.save(flush: true)
-                            }
-                            productInstance.addToDocuments(document)
+                            document = Document.findByFileUri(fileUri)
+                            log.info "Document:${document} found with fileUri:${fileUri}"
                         }
+                        if (!document) {
+                            log.info "Document NOT found with fileUri:${fileUri}"
+                            document = new Document(fileUri: fileUri)
+                            document.save(flush: true)
+                        }
+                        productInstance.addToDocuments(document)
                     }
                     productInstance.save(flush: true)
                 }
