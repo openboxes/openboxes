@@ -445,10 +445,10 @@ class TmsIntegrationService {
             fileTransferService.storeMessage(destinationFile, xmlContents, destinationDirectory)
             createEvent(stockMovement, EventTypeCode.UPLOADED, new Date())
         } catch (SFTPException e) {
-            log.error("Unable to upload delivery to order to ftp server due to " + e.statusCode, e)
+            log.error("Unable to upload delivery due to SFTP Exception: " + e.statusCode, e)
             throw e
         } catch (Exception e) {
-            log.error("Unable to upload delivery to order to ftp server due to " + e.message, e)
+            log.error("Unable to upload delivery due to exception: " + e.message, e)
             throw e
         }
     }

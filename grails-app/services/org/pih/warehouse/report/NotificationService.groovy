@@ -23,6 +23,7 @@ import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.support.WebApplicationContextUtils
@@ -122,6 +123,20 @@ class NotificationService {
 
     }
 
+    def sendRequisitionUpdatedNotification(Requisition requisition, Location location, List<RoleType> roleTypes) {
+        def users = userService.findUsersByRoleTypes(location, roleTypes)
+        String subject = "Requisition ${requisition?.requestNumber} has been updated"
+        String template = "/email/requisitionUpdated"
+        sendRequisitionNotifications(requisition, users, template, subject)
+    }
+
+    def sendRequisitionStatusNotification(Requisition requisition, Location location, List<RoleType> roleTypes) {
+        def users = userService.findUsersByRoleTypes(location, roleTypes)
+        String subject = "Requisition ${requisition?.requestNumber} status has been changed to ${requisition?.status}"
+        String template = "/email/requisitionStatusChanged"
+        sendRequisitionNotifications(requisition, users, template, subject)
+    }
+
     def sendShipmentCreatedNotification(Shipment shipmentInstance, Location location, List<RoleType> roleTypes) {
         def users = userService.findUsersByRoleTypes(location, roleTypes)
         String subject = "Shipment ${shipmentInstance?.shipmentNumber} has been created"
@@ -180,6 +195,19 @@ class NotificationService {
             }
         }
     }
+
+    def sendRequisitionNotifications(Requisition requisition, List<User> users, String template, String subject) {
+        try {
+            String body = renderTemplate(template, [requisition: requisition])
+            List emails = users.collect { it.email }.findAll { it }
+            if (!emails.empty) {
+                mailService.sendHtmlMail(subject, body, emails)
+            }
+        } catch (Exception e) {
+            log.error("Unable to send requisition notifications " + e.message, e)
+        }
+    }
+
 
     def sendShipmentNotifications(Shipment shipmentInstance, List<User> users, String template, String subject) {
         try {

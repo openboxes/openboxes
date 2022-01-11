@@ -80,11 +80,12 @@ class PicklistService {
         }
     }
 
-    def triggerPicklistStatusUpdate(String picklistId) {
+    def triggerPicklistStatusUpdate(Picklist picklist) {
 
-        Picklist picklist = Picklist.get(picklistId)
+        picklist = Picklist.load(picklist.id)
         if (!picklist) {
-            throw new IllegalStateException("Picklist ${picklistId} does not exist")
+            log.info("Picklist ${picklist?.id} not ready for status update")
+            return
         }
 
         Requisition requisition = picklist.requisition

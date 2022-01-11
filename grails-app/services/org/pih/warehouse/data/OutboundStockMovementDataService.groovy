@@ -150,6 +150,7 @@ class OutboundStockMovementDataService {
 
         requisitionItem.product = product
         requisitionItem.quantity = quantityRequested
+        requisitionItem.quantityApproved = quantityRequested
         requisitionItem.description = params.description
 
         requisition.addToRequisitionItems(requisitionItem)

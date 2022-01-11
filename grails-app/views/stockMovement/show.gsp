@@ -50,7 +50,6 @@
                 </div>
             </div>
         </g:if>
-
         <div class="button-group">
             <g:link controller="stockMovement" action="list" class="button">
                 <img src="${resource(dir: 'images/icons/silk', file: 'text_list_bullets.png')}" />&nbsp;
@@ -69,25 +68,17 @@
                 <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
                 <warehouse:message code="default.button.edit.label" />
             </g:link>
-            <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
-                <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
-                <warehouse:message code="default.button.receive.label" />
-            </g:link>
             <g:isUserAdmin>
-                <g:if test="${stockMovement?.hasBeenReceived() || stockMovement?.hasBeenPartiallyReceived()}">
-                    <g:link controller="partialReceiving" action="rollbackLastReceipt" id="${stockMovement?.shipment?.id}" class="button">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
-                        <warehouse:message code="stockMovement.rollbackLastReceipt.label" />
-                    </g:link>
-                </g:if>
-                <g:elseif test="${stockMovement?.stockMovementStatusCode == StockMovementStatusCode.PICKING ||
+                <g:if test="${stockMovement?.stockMovementStatusCode == StockMovementStatusCode.PICKING ||
+                        stockMovement?.stockMovementStatusCode == StockMovementStatusCode.REQUESTING ||
+                        stockMovement?.stockMovementStatusCode == StockMovementStatusCode.REQUESTED ||
                         stockMovement?.hasBeenIssued() || ((stockMovement?.hasBeenShipped() ||
                         stockMovement?.hasBeenPartiallyReceived()) && stockMovement?.isFromOrder)}">
                     <g:link controller="stockMovement" action="rollback" id="${stockMovement.id}" class="button">
                         <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
                         <warehouse:message code="default.button.rollback.label" />
                     </g:link>
-                </g:elseif>
+                </g:if>
                 <g:if test="${(stockMovement?.isPending() || !stockMovement?.shipment?.currentStatus) && (isSameOrigin || !stockMovement?.origin?.isDepot())}">
                     <g:link controller="stockMovement" action="remove" id="${stockMovement.id}" params="[show:true]" class="button"
                             onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
@@ -96,7 +87,29 @@
                     </g:link>
                 </g:if>
             </g:isUserAdmin>
-            <g:isSuperuser>
+        </div>
+        <div class="button-group">
+            <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
+                <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
+                <warehouse:message code="default.button.receive.label" />
+            </g:link>
+            <g:if test="${stockMovement?.hasBeenReceived() || stockMovement?.hasBeenPartiallyReceived()}">
+                <g:link controller="partialReceiving" action="rollbackLastReceipt" id="${stockMovement?.shipment?.id}" class="button">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
+                    <warehouse:message code="stockMovement.rollbackLastReceipt.label" />
+                </g:link>
+            </g:if>
+        </div>
+        <g:if test="${stockMovement.stockMovementStatusCode >= StockMovementStatusCode.PICKING}">
+            <div class="button-group">
+                <g:link class="button" controller="picklist" action="print" id="${stockMovement?.id}" target="_blank">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'text_list_numbers.png')}" />
+                    &nbsp;${warehouse.message(code: 'picklist.button.print.label', default: 'Print picklist')}
+                </g:link>
+            </div>
+        </g:if>
+        <g:isSuperuser>
+            <div class="button-group">
                 <a href="javascript:void(0);" class="button btn-show-dialog"
                     data-height="600" data-width="1000"
                    data-title="${g.message(code:'default.button.synchronize.label', default: 'Synchronize')}"
@@ -104,8 +117,10 @@
                     <img src="${resource(dir: 'images/icons/silk', file: 'arrow_join.png')}" />&nbsp;
                     <g:message code="default.button.synchronize.label" default="Synchronize"/>
                 </a>
-            </g:isSuperuser>
-        </div>
+            </div>
+        </g:isSuperuser>
+
+
     </div>
     <div class="yui-gf">
         <div class="yui-u first">
@@ -127,7 +142,12 @@
                                 <g:message code="stockMovement.status.label"/>
                             </td>
                             <td class="value">
-                                <format:metadata obj="${stockMovement?.shipment?.status?:stockMovement?.requisition?.status }"/>
+                                <g:if test="${stockMovement?.requisition?.status < RequisitionStatus.ISSUED}">
+                                    <format:metadata obj="${stockMovement?.requisition?.status?.displayStatus }"/>
+                                </g:if>
+                                <g:else>
+                                    ${stockMovement?.shipment?.status?.code?.displayStatus}
+                                </g:else>
                             </td>
                         </tr>
                         <tr class="prop">
@@ -444,7 +464,8 @@
             cookie : {
                 expires : 1
             },
-            selected: ${(stockMovement?.shipment?.currentStatus == ShipmentStatusCode.PENDING && stockMovement?.origin?.id == session.warehouse.id) || stockMovement?.origin?.isSupplier()} ? 0 : 1
+            // FIXME I never understood the need for this but will add it back if necessary
+            //selected: ${(stockMovement?.shipment?.currentStatus == ShipmentStatusCode.PENDING && stockMovement?.origin?.id == session.warehouse.id) || stockMovement?.origin?.isSupplier()} ? 0 : 1
         });
     });
 </script>

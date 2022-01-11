@@ -240,7 +240,7 @@ class StockMovementController {
                 stockMovementService.rollbackStockMovement(params.id)
                 flash.message = "Successfully rolled back stock movement with ID ${params.id}"
             } catch (Exception e) {
-                log.error("Unable to rollback stock movement with ID ${params.id}: " + e.message)
+                log.error("Unable to rollback stock movement with ID ${params.id}: " + e.message, e)
                 flash.message = "Unable to rollback stock movement with ID ${params.id}: " + e.message
             }
         } else {
