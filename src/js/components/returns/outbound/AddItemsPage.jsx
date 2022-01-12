@@ -247,7 +247,8 @@ class AddItemsPage extends Component {
           const outboundReturn = parseResponse(resp.data.data);
           const returnItems = _.map(
             outboundReturn.stockTransferItems,
-            item => ({ ...item, checked: true }),
+            // Picked value added to compensate value already subtracted
+            item => ({ ...item, quantityNotPicked: item.quantityNotPicked + _.sumBy(item.picklistItems, 'quantity'), checked: true }),
           );
           this.setState({
             outboundReturn,
@@ -289,6 +290,10 @@ class AddItemsPage extends Component {
           const returnItems = _.map(parseResponse(resp.data.data), item => ({
             ...item,
             quantity: this.state.selectedItems[item.productAvailabilityId] ? this.state.selectedItems[item.productAvailabilityId].quantity : '',
+            // Picked value added to compensate value already subtracted
+            quantityNotPicked: this.state.selectedItems[item.productAvailabilityId] ?
+              item.quantityNotPicked + this.state.selectedItems[item.productAvailabilityId].quantity
+              : item.quantityNotPicked,
             checked: !!this.state.selectedItems[item.productAvailabilityId],
           }));
           this.setState({ formValues: { returnItems } }, () => this.props.hideSpinner());

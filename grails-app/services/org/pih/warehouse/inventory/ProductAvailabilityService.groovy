@@ -155,7 +155,7 @@ class ProductAvailabilityService {
             SELECT
                 pli.binLocation,
                 pli.inventoryItem,
-                sum(pli.quantity)
+                sum(pli.quantity)*((count(distinct pli.requisitionItem) + count(distinct pli.orderItem) )/ count(*))
             FROM Picklist pl
             INNER JOIN pl.picklistItems pli
             LEFT JOIN pl.requisition r

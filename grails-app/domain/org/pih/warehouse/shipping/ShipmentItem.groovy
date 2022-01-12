@@ -51,7 +51,7 @@ class ShipmentItem implements Comparable, Serializable {
     static hasMany = [orderItems: OrderItem, receiptItems: ReceiptItem]
 
     static transients = ["comments", "orderItemId", "quantityReceivedAndCanceled", "quantityCanceled", "quantityReceived", "quantityRemaining",
-                         "orderNumber", "orderId", "orderName", "quantityRemainingToShip", "quantityPerUom", "hasRecalledLot", "quantityPicked"]
+                         "orderNumber", "orderId", "orderName", "quantityRemainingToShip", "quantityPerUom", "hasRecalledLot", "quantityPicked", "quantityPickedFromOrders"]
 
     static mapping = {
         id generator: 'uuid'
@@ -197,6 +197,16 @@ class ShipmentItem implements Comparable, Serializable {
             quantityPicked = requisitionItem?.picklistItems?.findAll { it.inventoryItem == inventoryItem && it.binLocation == binLocation }?.sum { it.quantity }
         } else {
             quantityPicked = requisitionItem?.picklistItems?.findAll { it.inventoryItem == inventoryItem }?.sum { it.quantity }
+        }
+        return quantityPicked?:quantity
+    }
+
+    Integer getQuantityPickedFromOrders() {
+        Integer quantityPicked
+        if (binLocation) {
+            quantityPicked = orderItems.collect { it.picklistItems?.findAll { it.inventoryItem == inventoryItem && it.binLocation == binLocation }?.sum { it.quantity } }.sum()
+        } else {
+            quantityPicked = orderItems.collect { it.picklistItems?.findAll { it.inventoryItem == inventoryItem }?.sum { it.quantity } }.sum()
         }
         return quantityPicked?:quantity
     }
