@@ -343,7 +343,7 @@ class Product implements Comparable, Serializable {
      * @return
      */
     Collection getImages() {
-        return documents?.findAll { it.contentType.startsWith("image") }
+        return documents?.findAll { it?.contentType?.startsWith("image") }
     }
 
     /**

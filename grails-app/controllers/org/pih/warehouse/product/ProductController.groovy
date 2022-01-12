@@ -718,8 +718,10 @@ class ProductController {
 
     def renderImage = {
         def documentInstance = Document.get(params.id)
-        if (documentInstance) {
+        if (documentInstance?.fileContents) {
             response.outputStream << documentInstance.fileContents
+        } else if (documentInstance?.fileUri) {
+            response.sendRedirect(documentInstance.fileUri)
         } else {
             response.sendError(404)
         }
