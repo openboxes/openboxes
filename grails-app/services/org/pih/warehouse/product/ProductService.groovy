@@ -20,9 +20,9 @@ import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
-import org.springframework.validation.ObjectError
 import util.ReportUtil
 
+import org.apache.commons.io.FilenameUtils
 import java.text.SimpleDateFormat
 /**
  * @author jmiranda*
@@ -1217,89 +1217,80 @@ class ProductService {
     }
 
     Product createFromJson(JSONObject productJson){
-        log.info "PRODUCT JSON ${productJson?.toString()}"
-        Category category = Category.findById(productJson.getString("category"))
-        if (!category) {
-            category = new Category()
-            category.id = productJson.getString("category")
-            category.name = productJson.getString("category")
-            category.save()
-        }
+        log.info "Product: ${productJson.toString(4)}"
+
         String productId = productJson.getString("id")
         Product productInstance = findProduct(productId)
         if (!productInstance) {
             productInstance = new Product()
+            // FIXME Hack to handle external product ID from external system (see OBDX-26 for proposed solution)
             productInstance.upc = productId
         }
         productInstance.name = productJson.getString("name")
         productInstance.productCode = productJson.getString("productCode")
         productInstance.description = productJson.getString("description")
         productInstance.pricePerUnit = productJson.getDouble("pricePerUnit")
-        productInstance.unitOfMeasure = productJson.getString("unitOfMeasure")
-        productInstance.brandName = productJson.getString("brandName")
+        productInstance.unitOfMeasure = !productJson.isNull("unitOfMeasure") ? productJson.getString("unitOfMeasure") :"each"
+        productInstance.brandName = !productJson.isNull("brandName") ? productJson.getString("brandName") : null
+
+        // Assign category
+        String categoryName = productJson.getString("category")
+        Category category = findOrCreateCategory(categoryName)
         productInstance.category = category
+
+        // Generate product identifier
         if (!productInstance.productCode) {
             productInstance.productCode = generateProductIdentifier(productInstance.productType)
         }
-        try {
-            if (!productInstance?.validate() || productInstance?.hasErrors()) {
-                productInstance?.errors?.allErrors?.each {
-                    log.error("ERR:${it}")
-                }
-            } else {
-                productInstance.save(flush: true, failOnError: true)
-                if(productJson.containsKey("attributes")){
-                    JSONArray attributesJsonArray = productJson.getJSONArray("attributes")
-                    log.info "Attributes json:${attributesJsonArray?.toString()}"
-                    for(int i=0;i<attributesJsonArray.length();i++){
-                        JSONObject attributeJson = attributesJsonArray.getJSONObject(i)
-                        log.info "Attribute Object json:${attributeJson?.toString()}"
-                        String attributeCode = attributeJson.getString("code")
-                        Attribute attribute = Attribute.findByCode(attributeCode)
-                        ProductAttribute productAttribute = null
-                        if(!attribute){
-                            log.info "Attribute NOT FOUND, with code:${attributeCode}"
-                            attribute = new Attribute(code: attributeCode, name:attributeCode, allowOther: true)
-                            attribute.save(flush: true, failOnError: true)
-                        }else{
-                            log.info "Attribute found:${attribute}, with code:$attributeCode}"
-                            productAttribute = ProductAttribute.findByAttributeAndProduct(attribute, productInstance)
-                        }
-                        if(!productAttribute){
-                            productAttribute = new ProductAttribute(attribute: attribute, value: attributeJson.getString("value"))
-                            log.info "PRODUCT Attribute NOT found:"
-                        }else{
-                            log.info "Found product attribute:${productAttribute}:"
-                            productAttribute.value = attributeJson.getString("value")
-                        }
-                        log.info("Product instance:"+productInstance?.id)
-                        productAttribute.product = productInstance
-                        productInstance.addToAttributes(productAttribute)
-                        productInstance.save(flush: true, failOnError: true)
+
+        // Process attributes
+        if(productJson.containsKey("attributes")){
+            JSONArray attributesJsonArray = productJson.getJSONArray("attributes")
+            for(int i=0;i<attributesJsonArray.length();i++){
+                JSONObject attributeJson = attributesJsonArray.getJSONObject(i)
+                if (!attributeJson.isNull("value") && !attributeJson.getString("value").isEmpty()) {
+                    String value = attributeJson.getString("value")
+                    String attributeCode = attributeJson.getString("code")
+                    Attribute attribute = Attribute.findByCode(attributeCode)
+                    if (!attribute) {
+                        attribute = new Attribute(code: attributeCode, name: attributeCode, allowOther: true)
+                        attribute.save(flush: true, failOnError: true)
                     }
-                }
-                if(productJson.containsKey("documents")) {
-                    JSONArray documentsJsonArray = productJson.getJSONArray("documents")
-                    log.info "Documents array json:${documentsJsonArray?.toString()}"
-//                    List<Document> documents = productInstance.documents?.toList()
-                    for (int i = 0; i < documentsJsonArray.length(); i++) {
-                        JSONObject documentJson = documentsJsonArray.getJSONObject(i)
-                        log.info "Document Object JSON:${documentJson?.toString()} at index:${i}"
-                        String fileUri = documentJson.getString("fileUri")
-                        Document document = productInstance?.documents?.find{it.fileUri == fileUri}
-                        if (!document) {
-                            log.info "Document NOT found with fileUri:${fileUri}, so creating new"
-                            document = new Document(fileUri: fileUri)
-                            document.save(flush: true)
-                            productInstance.addToDocuments(document)
+
+                    if (attribute && !value?.isEmpty()) {
+                        ProductAttribute productAttribute = ProductAttribute.findByAttributeAndProduct(attribute, productInstance)
+                        if (!productAttribute) {
+                            productAttribute = new ProductAttribute(attribute: attribute, value: value)
+                            productInstance.addToAttributes(productAttribute)
                         }
+                        else {
+                            productAttribute.value = value
+                        }
+                        productInstance.save(flush: true)
                     }
-                    productInstance.save(flush: true)
                 }
             }
-        } catch (Exception ex) {
-            log.error "Error in saving PRODUCT:${ex?.message}"
         }
+
+        // Process documents
+        if (productJson.containsKey("documents")) {
+            JSONArray documentsJsonArray = productJson.getJSONArray("documents")
+            for (int i = 0; i < documentsJsonArray.length(); i++) {
+                JSONObject documentJson = documentsJsonArray.getJSONObject(i)
+                String fileUri = documentJson.getString("fileUri")
+                Document document = productInstance?.documents?.find{it.fileUri == fileUri}
+                if (!document) {
+                    String name = FilenameUtils.getName(fileUri);
+                    String contentType = URLConnection.guessContentTypeFromName(fileUri) ?: "application/octet-stream"
+                    document = new Document(name: name, fileUri: fileUri, contentType: contentType)
+                    document.save(flush: true)
+                    productInstance.addToDocuments(document)
+                }
+            }
+        }
+
+        productInstance.save(flush: true)
+
         return productInstance
     }
 }

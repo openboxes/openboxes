@@ -48,6 +48,7 @@
                 <tr>
                     <th><g:message code="default.name.label"/></th>
                     <th><warehouse:message code="document.url.label" default="URL" /></th>
+                    <th><g:message code="document.contentType.label"/></th>
                     <th></th>
                 </tr>
                 <tbody>
@@ -62,6 +63,9 @@
                                 <a href="${document.fileUri}" target="_blank" style="word-break:break-all;">
                                     ${document.fileUri}
                                 </a>
+                            </td>
+                            <td>
+                                ${document?.contentType }
                             </td>
                             <td class="right">
                                 <g:if test="${document.id}">

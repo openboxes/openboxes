@@ -309,7 +309,7 @@
                         <label><format:metadata obj="${productAttribute?.attribute}"/></label>
                     </td>
                     <td>
-                        <span class="">${productAttribute.value }</span>
+                        <span class="">${productAttribute?.value }</span>
                         <small>${productAttribute?.attribute?.unitOfMeasureClass?.baseUom?.name}</small>
                     </td>
                 </tr>
