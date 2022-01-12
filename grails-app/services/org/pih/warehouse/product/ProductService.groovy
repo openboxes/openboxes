@@ -1242,6 +1242,7 @@ class ProductService {
         if (!productInstance.productCode) {
             productInstance.productCode = generateProductIdentifier(productInstance.productType)
         }
+        productInstance.save(flush: true)
 
         // Process attributes
         if(productJson.containsKey("attributes")){
@@ -1254,7 +1255,7 @@ class ProductService {
                     Attribute attribute = Attribute.findByCode(attributeCode)
                     if (!attribute) {
                         attribute = new Attribute(code: attributeCode, name: attributeCode, allowOther: true)
-                        attribute.save(flush: true, failOnError: true)
+                        attribute.save(flush: true)
                     }
 
                     if (attribute && !value?.isEmpty()) {
@@ -1285,11 +1286,10 @@ class ProductService {
                     document = new Document(name: name, fileUri: fileUri, contentType: contentType)
                     document.save(flush: true)
                     productInstance.addToDocuments(document)
+                    productInstance.save(flush: true)
                 }
             }
         }
-
-        productInstance.save(flush: true)
 
         return productInstance
     }
