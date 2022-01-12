@@ -16,14 +16,15 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.report.NotificationService
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
-import util.StringUtil
+import org.pih.warehouse.requisition.RequisitionStatus
 
 class OrderNotificationController {
-    def notificationService
+
     def grailsApplication
+    def identifierService
+    def notificationService
 
     def publish = {
         String message = request.JSON.toString()
@@ -52,84 +53,50 @@ class OrderNotificationController {
 
     def handleMessage = {
         JSONObject json = request.getJSON()
-        log.info "Create order JSON:${json}"
+        log.info "handle message ${json.toString(4)}"
         if (notificationService.confirmSubscription(json, Constants.ARN_TOPIC_ORDER_CREATE_TYPE)){
             render "subscribed"
             return
         }
         String message = json.getString("Message")
         JSONObject orderJson = new JSONObject(message)
-        log.info "ORDER JSON ${orderJson}"
+        log.info "handle order ${orderJson.toString(4)}"
         Requisition requisition = new Requisition()
-        if (orderJson.has("name")) {
-            requisition.name = orderJson.getString("name")
-        } else {
-            requisition.name = "DEFAULT"
+
+        requisition.status = RequisitionStatus.CREATED
+        requisition.requestNumber = identifierService.generateRequisitionIdentifier()
+
+        if (orderJson.has("origin") && orderJson.getString("origin")) {
+            JSONObject originJsonObject = orderJson.getJSONObject("origin")
+            Location origin = Location.findByLocationNumber(originJsonObject.getString("locationNumber"))
+            requisition.origin = origin
         }
-        try {
-            if (orderJson.has("origin") && orderJson.getString("origin")) {
-                JSONObject originJsonObject = orderJson.getJSONObject("origin")
-                log.info "Origin location Json:${originJsonObject}"
-                Location location = Location.findByLocationNumber(originJsonObject.getString("locationNumber"))
-                log.info "Origin location::${location}"
-                requisition.origin = location
-            }
-        } catch (Exception ex) {
-            log.error "Error in reading origin from order json:${orderJson}"
+
+        if (orderJson.has("destination") && orderJson.getString("destination")) {
+            JSONObject destinationJsonObject = orderJson.getJSONObject("destination")
+            Location destination = Location.findByLocationNumber(destinationJsonObject.getString("locationNumber"))
+            requisition.destination = destination
         }
-        try {
-            if (orderJson.has("destination") && orderJson.getString("destination")) {
-                JSONObject destinationJsonObject = orderJson.getJSONObject("destination")
-                log.info "Destination location Json:${destinationJsonObject}"
-                Location location = Location.findByLocationNumber(destinationJsonObject.getString("locationNumber"))
-                log.info "Destination location::${location}"
-                requisition.destination = location
-            }
-        } catch (Exception ex) {
-            log.error "Error:${ex.printStackTrace()} in reading destination from order json:${orderJson}"
+
+        if (orderJson.has("requestedBy") && orderJson.getString("requestedBy")) {
+            User requestedBy = User.findByUsername(orderJson.getString("requestedBy"))
+            requisition.requestedBy = requestedBy
         }
-        try {
-            if (orderJson.has("requestedBy") && orderJson.getString("requestedBy")) {
-                User requestedBy = User.findByUsername(orderJson.getString("requestedBy"))
-                if (!requestedBy) {
-                    JSONObject userMapping = StringUtil.toJson(grailsApplication.config?.openboxes?.integration?.userMapping ?: null)
-                    log.info "UserMapping:${userMapping}"
-                    if(userMapping) {
-                        String requestedByString = orderJson.getString("requestedBy")
-                        if(userMapping.has(requestedByString)) {
-                            String username = userMapping.getString(requestedByString)
-                            log.info "RequestedByString:${requestedByString}, userMapping[$requestedByString]:${username}"
-                            requestedBy = User.findByUsername(username)
-                        }
-                    }
-                }
-                requisition.requestedBy = requestedBy
-            }
-        } catch (Exception ex) {
-            log.error "Error:${ex.printStackTrace()} in reading requestedBy from order json:${orderJson}"
+
+        if (orderJson.has("dateRequested") && orderJson.getString("dateRequested")) {
+            Date dateRequested = DateUtils.parseDate(orderJson.getString("dateRequested"), "yyyy-MM-dd")
+            requisition.dateRequested = dateRequested
         }
-        try {
-            if (orderJson.has("dateRequested") && orderJson.getString("dateRequested")) {
-                Date dateRequested = DateUtils.parseDate(orderJson.getString("dateRequested"), "yyyy-MM-dd")
-                requisition.dateRequested = dateRequested
-            } else {
-                requisition.dateRequested = new Date()
-            }
-        } catch (Exception ex) {
-            log.error "Error:${ex.printStackTrace()} in reading dateRequested from order json:${orderJson}"
-            requisition.dateRequested = new Date()
+
+        if (orderJson.has("requestedDeliveryDate") && orderJson.getString("requestedDeliveryDate")) {
+            Date dateRequested = DateUtils.parseDate(orderJson.getString("requestedDeliveryDate"), "yyyy-MM-dd")
+            requisition.dateRequested = dateRequested
         }
-        try {
-            if (orderJson.has("requestedDeliveryDate") && orderJson.getString("requestedDeliveryDate")) {
-                Date dateRequested = DateUtils.parseDate(orderJson.getString("requestedDeliveryDate"), "yyyy-MM-dd")
-                requisition.dateRequested = dateRequested
-            } else {
-                requisition.requestedDeliveryDate = new Date()
-            }
-        } catch (Exception ex) {
-            log.error "Error in reading dateRequested from order json:${orderJson}"
-            requisition.requestedDeliveryDate = new Date()
-        }
+
+        requisition.name = orderJson.has("name") ? orderJson.getString("name") :
+                "${requisition?.origin?.locationNumber?.toUpperCase()}-${requisition?.destination?.locationNumber?.toUpperCase()}-${requisition?.dateRequested?.format("ddMMMyyyy")?.toUpperCase()}"
+        requisition.description = requisition.name
+
         Boolean lineItemHasError = false
         JSONArray orderLineItemsArray = orderJson.getJSONArray("orderItems")
         for (int lIndex = 0; lIndex < orderLineItemsArray?.length(); lIndex++) {
@@ -142,13 +109,13 @@ class OrderNotificationController {
                 if (!product) {
                     throw new IllegalArgumentException("Product not found with id:"+lineItem.getString("productId"))
                 }
-                log.info "product:${product} for lineItem index:${lIndex}"
                 Integer quantity = lineItem.getInt("quantity")
                 requisitionItem.product = product
                 requisitionItem.quantity = quantity
+                requisitionItem.quantityApproved = quantity
                 requisition.addToRequisitionItems(requisitionItem)
-            } catch (Exception ex) {
-                log.error "Error:${ex.printStackTrace()} in reading Order Line Item:${lineItem}"
+            } catch (Exception e) {
+                log.error "Error ${lineItem}", e
                 lineItemHasError = true
             }
         }
