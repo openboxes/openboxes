@@ -167,9 +167,6 @@ class InventoryController {
      *
      */
     def show = {
-        // OBPIH-4213: TEMPORARILY DISABLED
-        throw new UnsupportedOperationException("${warehouse.message(code: 'inventory.temporaryDisabled.message')}")
-
         def quantityMap = [:]
         def startTime = System.currentTimeMillis()
         def location = Location.get(session.warehouse.id)
