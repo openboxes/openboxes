@@ -13,16 +13,10 @@ package org.pih.warehouse.inventory
 class ReplenishmentController {
 
     def index = {
-        // OBPIH-4079: TEMPORARY DISABLED
-        throw new UnsupportedOperationException("${warehouse.message(code: 'replenishment.temporaryDisabled.message')}")
-
         redirect(action: "create", params: params)
     }
 
     def create = {
-        // OBPIH-4079: TEMPORARY DISABLED
-        throw new UnsupportedOperationException("${warehouse.message(code: 'replenishment.temporaryDisabled.message')}")
-
         render(template: "/common/react", params: params)
     }
 }

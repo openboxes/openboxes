@@ -1113,8 +1113,7 @@ openboxes {
                         [label: "inventory.import.label", defaultLabel: "Import Inventory", href: "/${appName}/batch/importData?type=inventory&execution=e1s1"],
                         [label: "inventory.createStockTransfer.label", defaultLabel: "Create Stock Transfer", href: "/${appName}/stockTransfer/create"],
                         [label: "inventory.listStockTransfers.label", defaultLabel: "List Stock Transfers", href: "/${appName}/stockTransfer/list"],
-//                        OBPIH-4079: TEMPORARY DISABLED
-//                        [label: "inventory.createReplenishment.label", defaultLabel: "Create Replenishment", href: "/${appName}/replenishment/index"]
+                        [label: "inventory.createReplenishment.label", defaultLabel: "Create Replenishment", href: "/${appName}/replenishment/index"]
                     ]
                 ]
             ]

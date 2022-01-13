@@ -70,16 +70,6 @@ const AsyncStockTransfer = Loadable({
   loading: Loading,
 });
 
-// OBPIH-4079: TEMPORARY DISABLED
-// const AsyncReplenishment = Loadable({
-//   loader: () => import('./replenishment/ReplenishmentWizard'),
-//   loading: Loading,
-// });
-
-// TODO: when replenishment will be enabled, then move this line into Router Switch below
-// <MainLayoutRoute
-//    path="/**/replenishment/create/:replenishmentId?" component={AsyncReplenishment} />
-
 const AsyncOutboundReturns = Loadable({
   loader: () => import('./returns/outbound/OutboundReturnsWizard'),
   loading: Loading,
@@ -87,6 +77,11 @@ const AsyncOutboundReturns = Loadable({
 
 const AsyncInboundReturns = Loadable({
   loader: () => import('./returns/inbound/InboundReturnsWizard'),
+  loading: Loading,
+});
+
+const AsyncReplenishment = Loadable({
+  loader: () => import('./replenishment/ReplenishmentWizard'),
   loading: Loading,
 });
 
@@ -107,6 +102,7 @@ const Router = props => (
         <MainLayoutRoute path="/**/stockTransfer/create/:stockTransferId?" component={AsyncStockTransfer} />
         <MainLayoutRoute path="/**/stockTransfer/createOutboundReturn/:outboundReturnId?" component={AsyncOutboundReturns} />
         <MainLayoutRoute path="/**/stockTransfer/createInboundReturn/:inboundReturnId?" component={AsyncInboundReturns} />
+        <MainLayoutRoute path="/**/replenishment/create/:replenishmentId?" component={AsyncReplenishment} />
         <MainLayoutRoute path="/**/" component={AsyncTablero} />
       </Switch>
     </BrowserRouter>
