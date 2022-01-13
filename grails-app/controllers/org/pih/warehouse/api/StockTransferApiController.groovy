@@ -207,6 +207,9 @@ class StockTransferApiController {
     }
 
     def returnCandidates = {
+        // OBPIH-4199: TEMPORARILY DISABLED
+        throw new UnsupportedOperationException("${warehouse.message(code: 'outboundReturns.temporaryDisabled.message')}")
+
         Location location = Location.get(params.locationId)
         if (!location) {
             throw new IllegalArgumentException("Can't find location with given id: ${params.locationId}")
@@ -218,7 +221,9 @@ class StockTransferApiController {
 
     def removeItem = {
         Order order = stockTransferService.deleteStockTransferItem(params.id)
-        render([data: StockTransfer.createFromOrder(order)?.toJson()] as JSON)
+        StockTransfer stockTransfer = StockTransfer.createFromOrder(order)
+        stockTransferService.setQuantityOnHand(stockTransfer)
+        render([data: stockTransfer?.toJson()] as JSON)
     }
 
     def removeAllItems = {

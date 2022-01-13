@@ -313,14 +313,20 @@ class AvailableItem {
     }
 
     AvailableItemStatus getStatus() {
-        if (quantityAvailable > 0) {
-            return AvailableItemStatus.AVAILABLE
-        }
         if (inventoryItem?.recalled) {
             return AvailableItemStatus.RECALLED
         }
         if (binLocation?.onHold) {
             return AvailableItemStatus.HOLD
+        }
+        if (quantityAvailable > 0 && quantityAvailable < quantityOnHand) {
+            return AvailableItemStatus.PICKED
+        }
+        if (quantityAvailable > 0) {
+            return AvailableItemStatus.AVAILABLE
+        }
+        if (quantityOnHand <= 0) {
+            return AvailableItemStatus.NOT_AVAILABLE
         }
 
         return AvailableItemStatus.PICKED
@@ -361,7 +367,7 @@ class AvailableItem {
 }
 
 enum AvailableItemStatus {
-    AVAILABLE, PICKED, RECALLED, HOLD
+    AVAILABLE, PICKED, RECALLED, HOLD, NOT_AVAILABLE
 }
 
 class SuggestedItem extends AvailableItem {
@@ -402,7 +408,7 @@ class SubstitutionItem {
     }
 
     Integer getQuantityAvailable() {
-        availableItems ? availableItems.sum { it.quantityAvailable } : 0
+        availableItems ? availableItems.sum { it.quantityAvailable < 0 ? 0 : it.quantityAvailable } : 0
     }
 
     Integer getQuantityOnHand() {

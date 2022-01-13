@@ -320,7 +320,9 @@ class UrlMappings {
 
         "/api/stockTransfers/candidates"(parseRequest: true) {
             controller = { "stockTransferApi" }
-            action = [GET: "stockTransferCandidates", POST: "returnCandidates"]
+            action = [GET: "stockTransferCandidates"]
+//            OBPIH-4199 TEMPORARILY DISABLED
+//            , POST: "returnCandidates"]
         }
 
         "/api/stockTransferItems/$id/"(parseRequest: true) {

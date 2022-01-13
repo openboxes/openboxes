@@ -184,12 +184,14 @@ class StockMovementService {
             if (item.substitutionItems) {
                 item.substitutionItems.each {
                     if (!validateQuantityRequested(it)) {
-                        stockMovement.errors.reject("stockMovement.invalidQtyRequested.message", [it.product?.name] as Object[], "Invalid quantity requested for product " + it.product?.name)
+                        String errorMessage = "Product " + it.product?.productCode + " has no available inventory. Please go back to edit page and revise quantity"
+                        stockMovement.errors.reject("stockMovement.invalidQtyRequested.message", [it.product?.name] as Object[], errorMessage)
                     }
                 }
             } else {
                 if (!validateQuantityRequested(item)) {
-                    stockMovement.errors.reject("stockMovement.invalidQtyRequested.message", [item.product?.name] as Object[], "Invalid quantity requested for product " + item.product?.name)
+                    String errorMessage = "Product " + item.product?.productCode + " has no available inventory. Please go back to edit page and revise quantity"
+                    stockMovement.errors.reject("stockMovement.invalidQtyRequested.message", [item.product?.name] as Object[], errorMessage)
                 }
             }
         }
@@ -1919,6 +1921,12 @@ class StockMovementService {
         requisitionItem.undoChanges()
         requisitionItem.quantityApproved = requisitionItem.quantity
         requisitionItem.save(flush: true)
+    }
+
+    def revertItemAndCreateMissingPicklist(StockMovementItem stockMovementItem) {
+        revertItem(stockMovementItem)
+
+        RequisitionItem requisitionItem = stockMovementItem.requisitionItem
 
         createMissingPicklistForStockMovementItem(StockMovementItem.createFromRequisitionItem(requisitionItem))
         createMissingShipmentItem(requisitionItem)
@@ -2006,12 +2014,17 @@ class StockMovementService {
 
         removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
 
+        // Find all products for which qty ATP needs to be recalculated
+        def productsToRefresh = []
+        productsToRefresh.add(requisitionItem?.product?.id)
+
         // Find all picklist items associated with the given requisition item
         List<PicklistItem> picklistItems = PicklistItem.findAllByRequisitionItem(requisitionItem)
 
         // Find all picklist items associated with the given requisition item's children
         requisitionItem?.requisitionItems?.each { RequisitionItem item ->
             picklistItems.addAll(PicklistItem.findAllByRequisitionItem(item))
+            productsToRefresh.add(item?.product?.id)
         }
 
         picklistItems.each { PicklistItem picklistItem ->
@@ -2024,7 +2037,7 @@ class StockMovementService {
         // Save requisition item before PA refresh
         requisitionItem.save(flush: true)
 
-        productAvailabilityService.refreshProductsAvailability(requisitionItem?.requisition?.origin?.id, [requisitionItem?.product?.id], false)
+        productAvailabilityService.refreshProductsAvailability(requisitionItem?.requisition?.origin?.id, productsToRefresh, false)
     }
 
     void updateAdjustedItems(StockMovement stockMovement, String adjustedProductCode) {
@@ -2520,15 +2533,18 @@ class StockMovementService {
                             stepNumber  : 4,
                             uri         : g.createLink(controller: 'picklist', action: "renderPdf", id: stockMovement?.requisition?.id, absolute: true),
                             hidden      : true
-                    ],
-                    [
-                            name        : g.message(code: "deliveryNote.label", default: "Delivery Note"),
-                            documentType: DocumentGroupCode.DELIVERY_NOTE.name(),
-                            contentType : "text/html",
-                            stepNumber  : 5,
-                            uri         : g.createLink(controller: 'deliveryNote', action: "print", id: stockMovement?.requisition?.id, absolute: true)
                     ]
             ])
+
+            if (!stockMovement?.origin?.isSupplier() && stockMovement?.origin?.supports(ActivityCode.MANAGE_INVENTORY)) {
+                documentList.add([
+                        name        : g.message(code: "deliveryNote.label", default: "Delivery Note"),
+                        documentType: DocumentGroupCode.DELIVERY_NOTE.name(),
+                        contentType : "text/html",
+                        stepNumber  : 5,
+                        uri         : g.createLink(controller: 'deliveryNote', action: "print", id: stockMovement?.requisition?.id, absolute: true)
+                ])
+            }
         }
 
         if (stockMovement?.shipment) {

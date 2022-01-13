@@ -412,6 +412,27 @@ class ProductAvailabilityService {
         return getQuantityOnHandByProduct(location)
     }
 
+    def getInventoryByProduct(Location location) {
+        def quantityMap = [:]
+        if (location) {
+            def results = ProductAvailability.executeQuery("""
+						select pa.product, sum(pa.quantityOnHand),
+						 sum(case when pa.quantityAvailableToPromise > 0 then pa.quantityAvailableToPromise else 0 end)
+						from ProductAvailability pa
+						where pa.location = :location
+						group by pa.product
+						""", [location: location])
+            results.each {
+                quantityMap[it[0]] = [
+                        quantityOnHand              : it[1],
+                        quantityAvailableToPromise  : it[2]
+                ]
+            }
+        }
+
+        return quantityMap
+    }
+
     Map<Product, Integer> getQuantityOnHandByProduct(Location location) {
         def quantityMap = [:]
         if (location) {
@@ -451,12 +472,13 @@ class ProductAvailabilityService {
         def quantityMap = [:]
         if (location) {
             def results = ProductAvailability.executeQuery("""
-						select pa.product, sum(pa.quantityAvailableToPromise)
+						select pa.product, sum(case when pa.quantityAvailableToPromise > 0 then pa.quantityAvailableToPromise else 0 end)
 						from ProductAvailability pa
 						where pa.location = :location
 						and pa.product in (:products)
 						group by pa.product
 						""", [location: location, products:products])
+
             results.each {
                 quantityMap[it[0]] = it[1]
             }
@@ -469,7 +491,8 @@ class ProductAvailabilityService {
         def quantityMap = [:]
         if (locations) {
             def results = ProductAvailability.executeQuery("""
-						select product, pa.location, category.name, sum(pa.quantityOnHand), sum(pa.quantityAvailableToPromise)
+						select product, pa.location, category.name, sum(pa.quantityOnHand),
+						 sum(case when pa.quantityAvailableToPromise > 0 then pa.quantityAvailableToPromise else 0 end)
 						from ProductAvailability pa, Product product, Category category
 						where pa.location in (:locations)
 						and pa.product = product
@@ -498,7 +521,7 @@ class ProductAvailabilityService {
 						    pa.inventoryItem,
 						    pa.binLocation,
 						    sum(pa.quantityOnHand),
-						    sum(pa.quantityAvailableToPromise)
+						    sum(case when pa.quantityAvailableToPromise > 0 then pa.quantityAvailableToPromise else 0 end)
 						from ProductAvailability pa
 						left outer join pa.inventoryItem ii
 						left outer join pa.binLocation bl

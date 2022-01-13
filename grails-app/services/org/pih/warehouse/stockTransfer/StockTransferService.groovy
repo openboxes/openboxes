@@ -171,7 +171,7 @@ class StockTransferService {
             orderItem = updateOrderItem(stockTransferItem, orderItem)
 
             stockTransferItem.splitItems.each { StockTransferItem splitItem ->
-                OrderItem childOrderItem
+                OrderItem childOrderItem = null
                 if (splitItem.id) {
                     childOrderItem = order.orderItems?.find { it.id == splitItem.id }
                 }
@@ -188,6 +188,7 @@ class StockTransferService {
                     childOrderItem.delete()
                 } else if (childOrderItem) {
                     childOrderItem = updateOrderItem(splitItem, childOrderItem)
+                    orderItem.addToOrderItems(childOrderItem)
                     childOrderItem.parentOrderItem = orderItem
                 }
             }
@@ -380,6 +381,14 @@ class StockTransferService {
             stockTransferItem.quantityOnHand = pa ? pa.quantityOnHand : 0
             stockTransferItem.quantityNotPicked = pa && pa.quantityNotPicked > 0 ? pa.quantityNotPicked: 0
             stockTransferItem.productAvailabilityId = pa ? pa.id : stockTransferItem.id
+
+            if (stockTransferItem.splitItems) {
+                stockTransferItem.splitItems.each { splitItem ->
+                    splitItem.quantityOnHand = stockTransferItem.quantityOnHand
+                    splitItem.quantityNotPicked = stockTransferItem.quantityNotPicked
+                    splitItem.productAvailabilityId = stockTransferItem.productAvailabilityId
+                }
+            }
         }
     }
 

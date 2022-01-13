@@ -238,6 +238,19 @@ class StockTransferSecondPage extends Component {
 
     return (
       <div className="stock-transfer">
+        {this.state.stockTransfer && this.state.stockTransfer.status === 'COMPLETED' &&
+          <div className="submit-buttons d-flex justify-content-end mb-3 mt-0">
+            <button
+              type="button"
+              onClick={() => {
+                window.location = `/openboxes/stockTransfer/show/${this.state.stockTransfer.id}`;
+              }}
+              className="btn btn-outline-primary btn-form btn-xs"
+              hidden={this.state.stockTransfer.status !== 'COMPLETED'}
+            ><Translate id="react.default.button.exit.label" defaultMessage="Exit" />
+            </button>
+          </div>
+        }
         {
           this.state.stockTransfer.stockTransferItems ?
             <SelectTreeTable
@@ -259,12 +272,14 @@ class StockTransferSecondPage extends Component {
             type="button"
             onClick={() => this.previousPage()}
             className="btn btn-outline-primary btn-form btn-xs"
+            disabled={this.state.stockTransfer.status === 'COMPLETED'}
           ><Translate id="react.default.button.previous.label" defaultMessage="Previous" />
           </button>
           <button
             type="button"
             onClick={() => this.completeStockTransfer()}
             className="btn btn-outline-success float-right btn-xs mr-3"
+            disabled={this.state.stockTransfer.status === 'COMPLETED'}
           ><Translate id="react.stockTransfer.completeStockTransfer.label" defaultMessage="Complete Stock Transfer" />
           </button>
         </div>

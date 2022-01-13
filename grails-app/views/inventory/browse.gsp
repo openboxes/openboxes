@@ -107,7 +107,7 @@
 														   </g:else>
 														</td>
 														<td>
-															<g:link controller="inventoryItem" action="showStockCard" id="${searchResult?.product?.id}" style="color: ${searchResult.color}">
+															<g:link controller="inventoryItem" action="showStockCard" id="${searchResult?.product?.id}" style="color: ${searchResult?.product?.color}">
 																${searchResult?.product?.productCode}
 																${searchResult?.product?.name}
 																<g:renderHandlingIcons product="${searchResult?.product}" />
