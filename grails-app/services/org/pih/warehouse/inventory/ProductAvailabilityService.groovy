@@ -473,6 +473,15 @@ class ProductAvailabilityService {
             }
         }
 
+        if (products.size() != quantityMap.size()) {
+            def missingProducts = products - quantityMap.keySet()
+            missingProducts.each { Product product ->
+                if (!quantityMap[product]) {
+                    quantityMap[product] = 0
+                }
+            }
+        }
+
         return quantityMap
     }
 
