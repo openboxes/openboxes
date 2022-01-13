@@ -74,7 +74,16 @@ class ProductNotificationTests  extends GroovyTestCase {
                 }, {
                     "fileUri": "videolink.com"
                 }],
-                "components": []
+                "components": [
+                    {
+                        "productCode":"SOF00001-SKU2_08",
+                        "quantity":1
+                    },
+                    {
+                        "productCode":"SOF00001-SKU2_06",
+                        "quantity":1
+                    }
+                ]
             }]
         }"""
 
@@ -89,6 +98,7 @@ class ProductNotificationTests  extends GroovyTestCase {
             assert product.name == "Test name"
             assert product.attributes?.size() == 15
             assert product.documents?.size() == 3
+            assert product.productComponents?.size() == 2
         }
     }
 }

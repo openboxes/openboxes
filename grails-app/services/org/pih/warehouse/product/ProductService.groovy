@@ -1052,16 +1052,28 @@ class ProductService {
     Product addProductComponent(String assemblyProductId, String componentProductId, BigDecimal quantity, String unitOfMeasureId) {
         def assemblyProduct = Product.get(assemblyProductId)
         if (assemblyProduct) {
-            def componentProduct = Product.get(componentProductId)
-            if (componentProduct) {
-                def unitOfMeasure = UnitOfMeasure.get(unitOfMeasureId)
-                log.info "Adding " + componentProduct.name + " to " + assemblyProduct.name
+            addProductComponent(assemblyProduct, componentProductId, quantity, unitOfMeasureId)
+        }
+        return assemblyProduct
+    }
 
-                ProductComponent productComponent = new ProductComponent(componentProduct: componentProduct,
-                        quantity: quantity, unitOfMeasure: unitOfMeasure, assemblyProduct: assemblyProduct)
-                assemblyProduct.addToProductComponents(productComponent)
-                assemblyProduct.save(flush: true, failOnError: true)
-            }
+    Product addProductComponent(Product assemblyProduct, String componentProductId, BigDecimal quantity, String unitOfMeasureId) {
+        if (assemblyProduct) {
+            def componentProduct = Product.get(componentProductId)
+            return addProductComponent(assemblyProduct, componentProduct, quantity, unitOfMeasureId)
+        }
+        return assemblyProduct
+    }
+
+    Product addProductComponent(Product assemblyProduct, Product componentProduct, BigDecimal quantity, String unitOfMeasureId) {
+        if (componentProduct) {
+            def unitOfMeasure = UnitOfMeasure.get(unitOfMeasureId)
+            log.info "Adding " + componentProduct.name + " to " + assemblyProduct.name
+
+            ProductComponent productComponent = new ProductComponent(componentProduct: componentProduct,
+                    quantity: quantity, unitOfMeasure: unitOfMeasure, assemblyProduct: assemblyProduct)
+            assemblyProduct.addToProductComponents(productComponent)
+            assemblyProduct.save(flush: true, failOnError: true)
         }
         return assemblyProduct
     }
@@ -1287,6 +1299,29 @@ class ProductService {
                     document.save(flush: true)
                     productInstance.addToDocuments(document)
                     productInstance.save(flush: true)
+                }
+
+            }
+        }
+        // Handling Components
+        if(productJson.containsKey("components")) {
+            JSONArray componentsJsonArray = productJson.getJSONArray("components")
+            log.info "Components array json:${componentsJsonArray?.toString()}"
+//                    List<Document> documents = productInstance.documents?.toList()
+            for (int i = 0; i < componentsJsonArray.length(); i++) {
+                JSONObject componentJson = componentsJsonArray.getJSONObject(i)
+                log.info "Component Object JSON:${componentJson?.toString()} at index:${i}"
+                String componentProductCode = componentJson.getString("productCode")
+                Product componentProduct = findProduct(componentProductCode)
+                BigDecimal quantity = componentJson.getDouble("quantity")
+                String unitOfMeasureId = "EA" // FIXME this is default unit of measure id
+                if(componentJson.containsKey("unitOfMeasureId")){
+                    unitOfMeasureId = componentJson.getString("unitOfMeasureId")
+                }
+                if(componentProduct) {
+                    addProductComponent(productInstance, componentProduct, quantity, unitOfMeasureId)
+                }else{
+                    log.warn("Component Product not found with code:${componentProductCode}")
                 }
             }
         }
