@@ -793,6 +793,7 @@ class ProductAvailabilityService {
                 searchTerms.each { searchTerm ->
                     or {
                         ilike("name", "%" + searchTerm + "%")
+                        ilike("productCode", "%" + searchTerm + "%")
                         inventoryItems {
                             ilike("lotNumber", "%" + searchTerm + "%")
                         }
