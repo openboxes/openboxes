@@ -186,9 +186,9 @@ class Shipment implements Comparable, Serializable {
         // a shipment can't have two events with the same event code (this should be the case for the current event codes: CREATED, SHIPPED, RECEIVED)
         // we may want to change this in the future?
         events(validator: { events ->
-            events?.collect({
-                it.eventType?.eventCode
-            })?.unique({ a, b -> a <=> b })?.size() == events?.size()
+            def allCoreEvents = events?.findAll { it.eventType.eventCode in [EventTypeCode.CREATED, EventTypeCode.SHIPPED, EventTypeCode.RECEIVED]}
+            def uniqueCoreEvents = allCoreEvents.collect({it.eventType?.eventCode})?.unique({ a, b -> a <=> b })
+            return uniqueCoreEvents?.size() == allCoreEvents?.size()
         })
         requisition(nullable: true)
         shipmentItemCount(nullable: true)
