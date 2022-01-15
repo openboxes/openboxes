@@ -23,7 +23,7 @@ import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.shipping.ShipmentStatusCode
+import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.util.DateUtil
 
 class RequisitionService {
@@ -430,14 +430,6 @@ class RequisitionService {
                 }
                 requisition.save()
             }
-            else if (requisition.status == RequisitionStatus.PICKING) {
-                clearPicklist(requisition)
-                requisition.status = RequisitionStatus.VERIFYING
-            }
-            else {
-                throw new IllegalStateException("Unable to rollback requisition with status ${requisition.status}")
-            }
-
         } catch (Exception e) {
             throw new RuntimeException(e)
         }
@@ -489,6 +481,15 @@ class RequisitionService {
     }
 
     void deleteRequisition(Requisition requisition) {
+
+        if (requisition?.shipments) {
+            def shipments = requisition?.shipments
+            shipments.toArray().each { Shipment shipment ->
+                requisition.removeFromShipments(shipment)
+                shipmentService.deleteShipment(shipment)
+            }
+        }
+
         requisition?.requisitionItems?.toArray().each { RequisitionItem requisitionItem ->
             deleteRequisitionItem(requisitionItem)
         }
@@ -496,7 +497,7 @@ class RequisitionService {
         if (requisition?.picklist) {
             requisition.picklist.delete()
         }
-        requisition.delete()
+        requisition.delete(flush:true)
     }
 
     void deleteRequisitionItem(RequisitionItem requisitionItem) {
