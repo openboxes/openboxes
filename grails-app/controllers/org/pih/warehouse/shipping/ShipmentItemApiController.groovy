@@ -9,6 +9,8 @@
 **/
 package org.pih.warehouse.shipping
 
+import grails.converters.JSON
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.api.BaseDomainApiController
 
 class ShipmentItemApiController extends BaseDomainApiController {
@@ -16,7 +18,27 @@ class ShipmentItemApiController extends BaseDomainApiController {
     def shipmentService
 
     def update = {
-        forward(controller: "genericApi", action: "update")
+        JSONObject jsonObject = request.JSON
+        log.info "Update shipment " + jsonObject.toString(4)
+
+        String action = jsonObject.has("action") ? jsonObject.get("action") : null
+        if (!action) {
+            forward(controller: "genericApi", action: "update")
+            return
+        }
+
+        ShipmentItem shipmentItem = ShipmentItem.get(params.id)
+        if (action.equalsIgnoreCase("PACK")) {
+            String containerId = jsonObject.has("container.id") && !jsonObject.isNull("container.id") ?
+                    jsonObject.get("container.id") : null
+
+            Integer quantityToPack = jsonObject.has("quantityToPack") && !jsonObject.isNull("quantityToPack") ?
+                    jsonObject.get("quantityToPack") : null
+
+            shipmentItem = shipmentService.packItem(params.id, containerId, quantityToPack)
+        }
+
+        render ([data: shipmentItem] as JSON)
     }
 
 }

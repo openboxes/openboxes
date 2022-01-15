@@ -23,22 +23,6 @@
     <div class="button-bar ">
         <g:if test="${stockMovement?.documents}">
             <div class="right">
-
-                <div class="button-group">
-                    <g:if test="${stockMovement.stockMovementStatusCode >= StockMovementStatusCode.PICKING}">
-                        <g:link class="button" controller="picklist" action="print" id="${stockMovement?.id}" target="_blank">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'map_clipboard.png')}" />
-                            &nbsp;${warehouse.message(code: 'picklist.label', default: 'Picklist')}
-                        </g:link>
-                    </g:if>
-                    <g:if test="${stockMovement.stockMovementStatusCode >= StockMovementStatusCode.PICKING}">
-                        <g:link class="button" controller="stockMovement" action="printPackingList" id="${stockMovement?.id}" target="_blank">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'picture_clipboard.png')}" />
-                            &nbsp;${warehouse.message(code: "packingList.label", default: "Packing List")}
-                        </g:link>
-                    </g:if>
-                </div>
-
                 <div class="button-group">
                     <g:link controller="stockMovement" action="addDocument" class="button" id="${stockMovement?.id}">
                         <img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />&nbsp;
@@ -86,6 +70,7 @@
             </g:link>
             <g:isUserAdmin>
                 <g:if test="${stockMovement?.stockMovementStatusCode == StockMovementStatusCode.PICKING ||
+                        stockMovement?.stockMovementStatusCode == StockMovementStatusCode.PICKED ||
                         stockMovement?.stockMovementStatusCode == StockMovementStatusCode.REQUESTING ||
                         stockMovement?.stockMovementStatusCode == StockMovementStatusCode.REQUESTED ||
                         stockMovement?.hasBeenIssued() || ((stockMovement?.hasBeenShipped() ||
