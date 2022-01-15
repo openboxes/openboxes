@@ -356,11 +356,6 @@ class StockMovementService {
 
     void deleteStockMovement(StockMovement stockMovement) {
         if (stockMovement?.requisition) {
-            def shipments = stockMovement?.requisition?.shipments
-            shipments.toArray().each { Shipment shipment ->
-                stockMovement?.requisition.removeFromShipments(shipment)
-                shipmentService.deleteShipment(shipment)
-            }
             requisitionService.deleteRequisition(stockMovement?.requisition)
         }
         else {
@@ -2557,7 +2552,11 @@ class StockMovementService {
         } else {
             switch (stockMovement.requisition.status) {
                 case RequisitionStatus.ISSUED:
-                    requisitionService.rollbackRequsition(stockMovement.requisition)
+                    requisitionService.rollbackRequisition(stockMovement.requisition)
+                    requisition.save()
+                    break;
+                case RequisitionStatus.PICKED:
+                    requisition.status = RequisitionStatus.PICKING
                     requisition.save()
                     break;
                 case RequisitionStatus.PICKING:
