@@ -98,10 +98,13 @@ class OutboundStockMovementDataService {
         }
 
         // Generate hypothetical delivery order for newly created stock movements
-        if (identifiers) {
-            identifiers.each { String identifier ->
-                StockMovement stockMovement = stockMovementService.getStockMovementByIdentifier(identifier, Boolean.FALSE)
-                tmsIntegrationService.uploadDeliveryOrder(stockMovement)
+        Boolean uploadDeliveryOrderOnCreate = openboxes.integration.uploadDeliveryOrderOnCreate.enabled
+        if (uploadDeliveryOrderOnCreate) {
+            if (identifiers) {
+                identifiers.each { String identifier ->
+                    StockMovement stockMovement = stockMovementService.getStockMovementByIdentifier(identifier, Boolean.FALSE)
+                    tmsIntegrationService.uploadDeliveryOrder(stockMovement)
+                }
             }
         }
     }
@@ -141,7 +144,15 @@ class OutboundStockMovementDataService {
         }
         requisition.origin = findLocationByLocationNumber(params.origin)
         requisition.destination = findLocationByLocationNumber(params.destination)
-        requisition.requestedDeliveryDate = deliveryDate.toDate()
+
+        // If the delivery date is changed then we need to make the same change to shipment
+        if (!requisition.requestedDeliveryDate.equals(deliveryDate)) {
+            requisition.requestedDeliveryDate = deliveryDate.toDate()
+            if (requisition.shipment) {
+                requisition.shipment.expectedDeliveryDate = deliveryDate.toDate()
+                requisition.shipment.expectedShippingDate = deliveryDate.toDate()
+            }
+        }
         requisition.save(failOnError: true)
 
         def requisitionItem = RequisitionItem.createCriteria().get {

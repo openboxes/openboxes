@@ -23,7 +23,8 @@ class StockMovementStatusEventService implements ApplicationListener<StockMoveme
         log.info "Application event ${event.source} has been published"
 
         // Push delivery order update to eTruckNow
-        if (event.stockMovementStatusCode == StockMovementStatusCode.PICKING && !event.rollback) {
+        Boolean uploadDeliveryOrderOnUpdate = grailsApplication.config.openboxes.integration.uploadDeliveryOrderOnUpdate.enabled
+        if (uploadDeliveryOrderOnUpdate && event.stockMovementStatusCode == StockMovementStatusCode.PICKING && !event.rollback) {
             tmsIntegrationService.uploadDeliveryOrder(event.source)
         }
 
