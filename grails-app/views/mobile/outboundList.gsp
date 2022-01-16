@@ -123,7 +123,6 @@
                                 <g:formatDate date="${uploadedEvent?.eventDate}" format="dd/MMM/yyyy"/>
                             </g:if>
                             <g:else>No</g:else>
-
                         </td>
                         <td>
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
