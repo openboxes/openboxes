@@ -48,6 +48,7 @@ class MobileController {
     def tmsIntegrationService
     def messageHandlerService
     def xsdValidatorService
+    def productAvailabilityService
 
 
     def index = {
@@ -311,6 +312,15 @@ class MobileController {
     def outboundDetails = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
+        // Get the on hand quantity for all products in the given stock movement
+        Location location = Location.get(session.warehouse.id)
+        List<Product> products = stockMovement.lineItems.collect { it.product }
+        Map<Product, Integer> quantityOnHand = productAvailabilityService.getQuantityOnHandByProduct(location, products)
+        // FIXME For some reason we cannot retrieve value from map using product object
+        quantityOnHand.each { product, value ->
+            quantityOnHand.put(product.id, value)
+        }
+
         // Move to service layer
         def events = stockMovement?.shipment?.events?.collect { Event event ->
             [id: event?.id, name: event?.eventType?.toString(), date: event?.eventDate]
@@ -321,7 +331,7 @@ class MobileController {
         }
         events = events.sort { it.date }
 
-        [stockMovement:stockMovement, events:events]
+        [stockMovement:stockMovement, events:events, quantityOnHand:quantityOnHand]
     }
 
     def outboundDownload = {

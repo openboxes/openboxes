@@ -222,10 +222,20 @@
                             <th class="text-center">
                                 <g:message code="requisitionItem.quantityRequested.label"/>
                             </th>
+                            <th class="text-center">
+                                <g:message code="requisitionItem.quantityRequired.label"/>
+                            </th>
+                            <th class="text-center">
+                                <g:message code="requisition.quantityOnHand.label"/>
+                            </th>
+                            <th>
+                                <g:message code="requisitionItem.status.label"/>
+                            </th>
                         </tr>
                         </thead>
                         <tbody>
                             <g:each var="item" in="${stockMovement.lineItems}">
+                                <g:set var="requisitionItem" value="${item.requisitionItem}"/>
                                 <tr>
                                     <td class="col-1">
                                         <g:if test="${item?.product?.images}">
@@ -239,11 +249,14 @@
                                                  class="img-fluid"/>
                                         </g:else>
                                     </td>
-                                    <td class="col-2">
-                                        <g:displayBarcode showData="${true}"
+                                    <td class="col-2 text-center">
+                                        <g:displayBarcode showData="${false}"
                                                           data="${item?.product?.productCode}"/>
+                                        <div class="badge bg-secondary">
+                                            ${item?.product?.productCode}
+                                        </div>
                                     </td>
-                                    <td class="col-6">
+                                    <td class="col-4">
                                         ${item?.product?.name}
                                         <g:if test="${item?.requisitionItem?.description}">
                                             <div class="text-muted">
@@ -255,13 +268,50 @@
                                         ${item.quantityRequested}
                                         ${item?.product?.unitOfMeasure?:"EA"}
                                     </td>
+                                    <td class="col-1 text-center">
+                                        ${item.quantityRequired}
+                                        ${item?.product?.unitOfMeasure?:"EA"}
+                                    </td>
+                                    <td class="col-1 text-center">
+                                        ${quantityOnHand[item?.product?.id]}
+                                        ${item?.product?.unitOfMeasure?:"EA"}
+                                    </td>
+                                    <td class="col-1">
+                                         <div class="badge ${requisitionItem.isCanceled() || requisitionItem.isCanceledDuringPick() ? 'bg-danger' :
+                                                requisitionItem.isSubstituted() || requisitionItem.isReduced() ? 'bg-warning' : 'bg-success'}">
+                                            <g:if test="${requisitionItem.isCanceled() || requisitionItem.isCanceledDuringPick()}">
+                                                <g:message code="enum.RequisitionItemStatus.CANCELED"/>
+                                            </g:if>
+                                            <g:elseif test="${requisitionItem.isReduced() && !requisitionItem.isSubstituted()}">
+                                                <g:message code="enum.RequisitionItemStatus.REDUCED"/>
+                                            </g:elseif>
+                                            <g:elseif test="${requisitionItem.isIncreased() && !requisitionItem.isSubstituted()}">
+                                                <g:message code="enum.RequisitionItemStatus.INCREASED"/>
+                                            </g:elseif>
+                                            <g:elseif test="${requisitionItem?.status==RequisitionItemStatus.APPROVED && requisitionItem?.requisition?.status == RequisitionStatus.ISSUED}">
+                                                <format:metadata obj="${requisitionItem?.requisition?.status}"/>
+                                            </g:elseif>
+                                            <g:else>
+                                                <format:metadata obj="${requisitionItem?.status}"/>
+                                            </g:else>
+                                        </div>
+                                        <g:set var="pickReasonCode" value="${requisitionItem?.modificationItem?.pickReasonCode ?: requisitionItem?.substitutionItem?.pickReasonCode ?: requisitionItem?.pickReasonCode}"/>
+                                        <g:if test="${requisitionItem?.cancelReasonCode || pickReasonCode }">
+                                            <div title="${requisitionItem?.cancelReasonCode ? 'Edit reason code: ' + requisitionItem?.cancelReasonCode : ''}${pickReasonCode ? 'Pick reason code: ' + pickReasonCode : ''}">
+                                                <img src="${createLinkTo(dir:'images/icons/silk',file:'note.png')}" />
+                                            </div>
+                                        </g:if>
+                                        <g:else>
+                                            <div class="fade"><g:message code="default.empty.label"/></div>
+                                        </g:else>
+                                    </td>
                                 </tr>
                             </g:each>
                         </tbody>
                     </table>
                     <g:unless test="${stockMovement.lineItems}">
                         <div class="alert alert-primary text-center text-muted">
-                            There are no item
+                            There are no items
                         </div>
                     </g:unless>
                 </div>
