@@ -18,6 +18,7 @@ class StockMovementStatusEventService implements ApplicationListener<StockMoveme
     boolean transactional = true
     def notificationService
     def tmsIntegrationService
+    def grailsApplication
 
     void onApplicationEvent(StockMovementStatusEvent event) {
         log.info "Application event ${event.source} has been published"
