@@ -17,6 +17,7 @@ import org.codehaus.groovy.grails.plugins.web.taglib.RenderTagLib
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.codehaus.groovy.grails.web.errors.GrailsWrappedRuntimeException
 import org.pih.warehouse.api.PartialReceipt
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.MailService
@@ -120,54 +121,71 @@ class NotificationService {
         else {
             mailService.sendHtmlMail(subject, body, toList)
         }
-
     }
+
+    def sendRequisitionRejectedNotifications(String requestNumber, String message, List<RoleType> roleTypes) {
+        Location location = AuthService.getCurrentLocation().get()
+        def users = userService.findUsersByRoleTypes(location, roleTypes)
+        String subject = "Order ${requestNumber} has been rejected"
+        String template = "/email/requisitionRejected"
+        Map model = [requestNumber:requestNumber, message:message]
+        sendNotifications(model, users, template, subject)
+    }
+
+    def sendRequisitionRevisedNotifications(Requisition requisition, Location location, List<RoleType> roleTypes) {
+        def users = userService.findUsersByRoleTypes(location, roleTypes)
+        String subject = "Order ${requisition?.requestNumber} has been revised"
+        String template = "/email/requisitionRevised"
+        Map model = [requisition: requisition]
+        sendNotifications(model, users, template, subject)
+    }
+
 
     def sendRequisitionUpdatedNotification(Requisition requisition, Location location, List<RoleType> roleTypes) {
         def users = userService.findUsersByRoleTypes(location, roleTypes)
-        String subject = "Requisition ${requisition?.requestNumber} has been updated"
+        String subject = "Order ${requisition?.requestNumber} has been updated"
         String template = "/email/requisitionUpdated"
         sendRequisitionNotifications(requisition, users, template, subject)
     }
 
     def sendRequisitionStatusNotification(Requisition requisition, Location location, List<RoleType> roleTypes) {
         def users = userService.findUsersByRoleTypes(location, roleTypes)
-        String subject = "Requisition ${requisition?.requestNumber} status has been changed to ${requisition?.status}"
+        String subject = "Order ${requisition?.requestNumber} status has been changed to ${requisition?.status}"
         String template = "/email/requisitionStatusChanged"
         sendRequisitionNotifications(requisition, users, template, subject)
     }
 
     def sendShipmentCreatedNotification(Shipment shipmentInstance, Location location, List<RoleType> roleTypes) {
         def users = userService.findUsersByRoleTypes(location, roleTypes)
-        String subject = "Shipment ${shipmentInstance?.shipmentNumber} has been created"
+        String subject = "Order ${shipmentInstance?.shipmentNumber} has been created"
         String template = "/email/shipmentCreated"
         sendShipmentNotifications(shipmentInstance, users, template, subject)
     }
 
     def sendShipmentAcceptedNotification(Shipment shipmentInstance, Location location, List<RoleType> roleTypes) {
         def users = userService.findUsersByRoleTypes(location, roleTypes)
-        String subject = "Shipment ${shipmentInstance?.shipmentNumber} has been accepted"
+        String subject = "Order ${shipmentInstance?.shipmentNumber} has been accepted"
         String template = "/email/shipmentAccepted"
         sendShipmentNotifications(shipmentInstance, users, template, subject)
     }
 
     def sendShipmentIssuedNotification(Shipment shipmentInstance, Location location, List<RoleType> roleTypes) {
         def users = userService.findUsersByRoleTypes(location, roleTypes)
-        String subject = "Shipment ${shipmentInstance?.shipmentNumber} has been shipped"
+        String subject = "Order ${shipmentInstance?.shipmentNumber} has been shipped"
         String template = "/email/shipmentShipped"
         sendShipmentNotifications(shipmentInstance, users, template, subject)
     }
 
     def sendShipmentReceiptNotification(Shipment shipmentInstance, Location location, List<RoleType> roleTypes) {
         List<User> users = userService.findUsersByRoleTypes(location, roleTypes)
-        String subject = "Shipment ${shipmentInstance?.shipmentNumber} has been received"
+        String subject = "Order ${shipmentInstance?.shipmentNumber} has been received"
         String template = "/email/shipmentReceived"
         sendShipmentNotifications(shipmentInstance, users, template, subject)
     }
 
     def sendShipmentDeliveryNotification(Shipment shipmentInstance, Location location, List<RoleType> roleTypes) {
         List<User> users = userService.findUsersByRoleTypes(location, roleTypes)
-        String subject = "Shipment ${shipmentInstance?.shipmentNumber} has been delivered"
+        String subject = "Order ${shipmentInstance?.shipmentNumber} has been delivered"
         String template = "/email/shipmentDelivered"
         sendShipmentNotifications(shipmentInstance, users, template, subject)
     }
@@ -175,7 +193,7 @@ class NotificationService {
     def sendShipmentStatusNotification(Shipment shipment, Event event, Location location, List<RoleType> roleTypes) {
         try {
             def users = userService.findUsersByRoleTypes(location, roleTypes)
-            String subject = "Shipment ${shipment?.shipmentNumber} status has been changed to ${event?.eventType?.name}"
+            String subject = "Order ${shipment?.shipmentNumber} status has been changed to ${event?.eventType?.name}"
             String template = "/email/shipmentStatusChanged"
             sendShipmentNotifications(shipment, users, template, subject)
         } catch (Exception e) {
@@ -197,8 +215,12 @@ class NotificationService {
     }
 
     def sendRequisitionNotifications(Requisition requisition, List<User> users, String template, String subject) {
+        sendNotifications([requisition:requisition], users, template, subject)
+    }
+
+    def sendNotifications(Map model, List<User> users, String template, String subject) {
         try {
-            String body = renderTemplate(template, [requisition: requisition])
+            String body = renderTemplate(template, model)
             List emails = users.collect { it.email }.findAll { it }
             if (!emails.empty) {
                 mailService.sendHtmlMail(subject, body, emails)

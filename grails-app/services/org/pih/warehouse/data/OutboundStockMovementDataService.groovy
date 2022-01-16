@@ -12,6 +12,7 @@ package org.pih.warehouse.data
 import org.joda.time.LocalDate
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
@@ -23,6 +24,7 @@ import org.pih.warehouse.auth.AuthService
 
 class OutboundStockMovementDataService {
 
+    def notificationService
     def stockMovementService
     def tmsIntegrationService
 
@@ -119,7 +121,9 @@ class OutboundStockMovementDataService {
 
         def deliveryDate = params.deliveryDate
         if (!isDateOneWeekFromNow(deliveryDate)) {
-            throw new IllegalArgumentException("Delivery date must be after seven days from now")
+            String message = "Delivery date must be after seven days from now"
+            notificationService.sendRequisitionRejectedNotifications(params.requestNumber, message, [RoleType.ROLE_SHIPMENT_NOTIFICATION])
+            throw new IllegalArgumentException(message)
         }
 
         def requestNumber = params.requestNumber

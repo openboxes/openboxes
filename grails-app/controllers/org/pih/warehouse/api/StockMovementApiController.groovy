@@ -18,7 +18,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.StockMovementService
+import org.pih.warehouse.inventory.StockMovementRevisedEvent
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
@@ -28,8 +28,8 @@ import org.pih.warehouse.shipping.Shipment
 
 class StockMovementApiController {
 
-    StockMovementService stockMovementService
     def dataService
+    def stockMovementService
 
     def list = {
         int max = Math.min(params.max ? params.int('max') : 10, 1000)
@@ -168,6 +168,12 @@ class StockMovementApiController {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         bindStockMovement(stockMovement, request.JSON)
         def revisedItems = stockMovementService.reviseItems(stockMovement)
+
+        // If there are revised items we want to broadcast that
+        if (!revisedItems.empty) {
+            grailsApplication.mainContext.publishEvent(new StockMovementRevisedEvent(stockMovement))
+        }
+
         render([data: revisedItems] as JSON)
     }
 
