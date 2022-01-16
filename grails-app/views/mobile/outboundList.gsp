@@ -37,6 +37,7 @@
                     <th><g:message code="stockMovement.requestedDeliveryDate.label" default="Requested Delivery"/></th>
                     <th><g:message code="stockMovement.trackingNumber.label" /></th>
                     <th><g:message code="stockMovement.shippingStatus.label" default="Shipping Status"/></th>
+                    <th><g:message code="document.uploaded.label" /></th>
                     <th class="col-1 text-center"></th>
                 </tr>
                 <tr>
@@ -61,6 +62,9 @@
                     </th>
                     <th>
                         <g:selectEventType name="eventType" value="${params.eventType}" class="form-control" noSelection="['':warehouse.message(code:'default.all.label')]" />
+                    </th>
+                    <th>
+
                     </th>
                     <th class="col-1 text-center">
                         <button type="submit" class="btn btn-primary"><i class="fa fa-filter"></i> Filter</button>
@@ -112,6 +116,14 @@
                                 </div>
                                 <p class="small text-muted"><g:formatDate date="${stockMovement.shipment?.currentEvent?.eventDate}" format="MMM dd HH:mm"/></p>
                             </g:if>
+                        </td>
+                        <td class="text-center">
+                            <g:set var="uploadedEvent" value="${stockMovement?.shipment?.events?.find { it.eventType.eventCode == org.pih.warehouse.core.EventTypeCode.UPLOADED }}"/>
+                            <g:if test="${uploadedEvent}">
+                                <g:formatDate date="${uploadedEvent?.eventDate}" format="dd/MMM/yyyy"/>
+                            </g:if>
+                            <g:else>No</g:else>
+
                         </td>
                         <td>
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">

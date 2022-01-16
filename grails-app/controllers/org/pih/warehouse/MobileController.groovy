@@ -315,12 +315,14 @@ class MobileController {
         // Get the on hand quantity for all products in the given stock movement
         Location location = Location.get(session.warehouse.id)
         List<Product> products = stockMovement.lineItems.collect { it.product }
-        Map<Product, Integer> quantityOnHand = productAvailabilityService.getQuantityOnHandByProduct(location, products)
-        // FIXME For some reason we cannot retrieve value from map using product object
-        quantityOnHand.each { product, value ->
-            quantityOnHand.put(product.id, value)
+        Map<Product, Integer> quantityOnHand = [:]
+        if (!products?.empty) {
+            Map tempQuantityOnHand = productAvailabilityService.getQuantityOnHandByProduct(location, products)
+            // FIXME For some reason we cannot retrieve value from map using product object
+            tempQuantityOnHand.each { product, value ->
+                quantityOnHand.put(product.id, value)
+            }
         }
-
         // Move to service layer
         def events = stockMovement?.shipment?.events?.collect { Event event ->
             [id: event?.id, name: event?.eventType?.toString(), date: event?.eventDate]

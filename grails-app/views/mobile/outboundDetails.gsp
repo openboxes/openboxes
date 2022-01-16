@@ -249,15 +249,16 @@
                                                  class="img-fluid"/>
                                         </g:else>
                                     </td>
-                                    <td class="col-2 text-center">
+                                    <td class="col-1 text-center">
                                         <g:displayBarcode showData="${false}"
                                                           data="${item?.product?.productCode}"/>
-                                        <div class="badge bg-secondary">
-                                            ${item?.product?.productCode}
-                                        </div>
+
                                     </td>
                                     <td class="col-4">
-                                        ${item?.product?.name}
+                                            <g:link controller="mobile" action="productDetails" id="${item?.product?.id}" class="text-reset text-decoration-none">
+                                                ${item?.product?.productCode}
+                                                ${item?.product?.name}
+                                            </g:link>
                                         <g:if test="${item?.requisitionItem?.description}">
                                             <div class="text-muted">
                                                 Special Instructions: ${item.requisitionItem?.description}
@@ -273,11 +274,16 @@
                                         ${item?.product?.unitOfMeasure?:"EA"}
                                     </td>
                                     <td class="col-1 text-center">
-                                        ${quantityOnHand[item?.product?.id]}
+                                        ${quantityOnHand[item?.product?.id]?:0}
                                         ${item?.product?.unitOfMeasure?:"EA"}
                                     </td>
                                     <td class="col-1">
-                                         <div class="badge ${requisitionItem.isCanceled() || requisitionItem.isCanceledDuringPick() ? 'bg-danger' :
+                                        <g:set var="pickReasonCode" value="${requisitionItem?.modificationItem?.pickReasonCode ?: requisitionItem?.substitutionItem?.pickReasonCode ?: requisitionItem?.pickReasonCode}"/>
+                                        <g:if test="${requisitionItem?.cancelReasonCode || pickReasonCode }">
+                                            <g:set var="tooltipMessage" value="${requisitionItem?.cancelReasonCode ? 'Edit reason code: ' + requisitionItem?.cancelReasonCode : ''}${pickReasonCode ? 'Pick reason code: ' + pickReasonCode : ''}"/>
+                                        </g:if>
+                                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltipMessage}"
+                                              class="badge ${requisitionItem.isCanceled() || requisitionItem.isCanceledDuringPick() ? 'bg-danger' :
                                                 requisitionItem.isSubstituted() || requisitionItem.isReduced() ? 'bg-warning' : 'bg-success'}">
                                             <g:if test="${requisitionItem.isCanceled() || requisitionItem.isCanceledDuringPick()}">
                                                 <g:message code="enum.RequisitionItemStatus.CANCELED"/>
@@ -288,22 +294,14 @@
                                             <g:elseif test="${requisitionItem.isIncreased() && !requisitionItem.isSubstituted()}">
                                                 <g:message code="enum.RequisitionItemStatus.INCREASED"/>
                                             </g:elseif>
-                                            <g:elseif test="${requisitionItem?.status==RequisitionItemStatus.APPROVED && requisitionItem?.requisition?.status == RequisitionStatus.ISSUED}">
+                                            <g:elseif test="${requisitionItem?.status==org.pih.warehouse.requisition.RequisitionItemStatus.APPROVED
+                                                    && requisitionItem?.requisition?.status == org.pih.warehouse.requisition.RequisitionStatus.ISSUED}">
                                                 <format:metadata obj="${requisitionItem?.requisition?.status}"/>
                                             </g:elseif>
                                             <g:else>
                                                 <format:metadata obj="${requisitionItem?.status}"/>
                                             </g:else>
-                                        </div>
-                                        <g:set var="pickReasonCode" value="${requisitionItem?.modificationItem?.pickReasonCode ?: requisitionItem?.substitutionItem?.pickReasonCode ?: requisitionItem?.pickReasonCode}"/>
-                                        <g:if test="${requisitionItem?.cancelReasonCode || pickReasonCode }">
-                                            <div title="${requisitionItem?.cancelReasonCode ? 'Edit reason code: ' + requisitionItem?.cancelReasonCode : ''}${pickReasonCode ? 'Pick reason code: ' + pickReasonCode : ''}">
-                                                <img src="${createLinkTo(dir:'images/icons/silk',file:'note.png')}" />
-                                            </div>
-                                        </g:if>
-                                        <g:else>
-                                            <div class="fade"><g:message code="default.empty.label"/></div>
-                                        </g:else>
+                                        </span>
                                     </td>
                                 </tr>
                             </g:each>
