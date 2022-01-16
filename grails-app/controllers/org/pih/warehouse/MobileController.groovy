@@ -195,6 +195,12 @@ class MobileController {
 
         try {
             StockMovement stockMovement = stockMovementService.getStockMovement(params.id, false)
+
+            // If there are no lines then we should export a template
+            if (!stockMovement.lineItems) {
+                stockMovement.lineItems = [new StockMovementItem()]
+            }
+
             def data = stockMovement.lineItems.collect { StockMovementItem stockMovementItem ->
                 return [
                         "Origin"              : stockMovement?.origin?.locationNumber,
