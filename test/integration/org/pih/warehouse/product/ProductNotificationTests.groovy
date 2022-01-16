@@ -9,12 +9,23 @@ class ProductNotificationTests  extends GroovyTestCase {
     def productService
 
     @Test
+    void testProductFindWithExternalId(){
+
+
+    }
+
+    @Test
     void testSaveProductFromJson(){
+
+        String externalId = "142"
+        Product productInstance = productService.findProductByExternalId(externalId)
+        assert productInstance == null
+
         String productJsonString = """{
             "locationNumber": "SOF00001",
             "products": [{
-                "id": "142",
-                "productCode": "SOF00001-SKU2",
+                "id": "${externalId}",
+                "productCode": "SOF00001-SKU02",
                 "name": "Test name",
                 "pricePerUnit": 150.0,
                 "description": "Test description",
@@ -65,7 +76,7 @@ class ProductNotificationTests  extends GroovyTestCase {
                     "value": "Subcategory 1"
                 }, {
                     "code": "ingredients",
-                    "value": ""
+                    "value": "ingredients 1"
                 }],
                 "documents": [{
                     "fileUri": "link2.com"
@@ -90,15 +101,17 @@ class ProductNotificationTests  extends GroovyTestCase {
         def category = productService.findOrCreateCategory("FMCG")
         JSONObject productsJson = new JSONObject(productJsonString)
         JSONArray products = productsJson.getJSONArray("products")
+        Product product = null
         for (int i = 0; i < products.length(); i++) {
             JSONObject productJson = products.getJSONObject(i)
-            Product product = productService.createFromJson(productJson)
-            product = productService.findProduct(productJson.getString("id"))
-            product.refresh()
+            product = productService.createFromJson(productJson)
             assert product.name == "Test name"
             assert product.attributes?.size() == 15
             assert product.documents?.size() == 3
             assert product.productComponents?.size() == 2
         }
+
+        productInstance = productService.findProductByExternalId(externalId)
+        assert productInstance == product
     }
 }

@@ -1228,15 +1228,40 @@ class ProductService {
         return productInstance
     }
 
+    Attribute findExternalProductIdAttribute(String externalAttributeCode = null){
+        if (!externalAttributeCode) {
+            externalAttributeCode = grailsApplication.config.externalProductId.attribute.code
+        }
+        if (!externalAttributeCode) {
+            externalAttributeCode = "EXTERNAL_PRODUCT_ID"
+        }
+        Attribute attribute = Attribute.findByCode(externalAttributeCode)
+        return attribute
+    }
+
+    Product findProductByExternalId(String externalProductId){
+        String externalAttributeCode = grailsApplication.config.externalProductId.attribute.code
+        if(!externalAttributeCode){
+            externalAttributeCode = "EXTERNAL_PRODUCT_ID"
+        }
+        Attribute attribute = findExternalProductIdAttribute(externalAttributeCode)
+        if(!attribute){
+            attribute = new Attribute(code: externalAttributeCode, name: externalAttributeCode, allowOther: false)
+            attribute.save(flush: true)
+        }
+        ProductAttribute productAttribute = ProductAttribute.findByAttributeAndValue(attribute, externalProductId)
+        return productAttribute?.product
+    }
+
     Product createFromJson(JSONObject productJson){
         log.info "Product: ${productJson.toString(4)}"
 
-        String productId = productJson.getString("id")
-        Product productInstance = findProduct(productId)
+        String externalProductId = productJson.getString("id")
+        Product productInstance = findProductByExternalId(externalProductId)
+        Boolean isNewInstance = false
         if (!productInstance) {
             productInstance = new Product()
-            // FIXME Hack to handle external product ID from external system (see OBDX-26 for proposed solution)
-            productInstance.upc = productId
+            isNewInstance = true
         }
         productInstance.name = productJson.getString("name")
         productInstance.productCode = productJson.getString("productCode")
@@ -1255,6 +1280,7 @@ class ProductService {
             productInstance.productCode = generateProductIdentifier(productInstance.productType)
         }
         productInstance.save(flush: true)
+
 
         // Process attributes
         if(productJson.containsKey("attributes")){
@@ -1284,6 +1310,14 @@ class ProductService {
                 }
             }
         }
+        if(isNewInstance){ // Saving product id in product attribute
+            Attribute attribute = findExternalProductIdAttribute()
+            ProductAttribute productAttribute = new ProductAttribute(attribute: attribute, value: externalProductId)
+            productInstance.addToAttributes(productAttribute)
+            productInstance.save(flush: true, failOnError: true)
+        }
+
+
 
         // Process documents
         if (productJson.containsKey("documents")) {
