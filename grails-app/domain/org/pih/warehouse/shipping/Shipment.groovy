@@ -187,7 +187,7 @@ class Shipment implements Comparable, Serializable {
         // we may want to change this in the future?
         events(validator: { events ->
             def allCoreEvents = events?.findAll { it.eventType.eventCode in [EventTypeCode.CREATED, EventTypeCode.SHIPPED, EventTypeCode.RECEIVED]}
-            def uniqueCoreEvents = allCoreEvents.collect({it.eventType?.eventCode})?.unique({ a, b -> a <=> b })
+            def uniqueCoreEvents = allCoreEvents?.collect({it.eventType?.eventCode})?.unique({ a, b -> a <=> b })
             return uniqueCoreEvents?.size() == allCoreEvents?.size()
         })
         requisition(nullable: true)
