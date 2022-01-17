@@ -100,40 +100,8 @@ class StockTransferApiController {
             throw new ValidationException("Invalid order", order.errors)
         }
 
-        // TODO: Refactor - Return only status
-        stockTransfer = StockTransfer.createFromOrder(order)
-        stockTransferService.setQuantityOnHand(stockTransfer)
-        render([data: stockTransfer?.toJson()] as JSON)
         forward(action: "read", id: order.id)
     }
-
-
-//    def update = {
-//        log.info "update transfer"
-//        JSONObject jsonObject = request.JSON
-//
-//        Order order = Order.get(params.id)
-//        if (!order) {
-//            throw new IllegalArgumentException("No stock transfer found for order ID ${params.id}")
-//        }
-//        User currentUser = User.get(session.user.id)
-//        Location currentLocation = Location.get(session.warehouse.id)
-//        if (!currentLocation || !currentUser) {
-//            throw new IllegalArgumentException("User must be logged into a location to update stock transfer")
-//        }
-//
-//        StockTransfer stockTransfer = StockTransfer.createFromOrder(order)
-//        bindStockTransferData(stockTransfer, currentUser, currentLocation, jsonObject)
-//        if (stockTransfer?.status == StockTransferStatus.COMPLETED) {
-//            order = stockTransferService.completeStockTransfer(stockTransfer)
-//        } else {
-//            order = stockTransferService.createOrderFromStockTransfer(stockTransfer)
-//            if (order.hasErrors() || !order.save(flush: true)) {
-//                throw new ValidationException("Invalid order", order.errors)
-//            }
-//        }
-//        forward(action: "read", id: params.id)
-//    }
 
     def delete = {
         Order order = Order.get(params.id)
@@ -144,7 +112,6 @@ class StockTransferApiController {
             render status: 204
         }
     }
-
 
     StockTransfer bindStockTransferData(StockTransfer stockTransfer, User currentUser, Location currentLocation, JSONObject jsonObject) {
         bindData(stockTransfer, jsonObject)
