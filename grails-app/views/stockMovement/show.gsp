@@ -90,12 +90,10 @@
             </g:isUserAdmin>
         </div>
         <div class="button-group">
-            <g:if test="${stockMovement?.hasBeenShipped()}">
-                <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
-                    <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
-                    <warehouse:message code="default.button.receive.label" />
-                </g:link>
-            </g:if>
+            <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
+                <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
+                <warehouse:message code="default.button.receive.label" />
+            </g:link>
             <g:if test="${stockMovement?.hasBeenReceived() || stockMovement?.hasBeenPartiallyReceived()}">
                 <g:link controller="partialReceiving" action="rollbackLastReceipt" id="${stockMovement?.shipment?.id}" class="button">
                     <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
