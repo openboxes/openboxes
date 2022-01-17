@@ -41,7 +41,7 @@
             <th class="left"><warehouse:message code="default.comment.label"/></th>
             <th><warehouse:message code="shipmentItem.isFullyReceived.label" default="Received?"/></th>
         </tr>
-        <g:if test="${shipmentInstance?.containers}">
+        <g:if test="${shipmentInstance?.containers + null}">
             <g:set var="count" value="${0}"/>
             <g:each var="container" in="${shipmentInstance?.containers + null}">
                 <g:set var="shipmentItems" value="${shipmentInstance.findShipmentItemsByContainer(container)}"/>
@@ -65,6 +65,9 @@
                                 <g:if test="${i == 0}">
                                     <g:if test="${container}">
                                         ${container?.name}
+                                        <g:if test="${container?.containerNumber}">
+                                            (${container?.containerNumber})
+                                        </g:if>
                                     </g:if>
                                     <g:else>
                                         <g:message code="shipping.unpackedItems.label"/>
