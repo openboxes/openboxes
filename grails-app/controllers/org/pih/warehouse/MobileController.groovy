@@ -141,8 +141,7 @@ class MobileController {
 
         StockMovement stockMovement = new StockMovement(origin: origin, destination: destination, stockMovementType: StockMovementType.INBOUND)
         if (params.status) {
-            ShipmentStatusCode shipmentStatusCode = params.status as ShipmentStatusCode
-            stockMovement.stockMovementStatusCode = ShipmentStatusCode.toStockMovementStatus(shipmentStatusCode)
+            stockMovement.receiptStatusCodes = [params.status as ShipmentStatusCode]
         }
         def stockMovements = stockMovementService.getStockMovements(stockMovement, [max:params.max?:10, offset: params.offset?:0])
         [stockMovements: stockMovements]

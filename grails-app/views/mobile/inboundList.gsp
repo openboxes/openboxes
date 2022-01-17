@@ -69,20 +69,19 @@
                 <g:each var="stockMovement" in="${stockMovements}">
                     <tr>
                         <td>
-                            <a href="${createLink(controller: 'stockMovement', action: 'show', id: stockMovement?.id)}" class="text-decoration-none text-reset">
-                                <g:if test="${stockMovement?.shipment?.currentEvent?.eventType?.eventCode}">
-                                    <div class="badge bg-primary">
-                                        ${stockMovement.shipment?.currentEvent?.eventType?.eventCode}
-                                    </div>
-                                    <p class="small text-muted">
-                                        <g:formatDate date="${stockMovement.shipment?.currentEvent?.eventDate}" format="MMM dd hh:mm a"/>
-                                    </p>
-                                </g:if>
-                                <g:else>
-                                    <div class="badge bg-primary">${stockMovement?.status}</div>
-                                    <p class="small text-muted"><g:formatDate date="${stockMovement.lastUpdated}" format="MMM dd HH:mm"/></p>
-                                </g:else>
-                            </a>
+                            <g:if test="${stockMovement?.shipment?.currentStatus}">
+                                <div class="badge bg-primary">
+                                    ${stockMovement?.shipment?.currentStatus}
+                                </div>
+                                <p class="small text-muted">
+                                    <g:if test="${stockMovement?.shipment?.currentEvent?.eventDate}">
+                                        <g:formatDate date="${stockMovement?.shipment?.currentEvent?.eventDate}" format="MMM dd hh:mm a"/>
+                                    </g:if>
+                                    <g:else>
+                                        <g:formatDate date="${stockMovement?.shipment?.lastUpdated}" format="MMM dd hh:mm a"/>
+                                    </g:else>
+                                </p>
+                            </g:if>
                         </td>
                         <td>
                             <a href="${createLink(controller: 'mobile', action: 'inboundDetails', id: stockMovement?.id)}" class="text-decoration-none text-reset">
@@ -109,6 +108,11 @@
                 </g:each>
                 </tbody>
             </table>
+            <g:unless test="${stockMovements}">
+                <div class="text-center text-muted">
+                    There are no inbound stock movements matching that criteria.
+                </div>
+            </g:unless>
         </g:form>
         <div class="pagination">
             <g:paginate total="${stockMovements.totalCount}"/>
