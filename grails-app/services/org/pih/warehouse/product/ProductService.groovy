@@ -1230,27 +1230,23 @@ class ProductService {
 
     Attribute findExternalProductIdAttribute(String externalAttributeCode = null){
         if (!externalAttributeCode) {
-            externalAttributeCode = grailsApplication.config.externalProductId.attribute.code
+            externalAttributeCode = grailsApplication.config.openboxes.product.externalProductId.attributeCode?:"EXTERNAL_PRODUCT_ID"
         }
-        if (!externalAttributeCode) {
-            externalAttributeCode = "EXTERNAL_PRODUCT_ID"
-        }
-        Attribute attribute = Attribute.findByCode(externalAttributeCode)
-        return attribute
+        return Attribute.findByCode(externalAttributeCode)
     }
 
     Product findProductByExternalId(String externalProductId){
-        String externalAttributeCode = grailsApplication.config.externalProductId.attribute.code
-        if(!externalAttributeCode){
-            externalAttributeCode = "EXTERNAL_PRODUCT_ID"
-        }
+        String externalAttributeCode = grailsApplication.config.openboxes.product.externalProductId.attributeCode?:"EXTERNAL_PRODUCT_ID"
         Attribute attribute = findExternalProductIdAttribute(externalAttributeCode)
         if(!attribute){
             attribute = new Attribute(code: externalAttributeCode, name: externalAttributeCode, allowOther: false)
             attribute.save(flush: true)
         }
-        ProductAttribute productAttribute = ProductAttribute.findByAttributeAndValue(attribute, externalProductId)
-        return productAttribute?.product
+        if(attribute && externalProductId) {
+            ProductAttribute productAttribute = ProductAttribute.findByAttributeAndValue(attribute, externalProductId)
+            return productAttribute?.product
+        }
+        return null
     }
 
     Product createFromJson(JSONObject productJson){
