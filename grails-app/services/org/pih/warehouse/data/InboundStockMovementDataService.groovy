@@ -16,6 +16,7 @@ import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionType
@@ -71,8 +72,8 @@ class InboundStockMovementDataService {
             stockMovement = new StockMovement()
         }
 
-        if (!isDateOneWeekFromNow(params.deliveryDate)) {
-            command.errors.reject("Delivery date ${params.deliveryDate} for ${params.loadCode} must be more than seven (7) days away from today")
+        if (stockMovement.stockMovementStatusCode >= StockMovementStatusCode.DISPATCHED) {
+            throw new IllegalStateException("Cannot update an inbound stock movement with status ${stockMovement?.stockMovementStatusCode}")
         }
 
         def expectedDeliveryDate =
