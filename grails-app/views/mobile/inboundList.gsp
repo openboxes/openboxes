@@ -34,11 +34,11 @@
             <table class="table table-borderless table-striped">
                 <thead>
                     <tr>
-                        <th><g:message code="stockMovement.status.label" default="Status"/></th>
-                        <th><g:message code="requisition.orderNumber.label"/></th>
-                        <th><g:message code="stockMovement.origin.label"/></th>
-                        <th><g:message code="stockMovement.destination.label" default="Destination"/></th>
-                        <th><g:message code="stockMovement.expectedDeliveryDate.label" default="Expected Delivery Date"/></th>
+                        <th class="col-2"><g:message code="stockMovement.status.label" default="Status"/></th>
+                        <th class="col-2"><g:message code="requisition.orderNumber.label"/></th>
+                        <th class="col-4"><g:message code="stockMovement.origin.label"/></th>
+                        <th><g:message code="stockMovement.requestedDeliveryDate.label" default="Requested"/></th>
+                        <th><g:message code="stockMovement.expectedDeliveryDate.label" default="Expected"/></th>
                         <th></th>
                     </tr>
                     <tr>
@@ -50,12 +50,13 @@
                                       value="${params.status}"
                                       noSelection="['':warehouse.message(code:'default.all.label')]" />
                         </th>
-                        <th></th>
+                        <th>
+                            <g:textField name="identifier" value="${params.identifier}" class="form-control" size="3"/>
+                        </th>
                         <th>
                             <g:selectLocation id="origin" name="origin.id" value="${params?.origin?.id}"
                                   class="form-control"
                                   noSelection="['null':warehouse.message(code:'default.all.label')]"/>
-
                         </th>
                         <th></th>
                         <th></th>
@@ -68,7 +69,7 @@
                 <tbody>
                 <g:each var="stockMovement" in="${stockMovements}">
                     <tr>
-                        <td>
+                        <td class="text-center">
                             <g:if test="${stockMovement?.shipment?.currentStatus}">
                                 <div class="badge bg-primary">
                                     ${stockMovement?.shipment?.currentStatus}
@@ -92,10 +93,12 @@
                             ${stockMovement?.origin?.name}
                         </td>
                         <td>
-                            ${stockMovement?.destination?.name} ${stockMovement?.destination?.locationNumber}
+                            <g:formatDate date="${stockMovement?.requestedDeliveryDate}" format="dd MMM yyyy"/>
                         </td>
                         <td>
-                            <g:formatDate date="${stockMovement?.expectedDeliveryDate}" format="dd MMM yyyy"/>
+                            <div><g:formatDate date="${stockMovement?.expectedDeliveryDate}" format="dd MMM yyyy"/></div>
+                            <small><g:formatDate date="${stockMovement?.expectedDeliveryDate}" format="hh:mm a"/></small>
+
                         </td>
                         <td>
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">

@@ -143,6 +143,9 @@ class MobileController {
         if (params.status) {
             stockMovement.receiptStatusCodes = [params.status as ShipmentStatusCode]
         }
+        if (params.identifier) {
+           stockMovement.identifier = "%" + params.identifier + "%"
+        }
         def stockMovements = stockMovementService.getStockMovements(stockMovement, [max:params.max?:10, offset: params.offset?:0])
         [stockMovements: stockMovements]
     }
