@@ -311,6 +311,10 @@ class StockMovementService {
         if (stockMovement.requestedBy) requisition.requestedBy = stockMovement.requestedBy
         if (stockMovement.dateRequested) requisition.dateRequested = stockMovement.dateRequested
         if (stockMovement.requestType) requisition.type = stockMovement.requestType
+        if (stockMovement.requestedDeliveryDate) {
+            requisition.requestedDeliveryDate = stockMovement.requestedDeliveryDate
+        }
+
         requisition.name = stockMovement.generateName()
 
         if (requisition.requisitionTemplate?.id != stockMovement.stocklist?.id) {
@@ -2126,8 +2130,8 @@ class StockMovementService {
         shipment.description = stockMovement.description
 
         // These values need defaults since they are not set until step 6
-        shipment.expectedShippingDate = requisition?.requestedDeliveryDate?:new Date()
-        shipment.expectedDeliveryDate = requisition?.requestedDeliveryDate
+        shipment.expectedShippingDate = stockMovement.expectedShippingDate
+        shipment.expectedDeliveryDate = stockMovement.expectedDeliveryDate
 
         // Set default shipment type so we can save to the database without user input
         shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
@@ -2318,6 +2322,8 @@ class StockMovementService {
         shipment.origin = stockMovement.origin
         shipment.destination = stockMovement.destination
         shipment.description = stockMovement.description
+        shipment.expectedShippingDate = stockMovement.expectedShippingDate
+        shipment.expectedDeliveryDate = stockMovement.expectedDeliveryDate
         shipment.name = stockMovement.generateName()
 
         if (shipment.hasErrors() || !shipment.save(flush: true)) {
