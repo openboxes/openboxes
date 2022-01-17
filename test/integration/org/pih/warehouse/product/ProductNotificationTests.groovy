@@ -9,12 +9,6 @@ class ProductNotificationTests  extends GroovyTestCase {
     def productService
 
     @Test
-    void testProductFindWithExternalId(){
-
-
-    }
-
-    @Test
     void testSaveProductFromJson(){
 
         String externalId = "142"
