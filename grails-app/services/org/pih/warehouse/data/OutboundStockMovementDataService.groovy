@@ -24,6 +24,7 @@ import org.pih.warehouse.auth.AuthService
 
 class OutboundStockMovementDataService {
 
+    def grailsApplication
     def notificationService
     def stockMovementService
     def tmsIntegrationService
@@ -98,7 +99,7 @@ class OutboundStockMovementDataService {
         }
 
         // Generate hypothetical delivery order for newly created stock movements
-        Boolean uploadDeliveryOrderOnCreate = openboxes.integration.uploadDeliveryOrderOnCreate.enabled
+        Boolean uploadDeliveryOrderOnCreate = grailsApplication.config.openboxes.integration.uploadDeliveryOrderOnCreate.enabled
         if (uploadDeliveryOrderOnCreate) {
             if (identifiers) {
                 identifiers.each { String identifier ->
