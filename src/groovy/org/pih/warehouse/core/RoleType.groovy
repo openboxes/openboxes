@@ -79,7 +79,10 @@ enum RoleType {
     ROLE_PURCHASER('Purchaser', 100),
 
     // Customer role types
-    ROLE_CUSTOMER('Customer', 102)
+    ROLE_CUSTOMER('Customer', 102),
+
+    // Requestor role type
+    ROLE_REQUESTOR('Requestor', 110)
 
     String name
     Integer sortOrder
@@ -169,6 +172,7 @@ enum RoleType {
                 ROLE_CLEARING_AGENT,
                 ROLE_CUSTOMER,
                 ROLE_PURCHASER,
+                ROLE_REQUESTOR,
         ]
     }
 }
