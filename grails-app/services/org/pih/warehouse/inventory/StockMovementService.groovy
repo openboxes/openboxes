@@ -2130,8 +2130,8 @@ class StockMovementService {
         shipment.description = stockMovement.description
 
         // These values need defaults since they are not set until step 6
-        shipment.expectedShippingDate = stockMovement.expectedShippingDate
-        shipment.expectedDeliveryDate = stockMovement.expectedDeliveryDate
+        shipment.expectedShippingDate = stockMovement.requestedDeliveryDate
+        shipment.expectedDeliveryDate = stockMovement.requestedDeliveryDate
 
         // Set default shipment type so we can save to the database without user input
         shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
@@ -2322,8 +2322,8 @@ class StockMovementService {
         shipment.origin = stockMovement.origin
         shipment.destination = stockMovement.destination
         shipment.description = stockMovement.description
-        shipment.expectedShippingDate = stockMovement.expectedShippingDate
-        shipment.expectedDeliveryDate = stockMovement.expectedDeliveryDate
+        shipment.expectedShippingDate = stockMovement.requestedDeliveryDate
+        shipment.expectedDeliveryDate = stockMovement.requestedDeliveryDate
         shipment.name = stockMovement.generateName()
 
         if (shipment.hasErrors() || !shipment.save(flush: true)) {
