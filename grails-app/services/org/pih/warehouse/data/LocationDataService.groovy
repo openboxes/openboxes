@@ -19,8 +19,8 @@ import org.pih.warehouse.importer.ImportDataCommand
 
 class LocationDataService {
 
-    def grailsApplication
     def organizationService
+    def identifierService
 
     /**
      * Validate inventory levels
@@ -33,12 +33,13 @@ class LocationDataService {
             Location parentLocation = params.parentLocation ? Location.findByName(params.parentLocation) : null
             LocationGroup locationGroup = params.locationGroup ? LocationGroup.findByName(params.locationGroup) : null
             LocationType locationType = params.locationType ? LocationType.findByName(params.locationType) : null
+            List<Organization> organizations = params.organization ? Organization.findAllByCodeOrName(params.organization, params.organization) : null
 
             if (Location.findByName(params.name)) {
                 command.errors.reject("Row ${index + 1}: '${params.name}' already exists in the system. Choose a unique name")
             }
 
-            if (locationNamesToImport.findAll {it == params.name}.size() > 1) {
+            if (locationNamesToImport.findAll { it == params.name }.size() > 1) {
                 command.errors.reject("Row ${index + 1}: '${params.name}' is not a unique name in imported data")
             }
 
@@ -54,12 +55,20 @@ class LocationDataService {
                 command.errors.reject("Row ${index + 1}: Location Type '${params.locationType}' does not exist")
             }
 
-            if ((locationType?.isInternalLocation() || locationType?.isZone())  && !parentLocation) {
+            if ((locationType?.isInternalLocation() || locationType?.isZone()) && !parentLocation) {
                 command.errors.reject("Row ${index + 1}: Location Type '${params.locationType}' requires a parent location")
             }
 
             if (!(locationType?.isInternalLocation() || locationType?.isZone()) && parentLocation) {
                 command.errors.reject("Row ${index + 1}: Cannot assign a parent location to a location of type '${params.locationType}'")
+            }
+
+            if (!(locationType?.isInternalLocation() || locationType?.isZone()) && !params.organization) {
+                command.errors.reject("Row ${index + 1}: Location Type '${params.locationType}' requires an organization")
+            }
+
+            if (organizations?.size() > 1) {
+                command.errors.reject("Row ${index + 1}: '${organizations.size()}' records found for organization name '${params.organization}'. Please specify by entering the organization code instead")
             }
         }
     }
@@ -85,17 +94,19 @@ class LocationDataService {
         location.locationType = params.locationType ? LocationType.findByNameLike(params.locationType + "%") : null
         location.locationGroup = params.locationGroup ? LocationGroup.findByName(params.locationGroup) : null
         location.parentLocation = params.parentLocation ? Location.findByNameOrLocationNumber(params.parentLocation, params.parentLocation) : null
+        location.organization = params.organization ? Organization.findByCodeOrName(params.organization, params.organization) : null
 
         // Add required association to organization for depots and suppliers
-        if (!location.organization) {
+        if (!(location.locationType?.isInternalLocation() || location.locationType?.isZone()) && !location.organization) {
+            def locationCode = identifierService.generateOrganizationIdentifier(params.organization)
             Location currentLocation = AuthService?.currentLocation?.get()
             Organization organization = (location.locationType?.locationTypeCode == LocationTypeCode.SUPPLIER) ?
-                    organizationService.findOrCreateSupplierOrganization(params.name, params.locationNumber) :
-                    (location?.locationType?.locationTypeCode == LocationTypeCode.DEPOT) ?
-                            currentLocation?.organization : null
+                    organizationService.findOrCreateSupplierOrganization(params?.organization, locationCode) :
+                    organizationService.findOrCreateOrganization(params?.organization, locationCode)
 
             location.organization = organization
         }
+
         return location
     }
 }
