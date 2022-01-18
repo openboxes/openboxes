@@ -188,6 +188,10 @@
                 </g:if>
             </g:each>
         </g:if>
-
     </table>
+    <g:unless test="${shipmentInstance?.shipmentItems}">
+        <div class="empty fade center">
+            <g:message code="shipment.noShipmentItems.message" default="Shipment has not been shipped yet"/>
+        </div>
+    </g:unless>
 </div>

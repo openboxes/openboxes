@@ -21,6 +21,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCommand
 import org.pih.warehouse.core.DocumentType
+import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.order.OrderTypeCode
@@ -331,13 +332,26 @@ class StockMovementController {
     def requisition = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         render(template: "requisition", model: [stockMovement: stockMovement])
+    }
 
+    def lineItems = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        render(template: "lineItems", model: [stockMovement: stockMovement])
+    }
+
+    def schedule = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        render(template: "schedule", model: [stockMovement: stockMovement])
+    }
+
+    def events = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        render(template: "events", model: [stockMovement: stockMovement])
     }
 
     def documents = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         render(template: "documents", model: [stockMovement: stockMovement])
-
     }
 
     def packingList = {
@@ -351,6 +365,47 @@ class StockMovementController {
         render(template: "receipts", model: [receiptItems: receiptItems])
     }
 
+    def saveSchedule = {
+        log.info "save schedule " + params
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+
+        Requisition requisition = stockMovement.requisition
+        if (requisition) {
+            requisition.requestedDeliveryDate = params.requestedDeliveryDate
+            requisition.save()
+        }
+
+        Shipment shipment = stockMovement.shipment
+        if (shipment) {
+            shipment.expectedDeliveryDate = params.expectedDeliveryDate
+            shipment.expectedShippingDate = params.expectedShippingDate
+            shipment.save()
+        }
+
+        flash.message = "Saved scheduling information"
+
+        redirect(action: "show", id: stockMovement.id)
+    }
+
+    def saveEvent = {
+
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        def shipmentInstance = stockMovement.shipment
+
+        def eventInstance = Event.get(params.eventId) ?: new Event()
+        bindData(eventInstance, params)
+
+        // check for errors
+        if (eventInstance?.validate() && eventInstance.hasErrors()) {
+            flash.message = "${warehouse.message(code: 'shipping.unableToEditEvent.message', args: [format.metadata(obj: eventInstance?.eventType)])}"
+        }
+        else {
+            eventInstance.save(flush: true)
+            shipmentInstance.addToEvents(eventInstance)
+            shipmentInstance.save(flush: true)
+        }
+        redirect(action: 'show', id: shipmentInstance.id)
+    }
 
     def uploadDocument = { DocumentCommand command ->
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)

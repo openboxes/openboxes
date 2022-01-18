@@ -89,18 +89,20 @@
                 </g:if>
             </g:isUserAdmin>
         </div>
-        <div class="button-group">
-            <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
-                <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
-                <warehouse:message code="default.button.receive.label" />
-            </g:link>
-            <g:if test="${stockMovement?.hasBeenReceived() || stockMovement?.hasBeenPartiallyReceived()}">
-                <g:link controller="partialReceiving" action="rollbackLastReceipt" id="${stockMovement?.shipment?.id}" class="button">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
-                    <warehouse:message code="stockMovement.rollbackLastReceipt.label" />
+        <g:if test="${stockMovement?.shipment}">
+            <div class="button-group">
+                <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
+                    <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
+                    <warehouse:message code="default.button.receive.label" />
                 </g:link>
-            </g:if>
-        </div>
+                <g:if test="${stockMovement?.hasBeenReceived() || stockMovement?.hasBeenPartiallyReceived()}">
+                    <g:link controller="partialReceiving" action="rollbackLastReceipt" id="${stockMovement?.shipment?.id}" class="button">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
+                        <warehouse:message code="stockMovement.rollbackLastReceipt.label" />
+                    </g:link>
+                </g:if>
+            </div>
+        </g:if>
     </div>
     <div class="yui-gf">
         <div class="yui-u first">
@@ -417,21 +419,40 @@
                             </a>
                         </li>
                     </g:if>
-                    <li>
-                        <a href="${request.contextPath}/stockMovement/packingList/${stockMovement?.id}">
-                            <warehouse:message code="shipping.packingList.label" />
-                        </a>
-                    </li>
-                    <li>
-                        <a href="${request.contextPath}/stockMovement/receipts/${stockMovement?.id}">
-                            <warehouse:message code="receipts.label" default="Receipts"/>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="${request.contextPath}/stockMovement/documents/${stockMovement?.id}">
-                            <warehouse:message code="documents.label" default="Documents"/>
-                        </a>
-                    </li>
+                    <g:else>
+                        <li>
+                            <a href="${request.contextPath}/stockMovement/lineItems/${stockMovement?.id}">
+                                <warehouse:message code="stockMovement.lineItems.label" default="Order"/>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="${request.contextPath}/stockMovement/schedule/${stockMovement?.id}">
+                                <warehouse:message code="stockMovement.schedule.label" default="Scheduling"/>
+                            </a>
+                        </li>
+                    </g:else>
+                    <g:if test="${stockMovement?.shipment}">
+                        <li>
+                            <a href="${request.contextPath}/stockMovement/events/${stockMovement?.id}">
+                                <warehouse:message code="stockMovement.events.label" default="Events"/>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="${request.contextPath}/stockMovement/packingList/${stockMovement?.id}">
+                                <warehouse:message code="shipping.packingList.label" />
+                            </a>
+                        </li>
+                        <li>
+                            <a href="${request.contextPath}/stockMovement/receipts/${stockMovement?.id}">
+                                <warehouse:message code="receipts.label" default="Receipts"/>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="${request.contextPath}/stockMovement/documents/${stockMovement?.id}">
+                                <warehouse:message code="documents.label" default="Documents"/>
+                            </a>
+                        </li>
+                    </g:if>
                 </ul>
             </div>
         </div>
