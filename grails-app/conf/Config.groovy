@@ -1438,6 +1438,8 @@ openboxes.api.pagination.pageSize = 10
 // Accounting (Budget Code, GL Account)
 openboxes.accounting.enabled = true
 
+openboxes.product.externalProductId.attributeCode = "EXTERNAL_PRODUCT_ID"
+
 // Grails doc configuration
 grails.doc.title = "OpenBoxes"
 grails.doc.subtitle = ""
