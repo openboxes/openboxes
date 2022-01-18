@@ -30,6 +30,7 @@ class LocationDataService {
     Boolean validateData(ImportDataCommand command) {
 
         def locationNamesToImport = command.data.collect {it.name}
+        def locationNumbersToImport = command.data.collect {it.locationNumber}
 
         command.data.eachWithIndex { params, index ->
             Location parentLocation = params.parentLocation ? Location.findByName(params.parentLocation) : null
@@ -45,8 +46,16 @@ class LocationDataService {
                 command.errors.reject("Row ${index + 1}: Active/inactive field is obligatory. Please fill with TRUE or FALSE")
             }
 
+            if (params.locationNumber && Location.findByLocationNumber(params.locationNumber)) {
+                command.errors.reject("Row ${index + 1}: '${params.locationNumber}' already exists in the system. Choose a unique location number")
+            }
+
             if (locationNamesToImport.findAll { it == params.name }.size() > 1) {
                 command.errors.reject("Row ${index + 1}: '${params.name}' is not a unique name in imported data")
+            }
+
+            if (params.locationNumber && locationNumbersToImport.findAll { it == params.locationNumber }.size() > 1) {
+                command.errors.reject("Row ${index + 1}: '${params.locationNumber}' is not a unique location number in imported data")
             }
 
             if (params.parentLocation && !parentLocation) {
@@ -86,11 +95,15 @@ class LocationDataService {
                 location.save(failOnError: true)
             }
         }
-
     }
 
     Location createOrUpdateLocation(Map params) {
-        Location location = Location.findByNameOrLocationNumber(params.name, params.locationNumber)
+        Location location
+        if (params.locationNumber) {
+            location = Location.findByNameOrLocationNumber(params.name, params.locationNumber)
+        } else {
+            location = Location.findByName(params.name)
+        }
         if (!location) {
             location = new Location()
         }
