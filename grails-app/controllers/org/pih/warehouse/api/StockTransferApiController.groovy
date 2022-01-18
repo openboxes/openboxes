@@ -61,7 +61,14 @@ class StockTransferApiController {
         StockTransfer stockTransfer = new StockTransfer()
         bindStockTransferData(stockTransfer, currentUser, currentLocation, jsonObject)
 
-        Order order = stockTransferService.createOrUpdateOrderFromStockTransfer(stockTransfer)
+        Boolean isReturnType = stockTransfer.type == OrderType.findByCode(Constants.OUTBOUND_RETURNS)
+        Order order
+        if (!isReturnType && stockTransfer?.status == StockTransferStatus.COMPLETED) {
+            order = stockTransferService.completeStockTransfer(stockTransfer)
+        } else {
+            order = stockTransferService.createOrUpdateOrderFromStockTransfer(stockTransfer)
+        }
+
         if (order.hasErrors() || !order.save(flush: true)) {
             throw new ValidationException("Invalid order", order.errors)
         }
