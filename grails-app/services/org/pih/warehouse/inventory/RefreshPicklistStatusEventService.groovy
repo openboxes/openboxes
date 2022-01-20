@@ -9,17 +9,15 @@
  **/
 package org.pih.warehouse.inventory
 
-import org.pih.warehouse.picklist.Picklist
 import org.springframework.context.ApplicationListener
 class RefreshPicklistStatusEventService implements ApplicationListener<RefreshPicklistStatusEvent> {
 
     boolean transactional = true
     def grailsApplication
-    def picklistService
+    def tmsIntegrationService
 
     void onApplicationEvent(RefreshPicklistStatusEvent event) {
         log.info "Application event $event has been published! " + event.properties
-        Picklist picklist = event?.source
-        picklistService.triggerPicklistStatusUpdate(picklist)
+        tmsIntegrationService.triggerStockMovementStatusUpdate(event?.source)
     }
 }

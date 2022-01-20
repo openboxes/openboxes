@@ -27,7 +27,7 @@ import org.pih.warehouse.requisition.Requisition
 class Picklist implements Serializable {
 
     def publishRefreshEvent = {
-        publishEvent(new RefreshPicklistStatusEvent(this))
+        publishEvent(new RefreshPicklistStatusEvent(requisition?.id))
     }
 
     def afterUpdate = publishRefreshEvent
@@ -81,7 +81,13 @@ class Picklist implements Serializable {
         updatedBy(nullable: true)
     }
 
-    static transients = ['pickablePicklistItems', 'pickablePicklistItemsByProductId']
+    static transients = ['pickablePicklistItems', 'pickablePicklistItemsByProductId', 'isFullyPicked']
+
+    Boolean getIsFullyPicked() {
+        return picklistItems.any { PicklistItem picklistItem ->
+            picklistItem.quantityRemaining <= 0
+        }
+    }
 
     def getPickablePicklistItems() {
         return picklistItems.findAll { it.pickable }

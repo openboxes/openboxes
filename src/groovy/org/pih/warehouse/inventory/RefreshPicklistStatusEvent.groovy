@@ -9,13 +9,12 @@
  **/
 package org.pih.warehouse.inventory
 
-import org.pih.warehouse.picklist.Picklist
 import org.springframework.context.ApplicationEvent
 
 class RefreshPicklistStatusEvent extends ApplicationEvent {
 
-    RefreshPicklistStatusEvent(Picklist picklist) {
-        super(picklist)
+    RefreshPicklistStatusEvent(String requisitionId) {
+        super(requisitionId)
     }
 
 }

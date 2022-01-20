@@ -84,32 +84,6 @@ class PicklistService {
         }
     }
 
-    def triggerPicklistStatusUpdate(Picklist picklist) {
-        picklist = Picklist.load(picklist.id)
-        if (!picklist) {
-            log.info("Picklist ${picklist?.id} not ready for status update")
-            return
-        }
-
-        Requisition requisition = picklist.requisition
-        if (!requisition) {
-            throw new IllegalStateException("Picklist should exist without a requisition")
-        }
-
-        // If requisition is in picking, but is fully picked, then transition to PICKED status
-        if (requisition.status == RequisitionStatus.PICKING) {
-            if (!picklist.picklistItems.empty) {
-                boolean quantityRemaining = picklist.picklistItems.any { PicklistItem picklistItem ->
-                    picklistItem.quantityRemaining > 0
-                }
-                if (!quantityRemaining) {
-                    requisition.status = RequisitionStatus.PICKED
-                    requisition.save(flush: true)
-                }
-            }
-        }
-    }
-
     void clearPicklist(Order order) {
         order?.orderItems?.each { OrderItem orderItem ->
             clearPicklist(orderItem)

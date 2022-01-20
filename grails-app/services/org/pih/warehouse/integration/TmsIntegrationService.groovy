@@ -60,7 +60,10 @@ import org.pih.warehouse.integration.xml.pod.DocumentUpload
 import org.pih.warehouse.integration.xml.trip.Orders
 import org.pih.warehouse.integration.xml.trip.Trip
 import org.pih.warehouse.inventory.StockMovementStatusCode
+import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.product.Attribute
+import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.Shipment
 
@@ -399,6 +402,32 @@ class TmsIntegrationService {
                 log.warn ("Stock movement ${stockMovement.identifier} with status ${stockMovement.status} has already been received")
             }
 
+        }
+    }
+
+    def triggerStockMovementStatusUpdate(String id) {
+        StockMovement stockMovement = stockMovementService.getStockMovement(id, false)
+        triggerStockMovementStatusUpdate(stockMovement)
+    }
+
+    def triggerStockMovementStatusUpdate(StockMovement stockMovement) {
+
+        Requisition requisition = stockMovement?.requisition
+        Picklist picklist = stockMovement?.requisition?.picklist
+
+        // Picklist and/or requisition is not ready to be checked
+        if (!picklist || !requisition) {
+            return
+        }
+
+        // If requisition is in picking and is fully picked, then transition to PICKED status
+        if (requisition.status == RequisitionStatus.PICKING) {
+            if (!picklist?.picklistItems?.empty) {
+                if (picklist.isFullyPicked) {
+                    log.info "Stock movement ${stockMovement.identifier} has been picked"
+                    stockMovementService.transitionRequisitionBasedStockMovement(stockMovement, StockMovementStatusCode.PICKED)
+                }
+            }
         }
     }
 

@@ -1026,6 +1026,14 @@ class StockMovementService {
         return receiptItems
     }
 
+    void undoQuantityPicked(StockMovement stockMovement) {
+        if (stockMovement?.requisition?.picklist) {
+            stockMovement.requisition.picklist.picklistItems.each { PicklistItem picklistItem ->
+                picklistItem.quantityPicked = 0
+            }
+        }
+    }
+
     void clearPicklist(String id) {
         StockMovement stockMovement = getStockMovement(id)
         clearPicklist(stockMovement)
@@ -2562,6 +2570,7 @@ class StockMovementService {
                     requisition.save()
                     break;
                 case RequisitionStatus.PICKED:
+                    undoQuantityPicked(stockMovement)
                     requisition.status = RequisitionStatus.PICKING
                     requisition.save()
                     break;

@@ -956,6 +956,10 @@ openboxes.barcode.labelaryApi.url = "https://api.labelary.com/v1/printers/12dpmm
 openboxes.typeahead.delay = 300
 openboxes.typeahead.minLength = 3
 
+// Automatic state transition Job
+openboxes.jobs.automaticStateTransitionJob.enabled = true
+openboxes.jobs.automaticStateTransitionJob.cronExpression = "0 * * * * ?" // every minute
+
 // Allow system administrators to disable refresh on startup
 openboxes.refreshAnalyticsDataOnStartup.enabled = true
 
