@@ -17,6 +17,7 @@ import org.codehaus.groovy.grails.web.json.JSONArray
 import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
@@ -34,6 +35,8 @@ class ProductService {
     def identifierService
     def userService
     def dataService
+    def productAvailabilityService
+    def notificationService
 
     def getNdcResults(operation, q) {
         def hipaaspaceApiKey = grailsApplication.config.hipaaspace.api.key
@@ -1358,4 +1361,31 @@ class ProductService {
 
         return productInstance
     }
+
+    void sendProductAvailabilityMessages(String locationId, List productIds){
+        Location location = Location.get(locationId)
+        List<Product> products = Product.findAllByIdInList(productIds)
+        log.info "location:${location} from locationId:${locationId}, products:${products} from ids:${productIds}"
+        Map<Product, Integer> quantityMap = productAvailabilityService.getQuantityOnHandByProduct(location, products)
+        Map<Product, Integer> quantityAvailableMap = productAvailabilityService.getQuantityAvailableToPromiseByProduct(location, products)
+        sendProductAvailabilityMessages(location, products, quantityMap, quantityAvailableMap)
+    }
+
+    void sendProductAvailabilityMessages(Location location, List<Product> products, Map<Product, Integer> quantityMap, Map<Product, Integer> quantityAvailableMap){
+        String TOPIC_ARN = grailsApplication.config.awssdk.sns.productAvailability
+        Attribute externalIdAttribute = findExternalProductIdAttribute()
+        products?.each {Product product ->
+            JSONObject jsonObject = new JSONObject()
+            String externalId = product.attributes.find{it.attribute == externalIdAttribute}.value
+            jsonObject.put("productId", externalId)
+            jsonObject.put("productCode", product?.productCode)
+            jsonObject.put("locationNumber", location?.locationNumber)
+            jsonObject.put("quantityOnHand", quantityMap[product])
+            jsonObject.put("quantityAvailable", quantityAvailableMap[product])
+            log.info "JSONObject:${jsonObject.toString(2)}, for product:${product}"
+            notificationService.publish(TOPIC_ARN, jsonObject.toString(), "Product Availability")
+        }
+    }
+
+
 }
