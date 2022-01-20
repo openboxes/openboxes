@@ -9,6 +9,9 @@
 
 <body>
     <div class="body">
+        <g:if test="${flash.message}">
+            <div class="message">${flash.message}</div>
+        </g:if>
         <div class="yui-gf">
             <div class="yui-u first">
                 <div class="sidebar">
@@ -93,7 +96,7 @@
                             </div>
                         </div>
                         <div class="buttons">
-                            <button class="download-button button" name="button" value="download">
+                            <button class="download-button button" name="button" params="[print:true]>
                                 <img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" />
                                 <g:set var="dataLabel" value="${g.message(code:'', default: '')}"/>
                                 ${g.message(code: 'default.download.label', args: [dataLabel])}
@@ -118,11 +121,12 @@
                 endDate: $("#endDate").val(),
                 replenishmentPeriodDays: $("#replenishmentPeriodDays").val(),
                 leadTimeDays: $("#leadTimeDays").val(),
-                locations: $("#locations").val(),
+                locations: $("#selectedLocations").val(),
                 category: $("#category").val(),
                 tags: $("#tags").val(),
                 catalogs: $("#catalogs").val(),
-                format: "text/csv"
+                format: "text/csv",
+                print: $("#print").val(),
             };
             var queryString = $.param(params, true);
             window.location.href = '${request.contextPath}/report/showForecastReport?' + queryString;
