@@ -44,19 +44,6 @@ class BatchController {
 
     def index = {}
 
-
-    def uploadData = { ImportDataCommand command ->
-
-        if (request instanceof DefaultMultipartHttpServletRequest) {
-            def uploadFile = request.getFile('xlsFile')
-            if (!uploadFile.empty) {
-                def localFile = uploadService.createLocalFile(uploadFile.originalFilename)
-                uploadFile.transferTo(localFile)
-            }
-        }
-    }
-
-
     def downloadExcel = {
         println "Download XLS template " + params
 
@@ -103,21 +90,14 @@ class BatchController {
 
     def importData = { ImportDataCommand command ->
 
-        log.info params
-        log.info command.location
-        log.info session
-
+        def xlsFile = flash.xlsFile
         if ("POST".equals(request.getMethod())) {
-            File localFile = null
-            if (request instanceof DefaultMultipartHttpServletRequest) {
-                def uploadFile = request.getFile('xlsFile')
-                if (!uploadFile?.empty) {
-                    try {
-                        localFile = uploadService.createLocalFile(uploadFile.originalFilename)
-                        uploadFile.transferTo(localFile)
-                        session.localFile = localFile
-                        //flash.message = "File uploaded successfully"
 
+            if (request instanceof DefaultMultipartHttpServletRequest) {
+                xlsFile = request.getFile('xlsFile')
+                if (!xlsFile?.empty) {
+                    try {
+                        flash.xlsFile = xlsFile
                     } catch (Exception e) {
                         //throw new RuntimeException(e);
                         flash.message = "Unable to upload file due to exception: " + e.message
@@ -127,70 +107,66 @@ class BatchController {
                     flash.message = "${warehouse.message(code: 'inventoryItem.emptyFile.message')}"
                 }
             }
-            // Otherwise, we need to retrieve the file from the session
-            else {
-                localFile = session.localFile
-            }
 
             def dataImporter
-            if (localFile) {
-                log.info "Local xls file " + localFile.getAbsolutePath()
-                command.importFile = localFile
-                command.filename = localFile.getAbsolutePath()
+            if (xlsFile) {
+                log.info "Local xls file " + xlsFile
+                command.importFile = xlsFile
+                command.filename = xlsFile.name
                 command.location = Location.get(session.warehouse.id)
                 try {
                     // Need to choose the right importer
                     switch (command.type) {
                         case "category":
-                            dataImporter = new CategoryExcelImporter(command?.filename)
+                            dataImporter = new CategoryExcelImporter(command?.filename, xlsFile.inputStream)
                             break
                         case "inventory":
-                            dataImporter = new InventoryExcelImporter(command?.filename)
+                            dataImporter = new InventoryExcelImporter(command?.filename, xlsFile.inputStream)
                             break
                         case "inventoryLevel":
-                            dataImporter = new InventoryLevelExcelImporter(command?.filename)
+                            dataImporter = new InventoryLevelExcelImporter(command?.filename, xlsFile.inputStream)
                             break
                         case "location":
-                            dataImporter = new LocationExcelImporter(command?.filename)
+                            dataImporter = new LocationExcelImporter(command?.filename, xlsFile.inputStream)
                             break
                         case "person":
-                            dataImporter = new PersonExcelImporter(command?.filename)
+                            dataImporter = new PersonExcelImporter(command?.filename, xlsFile.inputStream)
                             break
                         case "product":
-                            dataImporter = new ProductExcelImporter(command?.filename)
+                            dataImporter = new ProductExcelImporter(command?.filename, xlsFile.inputStream)
                             break
                         case "productAttribute":
-                            dataImporter = new ProductAttributeExcelImporter(command?.filename)
+                            dataImporter = new ProductAttributeExcelImporter(command?.filename, xlsFile.inputStream)
                             break
                         case "productCatalog":
-                            dataImporter = new ProductCatalogExcelImporter(command?.filename)
+                            dataImporter = new ProductCatalogExcelImporter(command?.filename, xlsFile.inputStream)
                             break
                         case "productCatalogItem":
-                            dataImporter = new ProductCatalogItemExcelImporter(command?.filename)
+                            dataImporter = new ProductCatalogItemExcelImporter(command?.filename, xlsFile.inputStream)
                             break
                         case "productSupplier":
-                            dataImporter = new ProductSupplierExcelImporter(command?.filename)
+                            dataImporter = new ProductSupplierExcelImporter(command?.filename, xlsFile.inputStream)
                             break
                         case "productSupplierPreference":
-                            dataImporter = new ProductSupplierPreferenceImporter(command?.filename)
+                            dataImporter = new ProductSupplierPreferenceImporter(command?.filename, xlsFile.inputStream)
                             break
                         case "productSupplierAttribute":
-                            dataImporter = new ProductSupplierAttributeImporter(command?.filename)
+                            dataImporter = new ProductSupplierAttributeImporter(command?.filename, xlsFile.inputStream)
                             break
                         case "productPackage":
-                            dataImporter = new ProductPackageExcelImporter(command?.filename)
+                            dataImporter = new ProductPackageExcelImporter(command?.filename, xlsFile.inputStream)
                             break
                         case "outboundStockMovement":
-                            dataImporter = new OutboundStockMovementExcelImporter(command?.filename)
+                            dataImporter = new OutboundStockMovementExcelImporter(command?.filename, xlsFile.inputStream)
                             break
                         case "tag":
-                            dataImporter = new TagExcelImporter(command?.filename)
+                            dataImporter = new TagExcelImporter(command?.filename, xlsFile.inputStream)
                             break
                         case "user":
-                            dataImporter = new UserExcelImporter(command?.filename)
+                            dataImporter = new UserExcelImporter(command?.filename, xlsFile.inputStream)
                             break
                         case "userLocation":
-                            dataImporter = new UserLocationExcelImporter(command?.filename)
+                            dataImporter = new UserLocationExcelImporter(command?.filename, xlsFile.inputStream)
                             break
                         default:
                             command.errors.reject("type", "${warehouse.message(code: 'import.invalidType.message', default: 'Please choose a valid import type')}")
@@ -218,7 +194,7 @@ class BatchController {
 
 
                 if (command?.data?.isEmpty()) {
-                    command.errors.reject("importFile", "${warehouse.message(code: 'inventoryItem.pleaseEnsureDate.message', args: [dataImporter.columnMap?.sheet?:'Sheet1', localFile.getAbsolutePath()])}")
+                    command.errors.reject("importFile", "${warehouse.message(code: 'inventoryItem.pleaseEnsureDate.message', args: [dataImporter.columnMap?.sheet?:'Sheet1', xlsFile.name])}")
                 }
 
                 if (command.type == 'inventory' && !command.date) {
@@ -235,7 +211,7 @@ class BatchController {
                     }
 
                     if (!command.errors.hasErrors()) {
-                        flash.message = "${warehouse.message(code: 'inventoryItem.importSuccess.message', args: [localFile.getAbsolutePath()])}"
+                        flash.message = "${warehouse.message(code: 'inventoryItem.importSuccess.message', args: [xlsFile.name])}"
                         redirect(action: "importData")
                         return
                     }

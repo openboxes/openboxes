@@ -46,8 +46,12 @@ class ProductPackageExcelImporter extends AbstractExcelImporter {
         super(fileName)
     }
 
+    ProductPackageExcelImporter(String fileName, InputStream inputStream) {
+        super(fileName, inputStream)
+    }
+
     def getDataService() {
-        return ApplicationHolder.getApplication().getMainContext().getBean("productPackageDataService")
+        return ApplicationHolder.application.mainContext.getBean("productPackageDataService")
     }
 
     List<Map> getData() {

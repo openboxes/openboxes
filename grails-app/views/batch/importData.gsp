@@ -30,6 +30,7 @@
                 </g:if>
 
                 <g:form controller="batch" action="importData" method="POST">
+
                     <input name="location.id" type="hidden" value="${session.warehouse.id }"/>
                     <input name="type" type="hidden" value="${params.type }"/>
 
@@ -97,29 +98,24 @@
                                     </tr>
                                 </g:each>
                                 </tbody>
-
                             </table>
                         </div>
                     </g:if>
 
-                        <div class="buttons">
-                            <g:if test="${!commandInstance?.hasErrors()}">
-                                <input name="import" id="import" type="hidden" value="${true}"/>
-                                <button type="button" class="button" id="finish-button">
-                                    <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}"/>&nbsp;
-                                    ${warehouse.message(code: 'default.button.finish.label')}
-                                </button>
-                            </g:if>
+                    <div class="buttons">
+                        <g:if test="${!commandInstance?.hasErrors()}">
+                            <input name="import" id="import" type="hidden" value="${true}"/>
+                            <button type="button" class="button" id="finish-button">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}"/>&nbsp;
+                                ${warehouse.message(code: 'default.button.finish.label')}
+                            </button>
+                        </g:if>
 
-                            <a href="${createLink(controller: "batch", action: "importData", params: params)}"
-                               class="button">
-                                <img src="${resource(dir: 'images/icons/silk', file: 'bullet_left.png')}"/>&nbsp;
-                                <warehouse:message code="default.button.back.label" default="Back"/>
-                            </a>
-
-
-                        </div>
-
+                        <a href="${createLink(controller: "batch", action: "importData", params: params)}"
+                           class="button">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'bullet_left.png')}"/>&nbsp;
+                            <warehouse:message code="default.button.back.label" default="Back"/>
+                        </a>
                     </div>
                 </g:form>
             </g:if>

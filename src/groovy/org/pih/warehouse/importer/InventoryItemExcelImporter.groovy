@@ -71,14 +71,19 @@ class InventoryItemExcelImporter extends AbstractExcelImporter {
 
     InventoryItemExcelImporter(String fileName) {
         super(fileName)
-        dataService = ApplicationHolder.getApplication().getMainContext().getBean("dataService")
     }
 
+    InventoryItemExcelImporter(String fileName, InputStream inputStream) {
+        super(fileName)
+    }
 
     List<Map> getData() {
         return ExcelImportUtils.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
     }
 
+    def getDataService() {
+        return ApplicationHolder.application.mainContext.getBean("dataService")
+    }
 
     void validateData(ImportDataCommand command) {
         dataService.validateInventoryLevels(command)

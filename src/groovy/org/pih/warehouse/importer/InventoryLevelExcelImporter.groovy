@@ -14,8 +14,6 @@ import org.grails.plugins.excelimport.ExcelImportUtils
 
 class InventoryLevelExcelImporter extends AbstractExcelImporter {
 
-    def dataService
-
     static Map cellMap = [sheet: 'Sheet1', startRow: 1, cellMap: []]
 
     static Map columnMap = [
@@ -77,14 +75,19 @@ class InventoryLevelExcelImporter extends AbstractExcelImporter {
 
     InventoryLevelExcelImporter(String fileName) {
         super(fileName)
-        dataService = ApplicationHolder.getApplication().getMainContext().getBean("dataService")
     }
 
+    InventoryLevelExcelImporter(String fileName, InputStream inputStream) {
+        super(fileName, inputStream)
+    }
 
     List<Map> getData() {
         return ExcelImportUtils.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
     }
 
+    def getDataService() {
+        return ApplicationHolder.application.mainContext.getBean("dataService")
+    }
 
     void validateData(ImportDataCommand command) {
         dataService.validateInventoryLevels(command)

@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse.importer
 
-import org.grails.plugins.excelimport.AbstractExcelImporter
 import org.grails.plugins.excelimport.ExcelImportUtils
 import org.pih.warehouse.core.Tag
 import org.springframework.validation.BeanPropertyBindingResult
@@ -32,6 +31,10 @@ class TagExcelImporter extends AbstractExcelImporter {
 
     TagExcelImporter(String fileName) {
         super(fileName)
+    }
+
+    TagExcelImporter(String fileName, InputStream inputStream) {
+        super(fileName, inputStream)
     }
 
     List<Map> getData() {
@@ -58,7 +61,6 @@ class TagExcelImporter extends AbstractExcelImporter {
         }
     }
 
-
     Tag createOrUpdateTag(Map params) {
         Tag tag = Tag.findByIdOrTag(params.id, params.tag)
         if (!tag) {
@@ -68,6 +70,5 @@ class TagExcelImporter extends AbstractExcelImporter {
         tag.tag = params.tag
         return tag
     }
-
 
 }
