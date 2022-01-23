@@ -97,7 +97,6 @@ class PurchaseOrderExcelImporter extends AbstractExcelImporter {
         super(fileName)
     }
 
-
     List<Map> getData() {
         return ExcelImportUtils.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
     }

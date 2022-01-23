@@ -17,8 +17,6 @@ import org.springframework.validation.BeanPropertyBindingResult
 
 class ProductCatalogItemExcelImporter extends AbstractExcelImporter {
 
-    def inventoryService
-
     static Map columnMap = [
             sheet    : 'Sheet1',
             startRow : 1,
@@ -35,11 +33,13 @@ class ProductCatalogItemExcelImporter extends AbstractExcelImporter {
             productName       : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null])
     ]
 
-
     ProductCatalogItemExcelImporter(String fileName) {
         super(fileName)
     }
 
+    ProductCatalogItemExcelImporter(String fileName, InputStream inputStream) {
+        super(fileName, inputStream)
+    }
 
     List<Map> getData() {
         return ExcelImportUtils.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
@@ -54,7 +54,6 @@ class ProductCatalogItemExcelImporter extends AbstractExcelImporter {
                 }
             }
         }
-
     }
 
     void importData(ImportDataCommand command) {
@@ -65,7 +64,6 @@ class ProductCatalogItemExcelImporter extends AbstractExcelImporter {
             }
         }
     }
-
 
     ProductCatalogItem createOrUpdateProductCatalogItem(Map params) {
         Product product

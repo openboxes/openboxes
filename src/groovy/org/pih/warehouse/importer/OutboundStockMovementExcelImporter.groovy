@@ -45,9 +45,12 @@ class OutboundStockMovementExcelImporter extends AbstractExcelImporter {
         super(fileName, inputStream)
     }
 
-
     def getDataService() {
-        return ApplicationHolder.getApplication().getMainContext().getBean("outboundStockMovementDataService")
+        return ApplicationHolder.application.mainContext.getBean("outboundStockMovementDataService")
+    }
+
+    List<Map> getData() {
+        return ExcelImportUtils.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
     }
 
     /**
@@ -56,10 +59,6 @@ class OutboundStockMovementExcelImporter extends AbstractExcelImporter {
      */
     void validateData(ImportDataCommand command) {
         dataService.validateData(command)
-    }
-
-    List<Map> getData() {
-        return ExcelImportUtils.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
     }
 
     /**

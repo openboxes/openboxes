@@ -11,13 +11,9 @@ package org.pih.warehouse.importer
 
 
 import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.grails.plugins.excelimport.AbstractExcelImporter
 import org.grails.plugins.excelimport.ExcelImportUtils
-import org.pih.warehouse.data.ProductSupplierAttributeDataService
 
 class ProductSupplierAttributeImporter extends AbstractExcelImporter {
-
-    ProductSupplierAttributeDataService productSupplierAttributeDataService
 
     static Map columnMap = [
             sheet    : 'Sheet1',
@@ -39,15 +35,17 @@ class ProductSupplierAttributeImporter extends AbstractExcelImporter {
             unitOfMeasure       : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
     ]
 
-
     ProductSupplierAttributeImporter(String fileName) {
         super(fileName)
     }
 
-    def getDataService() {
-        return ApplicationHolder.getApplication().getMainContext().getBean("productSupplierAttributeDataService")
+    ProductSupplierAttributeImporter(String fileName, InputStream inputStream) {
+        super(fileName, inputStream)
     }
 
+    def getDataService() {
+        return ApplicationHolder.application.mainContext.getBean("productSupplierAttributeDataService")
+    }
 
     List<Map> getData() {
         return ExcelImportUtils.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)

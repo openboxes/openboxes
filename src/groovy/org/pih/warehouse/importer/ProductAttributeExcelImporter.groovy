@@ -36,11 +36,13 @@ class ProductAttributeExcelImporter extends AbstractExcelImporter {
             unitOfMeasureCode: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
     ]
 
-
     ProductAttributeExcelImporter(String fileName) {
         super(fileName)
     }
 
+    ProductAttributeExcelImporter(String fileName, InputStream inputStream) {
+        super(fileName, inputStream)
+    }
 
     List<Map> getData() {
         return ExcelImportUtils.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
@@ -65,7 +67,6 @@ class ProductAttributeExcelImporter extends AbstractExcelImporter {
             }
         }
     }
-
 
     ProductAttribute createOrUpdateProductAttribute(Map params) {
         Product product = Product.findByProductCode(params.productCode)

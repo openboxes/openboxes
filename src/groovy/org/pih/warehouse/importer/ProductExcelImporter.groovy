@@ -10,12 +10,9 @@
 package org.pih.warehouse.importer
 
 import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.grails.plugins.excelimport.AbstractExcelImporter
 import org.grails.plugins.excelimport.ExcelImportUtils
 
 class ProductExcelImporter extends AbstractExcelImporter {
-
-    def productService
 
     static Map cellMap = [
             sheet: 'Sheet1', startRow: 1, cellMap: []]
@@ -55,29 +52,26 @@ class ProductExcelImporter extends AbstractExcelImporter {
 
     ProductExcelImporter(String fileName) {
         super(fileName)
-        productService = ApplicationHolder.getApplication().getMainContext().getBean("productService")
     }
 
+    ProductExcelImporter(String fileName, InputStream inputStream) {
+        super(fileName, inputStream)
+    }
+
+    def getDataService() {
+        return ApplicationHolder.application.mainContext.getBean("productService")
+    }
 
     List<Map> getData() {
         return ExcelImportUtils.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
     }
 
-
     void validateData(ImportDataCommand command) {
-        productService.validateData(command)
+        dataService.validateData(command)
     }
 
-
-    /**
-     * Import data from given inventoryMapList into database.
-     *
-     * @param location
-     * @param inventoryMapList
-     * @param errors
-     */
     void importData(ImportDataCommand command) {
-        productService.importData(command)
+        dataService.importData(command)
 
     }
 

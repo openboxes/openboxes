@@ -21,7 +21,6 @@ abstract class AbstractExcelImporter {
     InputStream inStr = null
     HSSFWorkbook workbook = null
     HSSFSheet sheet = null
-
     HSSFFormulaEvaluator evaluator = null
 
     AbstractExcelImporter(String fileName) {
@@ -36,7 +35,6 @@ abstract class AbstractExcelImporter {
         inStr = inputStream
         workbook = new HSSFWorkbook(inStr)
         evaluator = new HSSFFormulaEvaluator(workbook)
-
     }
 
     def close() {

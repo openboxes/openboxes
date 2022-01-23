@@ -11,12 +11,9 @@ package org.pih.warehouse.importer
 
 
 import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.grails.plugins.excelimport.AbstractExcelImporter
 import org.grails.plugins.excelimport.ExcelImportUtils
 
 class InventoryExcelImporter extends AbstractExcelImporter {
-
-    def inventoryService
 
     static Map cellMap = [sheet: 'Sheet1', startRow: 1, cellMap: []]
 
@@ -49,7 +46,14 @@ class InventoryExcelImporter extends AbstractExcelImporter {
 
     InventoryExcelImporter(String fileName) {
         super(fileName)
-        inventoryService = ApplicationHolder.getApplication().getMainContext().getBean("inventoryService")
+    }
+
+    InventoryExcelImporter(String fileName, InputStream inputStream) {
+        super(fileName, inputStream)
+    }
+
+    def getDataService() {
+        return ApplicationHolder.application.mainContext.getBean("inventoryService")
     }
 
 
@@ -59,7 +63,7 @@ class InventoryExcelImporter extends AbstractExcelImporter {
 
 
     void validateData(ImportDataCommand command) {
-        inventoryService.validateInventoryData(command)
+        dataService.validateInventoryData(command)
     }
 
 
@@ -71,7 +75,7 @@ class InventoryExcelImporter extends AbstractExcelImporter {
      * @param errors
      */
     void importData(ImportDataCommand command) {
-        inventoryService.importInventoryData(command)
+        dataService.importInventoryData(command)
 
     }
 
