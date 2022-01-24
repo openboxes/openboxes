@@ -136,8 +136,8 @@
                                                                     <td class="${productProperties?.productCode!=existingProduct?.productCode?'modified':'' }">
                                                                         <span title="${existingProduct?.productCode }">${productProperties?.productCode }</span>
                                                                     </td>
-                                                                    <td class="${productProperties?.productType?.code!=existingProduct?.productType?.code?'modified':'' }">
-                                                                        <span title="${existingProduct?.productType?.code }">${productProperties?.productType?.code} ${productProperties?.productType?.name}</span>
+                                                                    <td class="${productProperties?.productType?.name!=existingProduct?.productType?.name?'modified':'' }">
+                                                                        <span title="${existingProduct?.productType?.name }">${productProperties?.productType?.name}</span>
                                                                     </td>
                                                                     <td class="${productProperties?.name!=existingProduct?.name?'modified':'' }">
                                                                         <span title="${existingProduct?.name }">${productProperties?.name }</span>

@@ -596,7 +596,7 @@ class ProductService {
             println "Processing line: " + tokens
             def productId = tokens[0]
             def productCode = tokens[1]
-            def productTypeCode = tokens[2]
+            def productTypeName = tokens[2]
             def productName = tokens[3]
             def categoryName = tokens[4]
             def glAccountCode = tokens[5]
@@ -627,13 +627,11 @@ class ProductService {
             if (!productName) {
                 throw new RuntimeException("Product name cannot be empty at row " + rowCount)
             }
-            ProductType productType
-            if (!productTypeCode) {
-                productType = ProductType.findByCode(Constants.DEFAULT)
-            } else {
-                productType = ProductType.findByCodeOrName(productTypeCode, productTypeCode)
+            ProductType productType = null
+            if (productTypeName) {
+                productType = ProductType.findByName(productTypeName)
                 if (!productType) {
-                    throw new RuntimeException("Product type with code ${productTypeCode} does not exists at row " + rowCount)
+                    throw new RuntimeException("Product type with name ${productTypeName} does not exists at row " + rowCount)
                 }
             }
 
@@ -764,7 +762,7 @@ class ProductService {
             def row = [
                 Id                  : product?.id,
                 ProductCode         : product.productCode ?: '',
-                ProductType         : product.productType ? product.productType?.code || product.productType?.name : '',
+                ProductType         : product.productType?.name ?: '',
                 Name                : product.name,
                 Category            : product?.category?.name,
                 GLAccount           : product?.glAccount?.code ?: '',
