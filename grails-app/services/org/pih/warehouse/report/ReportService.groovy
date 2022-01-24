@@ -778,7 +778,9 @@ class ReportService implements ApplicationContextAware {
             }
 
             def results = dataService.executeQuery(query, params)
-            data = getOnOrderData(params.originId, results.collect{it.product_id}.unique())
+            if (results) {
+                data = getOnOrderData(params.originId, results.collect{it.product_id}.unique())
+            }
         }
         return data
     }
