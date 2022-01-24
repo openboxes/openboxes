@@ -631,13 +631,17 @@ class ProductService {
             if (productTypeName) {
                 productType = ProductType.findByName(productTypeName)
                 if (!productType) {
-                    throw new RuntimeException("Product type with name ${productTypeName} does not exists at row " + rowCount)
+                    throw new RuntimeException("Product type with name ${productTypeName} does not exist at row " + rowCount)
                 }
             }
 
-            GlAccount glAccount = GlAccount.findByCode(glAccountCode)
-            if (currentLocation?.accountingRequired && !glAccount) {
+            if (currentLocation?.accountingRequired && !glAccountCode) {
                 throw new RuntimeException("GL Account code cannot be empty at row " + rowCount)
+            }
+
+            GlAccount glAccount = GlAccount.findByCode(glAccountCode)
+            if (glAccountCode && !glAccount) {
+                throw new RuntimeException("GL Account with code ${glAccountCode} does not exist at row " + rowCount)
             }
 
             def category = findOrCreateCategory(categoryName)
