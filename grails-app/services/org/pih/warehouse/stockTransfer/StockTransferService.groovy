@@ -239,8 +239,10 @@ class StockTransferService {
                 picklistItem.disableRefresh = Boolean.TRUE
                 picklistItem.picklist?.removeFromPicklistItems(picklistItem)
                 picklistItem.orderItem?.removeFromPicklistItems(picklistItem)
-                picklistItem.delete()
+                picklistItem.delete(flush: true)
             }
+            def productsToRefresh = picklistItems.collect {it.inventoryItem?.product?.id}.unique()
+            productAvailabilityService.refreshProductsAvailability(orderItem?.order?.origin?.id, productsToRefresh, false)
         }
 
         OrderItem parentItem = orderItem?.parentOrderItem
