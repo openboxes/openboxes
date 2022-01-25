@@ -213,4 +213,12 @@ class ProductApiController extends BaseDomainApiController {
         render([monthlyDemand: demand.monthlyDemand, quantityOnHand: quantityOnHand, quantityAvailable: quantityAvailable] as JSON)
     }
 
+    def productDemand = {
+        Product product = Product.get(params.id)
+        Location origin = Location.get(params.originId)
+        Location destination = Location.get(params.destinationId)
+        def demand = forecastingService.getDemand(origin, destination, product)
+        render([monthlyDemand: demand.monthlyDemand] as JSON)
+    }
+
 }
