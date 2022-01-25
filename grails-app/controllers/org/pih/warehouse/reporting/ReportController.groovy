@@ -693,10 +693,10 @@ class ReportController {
                 def qtyOnHand = item?.totalOnHand ?: 0
                 def qtyExpiring = productExpiry.collect {it.quantity_on_hand}.sum() ?: 0
                 def qtyAvailable = qtyOnOrder + qtyOnHand - qtyExpiring ?: 0
-                def avgDemand = productExpiry.collect {it.average_daily_demand}.size() > 0 ? productExpiry.collect {it.average_daily_demand}.get(0).setScale(1, RoundingMode.HALF_UP) * 30 : 0
-                def monthsOfStock = ((replenishmentPeriodDays.toInteger() + leadTimeDays.toInteger())/30).setScale(1, RoundingMode.HALF_UP) ?: 0
+                def avgDemand = item.averageMonthlyDemand ? item.averageMonthlyDemand?.setScale(1, RoundingMode.HALF_UP) : 0
+                def monthsOfStock = ((replenishmentPeriodDays.toInteger() + leadTimeDays.toInteger()) / 30).setScale(1, RoundingMode.HALF_UP) ?: 0
                 def qtyNeeded = avgDemand * monthsOfStock ?: 0
-                def qtyToOrder = BigDecimal.ZERO.max(qtyNeeded - qtyOnHand)
+                def qtyToOrder = BigDecimal.ZERO.max(qtyNeeded - qtyAvailable)
                 def unitPrice = product?.pricePerUnit ?: 0
 
                 def printRow = [
