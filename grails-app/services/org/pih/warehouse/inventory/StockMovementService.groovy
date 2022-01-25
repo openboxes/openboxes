@@ -31,6 +31,7 @@ import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCode
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
@@ -49,6 +50,7 @@ import org.pih.warehouse.requisition.RequisitionItemStatus
 import org.pih.warehouse.requisition.RequisitionItemType
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
@@ -747,8 +749,20 @@ class StockMovementService {
                         quantityRequested               : stockMovementItem.quantityRequested,
                         statusCode                      : stockMovementItem.statusCode,
                         sortOrder                       : stockMovementItem.sortOrder,
-                        monthlyDemand                   : demand?.monthlyDemand?:0,
-                        demandPerReplenishmentPeriod    : Math.ceil((demand?.dailyDemand?:0) * (template?.replenishmentPeriod?:30))
+                        monthlyDemand                   : demand?.monthlyDemand ?: 0,
+                        demandPerReplenishmentPeriod    : Math.ceil((demand?.dailyDemand ?: 0) * (template?.replenishmentPeriod ?: 30)),
+                ]
+            } else if (requisition.requisitionTemplateId && requisition.type == RequisitionType.STOCK && requisition.destination.locationType.locationTypeCode == LocationTypeCode.WARD) {
+                def demand = forecastingService.getDemand(requisition.origin, requisition.destination, stockMovementItem.product)
+                return [
+                        id                              : stockMovementItem.id,
+                        product                         : stockMovementItem.product,
+                        productCode                     : stockMovementItem.productCode,
+                        comments                        : stockMovementItem.comments,
+                        statusCode                      : stockMovementItem.statusCode,
+                        sortOrder                       : stockMovementItem.sortOrder,
+                        monthlyDemand                   : demand?.monthlyDemand ?: 0,
+                        demandPerReplenishmentPeriod    : Math.ceil((demand?.dailyDemand ?: 0) * (template?.replenishmentPeriod ?: 30)),
                 ]
             } else {
                 return [
