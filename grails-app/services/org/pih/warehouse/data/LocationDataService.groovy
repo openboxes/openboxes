@@ -16,11 +16,9 @@ import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.importer.ImportDataCommand
-import org.springframework.validation.BeanPropertyBindingResult
 
 class LocationDataService {
 
-    def messageSource
     def grailsApplication
     def organizationService
 
@@ -29,31 +27,40 @@ class LocationDataService {
      */
     Boolean validateData(ImportDataCommand command) {
 
-        Locale locale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
+        def locationNamesToImport = command.data.collect {it.name}
 
         command.data.eachWithIndex { params, index ->
-
-            Location location = createOrUpdateLocation(params)
-
+            Location parentLocation = params.parentLocation ? Location.findByName(params.parentLocation) : null
             LocationGroup locationGroup = params.locationGroup ? LocationGroup.findByName(params.locationGroup) : null
+            LocationType locationType = params.locationType ? LocationType.findByName(params.locationType) : null
+
+            if (Location.findByName(params.name)) {
+                command.errors.reject("Row ${index + 1}: '${params.name}' already exists in the system. Choose a unique name")
+            }
+
+            if (locationNamesToImport.findAll {it == params.name}.size() > 1) {
+                command.errors.reject("Row ${index + 1}: '${params.name}' is not a unique name in imported data")
+            }
+
+            if (params.parentLocation && !parentLocation) {
+                command.errors.reject("Row ${index + 1}: Parent Location '${params.parentLocation}' does not exist")
+            }
+
             if (params.locationGroup && !locationGroup) {
-                command.errors.reject("Row ${index + 1}: Location group '${params.locationGroup}' does not exist")
+                command.errors.reject("Row ${index + 1}: Location Group '${params.locationGroup}' does not exist")
             }
 
-            if (!location.validate()) {
-                location.errors.each { BeanPropertyBindingResult error ->
-                    String errorMessage = messageSource.getMessage(error.fieldError, locale)
-                    command.errors.reject("Row ${index + 1}: ${errorMessage}")
-                }
+            if (!locationType) {
+                command.errors.reject("Row ${index + 1}: Location Type '${params.locationType}' does not exist")
             }
 
-            if (!location?.organization?.validate()) {
-                location?.organization?.errors?.each { BeanPropertyBindingResult error ->
-                    String errorMessage = messageSource.getMessage(error.fieldError, locale)
-                    command.errors.reject("Row ${index + 1}: ${errorMessage}")
-                }
+            if ((locationType?.isInternalLocation() || locationType?.isZone())  && !parentLocation) {
+                command.errors.reject("Row ${index + 1}: Location Type '${params.locationType}' requires a parent location")
             }
 
+            if (!(locationType?.isInternalLocation() || locationType?.isZone()) && parentLocation) {
+                command.errors.reject("Row ${index + 1}: Cannot assign a parent location to a location of type '${params.locationType}'")
+            }
         }
     }
 
