@@ -155,10 +155,10 @@ const FIELDS = {
         },
         getDynamicAttr: ({
           fieldValue, subfield, updatePickPageItem,
-          reasonCodes, hasBinLocationSupport, showOnly, requiresMobilePicking,
+          reasonCodes, hasBinLocationSupport, showOnly,
         }) => ({
           itemId: _.get(fieldValue, 'requisitionItem.id'),
-          btnOpenDisabled: showOnly || requiresMobilePicking,
+          btnOpenDisabled: showOnly,
           subfield,
           btnOpenText: fieldValue && fieldValue.hasChangedPick ? '' : 'react.default.button.edit.label',
           btnOpenDefaultText: fieldValue && fieldValue.hasChangedPick ? '' : 'Edit',
