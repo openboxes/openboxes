@@ -16,14 +16,14 @@
 
 package org.pih.warehouse.jobs
 
-import org.apache.commons.logging.Log
-import org.apache.commons.logging.LogFactory
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.codehaus.groovy.grails.support.PersistenceContextInterceptor
 import org.quartz.JobExecutionContext
 import org.quartz.JobExecutionException
 
 public class PersistenceContextJobListener extends grails.plugin.quartz2.PersistenceContextJobListener {
-	private static final transient Log log = LogFactory.getLog(PersistenceContextJobListener.class);
+	private static final transient Logger log = LoggerFactory.getLogger(PersistenceContextJobListener.class);
     PersistenceContextInterceptor persistenceInterceptor
 	public static final transient String PERSITENCE_INIT = "gormSession";
 	public static final String LISTENER_NAME = "persistenceContextJobListener"

@@ -7,12 +7,9 @@
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
  **/
-import grails.util.Environment
-import org.apache.log4j.Logger
+
 import org.codehaus.groovy.grails.test.junit4.JUnit4GrailsTestType
 import org.codehaus.groovy.grails.test.support.GrailsTestMode
-
-Logger log = Logger.getLogger("org.pih.warehouse._Events")
 
 /*loadtest setup*/
 def testTypeName = "loadtest"
