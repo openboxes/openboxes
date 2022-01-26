@@ -736,7 +736,20 @@ class StockMovementService {
             def quantityOnHand = productAvailabilityService.getQuantityOnHand(stockMovementItem.product, requisition.destination)
             def quantityAvailable = inventoryService.getQuantityAvailableToPromise(stockMovementItem.product, requisition.destination)
             def template = requisition.requisitionTemplate
-            if (!template || (template && template.replenishmentTypeCode == ReplenishmentTypeCode.PULL)) {
+            if (requisition.requisitionTemplateId && requisition.type == RequisitionType.STOCK && requisition.destination.locationType.locationTypeCode == LocationTypeCode.WARD) {
+                def demand = forecastingService.getDemand(requisition.origin, requisition.destination, stockMovementItem.product)
+                return [
+                        id                              : stockMovementItem.id,
+                        product                         : stockMovementItem.product,
+                        productCode                     : stockMovementItem.productCode,
+                        quantityOnHand                  : quantityOnHand ?: 0,
+                        comments                        : stockMovementItem.comments,
+                        statusCode                      : stockMovementItem.statusCode,
+                        sortOrder                       : stockMovementItem.sortOrder,
+                        monthlyDemand                   : demand?.monthlyDemand ?: 0,
+                        demandPerReplenishmentPeriod    : Math.ceil((demand?.dailyDemand ?: 0) * (template?.replenishmentPeriod ?: 30)),
+                ]
+            } else if (!template || (template && template.replenishmentTypeCode == ReplenishmentTypeCode.PULL)) {
                 def demand = forecastingService.getDemand(requisition.destination, null, stockMovementItem.product)
                 return [
                         id                              : stockMovementItem.id,
@@ -747,18 +760,6 @@ class StockMovementService {
                         quantityAllowed                 : stockMovementItem.quantityAllowed,
                         comments                        : stockMovementItem.comments,
                         quantityRequested               : stockMovementItem.quantityRequested,
-                        statusCode                      : stockMovementItem.statusCode,
-                        sortOrder                       : stockMovementItem.sortOrder,
-                        monthlyDemand                   : demand?.monthlyDemand ?: 0,
-                        demandPerReplenishmentPeriod    : Math.ceil((demand?.dailyDemand ?: 0) * (template?.replenishmentPeriod ?: 30)),
-                ]
-            } else if (requisition.requisitionTemplateId && requisition.type == RequisitionType.STOCK && requisition.destination.locationType.locationTypeCode == LocationTypeCode.WARD) {
-                def demand = forecastingService.getDemand(requisition.origin, requisition.destination, stockMovementItem.product)
-                return [
-                        id                              : stockMovementItem.id,
-                        product                         : stockMovementItem.product,
-                        productCode                     : stockMovementItem.productCode,
-                        comments                        : stockMovementItem.comments,
                         statusCode                      : stockMovementItem.statusCode,
                         sortOrder                       : stockMovementItem.sortOrder,
                         monthlyDemand                   : demand?.monthlyDemand ?: 0,
