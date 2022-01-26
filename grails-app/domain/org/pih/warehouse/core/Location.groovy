@@ -310,7 +310,8 @@ class Location implements Comparable<Location>, java.io.Serializable {
             "locationNumber": "locationNumber",
             "locationType"  : "locationType.name",
             "locationGroup" : "locationGroup.name",
-            "parentLocation": "parentLocation.name"
+            "parentLocation": "parentLocation.name",
+            "organization"  : "organization.name"
     ]
 
 }

@@ -23,7 +23,8 @@ class LocationExcelImporter extends AbstractExcelImporter {
                     'B': 'locationNumber',
                     'C': 'locationType',
                     'D': 'locationGroup',
-                    'E': 'parentLocation'
+                    'E': 'parentLocation',
+                    'F': 'organization'
             ]
     ]
 
@@ -33,6 +34,7 @@ class LocationExcelImporter extends AbstractExcelImporter {
             locationType  : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
             locationGroup : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
             parentLocation: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            organization  : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
     ]
 
     LocationExcelImporter(String fileName) {
