@@ -10,15 +10,19 @@
 
 import org.codehaus.groovy.grails.test.junit4.JUnit4GrailsTestType
 import org.codehaus.groovy.grails.test.support.GrailsTestMode
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
+Logger log = LoggerFactory.getLogger("org.pih.warehouse._Events")
 
 /*loadtest setup*/
 def testTypeName = "loadtest"
 def testDirectory = "loadtest"
 def testMode = new GrailsTestMode(autowire: true, wrapInTransaction: true, wrapInRequestEnvironment: true)
 def loadtestTestType = new JUnit4GrailsTestType(testTypeName, testDirectory, testMode)
- 
+
 loadtestTests = [loadtestTestType]
- 
+
 loadtestTestPhasePreparation = {
        integrationTestPhasePreparation()
 }
@@ -69,7 +73,7 @@ eventWarStart = {
 	//ant.copy(todir:"${basedir}/target/classes", failonerror:true, overwrite:true) {
 	//	fileset(dir:"${basedir}/grails-app/migrations", includes:"**/*")
 	//}
-	
+
 }
 
 eventRunAppStart = {
@@ -113,7 +117,7 @@ eventCreateWarStart = { warName, stagingDir ->
 	def revisionNumber = determineGitRevisionNumber()
     def branchName = determineGitBranchName()
 	def buildNumber = System.getProperty("build.number", metadata.'app.buildNumber')
-	
+
 	log.info("Setting BUILD_NUMBER to " + buildNumber)
 
 
