@@ -1528,14 +1528,15 @@ class AddItemsPage extends Component {
         apiClient.get(url)
           .then((response) => {
             const monthlyDemand = parseFloat(response.data.monthlyDemand.replace(',', ''));
+            const quantityRequested = monthlyDemand - (response.data.quantityOnHand || 0);
             this.setState({
               values: update(values, {
                 lineItems: {
                   [index]: {
                     product: { $set: product },
-                    quantityOnHand: { $set: 0 },
+                    quantityOnHand: { $set: response.data.quantityOnHand || 0 },
                     monthlyDemand: { $set: monthlyDemand },
-                    quantityRequested: { $set: 0 },
+                    quantityRequested: { $set: quantityRequested >= 0 ? quantityRequested : 0 },
                   },
                 },
               }),
