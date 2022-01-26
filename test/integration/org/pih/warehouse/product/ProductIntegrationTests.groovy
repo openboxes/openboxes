@@ -63,7 +63,7 @@ class ProductIntegrationTests extends GroovyTestCase{
 
     @Test
     void testLatestInventoryDate(){
-      def product = DbHelper.createProductIfNotExists("TestProductABC") 
+      def product = DbHelper.createProductIfNotExists("TestProductABC")
       Location boston =  Location.findByName("Boston Headquarters")
       Location miami =  Location.findByName("Miami Warehouse");
       def tenDaysAgo = new Date().minus(10)
@@ -183,6 +183,33 @@ class ProductIntegrationTests extends GroovyTestCase{
         assertEquals 0, product1?.synonyms?.size()
         assertEquals 1, product2.synonyms.size()
         assertNotNull Synonym.findByName("new synonym")
+
+    }
+
+    @Test
+    void testSaveProductReadOnly() {
+        def suppliers = Category.findByName("Supplies")
+        def name = "Test" + "12"
+        def product = new Product(name: name, category: suppliers)
+        product.save(flush:true, failOnError:true)
+        Long version = product.version
+        assert product.id != null
+        def newName = "Test" + "123"
+        product.name = newName
+        product.readOnly = true
+        product = product.save(flush: true, failOnError:true)
+        product = product.refresh()
+        assert product.name == name
+
+        newName = "Test" + "1234"
+        product.readOnly = false
+        product.name = newName
+        product.save(flush: true, failOnError:true)
+        product = product.refresh()
+        version = product.version
+//        assert product.name == newName
+        assert version == 1
+        assert product.name == newName
 
     }
 
