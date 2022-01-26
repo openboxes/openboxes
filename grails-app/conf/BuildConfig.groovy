@@ -24,14 +24,9 @@ grails.plugin.location.liquibase = 'liquibase/'
 grails.project.dependency.resolution = {
     // inherit Grails' default dependencies
     inherits("global") {
-        // https://grails.github.io/grails2-doc/1.3.9/guide/single.html#3.7.1%20Configurations%20and%20Dependencies
-        excludes(
-                "commons-logging",  // use jcl-over-slf4j instead
-                "log4j",  // use reload4j instead
-                "slf4j-log4j12",  // use slf4j-reload4j instead
-                "xml-apis",
-                "xmlbeans"
-        )
+        // uncomment to disable ehcache
+        // excludes 'ehcache'
+        excludes "xml-apis", "xmlbeans"
     }
     log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
     repositories {
@@ -50,22 +45,6 @@ grails.project.dependency.resolution = {
     }
 
     dependencies {
-        /*
-         * Unfortunately, grails 1.3.9 doesn't play nicely with log4j 2's bridge
-         * library (https://logging.apache.org/log4j/2.x/manual/migration.html);
-         * it instantiates org.apache.log4j.PatternLayout in a non-compliant way.
-         *
-         * For the time being, we can get critical log4j security patches from
-         * reload4j until we move to a more modern Grails release.
-         * https://reload4j.qos.ch/news.html https://www.slf4j.org/legacy.html
-         */
-        compile "org.slf4j:slf4j-reload4j:1.7.33"
-        compile "ch.qos.reload4j:reload4j:1.2.18.2"
-        // override hidden grails dependencies to work with reload4j
-        build "org.slf4j:slf4j-api:1.7.33"
-        compile "org.slf4j:slf4j-api:1.7.33"
-        runtime "org.slf4j:jcl-over-slf4j:1.7.33"
-        runtime "org.slf4j:jul-to-slf4j:1.7.33"
 
         // Required by database connection
         compile 'mysql:mysql-connector-java:5.1.47'
@@ -75,7 +54,7 @@ grails.project.dependency.resolution = {
 
         // Required by docx4j functionality
         compile('org.docx4j:docx4j:2.8.1') {
-            excludes 'commons-codec', 'commons-io'
+            excludes 'commons-logging:commons-logging:1.0.4', 'commons-codec', 'commons-io'
         }
 
         // Required for barcode4j
@@ -138,7 +117,7 @@ grails.project.dependency.resolution = {
         // Unknown
         build('org.jboss.tattletale:tattletale-ant:1.2.0.Beta2') { excludes "ant", "javassist" }
         compile('org.codehaus.groovy.modules.http-builder:http-builder:0.6') {
-            excludes "commons-codec", "commons-lang", "groovy", "xercesImpl"
+            excludes "xercesImpl", "groovy", "commons-lang", "commons-codec"
         }
 
         // REST client
