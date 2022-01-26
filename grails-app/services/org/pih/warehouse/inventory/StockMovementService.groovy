@@ -974,13 +974,13 @@ class StockMovementService {
         return packPageItems
     }
 
-    List<ReceiptItem> getStockMovementReceiptItems(StockMovement stockMovement) {
+    List<ReceiptItem> getStockMovementReceiptItems(def stockMovement) {
         return (stockMovement.requisition) ?
                 getRequisitionBasedStockMovementReceiptItems(stockMovement) :
                 getShipmentBasedStockMovementReceiptItems(stockMovement)
     }
 
-    List<ReceiptItem> getRequisitionBasedStockMovementReceiptItems(StockMovement stockMovement) {
+    List<ReceiptItem> getRequisitionBasedStockMovementReceiptItems(def stockMovement) {
         def shipments = Shipment.findAllByRequisition(stockMovement.requisition)
         List<ReceiptItem> receiptItems = shipments*.receipts*.receiptItems?.flatten()?.sort { a, b ->
             a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
@@ -990,7 +990,7 @@ class StockMovementService {
         return receiptItems
     }
 
-    List<ReceiptItem> getShipmentBasedStockMovementReceiptItems(StockMovement stockMovement) {
+    List<ReceiptItem> getShipmentBasedStockMovementReceiptItems(def stockMovement) {
         Shipment shipment = stockMovement.shipment
         List<ReceiptItem> receiptItems = shipment.receipts*.receiptItems?.flatten()?.sort { a, b ->
             a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
@@ -2521,7 +2521,7 @@ class StockMovementService {
     }
 
 
-    List<Map> getDocuments(StockMovement stockMovement) {
+    List<Map> getDocuments(def stockMovement) {
         def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
         def documentList = []
 

@@ -69,7 +69,7 @@
 					<td>
 						<div class="buttons left">
 							<button type="submit" class="button">${warehouse.message(code:'default.button.upload.label')}</button>
-							<g:link controller="stockMovement" action="show" id="${shipmentInstance?.id}">
+							<g:link controller="stockMovement" action="show" id="${stockMovementInstance?.id}">
 								<warehouse:message code="default.button.cancel.label" />
 							</g:link>
 						</div>
