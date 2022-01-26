@@ -47,7 +47,7 @@ class InventoryService implements ApplicationContextAware {
     def grailsApplication
 
     def dataService
-    def productService
+//    def productService
     def identifierService
     def messageService
     def locationService

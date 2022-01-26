@@ -44,6 +44,7 @@ import org.pih.warehouse.shipping.ShipmentItem
  */
 class Product implements Comparable, Serializable {
 
+    Boolean readOnly =  false
 
     def beforeInsert = {
         User.withNewSession {
@@ -54,7 +55,18 @@ class Product implements Comparable, Serializable {
             }
         }
     }
+
     def beforeUpdate = {
+        log.info "Update record:${this.id}, name:${this.name}, version:${this.version}"
+        if (this.readOnly) {
+            def names = this.dirtyPropertyNames
+            for (name in names) {
+                def originalValue = this.getPersistentValue(name)
+                log.info "${name}::${originalValue}"
+                this."${name}" = originalValue
+            }
+            return false
+        }
         User.withNewSession {
             def currentUser = AuthService.currentUser.get()
             if (currentUser) {
@@ -240,7 +252,7 @@ class Product implements Comparable, Serializable {
                          "substitutions",
                          "applicationTagLib",
                          "handlingIcons",
-                         "uoms"
+                         "uoms", "readOnly"
     ]
 
     static hasMany = [
