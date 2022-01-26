@@ -52,6 +52,7 @@ class ForecastingService {
                 onHandMonths : onHandMonths
             ]
         }
+        return [:]
     }
 
     def getDemandDetails(Location origin, Product product) {
