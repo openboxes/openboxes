@@ -807,14 +807,14 @@ class ReportService implements ApplicationContextAware {
 
             def results = dataService.executeQuery(query, params)
             if (results) {
-                def productGrupedResults = results.groupBy { it.product_id}
+                def onOrderData = getOnOrderData(params.originId, results.collect{it.product_id}.unique())
                 def monthsInPeriod = (params.endDate - params.startDate) / 30
-                data = getOnOrderData(params.originId, results.collect{it.product_id}.unique()).collect { onOrderDataItem ->
+                data = results.groupBy { it.product_id}.collect { productId, demandDetails ->
                     [
-                            productId             : onOrderDataItem.productId,
-                            totalOnOrder          : onOrderDataItem.totalOnOrder,
-                            totalOnHand           : onOrderDataItem.totalOnHand,
-                            averageMonthlyDemand  : productGrupedResults[onOrderDataItem.productId].collect {it.quantity_demand}.sum() / monthsInPeriod
+                            productId             : productId,
+                            totalOnOrder          : onOrderData.find {it.productId == productId}?.totalOnOrder ?: '',
+                            totalOnHand           : onOrderData.find {it.productId == productId}?.totalOnHand ?: '',
+                            averageMonthlyDemand  : demandDetails.collect {it.quantity_demand}.sum() / monthsInPeriod
                     ]
                 }
             }
