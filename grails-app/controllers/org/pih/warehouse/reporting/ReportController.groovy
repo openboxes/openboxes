@@ -686,17 +686,17 @@ class ReportController {
                 if (!params.replenishmentPeriodDays || !params.leadTimeDays) {
                     inventoryLevel = InventoryLevel.findByProduct(product)
                 }
-                def replenishmentPeriodDays = params.replenishmentPeriodDays ?: inventoryLevel && inventoryLevel.replenishmentPeriodDays ? inventoryLevel.replenishmentPeriodDays : 365
-                def leadTimeDays = params.leadTimeDays ?: inventoryLevel && inventoryLevel.expectedLeadTimeDays ? inventoryLevel.expectedLeadTimeDays : 365
+                Integer replenishmentPeriodDays = params.replenishmentPeriodDays ? params.replenishmentPeriodDays.toInteger() : inventoryLevel && inventoryLevel.replenishmentPeriodDays ? inventoryLevel.replenishmentPeriodDays : 365
+                Integer leadTimeDays = params.leadTimeDays ? params.leadTimeDays.toInteger() : inventoryLevel && inventoryLevel.expectedLeadTimeDays ? inventoryLevel.expectedLeadTimeDays : 365
                 def productExpiry = forecastingService.getProductExpiry(Location.load(params.originId), replenishmentPeriodDays + leadTimeDays, item.productId)
-                def qtyOnOrder = item?.totalOnOrder ?: 0
-                def qtyOnHand = item?.totalOnHand ?: 0
-                def qtyExpiring = productExpiry.collect {it.quantity_on_hand}.sum() ?: 0
-                def qtyAvailable = qtyOnOrder + qtyOnHand - qtyExpiring ?: 0
-                def avgDemand = item.averageMonthlyDemand ? item.averageMonthlyDemand?.setScale(1, RoundingMode.HALF_UP) : 0
-                def monthsOfStock = ((replenishmentPeriodDays.toInteger() + leadTimeDays.toInteger()) / 30).setScale(1, RoundingMode.HALF_UP) ?: 0
-                def qtyNeeded = avgDemand * monthsOfStock ?: 0
-                def qtyToOrder = BigDecimal.ZERO.max(qtyNeeded - qtyAvailable)
+                def quantityOnOrder = item?.totalOnOrder ?: 0
+                def quantityOnHand = item?.totalOnHand ?: 0
+                def quantityExpiring = productExpiry.collect {it.quantity_on_hand}.sum() ?: 0
+                def quantityAvailable = quantityOnOrder + quantityOnHand - quantityExpiring ?: 0
+                def averageDemand = item.averageMonthlyDemand ? item.averageMonthlyDemand?.setScale(1, RoundingMode.HALF_UP) : 0
+                def monthsOfStock = ((replenishmentPeriodDays + leadTimeDays) / 30).setScale(1, RoundingMode.HALF_UP) ?: 0
+                def quantityNeeded = averageDemand * monthsOfStock ?: 0
+                def quantityToOrder = BigDecimal.ZERO.max(quantityNeeded - quantityAvailable)
                 def unitPrice = product?.pricePerUnit ?: 0
 
                 def printRow = [
@@ -704,15 +704,15 @@ class ReportController {
                         'Name'                            : product.name,
                         'Order Period (Days)'             : replenishmentPeriodDays,
                         'Lead Time (Days)'                : leadTimeDays,
-                        'Qty On Order'                    : qtyOnOrder,
-                        'Qty On Hand'                     : qtyOnHand,
-                        'Qty Expiring within time period' : qtyExpiring,
-                        'Qty Available'                   : qtyAvailable,
-                        'Average Demand/Month'            : avgDemand,
+                        'Qty On Order'                    : quantityOnOrder,
+                        'Qty On Hand'                     : quantityOnHand,
+                        'Qty Expiring within time period' : quantityExpiring,
+                        'Qty Available'                   : quantityAvailable,
+                        'Average Demand/Month'            : averageDemand,
                         'Months of Stock Needed (order period + lead time in months)'  : monthsOfStock,
-                        'Qty Needed'                      : qtyNeeded,
-                        'Qty to Order'                    : qtyToOrder,
-                        'Estimated Cost'                  : unitPrice * qtyToOrder,
+                        'Qty Needed'                      : quantityNeeded,
+                        'Qty to Order'                    : quantityToOrder,
+                        'Estimated Cost'                  : unitPrice * quantityToOrder,
                 ]
 
                 rows << printRow
