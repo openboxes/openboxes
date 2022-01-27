@@ -56,7 +56,7 @@ class OrganizationService {
         }
 
         if (organization.validate() && !organization.hasErrors()) {
-            organization.save()
+            organization.save(flush:true)
         }
         return organization
     }

@@ -90,14 +90,14 @@ class BatchController {
 
     def importData = { ImportDataCommand command ->
 
-        def xlsFile = flash.xlsFile
+        def xlsFile = session.xlsFile
         if ("POST".equals(request.getMethod())) {
 
             if (request instanceof DefaultMultipartHttpServletRequest) {
                 xlsFile = request.getFile('xlsFile')
                 if (!xlsFile?.empty) {
                     try {
-                        flash.xlsFile = xlsFile
+                        session.xlsFile = xlsFile
                     } catch (Exception e) {
                         //throw new RuntimeException(e);
                         flash.message = "Unable to upload file due to exception: " + e.message
@@ -179,7 +179,7 @@ class BatchController {
 
                 if (dataImporter) {
 
-                    println "Using data importer ${dataImporter.class.name}"
+                    log.info "Using data importer ${dataImporter.class.name}"
 
                     // Get data from importer (should be done as a separate step 'processData' or within 'validateData')
                     command.data = dataImporter.data
@@ -203,24 +203,24 @@ class BatchController {
 
                 // If there are no errors and the user requests to import the data, we should execute the import
                 if (!command.hasErrors() && params.import) {
-                    println "Data is about to be imported ..."
+                    log.info "Data is about to be imported ..."
                     try {
+
                         dataImporter.importData(command)
+
+                        if (!command.errors.hasErrors()) {
+                            session.removeAttribute("xlsFile")
+                            flash.message = "${warehouse.message(code: 'inventoryItem.importSuccess.message', args: [xlsFile.name])}"
+                            redirect(action: "importData")
+                            return
+                        }
                     } catch (Exception e) {
                         command.errors.reject(e.message)
                     }
 
-                    if (!command.errors.hasErrors()) {
-                        flash.message = "${warehouse.message(code: 'inventoryItem.importSuccess.message', args: [xlsFile.name])}"
-                        redirect(action: "importData")
-                        return
-                    }
-                    log.info "There were errors: " + command.errors
                 } else if (!command.hasErrors()) {
                     flash.message = "${warehouse.message(code: 'inventoryItem.dataReadyToBeImported.message')}"
                 }
-
-
                 render(view: "importData", model: [commandInstance: command])
             } else {
                 flash.message = "${warehouse.message(code: 'inventoryItem.notValidXLSFile.message')}"
