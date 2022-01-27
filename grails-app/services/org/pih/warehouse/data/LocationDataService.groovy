@@ -60,8 +60,21 @@ class LocationDataService {
     void importData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
             Location location = createOrUpdateLocation(params)
-            if (location.validate()) {
-                location.save(failOnError: true)
+
+            // Populate address if address data exists
+            if (params.address) {
+                if (!location.address) {
+                    Address address = new Address(params)
+                    address.save(failOnError: true)
+                    location.address = address
+                }
+                else {
+                    location.address.properties = params
+                }
+            }
+
+            if (location.validate() && !location.hasErrors()) {
+                location.save(flush:true, failOnError: true)
             }
         }
     }

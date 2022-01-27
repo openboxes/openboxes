@@ -49,7 +49,8 @@ class BatchController {
 
         def objects = genericApiService.getList(params.type, [:])
         def domainClass = genericApiService.getDomainClass(params.type)
-        def data = dataService.transformObjects(objects, domainClass.PROPERTIES)
+        def properties = grailsApplication.config.openboxes.downloadExcel[params.type].properties?:domainClass.PROPERTIES
+        def data = dataService.transformObjects(objects, properties)
 
         response.contentType = "application/vnd.ms-excel"
         response.setHeader 'Content-disposition', "attachment; filename=\"${params.type}.xls\""
