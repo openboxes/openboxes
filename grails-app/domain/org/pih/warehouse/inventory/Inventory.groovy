@@ -26,9 +26,6 @@ class Inventory implements java.io.Serializable {
     static belongsTo = [warehouse: Location]
     static hasMany = [configuredProducts: InventoryLevel]
 
-    // Show use warehouse name
-    String toString() { return "${warehouse}" }
-
     static mapping = {
         id generator: 'uuid'
         cache true

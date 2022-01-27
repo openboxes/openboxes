@@ -10,6 +10,7 @@
 package org.pih.warehouse.data
 
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.Address
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.LocationType
@@ -53,26 +54,38 @@ class LocationDataService {
                     command.errors.reject("Row ${index + 1}: ${errorMessage}")
                 }
             }
-
         }
     }
 
     void importData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
             Location location = createOrUpdateLocation(params)
-            if (location.validate()) {
-                location.save(failOnError: true)
+
+            // Populate address if address data exists
+            if (params.address) {
+                if (!location.address) {
+                    Address address = new Address(params)
+                    address.save(failOnError: true)
+                    location.address = address
+                }
+                else {
+                    location.address.properties = params
+                }
+            }
+
+            if (location.validate() && !location.hasErrors()) {
+                location.save(flush:true, failOnError: true)
             }
         }
-
     }
 
     Location createOrUpdateLocation(Map params) {
+        log.info "Create or update location " + params
+
         Location location = Location.findByNameOrLocationNumber(params.name, params.locationNumber)
         if (!location) {
             location = new Location()
         }
-
         location.name = params.name
         location.locationNumber = params.locationNumber
         location.locationType = params.locationType ? LocationType.findByNameLike(params.locationType + "%") : null
@@ -86,7 +99,6 @@ class LocationDataService {
                     organizationService.findOrCreateSupplierOrganization(params.name, params.locationNumber) :
                     (location?.locationType?.locationTypeCode == LocationTypeCode.DEPOT) ?
                             currentLocation?.organization : null
-
             location.organization = organization
         }
         return location

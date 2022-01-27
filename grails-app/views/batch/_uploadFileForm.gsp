@@ -119,6 +119,9 @@
                                 </g:link>
                             </td>
                             <td>
+                                <g:link controller="batch" action="downloadExcel" params="[type:'Person']">
+                                    <warehouse:message code="default.download.label" args="[g.message(code:'default.data.label')]"/>
+                                </g:link>
                             </td>
                         </tr>
                         <tr>
@@ -273,6 +276,9 @@
                                 </g:link>
                             </td>
                             <td>
+                                <g:link controller="batch" action="downloadExcel" params="[type:'User']">
+                                    <warehouse:message code="default.download.label" args="[g.message(code:'default.data.label')]"/>
+                                </g:link>
                             </td>
                         </tr>
                         <tr>
@@ -288,6 +294,9 @@
                                 </g:link>
                             </td>
                             <td>
+                                <g:link controller="batch" action="downloadExcel" params="[type:'LocationRole']">
+                                    <warehouse:message code="default.download.label" args="[g.message(code:'default.data.label')]"/>
+                                </g:link>
                             </td>
                         </tr>
                     </table>

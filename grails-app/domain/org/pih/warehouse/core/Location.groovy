@@ -332,7 +332,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
         ]
     }
 
-    Map toJson(LocationTypeCode locationTypeCode)  {
+    Map toJson(LocationTypeCode locationTypeCode) {
         switch (locationTypeCode) {
             case LocationTypeCode.INTERNAL:
             case LocationTypeCode.BIN_LOCATION:
@@ -345,11 +345,18 @@ class Location implements Comparable<Location>, java.io.Serializable {
 
 
     static PROPERTIES = [
-            "name"          : "name",
-            "locationNumber": "locationNumber",
-            "locationType"  : "locationType.name",
-            "locationGroup" : "locationGroup.name",
-            "parentLocation": "parentLocation.name"
+            "name"           : "name",
+            "locationNumber" : "locationNumber",
+            "locationType"   : "locationType.name",
+            "locationGroup"  : "locationGroup.name",
+            "parentLocation" : "parentLocation.name",
+            "address"        : "address.address",
+            "address2"       : "address.address2",
+            "city"           : "address.city",
+            "stateOrProvince": "address.stateOrProvince",
+            "postalCode"     : "address.postalCode",
+            "country"        : "address.country",
+            "description"    : "address.description",
     ]
 
 }

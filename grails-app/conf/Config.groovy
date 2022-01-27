@@ -753,6 +753,9 @@ breadcrumbsConfig {
             listUrl = "/"
         }
 }
+// OpenBoxes
+openboxes.downloadExcel.Person.properties = ["firstName":"firstName", "lastName":"lastName",  "email":"email", "phoneNumber":"phoneNumber"]
+openboxes.downloadExcel.User.properties = ["username":"username", "firstName":"firstName", "lastName":"lastName", "email":"email"]
 
 // OpenBoxes identifier config
 openboxes.identifier.separator = Constants.DEFAULT_IDENTIFIER_SEPARATOR

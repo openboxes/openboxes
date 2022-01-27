@@ -103,6 +103,12 @@
                     </g:if>
 
                     <div class="buttons">
+                        <a href="${createLink(controller: "batch", action: "importData", params: params)}"
+                           class="button">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'bullet_left.png')}"/>&nbsp;
+                            <warehouse:message code="default.button.back.label" default="Back"/>
+                        </a>
+
                         <g:if test="${!commandInstance?.hasErrors()}">
                             <input name="import" id="import" type="hidden" value="${true}"/>
                             <button type="button" class="button" id="finish-button">
@@ -110,12 +116,6 @@
                                 ${warehouse.message(code: 'default.button.finish.label')}
                             </button>
                         </g:if>
-
-                        <a href="${createLink(controller: "batch", action: "importData", params: params)}"
-                           class="button">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'bullet_left.png')}"/>&nbsp;
-                            <warehouse:message code="default.button.back.label" default="Back"/>
-                        </a>
                     </div>
                 </g:form>
             </g:if>
