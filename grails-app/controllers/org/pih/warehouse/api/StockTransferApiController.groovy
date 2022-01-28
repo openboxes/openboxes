@@ -18,6 +18,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.shipping.ShipmentType
@@ -221,6 +222,16 @@ class StockTransferApiController {
         }
 
         shipmentService.sendShipment(order)
+        render status: 200
+    }
+
+    def updateStatus = {
+        Order order = Order.get(params.id)
+        if (!order) {
+            throw new IllegalArgumentException("Can't find order with given id: ${params.id}")
+        }
+
+        stockTransferService.updateStockTransferStatus(order, OrderStatus.valueOf(params.status))
         render status: 200
     }
 }
