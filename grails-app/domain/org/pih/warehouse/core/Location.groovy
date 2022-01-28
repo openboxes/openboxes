@@ -10,6 +10,7 @@
 package org.pih.warehouse.core
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.grails.plugins.excelimport.ExcelImportUtils
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
@@ -306,12 +307,19 @@ class Location implements Comparable<Location>, java.io.Serializable {
     }
 
     static PROPERTIES = [
-            "name"          : "name",
-            "locationNumber": "locationNumber",
-            "locationType"  : "locationType.name",
-            "locationGroup" : "locationGroup.name",
-            "parentLocation": "parentLocation.name",
-            "organization"  : "organization.name"
+            "name"            : "name",
+            "active"          : "active",
+            "locationNumber"  : "locationNumber",
+            "locationType"    : "locationType.name",
+            "locationGroup"   : "locationGroup.name",
+            "parentLocation"  : "parentLocation.name",
+            "organization"    : "organization.name",
+            "streetAddress"   : "address.address",
+            "streetAddress2"  : "address.address2",
+            "city"            : "address.city",
+            "stateOrProvince" : "address.stateOrProvince",
+            "postalCode"      : "address.postalCode",
+            "country"         : "address.country",
+            "description"     : "address.description",
     ]
-
 }

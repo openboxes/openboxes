@@ -9,13 +9,15 @@
  **/
 package org.pih.warehouse.data
 
-import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.Address
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.importer.ImportDataCommand
+
+import javax.annotation.Nullable
 
 class LocationDataService {
 
@@ -37,6 +39,10 @@ class LocationDataService {
 
             if (Location.findByName(params.name)) {
                 command.errors.reject("Row ${index + 1}: '${params.name}' already exists in the system. Choose a unique name")
+            }
+
+            if (!params.active || (!(params.active instanceof Boolean) && !("true".equalsIgnoreCase(params.active) || "false".equalsIgnoreCase(params.active)))) {
+                command.errors.reject("Row ${index + 1}: Active/inactive field is obligatory. Please fill with TRUE or FALSE")
             }
 
             if (locationNamesToImport.findAll { it == params.name }.size() > 1) {
@@ -90,16 +96,17 @@ class LocationDataService {
         }
 
         location.name = params.name
+        location.active = Boolean.valueOf(params.active)
         location.locationNumber = params.locationNumber
         location.locationType = params.locationType ? LocationType.findByNameLike(params.locationType + "%") : null
         location.locationGroup = params.locationGroup ? LocationGroup.findByName(params.locationGroup) : null
         location.parentLocation = params.parentLocation ? Location.findByNameOrLocationNumber(params.parentLocation, params.parentLocation) : null
         location.organization = params.organization ? Organization.findByCodeOrName(params.organization, params.organization) : null
+        location.address = createOrUpdateAddress(params, location?.address?.id)
 
         // Add required association to organization for depots and suppliers
         if (!(location.locationType?.isInternalLocation() || location.locationType?.isZone()) && !location.organization) {
             def locationCode = identifierService.generateOrganizationIdentifier(params.organization)
-            Location currentLocation = AuthService?.currentLocation?.get()
             Organization organization = (location.locationType?.locationTypeCode == LocationTypeCode.SUPPLIER) ?
                     organizationService.findOrCreateSupplierOrganization(params?.organization, locationCode) :
                     organizationService.findOrCreateOrganization(params?.organization, locationCode)
@@ -108,5 +115,30 @@ class LocationDataService {
         }
 
         return location
+    }
+
+    Address createOrUpdateAddress(Map params, @Nullable String addressId) {
+        Address address
+        if (addressId) {
+            address = Address.findById(addressId)
+        }
+
+        if (!address) {
+            address = new Address()
+        }
+
+        address.address = params.streetAddress ?: ''
+        address.address2 = params.streetAddress2 ?: ''
+        address.city = params.city ?: ''
+        address.stateOrProvince = params.stateOrProvince ?: ''
+        address.postalCode = params.postalCode ?: ''
+        address.country = params.country ?: ''
+        address.description = params.description ?: ''
+
+        if (address.validate() && !address.hasErrors()) {
+            address.save()
+        }
+
+        return address
     }
 }
