@@ -84,8 +84,8 @@ class Picklist implements Serializable {
     static transients = ['pickablePicklistItems', 'pickablePicklistItemsByProductId', 'isFullyPicked']
 
     Boolean getIsFullyPicked() {
-        return picklistItems.any { PicklistItem picklistItem ->
-            picklistItem.quantityRemaining <= 0
+        return !picklistItems.any { PicklistItem picklistItem ->
+            picklistItem.quantityRemaining > 0
         }
     }
 

@@ -182,7 +182,7 @@ class StockMovementService {
                         issueRequisitionBasedStockMovement(stockMovement.id)
                         break
                     default:
-                        throw new IllegalArgumentException("Cannot update status with invalid status ${jsonObject.status}")
+                        throw new IllegalArgumentException("Cannot update status with invalid status ${status}")
                         break
 
                 }
