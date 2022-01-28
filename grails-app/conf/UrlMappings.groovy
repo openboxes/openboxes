@@ -363,6 +363,11 @@ class UrlMappings {
             action = [POST: "sendShipment"]
         }
 
+        "/api/stockTransfers/$id/complete"(parseRequest: true) {
+            controller = { "stockTransferApi" }
+            action = [POST: "complete"]
+        }
+
         // OBPIH-4079: TEMPORARY DISABLED
 
 //        // Requirement API

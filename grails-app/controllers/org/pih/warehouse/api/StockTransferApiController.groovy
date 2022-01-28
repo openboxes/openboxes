@@ -223,4 +223,14 @@ class StockTransferApiController {
         shipmentService.sendShipment(order)
         render status: 200
     }
+
+    def complete = {
+        Order order = Order.get(params.id)
+        if (!order) {
+            throw new IllegalArgumentException("Can't find order with given id: ${params.id}")
+        }
+
+        stockTransferService.completeStockTransfer(order)
+        render status: 200
+    }
 }
