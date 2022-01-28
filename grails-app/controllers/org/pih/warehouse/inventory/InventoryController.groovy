@@ -1411,6 +1411,22 @@ class InventoryController {
         Location location = Location.load(session.warehouse.id)
         List data = productAvailabilityService.getQuantityOnHandByBinLocation(location)
         def rows = []
+
+        if (!data) {
+            def row = [
+                    'Product code'    : '',
+                    'Product name'    : '',
+                    'Lot number'      : '',
+                    'Expiration date' : '',
+                    'Bin location'    : '',
+                    'OB QOH'          : '',
+                    'Physical QOH'    : '',
+                    'Comment'         : '',
+            ]
+
+            rows << row
+        }
+
         data.findAll { it.quantity }.each {
             def row = [
                     'Product code'    : it.product?.productCode,
