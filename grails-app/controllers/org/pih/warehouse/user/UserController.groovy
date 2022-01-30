@@ -118,10 +118,14 @@ class UserController {
         log.info "attempt to save the user; show form with validation errors on failure"
         def userInstance = new User(params)
 
-        userInstance.password = params?.password?.encodeAsPassword()
-        userInstance.passwordConfirm = params?.passwordConfirm?.encodeAsPassword()
+        // We want to validate user before we encode the password so that minSize constraint
+        // on the password field is applied appropriately
+        if (userInstance.validate()) {
+            userInstance.password = params?.password?.encodeAsPassword()
+            userInstance.passwordConfirm = params?.passwordConfirm?.encodeAsPassword()
+        }
 
-        if (userInstance.save(flush: true)) {
+        if (!userInstance.hasErrors() && userInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
             redirect(action: "edit", id: userInstance.id)
         } else {
