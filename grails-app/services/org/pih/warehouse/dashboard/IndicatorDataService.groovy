@@ -1,24 +1,12 @@
-package org.pih.warehouse.tableroapi
+package org.pih.warehouse.dashboard
 
 import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.requisition.RequisitionStatus
-import org.pih.warehouse.tablero.GraphData
-import org.pih.warehouse.tablero.TableData
-import org.pih.warehouse.tablero.Table
-import org.pih.warehouse.tablero.ColorNumber
-import org.pih.warehouse.tablero.MultipleNumbersIndicator
-import org.pih.warehouse.tablero.IndicatorData
-import org.pih.warehouse.tablero.NumbersIndicator
-import org.pih.warehouse.tablero.IndicatorDatasets
-import org.pih.warehouse.tablero.NumberTableData
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.inventory.InventorySnapshot
-import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.core.Location
 import org.joda.time.LocalDate
@@ -98,23 +86,7 @@ class IndicatorDataService {
 
         IndicatorData indicatorData = new IndicatorData(datasets, listLabels)
 
-        def title = [
-            code : "react.dashboard.expirationSummaryData.title.label",
-            message : messageService.getMessage("react.dashboard.expirationSummaryData.title.label")
-        ]
-
-        def info = [
-            code : "react.dashboard.expirationSummaryData.info.label",
-            message : messageService.getMessage("react.dashboard.expirationSummaryData.info.label")
-        ]
-
-        GraphData graphData = new GraphData(
-            indicatorData,
-            title,
-            info,
-            "line",
-            "/openboxes/inventory/listExpiringStock"
-            )
+        GraphData graphData = new GraphData(indicatorData, "/openboxes/inventory/listExpiringStock")
 
         return graphData
     }
@@ -231,22 +203,7 @@ class IndicatorDataService {
 
         IndicatorData indicatorData = new IndicatorData(datasets, listLabels)
 
-        def title = [
-            code : "react.dashboard.fillRate.title.label",
-            message : messageService.getMessage("react.dashboard.fillRate.title.label")
-        ]
-
-        def info = [
-            code : "react.dashboard.fillRate.info.label",
-            message : messageService.getMessage("react.dashboard.fillRate.info.label")
-        ]
-
-        GraphData graphData = new GraphData(
-            indicatorData,
-            title,
-            info,
-            "bar"
-            )
+        GraphData graphData = new GraphData(indicatorData)
 
         return graphData
     }
@@ -316,23 +273,8 @@ class IndicatorDataService {
         colorNumber.value = "${colorNumber.value}%"
 
         IndicatorData indicatorData = new IndicatorData(datasets, listLabels, colorNumber);
-        def title = [
-            code : "react.dashboard.fillRateSnapshot.title.label",
-            message : messageService.getMessage("react.dashboard.fillRateSnapshot.title.label")
-        ]
 
-        def info = [
-            code : "react.dashboard.fillRateSnapshot.info.label",
-            message : messageService.getMessage("react.dashboard.fillRateSnapshot.info.label")
-        ]
-
-        GraphData graphData = new GraphData(
-            indicatorData,
-            title,
-            info,
-            "sparkline",
-            null
-            );
+        GraphData graphData = new GraphData(indicatorData, null)
 
         return graphData;
     }
@@ -385,22 +327,7 @@ class IndicatorDataService {
 
         IndicatorData indicatorData = new IndicatorData(datasets, ['In stock', 'Above maximum', 'Below reorder', 'Below minimum', 'No longer in stock'])
 
-        def title = [
-            code : "react.dashboard.inventorySummaryData.title.label",
-            message : messageService.getMessage("react.dashboard.inventorySummaryData.title.label")
-        ]
-
-        def info = [
-            code : "react.dashboard.inventorySummaryData.info.label",
-            message : messageService.getMessage("react.dashboard.inventorySummaryData.info.label")
-        ]
-
-        GraphData graphData = new GraphData(
-            indicatorData,
-            title,
-            info,
-            "horizontalBar"
-            )
+        GraphData graphData = new GraphData(indicatorData)
 
         return graphData
     }
@@ -453,22 +380,7 @@ class IndicatorDataService {
 
         IndicatorData indicatorData = new IndicatorData(datasets, listLabel)
 
-        def title = [
-            code : "react.dashboard.sentStockMovements.title.label",
-            message : messageService.getMessage("react.dashboard.sentStockMovements.title.label")
-        ]
-
-        def info = [
-            code : "react.dashboard.sentStockMovements.info.label",
-            message : messageService.getMessage("react.dashboard.sentStockMovements.info.label")
-        ]
-
-        GraphData graphData = new GraphData(
-            indicatorData,
-            title,
-            info,
-            "bar"
-            )
+        GraphData graphData = new GraphData(indicatorData)
 
         return graphData
     }
@@ -519,22 +431,7 @@ class IndicatorDataService {
 
         IndicatorData indicatorData = new IndicatorData(datasets, listLabel)
 
-        def title = [
-            code : "react.dashboard.receivedStockData.title.label",
-            message : messageService.getMessage("react.dashboard.receivedStockData.title.label")
-        ]
-
-        def info = [
-            code : "react.dashboard.receivedStockData.info.label",
-            message : messageService.getMessage("react.dashboard.receivedStockData.info.label")
-        ]
-
-        GraphData graphData = new GraphData(
-            indicatorData,
-            title,
-            info,
-            "bar"
-            )
+        GraphData graphData = new GraphData(indicatorData)
 
         return graphData
     }
@@ -563,23 +460,7 @@ class IndicatorDataService {
 
         NumbersIndicator numbersIndicator = new NumbersIndicator(green, yellow, red)
 
-        def title = [
-            code : "react.dashboard.outgoingStock.title.label",
-            message : messageService.getMessage("react.dashboard.outgoingStock.title.label")
-        ]
-
-        def info = [
-            code : "react.dashboard.outgoingStock.info.label",
-            message : messageService.getMessage("react.dashboard.outgoingStock.info.label")
-        ]
-
-        GraphData graphData = new GraphData(
-            numbersIndicator,
-            title,
-            info,
-            "numbers",
-            "/openboxes/stockMovement/list?receiptStatusCode=PENDING"
-            )
+        GraphData graphData = new GraphData(numbersIndicator, "/openboxes/stockMovement/list?receiptStatusCode=PENDING")
 
         return graphData
     }
@@ -607,22 +488,7 @@ class IndicatorDataService {
 
         NumbersIndicator numbersIndicator = new NumbersIndicator(pending, shipped, partiallyReceived)
 
-        def title = [
-            code : "react.dashboard.incomingStock.title.label",
-            message : messageService.getMessage("react.dashboard.incomingStock.title.label")
-        ]
-
-        def info = [
-            code : "react.dashboard.incomingStock.info.label",
-            message : messageService.getMessage("react.dashboard.incomingStock.info.label")
-        ]
-
-        GraphData graphData = new GraphData(
-            numbersIndicator,
-            title,
-            info,
-            "numbers",
-            "/openboxes/stockMovement/list?direction=INBOUND")
+        GraphData graphData = new GraphData(numbersIndicator, "/openboxes/stockMovement/list?direction=INBOUND")
 
         return graphData
     }
@@ -688,22 +554,7 @@ class IndicatorDataService {
 
         Table tableData = new Table("Shipment", "Name", "Discrepancy", tableBody)
 
-        def title = [
-            code : "react.dashboard.discrepancy.title.label",
-            message : messageService.getMessage("react.dashboard.discrepancy.title.label")
-        ]
-
-        def info = [
-            code : "react.dashboard.discrepancy.info.label",
-            message : messageService.getMessage("react.dashboard.discrepancy.info.label")
-        ]
-
-        GraphData graphData = new GraphData(
-            tableData,
-            title,
-            info,
-            "table"
-            )
+        GraphData graphData = new GraphData(tableData)
 
         return graphData;
     }
@@ -757,22 +608,7 @@ class IndicatorDataService {
 
         NumberTableData numberTableData = new NumberTableData(table, numbersIndicator)
 
-        def title = [
-            code : "react.dashboard.delayedShipments.title.label",
-            message : messageService.getMessage("react.dashboard.delayedShipments.title.label")
-        ]
-
-        def info = [
-            code : "react.dashboard.delayedShipments.info.label",
-            message : messageService.getMessage("react.dashboard.delayedShipments.info.label")
-        ]
-
-        GraphData graphData = new GraphData(
-            numberTableData,
-            title,
-            info,
-            "numberTable"
-            )
+        GraphData graphData = new GraphData(numberTableData)
 
         return graphData;
     }
@@ -845,17 +681,7 @@ class IndicatorDataService {
         }
         MultipleNumbersIndicator multipleNumbersIndicator = new MultipleNumbersIndicator(listPercentageNumbers)
 
-        def title = [
-            code : "react.dashboard.productsInventoried.title.label",
-            message : messageService.getMessage("react.dashboard.productsInventoried.title.label")
-        ]
-
-        GraphData productsInventoried = new GraphData(
-            multipleNumbersIndicator,
-            title,
-            null,
-            'numbersCustomColors'
-            )
+        GraphData productsInventoried = new GraphData(multipleNumbersIndicator)
 
         return productsInventoried
     }
@@ -944,17 +770,7 @@ class IndicatorDataService {
 
         IndicatorData indicatorData = new IndicatorData(datasets, listLabels)
 
-        def title = [
-            code : "react.dashboard.lossCausedByExpiry.title.label",
-            message : messageService.getMessage("react.dashboard.lossCausedByExpiry.title.label")
-        ]
-
-        GraphData graphData = new GraphData(
-            indicatorData,
-            title,
-            null,
-            "bar"
-            )
+        GraphData graphData = new GraphData(indicatorData)
 
         return graphData
     }
@@ -1004,23 +820,7 @@ class IndicatorDataService {
 
         IndicatorData indicatorData = new IndicatorData(datasets, listLabels)
 
-        def title = [
-            code : "react.dashboard.percentageAdHoc.title.label",
-            message : messageService.getMessage("react.dashboard.percentageAdHoc.title.label")
-        ]
-
-        def info = [
-            code : "react.dashboard.percentageAdHoc.info.label",
-            message : messageService.getMessage("react.dashboard.percentageAdHoc.info.label")
-        ]
-
-        GraphData graphData = new GraphData(
-            indicatorData,
-            title,
-            info,
-            'doughnut',
-            '/openboxes/stockMovement/list?direction=OUTBOUND'
-            )
+        GraphData graphData = new GraphData(indicatorData, '/openboxes/stockMovement/list?direction=OUTBOUND')
 
         return graphData
     }
@@ -1051,22 +851,7 @@ class IndicatorDataService {
 
         IndicatorData indicatorData = new IndicatorData(datasets, listLabels)
 
-        def title = [
-            code : "react.dashboard.stockOutLastMonth.title.label",
-            message : messageService.getMessage("react.dashboard.stockOutLastMonth.title.label")
-        ]
-
-        def info = [
-            code : "react.dashboard.stockOutLastMonth.info.label",
-            message : messageService.getMessage("react.dashboard.stockOutLastMonth.info.label")
-        ]
-
-        GraphData graphData = new GraphData(
-            indicatorData,
-            title,
-            info,
-            'doughnut'
-            )
+        GraphData graphData = new GraphData(indicatorData)
 
         return graphData
     }

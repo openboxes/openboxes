@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
 import ReactLoading from 'react-loading';
@@ -5,8 +6,6 @@ import { connect } from 'react-redux';
 import { getTranslate } from 'react-localize-redux';
 import { getRandomColor } from '../../consts/dataFormat/colorMapping';
 import { translateWithDefaultMessage } from '../../utils/Translate';
-
-/* global _ */
 
 const Numbers = () => {
   const colors = ['green', 'yellow', 'red'];
@@ -27,9 +26,7 @@ const PreviewIndicator = props => (
         <div className="col col-3 graph-preview">{props.children}</div>
         <div className="col col-6">
           {
-          props.title.code ?
-            <span>{_.truncate(props.translate(props.title.code, props.title.message), { length: 25, omission: '...' }) }</span> :
-            <span>{_.truncate(props.title, { length: 25, omission: '...' }) }</span>
+            <span>{_.truncate(props.translate(props.title, props.title), { length: 25, omission: '...' }) }</span>
           }
 
         </div>
@@ -38,8 +35,8 @@ const PreviewIndicator = props => (
             role="button"
             tabIndex={0}
             className="unarchive-button"
-            onClick={() => props.handleAdd(props.index, props.type)}
-            onKeyDown={() => props.handleAdd(props.index, props.type)}
+            onClick={() => props.handleAdd(props.widgetId)}
+            onKeyDown={() => props.handleAdd(props.widgetId)}
           >
             Unarchive
           </span>
@@ -54,6 +51,7 @@ const ArchivedNumber = props => (
   <PreviewIndicator
     title={props.title}
     index={props.index}
+    widgetId={props.widgetId}
     handleAdd={props.handleAdd}
     type="number"
     translate={props.translate}
@@ -102,6 +100,7 @@ const ArchivedGraph = (props) => {
     <PreviewIndicator
       title={props.title}
       index={props.index}
+      widgetId={props.widgetId}
       handleAdd={props.handleAdd}
       type="graph"
       translate={props.translate}
@@ -114,40 +113,46 @@ const ArchivedGraph = (props) => {
 
 const ArchivedIndicators = props => (
   <div>
-    {props.numberData.map((value, index) =>
-      (value.archived && value.enabled ? (
+    {props.widgets.map((value, index) =>
+      (value.type === 'number' ? (
         <ArchivedNumber
-          key={`item-${value.id}`}
+          key={`item-${value.widgetId}`}
           index={index}
+          widgetId={value.widgetId}
           title={value.title}
-          type={value.type}
-          data={value.data}
           handleAdd={props.handleAdd}
           unarchiveHandler={props.unarchiveHandler}
           size={props.size}
           translate={props.translate}
         />
-      ) : null))}
-    {props.graphData.map((value, index) =>
-      (value.archived && value.enabled ? (
+      ) : (
         <ArchivedGraph
-          key={`item-${value.id}`}
+          key={`item-${value.widgetId}`}
           index={index}
+          widgetId={value.widgetId}
           title={value.title}
-          type={value.type}
+          type={value.graphType}
           handleAdd={props.handleAdd}
           unarchiveHandler={props.unarchiveHandler}
           size={props.size}
           translate={props.translate}
         />
-      ) : null))}
+      )))}
   </div>
 );
 
 
 const UnarchiveIndicators = (props) => {
-  const size = props.graphData.filter(data => data.archived && data.enabled).length
-    + props.numberData.filter(data => data.archived && data.enabled).length;
+  const data = [...props.graphData, ...props.numberData];
+  const dashboardWidgets = _.chain(data)
+    .filter(widget => widget && widget.widgetId)
+    .map(widget => widget.widgetId).value();
+  const archivedWidgets = _.chain(props.dashboardConfig.dashboardWidgets)
+    .omit(dashboardWidgets)
+    .map((widget, widgetId) => ({ ...widget, widgetId }))
+    .filter(widget => widget.enabled)
+    .value();
+  const size = _.size(archivedWidgets);
 
   return (
     <div
@@ -166,8 +171,7 @@ const UnarchiveIndicators = (props) => {
         </span>
         <ul className="unarchived-list">
           <ArchivedIndicators
-            graphData={props.graphData}
-            numberData={props.numberData}
+            widgets={archivedWidgets}
             handleAdd={props.handleAdd}
             unarchiveHandler={props.unarchiveHandler}
             size={size}
@@ -188,6 +192,10 @@ export default (connect(mapStateToProps)(UnarchiveIndicators));
 UnarchiveIndicators.propTypes = {
   graphData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   numberData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  dashboardConfig: PropTypes.shape({
+    dashboards: PropTypes.shape({}),
+    dashboardWidgets: PropTypes.shape({}),
+  }).isRequired,
   unarchiveHandler: PropTypes.func.isRequired,
   handleAdd: PropTypes.func.isRequired,
   showPopout: PropTypes.bool.isRequired,
@@ -202,9 +210,8 @@ PreviewIndicator.propTypes = {
       message: PropTypes.string.isRequired,
     }).isRequired,
   ]).isRequired,
-  index: PropTypes.number.isRequired,
   handleAdd: PropTypes.func.isRequired,
-  type: PropTypes.string.isRequired,
+  widgetId: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
   translate: PropTypes.func.isRequired,
 };
@@ -220,6 +227,7 @@ ArchivedGraph.propTypes = {
   ]).isRequired,
   handleAdd: PropTypes.func.isRequired,
   index: PropTypes.number.isRequired,
+  widgetId: PropTypes.string.isRequired,
   translate: PropTypes.func.isRequired,
 };
 
@@ -233,12 +241,12 @@ ArchivedNumber.propTypes = {
   ]).isRequired,
   handleAdd: PropTypes.func.isRequired,
   index: PropTypes.number.isRequired,
+  widgetId: PropTypes.string.isRequired,
   translate: PropTypes.func.isRequired,
 };
 
 ArchivedIndicators.propTypes = {
-  graphData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  numberData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  widgets: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   unarchiveHandler: PropTypes.func.isRequired,
   handleAdd: PropTypes.func.isRequired,
   size: PropTypes.number.isRequired,

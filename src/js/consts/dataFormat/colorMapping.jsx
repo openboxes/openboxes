@@ -1,4 +1,4 @@
-import ColorPalette from '../../components/tablero/ColorPalette.scss';
+import ColorPalette from '../../components/dashboard/ColorPalette.scss';
 
 /* global _ */
 

@@ -7,7 +7,7 @@ import { getTranslate } from 'react-localize-redux';
 import { Tooltip } from 'react-tippy';
 import DragHandle from './DragHandle';
 import { getColorByName } from '../../consts/dataFormat/colorMapping';
-import './tablero.scss';
+import './Dashboard.scss';
 import { translateWithDefaultMessage } from '../../utils/Translate';
 
 /* global _ */
@@ -57,9 +57,7 @@ const NumberSparklineCard = ({
   <div className="number-div">
     <div className="number-body">
       <span className="title-card">
-        {cardTitle.code ?
-              translate(cardTitle.code, cardTitle.message)
-             : cardTitle}
+        {translate(cardTitle, cardTitle)}
       </span>
       <div className="result-part">
         <span style={{ color: getColorByName(color, 'default') }}> {value}  </span>
@@ -75,7 +73,7 @@ const NumberSparklineCard = ({
     <div className="number-infos">
       <Tooltip
         html={
-          <p> {cardInfo.code ? translate(cardInfo.code, cardInfo.message) : cardInfo.message} </p>
+          <p> {translate(cardInfo, cardInfo)} </p>
         }
         theme="transparent"
         arrow="true"
@@ -117,15 +115,11 @@ const NumberCard = SortableElement(({
       <div className="number-div">
         <div className="number-body">
           <span className="title-card">
-            {cardTitle.code ?
-              translate(cardTitle.code, cardTitle.message)
-             : cardTitle}
+            {translate(cardTitle, cardTitle)}
           </span>
           <span className="result-card"> {cardNumberType === 'number' ? cardNumberLocale : `${cardNumberLocale} ${currencyCode}`} </span>
           <span className="subtitle-card">
-            {cardSubtitle.code ?
-          _.truncate(translate(cardSubtitle.code, cardSubtitle.message), { length: 22 })
-             : _.truncate(cardSubtitle, { length: 22 })}
+            {_.truncate(translate(cardSubtitle, cardSubtitle), { length: 22 })}
           </span>
         </div>
         {
@@ -134,7 +128,7 @@ const NumberCard = SortableElement(({
               <Tooltip
                 html={
                   <p>
-                    {cardInfo.code ? translate(cardInfo.code, cardInfo.message) : cardInfo.message}
+                    {translate(cardInfo, cardInfo)}
                   </p>
                 }
                 theme="transparent"
@@ -173,42 +167,24 @@ const mapStateToProps = state => ({
 export default (connect(mapStateToProps)(NumberCard));
 
 NumberCard.defaultProps = {
-  cardSubtitle: {
-    code: '',
-    message: '',
-  },
+  cardSubtitle: '',
 };
 
 NumberCard.propTypes = {
-  cardTitle: PropTypes.shape({
-    code: PropTypes.string.isRequired,
-    message: PropTypes.string.isRequired,
-  }).isRequired,
+  cardTitle: PropTypes.string.isRequired,
   cardNumber: PropTypes.number,
   cardNumberType: PropTypes.string,
-  cardSubtitle: PropTypes.shape({
-    code: PropTypes.string.isRequired,
-    message: PropTypes.string.isRequired,
-  }),
+  cardSubtitle: PropTypes.string,
   cardLink: PropTypes.string,
   cardDataTooltip: PropTypes.string,
-  cardInfo: PropTypes.shape({
-    code: PropTypes.string.isRequired,
-    message: PropTypes.string.isRequired,
-  }).isRequired,
+  cardInfo: PropTypes.string.isRequired,
   translate: PropTypes.func.isRequired,
   currencyCode: PropTypes.string.isRequired,
 };
 
 NumberSparklineCard.propTypes = {
-  cardTitle: PropTypes.shape({
-    code: PropTypes.string.isRequired,
-    message: PropTypes.string.isRequired,
-  }).isRequired,
-  cardInfo: PropTypes.shape({
-    code: PropTypes.string.isRequired,
-    message: PropTypes.string.isRequired,
-  }).isRequired,
+  cardTitle: PropTypes.string.isRequired,
+  cardInfo: PropTypes.string.isRequired,
   color: PropTypes.string.isRequired,
   value: PropTypes.string.isRequired,
   goalDifference: PropTypes.string.isRequired,

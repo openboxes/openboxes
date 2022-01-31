@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { defaults } from 'react-chartjs-2';
@@ -19,7 +20,7 @@ import LoadingNumbers from './LoadingNumbers';
 import NumberCard from './NumberCard';
 import UnarchiveIndicators from './UnarchiveIndicators';
 import Filter from './Filter';
-import './tablero.scss';
+import './Dashboard.scss';
 import apiClient from '../../utils/apiClient';
 
 // Disable charts legends by default.
@@ -30,11 +31,12 @@ defaults.scale.ticks.beginAtZero = true;
 const SortableCards = SortableContainer(({ data, loadIndicator, allLocations }) => (
   <div className="card-component">
     {data.map((value, index) =>
-      (value.archived || !value.enabled ? null : (
+      (
         <GraphCard
           key={`item-${value.id}`}
           index={index}
           cardId={value.id}
+          widgetId={value.widgetId}
           cardTitle={value.title}
           cardType={value.type}
           cardLink={value.link}
@@ -48,7 +50,7 @@ const SortableCards = SortableContainer(({ data, loadIndicator, allLocations }) 
           allLocations={allLocations}
           size={value.size}
         />
-      )))}
+      ))}
   </div>
 ));
 
@@ -56,10 +58,11 @@ const SortableCards = SortableContainer(({ data, loadIndicator, allLocations }) 
 const SortableNumberCards = SortableContainer(({ data }) => (
   <div className="card-component">
     {data.map((value, index) => (
-      (value.archived || !value.enabled ? null : (
+      (
         <NumberCard
           key={`item-${value.id}`}
           index={index}
+          widgetId={value.widgetId}
           cardTitle={value.title}
           cardNumberType={value.numberType}
           cardNumber={value.number}
@@ -69,7 +72,7 @@ const SortableNumberCards = SortableContainer(({ data }) => (
           cardInfo={value.info}
           sparklineData={value.data}
         />
-      ))
+      )
     ))}
   </div>
 ));
@@ -126,7 +129,7 @@ const ConfigurationsList = ({
 };
 
 
-class Tablero extends Component {
+class Dashboard extends Component {
   constructor(props) {
     super(props);
 
@@ -158,7 +161,7 @@ class Tablero extends Component {
     if (prevLocation !== newLocation) {
       this.fetchData(this.config);
     }
-    if (prevProps.dashboardConfig.configurations !== this.props.dashboardConfig.configurations) {
+    if (prevProps.dashboardConfig.dashboards !== this.props.dashboardConfig.dashboards) {
       this.loadPageFilters(this.props.activeConfig);
     }
   }
@@ -166,8 +169,8 @@ class Tablero extends Component {
 
   loadPageFilters(config = '') {
     let pageFilters = [];
-    if (this.props.dashboardConfig.configurations) {
-      const allPages = Object.entries(this.props.dashboardConfig.configurations)
+    if (this.props.dashboardConfig.dashboards) {
+      const allPages = Object.entries(this.props.dashboardConfig.dashboards)
         .map(([key, value]) => [key, value]);
       allPages.forEach((page) => {
         const filters = Object.entries(page[1].filters)
@@ -187,7 +190,7 @@ class Tablero extends Component {
   }
 
   fetchLocations() {
-    const url = '/openboxes/apitablero/getFillRateDestinations';
+    const url = '/openboxes/api/dashboard/fillRateDestinations';
 
     return apiClient.get(url)
       .then((response) => {
@@ -201,7 +204,7 @@ class Tablero extends Component {
   fetchData = (config = 'personal') => {
     sessionStorage.setItem('dashboardKey', config);
     this.props.resetIndicators();
-    if (this.props.dashboardConfig && this.props.dashboardConfig.endpoints) {
+    if (this.props.dashboardConfig && this.props.dashboardConfig.dashboards) {
       this.props.fetchIndicators(
         this.props.dashboardConfig,
         config,
@@ -219,47 +222,44 @@ class Tablero extends Component {
   };
 
   updateConfig = () => {
-    const url = '/openboxes/apitablero/updateConfig';
+    const widgets = [];
 
+    _.forEach(this.props.indicatorsData, (widgetData, index) => {
+      widgets.push({ widgetId: widgetData.widgetId, order: index + 1 });
+    });
+
+    _.forEach(this.props.numberData, (widgetData, index) => {
+      widgets.push({ widgetId: widgetData.widgetId, order: index + 1 });
+    });
+
+    const url = '/openboxes/api/dashboard/config';
     const payload = {
-      number: {},
-      graph: {},
+      ...this.props.dashboardConfig.dashboards,
+      [this.props.activeConfig]: {
+        ...this.props.dashboardConfig.dashboards[this.props.activeConfig],
+        widgets,
+      },
     };
-
-    const configData = this.props.dashboardConfig.endpoints;
-    Object.keys(configData.graph).forEach((key) => {
-      const index = this.props.indicatorsData.findIndex(data => data &&
-        data.id === configData.graph[key].order);
-      payload.graph[key] = {
-        order: index + 1,
-        archived: this.props.indicatorsData[index].archived,
-      };
-    });
-
-    Object.keys(configData.number).forEach((key) => {
-      const index = this.props.numberData.findIndex(data => data &&
-        data.id === configData.number[key].order);
-      payload.number[key] = {
-        order: index + 1,
-        archived: this.props.numberData[index].archived,
-      };
-    });
 
     apiClient.post(url, payload).then(() => {
       this.props.fetchConfig();
       this.setState({ configModified: false });
     });
-  }
+  };
 
-  loadIndicator = (id, params) => {
-    const indicatorConfig = Object.values(this.props.dashboardConfig.endpoints.graph)
-      .filter(config => config.order === id)[0];
-    this.props.reloadIndicator(indicatorConfig, params, this.props.currentLocation);
-  }
+  loadIndicator = (widgetId, params) => {
+    const dashboardConf = this.props.dashboardConfig.dashboards[this.props.activeConfig];
+    const widget = _.find(dashboardConf.widgets, w => w.widgetId === widgetId);
+    const widgetConf = {
+      ...this.props.dashboardConfig.dashboardWidgets[widgetId],
+      ...widget,
+    };
+    this.props.reloadIndicator(widgetConf, params, this.props.currentLocation);
+  };
 
   toggleNav = () => {
     this.setState({ showNav: !this.state.showNav });
-  }
+  };
 
   sortStartHandle = () => {
     this.setState({ isDragging: true });
@@ -290,17 +290,27 @@ class Tablero extends Component {
   };
 
   unarchiveHandler = () => {
-    const size = this.props.indicatorsData.filter(data => data.archived).length
-      + this.props.numberData.filter(data => data.archived).length;
-    if (size) this.setState({ showPopout: !this.state.showPopout });
-    else this.setState({ showPopout: false });
+    const size = _.size(this.props.dashboardConfig.dashboardWidgets)
+      - (this.props.indicatorsData.length + this.props.numberData.length);
+
+    if (size) {
+      this.setState({ showPopout: !this.state.showPopout });
+    } else {
+      this.setState({ showPopout: false });
+    }
   };
 
-  handleAdd = (index, type) => {
-    this.props.addToIndicators(index, type);
+  handleAdd = (widgetId) => {
+    const widget = this.props.dashboardConfig.dashboardWidgets[widgetId];
+    const widgetConf = {
+      ...widget,
+      widgetId,
+      order: (widget.type === 'number' ? this.props.numberData.length : this.props.indicatorsData.length) + 1,
+    };
+    this.props.addToIndicators(widgetConf, this.props.currentLocation, this.props.currentUser);
 
-    const size = (this.props.indicatorsData.filter(data => data.archived).length
-       + this.props.numberData.filter(data => data.archived).length) - 1;
+    const size = _.size(this.props.dashboardConfig.dashboardWidgets)
+      - (this.props.indicatorsData.length + this.props.numberData.length);
 
     if (this.props.activeConfig === 'personal') {
       this.setState({
@@ -331,7 +341,7 @@ class Tablero extends Component {
     return (
       <div className="dashboard-container">
         <ConfigurationsList
-          configs={this.props.dashboardConfig.configurations || {}}
+          configs={this.props.dashboardConfig.dashboards || {}}
           loadConfigData={this.fetchData}
           activeConfig={this.props.activeConfig}
           showNav={this.state.showNav}
@@ -349,7 +359,7 @@ class Tablero extends Component {
 
         <div className="filter-and-cards-container">
           <Filter
-            configs={this.props.dashboardConfig.configurations || {}}
+            configs={this.props.dashboardConfig.dashboards || {}}
             activeConfig={this.props.activeConfig}
             fetchData={this.fetchData}
             pageFilters={this.state.pageFilters}
@@ -369,6 +379,8 @@ class Tablero extends Component {
             <UnarchiveIndicators
               graphData={this.props.indicatorsData}
               numberData={this.props.numberData}
+              dashboardConfig={this.props.dashboardConfig}
+              activeConfig={this.props.activeConfig}
               showPopout={this.state.showPopout}
               unarchiveHandler={this.unarchiveHandler}
               handleAdd={this.handleAdd}
@@ -397,9 +409,9 @@ export default connect(mapStateToProps, {
   resetIndicators,
   fetchConfigAndData,
   fetchConfig,
-})(Tablero);
+})(Dashboard);
 
-Tablero.defaultProps = {
+Dashboard.defaultProps = {
   currentLocation: '',
   currentUser: '',
   indicatorsData: null,
@@ -407,24 +419,18 @@ Tablero.defaultProps = {
   configModified: false,
 };
 
-Tablero.propTypes = {
+Dashboard.propTypes = {
   fetchIndicators: PropTypes.func.isRequired,
   reorderIndicators: PropTypes.func.isRequired,
   indicatorsData: PropTypes.arrayOf(PropTypes.shape({
-    archived: PropTypes.oneOfType([PropTypes.bool, PropTypes.number]),
     id: PropTypes.number,
   })).isRequired,
   numberData: PropTypes.arrayOf(PropTypes.shape({
-    archived: PropTypes.oneOfType([PropTypes.bool, PropTypes.number]),
     id: PropTypes.number,
   })).isRequired,
   dashboardConfig: PropTypes.shape({
-    enabled: PropTypes.bool,
-    configurations: PropTypes.shape({}),
-    endpoints: PropTypes.shape({
-      graph: PropTypes.shape({}),
-      number: PropTypes.shape({}),
-    }),
+    dashboards: PropTypes.shape({}),
+    dashboardWidgets: PropTypes.shape({}),
   }).isRequired,
   activeConfig: PropTypes.string.isRequired,
   currentLocation: PropTypes.string.isRequired,

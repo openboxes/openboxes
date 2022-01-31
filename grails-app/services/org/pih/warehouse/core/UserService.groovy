@@ -363,94 +363,22 @@ class UserService {
     }
 
     def getDashboardConfig(User user) {
-        def config = grailsApplication.config.openboxes.tablero
+        def config = grailsApplication.config.openboxes.dashboardConfig
         def userConfig = user.deserializeDashboardConfig()
         Boolean configChanged = false
 
         if (userConfig != null) {
-            int userConfigSize = userConfig.graph.size() + userConfig.number.size()
-            int configSize = config.endpoints.number.size() + config.endpoints.graph.size()
+            int userConfigSize = userConfig.size()
+            int configSize = config.dashboards.size()
             // If the size is different, that mean that the config has changed
             if (userConfigSize != configSize) {
                 return config
             }
-            // Checking all keys in number to know if one changed
-            config.endpoints.number.each { element ->
-                if (userConfig.number.find { it.key == element.key} == null) {
-                    configChanged = true
-                }
-            }
             if (!configChanged) {
                 config = [
-                        enabled         : config.enabled,
-                        configurations  : config.configurations,
-                        endpoints       : [
-                                graph   : config.endpoints.graph,
-                                number  : updateConfigEndpoints(config.endpoints.number, userConfig.number)
-                        ]
+                        dashboards          : userConfig,
+                        dashboardWidgets    : config.dashboardWidgets
                 ]
-            }
-
-            // Reset configChanged to false to check the other part of the config
-            configChanged = false
-
-            // Checking all keys in graph
-            config.endpoints.graph.each { element ->
-                if (userConfig.graph.find { it.key == element.key} == null) {
-                    configChanged = true
-                }
-            }
-            if (!configChanged) {
-                config = [
-                        enabled         : config.enabled,
-                        configurations  : config.configurations,
-                        endpoints       : [
-                                number   : config.endpoints.number,
-                                graph  : updateConfigEndpoints(config.endpoints.graph, userConfig.graph)
-                        ]
-                ]
-            }
-        }
-
-        return config
-    }
-
-    private def updateConfigEndpoints(endpoints, customEndpoints) {
-        def config = [:]
-        endpoints.each { key, value ->
-            def endpoint = [:]
-            value.each { k, v -> endpoint[k] = v }
-            config[key] = endpoint
-
-            // Update order
-            endpoint.order = customEndpoints[key]?.order ?: endpoint.order
-            def archived = value.archived?.collect { it }
-            endpoint.archived = archived
-
-            // If the indicator should be archived but it currently isn't
-            boolean archivedInConfig = archived.indexOf("personal") != -1
-            if (customEndpoints[key]?.archived && !archivedInConfig) {
-                archived.add("personal")
-            }
-
-            // If the indicator shouldn't be archived but it currently is
-            if (customEndpoints[key] && !customEndpoints[key]?.archived && archivedInConfig) {
-                archived.remove("personal")
-            }
-        }
-
-        // Fix to ensure each order appears only once
-        for (int order = 1; order <= endpoints.size(); order++) {
-            List indicators = endpoints.findAll { key, value ->
-                value.order == order
-            }.collect { key, value ->
-                key
-            }
-
-            if (indicators.size() > 1) {
-                for (int i = 1; i < indicators.size(); i++) {
-                    endpoints[indicators[i]].order = order + i
-                }
             }
         }
 
