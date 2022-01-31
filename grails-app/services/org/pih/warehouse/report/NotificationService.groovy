@@ -25,6 +25,7 @@ import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
 import org.codehaus.groovy.grails.plugins.web.taglib.RenderTagLib
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.codehaus.groovy.grails.web.errors.GrailsWrappedRuntimeException
+import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.core.Constants
@@ -33,6 +34,8 @@ import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.product.Attribute
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.support.WebApplicationContextUtils
@@ -44,6 +47,8 @@ class NotificationService {
     MailService mailService
     def grailsApplication
     def messageSource
+    def productAvailabilityService
+    def productService
 
     boolean transactional = false
 
@@ -296,5 +301,37 @@ class NotificationService {
         }
         return false
     }
+
+    void sendProductAvailabilityMessages(String locationId, List productIds){
+        Location location = Location.get(locationId)
+        List<Product> products = Product.findAllByIdInList(productIds)
+        log.info "location:${location} from locationId:${locationId}, products:${products} from ids:${productIds}"
+        Map<Product, Integer> quantityMap = productAvailabilityService.getQuantityOnHandByProduct(location, products)
+        Map<Product, Integer> quantityAvailableMap = productAvailabilityService.getQuantityAvailableToPromiseByProduct(location, products)
+        List availableItems = productAvailabilityService.getAvailableItems(location, products)
+        sendProductAvailabilityMessages(location, products, quantityMap, quantityAvailableMap, availableItems)
+    }
+
+    void sendProductAvailabilityMessages(Location location, List<Product> products, Map<Product, Integer> quantityMap,
+                                         Map<Product, Integer> quantityAvailableMap, List availableItems){
+        String TOPIC_ARN = grailsApplication.config.awssdk.sns.productAvailability
+        Attribute externalIdAttribute = productService.findExternalProductIdAttribute()
+        JSONArray jsonArray = new JSONArray()
+        products?.each {Product product ->
+            JSONObject jsonObject = new JSONObject()
+            String externalId = product.attributes.find{it.attribute == externalIdAttribute}.value
+            List productAvailableItem = availableItems.findAll {it.product == product}
+            jsonObject.put("productId", externalId)
+            jsonObject.put("productCode", product?.productCode)
+            jsonObject.put("locationNumber", location?.locationNumber)
+            jsonObject.put("quantityOnHand", quantityMap[product])
+            jsonObject.put("quantityAvailable", quantityAvailableMap[product])
+            jsonObject.put("earliestExpirationDate", productAvailableItem?.min {it?.inventoryItem?.expirationDate})
+            log.info "JSONObject:${jsonObject.toString(2)}, for product:${product}"
+            jsonArray.put(jsonObject)
+        }
+        publish(TOPIC_ARN, jsonArray.toString(), "Product Availability")
+    }
+
 
 }
