@@ -15,7 +15,7 @@ class RefreshProductAvailabilityEventService implements ApplicationListener<Refr
     boolean transactional = true
     def grailsApplication
     def productAvailabilityService
-    def productService
+    def notificationService
 
     void onApplicationEvent(RefreshProductAvailabilityEvent event) {
         log.info "Application event $event has been published! " + event.properties
@@ -35,7 +35,7 @@ class RefreshProductAvailabilityEventService implements ApplicationListener<Refr
         }
         if (event?.source instanceof Transaction) {
             log.info "Refresh Product Availability Event source:${event?.source}"
-            productService.sendProductAvailabilityMessages(event.locationId, event.productIds)
+            notificationService.sendProductAvailabilityMessages(event.locationId, event.productIds)
         }
     }
 }
