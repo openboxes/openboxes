@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <property name="now" value="now()"/>
+    <changeSet author="mtoczek" id="0301202215240-0">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*)
+                FROM document_type
+                WHERE id = "66762f6c61e34cfd9297ecb0fcee2df2"
+            </sqlCheck>
+        </preConditions>
+        <insert tableName="document_type">
+            <column name="id" value="66762f6c61e34cfd9297ecb0fcee2df2"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="name" value="Invoice Template"/>
+            <column name="description"/>
+            <column name="document_code" value="INVOICE_TEMPLATE"/>
+            <column name="date_created" valueDate="${now}"/>
+            <column name="last_updated" valueDate="${now}"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

@@ -33,11 +33,13 @@ class Constants {
     static final String SHORT_MONTH_YEAR_DATE_FORMAT = "MM/yyyy"
     static final String EXPIRATION_DATE_FORMAT = "MM/dd/yyyy"
     static final String DELIVERY_DATE_FORMAT = "MM/dd/yyyy HH:mm XXX"
+    static final String EUROPEAN_DATE_FORMAT = "dd/MM/yyyy"
 
 
     static final DateFormat DEFAULT_DATE_FORMATTER = new SimpleDateFormat(DEFAULT_DATE_FORMAT)
     static final DateFormat EXPIRATION_DATE_FORMATTER = new SimpleDateFormat(EXPIRATION_DATE_FORMAT)
     static final DateFormat DELIVERY_DATE_FORMATTER = new SimpleDateFormat(DELIVERY_DATE_FORMAT)
+    static final DateFormat EUROPEAN_DATE_FORMATTER = new SimpleDateFormat(EUROPEAN_DATE_FORMAT)
 
     // Dimension date formats
     static DateFormat weekFormat = new SimpleDateFormat("w")

@@ -29,24 +29,15 @@ grails.project.dependency.resolution = {
                 "commons-logging",  // use jcl-over-slf4j instead
                 "log4j",  // use reload4j instead
                 "slf4j-log4j12",  // use slf4j-reload4j instead
-                "xml-apis",
-                "xmlbeans"
+                "xml-apis",  // looks like this conflicts with Grails's internal SAXParserImpl
+                "xmlbeans"  // conflicts with Grails: see https://stackoverflow.com/a/6410955
         )
     }
     log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
     repositories {
-        //grailsRepo "http://grails.org/plugins"
-        grailsPlugins()
-        grailsHome()
-        grailsCentral()
-
-        mavenLocal()
-        mavenCentral()
-
+        inherit false  // some old plugins refer to repos that no longer exist
+        mavenRepo "https://repo1.maven.org/maven2/"
         mavenRepo "https://repo.grails.org/grails/plugins-releases/"
-        mavenRepo "https://repo.grails.org/grails/plugins/"
-        mavenRepo "https://repo.grails.org/grails/core/"
-        mavenRepo "https://oss.sonatype.org/content/repositories/snapshots/"
     }
 
     dependencies {
@@ -64,7 +55,7 @@ grails.project.dependency.resolution = {
         // override hidden grails dependencies to work with reload4j
         build "org.slf4j:slf4j-api:1.7.33"
         compile "org.slf4j:slf4j-api:1.7.33"
-        runtime "org.slf4j:jcl-over-slf4j:1.7.33"
+        compile "org.slf4j:jcl-over-slf4j:1.7.33"
         runtime "org.slf4j:jul-to-slf4j:1.7.33"
 
         // Required by database connection
@@ -146,6 +137,16 @@ grails.project.dependency.resolution = {
 
         // for com.google.common
         compile 'com.google.guava:guava:12.0'
+
+        // TODO: This is the last version for java 7. After migration to Java 8 upgrade this to 2.9+
+        compile 'org.jxls:jxls:2.8.1'
+        /*
+         * This jxls-poi release is the last that supports Apache POI v3 (anything
+         * above needs v4, which requires Java 8). What's more, if left to its
+         * own devices, it will introduce a dependency on a jxls that requires
+         * java 8, too. We exclude its jxls requirement to force the one above.
+         */
+        compile('org.jxls:jxls-poi:1.0.9') { exclude "jxls" }
     }
     plugins {
 
