@@ -334,7 +334,7 @@ class NotificationService {
             jsonObject.put("quantityAvailable", quantityAvailableMap[product])
             jsonObject.put("earliestExpirationDate", productAvailableItem?.collect {
                 it.inventoryItem?.expirationDate
-            }?.min())
+            }?.min()?.format("yyyy-MM-dd"))
             jsonObject.put("quantityExpiring", quantityExpiringForProduct ? quantityExpiringForProduct.get("expiringQuantity") : 0)
             jsonObject.put("quantityExpiringV2", productAvailableItem?.collect {
                 it.quantityOnHand
