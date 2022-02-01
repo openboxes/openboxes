@@ -477,7 +477,7 @@ class PackingPage extends Component {
                   type="button"
                   disabled={invalid}
                   onClick={() => this.save(values)}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-3"
                 >
                   <span><i className="fa fa-save pr-2" />
                     <Translate id="react.default.button.save.label" defaultMessage="Save" />
