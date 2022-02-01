@@ -309,24 +309,36 @@ class NotificationService {
         Map<Product, Integer> quantityMap = productAvailabilityService.getQuantityOnHandByProduct(location, products)
         Map<Product, Integer> quantityAvailableMap = productAvailabilityService.getQuantityAvailableToPromiseByProduct(location, products)
         List availableItems = productAvailabilityService.getAvailableItems(location, products)
-        sendProductAvailabilityMessages(location, products, quantityMap, quantityAvailableMap, availableItems)
+        Map<Product, Map> quantityExpiringForProducts = productAvailabilityService.quantityExpiringFroProducts(location, products)
+        sendProductAvailabilityMessages(location, products, quantityMap, quantityAvailableMap, availableItems, quantityExpiringForProducts)
     }
 
     void sendProductAvailabilityMessages(Location location, List<Product> products, Map<Product, Integer> quantityMap,
-                                         Map<Product, Integer> quantityAvailableMap, List availableItems){
+                                         Map<Product, Integer> quantityAvailableMap, List availableItems,
+                                         Map<Product, Map> quantityExpiringForProducts){
         String TOPIC_ARN = grailsApplication.config.awssdk.sns.productAvailability
         Attribute externalIdAttribute = productService.findExternalProductIdAttribute()
         JSONArray jsonArray = new JSONArray()
         products?.each {Product product ->
             JSONObject jsonObject = new JSONObject()
-            String externalId = product.attributes.find{it.attribute == externalIdAttribute}.value
-            List productAvailableItem = availableItems.findAll {it.product == product}
+            String externalId = product.attributes.find{it.attribute == externalIdAttribute}?.value
+            List productAvailableItems = availableItems.findAll {it.product == product}
+            def productAvailableItem = productAvailableItems?.findAll {
+                it.inventoryItem.expirationDate != null
+            }
+            Map quantityExpiringForProduct = quantityExpiringForProducts.get(product)
             jsonObject.put("productId", externalId)
             jsonObject.put("productCode", product?.productCode)
             jsonObject.put("locationNumber", location?.locationNumber)
             jsonObject.put("quantityOnHand", quantityMap[product])
             jsonObject.put("quantityAvailable", quantityAvailableMap[product])
-            jsonObject.put("earliestExpirationDate", productAvailableItem?.min {it?.inventoryItem?.expirationDate})
+            jsonObject.put("earliestExpirationDate", productAvailableItem?.collect {
+                it.inventoryItem?.expirationDate
+            }?.min())
+            jsonObject.put("quantityExpiring", quantityExpiringForProduct ? quantityExpiringForProduct.get("expiringQuantity") : 0)
+            jsonObject.put("quantityExpiringV2", productAvailableItem?.collect {
+                it.quantityOnHand
+            }?.min()?:0)
             log.info "JSONObject:${jsonObject.toString(2)}, for product:${product}"
             jsonArray.put(jsonObject)
         }
