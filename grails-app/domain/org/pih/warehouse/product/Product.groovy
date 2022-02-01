@@ -13,7 +13,7 @@ import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.NotImplementedException
 import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.hibernate.Criteria
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.GlAccount
@@ -231,31 +231,33 @@ class Product implements Comparable, Serializable {
 
     String color
 
-    static transients = ["rootCategory",
-                         "categoriesList",
-                         "images",
-                         "genericProduct",
-                         "thumbnail",
-                         "binLocation",
-                         "substitutions",
-                         "applicationTagLib",
-                         "handlingIcons",
-                         "uoms"
+    static transients = [
+            "rootCategory",
+            "categoriesList",
+            "images",
+            "genericProduct",
+            "thumbnail",
+            "binLocation",
+            "substitutions",
+            "applicationTagLib",
+            "handlingIcons",
+            "uoms",
+            "isExternalProduct"
     ]
 
     static hasMany = [
-            categories         : Category,
-            attributes         : ProductAttribute,
-            tags               : Tag,
-            documents          : Document,
-            productGroups      : ProductGroup,
-            packages           : ProductPackage,
-            synonyms           : Synonym,
-            inventoryLevels    : InventoryLevel,
-            inventoryItems     : InventoryItem,
-            productComponents  : ProductComponent,
-            productSuppliers   : ProductSupplier,
-            productCatalogItems: ProductCatalogItem,
+            categories           : Category,
+            attributes           : ProductAttribute,
+            tags                 : Tag,
+            documents            : Document,
+            productGroups        : ProductGroup,
+            packages             : ProductPackage,
+            synonyms             : Synonym,
+            inventoryLevels      : InventoryLevel,
+            inventoryItems       : InventoryItem,
+            productComponents    : ProductComponent,
+            productSuppliers     : ProductSupplier,
+            productCatalogItems  : ProductCatalogItem,
             productAvailabilities: ProductAvailability
     ]
 
@@ -413,6 +415,15 @@ class Product implements Comparable, Serializable {
 
         return attributes.find { ProductAttribute productAttribute ->
             productAttribute.attribute?.id == attribute?.id && !productAttribute.productSupplier
+        }
+    }
+
+    // FIXME Should be a calculated property if possible
+    Boolean getIsExternalProduct() {
+        String externalProductAttributeCode = ConfigurationHolder.config.openboxes.product.externalProductId.attributeCode ?: "EXTERNAL_PRODUCT_ID"
+        Attribute attribute = Attribute.findByCode(externalProductAttributeCode)
+        return attributes.find { ProductAttribute productAttribute ->
+            productAttribute.attribute?.id == attribute?.id && productAttribute.value
         }
     }
 
@@ -650,23 +661,23 @@ class Product implements Comparable, Serializable {
     }
 
     List getUoms() {
-       return packages.collect { [uom: it.uom.code, quantity: it.quantity] }.unique()
+        return packages.collect { [uom: it.uom.code, quantity: it.quantity] }.unique()
     }
 
     Map toJson() {
         [
-                id                  : id,
-                productCode         : productCode,
-                name                : name,
-                description         : description,
-                category            : category,
-                unitOfMeasure       : unitOfMeasure,
-                pricePerUnit        : pricePerUnit,
-                dateCreated         : dateCreated,
-                lastUpdated         : lastUpdated,
-                color               : color,
-                handlingIcons       : handlingIcons,
-                lotAndExpiryControl : lotAndExpiryControl,
+                id                 : id,
+                productCode        : productCode,
+                name               : name,
+                description        : description,
+                category           : category,
+                unitOfMeasure      : unitOfMeasure,
+                pricePerUnit       : pricePerUnit,
+                dateCreated        : dateCreated,
+                lastUpdated        : lastUpdated,
+                color              : color,
+                handlingIcons      : handlingIcons,
+                lotAndExpiryControl: lotAndExpiryControl,
         ]
     }
 }
