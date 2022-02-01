@@ -860,6 +860,24 @@ class OrderService {
         return orderItems.findAll { !it.isCompletelyFulfilled() }
     }
 
+    List<OrderItem> getPendingInboundOrderItems(Location destination, List<Product> products) {
+        def orderItems = OrderItem.createCriteria().list() {
+            order {
+                eq("destination", destination)
+                eq("orderType", OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name()))
+                not {
+                    'in'("status", OrderStatus.PENDING)
+                }
+            }
+            'in'("product", products)
+            not {
+                'in'("orderItemStatusCode", OrderItemStatusCode.CANCELED)
+            }
+        }
+
+        return orderItems.findAll { !it.isCompletelyFulfilled() }
+    }
+
     def getProductsInOrders(String[] terms, Location destination, Location vendor) {
         return OrderItem.createCriteria().list {
             not {

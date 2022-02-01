@@ -19,9 +19,11 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.reporting.DateDimension
+import org.pih.warehouse.requisition.RequisitionItem
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import util.InventoryUtil
@@ -36,6 +38,8 @@ class ReportService implements ApplicationContextAware {
     def dashboardService
     def grailsApplication
     def userService
+    def orderService
+    def shipmentService
 
     ApplicationContext applicationContext
 
@@ -688,12 +692,38 @@ class ReportService implements ApplicationContextAware {
         return data
     }
 
+    Map getQuantityOnOrder (String locationId, List<String> productIds) {
+        def products = []
+        productIds.each { products << Product.findById(it) }
+        def location = Location.get(locationId)
+        def items = orderService.getPendingInboundOrderItems(location, products)
+        items += shipmentService.getPendingInboundShipmentItems(location, products)
+        def itemsMap = [:]
+
+        items.collect {
+            def isOrderItem = it instanceof OrderItem
+            [
+                    productId  : it.product?.id,
+                    qtyOrderedNotShipped : isOrderItem ? (it.quantityRemaining * it.quantityPerUom) : 0,
+                    qtyShippedNotReceived : isOrderItem ? 0 : it.quantityRemaining.toInteger(),
+            ]
+        }.groupBy { it.productId }.collect { k, v ->
+            itemsMap.put(k, [
+                    qtyOrderedNotShipped : v.qtyOrderedNotShipped.sum(),
+                    qtyShippedNotReceived : v.qtyShippedNotReceived.sum(),
+            ]
+            )
+        }
+
+        return itemsMap
+    }
+
     List getOnOrderData(String locationId, List<String> productIds) {
+        def onOrder = getQuantityOnOrder(locationId, productIds)
+
         String query = """
             select
                 oos.product_id as productId,
-                oos.quantity_ordered_not_shipped as qtyOrderedNotShipped,
-                oos.quantity_shipped_not_received as qtyShippedNotReceived, 
                 ps.quantity_on_hand as qtyOnHand
             from on_order_summary oos
             join product on oos.product_id = product.id
@@ -703,13 +733,10 @@ class ReportService implements ApplicationContextAware {
             """
         def results = dataService.executeQuery(query, [locationId: locationId])
         def data = results.collect {
-            def qtyOnHand = it.qtyOnHand ? it.qtyOnHand.toInteger() : 0
-            def qtyOrderedNotShipped = it.qtyOrderedNotShipped ? it.qtyOrderedNotShipped.toInteger() : 0
-            def qtyShippedNotReceived = it.qtyShippedNotReceived ? it.qtyShippedNotReceived : 0
             [
                     productId            : it.productId,
-                    totalOnOrder         : qtyOrderedNotShipped + qtyShippedNotReceived,
-                    totalOnHand          : qtyOnHand,
+                    totalOnOrder         : onOrder[it.productId].qtyOrderedNotShipped.toInteger() + onOrder[it.productId].qtyShippedNotReceived.toInteger() ?: 0,
+                    totalOnHand          : it.qtyOnHand ? it.qtyOnHand.toInteger() : 0,
             ]
         }
         return data
@@ -787,7 +814,7 @@ class ReportService implements ApplicationContextAware {
                             productId             : onOrderDataItem.productId,
                             totalOnOrder          : onOrderDataItem.totalOnOrder,
                             totalOnHand           : onOrderDataItem.totalOnHand,
-                            averageMonthlyDemand : productGrupedResults[onOrderDataItem.productId].collect {it.quantity_demand}.sum() / monthsInPeriod
+                            averageMonthlyDemand  : productGrupedResults[onOrderDataItem.productId].collect {it.quantity_demand}.sum() / monthsInPeriod
                     ]
                 }
             }
