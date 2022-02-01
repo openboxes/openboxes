@@ -42,10 +42,19 @@ const FIELDS = {
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     rowComponent: TableRowWithSubfields,
-    getDynamicRowAttr: ({ rowValues, subfield, showOnlyErroredItems }) => {
+    getDynamicRowAttr: ({
+      rowValues, subfield, showOnlyErroredItems, itemFilter,
+    }) => {
       let className = rowValues.statusCode === 'SUBSTITUTED' ? 'crossed-out ' : '';
       if (!subfield) { className += 'font-weight-bold'; }
-      return { className, hideRow: showOnlyErroredItems && !rowValues.hasError };
+      const filterOutItems = itemFilter && !(
+        rowValues.product.name.toLowerCase().includes(itemFilter.toLowerCase()) ||
+        rowValues.productCode.toLowerCase().includes(itemFilter.toLowerCase())
+      );
+      const hideRow = (
+        (showOnlyErroredItems && !rowValues.hasError) || filterOutItems
+      ) && !subfield;
+      return { className, hideRow };
     },
     subfieldKey: 'substitutionItems',
     fields: {
@@ -292,6 +301,7 @@ class EditItemsPage extends Component {
       totalCount: 0,
       isFirstPageLoaded: false,
       showOnlyErroredItems: false,
+      itemFilter: '',
     };
 
     this.revertItem = this.revertItem.bind(this);
@@ -800,7 +810,7 @@ class EditItemsPage extends Component {
   }
 
   render() {
-    const { showOnlyErroredItems } = this.state;
+    const { showOnlyErroredItems, itemFilter } = this.state;
     const { showOnly } = this.props;
     const erroredItemsCount = this.state.values && this.state.values.editPageItems.length > 0 ? _.filter(this.state.values.editPageItems, item => item.hasError).length : '0';
     return (
@@ -813,17 +823,34 @@ class EditItemsPage extends Component {
           <div className="d-flex flex-column">
             { !showOnly ?
               <span className="buttons-container">
+                <div className="d-flex mr-auto justify-content-center align-items-center">
+                  <input
+                    value={itemFilter}
+                    onChange={event => this.setState({ itemFilter: event.target.value })}
+                    className="float-left btn btn-outline-secondary btn-xs filter-input mr-1 mb-1"
+                  />
+                  {itemFilter &&
+                    <i
+                      role="button"
+                      className="fa fa-times-circle"
+                      style={{ color: 'grey', cursor: 'pointer' }}
+                      onClick={() => this.setState({ itemFilter: '' })}
+                      onKeyPress={() => this.setState({ itemFilter: '' })}
+                      tabIndex={0}
+                    />
+                  }
+                </div>
                 <button
                   type="button"
                   onClick={() => this.setState({ showOnlyErroredItems: !showOnlyErroredItems })}
-                  className={`float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs ${showOnlyErroredItems ? 'active' : ''}`}
+                  className={`float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-3 ${showOnlyErroredItems ? 'active' : ''}`}
                 >
                   <span>{erroredItemsCount} <Translate id="react.stockMovement.erroredItemsCount.label" defaultMessage="item(s) require your attention" /></span>
                 </button>
                 <button
                   type="button"
                   onClick={() => this.refresh()}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-3"
                 >
                   <span><i className="fa fa-refresh pr-2" /><Translate
                     id="react.default.button.refresh.label"
@@ -834,7 +861,7 @@ class EditItemsPage extends Component {
                 <button
                   type="button"
                   onClick={() => this.save(values)}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-3 btn-xs ml-3"
                 >
                   <span><i className="fa fa-save pr-2" /><Translate
                     id="react.default.button.save.label"
@@ -845,7 +872,7 @@ class EditItemsPage extends Component {
                 <button
                   type="button"
                   onClick={() => this.saveAndExit(values)}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-3 btn-xs ml-3"
                 >
                   <span><i className="fa fa-sign-out pr-2" /><Translate
                     id="react.default.button.saveAndExit.label"
@@ -882,6 +909,7 @@ class EditItemsPage extends Component {
                   values,
                   showOnly,
                   showOnlyErroredItems,
+                  itemFilter,
                 }))}
               </div>
               <div className="submit-buttons">
