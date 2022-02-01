@@ -19,6 +19,16 @@ class RefreshProductAvailabilityEventService implements ApplicationListener<Refr
 
     void onApplicationEvent(RefreshProductAvailabilityEvent event) {
         log.info "Application event $event has been published! " + event.properties
+
+        // All transaction should publish a message to the product availability message queue
+        if (event?.source instanceof Transaction) {
+            try {
+                notificationService.sendProductAvailabilityMessages(event.locationId, event.productIds)
+            } catch (Exception e) {
+                log.error("Unable to publish product availability message due to " + e.message, e)
+            }
+        }
+
         // Some event publishers might want to trigger the events on their own
         // in order to allow the transaction to be saved to the database (e.g. Partial Receiving)
         if (event?.disableRefresh) {
@@ -32,10 +42,6 @@ class RefreshProductAvailabilityEventService implements ApplicationListener<Refr
         } else {
             productAvailabilityService.triggerRefreshProductAvailability(event.locationId,
                     event.productIds, event.forceRefresh)
-        }
-        if (event?.source instanceof Transaction) {
-            log.info "Refresh Product Availability Event source:${event?.source}"
-            notificationService.sendProductAvailabilityMessages(event.locationId, event.productIds)
         }
     }
 }
