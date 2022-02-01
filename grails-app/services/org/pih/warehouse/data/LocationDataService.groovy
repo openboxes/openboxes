@@ -42,8 +42,12 @@ class LocationDataService {
                 command.errors.reject("Row ${index + 1}: '${params.name}' already exists in the system. Choose a unique name")
             }
 
-            if (!params.active || (!(params.active instanceof Boolean) && !("true".equalsIgnoreCase(params.active) || "false".equalsIgnoreCase(params.active)))) {
-                command.errors.reject("Row ${index + 1}: Active/inactive field is obligatory. Please fill with TRUE or FALSE")
+            if (!params.active && !(params.active instanceof Boolean)) {
+                command.errors.reject("Row ${index + 1}: Active field is obligatory. Please fill with TRUE or FALSE")
+            }
+
+            if (params.active && !(params.active instanceof Boolean) && !"true".equalsIgnoreCase(params.active) && !"false".equalsIgnoreCase(params.active)) {
+                command.errors.reject("Row ${index + 1}: Active field is incorrectly filled. Please fill with TRUE or FALSE")
             }
 
             if (params.locationNumber && Location.findByLocationNumber(params.locationNumber)) {
