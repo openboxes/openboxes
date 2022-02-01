@@ -255,8 +255,14 @@ class ProductController {
     def update = {
         log.info "Update called with params " + params
         def productInstance = Product.get(params.id)
-
         if (productInstance) {
+
+            if (productInstance.isExternalProduct) {
+                flash.message = "${warehouse.message(code: 'product.cannotModifyExternalProduct.message')}"
+                redirect(action: "edit", id: params.id)
+                return
+            }
+
             if (params.version) {
                 def version = params.version.toLong()
                 if (productInstance.version > version) {
@@ -398,6 +404,13 @@ class ProductController {
         def productInstance = Product.get(params.id)
         if (productInstance && !productInstance.hasAssociatedTransactionEntriesOrShipmentItems()) {
             try {
+
+                if (productInstance.isExternalProduct) {
+                    flash.message = "${warehouse.message(code: 'product.cannotDeleteExternalProduct.message')}"
+                    redirect(action: "edit", id: params.id)
+                    return
+                }
+
                 // first we need to delete any inventory items associated with this product
                 def items = InventoryItem.findAllByProduct(productInstance)
                 items.each {
@@ -558,6 +571,13 @@ class ProductController {
         // HACK - for some reason the Product in document command is not getting bound
         command.product = Product.get(params.product.id)
 
+        if (command.product.isExternalProduct) {
+            flash.message = "${warehouse.message(code: 'product.cannotModifyExternalProduct.message')}"
+            redirect(action: "edit", id: params.id)
+            return
+        }
+
+
         if (params.url) {
 
             Document documentInstance
@@ -662,6 +682,13 @@ class ProductController {
                 flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label', default: 'Document'), params.id])}"
                 redirect(action: "edit", id: productInstance?.id)
             } else {
+
+                if (productInstance.isExternalProduct) {
+                    flash.message = "${warehouse.message(code: 'product.cannotModifyExternalProduct.message')}"
+                    redirect(action: "edit", id: productInstance?.id)
+                    return
+                }
+
                 productInstance.removeFromDocuments(documentInstance)
                 documentInstance?.delete()
                 if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
@@ -971,6 +998,11 @@ class ProductController {
         def productInstance
         def productComponent = ProductComponent.get(params.id)
         if (productComponent) {
+
+            if (productComponent.isExternalProduct) {
+                throw new UnsupportedOperationException("Externally managed products cannot be edited")
+            }
+
             productInstance = productComponent.assemblyProduct
             productComponent.assemblyProduct.removeFromProductComponents(productComponent)
             productComponent.delete()

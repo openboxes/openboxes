@@ -69,34 +69,37 @@
                 </g:unless>
                 </tbody>
 
-                <tfoot>
-                    <tr>
-                        <td colspan="2">
-                            <input name="assemblyProduct.id" type="hidden" value="${productInstance?.id}" />
-                            <g:autoSuggest id="componentProduct" name="componentProduct" size="80" class="medium text"
-                                           placeholder="${warehouse.message(code:'product.addProductComponent.label', default: 'Search for a product to add as a component')}"
-                                           jsonUrl="${request.contextPath }/json/findProductByName" width="500" styleClass="text"/>
-                        </td>
-                        <td>
-                            <input type="text" name="quantity" placeholder="Quantity" class="medium text"/>
-                        </td>
-                        <td>
-                            <g:select name="unitOfMeasure"
-                                      from="${org.pih.warehouse.core.UnitOfMeasure.list() }"
-                                      optionKey="id" optionValue="name"
-                                      data-placeholder="Choose a unit of measure"
-                                      class="chzn-select-deselect"
-                                      noSelection="['null':'']"></g:select>
-                        </td>
-                        <td></td>
-                        <td>
-                            <button  class="button">
-                                <img src="${createLinkTo(dir:'images/icons/silk', file:'add.png')}" />&nbsp;
-                                ${warehouse.message(code:'default.button.add.label')}
-                            </button>
-                        </td>
-                    </tr>
-                </tfoot>
+                <g:if test="${!productInstance?.isExternalProduct}">
+                    <tfoot>
+                        <tr>
+                            <td colspan="2">
+                                <input name="assemblyProduct.id" type="hidden" value="${productInstance?.id}" />
+                                <g:autoSuggest id="componentProduct" name="componentProduct" size="80" class="medium text"
+                                               placeholder="${warehouse.message(code:'product.addProductComponent.label', default: 'Search for a product to add as a component')}"
+                                               jsonUrl="${request.contextPath }/json/findProductByName" width="500" styleClass="text"/>
+                            </td>
+                            <td>
+                                <input type="text" name="quantity" placeholder="Quantity" class="medium text"/>
+                            </td>
+                            <td>
+                                <g:select name="unitOfMeasure"
+                                          from="${org.pih.warehouse.core.UnitOfMeasure.list() }"
+                                          optionKey="id" optionValue="name"
+                                          data-placeholder="Choose a unit of measure"
+                                          class="chzn-select-deselect"
+                                          noSelection="['null':'']"></g:select>
+                            </td>
+                            <td></td>
+                            <td>
+                                <button  class="button">
+                                    <img src="${createLinkTo(dir:'images/icons/silk', file:'add.png')}" />&nbsp;
+                                    ${warehouse.message(code:'default.button.add.label')}
+                                </button>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </g:if>
+
             </table>
         </g:formRemote>
     </div>

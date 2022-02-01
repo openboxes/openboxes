@@ -212,6 +212,13 @@ class DocumentController {
                     requestInstance.addToDocuments(documentInstance).save(flush: true)
                     flash.message = "${warehouse.message(code: 'document.successfullySavedToRequest.message', args: [requestInstance?.description])}"
                 } else if (productInstance) {
+
+                    if (productInstance.isExternalProduct) {
+                        flash.message = "${warehouse.message(code: 'product.cannotModifyExternalProduct.message')}"
+                        redirect(controller: "product", action: "edit", id: productInstance.id)
+                        return
+                    }
+
                     productInstance.addToDocuments(documentInstance).save(flush: true)
                     flash.message = "${warehouse.message(code: 'document.succesfullyUpdatedDocument.message')}"
                 } else if (invoiceInstance) {
