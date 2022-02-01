@@ -89,7 +89,7 @@
                         <g:if test="${grailsApplication.config.openboxes.bom.enabled}">
                             <li>
                                 <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=productComponents">
-                                    <g:message code="product.components.label" default="Components (Bill of Materials)"/>
+                                    <g:message code="product.components.label" default="Components"/>
                                 </a>
                             </li>
                         </g:if>
