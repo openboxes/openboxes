@@ -11,6 +11,7 @@ package org.pih.warehouse.inventory
 
 import grails.orm.PagedResultList
 import groovy.sql.BatchingStatementWrapper
+import groovy.sql.GroovyRowResult
 import groovy.sql.Sql
 import groovy.time.TimeCategory
 import groovyx.gpars.GParsPool
@@ -894,5 +895,30 @@ class ProductAvailabilityService {
         }
 
         return quantityAvailableToPromise ?: 0
+    }
+
+    def quantityExpiringFroProducts(Location location, List<Product> products){
+        Map<Product, Map> result = [:]
+        Sql sql = new Sql(dataSource)
+        String query = """
+            SELECT any_value(pa.product_id) productId, any_value(pa.location_id) locationId, 
+sum(pa.quantity_on_hand) quantityOnHand, 
+sum(pa.quantity_available_to_promise), 
+min(expiration_date) expiringDate, 
+any_value((select quantity_on_hand from product_availability paa join inventory_item ii on ii.id = paa.inventory_item_id where paa.id = pa.id order by expiration_date desc limit 1)) expiringQuantity
+FROM product_availability pa 
+left outer join inventory_item ii on pa.inventory_item_id = ii.id
+where ii.expiration_date is not null
+and pa.product_id in (${products?.id?.collect { "'$it'" }?.join( ',' )}) and pa.location_id = '${location?.id}'
+group by pa.product_id, pa.location_id;
+        """
+        List<GroovyRowResult> rows = sql.rows(query)
+//        log.info "query:${query} ,rows:${rows}, products?.id:${products?.id}, location?.id:${location?.id}"
+        rows?.each {GroovyRowResult row ->
+            Product product = products.find{it.id == row.productId}
+            log.info "row:${row}, product:${product}"
+            result[product] = [expirationDate: row.getProperty("expiringDate"), expiringQuantity: row.getProperty("expiringQuantity")]
+        }
+        return result
     }
 }
