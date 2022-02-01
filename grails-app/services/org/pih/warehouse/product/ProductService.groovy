@@ -1068,6 +1068,11 @@ class ProductService {
 
     Product addProductComponent(Product assemblyProduct, Product componentProduct, BigDecimal quantity, String unitOfMeasureId) {
         if (componentProduct) {
+
+            if (assemblyProduct.isExternalProduct || componentProduct.isExternalProduct) {
+                throw new UnsupportedOperationException("Externally managed products cannot be edited")
+            }
+
             def unitOfMeasure = UnitOfMeasure.get(unitOfMeasureId)
             log.info "Adding " + componentProduct.name + " to " + assemblyProduct.name
 

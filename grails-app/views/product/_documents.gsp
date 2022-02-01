@@ -110,6 +110,8 @@
         </tbody>
     </table>
 </div>
+
+<g:if test="${!productInstance?.isExternalProduct}">
 <div class="box">
     <h2><warehouse:message
                     code="product.uploadADocument.label" default="Upload document" /></h2>
@@ -160,3 +162,4 @@
         </table>
     </g:uploadForm>
 </div>
+</g:if>
