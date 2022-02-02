@@ -105,24 +105,16 @@ class AdminController {
                 withForm {
                     MultipartFile multipartFile = request.getFile('file')
                     if (!multipartFile.empty) {
-                        byte[] bytes = multipartFile.bytes
-
-                        println multipartFile.contentType
-                        println multipartFile.originalFilename
-                        println multipartFile.name
-
-                        def emailMessageMap = [
-                                from          : session?.user?.email,
-                                to            : params.list("to"),
-                                cc            : [],
-                                bcc           : [],
-                                subject       : params["subject"],
-                                body          : params["message"],
-                                attachment    : multipartFile?.bytes,
-                                attachmentName: multipartFile?.originalFilename,
-                                mimeType      : multipartFile?.contentType
-                        ]
-                        mailService.sendHtmlMailWithAttachment(emailMessageMap)
+                        mailService.sendHtmlMailWithAttachment(
+                                session?.user,
+                                params.list("to"),
+                                null,
+                                params["subject"],
+                                params["message"],
+                                multipartFile?.bytes,
+                                multipartFile?.originalFilename,
+                                multipartFile?.contentType
+                        )
                         flash.message = "Multipart email with subject ${params.subject} and attachment ${multipartFile.originalFilename} has been sent to ${params.to}"
                     } else {
                         if (params.includesHtml) {

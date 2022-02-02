@@ -1012,7 +1012,7 @@ CREATE TABLE `person` (
 
 LOCK TABLES `person` WRITE;
 /*!40000 ALTER TABLE `person` DISABLE KEYS */;
-INSERT INTO `person` VALUES ('1',1,'2010-08-25 00:00:00','admin@pih.org','Miss','Administrator','2010-08-25 00:00:00',NULL),('2',5,'2010-08-25 00:00:00','manager@pih.org','Mister','Manager','2010-08-25 00:00:00',NULL),('3',1,'2010-08-25 00:00:00','jmiranda@pih.org','Justin','Miranda','2010-08-25 00:00:00',NULL),('4',1,'2010-08-25 00:00:00','inactive@pih.org','In','Active','2010-08-25 00:00:00',NULL);
+INSERT INTO `person` VALUES ('1',1,'2010-08-25 00:00:00','openboxes@pih.org','Miss','Administrator','2010-08-25 00:00:00',NULL),('2',5,'2010-08-25 00:00:00','openboxes@pih.org','Mister','Manager','2010-08-25 00:00:00',NULL),('3',1,'2010-08-25 00:00:00','openboxes@pih.org','Justin','Miranda','2010-08-25 00:00:00',NULL),('4',1,'2010-08-25 00:00:00','openboxes@pih.org','In','Active','2010-08-25 00:00:00',NULL);
 /*!40000 ALTER TABLE `person` ENABLE KEYS */;
 UNLOCK TABLES;
 

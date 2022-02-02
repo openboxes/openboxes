@@ -9,12 +9,12 @@
  **/
 package org.pih.warehouse.core
 
-import org.apache.commons.mail.ByteArrayDataSource
+import org.apache.commons.mail.Email
 import org.apache.commons.mail.EmailAttachment
 import org.apache.commons.mail.HtmlEmail
 import org.apache.commons.mail.SimpleEmail
 
-import javax.mail.internet.InternetAddress
+import javax.mail.util.ByteArrayDataSource
 
 class MailService {
 
@@ -30,7 +30,7 @@ class MailService {
     }
 
     Integer getDefaultPort() {
-        Integer.valueOf(grailsApplication.config.grails.mail.port)
+        return Integer.valueOf(grailsApplication.config.grails.mail.port)
     }
 
     String getUsername() {
@@ -53,353 +53,146 @@ class MailService {
         return grailsApplication.config.grails.mail.props["mail.smtp.starttls.enable"]
     }
 
-    /**
-     * @return
-     */
-    def getIsMailEnabled() {
-        Boolean mailEnabled = grailsApplication.config.grails.mail.enabled.toBoolean()
-        log.info(mailEnabled ? "Mail is enabled" : "Mail is disabled")
-        return mailEnabled
+    Boolean getIsMailEnabled() {
+        return grailsApplication.config.grails.mail.enabled.toBoolean()
     }
 
-    /**
-     * @param subject
-     * @param msg
-     * @param to
-     * @return
-     */
-    def sendMail(String subject, String msg, String to) {
-        sendMail(subject, msg, [to], null)
+    void sendMail(String subject, String msg, String to) {
+        sendMailImpl(subject, msg, null, null, Collections.singleton(to), null, null, null, false, false)
     }
 
-    /**
-     * @param subject
-     * @param msg
-     * @param to
-     * @return
-     */
-    def sendMail(String subject, String msg, Collection to, Integer port) {
-        if (isMailEnabled) {
-            log.info "Sending text email '" + subject + "' to " + to
-            try {
-                //SimpleEmail is the class which will do all the hard work for you
-                SimpleEmail email = new SimpleEmail()
-                email.setCharset("UTF-8")
-                email.setHostName(defaultHost)
-
-                // override port
-                email.setSmtpPort(port ?: defaultPort)
-
-                to.each {
-                    email.addTo(it)
-                }
-
-                email.setFrom(defaultFrom)
-                email.setSubject("${prefix} " + subject)
-                email.setMsg(msg)
-
-                if (debug) {
-                    email.setDebug(debug)
-
-                }
-                // Authenticate
-                if (username && password) {
-                    email.setAuthentication(username, password)
-                }
-
-                if (startTlsEnabled) {
-                    email.setStartTLSEnabled(startTlsEnabled)
-                }
-
-                email.send()
-            } catch (Exception e) {
-                log.error("Error sending plaintext email message with subject " + subject + " to " + to, e)
-                throw e
-            }
-        }
+    void sendMail(String subject, String msg, Collection to, Integer port) {
+        sendMailImpl(subject, msg, null, null, to, null, null, port, false, false)
     }
 
-
-    /**
-     * Send html email
-     *
-     * @param subject
-     * @param htmlMessage
-     * @param to
-     * @return
-     */
-    def sendHtmlMail(String subject, String htmlMessage, String[] to) {
-        log.debug "Sending email to array " + to
-        sendHtmlMail(subject, htmlMessage, to, null)
-
+    void sendHtmlMail(String subject, String htmlMessage, String[] to) {
+        sendMailImpl(subject, body, null, null, to.toList(), null, null, null, true, false)
     }
 
-
-    /**
-     *
-     * @param subject
-     * @param htmlMessage
-     * @param to
-     * @return
-     */
-    def sendHtmlMail(String subject, String htmlMessage, String to) {
-        sendHtmlMail(subject, htmlMessage, [to], null, false)
+    void sendHtmlMail(String subject, String htmlMessage, String to) {
+        sendMailImpl(subject, htmlMessage, null, null, Collections.singleton(to), null, null, null, true, false)
     }
 
-    def sendHtmlMail(String subject, String htmlMessage, String to, Integer port) {
-        sendHtmlMail(subject, htmlMessage, [to], port, false)
+    void sendHtmlMail(String subject, String htmlMessage, String to, Integer port) {
+        sendMailImpl(subject, htmlMessage, null, null, Collections.singleton(to), null, null, port, true, false)
     }
 
-    def sendHtmlMail(String subject, String htmlMessage, String to, Integer port, Boolean override) {
-        sendHtmlMail(subject, htmlMessage, [to], port, override)
+    void sendHtmlMail(String subject, String htmlMessage, String to, Integer port, Boolean override) {
+        sendMailImpl(subject, htmlMessage, null, null, Collections.singleton(to), null, null, port, true, override)
     }
 
-
-    def sendHtmlMail(String subject, String body, Collection to) {
-        sendHtmlMail(subject, body, to, null, false)
+    void sendHtmlMail(String subject, String body, Collection to) {
+        sendMailImpl(subject, body, null, null, to, null, null, null, true, false)
     }
 
-    /**
-     * @param subject
-     * @param body
-     * @param to
-     * @return
-     */
-    def sendHtmlMail(String subject, String body, Collection to, Integer port, Boolean override) {
-        log.info "Sending email with subject ${subject} to ${to} from ${getDefaultFrom()} via ${defaultHost}:${port?:defaultPort}"
-        if (isMailEnabled || override) {
-            log.info "Sending html email '" + subject + "' to " + to
-            try {
-                // Create the email message
-                HtmlEmail email = new HtmlEmail()
-                email.setCharset("UTF-8")
-                email.setHostName(defaultHost)
-                to.each {
-                    email.addTo(it)
-                }
-
-                email.setFrom(defaultFrom)
-                email.setSmtpPort(port ?: defaultPort)
-                email.setSubject("${prefix} " + subject)
-                email.setHtmlMsg(body)
-                email.setTextMsg(subject)
-
-                // Authenticate
-                if (username && password) {
-                    email.setAuthentication(username, password)
-                }
-
-                if (startTlsEnabled) {
-                    email.setStartTLSEnabled(startTlsEnabled)
-                }
-
-                email.send()
-            } catch (Exception e) {
-                log.error("Error sending HTML email message with subject " + subject + " to " + to, e)
-                throw e
-            }
-        }
+    void sendHtmlMail(String subject, String body, Collection to, Integer port, Boolean override) {
+        sendMailImpl(subject, body, null, null, to, null, null, port, true, override)
     }
 
-
-    /**
-     *
-     * @param to
-     * @param subject
-     * @param body
-     * @param bytes
-     * @param name
-     * @param mimeType
-     * @return
-     */
     def sendHtmlMailWithAttachment(String to, String subject, String body, byte[] bytes, String name, String mimeType) {
-        def toList = new ArrayList()
-        toList.add(to)
-        sendHtmlMailWithAttachment(null, toList, subject, body, bytes, name, mimeType, null)
+        sendMailImpl(subject, body, null, null, Collections.singleton(to), ccList, Collections.singleton(new Attachment(name: name, mimeType: mimeType, bytes: bytes)), null, true, false)
     }
 
     /**
-     *
-     * @param userInstance
-     * @param subject
-     * @param body
-     * @param bytes
-     * @param name
-     * @param mimeType
-     * @return
+     * This particular flavor sends an email to the user, from the user, and may not work with sendgrid.
      */
     def sendHtmlMailWithAttachment(User userInstance, String subject, String body, byte[] bytes, String name, String mimeType) {
-        sendHtmlMailWithAttachment(userInstance, userInstance?.email, subject, body, bytes, name, mimeType, null)
+        sendMailImpl(subject, body, userInstance?.email, null, Collections.singleton(userInstance?.email), null, Collections.singleton(new Attachment(name: name, mimeType: mimeType, bytes: bytes)), null, true, false)
     }
 
-    /**
-     *
-     * @param toList
-     * @param subject
-     * @param body
-     * @param attachments
-     * @return
-     */
     def sendHtmlMailWithAttachment(Collection toList, String subject, String body, List<Attachment> attachments) {
-        sendHtmlMailWithAttachment(null, toList, [], subject, body, attachments, null)
+        sendMailImpl(subject, body, null, null, toList, null, attachments, null, true, false)
     }
 
-    /**
-     *
-     * @param toList
-     * @param ccList
-     * @param subject
-     * @param body
-     * @param bytes
-     * @param name
-     * @param mimeType
-     * @return
-     */
     def sendHtmlMailWithAttachment(Collection toList, Collection ccList, String subject, String body, byte[] bytes, String name, String mimeType) {
-        sendHtmlMailWithAttachment(null, toList, ccList, subject, body, bytes, name, mimeType, null)
+        sendMailImpl(subject, body, null, null, toList, ccList, Collections.singleton(new Attachment(name: name, mimeType: mimeType, bytes: bytes)), null, true, false)
     }
 
-    /**
-     *
-     * @param toList
-     * @param ccList
-     * @param subject
-     * @param body
-     * @param bytes
-     * @param name
-     * @param mimeType
-     * @return
-     */
     def sendHtmlMailWithAttachment(User fromUser, Collection toList, Collection ccList, String subject, String body, byte[] bytes, String name, String mimeType) {
-        sendHtmlMailWithAttachment(fromUser, toList, ccList, subject, body, bytes, name, mimeType, null)
+        sendMailImpl(subject, body, fromUser?.email, fromUser?.name, toList, ccList, Collections.singleton(new Attachment(name: name, mimeType: mimeType, bytes: bytes)), null, true, false)
     }
 
-    /**
-     *
-     * @param fromUser
-     * @param toList
-     * @param ccList
-     * @param subject
-     * @param body
-     * @param bytes
-     * @param name
-     * @param mimeType
-     * @params port* @return
-     */
     def sendHtmlMailWithAttachment(User fromUser, Collection toList, Collection ccList, String subject, String body, byte[] bytes, String name, String mimeType, Integer port) {
-        List<Attachment> attachments = []
-        Attachment attachment = new Attachment(name: name, mimeType: mimeType, bytes: bytes)
-        attachments.add(attachment)
-        sendHtmlMailWithAttachment(fromUser, toList, ccList, subject, body, attachments, port)
+        sendMailImpl(subject, body, fromUser?.email, fromUser?.name, toList, ccList, Collections.singleton(new Attachment(name: name, mimeType: mimeType, bytes: bytes)), port, true, false)
+    }
+
+    def sendHtmlMailWithAttachment(User fromUser, Collection toList, Collection ccList, String subject, String body, List<Attachment> attachments, Integer port) {
+        sendMailImpl(subject, body, fromUser?.email, fromUser?.name, toList, ccList, attachments, port, true, false)
     }
 
     /**
+     * Send an email.
      *
-     * @param toList
-     * @param ccList
      * @param subject
      * @param body
+     * @param from
+     * @param fromName
+     * @param to
+     * @param cc
      * @param attachments
      * @param port
-     * @return
+     * @param useHtml
+     * @param override
      */
-    def sendHtmlMailWithAttachment(User fromUser, Collection toList, Collection ccList, String subject, String body, List<Attachment> attachments, Integer port) {
-        log.info("Sending email with attachment " + toList)
-        if (isMailEnabled) {
-            try {
-                // Create the email message
-                HtmlEmail email = new HtmlEmail()
-                email.setCharset("UTF-8")
-                email.setHostName(defaultHost)
+    void sendMailImpl(
+            String subject,
+            String body,
+            String from,
+            String fromName,
+            Collection<String> to,
+            Collection<String> cc,
+            Collection<Attachment> attachments,
+            Integer port,
+            boolean useHtml,
+            boolean override) {
 
-                // Override smtp port
-                email.setSmtpPort(port ?: defaultPort)
+        def summary = "email with subject '${subject}' to ${to} from ${from ?: defaultFrom} via ${defaultHost}:${port ?: defaultPort}"
 
-                email.setFrom(defaultFrom)
-                toList.each { to -> email.addTo(to) }
-                if (ccList) {
-                    ccList.each { cc -> email.addCc(cc) }
-                }
+        if (!isMailEnabled && !override) {
+            log.info "email disabled: not sending ${summary}"
+            return
+        }
 
-                email.setSubject("${prefix} " + subject)
-                email.setHtmlMsg(body)
+        log.info "sending ${summmary}"
 
-                // Override from user
-                if (fromUser) {
-                    email.setFrom(fromUser.email, fromUser.name)
-                }
-
-                // Authenticate
-                if (username && password) {
-                    email.setAuthentication(username, password)
-                }
-
-                // add the attachment
+        try {
+            Email email
+            if (useHtml) {
+                HtmlEmail htmlEmail = new HtmlEmail()
+                htmlEmail.setHtmlMsg(body)
                 attachments.each {
-                    email.attach(new ByteArrayDataSource(it.bytes, it.mimeType),
+                    htmlEmail.attach(new ByteArrayDataSource(it.bytes, it.mimeType),
                             it.name, it.name, EmailAttachment.ATTACHMENT)
                 }
-
-                if (startTlsEnabled) {
-                    email.setStartTLSEnabled(startTlsEnabled)
-                }
-
-                // send the email
-                email.send()
-            } catch (Exception e) {
-                log.error "Problem sending email $e.message", e
+                email = htmlEmail
+            } else {
+                email = new SimpleEmail()
+                email.setMsg(body)
             }
-        }
-    }
 
-    /**
-     *
-     * @param toList
-     * @param ccList
-     * @param subject
-     * @param body
-     * @param bytes
-     * @param name
-     * @param mimeType
-     * @return
-     */
-    def sendHtmlMailWithAttachment(message) {
-        log.info("Sending email with attachment " + message.to)
-
-        if (isMailEnabled) {
-            try {
-                // Create the email message
-                HtmlEmail email = new HtmlEmail()
-                email.setCharset("UTF-8")
-                email.setHostName(message.host ?: defaultHost)
-                email.setSmtpPort(message.port ?: defaultPort)
-
-                // Set from, to, cc, subject, and body
-                email.setFrom(message.from ?: defaultFrom)
-                email.setSubject("${prefix} ${message.subject}")
-                email.setHtmlMsg(message.body)
-                email.setTo(message.to.collect { new InternetAddress(it) })
-                if (message.cc) email.setCc(message.cc.collect { new InternetAddress(it) })
-                if (message.bcc) email.setBcc(message.bcc.collect { new InternetAddress(it) })
-
-                // Authenticate
-                if (username && password) {
-                    email.setAuthentication(username, password)
-                }
-
-                if (startTlsEnabled) {
-                    email.setStartTLSEnabled(startTlsEnabled)
-                }
-
-                // add the attachment
-                email.attach(new ByteArrayDataSource(message.attachment, message.mimeType),
-                        message.attachmentName, message.attachmentName, EmailAttachment.ATTACHMENT)
-
-                // send the email
-                email.send()
-            } catch (Exception e) {
-                log.error "Problem sending email $e.message", e
+            email.setCharset("UTF-8")
+            email.setFrom(from ?: defaultFrom, fromName)
+            email.setHostName(defaultHost)
+            email.setSmtpPort(port ?: defaultPort)
+            email.setSubject("${prefix} ${subject}")
+            to.each {
+                email.addTo(it)
             }
+
+            if (debug) {
+                email.setDebug(debug)
+            }
+            if (username && password) {
+                email.setAuthentication(username, password)
+            }
+            if (startTlsEnabled) {
+                email.setStartTLSEnabled(startTlsEnabled)
+            }
+
+            email.send()
+        } catch (Exception e) {
+            log.error("Error sending ${summary}", e)
+            throw e
         }
     }
 }

@@ -1,32 +1,44 @@
 package org.pih.warehouse.core
 
+import com.icegreen.greenmail.util.GreenMail
+import com.icegreen.greenmail.util.GreenMailUtil
+import com.icegreen.greenmail.util.ServerSetupTest
+import grails.test.GrailsUnitTestCase
 import org.junit.Test
-import com.dumbster.smtp.SimpleSmtpServer
 
-class MailServiceTests extends GroovyTestCase{
-  
+import javax.mail.Message
+
+class MailServiceTests extends GrailsUnitTestCase {
+
 	def mailService
 	def grailsApplication
 
+	static GreenMail testSmtpService
+
+	@Override
 	protected void setUp() {
 		super.setUp()
 
-		// Reset mail server settings
-		grailsApplication.config.grails.mail.host = "localhost"
-		grailsApplication.config.grails.mail.port = 2525
+		testSmtpService = new GreenMail(ServerSetupTest.ALL)
+		testSmtpService.start()
+
+		grailsApplication.config.grails.mail.host = ServerSetupTest.SMTP.bindAddress
+		grailsApplication.config.grails.mail.port = ServerSetupTest.SMTP.port
+	}
+
+	@Override
+	protected void tearDown() {
+		super.tearDown()
+		testSmtpService.stop()
 	}
 
 	@Test
-	void sendHtmlMail_shouldHandleAccentedCharactersCorrectly() { 
-		def server = SimpleSmtpServer.start(2525)
+	void sendHtmlMail_shouldHandleAccentedCharactersCorrectly() {
+		mailService.sendHtmlMail("sübĵéçt", "This Is Spın̈al Tap", "anybody@anywhere.com", null, true)
 
-		mailService.sendHtmlMail("subject", "body", "anybody@anywhere.com")
-
-		server.stop()
-		
-		assert server.receivedEmail.toList().size() == 1
-	
-		// a little dump to see what's in the email :)
-		server.receivedEmail.each { println it }
-	}	
+		Message[] messages = testSmtpService.receivedMessages
+		assertEquals(1, messages.length)
+		assertEquals("[OpenBoxes] sübĵéçt", messages[0].subject)
+		assertTrue(GreenMailUtil.getBody(messages[0]).contains("This Is Sp=C4=B1n=CC=88al Tap"))
+	}
 }

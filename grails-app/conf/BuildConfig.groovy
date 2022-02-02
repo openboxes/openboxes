@@ -72,12 +72,11 @@ grails.project.dependency.resolution = {
         // Required for barcode4j
         compile 'com.google.zxing:javase:2.0'
 
-        // Required by MailService (should replace with grails mail plugin)
-        compile 'org.apache.commons:commons-email:1.3'
-        compile 'org.apache.commons:commons-text:1.3'
+        compile "org.apache.commons:commons-email:1.5"
+        compile "org.apache.commons:commons-text:1.3"  // last Java 7-compatible release
         compile 'commons-lang:commons-lang:2.6'
         compile "org.jadira.usertype:usertype.jodatime:1.9"
-        compile 'org.apache.commons:commons-csv:1.6'
+        compile "org.apache.commons:commons-csv:1.6"  // last Java 7-compatible release
 
         // Required by LDAP
         compile "com.unboundid:unboundid-ldapsdk:2.3.6"
@@ -118,8 +117,11 @@ grails.project.dependency.resolution = {
         compile ("fr.opensagres.xdocreport:org.odftoolkit.odfdom.converter.pdf:1.0.6")
         compile "org.apache.xmlgraphics:batik-util:1.7"
 
-        // Fake SMTP server
-        test 'dumbster:dumbster:1.6'
+        /*
+         * This test SMTP client is the latest release that works with Grails 1,
+         * and Java 7, although it depends on a junit release we can't use (yet).
+         */
+        test("com.icegreen:greenmail:1.5.10") { excludes "junit" }
 
         // Required for GPars
         compile "org.codehaus.gpars:gpars:0.12"

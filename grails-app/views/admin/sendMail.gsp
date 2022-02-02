@@ -37,7 +37,7 @@
                                     <label><warehouse:message code="mail.from.label" default="From"/></label>
                                 </td>
                                 <td class="value">
-                                    <g:textField name="from" value="info@openboxes.com" class="text" size="60"/>
+                                    <g:textField name="from" value="${grailsApplication.config.grails.mail.from}" class="text" size="60"/>
                                 </td>
                             </tr>
                             <tr class="prop">
