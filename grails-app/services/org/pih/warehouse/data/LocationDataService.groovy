@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.data
 
+import grails.validation.ValidationException
 import org.pih.warehouse.core.Address
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
@@ -33,12 +34,18 @@ class LocationDataService {
         def locationNumbersToImport = command.data.collect {it.locationNumber}
 
         command.data.eachWithIndex { params, index ->
+            Location location = params.id ? Location.findById(params.id) : null
             Location parentLocation = params.parentLocation ? Location.findByName(params.parentLocation) : null
             LocationGroup locationGroup = params.locationGroup ? LocationGroup.findByName(params.locationGroup) : null
-            LocationType locationType = params.locationType ? LocationType.findByName(params.locationType) : null
+            LocationType locationType = params.locationType ? LocationType.findByNameLike(params.locationType + "%") : null
             List<Organization> organizations = params.organization ? Organization.findAllByCodeOrName(params.organization, params.organization) : null
 
-            if (Location.findByName(params.name)) {
+            if (params.id && !location) {
+                command.errors.reject("Row ${index + 1}: Id '${params.id}' do not exists in the system.")
+            }
+
+            // Location name should be unique unless we are editing location (id should be added)
+            if (Location.findByName(params.name) && !(params.id && params.name == location?.name)) {
                 command.errors.reject("Row ${index + 1}: '${params.name}' already exists in the system. Choose a unique name")
             }
 
@@ -50,7 +57,8 @@ class LocationDataService {
                 command.errors.reject("Row ${index + 1}: Active field is incorrectly filled. Please fill with TRUE or FALSE")
             }
 
-            if (params.locationNumber && Location.findByLocationNumber(params.locationNumber)) {
+            // Location number should be unique unless we are editing location
+            if (params.locationNumber && Location.findByLocationNumber(params.locationNumber) && !(params.id && params.locationNumber == location?.locationNumber)) {
                 command.errors.reject("Row ${index + 1}: '${params.locationNumber}' already exists in the system. Choose a unique location number")
             }
 
@@ -89,21 +97,28 @@ class LocationDataService {
             if (organizations?.size() > 1) {
                 command.errors.reject("Row ${index + 1}: '${organizations.size()}' records found for organization name '${params.organization}'. Please specify by entering the organization code instead")
             }
+
+            // Do not allow to change internal type location to non-internal
+            if (params.locationType && location && (location.locationType.isInternalLocation() || location.locationType.isZone()) && !(LocationType.findByNameLike(params.locationType + "%").isInternalLocation() || LocationType.findByNameLike(params.locationType + "%").isZone())) {
+                command.errors.reject("Row ${index + 1}: Changing Location Type from internal to '${params.locationType}' is not possible")
+            }
         }
     }
 
     void importData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
             Location location = createOrUpdateLocation(params)
-            if (location.validate()) {
-                location.save(failOnError: true)
+            if (!location.validate() || !location.save(failOnError: true)) {
+                throw new ValidationException("Invalid location ${location.name}", location.errors)
             }
         }
     }
 
     Location createOrUpdateLocation(Map params) {
         Location location
-        if (params.locationNumber) {
+        if (params.id) {
+            location = Location.findById(params.id)
+        } else if (params.locationNumber) {
             location = Location.findByNameOrLocationNumber(params.name, params.locationNumber)
         } else {
             location = Location.findByName(params.name)
@@ -115,11 +130,19 @@ class LocationDataService {
         location.name = params.name
         location.active = Boolean.valueOf(params.active)
         location.locationNumber = params.locationNumber
-        location.locationType = params.locationType ? LocationType.findByNameLike(params.locationType + "%") : null
         location.locationGroup = params.locationGroup ? LocationGroup.findByName(params.locationGroup) : null
         location.parentLocation = params.parentLocation ? Location.findByNameOrLocationNumber(params.parentLocation, params.parentLocation) : null
         location.organization = params.organization ? Organization.findByCodeOrName(params.organization, params.organization) : null
         location.address = createOrUpdateAddress(params, location?.address?.id)
+
+        def locationType = params.locationType ? LocationType.findByNameLike(params.locationType + "%") : null
+        def currentLocationType = location.locationType
+
+        //Do not allow to change internal type location to non-internal
+        if (((currentLocationType?.isInternalLocation() || currentLocationType?.isZone()) && (locationType?.isInternalLocation() || locationType?.isZone())) || !(currentLocationType?.isInternalLocation() || currentLocationType?.isZone())) {
+            location.locationType = locationType
+            location.supportedActivities = currentLocationType && locationType == currentLocationType ? location.supportedActivities : location.supportedActivities?.clear()
+        }
 
         // Add required association to organization for depots and suppliers
         if (!(location.locationType?.isInternalLocation() || location.locationType?.isZone()) && !location.organization) {

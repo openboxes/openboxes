@@ -307,6 +307,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
     }
 
     static PROPERTIES = [
+            "id"              : "id",
             "name"            : "name",
             "active"          : "active",
             "locationNumber"  : "locationNumber",
