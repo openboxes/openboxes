@@ -18,7 +18,9 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.requisition.RequisitionType
 
 class OrderNotificationController {
 
@@ -65,6 +67,8 @@ class OrderNotificationController {
         Requisition requisition = new Requisition()
 
         requisition.status = RequisitionStatus.CREATED
+        requisition.type = RequisitionType.DEFAULT
+        requisition.sourceType = RequisitionSourceType.PAPER
         requisition.requestNumber = identifierService.generateRequisitionIdentifier()
 
         if (orderJson.has("origin") && orderJson.getString("origin")) {
