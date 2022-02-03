@@ -25,6 +25,7 @@ class OrderNotificationController {
     def grailsApplication
     def identifierService
     def notificationService
+    def productService
 
     def publish = {
         String message = request.JSON.toString()
@@ -104,8 +105,7 @@ class OrderNotificationController {
             log.info "Reading LineItem:${lineItem} for Order"
             try {
                 RequisitionItem requisitionItem = new RequisitionItem()
-                // FIXME Should use a generic approach (e.g. product attribute) for external product IDs
-                Product product = Product.findByUpc(lineItem.getString("productId"))
+                Product product = productService.findProductByExternalId(lineItem.getString("productId"))
                 if (!product) {
                     throw new IllegalArgumentException("Product not found with id:"+lineItem.getString("productId"))
                 }
