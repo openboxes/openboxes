@@ -545,6 +545,10 @@
                                 <warehouse:message code="product.associations.label" default="Product Associations"/></g:link>
                         </div>
                         <div class="mm-menu-item">
+                            <g:link controller="productAttributeValue" action="list" class="list">
+                                <warehouse:message code="product.attributes.label" default="Product Attributes"/></g:link>
+                        </div>
+                        <div class="mm-menu-item">
                             <g:link controller="tag" action="list" class="list">
                                 <warehouse:message code="product.tags.label"/></g:link>
                         </div>

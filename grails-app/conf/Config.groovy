@@ -1270,6 +1270,7 @@ openboxes {
                         [label: "products.label", defaultLabel: "Products", href: "/${appName}/product/list"],
                         [label: "productSuppliers.label", defaultLabel: "Products Sources", href: "/${appName}/productSupplier/list"],
                         [label: "product.associations.label", defaultLabel: "Products Associations", href: "/${appName}/productAssociation/list"],
+                        [label: "product.attributes.label", defaultLabel: "Products Attributes", href: "/${appName}/productAttributeValue/list"],
                         [label: "product.tags.label", defaultLabel: "Tags", href: "/${appName}/tag/list"],
                         [label: "unitOfMeasure.label", defaultLabel: "Unit of Measure", href: "/${appName}/unitOfMeasure/list"],
                         [label: "unitOfMeasureClass.label", defaultLabel: "Uom Class", href: "/${appName}/unitOfMeasureClass/list"],
