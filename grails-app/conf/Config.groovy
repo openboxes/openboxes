@@ -964,6 +964,10 @@ openboxes.jobs.sendStockAlertsJob.skipOnEmpty = true
 openboxes.jobs.sendStockAlertsJob.daysUntilExpiry = 60
 openboxes.jobs.sendStockAlertsJob.cronExpression = "0 0 0 * * ?" // every day at midnight
 
+// Send product availability messages
+openboxes.jobs.sendProductAvailabilityMessagesJob.enabled = true
+openboxes.jobs.sendProductAvailabilityMessagesJob.delayStartInMilliseconds = 500
+
 // Refresh inventory snapshots
 openboxes.jobs.refreshInventorySnapshotJob.enabled = true
 openboxes.jobs.refreshInventorySnapshotJob.retryOnError = false
@@ -979,8 +983,8 @@ openboxes.jobs.refreshProductAvailabilityJob.enabled = true
 openboxes.jobs.refreshProductAvailabilityJob.cronExpression = "0 0 0/2 * * ?" // every two hours starting at midnight
 
 // Use delay when transactions are persisted to avoid missing data
-openboxes.jobs.refreshProductAvailabilityJob.delayStart = true
-openboxes.jobs.refreshProductAvailabilityJob.delayInMilliseconds = 5000
+openboxes.jobs.refreshProductAvailabilityJob.delayStart = false
+openboxes.jobs.refreshProductAvailabilityJob.delayInMilliseconds = 0
 
 // Refresh transaction fact table
 openboxes.jobs.refreshTransactionFactJob.enabled = true
