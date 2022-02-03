@@ -34,11 +34,28 @@ class MailServiceTests extends GrailsUnitTestCase {
 
 	@Test
 	void sendHtmlMail_shouldHandleAccentedCharactersCorrectly() {
-		mailService.sendHtmlMail("sübĵéçt", "This Is Spın̈al Tap", "anybody@anywhere.com", null, true)
-
+		def sent = mailService.sendHtmlMail("sübĵéçt", "This Is Spın̈al Tap", "anybody@anywhere.com", null, true)
+		assertTrue(sent)
 		Message[] messages = testSmtpService.receivedMessages
 		assertEquals(1, messages.length)
 		assertEquals("[OpenBoxes] sübĵéçt", messages[0].subject)
 		assertTrue(GreenMailUtil.getBody(messages[0]).contains("This Is Sp=C4=B1n=CC=88al Tap"))
+	}
+
+	@Test
+	void sendHtmlMail_shouldNotRaiseExceptionIfSmtpServerIsDown() {
+		testSmtpService.stop()
+		def sent = mailService.sendHtmlMail("undeliverable", "this message will not send", "anybody@anywhere.com", null, true)
+		assertFalse(sent)
+	}
+
+	@Test
+	void sendMail_shouldNotRaiseExceptionIfSmtpServerIsDown() {
+		grailsApplication.config.grails.mail.enabled = true
+		def shouldSend = mailService.sendMail("deliverable", "this message will send", "anybody@anywhere.com")
+		assertTrue(shouldSend)
+		testSmtpService.stop()
+		def shouldNotSend = mailService.sendMail("undeliverable", "this message will not send", "anybody@anywhere.com")
+		assertFalse(shouldNotSend)
 	}
 }

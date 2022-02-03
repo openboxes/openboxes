@@ -57,67 +57,67 @@ class MailService {
         return grailsApplication.config.grails.mail.enabled.toBoolean()
     }
 
-    void sendMail(String subject, String msg, String to) {
-        sendMailImpl(subject, msg, null, null, Collections.singleton(to), null, null, null, false, false)
+    Boolean sendMail(String subject, String msg, String to) {
+        return sendMailImpl(subject, msg, null, null, Collections.singleton(to), null, null, null, false, false)
     }
 
-    void sendMail(String subject, String msg, Collection to, Integer port) {
-        sendMailImpl(subject, msg, null, null, to, null, null, port, false, false)
+    Boolean sendMail(String subject, String msg, Collection to, Integer port) {
+        return sendMailImpl(subject, msg, null, null, to, null, null, port, false, false)
     }
 
-    void sendHtmlMail(String subject, String htmlMessage, String[] to) {
-        sendMailImpl(subject, body, null, null, to.toList(), null, null, null, true, false)
+    Boolean sendHtmlMail(String subject, String htmlMessage, String[] to) {
+        return sendMailImpl(subject, body, null, null, to.toList(), null, null, null, true, false)
     }
 
-    void sendHtmlMail(String subject, String htmlMessage, String to) {
-        sendMailImpl(subject, htmlMessage, null, null, Collections.singleton(to), null, null, null, true, false)
+    Boolean sendHtmlMail(String subject, String htmlMessage, String to) {
+        return sendMailImpl(subject, htmlMessage, null, null, Collections.singleton(to), null, null, null, true, false)
     }
 
-    void sendHtmlMail(String subject, String htmlMessage, String to, Integer port) {
-        sendMailImpl(subject, htmlMessage, null, null, Collections.singleton(to), null, null, port, true, false)
+    Boolean sendHtmlMail(String subject, String htmlMessage, String to, Integer port) {
+        return sendMailImpl(subject, htmlMessage, null, null, Collections.singleton(to), null, null, port, true, false)
     }
 
-    void sendHtmlMail(String subject, String htmlMessage, String to, Integer port, Boolean override) {
-        sendMailImpl(subject, htmlMessage, null, null, Collections.singleton(to), null, null, port, true, override)
+    Boolean sendHtmlMail(String subject, String htmlMessage, String to, Integer port, Boolean override) {
+        return sendMailImpl(subject, htmlMessage, null, null, Collections.singleton(to), null, null, port, true, override)
     }
 
-    void sendHtmlMail(String subject, String body, Collection to) {
-        sendMailImpl(subject, body, null, null, to, null, null, null, true, false)
+    Boolean sendHtmlMail(String subject, String body, Collection to) {
+        return sendMailImpl(subject, body, null, null, to, null, null, null, true, false)
     }
 
-    void sendHtmlMail(String subject, String body, Collection to, Integer port, Boolean override) {
-        sendMailImpl(subject, body, null, null, to, null, null, port, true, override)
+    Boolean sendHtmlMail(String subject, String body, Collection to, Integer port, Boolean override) {
+        return sendMailImpl(subject, body, null, null, to, null, null, port, true, override)
     }
 
-    def sendHtmlMailWithAttachment(String to, String subject, String body, byte[] bytes, String name, String mimeType) {
-        sendMailImpl(subject, body, null, null, Collections.singleton(to), ccList, Collections.singleton(new Attachment(name: name, mimeType: mimeType, bytes: bytes)), null, true, false)
+    Boolean sendHtmlMailWithAttachment(String to, String subject, String body, byte[] bytes, String name, String mimeType) {
+        return sendMailImpl(subject, body, null, null, Collections.singleton(to), ccList, Collections.singleton(new Attachment(name: name, mimeType: mimeType, bytes: bytes)), null, true, false)
     }
 
     /**
      * This particular flavor sends an email to the user, from the user, and may not work with sendgrid.
      */
-    def sendHtmlMailWithAttachment(User userInstance, String subject, String body, byte[] bytes, String name, String mimeType) {
-        sendMailImpl(subject, body, userInstance?.email, null, Collections.singleton(userInstance?.email), null, Collections.singleton(new Attachment(name: name, mimeType: mimeType, bytes: bytes)), null, true, false)
+    Boolean sendHtmlMailWithAttachment(User userInstance, String subject, String body, byte[] bytes, String name, String mimeType) {
+        return sendMailImpl(subject, body, userInstance?.email, null, Collections.singleton(userInstance?.email), null, Collections.singleton(new Attachment(name: name, mimeType: mimeType, bytes: bytes)), null, true, false)
     }
 
-    def sendHtmlMailWithAttachment(Collection toList, String subject, String body, List<Attachment> attachments) {
-        sendMailImpl(subject, body, null, null, toList, null, attachments, null, true, false)
+    Boolean sendHtmlMailWithAttachment(Collection toList, String subject, String body, List<Attachment> attachments) {
+        return sendMailImpl(subject, body, null, null, toList, null, attachments, null, true, false)
     }
 
-    def sendHtmlMailWithAttachment(Collection toList, Collection ccList, String subject, String body, byte[] bytes, String name, String mimeType) {
-        sendMailImpl(subject, body, null, null, toList, ccList, Collections.singleton(new Attachment(name: name, mimeType: mimeType, bytes: bytes)), null, true, false)
+    Boolean sendHtmlMailWithAttachment(Collection toList, Collection ccList, String subject, String body, byte[] bytes, String name, String mimeType) {
+        return sendMailImpl(subject, body, null, null, toList, ccList, Collections.singleton(new Attachment(name: name, mimeType: mimeType, bytes: bytes)), null, true, false)
     }
 
-    def sendHtmlMailWithAttachment(User fromUser, Collection toList, Collection ccList, String subject, String body, byte[] bytes, String name, String mimeType) {
-        sendMailImpl(subject, body, fromUser?.email, fromUser?.name, toList, ccList, Collections.singleton(new Attachment(name: name, mimeType: mimeType, bytes: bytes)), null, true, false)
+    Boolean sendHtmlMailWithAttachment(User fromUser, Collection toList, Collection ccList, String subject, String body, byte[] bytes, String name, String mimeType) {
+        return sendMailImpl(subject, body, fromUser?.email, fromUser?.name, toList, ccList, Collections.singleton(new Attachment(name: name, mimeType: mimeType, bytes: bytes)), null, true, false)
     }
 
-    def sendHtmlMailWithAttachment(User fromUser, Collection toList, Collection ccList, String subject, String body, byte[] bytes, String name, String mimeType, Integer port) {
-        sendMailImpl(subject, body, fromUser?.email, fromUser?.name, toList, ccList, Collections.singleton(new Attachment(name: name, mimeType: mimeType, bytes: bytes)), port, true, false)
+    Boolean sendHtmlMailWithAttachment(User fromUser, Collection toList, Collection ccList, String subject, String body, byte[] bytes, String name, String mimeType, Integer port) {
+        return sendMailImpl(subject, body, fromUser?.email, fromUser?.name, toList, ccList, Collections.singleton(new Attachment(name: name, mimeType: mimeType, bytes: bytes)), port, true, false)
     }
 
-    def sendHtmlMailWithAttachment(User fromUser, Collection toList, Collection ccList, String subject, String body, List<Attachment> attachments, Integer port) {
-        sendMailImpl(subject, body, fromUser?.email, fromUser?.name, toList, ccList, attachments, port, true, false)
+    Boolean sendHtmlMailWithAttachment(User fromUser, Collection toList, Collection ccList, String subject, String body, List<Attachment> attachments, Integer port) {
+        return sendMailImpl(subject, body, fromUser?.email, fromUser?.name, toList, ccList, attachments, port, true, false)
     }
 
     /**
@@ -133,8 +133,9 @@ class MailService {
      * @param port
      * @param useHtml
      * @param override
+     * @return true if an email was sent, false otherwise.
      */
-    void sendMailImpl(
+    Boolean sendMailImpl(
             String subject,
             String body,
             String from,
@@ -146,23 +147,25 @@ class MailService {
             boolean useHtml,
             boolean override) {
 
+        Email email
         def summary = "email with subject '${subject}' to ${to} from ${from ?: defaultFrom} via ${defaultHost}:${port ?: defaultPort}"
 
         if (!isMailEnabled && !override) {
             log.info "email disabled: not sending ${summary}"
-            return
+            return false
         }
 
-        log.info "sending ${summmary}"
-
         try {
-            Email email
             if (useHtml) {
                 HtmlEmail htmlEmail = new HtmlEmail()
                 htmlEmail.setHtmlMsg(body)
                 attachments.each {
-                    htmlEmail.attach(new ByteArrayDataSource(it.bytes, it.mimeType),
-                            it.name, it.name, EmailAttachment.ATTACHMENT)
+                    if (it.bytes && it.mimeType && it.name) {
+                        htmlEmail.attach(new ByteArrayDataSource(it.bytes, it.mimeType),
+                                it.name, it.name, EmailAttachment.ATTACHMENT)
+                    } else {
+                        log.warn "skipping incompletely-declared attachment"
+                    }
                 }
                 email = htmlEmail
             } else {
@@ -188,11 +191,19 @@ class MailService {
             if (startTlsEnabled) {
                 email.setStartTLSEnabled(startTlsEnabled)
             }
-
-            email.send()
         } catch (Exception e) {
-            log.error("Error sending ${summary}", e)
-            throw e
+            log.error("could not create ${summary}", e)
+            return false
         }
+
+        try {
+            log.info "sending ${summary}"
+            email.send()
+            return true
+        } catch (Exception e) {
+            log.error("could not send ${summary}", e)
+            return false
+        }
+        return false
     }
 }

@@ -105,7 +105,7 @@ class AdminController {
                 withForm {
                     MultipartFile multipartFile = request.getFile('file')
                     if (!multipartFile.empty) {
-                        mailService.sendHtmlMailWithAttachment(
+                        def success = mailService.sendHtmlMailWithAttachment(
                                 session?.user,
                                 params.list("to"),
                                 null,
@@ -115,7 +115,12 @@ class AdminController {
                                 multipartFile?.originalFilename,
                                 multipartFile?.contentType
                         )
-                        flash.message = "Multipart email with subject ${params.subject} and attachment ${multipartFile.originalFilename} has been sent to ${params.to}"
+
+                        if (success) {
+                            flash.message = "Multipart email with subject ${params.subject} and attachment ${multipartFile.originalFilename} has been sent to ${params.to}"
+                        } else {
+                            flash.message = "Could not send email with subject ${params.subject} and attachment ${multipartFile.originalFilename} to ${params.to}"
+                        }
                     } else {
                         if (params.includesHtml) {
                             mailService.sendHtmlMail(params.subject, params.message, params.to)
