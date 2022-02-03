@@ -65,8 +65,7 @@ class ProductAvailabilityService {
                     Product product = Product.load(productId)
                     refreshProductAvailability(location, product, forceRefresh)
                 }
-            }
-            else {
+            } else {
                 refreshProductAvailability(location, forceRefresh)
             }
         }
@@ -193,7 +192,7 @@ class ProductAvailabilityService {
                     // Allows the SQL IFNULL to work properly
                     //   IFNULL(null, product_id)
                     //   IFNULL('10003', product_id)
-                    String productId = product?.id?"'${product?.id}'":null
+                    String productId = product?.id ? "'${product?.id}'" : null
                     String forceRefreshStatement = String.format(
                             "delete from product_availability " +
                                     "where location_id = '${location.id}' " +
@@ -227,9 +226,9 @@ class ProductAvailabilityService {
         String binLocationName = entry?.binLocation?.name ?
                 "'${StringEscapeUtils.escapeSql(entry?.binLocation?.name)}'" : "'DEFAULT'"
 
-        Integer onHandQuantity = entry.quantity?:0
-        Integer quantityAllocated = entry.quantityAllocated?:0
-        Integer quantityOnHold = entry.quantityOnHold?:0
+        Integer onHandQuantity = entry.quantity ?: 0
+        Integer quantityAllocated = entry.quantityAllocated ?: 0
+        Integer quantityOnHold = entry.quantityOnHold ?: 0
         Integer quantityAvailableToPromise = onHandQuantity - quantityAllocated - quantityOnHold
         def insertStatement =
                 "INSERT INTO product_availability (id, version, location_id, product_id, product_code, " +
@@ -246,12 +245,12 @@ class ProductAvailabilityService {
     def transformBinLocations(List binLocations, List picked) {
         def binLocationsTransformed = binLocations.collect {
             [
-                product          : [id: it?.product?.id, productCode: it?.product?.productCode, name: it?.product?.name],
-                inventoryItem    : [id: it?.inventoryItem?.id, lotNumber: it?.inventoryItem?.lotNumber, expirationDate: it?.inventoryItem?.expirationDate],
-                binLocation      : [id: it?.binLocation?.id, name: it?.binLocation?.name],
-                quantity         : it.quantity,
-                quantityAllocated: picked ? (picked.findAll { row -> row.binLocation == it?.binLocation?.id && row.inventoryItem == it?.inventoryItem?.id }?.sum { it.quantityAllocated } ?: 0) : 0,
-                quantityOnHold   : it?.binLocation?.isOnHold() || it?.inventoryItem?.lotStatus == LotStatusCode.RECALLED ? it.quantity : 0
+                    product          : [id: it?.product?.id, productCode: it?.product?.productCode, name: it?.product?.name],
+                    inventoryItem    : [id: it?.inventoryItem?.id, lotNumber: it?.inventoryItem?.lotNumber, expirationDate: it?.inventoryItem?.expirationDate],
+                    binLocation      : [id: it?.binLocation?.id, name: it?.binLocation?.name],
+                    quantity         : it.quantity,
+                    quantityAllocated: picked ? (picked.findAll { row -> row.binLocation == it?.binLocation?.id && row.inventoryItem == it?.inventoryItem?.id }?.sum { it.quantityAllocated } ?: 0) : 0,
+                    quantityOnHold   : it?.binLocation?.isOnHold() || it?.inventoryItem?.lotStatus == LotStatusCode.RECALLED ? it.quantity : 0
             ]
         }
 
@@ -397,7 +396,7 @@ class ProductAvailabilityService {
     }
 
     def getQuantityNotPickedInLocation(Product product, Location location) {
-        return  ProductAvailability.createCriteria().get {
+        return ProductAvailability.createCriteria().get {
             projections {
                 sum("quantityNotPicked")
             }
@@ -436,7 +435,7 @@ class ProductAvailabilityService {
 						where pa.location = :location
 						and pa.product in (:products)
 						group by pa.product
-						""", [location: location, products:products])
+						""", [location: location, products: products])
             results.each {
                 quantityMap[it[0]] = it[1]
             }
@@ -454,7 +453,7 @@ class ProductAvailabilityService {
 						where pa.location = :location
 						and pa.product in (:products)
 						group by pa.product
-						""", [location: location, products:products])
+						""", [location: location, products: products])
             results.each {
                 quantityMap[it[0]] = it[1]
             }
@@ -556,12 +555,12 @@ class ProductAvailabilityService {
                 def quantity = it[3]
 
                 [
-                        status                      : status(quantity),
-                        product                     : it[0],
-                        inventoryItem               : inventoryItem,
-                        binLocation                 : binLocation,
-                        quantityOnHand              : quantity,
-                        quantityAvailableToPromise  : it[4]
+                        status                    : status(quantity),
+                        product                   : it[0],
+                        inventoryItem             : inventoryItem,
+                        binLocation               : binLocation,
+                        quantityOnHand            : quantity,
+                        quantityAvailableToPromise: it[4]
                 ]
             }
         }
@@ -661,20 +660,20 @@ class ProductAvailabilityService {
             Product product = it[0]
             InventoryItem inventoryItem = it[1]
             Location bin = it[2]
-            BigDecimal quantity = it[3]?:0.0
-            BigDecimal quantityAvailableToPromise = it[4]?:0.0
-            BigDecimal unitCost = product.pricePerUnit?:0.0
+            BigDecimal quantity = it[3] ?: 0.0
+            BigDecimal quantityAvailableToPromise = it[4] ?: 0.0
+            BigDecimal unitCost = product.pricePerUnit ?: 0.0
             BigDecimal totalValue = quantity * unitCost
 
             [
-                    status                      : getStatus(quantity),
-                    product                     : product,
-                    inventoryItem               : inventoryItem,
-                    binLocation                 : bin,
-                    quantity                    : quantity,
-                    quantityAvailableToPromise  : quantityAvailableToPromise,
-                    unitCost                    : unitCost,
-                    totalValue                  : totalValue
+                    status                    : getStatus(quantity),
+                    product                   : product,
+                    inventoryItem             : inventoryItem,
+                    binLocation               : bin,
+                    quantity                  : quantity,
+                    quantityAvailableToPromise: quantityAvailableToPromise,
+                    unitCost                  : unitCost,
+                    totalValue                : totalValue
             ]
         }
         return data
@@ -688,10 +687,10 @@ class ProductAvailabilityService {
                         "and a.lotNumber != :lotNumber",
                 [
                         inventoryItemId: inventoryItem.id,
-                        lotNumber      : inventoryItem.lotNumber?:Constants.DEFAULT_LOT_NUMBER
+                        lotNumber      : inventoryItem.lotNumber ?: Constants.DEFAULT_LOT_NUMBER
                 ]
         )
-        log.info "Updated ${results} product availability records for inventory item ${inventoryItem?.lotNumber?:Constants.DEFAULT_LOT_NUMBER}"
+        log.info "Updated ${results} product availability records for inventory item ${inventoryItem?.lotNumber ?: Constants.DEFAULT_LOT_NUMBER}"
     }
 
 
@@ -705,10 +704,10 @@ class ProductAvailabilityService {
                             "and a.binLocationName != :binLocationName",
                     [
                             binLocationId  : location.id,
-                            binLocationName: location.name?:Constants.DEFAULT_BIN_LOCATION_NAME
+                            binLocationName: location.name ?: Constants.DEFAULT_BIN_LOCATION_NAME
                     ]
             )
-            log.info "Updated ${results} product availability records for bin location ${location?.name?:Constants.DEFAULT_BIN_LOCATION_NAME}"
+            log.info "Updated ${results} product availability records for bin location ${location?.name ?: Constants.DEFAULT_BIN_LOCATION_NAME}"
         }
     }
 
@@ -798,9 +797,9 @@ class ProductAvailabilityService {
             }
 
             items << [
-                id   : product.id,
-                product: product,
-                quantityOnHand: quantity
+                    id            : product.id,
+                    product       : product,
+                    quantityOnHand: quantity
             ]
         }
 
@@ -850,7 +849,7 @@ class ProductAvailabilityService {
 
     // Get quantity available to promise (with negative values)
     def getQuantityAvailableToPromise(Location location, Location binLocation, InventoryItem inventoryItem) {
-         def quantityAvailableToPromise = ProductAvailability.createCriteria().get {
+        def quantityAvailableToPromise = ProductAvailability.createCriteria().get {
             projections {
                 sum("quantityAvailableToPromise")
             }
@@ -865,27 +864,28 @@ class ProductAvailabilityService {
         return quantityAvailableToPromise ?: 0
     }
 
-    def quantityExpiringFroProducts(Location location, List<Product> products){
+    def getQuantityExpiring(Location location, List<Product> products) {
         Map<Product, Map> result = [:]
         Sql sql = new Sql(dataSource)
         String query = """
-            SELECT any_value(pa.product_id) productId, any_value(pa.location_id) locationId, 
-sum(pa.quantity_on_hand) quantityOnHand, 
-sum(pa.quantity_available_to_promise), 
-min(expiration_date) expiringDate, 
-any_value((select quantity_on_hand from product_availability paa join inventory_item ii on ii.id = paa.inventory_item_id where paa.id = pa.id order by expiration_date desc limit 1)) expiringQuantity
-FROM product_availability pa 
-left outer join inventory_item ii on pa.inventory_item_id = ii.id
-where ii.expiration_date is not null
-and pa.product_id in (${products?.id?.collect { "'$it'" }?.join( ',' )}) and pa.location_id = '${location?.id}'
-group by pa.product_id, pa.location_id;
+                SELECT
+                    ANY_VALUE(pa.product_id) productId, 
+                    ANY_VALUE(pa.location_id) locationId, 
+                    SUM(pa.quantity_on_hand) quantityOnHand, 
+                    SUM(pa.quantity_available_to_promise) quantityAvailable, 
+                    MIN(expiration_date) expirationDate, 
+                    ANY_VALUE((SELECT quantity_on_hand FROM product_availability paa join inventory_item ii on ii.id = paa.inventory_item_id where paa.id = pa.id ORDER BY expiration_date desc limit 1)) expiringQuantity
+                FROM product_availability pa 
+                LEFT OUTER JOIN inventory_item ii on pa.inventory_item_id = ii.id
+                WHERE ii.expiration_date is not null
+                AND pa.product_id in (${products?.id?.collect { "'$it'" }?.join(',')}) and pa.location_id = '${location?.id}'
+                GROUP BY pa.product_id, pa.location_id;
         """
         List<GroovyRowResult> rows = sql.rows(query)
-//        log.info "query:${query} ,rows:${rows}, products?.id:${products?.id}, location?.id:${location?.id}"
-        rows?.each {GroovyRowResult row ->
-            Product product = products.find{it.id == row.productId}
+        rows?.each { GroovyRowResult row ->
+            Product product = products.find { it.id == row.productId }
             log.info "row:${row}, product:${product}"
-            result[product] = [expirationDate: row.getProperty("expiringDate"), expiringQuantity: row.getProperty("expiringQuantity")]
+            result[product] = [expirationDate: row.getProperty("expirationDate"), expiringQuantity: row.getProperty("expiringQuantity")]
         }
         return result
     }
