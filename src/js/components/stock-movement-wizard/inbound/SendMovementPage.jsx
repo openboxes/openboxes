@@ -161,6 +161,9 @@ const SUPPLIER_FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.code.label',
         defaultMessage: 'Code',
+        attributes: {
+          showValueTooltip: true,
+        },
       },
       product: {
         type: LabelField,
@@ -177,6 +180,7 @@ const SUPPLIER_FIELDS = {
               {renderHandlingIcons(value.handlingIcons)}
             </span>
           ),
+          showValueTooltip: true,
         },
       },
       lotNumber: {

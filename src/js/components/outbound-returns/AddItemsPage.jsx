@@ -67,6 +67,9 @@ const FIELDS = {
         label: 'react.outboundReturns.productCode.label',
         defaultMessage: 'Code',
         flexWidth: '1',
+        attributes: {
+          showValueTooltip: true,
+        },
       },
       'product.name': {
         type: LabelField,

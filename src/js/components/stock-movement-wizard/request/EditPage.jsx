@@ -69,17 +69,20 @@ const AD_HOCK_FIELDS = {
       productCode: {
         type: LabelField,
         headerAlign: 'left',
-        flexWidth: '0.5',
+        flexWidth: '1',
         getDynamicAttr: ({ subfield }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
         }),
         label: 'react.stockMovement.code.label',
         defaultMessage: 'Code',
+        attributes: {
+          showValueTooltip: true,
+        },
       },
       product: {
         type: LabelField,
         headerAlign: 'left',
-        flexWidth: '3',
+        flexWidth: '2.5',
         label: 'react.stockMovement.productName.label',
         defaultMessage: 'Product name',
         attributes: {
@@ -91,6 +94,7 @@ const AD_HOCK_FIELDS = {
               {renderHandlingIcons(value ? value.handlingIcons : null)}
             </span>
           ),
+          showValueTooltip: true,
         },
         getDynamicAttr: ({ subfield }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
@@ -331,17 +335,20 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
       productCode: {
         type: LabelField,
         headerAlign: 'left',
-        flexWidth: '0.5',
+        flexWidth: '1',
         getDynamicAttr: ({ subfield }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
         }),
         label: 'react.stockMovement.code.label',
         defaultMessage: 'Code',
+        attributes: {
+          showValueTooltip: true,
+        },
       },
       product: {
         type: LabelField,
         headerAlign: 'left',
-        flexWidth: '3',
+        flexWidth: '2.5',
         label: 'react.stockMovement.productName.label',
         defaultMessage: 'Product name',
         attributes: {
@@ -353,6 +360,7 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
               {renderHandlingIcons(value ? value.handlingIcons : null)}
             </span>
           ),
+          showValueTooltip: true,
         },
         getDynamicAttr: ({ subfield }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
@@ -593,17 +601,20 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
       productCode: {
         type: LabelField,
         headerAlign: 'left',
-        flexWidth: '0.5',
+        flexWidth: '1',
         getDynamicAttr: ({ subfield }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
         }),
         label: 'react.stockMovement.code.label',
         defaultMessage: 'Code',
+        attributes: {
+          showValueTooltip: true,
+        },
       },
       product: {
         type: LabelField,
         headerAlign: 'left',
-        flexWidth: '3.5',
+        flexWidth: '3',
         label: 'react.stockMovement.productName.label',
         defaultMessage: 'Product name',
         attributes: {
@@ -615,6 +626,7 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
               {renderHandlingIcons(value ? value.handlingIcons : null)}
             </span>
           ),
+          showValueTooltip: true,
         },
         getDynamicAttr: ({ subfield }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',

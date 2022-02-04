@@ -91,6 +91,7 @@ const TABLE_FIELDS = {
         flexWidth: '1',
         attributes: {
           className: 'text-left ml-1',
+          showValueTooltip: true,
         },
       },
       'product.name': {
