@@ -126,13 +126,16 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.productCode.label',
         defaultMessage: 'Code',
-        flexWidth: '0.5',
+        flexWidth: '1',
+        attributes: {
+          showValueTooltip: true,
+        },
       },
       'product.name': {
         type: LabelField,
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
-        flexWidth: '2',
+        flexWidth: '1.5',
         headerAlign: 'left',
         attributes: {
           showValueTooltip: true,

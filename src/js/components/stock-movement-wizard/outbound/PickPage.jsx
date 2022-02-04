@@ -51,17 +51,20 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.code.label',
         defaultMessage: 'Code',
-        flexWidth: '0.9',
+        flexWidth: '1',
         headerAlign: 'left',
         getDynamicAttr: ({ subfield }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
         }),
+        attributes: {
+          showValueTooltip: true,
+        },
       },
       product: {
         type: LabelField,
         label: 'react.stockMovement.productName.label',
         defaultMessage: 'Product name',
-        flexWidth: '3.8',
+        flexWidth: '3.7',
         headerAlign: 'left',
         attributes: {
           className: 'text-left ml-1',
@@ -73,6 +76,7 @@ const FIELDS = {
               {renderHandlingIcons(value.handlingIcons)}
             </span>
           ),
+          showValueTooltip: true,
         },
       },
       lotNumber: {

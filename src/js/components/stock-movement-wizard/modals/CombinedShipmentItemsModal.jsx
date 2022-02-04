@@ -60,6 +60,9 @@ const FIELDS = {
         label: 'react.stockMovement.productCode.label',
         defaultMessage: 'Product Code',
         flexWidth: '1',
+        attributes: {
+          showValueTooltip: true,
+        },
       },
       productName: {
         type: LabelField,

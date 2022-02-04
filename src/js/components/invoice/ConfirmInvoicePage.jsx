@@ -151,6 +151,9 @@ const INVOICE_ITEMS = {
         label: 'react.invoice.itemNo.label',
         defaultMessage: 'Item No',
         flexWidth: '1',
+        attributes: {
+          showValueTooltip: true,
+        },
       },
       description: {
         type: LabelField,

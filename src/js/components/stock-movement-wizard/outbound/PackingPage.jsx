@@ -41,19 +41,20 @@ const FIELDS = {
     fields: {
       productCode: {
         type: LabelField,
-        flexWidth: '0.7',
+        flexWidth: '1',
         headerAlign: 'left',
         label: 'react.stockMovement.code.label',
         defaultMessage: 'Code',
         attributes: {
           className: 'text-left ml-1',
+          showValueTooltip: true,
         },
       },
       product: {
         type: LabelField,
         label: 'react.stockMovement.productName.label',
         defaultMessage: 'Product Name',
-        flexWidth: '3.5',
+        flexWidth: '3.2',
         attributes: {
           className: 'text-left ml-1',
           formatValue: value => (
@@ -64,6 +65,7 @@ const FIELDS = {
               {renderHandlingIcons(value.handlingIcons)}
             </span>
           ),
+          showValueTooltip: true,
         },
       },
       binLocation: {
