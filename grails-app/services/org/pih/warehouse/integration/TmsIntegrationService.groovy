@@ -340,7 +340,6 @@ class TmsIntegrationService {
         }
 
         createEvent(stockMovement, EventTypeCode.ACCEPTED, new Date())
-        notificationService.sendShipmentAcceptedNotification(shipment, shipment.origin, [RoleType.ROLE_SHIPMENT_NOTIFICATION])
     }
 
     void attachDocument(String trackingNumber, String documentType, String fileName, String fileContents) {
