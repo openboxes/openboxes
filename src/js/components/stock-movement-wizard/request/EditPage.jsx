@@ -1441,6 +1441,7 @@ class EditItemsPage extends Component {
                     value={itemFilter}
                     onChange={event => this.setState({ itemFilter: event.target.value })}
                     className="float-left btn btn-outline-secondary btn-xs filter-input mr-1 mb-1"
+                    placeholder={this.props.translate('react.stockMovement.searchPlaceholder.label', 'Search...')}
                   />
                   {itemFilter &&
                     <i
