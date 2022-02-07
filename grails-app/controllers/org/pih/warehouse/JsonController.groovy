@@ -1388,8 +1388,8 @@ class JsonController {
         def data = items.collect {
             def isOrderItem = it instanceof OrderItem
             [
-                    productCode  : it.product.productCode,
-                    productName  : it.product.name,
+                    productCode  : it.product?.productCode,
+                    productName  : it.product?.name,
                     qtyOrderedNotShipped : isOrderItem ? it.quantityRemaining * it.quantityPerUom : '',
                     qtyShippedNotReceived : isOrderItem ? '' : it.quantityRemaining,
                     orderNumber  : isOrderItem ? it.order.orderNumber : (it.shipment.isFromPurchaseOrder ? it.orderNumber : ''),

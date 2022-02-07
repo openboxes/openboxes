@@ -490,12 +490,12 @@ class ReportController {
                 })
 
                 items.sort { a,b ->
-                    a.product.productCode <=> b.product.productCode
+                    a.product?.productCode <=> b.product?.productCode
                 }.each {
                     def isOrderItem = it instanceof OrderItem
                     csv << [
-                            productCode  : it.product.productCode,
-                            productName  : it.product.name,
+                            productCode  : it.product?.productCode,
+                            productName  : it.product?.name,
                             qtyOrderedNotShipped : isOrderItem ? it.quantityRemaining * it.quantityPerUom : '',
                             qtyShippedNotReceived : isOrderItem ? '' : it.quantityRemaining,
                             orderNumber  : isOrderItem ? it.order.orderNumber : (it.shipment.isFromPurchaseOrder ? it.orderNumber : ''),
