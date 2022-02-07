@@ -1,21 +1,21 @@
-package org.pih.warehouse.tablero
+package org.pih.warehouse.dashboard
 
 
 class IndicatorDatasets implements Serializable {
-    String label;
-    List<Integer> data;
-    List<String> links;
-    String type;
-    String yAxisID;
-    def legendConfig;
+    String label
+    List<Integer> data
+    List<String> links
+    String type
+    String yAxisID
+    def legendConfig
 
     IndicatorDatasets(String label, List<Integer> data, List<String> links = null, String type = null, String yAxisID = null, def legendConfig = null) {
-        this.label = label;
-        this.data = data;
-        this.links = links;
-        this.type = type;
-        this.yAxisID = yAxisID;
-        this.legendConfig = legendConfig;
+        this.label = label
+        this.data = data
+        this.links = links
+        this.type = type
+        this.yAxisID = yAxisID
+        this.legendConfig = legendConfig
     }
 
     Map toJson() {

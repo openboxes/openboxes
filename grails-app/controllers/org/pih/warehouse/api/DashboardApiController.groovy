@@ -1,12 +1,12 @@
-package org.pih.warehouse.apitablero
+package org.pih.warehouse.api
 
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.Cacheable
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
-import org.pih.warehouse.tablero.NumberData
+import org.pih.warehouse.dashboard.NumberData
 
-class ApitableroController {
+class DashboardApiController {
 
     def numberDataService
     def indicatorDataService

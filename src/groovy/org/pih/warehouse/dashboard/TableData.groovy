@@ -1,18 +1,18 @@
-package org.pih.warehouse.tablero
+package org.pih.warehouse.dashboard
 
 class TableData implements Serializable {
 
-    String number;
-    String name;
-    String value;
-    String link;
-    String icon;
+    String number
+    String name
+    String value
+    String link
+    String icon
 
     TableData(String number, String name, String value = null, String link = null, String icon = null) {
-        this.number = number;
-        this.name = name;
-        this.value = value;
-        this.link = link;
+        this.number = number
+        this.name = name
+        this.value = value
+        this.link = link
         this.icon = icon
     }
 

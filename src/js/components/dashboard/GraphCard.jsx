@@ -45,7 +45,7 @@ class FilterComponent extends Component {
     }
 
     if (params !== '') {
-      loadIndicator(cardId, params);
+      loadIndicator(this.props.widgetId, params);
     }
 
     dropdown.size = 1;
@@ -111,6 +111,7 @@ const handleChartClick = (elements) => {
 
 const GraphCard = SortableElement(({
   cardId,
+  widgetId,
   cardTitle,
   cardType,
   cardLink,
@@ -170,7 +171,7 @@ const GraphCard = SortableElement(({
   } else if (cardType === 'loading') {
     graph = <LoadingCard />;
   } else if (cardType === 'error') {
-    graph = <button onClick={() => loadIndicator(cardId)} ><i className="fa fa-repeat" /></button>;
+    graph = <button onClick={() => loadIndicator(widgetId)} ><i className="fa fa-repeat" /></button>;
   }
 
   return (
@@ -179,16 +180,12 @@ const GraphCard = SortableElement(({
         {cardLink ?
           <a target="_blank" rel="noopener noreferrer" href={cardLink.code} className="title-link">
             <span className="title-link">
-              {cardTitle.code ?
-              translate(cardTitle.code, cardTitle.message)
-             : cardTitle}
+              {translate(cardTitle, cardTitle)}
             </span>
           </a>
           :
           <span className="title-link">
-            {cardTitle.code ?
-            translate(cardTitle.code, cardTitle.message)
-           : cardTitle}
+            {translate(cardTitle, cardTitle)}
           </span>
         }
         {
@@ -197,7 +194,7 @@ const GraphCard = SortableElement(({
               <Tooltip
                 html={
                   <p>
-                    {cardInfo.code ? translate(cardInfo.code, cardInfo.message) : cardInfo.message}
+                    {translate(cardInfo, cardInfo)}
                   </p>
                 }
                 theme="transparent"
@@ -213,6 +210,7 @@ const GraphCard = SortableElement(({
 
         <FilterComponent
           cardId={cardId}
+          widgetId={widgetId}
           loadIndicator={loadIndicator}
           locationFilter={locationFilter}
           timeLimit={timeLimit}
@@ -236,20 +234,10 @@ const mapStateToProps = state => ({
 
 export default (connect(mapStateToProps)(GraphCard));
 
-
 GraphCard.propTypes = {
-  cardTitle: PropTypes.oneOfType([
-    PropTypes.string.isRequired,
-    PropTypes.shape({
-      code: PropTypes.string.isRequired,
-      message: PropTypes.string.isRequired,
-    }).isRequired,
-  ]).isRequired,
+  cardTitle: PropTypes.string.isRequired,
   cardType: PropTypes.string.isRequired,
-  cardInfo: PropTypes.shape({
-    code: PropTypes.string.isRequired,
-    message: PropTypes.string.isRequired,
-  }).isRequired,
+  cardInfo: PropTypes.string.isRequired,
   timeLimit: PropTypes.number,
   loadIndicator: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
@@ -266,6 +254,7 @@ FilterComponent.propTypes = {
   timeLimit: PropTypes.number.isRequired,
   label: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
   cardId: PropTypes.number.isRequired,
+  widgetId: PropTypes.string.isRequired,
   loadIndicator: PropTypes.func.isRequired,
   allLocations: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   translate: PropTypes.func.isRequired,

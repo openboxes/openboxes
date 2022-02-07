@@ -54,8 +54,8 @@ const AsyncManagement = Loadable({
   loading: Loading,
 });
 
-const AsyncTablero = Loadable({
-  loader: () => import('./tablero/Tablero'),
+const AsyncDashboard = Loadable({
+  loader: () => import('./dashboard/Dashboard'),
   loading: Loading,
 });
 
@@ -103,7 +103,7 @@ const Router = props => (
         <MainLayoutRoute path="/**/stockTransfer/createOutboundReturn/:outboundReturnId?" component={AsyncOutboundReturns} />
         <MainLayoutRoute path="/**/stockTransfer/createInboundReturn/:inboundReturnId?" component={AsyncInboundReturns} />
         <MainLayoutRoute path="/**/replenishment/create/:replenishmentId?" component={AsyncReplenishment} />
-        <MainLayoutRoute path="/**/" component={AsyncTablero} />
+        <MainLayoutRoute path="/**/" component={AsyncDashboard} />
       </Switch>
     </BrowserRouter>
     <div className="spinner-container">

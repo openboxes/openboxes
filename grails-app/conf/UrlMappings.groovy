@@ -367,6 +367,143 @@ class UrlMappings {
             action = [GET: "getPicklist", POST: "createPicklist", PUT: "updatePicklist", DELETE: "deletePicklist"]
         }
 
+        // Dashboard API
+
+        "/api/dashboard/config"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "config", POST: "updateConfig"]
+        }
+
+        "/api/dashboard/breadcrumbsConfig"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "breadcrumbsConfig"]
+        }
+
+        "/api/dashboard/inventoryByLotAndBin"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getInventoryByLotAndBin"]
+        }
+
+        "/api/dashboard/inProgressShipments"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getInProgressShipments"]
+        }
+
+        "/api/dashboard/inProgressPutaways"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getInProgressPutaways"]
+        }
+
+        "/api/dashboard/receivingBin"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getReceivingBin"]
+        }
+
+        "/api/dashboard/itemsInventoried"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getItemsInventoried"]
+        }
+
+        "/api/dashboard/defaultBin"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getDefaultBin"]
+        }
+
+        "/api/dashboard/expiredProductsInStock"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getExpiredProductsInStock"]
+        }
+
+        "/api/dashboard/expirationSummary"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getExpirationSummary"]
+        }
+
+        "/api/dashboard/fillRate"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getFillRate"]
+        }
+
+        "/api/dashboard/fillRateSnapshot"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getFillRateSnapshot"]
+        }
+
+        "/api/dashboard/fillRateDestinations"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getFillRateDestinations"]
+        }
+
+        "/api/dashboard/inventorySummary"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getInventorySummary"]
+        }
+
+        "/api/dashboard/sentStockMovements"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getSentStockMovements"]
+        }
+
+        "/api/dashboard/receivedStockMovements"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getReceivedStockMovements"]
+        }
+
+        "/api/dashboard/outgoingStock"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getOutgoingStock"]
+        }
+
+        "/api/dashboard/incomingStock"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getIncomingStock"]
+        }
+
+        "/api/dashboard/discrepancy"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getDiscrepancy"]
+        }
+
+        "/api/dashboard/delayedShipments"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getDelayedShipments"]
+        }
+
+        "/api/dashboard/productWithNegativeInventory"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getProductWithNegativeInventory"]
+        }
+
+        "/api/dashboard/lossCausedByExpiry"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getLossCausedByExpiry"]
+        }
+
+        "/api/dashboard/productsInventoried"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getProductsInventoried"]
+        }
+
+        "/api/dashboard/percentageAdHoc"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getPercentageAdHoc"]
+        }
+
+        "/api/dashboard/stockOutLastMonth"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getStockOutLastMonth"]
+        }
+
+        "/api/dashboard/openStockRequests"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getOpenStockRequests"]
+        }
+
+        "/api/dashboard/inventoryValue"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getInventoryValue"]
+        }
+
         // Standard REST APIs
 
         "/api/${resource}s"(parseRequest: true) {

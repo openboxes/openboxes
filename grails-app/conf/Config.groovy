@@ -387,24 +387,175 @@ openboxes.dashboard.newsSummary.rssUrl = "https://openboxes.com/blog/index.xml"
 openboxes.dashboard.newsSummary.limit = 25
 
 openboxes {
-    tablero {
-        enabled = true
-        configurations {
+    dashboardConfig {
+        dashboards {
             personal {
                 name = "My Dashboard"
                 filters {}
+                widgets = [
+                        [
+                            widgetId: "inventoryByLotAndBin",
+                            order: 1
+                        ],
+                        [
+                            widgetId: "receivingBin",
+                            order: 2
+                        ],
+                        [
+                            widgetId: "inProgressShipments",
+                            order: 3
+                        ],
+                        [
+                            widgetId: "inProgressPutaways",
+                            order: 4
+                        ],
+
+                        [
+                            widgetId: "inventorySummary",
+                            order: 1
+                        ],
+                        [
+                            widgetId: "expirationSummary",
+                            order: 2
+                        ],
+                        [
+                            widgetId: "incomingStock",
+                            order: 3
+                        ],
+                        [
+                            widgetId: "outgoingStock",
+                            order: 4
+                        ],
+                        [
+                            widgetId: "delayedShipments",
+                            order: 5
+                        ],
+                        [
+                            widgetId: "discrepancy",
+                            order: 6
+                        ]
+                ]
             }
             warehouse {
                 name = "Warehouse Management"
                 filters {}
+                widgets = [
+                        [
+                            widgetId: "inventoryByLotAndBin",
+                            order: 1
+                        ],
+                        [
+                            widgetId: "receivingBin",
+                            order: 2
+                        ],
+                        [
+                            widgetId: "inProgressShipments",
+                            order: 3
+                        ],
+                        [
+                            widgetId: "inProgressPutaways",
+                            order: 4
+                        ],
+                        [
+                            widgetId: "itemsInventoried",
+                            order: 5
+                        ],
+
+                        [
+                            widgetId: "inventorySummary",
+                            order: 1
+                        ],
+                        [
+                            widgetId: "expirationSummary",
+                            order: 2
+                        ],
+                        [
+                            widgetId: "incomingStock",
+                            order: 3
+                        ],
+                        [
+                            widgetId: "outgoingStock",
+                            order: 4
+                        ],
+                        [
+                            widgetId: "delayedShipments",
+                            order: 5
+                        ],
+                        [
+                            widgetId: "discrepancy",
+                            order: 6
+                        ]
+                ]
             }
             inventory {
                 name = "Inventory Management"
                 filters {}
+                widgets = [
+                        [
+                            widgetId: "receivingBin",
+                            order: 1
+                        ],
+                        [
+                            widgetId: "defaultBin",
+                            order: 2
+                        ],
+                        [
+                            widgetId: "negativeInventory",
+                            order: 3
+                        ],
+                        [
+                            widgetId: "expiredStock",
+                            order: 4
+                        ],
+                        [
+                            widgetId: "openStockRequests",
+                            order: 5
+                        ],
+
+                        [
+                            widgetId: "delayedShipments",
+                            order: 1
+                        ],
+                        [
+                            widgetId: "productsInventoried",
+                            order: 2
+                        ]
+                ]
             }
             transaction {
                 name = "Transaction Management"
                 filters {}
+                widgets = [
+                        [
+                            widgetId: "fillRateSnapshot",
+                            order: 1
+                        ],
+
+                        [
+                            widgetId: "receivedStockMovements",
+                            order: 1
+                        ],
+                        [
+                            widgetId: "sentStockMovements",
+                            order: 2
+                        ],
+                        [
+                            widgetId: "lossCausedByExpiry",
+                            order: 3
+                        ],
+                        [
+                            widgetId: "percentageAdHoc",
+                            order: 4
+                        ],
+                        [
+                            widgetId: "fillRate",
+                            order: 5
+                        ],
+                        [
+                            widgetId: "stockOutLastMonth",
+                            order: 6
+                        ]
+                ]
             }
             fillRate {
                 name = "Fill Rate"
@@ -413,255 +564,322 @@ openboxes {
                         endpoint = "/${appName}/categoryApi/list"
                     }
                 }
+                widgets = [
+                        [
+                            widgetId: "fillRateSnapshot",
+                            order: 1
+                        ],
+
+                        [
+                            widgetId: "fillRate",
+                            order: 1
+                        ]
+                ]
             }
         }
-        endpoints {
-            number {
-                inProgressPutaways {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getInProgressPutaways"
-                    archived = ['inventory', 'transaction', 'fillRate']
-                    order = 4
-                }
-                inventoryByLotAndBin {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getInventoryByLotAndBin"
-                    archived = ['inventory', 'transaction', 'fillRate']
-                    order = 1
-                }
-                inProgressShipments {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getInProgressShipments"
-                    archived = ['inventory', 'transaction', 'fillRate']
-                    order = 3
-                }
-                receivingBin {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getReceivingBin"
-                    archived = ['transaction', 'fillRate']
-                    order = 2
-                }
-                itemsInventoried {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getItemsInventoried"
-                    archived = ['personal', 'warehouse', 'transaction', 'fillRate']
-                    order = 5
-                }
-                defaultBin {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getDefaultBin"
-                    archived = ['personal', 'warehouse', 'transaction', 'fillRate']
-                    order = 6
-                }
-                negativeInventory {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getProductWithNegativeInventory"
-                    archived = ['personal', 'warehouse', 'transaction', 'fillRate']
-                    order = 7
-                }
-                expiredStock {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getExpiredProductsInStock"
-                    archived = ['personal', 'warehouse', 'transaction', 'fillRate']
-                    order = 8
-                }
-                fillRateSnapshot {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getFillRateSnapshot"
-                    archived = ['personal', 'warehouse', 'inventory']
-                    order = 9
-                }
-                openStockRequests {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getOpenStockRequests"
-                    archived = ['personal', 'warehouse', 'transaction', 'fillRate']
-                    order = 10
-                }
-                inventoryValue {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getInventoryValue"
-                    archived = ['personal', 'warehouse', 'inventory', 'transaction', 'fillRate']
-                    order = 11
-                }
+        dashboardWidgets {
+            inProgressPutaways {
+                enabled = true
+                title = "react.dashboard.inProgressPutaways.title.label"
+                info = "react.dashboard.inProgressPutaways.info.label"
+                subtitle = "react.dashboard.subtitle.putaways.label"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/${appName}/api/dashboard/inProgressPutaways"
             }
-            graph {
-                inventorySummary {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getInventorySummary"
-                    archived = ['inventory', 'transaction', 'fillRate']
-                    datalabel = true
-                    order = 1
-                    colors {
-                        labels {
-                            success = ["In stock"]
-                            warning = ["Above maximum", "Below reorder", "Below minimum"]
-                            error = ["No longer in stock"]
-                        }
+            inventoryByLotAndBin {
+                enabled = true
+                title = "react.dashboard.inventoryByLotAndBin.title.label"
+                info = "react.dashboard.inventoryByLotAndBin.info.label"
+                subtitle = "react.dashboard.subtitle.inStock.label"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/${appName}/api/dashboard/inventoryByLotAndBin"
+            }
+            inProgressShipments {
+                enabled = true
+                title = "react.dashboard.inProgressShipments.title.label"
+                info = "react.dashboard.inProgressShipments.info.label"
+                subtitle = "react.dashboard.subtitle.shipments.label"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/${appName}/api/dashboard/inProgressShipments"
+            }
+            receivingBin {
+                enabled = true
+                title = "react.dashboard.receivingBin.title.label"
+                info = "react.dashboard.receivingBin.info.label"
+                subtitle = "react.dashboard.subtitle.products.label"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/${appName}/api/dashboard/receivingBin"
+            }
+            itemsInventoried {
+                enabled = true
+                title = "react.dashboard.itemsInventoried.title.label"
+                info = "react.dashboard.itemsInventoried.info.label"
+                subtitle = "react.dashboard.subtitle.items.label"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/${appName}/api/dashboard/itemsInventoried"
+            }
+            defaultBin {
+                enabled = true
+                title = "react.dashboard.defaultBin.title.label"
+                info = "react.dashboard.defaultBin.info.label"
+                subtitle = "react.dashboard.subtitle.products.label"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/${appName}/api/dashboard/defaultBin"
+            }
+            negativeInventory {
+                enabled = true
+                title = "react.dashboard.productWithNegativeInventory.title.label"
+                info = "react.dashboard.productWithNegativeInventory.info.label"
+                subtitle = "react.dashboard.subtitle.products.label"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/${appName}/api/dashboard/productWithNegativeInventory"
+            }
+            expiredStock {
+                enabled = true
+                title = "react.dashboard.expiredProductsInStock.title.label"
+                info = "react.dashboard.expiredProductsInStock.info.label"
+                subtitle = "react.dashboard.subtitle.products.label"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/${appName}/api/dashboard/expiredProductsInStock"
+            }
+            openStockRequests {
+                enabled = true
+                title = "react.dashboard.openStockRequests.title.label"
+                info = "react.dashboard.openStockRequests.info.label"
+                subtitle = "react.dashboard.requests.subtitle.label"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/${appName}/api/dashboard/openStockRequests"
+            }
+            inventoryValue {
+                enabled = true
+                title = "react.dashboard.inventoryValue.title.label"
+                info = ''
+                subtitle = "react.dashboard.subtitle.inStock.label"
+                numberType = 'dollars'
+                type = 'number'
+                endpoint = "/${appName}/api/dashboard/inventoryValue"
+            }
+
+            fillRateSnapshot {
+                enabled = true
+                title = "react.dashboard.fillRateSnapshot.title.label"
+                info = "react.dashboard.fillRateSnapshot.info.label"
+                graphType = 'sparkline'
+                type = 'number'
+                endpoint = "/${appName}/api/dashboard/fillRateSnapshot"
+            }
+
+            inventorySummary {
+                enabled = true
+                title = "react.dashboard.inventorySummaryData.title.label"
+                info = "react.dashboard.inventorySummaryData.info.label"
+                graphType = "horizontalBar"
+                type = 'graph'
+                endpoint = "/${appName}/api/dashboard/inventorySummary"
+                datalabel = true
+                colors {
+                    labels {
+                        success = ["In stock"]
+                        warning = ["Above maximum", "Below reorder", "Below minimum"]
+                        error = ["No longer in stock"]
                     }
                 }
-                expirationSummary {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getExpirationSummary"
-                    archived = ['inventory', 'transaction', 'fillRate']
-                    timeFilter = true
-                    order = 2
-                    colors {
-                        datasets {
-                            state6 = ["Expiration(s)"]
-                        }
-                        labels {
-                            state5 = [
+            }
+            expirationSummary {
+                enabled = true
+                title = "react.dashboard.expirationSummaryData.title.label"
+                info = "react.dashboard.expirationSummaryData.info.label"
+                graphType = "line"
+                type = 'graph'
+                endpoint = "/${appName}/api/dashboard/expirationSummary"
+                timeFilter = true
+                colors {
+                    datasets {
+                        state6 = ["Expiration(s)"]
+                    }
+                    labels {
+                        state5 = [
                                 [code : "react.dashboard.timeline.today.label", message : "today"],
                                 [code : "react.dashboard.timeline.within30Days.label", message : "within 30 days"],
                                 [code : "react.dashboard.timeline.within90Days.label", message : "within 90 days"],
                                 [code : "react.dashboard.timeline.within180Days.label", message : "within 180 days"],
                                 [code : "react.dashboard.timeline.within360Days.label", message : "within 360 days"]
-                            ]
-                        }
+                        ]
                     }
                 }
-                incomingStock {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getIncomingStock"
-                    archived = ['inventory', 'transaction', 'fillRate']
-                    order = 3
-                    colors {
-                        datasets {
-                            state6 = ["first"]
-                            state7 = ["second"]
-                            state8 = ["third"]
-                        }
+            }
+            incomingStock {
+                enabled = true
+                title = "react.dashboard.incomingStock.title.label"
+                info = "react.dashboard.incomingStock.info.label"
+                graphType = "numbers"
+                type = 'graph'
+                endpoint = "/${appName}/api/dashboard/incomingStock"
+                colors {
+                    datasets {
+                        state6 = ["first"]
+                        state7 = ["second"]
+                        state8 = ["third"]
                     }
                 }
-                outgoingStock {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getOutgoingStock"
-                    archived = ['inventory', 'transaction', 'fillRate']
-                    order = 4
-                    colors {
-                        datasets {
-                            success = ["first"]
-                            warning = ["second"]
-                            error = ["third"]
-                        }
+            }
+            outgoingStock {
+                enabled = true
+                title = "react.dashboard.outgoingStock.title.label"
+                info = "react.dashboard.outgoingStock.info.label"
+                graphType = "numbers"
+                type = 'graph'
+                endpoint = "/${appName}/api/dashboard/outgoingStock"
+                colors {
+                    datasets {
+                        success = ["first"]
+                        warning = ["second"]
+                        error = ["third"]
                     }
                 }
-                receivedStockMovements {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getReceivedStockMovements"
-                    archived = ['personal', 'warehouse', 'inventory', 'fillRate']
-                    timeFilter = true
-                    stacked = true
-                    datalabel = true
-                    order = 7
-                }
-                discrepancy {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getDiscrepancy"
-                    archived = ['inventory', 'transaction', 'fillRate']
-                    timeFilter = true
-                    order = 6
-                }
-                delayedShipments {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getDelayedShipments"
-                    archived = ['transaction', 'fillRate']
-                    order = 5
-                    colors {
-                        datasets {
-                            state5 = ["first"]
-                            state4 = ["second"]
-                            state3 = ["third"]
-                        }
+            }
+            receivedStockMovements {
+                enabled = true
+                title = "react.dashboard.receivedStockData.title.label"
+                info = "react.dashboard.receivedStockData.info.label"
+                graphType = "bar"
+                type = 'graph'
+                endpoint = "/${appName}/api/dashboard/receivedStockMovements"
+                timeFilter = true
+                stacked = true
+                datalabel = true
+            }
+            discrepancy {
+                enabled = true
+                title = "react.dashboard.discrepancy.title.label"
+                info = "react.dashboard.discrepancy.info.label"
+                graphType = "table"
+                type = 'graph'
+                endpoint = "/${appName}/api/dashboard/discrepancy"
+                timeFilter = true
+            }
+            delayedShipments {
+                enabled = true
+                title = "react.dashboard.delayedShipments.title.label"
+                info = "react.dashboard.delayedShipments.info.label"
+                graphType = "numberTable"
+                type = 'graph'
+                endpoint = "/${appName}/api/dashboard/delayedShipments"
+                colors {
+                    datasets {
+                        state5 = ["first"]
+                        state4 = ["second"]
+                        state3 = ["third"]
                     }
                 }
-                sentStockMovements {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getSentStockMovements"
-                    archived = ['personal', 'warehouse', 'inventory', 'fillRate']
-                    timeFilter = true
-                    stacked = true
-                    datalabel = true
-                    order = 8
-                }
-                lossCausedByExpiry {
-                    enabled = false
-                    endpoint = "/${appName}/apitablero/getLossCausedByExpiry"
-                    archived = ['personal', 'warehouse', 'inventory', 'fillRate']
-                    timeFilter = true
-                    stacked = true
-                    order = 9
-                    colors {
-                        datasets {
-                            success = ["Inventory value not expired last day of month"]
-                            warning = ["Inventory value expired last day of month"]
-                            error = ["Inventory value removed due to expiry"]
-                        }
+            }
+            sentStockMovements {
+                enabled = true
+                title = "react.dashboard.sentStockMovements.title.label"
+                info = "react.dashboard.sentStockMovements.info.label"
+                graphType = "bar"
+                type = 'graph'
+                endpoint = "/${appName}/api/dashboard/sentStockMovements"
+                timeFilter = true
+                stacked = true
+                datalabel = true
+            }
+            lossCausedByExpiry {
+                enabled = false
+                title = "react.dashboard.lossCausedByExpiry.title.label"
+                info = ""
+                graphType = "bar"
+                type = 'graph'
+                endpoint = "/${appName}/api/dashboard/lossCausedByExpiry"
+                timeFilter = true
+                stacked = true
+                colors {
+                    datasets {
+                        success = ["Inventory value not expired last day of month"]
+                        warning = ["Inventory value expired last day of month"]
+                        error = ["Inventory value removed due to expiry"]
                     }
                 }
-                productsInventoried {
-                    enabled = false
-                    endpoint = "/${appName}/apitablero/getProductsInventoried"
-                    archived = ['personal', 'warehouse', 'transaction', 'fillRate']
-                    order = 10
-                    colors {
-                        datasets {
-                            state6 = ["first"]
-                            state7 = ["second"]
-                            state8 = ["third"]
-                        }
+            }
+            productsInventoried {
+                enabled = false
+                title = "react.dashboard.productsInventoried.title.label"
+                info = ""
+                graphType = "numbersCustomColors"
+                type = 'graph'
+                endpoint = "/${appName}/api/dashboard/productsInventoried"
+                colors {
+                    datasets {
+                        state6 = ["first"]
+                        state7 = ["second"]
+                        state8 = ["third"]
                     }
                 }
-                percentageAdHoc {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getPercentageAdHoc"
-                    archived = ['personal', 'warehouse', 'inventory', 'fillRate']
-                    legend = true
-                    datalabel = true
-                    order = 11
-                    colors {
-                        labels {
-                            state5 = ["STOCK"]
-                            state4 = ["ADHOC"]
-                        }
+            }
+            percentageAdHoc {
+                enabled = true
+                title = "react.dashboard.percentageAdHoc.title.label"
+                info = "react.dashboard.percentageAdHoc.info.label"
+                graphType = "doughnut"
+                type = 'graph'
+                endpoint = "/${appName}/api/dashboard/percentageAdHoc"
+                legend = true
+                datalabel = true
+                colors {
+                    labels {
+                        state5 = ["STOCK"]
+                        state4 = ["ADHOC"]
                     }
                 }
-                fillRate {
-                    enabled = true
-                    legend = true
-                    endpoint = "/${appName}/apitablero/getFillRate"
-                    archived = ['personal', 'warehouse', 'inventory']
-                    timeFilter = true
-                    locationFilter = true
-                    timeLimit = 12
-                    doubleAxeY = true
-                    datalabel = false
-                    size = 'big'
-                    colors {
-                        datasets {
-                            state3 = ["Request lines submitted"]
-                            state6 = ["Lines cancelled stock out"]
-                            state2 = ["Average Fill Rate"]
-                            state8 = ["Average of target Fill Rate"]
-                        }
+            }
+            fillRate {
+                enabled = true
+                title = "react.dashboard.fillRate.title.label"
+                info = "react.dashboard.fillRate.info.label"
+                graphType = "bar"
+                type = 'graph'
+                legend = true
+                endpoint = "/${appName}/api/dashboard/fillRate"
+                timeFilter = true
+                locationFilter = true
+                timeLimit = 12
+                doubleAxeY = true
+                datalabel = false
+                size = 'big'
+                colors {
+                    datasets {
+                        state3 = ["Request lines submitted"]
+                        state6 = ["Lines cancelled stock out"]
+                        state2 = ["Average Fill Rate"]
+                        state8 = ["Average of target Fill Rate"]
                     }
-                    order = 12
                 }
-                stockOutLastMonth {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getStockOutLastMonth"
-                    archived = ['personal', 'warehouse', 'inventory', 'fillRate']
-                    legend = true
-                    datalabel = true
-                    order = 13
-                    colors {
-                        labels {
-                            success = ["Never"]
-                            warning = ["Stocked out <1 week"]
-                            state2  = ["Stocked out 1-2 weeks"]
-                            state1  = ["Stocked out 2-3 weeks"]
-                            error   = ["Stocked out 3-4 weeks"]
-                        }
+            }
+            stockOutLastMonth {
+                enabled = true
+                title = "react.dashboard.stockOutLastMonth.title.label"
+                info = "react.dashboard.stockOutLastMonth.info.label"
+                graphType = "doughnut"
+                type = 'graph'
+                endpoint = "/${appName}/api/dashboard/stockOutLastMonth"
+                legend = true
+                datalabel = true
+                colors {
+                    labels {
+                        success = ["Never"]
+                        warning = ["Stocked out <1 week"]
+                        state2  = ["Stocked out 1-2 weeks"]
+                        state1  = ["Stocked out 2-3 weeks"]
+                        error   = ["Stocked out 3-4 weeks"]
                     }
                 }
             }

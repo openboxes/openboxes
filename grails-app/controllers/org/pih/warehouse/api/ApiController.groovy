@@ -11,7 +11,6 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
-import grails.plugin.springcache.annotations.Cacheable
 import grails.util.GrailsUtil
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Location
@@ -131,7 +130,6 @@ class ApiController {
         def hostname = session.hostname ?: "Unknown"
         def timezone = session?.timezone?.ID
         def isPaginated = grailsApplication.config.openboxes.api.pagination.enabled
-        def tablero = grailsApplication.config.openboxes.tablero
         DateFormat dateFormat = new SimpleDateFormat("MM/DD/YYYY");
         String minimumExpirationDate = dateFormat.format(grailsApplication.config.openboxes.expirationDate.minValue)
         def logoLabel = grailsApplication.config.openboxes.logo.label
@@ -160,7 +158,6 @@ class ApiController {
                         ipAddress            : ipAddress,
                         hostname             : hostname,
                         timezone             : timezone,
-                        tablero              : tablero,
                         minimumExpirationDate: minimumExpirationDate,
                         activeLanguage       : locale.language,
                         isPaginated          : isPaginated,
