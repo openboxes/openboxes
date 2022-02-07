@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.api.StockMovementType" %>
+<%@ page import="org.pih.warehouse.api.StockMovementDirection" %>
 <div class="box">
     <h2>
         ${entityName} &rsaquo;
@@ -6,7 +6,7 @@
             <warehouse:message code="requests.label"/>
         </g:if>
         <g:elseif test="${params.direction}">
-            <warehouse:message code="enum.StockMovementType.${params.direction}"/>
+            <warehouse:message code="enum.StockMovementDirection.${params.direction}"/>
         </g:elseif>
         (${totalCount?:0})
     </h2>
@@ -19,11 +19,11 @@
             <th>
                 <warehouse:message code="default.numItems.label"/>
             </th>
-            <g:if test="${!params.direction || params.direction as StockMovementType == StockMovementType.OUTBOUND}">
+            <g:if test="${!params.direction || params.direction as StockMovementDirection == StockMovementDirection.OUTBOUND}">
                 <g:sortableColumn property="status" params="${pageParams}"
                                   title="${warehouse.message(code: 'default.status.label', default: 'Status')}" />
             </g:if>
-            <g:if test="${!params.direction || params.direction as StockMovementType == StockMovementType.INBOUND}">
+            <g:if test="${!params.direction || params.direction as StockMovementDirection == StockMovementDirection.INBOUND}">
                 <th>
                     <warehouse:message code="receiving.status.label"/>
                 </th>
@@ -66,12 +66,12 @@
                 <td>
                     <div class="count">${stockMovement?.lineItemCount}</div>
                 </td>
-                <g:if test="${!params.direction || params.direction as StockMovementType == StockMovementType.OUTBOUND}">
+                <g:if test="${!params.direction || params.direction as StockMovementDirection == StockMovementDirection.OUTBOUND}">
                     <td>
                         <label class="status"><format:metadata obj="${stockMovement?.status}"/></label>
                     </td>
                 </g:if>
-                <g:if test="${!params.direction || params.direction as StockMovementType == StockMovementType.INBOUND}">
+                <g:if test="${!params.direction || params.direction as StockMovementDirection == StockMovementDirection.INBOUND}">
                     <td>
                         <label class="status"><format:metadata obj="${stockMovement?.shipment?.status}"/></label>
                     </td>

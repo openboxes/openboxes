@@ -28,10 +28,8 @@ import org.quartz.JobKey
 import org.quartz.impl.StdScheduler
 import util.ReportUtil
 
-import java.math.MathContext
 import java.math.RoundingMode
 import java.text.DateFormat
-import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 
 class ReportController {

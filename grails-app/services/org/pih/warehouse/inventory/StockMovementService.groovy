@@ -19,8 +19,8 @@ import org.pih.warehouse.api.DocumentGroupCode
 import org.pih.warehouse.api.PackPageItem
 import org.pih.warehouse.api.PickPageItem
 import org.pih.warehouse.api.StockMovement
+import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.api.StockMovementItem
-import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.auth.AuthService
@@ -69,6 +69,7 @@ class StockMovementService {
     def locationService
     def dataService
     def forecastingService
+    def outboundStockMovementService
 
     boolean transactional = true
 
@@ -358,10 +359,10 @@ class StockMovementService {
 
     def getStockMovements(StockMovement criteria, Map params) {
         params.includeStockMovementItems = false
-        switch(criteria.stockMovementType) {
-            case StockMovementType.OUTBOUND:
-                return getOutboundStockMovements(criteria, params)
-            case StockMovementType.INBOUND:
+        switch(criteria.stockMovementDirection) {
+            case StockMovementDirection.OUTBOUND:
+                return outboundStockMovementService.getStockMovements(criteria, params)
+            case StockMovementDirection.INBOUND:
                 return getInboundStockMovements(criteria, params)
             default:
                 throw new IllegalArgumentException("Origin and destination cannot be the same")

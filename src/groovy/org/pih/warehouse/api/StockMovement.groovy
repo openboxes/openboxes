@@ -22,19 +22,6 @@ import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 
-enum StockMovementType {
-
-    INBOUND('Inbound'),
-    OUTBOUND('Outbound')
-
-    String name
-
-    StockMovementType(String name) { this.name = name }
-
-    static list() {
-        [INBOUND, OUTBOUND]
-    }
-}
 
 @Validateable
 class StockMovement {
@@ -67,7 +54,7 @@ class StockMovement {
     String currentStatus
     Float totalValue
 
-    StockMovementType stockMovementType
+    StockMovementDirection stockMovementDirection
     StockMovementStatusCode stockMovementStatusCode
 
 
@@ -99,7 +86,7 @@ class StockMovement {
         requestedBy(nullable: false)
         dateRequested(nullable: false)
 
-        stockMovementType(nullable: true)
+        stockMovementDirection(nullable: true)
         stockMovementStatusCode(nullable: true)
         receiptStatusCode(nullable: true)
         dateShipped(nullable: true)
@@ -381,28 +368,6 @@ class StockMovement {
         }
 
         return stockMovement
-    }
-
-}
-
-enum DocumentGroupCode {
-
-    EXPORT('Export'),
-    INVOICE('Invoice'),
-    PICKLIST('Pick list'),
-    PACKING_LIST('Packing List'),
-    CERTIFICATE_OF_DONATION('Certificate of Donation'),
-    DELIVERY_NOTE('Delivery Note'),
-    GOODS_RECEIPT_NOTE('Goods Receipt Note'),
-
-    final String description
-
-    DocumentGroupCode(String description) {
-        this.description = description
-    }
-
-    static list() {
-        return [EXPORT, INVOICE, PICKLIST, PACKING_LIST, CERTIFICATE_OF_DONATION, DELIVERY_NOTE, GOODS_RECEIPT_NOTE]
     }
 
 }
