@@ -46,7 +46,7 @@ const FIELDS = {
       <button
         type="button"
         className="btn btn-outline-success btn-xs"
-        onClick={() => addRow({})}
+        onClick={() => addRow({}, null, false)}
       ><Translate id="react.default.button.addCustomSubstitution.label" defaultMessage="Add custom substitution" />
       </button>
     ),

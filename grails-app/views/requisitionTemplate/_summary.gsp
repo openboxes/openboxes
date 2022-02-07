@@ -33,7 +33,7 @@
 					</td>
 					<td>
 						<div class="right">
-							<g:if test="${requisition.isPublished}">
+							<g:if test="${requisition?.isPublished}">
 								<div class="tag tag-alert">
 									<warehouse:message code="default.published.label" default="Published"/>
 								</div>
@@ -101,7 +101,7 @@
 						&nbsp;${warehouse.message(code: 'default.button.export.label')}
 					</g:link>
 
-					<g:if test="${!requisition.isPublished}">
+					<g:if test="${!requisition?.isPublished}">
 						<g:link controller="requisitionTemplate" action="publish" id="${requisition?.id}" class="button">
 							<img src="${resource(dir:'images/icons/silk',file:'page_world.png')}" />
 							&nbsp;${warehouse.message(code: 'default.button.publish.label')}
