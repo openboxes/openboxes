@@ -323,8 +323,8 @@ class NotificationService {
                 JSONObject jsonObject = new JSONObject()
 
                 String externalId = product.attributes.find { it.attribute == externalIdAttribute }?.value
-
-                def expiringAvailableItems = availableItems?.findAll { it.product == product && it.inventoryItem.expirationDate }
+                def expiringAvailableItems =
+                        availableItems?.findAll { it.product == product && it.inventoryItem.expirationDate && it.quantityOnHand > 0 }
                 def minExpirationDate = expiringAvailableItems.collect {
                     it?.inventoryItem?.expirationDate
                 }?.min()
