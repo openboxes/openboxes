@@ -116,25 +116,6 @@
                     </span>
                 </div>
             </div>
-
-            <!--
-            <div class="row">
-                <div class="col-sm-4"><strong class="font-weight-600">Label</strong>
-                    <p>Value</p>
-                </div>
-
-                <div class="col-sm-4"><strong class="font-weight-600">Label</strong>
-                    <p>Value</p>
-                </div>
-
-                <div class="col-sm-4"><strong class="font-weight-600">Label</strong>
-                    <p><span class="badge badge-pill badge-dark badge-success alert-success py-1 px-2 font-weight-normal">Confirmed <i
-                            class="fas fa-check-circle"></i></span></p>
-                </div>
-            </div>
-            -->
-
-
         </div>
     </div>
 
@@ -145,6 +126,9 @@
             </li>
             <li class="nav-item" role="presentation">
                 <a class="nav-link" id="events-tab" href="#events" data-bs-toggle="tab">Timeline</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="receipts-tab" href="#receipts" data-bs-toggle="tab">Receipts</a>
             </li>
             <li class="nav-item" role="presentation">
                 <a class="nav-link" id="documents-tab" href="#documents" data-bs-toggle="tab">Documents</a>
@@ -261,6 +245,22 @@
                     </div>
                 </div>
             </div>
+            <div class="tab-pane fade" id="receipts" role="tabpanel" aria-labelledby="receipts-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center trip-title">
+                            <h5 class="h5">Receipts</h5>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <g:render template="receipts" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="tab-pane fade" id="documents" role="tabpanel" aria-labelledby="documents-tab">
                 <div class="card">
                     <div class="card-header">
@@ -269,7 +269,6 @@
                         </div>
                     </div>
                     <div class="card-body">
-
                         <table class="table table-striped table-borderless">
                             <thead>
                                 <tr>
