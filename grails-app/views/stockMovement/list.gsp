@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.api.StockMovementType; org.pih.warehouse.requisition.RequisitionStatus" %>
+<%@ page import="org.pih.warehouse.api.StockMovementDirection; org.pih.warehouse.requisition.RequisitionStatus" %>
 <%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode" %>
 <%@ page import="org.pih.warehouse.requisition.RequisitionType" %>
 <html>
@@ -12,7 +12,7 @@
             &rsaquo; <warehouse:message code="requests.label"/>
         </g:if>
         <g:elseif test="${params.direction}">
-            &rsaquo; <warehouse:message code="enum.StockMovementType.${params.direction}"/>
+            &rsaquo; <warehouse:message code="enum.StockMovementDirection.${params.direction}"/>
         </g:elseif>
     </title>
     <content tag="pageTitle">${entityName}</content>
@@ -44,7 +44,7 @@
                 &rsaquo; <warehouse:message code="requests.label"/>
             </g:if>
             <g:elseif test="${params.direction}">
-                &rsaquo; <warehouse:message code="enum.StockMovementType.${params.direction}"/>
+                &rsaquo; <warehouse:message code="enum.StockMovementDirection.${params.direction}"/>
             </g:elseif>
         </div>
     </div>
@@ -53,13 +53,13 @@
 
         <div class="right">
             <div class="button-container">
-                <g:if test="${params.direction as StockMovementType == StockMovementType.INBOUND}">
+                <g:if test="${params.direction as org.pih.warehouse.api.StockMovementDirection == StockMovementDirection.INBOUND}">
                     <g:link controller="stockMovement" action="exportItems" class="button">
                         <img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" />
                         ${warehouse.message(code: 'stockMovements.exportIncomingItems.label', default: 'Export all incoming items')}
                     </g:link>
                 </g:if>
-                <g:if test="${params.direction as StockMovementType == StockMovementType.OUTBOUND}">
+                <g:if test="${params.direction as StockMovementDirection == StockMovementDirection.OUTBOUND}">
                     <g:link class="button" action="exportPendingRequisitionItems">
                         <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" />&nbsp;
                         <warehouse:message code="stockMovements.exportPendingShipmentItems.label" args="['Preference Type']"/>
@@ -77,7 +77,7 @@
                 <img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}" />&nbsp;
                 <warehouse:message code="default.list.label" args="[warehouse.message(code: 'stockMovement.label')]"/>
             </g:link>
-            <g:if test="${params.direction as StockMovementType == StockMovementType.OUTBOUND}">
+            <g:if test="${params.direction as StockMovementDirection == StockMovementDirection.OUTBOUND}">
                 <g:link controller="stockMovement" action="list" class="button" params="[direction:'OUTBOUND', sourceType: 'ELECTRONIC']">
                     <img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}" />&nbsp;
                     <warehouse:message code="default.open.label" args="[warehouse.message(code: 'requests.label')]"/>
@@ -87,7 +87,7 @@
                 <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
                 <warehouse:message code="default.create.label" args="[warehouse.message(code: 'stockMovement.label')]" />
             </g:link>
-            <g:if test="${params.direction as StockMovementType == StockMovementType.INBOUND}">
+            <g:if test="${params.direction as StockMovementDirection == StockMovementDirection.INBOUND}">
                 <g:link controller="stockMovement" action="createCombinedShipments" class="button" params="[direction:'INBOUND']">
                     <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
                     <warehouse:message code="default.create.label" args="[warehouse.message(code: 'shipmentFromPO.label')]"/>
@@ -113,7 +113,7 @@
                                 <g:textField name="q" style="width:100%" class="text" value="${params.q}" placeholder="Search by requisition number, name, etc"/>
                             </p>
                         </div>
-                        <g:if test="${!params.direction || params.direction as StockMovementType == StockMovementType.OUTBOUND}">
+                        <g:if test="${!params.direction || params.direction as StockMovementDirection == StockMovementDirection.OUTBOUND}">
                             <div class="filter-list-item">
                                 <label><warehouse:message code="stockMovement.status.label"/></label>
                                 <p>
@@ -126,7 +126,7 @@
                                 </p>
                             </div>
                         </g:if>
-                        <g:if test="${!params.direction || params.direction as StockMovementType == StockMovementType.INBOUND}">
+                        <g:if test="${!params.direction || params.direction as StockMovementDirection == StockMovementDirection.INBOUND}">
                             <div class="filter-list-item">
                                 <label><warehouse:message code="stockMovement.receiptStatus.label" default="Receipt Status"/></label>
                                 <p>
@@ -170,7 +170,7 @@
                                               noSelection="['null':'']" class="chzn-select-deselect"/>
                             </p>
                         </div>
-                        <g:if test="${!params.direction || params.direction as StockMovementType == StockMovementType.OUTBOUND}">
+                        <g:if test="${!params.direction || params.direction as StockMovementDirection == StockMovementDirection.OUTBOUND}">
                             <div class="filter-list-item">
                                 <label><warehouse:message code="stockMovement.requestType.label" default="Request type"/></label>
                                 <p>

@@ -19,8 +19,8 @@ import org.pih.warehouse.api.DocumentGroupCode
 import org.pih.warehouse.api.PackPageItem
 import org.pih.warehouse.api.PickPageItem
 import org.pih.warehouse.api.StockMovement
+import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.api.StockMovementItem
-import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.auth.AuthService
@@ -69,6 +69,7 @@ class StockMovementService {
     def locationService
     def dataService
     def forecastingService
+    def outboundStockMovementService
 
     boolean transactional = true
 
@@ -358,10 +359,10 @@ class StockMovementService {
 
     def getStockMovements(StockMovement criteria, Map params) {
         params.includeStockMovementItems = false
-        switch(criteria.stockMovementType) {
-            case StockMovementType.OUTBOUND:
-                return getOutboundStockMovements(criteria, params)
-            case StockMovementType.INBOUND:
+        switch(criteria.stockMovementDirection) {
+            case StockMovementDirection.OUTBOUND:
+                return outboundStockMovementService.getStockMovements(criteria, params)
+            case StockMovementDirection.INBOUND:
                 return getInboundStockMovements(criteria, params)
             default:
                 throw new IllegalArgumentException("Origin and destination cannot be the same")
@@ -428,7 +429,7 @@ class StockMovementService {
     }
 
     def getOutboundStockMovements(StockMovement stockMovement, Map params) {
-        log.info "Stock movement: ${stockMovement?.shipmentStatusCode}"
+        log.info "Stock movement: ${stockMovement?.currentStatus}"
 
         def requisitions = Requisition.createCriteria().list(max: params.max, offset: params.offset) {
             eq("isTemplate", Boolean.FALSE)
@@ -973,13 +974,13 @@ class StockMovementService {
         return packPageItems
     }
 
-    List<ReceiptItem> getStockMovementReceiptItems(StockMovement stockMovement) {
+    List<ReceiptItem> getStockMovementReceiptItems(def stockMovement) {
         return (stockMovement.requisition) ?
                 getRequisitionBasedStockMovementReceiptItems(stockMovement) :
                 getShipmentBasedStockMovementReceiptItems(stockMovement)
     }
 
-    List<ReceiptItem> getRequisitionBasedStockMovementReceiptItems(StockMovement stockMovement) {
+    List<ReceiptItem> getRequisitionBasedStockMovementReceiptItems(def stockMovement) {
         def shipments = Shipment.findAllByRequisition(stockMovement.requisition)
         List<ReceiptItem> receiptItems = shipments*.receipts*.receiptItems?.flatten()?.sort { a, b ->
             a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
@@ -989,7 +990,7 @@ class StockMovementService {
         return receiptItems
     }
 
-    List<ReceiptItem> getShipmentBasedStockMovementReceiptItems(StockMovement stockMovement) {
+    List<ReceiptItem> getShipmentBasedStockMovementReceiptItems(def stockMovement) {
         Shipment shipment = stockMovement.shipment
         List<ReceiptItem> receiptItems = shipment.receipts*.receiptItems?.flatten()?.sort { a, b ->
             a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
@@ -2520,7 +2521,7 @@ class StockMovementService {
     }
 
 
-    List<Map> getDocuments(StockMovement stockMovement) {
+    List<Map> getDocuments(def stockMovement) {
         def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
         def documentList = []
 

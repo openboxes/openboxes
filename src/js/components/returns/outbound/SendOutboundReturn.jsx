@@ -260,7 +260,7 @@ class SendMovementPage extends Component {
         .then(() => {
           apiClient.post(url, flattenRequest(payload))
             .then(() => {
-              window.location = `/openboxes/stockTransfer/show/${this.props.match.params.outboundReturnId}`;
+              window.location = `/openboxes/stockMovement/show/${this.props.match.params.outboundReturnId}`;
             })
             .catch(() => {
               this.props.hideSpinner();
