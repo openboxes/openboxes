@@ -12,22 +12,23 @@ package org.pih.warehouse.notification
 import org.apache.commons.lang3.time.DateUtils
 import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.pih.warehouse.api.StockMovement
+import org.pih.warehouse.api.StockMovementItem
+import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionSourceType
-import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
 
 class OrderNotificationController {
 
+    def productService
     def grailsApplication
     def identifierService
     def notificationService
-    def productService
+    def stockMovementService
 
     def publish = {
         String message = request.JSON.toString()
@@ -64,78 +65,62 @@ class OrderNotificationController {
         String message = json.getString("Message")
         JSONObject orderJson = new JSONObject(message)
         log.info "handle order ${orderJson.toString(4)}"
-        Requisition requisition = new Requisition()
-
-        requisition.status = RequisitionStatus.CREATED
-        requisition.type = RequisitionType.DEFAULT
-        requisition.sourceType = RequisitionSourceType.PAPER
-        requisition.requestNumber = identifierService.generateRequisitionIdentifier()
+        StockMovement stockMovement = new StockMovement()
+        stockMovement.sourceType = RequisitionSourceType.PAPER
+        stockMovement.requestType = RequisitionType.DEFAULT
+        stockMovement.stockMovementType = StockMovementType.OUTBOUND
 
         if (orderJson.has("origin") && orderJson.getString("origin")) {
             JSONObject originJsonObject = orderJson.getJSONObject("origin")
             Location origin = Location.findByLocationNumber(originJsonObject.getString("locationNumber"))
-            requisition.origin = origin
+            stockMovement.origin = origin
         }
 
         if (orderJson.has("destination") && orderJson.getString("destination")) {
             JSONObject destinationJsonObject = orderJson.getJSONObject("destination")
             Location destination = Location.findByLocationNumber(destinationJsonObject.getString("locationNumber"))
-            requisition.destination = destination
+            stockMovement.destination = destination
         }
 
         if (orderJson.has("requestedBy") && orderJson.getString("requestedBy")) {
             User requestedBy = User.findByUsername(orderJson.getString("requestedBy"))
-            requisition.requestedBy = requestedBy
+            stockMovement.requestedBy = requestedBy
         }
 
         if (orderJson.has("dateRequested") && orderJson.getString("dateRequested")) {
             Date dateRequested = DateUtils.parseDate(orderJson.getString("dateRequested"), "yyyy-MM-dd")
-            requisition.dateRequested = dateRequested
+            stockMovement.dateRequested = dateRequested
         }
 
         if (orderJson.has("requestedDeliveryDate") && orderJson.getString("requestedDeliveryDate")) {
             Date dateRequested = DateUtils.parseDate(orderJson.getString("requestedDeliveryDate"), "yyyy-MM-dd")
-            requisition.dateRequested = dateRequested
+            stockMovement.dateRequested = dateRequested
         }
 
-        requisition.name = orderJson.has("name") ? orderJson.getString("name") :
-                "${requisition?.origin?.locationNumber?.toUpperCase()}-${requisition?.destination?.locationNumber?.toUpperCase()}-${requisition?.dateRequested?.format("ddMMMyyyy")?.toUpperCase()}"
-        requisition.description = requisition.name
+        stockMovement.name = orderJson.has("name") ? orderJson.getString("name") :
+                "${stockMovement?.origin?.locationNumber?.toUpperCase()}-${stockMovement?.destination?.locationNumber?.toUpperCase()}-${stockMovement?.dateRequested?.format("ddMMMyyyy")?.toUpperCase()}"
+        stockMovement.description = stockMovement.name
 
         Boolean lineItemHasError = false
         JSONArray orderLineItemsArray = orderJson.getJSONArray("orderItems")
-        for (int lIndex = 0; lIndex < orderLineItemsArray?.length(); lIndex++) {
-            JSONObject lineItem = orderLineItemsArray.getJSONObject(lIndex)
+        for (JSONObject lineItem : orderLineItemsArray) {
             log.info "Reading LineItem:${lineItem} for Order"
-            try {
-                RequisitionItem requisitionItem = new RequisitionItem()
-                Product product = productService.findProductByExternalId(lineItem.getString("productId"))
-                if (!product) {
-                    throw new IllegalArgumentException("Product not found with id:"+lineItem.getString("productId"))
-                }
-                Integer quantity = lineItem.getInt("quantity")
-                requisitionItem.product = product
-                requisitionItem.quantity = quantity
-                requisitionItem.quantityApproved = quantity
-                requisition.addToRequisitionItems(requisitionItem)
-            } catch (Exception e) {
-                log.error "Error ${lineItem}", e
-                lineItemHasError = true
+            StockMovementItem stockMovementItem = new StockMovementItem()
+            Product product = productService.findProductByExternalId(lineItem.getString("productId"))
+            if (!product) {
+                throw new IllegalArgumentException("Product not found with id:"+lineItem.getString("productId"))
             }
+            Integer quantity = lineItem.getInt("quantity")
+            stockMovementItem.product = product
+            stockMovementItem.quantityRequested = quantity
+            stockMovement.lineItems.add(stockMovementItem)
         }
         try {
-            if (!lineItemHasError) {
-                if (requisition.validate() && !requisition.hasErrors()) {
-                    requisition.save(flush: true, failOnError: true)
-                } else {
-                    requisition?.errors?.allErrors?.each {
-                        log.error("ERR:${it}")
-                    }
-                }
-            }
-        } catch (Exception ex) {
-            log.error "Error:${ex.printStackTrace()} in saving ORDER:${ex?.message}"
+            stockMovementService.createStockMovement(stockMovement)
+        } catch (Exception e) {
+            log.error "Error creating stock movement " + e.message, e
         }
 
+        render([status: 200, text: "Order message handled successfully"])
     }
 }
