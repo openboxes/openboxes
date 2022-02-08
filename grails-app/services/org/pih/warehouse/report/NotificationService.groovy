@@ -20,8 +20,6 @@ import com.amazonaws.services.sns.model.SubscribeResult
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.mail.EmailException
 import org.apache.commons.validator.EmailValidator
-import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
 import org.codehaus.groovy.grails.plugins.web.taglib.RenderTagLib
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.codehaus.groovy.grails.web.errors.GrailsWrappedRuntimeException
@@ -338,7 +336,7 @@ class NotificationService {
                 jsonObject.put("locationNumber", location?.locationNumber)
                 jsonObject.put("quantityOnHand", quantityMap[product])
                 jsonObject.put("quantityAvailable", quantityAvailableMap[product])
-                jsonObject.put("earliestExpirationDate", minExpirationDate.format("yyyy-MM-dd"))
+                jsonObject.put("earliestExpirationDate", minExpirationDate ? minExpirationDate.format("yyyy-MM-dd") : JSONObject.NULL)
                 jsonObject.put("quantityExpiring", quantityExpiring ?: 0)
                 log.info "JSONObject:${jsonObject.toString(2)}, for product:${product}"
                 jsonArray.put(jsonObject)
