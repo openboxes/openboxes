@@ -688,9 +688,9 @@ class ReportController {
                 }
                 Integer replenishmentPeriodDays = params.replenishmentPeriodDays ? params.replenishmentPeriodDays.toInteger() : inventoryLevel && inventoryLevel.replenishmentPeriodDays ? inventoryLevel.replenishmentPeriodDays : 365
                 Integer leadTimeDays = params.leadTimeDays ? params.leadTimeDays.toInteger() : inventoryLevel && inventoryLevel.expectedLeadTimeDays ? inventoryLevel.expectedLeadTimeDays : 365
-                def productExpiry = forecastingService.getProductExpiry(Location.load(params.originId), replenishmentPeriodDays + leadTimeDays, item.productId)
+                def productExpiry = forecastingService.getProductExpiry(origin, replenishmentPeriodDays + leadTimeDays, item.productId)
                 def quantityOnOrder = item?.totalOnOrder ?: 0
-                def quantityOnHand = item?.totalOnHand ?: 0
+                def quantityOnHand = item?.totalOnHand ?: productAvailabilityService.getQuantityOnHand(product, origin)
                 def quantityExpiring = productExpiry.collect {it.quantity_on_hand}.sum() ?: 0
                 def quantityAvailable = quantityOnOrder + quantityOnHand - quantityExpiring ?: 0
                 def averageDemand = item.averageMonthlyDemand ? item.averageMonthlyDemand?.setScale(1, RoundingMode.HALF_UP) : 0
