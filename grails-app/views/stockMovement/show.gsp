@@ -89,7 +89,7 @@
                 </g:if>
             </g:isUserAdmin>
         </div>
-        <g:if test="${stockMovement?.shipment}">
+        <g:if test="${(stockMovement?.hasBeenShipped() || stockMovement?.hasBeenPartiallyReceived()) && stockMovement?.destination?.id == session?.warehouse?.id}">
             <div class="button-group">
                 <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
                     <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
