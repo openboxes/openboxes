@@ -2562,6 +2562,9 @@ class StockMovementService {
         Requisition requisition = stockMovement?.requisition
         Shipment shipment = stockMovement?.requisition?.shipment ?: stockMovement?.shipment
         if (shipment && shipment.currentStatus > ShipmentStatusCode.PENDING) {
+            if (shipment.hasShipped()) {
+                requisitionService.rollbackRequisition(requisition)
+            }
             shipmentService.rollbackLastEvent(shipment)
         } else {
             switch (stockMovement.requisition.status) {
