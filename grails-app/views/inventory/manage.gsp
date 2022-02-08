@@ -114,8 +114,8 @@
                 $('#manageInventoryTable tbody').on('click', 'tr', function () {
                     console.log(this);
                     var nTds = $('td', this);
-                    var productCode = $(nTds[0]).text();
-                    var binLocation = $(nTds[2]).text();
+                    var productCode = escape($(nTds[0]).text());
+                    var binLocation = escape($(nTds[2]).text());
                     var lotNumber = escape($(nTds[3]).html());
                     var url = "${request.contextPath}/inventory/editBinLocation?productCode=" + productCode + "&binLocation=" + binLocation + "&lotNumber=" + lotNumber;
                     openModalDialog("#dlgShowDialog", "Adjust Stock", 1000, 400, url);
