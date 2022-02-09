@@ -19,6 +19,7 @@ import {
   REMOVE_FROM_INDICATORS,
   REORDER_INDICATORS,
   FETCH_CONFIG,
+  FETCH_CONFIG_AND_SET_ACTIVE,
   SET_ACTIVE_CONFIG,
   UPDATE_BREADCRUMBS_PARAMS,
   FETCH_BREADCRUMBS_CONFIG,
@@ -379,9 +380,10 @@ export function fetchConfigAndData(locationId, config = 'personal', userId, filt
   return (dispatch) => {
     apiClient.get('/openboxes/api/dashboard/config').then((res) => {
       dispatch({
-        type: FETCH_CONFIG,
+        type: FETCH_CONFIG_AND_SET_ACTIVE,
         payload: {
           data: res.data,
+          activeConfig: config
         },
       });
       getData(dispatch, res.data, locationId, config, userId, filterSelected);

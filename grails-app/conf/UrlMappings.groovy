@@ -44,6 +44,7 @@ class UrlMappings {
         "/api/products/$id/$action" {
             controller = { "productApi" }
         }
+
         "/api/locations/$id/$action" {
             controller = { "locationApi" }
         }
@@ -502,6 +503,11 @@ class UrlMappings {
         "/api/dashboard/inventoryValue"(parseRequest: true) {
             controller = { "dashboardApi" }
             action = [GET: "getInventoryValue"]
+        }
+
+        "/api/dashboard/openPurchaseOrdersCount"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getOpenPurchaseOrdersCount"]
         }
 
         // Standard REST APIs

@@ -3,6 +3,7 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.Cacheable
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.User
 import org.pih.warehouse.dashboard.NumberData
 
@@ -210,6 +211,12 @@ class DashboardApiController {
     def getInventoryValue = {
         Location location = Location.get(params.locationId)
         NumberData numberData = numberDataService.getInventoryValue(location)
+        render (numberData as JSON)
+    }
+
+    @Cacheable("dashboardCache")
+    def getOpenPurchaseOrdersCount = {
+        NumberData numberData = numberDataService.getOpenPurchaseOrdersCount(params)
         render (numberData as JSON)
     }
 }

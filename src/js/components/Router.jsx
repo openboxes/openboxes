@@ -103,6 +103,7 @@ const Router = props => (
         <MainLayoutRoute path="/**/stockTransfer/createOutboundReturn/:outboundReturnId?" component={AsyncOutboundReturns} />
         <MainLayoutRoute path="/**/stockTransfer/createInboundReturn/:inboundReturnId?" component={AsyncInboundReturns} />
         <MainLayoutRoute path="/**/replenishment/create/:replenishmentId?" component={AsyncReplenishment} />
+        <MainLayoutRoute path="/**/dashboard/:configId?" component={AsyncDashboard} />
         <MainLayoutRoute path="/**/" component={AsyncDashboard} />
       </Switch>
     </BrowserRouter>

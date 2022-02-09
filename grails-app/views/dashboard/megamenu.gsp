@@ -210,6 +210,11 @@
                         <warehouse:message code="shipment.shipfromPO.label"/>
                     </g:link>
                 </div>
+                <div class="mm-menu-item">
+                    <a href="${createLink(uri: '/dashboard/supplier', absolute:'true')}">
+                        <warehouse:message code="dashboard.supplierDashboard.label" default="Supplier Dashboard" />
+                    </a>
+                </div>
             </div>
         </li>
         </a>

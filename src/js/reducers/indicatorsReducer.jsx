@@ -9,7 +9,7 @@ import {
   REORDER_INDICATORS,
   RESET_INDICATORS,
   FETCH_CONFIG,
-  SET_ACTIVE_CONFIG,
+  SET_ACTIVE_CONFIG, FETCH_CONFIG_AND_SET_ACTIVE,
 } from '../actions/types';
 import { loadNumbersOptions } from '../consts/dataFormat/customGraphConfig';
 
@@ -133,6 +133,12 @@ export default function (state = initialState, action) {
       return {
         ...state,
         activeConfig: action.payload.data,
+      };
+    case FETCH_CONFIG_AND_SET_ACTIVE:
+      return {
+        ...state,
+        config: action.payload.data,
+        activeConfig: action.payload.activeConfig,
       };
     default:
       return state;

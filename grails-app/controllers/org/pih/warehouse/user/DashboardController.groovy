@@ -108,6 +108,10 @@ class DashboardController {
         render(template: "/common/react")
     }
 
+    def supplier = {
+        render(template: "/common/react")
+    }
+
     def expirationSummary = {
         def location = Location.get(session.warehouse.id)
         def results = dashboardService.getExpirationSummary(location)
