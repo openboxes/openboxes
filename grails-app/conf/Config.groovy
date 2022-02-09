@@ -576,6 +576,20 @@ openboxes {
                         ]
                 ]
             }
+            supplier {
+                name = "Supplier Dashboard"
+                filters {
+                    supplier {
+                        endpoint = "/${appName}/api/locations?direction=INBOUND"
+                    }
+                }
+                widgets = [
+                    [
+                        widgetId: "numberOfOpenPurchaseOrders",
+                        order: 1
+                    ]
+                ]
+            }
         }
         dashboardWidgets {
             inProgressPutaways {
@@ -882,6 +896,15 @@ openboxes {
                         error   = ["Stocked out 3-4 weeks"]
                     }
                 }
+            }
+            numberOfOpenPurchaseOrders {
+                enabled = true
+                title = "react.dashboard.numberOfOpenPurchaseOrders.title.label"
+                info = "react.dashboard.numberOfOpenPurchaseOrders.info.label"
+                subtitle = "react.dashboard.subtitle.purchaseOrders.label"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/${appName}/api/dashboard/openPurchaseOrdersCount"
             }
         }
     }
@@ -1348,7 +1371,8 @@ openboxes {
                             [label: "order.createPurchase.label", defaultLabel: "Create Purchase Order", href: "/${appName}/purchaseOrder/index", requiredActivities: [ActivityCode.PLACE_ORDER]],
                             [label: "order.listPurchase.label", defaultLabel: "List Purchase Orders", href: "/${appName}/order/list?orderType=PURCHASE_ORDER"],
                             [label: "location.listSuppliers.label", defaultLabel: "List Suppliers", href: "/${appName}/supplier/list"],
-                            [label: "shipment.shipfromPO.label", defaultLabel: "Ship from Purchase Order", href: "/${appName}/stockMovement/createCombinedShipments?direction=INBOUND"]
+                            [label: "shipment.shipfromPO.label", defaultLabel: "Ship from Purchase Order", href: "/${appName}/stockMovement/createCombinedShipments?direction=INBOUND"],
+                            [label: "dashboard.supplierDashboard.label", defaultLabel: "Supplier Dashboard", href: "/${appName}/dashboard/supplier"]
                     ]
                 ]
             ]

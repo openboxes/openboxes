@@ -147,7 +147,8 @@ class Dashboard extends Component {
   }
 
   componentDidMount() {
-    this.config = sessionStorage.getItem('dashboardKey') || this.config;
+    const configId = this.getConfigIdFromParams();
+    this.config = configId || sessionStorage.getItem('dashboardKey') || this.config;
     if (this.props.currentLocation !== '') {
       this.fetchData(this.config);
     }
@@ -155,7 +156,8 @@ class Dashboard extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    this.config = sessionStorage.getItem('dashboardKey') || this.config;
+    const configId = this.getConfigIdFromParams();
+    this.config = configId || sessionStorage.getItem('dashboardKey') || this.config;
     const prevLocation = prevProps.currentLocation;
     const newLocation = this.props.currentLocation;
     if (prevLocation !== newLocation) {
@@ -165,6 +167,15 @@ class Dashboard extends Component {
       this.loadPageFilters(this.props.activeConfig);
     }
   }
+
+  getConfigIdFromParams() {
+    if (this.props.match.params.configId) {
+      return this.props.match.params.configId === 'index' ? this.props.activeConfig : this.props.match.params.configId;
+    }
+
+    return '';
+  }
+
   dataFetched = false;
 
   loadPageFilters(config = '') {
@@ -417,6 +428,9 @@ Dashboard.defaultProps = {
   indicatorsData: null,
   numberData: [],
   configModified: false,
+  match: {
+    params: { configId: 'personal' },
+  },
 };
 
 Dashboard.propTypes = {
@@ -440,6 +454,9 @@ Dashboard.propTypes = {
   resetIndicators: PropTypes.func.isRequired,
   fetchConfigAndData: PropTypes.func.isRequired,
   fetchConfig: PropTypes.func.isRequired,
+  match: PropTypes.shape({
+    params: PropTypes.shape({ configId: PropTypes.string }),
+  }),
 };
 
 ArchiveIndicator.propTypes = {

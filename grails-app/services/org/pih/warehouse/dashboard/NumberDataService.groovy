@@ -2,10 +2,13 @@ package org.pih.warehouse.dashboard
 
 import org.joda.time.LocalDate
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderType
+import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionSourceType
@@ -157,5 +160,18 @@ class NumberDataService {
                 ['location': location])
 
         return new NumberData(inventoryValue[0])
+    }
+
+    NumberData getOpenPurchaseOrdersCount (Map params) {
+        if (params.value) {
+            def supplierIds = params.list('value').toList()
+            return new NumberData(Order.createCriteria().list {
+                eq("orderType", OrderType.get(OrderTypeCode.PURCHASE_ORDER.name()))
+                'in'("origin", Location.findAllByIdInList(supplierIds))
+                'in'("status", OrderStatus.listPending())
+            }?.size() ?: 0)
+        }
+
+        return new NumberData(0)
     }
 }
