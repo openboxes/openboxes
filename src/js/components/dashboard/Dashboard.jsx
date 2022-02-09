@@ -147,8 +147,7 @@ class Dashboard extends Component {
   }
 
   componentDidMount() {
-    const configId = this.getConfigIdFromParams();
-    this.config = configId || sessionStorage.getItem('dashboardKey') || this.config;
+    this.config = this.getConfigIdFromParams() || sessionStorage.getItem('dashboardKey') || this.config;
     if (this.props.currentLocation !== '') {
       this.fetchData(this.config);
     }
@@ -156,8 +155,7 @@ class Dashboard extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const configId = this.getConfigIdFromParams();
-    this.config = configId || sessionStorage.getItem('dashboardKey') || this.config;
+    this.config = this.getConfigIdFromParams() || sessionStorage.getItem('dashboardKey') || this.config;
     const prevLocation = prevProps.currentLocation;
     const newLocation = this.props.currentLocation;
     if (prevLocation !== newLocation) {
