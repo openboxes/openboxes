@@ -1373,6 +1373,7 @@ openboxes {
             enabled = true
             label = "default.inbound.label"
             defaultLabel = "Inbound"
+            requiredActivities = [ActivityCode.RECEIVE_STOCK]
             subsections = [
                     [
                             label: "stockMovements.label",
@@ -1398,6 +1399,7 @@ openboxes {
             enabled = true
             label = "outbound.label"
             defaultLabel = "Outbound"
+            requiredActivities = [ActivityCode.SEND_STOCK]
             subsections = [
                 [
                     label: "",
@@ -1459,6 +1461,7 @@ openboxes {
             enabled = true
             label = "products.label"
             defaultLabel = "Products"
+            requiredActivities = [ActivityCode.MANAGE_INVENTORY]
             subsections = [
                 [
                     label: "", // No label

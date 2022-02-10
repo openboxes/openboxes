@@ -839,7 +839,7 @@
         </g:isUserAdmin>
     </g:if>
 
-    <g:if test="${megamenuConfig.customLinks.enabled}">
+    <g:if test="${megamenuConfig.customLinks.enabled && megamenuConfig.customLinks.menuItems}">
         <li class="mm-item">
             <a href="javascript:void(0)" class="mm-item-link">
                 <warehouse:message code="customLinks.label" default="Custom Links" />
@@ -852,11 +852,6 @@
                         </a>
                     </div>
                 </g:each>
-                <g:unless test="${megamenuConfig.customLinks.menuItems}">
-                    <div class="mm-menu-item">
-                        <a href="#">There are no custom links</a>
-                    </div>
-                </g:unless>
             </div>
         </li>
     </g:if>
