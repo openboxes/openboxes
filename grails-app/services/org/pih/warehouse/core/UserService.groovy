@@ -140,6 +140,15 @@ class UserService {
         return false
     }
 
+    Boolean isUserRequestor(User u) {
+        if (u) {
+            def user = User.get(u.id)
+            def roles = [RoleType.ROLE_REQUESTOR]
+            return getEffectiveRoles(user).any { roles.contains(it.roleType) }
+        }
+        return false
+    }
+
     Boolean canUserBrowse(User u) {
         if (u) {
             def user = User.get(u.id)

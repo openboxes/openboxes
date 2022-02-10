@@ -76,7 +76,7 @@ class LocalizationService {
      */
     Properties getMessagesProperties(Locale locale) {
         Properties messagesProperties
-        def messagesPropertiesFilename = (locale && locale.language != "en") ? "messages_${locale.language}.properties" : "messages.properties"
+        def messagesPropertiesFilename = (locale && locale.language != "en" && locale.language != 'null') ? "messages_${locale.language}.properties" : "messages.properties"
 
         // Get properties from classpath
         if (!Metadata.getCurrent().isWarDeployed()) {

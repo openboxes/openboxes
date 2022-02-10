@@ -20,7 +20,6 @@ import util.ConfigHelper
 class LocationService {
 
     def grailsApplication
-    def userService
     boolean transactional = true
 
 
@@ -108,7 +107,6 @@ class LocationService {
     }
 
     def getLocations(String[] fields, Map params, Boolean isSuperuser, String direction, Location currentLocation, User user) {
-
         def locations = new HashSet()
         locations += getLocations(fields, params)
 
@@ -191,6 +189,18 @@ class LocationService {
         }
         return locations
 
+    }
+
+    def getRequestorLocations(User user) {
+        def locations = new HashSet()
+        List locationRolesForRequestor = user?.locationRoles.findAll {it.role.roleType == RoleType.ROLE_REQUESTOR}
+
+        if (locationRolesForRequestor) {
+            locations = locationRolesForRequestor.collect {it.location}
+            locations = locations.findAll {it -> it.supports(ActivityCode.SUBMIT_REQUEST) && !it.supports(ActivityCode.MANAGE_INVENTORY)}
+        }
+
+        return locations
     }
 
     def getSuppliers(String query, Integer max, Integer offset) {

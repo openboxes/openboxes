@@ -34,7 +34,12 @@ class LocationApiController extends BaseDomainApiController {
         boolean isSuperuser = userService.isSuperuser(session?.user)
         String direction = params?.direction
         def fields = params.fields ? params.fields.split(",") : null
-        def locations = locationService.getLocations(fields, params, isSuperuser, direction, currentLocation, currentUser)
+        def locations
+        if (params.locationChooser && userService.isUserRequestor(currentUser)) {
+            locations = locationService.getRequestorLocations(currentUser)
+        } else {
+            locations = locationService.getLocations(fields, params, isSuperuser, direction, currentLocation, currentUser)
+        }
         render ([data:locations] as JSON)
      }
 
