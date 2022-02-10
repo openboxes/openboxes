@@ -79,7 +79,7 @@ class LocationService {
 
     def getLocations(String[] fields, Map params) {
 
-        LocationTypeCode locationTypeCode = params.locationTypeCode ?: null
+        LocationTypeCode locationTypeCode = params?.locationTypeCode ?: null
 
         def locations = Location.createCriteria().list() {
             if (fields) {
@@ -90,11 +90,11 @@ class LocationService {
                 }
             }
 
-            if (params.name) {
+            if (params?.name) {
                 ilike("name", "%" + params.name + "%")
             }
 
-            if (params.locationTypeCode) {
+            if (params?.locationTypeCode) {
                 locationType {
                     eq("locationTypeCode", locationTypeCode)
                 }
@@ -248,9 +248,14 @@ class LocationService {
 
         List locationRolesForRequestor = user.locationRoles.findAll {it.role.roleType == RoleType.ROLE_REQUESTOR}
 
-        if (locationRolesForRequestor) {
-            locations = locationRolesForRequestor.collect {it.location}
-            locations = locations.findAll {it -> it.supports(ActivityCode.SUBMIT_REQUEST) && !it.supports(ActivityCode.MANAGE_INVENTORY)}
+        if (userService.hasDefaultRoleRequestor(user) && !user.locationRoles) {
+            locations = getLocations(null, null)
+            locations = locations.findAll {it -> it.supportedActivities && it.supports(ActivityCode.SUBMIT_REQUEST) }
+        } else if (locationRolesForRequestor && userService.hasRoleBrowser(user)) {
+            locations = getRequestorLocations(user)
+            locations += getLoginLocations(currentLocation)
+        } else if (locationRolesForRequestor) {
+            locations = getRequestorLocations(user)
         } else {
             locations = getLoginLocations(currentLocation)
         }

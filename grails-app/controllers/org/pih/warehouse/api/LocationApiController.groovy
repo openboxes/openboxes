@@ -11,6 +11,7 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import org.hibernate.Criteria
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.ProductAvailability
@@ -35,7 +36,14 @@ class LocationApiController extends BaseDomainApiController {
         String direction = params?.direction
         def fields = params.fields ? params.fields.split(",") : null
         def locations
-        if (params.locationChooser && userService.isUserRequestor(currentUser)) {
+
+        if (params.locationChooser && userService.hasDefaultRoleRequestor(currentUser) && !currentUser.locationRoles) {
+            locations = locationService.getLocations(null, null)
+            locations = locations.findAll { it.supportedActivities && it.supports(ActivityCode.SUBMIT_REQUEST) }
+        } else if (params.locationChooser && userService.isUserRequestor(currentUser) && userService.hasRoleBrowser(currentUser)) {
+            locations = locationService.getRequestorLocations(currentUser)
+            locations += locationService.getLocations(fields, params, isSuperuser, direction, currentLocation, currentUser)
+        } else if (params.locationChooser && userService.isUserRequestor(currentUser)) {
             locations = locationService.getRequestorLocations(currentUser)
         } else {
             locations = locationService.getLocations(fields, params, isSuperuser, direction, currentLocation, currentUser)

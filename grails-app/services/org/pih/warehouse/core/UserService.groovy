@@ -149,6 +149,15 @@ class UserService {
         return false
     }
 
+    Boolean hasDefaultRoleRequestor(User u) {
+        if (u) {
+            def user = User.get(u.id)
+            def roles = [RoleType.ROLE_REQUESTOR]
+            return user.getDefaultRoles().any { roles.contains(it.roleType) }
+        }
+        return false
+    }
+
     Boolean canUserBrowse(User u) {
         if (u) {
             def user = User.get(u.id)
@@ -190,6 +199,15 @@ class UserService {
             def roleTypes = [RoleType.ROLE_INVOICE]
             def co = getEffectiveRoles(user).any { Role role -> roleTypes.contains(role.roleType) }
             return co
+        }
+        return false
+    }
+
+    Boolean hasRoleBrowser(User u) {
+        if (u) {
+            def user = User.get(u.id)
+            def roleTypes = [RoleType.ROLE_BROWSER]
+            return getEffectiveRoles(user).any { Role role -> roleTypes.contains(role.roleType) }
         }
         return false
     }
