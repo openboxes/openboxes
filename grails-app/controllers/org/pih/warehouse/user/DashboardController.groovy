@@ -15,21 +15,17 @@ import grails.plugin.springcache.annotations.Cacheable
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.Tag
-import org.pih.warehouse.core.UnitOfMeasure
-import org.pih.warehouse.core.UnitOfMeasureClass
-import org.pih.warehouse.core.UnitOfMeasureType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.jobs.RefreshInventorySnapshotJob
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
 
 import java.text.SimpleDateFormat
@@ -104,7 +100,10 @@ class DashboardController {
             redirect(controller: "mobile")
             return
         }
-
+        if (userService.hasHighestRole(session?.user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED)) {
+            redirect(controller: "stockMovement", action: "list", params: [direction: 'INBOUND'] )
+            return
+        }
         render(template: "/common/react")
     }
 
@@ -190,6 +189,11 @@ class DashboardController {
                 user.lastLoginDate = new Date()
                 user.save(flush: true)
                 session.user = user
+            }
+
+            if (userService.hasHighestRole(session?.user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED)) {
+                redirect(controller: 'stockMovement', action: 'list' , params: [direction: 'INBOUND'])
+                return
             }
 
             // Successfully logged in and selected a warehouse

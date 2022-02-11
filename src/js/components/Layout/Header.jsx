@@ -54,7 +54,7 @@ class Header extends Component {
         <div className="d-flex align-items-center justify-content-between flex-wrap">
           <div className="logo-header">
             <a
-              href="/openboxes"
+              href={this.props.highestRole === 'Authenticated' ? '/openboxes/stockMovement/list?direction=INBOUND' : '/openboxes'}
               className="navbar-brand brand-name"
             >
               { this.state.logoUrl !== '' ?
@@ -77,6 +77,7 @@ class Header extends Component {
 const mapStateToProps = state => ({
   username: state.session.user.username,
   isImpersonated: state.session.isImpersonated,
+  highestRole: state.session.highestRole,
   logoUrl: state.session.logoUrl,
   logoLabel: state.session.logoLabel,
 });
@@ -92,4 +93,5 @@ Header.propTypes = {
   logoUrl: PropTypes.string.isRequired,
   /** Id of the current location */
   logoLabel: PropTypes.string.isRequired,
+  highestRole: PropTypes.string.isRequired,
 };

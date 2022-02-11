@@ -1412,7 +1412,7 @@ openboxes {
                             defaultLabel: "Stock Movements",
                             menuItems: [
                                     [label: "inbound.create.label", defaultLabel: "Create Inbound Movement", href: "/${appName}/stockMovement/createInbound?direction=INBOUND"],
-                                    [label: "stockRequest.create.label", defaultLabel: "Create Stock Request", href: "/${appName}/stockMovement/createRequest"],
+                                    [label: "stockRequest.create.label", defaultLabel: "Create Stock Request", href: "/${appName}/stockMovement/createRequest", requiredRole: [RoleType.ROLE_REQUESTOR]],
                                     [label: "inbound.list.label", defaultLabel: "List Inbound Movements", href: "/${appName}/stockMovement/list?direction=INBOUND"],
                                     [label: "inboundReturns.create.label", defaultLabel: "Create Inbound Return", href: "/${appName}/stockTransfer/createInboundReturn"]
                             ]
@@ -1657,6 +1657,24 @@ openboxes {
             enabled = false
             label = "receiving.label"
             defaultLabel = "Receiving"
+        }
+    }
+    requestorMegamenu {
+        request {
+            enabled = true
+            requiredRole = [RoleType.ROLE_REQUESTOR]
+            label = "default.inbound.label"
+            defaultLabel = "Inbound"
+            subsections = [
+                    [
+                            label       : "stockMovements.label",
+                            defaultLabel: "Stock Movements",
+                            menuItems   : [
+                                    [label: "stockRequest.create.label", defaultLabel: "Create Stock Request", href: "/${appName}/stockMovement/createRequest"],
+                                    [label: "inbound.list.label", defaultLabel: "List Inbound Movements", href: "/${appName}/stockMovement/list?direction=INBOUND"],
+                            ]
+                    ]
+            ]
         }
     }
 }
