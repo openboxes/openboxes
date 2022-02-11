@@ -38,7 +38,7 @@ CREATE OR REPLACE VIEW stock_movement AS
            null as order_status,
            'STOCK_MOVEMENT' as stock_movement_type
     from requisition r
-        left join shipment s on s.requisition_id = r.id
+        join shipment s on s.requisition_id = r.id
     where r.is_template is false
 
 union all
@@ -75,10 +75,10 @@ union all
            o.status as order_status,
            'RETURN_ORDER' as stock_movement_type
     from `order` o
-         left join order_item oi on oi.order_id = o.id
-         left join order_shipment os on os.order_item_id = oi.id
-         left join shipment_item si on si.id = os.shipment_item_id
-         left join shipment s on s.id = si.shipment_id
+         join order_item oi on oi.order_id = o.id
+         join order_shipment os on os.order_item_id = oi.id
+         join shipment_item si on si.id = os.shipment_item_id
+         join shipment s on s.id = si.shipment_id
 
     where order_type_id = 'RETURN_ORDER'
     group by o.id, s.id, tracking_number;
