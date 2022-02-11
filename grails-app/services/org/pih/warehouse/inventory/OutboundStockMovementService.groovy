@@ -18,13 +18,17 @@ class OutboundStockMovementService {
 
     boolean transactional = true
 
-    OutboundStockMovement getStockMovement(String id) {
+    def getStockMovement(String id) {
         OutboundStockMovement outboundStockMovement = OutboundStockMovement.get(id)
-        if (outboundStockMovement) {
-            return outboundStockMovement
-        } else {
-            throw new ObjectNotFoundException(id, OutboundStockMovement.class.toString())
-        }
+
+        // Temporary returning outboundStockMovement even if not found.
+        // This is a workaround, because we don't have INBOUND SM covered for the PO shipment case.
+        return outboundStockMovement
+        // if (outboundStockMovement) {
+        //     return outboundStockMovement
+        // } else {
+        //     throw new ObjectNotFoundException(id, OutboundStockMovement.class.toString())
+        // }
     }
 
     def getStockMovements(StockMovement stockMovement, Map params) {

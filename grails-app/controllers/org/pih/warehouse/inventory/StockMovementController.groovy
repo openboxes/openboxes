@@ -113,10 +113,13 @@ class StockMovementController {
     }
 
     def show = {
-        OutboundStockMovement stockMovement = outboundStockMovementService.getStockMovement(params.id)
+        def stockMovement = outboundStockMovementService.getStockMovement(params.id)
+        if (!stockMovement) {
+            stockMovement =  stockMovementService.getStockMovement(params.id)
+        }
         stockMovement.documents = stockMovementService.getDocuments(stockMovement)
 
-        if (StockMovementType.RETURN_ORDER == stockMovement.stockMovementType) {
+        if (stockMovement.hasProperty("stockMovementType") && stockMovement.stockMovementType == StockMovementType.RETURN_ORDER) {
             render(view: "/returns/show", model: [stockMovement: stockMovement])
         } else {
             render(view: "show", model: [stockMovement: stockMovement])
@@ -341,18 +344,27 @@ class StockMovementController {
     }
 
     def documents = {
-        OutboundStockMovement stockMovement = outboundStockMovementService.getStockMovement(params.id)
+        def stockMovement = outboundStockMovementService.getStockMovement(params.id)
+        if (!stockMovement) {
+            stockMovement =  stockMovementService.getStockMovement(params.id)
+        }
         stockMovement.documents = stockMovementService.getDocuments(stockMovement)
         render(template: "documents", model: [stockMovement: stockMovement])
     }
 
     def packingList = {
-        OutboundStockMovement stockMovement = outboundStockMovementService.getStockMovement(params.id)
+        def stockMovement = outboundStockMovementService.getStockMovement(params.id)
+        if (!stockMovement) {
+            stockMovement =  stockMovementService.getStockMovement(params.id)
+        }
         render(template: "packingList", model: [stockMovement: stockMovement])
     }
 
     def receipts = {
-        OutboundStockMovement stockMovement = outboundStockMovementService.getStockMovement(params.id)
+        def stockMovement = outboundStockMovementService.getStockMovement(params.id)
+        if (!stockMovement) {
+            stockMovement =  stockMovementService.getStockMovement(params.id)
+        }
         def receiptItems = stockMovementService.getStockMovementReceiptItems(stockMovement)
         render(template: "receipts", model: [receiptItems: receiptItems])
     }
@@ -397,7 +409,10 @@ class StockMovementController {
 
     def addDocument = {
         log.info params
-        OutboundStockMovement stockMovement = outboundStockMovementService.getStockMovement(params.id)
+        def stockMovement = outboundStockMovementService.getStockMovement(params.id)
+        if (!stockMovement) {
+            stockMovement =  stockMovementService.getStockMovement(params.id)
+        }
 
         Shipment shipmentInstance = stockMovement.shipment
         def documentInstance = Document.get(params?.document?.id)
