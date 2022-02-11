@@ -214,7 +214,6 @@ class DashboardApiController {
         render (numberData as JSON)
     }
 
-    @Cacheable("dashboardCache")
     def getOpenPurchaseOrdersCount = {
         NumberData numberData = numberDataService.getOpenPurchaseOrdersCount(params)
         render (numberData as JSON)

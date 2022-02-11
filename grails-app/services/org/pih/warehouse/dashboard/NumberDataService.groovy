@@ -13,8 +13,12 @@ import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.shipping.ShipmentStatus
+import org.pih.warehouse.shipping.ShipmentStatusCode
 
 class NumberDataService {
+
+    def dataService
 
     NumberData getInventoryByLotAndBin(def location) {
         def binLocations = ProductAvailability.executeQuery("select count(*) from ProductAvailability pa where pa.location = :location and pa.quantityOnHand > 0",
@@ -163,15 +167,32 @@ class NumberDataService {
     }
 
     NumberData getOpenPurchaseOrdersCount (Map params) {
+        def openPurchaseOrdersCount = 0
+
         if (params.value) {
-            def supplierIds = params.list('value').toList()
-            return new NumberData(Order.createCriteria().list {
-                eq("orderType", OrderType.get(OrderTypeCode.PURCHASE_ORDER.name()))
-                'in'("origin", Location.findAllByIdInList(supplierIds))
-                'in'("status", OrderStatus.listPending())
-            }?.size() ?: 0)
+            def supplierIds = params.list('value').toList().collect { "'$it'" }.join(',')
+            def pendingShipmentStatues = ShipmentStatusCode.listPending().collect { "'$it'" }.join(',')
+            def pendingOrderStatuses = OrderStatus.listPending().collect { "'$it'" }.join(',')
+            def openPurchaseOrders = dataService.executeQuery("""
+                SELECT 
+                    COUNT(DISTINCT o.id) AS openPurchaseOrdersCount
+                FROM `order` AS o
+                    LEFT OUTER JOIN order_item ON o.id = order_item.order_id
+                    LEFT OUTER JOIN order_shipment ON order_item.id = order_shipment.order_item_id
+                    LEFT OUTER JOIN shipment_item ON shipment_item.id = order_shipment.shipment_item_id
+                    LEFT OUTER JOIN shipment ON shipment.id = shipment_item.shipment_id
+                WHERE 
+                    o.order_type_id = '${OrderTypeCode.PURCHASE_ORDER.name()}' AND 
+                    o.origin_id in (${supplierIds}) AND 
+                    (
+                        (shipment.id IS NOT NULL AND shipment.current_status IN (${pendingShipmentStatues})) OR 
+                        (shipment.id IS NULL AND o.status IN (${pendingOrderStatuses}))
+                    )
+            """)
+
+            openPurchaseOrdersCount = openPurchaseOrders?.size() ? openPurchaseOrders[0].openPurchaseOrdersCount : 0
         }
 
-        return new NumberData(0)
+        return new NumberData(openPurchaseOrdersCount)
     }
 }
