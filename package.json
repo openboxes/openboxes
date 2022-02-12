@@ -40,7 +40,7 @@
   },
   "homepage": "https://github.com/openboxes/openboxes#readme",
   "dependencies": {
-    "@fortawesome/fontawesome-free": "5.12.1",
+    "@fortawesome/fontawesome-free": "5.14.0",
     "@fortawesome/fontawesome-svg-core": "1.2.30",
     "@fortawesome/free-brands-svg-icons": "5.14.0",
     "@fortawesome/free-regular-svg-icons": "5.14.0",
@@ -58,7 +58,7 @@
     "js-file-download": "0.4.1",
     "lodash": "4.17.21",
     "moment": "2.22.2",
-    "popper.js": "1.14.4",
+    "popper.js": "1.14.7",
     "prop-types": "15.6.2",
     "query-string": "6.10.1",
     "react": "16.4.2",
@@ -90,6 +90,7 @@
     "redux-thunk": "2.3.0"
   },
   "devDependencies": {
+    "acorn": "6.4.2",
     "babel": "6.23.0",
     "babel-core": "6.26.3",
     "babel-eslint": "8.0.1",
@@ -111,6 +112,7 @@
     "html-webpack-plugin": "3.2.0",
     "jest": "22.4.4",
     "jquery": "3.5.0",
+    "jss": "9.8.7",
     "mini-css-extract-plugin": "0.4.4",
     "node-sass": "4.14.1",
     "optimize-css-assets-webpack-plugin": "5.0.1",
