@@ -13,21 +13,18 @@ class AutomaticStateTransitionJob {
     def stockMovementService
 
     static triggers = {
-        cron name: 'autoTransitionRequisitionStatusJobCronTrigger',
-                cronExpression: ConfigurationHolder.config.openboxes.jobs.automaticStateTransitionJob.cronExpression
+        /* should only be triggered programmatically */
     }
 
     def execute(JobExecutionContext context) {
-        log.info "Running automatic state transition job ... "
+        log.info "Automatic state transition job " + context.mergedJobDataMap.get("id")
         if(!ConfigurationHolder.config.openboxes.jobs.automaticStateTransitionJob.enabled) {
             return
         }
-
-        StockMovement criteria = new StockMovement(stockMovementStatusCode: StockMovementStatusCode.PICKING)
-        def stockMovements = stockMovementService.getOutboundStockMovements(criteria, [:])
-        log.info "Found ${stockMovements.size()} stock movements in PICKING "
-        stockMovements.each { StockMovement stockMovement ->
-            log.info "stock movement " + stockMovement.identifier + " " + stockMovement.status
+        String id = context.mergedJobDataMap.get("id")
+        StockMovement stockMovement = stockMovementService.getStockMovement(id, false)
+        if (stockMovement) {
+            log.info "Transition stock movement " + stockMovement.identifier + " status = " + stockMovement.status
             tmsIntegrationService.triggerStockMovementStatusUpdate(stockMovement)
         }
     }
