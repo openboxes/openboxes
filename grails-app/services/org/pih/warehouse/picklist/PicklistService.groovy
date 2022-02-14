@@ -16,6 +16,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
+import org.pih.warehouse.inventory.RefreshPicklistStatusEvent
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Product
@@ -24,6 +25,7 @@ import org.pih.warehouse.requisition.RequisitionStatus
 
 class PicklistService {
 
+    def grailsApplication
     def productAvailabilityService
 
     Picklist save(Map data) {
@@ -81,6 +83,12 @@ class PicklistService {
         picklistItem.picker = User.load(pickerId)
         if (picklistItem.hasErrors() || !picklistItem.save(flush:true)) {
             throw new ValidationException("Unable to save picklist item", picklistItem.errors)
+        }
+
+        // Check if the picklist has been completed
+        String requisitionId = picklistItem?.picklist?.requisition?.id
+        if (requisitionId) {
+            grailsApplication.mainContext.publishEvent(new RefreshPicklistStatusEvent(requisitionId))
         }
     }
 

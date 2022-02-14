@@ -26,12 +26,6 @@ import org.pih.warehouse.requisition.Requisition
  */
 class Picklist implements Serializable {
 
-    def publishRefreshEvent = {
-        publishEvent(new RefreshPicklistStatusEvent(requisition?.id))
-    }
-
-    def afterUpdate = publishRefreshEvent
-
     def beforeInsert = {
         def currentUser = AuthService.currentUser.get()
         if (currentUser) {
