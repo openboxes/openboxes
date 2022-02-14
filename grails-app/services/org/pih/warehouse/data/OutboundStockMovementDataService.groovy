@@ -98,6 +98,12 @@ class OutboundStockMovementDataService {
             }
         }
 
+        // FIXME When creating the stock movement in the UI, we create a placeholder shipment.
+        identifiers.each { String identifier ->
+            StockMovement stockMovement = stockMovementService.getStockMovementByIdentifier(identifier)
+            stockMovementService.createShipment(stockMovement)
+        }
+
         // Generate hypothetical delivery order for newly created stock movements
         Boolean uploadDeliveryOrderOnCreate = grailsApplication.config.openboxes.integration.uploadDeliveryOrderOnCreate.enabled
         if (uploadDeliveryOrderOnCreate) {
