@@ -72,20 +72,50 @@ class InboundStockMovementDataService {
             stockMovement = new StockMovement()
         }
 
+        if (!params?.origin) {
+            command.errors.reject("Order number ${params.loadCode} failed: Origin is required")
+        }
+        if (!params?.destination) {
+            command.errors.reject("Order number ${params.loadCode} failed: Destination is required")
+        }
+        if (params?.quantity < 0) {
+            command.errors.reject("Order number ${params.loadCode} failed: Requested Quantity is required")
+        }
+        if(command?.location?.locationNumber != params.destination) {
+            command.errors.reject("Order number ${params.loadCode} failed: Destination [${params.destination}] must match the current location [${command?.location?.locationNumber}]")
+        }
+
+        Location origin = Location.findByLocationNumber(params.origin)
+        log.info "origin ${params.origin} " + origin
+        if (!origin) {
+            command.errors.reject("Order number ${params.loadCode} failed: Unknown Supplier [${params.origin}]")
+        }
+
+        Location destination = Location.findByLocationNumber(params.destination)
+        log.info "destination ${params.destination} " + destination
+        if (!destination) {
+            command.errors.reject("Order number ${params.loadCode} failed: Unknown Destination [${params.destination}]")
+        }
+
+
         if (stockMovement.stockMovementStatusCode >= StockMovementStatusCode.DISPATCHED) {
-            throw new IllegalStateException("Cannot update an inbound stock movement with status ${stockMovement?.stockMovementStatusCode}")
+            command.errors.reject("Order number ${params.loadCode} failed: Cannot update an inbound stock movement with status ${stockMovement?.stockMovementStatusCode}")
         }
 
         def expectedDeliveryDate =
                 new SimpleDateFormat("yyyy-MM-dd").parse(params.deliveryDate.toString())
+
+        if (expectedDeliveryDate.before(new Date())) {
+            command.errors.reject("Order number ${params.loadCode} failed: Expected delivery date should not be in the past")
+        }
 
         stockMovement.identifier = params.loadCode
         stockMovement.description = ""
         stockMovement.stockMovementType = StockMovementType.INBOUND
         stockMovement.requestType = RequisitionType.DEFAULT
         stockMovement.sourceType = RequisitionSourceType.PAPER
-        stockMovement.origin = findLocationByLocationNumber(params.origin)
-        stockMovement.destination = findLocationByLocationNumber(params.destination)
+        stockMovement.origin = origin
+        stockMovement.destination = destination
         stockMovement.dateRequested = new Date()
         stockMovement.requestedBy = AuthService.currentUser.get()
         stockMovement.requestedDeliveryDate = expectedDeliveryDate
@@ -100,27 +130,18 @@ class InboundStockMovementDataService {
         String productCode = params.productCode
         Product product = Product.findByProductCode(productCode)
         if(!product) {
-            command.errors.reject("Product not found for product code ${productCode}")
+            command.errors.reject("Order number ${params.loadCode} failed: Unknown SKU [${productCode}]")
         }
 
         def quantityRequested = params.quantity as Integer
         if (quantityRequested < 0) {
-            command.errors.reject("Requested quantity (${quantityRequested}) for ${productCode} should be greater than or equal to 0")
+            command.errors.reject("Order number ${params.loadCode} failed: Requested quantity [${quantityRequested}] for SKU ${productCode} should be greater than or equal to 0")
         }
 
         stockMovementItem.product = product
         stockMovementItem.quantityRequested = quantityRequested
         stockMovementItem.comments = params.specialInstructions
         return stockMovementItem
-    }
-
-
-    Location findLocationByLocationNumber(String locationNumber) {
-        Location location = Location.findByLocationNumber(locationNumber)
-        if (!location) {
-            throw new IllegalArgumentException("Location not found for location number ${locationNumber}")
-        }
-        return location
     }
 
 
