@@ -89,9 +89,7 @@
     <div class="content">
         <table>
             <tr>
-                <td>
-                    <g:displayReportLogo/>
-                </td>
+                <th><g:message code="order.orderNumber.label"/></th>
                 <td>
                     ${jsonObject?.putawayNumber}
                 </td>
