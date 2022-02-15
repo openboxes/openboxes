@@ -32,18 +32,15 @@
                               title="${warehouse.message(code: 'stockMovement.identifier.label', default: 'Stock movement number')}" />
 
             <th><g:message code="default.name.label"/></th>
-            <th><g:message code="stockMovement.origin.label"/></th>
             <th><g:message code="stockMovement.destination.label"/></th>
-            <th><g:message code="stockMovement.stocklist.label"/></th>
-
-
             <g:sortableColumn property="requestedBy" params="${pageParams}"
                               title="${warehouse.message(code: 'stockMovement.requestedBy.label', default: 'Requested by')}" />
 
             <g:sortableColumn property="dateRequested" params="${pageParams}"
                               title="${warehouse.message(code: 'stockMovement.dateRequested.label', default: 'Date requested')}" />
 
-            <th><g:message code="default.dateCreated.label"/></th>
+            <th><g:message code="stockMovement.requestedDeliveryDate.label" default="Requested delivery date"/></th>
+            <th><g:message code="stockMovement.expectedDeliveryDate.label" default="Expected delivery date"/></th>
 
         </tr>
         </thead>
@@ -87,13 +84,7 @@
                     </g:link>
                 </td>
                 <td>
-                    ${stockMovement?.origin?.name}
-                </td>
-                <td>
                     ${stockMovement?.destination?.name}
-                </td>
-                <td>
-                    ${stockMovement?.stocklist?.name?:"N/A"}
                 </td>
                 <td>
                     ${stockMovement.requestedBy?:warehouse.message(code:'default.noone.label')}
@@ -102,7 +93,10 @@
                     <g:formatDate format="MMM dd, yyyy" date="${stockMovement?.dateRequested}"/>
                 </td>
                 <td>
-                    <g:formatDate format="MMM dd, yyyy" date="${stockMovement?.dateCreated}"/>
+                    <g:formatDate format="MMM dd, yyyy" date="${stockMovement?.requisition?.requestedDeliveryDate}"/>
+                </td>
+                <td>
+                    <g:formatDate format="MMM dd, yyyy HH:mm" date="${stockMovement?.shipment?.expectedDeliveryDate}"/>
                 </td>
             </tr>
         </g:each>

@@ -326,6 +326,21 @@
                         </tr>
                         <tr class="prop">
                             <td class="name">
+                                <g:message code="stockMovement.requestedDeliveryDate.label" default="Requested Delivery Date"/>
+                            </td>
+                            <td class="value">
+                                <g:if test="${stockMovement?.requestedDeliveryDate}">
+                                    <span title="${g.formatDate(date:stockMovement?.requestedDeliveryDate)}">
+                                        <g:formatDate format="MMMM dd, yyyy HH:mm z" date="${stockMovement?.requestedDeliveryDate}"/>
+                                    </span>
+                                </g:if>
+                                <g:else>
+                                    <g:message code="default.none.label"/>
+                                </g:else>
+                            </td>
+                        </tr>
+                        <tr class="prop">
+                            <td class="name">
                                 <g:message code="stockMovement.dateShipped.label"/>
                                 <g:if test="${stockMovement?.shipment?.status?.code==org.pih.warehouse.shipping.ShipmentStatusCode.PENDING}">
                                     <small><g:message code="default.expected.label"/></small>
@@ -334,12 +349,27 @@
                             <td class="value">
                                 <g:if test="${stockMovement?.dateShipped}">
                                     <span title="${g.formatDate(date:stockMovement?.dateShipped)}">
-                                        <g:formatDate format="MMMM dd, yyyy" date="${stockMovement?.dateShipped}"/>
+                                        <g:formatDate format="MMMM dd, yyyy HH:mm z" date="${stockMovement?.dateShipped}"/>
                                     </span>
                                     <g:if test="${stockMovement?.shipment?.createdBy}">
                                         <g:message code="default.by.label"/>
                                         ${stockMovement?.shipment?.createdBy?.name}
                                     </g:if>
+                                </g:if>
+                                <g:else>
+                                    <g:message code="default.none.label"/>
+                                </g:else>
+                            </td>
+                        </tr>
+                        <tr class="prop">
+                            <td class="name">
+                                <g:message code="stockMovement.expectedDeliveryDate.label" default="Expected Delivery Date"/>
+                            </td>
+                            <td class="value">
+                                <g:if test="${stockMovement?.shipment?.expectedDeliveryDate}">
+                                    <span title="${g.formatDate(date:stockMovement?.expectedDeliveryDate)}">
+                                        <g:formatDate format="MMMM dd, yyyy HH:mm z" date="${stockMovement?.expectedDeliveryDate}"/>
+                                    </span>
                                 </g:if>
                                 <g:else>
                                     <g:message code="default.none.label"/>
@@ -427,13 +457,13 @@
                                 <warehouse:message code="stockMovement.lineItems.label" default="Order"/>
                             </a>
                         </li>
+                    </g:else>
+                    <g:if test="${stockMovement?.shipment}">
                         <li>
                             <a href="${request.contextPath}/stockMovement/schedule/${stockMovement?.id}">
                                 <warehouse:message code="stockMovement.schedule.label" default="Scheduling"/>
                             </a>
                         </li>
-                    </g:else>
-                    <g:if test="${stockMovement?.shipment}">
                         <li>
                             <a href="${request.contextPath}/stockMovement/events/${stockMovement?.id}">
                                 <warehouse:message code="stockMovement.events.label" default="Events"/>
