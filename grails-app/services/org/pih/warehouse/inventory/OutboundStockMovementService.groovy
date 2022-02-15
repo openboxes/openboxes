@@ -34,7 +34,7 @@ class OutboundStockMovementService {
     def getStockMovements(StockMovement stockMovement, Map params) {
         params.includeStockMovementItems = false
 
-        def stockMovements = OutboundStockMovement.createCriteria().list(max: params.max, offset: params.offset) {
+        def stockMovements = OutboundStockMovementListItem.createCriteria().list(max: params.max, offset: params.offset) {
 
             if (stockMovement?.receiptStatusCodes) {
                 'in'("shipmentStatus", stockMovement.receiptStatusCodes)
