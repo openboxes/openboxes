@@ -122,8 +122,14 @@ class StockMovementController {
 
         def max = params.max ? params.max as int : 10
         def offset = params.offset ? params.offset as int : 0
-        Date createdAfter = params.createdAfter ? Date.parse("MM/dd/yyyy", params.createdAfter) : null
-        Date createdBefore = params.createdBefore ? Date.parse("MM/dd/yyyy", params.createdBefore) : null
+        Date dateCreatedFrom = params.dateCreatedFrom ? Date.parse("MM/dd/yyyy", params.dateCreatedFrom) : null
+        Date dateCreatedTo = params.dateCreatedTo ? Date.parse("MM/dd/yyyy", params.dateCreatedTo) : null
+        Date requestedDeliveryDateFrom = params.requestedDeliveryDateFrom ? Date.parse("MM/dd/yyyy", params.requestedDeliveryDateFrom) : null
+        Date requestedDeliveryDateTo = params.requestedDeliveryDateTo ? Date.parse("MM/dd/yyyy", params.requestedDeliveryDateTo) : null
+        Date expectedDeliveryDateFrom = params.expectedDeliveryDateFrom ? Date.parse("MM/dd/yyyy", params.expectedDeliveryDateFrom) : null
+        Date expectedDeliveryDateTo = params.expectedDeliveryDateTo ? Date.parse("MM/dd/yyyy", params.expectedDeliveryDateTo) : null
+        Date expectedShippingDateFrom = params.expectedShippingDateFrom ? Date.parse("MM/dd/yyyy", params.expectedShippingDateFrom) : null
+        Date expectedShippingDateTo = params.expectedShippingDateTo ? Date.parse("MM/dd/yyyy", params.expectedShippingDateTo) : null
         Location currentLocation = Location.get(session?.warehouse?.id)
 
         StockMovementType stockMovementType = params.direction ? params.direction as StockMovementType : null
@@ -163,9 +169,10 @@ class StockMovementController {
         // Create stock movement to be used as search criteria
         StockMovement stockMovement = new StockMovement()
         if (params.q) {
-            stockMovement.identifier = "%" + params.q + "%"
             stockMovement.name = "%" + params.q + "%"
+            stockMovement.identifier = "%" + params.q + "%"
             stockMovement.description = "%" + params.q + "%"
+            stockMovement.trackingNumber = "%" + params.q + "%"
         }
 
         stockMovement.stockMovementType = stockMovementType
@@ -183,7 +190,22 @@ class StockMovementController {
         def stockMovements
 
         try {
-            stockMovements = stockMovementService.getStockMovements(stockMovement, [max: max, offset: offset, createdAfter: createdAfter, createdBefore: createdBefore])
+            stockMovements = stockMovementService.getStockMovements(stockMovement,
+                    [
+                            max: max,
+                            offset: offset,
+                            sort: params.sort,
+                            order: params.order,
+                            dateCreatedFrom: dateCreatedFrom,
+                            dateCreatedTo: dateCreatedTo,
+                            expectedShippingDateFrom: expectedShippingDateFrom,
+                            expectedShippingDateTo: expectedShippingDateTo,
+                            expectedDeliveryDateFrom: expectedDeliveryDateFrom,
+                            expectedDeliveryDateTo: expectedDeliveryDateTo,
+                            requestedDeliveryDateFrom: requestedDeliveryDateFrom,
+                            requestedDeliveryDateTo: requestedDeliveryDateTo
+                    ]
+            )
         } catch(Exception e) {
             flash.message = "${e.message}"
         }

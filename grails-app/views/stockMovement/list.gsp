@@ -16,7 +16,6 @@
         </g:elseif>
     </title>
     <content tag="pageTitle">${entityName}</content>
-    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/jquery-date-range-picker/0.16.1/daterangepicker.min.css" />
 </head>
 <body>
 
@@ -26,8 +25,11 @@
                requestedDateRange:params.requestedDateRange, issuedDateRange:params.issuedDateRange, type:params.type,
                'createdBy.id':params?.createdBy?.id, sort:params?.sort, order:params?.order,
                'requestedBy.id': params?.requestedBy?.id, receiptStatusCode: params.receiptStatusCode,
-               'createdAfter': params?.createdAfter, 'createdBefore': params?.createdBefore,
-               'sourceType': params?.sourceType, 'updatedBy.id':params?.updatedBy?.id]"/>
+               dateCreatedFrom: params?.dateCreatedFrom, dateCreatedTo: params?.dateCreatedTo,
+               requestedDeliveryDateFrom: params?.requestedDeliveryDateFrom, requestedDeliveryDateTo: params?.requestedDeliveryDateTo,
+               expectedShippingDateFrom: params?.expectedShippingDateFrom, expectedShippingDateTo: params?.expectedShippingDateTo,
+               expectedDeliveryDateFrom: params?.expectedDeliveryDateFrom, expectedDeliveryDateTo: params?.expectedDeliveryDateTo,
+               sourceType: params?.sourceType, 'updatedBy.id':params?.updatedBy?.id]"/>
 
 <div class="body">
     <g:if test="${flash.message}">
@@ -184,28 +186,86 @@
                         </g:if>
                         <div class="filter-list-item">
                             <label>
-                                ${warehouse.message(code: 'default.createdAfter.label', default: 'Created after')}
+                                ${warehouse.message(code: 'stockMovement.requestedDeliveryDate.label', default: 'Requested delivery date')}
                             </label>
-                            <a href="javascript:void(0);" id="clearCreatedAfterDate">Clear</a>
-                            <g:jqueryDatePicker id="createdAfter"
-                                                name="createdAfter"
-                                                placeholder="Select date"
-                                                size="40"
+                            <g:jqueryDatePicker id="requestedDeliveryDateFrom"
+                                                name="requestedDeliveryDateFrom"
+                                                placeholder="From"
+                                                size="20"
                                                 autocomplete="off"
-                                                value="${params?.createdAfter}"
+                                                value="${params?.requestedDeliveryDateFrom}"
+                                                format="MM/dd/yyyy"/>
+                        </div>
+                        <div class="filter-list-item">
+                            <g:jqueryDatePicker id="requestedDeliveryDateTo"
+                                                name="requestedDeliveryDateTo"
+                                                placeholder="To"
+                                                size="20"
+                                                autocomplete="off"
+                                                value="${params?.requestedDeliveryDateTo}"
                                                 format="MM/dd/yyyy"/>
                         </div>
                         <div class="filter-list-item">
                             <label>
-                                ${warehouse.message(code: 'default.createdBefore.label', default: 'Created before')}
+                                ${warehouse.message(code: 'stockMovement.requestedShippingDate.label', default: 'Expected Shipping')}
                             </label>
-                            <a href="javascript:void(0);" id="clearCreatedBeforeDate">Clear</a>
-                            <g:jqueryDatePicker id="createdBefore"
-                                                name="createdBefore"
-                                                placeholder="Select date"
-                                                size="40"
+                            <g:jqueryDatePicker id="expectedShippingDateFrom"
+                                                name="expectedShippingDateFrom"
+                                                placeholder="From"
+                                                size="20"
                                                 autocomplete="off"
-                                                value="${params?.createdBefore}"
+                                                value="${params?.expectedShippingDateFrom}"
+                                                format="MM/dd/yyyy"/>
+                        </div>
+                        <div class="filter-list-item">
+                            <g:jqueryDatePicker id="expectedShippingDateTo"
+                                                name="expectedShippingDateTo"
+                                                placeholder="To"
+                                                size="20"
+                                                autocomplete="off"
+                                                value="${params?.expectedShippingDateTo}"
+                                                format="MM/dd/yyyy"/>
+                        </div>
+                        <div class="filter-list-item">
+                            <label>
+                                ${warehouse.message(code: 'stockMovement.expectedDeliveryDate.label', default: 'Expected Delivery')}
+                            </label>
+                            <g:jqueryDatePicker id="expectedDeliveryDateFrom"
+                                                name="expectedDeliveryDateFrom"
+                                                placeholder="From"
+                                                size="20"
+                                                autocomplete="off"
+                                                value="${params?.expectedDeliveryDateFrom}"
+                                                format="MM/dd/yyyy"/>
+                        </div>
+                        <div class="filter-list-item">
+                            <g:jqueryDatePicker id="expectedDeliveryDateTo"
+                                                name="expectedDeliveryDateTo"
+                                                placeholder="To"
+                                                size="20"
+                                                autocomplete="off"
+                                                value="${params?.expectedDeliveryDateTo}"
+                                                format="MM/dd/yyyy"/>
+                        </div>
+                        <div class="filter-list-item">
+                            <label>
+                                ${warehouse.message(code: 'stockMovement.dateCreated.label', default: 'Date created')}
+                            </label>
+                            <g:jqueryDatePicker id="dateCreatedFrom"
+                                                name="dateCreatedFrom"
+                                                placeholder="From"
+                                                size="20"
+                                                autocomplete="off"
+                                                value="${params?.dateCreatedFrom}"
+                                                format="MM/dd/yyyy"/>
+                        </div>
+                        <div class="filter-list-item">
+                            <g:jqueryDatePicker id="dateCreatedTo"
+                                                name="dateCreatedTo"
+                                                placeholder="To"
+                                                size="20"
+                                                autocomplete="off"
+                                                value="${params?.dateCreatedTo}"
                                                 format="MM/dd/yyyy"/>
                         </div>
                         <hr/>
@@ -219,8 +279,6 @@
                                 <warehouse:message code="default.button.download.label" default="Download"/>
                             </button>
                         </div>
-
-                        <div class="clear"></div>
                     </div>
                 </g:form>
             </div>
@@ -244,12 +302,9 @@
         </div>
     </div>
 </div>
-<script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery-date-range-picker/0.16.1/jquery.daterangepicker.min.js"></script>
-
-
 <script type="text/javascript">
 			$(function() {
+
 		    	$(".tabs").tabs(
 	    			{
 	    				cookie: {
@@ -265,18 +320,6 @@
                 $(".dialog-trigger").click(function(event){
                     $($(this).attr("data-id")).dialog('open');
                 });
-
-                $("#clearCreatedAfterDate")
-                .click(function () {
-                  $('#createdAfter-datepicker')
-                    .datepicker('setDate', null);
-                });
-                $("#clearCreatedBeforeDate")
-                .click(function () {
-                  $('#createdBefore-datepicker')
-                    .datepicker('setDate', null);
-                });
-
             });
         </script>
 
