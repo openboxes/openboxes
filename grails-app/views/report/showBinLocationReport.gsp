@@ -35,12 +35,23 @@
                                                   value="${params?.location?.id?:session?.warehouse?.id}" noSelection="['':'']" data-placeholder=" " />
                             </div>
                             <div class="filter-list-item">
+                                <label>${warehouse.message(code:'location.locationType.label')}</label>
+                                <g:select name="locationType"
+                                              from="${org.pih.warehouse.core.LocationType.getInternalLocationTypes()}"
+                                              class="chzn-select-deselect"
+                                              optionKey="id"
+                                              optionValue="${{ format.metadata(obj: it) }}"
+                                              value="${params?.locationType}"
+                                              noSelection="['': '']"/>
+                            </div>
+                            <div class="filter-list-item">
                                 <label>${warehouse.message(code:'default.status.label')}</label>
                                 <g:select name="status" class="chzn-select-deselect" from="${statuses}"
                                     optionKey="status" optionValue="${{ it.label }}" value="${params.status}"
                                     noSelection="['':g.message(code:'default.all.label')]" data-placeholder=" " />
                             </div>
                         </div>
+                        <hr/>
                         <div class="buttons">
                             <button name="button" value="run" class="button">
                                 <img src="${createLinkTo(dir:'images/icons/silk',file:'play_green.png')}" />&nbsp;
@@ -96,6 +107,7 @@
                                 <th class="center"><g:message code="product.label"/></th>
                                 <th class="center"><g:message code="location.zone.label"/></th>
                                 <th class="center"><g:message code="location.binLocation.label"/></th>
+                                <th class="center"><g:message code="location.locationType.label"/></th>
                                 <th class="center"><g:message code="inventoryItem.lotNumber.label"/></th>
                                 <th class="center"><g:message code="inventoryItem.expirationDate.label"/></th>
                                 <th class="center"><g:message code="default.quantityOnHand.label"/></th>
@@ -149,6 +161,7 @@
                 console.log("server params ");
                 data.push({ name: "location.id", value: "${params?.location?.id}"});
                 data.push({ name: "status", value: "${params.status}"});
+                data.push({ name: "locationType", value: "${params.locationType}"});
             },
             "fnServerData": function ( sSource, aoData, fnCallback ) {
                 console.log("fnServerData", aoData);
@@ -182,6 +195,7 @@
                 { "mData": "productName", "sWidth": "20%" },
                 { "mData": "zone", "sWidth": "4%"  },
                 { "mData": "binLocation", "sWidth": "4%"  },
+                { "mData": "locationType", "sWidth": "1%"  },
                 { "mData": "lotNumber", "sWidth": "5%"  },
                 { "mData": "expirationDate", "sWidth": "4%"  },
                 { "mData": "quantity", "sWidth": "4%"  },

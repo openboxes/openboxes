@@ -97,7 +97,7 @@ class NumberDataService {
 
     NumberData getReceivingBin(def location) {
         def receivingBin = ProductAvailability.executeQuery("""
-            SELECT COUNT(distinct pa.product.id) from ProductAvailability pa 
+            SELECT COUNT(distinct pa.id) from ProductAvailability pa 
             LEFT JOIN pa.location l 
             LEFT JOIN pa.binLocation bl
             WHERE l = :location AND pa.quantityOnHand > 0 
@@ -118,15 +118,15 @@ class NumberDataService {
         ]
 
         def subTitle = [
-            code : "react.dashboard.subtitle.products.label",
-            message : messageService.getMessage("react.dashboard.subtitle.products.label")
+            code : "react.dashboard.subtitle.items.label",
+            message : messageService.getMessage("react.dashboard.subtitle.items.label")
         ]
 
         return new NumberData(
             title,
             info,
             receivingBin[0],
-            subTitle, "/openboxes/report/showBinLocationReport?status=inStock"
+            subTitle, "/openboxes/report/showBinLocationReport?status=inStock&locationType=" + Constants.RECEIVING_LOCATION_TYPE_ID
             )
     }
 
