@@ -38,6 +38,7 @@ const initialState = {
     replenishment: false,
     outboundReturns: false,
     inboundReturns: false,
+    productsConfiguration: false,
   },
   searchConfig: {
     debounceTime: 500,

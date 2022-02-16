@@ -836,6 +836,11 @@
                                     <warehouse:message code="shipmentWorkflows.label" default="Shipment Workflows" />
                                 </g:link>
                             </div>
+                            <div class="mm-menu-item">
+                                <g:link controller="productsConfiguration" action="index" >
+                                    <warehouse:message code="productsConfiguration.label" default="Categories and Products Configuration" />
+                                </g:link>
+                            </div>
                         </div>
 
                     </div>

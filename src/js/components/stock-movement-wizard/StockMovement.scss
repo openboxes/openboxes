@@ -336,3 +336,13 @@
     width: 300px;
     border: 1px solid #999 !important;
 }
+
+.products-configuration-content {
+    background-color: #fff;
+    box-shadow: 0 4px 2px -2px rgba(0, 0, 0, .09);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 1.5rem 0;
+    height: 100px;
+}
