@@ -458,27 +458,30 @@ class StockMovementService {
                 }
             }
 
-            if (stockMovement?.identifier || stockMovement.name || stockMovement?.description) {
-                or {
-                    if (stockMovement?.identifier) {
-                        ilike("requestNumber", stockMovement.identifier)
-                    }
-                    if (stockMovement?.name) {
-                        ilike("name", stockMovement.name)
-                    }
-                    if (stockMovement?.description) {
-                        ilike("description", stockMovement.description)
+            or {
+                if (stockMovement?.identifier || stockMovement.name || stockMovement?.description) {
+                    or {
+                        if (stockMovement?.name) {
+                            ilike("name", stockMovement.name)
+                        }
+                        if (stockMovement?.identifier) {
+                            ilike("requestNumber", stockMovement.identifier)
+                        }
+                        if (stockMovement?.description) {
+                            ilike("description", stockMovement.description)
+                        }
                     }
                 }
-            }
 
-            if (stockMovement.trackingNumber) {
-                ReferenceNumberType trackingNumberType = ReferenceNumberType.findById(Constants.TRACKING_NUMBER_TYPE_ID)
-                shipments {
-                    referenceNumbers {
-                        and {
-                            eq("referenceNumberType", trackingNumberType)
-                            ilike("identifier", stockMovement.trackingNumber)
+                log.info "tracking number " + stockMovement.trackingNumber
+                if (stockMovement.trackingNumber) {
+                    ReferenceNumberType trackingNumberType = ReferenceNumberType.findById(Constants.TRACKING_NUMBER_TYPE_ID)
+                    shipments {
+                        referenceNumbers {
+                            and {
+                                eq("referenceNumberType", trackingNumberType)
+                                ilike("identifier", stockMovement.trackingNumber)
+                            }
                         }
                     }
                 }
@@ -546,14 +549,47 @@ class StockMovementService {
                     }
                 }
             }
-            if(params.createdAfter) {
-                ge("dateCreated", params.createdAfter)
+            if(params.dateCreatedFrom) {
+                ge("dateCreated", params.dateCreatedFrom)
             }
-            if(params.createdBefore) {
-                le("dateCreated", params.createdBefore)
+            if(params.dateCreatedTo) {
+                le("dateCreated", params.dateCreatedTo)
+            }
+            if(params.requestedDeliveryDateFrom) {
+                ge("requestedDeliveryDate", params.requestedDeliveryDateFrom)
+            }
+            if(params.requestedDeliveryDateTo) {
+                le("requestedDeliveryDate", params.requestedDeliveryDateTo)
+            }
+            if(params.expectedShippingDateFrom) {
+                shipments {
+                    ge("expectedShippingDate", params.expectedShippingDateFrom)
+                }
+            }
+            if(params.expectedShippingDateTo) {
+                shipments {
+                    le("expectedShippingDate", params.expectedShippingDateTo)
+                }
+            }
+            if(params.expectedDeliveryDateFrom) {
+                shipments {
+                    ge("expectedDeliveryDate", params.expectedDeliveryDateFrom)
+                }
+            }
+            if(params.expectedDeliveryDateTo) {
+                shipments {
+                    le("expectedDeliveryDate", params.expectedDeliveryDateTo)
+                }
             }
             if (params.sort && params.order) {
-                order(params.sort, params.order)
+                if (params.sort in ["expectedDeliveryDate", "expectedShippingDate"]) {
+                    shipments {
+                        order(params.sort, params.order)
+                    }
+                }
+                else {
+                    order(params.sort, params.order)
+                }
             } else {
                 order("statusSortOrder", "asc")
                 order("dateCreated", "desc")
