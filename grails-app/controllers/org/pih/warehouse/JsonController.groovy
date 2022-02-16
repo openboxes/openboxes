@@ -21,6 +21,7 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Localization
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.Tag
@@ -1344,6 +1345,11 @@ class JsonController {
         Location location = Location.get(locationId)
         def data = productAvailabilityService.getQuantityOnHandByBinLocation(location)
 
+        if (params.locationType) {
+            LocationType locationType = LocationType.findByIdOrName(params.locationType, params.locationType)
+            data = data.findAll { it.binLocation?.locationType == locationType }
+        }
+
         if (params.status) {
             data = data.findAll { it.status == params.status }
         }
@@ -1369,6 +1375,7 @@ class JsonController {
                     unitOfMeasure               : it?.product?.unitOfMeasure,
                     zone                        : it?.binLocation?.zone?.name ?: "",
                     binLocation                 : it?.binLocation?.name ?: "Default",
+                    locationType                : it?.binLocation?.locationType?.name ?: "",
                     isOnHold                    : it?.binLocation?.isOnHold(),
                     quantity                    : quantity,
                     quantityAvailableToPromise  : quantityAvailableToPromise,
