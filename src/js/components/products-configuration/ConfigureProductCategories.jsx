@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router-dom';
 import Alert from 'react-s-alert';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -39,9 +37,7 @@ class ConfigureProductCategories extends Component {
   }
 }
 
-const mapStateToProps = () => ({});
-
-export default withRouter(connect(mapStateToProps, {})(ConfigureProductCategories));
+export default ConfigureProductCategories;
 
 ConfigureProductCategories.propTypes = {
   nextPage: PropTypes.func.isRequired,

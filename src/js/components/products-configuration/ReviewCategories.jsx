@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -41,9 +40,7 @@ class ReviewCategories extends Component {
   }
 }
 
-const mapStateToProps = () => ({});
-
-export default (connect(mapStateToProps, {})(ReviewCategories));
+export default ReviewCategories;
 
 ReviewCategories.propTypes = {
   nextPage: PropTypes.func.isRequired,

@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Alert from 'react-s-alert';
 
@@ -38,9 +37,7 @@ class ConfigureProducts extends Component {
   }
 }
 
-const mapStateToProps = () => ({});
-
-export default connect(mapStateToProps, {})(ConfigureProducts);
+export default ConfigureProducts;
 
 ConfigureProducts.propTypes = {
   previousPage: PropTypes.func.isRequired,
