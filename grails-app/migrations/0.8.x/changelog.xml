@@ -142,4 +142,5 @@
     <include file="0.8.x/changelog-2021-11-22-1530-rename-outbound-returns-order-type.xml"/>
     <include file="0.8.x/changelog-2021-12-14-1140-add-submit-request-activity.xml"/>
     <include file="0.8.x/changelog-2022-01-03-1524-configure-invoice-templates.xml"/>
+    <include file="0.8.x/changelog-2022-02-14-1200-alter-table-shipment-reference-number-add-foreign-key-constraint.xml"/>
 </databaseChangeLog>
