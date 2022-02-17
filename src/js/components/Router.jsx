@@ -85,6 +85,11 @@ const AsyncReplenishment = Loadable({
   loading: Loading,
 });
 
+const AsyncProductsConfiguration = Loadable({
+  loader: () => import('./products-configuration/ProductsConfigurationWizard'),
+  loading: Loading,
+});
+
 const Router = props => (
   <div>
     <BrowserRouter>
@@ -103,6 +108,7 @@ const Router = props => (
         <MainLayoutRoute path="/**/stockTransfer/createOutboundReturn/:outboundReturnId?" component={AsyncOutboundReturns} />
         <MainLayoutRoute path="/**/stockTransfer/createInboundReturn/:inboundReturnId?" component={AsyncInboundReturns} />
         <MainLayoutRoute path="/**/replenishment/create/:replenishmentId?" component={AsyncReplenishment} />
+        <MainLayoutRoute path="/**/productsConfiguration/index" component={AsyncProductsConfiguration} />
         <MainLayoutRoute path="/**/dashboard/:configId?" component={AsyncDashboard} />
         <MainLayoutRoute path="/**/" component={AsyncDashboard} />
       </Switch>

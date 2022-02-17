@@ -1000,6 +1000,14 @@ breadcrumbsConfig {
             actionUrl = "/${appName}/stockTransfer/createInboundReturn/"
             listUrl = "/"
         }
+        productsConfiguration {
+            actionLabel = "productsConfiguration.label"
+            defaultActionLabel = "Categories and Products Configuration"
+            listLabel = "productsConfiguration.label"
+            defaultListLabel = "Categories and Products Configuration"
+            actionUrl = "/${appName}/productsConfiguration/index"
+            listUrl = "/${appName}/productsConfiguration/index"
+        }
 }
 
 // OpenBoxes identifier config
@@ -1598,7 +1606,8 @@ openboxes {
                         [label: "paymentTerms.label", defaultLabel: "Payment Terms", href: "/${appName}/paymentTerm/list"],
                         [label: "preferenceType.label", defaultLabel: "Preference Type", href: "/${appName}/preferenceType/list"],
                         [label: "shippers.label", defaultLabel: "Shippers", href: "/${appName}/shipper/list"],
-                        [label: "shipmentWorkflows.label", defaultLabel: "Shipment Workflows", href: "/${appName}/shipmentWorkflow/list"]
+                        [label: "shipmentWorkflows.label", defaultLabel: "Shipment Workflows", href: "/${appName}/shipmentWorkflow/list"],
+                        [label: "productsConfiguration.label", defaultLabel: "Categories and Products Configuration", href: "/${appName}/productsConfiguration/index"]
                     ]
                 ]
             ]
