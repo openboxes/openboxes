@@ -818,10 +818,12 @@ class OrderService {
             propertiesMap.each {
                 def excludedProperties = it.deny
                 excludedProperties.each { property ->
-                    def existingValue = existingOrderItem.toImport()."${property}"
-                    def importedValue = orderItem."${property}"
-                    if (order.status == it.status && (existingValue != importedValue)) {
-                        throw new IllegalArgumentException("Import must not change ${property} of item ${orderItem.productCode}, before: ${existingValue}, after: ${importedValue}")
+                    if (order.status == it.status) {
+                        def existingValue = existingOrderItem.toImport()."${property}"
+                        def importedValue = orderItem."${property}"
+                        if (existingValue != importedValue) {
+                            throw new IllegalArgumentException("Import must not change ${property} of item ${orderItem.productCode}, before: ${existingValue}, after: ${importedValue}")
+                        }
                     }
                 }
             }
