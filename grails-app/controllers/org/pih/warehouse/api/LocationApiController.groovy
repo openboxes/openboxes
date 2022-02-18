@@ -37,8 +37,8 @@ class LocationApiController extends BaseDomainApiController {
         def fields = params.fields ? params.fields.split(",") : null
         def locations
 
-        if (params.locationChooser && userService.hasDefaultRoleRequestor(currentUser) && !currentUser.locationRoles) {
-            locations = locationService.getLocations(null, null)
+        if (params.locationChooser && userService.isUserRequestor(currentUser) && !currentUser.locationRoles) {
+            locations = locationService.getLocations(fields, params)
             locations = locations.findAll { it.supportedActivities && it.supports(ActivityCode.SUBMIT_REQUEST) }
         } else if (params.locationChooser && userService.isUserRequestor(currentUser) && userService.hasRoleBrowser(currentUser)) {
             locations = locationService.getRequestorLocations(currentUser)

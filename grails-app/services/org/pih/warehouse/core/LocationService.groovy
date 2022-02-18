@@ -20,6 +20,7 @@ import util.ConfigHelper
 class LocationService {
 
     def grailsApplication
+    def userService
     boolean transactional = true
 
 
@@ -248,7 +249,7 @@ class LocationService {
 
         List locationRolesForRequestor = user.locationRoles.findAll {it.role.roleType == RoleType.ROLE_REQUESTOR}
 
-        if (userService.hasDefaultRoleRequestor(user) && !user.locationRoles) {
+        if (userService.isUserRequestor(user) && !user.locationRoles) {
             locations = getLocations(null, null)
             locations = locations.findAll {it -> it.supportedActivities && it.supports(ActivityCode.SUBMIT_REQUEST) }
         } else if (locationRolesForRequestor && userService.hasRoleBrowser(user)) {
