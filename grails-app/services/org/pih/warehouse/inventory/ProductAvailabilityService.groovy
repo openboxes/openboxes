@@ -43,7 +43,7 @@ class ProductAvailabilityService {
     def inventoryService
     def dataService
 
-    def triggerRefreshProductAvailability(String locationId, List<String> productIds, Boolean forceRefresh) {
+    def triggerRefreshProductAvailability(String locationId, List<String> productIds, Boolean forceRefresh, Boolean sendNotification = false) {
         log.info "Triggering refresh product availability"
         use(TimeCategory) {
             Boolean delayStart = grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayStart
@@ -52,7 +52,7 @@ class ProductAvailabilityService {
             Date runAt = new Date() + delayInMilliseconds.milliseconds
             log.info "Triggering refresh product availability with ${delayInMilliseconds} ms delay"
             RefreshProductAvailabilityJob.schedule(runAt,
-                    [locationId: locationId, productIds: productIds, forceRefresh: forceRefresh])
+                    [locationId: locationId, productIds: productIds, forceRefresh: forceRefresh, sendNotification: sendNotification])
         }
     }
 
