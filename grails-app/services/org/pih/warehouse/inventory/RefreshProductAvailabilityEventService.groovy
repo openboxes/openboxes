@@ -24,14 +24,17 @@ class RefreshProductAvailabilityEventService implements ApplicationListener<Refr
 
         // Some event publishers might want to trigger the events on their own
         // in order to allow the transaction to be saved to the database (e.g. Partial Receiving)
+        Boolean notificationSent = false
         if (!event?.disableRefresh) {
             log.warn "Refresh product availability (synchronous=${event?.synchronousRequired})"
             if (event?.synchronousRequired) {
                 productAvailabilityService.refreshProductsAvailability(event.locationId,
                         event.productIds, event.forceRefresh)
             } else {
+                Boolean sendNotification = event?.source instanceof Transaction
                 productAvailabilityService.triggerRefreshProductAvailability(event.locationId,
-                        event.productIds, event.forceRefresh)
+                        event.productIds, event.forceRefresh, sendNotification)
+                notificationSent =  true
             }
         }
         else {
@@ -39,7 +42,7 @@ class RefreshProductAvailabilityEventService implements ApplicationListener<Refr
         }
 
         // All transaction events should publish a message to the product availability message queue
-        if (event?.source instanceof Transaction) {
+        if (event?.source instanceof Transaction && !notificationSent) {
             use(TimeCategory) {
                 def delayStartInMilliseconds = grailsApplication.config.openboxes.jobs.sendProductAvailabilityMessagesJob.delayStartInMilliseconds?:0
                 Date runAt = new Date() + delayStartInMilliseconds.milliseconds
