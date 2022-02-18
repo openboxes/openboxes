@@ -28,6 +28,7 @@ grails.project.dependency.resolution = {
         excludes(
                 "commons-logging",  // use jcl-over-slf4j instead
                 "log4j",  // use reload4j instead
+                "logback-core",  // use slf4j instead
                 "slf4j-log4j12",  // use slf4j-reload4j instead
                 "xml-apis",  // looks like this conflicts with Grails's internal SAXParserImpl
                 "xmlbeans"  // conflicts with Grails: see https://stackoverflow.com/a/6410955
@@ -63,11 +64,6 @@ grails.project.dependency.resolution = {
 
         // Required by database connection pool
         compile 'com.mchange:c3p0:0.9.5.3'
-
-        // Required by docx4j functionality
-        compile('org.docx4j:docx4j:2.8.1') {
-            excludes 'commons-codec', 'commons-io'
-        }
 
         // Required for barcode4j
         compile 'com.google.zxing:javase:2.0'
@@ -113,9 +109,6 @@ grails.project.dependency.resolution = {
         compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.odt.odfdom:1.0.6")
         compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.xwpf:1.0.6")
         compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.docx4j:1.0.6")
-        compile ("fr.opensagres.xdocreport:org.apache.poi.xwpf.converter.pdf:1.0.6")
-        compile ("fr.opensagres.xdocreport:org.odftoolkit.odfdom.converter.pdf:1.0.6")
-        compile "org.apache.xmlgraphics:batik-util:1.7"
 
         /*
          * This test SMTP client is the latest release that works with Grails 1,
@@ -137,7 +130,9 @@ grails.project.dependency.resolution = {
         // REST client
         compile 'org.apache.httpcomponents:httpclient:4.5.12'
 
-        // for com.google.common
+        // for javax.annotation.Nullable
+        compile 'com.google.code.findbugs:jsr305:3.0.2'
+        // for com.google.common.base.Enums
         compile 'com.google.guava:guava:12.0'
 
         // TODO: This is the last version for java 7. After migration to Java 8 upgrade this to 2.9+
