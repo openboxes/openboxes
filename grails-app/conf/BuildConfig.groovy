@@ -98,17 +98,13 @@ grails.project.dependency.resolution = {
             exclude 'spock'
         }
 
-        compile ("fr.opensagres.xdocreport:xdocreport:1.0.6")
-        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.document:1.0.6")
-        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.docx:1.0.6")
-        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.odt:1.0.6")
-        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.template:1.0.6")
-        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.freemarker:1.0.6")
-        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.velocity:1.0.6")
-        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter:1.0.6")
-        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.odt.odfdom:1.0.6")
-        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.xwpf:1.0.6")
-        compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.docx4j:1.0.6")
+        // releases 2.0.2+ depend on POI 4, which requires Java 8
+        compile "fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.docx:2.0.1"
+        compile "fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.odt:2.0.1"
+        compile "fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.freemarker:2.0.1"
+        compile "fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.velocity:2.0.1"
+        compile "fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.xwpf:2.0.1"   // docx->pdf via POI
+        compile "fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.odt.odfdom:2.0.1"  // odf->pdf
 
         /*
          * This test SMTP client is the latest release that works with Grails 1,
