@@ -85,4 +85,14 @@ class ContainerApiController extends BaseDomainApiController {
             render([errorCode: 500, cause: e?.class, errorMessage: e?.message] as JSON)
         }
     }
+
+    def updateStatus = {
+        Container container = Container.get(params.id)
+        if (!container) {
+            throw new IllegalArgumentException("Can't find container with given id: ${params.id}")
+        }
+
+        shipmentService.updateContainerStatus(container, ContainerStatus.valueOf(params.status))
+        render status: 200
+    }
 }

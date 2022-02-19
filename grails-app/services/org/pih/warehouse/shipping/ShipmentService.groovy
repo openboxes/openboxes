@@ -2434,4 +2434,8 @@ class ShipmentService {
         return identifierService.renderTemplate(template, model)
     }
 
+    void updateContainerStatus(Container container, ContainerStatus containerStatus) {
+        container.containerStatus = containerStatus
+        container.save()
+    }
 }
