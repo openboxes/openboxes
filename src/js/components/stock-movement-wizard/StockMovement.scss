@@ -338,11 +338,39 @@
 }
 
 .products-configuration-content {
-    background-color: #fff;
-    box-shadow: 0 4px 2px -2px rgba(0, 0, 0, .09);
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin: 1.5rem 0;
-    height: 100px;
+}
+
+.vartical-tabs {
+    > div {
+        font-size: 16px;
+        cursor: pointer;
+        background-color: #fff;
+        box-shadow: 0 4px 2px -2px rgba(0, 0, 0, .09);
+        margin: 0 10px 5px 0;
+        color: #999;
+        line-break: anywhere;
+        &:hover {
+            background-color: #EEE;
+        }
+        &.active {
+            color: black;
+        }
+    }
+    i {
+        font-size: 20px;
+        color: #999;
+        &.active {
+           color: #4f87ce !important;
+        }
+    }
+}
+
+.vertical-tabs-content {
+    min-height: 300px;
+    background-color: #fff;
+    box-shadow: 0 4px 2px -2px rgba(0, 0, 0, .09);
 }
