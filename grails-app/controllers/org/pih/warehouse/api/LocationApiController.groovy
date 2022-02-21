@@ -40,10 +40,10 @@ class LocationApiController extends BaseDomainApiController {
         if (params.locationChooser && userService.isUserRequestor(currentUser) && !currentUser.locationRoles) {
             locations = locationService.getLocations(fields, params)
             locations = locations.findAll { it.supportedActivities && it.supports(ActivityCode.SUBMIT_REQUEST) }
-        } else if (params.locationChooser && userService.isUserRequestor(currentUser) && userService.hasRoleBrowser(currentUser)) {
+        } else if (params.locationChooser && userService.hasRoleRequestorInAnyLocations(currentUser) && userService.hasRoleBrowser(currentUser)) {
             locations = locationService.getRequestorLocations(currentUser)
             locations += locationService.getLocations(fields, params, isSuperuser, direction, currentLocation, currentUser)
-        } else if (params.locationChooser && userService.isUserRequestor(currentUser)) {
+        } else if (params.locationChooser && userService.hasRoleRequestorInAnyLocations(currentUser)) {
             locations = locationService.getRequestorLocations(currentUser)
         } else {
             locations = locationService.getLocations(fields, params, isSuperuser, direction, currentLocation, currentUser)

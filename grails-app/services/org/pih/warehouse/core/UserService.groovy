@@ -203,6 +203,16 @@ class UserService {
         return false
     }
 
+    // Checks if requestor role exist for any location - for location chooser purposes
+    Boolean hasRoleRequestorInAnyLocations(User u) {
+        if (u) {
+            def user = User.get(u.id)
+            def roleTypes = [RoleType.ROLE_REQUESTOR]
+            return user.getAllRoles().any { Role role -> roleTypes.contains(role.roleType) }
+        }
+        return false
+    }
+
     Boolean canEditUserRoles(User currentUser, User otherUser) {
         def location = AuthService.currentLocation.get()
         return isSuperuser(currentUser) || (currentUser.getHighestRole(location) >= otherUser.getHighestRole(location))
