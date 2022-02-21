@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { getTranslate } from 'react-localize-redux';
+import { Tooltip } from 'react-tippy';
 
 import ModalWrapper from '../../form-elements/ModalWrapper';
 import LabelField from '../../form-elements/LabelField';
@@ -10,13 +11,17 @@ import ArrayField from '../../form-elements/ArrayField';
 import apiClient, { parseResponse } from '../../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../../actions';
 import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
+import TableRowWithSubfields from '../../form-elements/TableRowWithSubfields';
 
 const FIELDS = {
   pendingRequisitionDetails: {
     type: ArrayField,
+    rowComponent: TableRowWithSubfields,
+    subfieldKey: 'requisitions',
     fields: {
       'destination.name': {
-        type: LabelField,
+        type: params => (!params.subfield ? <LabelField {...params} /> : null),
+        headerAlign: 'left',
         label: 'react.stockMovement.destination.label',
         defaultMessage: 'Destination',
         attributes: {
@@ -25,20 +30,37 @@ const FIELDS = {
         },
       },
       averageMonthlyDemand: {
-        type: LabelField,
+        type: params => (!params.subfield ? <LabelField {...params} /> : null),
         label: 'react.averageMonthlyDemand.lot.label',
         defaultMessage: 'Average Monthly Demand',
+        attributes: {
+          formatValue: value => (value || value === 0 ? value.toLocaleString('en-US') : null),
+          numberField: true,
+        },
       },
       quantityOnHandAtDestination: {
-        type: LabelField,
+        type: params => (!params.subfield ? <LabelField {...params} /> : null),
         label: 'react.stockMovement.qoh.label',
         defaultMessage: 'QoH',
         attributes: {
           formatValue: value => (value || value === 0 ? value.toLocaleString('en-US') : null),
+          numberField: true,
         },
       },
-      requestNumber: {
-        type: LabelField,
+      requisition: {
+        type: (params) => {
+          const { fieldValue } = params;
+          if (fieldValue) {
+            return (
+              <div className="d-flex align-items-center justify-content-center">
+                <a target="_blank" rel="noopener noreferrer" href={`/openboxes/stockMovement/show/${fieldValue.id}`}>
+                  {fieldValue.requestNumber}
+                </a>
+              </div>
+            );
+          }
+          return null;
+        },
         label: 'react.stockMovement.requestNumber.label',
         defaultMessage: 'Request number',
       },
@@ -48,6 +70,7 @@ const FIELDS = {
         defaultMessage: 'Requested',
         attributes: {
           formatValue: value => (value || value === 0 ? value.toLocaleString('en-US') : null),
+          numberField: true,
         },
       },
       quantityPicked: {
@@ -56,6 +79,7 @@ const FIELDS = {
         defaultMessage: 'Picked',
         attributes: {
           formatValue: value => (value || value === 0 ? value.toLocaleString('en-US') : null),
+          numberField: true,
         },
       },
     },
@@ -95,7 +119,7 @@ class DetailsModal extends Component {
   }
 
   fetchPendingRequestsDetails() {
-    const url = `/openboxes/api/stockMovements/pendingRequisitionDetails?origin.id=${this.state.attr.originId}&product.id=${this.state.attr.productId}`;
+    const url = `/openboxes/api/stockMovements/pendingRequisitionDetails?origin.id=${this.state.attr.originId}&product.id=${this.state.attr.productId}&stockMovementId=${this.state.attr.stockMovementId}`;
 
     apiClient.get(url)
       .then((resp) => {
@@ -108,6 +132,12 @@ class DetailsModal extends Component {
   render() {
     const { attr, formValues } = this.state;
     const { pendingRequisitionDetails } = formValues;
+    const {
+      productCode, productName, quantityRequested, quantityOnHand, quantityAvailable,
+    } = attr;
+    const averageMonthlyDemand = _.sumBy(pendingRequisitionDetails, 'averageMonthlyDemand');
+    const totalQtyRequested = _.sumBy(pendingRequisitionDetails, item => item.quantityRequested + _.sumBy(item.requisitions, 'quantityRequested'));
+    const totalQtyPicked = _.sumBy(pendingRequisitionDetails, item => item.quantityPicked + _.sumBy(item.requisitions, 'quantityPicked'));
 
     return (
       <ModalWrapper
@@ -116,25 +146,57 @@ class DetailsModal extends Component {
         fields={FIELDS}
         initialValues={formValues}
       >
-        <div>
-          <div className="font-weight-bold">
-            <Translate id="react.stockMovement.productCode.label" defaultMessage="Product code" />: {attr.productCode}
+        <div className="mb-2">
+          <h5>{productCode} {productName}</h5>
+          <div>
+            <span className="font-weight-bold">
+              <Translate id="react.stockMovement.requested.label" defaultMessage="Requested" />:&nbsp;&nbsp;
+            </span>
+            {quantityRequested ? (quantityRequested.toLocaleString('en-US')) : quantityRequested}
           </div>
-          <div className="font-weight-bold">
-            <Translate id="react.stockMovement.productName.label" defaultMessage="Product name" />: {attr.productName}
+          <div>
+            <span className="font-weight-bold">
+              <Translate id="react.stockMovement.onHand.label" defaultMessage="On Hand" />:&nbsp;&nbsp;
+            </span>
+            {quantityOnHand ? (quantityOnHand.toLocaleString('en-US')) : quantityOnHand}
           </div>
-          <div className="font-weight-bold">
-            <Translate id="react.stockMovement.totalMonthlyDemand.label" defaultMessage="Total Monthly Demand" />:
-            {_.sumBy(_.uniqBy(pendingRequisitionDetails, 'destination.name'), 'averageMonthlyDemand')}
+          <div>
+            <span className="font-weight-bold">
+              <Translate id="react.stockMovement.available.label" defaultMessage="Available" />:&nbsp;&nbsp;
+            </span>
+            {quantityAvailable ? (quantityAvailable.toLocaleString('en-US')) : quantityAvailable}
           </div>
-          <div className="font-weight-bold">
-            <Translate id="react.stockMovement.totalQuantityRequired.label" defaultMessage="Total Qty Required" />:
-            {_.sumBy(pendingRequisitionDetails, 'quantityRequested')}
+          <div>
+            <span className="font-weight-bold">
+              <Translate id="react.stockMovement.totalMonthlyDemand.label" defaultMessage="Total Monthly Demand" />:&nbsp;&nbsp;
+            </span>
+            {averageMonthlyDemand ? (averageMonthlyDemand.toLocaleString('en-US')) : averageMonthlyDemand}
           </div>
-          <div className="font-weight-bold">
-            <Translate id="react.stockMovement.totalQuantityPicked.label" defaultMessage="Total Qty Picked" />:
-            {_.sumBy(pendingRequisitionDetails, 'quantityPicked')}
-          </div>
+          <Tooltip
+            html={this.props.translate(
+              'react.stockMovement.requestedInOtherRequests.label',
+              'This is the quantity requested in other requests but not yet picked. Picked quantities have already been removed from the available quantity',
+            )}
+            theme="transparent"
+            position="top-start"
+            arrow="true"
+            delay="150"
+            duration="250"
+            hideDelay="50"
+          >
+            <div>
+              <span className="font-weight-bold">
+                <Translate id="react.stockMovement.totalQuantityRequested.label" defaultMessage="Total Qty Requested" />:&nbsp;&nbsp;
+              </span>
+              {totalQtyRequested ? (totalQtyRequested.toLocaleString('en-US')) : totalQtyRequested}
+            </div>
+            <div>
+              <span className="font-weight-bold">
+                <Translate id="react.stockMovement.totalQuantityPicked.label" defaultMessage="Total Qty Picked" />:&nbsp;&nbsp;
+              </span>
+              {totalQtyPicked ? (totalQtyPicked.toLocaleString('en-US')) : totalQtyPicked}
+            </div>
+          </Tooltip>
         </div>
       </ModalWrapper>
     );

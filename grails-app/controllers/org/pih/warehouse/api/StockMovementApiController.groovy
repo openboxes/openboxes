@@ -330,12 +330,13 @@ class StockMovementApiController {
     def getPendingRequisitionDetails = {
         Location origin = Location.get(params.origin.id)
         Product product = Product.get(params.product.id)
+        def stockMovementId = params.stockMovementId
 
         if (!origin || !product) {
             throw new IllegalArgumentException("Both origin location and product are required!")
         }
 
-        def pendingRequisitionDetails = stockMovementService.getPendingRequisitionDetails(origin, product)
+        def pendingRequisitionDetails = stockMovementService.getPendingRequisitionDetails(origin, product, stockMovementId)
         render([data: pendingRequisitionDetails] as JSON)
     }
 
