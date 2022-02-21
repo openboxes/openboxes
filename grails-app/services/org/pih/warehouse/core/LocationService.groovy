@@ -556,4 +556,29 @@ class LocationService {
         return "${receivingLocationPrefix}-${identifier}"
     }
 
+    List<Location> searchInternalLocations(Map params, LocationTypeCode[] locationTypeCodes) {
+        return Location.createCriteria().list(params) {
+            eq("active", Boolean.TRUE)
+
+            if (params.parentLocation?.id) {
+                eq("parentLocation", Location.get(params.parentLocation.id))
+            }
+
+            if (locationTypeCodes) {
+                locationType {
+                    'in'("locationTypeCode", locationTypeCodes)
+                }
+            }
+
+            if (params.searchTerm) {
+                or {
+                    ilike("name", "%${params.searchTerm}%")
+                    ilike("locationNumber", "%${params.searchTerm}%")
+                }
+            }
+
+            order("sortOrder", "asc")
+            order("name", "asc")
+        }
+    }
 }
