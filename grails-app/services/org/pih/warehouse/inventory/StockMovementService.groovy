@@ -582,31 +582,38 @@ class StockMovementService {
         return requisitionItems
     }
 
-    def getPendingRequisitionDetails(Location origin, Product product) {
+    def getPendingRequisitionDetails(Location origin, Product product, def currentRequisitionId) {
         def results = []
-        def demandDetailsMap = [:]
         def pendingRequisitionDetails = requisitionService.getPendingRequisitionItems(origin, product)
-        pendingRequisitionDetails.groupBy { it.requisition }.collect { Requisition requisition, List<RequisitionItem> requisitionItems ->
-            def demandDetails
-            if (demandDetailsMap.get(requisition.destination)){
-                demandDetails = demandDetailsMap.get(requisition.destination)
-            } else {
-                demandDetails = forecastingService.getDemand(origin, requisition.destination, product)
-                if (requisition.destination.isDepot()) {
-                    def quantityOnHandAtDestination = productAvailabilityService.getQuantityOnHand(product, requisition.destination)
-                    demandDetails << [quantityOnHandAtDestination: quantityOnHandAtDestination]
-                }
-                demandDetailsMap.put(requisition.destination, demandDetails)
+        pendingRequisitionDetails = pendingRequisitionDetails.findAll { it.requisition.id != currentRequisitionId }
+
+        pendingRequisitionDetails.groupBy { it.requisition.destination }.collect { Location destination, List<RequisitionItem> requisitionItems ->
+            def demandDetails = forecastingService.getDemand(origin, destination, product)
+            if (destination.isDepot()) {
+                def quantityOnHandAtDestination = productAvailabilityService.getQuantityOnHand(product, destination)
+                demandDetails << [quantityOnHandAtDestination: quantityOnHandAtDestination]
             }
 
+            def requisitionDetails = requisitionItems.groupBy { it.requisition }.collect { Requisition requisition, List<RequisitionItem> items ->
+                [
+                        'requisition.id'            : requisition.id,
+                        'requisition.requestNumber' : requisition.requestNumber,
+                        quantityRequested           : items.quantity.sum(),
+                        quantityPicked              : items.sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityPicked() },
+                ]
+            }
+
+            def details = requisitionDetails.pop()
+
             results << [
-                id                          : requisition.id,
-                requestNumber               : requisition.requestNumber,
-                'destination.name'          : requisition.destination.name,
-                quantityOnHandAtDestination : demandDetails.quantityOnHandAtDestination,
-                averageMonthlyDemand        : demandDetails.monthlyDemand as Integer,
-                quantityRequested           : requisitionItems.quantity.sum(),
-                quantityPicked              : requisitionItems.sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityPicked() },
+                    'destination.name'          : destination.name,
+                    quantityOnHandAtDestination : demandDetails.quantityOnHandAtDestination,
+                    averageMonthlyDemand        : demandDetails.monthlyDemand as Integer,
+                    requisitions                : requisitionDetails,
+                    'requisition.id'            : details['requisition.id'],
+                    'requisition.requestNumber' : details['requisition.requestNumber'],
+                    quantityRequested           : details.quantityRequested,
+                    quantityPicked              : details.quantityPicked,
             ]
         }
 
