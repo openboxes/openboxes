@@ -231,10 +231,16 @@ class UrlMappings {
             action = [GET: "listReceiving"]
         }
 
+        "/api/internalLocations/search"(parseRequest: true) {
+            controller = "internalLocationApi"
+            action = [GET: "search"]
+        }
+
         "/api/internalLocations/$id/details"(parseRequest: true) {
             controller = "internalLocationApi"
             action = [GET: "details"]
         }
+
         "/api/internalLocations/$id/labels/$documentId**?" {
             controller = { "internalLocationApi" }
             action = [GET: "renderLabel", POST: "printLabel", PUT: "printLabel"]

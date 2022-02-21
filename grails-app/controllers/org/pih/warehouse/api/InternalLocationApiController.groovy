@@ -37,6 +37,12 @@ class InternalLocationApiController {
         render([data: locations?.collect { it.toJson(it?.locationType?.locationTypeCode) }] as JSON)
     }
 
+    def search = {
+        LocationTypeCode[] locationTypeCodes = params.locationTypeCode ? params.list("locationTypeCode") : [LocationTypeCode.INTERNAL, LocationTypeCode.BIN_LOCATION]
+        List<Location> locations = locationService.searchInternalLocations(params, locationTypeCodes)
+        render([data: locations?.collect { it.toJson(it?.locationType?.locationTypeCode) }] as JSON)
+    }
+
     def listReceiving = {
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location parentLocation = locationId ? Location.get(locationId) : null
