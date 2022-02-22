@@ -13,6 +13,7 @@ import grails.converters.JSON
 import grails.test.ControllerUnitTestCase
 import org.codehaus.groovy.grails.commons.DefaultGrailsApplication
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 
 class LocationApiControllerTests extends ControllerUnitTestCase {
@@ -58,7 +59,10 @@ class LocationApiControllerTests extends ControllerUnitTestCase {
         controller.session.warehouse = warehouse
         controller.session.user = user
         controller.userService = [
-                isSuperuser: { User user -> return true }
+                isSuperuser: { User user -> return true },
+                isUserRequestor: { User user -> return false },
+                isUserInRole: { User user, RoleType roleType -> return false },
+                hasRoleRequestorInAnyLocations: { User user -> return false }
         ]
         controller.locationService = [
                 getLocations: { String[] fields, Map params, Boolean isSuperuser, String direction, Location currentLocation, User u -> [location] }

@@ -246,14 +246,17 @@ class LocationService {
         def locationMap = [:]
         def locations
         def nullHigh = new NullComparator(true)
+        def isRequestor = userService.isUserRequestor(user)
+        def inRoleBrowser = userService.isUserInRole(user, RoleType.ROLE_BROWSER)
+        def requestorInAnyLocation = userService.hasRoleRequestorInAnyLocations(user)
 
-        if (userService.isUserRequestor(user) && !user.locationRoles) {
+        if (isRequestor && !user.locationRoles && !inRoleBrowser) {
             locations = getLocations(null, null)
             locations = locations.findAll {it -> it.supportedActivities && it.supports(ActivityCode.SUBMIT_REQUEST) }
-        } else if (userService.hasRoleRequestorInAnyLocations(user) && userService.isUserInRole(user, RoleType.ROLE_BROWSER)) {
+        } else if (requestorInAnyLocation && inRoleBrowser) {
             locations = getRequestorLocations(user)
             locations += getLoginLocations(currentLocation)
-        } else if (userService.hasRoleRequestorInAnyLocations(user)) {
+        } else if (requestorInAnyLocation) {
             locations = getRequestorLocations(user)
         } else {
             locations = getLoginLocations(currentLocation)
