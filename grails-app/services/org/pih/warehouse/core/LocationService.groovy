@@ -247,15 +247,13 @@ class LocationService {
         def locations
         def nullHigh = new NullComparator(true)
 
-        List locationRolesForRequestor = user.locationRoles.findAll {it.role.roleType == RoleType.ROLE_REQUESTOR}
-
         if (userService.isUserRequestor(user) && !user.locationRoles) {
             locations = getLocations(null, null)
             locations = locations.findAll {it -> it.supportedActivities && it.supports(ActivityCode.SUBMIT_REQUEST) }
-        } else if (locationRolesForRequestor && userService.isUserInRole(user, RoleType.ROLE_BROWSER)) {
+        } else if (userService.hasRoleRequestorInAnyLocations(user) && userService.isUserInRole(user, RoleType.ROLE_BROWSER)) {
             locations = getRequestorLocations(user)
             locations += getLoginLocations(currentLocation)
-        } else if (locationRolesForRequestor) {
+        } else if (userService.hasRoleRequestorInAnyLocations(user)) {
             locations = getRequestorLocations(user)
         } else {
             locations = getLoginLocations(currentLocation)
