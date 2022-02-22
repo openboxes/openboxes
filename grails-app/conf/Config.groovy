@@ -1674,6 +1674,19 @@ openboxes.shipping.search.maxResults = 1000
 openboxes.receiving.createReceivingLocation.enabled = true
 openboxes.receiving.receivingLocation.prefix = Constants.DEFAULT_RECEIVING_LOCATION_PREFIX
 
+
+// Product configuration wizard
+openboxes.configurationWizard.thirdPartyCategories.enabled = true // For potential disabling option to import third party categories
+openboxes.configurationWizard.thirdPartyCategories.fileUrl = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/UNSPSC_categories.csv"
+openboxes.configurationWizard.thirdPartyCategories.label = "productsConfiguration.unspscCategories.label"
+
+// TODO (?): Provide file for OpenBoxes category tree
+openboxes.configurationWizard.defaultCategories.enabled = true // For potential disabling option to import default OB categories
+openboxes.configurationWizard.defaultCategories.fileUrl = ""
+openboxes.configurationWizard.defaultCategories.label = "productsConfiguration.defaultCategoryTree.label"
+
+openboxes.configurationWizard.customCategories.enabled = true // For potential disabling option to import categories from user's excel
+
 // Pagination
 openboxes.api.pagination.enabled = true
 openboxes.api.pagination.pageSize = 10

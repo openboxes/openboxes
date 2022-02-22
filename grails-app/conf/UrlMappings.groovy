@@ -510,6 +510,11 @@ class UrlMappings {
             action = [GET: "getOpenPurchaseOrdersCount"]
         }
 
+        "/api/productsConfiguration/importThirdPartyCategories"(parseRequest: true) {
+            controller = { "productsConfigurationApi" }
+            action = [POST: "importThirdPartyCategories"]
+        }
+
         // Standard REST APIs
 
         "/api/${resource}s"(parseRequest: true) {

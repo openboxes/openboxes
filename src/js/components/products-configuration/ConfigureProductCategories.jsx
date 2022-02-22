@@ -22,7 +22,7 @@ function getDefaultCategoryTreeContent() {
 function getNSPSCCategoryTreeContent() {
   return (
     <div className="d-flex justify-content-center p-5">
-      <h3><Translate id="react.productsConfiguration.nspscCategoryList.label" defaultMessage="NSPSC category list" /></h3>
+      <h3><Translate id="react.productsConfiguration.unspscCategoryList.label" defaultMessage="NSPSC category list" /></h3>
     </div>
   );
 }
@@ -44,7 +44,7 @@ class ConfigureProductCategories extends Component {
   render() {
     const tabs = {
       'react.productsConfiguration.defaultCategoryTree.label': getDefaultCategoryTreeContent(),
-      'react.productsConfiguration.nspscCategoryList.label': getNSPSCCategoryTreeContent(),
+      'react.productsConfiguration.unspscCategoryList.label': getNSPSCCategoryTreeContent(),
       'react.productsConfiguration.importFromExcel.label': getImportFromExcelTabContent(),
     };
 

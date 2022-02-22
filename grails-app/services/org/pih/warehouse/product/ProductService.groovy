@@ -825,6 +825,22 @@ class ProductService {
     }
 
     /**
+     * Find or create a category with the given name and parent category name.
+     *
+     * @param categoryName
+     * @param parentCategory
+     * @return
+     */
+    Category findOrCreateCategoryWithParentCategory(String categoryName, Category parentCategory) {
+        def category = Category.findByName(categoryName)
+        if (!category) {
+            category = new Category(parentCategory: parentCategory, name: categoryName)
+            category.save(failOnError: true)
+        }
+        return category
+    }
+
+    /**
      * Find all top-level categories (e.g. children of the root category)
      *
      * @return
@@ -1233,5 +1249,37 @@ class ProductService {
         def results = dataService.executeQuery(query)
 
         return results.collect { new ProductSearchDto(it) }
+    }
+
+    // By default it will be used for UNSPSC import
+    def importThirdPartyCategories() {
+        def enabled = grailsApplication.config.openboxes.configurationWizard.thirdPartyCategories.enabled
+        def fileUrl = grailsApplication.config.openboxes.configurationWizard.thirdPartyCategories.fileUrl
+
+        if (enabled && fileUrl) {
+            def fileContent = new URL(fileUrl).getBytes()
+            String csv = new String(fileContent)
+
+            def settings = [separatorChar: ',', skipLines: 1]
+            csv.toCsvReader(settings).eachLine { tokens ->
+                def categoryName = tokens[0]
+                def parentCategoryName = tokens[1]
+
+                // Use already existing root category or create one with the Constants.ROOT_CATEGORY_NAME (which should be the same as a root category name from file)
+                def rootCategory = Category.getRootCategory()
+                if (!rootCategory) {
+                    rootCategory = new Category(name: Constants.ROOT_CATEGORY_NAME, isRoot: true, parentCategory: null)
+                    rootCategory.save(failOnError: true)
+                }
+
+                def category
+                if (parentCategoryName.toUpperCase() == Constants.ROOT_CATEGORY_NAME) {
+                    category = findOrCreateCategoryWithParentCategory(categoryName, rootCategory)
+                } else {
+                    def parentCategory = Category.findByName(parentCategoryName)
+                    category = findOrCreateCategoryWithParentCategory(categoryName, parentCategory)
+                }
+            }
+        }
     }
 }
