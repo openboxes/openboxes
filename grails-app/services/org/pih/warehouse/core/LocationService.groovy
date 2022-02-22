@@ -252,7 +252,7 @@ class LocationService {
         if (userService.isUserRequestor(user) && !user.locationRoles) {
             locations = getLocations(null, null)
             locations = locations.findAll {it -> it.supportedActivities && it.supports(ActivityCode.SUBMIT_REQUEST) }
-        } else if (locationRolesForRequestor && userService.hasRoleBrowser(user)) {
+        } else if (locationRolesForRequestor && userService.isUserInRole(user, RoleType.ROLE_BROWSER)) {
             locations = getRequestorLocations(user)
             locations += getLoginLocations(currentLocation)
         } else if (locationRolesForRequestor) {
