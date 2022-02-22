@@ -310,6 +310,20 @@ class MobileController {
         redirect(action: "inboundList")
     }
 
+    def showDetails = {
+        Location currentLocation = Location.get(session?.warehouse?.id)
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        if (!stockMovement) {
+            flash.message = "Unable to locate stock movement with ID ${params.id}"
+            redirect(action: "index")
+        }
+        if (stockMovement.origin?.isSupplier() || stockMovement?.destination == currentLocation) {
+            redirect(action: "inboundDetails", id: stockMovement?.id)
+        }
+        else {
+            redirect(action: "outboundDetails", id: stockMovement?.id)
+        }
+    }
 
     def outboundDetails = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)

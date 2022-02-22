@@ -8,7 +8,7 @@
     <div style="margin: 10px;">
         ${warehouse.message(code: 'email.shipmentReceived.message', args: [format.metadata(obj:shipmentInstance.shipmentType), shipmentInstance?.name])}
         &nbsp;
-        <g:link controller="shipment" action="showDetails" id="${shipmentInstance?.id }" absolute="true" class="button">
+        <g:link controller="mobile" action="showDetails" id="${shipmentInstance?.id }" absolute="true" class="button">
             ${warehouse.message(code: 'email.link.label', args: [shipmentInstance?.name])}
         </g:link>
     </div>
