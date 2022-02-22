@@ -21,7 +21,7 @@ class VerticalTabs extends Component {
         onKeyPress={() => this.setState({ activeTab: tabTitle })}
         tabIndex={0}
       >
-        <i className={`fa ml-5 mr-3 ${this.isActive(tabTitle) ? 'fa-dot-circle-o active ' : 'fa-circle-o'}`} />
+        <i className={`fa tab-title-icon ${this.isActive(tabTitle) ? 'fa-dot-circle-o active ' : 'fa-circle-o'}`} />
         <Translate id={tabTitle} defaultMessage={tabTitle} />
       </div>
     ));
