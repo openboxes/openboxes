@@ -106,6 +106,17 @@ grails.project.dependency.resolution = {
         compile "fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.xwpf:2.0.1"   // docx->pdf via POI
         compile "fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.odt.odfdom:2.0.1"  // odf->pdf
 
+        // use the latest version of docx4j that supports Java 7
+        compile "org.docx4j:docx4j:6.1.2"
+        compile "org.docx4j:docx4j-export-fo:6.1.0"  // for org.docx4j.convert.out.pdf.*
+
+        compile "org.xhtmlrenderer:flying-saucer-core:9.1.22"
+        /*
+         * FIXME use OpenPDF, not iText 2, when we move to Java 8
+         * (replace following line with org.xhtmlrenderer:flying-saucer-pdf-openpdf)
+         */
+        compile "org.xhtmlrenderer:flying-saucer-pdf:9.1.22"
+
         /*
          * This test SMTP client is the latest release that works with Grails 1,
          * and Java 7, although it depends on a junit release we can't use (yet).
