@@ -13,13 +13,13 @@
 <body>
 
 <g:if test="${flash.command}">
-<div class="row g-0">
-    <div class="col">
-        <div class="text-danger">
-            <g:renderErrors bean="${flash.command}" as="list"/>
+    <div class="row g-0">
+        <div class="col">
+            <div class="alert alert-danger">
+                <g:renderErrors bean="${flash.command}" as="list"/>
+            </div>
         </div>
     </div>
-</div>
 </g:if>
 
 <div class="row g-0 mb-2">

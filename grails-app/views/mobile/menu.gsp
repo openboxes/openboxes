@@ -53,7 +53,7 @@
                     <div class="dropdown text-end">
                         <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle"
                            id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                            <g:if test="${session.user?.id}">
+                            <g:if test="${session.user?.id && session?.user?.photo}">
                                 <img src="${createLink(controller: 'user', action: 'viewThumb', id: session?.user?.id)}"
                                      width="48" height="48" class="rounded-circle"/>
                             </g:if>

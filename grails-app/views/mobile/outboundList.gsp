@@ -8,19 +8,17 @@
 
 <body>
 
-<g:hasErrors bean="${commandInstance}">
-    <div class="errors">
-        <g:renderErrors bean="${commandInstance}" as="list" />
-    </div>
-</g:hasErrors>
+<g:if test="${flash.command}">
+    <ul class="alert alert-danger">
+        <g:renderErrors bean="${flash.command}" as="list"/>
+    </ul>
+</g:if>
 
 <div class="row g-0 mb-2">
     <div class="col col-md-12 ">
-
         <div class="btn-group float-end">
             <button type="button" class="btn btn-outline-primary "
                     data-bs-toggle="modal" data-bs-target="#outboundModal"><i class="fa fa-file-import"></i> Import Delivery Orders</button>
-
         </div>
     </div>
 </div>
@@ -136,9 +134,9 @@
                 </tbody>
             </table>
         </g:form>
-        <div class="pagination">
-            <g:paginate total="${stockMovements.totalCount}"/>
-        </div>
+        <ul class="pagination">
+            <g:pagination total="${stockMovements.totalCount}"/>
+        </ul>
     </div>
 </div>
 
