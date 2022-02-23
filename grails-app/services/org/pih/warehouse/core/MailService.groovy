@@ -144,8 +144,8 @@ class MailService {
         Collection<String> cc,
         Collection<Attachment> attachments,
         Integer port,
-        boolean useHtml,
-        boolean override) {
+        Boolean useHtml,
+        Boolean override) {
 
         Email email
         def summary = "email with subject '${subject}' to ${to} from ${from ?: defaultFrom} via ${defaultHost}:${port ?: defaultPort}"

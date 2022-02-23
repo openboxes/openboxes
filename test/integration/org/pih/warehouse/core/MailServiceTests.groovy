@@ -49,8 +49,22 @@ class MailServiceTests extends GrailsUnitTestCase {
 	@Test
 	void sendHtmlMailShouldNotRaiseExceptionIfSmtpServerIsDown() {
 		testSmtpService.stop()
+		// should not raise org.apache.commons.mail.EmailException
 		def sent = mailService.sendHtmlMail("undeliverable", "this message will not send", "anybody@anywhere.com", null, true)
 		assertFalse(sent)
+	}
+
+	@Test
+	void sendHtmlMailShouldNotRaiseExceptionIfPortIsInvalid() {
+		def oldPort = grailsApplication.config.grails.mail.port = ServerSetupTest.SMTP.port
+		grailsApplication.config.grails.mail.port = -1
+		try {
+			// should not raise java.lang.IllegalArgumentException
+			def sent = mailService.sendHtmlMail("invalid port", "this message will not send", "anybody@anywhere.com", null, true)
+			assertFalse(sent)
+		} finally {
+			grailsApplication.config.grails.mail.port = oldPort
+		}
 	}
 
 	@Test
@@ -62,6 +76,7 @@ class MailServiceTests extends GrailsUnitTestCase {
 			def shouldSend = mailService.sendMail("deliverable", "this message will send", "anybody@anywhere.com")
 			assertTrue(shouldSend)
 			testSmtpService.stop()
+			// should not raise org.apache.commons.mail.EmailException
 			def shouldNotSend = mailService.sendMail("undeliverable", "this message will not send", "anybody@anywhere.com")
 			assertFalse(shouldNotSend)
 		} finally {
@@ -82,6 +97,7 @@ class MailServiceTests extends GrailsUnitTestCase {
 				"right_" + grailsApplication.config.grails.mail.username,
 				"right_" + grailsApplication.config.grails.mail.password
 			)
+			// should not raise org.apache.commons.mail.EmailException
 			def sent = mailService.sendHtmlMail("unauthorized", "this message will not send", "anybody@anywhere.com", null, true)
 			assertFalse(sent)
 		} finally {
