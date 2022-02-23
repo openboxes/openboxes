@@ -205,15 +205,16 @@ class DashboardController {
             return
         }
 
+        def loginLocationsMap = locationService.getLoginLocationsMap(user, warehouse)
+        def savedLocations = user.warehouse && loginLocationsMap.containsValue(user.warehouse) ? [user.warehouse] : null
+
         if (userAgentIdentService.isMobile()) {
             render (view: "/mobile/chooseLocation",
-                    model: [savedLocations: user.warehouse ? [user.warehouse] : null, loginLocationsMap: locationService.getLoginLocationsMap(user, warehouse)])
+                    model: [savedLocations: savedLocations, loginLocationsMap: loginLocationsMap])
             return
         }
 
-
-
-        [savedLocations: user.warehouse ? [user.warehouse] : null, loginLocationsMap: locationService.getLoginLocationsMap(user, warehouse)]
+        [savedLocations: savedLocations, loginLocationsMap: loginLocationsMap]
     }
 
 

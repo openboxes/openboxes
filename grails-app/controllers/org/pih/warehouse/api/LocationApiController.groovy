@@ -37,14 +37,17 @@ class LocationApiController extends BaseDomainApiController {
         String direction = params?.direction
         def fields = params.fields ? params.fields.split(",") : null
         def locations
+        def isRequestor = userService.isUserRequestor(currentUser)
+        def inRoleBrowser = userService.isUserInRole(currentUser, RoleType.ROLE_BROWSER)
+        def requestorInAnyLocation = userService.hasRoleRequestorInAnyLocations(currentUser)
 
-        if (params.locationChooser && userService.isUserRequestor(currentUser) && !currentUser.locationRoles) {
-            locations = locationService.getLocations(fields, params)
+        if (params.locationChooser && isRequestor && !currentUser.locationRoles && !inRoleBrowser) {
+            locations = locationService.getLocations(null, null)
             locations = locations.findAll { it.supportedActivities && it.supports(ActivityCode.SUBMIT_REQUEST) }
-        } else if (params.locationChooser && userService.hasRoleRequestorInAnyLocations(currentUser) && userService.isUserInRole(currentUser, RoleType.ROLE_BROWSER)) {
+        } else if (params.locationChooser && requestorInAnyLocation && inRoleBrowser) {
             locations = locationService.getRequestorLocations(currentUser)
             locations += locationService.getLocations(fields, params, isSuperuser, direction, currentLocation, currentUser)
-        } else if (params.locationChooser && userService.hasRoleRequestorInAnyLocations(currentUser)) {
+        } else if (params.locationChooser && requestorInAnyLocation) {
             locations = locationService.getRequestorLocations(currentUser)
         } else {
             locations = locationService.getLocations(fields, params, isSuperuser, direction, currentLocation, currentUser)
