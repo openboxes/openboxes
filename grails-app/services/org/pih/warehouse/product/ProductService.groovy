@@ -825,6 +825,25 @@ class ProductService {
     }
 
     /**
+     * Find or create a root category with the given name.
+     *
+     * @param rootCategoryName
+     * @return
+     */
+    Category findOrCreateRootCategory(String rootCategoryName) {
+        def rootCategory = Category.findByName(rootCategoryName)
+
+        if (rootCategory && rootCategory.isRoot) {
+            return rootCategory
+        }
+
+        rootCategory = new Category(parentCategory: null, name: rootCategoryName, isRoot: true)
+        rootCategory.save(failOnError: true)
+
+        return rootCategory
+    }
+
+    /**
      * Find or create a category with the given name and parent category name.
      *
      * @param categoryName
@@ -1251,35 +1270,46 @@ class ProductService {
         return results.collect { new ProductSearchDto(it) }
     }
 
-    // By default it will be used for UNSPSC import
-    def importThirdPartyCategories() {
-        def enabled = grailsApplication.config.openboxes.configurationWizard.thirdPartyCategories.enabled
-        def fileUrl = grailsApplication.config.openboxes.configurationWizard.thirdPartyCategories.fileUrl
+    def importCategories(String categoryOption) {
+        def enabled = grailsApplication.config.openboxes.configurationWizard.enabled
 
-        if (enabled && fileUrl) {
-            def fileContent = new URL(fileUrl).getBytes()
+        if (enabled && categoryOption) {
+            def categoryOptionConfig = grailsApplication.config.openboxes.configurationWizard.categoryOptions[categoryOption]
+
+            if (!categoryOptionConfig) {
+                throw new Exception("There is no category option with the code: ${categoryOption}")
+            }
+
+            if (!categoryOptionConfig.enabled) {
+                return
+            }
+
+            // TODO: get this part working with [classpath:, file://, https://] (currently it does not support classpath)
+            def fileContent = new URL(categoryOptionConfig.fileUrl).getBytes()
             String csv = new String(fileContent)
+
+            // Find existing root category or create one with the configured root name or the Constants.ROOT_CATEGORY_NAME
+            def rootCategoryName = categoryOptionConfig.rootCategoryName ?: Constants.ROOT_CATEGORY_NAME
+            def rootCategory = findOrCreateRootCategory(rootCategoryName)
+
+            def categoryNameColumnIndex = categoryOptionConfig.categoryNameColumnIndex ?: 0
+            def parentCategoryNameColumnIndex = categoryOptionConfig.parentCategoryNameColumnIndex ?: 1
 
             def settings = [separatorChar: ',', skipLines: 1]
             csv.toCsvReader(settings).eachLine { tokens ->
-                def categoryName = tokens[0]
-                def parentCategoryName = tokens[1]
-
-                // Use already existing root category or create one with the Constants.ROOT_CATEGORY_NAME (which should be the same as a root category name from file)
-                def rootCategory = Category.getRootCategory()
-                if (!rootCategory) {
-                    rootCategory = new Category(name: Constants.ROOT_CATEGORY_NAME, isRoot: true, parentCategory: null)
-                    rootCategory.save(failOnError: true)
-                }
+                def categoryName = tokens[categoryNameColumnIndex]
+                def parentCategoryName = tokens[parentCategoryNameColumnIndex]
 
                 def category
-                if (parentCategoryName.toUpperCase() == Constants.ROOT_CATEGORY_NAME) {
+                if (parentCategoryName.toUpperCase() == categoryOptionConfig.rootCategoryName) {
                     category = findOrCreateCategoryWithParentCategory(categoryName, rootCategory)
                 } else {
                     def parentCategory = Category.findByName(parentCategoryName)
                     category = findOrCreateCategoryWithParentCategory(categoryName, parentCategory)
                 }
             }
+        } else if (enabled && !categoryOption) {
+            // TODO OBDS-86: This is for excel import done by user
         }
     }
 }

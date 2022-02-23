@@ -1676,16 +1676,28 @@ openboxes.receiving.receivingLocation.prefix = Constants.DEFAULT_RECEIVING_LOCAT
 
 
 // Product configuration wizard
-openboxes.configurationWizard.thirdPartyCategories.enabled = true // For potential disabling option to import third party categories
-openboxes.configurationWizard.thirdPartyCategories.fileUrl = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/UNSPSC_categories.csv"
-openboxes.configurationWizard.thirdPartyCategories.label = "productsConfiguration.unspscCategories.label"
-
-// TODO (?): Provide file for OpenBoxes category tree
-openboxes.configurationWizard.defaultCategories.enabled = true // For potential disabling option to import default OB categories
-openboxes.configurationWizard.defaultCategories.fileUrl = ""
-openboxes.configurationWizard.defaultCategories.label = "productsConfiguration.defaultCategoryTree.label"
-
-openboxes.configurationWizard.customCategories.enabled = true // For potential disabling option to import categories from user's excel
+openboxes.configurationWizard.enabled = true
+openboxes.configurationWizard.categoryOptions = [
+    unspscCategories: [
+        enabled: true,
+        // TODO: add option to support 'classpath:'
+        fileUrl: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/UNSPSC_categories.csv",
+        rootCategoryName: "ROOT", // needs to match the category from file
+        categoryNameColumnIndex: 0,
+        parentCategoryNameColumnIndex: 1,
+        title: "productsConfiguration.unspscCategories.label",
+        description: "",
+    ],
+    defaultCategories: [
+        enabled: true,
+        fileUrl: "", // TODO: Provide file for OpenBoxes category tree
+        rootCategoryName: "ROOT",
+        categoryNameColumnIndex: 0,
+        parentCategoryNameColumnIndex: 1,
+        title: "productsConfiguration.defaultCategoryTree.label",
+        description: "",
+    ]
+]
 
 // Pagination
 openboxes.api.pagination.enabled = true

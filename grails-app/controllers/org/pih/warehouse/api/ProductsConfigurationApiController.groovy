@@ -14,13 +14,12 @@ class ProductsConfigurationApiController {
     def userService
     def grailsApplication
 
-    // By default it will be used for UNSPSC import (or other third party categories)
-    def importThirdPartyCategories = {
+    def importCategories = {
         if (!userService.isSuperuser(session?.user)) {
             throw new Exception("You are not authorized to perform this action")
         }
 
-        productService.importThirdPartyCategories()
+        productService.importCategories(params.categoryOption)
         return 200
     }
 }
