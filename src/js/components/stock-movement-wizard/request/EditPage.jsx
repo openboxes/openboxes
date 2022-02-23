@@ -513,11 +513,15 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
           title: 'react.stockMovement.pendingRequisitionDetails.label',
           defaultTitleMessage: 'Pending Requisition Details',
         },
-        getDynamicAttr: ({ fieldValue, values }) => ({
+        getDynamicAttr: ({ fieldValue, stockMovementId, values }) => ({
           productId: fieldValue && fieldValue.product && fieldValue.product.id,
           productCode: fieldValue && fieldValue.product && fieldValue.product.productCode,
           productName: fieldValue && fieldValue.product && fieldValue.product.name,
           originId: values && values.origin && values.origin.id,
+          stockMovementId,
+          quantityRequested: fieldValue && fieldValue.quantityRequested,
+          quantityOnHand: fieldValue && fieldValue.quantityOnHand,
+          quantityAvailable: fieldValue && fieldValue.quantityAvailable,
           btnOpenText: 'react.stockMovement.details.label',
           btnOpenDefaultText: 'Details',
           btnCancelText: 'Close',
@@ -800,11 +804,15 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
           title: 'react.stockMovement.pendingRequisitionDetails.label',
           defaultTitleMessage: 'Pending Requisition Details',
         },
-        getDynamicAttr: ({ fieldValue, values }) => ({
+        getDynamicAttr: ({ fieldValue, stockMovementId, values }) => ({
           productId: fieldValue && fieldValue.product && fieldValue.product.id,
           productCode: fieldValue && fieldValue.product && fieldValue.product.productCode,
           productName: fieldValue && fieldValue.product && fieldValue.product.name,
           originId: values && values.origin && values.origin.id,
+          stockMovementId,
+          quantityRequested: fieldValue && fieldValue.quantityRequested,
+          quantityOnHand: fieldValue && fieldValue.quantityOnHand,
+          quantityAvailable: fieldValue && fieldValue.quantityAvailable,
           btnOpenText: 'react.stockMovement.details.label',
           btnOpenDefaultText: 'Details',
           btnCancelText: 'Close',
