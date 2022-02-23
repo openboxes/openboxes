@@ -510,6 +510,11 @@ class UrlMappings {
             action = [GET: "getOpenPurchaseOrdersCount"]
         }
 
+        "/api/productsConfiguration/importCategories"(parseRequest: true) {
+            controller = { "productsConfigurationApi" }
+            action = [POST: "importCategories"]
+        }
+
         // Standard REST APIs
 
         "/api/${resource}s"(parseRequest: true) {

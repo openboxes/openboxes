@@ -138,4 +138,7 @@ class Constants {
 
     static final String PUTAWAY_ORDER = "PUTAWAY_ORDER"
     static final String RETURN_ORDER = "RETURN_ORDER"
+
+    // Products and categories configuration wizard
+    static final String ROOT_CATEGORY_NAME = "ROOT"
 }
