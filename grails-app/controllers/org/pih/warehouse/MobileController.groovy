@@ -33,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest
 
 
+
 class MobileController {
 
     def userService
@@ -239,14 +240,21 @@ class MobileController {
 
                 try {
                     xlsFiles.each { xlsFile ->
-
-                        command.importFile = xlsFile
-                        command.filename = xlsFile.name
+                        InputStream inputStream = null
+                        if(xlsFile.getOriginalFilename()?.endsWith(".xlsx")){
+                            command.importFile = uploadService.convertXlsx2xls(xlsFile)
+                            inputStream = command.importFile.newDataInputStream()
+                            command.filename = command.importFile.getName()
+                        }else{
+                            command.importFile = xlsFile
+                            command.filename = xlsFile.name
+                            inputStream = command.importFile.inputStream
+                        }
                         command.location = Location.get(session.warehouse.id)
 
                         dataImporter = (params.type == "outbound") ?
-                                new OutboundStockMovementExcelImporter(command.filename, xlsFile.inputStream) :
-                                new InboundStockMovementExcelImporter(command.filename, xlsFile.inputStream)
+                                new OutboundStockMovementExcelImporter(command.filename, inputStream) :
+                                new InboundStockMovementExcelImporter(command.filename, inputStream)
 
                         if (dataImporter) {
                             log.info "Using data importer ${dataImporter.class.name}"
@@ -511,4 +519,6 @@ class MobileController {
         response.outputStream << document.fileContents
         response.outputStream.flush()
     }
+
+
 }
