@@ -345,7 +345,13 @@ class StockTransferService {
             throw new IllegalArgumentException("Location is required")
         }
 
-        Integer quantityAvailable = productAvailabilityService.getQuantityNotPickedInBinLocation(inventoryItem, originBinLocation)
+        Integer quantityAvailable
+        if (originBinLocation) {
+            quantityAvailable = productAvailabilityService.getQuantityNotPickedInBinLocation(inventoryItem, originBinLocation)
+        } else {
+            quantityAvailable = productAvailabilityService.getQuantityNotPickedInLocation(inventoryItem.product, location)
+        }
+
         log.info "Quantity: ${quantity} vs ${quantityAvailable}"
 
         if (quantityAvailable < 0) {
