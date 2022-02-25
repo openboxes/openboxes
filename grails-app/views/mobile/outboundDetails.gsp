@@ -8,6 +8,14 @@
 </head>
 
 <body>
+
+<g:if test="${flash.command}">
+    <ul class="alert alert-danger">
+        <g:renderErrors bean="${flash.command}" as="list"/>
+    </ul>
+</g:if>
+
+
 <div class="card">
     <div class="card-header">
         <div class="row align-items-center">
@@ -259,9 +267,9 @@
                                                 ${item?.product?.productCode}
                                                 ${item?.product?.name}
                                             </g:link>
-                                        <g:if test="${item?.requisitionItem?.description}">
+                                        <g:if test="${item?.comments}">
                                             <div class="text-muted">
-                                                Special Instructions: ${item.requisitionItem?.description}
+                                                Special Instructions: ${item.comments}
                                             </div>
                                         </g:if>
                                     </td>

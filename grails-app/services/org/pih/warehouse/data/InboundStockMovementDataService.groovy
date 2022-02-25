@@ -49,7 +49,7 @@ class InboundStockMovementDataService {
 
     List<StockMovement> buildStockMovements(ImportDataCommand command) {
         List<StockMovement> stockMovements = new ArrayList<StockMovement>()
-        command.data.groupBy { it.loadCode }.each { loadCode, rows ->
+        command.data.groupBy { it.identifier }.each { identifier, rows ->
             StockMovement stockMovement = buildStockMovement(command, rows[0])
             rows.each { row ->
                 Product product = Product.findByProductCode(row.productCode)
@@ -66,50 +66,50 @@ class InboundStockMovementDataService {
 
     StockMovement buildStockMovement(ImportDataCommand command, Map params) {
         StockMovement stockMovement =
-                stockMovementService.getStockMovementByIdentifier(params.loadCode)
+                stockMovementService.getStockMovementByIdentifier(params.identifier)
 
         if (!stockMovement) {
             stockMovement = new StockMovement()
         }
 
         if (!params?.origin) {
-            command.errors.reject("Order number ${params.loadCode} failed: Origin is required")
+            command.errors.reject("Order number ${params.identifier} failed: Origin is required")
         }
         if (!params?.destination) {
-            command.errors.reject("Order number ${params.loadCode} failed: Destination is required")
+            command.errors.reject("Order number ${params.identifier} failed: Destination is required")
         }
         if (params?.quantity < 0) {
-            command.errors.reject("Order number ${params.loadCode} failed: Requested Quantity is required")
+            command.errors.reject("Order number ${params.identifier} failed: Requested Quantity is required")
         }
         if(command?.location?.locationNumber != params.destination) {
-            command.errors.reject("Order number ${params.loadCode} failed: Destination [${params.destination}] must match the current location [${command?.location?.locationNumber}]")
+            command.errors.reject("Order number ${params.identifier} failed: Destination [${params.destination}] must match the current location [${command?.location?.locationNumber}]")
         }
 
         Location origin = Location.findByLocationNumber(params.origin)
         log.info "origin ${params.origin} " + origin
         if (!origin) {
-            command.errors.reject("Order number ${params.loadCode} failed: Unknown Supplier [${params.origin}]")
+            command.errors.reject("Order number ${params.identifier} failed: Unknown Supplier [${params.origin}]")
         }
 
         Location destination = Location.findByLocationNumber(params.destination)
         log.info "destination ${params.destination} " + destination
         if (!destination) {
-            command.errors.reject("Order number ${params.loadCode} failed: Unknown Destination [${params.destination}]")
+            command.errors.reject("Order number ${params.identifier} failed: Unknown Destination [${params.destination}]")
         }
 
 
         if (stockMovement.stockMovementStatusCode >= StockMovementStatusCode.DISPATCHED) {
-            command.errors.reject("Order number ${params.loadCode} failed: Cannot update an inbound stock movement with status ${stockMovement?.stockMovementStatusCode}")
+            command.errors.reject("Order number ${params.identifier} failed: Cannot update an inbound stock movement with status ${stockMovement?.stockMovementStatusCode}")
         }
 
         def expectedDeliveryDate =
                 new SimpleDateFormat("yyyy-MM-dd").parse(params.deliveryDate.toString())
 
         if (expectedDeliveryDate.before(new Date())) {
-            command.errors.reject("Order number ${params.loadCode} failed: Expected delivery date should not be in the past")
+            command.errors.reject("Order number ${params.identifier} failed: Expected delivery date should not be in the past")
         }
 
-        stockMovement.identifier = params.loadCode
+        stockMovement.identifier = params.identifier
         stockMovement.description = ""
         stockMovement.stockMovementType = StockMovementType.INBOUND
         stockMovement.requestType = RequisitionType.DEFAULT
@@ -130,27 +130,17 @@ class InboundStockMovementDataService {
         String productCode = params.productCode
         Product product = Product.findByProductCode(productCode)
         if(!product) {
-            command.errors.reject("Order number ${params.loadCode} failed: Unknown SKU [${productCode}]")
+            command.errors.reject("Order number ${params.identifier} failed: Unknown SKU [${productCode}]")
         }
 
         def quantityRequested = params.quantity as Integer
         if (quantityRequested < 0) {
-            command.errors.reject("Order number ${params.loadCode} failed: Requested quantity [${quantityRequested}] for SKU ${productCode} should be greater than or equal to 0")
+            command.errors.reject("Order number ${params.identifier} failed: Requested quantity [${quantityRequested}] for SKU ${productCode} should be greater than or equal to 0")
         }
 
         stockMovementItem.product = product
         stockMovementItem.quantityRequested = quantityRequested
         stockMovementItem.comments = params.specialInstructions
         return stockMovementItem
-    }
-
-
-    boolean isDateOneWeekFromNow(def date) {
-        LocalDate today = LocalDate.now()
-        LocalDate oneWeekFromNow = today.plusDays(7)
-        if(date > oneWeekFromNow) {
-            return true
-        }
-        return false
     }
 }
