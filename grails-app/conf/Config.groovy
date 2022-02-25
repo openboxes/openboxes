@@ -1447,6 +1447,7 @@ openboxes.integration.ftp.inbound.archiveOnSuccess.enabled = Boolean.TRUE
 openboxes.integration.ftp.inbound.archiveOnFailure.enabled = Boolean.FALSE
 
 // OpenBoxes / eTN Integration default configuration
+openboxes.integration.daysRequiredBeforeDeliveryDate = 7
 openboxes.integration.uploadDeliveryOrderOnCreate.enabled = false
 openboxes.integration.uploadDeliveryOrderOnUpdate.enabled = false
 openboxes.integration.defaultTimeZone = System.env.DEFAULT_TIME_ZONE ?: "Europe/London"

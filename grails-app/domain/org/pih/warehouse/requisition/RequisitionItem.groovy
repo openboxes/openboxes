@@ -157,7 +157,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
                 id: stockMovementItem?.id,
                 product: stockMovementItem?.product,
                 inventoryItem: stockMovementItem?.inventoryItem,
-                description: stockMovementItem?.comments,
+                comment: stockMovementItem?.comments,
                 quantity: stockMovementItem.quantityRequested,
                 recipient: stockMovementItem.recipient,
                 orderIndex: stockMovementItem.sortOrder

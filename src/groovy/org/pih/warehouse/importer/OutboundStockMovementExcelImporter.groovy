@@ -19,11 +19,12 @@ class OutboundStockMovementExcelImporter extends AbstractExcelImporter {
             columnMap : [
                     'A': 'origin', // 'Source',
                     'B': 'destination', // 'Dest Venue Code',
+                    'C': 'productName',
                     'D': 'productCode', // 'SKU Code',
                     'E': 'quantity', // 'Requested Quantity',
                     'H': 'deliveryDate', // 'Delivery Date',
-                    'I': 'requestNumber', // 'Load Code',
-                    'J': 'description' // 'Special Instructions'
+                    'I': 'identifier', // 'Load Code',
+                    'J': 'specialInstructions' // 'Special Instructions'
             ]
     ]
 
@@ -33,8 +34,8 @@ class OutboundStockMovementExcelImporter extends AbstractExcelImporter {
             "productCode"       : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
             "quantity": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue: null]),
             "deliveryDate": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "requestNumber": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "description": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null])
+            "identifier": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            "specialInstructions": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null])
     ]
 
     OutboundStockMovementExcelImporter(String fileName) {

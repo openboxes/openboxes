@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse
 
+import grails.validation.ValidationException
 import net.schmizz.sshj.sftp.SFTPException
 import org.apache.commons.net.util.Base64
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException
@@ -272,6 +273,10 @@ class MobileController {
                 } catch (OfficeXmlFileException e) {
                     log.error("An exception occurred while loading Excel file: " + e.message, e)
                     flash.message = "Detected invalid Excel .xlsx format - please import .xls files instead"
+                } catch (ValidationException e) {
+                    command.errors = e.errors
+                    flash.command = command
+
                 } catch (Exception e) {
                     log.error("An exception occurred while importing data: " + e.message, e)
                     flash.message = e.message
