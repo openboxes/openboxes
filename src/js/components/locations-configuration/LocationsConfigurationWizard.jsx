@@ -3,9 +3,10 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 
-import ConfigureProductCategories from './ConfigureProductCategories';
-import ReviewCategories from './ReviewCategories';
-import ConfigureProducts from './ConfigureProducts';
+import LocationDetails from './LocationDetails';
+import LocationAddress from './LocationAddress';
+import ZoneAndBinLocations from './ZoneAndBinLocations';
+import Forecasting from './Forecasting';
 import Wizard from '../wizard/Wizard';
 import { fetchTranslations, updateBreadcrumbs, fetchBreadcrumbsConfig } from '../../actions';
 import { translateWithDefaultMessage } from '../../utils/Translate';
@@ -13,12 +14,13 @@ import { translateWithDefaultMessage } from '../../utils/Translate';
 import '../stock-movement-wizard/StockMovement.scss';
 
 const SUPPORT_LINKS = {
-  configureCategories: 'Configure Categories',
-  reviewCategories: 'Review Categories',
-  configureProducts: 'Configure Products',
+  locationDetails: 'Location Details',
+  locationAddress: 'Address',
+  zoneAndBinLocations: 'Zone and Bin Locations',
+  forecasting: 'Forecasting',
 };
 
-class ProductsConfigurationWizard extends Component {
+class LocationsConfigurationWizard extends Component {
   constructor(props) {
     super(props);
 
@@ -30,7 +32,7 @@ class ProductsConfigurationWizard extends Component {
 
   componentDidMount() {
     this.props.fetchBreadcrumbsConfig();
-    this.props.fetchTranslations('', 'productsConfiguration');
+    this.props.fetchTranslations('', 'locationsConfiguration');
 
     const {
       actionLabel, defaultActionLabel, actionUrl,
@@ -42,7 +44,7 @@ class ProductsConfigurationWizard extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (this.props.locale && this.props.locale !== nextProps.locale) {
-      this.props.fetchTranslations(nextProps.locale, 'productsConfiguration');
+      this.props.fetchTranslations(nextProps.locale, 'locationsConfiguration');
     }
 
     if (nextProps.breadcrumbsConfig &&
@@ -59,15 +61,16 @@ class ProductsConfigurationWizard extends Component {
 
   getStepList() {
     return [
-      this.props.translate('react.productsConfiguration.configureCategories.label', 'Configure Product Categories'),
-      this.props.translate('react.productsConfiguration.reviewCategories.label', 'Review Categories'),
-      this.props.translate('react.productsConfiguration.configureProducts.label', 'Configure Products'),
+      this.props.translate('react.locationsConfiguration.locationDetails.label', 'Details'),
+      this.props.translate('react.locationsConfiguration.address.label', 'Address'),
+      this.props.translate('react.locationsConfiguration.zoneAndBin.label', 'Zone and Bin Locations'),
+      this.props.translate('react.locationsConfiguration.forecasting.label', 'Forecasting'),
     ];
   }
 
   render() {
     const { values, currentPage } = this.state;
-    const pageList = [ConfigureProductCategories, ReviewCategories, ConfigureProducts];
+    const pageList = [LocationDetails, LocationAddress, ZoneAndBinLocations, Forecasting];
     const stepList = this.getStepList();
     const { location, history } = this.props;
     const locationId = location.id;
@@ -88,7 +91,7 @@ class ProductsConfigurationWizard extends Component {
 }
 
 const mapStateToProps = state => ({
-  breadcrumbsConfig: state.session.breadcrumbsConfig.productsConfiguration,
+  breadcrumbsConfig: state.session.breadcrumbsConfig.locationsConfiguration,
   locale: state.session.activeLanguage,
   location: state.session.currentLocation,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
@@ -96,9 +99,9 @@ const mapStateToProps = state => ({
 
 export default connect(mapStateToProps, {
   fetchTranslations, updateBreadcrumbs, fetchBreadcrumbsConfig,
-})(ProductsConfigurationWizard);
+})(LocationsConfigurationWizard);
 
-ProductsConfigurationWizard.propTypes = {
+LocationsConfigurationWizard.propTypes = {
   locale: PropTypes.string.isRequired,
   fetchTranslations: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
@@ -125,7 +128,7 @@ ProductsConfigurationWizard.propTypes = {
   }).isRequired,
 };
 
-ProductsConfigurationWizard.defaultProps = {
+LocationsConfigurationWizard.defaultProps = {
   initialValues: {},
   breadcrumbsConfig: {
     actionLabel: '',

@@ -1003,10 +1003,12 @@ breadcrumbsConfig {
         productsConfiguration {
             actionLabel = "productsConfiguration.label"
             defaultActionLabel = "Categories and Products Configuration"
-            listLabel = "productsConfiguration.label"
-            defaultListLabel = "Categories and Products Configuration"
             actionUrl = "/${appName}/productsConfiguration/index"
-            listUrl = "/${appName}/productsConfiguration/index"
+        }
+        locationsConfiguration {
+            actionLabel = "locationsConfiguration.label"
+            defaultActionLabel = "Locations Configuration"
+            actionUrl = "/${appName}/locationsConfiguration/index"
         }
 }
 
@@ -1607,7 +1609,8 @@ openboxes {
                         [label: "preferenceType.label", defaultLabel: "Preference Type", href: "/${appName}/preferenceType/list"],
                         [label: "shippers.label", defaultLabel: "Shippers", href: "/${appName}/shipper/list"],
                         [label: "shipmentWorkflows.label", defaultLabel: "Shipment Workflows", href: "/${appName}/shipmentWorkflow/list"],
-                        [label: "productsConfiguration.label", defaultLabel: "Categories and Products Configuration", href: "/${appName}/productsConfiguration/index"]
+                        [label: "productsConfiguration.label", defaultLabel: "Categories and Products Configuration", href: "/${appName}/productsConfiguration/index"],
+                        [label: "locationsConfiguration.label", defaultLabel: "Locations Configuration", href: "/${appName}/locationsConfiguration/index"]
                     ]
                 ]
             ]

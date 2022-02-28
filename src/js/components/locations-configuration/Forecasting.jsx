@@ -8,9 +8,9 @@ import Translate from '../../utils/Translate';
 
 const INITIAL_STATE = {};
 
-const PAGE_ID = 'configureProducts';
+const PAGE_ID = 'forecasting';
 
-class ConfigureProducts extends Component {
+class Forecasting extends Component {
   constructor(props) {
     super(props);
     this.state = INITIAL_STATE;
@@ -37,9 +37,9 @@ class ConfigureProducts extends Component {
   }
 }
 
-export default ConfigureProducts;
+export default Forecasting;
 
-ConfigureProducts.propTypes = {
+Forecasting.propTypes = {
   previousPage: PropTypes.func.isRequired,
   supportLinks: PropTypes.shape({}).isRequired,
 };

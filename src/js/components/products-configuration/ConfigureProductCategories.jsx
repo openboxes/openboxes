@@ -57,7 +57,7 @@ class ConfigureProductCategories extends Component {
             <Translate id="react.default.button.support.label" defaultMessage="Support" />
           </button>
         </div>
-        <div className="products-configuration-content">
+        <div className="configuration-wizard-content">
           <VerticalTabs tabs={tabs} activeTab="react.productsConfiguration.defaultCategoryTree.label" />
         </div>
         <div className="submit-buttons">

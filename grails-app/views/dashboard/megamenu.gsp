@@ -841,6 +841,11 @@
                                     <warehouse:message code="productsConfiguration.label" default="Categories and Products Configuration" />
                                 </g:link>
                             </div>
+                            <div class="mm-menu-item">
+                                <g:link controller="locationsConfiguration" action="index" >
+                                    <warehouse:message code="locationsConfiguration.label" default="Locations Configuration" />
+                                </g:link>
+                            </div>
                         </div>
 
                     </div>
