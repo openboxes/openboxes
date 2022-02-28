@@ -26,6 +26,8 @@ import org.codehaus.groovy.grails.web.errors.GrailsWrappedRuntimeException
 import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.api.PartialReceipt
+import org.pih.warehouse.api.StockMovement
+import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.MailService
@@ -34,6 +36,7 @@ import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Attribute
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.support.WebApplicationContextUtils
@@ -345,6 +348,32 @@ class NotificationService {
 
         if (!jsonArray.empty) {
             publish(TOPIC_ARN, jsonArray.toString(), "Product Availability")
+        }
+    }
+
+    void sendRequisitionStatusNotification(StockMovement stockMovement, Location origin){
+        String TOPIC_ARN = grailsApplication.config.awssdk.sns.order.statusWmsToStocksUpDev
+        String configuredStatusesString = grailsApplication.config?.openboxes?.integration?.requisition?.notification?.configuredStatuses?.toString()
+        List<String> configuredStatuses = []
+        if(configuredStatusesString){
+            configuredStatuses = configuredStatusesString.split(",")
+        }
+        JSONObject notifyJson = null
+        if(configuredStatuses?.contains(stockMovement.status?.toString())){
+            notifyJson = new JSONObject()
+            notifyJson.put("id", stockMovement.id)
+            notifyJson.put("locationNumber", origin.locationNumber)
+            notifyJson.put("status", stockMovement.status)
+            JSONArray orderLineItems = new JSONArray()
+            stockMovement.lineItems?.each { StockMovementItem stockMovementItem ->
+                JSONObject orderItem = new JSONObject()
+                orderItem.put("id", stockMovementItem.id)
+                orderItem.put("acceptedQuantity", stockMovementItem.quantityPicked)
+                orderLineItems.add(orderItem)
+            }
+            notifyJson.put("orderItems", orderLineItems)
+            log.info "notifyJson::${notifyJson}"
+            publish(TOPIC_ARN, notifyJson.toString(), "Order Status")
         }
     }
 
