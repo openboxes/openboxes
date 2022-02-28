@@ -9,6 +9,8 @@
  **/
 package org.pih.warehouse.api
 
+import grails.converters.JSON
+
 class ProductsConfigurationApiController {
     def productService
     def userService
@@ -21,5 +23,20 @@ class ProductsConfigurationApiController {
 
         productService.importCategories(params.categoryOption)
         return 200
+    }
+
+    def importProducts = {
+        if (!userService.isSuperuser(session?.user)) {
+            throw new Exception("You are not authorized to perform this action")
+        }
+
+        productService.importProductsFromConfig(params.productOption)
+        return 200
+    }
+
+    def categoryOptions = {
+        def categoryOptions = grailsApplication.config.openboxes.configurationWizard.categoryOptions
+
+        render([data: categoryOptions] as JSON)
     }
 }

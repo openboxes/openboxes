@@ -1681,6 +1681,15 @@ openboxes.receiving.receivingLocation.prefix = Constants.DEFAULT_RECEIVING_LOCAT
 // Product configuration wizard
 openboxes.configurationWizard.enabled = true
 openboxes.configurationWizard.categoryOptions = [
+    defaultCategories: [
+        enabled: true,
+        fileUrl: "", // TODO: Provide file for OpenBoxes category tree
+        rootCategoryName: "ROOT",
+        categoryNameColumnIndex: 0,
+        parentCategoryNameColumnIndex: 1,
+        title: "OpenBoxes default category tree",
+        description: "",
+    ],
     unspscCategories: [
         enabled: true,
         // TODO: add option to support 'classpath:'
@@ -1688,18 +1697,29 @@ openboxes.configurationWizard.categoryOptions = [
         rootCategoryName: "ROOT", // needs to match the category from file
         categoryNameColumnIndex: 0,
         parentCategoryNameColumnIndex: 1,
-        title: "productsConfiguration.unspscCategories.label",
+        title: "UNSPSC category list",
         description: "",
     ],
-    defaultCategories: [
-        enabled: true,
-        fileUrl: "", // TODO: Provide file for OpenBoxes category tree
-        rootCategoryName: "ROOT",
-        categoryNameColumnIndex: 0,
-        parentCategoryNameColumnIndex: 1,
-        title: "productsConfiguration.defaultCategoryTree.label",
-        description: "",
+    whoCategories: [
+            enabled: true,
+            // TODO: add option to support 'classpath:'
+            fileUrl: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/WHO_categories.csv",
+            rootCategoryName: "ROOT", // needs to match the category from file
+            categoryNameColumnIndex: 0,
+            parentCategoryNameColumnIndex: 1,
+            title: "WHO category list",
+            description: "",
     ]
+]
+
+openboxes.configurationWizard.productOptions = [
+        whoProducts: [
+                enabled: true,
+                // TODO: add option to support 'classpath:'
+                fileUrl: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/WHO_products.csv",
+                title: "WHO product list",
+                description: "",
+        ]
 ]
 
 // Pagination
