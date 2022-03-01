@@ -193,7 +193,7 @@ class InboundReturns extends Component {
 }
 
 const mapStateToProps = state => ({
-  breadcrumbsConfig: state.session.breadcrumbsConfig.returns,
+  breadcrumbsConfig: state.session.breadcrumbsConfig.inboundReturns,
   locale: state.session.activeLanguage,
   location: state.session.currentLocation,
   inboundReturnsTranslationsFetched: state.session.fetchedTranslations.inboundReturns,

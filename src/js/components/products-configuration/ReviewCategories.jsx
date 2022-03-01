@@ -26,7 +26,7 @@ class ReviewCategories extends Component {
             <Translate id="react.default.button.support.label" defaultMessage="Support" />
           </button>
         </div>
-        <div className="products-configuration-content" />
+        <div className="configuration-wizard-content" />
         <div className="submit-buttons">
           <button type="button" onClick={this.props.previousPage} className="btn btn-outline-primary float-left btn-xs">
             <Translate id="react.default.button.previous.label" defaultMessage="Previous" />

@@ -207,7 +207,7 @@ class OutboundReturns extends Component {
 }
 
 const mapStateToProps = state => ({
-  breadcrumbsConfig: state.session.breadcrumbsConfig.returns,
+  breadcrumbsConfig: state.session.breadcrumbsConfig.outboundReturns,
   locale: state.session.activeLanguage,
   location: state.session.currentLocation,
   outboundReturnsTranslationsFetched: state.session.fetchedTranslations.outboundReturns,

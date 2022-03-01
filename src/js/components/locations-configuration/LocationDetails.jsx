@@ -8,9 +8,9 @@ import Translate from '../../utils/Translate';
 
 const INITIAL_STATE = {};
 
-const PAGE_ID = 'configureProducts';
+const PAGE_ID = 'locationDetails';
 
-class ConfigureProducts extends Component {
+class LocationDetails extends Component {
   constructor(props) {
     super(props);
     this.state = INITIAL_STATE;
@@ -28,8 +28,8 @@ class ConfigureProducts extends Component {
         </div>
         <div className="configuration-wizard-content" />
         <div className="submit-buttons">
-          <button type="button" onClick={this.props.previousPage} className="btn btn-outline-primary float-left btn-xs">
-            <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
+          <button type="button" onClick={this.props.nextPage} className="btn btn-outline-primary float-right btn-xs">
+            <Translate id="react.default.button.next.label" defaultMessage="Next" />
           </button>
         </div>
       </div>
@@ -37,9 +37,9 @@ class ConfigureProducts extends Component {
   }
 }
 
-export default ConfigureProducts;
+export default LocationDetails;
 
-ConfigureProducts.propTypes = {
-  previousPage: PropTypes.func.isRequired,
+LocationDetails.propTypes = {
+  nextPage: PropTypes.func.isRequired,
   supportLinks: PropTypes.shape({}).isRequired,
 };
