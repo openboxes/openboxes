@@ -153,6 +153,7 @@ class IdentifierService {
         return generateIdentifier(grailsApplication.config.openboxes.identifier.organization.format)
     }
 
+    // TODO: refactor this to sequence or sth else, because this way it will fail when more than 10 duplicates
     def generateOrganizationIdentifier(String name) {
         Integer minSize = ConfigurationHolder.config.openboxes.identifier.organization.minSize
         Integer maxSize = ConfigurationHolder.config.openboxes.identifier.organization.maxSize
@@ -166,7 +167,32 @@ class IdentifierService {
         else if (identifier.length() > maxSize) {
             identifier = identifier.substring(0, maxSize)
         }
-        return identifier.toUpperCase()
+
+        // Checking for a duplicates
+        if (validateOrganizationIdentifier(identifier.toUpperCase())) {
+            return identifier.toUpperCase()
+        }
+
+        String identifierWithHighestNumber = getOrganizationIdentifierWithHighestSuffix(identifier.substring(0, identifier.size() - 1))
+        if (identifierWithHighestNumber) {
+            char suffix = identifierWithHighestNumber.charAt(identifierWithHighestNumber.size() - 1)
+            suffix++
+
+            return identifier.toUpperCase().substring(0, identifier.size() -1) + suffix
+        }
+        return identifier.length() < maxSize ? identifier.toUpperCase() + '0': identifier.toUpperCase().substring(0, maxSize - 1) + '0'
+    }
+
+    def validateOrganizationIdentifier(String identifier) {
+        println "Validating organization identifier " + identifier
+        def count = Organization.executeQuery( "select count(o.code) from Organization o where code = :identifier", [identifier: identifier] )
+
+        return count ? (count[0] == 0) : false
+    }
+
+    def getOrganizationIdentifierWithHighestSuffix(String identifier) {
+        def organizations = Organization.executeQuery( "select o.code from Organization o where code like :identifier", [identifier: identifier + '%'] )
+        return organizations.findAll { Character.isDigit(it.charAt(it.size() - 1)) }.sort().last()
     }
 
     def extractSequenceFormat(String productIdentifierFormat, String sequentialPatternChar, Integer allowedSequences) {

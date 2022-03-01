@@ -141,4 +141,6 @@ class Constants {
 
     // Products and categories configuration wizard
     static final String ROOT_CATEGORY_NAME = "ROOT"
+
+    static final String DEFAULT_ORGANIZATION_CODE = "ORG"
 }

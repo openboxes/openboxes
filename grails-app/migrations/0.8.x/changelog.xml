@@ -143,4 +143,5 @@
     <include file="0.8.x/changelog-2021-12-14-1140-add-submit-request-activity.xml"/>
     <include file="0.8.x/changelog-2022-01-03-1524-configure-invoice-templates.xml"/>
     <include file="0.8.x/changelog-2022-02-14-1200-alter-table-shipment-reference-number-add-foreign-key-constraint.xml"/>
+    <include file="0.8.x/changelog-2022-03-01-0850-add-unique-constraint-party-type-code.xml"/>
 </databaseChangeLog>
