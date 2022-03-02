@@ -1,3 +1,7 @@
+import org.pih.warehouse.core.Role
+import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.core.User
+
 /**
  * Copyright (c) 2012 Partners In Health.  All rights reserved.
  * The use and distribution terms for this software are covered by the
@@ -46,6 +50,11 @@ class RoleFilters {
             'invoice': ['*']
     ]
 
+    def static customerActions = [
+            'mobile': ['*']
+    ]
+
+
     def filters = {
         readonlyCheck(controller: '*', action: '*') {
             before = {
@@ -62,9 +71,10 @@ class RoleFilters {
                 def missAdmin = needAdmin(controllerName, actionName) && !userService.isUserAdmin(session.user)
                 def missSuperuser = needSuperuser(controllerName, actionName) && !userService.isSuperuser(session.user)
                 def invoice = needInvoice(controllerName, actionName) && !userService.hasRoleInvoice(session.user)
-
-                if (missBrowser || missManager || missAdmin || missSuperuser || invoice) {
-                    log.info("User ${session?.user?.username} does not have access to ${controllerName}/${actionName} in location ${session?.warehouse?.name}")
+                def missCustomer = needCustomer(controllerName, actionName) && !userService.hasRoleCustomer(session.user)
+                log.info "${missBrowser} ${missAdmin} ${missManager} ${missSuperuser} ${missCustomer}"
+                if (missBrowser || missManager || missAdmin || missSuperuser || invoice || missCustomer) {
+                    log.info("User ${session?.user?.username} with roles does not have access to ${controllerName}/${actionName} in location ${session?.warehouse?.name}")
                     redirect(controller: "errors", action: "handleForbidden")
                     return false
                 }
@@ -93,6 +103,10 @@ class RoleFilters {
 
     static Boolean needInvoice(controllerName, actionName) {
         invoiceActions[controllerName]?.contains("*") || invoiceActions[controllerName]?.contains(actionName)
+    }
+
+    static Boolean needCustomer(controllerName, actionName) {
+        customerActions[controllerName]?.contains("*") || customerActions[controllerName]?.contains(actionName)
     }
 
 }
