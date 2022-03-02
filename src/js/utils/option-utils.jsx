@@ -209,3 +209,29 @@ export const debounceOrganizationsFetch = (waitTime, minSearchLength) =>
       callback(null, { options: [] });
     }
   }, waitTime);
+
+export const debounceLocationGroupsFetch = (waitTime, minSearchLength) =>
+  _.debounce((searchTerm, callback) => {
+    if (searchTerm && searchTerm.length >= minSearchLength) {
+      apiClient.get(`/openboxes/api/locationGroups?q=${searchTerm}`)
+        .then(result => callback(
+          null,
+          {
+            complete: true,
+            options: _.map(result.data.data, obj => (
+              {
+                value: {
+                  id: obj.id,
+                  name: obj.name,
+                  label: `${obj.name}`,
+                },
+                label: `${obj.name}`,
+              }
+            )),
+          },
+        ))
+        .catch(error => callback(error, { options: [] }));
+    } else {
+      callback(null, { options: [] });
+    }
+  }, waitTime);

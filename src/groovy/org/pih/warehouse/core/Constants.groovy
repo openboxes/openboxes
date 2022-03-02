@@ -124,6 +124,7 @@ class Constants {
     static final String DEFAULT_PO_SEQUENCE_NUMBER_FORMAT = "000000"
     static final String DEFAULT_SEQUENCE_NUMBER_FORMAT_CHAR = "0"
     static final String DEFAULT_INVOICE_NUMBER_FORMAT = "NNNLLL"
+    static final String DEFAULT_LOCATION_NUMBER_FORMAT = "NNNLLL"
 
     static final String TRACKING_NUMBER_TYPE_ID = "10"
     static final String VENDOR_INVOICE_NUMBER_TYPE_ID = "VENDOR_INVOICE_NUMBER"

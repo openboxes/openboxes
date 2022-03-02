@@ -1027,6 +1027,7 @@ openboxes.identifier.requisition.format = Constants.DEFAULT_REQUISITION_NUMBER_F
 openboxes.identifier.shipment.format = Constants.DEFAULT_SHIPMENT_NUMBER_FORMAT
 openboxes.identifier.sequenceNumber.format = Constants.DEFAULT_SEQUENCE_NUMBER_FORMAT
 openboxes.identifier.invoice.format = Constants.DEFAULT_INVOICE_NUMBER_FORMAT
+openboxes.identifier.location.format = Constants.DEFAULT_LOCATION_NUMBER_FORMAT
 
 openboxes.identifier.organization.format = Constants.DEFAULT_ORGANIZATION_NUMBER_FORMAT
 openboxes.identifier.organization.minSize = 2

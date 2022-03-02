@@ -149,6 +149,10 @@ class IdentifierService {
         return generateIdentifier(grailsApplication.config.openboxes.identifier.transaction.format)
     }
 
+    def generateLocationIdentifier() {
+        return generateIdentifier(grailsApplication.config.openboxes.identifier.location.format)
+    }
+
     def generateOrganizationIdentifier() {
         return generateIdentifier(grailsApplication.config.openboxes.identifier.organization.format)
     }
