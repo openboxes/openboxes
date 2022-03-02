@@ -14,4 +14,8 @@ class LocationsConfigurationController {
     def index = {
         render(template: "/common/react")
     }
+
+    def create = {
+        render(template: "/common/react")
+    }
 }

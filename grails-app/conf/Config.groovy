@@ -1008,7 +1008,7 @@ breadcrumbsConfig {
         locationsConfiguration {
             actionLabel = "locationsConfiguration.label"
             defaultActionLabel = "Locations Configuration"
-            actionUrl = "/${appName}/locationsConfiguration/index"
+            actionUrl = "/${appName}/locationsConfiguration/create"
         }
 }
 

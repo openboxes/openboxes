@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { BrowserRouter, Switch } from 'react-router-dom';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { ClimbingBoxLoader } from 'react-spinners';
 import Alert from 'react-s-alert';
 import Loadable from 'react-loadable';
@@ -95,6 +95,11 @@ const AsyncLocationsConfiguration = Loadable({
   loading: Loading,
 });
 
+const AsyncWelcomeModal = Loadable({
+  loader: () => import('./locations-configuration/WelcomeModal'),
+  loading: Loading,
+});
+
 const Router = props => (
   <div>
     <BrowserRouter>
@@ -114,7 +119,10 @@ const Router = props => (
         <MainLayoutRoute path="/**/stockTransfer/createInboundReturn/:inboundReturnId?" component={AsyncInboundReturns} />
         <MainLayoutRoute path="/**/replenishment/create/:replenishmentId?" component={AsyncReplenishment} />
         <MainLayoutRoute path="/**/productsConfiguration/index" component={AsyncProductsConfiguration} />
-        <MainLayoutRoute path="/**/locationsConfiguration/index" component={AsyncLocationsConfiguration} />
+        <MainLayoutRoute path="/**/locationsConfiguration/create" component={AsyncLocationsConfiguration} />
+        <Route path="/**/locationsConfiguration/index" >
+          <AsyncWelcomeModal />
+        </Route>
         <MainLayoutRoute path="/**/dashboard/:configId?" component={AsyncDashboard} />
         <MainLayoutRoute path="/**/" component={AsyncDashboard} />
       </Switch>
