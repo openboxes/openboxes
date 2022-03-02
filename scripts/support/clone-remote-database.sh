@@ -66,14 +66,14 @@ shift $((OPTIND-1))
 [ "$1" ] && [ "$#" -eq 1 ] || usage
 REMOTE_HOST="$1"
 
-SQL_BASENAME="$REMOTE_HOST-$REMOTE_DB"
+SQL_BASENAME="$REMOTE_HOST-$REMOTE_DB-$LOCAL_DB"
 
 echo -n "Counting products in remote database $REMOTE_HOST:$REMOTE_DB ..."
 remote_product_cnt=$(ssh "$REMOTE_HOST" "mysql $REMOTE_DB -Nse 'select count(id) from product;'")
 echo " $remote_product_cnt"
 
 echo "Exporting schema from remote database $REMOTE_HOST:$REMOTE_DB ..."
-/usr/bin/time ssh $REMOTE_HOST "mysqldump --allow-keywords --single-transaction --skip-comments --skip-extended-insert --no-data --routines $REMOTE_DB | gzip -cf" | gunzip -c > $SQL_BASENAME-schema.sql
+/usr/bin/time ssh $REMOTE_HOST "mysqldump --allow-keywords --single-transaction --skip-comments --no-data --routines $REMOTE_DB | gzip -cf" | gunzip -c > $SQL_BASENAME-schema.sql
 
 database_exists=$(mysql -Nse "select count(schema_name) from information_schema.schemata where schema_name = '$LOCAL_DB';")
 if [ "$DO_CLOBBER" -eq 1 ]
@@ -104,9 +104,9 @@ do
 done
 
 echo "Exporting data (ignoring ${#IGNORED_REMOTE_TABLES[@]} tables) from remote database $REMOTE_HOST:$REMOTE_DB ..."
-/usr/bin/time ssh $REMOTE_HOST "mysqldump --allow-keywords --single-transaction --skip-comments --skip-extended-insert --no-create-info ${IGNORED_REMOTE_TABLES[@]} $REMOTE_DB | gzip -cf" | gunzip -c > $SQL_BASENAME-data.sql
+/usr/bin/time ssh $REMOTE_HOST "mysqldump --allow-keywords --single-transaction --skip-comments --no-create-info ${IGNORED_REMOTE_TABLES[@]} $REMOTE_DB | gzip -cf" | gunzip -c > $SQL_BASENAME-data.sql
 
-echo "Importing data into local database $LOCAL_DB (this may take 30+ minutes) ..."
+echo "Importing data into local database $LOCAL_DB (this may take 10+ minutes) ..."
 /usr/bin/time mysql $LOCAL_DB < $SQL_BASENAME-data.sql --reconnect --wait
 
 echo -n "Counting products in local database $REMOTE_HOST:$LOCAL_DB ..."
