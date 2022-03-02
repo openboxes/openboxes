@@ -351,15 +351,15 @@ class NotificationService {
         }
     }
 
-    void sendRequisitionStatusNotification(StockMovement stockMovement, Location origin){
-        String TOPIC_ARN = grailsApplication.config.awssdk.sns.order.statusWmsToStocksUpDev
-        String configuredStatusesString = grailsApplication.config?.openboxes?.integration?.requisition?.notification?.configuredStatuses?.toString()
-        List<String> configuredStatuses = []
-        if(configuredStatusesString){
-            configuredStatuses = configuredStatusesString.split(",")
-        }
+    void publishStockMovementStatusEvent(StockMovement stockMovement, Location origin){
+        String TOPIC_ARN = grailsApplication.config.awssdk.sns.order.status
+//        String configuredStatusesString = grailsApplication.config?.openboxes?.integration?.requisition?.notification?.configuredStatuses?.toString()
+//        List<String> configuredStatuses = []
+//        if(configuredStatusesString){
+//            configuredStatuses = configuredStatusesString.split(",")
+//        }
         JSONObject notifyJson = null
-        if(configuredStatuses?.contains(stockMovement.status?.toString())){
+//        if(configuredStatuses?.contains(stockMovement.status?.toString())){
             notifyJson = new JSONObject()
             notifyJson.put("id", stockMovement.id)
             notifyJson.put("locationNumber", origin.locationNumber)
@@ -374,7 +374,7 @@ class NotificationService {
             notifyJson.put("orderItems", orderLineItems)
             log.info "notifyJson::${notifyJson}"
             publish(TOPIC_ARN, notifyJson.toString(), "Order Status")
-        }
+//        }
     }
 
 

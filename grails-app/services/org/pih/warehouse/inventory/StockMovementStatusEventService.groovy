@@ -17,22 +17,14 @@ class StockMovementStatusEventService  implements ApplicationListener<StockMovem
 
     boolean transactional = true
     def notificationService
-    def tmsIntegrationService
-    def grailsApplication
 
     void onApplicationEvent(StockMovementStatusEvent event) {
         log.info "Application event ${event.source} has been published"
 
-        // Push delivery order update to eTruckNow
-        Boolean uploadDeliveryOrderOnUpdate = grailsApplication.config.openboxes.integration.uploadDeliveryOrderOnUpdate.enabled
-        if (uploadDeliveryOrderOnUpdate && event.stockMovementStatusCode == StockMovementStatusCode.PICKING && !event.rollback) {
-            tmsIntegrationService.uploadDeliveryOrder(event.source)
-        }
-
         // Send notification for status updates on outbound stock movements
         StockMovement stockMovement = event.source
-        if (stockMovement?.requisition && stockMovement?.origin?.managedLocally) {
-            notificationService.sendRequisitionStatusNotification(stockMovement,
+        if (stockMovement?.isOutboundStockMovement()) {
+            notificationService.publishStockMovementStatusEvent(stockMovement,
                     stockMovement?.origin)
         }
     }
