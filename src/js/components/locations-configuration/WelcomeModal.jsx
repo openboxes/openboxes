@@ -42,15 +42,15 @@ class WelcomeModal extends Component {
             </button>
           </div>
           <div>
-            <h3><Translate id="react.locationsConfiguration.welcomeHeader.label" defaultMessage="Welcome to OpenBoxes!" /></h3>
+            <h3 className="font-weight-bold"><Translate id="react.locationsConfiguration.welcomeHeader.label" defaultMessage="Welcome to OpenBoxes!" /></h3>
           </div>
-          <div className="my-3 px-5">
+          <div className="my-3 px-5 text-center">
             <Translate id="react.locationsConfiguration.modalIntro.label" defaultMessage="Learn more about locations in OpenBoxes" />&nbsp;
             <a target="_blank" rel="noopener noreferrer" href="https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1291452471/Configure+Organizations+and+Locations">
               <Translate id="react.locationsConfiguration.here.label" defaultMessage="here" />
             </a>.&nbsp;
             <Translate id="react.locationsConfiguration.modalText1.label" defaultMessage="" />
-            <span className="font-weight-bold"> <Translate id="react.locationsConfiguration.locationCreation.label" defaultMessage="" /> </span>
+            <span className="font-weight-bold"> <Translate id="react.locationsConfiguration.locationCreation.label" defaultMessage="" />, </span>
             <Translate id="react.locationsConfiguration.modalText2.label" defaultMessage="" />
             <span className="font-weight-bold"> &ldquo;<Translate id="react.locationsConfiguration.importLocations.label" defaultMessage="" />&rdquo; </span>
             <Translate id="react.locationsConfiguration.modalText3.label" defaultMessage="" />
