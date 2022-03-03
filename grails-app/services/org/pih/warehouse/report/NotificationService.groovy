@@ -351,31 +351,4 @@ class NotificationService {
         }
     }
 
-    void publishStockMovementStatusEvent(StockMovement stockMovement, Location origin){
-        String TOPIC_ARN = grailsApplication.config.awssdk.sns.order.status
-//        String configuredStatusesString = grailsApplication.config?.openboxes?.integration?.requisition?.notification?.configuredStatuses?.toString()
-//        List<String> configuredStatuses = []
-//        if(configuredStatusesString){
-//            configuredStatuses = configuredStatusesString.split(",")
-//        }
-        JSONObject notifyJson = null
-//        if(configuredStatuses?.contains(stockMovement.status?.toString())){
-            notifyJson = new JSONObject()
-            notifyJson.put("id", stockMovement.id)
-            notifyJson.put("locationNumber", origin.locationNumber)
-            notifyJson.put("status", stockMovement.status)
-            JSONArray orderLineItems = new JSONArray()
-            stockMovement.lineItems?.each { StockMovementItem stockMovementItem ->
-                JSONObject orderItem = new JSONObject()
-                orderItem.put("id", stockMovementItem.id)
-                orderItem.put("acceptedQuantity", stockMovementItem.quantityPicked)
-                orderLineItems.add(orderItem)
-            }
-            notifyJson.put("orderItems", orderLineItems)
-            log.info "notifyJson::${notifyJson}"
-            publish(TOPIC_ARN, notifyJson.toString(), "Order Status")
-//        }
-    }
-
-
 }
