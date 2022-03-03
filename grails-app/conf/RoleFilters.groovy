@@ -32,14 +32,15 @@ class RoleFilters {
 
     def static superuserControllers = []
     def static superuserActions = [
-            '*'               : ['delete'],
-            'console'         : ['index', 'execute'],
-            'inventory'       : ['createInboundTransfer', 'createOutboundTransfer', 'createConsumed', 'editTransaction', 'deleteTransaction', 'saveTransaction'],
-            'inventoryItem'   : ['adjustStock', 'transferStock'],
-            'productCatalog'  : ['create', 'importProductCatalog'],
-            'productType'     : ['edit', 'delete', 'save', 'update'],
-            'transactionEntry': ['edit', 'delete', 'save', 'update'],
-            'user'            : ['impersonate']
+            '*'                         : ['delete'],
+            'console'                   : ['index', 'execute'],
+            'inventory'                 : ['createInboundTransfer', 'createOutboundTransfer', 'createConsumed', 'editTransaction', 'deleteTransaction', 'saveTransaction'],
+            'inventoryItem'             : ['adjustStock', 'transferStock'],
+            'productCatalog'            : ['create', 'importProductCatalog'],
+            'productType'               : ['edit', 'delete', 'save', 'update'],
+            'transactionEntry'          : ['edit', 'delete', 'save', 'update'],
+            'user'                      : ['impersonate'],
+            'productsConfigurationApi'  : ['downloadCategories', 'importCategories']
     ]
 
     def static invoiceActions = [

@@ -10,17 +10,27 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import org.pih.warehouse.product.Category
 
 class ProductsConfigurationApiController {
+    def dataService
     def productService
     def userService
-    def grailsApplication
+
+    def getCategoriesCount = {
+        render([data: Category.count()] as JSON)
+    }
+
+    def downloadCategories = {
+        def objects = Category.list()
+        def data = dataService.transformObjects(objects, Category.CSV_PROPERTIES)
+        String csv = dataService.generateCsv(data)
+
+        response.setHeader("Content-disposition", "attachment; filename=\"Categories.csv\"")
+        render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
+    }
 
     def importCategories = {
-        if (!userService.isSuperuser(session?.user)) {
-            throw new Exception("You are not authorized to perform this action")
-        }
-
         productService.importCategories(params.categoryOption)
         return 200
     }
