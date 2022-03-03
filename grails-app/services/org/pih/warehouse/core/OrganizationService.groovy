@@ -43,7 +43,7 @@ class OrganizationService {
         if (!organization) {
             organization = new Organization()
             organization.name = name
-            organization.partyType = PartyType.findByPartyTypeCode(PartyTypeCode.ORGANIZATION)
+            organization.partyType = PartyType.findByCode(Constants.DEFAULT_ORGANIZATION_CODE)
             organization.code = code?:identifierService.generateOrganizationIdentifier(name)
         }
 
