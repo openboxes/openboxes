@@ -222,9 +222,15 @@ class StockMovementService {
     }
 
     void updateRequisitionStatus(String id, RequisitionStatus status) {
-
         log.info "Update status ${id} " + status
         Requisition requisition = Requisition.get(id)
+        if(requisition) {
+            updateRequisitionStatus(requisition, status)
+        }
+    }
+
+    void updateRequisitionStatus(Requisition requisition, RequisitionStatus status) {
+
         if (status == RequisitionStatus.CHECKING) {
             Shipment shipment = requisition.shipment
             shipment?.expectedShippingDate = new Date()
@@ -2630,5 +2636,10 @@ class StockMovementService {
             validateQuantityRequested(stockMovement)
         }
         return true
+    }
+
+    Requisition findRequisitionIdOrIdentifier(String id){
+        Requisition requisition = Requisition.findByIdOrRequestNumber(id, id)
+        return requisition
     }
 }

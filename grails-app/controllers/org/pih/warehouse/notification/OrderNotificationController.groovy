@@ -18,8 +18,11 @@ import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
+import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionSourceType
+import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
 
 class OrderNotificationController {
@@ -122,5 +125,17 @@ class OrderNotificationController {
         }
 
         render([status: 200, text: "Order message handled successfully"])
+    }
+
+    def updateOrderStatus = {
+        JSONObject orderJson = new JSONObject(request.getJSON()?.toString())
+        log.info "Order Status update, JsonRequest:${orderJson?.toString(4)}"
+        Requisition requisition = stockMovementService.findRequisitionIdOrIdentifier(orderJson.getString("id"))
+        if(requisition){
+            StockMovementStatusCode status =
+                    orderJson.containsKey("status") ? orderJson.status as StockMovementStatusCode : null
+            RequisitionStatus requisitionStatus = RequisitionStatus.fromStockMovementStatus(status)
+            stockMovementService.updateRequisitionStatus(requisition, requisitionStatus)
+        }
     }
 }
