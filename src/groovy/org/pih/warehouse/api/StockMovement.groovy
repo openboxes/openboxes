@@ -393,6 +393,10 @@ class StockMovement {
         return stockMovement
     }
 
+    Boolean isOutboundStockMovement() {
+        return requisition && origin?.managedLocally
+    }
+
 }
 
 enum DocumentGroupCode {

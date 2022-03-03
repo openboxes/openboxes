@@ -175,6 +175,7 @@ class StockMovementService {
                 // If the dependent actions were updated properly then we can update the
                 RequisitionStatus requisitionStatus = RequisitionStatus.fromStockMovementStatus(status)
                 updateRequisitionStatus(stockMovement.id, requisitionStatus)
+                grailsApplication.mainContext.publishEvent(new StockMovementStatusEvent(stockMovement, status, rollback))
             }
         }
     }

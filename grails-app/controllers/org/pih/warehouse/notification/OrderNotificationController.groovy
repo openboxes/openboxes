@@ -70,6 +70,10 @@ class OrderNotificationController {
         stockMovement.requestType = RequisitionType.DEFAULT
         stockMovement.stockMovementType = StockMovementType.OUTBOUND
 
+        if(orderJson.has("id")){
+            stockMovement.identifier = orderJson.getString("id")
+        }
+
         if (orderJson.has("origin") && orderJson.getString("origin")) {
             JSONObject originJsonObject = orderJson.getJSONObject("origin")
             Location origin = Location.findByLocationNumber(originJsonObject.getString("locationNumber"))

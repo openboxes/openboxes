@@ -26,6 +26,8 @@ import org.codehaus.groovy.grails.web.errors.GrailsWrappedRuntimeException
 import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.api.PartialReceipt
+import org.pih.warehouse.api.StockMovement
+import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.MailService
@@ -34,6 +36,7 @@ import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Attribute
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.support.WebApplicationContextUtils
@@ -347,6 +350,5 @@ class NotificationService {
             publish(TOPIC_ARN, jsonArray.toString(), "Product Availability")
         }
     }
-
 
 }
