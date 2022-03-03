@@ -16,7 +16,7 @@ import org.pih.warehouse.core.RoleType
 class StockMovementStatusEventService  implements ApplicationListener<StockMovementStatusEvent> {
 
     boolean transactional = true
-    def notificationService
+    def eventService
 
     void onApplicationEvent(StockMovementStatusEvent event) {
         log.info "Application event ${event.source} has been published"
@@ -24,7 +24,7 @@ class StockMovementStatusEventService  implements ApplicationListener<StockMovem
         // Send notification for status updates on outbound stock movements
         StockMovement stockMovement = event.source
         if (stockMovement?.isOutboundStockMovement()) {
-            notificationService.publishStockMovementStatusEvent(stockMovement,
+            eventService.publishStockMovementStatusEvent(stockMovement,
                     stockMovement?.origin)
         }
     }
