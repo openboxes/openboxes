@@ -10,6 +10,12 @@
 
     <div class="row g-0">
         <table class="table table-borderless">
+            <tr>
+                <th></th>
+                <th><g:message code="product.label"/></th>
+                <th><g:message code="default.quantityOnHand.label"/></th>
+                <th></th>
+            </tr>
             <g:each var="productSummary" in="${productSummaries}">
                 <g:set var="product" value="${productSummary.product}"/>
                 <tr class="border-bottom">
@@ -28,8 +34,10 @@
                     </td>
                     <td class="col-8">
                         <a href="${createLink(controller: 'mobile', action: 'productDetails', id: product?.id)}" class="text-decoration-none text-reset">
-                            <h5>${product.productCode} ${product.name}</h5>
+                            <h5><small>${product.productCode}</small> ${product.name}</h5>
                         </a>
+                        <small>${product?.category?.name}</small>
+
                         <g:renderHandlingIcons product="${product}"/>
                         <g:if test="${product.description}">
                             <div class="d-flex align-items-center justify-content-between mt-1">

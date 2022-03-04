@@ -193,6 +193,11 @@ class StockMovement {
 
     }
 
+    List<Category> getCategories() {
+        return lineItems?.collect { it?.product?.category }?.unique()?:[]
+    }
+
+
     /**
      * Return total value of the issued shipment
      *

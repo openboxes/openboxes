@@ -41,11 +41,11 @@
                     <table class="table table-borderless table-striped">
                         <thead>
                             <tr>
-                                <th class="col-1">Order Number</th>
-                                <th class="col-3">Supplier</th>
+                                <th class="col-2">Order Number</th>
+                                <th class="col-3">Origin</th>
                                 <th class="col-3">Delivery for FA</th>
-                                <th class="col-2">Delivery Date</th>
-                                <th class="col-2">Status</th>
+                                <th class="col-1">Delivery Date</th>
+                                <th class="col-1">Status</th>
                                 <th class="col-1">Details</th>
                             </tr>
                         </thead>
@@ -54,7 +54,7 @@
                             <tr>
                                 <td><g:link controller="mobile" action="inboundDetails" id="${inboundOrder?.id}" class="card-link">${inboundOrder.identifier}</g:link></td>
                                 <td>${inboundOrder.origin}</td>
-                                <td>${inboundOrder.destination}</td>
+                                <td>${inboundOrder?.categories[0]?.name}</td>
                                 <td>${g.formatDate(date: inboundOrder.expectedDeliveryDate, format: "dd MMM yyyy")}</td>
                                 <td>${inboundOrder.currentStatus}</td>
                                 <td><g:link controller="mobile" action="inboundDetails" id="${inboundOrder?.id}" class="card-link">Details</g:link></td>
@@ -79,11 +79,11 @@
                     <table class="table table-borderless table-hover table-striped">
                         <thead>
                             <tr>
-                                <th class="col-1">Order Number</th>
+                                <th class="col-2">Order Number</th>
+                                <th class="col-3">Destination</th>
                                 <th class="col-3">Delivery for FA</th>
-                                <th class="col-3">Venue</th>
-                                <th class="col-2">Delivery Date</th>
-                                <th class="col-2">Status</th>
+                                <th class="col-1">Delivery Date</th>
+                                <th class="col-1">Status</th>
                                 <th class="col-1">Details</th>
                             </tr>
                         </thead>
@@ -91,8 +91,8 @@
                             <g:each var="outboundOrder" in="${outboundPending}">
                                 <tr>
                                     <td><g:link controller="mobile" action="outboundDetails" id="${outboundOrder?.id}" class="card-link">${outboundOrder.identifier}</g:link></td>
-                                    <td>${outboundOrder.origin}</td>
                                     <td>${outboundOrder.destination}</td>
+                                    <td>${outboundOrder?.categories[0]?.name}</td>
                                     <td>${g.formatDate(date: outboundOrder.expectedDeliveryDate, format: "dd MMM yyyy")}</td>
                                     <td>${outboundOrder.status}</td>
                                     <td><g:link controller="mobile" action="outboundDetails" id="${outboundOrder?.id}" class="card-link">Details</g:link></td>
@@ -117,11 +117,11 @@
                     <table class="table table-borderless table-striped">
                         <thead>
                             <tr>
-                                <th class="col-1">Order Number</th>
-                                <th class="col-3">FA</th>
-                                <th class="col-3">Delivery Destination (Venue)</th>
-                                <th class="col-2">Delivery Date</th>
-                                <th class="col-2">Status</th>
+                                <th class="col-2">Order Number</th>
+                                <th class="col-3">Destination</th>
+                                <th class="col-3">Delivery for FA</th>
+                                <th class="col-1">Delivery Date</th>
+                                <th class="col-1">Status</th>
                                 <th class="col-1">Details</th>
                             </tr>
                         </thead>
@@ -130,11 +130,10 @@
                                 <tr>
                                     <td>${outboundOrder.identifier}</td>
                                     <td>${outboundOrder.origin}</td>
-                                    <td>${outboundOrder.destination}</td>
+                                    <td>${outboundOrder?.categories[0]?.name}</td>
                                     <td>${g.formatDate(date: outboundOrder.expectedDeliveryDate, format: "dd MMM yyyy")}</td>
                                     <td>${outboundOrder.status}</td>
                                     <td><g:link controller="mobile" action="outboundDetails" id="${outboundOrder?.id}" class="card-link">Details</g:link></td>
-                                    <td></td>
                                 </tr>
                             </g:each>
                         </tbody>
@@ -156,11 +155,11 @@
                     <table class="table table-borderless table-hover table-striped">
                         <thead>
                             <tr>
-                                <th class="col-1">Order Number</th>
+                                <th class="col-2">Order Number</th>
+                                <th class="col-3">Destination</th>
                                 <th class="col-3">Delivery for FA</th>
-                                <th class="col-3">Venue</th>
-                                <th class="col-2">Delivery Date</th>
-                                <th class="col-2">Status</th>
+                                <th class="col-1">Delivery Date</th>
+                                <th class="col-1">Status</th>
                                 <th class="col-1">Tracking</th>
                             </tr>
                         </thead>
@@ -168,8 +167,8 @@
                             <g:each var="outboundOrder" in="${inTransit}">
                                 <tr>
                                     <td><g:link controller="mobile" action="outboundDetails" id="${outboundOrder?.id}" class="card-link">${outboundOrder.identifier}</g:link></td>
-                                    <td>${outboundOrder.origin}</td>
                                     <td>${outboundOrder.destination}</td>
+                                    <td>${outboundOrder?.categories[0]?.name}</td>
                                     <td>${g.formatDate(date: outboundOrder.expectedDeliveryDate, format: "dd MMM yyyy")}</td>
                                     <td>${outboundOrder.currentStatus}</td>
                                     <td>
@@ -177,9 +176,6 @@
                                             <g:link url="${stockMovement.trackingUri}">${stockMovement?.trackingNumber}</g:link>
                                             <g:displayBarcode showData="${false}" data="${stockMovement.trackingUri}" format="QR_CODE"/>
                                         </g:if>
-                                        <g:else>
-                                            Not Available
-                                        </g:else>
                                     </td>
                                 </tr>
                             </g:each>
@@ -203,18 +199,25 @@
                     <table class="table table-borderless table-striped">
                         <thead>
                             <tr>
+                                <th class="col-2">Status</th>
                                 <th class="col-2">SKU Code</th>
                                 <th class="col-4">Description</th>
                                 <th class="col-1">On Hand</th>
                                 <th class="col-1">On Order</th>
-                                <th class="col-2">Status</th>
-                                <th>Shipment Details</th>
                             </tr>
                         </thead>
                         <tbody>
                             <g:each var="productSummary" in="${inventorySummary}">
                                 <g:set var="product" value="${productSummary.product}"/>
                                 <tr>
+                                    <td>
+                                        <g:if test="${productSummary?.quantityOnHand > 0}">
+                                            In stock
+                                        </g:if>
+                                        <g:else>
+                                            Out of stock
+                                        </g:else>
+                                    </td>
                                     <td>
                                         <a href="${createLink(controller: 'mobile', action: 'productDetails', id: product?.id)}">
                                             ${product.productCode}
@@ -230,17 +233,6 @@
                                     <td>
                                         <g:formatNumber number="${productSummary.quantityOnOrder}" maxFractionDigits="0"/>
                                         <small>${product?.unitOfMeasure?:"EA"}</small>
-                                    </td>
-                                    <td>
-                                        <g:if test="${productSummary?.quantityOnHand > 0}">
-                                            In stock
-                                        </g:if>
-                                        <g:else>
-                                            Out of stock
-                                        </g:else>
-                                    </td>
-                                    <td>
-
                                     </td>
                                 </tr>
                             </g:each>

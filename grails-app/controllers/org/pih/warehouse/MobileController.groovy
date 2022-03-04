@@ -60,11 +60,23 @@ class MobileController {
 
         StockMovement inboundCriteria = new StockMovement(destination: location, stockMovementType: StockMovementType.INBOUND)
         def inboundOrders = stockMovementService.getStockMovements(inboundCriteria, [max:params.max?:10, offset: params.offset?:0])
+
+        // FIXME Hack to set line items so we can display categories for each stock movement
+        inboundOrders.each { stockMovement ->
+            stockMovement.lineItems = stockMovementService.getStockMovementItems(stockMovement.id, null, null, null)
+        }
+
         def inboundCount = inboundOrders.size()?:0
         def inboundPending = inboundOrders.findAll { !it.isReceived }
 
         StockMovement outboundCriteria = new StockMovement(origin: location, stockMovementType: StockMovementType.OUTBOUND)
         def outboundOrders = stockMovementService.getStockMovements(outboundCriteria, [max:params.max?:10, offset: params.offset?:0])
+
+        // FIXME Hack to set line items so we can display categories for each stock movement
+        outboundOrders.each { stockMovement ->
+            stockMovement.lineItems = stockMovementService.getStockMovementItems(stockMovement.id, null, null, null)
+        }
+
         def outboundCount = outboundOrders.size()?:0
 
         def outboundPending = outboundOrders.findAll { it.stockMovementStatusCode < StockMovementStatusCode.DISPATCHED }
