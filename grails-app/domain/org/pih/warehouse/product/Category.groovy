@@ -171,4 +171,9 @@ class Category implements Comparable, Serializable {
             "name"            : "name",
             "parentCategoryId": "parentCategoryId",
     ]
+
+    static CSV_PROPERTIES = [
+            "Category name"         : "name",
+            "Parent Category Name"  : "parentCategory.name",
+    ]
 }

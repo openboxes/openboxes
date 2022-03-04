@@ -525,6 +525,16 @@ class UrlMappings {
             action = [POST: "importProducts"]
         }
 
+        "/api/productsConfiguration/categoriesCount"(parseRequest: true) {
+            controller = { "productsConfigurationApi" }
+            action = [GET: "getCategoriesCount"]
+        }
+
+        "/api/productsConfiguration/downloadCategories"(parseRequest: true) {
+            controller = { "productsConfigurationApi" }
+            action = [GET: "downloadCategories"]
+        }
+
         // Standard REST APIs
 
         "/api/${resource}s"(parseRequest: true) {
