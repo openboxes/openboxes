@@ -8,8 +8,14 @@ class VerticalTabs extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      activeTab: this.props.activeTab,
+      activeTab: '',
     };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (Object.keys(this.props.tabs).length !== Object.keys(nextProps.tabs).length) {
+      this.setState({ activeTab: Object.keys(nextProps.tabs)[0] });
+    }
   }
 
   getTabTitles() {
@@ -49,5 +55,4 @@ export default VerticalTabs;
 
 VerticalTabs.propTypes = {
   tabs: PropTypes.func.isRequired,
-  activeTab: PropTypes.string.isRequired,
 };

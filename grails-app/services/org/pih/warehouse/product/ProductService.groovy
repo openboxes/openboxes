@@ -1312,4 +1312,28 @@ class ProductService {
             // TODO OBDS-86: This is for excel import done by user
         }
     }
+
+    def importProductsFromConfig(String productOption) {
+        def enabled = grailsApplication.config.openboxes.configurationWizard.enabled
+
+        if (enabled && productOption) {
+            def productOptionConfig = grailsApplication.config.openboxes.configurationWizard.productOptions[productOption]
+
+            if (!productOptionConfig) {
+                throw new Exception("There is no product option with the code: ${productOption}")
+            }
+
+            if (!productOptionConfig.enabled) {
+                return
+            }
+
+            // TODO: get this part working with [classpath:, file://, https://] (currently it does not support classpath)
+            def fileContent = new URL(productOptionConfig.fileUrl).getBytes()
+            String csv = new String(fileContent)
+
+            def products = validateProducts(csv)
+
+            importProducts(products)
+        }
+    }
 }
