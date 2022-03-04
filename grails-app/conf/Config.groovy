@@ -966,7 +966,7 @@ openboxes.jobs.sendStockAlertsJob.cronExpression = "0 0 0 * * ?" // every day at
 
 // Send product availability messages
 openboxes.jobs.sendProductAvailabilityMessagesJob.enabled = true
-openboxes.jobs.sendProductAvailabilityMessagesJob.delayStartInMilliseconds = 500
+openboxes.jobs.sendProductAvailabilityMessagesJob.delayStartInMilliseconds = 5000
 
 // Refresh inventory snapshots
 openboxes.jobs.refreshInventorySnapshotJob.enabled = true

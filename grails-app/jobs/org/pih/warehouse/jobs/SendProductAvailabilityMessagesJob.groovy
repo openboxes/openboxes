@@ -16,6 +16,7 @@ class SendProductAvailabilityMessagesJob {
     def grailsApplication
     def locationService
     def notificationService
+    def productAvailabilityService
 
     static triggers = { /* should only be triggered programmatically */ }
 

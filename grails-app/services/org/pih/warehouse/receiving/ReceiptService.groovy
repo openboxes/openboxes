@@ -272,9 +272,9 @@ class ReceiptService {
                         new ShipmentStatusTransitionEvent(partialReceipt, ShipmentStatusCode.RECEIVED))
 
                 // Trigger product availability refresh
-//                transaction.disableRefresh = Boolean.FALSE
-//                grailsApplication.mainContext.publishEvent(
-//                        new RefreshProductAvailabilityEvent(transaction, transaction.associatedLocation, transaction.associatedProducts, false))
+                transaction.disableRefresh = Boolean.FALSE
+                grailsApplication.mainContext.publishEvent(
+                        new RefreshProductAvailabilityEvent(transaction, transaction.associatedLocation, transaction.associatedProducts, false))
 
             } catch (Exception e) {
                 log.error "An unexpected error occurred during receipt: " + e.message, e
@@ -356,7 +356,7 @@ class ReceiptService {
         }
 
         // FIXME Block the refresh of the product availability table (to be triggered at end of request)
-        creditTransaction.disableRefresh = Boolean.FALSE
+        creditTransaction.disableRefresh = Boolean.TRUE
 
         if (creditTransaction.hasErrors() || !creditTransaction.save(flush:true)) {
             // did not save successfully, display errors message

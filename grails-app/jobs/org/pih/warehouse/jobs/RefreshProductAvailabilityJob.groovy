@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse.jobs
 
-import groovy.time.TimeCategory
 import org.quartz.DisallowConcurrentExecution
 import org.quartz.JobExecutionContext
 
@@ -19,7 +18,6 @@ class RefreshProductAvailabilityJob {
     def concurrent = false
     def grailsApplication
     def productAvailabilityService
-    def notificationService
 
     // Should never be triggered on a schedule - should only be triggered by persistence event listener
     static triggers = {}
@@ -35,22 +33,6 @@ class RefreshProductAvailabilityJob {
 
             productAvailabilityService.refreshProductsAvailability(locationId, productIds, forceRefresh)
             log.info "Finished refreshing product availability data in " + (System.currentTimeMillis() - startTime) + " ms"
-            boolean sendNotification = context.mergedJobDataMap.getBoolean("sendNotification")?:false
-            if (sendNotification && locationId && !productIds?.empty){
-//                startTime = System.currentTimeMillis()
-//                notificationService.sendProductAvailabilityMessages(locationId, productIds)
-//                log.info "Successfully published product availability messages ${(System.currentTimeMillis() - startTime)} ms"
-                use(TimeCategory) {
-                    def delayStartInMilliseconds = grailsApplication.config.openboxes.jobs.sendProductAvailabilityMessagesJob.delayStartInMilliseconds?:0
-                    Date runAt = new Date() + delayStartInMilliseconds.milliseconds
-                    log.info "Scheduling trigger for SendProductAvailabilityMessagesJob to run at ${runAt}"
-                    SendProductAvailabilityMessagesJob.schedule(runAt, [locationId:locationId, productIds:productIds])
-                }
-            }else{
-                if(!sendNotification) {
-                    log.info "Send Notification is disabled from RefreshProductAvailabilityJob"
-                }
-            }
         }
     }
 
