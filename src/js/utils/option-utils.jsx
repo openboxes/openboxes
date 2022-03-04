@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import queryString from 'query-string';
-import apiClient from './apiClient';
+
+import apiClient from 'utils/apiClient';
 
 const INBOUND = 'INBOUND';
 

@@ -1,17 +1,19 @@
+import update from 'immutability-helper';
 import _ from 'lodash';
 import { arrayMove } from 'react-sortable-hoc';
-import update from 'immutability-helper';
-import { loadGraphColors, loadGraphOptions } from '../consts/dataFormat/graphConfig';
+
 import {
+  FETCH_CONFIG,
+  FETCH_CONFIG_AND_SET_ACTIVE,
   FETCH_GRAPHS,
   FETCH_NUMBERS,
   REMOVE_FROM_INDICATORS,
   REORDER_INDICATORS,
-  RESET_INDICATORS,
-  FETCH_CONFIG,
-  SET_ACTIVE_CONFIG, FETCH_CONFIG_AND_SET_ACTIVE,
-} from '../actions/types';
-import { loadNumbersOptions } from '../consts/dataFormat/customGraphConfig';
+  RESET_INDICATORS, SET_ACTIVE_CONFIG,
+} from 'actions/types';
+import { loadNumbersOptions } from 'consts/dataFormat/customGraphConfig';
+import { loadGraphColors, loadGraphOptions } from 'consts/dataFormat/graphConfig';
+
 
 function arrayArchive(array = [], index) {
   let newArray = update(array, { $splice: [[index, 1]] });

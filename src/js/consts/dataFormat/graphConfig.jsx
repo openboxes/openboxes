@@ -1,7 +1,8 @@
 /* eslint no-param-reassign: ["error", { "props": false }] */
 // eslint-disable-next-line no-unused-vars
 import datalabels from 'chartjs-plugin-datalabels';
-import { getColor, getArrayOfColors } from './colorMapping';
+
+import { getArrayOfColors, getColor } from 'consts/dataFormat/colorMapping';
 
 // === COLOR OPTIONS ===
 

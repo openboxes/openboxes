@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+
 import PropTypes from 'prop-types';
-import { showUserActions, hideUserActions } from '../../actions';
+import { connect } from 'react-redux';
+
+import { hideUserActions, showUserActions } from 'actions';
 
 
 class UserActionMenu extends Component {

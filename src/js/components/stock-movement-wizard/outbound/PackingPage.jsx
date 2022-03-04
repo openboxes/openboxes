@@ -1,33 +1,35 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { Form } from 'react-final-form';
-import arrayMutators from 'final-form-arrays';
-import PropTypes from 'prop-types';
-import Alert from 'react-s-alert';
-import update from 'immutability-helper';
-import { confirmAlert } from 'react-confirm-alert';
-import { getTranslate } from 'react-localize-redux';
+
 import axios from 'axios';
+import arrayMutators from 'final-form-arrays';
+import update from 'immutability-helper';
+import _ from 'lodash';
+import PropTypes from 'prop-types';
+import { confirmAlert } from 'react-confirm-alert';
+import { Form } from 'react-final-form';
+import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+import Alert from 'react-s-alert';
+
+import { hideSpinner, showSpinner } from 'actions';
+import ArrayField from 'components/form-elements/ArrayField';
+import LabelField from 'components/form-elements/LabelField';
+import SelectField from 'components/form-elements/SelectField';
+import TextField from 'components/form-elements/TextField';
+import PackingSplitLineModal from 'components/stock-movement-wizard/modals/PackingSplitLineModal';
+import AlertMessage from 'utils/AlertMessage';
+import {
+  flattenRequest,
+  handleError,
+  handleSuccess,
+} from 'utils/apiClient';
+import { renderFormField } from 'utils/form-utils';
+import { debounceUsersFetch } from 'utils/option-utils';
+import renderHandlingIcons from 'utils/product-handling-icons';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-import ArrayField from '../../form-elements/ArrayField';
-import TextField from '../../form-elements/TextField';
-import { renderFormField } from '../../../utils/form-utils';
-import LabelField from '../../form-elements/LabelField';
-import SelectField from '../../form-elements/SelectField';
-import {
-  flattenRequest,
-  handleSuccess,
-  handleError,
-} from '../../../utils/apiClient';
-import { showSpinner, hideSpinner } from '../../../actions';
-import PackingSplitLineModal from '../modals/PackingSplitLineModal';
-import { debounceUsersFetch } from '../../../utils/option-utils';
-import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
-import renderHandlingIcons from '../../../utils/product-handling-icons';
-import AlertMessage from '../../../utils/AlertMessage';
 
 const FIELDS = {
   packPageItems: {

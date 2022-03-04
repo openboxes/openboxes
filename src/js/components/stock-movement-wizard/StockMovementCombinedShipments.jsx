@@ -1,15 +1,18 @@
-import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+
+import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { fetchBreadcrumbsConfig, fetchTranslations, hideSpinner, showSpinner, updateBreadcrumbs } from '../../actions';
-import apiClient from '../../utils/apiClient';
-import { translateWithDefaultMessage } from '../../utils/Translate';
-import Wizard from '../wizard/Wizard';
-import AddItemsPage from './combined-shipments/AddItemsPage';
-import CreateStockMovement from './combined-shipments/CreateStockMovement';
-import SendMovementPage from './combined-shipments/SendMovementPage';
-import './StockMovement.scss';
+
+import { fetchBreadcrumbsConfig, fetchTranslations, hideSpinner, showSpinner, updateBreadcrumbs } from 'actions';
+import AddItemsPage from 'components/stock-movement-wizard/combined-shipments/AddItemsPage';
+import CreateStockMovement from 'components/stock-movement-wizard/combined-shipments/CreateStockMovement';
+import SendMovementPage from 'components/stock-movement-wizard/combined-shipments/SendMovementPage';
+import Wizard from 'components/wizard/Wizard';
+import apiClient from 'utils/apiClient';
+import { translateWithDefaultMessage } from 'utils/Translate';
+
+import 'components/stock-movement-wizard/StockMovement.scss';
 
 /** Main combined shipments stock movement form's wizard component. */
 class StockMovementCombinedShipments extends Component {

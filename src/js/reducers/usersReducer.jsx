@@ -1,5 +1,6 @@
 import _ from 'lodash';
-import { FETCH_USERS } from '../actions/types';
+
+import { FETCH_USERS } from 'actions/types';
 
 const initialState = {
   data: [],

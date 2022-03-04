@@ -1,18 +1,19 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
 
-import CreateOutboundReturn from './CreateOutboundReturn';
-import AddItemsPage from './AddItemsPage';
-import PickPage from './PickPage';
-import SendOutboundReturns from './SendOutboundReturn';
-import Wizard from '../../wizard/Wizard';
-import apiClient, { parseResponse } from '../../../utils/apiClient';
-import { showSpinner, hideSpinner, fetchTranslations, updateBreadcrumbs, fetchBreadcrumbsConfig } from '../../../actions';
-import { translateWithDefaultMessage } from '../../../utils/Translate';
+import { fetchBreadcrumbsConfig, fetchTranslations, hideSpinner, showSpinner, updateBreadcrumbs } from 'actions';
+import AddItemsPage from 'components/returns/outbound/AddItemsPage';
+import CreateOutboundReturn from 'components/returns/outbound/CreateOutboundReturn';
+import PickPage from 'components/returns/outbound/PickPage';
+import SendOutboundReturns from 'components/returns/outbound/SendOutboundReturn';
+import Wizard from 'components/wizard/Wizard';
+import apiClient, { parseResponse } from 'utils/apiClient';
+import { translateWithDefaultMessage } from 'utils/Translate';
 
-import '../../stock-movement-wizard/StockMovement.scss';
+import 'components/stock-movement-wizard/StockMovement.scss';
 
 class OutboundReturns extends Component {
   constructor(props) {

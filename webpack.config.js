@@ -97,6 +97,19 @@ module.exports = {
     ],
   },
   resolve: {
+    alias: {
+      root: ROOT,
+      src: SRC,
+      components: path.resolve(SRC, 'components'),
+      reducers: path.resolve(SRC, 'reducers'),
+      actions: path.resolve(SRC, 'actions'),
+      consts: path.resolve(SRC, 'consts'),
+      tests: path.resolve(SRC, 'tests'),
+      utils: path.resolve(SRC, 'utils'),
+      templates: path.resolve(SRC, 'templates'),
+      store: path.resolve(SRC, 'store'),
+      css: path.resolve(ROOT, 'css'),
+    },
     extensions: ['.js', '.jsx'],
   },
 };

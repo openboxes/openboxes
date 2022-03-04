@@ -1,15 +1,17 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
+
+import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { Tooltip } from 'react-tippy';
-import { connect } from 'react-redux';
 import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+import { Tooltip } from 'react-tippy';
+
+import TableBody from 'components/form-elements/TableBody';
+import TableBodyVirtualized from 'components/form-elements/TableBodyVirtualized';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-tippy/dist/tippy.css';
 
-import TableBody from './TableBody';
-import TableBodyVirtualized from './TableBodyVirtualized';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
 
 class FieldArrayComponent extends Component {
   constructor(props) {

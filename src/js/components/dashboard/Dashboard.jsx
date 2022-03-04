@@ -1,28 +1,30 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
+
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { defaults } from 'react-chartjs-2';
 import { connect } from 'react-redux';
 import { SortableContainer } from 'react-sortable-hoc';
-import 'react-table/react-table.css';
-import 'react-confirm-alert/src/react-confirm-alert.css';
+
 import {
   addToIndicators,
-  fetchIndicators,
-  reorderIndicators,
-  reloadIndicator,
-  resetIndicators,
-  fetchConfigAndData,
   fetchConfig,
-} from '../../actions';
-import GraphCard from './GraphCard';
-import LoadingNumbers from './LoadingNumbers';
-import NumberCard from './NumberCard';
-import UnarchiveIndicators from './UnarchiveIndicators';
-import Filter from './Filter';
-import './Dashboard.scss';
-import apiClient from '../../utils/apiClient';
+  fetchConfigAndData,
+  fetchIndicators,
+  reloadIndicator,
+  reorderIndicators,
+  resetIndicators,
+} from 'actions';
+import Filter from 'components/dashboard/Filter';
+import GraphCard from 'components/dashboard/GraphCard';
+import LoadingNumbers from 'components/dashboard/LoadingNumbers';
+import NumberCard from 'components/dashboard/NumberCard';
+import UnarchiveIndicators from 'components/dashboard/UnarchiveIndicators';
+import apiClient from 'utils/apiClient';
 
+import 'react-table/react-table.css';
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import 'components/dashboard/Dashboard.scss';
 // Disable charts legends by default.
 defaults.scale.ticks.beginAtZero = true;
 

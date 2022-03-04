@@ -1,10 +1,12 @@
-import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+
+import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import store from '../store';
-import apiClient from '../utils/apiClient';
-import { translateWithDefaultMessage } from '../utils/Translate';
+import store from 'store';
+
+import apiClient from 'utils/apiClient';
+import { translateWithDefaultMessage } from 'utils/Translate';
 
 
 class LoginForm extends Component {

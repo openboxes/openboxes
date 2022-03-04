@@ -1,16 +1,18 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
 
-import ConfigureProductCategories from './ConfigureProductCategories';
-import ReviewCategories from './ReviewCategories';
-import ConfigureProducts from './ConfigureProducts';
-import Wizard from '../wizard/Wizard';
-import { fetchTranslations, updateBreadcrumbs, fetchBreadcrumbsConfig } from '../../actions';
-import { translateWithDefaultMessage } from '../../utils/Translate';
+import { fetchBreadcrumbsConfig, fetchTranslations, updateBreadcrumbs } from 'actions';
+import ConfigureProductCategories from 'components/products-configuration/ConfigureProductCategories';
+import ConfigureProducts from 'components/products-configuration/ConfigureProducts';
+import ReviewCategories from 'components/products-configuration/ReviewCategories';
+import Wizard from 'components/wizard/Wizard';
+import { translateWithDefaultMessage } from 'utils/Translate';
 
-import '../stock-movement-wizard/StockMovement.scss';
+import 'components/stock-movement-wizard/StockMovement.scss';
+
 
 const SUPPORT_LINKS = {
   configureCategories: 'Configure Categories',

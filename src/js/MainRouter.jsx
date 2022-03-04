@@ -1,12 +1,12 @@
 import React from 'react';
+
 import PropTypes from 'prop-types';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { withLocalize } from 'react-localize-redux';
 import connect from 'react-redux/es/connect/connect';
 
-import Router from './components/Router';
-
-import { fetchTranslations, fetchSessionInfo, fetchMenuConfig } from './actions';
+import { fetchMenuConfig, fetchSessionInfo, fetchTranslations } from 'actions';
+import Router from 'components/Router';
 
 const onMissingTranslation = ({ translationId }) => `${translationId}`;
 

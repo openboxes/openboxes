@@ -1,25 +1,27 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+
+import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router-dom';
 import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 
-import CreateReplenishment from './CreateReplenishment';
-import ReplenishmentSecondPage from './ReplenishmentSecondPage';
-import ReplenishmentCheckPage from './ReplenishmentCheckPage';
-import Wizard from '../wizard/Wizard';
-import apiClient, { parseResponse } from '../../utils/apiClient';
 import {
-  showSpinner,
-  hideSpinner,
-  fetchTranslations,
-  updateBreadcrumbs,
   fetchBreadcrumbsConfig,
-} from '../../actions';
-import { translateWithDefaultMessage } from '../../utils/Translate';
+  fetchTranslations,
+  hideSpinner,
+  showSpinner,
+  updateBreadcrumbs,
+} from 'actions';
+import CreateReplenishment from 'components/replenishment/CreateReplenishment';
+import ReplenishmentCheckPage from 'components/replenishment/ReplenishmentCheckPage';
+import ReplenishmentSecondPage from 'components/replenishment/ReplenishmentSecondPage';
+import Wizard from 'components/wizard/Wizard';
+import apiClient, { parseResponse } from 'utils/apiClient';
+import { translateWithDefaultMessage } from 'utils/Translate';
 
-import './Replenishment.scss';
+import 'components/replenishment/Replenishment.scss';
+
 
 class ReplenishmentWizard extends Component {
   constructor(props) {

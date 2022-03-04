@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
+
 import PropTypes from 'prop-types';
-import apiClient from './../../utils/apiClient';
+
+import apiClient from 'utils/apiClient';
+
 
 class Filter extends Component {
   constructor(props) {

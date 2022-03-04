@@ -17,13 +17,15 @@
     "bundle": "webpack --mode=production",
     "test": "jest",
     "styleguide": "styleguidist server",
-    "styleguide:build": "styleguidist build"
+    "styleguide:build": "styleguidist build",
+    "eslint": "eslint --fix --ext .js,.jsx ./src/js/"
   },
   "jest": {
     "verbose": true,
     "roots": [
       "<rootDir>/src/"
     ],
+    "moduleDirectories": ["node_modules", "src/js"],
     "moduleNameMapper": {
       "\\.(css|scss)$": "<rootDir>/src/js/tests/__mocks__/styleMock.js"
     },
@@ -112,6 +114,7 @@
     "eslint-plugin-import": "2.13.0",
     "eslint-plugin-jsx-a11y": "6.1.1",
     "eslint-plugin-react": "7.10.0",
+    "eslint-plugin-simple-import-sort": "^7.0.0",
     "extract-text-webpack-plugin": "3.0.2",
     "file-loader": "1.1.11",
     "html-webpack-plugin": "3.2.0",

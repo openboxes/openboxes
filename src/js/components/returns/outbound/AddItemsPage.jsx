@@ -1,29 +1,30 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import _ from 'lodash';
-import update from 'immutability-helper';
-import { getTranslate } from 'react-localize-redux';
-import { Form } from 'react-final-form';
+
 import arrayMutators from 'final-form-arrays';
-import DatePicker from 'react-datepicker';
+import update from 'immutability-helper';
+import _ from 'lodash';
 import moment from 'moment';
+import PropTypes from 'prop-types';
+import DatePicker from 'react-datepicker';
+import { Form } from 'react-final-form';
+import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
+
+import { hideSpinner, showSpinner } from 'actions';
+import ArrayField from 'components/form-elements/ArrayField';
+import LabelField from 'components/form-elements/LabelField';
+import TextField from 'components/form-elements/TextField';
+import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import Checkbox from 'utils/Checkbox';
+import { renderFormField } from 'utils/form-utils';
+import { debounceAvailableItemsFetch } from 'utils/option-utils';
+import renderHandlingIcons from 'utils/product-handling-icons';
+import Select from 'utils/Select';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-table/react-table.css';
 import 'react-datepicker/dist/react-datepicker.css';
-
-import { renderFormField } from '../../../utils/form-utils';
-import LabelField from '../../form-elements/LabelField';
-import Select from '../../../utils/Select';
-import ArrayField from '../../form-elements/ArrayField';
-import TextField from '../../form-elements/TextField';
-import Checkbox from '../../../utils/Checkbox';
-import { showSpinner, hideSpinner } from '../../../actions';
-import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
-import apiClient, { flattenRequest, parseResponse } from '../../../utils/apiClient';
-import { debounceAvailableItemsFetch } from '../../../utils/option-utils';
-import renderHandlingIcons from '../../../utils/product-handling-icons';
 
 const FIELDS = {
   returnItems: {

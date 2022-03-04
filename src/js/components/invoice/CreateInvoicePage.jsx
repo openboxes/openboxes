@@ -1,23 +1,25 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+
+import _ from 'lodash';
+import moment from 'moment';
 import PropTypes from 'prop-types';
-import { Form } from 'react-final-form';
-import { withRouter } from 'react-router-dom';
 import { confirmAlert } from 'react-confirm-alert';
+import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+
+import { fetchCurrencies, hideSpinner, showSpinner } from 'actions';
+import DateField from 'components/form-elements/DateField';
+import SelectField from 'components/form-elements/SelectField';
+import TextField from 'components/form-elements/TextField';
+import apiClient from 'utils/apiClient';
+import { renderFormField } from 'utils/form-utils';
+import { debounceOrganizationsFetch } from 'utils/option-utils';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import moment from 'moment';
 
-import TextField from '../form-elements/TextField';
-import SelectField from '../form-elements/SelectField';
-import DateField from '../form-elements/DateField';
-import { renderFormField } from '../../utils/form-utils';
-import apiClient from '../../utils/apiClient';
-import { showSpinner, hideSpinner, fetchCurrencies } from '../../actions';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
-import { debounceOrganizationsFetch } from '../../utils/option-utils';
 
 function validate(values) {
   const errors = {};

@@ -1,11 +1,13 @@
-import _ from 'lodash';
 import React from 'react';
+
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import ReactLoading from 'react-loading';
-import { connect } from 'react-redux';
 import { getTranslate } from 'react-localize-redux';
-import { getRandomColor } from '../../consts/dataFormat/colorMapping';
-import { translateWithDefaultMessage } from '../../utils/Translate';
+import { connect } from 'react-redux';
+
+import { getRandomColor } from 'consts/dataFormat/colorMapping';
+import { translateWithDefaultMessage } from 'utils/Translate';
 
 const Numbers = () => {
   const colors = ['green', 'yellow', 'red'];

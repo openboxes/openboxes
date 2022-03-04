@@ -1,17 +1,19 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
 
-import LocationDetails from './LocationDetails';
-import LocationAddress from './LocationAddress';
-import ZoneAndBinLocations from './ZoneAndBinLocations';
-import Forecasting from './Forecasting';
-import Wizard from '../wizard/Wizard';
-import { fetchTranslations, updateBreadcrumbs, fetchBreadcrumbsConfig } from '../../actions';
-import { translateWithDefaultMessage } from '../../utils/Translate';
+import { fetchBreadcrumbsConfig, fetchTranslations, updateBreadcrumbs } from 'actions';
+import Forecasting from 'components/locations-configuration/Forecasting';
+import LocationAddress from 'components/locations-configuration/LocationAddress';
+import LocationDetails from 'components/locations-configuration/LocationDetails';
+import ZoneAndBinLocations from 'components/locations-configuration/ZoneAndBinLocations';
+import Wizard from 'components/wizard/Wizard';
+import { translateWithDefaultMessage } from 'utils/Translate';
 
-import '../stock-movement-wizard/StockMovement.scss';
+import 'components/stock-movement-wizard/StockMovement.scss';
+
 
 const SUPPORT_LINKS = {
   locationDetails: 'Location Details',

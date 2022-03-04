@@ -1,4 +1,5 @@
-import apiClient from '../../utils/apiClient';
+import apiClient from 'utils/apiClient';
+
 
 describe('apiClient', () => {
   test('returns 200', () => {

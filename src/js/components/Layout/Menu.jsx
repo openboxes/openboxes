@@ -1,7 +1,9 @@
-import _ from 'lodash';
 import React from 'react';
-import { connect } from 'react-redux';
+
+import _ from 'lodash';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+
 
 const Menu = ({ menuConfig }) => {
   function getSectionComponent(section, key) {

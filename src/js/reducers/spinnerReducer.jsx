@@ -1,4 +1,4 @@
-import { SHOW_SPINNER, HIDE_SPINNER } from '../actions/types';
+import { HIDE_SPINNER, SHOW_SPINNER } from 'actions/types';
 
 const initialState = {
   show: false,

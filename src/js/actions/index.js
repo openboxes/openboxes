@@ -1,32 +1,33 @@
 /* eslint no-param-reassign: ["error", { "props": false }] */
 import _ from 'lodash';
 import { addTranslationForLanguage } from 'react-localize-redux';
+
 import {
-  SHOW_SPINNER,
-  HIDE_SPINNER,
-  TOGGLE_LOCATION_CHOOSER,
-  TOGGLE_USER_ACTION_MENU,
-  FETCH_USERS,
-  FETCH_REASONCODES,
-  FETCH_SESSION_INFO,
-  FETCH_MENU_CONFIG,
-  CHANGE_CURRENT_LOCATION,
-  TRANSLATIONS_FETCHED,
   CHANGE_CURRENT_LOCALE,
-  FETCH_GRAPHS,
-  FETCH_NUMBERS,
-  RESET_INDICATORS,
-  REMOVE_FROM_INDICATORS,
-  REORDER_INDICATORS,
+  CHANGE_CURRENT_LOCATION,
+  FETCH_BREADCRUMBS_CONFIG,
   FETCH_CONFIG,
   FETCH_CONFIG_AND_SET_ACTIVE,
-  SET_ACTIVE_CONFIG,
-  UPDATE_BREADCRUMBS_PARAMS,
-  FETCH_BREADCRUMBS_CONFIG,
   FETCH_CURRENCIES,
+  FETCH_GRAPHS,
+  FETCH_MENU_CONFIG,
+  FETCH_NUMBERS,
   FETCH_ORGANIZATIONS,
-} from './types';
-import apiClient, { parseResponse } from '../utils/apiClient';
+  FETCH_REASONCODES,
+  FETCH_SESSION_INFO,
+  FETCH_USERS,
+  HIDE_SPINNER,
+  REMOVE_FROM_INDICATORS,
+  REORDER_INDICATORS,
+  RESET_INDICATORS,
+  SET_ACTIVE_CONFIG,
+  SHOW_SPINNER,
+  TOGGLE_LOCATION_CHOOSER,
+  TOGGLE_USER_ACTION_MENU,
+  TRANSLATIONS_FETCHED,
+  UPDATE_BREADCRUMBS_PARAMS,
+} from 'actions/types';
+import apiClient, { parseResponse } from 'utils/apiClient';
 
 export function showSpinner() {
   return {
@@ -383,7 +384,7 @@ export function fetchConfigAndData(locationId, config = 'personal', userId, filt
         type: FETCH_CONFIG_AND_SET_ACTIVE,
         payload: {
           data: res.data,
-          activeConfig: config
+          activeConfig: config,
         },
       });
       getData(dispatch, res.data, locationId, config, userId, filterSelected);

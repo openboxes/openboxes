@@ -1,17 +1,18 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
 
-import CreateInboundReturn from './CreateInboundReturn';
-import AddItemsPage from './AddItemsPage';
-import SendInboundReturn from './SendInboundReturn';
-import Wizard from '../../wizard/Wizard';
-import apiClient, { parseResponse } from '../../../utils/apiClient';
-import { showSpinner, hideSpinner, fetchTranslations, updateBreadcrumbs, fetchBreadcrumbsConfig } from '../../../actions';
-import { translateWithDefaultMessage } from '../../../utils/Translate';
+import { fetchBreadcrumbsConfig, fetchTranslations, hideSpinner, showSpinner, updateBreadcrumbs } from 'actions';
+import AddItemsPage from 'components/returns/inbound/AddItemsPage';
+import CreateInboundReturn from 'components/returns/inbound/CreateInboundReturn';
+import SendInboundReturn from 'components/returns/inbound/SendInboundReturn';
+import Wizard from 'components/wizard/Wizard';
+import apiClient, { parseResponse } from 'utils/apiClient';
+import { translateWithDefaultMessage } from 'utils/Translate';
 
-import '../../stock-movement-wizard/StockMovement.scss';
+import 'components/stock-movement-wizard/StockMovement.scss';
 
 class InboundReturns extends Component {
   constructor(props) {

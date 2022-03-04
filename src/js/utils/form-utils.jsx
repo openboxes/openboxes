@@ -1,12 +1,14 @@
 import React from 'react';
-import { Tooltip } from 'react-tippy';
+
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
+import { Tooltip } from 'react-tippy';
+
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-tippy/dist/tippy.css';
 
-import Translate, { translateWithDefaultMessage } from './Translate';
 
 export const renderFormField = (fieldConfig, fieldName, props = {}) => {
   const FieldType = fieldConfig.type;

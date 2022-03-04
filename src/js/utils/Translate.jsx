@@ -1,6 +1,7 @@
 import React from 'react';
-import { Translate } from 'react-localize-redux';
+
 import PropTypes from 'prop-types';
+import { Translate } from 'react-localize-redux';
 
 export const translateWithDefaultMessage = translate => ((id, defaultMessage, data, options) =>
   translate(id, data, { ...options, onMissingTranslation: () => (defaultMessage || id) }));

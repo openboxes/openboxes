@@ -1,9 +1,9 @@
 /* eslint-disable react/no-array-index-key */
 import React from 'react';
+
 import PropTypes from 'prop-types';
 
-import { getColorByName } from '../../consts/dataFormat/colorMapping';
-
+import { getColorByName } from 'consts/dataFormat/colorMapping';
 
 const NumbersRAG = ({ data }) => (
   <div className="big-gyr-indicator">

@@ -1,7 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+
 import _ from 'lodash';
-import './WizardSteps.scss';
+import PropTypes from 'prop-types';
+
+import 'components/wizard/WizardSteps.scss';
+
 
 const WizardSteps = props => (
   <div className="steps-box d-print-none">

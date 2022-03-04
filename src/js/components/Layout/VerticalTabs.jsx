@@ -1,8 +1,10 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
+
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 
-import Translate from '../../utils/Translate';
+import Translate from 'utils/Translate';
+
 
 class VerticalTabs extends Component {
   constructor(props) {

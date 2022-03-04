@@ -1,20 +1,22 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
-import Alert from 'react-s-alert';
 import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+import Alert from 'react-s-alert';
+
+import { fetchUsers, hideSpinner, showSpinner } from 'actions';
+import CheckboxField from 'components/form-elements/CheckboxField';
+import SelectField from 'components/form-elements/SelectField';
+import TextField from 'components/form-elements/TextField';
+import apiClient from 'utils/apiClient';
+import { renderFormField } from 'utils/form-utils';
+import { debounceLocationGroupsFetch, debounceOrganizationsFetch, debounceUsersFetch } from 'utils/option-utils';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import TextField from '../form-elements/TextField';
-import CheckboxField from '../form-elements/CheckboxField';
-import SelectField from '../form-elements/SelectField';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
-import { fetchUsers, hideSpinner, showSpinner } from '../../actions';
-import { debounceUsersFetch, debounceLocationGroupsFetch, debounceOrganizationsFetch } from '../../utils/option-utils';
-import { renderFormField } from '../../utils/form-utils';
-import apiClient from '../../utils/apiClient';
 
 const PAGE_ID = 'locationDetails';
 

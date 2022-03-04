@@ -1,11 +1,12 @@
 /* eslint-disable no-console */
-import _ from 'lodash';
 import React from 'react';
-import axios from 'axios';
-import Alert from 'react-s-alert';
-import { confirmAlert } from 'react-confirm-alert';
 
-import LoginModal from '../components/LoginModal';
+import axios from 'axios';
+import _ from 'lodash';
+import { confirmAlert } from 'react-confirm-alert';
+import Alert from 'react-s-alert';
+
+import LoginModal from 'components/LoginModal';
 
 const justRejectRequestError = error => Promise.reject(error);
 
