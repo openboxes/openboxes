@@ -263,10 +263,9 @@
 
                                     </td>
                                     <td class="col-4">
-                                            <g:link controller="mobile" action="productDetails" id="${item?.product?.id}" class="text-reset text-decoration-none">
-                                                ${item?.product?.productCode}
-                                                ${item?.product?.name}
-                                            </g:link>
+                                        <small>${item?.product?.productCode}</small>
+                                        ${item?.product?.name}
+                                        <div class="small">${item?.product?.category?.name}</div>
                                         <g:if test="${item?.comments}">
                                             <div class="text-muted">
                                                 Special Instructions: ${item.comments}

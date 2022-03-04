@@ -174,10 +174,12 @@
                                             </g:else>
                                         </td>
                                         <td class="col-2">
-                                            <g:displayBarcode showData="${true}" data="${item?.product?.productCode}" />
+                                            <g:displayBarcode showData="${false}" data="${item?.product?.productCode}" />
                                         </td>
                                         <td class="col-6">
+                                            <small>${item?.product?.productCode}</small>
                                             ${item?.product?.name}
+                                            <div class="small">${item?.product?.category?.name}</div>
                                             <g:if test="${item?.comments}">
                                                 <div class="text-muted">
                                                     Special Instructions: ${item?.comments}
