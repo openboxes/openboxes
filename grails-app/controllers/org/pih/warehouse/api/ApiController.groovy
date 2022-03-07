@@ -14,6 +14,7 @@ import grails.plugin.springcache.annotations.CacheFlush
 import grails.util.GrailsUtil
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.RequisitionType
@@ -64,8 +65,8 @@ class ApiController {
     }
 
     def getMenuConfig = {
-        Map menuConfig = grailsApplication.config.openboxes.megamenu
         User user = User.get(session?.user?.id)
+        Map menuConfig = userService.hasHighestRole(user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED) ? grailsApplication.config.openboxes.requestorMegamenu : grailsApplication.config.openboxes.megamenu
         Location location = Location.get(session.warehouse?.id)
         List translatedMenu = megamenuService.buildAndTranslateMenu(menuConfig, user, location)
         render([data: [menuConfig: translatedMenu]] as JSON)

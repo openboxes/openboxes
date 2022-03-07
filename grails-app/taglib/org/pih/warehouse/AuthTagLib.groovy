@@ -10,6 +10,7 @@
 package org.pih.warehouse
 
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 
 class AuthTagLib {
@@ -76,6 +77,15 @@ class AuthTagLib {
         }
     }
 
+    def hasHighestRoleAuthenticated = { attrs, body ->
+        if (User.get(session?.user?.id)?.getHighestRole(session.warehouse).roleType == RoleType.ROLE_AUTHENTICATED)
+            out << body()
+    }
+
+    def hasHigherRoleThanAuthenticated = { attrs, body ->
+        if (User.get(session?.user?.id)?.getHighestRole(session.warehouse).roleType != RoleType.ROLE_AUTHENTICATED)
+            out << body()
+    }
 
     def authorize = { attrs, body ->
         def authorized = false
