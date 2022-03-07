@@ -231,7 +231,7 @@
 					"url": sSource,
 					"data": aoData,
 					"success": fnCallback,
-					"timeout": 30000,
+					"timeout": ${grailsApplication.config.openboxes.ajaxRequest.timeout},
 					"error": function (xhr, status, error) {
 						var message = "An unexpected error has occurred on the server. Please contact your system administrator.";
 						if (xhr.responseText) {
