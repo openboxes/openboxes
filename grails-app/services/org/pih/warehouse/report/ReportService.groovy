@@ -78,9 +78,10 @@ class ReportService implements ApplicationContextAware {
             DocumentBuilder builder = builderFactory.newDocumentBuilder()
 
             html = getHtmlContent(url)
+            URI uri = new URI(url)
 
             ITextRenderer renderer = new ITextRenderer()
-            renderer.setDocumentFromString(html)
+            renderer.setDocumentFromString(html, baseUrl: "${uri.scheme}://${uri.authority}")
 
             renderer.layout()
             renderer.createPDF(outputStream)
