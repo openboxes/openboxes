@@ -1,62 +1,66 @@
-.steps-box {
-    padding: 12px 24px 24px;
+.steps-main-box {
+  padding: 0 10px;
+  font-size: .8em;
+  background-color: #ffffff;
+  margin: 0.75rem 1.5rem 0;
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.09);
+}
+
+.steps-inside-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  color: lightgrey;
+}
+
+.step-container {
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  .circle {
+    padding: 8px;
+    height: 21px;
+    width: 21px;
+    border: 3px solid lightgrey;
+    border-radius: 50%;
     display: flex;
-    background-color: #fff;
-    margin: 0.5rem 1.5rem 0;
-    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.09);
+    justify-content: center;
+    align-items: center;
+    color: #ffffff;
+  }
+  .filled {
+    background-color: lightgrey;
+    border: none;
+  }
 
-    .steps {
-        margin: auto;
-        flex: 1;
-        justify-content: space-evenly;
+  .step-name {
+    padding: 10px;
+    display: flex;
+  }
+  .line {
+    border: 1px solid lightgrey;
+    flex: 1;
+  }
+}
 
-        .step-container {
-            display: flex;
+.active {
+  color: black;
+  .circle {
+    border: 3px solid #4f87ce;
+    color: white;
+  }
+  .filled {
+    background-color: #4f87ce;
+  }
+}
 
-            &:not(:last-child) {
-                flex: 1;
-            }
+.step-container:not(:last-child) {
+  flex: 1;
+}
 
-            .step {
-                border: none;
-                background: none;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                position: relative;
-
-                // Icons
-                .fa {
-                    font-size: 20px !important;
-                }
-
-                .fa-check-circle-o {
-                    color: #50c146;
-                }
-
-                .fa-circle-o.disabled {
-                    color: #e9ebeb;
-                }
-
-                .fa-circle-o {
-                    color: #4f87ce;
-                }
-
-                .step-text {
-                    position: absolute;
-                    top: 20px;
-                    font-size: small;
-                    white-space: nowrap;
-                }
-            }
-        }
-
-        .step-container:not(:last-child)::after {
-            content: " ";
-            border-bottom: 1px dashed #e9ebeb;
-            flex: 1;
-            height: 18px;
-        }
-
-    }
+.step-container:not(:last-child)::after {
+  flex: 1;
+  content: " ";
+  border-bottom: 2px solid lightgrey;
 }

@@ -84,6 +84,7 @@ class ProductsConfigurationWizard extends Component {
         additionalProps={{
           locationId, location, history, supportLinks: SUPPORT_LINKS,
         }}
+        showStepNumber
       />
     );
   }

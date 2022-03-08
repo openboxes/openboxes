@@ -2,120 +2,95 @@
 
 exports[`WizardSteps renders correctly 1`] = `
 <div
-  className="steps-box d-print-none"
+  className="steps-main-box"
 >
   <div
-    className="steps d-flex flex-wrap"
+    className="steps-inside-wrapper"
   >
     <div
-      className="step-container"
+      className="step-container "
     >
-      <button
-        className="step"
+      <div
+        className="circle"
         disabled={true}
         onClick={[Function]}
+        onKeyPress={[Function]}
+        role="button"
+        tabIndex="0"
+      />
+      <div
+        className="step-name"
       >
-        <i
-          aria-hidden="true"
-          className="fa 
-                 
-                fa-check-circle-o 
-                fa-circle-o disabled"
-        />
-        <span
-          className="step-text"
-        >
-          Create
-        </span>
-      </button>
+        Create
+      </div>
     </div>
     <div
-      className="step-container"
+      className="step-container active"
     >
-      <button
-        className="step"
+      <div
+        className="circle"
         disabled={true}
         onClick={[Function]}
+        onKeyPress={[Function]}
+        role="button"
+        tabIndex="0"
+      />
+      <div
+        className="step-name"
       >
-        <i
-          aria-hidden="true"
-          className="fa 
-                fa-circle-o 
-                 
-                "
-        />
-        <span
-          className="step-text"
-        >
-          Add items
-        </span>
-      </button>
+        Add items
+      </div>
     </div>
     <div
-      className="step-container"
+      className="step-container "
     >
-      <button
-        className="step"
+      <div
+        className="circle"
         disabled={true}
         onClick={[Function]}
+        onKeyPress={[Function]}
+        role="button"
+        tabIndex="0"
+      />
+      <div
+        className="step-name"
       >
-        <i
-          aria-hidden="true"
-          className="fa 
-                 
-                 
-                fa-circle-o disabled"
-        />
-        <span
-          className="step-text"
-        >
-          Edit
-        </span>
-      </button>
+        Edit
+      </div>
     </div>
     <div
-      className="step-container"
+      className="step-container "
     >
-      <button
-        className="step"
+      <div
+        className="circle"
         disabled={true}
         onClick={[Function]}
+        onKeyPress={[Function]}
+        role="button"
+        tabIndex="0"
+      />
+      <div
+        className="step-name"
       >
-        <i
-          aria-hidden="true"
-          className="fa 
-                 
-                 
-                fa-circle-o disabled"
-        />
-        <span
-          className="step-text"
-        >
-          Pick
-        </span>
-      </button>
+        Pick
+      </div>
     </div>
     <div
-      className="step-container"
+      className="step-container "
     >
-      <button
-        className="step"
+      <div
+        className="circle"
         disabled={true}
         onClick={[Function]}
+        onKeyPress={[Function]}
+        role="button"
+        tabIndex="0"
+      />
+      <div
+        className="step-name"
       >
-        <i
-          aria-hidden="true"
-          className="fa 
-                 
-                 
-                fa-circle-o disabled"
-        />
-        <span
-          className="step-text"
-        >
-          Send
-        </span>
-      </button>
+        Send
+      </div>
     </div>
   </div>
 </div>
