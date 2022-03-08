@@ -63,6 +63,18 @@ class RoleFilters {
             'stockMovementItemApi': ['getStockMovementItems']
     ]
 
+    def static authenticatedActions = [
+            'api'                 : ['getAppContext', 'getRequestTypes', 'getMenuConfig'],
+            'dashboard'           : ['megamenu'],
+            'dashboardApi'        : ['breadcrumbsConfig'],
+            'grails'              : ['errors'],
+            'localizationApi'     : ['list'],
+            'locationApi'         : ['list'],
+            'productApi'          : ['list', 'productDemand'],
+            'stocklistApi'        : ['list'],
+            'stockMovement'       : ['list'],
+    ]
+
     def filters = {
         readonlyCheck(controller: '*', action: '*') {
             before = {
@@ -83,7 +95,7 @@ class RoleFilters {
                 def isNotRequestor = needRequestorOrManager(controllerName, actionName) && !userService.isUserRequestor(session.user)
                 def isNotRequestorOrManager = needRequestorOrManager(controllerName, actionName) ? !userService.isUserManager(session.user) && !userService.isUserRequestor(session.user) : false
 
-                if (isNotAuthenticated || isNotBrowser || isNotManager || isNotAdmin || isNotSuperuser || hasNoRoleInvoice || (isNotRequestorOrManager && !userService.hasHighestRole(session.user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED)) || (isNotRequestor && userService.hasHighestRole(session.user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED))) {
+                if (isNotAuthenticated || isNotBrowser || isNotManager || isNotAdmin || isNotSuperuser || hasNoRoleInvoice || (isNotRequestorOrManager && !userService.hasHighestRole(session.user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED) && !needAuthenticatedActions(controllerName, actionName)) || (isNotRequestor && userService.hasHighestRole(session.user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED) && !needAuthenticatedActions(controllerName, actionName))) {
                     log.info("User ${session?.user?.username} does not have access to ${controllerName}/${actionName} in location ${session?.warehouse?.name}")
                     redirect(controller: "errors", action: "handleForbidden")
                     return false
@@ -121,5 +133,9 @@ class RoleFilters {
 
     static Boolean needRequestorOrManager(controllerName, actionName) {
         requestorOrManagerActions[controllerName]?.contains(actionName)
+    }
+
+    static Boolean needAuthenticatedActions(controllerName, actionName) {
+        authenticatedActions[controllerName]?.contains(actionName)
     }
 }
