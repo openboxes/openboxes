@@ -64,7 +64,7 @@ export const renderFormFields = ({
               {FieldLabel && <Translate id={FieldLabel} defaultMessage={defaultMessage} />}
               { attr.withTooltip ?
                 <Tooltip
-                  title={tooltip}
+                  title={translate(tooltip, tooltip)}
                 >
                   &nbsp;
                   <i className="fa fa-question-circle-o text-primary" aria-hidden="true" />

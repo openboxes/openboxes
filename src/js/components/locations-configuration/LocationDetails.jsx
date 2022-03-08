@@ -35,7 +35,7 @@ function validate(values) {
 const FIELDS = {
   active: {
     type: CheckboxField,
-    label: 'react.locationConfiguration.locationStatus.label',
+    label: 'react.locationsConfiguration.locationStatus.label',
     defaultMessage: 'Location Status',
     attributes: {
       withLabel: true,
@@ -44,26 +44,26 @@ const FIELDS = {
   },
   name: {
     type: TextField,
-    label: 'react.locationConfiguration.name.label',
+    label: 'react.locationsConfiguration.name.label',
     defaultMessage: 'Name',
     attributes: {
       required: true,
       withTooltip: true,
-      tooltip: 'react.locationConfiguration.name.tooltip.label',
+      tooltip: 'react.locationsConfiguration.name.tooltip.label',
     },
   },
   locationNumber: {
     type: TextField,
-    label: 'react.locationConfiguration.locationNumber.label',
+    label: 'react.locationsConfiguration.locationNumber.label',
     defaultMessage: 'Location Number',
     attributes: {
       withTooltip: true,
-      tooltip: 'react.locationConfiguration.locationNumber.tooltip.label',
+      tooltip: 'react.locationsConfiguration.locationNumber.tooltip.label',
     },
   },
   organization: {
     type: SelectField,
-    label: 'react.locationConfiguration.organization.label',
+    label: 'react.locationsConfiguration.organization.label',
     defaultMessage: 'Organization',
     attributes: {
       async: true,
@@ -73,7 +73,7 @@ const FIELDS = {
       autoload: false,
       cache: false,
       withTooltip: true,
-      tooltip: 'react.locationConfiguration.organization.tooltip.label',
+      tooltip: 'react.locationsConfiguration.organization.tooltip.label',
       options: [],
       filterOptions: options => options,
     },
@@ -83,7 +83,7 @@ const FIELDS = {
   },
   locationGroup: {
     type: SelectField,
-    label: 'react.locationConfiguration.locationGroup.label',
+    label: 'react.locationsConfiguration.locationGroup.label',
     defaultMessage: 'Location Group',
     attributes: {
       async: true,
@@ -92,7 +92,7 @@ const FIELDS = {
       autoload: false,
       cache: false,
       withTooltip: true,
-      tooltip: 'react.locationConfiguration.locationGroup.tooltip.label',
+      tooltip: 'react.locationsConfiguration.locationGroup.tooltip.label',
       options: [],
       filterOptions: options => options,
     },
@@ -102,7 +102,7 @@ const FIELDS = {
   },
   manager: {
     type: SelectField,
-    label: 'react.locationConfiguration.manager.label',
+    label: 'react.locationsConfiguration.manager.label',
     defaultMessage: 'Manager',
     attributes: {
       async: true,
@@ -174,7 +174,7 @@ class LocationDetails extends Component {
       apiClient.post(locationUrl, payload)
         .then((response) => {
           this.props.hideSpinner();
-          Alert.success(this.props.translate('react.locationConfiguration.alert.locationSaveCompleted.label', 'Location was successfully saved!'), { timeout: 3000 });
+          Alert.success(this.props.translate('react.locationsConfiguration.alert.locationSaveCompleted.label', 'Location was successfully saved!'), { timeout: 3000 });
           const resp = response.data.data;
           this.props.nextPage({
             ...values,
@@ -194,44 +194,42 @@ class LocationDetails extends Component {
 
   render() {
     return (
-      <div className="d-flex flex-column">
-        <div className="configuration-wizard-content">
-          <Form
-            onSubmit={values => this.nextPage(values)}
-            validate={validate}
-            initialValues={this.state.values}
-            render={({ form, handleSubmit, values }) => (
-              <form onSubmit={handleSubmit}>
-                <div className="classic-form with-description">
-                  <div className="submit-buttons">
-                    <button type="button" onClick={() => Alert.info(this.props.supportLinks[PAGE_ID])} className="btn btn-outline-primary float-right btn-xs">
-                      <i className="fa fa-question-circle-o" aria-hidden="true" />
-                      &nbsp;
-                      <Translate id="react.default.button.support.label" defaultMessage="Support" />
-                    </button>
-                  </div>
-                  <div className="form-title"><Translate id="react.locationConfiguration.details.label" defaultMessage="Details" /></div>
-                  <div className="form-subtitle"><Translate id="react.locationConfiguration.additionalTitle.label" defaultMessage="Fill in the details for your location. Click the question mark next to the field name to find out more." /></div>
-
-                  {_.map(
-                    FIELDS,
-                    (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-                      active: values.active,
-                      debouncedLocationGroupsFetch: this.debouncedLocationGroupsFetch,
-                      debouncedOrganizationsFetch: this.debouncedOrganizationsFetch,
-                      debouncedUsersFetch: this.debouncedUsersFetch,
-                    }),
-                  )}
-                </div>
+      <div className="configuration-wizard-content flex-column">
+        <Form
+          onSubmit={values => this.nextPage(values)}
+          validate={validate}
+          initialValues={this.state.values}
+          render={({ form, handleSubmit, values }) => (
+            <form onSubmit={handleSubmit} className="w-100">
+              <div className="classic-form with-description">
                 <div className="submit-buttons">
-                  <button type="submit" className="btn btn-outline-primary float-right btn-xs">
-                    <Translate id="react.default.button.next.label" defaultMessage="Next" />
+                  <button type="button" onClick={() => Alert.info(this.props.supportLinks[PAGE_ID])} className="btn btn-outline-primary float-right btn-xs">
+                    <i className="fa fa-question-circle-o" aria-hidden="true" />
+                    &nbsp;
+                    <Translate id="react.default.button.support.label" defaultMessage="Support" />
                   </button>
                 </div>
-              </form>
-            )}
-          />
-        </div>
+                <div className="form-title"><Translate id="react.locationsConfiguration.details.label" defaultMessage="Details" /></div>
+                <div className="form-subtitle"><Translate id="react.locationsConfiguration.additionalTitle.label" defaultMessage="Fill in the details for your location. Click the question mark next to the field name to find out more." /></div>
+
+                {_.map(
+                  FIELDS,
+                  (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
+                    active: values.active,
+                    debouncedLocationGroupsFetch: this.debouncedLocationGroupsFetch,
+                    debouncedOrganizationsFetch: this.debouncedOrganizationsFetch,
+                    debouncedUsersFetch: this.debouncedUsersFetch,
+                  }),
+                )}
+              </div>
+              <div className="submit-buttons">
+                <button type="submit" className="btn btn-outline-primary float-right btn-xs">
+                  <Translate id="react.default.button.next.label" defaultMessage="Next" />
+                </button>
+              </div>
+            </form>
+          )}
+        />
       </div>
     );
   }

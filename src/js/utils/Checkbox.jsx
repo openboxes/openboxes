@@ -29,7 +29,7 @@ const Checkbox = ({
 
   if (withLabel) {
     return (
-      <div>
+      <div className="d-flex align-items-center">
         <input
           type="checkbox"
           ref={(elem) => {
@@ -45,7 +45,7 @@ const Checkbox = ({
           {...props}
           onChange={onChange}
         />
-        <label htmlFor={props.id}>{label}</label>
+        <label htmlFor={props.id} style={{ margin: '0 0 0 5px' }}>{label}</label>
       </div>
     );
   }
