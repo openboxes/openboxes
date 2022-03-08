@@ -11,28 +11,13 @@ import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
 import VerticalTabs from '../Layout/VerticalTabs';
 import apiClient from '../../utils/apiClient';
 import { showSpinner, hideSpinner } from '../../actions';
+import ImportCategories from './ImportCategories';
 
 const INITIAL_STATE = {
-  categoryOptions: [],
+  categoryOptions: {},
 };
 
 const PAGE_ID = 'configureCategories';
-
-function getCategoryTreeContent(title) {
-  return (
-    <div className="d-flex justify-content-center p-5">
-      <h3>{title}</h3>
-    </div>
-  );
-}
-
-function getImportFromExcelTabContent() {
-  return (
-    <div className="d-flex justify-content-center p-5">
-      <h3><Translate id="react.productsConfiguration.importFromExcel.label" defaultMessage="Import from Excel" /></h3>
-    </div>
-  );
-}
 
 class ConfigureProductCategories extends Component {
   constructor(props) {
@@ -56,16 +41,45 @@ class ConfigureProductCategories extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  getCategoryTreeContent(category, categoryName) {
+    return (
+      <div className="d-flex flex-column align-items-center p-5">
+        <h3>{category.title}</h3>
+        <div className="my-3">{category.description}</div>
+        <div>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => this.importCategory(categoryName)}
+          >
+            <Translate id="react.productsConfiguration.importCategories.label" defaultMessage="Import Categories" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   getTabs() {
     const tabs = {};
-
-    _.forEach(this.state.categoryOptions, (category) => {
-      tabs[category.title] = getCategoryTreeContent(category.title);
+    _.forEach(this.state.categoryOptions, (category, categoryName) => {
+      tabs[category.title] = this.getCategoryTreeContent(category, categoryName);
     });
 
-    tabs[`${this.props.translate('react.productsConfiguration.importFromExcel.label', 'Import from Excel')}`] = getImportFromExcelTabContent();
+    tabs[`${this.props.translate('react.productsConfiguration.importFromExcel.label', 'Import from Excel')}`] = <ImportCategories />;
 
     return tabs;
+  }
+
+  importCategory(categoryName) {
+    this.props.showSpinner();
+    const url = `/openboxes/api/productsConfiguration/importCategories?categoryOption=${categoryName}`;
+
+    apiClient.post(url)
+      .then(() => {
+        this.props.hideSpinner();
+        Alert.success(this.props.translate('react.productsConfiguration.importSuccessful.label', 'Categories imported successfully'));
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   render() {
