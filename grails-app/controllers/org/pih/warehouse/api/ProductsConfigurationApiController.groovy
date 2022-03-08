@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.Category
 
 class ProductsConfigurationApiController {
@@ -32,7 +33,39 @@ class ProductsConfigurationApiController {
 
     def importCategories = {
         productService.importCategories(params.categoryOption)
-        return 200
+
+        render status: 200
+    }
+
+    def importCategoryCsv = { ImportDataCommand command ->
+        try {
+            def importFile = command.importFile
+
+            if (importFile.isEmpty()) {
+                throw new IllegalArgumentException("File cannot be empty")
+            }
+
+            if (importFile.fileItem.contentType != "text/csv") {
+                throw new IllegalArgumentException("File must be in CSV format")
+            }
+
+            String csv = new String(importFile.bytes)
+
+            productService.importCategoryCsv(csv)
+        } catch (Exception e) {
+            response.status = 500
+            render([errorCode: 500, errorMessage: e?.message ?: "An unknown error occurred during import"] as JSON)
+            return
+        }
+
+        render status: 200
+    }
+
+    def downloadCategoryTemplate = {
+        def csv = "Category Name,Parent Category Name\n"
+
+        response.setHeader("Content-disposition", "attachment; filename=\"Category_template.csv\"")
+        render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
     }
 
     def importProducts = {
@@ -41,7 +74,8 @@ class ProductsConfigurationApiController {
         }
 
         productService.importProductsFromConfig(params.productOption)
-        return 200
+
+        render status: 200
     }
 
     def categoryOptions = {

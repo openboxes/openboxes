@@ -515,6 +515,16 @@ class UrlMappings {
             action = [POST: "importCategories"]
         }
 
+        "/api/productsConfiguration/importCategoryCsv"(parseRequest: true) {
+            controller = { "productsConfigurationApi" }
+            action = [POST: "importCategoryCsv"]
+        }
+
+        "/api/productsConfiguration/downloadCategoryTemplate"(parseRequest: true) {
+            controller = { "productsConfigurationApi" }
+            action = [GET: "downloadCategoryTemplate"]
+        }
+
         "/api/productsConfiguration/categoryOptions"(parseRequest: true) {
             controller = { "productsConfigurationApi" }
             action = [GET: "categoryOptions"]

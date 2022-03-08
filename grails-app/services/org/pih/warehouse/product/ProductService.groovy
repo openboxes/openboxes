@@ -1290,26 +1290,35 @@ class ProductService {
 
             // Find existing root category or create one with the configured root name or the Constants.ROOT_CATEGORY_NAME
             def rootCategoryName = categoryOptionConfig.rootCategoryName ?: Constants.ROOT_CATEGORY_NAME
-            def rootCategory = findOrCreateRootCategory(rootCategoryName)
 
             def categoryNameColumnIndex = categoryOptionConfig.categoryNameColumnIndex ?: 0
             def parentCategoryNameColumnIndex = categoryOptionConfig.parentCategoryNameColumnIndex ?: 1
 
-            def settings = [separatorChar: ',', skipLines: 1]
-            csv.toCsvReader(settings).eachLine { tokens ->
-                def categoryName = tokens[categoryNameColumnIndex]
-                def parentCategoryName = tokens[parentCategoryNameColumnIndex]
-
-                def category
-                if (parentCategoryName.toUpperCase() == categoryOptionConfig.rootCategoryName) {
-                    category = findOrCreateCategoryWithParentCategory(categoryName, rootCategory)
-                } else {
-                    def parentCategory = Category.findByName(parentCategoryName)
-                    category = findOrCreateCategoryWithParentCategory(categoryName, parentCategory)
-                }
-            }
+            importCategoryCsv(csv, rootCategoryName, categoryNameColumnIndex, parentCategoryNameColumnIndex)
         } else if (enabled && !categoryOption) {
             // TODO OBDS-86: This is for excel import done by user
+        }
+    }
+
+    def importCategoryCsv(String csv) {
+        importCategoryCsv(csv, Constants.ROOT_CATEGORY_NAME, 0, 1)
+    }
+
+    def importCategoryCsv(String csv, def rootCategoryName, def categoryNameColumnIndex, def parentCategoryNameColumnIndex) {
+        def rootCategory = findOrCreateRootCategory(rootCategoryName)
+
+        def settings = [separatorChar: ',', skipLines: 1]
+        csv.toCsvReader(settings).eachLine { tokens ->
+            def categoryName = tokens[categoryNameColumnIndex]
+            def parentCategoryName = tokens[parentCategoryNameColumnIndex]
+
+            def category
+            if (parentCategoryName.toUpperCase() == rootCategoryName) {
+                category = findOrCreateCategoryWithParentCategory(categoryName, rootCategory)
+            } else {
+                def parentCategory = Category.findByName(parentCategoryName)
+                category = findOrCreateCategoryWithParentCategory(categoryName, parentCategory)
+            }
         }
     }
 
