@@ -1,7 +1,7 @@
 import React from 'react';
 
-import BaseField from './BaseField';
-import Select from '../../utils/Select';
+import BaseField from 'components/form-elements/BaseField';
+import Select from 'utils/Select';
 
 const SelectField = (props) => {
   // eslint-disable-next-line react/prop-types

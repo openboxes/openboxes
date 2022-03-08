@@ -1,19 +1,20 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
+import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
+import { hideSpinner, showSpinner } from 'actions';
+import SelectField from 'components/form-elements/SelectField';
+import TextField from 'components/form-elements/TextField';
+import apiClient, { parseResponse } from 'utils/apiClient';
+import { renderFormField } from 'utils/form-utils';
+import { debounceLocationsFetch } from 'utils/option-utils';
+import Translate from 'utils/Translate';
 
-import TextField from '../../form-elements/TextField';
-import SelectField from '../../form-elements/SelectField';
-import { renderFormField } from '../../../utils/form-utils';
-import apiClient, { parseResponse } from '../../../utils/apiClient';
-import { showSpinner, hideSpinner } from '../../../actions';
-import { debounceLocationsFetch } from '../../../utils/option-utils';
-import Translate from '../../../utils/Translate';
+import 'react-confirm-alert/src/react-confirm-alert.css';
 
 function validate(values) {
   const errors = {};

@@ -1,17 +1,21 @@
-import _ from 'lodash';
-import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import 'react-confirm-alert/src/react-confirm-alert.css';
+
+import _ from 'lodash';
+import moment from 'moment';
+import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import moment from 'moment';
-import { fetchTranslations, hideSpinner, showSpinner } from '../../actions';
-import apiClient, { parseResponse } from '../../utils/apiClient';
-import { translateWithDefaultMessage } from '../../utils/Translate';
-import '../stock-movement-wizard/StockMovement.scss';
-import Wizard from '../wizard/Wizard';
-import PartialReceivingPage from './PartialReceivingPage';
-import ReceivingCheckScreen from './ReceivingCheckScreen';
+
+import { fetchTranslations, hideSpinner, showSpinner } from 'actions';
+import PartialReceivingPage from 'components/receiving/PartialReceivingPage';
+import ReceivingCheckScreen from 'components/receiving/ReceivingCheckScreen';
+import Wizard from 'components/wizard/Wizard';
+import apiClient, { parseResponse } from 'utils/apiClient';
+import { translateWithDefaultMessage } from 'utils/Translate';
+
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import 'components/stock-movement-wizard/StockMovement.scss';
+
 
 /** Main partial receiving form's component. */
 class ReceivingPage extends Component {

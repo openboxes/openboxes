@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 
-import WizardSteps from '../wizard/WizardSteps';
-import WizardPage from '../wizard/WizardPage';
-import WizardTitle from '../wizard/WizardTitle';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+
+import WizardPage from 'components/wizard/WizardPage';
+import WizardSteps from 'components/wizard/WizardSteps';
+import WizardTitle from 'components/wizard/WizardTitle';
+
 
 /** Wizard component. */
 class Wizard extends Component {

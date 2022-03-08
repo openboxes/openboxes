@@ -1,10 +1,12 @@
 import React from 'react';
-import { setActiveLanguage, getLanguages } from 'react-localize-redux';
-import { connect } from 'react-redux';
+
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import Translate from '../../utils/Translate';
-import { changeCurrentLocale } from '../../actions';
+import { getLanguages, setActiveLanguage } from 'react-localize-redux';
+import { connect } from 'react-redux';
+
+import { changeCurrentLocale } from 'actions';
+import Translate from 'utils/Translate';
 
 
 const Footer = ({

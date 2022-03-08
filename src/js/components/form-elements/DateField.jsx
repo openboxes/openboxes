@@ -1,12 +1,13 @@
 /* eslint-disable react/prop-types */
 import React, { Component } from 'react';
+
+import moment from 'moment';
 import DatePicker from 'react-datepicker';
 import { Portal } from 'react-overlays';
-import moment from 'moment';
+
+import BaseField from 'components/form-elements/BaseField';
 
 import 'react-datepicker/dist/react-datepicker.css';
-
-import BaseField from './BaseField';
 
 const CalendarContainer = ({ children }) => {
   const el = document.getElementById('root');

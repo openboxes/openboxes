@@ -1,7 +1,9 @@
 import React from 'react';
+
 import renderer from 'react-test-renderer';
-import CheckboxField from '../../components/form-elements/CheckboxField';
-import { renderFormField } from '../../utils/form-utils';
+
+import CheckboxField from 'components/form-elements/CheckboxField';
+import { renderFormField } from 'utils/form-utils';
 
 jest.mock('react-final-form', () => ({
   Field: (props) => {

@@ -1,19 +1,21 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { Tooltip } from 'react-tippy';
+
 import update from 'immutability-helper';
+import _ from 'lodash';
 import PropTypes from 'prop-types';
-import Modal from 'react-modal';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
+import Modal from 'react-modal';
 import connect from 'react-redux/es/connect/connect';
+import { Tooltip } from 'react-tippy';
+
+import Input from 'utils/Input';
+import Select from 'utils/Select';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'react-tippy/dist/tippy.css';
 
-import Input from '../../utils/Input';
-import Select from '../../utils/Select';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
 
 /**
  * Modal window where user can split put-away's line. It has details of the line

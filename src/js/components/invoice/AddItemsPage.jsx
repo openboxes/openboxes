@@ -1,21 +1,23 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+
+import arrayMutators from 'final-form-arrays';
+import update from 'immutability-helper';
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
-import arrayMutators from 'final-form-arrays';
-import _ from 'lodash';
-import update from 'immutability-helper';
+import { connect } from 'react-redux';
 
-import { showSpinner, hideSpinner } from '../../actions';
-import Translate from '../../utils/Translate';
-import ArrayField from '../form-elements/ArrayField';
-import LabelField from '../form-elements/LabelField';
-import { renderFormField } from '../../utils/form-utils';
-import accountingFormat from '../../utils/number-utils';
-import apiClient from '../../utils/apiClient';
-import InvoiceItemsModal from './InvoiceItemsModal';
-import ButtonField from '../form-elements/ButtonField';
-import TextField from '../form-elements/TextField';
+import { hideSpinner, showSpinner } from 'actions';
+import ArrayField from 'components/form-elements/ArrayField';
+import ButtonField from 'components/form-elements/ButtonField';
+import LabelField from 'components/form-elements/LabelField';
+import TextField from 'components/form-elements/TextField';
+import InvoiceItemsModal from 'components/invoice/InvoiceItemsModal';
+import apiClient from 'utils/apiClient';
+import { renderFormField } from 'utils/form-utils';
+import accountingFormat from 'utils/number-utils';
+import Translate from 'utils/Translate';
+
 
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,

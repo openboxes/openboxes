@@ -1,32 +1,34 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
-import Dropzone from 'react-dropzone';
-import Alert from 'react-s-alert';
-import { Form } from 'react-final-form';
-import arrayMutators from 'final-form-arrays';
-import { getTranslate } from 'react-localize-redux';
-import { confirmAlert } from 'react-confirm-alert';
-import { Tooltip } from 'react-tippy';
-import axios from 'axios';
 
+import axios from 'axios';
+import arrayMutators from 'final-form-arrays';
+import _ from 'lodash';
 import moment from 'moment';
+import PropTypes from 'prop-types';
+import { confirmAlert } from 'react-confirm-alert';
+import Dropzone from 'react-dropzone';
+import { Form } from 'react-final-form';
+import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+import Alert from 'react-s-alert';
+import { Tooltip } from 'react-tippy';
+
+import { hideSpinner, showSpinner } from 'actions';
+import DocumentButton from 'components/DocumentButton';
+import ArrayField from 'components/form-elements/ArrayField';
+import DateField from 'components/form-elements/DateField';
+import LabelField from 'components/form-elements/LabelField';
+import SelectField from 'components/form-elements/SelectField';
+import TextField from 'components/form-elements/TextField';
+import AlertMessage from 'utils/AlertMessage';
+import { handleError, handleSuccess } from 'utils/apiClient';
+import { renderFormField } from 'utils/form-utils';
+import { debounceLocationsFetch } from 'utils/option-utils';
+import renderHandlingIcons from 'utils/product-handling-icons';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-import { renderFormField } from '../../../utils/form-utils';
-import { showSpinner, hideSpinner } from '../../../actions';
-import { handleError, handleSuccess } from '../../../utils/apiClient';
-import DateField from '../../form-elements/DateField';
-import DocumentButton from '../../DocumentButton';
-import SelectField from '../../form-elements/SelectField';
-import TextField from '../../form-elements/TextField';
-import LabelField from '../../form-elements/LabelField';
-import { debounceLocationsFetch } from '../../../utils/option-utils';
-import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
-import ArrayField from '../../form-elements/ArrayField';
-import renderHandlingIcons from '../../../utils/product-handling-icons';
-import AlertMessage from '../../../utils/AlertMessage';
 
 const SHIPMENT_FIELDS = {
   'origin.name': {

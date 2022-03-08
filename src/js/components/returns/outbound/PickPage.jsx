@@ -1,20 +1,21 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { Form } from 'react-final-form';
+
 import arrayMutators from 'final-form-arrays';
+import _ from 'lodash';
 import PropTypes from 'prop-types';
+import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+
+import { hideSpinner, showSpinner } from 'actions';
+import ArrayField from 'components/form-elements/ArrayField';
+import LabelField from 'components/form-elements/LabelField';
+import apiClient from 'utils/apiClient';
+import { renderFormField } from 'utils/form-utils';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-import ArrayField from '../../form-elements/ArrayField';
-import LabelField from '../../form-elements/LabelField';
-import { renderFormField } from '../../../utils/form-utils';
-
-import { showSpinner, hideSpinner } from '../../../actions';
-import apiClient from '../../../utils/apiClient';
-import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
 
 const FIELDS = {
   picklistItems: {

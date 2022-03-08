@@ -1,19 +1,21 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
+
+import _ from 'lodash';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 import ReactTable from 'react-table';
 import selectTableHOC from 'react-table/lib/hoc/selectTable';
-import PropTypes from 'prop-types';
-import { withRouter } from 'react-router-dom';
+
+import { fetchBreadcrumbsConfig, hideSpinner, showSpinner, updateBreadcrumbs } from 'actions';
+import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import customTreeTableHOC from 'utils/CustomTreeTable';
+import Filter from 'utils/Filter';
+import Select from 'utils/Select';
+import Translate from 'utils/Translate';
 
 import 'react-table/react-table.css';
 
-import customTreeTableHOC from '../../utils/CustomTreeTable';
-import Select from '../../utils/Select';
-import apiClient, { parseResponse, flattenRequest } from '../../utils/apiClient';
-import { showSpinner, hideSpinner, updateBreadcrumbs, fetchBreadcrumbsConfig } from '../../actions';
-import Filter from '../../utils/Filter';
-import Translate from '../../utils/Translate';
 
 const SelectTreeTable = selectTableHOC(customTreeTableHOC(ReactTable));
 

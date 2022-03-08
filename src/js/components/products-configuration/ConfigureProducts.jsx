@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
+
 import PropTypes from 'prop-types';
 import Alert from 'react-s-alert';
 
+import Translate from 'utils/Translate';
+
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-import Translate from '../../utils/Translate';
 
 const INITIAL_STATE = {};
 

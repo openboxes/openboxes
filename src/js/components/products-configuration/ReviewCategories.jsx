@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
-import Alert from 'react-s-alert';
+
 import fileDownload from 'js-file-download';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import Alert from 'react-s-alert';
+
+import { hideSpinner, showSpinner } from 'actions';
+import apiClient from 'utils/apiClient';
+import Translate from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-
-import { hideSpinner, showSpinner } from '../../actions';
-import apiClient from '../../utils/apiClient';
-import Translate from '../../utils/Translate';
 
 const INITIAL_STATE = {
   categoriesCount: 0,

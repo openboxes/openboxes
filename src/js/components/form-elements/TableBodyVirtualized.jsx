@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { AutoSizer, InfiniteLoader, List } from 'react-virtualized';
-import _ from 'lodash';
-import { connect } from 'react-redux';
 
-import TableRow from './TableRow';
+import _ from 'lodash';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { AutoSizer, InfiniteLoader, List } from 'react-virtualized';
+
+import TableRow from 'components/form-elements/TableRow';
+
 
 class TableBodyVirtualized extends Component {
   constructor(props) {

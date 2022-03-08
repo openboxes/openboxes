@@ -1,21 +1,23 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import ReactTable from 'react-table';
+
+import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { getTranslate } from 'react-localize-redux';
 import { confirmAlert } from 'react-confirm-alert';
+import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
+import ReactTable from 'react-table';
+
+import { hideSpinner, showSpinner } from 'actions';
+import { extractNonCanceledItems } from 'components/stock-transfer/utils';
+import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import customTreeTableHOC from 'utils/CustomTreeTable';
+import Filter from 'utils/Filter';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-table/react-table.css';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-import customTreeTableHOC from '../../utils/CustomTreeTable';
-import apiClient, { flattenRequest, parseResponse } from '../../utils/apiClient';
-import { showSpinner, hideSpinner } from '../../actions';
-import Filter from '../../utils/Filter';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
-import { extractNonCanceledItems } from './utils';
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
 

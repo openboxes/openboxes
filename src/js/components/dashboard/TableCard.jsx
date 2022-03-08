@@ -1,5 +1,7 @@
 import React from 'react';
+
 import PropTypes from 'prop-types';
+
 
 /* global _ */
 const TableCard = props => (

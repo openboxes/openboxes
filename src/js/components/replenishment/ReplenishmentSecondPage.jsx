@@ -1,23 +1,24 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { Form } from 'react-final-form';
+
 import arrayMutators from 'final-form-arrays';
+import _ from 'lodash';
 import PropTypes from 'prop-types';
+import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+
+import { hideSpinner, showSpinner } from 'actions';
+import ArrayField from 'components/form-elements/ArrayField';
+import ButtonField from 'components/form-elements/ButtonField';
+import LabelField from 'components/form-elements/LabelField';
+import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
+import EditPickModal from 'components/replenishment/EditPickModal';
+import apiClient from 'utils/apiClient';
+import { renderFormField } from 'utils/form-utils';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-import ArrayField from '../form-elements/ArrayField';
-import ButtonField from '../form-elements/ButtonField';
-import LabelField from '../form-elements/LabelField';
-import { renderFormField } from '../../utils/form-utils';
-
-import EditPickModal from './EditPickModal';
-import { showSpinner, hideSpinner } from '../../actions';
-import TableRowWithSubfields from '../form-elements/TableRowWithSubfields';
-import apiClient from '../../utils/apiClient';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
 
 const FIELDS = {
   replenishmentItems: {

@@ -1,21 +1,23 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
+
+import update from 'immutability-helper';
+import _ from 'lodash';
+import PropTypes from 'prop-types';
+import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import ReactTable from 'react-table';
-import PropTypes from 'prop-types';
-import update from 'immutability-helper';
-import { getTranslate } from 'react-localize-redux';
 import { Tooltip } from 'react-tippy';
+
+import { hideSpinner, showSpinner } from 'actions';
+import { extractStockTransferItems, prepareRequest } from 'components/stock-transfer/utils';
+import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import customTreeTableHOC from 'utils/CustomTreeTable';
+import Filter from 'utils/Filter';
+import Select from 'utils/Select';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-table/react-table.css';
 
-import customTreeTableHOC from '../../utils/CustomTreeTable';
-import Select from '../../utils/Select';
-import apiClient, { flattenRequest, parseResponse } from '../../utils/apiClient';
-import { showSpinner, hideSpinner } from '../../actions';
-import Filter from '../../utils/Filter';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
-import { extractStockTransferItems, prepareRequest } from './utils';
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
 

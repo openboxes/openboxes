@@ -1,24 +1,27 @@
+import React, { Component } from 'react';
+
 import arrayMutators from 'final-form-arrays';
 import update from 'immutability-helper';
 import fileDownload from 'js-file-download';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { fetchUsers, hideSpinner, showSpinner } from '../../actions';
-import apiClient, { flattenRequest, parseResponse } from '../../utils/apiClient';
-import Checkbox from '../../utils/Checkbox';
-import { renderFormField } from '../../utils/form-utils';
-import Select from '../../utils/Select';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
-import ArrayField from '../form-elements/ArrayField';
-import LabelField from '../form-elements/LabelField';
-import SelectField from '../form-elements/SelectField';
-import TableRowWithSubfields from '../form-elements/TableRowWithSubfields';
-import TextField from '../form-elements/TextField';
-import EditLineModal from './modals/EditLineModal';
+
+import { fetchUsers, hideSpinner, showSpinner } from 'actions';
+import ArrayField from 'components/form-elements/ArrayField';
+import LabelField from 'components/form-elements/LabelField';
+import SelectField from 'components/form-elements/SelectField';
+import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
+import TextField from 'components/form-elements/TextField';
+import EditLineModal from 'components/receiving/modals/EditLineModal';
+import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import Checkbox from 'utils/Checkbox';
+import { renderFormField } from 'utils/form-utils';
+import Select from 'utils/Select';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+
 
 const isReceived = (subfield, fieldValue) => {
   if (!fieldValue) {

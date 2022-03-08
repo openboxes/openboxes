@@ -1,19 +1,21 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-underscore-dangle */
-import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { getTranslate } from 'react-localize-redux';
-import { Tooltip } from 'react-tippy';
+
+import PropTypes from 'prop-types';
 import { Bar, Doughnut, HorizontalBar, Line } from 'react-chartjs-2';
+import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
 import { SortableElement } from 'react-sortable-hoc';
-import DragHandle from './DragHandle';
-import LoadingCard from './LoadingCard';
-import Numbers from './Numbers';
-import NumbersTableCard from './NumbersTableCard';
-import TableCard from './TableCard';
-import NumbersRAG from './NumbersRAG';
-import { translateWithDefaultMessage } from '../../utils/Translate';
+import { Tooltip } from 'react-tippy';
+
+import DragHandle from 'components/dashboard/DragHandle';
+import LoadingCard from 'components/dashboard/LoadingCard';
+import Numbers from 'components/dashboard/Numbers';
+import NumbersRAG from 'components/dashboard/NumbersRAG';
+import NumbersTableCard from 'components/dashboard/NumbersTableCard';
+import TableCard from 'components/dashboard/TableCard';
+import { translateWithDefaultMessage } from 'utils/Translate';
 
 
 class FilterComponent extends Component {

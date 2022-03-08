@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+
 import PropTypes from 'prop-types';
-import Translate from '../../utils/Translate';
-import GlobalSearch from '../GlobalSearch';
-import LocationChooser from '../location/LocationChooser';
-import UserActionMenu from '../user/UserActionMenu';
-import apiClient from '../../utils/apiClient';
+import { connect } from 'react-redux';
+
+import GlobalSearch from 'components/GlobalSearch';
+import LocationChooser from 'components/location/LocationChooser';
+import UserActionMenu from 'components/user/UserActionMenu';
+import apiClient from 'utils/apiClient';
+import Translate from 'utils/Translate';
 
 
 class Header extends Component {

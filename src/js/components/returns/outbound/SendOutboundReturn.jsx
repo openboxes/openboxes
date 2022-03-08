@@ -1,25 +1,25 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { Form } from 'react-final-form';
+
 import arrayMutators from 'final-form-arrays';
-import PropTypes from 'prop-types';
-import { getTranslate } from 'react-localize-redux';
+import _ from 'lodash';
 import moment from 'moment';
+import PropTypes from 'prop-types';
 import { confirmAlert } from 'react-confirm-alert';
+import { Form } from 'react-final-form';
+import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+
+import { hideSpinner, showSpinner } from 'actions';
+import ArrayField from 'components/form-elements/ArrayField';
+import DateField from 'components/form-elements/DateField';
+import LabelField from 'components/form-elements/LabelField';
+import SelectField from 'components/form-elements/SelectField';
+import TextField from 'components/form-elements/TextField';
+import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import { renderFormField } from 'utils/form-utils';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-
-import ArrayField from '../../form-elements/ArrayField';
-import DateField from '../../form-elements/DateField';
-import LabelField from '../../form-elements/LabelField';
-import SelectField from '../../form-elements/SelectField';
-import TextField from '../../form-elements/TextField';
-import { renderFormField } from '../../../utils/form-utils';
-
-import { showSpinner, hideSpinner } from '../../../actions';
-import apiClient, { parseResponse, flattenRequest } from '../../../utils/apiClient';
-import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
 
 const SHIPMENT_FIELDS = {
   'origin.name': {

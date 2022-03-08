@@ -1,29 +1,31 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
-import fileDownload from 'js-file-download';
-import { Form } from 'react-final-form';
+
 import arrayMutators from 'final-form-arrays';
-import Alert from 'react-s-alert';
-import { confirmAlert } from 'react-confirm-alert';
-import { getTranslate } from 'react-localize-redux';
-import moment from 'moment';
 import update from 'immutability-helper';
+import fileDownload from 'js-file-download';
+import _ from 'lodash';
+import moment from 'moment';
+import PropTypes from 'prop-types';
+import { confirmAlert } from 'react-confirm-alert';
+import { Form } from 'react-final-form';
+import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+import Alert from 'react-s-alert';
+
+import { fetchUsers, hideSpinner, showSpinner } from 'actions';
+import ArrayField from 'components/form-elements/ArrayField';
+import ButtonField from 'components/form-elements/ButtonField';
+import LabelField from 'components/form-elements/LabelField';
+import SelectField from 'components/form-elements/SelectField';
+import TextField from 'components/form-elements/TextField';
+import apiClient from 'utils/apiClient';
+import { renderFormField } from 'utils/form-utils';
+import { debounceProductsFetch } from 'utils/option-utils';
+import renderHandlingIcons from 'utils/product-handling-icons';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-import TextField from '../../form-elements/TextField';
-import SelectField from '../../form-elements/SelectField';
-import ArrayField from '../../form-elements/ArrayField';
-import ButtonField from '../../form-elements/ButtonField';
-import LabelField from '../../form-elements/LabelField';
-import { renderFormField } from '../../../utils/form-utils';
-import { showSpinner, hideSpinner, fetchUsers } from '../../../actions';
-import apiClient from '../../../utils/apiClient';
-import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
-import { debounceProductsFetch } from '../../../utils/option-utils';
-import renderHandlingIcons from '../../../utils/product-handling-icons';
 
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,

@@ -1,8 +1,9 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import ReactSelect, { Async } from 'react-select-plus';
-import { Overlay } from 'react-overlays';
+
+import _ from 'lodash';
 import PropTypes from 'prop-types';
+import { Overlay } from 'react-overlays';
+import ReactSelect, { Async } from 'react-select-plus';
 import { Tooltip } from 'react-tippy';
 
 import 'react-select-plus/dist/react-select-plus.css';

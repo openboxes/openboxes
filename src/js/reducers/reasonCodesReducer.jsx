@@ -1,5 +1,6 @@
 import _ from 'lodash';
-import { FETCH_REASONCODES } from '../actions/types';
+
+import { FETCH_REASONCODES } from 'actions/types';
 
 const initialState = {
   data: [],

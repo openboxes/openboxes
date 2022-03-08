@@ -1,8 +1,11 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
+
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Tooltip } from 'react-tippy';
-import { renderFormField } from '../../utils/form-utils';
+
+import { renderFormField } from 'utils/form-utils';
+
 
 class TableRow extends Component {
   shouldComponentUpdate(nextProps) {

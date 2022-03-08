@@ -1,35 +1,36 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { Form } from 'react-final-form';
-import arrayMutators from 'final-form-arrays';
-import PropTypes from 'prop-types';
-import { getTranslate } from 'react-localize-redux';
-import fileDownload from 'js-file-download';
-import update from 'immutability-helper';
-import Alert from 'react-s-alert';
-import { confirmAlert } from 'react-confirm-alert';
+
 import axios from 'axios';
+import arrayMutators from 'final-form-arrays';
+import update from 'immutability-helper';
+import fileDownload from 'js-file-download';
+import _ from 'lodash';
+import PropTypes from 'prop-types';
+import { confirmAlert } from 'react-confirm-alert';
+import { Form } from 'react-final-form';
+import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+import Alert from 'react-s-alert';
+
+import { fetchReasonCodes, hideSpinner, showSpinner } from 'actions';
+import ArrayField from 'components/form-elements/ArrayField';
+import ButtonField from 'components/form-elements/ButtonField';
+import LabelField from 'components/form-elements/LabelField';
+import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
+import EditPickModal from 'components/stock-movement-wizard/modals/EditPickModal';
+import AlertMessage from 'utils/AlertMessage';
+import {
+  flattenRequest,
+  handleError,
+  handleSuccess,
+  parseResponse,
+} from 'utils/apiClient';
+import { renderFormField } from 'utils/form-utils';
+import renderHandlingIcons from 'utils/product-handling-icons';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-import ArrayField from '../../form-elements/ArrayField';
-import LabelField from '../../form-elements/LabelField';
-import { renderFormField } from '../../../utils/form-utils';
-
-import EditPickModal from '../modals/EditPickModal';
-import { showSpinner, hideSpinner, fetchReasonCodes } from '../../../actions';
-import TableRowWithSubfields from '../../form-elements/TableRowWithSubfields';
-import {
-  parseResponse,
-  flattenRequest,
-  handleSuccess,
-  handleError,
-} from '../../../utils/apiClient';
-import ButtonField from '../../form-elements/ButtonField';
-import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
-import renderHandlingIcons from '../../../utils/product-handling-icons';
-import AlertMessage from '../../../utils/AlertMessage';
 
 const FIELDS = {
   pickPageItems: {

@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
-import { fetchTranslations } from '../../actions';
-import Translate from '../../utils/Translate';
+import { fetchTranslations } from 'actions';
+import Translate from 'utils/Translate';
 
-import './WelcomeModal.scss';
+import 'components/locations-configuration/WelcomeModal.scss';
 
 class WelcomeModal extends Component {
   componentDidMount() {

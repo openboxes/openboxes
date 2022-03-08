@@ -1,17 +1,19 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
+
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import ModalWrapper from '../../form-elements/ModalWrapper';
-import TextField from '../../form-elements/TextField';
-import ArrayField from '../../form-elements/ArrayField';
-import LabelField from '../../form-elements/LabelField';
-import SelectField from '../../form-elements/SelectField';
-import { showSpinner, hideSpinner } from '../../../actions';
-import { debounceUsersFetch } from '../../../utils/option-utils';
-import Translate from '../../../utils/Translate';
-import renderHandlingIcons from '../../../utils/product-handling-icons';
+import { hideSpinner, showSpinner } from 'actions';
+import ArrayField from 'components/form-elements/ArrayField';
+import LabelField from 'components/form-elements/LabelField';
+import ModalWrapper from 'components/form-elements/ModalWrapper';
+import SelectField from 'components/form-elements/SelectField';
+import TextField from 'components/form-elements/TextField';
+import { debounceUsersFetch } from 'utils/option-utils';
+import renderHandlingIcons from 'utils/product-handling-icons';
+import Translate from 'utils/Translate';
+
 
 const FIELDS = {
   splitLineItems: {

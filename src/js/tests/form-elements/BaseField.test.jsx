@@ -1,6 +1,8 @@
 import React from 'react';
+
 import renderer from 'react-test-renderer';
-import BaseField from '../../components/form-elements/BaseField';
+
+import BaseField from 'components/form-elements/BaseField';
 
 jest.mock('react-final-form', () => ({
   Field: (props) => {

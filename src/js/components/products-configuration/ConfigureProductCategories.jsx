@@ -1,17 +1,18 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+
+import _ from 'lodash';
 import PropTypes from 'prop-types';
-import Alert from 'react-s-alert';
 import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+import Alert from 'react-s-alert';
+
+import { hideSpinner, showSpinner } from 'actions';
+import VerticalTabs from 'components/Layout/VerticalTabs';
+import ImportCategories from 'components/products-configuration/ImportCategories';
+import apiClient from 'utils/apiClient';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
-import VerticalTabs from '../Layout/VerticalTabs';
-import apiClient from '../../utils/apiClient';
-import { showSpinner, hideSpinner } from '../../actions';
-import ImportCategories from './ImportCategories';
 
 const INITIAL_STATE = {
   categoryOptions: {},

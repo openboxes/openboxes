@@ -1,7 +1,8 @@
 import React from 'react';
 
-import BaseField from './BaseField';
-import Input from '../../utils/Input';
+import BaseField from 'components/form-elements/BaseField';
+import Input from 'utils/Input';
+
 
 const TextField = (props) => {
   const renderInput = attributes => (

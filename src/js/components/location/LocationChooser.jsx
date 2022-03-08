@@ -1,17 +1,19 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import Modal from 'react-modal';
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+
+import _ from 'lodash';
 import PropTypes from 'prop-types';
+import Modal from 'react-modal';
+import { connect } from 'react-redux';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
 import {
   changeCurrentLocation,
-  showLocationChooser,
-  hideLocationChooser,
   fetchSessionInfo,
-} from '../../actions';
-import apiClient from '../../utils/apiClient';
+  hideLocationChooser,
+  showLocationChooser,
+} from 'actions';
+import apiClient from 'utils/apiClient';
+
 
 class LocationChooser extends Component {
   constructor(props) {

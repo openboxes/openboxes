@@ -1,4 +1,4 @@
-import { getColorByName } from './colorMapping';
+import { getColorByName } from 'consts/dataFormat/colorMapping';
 
 function loadNumbersOptions(payload) {
   const palette = (payload.config.colors && payload.config.colors.palette) ?

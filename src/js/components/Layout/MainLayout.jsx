@@ -1,7 +1,10 @@
 import React from 'react';
+
 import PropTypes from 'prop-types';
-import Navbar from './Navbar';
-import Footer from './Footer';
+
+import Footer from 'components/Layout/Footer';
+import Navbar from 'components/Layout/Navbar';
+
 
 const MainLayout = ({ children }) => (
   <div className="page page-dashboard">

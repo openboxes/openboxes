@@ -1,29 +1,31 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { Form } from 'react-final-form';
+
 import arrayMutators from 'final-form-arrays';
-import PropTypes from 'prop-types';
-import Alert from 'react-s-alert';
-import { confirmAlert } from 'react-confirm-alert';
-import { getTranslate } from 'react-localize-redux';
 import update from 'immutability-helper';
+import _ from 'lodash';
+import PropTypes from 'prop-types';
+import { confirmAlert } from 'react-confirm-alert';
+import { Form } from 'react-final-form';
+import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+import Alert from 'react-s-alert';
+
+import { fetchReasonCodes, hideSpinner, showSpinner } from 'actions';
+import ArrayField from 'components/form-elements/ArrayField';
+import ButtonField from 'components/form-elements/ButtonField';
+import LabelField from 'components/form-elements/LabelField';
+import SelectField from 'components/form-elements/SelectField';
+import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
+import TextField from 'components/form-elements/TextField';
+import DetailsModal from 'components/stock-movement-wizard/modals/DetailsModal';
+import SubstitutionsModal from 'components/stock-movement-wizard/modals/SubstitutionsModal';
+import apiClient from 'utils/apiClient';
+import { renderFormField } from 'utils/form-utils';
+import renderHandlingIcons from 'utils/product-handling-icons';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-import ArrayField from '../../form-elements/ArrayField';
-import TextField from '../../form-elements/TextField';
-import { renderFormField } from '../../../utils/form-utils';
-import LabelField from '../../form-elements/LabelField';
-import SelectField from '../../form-elements/SelectField';
-import DetailsModal from '../modals/DetailsModal';
-import SubstitutionsModal from '../modals/SubstitutionsModal';
-import apiClient from '../../../utils/apiClient';
-import TableRowWithSubfields from '../../form-elements/TableRowWithSubfields';
-import { showSpinner, hideSpinner, fetchReasonCodes } from '../../../actions';
-import ButtonField from '../../form-elements/ButtonField';
-import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
-import renderHandlingIcons from '../../../utils/product-handling-icons';
 
 const BTN_CLASS_MAPPER = {
   YES: 'btn btn-outline-success',

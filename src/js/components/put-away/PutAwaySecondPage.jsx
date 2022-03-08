@@ -1,24 +1,26 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import ReactTable from 'react-table';
-import PropTypes from 'prop-types';
+
 import update from 'immutability-helper';
 import fileDownload from 'js-file-download';
-import { getTranslate } from 'react-localize-redux';
-import { Tooltip } from 'react-tippy';
+import _ from 'lodash';
+import PropTypes from 'prop-types';
 import { confirmAlert } from 'react-confirm-alert';
+import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+import ReactTable from 'react-table';
+import { Tooltip } from 'react-tippy';
+
+import { fetchBreadcrumbsConfig, hideSpinner, showSpinner, updateBreadcrumbs } from 'actions';
+import SplitLineModal from 'components/put-away/SplitLineModal';
+import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import customTreeTableHOC from 'utils/CustomTreeTable';
+import Filter from 'utils/Filter';
+import showLocationChangedAlert from 'utils/location-change-alert';
+import Select from 'utils/Select';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-table/react-table.css';
 
-import customTreeTableHOC from '../../utils/CustomTreeTable';
-import Select from '../../utils/Select';
-import SplitLineModal from './SplitLineModal';
-import apiClient, { parseResponse, flattenRequest } from '../../utils/apiClient';
-import { showSpinner, hideSpinner, updateBreadcrumbs, fetchBreadcrumbsConfig } from '../../actions';
-import Filter from '../../utils/Filter';
-import showLocationChangedAlert from '../../utils/location-change-alert';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
 

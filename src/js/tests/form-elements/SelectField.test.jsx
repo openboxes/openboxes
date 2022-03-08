@@ -1,7 +1,9 @@
 import React from 'react';
+
 import renderer from 'react-test-renderer';
-import SelectField from '../../components/form-elements/SelectField';
-import { renderFormField } from '../../utils/form-utils';
+
+import SelectField from 'components/form-elements/SelectField';
+import { renderFormField } from 'utils/form-utils';
 
 jest.mock('react-final-form', () => ({
   Field: (props) => {

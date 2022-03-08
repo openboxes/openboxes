@@ -1,102 +1,103 @@
 import React from 'react';
-import { connect } from 'react-redux';
+
 import PropTypes from 'prop-types';
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
-import { ClimbingBoxLoader } from 'react-spinners';
-import Alert from 'react-s-alert';
 import Loadable from 'react-loadable';
+import { connect } from 'react-redux';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import Alert from 'react-s-alert';
+import { ClimbingBoxLoader } from 'react-spinners';
+
+import MainLayoutRoute from 'components/Layout/MainLayoutRoute';
+import Loading from 'components/Loading';
 
 import 'react-s-alert/dist/s-alert-default.css';
 import 'react-s-alert/dist/s-alert-css-effects/bouncyflip.css';
 
-import MainLayoutRoute from './Layout/MainLayoutRoute';
-import Loading from './Loading';
-
 // TODO: Fix entering Inbound SM from list
 
 const AsyncStockMovement = Loadable({
-  loader: () => import('./stock-movement-wizard/StockMovement'),
+  loader: () => import('components/stock-movement-wizard/StockMovement'),
   loading: Loading,
 });
 
 const AsyncStockMovementInbound = Loadable({
-  loader: () => import('./stock-movement-wizard/StockMovementInbound'),
+  loader: () => import('components/stock-movement-wizard/StockMovementInbound'),
   loading: Loading,
 });
 
 const AsyncStockMovementCombinedShipments = Loadable({
-  loader: () => import('./stock-movement-wizard/StockMovementCombinedShipments'),
+  loader: () => import('components/stock-movement-wizard/StockMovementCombinedShipments'),
   loading: Loading,
 });
 
 const AsyncStockMovementRequest = Loadable({
-  loader: () => import('./stock-movement-wizard/StockMovementRequest'),
+  loader: () => import('components/stock-movement-wizard/StockMovementRequest'),
   loading: Loading,
 });
 
 const AsyncStockMovementVerifyRequest = Loadable({
-  loader: () => import('./stock-movement-wizard/StockMovementVerifyRequest'),
+  loader: () => import('components/stock-movement-wizard/StockMovementVerifyRequest'),
   loading: Loading,
 });
 
 const AsyncReceivingPage = Loadable({
-  loader: () => import('./receiving/ReceivingPage'),
+  loader: () => import('components/receiving/ReceivingPage'),
   loading: Loading,
 });
 
 const AsyncPutAwayMainPage = Loadable({
-  loader: () => import('./put-away/PutAwayMainPage'),
+  loader: () => import('components/put-away/PutAwayMainPage'),
   loading: Loading,
 });
 
 const AsyncManagement = Loadable({
-  loader: () => import('./stock-list-management/StocklistManagement'),
+  loader: () => import('components/stock-list-management/StocklistManagement'),
   loading: Loading,
 });
 
 const AsyncDashboard = Loadable({
-  loader: () => import('./dashboard/Dashboard'),
+  loader: () => import('components/dashboard/Dashboard'),
   loading: Loading,
 });
 
 // TODO add megamenu and menu config
 const AsyncInvoice = Loadable({
-  loader: () => import('./invoice/InvoiceWizard'),
+  loader: () => import('components/invoice/InvoiceWizard'),
   loading: Loading,
 });
 
 const AsyncStockTransfer = Loadable({
-  loader: () => import('./stock-transfer/StockTransferWizard'),
+  loader: () => import('components/stock-transfer/StockTransferWizard'),
   loading: Loading,
 });
 
 const AsyncOutboundReturns = Loadable({
-  loader: () => import('./returns/outbound/OutboundReturnsWizard'),
+  loader: () => import('components/returns/outbound/OutboundReturnsWizard'),
   loading: Loading,
 });
 
 const AsyncInboundReturns = Loadable({
-  loader: () => import('./returns/inbound/InboundReturnsWizard'),
+  loader: () => import('components/returns/inbound/InboundReturnsWizard'),
   loading: Loading,
 });
 
 const AsyncReplenishment = Loadable({
-  loader: () => import('./replenishment/ReplenishmentWizard'),
+  loader: () => import('components/replenishment/ReplenishmentWizard'),
   loading: Loading,
 });
 
 const AsyncProductsConfiguration = Loadable({
-  loader: () => import('./products-configuration/ProductsConfigurationWizard'),
+  loader: () => import('components/products-configuration/ProductsConfigurationWizard'),
   loading: Loading,
 });
 
 const AsyncLocationsConfiguration = Loadable({
-  loader: () => import('./locations-configuration/LocationsConfigurationWizard'),
+  loader: () => import('components/locations-configuration/LocationsConfigurationWizard'),
   loading: Loading,
 });
 
 const AsyncWelcomeModal = Loadable({
-  loader: () => import('./locations-configuration/WelcomeModal'),
+  loader: () => import('components/locations-configuration/WelcomeModal'),
   loading: Loading,
 });
 

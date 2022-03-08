@@ -1,14 +1,17 @@
-import PropTypes from 'prop-types';
 import React from 'react';
-import { SortableElement } from 'react-sortable-hoc';
+
+import PropTypes from 'prop-types';
 import { Line } from 'react-chartjs-2';
-import { connect } from 'react-redux';
 import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+import { SortableElement } from 'react-sortable-hoc';
 import { Tooltip } from 'react-tippy';
-import DragHandle from './DragHandle';
-import { getColorByName } from '../../consts/dataFormat/colorMapping';
-import './Dashboard.scss';
-import { translateWithDefaultMessage } from '../../utils/Translate';
+
+import DragHandle from 'components/dashboard/DragHandle';
+import { getColorByName } from 'consts/dataFormat/colorMapping';
+import { translateWithDefaultMessage } from 'utils/Translate';
+
+import 'components/dashboard/Dashboard.scss';
 
 /* global _ */
 

@@ -1,21 +1,23 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+
+import arrayMutators from 'final-form-arrays';
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
-import arrayMutators from 'final-form-arrays';
+import { connect } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
-import { showSpinner, hideSpinner } from '../../actions';
-import { renderFormField } from '../../utils/form-utils';
-import accountingFormat from '../../utils/number-utils';
-import DateField from '../form-elements/DateField';
-import TextField from '../form-elements/TextField';
-import LabelField from '../form-elements/LabelField';
-import Translate from '../../utils/Translate';
-import ArrayField from '../form-elements/ArrayField';
-import apiClient from '../../utils/apiClient';
-import DocumentButton from '../DocumentButton';
+import { hideSpinner, showSpinner } from 'actions';
+import DocumentButton from 'components/DocumentButton';
+import ArrayField from 'components/form-elements/ArrayField';
+import DateField from 'components/form-elements/DateField';
+import LabelField from 'components/form-elements/LabelField';
+import TextField from 'components/form-elements/TextField';
+import apiClient from 'utils/apiClient';
+import { renderFormField } from 'utils/form-utils';
+import accountingFormat from 'utils/number-utils';
+import Translate from 'utils/Translate';
+
 
 const INVOICE_HEADER_FIELDS = {
   invoiceNumber: {

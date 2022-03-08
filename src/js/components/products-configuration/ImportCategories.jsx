@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
-import Alert from 'react-s-alert';
-import { getTranslate } from 'react-localize-redux';
-import Dropzone from 'react-dropzone';
-import fileDownload from 'js-file-download';
 
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
-import { showSpinner, hideSpinner } from '../../actions';
-import apiClient from '../../utils/apiClient';
+import fileDownload from 'js-file-download';
+import PropTypes from 'prop-types';
+import Dropzone from 'react-dropzone';
+import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+import Alert from 'react-s-alert';
+
+import { hideSpinner, showSpinner } from 'actions';
+import apiClient from 'utils/apiClient';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 class ImportCategories extends Component {
   constructor(props) {

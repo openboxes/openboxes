@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import Modal from 'react-modal';
-import { Form } from 'react-final-form';
+
 import arrayMutators from 'final-form-arrays';
 import _ from 'lodash';
+import PropTypes from 'prop-types';
+import { Form } from 'react-final-form';
+import Modal from 'react-modal';
 
-import { renderFormField } from '../../utils/form-utils';
-import Translate from '../../utils/Translate';
+import { renderFormField } from 'utils/form-utils';
+import Translate from 'utils/Translate';
+
 
 class ModalWrapper extends Component {
   constructor(props) {

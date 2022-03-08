@@ -1,7 +1,7 @@
 import React from 'react';
 
-import BaseField from './BaseField';
-import Checkbox from '../../utils/Checkbox';
+import BaseField from 'components/form-elements/BaseField';
+import Checkbox from 'utils/Checkbox';
 
 const CheckboxField = (props) => {
   // eslint-disable-next-line react/prop-types

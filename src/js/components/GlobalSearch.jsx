@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 
-import Select from '../utils/Select';
-import { debounceGlobalSearch } from '../utils/option-utils';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+
+import { debounceGlobalSearch } from 'utils/option-utils';
+import Select from 'utils/Select';
+
 
 class GlobalSearch extends Component {
   constructor(props) {

@@ -1,8 +1,10 @@
 /* eslint-disable react/jsx-closing-tag-location */
-
 import React from 'react';
+
 import ReactLoading from 'react-loading';
-import { getRandomColor } from '../../consts/dataFormat/colorMapping';
+
+import { getRandomColor } from 'consts/dataFormat/colorMapping';
+
 
 const LoadingNumbers = () => {
   const loadingNumbers = [];

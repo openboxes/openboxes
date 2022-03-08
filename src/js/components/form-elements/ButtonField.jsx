@@ -1,8 +1,9 @@
 import React from 'react';
+
 import PropTypes from 'prop-types';
 import { Tooltip } from 'react-tippy';
 
-import Translate from '../../utils/Translate';
+import Translate from 'utils/Translate';
 
 const ButtonField = (props) => {
   const {
