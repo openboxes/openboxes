@@ -62,6 +62,15 @@
             }
         }
 
+        .form-subtitle {
+            width: 100%;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 9px;
+        }
+
         &.with-description {
             .form-group:first-child {
                 width: 100%;

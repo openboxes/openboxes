@@ -10,9 +10,13 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.validation.ValidationException
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.Criteria
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.ProductAvailability
@@ -21,6 +25,8 @@ class LocationApiController extends BaseDomainApiController {
 
     def locationService
     def userService
+    def identifierService
+    def inventoryService
     def grailsApplication
 
     def list = {
@@ -72,5 +78,54 @@ class LocationApiController extends BaseDomainApiController {
         }
         render ([data:data] as JSON)
 
+    }
+
+    def create = { Location location ->
+        JSONObject jsonObject = request.JSON
+
+        bindLocationData(location, jsonObject)
+
+        if (!location.validate() || !location.save(failOnError: true)) {
+            throw new ValidationException("Invalid location ${location.name}", location.errors)
+        }
+
+        render ([data: location] as JSON)
+    }
+
+    def update = {
+        JSONObject jsonObject = request.JSON
+
+        Location existingLocation = Location.get(params.id)
+
+        if (!existingLocation) {
+            throw new IllegalArgumentException("No Location found for location ID ${params.id}")
+        }
+
+        bindLocationData(existingLocation, jsonObject)
+
+        if (!existingLocation.validate() || !existingLocation.save(failOnError: true)) {
+            throw new ValidationException("Invalid location ${existingLocation.name}", existingLocation.errors)
+        }
+
+        render([data: existingLocation] as JSON)
+    }
+
+    Location bindLocationData(Location location, JSONObject jsonObject) {
+        bindData(location, jsonObject)
+
+        if (!location.locationNumber) {
+            location.locationNumber = identifierService.generateLocationIdentifier()
+        }
+
+        // TODO: should be changed in OBDS-100
+        if (!location.locationType) {
+            location.locationType = LocationType.findById('4')
+        }
+
+        if (!location.inventory) {
+            location.inventory = inventoryService.addInventory(location)
+        }
+
+        return location
     }
 }
