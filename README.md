@@ -72,8 +72,9 @@ https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1719435265/Push-button+dep
 ### Install Dependencies
 
 #### Required
-* [Java 7 (must install Java 7)](https://docs.openboxes.com/en/develop/installation/ubuntu1804/java/)
-* MySQL 5.7
+* [Java 7 (must install Java 7)](https://www.azul.com/downloads/?version=java-7-lts&package=jdk)
+* [MySQL 5.7](https://downloads.mysql.com/archives/community/)
+  * Mac users: 5.7.31 is the latest 5.7.x with a pre-built installer and works fine
 * [SDK Man](https://sdkman.io/install)
 * [Grails 1.3.9](https://grails.org/download.html)
 * NPM 6.14.6
@@ -95,7 +96,7 @@ Install required dependencies above
 Check that you have SDK Man installed properly (otherwise follow instructions on the skdman install page).
 ```
 $ sdk version
-SDKMAN 3.1.0
+SDKMAN 5.13.2
 ```
 
 Install Grails 1.3.9

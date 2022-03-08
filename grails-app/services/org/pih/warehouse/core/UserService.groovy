@@ -149,6 +149,16 @@ class UserService {
         return false
     }
 
+    Boolean hasHighestRole(User u, String locationId, RoleType roleType) {
+        if (u) {
+            def user = User.get(u.id)
+            Location currentLocation = Location.get(locationId)
+            def highestRole = user.getHighestRole(currentLocation)
+            return roleType == highestRole?.roleType
+        }
+        return false
+    }
+
     Boolean canUserBrowse(User u) {
         if (u) {
             def user = User.get(u.id)

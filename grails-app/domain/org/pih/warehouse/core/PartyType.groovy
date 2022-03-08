@@ -27,7 +27,7 @@ class PartyType {
     }
 
     static constraints = {
-        code(nullable: false)
+        code(nullable: false, unique: true)
         name(nullable: false, maxSize: 255)
         description(nullable: true, maxSize: 255)
         dateCreated(display: false)

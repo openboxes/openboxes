@@ -1,16 +1,20 @@
 <%@page import="org.pih.warehouse.core.ActivityCode;"%>
 <%@page import="org.pih.warehouse.core.Constants;"%>
+<%@page import="org.pih.warehouse.core.RoleType" %>
+<%@page import="org.pih.warehouse.core.User" %>
 <%@page import="org.pih.warehouse.order.OrderTypeCode"%>
 <%@page import="org.pih.warehouse.requisition.RequisitionStatus"%>
 <%@page import="org.pih.warehouse.shipping.Shipment"%>
 <ul class="megamenu">
 
     <g:if test="${megamenuConfig.dashboard.enabled}">
-        <li class="mm-item">
-            <g:link controller="dashboard" action="index" class="mm-item-link">
-                <warehouse:message code="dashboard.label" />&nbsp;
-            </g:link>
-        </li>
+        <g:isUserInRole roles="[RoleType.ROLE_BROWSER]">
+            <li class="mm-item">
+                <g:link controller="dashboard" action="index" class="mm-item-link">
+                    <warehouse:message code="dashboard.label" />&nbsp;
+                </g:link>
+            </li>
+        </g:isUserInRole>
     </g:if>
 
     <g:if test="${megamenuConfig.analytics.enabled}">
@@ -47,7 +51,7 @@
     </g:if>
 
     <g:if test="${megamenuConfig.inventory.enabled}">
-
+        <g:isUserInRole roles="[RoleType.ROLE_BROWSER]">
         <g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">
             <li class="mm-item">
                 <a href="javascript:void(0)" class="mm-item-link">
@@ -127,9 +131,11 @@
                 </div>
             </li>
         </g:authorize>
+        </g:isUserInRole>
     </g:if>
 
     <g:if test="${megamenuConfig.requisitions.enabled}">
+        <g:isUserInRole roles="[RoleType.ROLE_BROWSER]">
         <g:authorize activity="[ActivityCode.PLACE_REQUEST,ActivityCode.FULFILL_REQUEST]">
             <li class="mm-item">
                 <a href="javascript:void(0)" class="mm-item-link">
@@ -180,9 +186,11 @@
                 </div>
             </li>
         </g:authorize>
+        </g:isUserInRole>
     </g:if>
 
     <g:if test="${megamenuConfig.purchasing.enabled}">
+        <g:isUserInRole roles="[RoleType.ROLE_BROWSER]">
         <li class="mm-item">
             <a href="javascript:void(0)" class="mm-item-link">
                 <warehouse:message code="order.purchasing.label" />
@@ -218,6 +226,7 @@
             </div>
         </li>
         </a>
+        </g:isUserInRole>
     </g:if>
 
     <g:if test="${megamenuConfig.invoicing.enabled}">
@@ -243,7 +252,30 @@
         </g:hasRoleInvoice>
     </g:if>
 
+    <g:if test="${megamenuConfig.stockRequest.enabled}">
+        <g:hasHighestRoleAuthenticated>
+            <li class="mm-item">
+                <a href="javascript:void(0)" class="mm-item-link">
+                    <warehouse:message code="default.inbound.label" />
+                </a>
+                <div class="mm-item-content">
+                    <div class="mm-menu-item">
+                        <g:link controller="stockMovement" action="createRequest">
+                            <warehouse:message code="default.create.label" args="[warehouse.message(code: 'stockRequest.label', default: 'Stock Request')]"/>
+                        </g:link>
+                    </div>
+                    <div class="mm-menu-item">
+                        <g:link controller="stockMovement" action="list" params="[direction:'INBOUND']">
+                            <warehouse:message code="default.list.label" args="[warehouse.message(code: 'stockMovements.inbound.label')]"/>
+                        </g:link>
+                    </div>
+                </div>
+            </li>
+        </g:hasHighestRoleAuthenticated>
+    </g:if>
+
     <g:if test="${megamenuConfig.inbound.enabled}">
+        <g:hasHigherRoleThanAuthenticated>
         <g:authorize activity="[ActivityCode.RECEIVE_STOCK]">
             <li class="mm-item">
                 <a href="javascript:void(0)" class="mm-item-link">
@@ -327,9 +359,11 @@
         </a>
 
         </g:authorize>
+        </g:hasHigherRoleThanAuthenticated>
     </g:if>
 
     <g:if test="${megamenuConfig.outbound.enabled}">
+        <g:isUserInRole roles="[RoleType.ROLE_BROWSER]">
         <g:authorize activity="[ActivityCode.SEND_STOCK]">
             <li class="mm-item">
                 <a href="javascript:void(0)" class="mm-item-link">
@@ -389,9 +423,11 @@
                 </div>
             </li>
         </g:authorize>
+        </g:isUserInRole>
     </g:if>
 
     <g:if test="${megamenuConfig.reporting.enabled}">
+        <g:isUserInRole roles="[RoleType.ROLE_BROWSER]">
         <li class="mm-item">
             <a href="javascript:void(0)" class="mm-item-link">
                 <warehouse:message code="report.label" />
@@ -500,10 +536,12 @@
                 </div>
             </div>
         </li>
+        </g:isUserInRole>
     </g:if>
 
 
     <g:if test="${megamenuConfig.products.enabled}">
+        <g:isUserInRole roles="[RoleType.ROLE_BROWSER]">
         <g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">
             <li class="mm-item">
                 <a href="javascript:void(0)" class="mm-item-link">
@@ -614,9 +652,11 @@
                 </div>
             </li>
         </g:authorize>
+        </g:isUserInRole>
     </g:if>
 
     <g:if test="${megamenuConfig.requisitionTemplate.enabled}">
+        <g:isUserInRole roles="[RoleType.ROLE_BROWSER]">
         <li class="mm-item">
             <a href="javascript:void(0)" class="mm-item-link">
                 <warehouse:message code="requisitionTemplates.label" default="Stock Lists" />
@@ -636,6 +676,7 @@
                 </g:isUserAdmin>
             </div>
         </li>
+        </g:isUserInRole>
     </g:if>
 
     <g:if test="${megamenuConfig.configuration.enabled}">
@@ -855,6 +896,7 @@
     </g:if>
 
     <g:if test="${megamenuConfig.customLinks.enabled && megamenuConfig.customLinks.menuItems}">
+        <g:isUserInRole roles="[RoleType.ROLE_BROWSER]">
         <li class="mm-item">
             <a href="javascript:void(0)" class="mm-item-link">
                 <warehouse:message code="customLinks.label" default="Custom Links" />
@@ -869,6 +911,7 @@
                 </g:each>
             </div>
         </li>
+        </g:isUserInRole>
     </g:if>
 </ul>
 <!--MegaMenu Ends-->

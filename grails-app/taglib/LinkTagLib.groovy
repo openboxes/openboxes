@@ -12,7 +12,7 @@ class LinkTagLib extends ApplicationTagLib {
         def actionName = attrs.action
         def controllerName = attrs.controller ?: ""
         if (!SecurityFilters.actionsWithAuthUserNotRequired.contains(actionName)) {
-            def missManager = RoleFilters.needManager(controllerName, actionName) && !userService.isUserManager(session.user)
+            def missManager = RoleFilters.needManager(controllerName, actionName) && (RoleFilters.needRequestorOrManager(controllerName, actionName) ? !userService.isUserManager(session.user) && !userService.isUserRequestor(session.user) : !userService.isUserManager(session.user))
             def missAdmin = RoleFilters.needAdmin(controllerName, actionName) && !userService.isUserAdmin(session.user)
             def missSuperuser = RoleFilters.needSuperuser(controllerName, actionName) && !userService.isSuperuser(session.user)
 

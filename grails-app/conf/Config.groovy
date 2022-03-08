@@ -1008,7 +1008,7 @@ breadcrumbsConfig {
         locationsConfiguration {
             actionLabel = "locationsConfiguration.label"
             defaultActionLabel = "Locations Configuration"
-            actionUrl = "/${appName}/locationsConfiguration/index"
+            actionUrl = "/${appName}/locationsConfiguration/create"
         }
 }
 
@@ -1415,7 +1415,7 @@ openboxes {
                             defaultLabel: "Stock Movements",
                             menuItems: [
                                     [label: "inbound.create.label", defaultLabel: "Create Inbound Movement", href: "/${appName}/stockMovement/createInbound?direction=INBOUND"],
-                                    [label: "stockRequest.create.label", defaultLabel: "Create Stock Request", href: "/${appName}/stockMovement/createRequest"],
+                                    [label: "stockRequest.create.label", defaultLabel: "Create Stock Request", href: "/${appName}/stockMovement/createRequest", requiredRole: [RoleType.ROLE_REQUESTOR]],
                                     [label: "inbound.list.label", defaultLabel: "List Inbound Movements", href: "/${appName}/stockMovement/list?direction=INBOUND"],
                                     [label: "inboundReturns.create.label", defaultLabel: "Create Inbound Return", href: "/${appName}/stockTransfer/createInboundReturn"]
                             ]
@@ -1663,6 +1663,24 @@ openboxes {
             defaultLabel = "Receiving"
         }
     }
+    requestorMegamenu {
+        request {
+            enabled = true
+            requiredRole = [RoleType.ROLE_REQUESTOR]
+            label = "default.inbound.label"
+            defaultLabel = "Inbound"
+            subsections = [
+                    [
+                            label       : "stockMovements.label",
+                            defaultLabel: "Stock Movements",
+                            menuItems   : [
+                                    [label: "stockRequest.create.label", defaultLabel: "Create Stock Request", href: "/${appName}/stockMovement/createRequest"],
+                                    [label: "inbound.list.label", defaultLabel: "List Inbound Movements", href: "/${appName}/stockMovement/list?direction=INBOUND"],
+                            ]
+                    ]
+            ]
+        }
+    }
 }
 
 openboxes.generateName.separator = " - "
@@ -1682,6 +1700,15 @@ openboxes.receiving.receivingLocation.prefix = Constants.DEFAULT_RECEIVING_LOCAT
 // Product configuration wizard
 openboxes.configurationWizard.enabled = true
 openboxes.configurationWizard.categoryOptions = [
+    defaultCategories: [
+        enabled: true,
+        fileUrl: "", // TODO: Provide file for OpenBoxes category tree
+        rootCategoryName: "ROOT",
+        categoryNameColumnIndex: 0,
+        parentCategoryNameColumnIndex: 1,
+        title: "OpenBoxes default category tree",
+        description: "",
+    ],
     unspscCategories: [
         enabled: true,
         // TODO: add option to support 'classpath:'
@@ -1689,18 +1716,29 @@ openboxes.configurationWizard.categoryOptions = [
         rootCategoryName: "ROOT", // needs to match the category from file
         categoryNameColumnIndex: 0,
         parentCategoryNameColumnIndex: 1,
-        title: "productsConfiguration.unspscCategories.label",
+        title: "UNSPSC category list",
         description: "",
     ],
-    defaultCategories: [
-        enabled: true,
-        fileUrl: "", // TODO: Provide file for OpenBoxes category tree
-        rootCategoryName: "ROOT",
-        categoryNameColumnIndex: 0,
-        parentCategoryNameColumnIndex: 1,
-        title: "productsConfiguration.defaultCategoryTree.label",
-        description: "",
+    whoCategories: [
+            enabled: true,
+            // TODO: add option to support 'classpath:'
+            fileUrl: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/WHO_categories.csv",
+            rootCategoryName: "ROOT", // needs to match the category from file
+            categoryNameColumnIndex: 0,
+            parentCategoryNameColumnIndex: 1,
+            title: "WHO category list",
+            description: "",
     ]
+]
+
+openboxes.configurationWizard.productOptions = [
+        whoProducts: [
+                enabled: true,
+                // TODO: add option to support 'classpath:'
+                fileUrl: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/WHO_products.csv",
+                title: "WHO product list",
+                description: "",
+        ]
 ]
 
 // Pagination
