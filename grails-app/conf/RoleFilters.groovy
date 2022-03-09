@@ -56,7 +56,7 @@ class RoleFilters {
             'grails'              : ['errors'],
             'localizationApi'     : ['list'],
             'locationApi'         : ['list'],
-            'productApi'          : ['list', 'productDemand'],
+            'productApi'          : ['list', 'productDemand', 'productAvailabilityAndDemand'],
             'stocklistApi'        : ['list'],
             'stockMovement'       : ['list', 'createRequest'],
             'stockMovementApi'    : ['updateItems', 'create', 'updateStatus', 'read'],
@@ -70,7 +70,7 @@ class RoleFilters {
             'grails'              : ['errors'],
             'localizationApi'     : ['list'],
             'locationApi'         : ['list'],
-            'productApi'          : ['list', 'productDemand'],
+            'productApi'          : ['list', 'productDemand', 'productAvailabilityAndDemand'],
             'stocklistApi'        : ['list'],
             'stockMovement'       : ['list'],
     ]
