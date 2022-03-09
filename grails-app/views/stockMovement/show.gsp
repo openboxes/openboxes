@@ -434,7 +434,7 @@
             cookie : {
                 expires : 1
             },
-            selected: ${(stockMovement?.shipment?.currentStatus == ShipmentStatusCode.PENDING && stockMovement?.origin?.id == session.warehouse.id) || stockMovement?.origin?.isSupplier()} ? 0 : 1
+            selected: ${(stockMovement?.shipment?.currentStatus == ShipmentStatusCode.PENDING && stockMovement?.origin?.id == session.warehouse.id) || !stockMovement?.origin?.isSupplier()} ? 0 : 1
         });
     });
 </script>
