@@ -83,5 +83,22 @@
             openboxes.expireFromLocal();
 		});
 	</script>
+	<g:if test="${grailsApplication.config.openboxes.helpscout.widget.enabled}">
+		<script type="text/javascript">
+
+			window.Beacon("suggest", [
+				<!-- suggest the "Logging In" help article, via its hash -->
+				"6229284aab585b230a89ed8c",
+				{
+					text: 'Logging in',
+					url: 'https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1266516059/Log+In',
+				},
+				{
+					text: 'Basic navigation',
+					url: 'https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1296138352/Basic+Navigation',
+				}
+			])
+		</script>
+	</g:if>
 </body>
 </html>

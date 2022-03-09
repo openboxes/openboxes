@@ -1178,6 +1178,10 @@ openboxes.uservoice.widget.position = "right"
 openboxes.zopim.widget.enabled = false
 openboxes.zopim.widget.url = "//v2.zopim.com/?2T7RMi7ERqr3s8N20KQ3wOBRudcwosBA"
 
+// HelpScout beacon
+openboxes.helpscout.widget.enabled = true
+openboxes.helpscout.widget.uuid = "5eafcb3f-9e7e-4943-8ebb-669f60a696cd"
+
 // JIRA Issue Collector
 openboxes.jira.issue.collector.enabled = false
 openboxes.jira.issue.collector.url = "https://openboxes.atlassian.net/s/d41d8cd98f00b204e9800998ecf8427e/en_USgc5zl3-1988229788/6318/12/1.4.10/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?collectorId=fb813fdb"

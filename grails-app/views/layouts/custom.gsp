@@ -47,12 +47,43 @@
     <g:render template="/common/fullstory"/>
     <g:render template="/common/hotjar"/>
 
-    <ga:trackPageview />
+    <ga:trackPageview/>
     <r:layoutResources/>
 
     <script src="https://use.fontawesome.com/releases/v5.14.0/js/all.js" data-auto-replace-svg="nest"></script>
 </head>
+
 <body class="yui-skin-sam">
+
+<g:if test="${grailsApplication.config.openboxes.helpscout.widget.enabled}">
+    <!--
+      -- Place magical HelpScout incantations first in body so that
+      -- window.Beacon is accessible to any included divs, etc.
+      -->
+    <script type="text/javascript">
+        !function (e, t, n) {
+            function a() {
+                var e = t.getElementsByTagName("script")[0],
+                    n = t.createElement("script");
+                n.type = "text/javascript", n.async = !0, n.src = "https://beacon-v2.helpscout.net", e.parentNode.insertBefore(n, e)
+            }
+
+            if (e.Beacon = n = function (t, n, a) {
+                e.Beacon.readyQueue.push({
+                    method: t,
+                    options: n,
+                    data: a
+                })
+            }, n.readyQueue = [], "complete" === t.readyState) return a();
+            e.attachEvent ? e.attachEvent("onload", a) : e.addEventListener("load", a, !1)
+        }(window, document, window.Beacon || function () {
+        });
+    </script>
+    <script type="text/javascript">
+        window.Beacon("init", "${grailsApplication.config.openboxes.helpscout.widget.uuid}")
+    </script>
+    <!-- end magical HelpScout incantations -->
+</g:if>
 
 <g:render template="/common/customVariables"/>
 <div id="doc3">
