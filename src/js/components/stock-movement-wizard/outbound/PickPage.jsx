@@ -42,10 +42,19 @@ const FIELDS = {
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     rowComponent: TableRowWithSubfields,
     subfieldKey: 'picklistItems',
-    getDynamicRowAttr: ({ rowValues, subfield }) => {
+    getDynamicRowAttr: ({
+      rowValues, subfield, showOnlyErroredItems, itemFilter,
+    }) => {
       let className = rowValues.initial ? 'crossed-out ' : '';
       if (!subfield) { className += 'font-weight-bold'; }
-      return { className };
+      const filterOutItems = itemFilter && !(
+        rowValues.product.name.toLowerCase().includes(itemFilter.toLowerCase()) ||
+        rowValues.productCode.toLowerCase().includes(itemFilter.toLowerCase())
+      );
+      const hideRow = (
+        (showOnlyErroredItems && !rowValues.hasError) || filterOutItems
+      ) && !subfield;
+      return { className, hideRow };
     },
     fields: {
       productCode: {
@@ -207,6 +216,7 @@ class PickPage extends Component {
       isFirstPageLoaded: false,
       showAlert: false,
       alertMessage: '',
+      itemFilter: '',
     };
 
     this.revertUserPick = this.revertUserPick.bind(this);
@@ -619,6 +629,7 @@ class PickPage extends Component {
   }
 
   render() {
+    const { itemFilter } = this.state;
     const { showOnly } = this.props;
     return (
       <Form
@@ -630,6 +641,24 @@ class PickPage extends Component {
             <AlertMessage show={this.state.showAlert} message={this.state.alertMessage} danger />
             { !showOnly ?
               <span className="buttons-container">
+                <div className="d-flex mr-auto justify-content-center align-items-center">
+                  <input
+                    value={itemFilter}
+                    onChange={event => this.setState({ itemFilter: event.target.value })}
+                    className="float-left btn btn-outline-secondary btn-xs filter-input mr-1 mb-1"
+                    placeholder={this.props.translate('react.stockMovement.searchPlaceholder.label', 'Search...')}
+                  />
+                  {itemFilter &&
+                    <i
+                      role="button"
+                      className="fa fa-times-circle"
+                      style={{ color: 'grey', cursor: 'pointer' }}
+                      onClick={() => this.setState({ itemFilter: '' })}
+                      onKeyPress={() => this.setState({ itemFilter: '' })}
+                      tabIndex={0}
+                    />
+                  }
+                </div>
                 <label
                   htmlFor="csvInput"
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
@@ -710,6 +739,7 @@ class PickPage extends Component {
                   isPaginated: this.props.isPaginated,
                   showOnly,
                   isFirstPageLoaded: this.state.isFirstPageLoaded,
+                  itemFilter,
                 }))}
               </div>
               <div className="d-print-none submit-buttons">
