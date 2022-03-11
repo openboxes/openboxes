@@ -78,7 +78,7 @@ https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1719435265/Push-button+dep
 * [SDK Man](https://sdkman.io/install)
 * [Grails 1.3.9](https://grails.org/download.html)
 * NPM 6.14.6
-* Node 13.11.0
+* Node 14+
 
 #### Optional
 * [IntelliJ IDEA 14.1](https://www.jetbrains.com/idea/download/)

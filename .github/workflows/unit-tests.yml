@@ -14,7 +14,7 @@ jobs:
 
     - uses: actions/setup-node@v2
       with:
-        node-version: '13.11.0'
+        node-version: '14'
 
     - name: Cache node modules
       uses: actions/cache@v1
@@ -61,8 +61,8 @@ jobs:
       shell: bash
       if: steps.grails.outputs.cache-hit != 'true'
       run: unzip -o ${{ steps.sdkman.outputs.file }} -d $HOME/
-    - name: npm install
-      run: npm install
+    - name: npm install with node sass rebuild
+      run: npm install && npm rebuild node-sass
     - name: npm run bundle
       run: npm run bundle
 
