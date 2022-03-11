@@ -119,7 +119,7 @@
 							</g:if>
 						</div>
 						<div class="action-menu-item">
-							<g:link controller="order" action="remove" id="${orderInstance?.id}"
+							<g:link controller="order" action="remove" id="${orderInstance?.id}" params="${params}"
 									disabled="${orderInstance?.status != OrderStatus.PENDING}"
 									disabledMessage="${g.message(code:'order.errors.delete.message')}"
 									onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
@@ -132,7 +132,7 @@
 				<g:if test="${orderInstance?.orderType == PUTAWAY_ORDER && orderInstance?.status != OrderStatus.COMPLETED}">
 					<div class="action-menu-item">
 						<g:link controller="order" action="remove" id="${orderInstance?.id}"
-								disabled="${orderInstance?.status != OrderStatus.PENDING}"
+								disabled="${orderInstance?.status != OrderStatus.PENDING}" params="${params}"
 								disabledMessage="${g.message(code:'order.errors.delete.message')}"
 								onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
 							<img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}" />
