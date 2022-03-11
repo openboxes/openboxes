@@ -8,8 +8,6 @@
  * You must not remove this notice, or any other, from this software.
  **/
 
-
-import org.apache.http.auth.AuthenticationException
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
@@ -28,25 +26,31 @@ class SecurityFilters {
         loginCheck(controller: '*', action: '*') {
 
             afterView = {
-                // Clear out current user after rendering the view
-                AuthService.currentUser.set(null)
-                AuthService.currentLocation.set(null)
+                // Clear out current user/location after rendering the view
+                AuthService.currentUser.get()?.discard()
+                AuthService.currentUser.remove()
+                AuthService.currentLocation.get()?.discard()
+                AuthService.currentLocation.remove()
             }
+
             before = {
 
-                // Set the current user (if there's on in the session)
-                if (session.user) {
+                // merge user state back into the current session
+                if (session.user != null) {
                     if (!AuthService.currentUser) {
                         AuthService.currentUser = new ThreadLocal<User>()
                     }
                     AuthService.currentUser.set(User.get(session.user.id))
+                    session.user = AuthService.currentUser.get()
                 }
 
-                if (session.warehouse) {
+                // merge warehouse state back into the current session
+                if (session.warehouse != null) {
                     if (!AuthService.currentLocation) {
                         AuthService.currentLocation = new ThreadLocal<Location>()
                     }
                     AuthService.currentLocation.set(Location.get(session.warehouse.id))
+                    session.warehouse = AuthService.currentLocation.get()
                 }
 
                 // This allows requests for the health monitoring endpoint to pass through without a user
