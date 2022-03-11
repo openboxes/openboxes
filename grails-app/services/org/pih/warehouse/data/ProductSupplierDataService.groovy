@@ -10,7 +10,6 @@
 package org.pih.warehouse.data
 
 import groovy.sql.Sql
-import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PreferenceType
 import org.pih.warehouse.core.ProductPrice
@@ -33,6 +32,7 @@ class ProductSupplierDataService {
 
     Boolean validate(ImportDataCommand command) {
         log.info "Validate data " + command.filename
+
         command.data.eachWithIndex { params, index ->
 
             def productCode = params.productCode
@@ -73,12 +73,10 @@ class ProductSupplierDataService {
                 command.errors.reject("Row ${index + 1}: Rating Type with value '${params.ratingTypeCode}' does not exist. " + e.message)
             }
 
-
             if (preferenceType && !PreferenceType.findByName(preferenceType)) {
                 command.errors.reject("Row ${index + 1}: Preference Type with name '${preferenceType}' does not exist")
             }
 
-            log.info("uomCode " + uomCode)
             if (uomCode) {
                 def unitOfMeasure = UnitOfMeasure.findByCode(uomCode)
                 if (!unitOfMeasure) {
@@ -135,9 +133,9 @@ class ProductSupplierDataService {
     void process(ImportDataCommand command) {
         log.info "Process data " + command.filename
 
-        command.data.eachWithIndex { params, index ->
-            ProductSupplier productSupplier = createOrUpdate(params)
-            if (productSupplier.validate()) {
+        command.data.each { params ->
+            ProductSupplier.withNewSession {
+                ProductSupplier productSupplier = createOrUpdate(params)
                 productSupplier.save(failOnError: true)
             }
         }

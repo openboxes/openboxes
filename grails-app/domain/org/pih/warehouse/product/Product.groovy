@@ -44,23 +44,12 @@ import org.pih.warehouse.shipping.ShipmentItem
  */
 class Product implements Comparable, Serializable {
 
-
     def beforeInsert = {
-        User.withNewSession {
-            def currentUser = AuthService.currentUser.get()
-            if (currentUser) {
-                createdBy = currentUser
-                updatedBy = currentUser
-            }
-        }
+        createdBy = updatedBy = AuthService.currentUser.get()
     }
+
     def beforeUpdate = {
-        User.withNewSession {
-            def currentUser = AuthService.currentUser.get()
-            if (currentUser) {
-                updatedBy = currentUser
-            }
-        }
+        updatedBy = AuthService.currentUser.get()
     }
 
     def publishPersistenceEvent = {
@@ -269,7 +258,7 @@ class Product implements Comparable, Serializable {
         packages cascade: "all-delete-orphan"
         productGroups joinTable: [name: 'product_group_product', column: 'product_group_id', key: 'product_id']
         synonyms cascade: 'all-delete-orphan', sort: 'name'
-        productSuppliers cascade: 'all-delete-orphan'//, sort: 'dateCreated'
+        productSuppliers cascade: 'all-delete-orphan'
         productComponents cascade: "all-delete-orphan"
         color(formula: '(select max(pc.color) from product_catalog_item pci left outer join product_catalog pc on pci.product_catalog_id = pc.id where pci.product_id = id group by pci.product_id)')
     }
