@@ -36,6 +36,8 @@ class ProductSupplierPreference {
         id generator: 'uuid'
     }
 
+    static belongsTo = ProductSupplier
+
     static constraints = {
         productSupplier(nullable: false)
         destinationParty(nullable: true, unique: ['productSupplier'])

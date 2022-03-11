@@ -13,7 +13,6 @@ import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.NotImplementedException
 import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.hibernate.Criteria
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.GlAccount
@@ -29,6 +28,7 @@ import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.shipping.ShipmentItem
+
 /**
  * An product is an instance of a generic.  For instance,
  * the product might be Ibuprofen, but the product is Advil 200mg
@@ -266,6 +266,7 @@ class Product implements Comparable, Serializable {
         categories joinTable: [name: 'product_category', column: 'category_id', key: 'product_id']
         attributes joinTable: [name: 'product_attribute', column: 'attribute_id', key: 'product_id']
         documents joinTable: [name: 'product_document', column: 'document_id', key: 'product_id']
+        packages cascade: "all-delete-orphan"
         productGroups joinTable: [name: 'product_group_product', column: 'product_group_id', key: 'product_id']
         synonyms cascade: 'all-delete-orphan', sort: 'name'
         productSuppliers cascade: 'all-delete-orphan'//, sort: 'dateCreated'
@@ -670,4 +671,3 @@ class Product implements Comparable, Serializable {
         ]
     }
 }
-

@@ -51,7 +51,7 @@ class ProductPackage implements Comparable<ProductPackage>, Serializable {
     User createdBy
     User updatedBy
 
-    static belongsTo = [product: Product]
+    static belongsTo = [product: Product, productSupplier: ProductSupplier]
 
     static mapping = {
         id generator: 'uuid'

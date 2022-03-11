@@ -67,9 +67,11 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
     static transients = ["defaultProductPackage", "globalProductSupplierPreference", "attributes"]
 
     static hasMany = [productPackages: ProductPackage, productSupplierPreferences: ProductSupplierPreference]
-
+    static belongsTo = [product: Product, supplier: Organization]
     static mapping = {
         description type: 'text'
+        cascade productPackages: "all-delete-orphan"
+        cascade productSupplierPreferences: "all-delete-orphan"
     }
 
     static constraints = {
