@@ -18,11 +18,12 @@ class AutomaticStateTransitionPollingJob {
     }
 
     def execute(JobExecutionContext context) {
-        log.info "Running automatic state transition job ... "
+
         if(!ConfigurationHolder.config.openboxes.jobs.automaticStateTransitionPollingJob.enabled) {
+            log.info "Automatic state transition job is disabled"
             return
         }
-
+        log.info "Running automatic state transition job ... "
         StockMovement criteria = new StockMovement(stockMovementStatusCode: StockMovementStatusCode.PICKING)
         def stockMovements = stockMovementService.getOutboundStockMovements(criteria, [:])
         log.info "Found ${stockMovements.size()} stock movements in PICKING "
