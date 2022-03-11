@@ -121,8 +121,10 @@ class PutawayService {
             gt("quantityOnHand", 0)
         }
 
+        // Get all active internal locations within the given facility and zone (if provided)
         def allInternalLocations = Location.createCriteria().list {
             eq("parentLocation", location)
+            eq("active", Boolean.TRUE)
             locationType {
                 'in'("locationTypeCode", [LocationTypeCode.INTERNAL, LocationTypeCode.BIN_LOCATION])
             }
@@ -133,11 +135,18 @@ class PutawayService {
             order("name","asc")
         }
 
-        def putawayLocations = allInternalLocations.findAll { it.supports(ActivityCode.PUTAWAY_STOCK) }
-        def pendingPutawayLocations = getPendingItems(location).collect { it.putawayLocation }
-        def availableLocations = putawayLocations - unavailableLocations - pendingPutawayLocations
+        // Get all available putaway locations that do not have a hold on them
+        def putawayLocations = allInternalLocations.findAll {
+            it.supports(ActivityCode.PUTAWAY_STOCK) && !it.supports(ActivityCode.HOLD_STOCK)
+        }
 
-        return availableLocations
+        // Get all putaway locations that have already been assigned in other putaway orders
+        def pendingPutawayLocations = getPendingItems(location).collect { it.putawayLocation }
+
+        // Return all putaway locations that are not already in use
+        def availablePutawayLocations = putawayLocations - unavailableLocations - pendingPutawayLocations
+
+        return availablePutawayLocations
     }
 
 
