@@ -14,6 +14,7 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptContainer
 import org.pih.warehouse.api.PartialReceiptItem
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventTypeCode
@@ -450,9 +451,13 @@ class ReceiptService {
         }
     }
 
-    void createTemporaryReceivingBin(Shipment shipment) {
+    void createTemporaryReceivingLocation(Shipment shipment) {
         // Create temporary receiving area for the Partial Receipt process
-        if (grailsApplication.config.openboxes.receiving.createReceivingLocation.enabled && shipment?.destination?.hasBinLocationSupport()) {
+        Boolean dynamicReceivingEnabled =
+                (grailsApplication.config.openboxes.receiving.createReceivingLocation.enabled ||
+                        shipment?.destination?.supports(ActivityCode.DYNAMIC_RECEIVING))?:false
+
+        if (dynamicReceivingEnabled && shipment?.destination?.hasBinLocationSupport()) {
             LocationType locationType = LocationType.findByName("Receiving")
             if (!locationType) {
                 throw new IllegalArgumentException("Unable to find location type 'Receiving'")
