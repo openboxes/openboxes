@@ -168,7 +168,8 @@
 									<g:set var="colspan" value="${orderType == OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name()) ? 12 : 8}"/>
 									<th colspan="${colspan}"></th>
 									<th><label>${warehouse.message(code:'order.totalPrice.label')}</label></th>
-									<th colspan="2" class="right">
+									<th></th>
+									<th class="center middle">
 										<g:formatNumber number="${totalPrice}"/>
 										${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
 									</th>
