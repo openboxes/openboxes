@@ -25,7 +25,10 @@
     "roots": [
       "<rootDir>/src/"
     ],
-    "moduleDirectories": ["node_modules", "src/js"],
+    "moduleDirectories": [
+      "node_modules",
+      "src/js"
+    ],
     "moduleNameMapper": {
       "\\.(css|scss)$": "<rootDir>/src/js/tests/__mocks__/styleMock.js"
     },
