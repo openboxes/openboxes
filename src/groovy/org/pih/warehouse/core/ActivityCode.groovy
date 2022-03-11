@@ -45,7 +45,16 @@ enum ActivityCode {
     // Packing
     PACK_SHIPMENT('PACK_SHIPMENT'),
 
-    // Receiving
+    // Static slotting
+    STATIC_SLOTTING('STATIC_SLOTTING'),
+
+    // Dynamic slotting
+    DYNAMIC_SLOTTING('DYNAMIC_SLOTTING'),
+
+    // Creates a dynamic receiving location during receipt
+    DYNAMIC_RECEIVING('DYNAMIC_RECEIVING'),
+
+    // Allows partial receipting of quantities
     PARTIAL_RECEIVING('PARTIAL_RECEIVING'),
 
     // Accounting (Budget Code, GL Account)
@@ -84,7 +93,10 @@ enum ActivityCode {
                 EXTERNAL,
                 ENABLE_NOTIFICATIONS,
                 PACK_SHIPMENT,
+                DYNAMIC_RECEIVING,
                 PARTIAL_RECEIVING,
+                DYNAMIC_SLOTTING,
+                STATIC_SLOTTING,
                 REQUIRE_ACCOUNTING,
                 ENABLE_CENTRAL_PURCHASING,
                 HOLD_STOCK,

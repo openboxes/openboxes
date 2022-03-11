@@ -959,13 +959,18 @@ openboxes.barcode.labelaryApi.url = "https://api.labelary.com/v1/printers/12dpmm
 openboxes.typeahead.delay = 300
 openboxes.typeahead.minLength = 3
 
+// Automatic slotting job
+openboxes.jobs.automaticSlottingJob.enabled = true
+openboxes.jobs.automaticSlottingJob.cronExpression = "0 */5 * * * ?" // every five minutes
+openboxes.jobs.automaticSlottingJob.defaultPutawayAssignee = "admin"
+
 // Automatic state transition job
 openboxes.jobs.automaticStateTransitionJob.enabled = true
 openboxes.jobs.automaticStateTransitionJob.delayInMilliseconds = 1000
 
 // Automatic state transition polling job
 openboxes.jobs.automaticStateTransitionPollingJob.enabled = true
-openboxes.jobs.automaticStateTransitionPollingJob.cronExpression = "0 */5 * * * ?" // every minute
+openboxes.jobs.automaticStateTransitionPollingJob.cronExpression = "0 */5 * * * ?" // every five minutes
 
 // Allow system administrators to disable refresh on startup
 openboxes.refreshAnalyticsDataOnStartup.enabled = true
@@ -1511,7 +1516,7 @@ openboxes.shipping.splitPickItems.enabled = true
 openboxes.shipping.search.maxResults = 1000
 
 // Automatically create temporary receiving locations for shipments
-openboxes.receiving.createReceivingLocation.enabled = true
+openboxes.receiving.createReceivingLocation.enabled = false
 openboxes.receiving.receivingLocation.name = Constants.DEFAULT_RECEIVING_LOCATION_NAME
 openboxes.receiving.receivingLocation.prefix = Constants.DEFAULT_RECEIVING_LOCATION_PREFIX
 openboxes.receiving.receivingLocation.defaultNames = ["Receiving", "Quarantine", "Hold"]

@@ -10,6 +10,8 @@
 package org.pih.warehouse.putaway
 
 import org.apache.commons.beanutils.BeanUtils
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
@@ -17,22 +19,127 @@ import org.pih.warehouse.api.PutawayStatus
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationTypeCode
+import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.TransferStockCommand
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderType
+import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductAvailability
 
 class PutawayService {
 
+    def userService
     def locationService
     def inventoryService
     def productAvailabilityService
+    def identifierService
     def grailsApplication
 
     boolean transactional = true
+
+    void generatePutaways(Location location, User putawayAssignee) {
+        def putawayCandidates = getPutawayCandidates(location)
+        for (PutawayItem putawayCandidate in putawayCandidates) {
+
+
+            // Ignore putaway candidates that already have a putaway order associated with it
+            if (!putawayCandidate.id) {
+
+                log.info "Attempting to generate putaway for putaway candidate ..." + new JSONObject(putawayCandidate?.toJson()).toString(4)
+
+                // Get the next available putaway location based on criteria (available vs unavailable, volume, weight, etc)
+                Location putawayLocation = getNextAvailablePutawayLocation(location, putawayCandidate.product)
+                if (!putawayLocation) {
+                    log.warn("No available putaway location for ${putawayCandidate?.product?.productCode}, Quantity=${putawayCandidate.quantity}, Lot Number=${putawayCandidate?.inventoryItem?.lotNumber}, Current Location=${putawayCandidate.currentFacility} . ${putawayCandidate?.currentLocation}")
+                    return
+                }
+
+                // Create a new putaway order for the putaway candidate
+                Putaway putaway = new Putaway()
+                putaway.origin = location
+                putaway.destination = location
+                putaway.putawayDate = new Date()
+                putaway.putawayStatus = PutawayStatus.PENDING
+                putaway.putawayAssignee = putawayAssignee
+                putaway.putawayNumber = identifierService.generateOrderIdentifier()
+                putawayCandidate.putawayLocation = putawayLocation
+                putaway.putawayItems.add(putawayCandidate)
+                savePutaway(putaway)
+            }
+        }
+    }
+
+    def getPutawayUsers(Location location) {
+        List<User> users = userService.findUsersByRoleType(RoleType.ROLE_PUTAWAY)
+        if (!users) {
+            String usernameOrId = ConfigurationHolder.config.openboxes.jobs.automaticSlottingJob.defaultPutawayAssignee
+            User user = User.findByIdOrUsername(usernameOrId, usernameOrId)
+            users = [user]
+        }
+        return users
+    }
+
+    def getNextAvailablePutawayLocation(Location location, Product product) {
+        def availableLocations
+
+        InventoryLevel inventoryLevel = InventoryLevel.findByProductAndInventory(product, location.inventory)
+        if (location.supports(ActivityCode.DYNAMIC_SLOTTING)) {
+            // If inventory level specifies a putaway zone, assign a putaway location within that zone
+            if (inventoryLevel?.preferredBinLocation && inventoryLevel?.preferredBinLocation?.isZoneLocation()) {
+                availableLocations = getAvailablePutawayLocations(location, inventoryLevel?.preferredBinLocation)
+            }
+            // Assign a static putaway location has been specified
+            else if (inventoryLevel?.preferredBinLocation && inventoryLevel?.preferredBinLocation?.isInternalLocation()) {
+               availableLocations = [inventoryLevel?.preferredBinLocation]
+            }
+            // Otherwise assign any available putaway location
+            else {
+                availableLocations = getAvailablePutawayLocations(location, null)
+            }
+        }
+        else if (location.supports(ActivityCode.STATIC_SLOTTING)) {
+            if (inventoryLevel?.preferredBinLocation && inventoryLevel?.preferredBinLocation?.isInternalLocation()) {
+               availableLocations = [inventoryLevel?.preferredBinLocation]
+            }
+        }
+        return availableLocations ? availableLocations[0] : null
+    }
+
+    def getAvailablePutawayLocations(Location location, Location zone = null) {
+        def unavailableLocations = ProductAvailability.createCriteria().list {
+            projections {
+                property("binLocation")
+            }
+            eq("location", location)
+            gt("quantityOnHand", 0)
+        }
+
+        def allInternalLocations = Location.createCriteria().list {
+            eq("parentLocation", location)
+            locationType {
+                'in'("locationTypeCode", [LocationTypeCode.INTERNAL, LocationTypeCode.BIN_LOCATION])
+            }
+            if (zone) {
+                eq("zone", zone)
+            }
+            order("sortOrder","asc")
+            order("name","asc")
+        }
+
+        def putawayLocations = allInternalLocations.findAll { it.supports(ActivityCode.PUTAWAY_STOCK) }
+        def pendingPutawayLocations = getPendingItems(location).collect { it.putawayLocation }
+        def availableLocations = putawayLocations - unavailableLocations - pendingPutawayLocations
+
+        return availableLocations
+    }
+
 
     def getPutawayCandidates(Location location) {
         List putawayItems = []
@@ -154,6 +261,7 @@ class PutawayService {
 
 
     Order savePutaway(Putaway putaway) {
+        log.info "Saving putaway " + new JSONObject(putaway.toJson()).toString(4)
 
         Order order = Order.get(putaway.id)
         if (!order) {
