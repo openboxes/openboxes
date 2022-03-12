@@ -34,6 +34,10 @@
 			background-color: #ffcccb !important;
 		}
 
+		.unavailable {
+			background-color: #ffcccb !important;
+		}
+
 		.restricted {
 			background-color: #fca714 !important;
 		}

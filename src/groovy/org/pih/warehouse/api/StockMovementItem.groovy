@@ -326,6 +326,9 @@ class AvailableItem {
         if (binLocation?.onHold) {
             return AvailableItemStatus.HOLD
         }
+        if (inventoryItem?.unavailable) {
+            return AvailableItemStatus.NOT_AVAILABLE
+        }
         if (quantityAvailable > 0 && quantityAvailable < quantityOnHand) {
             return AvailableItemStatus.PICKED
         }
@@ -335,8 +338,7 @@ class AvailableItem {
         if (quantityOnHand <= 0) {
             return AvailableItemStatus.NOT_AVAILABLE
         }
-
-        return AvailableItemStatus.PICKED
+        return AvailableItemStatus.NOT_AVAILABLE
     }
 
     Boolean isPickable() {
@@ -349,6 +351,10 @@ class AvailableItem {
 
     Boolean isRecalled() {
         return inventoryItem?.recalled
+    }
+
+    Boolean isUnavailable() {
+        return inventoryItem.unavailable
     }
 
     Map toJson() {

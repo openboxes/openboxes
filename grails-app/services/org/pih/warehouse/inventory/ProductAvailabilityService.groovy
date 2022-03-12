@@ -251,7 +251,7 @@ class ProductAvailabilityService {
                 binLocation      : [id: it?.binLocation?.id, name: it?.binLocation?.name],
                 quantity         : it.quantity,
                 quantityAllocated: picked ? (picked.findAll { row -> row.binLocation == it?.binLocation?.id && row.inventoryItem == it?.inventoryItem?.id }?.sum { it.quantityAllocated } ?: 0) : 0,
-                quantityOnHold   : it?.binLocation?.isOnHold() || it?.inventoryItem?.lotStatus == LotStatusCode.RECALLED ? it.quantity : 0
+                quantityOnHold   : it?.binLocation?.isOnHold() || it?.inventoryItem?.lotStatus in LotStatusCode.listUnavailable() ? it.quantity : 0
             ]
         }
 
