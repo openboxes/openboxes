@@ -14,9 +14,6 @@ dataSource {
     dialect = org.hibernate.dialect.MySQL5InnoDBDialect
     username = "root"
     password = "root"
-    loggingSql = false
-    format_sql = false
-    use_sql_comments = false
 
     // Basic Pool Configuration
     acquireIncrement = 5
@@ -67,10 +64,13 @@ hibernate {
     //cache.provider_class='net.sf.ehcache.hibernate.EhCacheProvider'
 
     default_batch_fetch_size = 25
+    format_sql = false
     jdbc.fetch_size = 25
     jdbc.batch_size = 15
+    loggingSql = false
     order_inserts = true
     order_updates = true
+    use_sql_comments = false
     //jdbc.batch_versioned_data = true
     //max_fetch_depth = 5
 }
