@@ -72,6 +72,7 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
         description type: 'text'
         cascade productPackages: "all-delete-orphan"
         cascade productSupplierPreferences: "all-delete-orphan"
+        cascade contractPrice: "all-delete-orphan"
     }
 
     static constraints = {
@@ -84,7 +85,7 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
         ndc(nullable: true, maxSize: 255)
         upc(nullable: true, maxSize: 255)
 
-        supplier(nullable: true)
+        supplier(nullable: false)
         supplierCode(nullable: true, maxSize: 255)
         supplierName(nullable: true, maxSize: 255)
 
@@ -99,7 +100,7 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
         ratingTypeCode(nullable: true)
         comments(nullable: true)
 
-        contractPrice(nullable: true)
+        contractPrice(nullable: true, unique: true)
     }
 
     ProductPackage getDefaultProductPackage() {

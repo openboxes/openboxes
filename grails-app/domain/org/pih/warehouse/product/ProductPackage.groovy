@@ -45,6 +45,7 @@ class ProductPackage implements Comparable<ProductPackage>, Serializable {
 
     static mapping = {
         id generator: 'uuid'
+        cascade productPrice: "all-delete-orphan"
     }
 
     static constraints = {
@@ -52,11 +53,11 @@ class ProductPackage implements Comparable<ProductPackage>, Serializable {
         description(nullable: true)
         gtin(nullable: true)
         uom(nullable: true)
-        productPrice(nullable: true)
+        productPrice(nullable: true, unique: true)
         quantity(nullable: false)
         createdBy(nullable: true)
         updatedBy(nullable: true)
-        productSupplier(nullable: true)
+        productSupplier(nullable: false)
     }
 
     String toString() {
