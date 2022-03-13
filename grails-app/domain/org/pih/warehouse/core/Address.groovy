@@ -35,7 +35,7 @@ class Address implements Serializable {
         city(nullable: true, maxSize: 255)
         stateOrProvince(nullable: true, maxSize: 255)
         postalCode(nullable: true, maxSize: 255)
-        stateOrProvince(nullable: true, maxSize: 255)
+        country(nullable: true, maxSize: 255)
         description(nullable: true, maxSize: 4000)
     }
 }
