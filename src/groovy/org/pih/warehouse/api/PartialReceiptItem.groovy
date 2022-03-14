@@ -3,6 +3,7 @@ package org.pih.warehouse.api
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.LotStatusCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptStatusCode
@@ -25,6 +26,7 @@ class PartialReceiptItem {
     String lotNumber
     Date expirationDate
     Integer quantityOnHand
+    LotStatusCode lotStatusCode
 
     Integer quantityShipped
     Product product
@@ -85,6 +87,7 @@ class PartialReceiptItem {
                 "product.lotAndExpiryControl"   : inventoryItem?.product?.lotAndExpiryControl,
                 "lotNumber"                     : lotNumber,
                 "expirationDate"                : expirationDate?.format("MM/dd/yyyy"),
+                "lotStatusCode"                 : lotStatusCode?.name(),
                 "binLocation.id"                : binLocation?.id,
                 "binLocation.name"              : binLocation?.name,
                 "binLocation.zoneId"            : binLocation?.zone?.id,
