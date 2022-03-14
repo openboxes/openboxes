@@ -530,6 +530,11 @@ class UrlMappings {
             action = [GET: "categoryOptions"]
         }
 
+        "/api/productsConfiguration/productOptions"(parseRequest: true) {
+            controller = { "productsConfigurationApi" }
+            action = [GET: "productOptions"]
+        }
+
         "/api/productsConfiguration/importProducts"(parseRequest: true) {
             controller = { "productsConfigurationApi" }
             action = [POST: "importProducts"]

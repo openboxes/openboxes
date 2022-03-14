@@ -83,4 +83,10 @@ class ProductsConfigurationApiController {
 
         render([data: categoryOptions] as JSON)
     }
+
+    def productOptions = {
+        def productOptions = grailsApplication.config.openboxes.configurationWizard.productOptions
+
+        render([data: productOptions] as JSON)
+    }
 }
