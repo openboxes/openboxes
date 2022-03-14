@@ -10,7 +10,6 @@
 package org.pih.warehouse.order
 
 import grails.validation.ValidationException
-import java.math.RoundingMode
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.grails.plugins.csv.CSVMapReader
 import org.hibernate.criterion.CriteriaSpecification
@@ -40,6 +39,8 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentException
 import org.pih.warehouse.shipping.ShipmentItem
 import util.ReportUtil
+
+import java.math.RoundingMode
 
 class OrderService {
 
@@ -550,20 +551,12 @@ class OrderService {
                 productPackage.name = "${orderItem?.quantityUom?.code}/${orderItem?.quantityPerUom as Integer}"
                 productPackage.uom = orderItem.quantityUom
                 productPackage.quantity = orderItem.quantityPerUom as Integer
-                ProductPrice productPrice = new ProductPrice()
-                productPrice.price = packagePrice
-                productPackage.productPrice = productPrice
+                productPackage.createOrGetProductPrice().price = packagePrice
                 productPackage.save()
             }
             // Otherwise update the price
             else {
-                if (productPackage.productPrice) {
-                    productPackage.productPrice.price = packagePrice
-                } else {
-                    ProductPrice productPrice = new ProductPrice()
-                    productPrice.price = packagePrice
-                    productPackage.productPrice = productPrice
-                }
+                productPackage.createOrGetProductPrice().price = packagePrice
                 productPackage.lastUpdated = new Date()
             }
             // Associate product package with order item
@@ -574,14 +567,7 @@ class OrderService {
         }
         // Otherwise we update the existing price
         else {
-            if (orderItem.productPackage.productPrice) {
-                orderItem.productPackage.productPrice.price = packagePrice
-            } else {
-                ProductPrice productPrice = new ProductPrice()
-                productPrice.price = packagePrice
-                orderItem.productPackage.productPrice = productPrice
-            }
-
+            orderItem.productPackage.createOrGetProductPrice().price = packagePrice
         }
     }
 

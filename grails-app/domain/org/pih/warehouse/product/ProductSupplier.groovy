@@ -65,7 +65,6 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
     Date lastUpdated
 
     static transients = ["defaultProductPackage", "globalProductSupplierPreference", "attributes"]
-
     static hasMany = [productPackages: ProductPackage, productSupplierPreferences: ProductSupplierPreference]
     static belongsTo = [product: Product, supplier: Organization]
     static mapping = {
@@ -121,6 +120,14 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
         return ratingTypeCode <=> obj.ratingTypeCode ?:
                 dateCreated <=> obj.dateCreated ?:
                         id <=> obj.id
+    }
+
+    ProductPrice createOrGetContractPrice() {
+        if (!contractPrice) {
+            contractPrice = new ProductPrice()
+            contractPrice.productSupplier = this
+        }
+        return contractPrice
     }
 
     static PROPERTIES = [

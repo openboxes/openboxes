@@ -335,13 +335,8 @@ class DataService {
         productPackage.product = product
         productPackage.gtin = ""
         productPackage.uom = unitOfMeasure
-        if (!productPackage.productPrice && price) {
-            ProductPrice productPrice = new ProductPrice()
-            productPrice.price = price
-            productPrice.save()
-            productPackage.productPrice = productPrice
-        } else if (productPackage.productPrice && price) {
-            productPackage.productPrice.price = price
+        if (price) {
+            productPackage.createOrGetProductPrice().price = price
         }
         productPackage.quantity = quantity ?: 1
         productPackage = productPackage.merge()

@@ -14,7 +14,6 @@ import org.pih.warehouse.core.ProductPrice
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.User
 
-
 class ProductPackage implements Comparable<ProductPackage>, Serializable {
 
     def beforeInsert = {
@@ -42,7 +41,6 @@ class ProductPackage implements Comparable<ProductPackage>, Serializable {
     User updatedBy
 
     static belongsTo = [product: Product, productSupplier: ProductSupplier]
-
     static mapping = {
         id generator: 'uuid'
         cascade productPrice: "all-delete-orphan"
@@ -54,19 +52,26 @@ class ProductPackage implements Comparable<ProductPackage>, Serializable {
         gtin(nullable: true)
         uom(nullable: true)
         productPrice(nullable: true, unique: true)
-        quantity(nullable: false)
         createdBy(nullable: true)
         updatedBy(nullable: true)
-        productSupplier(nullable: false)
     }
 
     String toString() {
         return name
     }
 
+    ProductPrice createOrGetProductPrice() {
+        if (!productPrice) {
+            productPrice = new ProductPrice()
+            productPrice.productPackage = this
+        }
+        return productPrice
+    }
+
     /**
      * Sort by quantity
      */
+    @Override
     int compareTo(ProductPackage other) {
         return other.quantity <=> quantity
     }

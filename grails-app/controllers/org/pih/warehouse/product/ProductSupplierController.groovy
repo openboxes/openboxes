@@ -12,9 +12,10 @@ package org.pih.warehouse.product
 import grails.validation.ValidationException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.PreferenceType
+import org.pih.warehouse.core.ProductPrice
+
 import java.math.RoundingMode
 import java.text.SimpleDateFormat
-import org.pih.warehouse.core.ProductPrice
 
 class ProductSupplierController {
 
@@ -110,10 +111,9 @@ class ProductSupplierController {
                 productSupplierInstance.contractPrice.price = parsedUnitPrice
                 productSupplierInstance.contractPrice.toDate = params.toDate ? dateFormat.parse(params.toDate) : null
             } else {
-                ProductPrice productPrice = new ProductPrice()
-                productPrice.price = parsedUnitPrice
-                productPrice.toDate = params.toDate ? dateFormat.parse(params.toDate) : null
-                productSupplierInstance.contractPrice = productPrice
+                ProductPrice contractPrice = productSupplierInstance.createOrGetContractPrice()
+                contractPrice.price = parsedUnitPrice
+                contractPrice.toDate = params.toDate ? dateFormat.parse(params.toDate) : null
             }
         }
 
@@ -230,10 +230,9 @@ class ProductSupplierController {
                     productSupplierInstance.contractPrice.price = parsedUnitPrice
                     productSupplierInstance.contractPrice.toDate = params.toDate ? dateFormat.parse(params.toDate) : null
                 } else {
-                    ProductPrice productPrice = new ProductPrice()
-                    productPrice.price = parsedUnitPrice
-                    productPrice.toDate = params.toDate ? dateFormat.parse(params.toDate) : null
-                    productSupplierInstance.contractPrice = productPrice
+                    ProductPrice contractPrice = productSupplierInstance.createOrGetContractPrice()
+                    contractPrice.price = parsedUnitPrice
+                    contractPrice.toDate = params.toDate ? dateFormat.parse(params.toDate) : null
                 }
             } else if (productSupplierInstance.contractPrice?.id) {
                 productSupplierInstance.contractPrice = null

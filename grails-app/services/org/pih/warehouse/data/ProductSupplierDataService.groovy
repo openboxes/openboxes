@@ -12,7 +12,6 @@ package org.pih.warehouse.data
 import groovy.sql.Sql
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PreferenceType
-import org.pih.warehouse.core.ProductPrice
 import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
@@ -184,14 +183,11 @@ class ProductSupplierDataService {
                 defaultProductPackage.product = productSupplier.product
                 defaultProductPackage.uom = unitOfMeasure
                 defaultProductPackage.quantity = quantity
-                defaultProductPackage.productPrice = new ProductPrice()
-                defaultProductPackage.productPrice.price = price
                 productSupplier.addToProductPackages(defaultProductPackage)
-            } else if (price && !defaultProductPackage.productPrice) {
-                defaultProductPackage.productPrice = new ProductPrice()
-                defaultProductPackage.productPrice.price = price
-            } else if (price && defaultProductPackage.productPrice) {
-                defaultProductPackage.productPrice.price = price
+            }
+
+            if (price) {
+                defaultProductPackage.createOrGetProductPrice().price = price
             }
         }
 
@@ -201,12 +197,7 @@ class ProductSupplierDataService {
         BigDecimal contractPricePrice = params.contractPricePrice ? new BigDecimal(params.contractPricePrice) : null
 
         if (contractPricePrice) {
-            if (!productSupplier.contractPrice) {
-                productSupplier.contractPrice = new ProductPrice()
-            }
-
-            productSupplier.contractPrice.price = contractPricePrice
-
+            productSupplier.createOrGetContractPrice().price = contractPricePrice
             if (contractPriceValidUntil) {
                 productSupplier.contractPrice.toDate = contractPriceValidUntil
             }
