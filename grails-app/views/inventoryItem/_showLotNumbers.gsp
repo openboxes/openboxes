@@ -1,6 +1,7 @@
 <%@ page import="org.pih.warehouse.inventory.LotStatusCode" %>
 <style>
 	.recalled { background-color: #ffcccb; }
+	.unavailable { background-color: #ffcccb; }
 </style>
 <div id="showLotNumbers" class="box">
 	<h2><warehouse:message code="inventory.showLotNumbers.label"/></h2>
@@ -11,6 +12,7 @@
 					<th class="center" style=""><warehouse:message code="default.actions.label"/></th>
 					<th><warehouse:message code="default.lotSerialNo.label"/></th>
 					<th><warehouse:message code="default.expires.label"/></th>
+					<th><warehouse:message code="inventoryItem.lotStatus.label" default="Lot Status"/></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -29,7 +31,7 @@
 					<g:set var="isSuperuser" value="${true}"/>
 				</g:isSuperuser>
 				<g:each var="inventoryItem" in="${commandInstance?.product?.inventoryItems.sort { it.dateCreated }}" status="status">
-					<tr class="prop ${inventoryItem?.lotStatus == LotStatusCode.RECALLED ? 'recalled' : ''}">
+					<tr class="prop ${inventoryItem?.lotStatus == LotStatusCode.RECALLED ? 'recalled' : inventoryItem?.lotStatus in LotStatusCode.listUnavailable() ? 'unavailable' : ''}">
 						<td class="middle center" nowrap="nowrap">
 							<div class="action-menu">
 								<button class="action-btn">
@@ -84,8 +86,10 @@
 								<span class="fade"><warehouse:message code="default.never.label"/></span>
 							</g:else>
 						</td>
+						<td>
+							<format:metadata obj="${inventoryItem?.lotStatus}"/>
+						</td>
 					</tr>
-
 				</g:each>
 					<g:isUserManager>
 						<tr class="prop">

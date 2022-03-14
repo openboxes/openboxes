@@ -26,6 +26,7 @@
                     <warehouse:message code="stockCard.qtyAvailable.label"/>
                 </th>
                 <th>
+                    <warehouse:message code="inventoryItem.lotStatus.label" default="Status"/>
                 </th>
             </tr>
         </thead>
@@ -35,8 +36,10 @@
                 <g:set var="isSuperuser" value="${true}"/>
             </g:isSuperuser>
             <g:each var="entry" in="${commandInstance.availableItems}" status="status">
-                <g:set var="styleClass" value="${(status%2==0)?'even':'odd' } ${entry?.recalled ? 'recalled' : (entry?.onHold ? 'restricted' : '')}"/>
-                <tr class="prop ${styleClass}" title="${entry?.inventoryItem?.lotStatus == LotStatusCode.RECALLED ? warehouse.message(code: 'inventoryItem.recalledLot.label') : (entry?.onHold ?  warehouse.message(code: 'inventoryItem.restrictedBin.label') : '')}">
+                <g:set var="statusClass" value="${entry?.recalled ? 'recalled' : entry?.onHold ? 'restricted' : entry?.unavailable ? 'unavailable' : ''}"/>
+                <g:set var="styleClass" value="${(status%2==0)?'even':'odd' } "/>
+                <g:set var="title" value="${entry?.inventoryItem?.lotStatus == LotStatusCode.RECALLED ? warehouse.message(code: 'inventoryItem.recalledLot.label') : (entry?.onHold ?  warehouse.message(code: 'inventoryItem.restrictedBin.label') : '')}"/>
+                <tr class="prop ${styleClass} ${statusClass}" title="${title}">
                     <td class="middle" style="text-align: left; width: 10%" nowrap="nowrap">
                         <g:render template="actionsCurrentStock"
                                   model="[commandInstance:commandInstance,binLocation:entry.binLocation,itemInstance:entry.inventoryItem,itemQuantity:entry.quantityOnHand,isSuperuser:isSuperuser]" />
@@ -78,9 +81,14 @@
                                 <warehouse:message code="stockCard.enum.AvailableItemStatus.${entry?.status}"/>
                             </a>
                         </g:if>
-                        <g:elseif test="${entry?.status && entry.status != AvailableItemStatus.AVAILABLE && entry.status != AvailableItemStatus.NOT_AVAILABLE}">
+                        <g:else>
                             <warehouse:message code="stockCard.enum.AvailableItemStatus.${entry?.status}"/>
-                        </g:elseif>
+                        </g:else>
+                        <div class="small">
+                            ${entry?.inventoryItem?.lotStatus}
+                        </div>
+
+
                     </td>
                 </tr>
             </g:each>

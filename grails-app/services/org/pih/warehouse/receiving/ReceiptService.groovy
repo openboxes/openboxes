@@ -253,6 +253,9 @@ class ReceiptService {
 
             if (partialReceiptItem.shouldSave) {
                 ReceiptItem receiptItem = createOrUpdateReceiptItem(partialReceiptItem)
+                if (partialReceiptItem.lotStatusCode) {
+                    receiptItem.inventoryItem.lotStatus = partialReceiptItem.lotStatusCode
+                }
                 receipt.addToReceiptItems(receiptItem)
                 ShipmentItem shipmentItem = partialReceiptItem.shipmentItem
                 shipmentItem.addToReceiptItems(receiptItem)

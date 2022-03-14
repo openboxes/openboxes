@@ -51,6 +51,12 @@
                     <td class="value">
                         <div>
                             ${g.formatNumber(number: totalQuantityAvailableToPromise, format: '###,###,###') }
+                            <g:if test="${productInstance?.unitOfMeasure }">
+                                <format:metadata obj="${productInstance?.unitOfMeasure}"/>
+                            </g:if>
+                            <g:else>
+                                ${warehouse.message(code:'default.each.label') }
+                            </g:else>
                         </div>
                     </td>
                 </tr>
