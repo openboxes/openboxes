@@ -37,17 +37,11 @@ import org.pih.warehouse.shipping.Shipment
 class Transaction implements Comparable, Serializable {
 
     def beforeInsert = {
-        def currentUser = AuthService.currentUser.get()
-        if (currentUser) {
-            createdBy = currentUser
-            updatedBy = currentUser
-        }
+        createdBy = AuthService.currentUser.get()
     }
+
     def beforeUpdate = {
-        def currentUser = AuthService.currentUser.get()
-        if (currentUser) {
-            updatedBy = currentUser
-        }
+        updatedBy = AuthService.currentUser.get()
     }
 
     def publishSaveEvent = {

@@ -9,11 +9,20 @@
  **/
 package org.pih.warehouse.product
 
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PreferenceType
 import org.pih.warehouse.core.User
 
 class ProductSupplierPreference {
+
+    def beforeInsert = {
+        createdBy = AuthService.currentUser.get()
+    }
+
+    def beforeUpdate = {
+        updatedBy = AuthService.currentUser.get()
+    }
 
     String id
 

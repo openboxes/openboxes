@@ -17,6 +17,7 @@ class UnitOfMeasureClass implements Serializable {
     def beforeInsert = {
         createdBy = AuthService.currentUser.get()
     }
+
     def beforeUpdate = {
         updatedBy = AuthService.currentUser.get()
     }

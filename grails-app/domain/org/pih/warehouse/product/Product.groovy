@@ -13,7 +13,6 @@ import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.NotImplementedException
 import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.hibernate.Criteria
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.GlAccount
@@ -29,6 +28,7 @@ import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.shipping.ShipmentItem
+
 /**
  * An product is an instance of a generic.  For instance,
  * the product might be Ibuprofen, but the product is Advil 200mg
@@ -46,21 +46,11 @@ class Product implements Comparable, Serializable {
 
 
     def beforeInsert = {
-        User.withNewSession {
-            def currentUser = AuthService.currentUser.get()
-            if (currentUser) {
-                createdBy = currentUser
-                updatedBy = currentUser
-            }
-        }
+        createdBy = AuthService.currentUser.get()
     }
+
     def beforeUpdate = {
-        User.withNewSession {
-            def currentUser = AuthService.currentUser.get()
-            if (currentUser) {
-                updatedBy = currentUser
-            }
-        }
+        updatedBy = AuthService.currentUser.get()
     }
 
     def publishPersistenceEvent = {
@@ -670,4 +660,3 @@ class Product implements Comparable, Serializable {
         ]
     }
 }
-
