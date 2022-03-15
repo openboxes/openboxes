@@ -9,10 +9,7 @@
  **/
 
 
-import org.apache.http.auth.AuthenticationException
 import org.pih.warehouse.auth.AuthService
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.User
 import org.pih.warehouse.util.RequestUtil
 
 class SecurityFilters {
@@ -24,30 +21,26 @@ class SecurityFilters {
     static ArrayList actionsWithLocationNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'chooseLocation', 'menu']
 
     def authService
+    def dependsOn = [InitializationFilters]
     def filters = {
         loginCheck(controller: '*', action: '*') {
 
             afterView = {
-                // Clear out current user after rendering the view
-                AuthService.currentUser.set(null)
-                AuthService.currentLocation.set(null)
+                // Completely clear user/location after rendering the view
+
+                session.user?.discard()
+                AuthService.currentUser.get()?.discard()
+                AuthService.currentUser.remove()
+
+                session.warehouse?.discard()
+                AuthService.currentLocation.get()?.discard()
+                AuthService.currentLocation.remove()
             }
+
             before = {
-
-                // Set the current user (if there's on in the session)
-                if (session.user) {
-                    if (!AuthService.currentUser) {
-                        AuthService.currentUser = new ThreadLocal<User>()
-                    }
-                    AuthService.currentUser.set(User.get(session.user.id))
-                }
-
-                if (session.warehouse) {
-                    if (!AuthService.currentLocation) {
-                        AuthService.currentLocation = new ThreadLocal<Location>()
-                    }
-                    AuthService.currentLocation.set(Location.get(session.warehouse.id))
-                }
+                // make thread-local references to session state
+                AuthService.currentUser.set(session.user)
+                AuthService.currentLocation.set(session.warehouse)
 
                 // This allows requests for the health monitoring endpoint to pass through without a user
                 if (controllerName.equals("api") && actionName.equals("status")) {

@@ -13,6 +13,8 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
 import org.slf4j.MDC
 
 class LoggingFilters {
+    def dependsOn = [SecurityFilters]  // don't run until session.user is sane
+
     def filters = {
         all(controller: '*', action: '*') {
             before = {

@@ -8,6 +8,7 @@
  * You must not remove this notice, or any other, from this software.
  **/
 class AccessLogFilters {
+    def dependsOn = [SecurityFilters]  // don't run until session.user is sane
 
     def filters = {
         all(controller: '*', action: '*') {
