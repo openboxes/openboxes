@@ -1749,6 +1749,11 @@ class StockMovementService {
                         requisition.removeFromRequisitionItems(requisitionItem)
                         requisitionItem.delete(flush: true)
                     } else {
+
+                        if (stockMovementItem.quantityRequested > requisitionItem.quantity) {
+                            throw new IllegalArgumentException("User is not allowed to increase the quantity")
+                        }
+
                         if (stockMovementItem.quantityRequested != requisitionItem.quantity) {
                             requisitionItem.undoChanges()
                         }
