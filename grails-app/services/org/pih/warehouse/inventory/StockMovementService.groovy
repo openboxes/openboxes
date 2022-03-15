@@ -422,7 +422,23 @@ class StockMovementService {
             if(params.createdBefore) {
                 le("dateCreated", params.createdBefore)
             }
-
+            if (params.requestedDeliveryDates && params.list("requestedDeliveryDates").size() == 2) {
+                requisition {
+                    between("requestedDeliveryDate", params.requestedDeliveryDates[0], params.requestedDeliveryDates[1])
+                }
+            }
+            if (params.expectedDeliveryDates && params.list("expectedDeliveryDates").size() == 2) {
+                between("expectedDeliveryDate", params.expectedDeliveryDates[0], params.expectedDeliveryDates[1])
+            }
+            if (params.sort && params.order) {
+                if (params.sort in ["requestedDeliveryDate"]) {
+                    requisition {
+                        order(params.sort, params.order)
+                    }
+                } else {
+                    order(params.sort, params.order)
+                }
+            }
             order("dateCreated", "desc")
         }
         def stockMovements = shipments.collect { Shipment shipment ->

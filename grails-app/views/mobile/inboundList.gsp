@@ -30,6 +30,7 @@
 </div>
 <div class="row g-0">
     <div class="col">
+        <g:set var="pageParams" value="${pageScope.variables['params']}"/>
         <g:form controller="mobile" action="inboundList" method="GET">
             <table class="table table-borderless table-striped">
                 <thead>
@@ -37,8 +38,8 @@
                         <th class="col-2"><g:message code="stockMovement.status.label" default="Status"/></th>
                         <th class="col-2"><g:message code="requisition.orderNumber.label"/></th>
                         <th class="col-4"><g:message code="stockMovement.origin.label"/></th>
-                        <th><g:message code="stockMovement.requestedDeliveryDate.label" default="Requested"/></th>
-                        <th><g:message code="stockMovement.expectedDeliveryDate.label" default="Expected"/></th>
+                        <g:sortableColumn property="requestedDeliveryDate" title="${warehouse.message(code: 'stockMovement.requestedDeliveryDate.label', default: 'Requested')}" defaultOrder="desc" params="${pageParams}"/>
+                        <g:sortableColumn property="expectedDeliveryDate" title="${warehouse.message(code: 'stockMovement.expectedDeliveryDate.label', default: 'Expected')}" defaultOrder="desc" params="${pageParams}"/>
                         <th></th>
                     </tr>
                     <tr>
@@ -54,12 +55,18 @@
                             <g:textField name="identifier" value="${params.identifier}" class="form-control" size="3"/>
                         </th>
                         <th>
-                            <g:selectLocation id="origin" name="origin.id" value="${params?.origin?.id}"
+                            <g:selectLocation id="origin" name="originId" value="${params?.originId}"
                                   class="form-control"
                                   noSelection="['null':warehouse.message(code:'default.all.label')]"/>
                         </th>
-                        <th></th>
-                        <th></th>
+                        <th>
+                            <g:textField name="requestedDeliveryDateFilter" class="date-filter form-control" size="10"
+                                         value="${params.requestedDeliveryDateFilter}"/>
+                        </th>
+                        <th>
+                            <g:textField name="expectedDeliveryDateFilter" class="date-filter form-control" size="10"
+                                         value="${params.expectedDeliveryDateFilter}"/>
+                        </th>
                         <th class="col-1 text-center">
                             <button type="submit" class="btn btn-primary"><i class="fa fa-filter"></i> Filter</button>
                         </th>
@@ -118,7 +125,7 @@
             </g:unless>
         </g:form>
         <div class="pagination">
-            <g:paginate total="${stockMovements.totalCount}"/>
+            <g:paginate total="${stockMovements.totalCount}" params="${pageParams}"/>
         </div>
     </div>
 </div>

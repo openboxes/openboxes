@@ -59,7 +59,8 @@ class MobileController {
         def productListUrl = g.createLink(controller: "mobile", action: "productList")
 
         StockMovement inboundCriteria = new StockMovement(destination: location, stockMovementType: StockMovementType.INBOUND)
-        def inboundOrders = stockMovementService.getStockMovements(inboundCriteria, [max:params.max?:10, offset: params.offset?:0])
+        Map inboundParams = [max:params.max?:10, offset: params.offset?:0, sort: "requestedDeliveryDate", order: "asc"]
+        def inboundOrders = stockMovementService.getStockMovements(inboundCriteria, inboundParams)
 
         // FIXME Hack to set line items so we can display categories for each stock movement
         inboundOrders.each { stockMovement ->
@@ -70,7 +71,8 @@ class MobileController {
         def inboundPending = inboundOrders.findAll { !it.isReceived }
 
         StockMovement outboundCriteria = new StockMovement(origin: location, stockMovementType: StockMovementType.OUTBOUND)
-        def outboundOrders = stockMovementService.getStockMovements(outboundCriteria, [max:params.max?:10, offset: params.offset?:0])
+        Map outboundParams = [max:params.max?:10, offset: params.offset?:0, sort: "requestedDeliveryDate", order: "asc"]
+        def outboundOrders = stockMovementService.getStockMovements(outboundCriteria, outboundParams)
 
         // FIXME Hack to set line items so we can display categories for each stock movement
         outboundOrders.each { stockMovement ->
@@ -149,8 +151,14 @@ class MobileController {
     }
 
     def inboundList = {
+
+        params.max = params.max?:10
+        params.offset = params.offset?:0
+        params.sort = params?.sort?:"expectedDeliveryDate"
+        params.order = params?.sort?:"asc"
+
         Location destination = Location.get(session.warehouse.id)
-        Location origin = params.origin?Location.get(params.origin.id):null
+        Location origin = params.originId?Location.get(params?.originId):null
 
         StockMovement stockMovement = new StockMovement(origin: origin, destination: destination, stockMovementType: StockMovementType.INBOUND)
         if (params.status) {
@@ -159,7 +167,14 @@ class MobileController {
         if (params.identifier) {
            stockMovement.identifier = "%" + params.identifier + "%"
         }
-        def stockMovements = stockMovementService.getStockMovements(stockMovement, [max:params.max?:10, offset: params.offset?:0])
+        if (params.requestedDeliveryDateFilter) {
+            params.requestedDeliveryDates = DateUtil.parseDateRange(params.requestedDeliveryDateFilter, "dd/MMM/yyyy", " - ")
+        }
+        if (params.expectedDeliveryDateFilter) {
+            params.expectedDeliveryDates = DateUtil.parseDateRange(params.expectedDeliveryDateFilter, "dd/MMM/yyyy", " - ")
+        }
+
+        def stockMovements = stockMovementService.getStockMovements(stockMovement, params)
         [stockMovements: stockMovements]
     }
 
