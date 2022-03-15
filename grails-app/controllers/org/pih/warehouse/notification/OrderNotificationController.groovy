@@ -38,7 +38,6 @@ class OrderNotificationController {
         render "published"
     }
 
-
     def subscribe = {
         String ORDER_TOPIC_ARN = grailsApplication.config.awssdk.sns.order.arn?.toString()
         log.info "Subscribiing topic:${ORDER_TOPIC_ARN}"
@@ -71,6 +70,7 @@ class OrderNotificationController {
         stockMovement.stockMovementType = StockMovementType.OUTBOUND
 
         if(orderJson.has("id")){
+            stockMovement.id = orderJson.getString("id")
             stockMovement.identifier = orderJson.getString("id")
         }
 
@@ -101,22 +101,17 @@ class OrderNotificationController {
             stockMovement.dateRequested = dateRequested
         }
 
-        stockMovement.name = orderJson.has("name") ? orderJson.getString("name") :
-                "${stockMovement?.origin?.locationNumber?.toUpperCase()}-${stockMovement?.destination?.locationNumber?.toUpperCase()}-${stockMovement?.dateRequested?.format("ddMMMyyyy")?.toUpperCase()}"
-        stockMovement.description = stockMovement.name
-
-        Boolean lineItemHasError = false
         JSONArray orderLineItemsArray = orderJson.getJSONArray("orderItems")
         for (JSONObject lineItem : orderLineItemsArray) {
-            log.info "Reading LineItem:${lineItem} for Order"
+            log.info "lineItems: ${lineItem.toString(4)}"
             StockMovementItem stockMovementItem = new StockMovementItem()
             Product product = productService.findProductByExternalId(lineItem.getString("productId"))
             if (!product) {
                 throw new IllegalArgumentException("Product not found with id:"+lineItem.getString("productId"))
             }
-            Integer quantity = lineItem.getInt("quantity")
             stockMovementItem.product = product
-            stockMovementItem.quantityRequested = quantity
+            stockMovementItem.description = lineItem.get("id")
+            stockMovementItem.quantityRequested = lineItem.getInt("quantity")
             stockMovement.lineItems.add(stockMovementItem)
         }
         try {

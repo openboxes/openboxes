@@ -123,45 +123,45 @@ class StockMovement {
 
     Map toJson() {
         return [
-            id                  : id,
-            name                : name,
-            description         : description,
-            statusCode          : statusCode,
-            identifier          : identifier,
-            origin              : origin,
-            destination         : destination,
-            hasManageInventory  : origin?.supports(ActivityCode.MANAGE_INVENTORY),
-            stocklist           : [
-                id  : stocklist?.id,
-                name: stocklist?.name
-            ],
-            replenishmentType   : stocklist?.replenishmentTypeCode,
-            dateRequested       : dateRequested?.format("MM/dd/yyyy"),
-            dateShipped         : dateShipped?.format("MM/dd/yyyy HH:mm XXX"),
-            expectedDeliveryDate: expectedDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),
-            shipmentType        : shipmentType,
-            shipmentStatus      : currentStatus,
-            trackingNumber      : trackingNumber,
-            driverName          : driverName,
-            comments            : comments,
-            requestedBy         : requestedBy,
-            lineItems           : lineItems,
-            lineItemCount       : lineItemCount,
-            associations        : [
-                requisition: [id: requisition?.id, requestNumber: requisition?.requestNumber, status: requisition?.status?.name()],
-                shipment   : [id: shipment?.id, shipmentNumber: shipment?.shipmentNumber, status: shipment?.currentStatus?.name()],
-                shipments  : requisition?.shipments?.collect {
-                    [id: it?.id, shipmentNumber: it?.shipmentNumber, status: it?.currentStatus?.name()]
-                },
-                documents  : documents
-            ],
-            isFromOrder         : isFromOrder,
-            isShipped           : isShipped,
-            isReceived          : isReceived,
-            shipped             : isShipped,
-            received            : isReceived,
-            requestType         : requestType,
-            sourceType          : sourceType?.name,
+                id                  : id,
+                name                : name,
+                description         : description,
+                statusCode          : statusCode,
+                identifier          : identifier,
+                origin              : origin,
+                destination         : destination,
+                hasManageInventory  : origin?.supports(ActivityCode.MANAGE_INVENTORY),
+                stocklist           : [
+                        id  : stocklist?.id,
+                        name: stocklist?.name
+                ],
+                replenishmentType   : stocklist?.replenishmentTypeCode,
+                dateRequested       : dateRequested?.format("MM/dd/yyyy"),
+                dateShipped         : dateShipped?.format("MM/dd/yyyy HH:mm XXX"),
+                expectedDeliveryDate: expectedDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),
+                shipmentType        : shipmentType,
+                shipmentStatus      : currentStatus,
+                trackingNumber      : trackingNumber,
+                driverName          : driverName,
+                comments            : comments,
+                requestedBy         : requestedBy,
+                lineItems           : lineItems,
+                lineItemCount       : lineItemCount,
+                associations        : [
+                        requisition: [id: requisition?.id, requestNumber: requisition?.requestNumber, status: requisition?.status?.name()],
+                        shipment   : [id: shipment?.id, shipmentNumber: shipment?.shipmentNumber, status: shipment?.currentStatus?.name()],
+                        shipments  : requisition?.shipments?.collect {
+                            [id: it?.id, shipmentNumber: it?.shipmentNumber, status: it?.currentStatus?.name()]
+                        },
+                        documents  : documents
+                ],
+                isFromOrder         : isFromOrder,
+                isShipped           : isShipped,
+                isReceived          : isReceived,
+                shipped             : isShipped,
+                received            : isReceived,
+                requestType         : requestType,
+                sourceType          : sourceType,
         ]
     }
 

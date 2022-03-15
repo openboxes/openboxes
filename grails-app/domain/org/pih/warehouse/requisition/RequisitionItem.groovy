@@ -155,6 +155,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     static RequisitionItem createFromStockMovementItem(StockMovementItem stockMovementItem) {
         return new RequisitionItem(
                 id: stockMovementItem?.id,
+                description: stockMovementItem?.description,
                 product: stockMovementItem?.product,
                 inventoryItem: stockMovementItem?.inventoryItem,
                 quantity: stockMovementItem.quantityRequested,
@@ -699,13 +700,14 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
     String toString() {
-        return "${product.productCode}:${status}:${requisitionItemType}:${quantity}"
+        return "${id}:${description}:${product.productCode}:${status}:${requisitionItemType}:${quantity}"
     }
 
 
     Map toJson() {
         [
                 id                    : id,
+                description           : description,
                 version               : version,
                 productId             : product?.id,
                 productName           : product?.productCode + " " + product?.name + ((productPackage) ? " (" + productPackage?.uom?.code + "/" + productPackage?.quantity + ")" : " (EA/1)"),

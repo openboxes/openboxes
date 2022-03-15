@@ -1560,6 +1560,7 @@ class StockMovementService {
     }
 
     StockMovement createRequisitionBasedStockMovement(StockMovement stockMovement) {
+        log.info "Creating requisition " + stockMovement.toJson()
         Requisition requisition = Requisition.get(stockMovement.id)
         if (!requisition) {
             requisition = new Requisition()
@@ -1573,6 +1574,10 @@ class StockMovementService {
         if (!stockMovement.identifier && !requisition.requestNumber) {
             requisition.requestNumber = identifierService.generateRequisitionIdentifier()
         }
+        else if (stockMovement.identifier) {
+            requisition.requestNumber = stockMovement.identifier
+        }
+
         requisition.type = stockMovement.requestType
         requisition.sourceType = stockMovement.sourceType
         requisition.requisitionTemplate = stockMovement.stocklist

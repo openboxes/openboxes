@@ -16,6 +16,7 @@ class StockMovementItem {
 
     String id
     String productCode
+    String description
     Product product
     InventoryItem inventoryItem
     Location binLocation
@@ -78,6 +79,7 @@ class StockMovementItem {
     static constraints = {
         id(nullable: true)
         productCode(nullable: true)
+        description(nullable: false)
         product(nullable: true)
         inventoryItem(nullable: true)
         binLocation(nullable: true)
@@ -109,32 +111,33 @@ class StockMovementItem {
 
     Map toJson() {
         return [
-                id                        : id,
-                productCode               : productCode,
-                product                   : product,
-                lotNumber                 : lotNumber,
-                expirationDate            : expirationDate?.format("MM/dd/yyyy"),
-                palletName                : palletName,
-                boxName                   : boxName,
-                statusCode                : statusCode,
-                quantityRequested         : quantityRequested,
-                quantityAllowed           : quantityAllowed,
-                quantityOnHand            : quantityOnHand,
-                quantityAvailable         : quantityAvailable,
-                quantityCanceled          : quantityCanceled,
-                quantityRevised           : quantityRevised,
-                quantityPicked            : quantityPicked,
-                quantityRequired          : quantityRequired,
-                reasonCode                : reasonCode,
-                comments                  : comments,
-                recipient                 : recipient,
-                substitutionItems         : substitutionItems,
-                sortOrder                 : sortOrder,
-                orderItemId               : orderItemId,
-                orderNumber               : orderNumber,
-                orderId                   : orderId,
-                packSize                  : packSize,
-                inventoryItem             : !inventoryItem ? null : [
+                id               : id,
+                productCode      : productCode,
+                description      : description,
+                product          : product,
+                lotNumber        : lotNumber,
+                expirationDate   : expirationDate?.format("MM/dd/yyyy"),
+                palletName       : palletName,
+                boxName          : boxName,
+                statusCode       : statusCode,
+                quantityRequested: quantityRequested,
+                quantityAllowed  : quantityAllowed,
+                quantityOnHand   : quantityOnHand,
+                quantityAvailable: quantityAvailable,
+                quantityCanceled : quantityCanceled,
+                quantityRevised  : quantityRevised,
+                quantityPicked   : quantityPicked,
+                quantityRequired : quantityRequired,
+                reasonCode       : reasonCode,
+                comments         : comments,
+                recipient        : recipient,
+                substitutionItems: substitutionItems,
+                sortOrder        : sortOrder,
+                orderItemId      : orderItemId,
+                orderNumber      : orderNumber,
+                orderId          : orderId,
+                packSize         : packSize,
+                inventoryItem    : !inventoryItem ? null : [
                         id            : inventoryItem.id,
                         lotNumber     : inventoryItem.lotNumber,
                         expirationDate: inventoryItem.expirationDate?.format("MM/dd/yyyy"),
@@ -192,6 +195,7 @@ class StockMovementItem {
 
         return new StockMovementItem(
                 id: requisitionItem.id,
+                description: requisitionItem?.description,
                 statusCode: requisitionItem.status?.name(),
                 productCode: requisitionItem?.product?.productCode,
                 product: requisitionItem?.product,
