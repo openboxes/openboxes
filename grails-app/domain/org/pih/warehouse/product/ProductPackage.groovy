@@ -51,10 +51,10 @@ class ProductPackage implements Comparable<ProductPackage>, Serializable {
     User createdBy
     User updatedBy
 
-    static belongsTo = [product: Product]
-
+    static belongsTo = [product: Product, productSupplier: ProductSupplier]
     static mapping = {
         id generator: 'uuid'
+        cascade productPrice: "all-delete-orphan"
     }
 
     static constraints = {
@@ -62,11 +62,9 @@ class ProductPackage implements Comparable<ProductPackage>, Serializable {
         description(nullable: true)
         gtin(nullable: true)
         uom(nullable: true)
-        productPrice(nullable: true)
-        quantity(nullable: false)
+        productPrice(nullable: true, unique: true)
         createdBy(nullable: true)
         updatedBy(nullable: true)
-        productSupplier(nullable: true)
     }
 
     String toString() {
@@ -76,6 +74,7 @@ class ProductPackage implements Comparable<ProductPackage>, Serializable {
     /**
      * Sort by quantity
      */
+    @Override
     int compareTo(ProductPackage other) {
         return other.quantity <=> quantity
     }

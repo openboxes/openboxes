@@ -266,9 +266,10 @@ class Product implements Comparable, Serializable {
         categories joinTable: [name: 'product_category', column: 'category_id', key: 'product_id']
         attributes joinTable: [name: 'product_attribute', column: 'attribute_id', key: 'product_id']
         documents joinTable: [name: 'product_document', column: 'document_id', key: 'product_id']
+        packages cascade: "all-delete-orphan"
         productGroups joinTable: [name: 'product_group_product', column: 'product_group_id', key: 'product_id']
         synonyms cascade: 'all-delete-orphan', sort: 'name'
-        productSuppliers cascade: 'all-delete-orphan'//, sort: 'dateCreated'
+        productSuppliers cascade: 'all-delete-orphan'
         productComponents cascade: "all-delete-orphan"
         color(formula: '(select max(pc.color) from product_catalog_item pci left outer join product_catalog pc on pci.product_catalog_id = pc.id where pci.product_id = id group by pci.product_id)')
     }

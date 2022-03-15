@@ -16,14 +16,10 @@ import org.pih.warehouse.order.OrderTypeCode
 
 class Organization extends Party {
 
-    String id
     String code
     String name
     String description
     Location defaultLocation
-
-    Date dateCreated
-    Date lastUpdated
 
     static hasMany = [locations : Location]
 

@@ -10,7 +10,6 @@
 package org.pih.warehouse.core
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
-import org.grails.plugins.excelimport.ExcelImportUtils
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
@@ -97,6 +96,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
 
     static mapping = {
         id generator: 'uuid'
+        packages cascade: "all-delete-orphan"
         cache true
     }
 

@@ -68,21 +68,22 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
 
     static hasMany = [productPackages: ProductPackage, productSupplierPreferences: ProductSupplierPreference]
 
+    static belongsTo = [product: Product, supplier: Organization]
     static mapping = {
         description type: 'text'
+        cascade productPackages: "all-delete-orphan"
+        cascade productSupplierPreferences: "all-delete-orphan"
+        cascade contractPrice: "all-delete-orphan"
     }
 
     static constraints = {
 
         code(nullable: true)
-        name(nullable: false)
         description(nullable: true)
-        product(nullable: false)
         productCode(nullable: true)
         ndc(nullable: true, maxSize: 255)
         upc(nullable: true, maxSize: 255)
 
-        supplier(nullable: true)
         supplierCode(nullable: true, maxSize: 255)
         supplierName(nullable: true, maxSize: 255)
 
@@ -97,7 +98,7 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
         ratingTypeCode(nullable: true)
         comments(nullable: true)
 
-        contractPrice(nullable: true)
+        contractPrice(nullable: true, unique: true)
     }
 
     ProductPackage getDefaultProductPackage() {

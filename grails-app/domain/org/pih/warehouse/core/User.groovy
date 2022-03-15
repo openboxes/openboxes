@@ -9,14 +9,12 @@
  * */
 package org.pih.warehouse.core
 
+import grails.converters.JSON
 import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
 import util.StringUtil
-import grails.converters.JSON
-
 
 class User extends Person {
 
-    String id
     Boolean active = false                // default = false?
     String username            // email or username
     String password            // encrypted password

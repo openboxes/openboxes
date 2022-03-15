@@ -11,17 +11,10 @@ package org.pih.warehouse.core
 
 class LocationRole implements Serializable {
     String id
-    Location location
-    Role role
+
     static mapping = {
         id generator: 'uuid'
     }
-    static belongsTo = [user: User]
-    static constraints = {
-        user(nullable: false)
-        location(nullable: false)
-        role(nullable: false)
-    }
 
-
+    static belongsTo = [location: Location, role: Role, user: User]
 }
