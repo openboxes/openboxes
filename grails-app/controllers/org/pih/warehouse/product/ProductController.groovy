@@ -472,20 +472,14 @@ class ProductController {
 
         if (!packageInstance) {
             packageInstance = new ProductPackage(params)
-            ProductPrice productPrice = new ProductPrice()
-            productPrice.price = parsedUnitPrice?:0
-            packageInstance.productPrice = productPrice
             productInstance.addToPackages(packageInstance)
         } else {
             packageInstance.properties = params
-            if (packageInstance.productPrice) {
-                packageInstance.productPrice.price = parsedUnitPrice?:0
-            } else if (parsedUnitPrice) {
-                ProductPrice productPrice = new ProductPrice()
-                productPrice.price = parsedUnitPrice
-                packageInstance.productPrice = productPrice
-            }
         }
+        if (parsedUnitPrice) {
+            packageInstance.createOrGetProductPrice().price = parsedUnitPrice
+        }
+
 
         if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'package.label', default: 'Product'), packageInstance.name])}"
@@ -1147,6 +1141,3 @@ class ProductController {
         render(view: "addDocument", model: [productInstance: productInstance, documentInstance: documentInstance])
     }
 }
-
-
-

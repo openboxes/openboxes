@@ -53,8 +53,8 @@ class ProductPrice implements Serializable {
     static constraints = {
         type(nullable: false)
         price(nullable: false)
-        productPackage(nullable: true)
-        productSupplier(nullable: true)
+        productPackage(nullable: true, validator: { value, obj -> value || obj.productSupplier })
+        productSupplier(nullable: true, validator: { value, obj -> value || obj.productPackage })
         currency(nullable: true)
         fromDate(nullable: true)
         toDate(nullable: true)

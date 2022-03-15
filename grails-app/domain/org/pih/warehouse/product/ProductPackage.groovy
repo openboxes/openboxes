@@ -14,7 +14,6 @@ import org.pih.warehouse.core.ProductPrice
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.User
 
-
 class ProductPackage implements Comparable<ProductPackage>, Serializable {
 
     def beforeInsert = {
@@ -71,6 +70,14 @@ class ProductPackage implements Comparable<ProductPackage>, Serializable {
 
     String toString() {
         return name
+    }
+
+    ProductPrice createOrGetProductPrice() {
+        if (!productPrice) {
+            productPrice = new ProductPrice()
+            productPrice.productPackage = this
+        }
+        return productPrice
     }
 
     /**

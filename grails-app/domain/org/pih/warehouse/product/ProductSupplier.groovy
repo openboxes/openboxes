@@ -120,6 +120,14 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
                         id <=> obj.id
     }
 
+    ProductPrice createOrGetContractPrice() {
+        if (!contractPrice) {
+            contractPrice = new ProductPrice()
+            contractPrice.productSupplier = this
+        }
+        return contractPrice
+    }
+
     static PROPERTIES = [
             "ID"                                  : "id",
             "Product Source Code"                 : "code",
