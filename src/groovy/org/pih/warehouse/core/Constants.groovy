@@ -53,7 +53,7 @@ class Constants {
     static final String DEFAULT_VOLUME_UNITS = "ft"
 
     static final ArrayList WEIGHT_UNITS = ["lbs", "kg"]
-    static final ArrayList VOLUME_UNITS = ["ft", "m"]
+    static final ArrayList VOLUME_UNITS = ["ft", "m", "cm", "mm"]
 
     static final Float POUNDS_PER_KILOGRAM = 0.45359237
     static final Float KILOGRAMS_PER_POUND = 2.20462262
