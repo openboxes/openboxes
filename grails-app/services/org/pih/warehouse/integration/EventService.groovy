@@ -13,8 +13,7 @@ import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.report.NotificationService
+import org.pih.warehouse.shipping.Container
 
 class EventService {
 
@@ -23,22 +22,38 @@ class EventService {
     def notificationService
     def grailsApplication
 
-    void publishStockMovementStatusEvent(StockMovement stockMovement, Location origin){
+    void publishStockMovementStatusEvent(StockMovement stockMovement){
+        log.info "Publish status change event " + stockMovement.toJson()
         String TOPIC_ARN = grailsApplication.config.awssdk.sns.order.status
-        JSONObject notifyJson = null
-        notifyJson = new JSONObject()
-        notifyJson.put("id", stockMovement.id)
-        notifyJson.put("locationNumber", origin.locationNumber)
+        JSONObject notifyJson = new JSONObject()
+        notifyJson.put("id", stockMovement.identifier)
+        notifyJson.put("locationNumber", stockMovement?.origin?.locationNumber)
         notifyJson.put("status", stockMovement.status)
-        JSONArray orderLineItems = new JSONArray()
+
+        // Add order items
+        JSONArray orderItems = new JSONArray()
         stockMovement.lineItems?.each { StockMovementItem stockMovementItem ->
             JSONObject orderItem = new JSONObject()
-            orderItem.put("id", stockMovementItem.id)
+            orderItem.put("id", stockMovementItem.description)
             orderItem.put("acceptedQuantity", stockMovementItem.quantityPicked)
-            orderLineItems.add(orderItem)
+            orderItems.add(orderItem)
         }
-        notifyJson.put("orderItems", orderLineItems)
-        log.info "notifyJson::${notifyJson}"
+        notifyJson.put("orderItems", orderItems)
+
+        // Add packages
+        JSONArray packages = new JSONArray()
+        stockMovement?.shipment?.containers.each { Container container ->
+            JSONObject jsonObject = new JSONObject()
+            jsonObject.put("identifier", container?.containerNumber)
+            jsonObject.put("type", container?.containerType?.name)
+            jsonObject.put("length", container?.length)
+            jsonObject.put("width", container?.width)
+            jsonObject.put("height", container?.height)
+            jsonObject.put("weight", container?.weight)
+            packages.add(jsonObject)
+        }
+        notifyJson.put("packages", packages)
+        log.info "Publishing stock movement status update ${notifyJson.toString(4)}"
         notificationService.publish(TOPIC_ARN, notifyJson.toString(), "Order Status")
     }
 }

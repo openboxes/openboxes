@@ -17,7 +17,11 @@
     <g:if test="${flash.error}">
         <div class="error">${flash.error}</div>
     </g:if>
-
+    <g:hasErrors bean="${flash.errors}">
+        <div class="errors">
+            <g:renderErrors bean="${flash.errors}" as="list" />
+        </div>
+    </g:hasErrors>
     <g:render template="summary" model="[shipmentInstance:stockMovement?.shipment, requisition: stockMovement?.requisition]"/>
 
     <div class="button-bar ">
@@ -433,8 +437,7 @@
         $(".tabs").tabs({
             cookie : {
                 expires : 1
-            },
-            selected: ${(stockMovement?.shipment?.currentStatus == ShipmentStatusCode.PENDING && stockMovement?.origin?.id == session.warehouse.id) || stockMovement?.origin?.isSupplier()} ? 0 : 1
+            }
         });
     });
 </script>

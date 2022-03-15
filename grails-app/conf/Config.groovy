@@ -1425,6 +1425,9 @@ openboxes.shipping.splitPickItems.enabled = true
 // Add item to shipment search
 openboxes.shipping.search.maxResults = 1000
 
+// Package types used as templates for new containers
+openboxes.shipping.packageTypes = []
+
 // Automatically create temporary receiving locations for shipments
 openboxes.receiving.createReceivingLocation.enabled = true
 openboxes.receiving.receivingLocation.prefix = Constants.DEFAULT_RECEIVING_LOCATION_PREFIX

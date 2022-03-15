@@ -68,6 +68,10 @@
                             </span>
                         </g:if>
                         <span>
+                            <warehouse:message code="stockMovement.containers.label" default="Containers"/>:
+                            <label>${stockMovement?.shipment?.containers?.size()?:0 }</label>
+                        </span>
+                        <span>
                             <warehouse:message code="stockMovement.lineItems.label"/>:
                             <label>${stockMovement.lineItems.size()?:0 }</label>
                         </span>

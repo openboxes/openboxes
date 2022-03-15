@@ -194,11 +194,140 @@
         </g:if>
         <g:else>
             <tr>
-                <td colspan="11" class="middle center fade empty">
+                <td colspan="12" class="middle center fade empty">
                     <warehouse:message code="shipment.noShipmentItems.message"/>
                 </td>
             </tr>
         </g:else>
 
+    </table>
+</div>
+<div id="packages" class="box">
+    <h2>
+        <img src="${createLinkTo(dir:'images/icons/silk',file:'package.png')}" alt="contents" style="vertical-align: middle"/>
+        ${warehouse.message(code:'shipping.packages.label', default: 'Packages')}
+    </h2>
+    <table>
+        <thead>
+            <tr>
+                <th><g:message code="default.actions.label" /></th>
+                <th><g:message code="container.name.label"/></th>
+                <th><g:message code="container.containerNumber.label"/></th>
+                <th><g:message code="container.containerType.label"/></th>
+                <th><g:message code="default.weight.label" default="Weight"/></th>
+                <th><g:message code="default.length.label" default="Length"/></th>
+                <th><g:message code="default.width.label" default="Width"/></th>
+                <th><g:message code="default.height.label" default="Height"/></th>
+                <th><g:message code="default.volume.label" default="Volume"/></th>
+            </tr>
+        </thead>
+        <tbody>
+            <g:set var="totalVolume" value="${0}"/>
+            <g:each in="${shipmentInstance?.containers}" var="container" status="i">
+                <tr class="prop ${i%2==0 ? 'odd' : 'even'}">
+                    <td>
+                        <span id="package-action-menu" class="action-menu">
+                            <button class="action-btn">
+                                <img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_arrow_down.png')}" />
+                            </button>
+                            <div class="actions">
+                                <div class="action-menu-item">
+                                    <a href="javascript:void(0);" class="btn-show-dialog" data-height="400"
+                                       data-title="${warehouse.message(code:'default.button.edit.label')}"
+                                       data-url="${request.contextPath}/stockMovement/containerDialog/${container?.id}?stockMovement.id=${stockMovement.id}">
+                                        <img src="${createLinkTo(dir:'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
+                                        ${warehouse.message(code:'default.button.edit.label')}
+                                    </a>
+                                </div>
+                                <div class="action-menu-item">
+                                    <g:link controller="stockMovement" action="deleteContainer" id="${container?.id}" params="['stockMovement.id':stockMovement.id]">
+                                        <img src="${createLinkTo(dir:'images/icons/silk', file: 'delete.png')}"/>&nbsp;
+                                        ${warehouse.message(code:'default.button.delete.label')}
+                                    </g:link>
+                                </div>
+                            </div>
+                        </span>
+                    </td>
+                    <td>
+                       ${container?.name}
+                    </td>
+                    <td>
+                        ${container.containerNumber}
+                    </td>
+                    <td>
+                        <format:metadata obj="${container?.containerType?.name}"/>
+                    </td>
+                    <td>
+                        ${container.weight} ${container?.weightUnits}
+                    </td>
+                    <td>
+                        ${container.length} ${container?.volumeUnits}
+                    </td>
+                    <td>
+                        ${container.width} ${container?.volumeUnits}
+                    </td>
+                    <td>
+                        ${container.height} ${container?.volumeUnits}
+                    </td>
+                    <td>
+                        <g:set var="volume" value="${(container.length/1000 * container?.height/1000 * container?.width/1000)}"/>
+                        <g:formatNumber number="${volume}" minFractionDigits="5"/> cbm
+                    </td>
+                    <td>
+
+                    </td>
+                </tr>
+                <g:set var="totalVolume" value="${totalVolume+volume}"/>
+            </g:each>
+            <g:unless test="${shipmentInstance?.containers}">
+                <tr>
+                    <td colspan="12" class="fade center middle empty">
+                        <g:message code="shipping.noContainers.message" default="No containers"/>
+                    </td>
+                </tr>
+            </g:unless>
+        </tbody>
+        <tfoot>
+            <g:if test="${shipmentInstance?.containers}">
+                <tr>
+                    <td></td>
+                    <td><g:message code="default.total.label"/></td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        ${shipmentInstance?.totalWeightInKilograms()} kg
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        <g:formatNumber number="${totalVolume}" minFractionDigits="5"/> cbm
+                    </td>
+                </tr>
+            </g:if>
+            <tr>
+                <td colspan="12">
+                    <div id="packages-action-menu" class="action-menu">
+                        <button class="action-btn button">
+                            <img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" />
+                            ${warehouse.message(code: 'default.create.label', args: [warehouse.message(code: "container.label")])}
+                            <img src="${createLinkTo(dir:'images/icons/silk',file:'bullet_arrow_down.png')}" />
+                        </button>
+                        <div class="actions" >
+                            <g:each var="packageType" in="${grailsApplication.config.openboxes.shipping.packageTypes}">
+                                <div class="action-menu-item">
+                                    <a href="javascript:void(0);" class="btn-show-dialog" data-height="400"
+                                       data-title="${warehouse.message(code:'packingList.createNewContainer.label', default: 'Create container')}"
+                                       data-url="${request.contextPath}/stockMovement/containerDialog?packageType=${packageType?.id}&stockMovement.id=${stockMovement.id}">
+                                        <img src="${createLinkTo(dir:'images/icons/silk', file: 'add.png')}"/>&nbsp;
+                                        ${warehouse.message(code:'default.create.label', args: [packageType?.name])}
+                                    </a>
+                                </div>
+                            </g:each>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </tfoot>
     </table>
 </div>

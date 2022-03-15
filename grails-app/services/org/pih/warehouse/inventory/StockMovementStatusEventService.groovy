@@ -24,8 +24,7 @@ class StockMovementStatusEventService  implements ApplicationListener<StockMovem
         // Send notification for status updates on outbound stock movements
         StockMovement stockMovement = event.source
         if (stockMovement?.isOutboundStockMovement()) {
-            eventService.publishStockMovementStatusEvent(stockMovement,
-                    stockMovement?.origin)
+            eventService.publishStockMovementStatusEvent(stockMovement)
         }
     }
 }
