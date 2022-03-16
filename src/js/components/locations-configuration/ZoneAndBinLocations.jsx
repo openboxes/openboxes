@@ -15,8 +15,16 @@ const PAGE_ID = 'zoneAndBinLocations';
 class ZoneAndBinLocations extends Component {
   constructor(props) {
     super(props);
-    this.state = INITIAL_STATE;
+    this.state = {
+      ...INITIAL_STATE,
+      locationId: this.props.initialValues.locationId,
+    };
   }
+
+  nextPage() {
+    this.props.nextPage({ locationId: this.state.locationId });
+  }
+
 
   render() {
     return (
@@ -33,7 +41,7 @@ class ZoneAndBinLocations extends Component {
           <button type="button" onClick={this.props.previousPage} className="btn btn-outline-primary float-left btn-xs">
             <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
           </button>
-          <button type="button" onClick={this.props.nextPage} className="btn btn-outline-primary float-right btn-xs">
+          <button type="button" onClick={() => this.nextPage()} className="btn btn-outline-primary float-right btn-xs">
             <Translate id="react.default.button.next.label" defaultMessage="Next" />
           </button>
         </div>
@@ -48,4 +56,14 @@ ZoneAndBinLocations.propTypes = {
   nextPage: PropTypes.func.isRequired,
   previousPage: PropTypes.func.isRequired,
   supportLinks: PropTypes.shape({}).isRequired,
+  initialValues: PropTypes.shape({
+    active: PropTypes.bool,
+    name: PropTypes.string,
+    locationNumber: PropTypes.string,
+    locationType: PropTypes.string,
+    organization: PropTypes.string,
+    locationGroup: PropTypes.string,
+    manager: PropTypes.string,
+    locationId: PropTypes.string,
+  }).isRequired,
 };
