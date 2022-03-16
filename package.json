@@ -14,7 +14,7 @@
   },
   "scripts": {
     "watch": "webpack --watch --colors --progress --mode=development",
-    "bundle": "webpack --mode=production",
+    "bundle": "webpack --no-color --mode=production",
     "test": "jest",
     "styleguide": "styleguidist server",
     "styleguide:build": "styleguidist build",
