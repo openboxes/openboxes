@@ -102,7 +102,9 @@ class EmailModal extends Component {
         subject: this.props.translate('react.stockListManagement.emailSubject.label', 'STOCK LIST UPDATE'),
         text: this.props.translate('react.stockListManagement.emailMessage.label', 'Please find attached a new' +
           ' version of your stock list reflecting recent updates. Please use this version for your next replenishment request.'),
-        recipients: manager ? [{ id: manager.id, email: manager.email, label: manager.name }] : [],
+        recipients: manager ? [{
+          id: manager.id, value: manager.id, email: manager.email, label: manager.name,
+        }] : [],
         includePdf: true,
         includeXls: true,
         showModal: true,

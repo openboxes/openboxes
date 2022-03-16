@@ -86,7 +86,9 @@ class StocklistManagement extends Component {
     apiClient.get(url)
       .then((response) => {
         const users = _.map(response.data.data, user => (
-          { value: { id: user.id, email: user.email, label: user.name }, label: user.name }
+          {
+            id: user.id, value: user.id, email: user.email, label: user.name,
+          }
         ));
         this.setState({ users, usersFetched: true });
       })
@@ -112,7 +114,13 @@ class StocklistManagement extends Component {
       .then((response) => {
         this.setState({
           availableStocklists: _.map(parseResponse(response.data.data), val =>
-            ({ value: val, label: val.name })),
+            ({
+              value: {
+                ...val,
+                label: val.name,
+              },
+              label: val.name,
+            })),
           stocklistsFetched: true,
         });
       })

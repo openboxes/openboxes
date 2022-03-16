@@ -145,7 +145,12 @@ class ReceivingPage extends Component {
     const mapBins = bins => (_.chain(bins)
       .map(bin => ({
         value: {
-          id: bin.id, name: bin.name, zoneId: bin.zoneId, zoneName: bin.zoneName,
+          id: bin.id,
+          name: bin.name,
+          zoneId: bin.zoneId,
+          zoneName: bin.zoneName,
+          label: bin.name,
+          value: bin.id,
         },
         label: bin.name,
       }))

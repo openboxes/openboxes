@@ -3,17 +3,16 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Overlay } from 'react-overlays';
-import ReactSelect, { Async } from 'react-select-plus';
+import ReactSelect, { Async, components } from 'react-select';
 import { Tooltip } from 'react-tippy';
 
-import 'react-select-plus/dist/react-select-plus.css';
 import 'react-tippy/dist/tippy.css';
 
 // eslint-disable-next-line react/prop-types
 const Dropdown = ({ children, style, width }) => (
   <div
     style={{
-      ...style, position: 'absolute', zIndex: 9999, width,
+      ...style, position: 'absolute', zIndex: 9999, width, backgroundColor: 'white', border: '1px solid hsl(0deg 0% 80%)',
     }}
   >
     {children}
@@ -35,11 +34,11 @@ class Select extends Component {
   handleChange(value) {
     if (this.props.multi) {
       const values = _.map(value, val =>
-        (this.props.objectValue ? JSON.parse(val.value) : val.value));
+        (this.props.objectValue ? val : val));
       this.setState({ value: values });
       this.props.onChange(values);
     } else if (value !== null && value !== undefined) {
-      const val = this.props.objectValue ? JSON.parse(value.value) : value.value;
+      const val = this.props.objectValue ? value.value : value;
       this.props.onChange(val);
       this.setState({ value: val });
     } else {
@@ -62,7 +61,7 @@ class Select extends Component {
       if (typeof value === 'string') {
         return { value, label: value };
       } else if (objectValue) {
-        option = { ...value, value: JSON.stringify(value.value) };
+        option = { ...value };
       }
 
       if (option.options) {
@@ -77,14 +76,15 @@ class Select extends Component {
     let value = selectValue;
 
     if (objectValue) {
-      value = multi ? _.map(selectValue, val => JSON.stringify(val))
-        : JSON.stringify(selectValue);
+      value = multi ? _.map(selectValue, val => val)
+        : selectValue;
+    } else if (typeof selectValue === 'string') {
+      value = { selectValue, label: selectValue };
     }
 
     const SelectType = async ? Async : ReactSelect;
 
-    // eslint-disable-next-line react/prop-types
-    const dropdownComponent = ({ children }) => {
+    const Menu = ({ children, innerProps }) => {
       const target = document.getElementById(`${this.state.id}-container`);
       return (
         <Overlay
@@ -94,11 +94,33 @@ class Select extends Component {
           container={document.getElementById('root')}
         >
           <Dropdown width={target.offsetWidth}>
-            {children}
+            <div className="custom-option" {...innerProps}>
+              {children}
+            </div>
           </Dropdown>
         </Overlay>
       );
     };
+
+    const Option = props => (
+      <components.Option {...props}>
+        {this.props.optionRenderer ? (
+          this.props.optionRenderer(props.data)
+        ) : (
+          <div>{props.data.label}</div>
+        )}
+      </components.Option>
+    );
+
+    const SingleValue = props => (
+      <components.SingleValue {...props}>
+        {this.props.valueRenderer ? (
+          this.props.valueRenderer(props.data)
+        ) : (
+          <div>{props.data.label}</div>
+        )}
+      </components.SingleValue>
+    );
 
     if (attributes.disabled && this.props.value && showLabel) {
       // eslint-disable-next-line no-nested-ternary
@@ -137,58 +159,60 @@ class Select extends Component {
           <SelectType
             name={this.state.id}
             {...attributes}
+            isDisabled={attributes.disabled}
             options={options}
-            multi={multi}
+            isMulti={multi}
             title=""
             delimiter={delimiter}
-            value={multi ? _.join(value, delimiter) : value}
+            value={value}
             onChange={this.handleChange}
-            dropdownComponent={dropdownComponent}
+            components={{ Menu, Option, SingleValue }}
             ref={fieldRef}
-            inputProps={{
-              onKeyDown: (event) => {
-                switch (event.keyCode) {
-                  case 37: /* arrow left */
-                    if (arrowLeft) {
-                      arrowLeft();
-                      event.preventDefault();
-                      event.stopPropagation();
-                    }
-                    break;
-                  case 38: /* arrow up */
-                    if (arrowUp) {
-                      arrowUp();
-                      event.preventDefault();
-                      event.stopPropagation();
-                    }
-                    break;
-                  case 39: /* arrow right */
-                    if (arrowRight) {
-                      arrowRight();
-                      event.preventDefault();
-                      event.stopPropagation();
-                    }
-                    break;
-                  case 40: /* arrow down */
-                    if (arrowDown) {
-                      arrowDown();
-                      event.preventDefault();
-                      event.stopPropagation();
-                    }
-                    break;
-                  case 9: /* Tab key */
-                    if (onTabPress) {
-                      onTabPress(event);
-                    }
-                    break;
-                  case 13: /* Enter key */
-                    if (onEnterPress) {
-                      onEnterPress(event);
-                    }
-                    break;
-                  default:
-                }
-              },
+            isClearable
+            classNamePrefix="react-select"
+            noOptionsMessage={() => (async ? 'Type to search' : 'No results found')}
+            onKeyDown={(event) => {
+              switch (event.keyCode) {
+                case 37: /* arrow left */
+                  if (arrowLeft) {
+                    arrowLeft();
+                    event.preventDefault();
+                    event.stopPropagation();
+                  }
+                  break;
+                case 38: /* arrow up */
+                  if (arrowUp) {
+                    arrowUp();
+                    event.preventDefault();
+                    event.stopPropagation();
+                  }
+                  break;
+                case 39: /* arrow right */
+                  if (arrowRight) {
+                    arrowRight();
+                    event.preventDefault();
+                    event.stopPropagation();
+                  }
+                  break;
+                case 40: /* arrow down */
+                  if (arrowDown) {
+                    arrowDown();
+                    event.preventDefault();
+                    event.stopPropagation();
+                  }
+                  break;
+                case 9: /* Tab key */
+                  if (onTabPress) {
+                    onTabPress(event);
+                  }
+                  break;
+                case 13: /* Enter key */
+                  if (onEnterPress) {
+                    onEnterPress(event);
+                  }
+                  break;
+                default:
+              }
             }}
           />
         </Tooltip>
@@ -219,6 +243,8 @@ Select.propTypes = {
   fieldRef: PropTypes.func,
   onTabPress: PropTypes.func,
   onEnterPress: PropTypes.func,
+  optionRenderer: PropTypes.func,
+  valueRenderer: PropTypes.func,
 };
 
 Select.defaultProps = {
@@ -237,4 +263,6 @@ Select.defaultProps = {
   fieldRef: null,
   onTabPress: null,
   onEnterPress: null,
+  optionRenderer: null,
+  valueRenderer: null,
 };

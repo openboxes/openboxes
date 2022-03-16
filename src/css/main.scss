@@ -286,18 +286,40 @@ body {
   font-size: .875rem;
   border-radius: .2rem;
 
-  .Select-control {
+  .react-select__control {
     height: 26px;
+    min-height: 26px !important;
 
-    .Select-value {
+    &.react-select__control--is-focused {
+      border-color: #007eff;
+      box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 0 3px rgba(0,126,255,.1);
+    }
+
+    &.react-select__control--menu-is-open {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      border-color: #b3b3b3 #cccccc #d9d9d9 !important;
+      box-shadow: none;
+    }
+
+
+    .react-select__value-container {
+      min-height: 26px !important;
       line-height: 26px !important;
     }
 
-    .Select-placeholder {
+    .react-select__indicators {
       line-height: 26px;
+
+      .react-select__indicator {
+        padding-right: 5px !important;
+        cursor: pointer;
+      }
     }
 
-    .Select-input {
+    .react-select__input {
+      display: flex !important;
+      align-items: center;
       height: 24px;
 
       input {
@@ -306,24 +328,37 @@ body {
       }
     }
   }
+
+  .react-select__menu {
+    background-color: white;
+    z-index: 9999;
+  }
 }
 
 .select-sm {
   font-size: .875rem;
   border-radius: .2rem;
 
-  .Select-control {
+  .react-select__control {
     height: 32px;
 
-    .Select-value {
+    .react-select__value-container {
       line-height: 32px !important;
     }
 
-    .Select-placeholder {
+    .react-select__indicators {
       line-height: 32px;
+
+      .react-select__indicator {
+        padding: 0 !important;
+        cursor: pointer;
+      }
+      .react-select__indicator:last-child {
+        padding-right: 5px !important;
+      }
     }
 
-    .Select-input {
+    .react-select__input {
       height: 30px;
 
       input {
@@ -331,6 +366,17 @@ body {
         line-height: 32px;
       }
     }
+  }
+}
+
+.custom-option {
+  .react-select__menu-list {
+    padding: 0;
+
+    .react-select__menu-notice {
+      text-align: left;
+    }
+
   }
 }
 
@@ -383,7 +429,7 @@ body {
 }
 
 .has-error .form-control,
-.has-error .Select-control {
+.has-error .react-select__control {
   border: 2px solid $red-beta;
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
@@ -697,7 +743,7 @@ div.crossed-out .table-inner-row:before {
   z-index: 9999 !important;
 }
 
-.Select-loading-zone {
+.react-select__loading-zone {
   display: none !important;
 }
 

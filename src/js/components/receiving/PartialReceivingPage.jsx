@@ -208,7 +208,7 @@ const TABLE_FIELDS = {
           clearable: false,
         },
       },
-      'recipient.id': {
+      recipient: {
         type: params => (params.subfield ? <SelectField {...params} /> : null),
         fieldKey: '',
         flexWidth: '1',
@@ -475,9 +475,30 @@ class PartialReceivingPage extends Component {
     const url = `/openboxes/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=1`;
 
     return apiClient.get(url)
-      .then((response) => {
+      .then((resp) => {
+        const response = parseResponse(resp.data.data);
         this.setState({ values: {} }, () => {
-          this.setState({ values: parseResponse(response.data.data) });
+          this.setState({
+            values: {
+              ...response,
+              containers: _.map(response.containers, container => ({
+                ...container,
+                shipmentItems: _.map(container.shipmentItems, shipmentItem => ({
+                  ...shipmentItem,
+                  binLocation: {
+                    ...shipmentItem.binLocation,
+                    value: shipmentItem.binLocation ? shipmentItem.binLocation.id : null,
+                    label: shipmentItem.binLocation ? shipmentItem.binLocation.name : null,
+                  },
+                  recipient: {
+                    ...shipmentItem.recipient,
+                    value: shipmentItem.recipient ? shipmentItem.recipient.id : null,
+                    label: shipmentItem.recipient ? shipmentItem.recipient.name : null,
+                  },
+                })),
+              })),
+            },
+          });
         });
       })
       .catch(() => this.props.hideSpinner());

@@ -553,7 +553,7 @@ class EditItemsPage extends Component {
       lineItems: _.map(itemsToRevise, item => ({
         id: item.requisitionItemId,
         quantityRevised: item.quantityRevised,
-        reasonCode: item.reasonCode,
+        reasonCode: item.reasonCode.value,
       })),
     };
 
