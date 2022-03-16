@@ -95,6 +95,17 @@ class Select extends Component {
         >
           <Dropdown width={target.offsetWidth}>
             <div className="custom-option" {...innerProps}>
+              {attributes.createNewFromModal &&
+                <div
+                  className="add-new-button"
+                  onClick={attributes.newOptionModalOpen}
+                  onKeyPress={attributes.newOptionModalOpen}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <span><i className="fa fa-plus pr-2" />{attributes.createNewFromModalLabel}</span>
+                </div>
+              }
               {children}
             </div>
           </Dropdown>

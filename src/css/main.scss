@@ -376,8 +376,15 @@ body {
     .react-select__menu-notice {
       text-align: left;
     }
-
   }
+}
+
+.add-new-button {
+  padding: 8px 12px;
+  cursor: pointer;
+  text-align: right;
+  background-color: #DEEBFF;
+  color: #4f87ce;
 }
 
 .table-xs th,

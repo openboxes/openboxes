@@ -68,6 +68,8 @@ const FIELDS = {
     label: 'react.locationsConfiguration.organization.label',
     defaultMessage: 'Organization',
     attributes: {
+      createNewFromModal: true,
+      createNewFromModalLabel: 'Add new Organization',
       async: true,
       required: true,
       showValueTooltip: true,
@@ -79,8 +81,9 @@ const FIELDS = {
       options: [],
       filterOptions: options => options,
     },
-    getDynamicAttr: ({ debouncedOrganizationsFetch }) => ({
+    getDynamicAttr: ({ debouncedOrganizationsFetch, openNewOrganizationModal }) => ({
       loadOptions: debouncedOrganizationsFetch,
+      newOptionModalOpen: openNewOrganizationModal,
     }),
   },
   locationGroup: {
@@ -153,6 +156,13 @@ class LocationDetails extends Component {
     this.setState({ values, setInitialValues: false });
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  openNewOrganizationModal() {
+    // TODO: Add new organization modal opener here
+    // eslint-disable-next-line no-console
+    console.log('new organization modal open');
+  }
+
   saveLocationDetails(values) {
     if (values.name && values.organization) {
       this.props.showSpinner();
@@ -221,6 +231,7 @@ class LocationDetails extends Component {
                     debouncedLocationGroupsFetch: this.debouncedLocationGroupsFetch,
                     debouncedOrganizationsFetch: this.debouncedOrganizationsFetch,
                     debouncedUsersFetch: this.debouncedUsersFetch,
+                    openNewOrganizationModal: this.openNewOrganizationModal,
                   }),
                 )}
               </div>
