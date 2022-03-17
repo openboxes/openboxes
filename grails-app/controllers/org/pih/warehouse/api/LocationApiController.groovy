@@ -19,6 +19,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.product.ProductAvailability
 
 class LocationApiController extends BaseDomainApiController {
@@ -103,7 +104,14 @@ class LocationApiController extends BaseDomainApiController {
 
         bindLocationData(existingLocation, jsonObject)
 
-        if (!existingLocation.validate() || !existingLocation.save(failOnError: true)) {
+        if (existingLocation.validate() && !existingLocation.hasErrors()) {
+            if (existingLocation?.address?.validate() && !existingLocation?.address?.hasErrors()) {
+                existingLocation.address.save()
+            } else {
+                throw new ValidationException("Address validation failed", existingLocation.errors)
+            }
+            existingLocation.save()
+        } else {
             throw new ValidationException("Invalid location ${existingLocation.name}", existingLocation.errors)
         }
 
@@ -125,6 +133,7 @@ class LocationApiController extends BaseDomainApiController {
         if (!location.inventory) {
             location.inventory = inventoryService.addInventory(location)
         }
+
 
         return location
     }
