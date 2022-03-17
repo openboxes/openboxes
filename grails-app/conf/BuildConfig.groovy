@@ -26,11 +26,12 @@ grails.project.dependency.resolution = {
     inherits("global") {
         // https://grails.github.io/grails2-doc/1.3.9/guide/single.html#3.7.1%20Configurations%20and%20Dependencies
         excludes(
-                "commons-logging",  // use jcl-over-slf4j instead
-                "log4j",  // use reload4j instead
-                "slf4j-log4j12",  // use slf4j-reload4j instead
-                "xml-apis",  // looks like this conflicts with Grails's internal SAXParserImpl
-                "xmlbeans"  // conflicts with Grails: see https://stackoverflow.com/a/6410955
+            "commons-logging",  // use jcl-over-slf4j instead
+            "log4j",  // use reload4j instead
+            "logback-core",  // use slf4j instead
+            "slf4j-log4j12",  // use slf4j-reload4j instead
+            "xml-apis",  // looks like this conflicts with Grails's internal SAXParserImpl
+            "xmlbeans"  // conflicts with Grails: see https://stackoverflow.com/a/6410955
         )
     }
     log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
@@ -50,30 +51,29 @@ grails.project.dependency.resolution = {
          * reload4j until we move to a more modern Grails release.
          * https://reload4j.qos.ch/news.html https://www.slf4j.org/legacy.html
          */
-        compile "org.slf4j:slf4j-reload4j:1.7.33"
-        compile "ch.qos.reload4j:reload4j:1.2.18.2"
+        compile "org.slf4j:slf4j-reload4j:1.7.36"
+        compile "ch.qos.reload4j:reload4j:1.2.19"
         // override hidden grails dependencies to work with reload4j
-        build "org.slf4j:slf4j-api:1.7.33"
-        compile "org.slf4j:slf4j-api:1.7.33"
-        compile "org.slf4j:jcl-over-slf4j:1.7.33"
-        runtime "org.slf4j:jul-to-slf4j:1.7.33"
+        build "org.slf4j:slf4j-api:1.7.36"
+        compile "org.slf4j:slf4j-api:1.7.36"
+        compile "org.slf4j:jcl-over-slf4j:1.7.36"
+        runtime "org.slf4j:jul-to-slf4j:1.7.36"
 
         // Required by database connection
-        compile 'mysql:mysql-connector-java:5.1.47'
+        compile "mysql:mysql-connector-java:5.1.49"  // last version to support Java 7
 
         // Required by database connection pool
         compile 'com.mchange:c3p0:0.9.5.3'
 
         // Required by docx4j functionality
-        compile('org.docx4j:docx4j:2.8.1') {
-            excludes 'commons-codec', 'commons-io'
-        }
+        compile "org.docx4j:docx4j:2.8.1"
 
         // Required for barcode4j
         compile 'com.google.zxing:javase:2.0'
 
         compile "org.apache.commons:commons-email:1.5"
         compile "org.apache.commons:commons-text:1.3"  // last Java 7-compatible release
+        compile "commons-beanutils:commons-beanutils:1.9.4"
         compile 'commons-lang:commons-lang:2.6'
         compile "org.jadira.usertype:usertype.jodatime:1.9"
         compile "org.apache.commons:commons-csv:1.6"  // last Java 7-compatible release
@@ -135,10 +135,12 @@ grails.project.dependency.resolution = {
         }
 
         // REST client
-        compile 'org.apache.httpcomponents:httpclient:4.5.12'
+        compile "org.apache.httpcomponents:httpclient:4.5.13"
 
-        // for com.google.common
-        compile 'com.google.guava:guava:12.0'
+        // for javax.annotation.Nullable
+        compile "com.google.code.findbugs:jsr305:3.0.2"
+        // for com.google.common.base.Enums
+        compile "com.google.guava:guava:20.0"  // last version to support Java 7
 
         // TODO: This is the last version for java 7. After migration to Java 8 upgrade this to 2.9+
         compile 'org.jxls:jxls:2.8.1'
@@ -149,6 +151,11 @@ grails.project.dependency.resolution = {
          * java 8, too. We exclude its jxls requirement to force the one above.
          */
         compile('org.jxls:jxls-poi:1.0.9') { exclude "jxls" }
+
+        // patch security issues in dependencies -- we don't use these directly
+        runtime "commons-fileupload:commons-fileupload:1.3.3"
+        compile "commons-io:commons-io:2.6"  // latest version to support Java 7
+        runtime "xalan:xalan:2.7.2"
     }
     plugins {
 
@@ -227,6 +234,5 @@ grails.project.dependency.resolution = {
         //compile ":settings:1.4"
         //compile ":symmetricds:2.4.0"
         //compile ":grails-melody:1.46"
-
     }
 }
