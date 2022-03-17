@@ -7,14 +7,17 @@ function extractItem(item, status) {
   const { destinationBinLocation, destinationZone } = item;
 
   let destinationBin = {};
-  if (status === PENDING) {
-    destinationBin = {
-      id: null, name: null, zoneId: null, zoneName: null,
-    };
+  if (status === PENDING || (destinationBinLocation &&
+    !destinationBinLocation.id && !destinationBinLocation.name)
+  ) {
+    destinationBin = null;
   } else {
     destinationBin = {
       id: destinationBinLocation && destinationBinLocation.id ? destinationBinLocation.id : null,
       name: destinationBinLocation && destinationBinLocation.name ?
+        destinationBinLocation.name : null,
+      value: destinationBinLocation && destinationBinLocation.id ? destinationBinLocation.id : null,
+      label: destinationBinLocation && destinationBinLocation.name ?
         destinationBinLocation.name : null,
       zoneId: destinationZone && destinationZone.id ? destinationZone.id : null,
       zoneName: destinationZone && destinationZone.name ? destinationZone.name : null,
@@ -31,14 +34,16 @@ function extractItem(item, status) {
 function extractSplitItem(item, splitItem, status) {
   let destinationBin = {};
 
-  if (status === PENDING) {
-    destinationBin = {
-      id: null, name: null, zoneId: null, zoneName: null,
-    };
+  if (status === PENDING || (splitItem.destinationBinLocation &&
+    !splitItem.destinationBinLocation.id && !splitItem.destinationBinLocation.name)
+  ) {
+    destinationBin = null;
   } else {
     destinationBin = {
       id: splitItem.destinationBinLocation.id ? splitItem.destinationBinLocation.id : null,
       name: splitItem.destinationBinLocation.name ? splitItem.destinationBinLocation.name : null,
+      value: splitItem.destinationBinLocation.id ? splitItem.destinationBinLocation.id : null,
+      label: splitItem.destinationBinLocation.name ? splitItem.destinationBinLocation.name : null,
       zoneId: splitItem.destinationZone ? splitItem.destinationZone.id : null,
       zoneName: splitItem.destinationZone ? splitItem.destinationZone.name : null,
     };
