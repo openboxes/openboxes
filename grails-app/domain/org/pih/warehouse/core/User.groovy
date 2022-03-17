@@ -65,6 +65,15 @@ class User extends Person {
         dashboardConfig(nullable: true)
     }
 
+    /**
+     * Should only be used when a location is not available.
+     *
+     * @param roleType
+     * @return
+     */
+    def hasRole(RoleType roleType) {
+        return roleType in roles.collect { it.roleType }
+    }
 
     /**
      * @return the highest role for this user
@@ -117,7 +126,7 @@ class User extends Person {
 
     def deserializeDashboardConfig() {
         if (dashboardConfig == null) return null
-        
+
         def json = new JSON();
         return json.parse(dashboardConfig)
     }

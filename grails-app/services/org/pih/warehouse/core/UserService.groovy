@@ -13,6 +13,7 @@ package org.pih.warehouse.core
 import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.apache.commons.collections.ListUtils
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.auth.AuthService
 
 class UserService {
@@ -360,6 +361,25 @@ class UserService {
             return (userInstance.password == password.encodeAsPassword() || userInstance.password == password)
         }
         return false
+    }
+
+    def authenticateIntegrationUser() {
+        def username = ConfigurationHolder.config.openboxes.integration.username
+        def password = ConfigurationHolder.config.openboxes.integration.password
+        if (username && password) {
+            log.info "Attempting to authenticate as ${username}..."
+            if (authenticate(username, password)) {
+                User user = User.findByUsernameOrEmail(username, username)
+                if (user.active) {
+                    log.info "Authentication successful"
+                    AuthService.currentUser.set(user)
+                }
+            }
+        }
+    }
+
+    def invalidateIntegrationUserSession() {
+        AuthService.currentUser.set(null)
     }
 
     def getDashboardConfig(User user) {

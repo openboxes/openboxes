@@ -18,6 +18,7 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.Synonym
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
@@ -46,6 +47,7 @@ class Product implements Comparable, Serializable {
 
 
     def beforeInsert = {
+        checkIfExternalProduct()
         User.withNewSession {
             def currentUser = AuthService.currentUser.get()
             if (currentUser) {
@@ -55,6 +57,7 @@ class Product implements Comparable, Serializable {
         }
     }
     def beforeUpdate = {
+        checkIfExternalProduct()
         User.withNewSession {
             def currentUser = AuthService.currentUser.get()
             if (currentUser) {
@@ -62,6 +65,25 @@ class Product implements Comparable, Serializable {
             }
         }
     }
+
+    def beforeDelete = {
+        checkIfExternalProduct()
+    }
+
+    /**
+     * Admittedly kind of a hack, but this is the best we can do for now with permissions. We
+     * should refactor this out once we migrate to spring security.
+     */
+    def checkIfExternalProduct() {
+        User.withNewSession {
+            User user = AuthService.currentUser.get()
+            Boolean isAuthorized = user?.hasRole(RoleType.ROLE_INTEGRATION_USER)
+            if (isExternalProduct && !isAuthorized) {
+                throw new UnsupportedOperationException("Externally managed products cannot be edited or deleted without authorized role")
+            }
+        }
+    }
+
 
     def publishPersistenceEvent = {
         publishEvent(new InventorySnapshotEvent(this))
