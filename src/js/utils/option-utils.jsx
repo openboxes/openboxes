@@ -66,6 +66,60 @@ export const debounceLocationsFetch = (
     }
   }, waitTime);
 
+export const debounceInternalLocationsFetch = (
+  waitTime,
+  minSearchLength,
+  locationId,
+  locationTypeCodes,
+  mapBins = null,
+  defaultOptions = [],
+) =>
+  _.debounce((searchTerm, callback) => {
+    if (searchTerm && searchTerm.length >= minSearchLength) {
+      const locationTypeCodesParams = locationTypeCodes ? locationTypeCodes.map(locationTypeCode => `&locationTypeCode=${locationTypeCode}`).join('') : '';
+      apiClient.get(`/openboxes/api/internalLocations/search?parentLocation.id=${locationId}&searchTerm=${searchTerm}${locationTypeCodesParams}`)
+        .then((result) => {
+          if (mapBins) {
+            const binGroups = _.partition(result.data.data, bin => (bin.zoneName));
+            const binsWithZone = _.chain(binGroups[0]).groupBy('zoneName')
+              .map((value, key) => ({ label: key, options: mapBins(value) }))
+              .orderBy(['label'], ['asc'])
+              .value();
+            const binsWithoutZone = mapBins(binGroups[1]);
+
+            return callback(
+              null,
+              {
+                complete: true,
+                options: [...binsWithZone, ...binsWithoutZone],
+              },
+            );
+          }
+
+          return callback(
+            null,
+            {
+              complete: true,
+              options: _.map(result.data.data, obj => ({
+                value: {
+                  id: obj.id,
+                  name: obj.name,
+                  zoneId: obj.zoneId,
+                  zoneName: obj.zoneName,
+                  label: obj.name,
+                },
+              })),
+            },
+          );
+        })
+        .catch(error => callback(error, { options: defaultOptions }));
+    } else if (!searchTerm) {
+      callback(null, { options: defaultOptions });
+    } else {
+      callback(null, { options: [] });
+    }
+  }, waitTime);
+
 export const debounceGlobalSearch = (waitTime, minSearchLength) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {

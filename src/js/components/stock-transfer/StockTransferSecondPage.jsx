@@ -12,6 +12,7 @@ import 'react-table/react-table.css';
 import customTreeTableHOC from '../../utils/CustomTreeTable';
 import Select from '../../utils/Select';
 import apiClient, { flattenRequest, parseResponse } from '../../utils/apiClient';
+import { debounceInternalLocationsFetch } from '../../utils/option-utils';
 import { showSpinner, hideSpinner } from '../../actions';
 import Filter from '../../utils/Filter';
 import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
@@ -21,6 +22,16 @@ const SelectTreeTable = (customTreeTableHOC(ReactTable));
 
 const APPROVED = 'APPROVED';
 const CANCELED = 'CANCELED';
+
+const mapBins = bins => (_.chain(bins)
+  .map(bin => ({
+    value: {
+      id: bin.id, name: bin.name, zoneId: bin.zoneId, zoneName: bin.zoneName, label: bin.name,
+    },
+    label: bin.name,
+  }))
+  .orderBy(['label'], ['asc']).value()
+);
 
 /**
  * The second page of stock transfer where user can choose qty and bin to transfer
@@ -193,13 +204,24 @@ class StockTransferSecondPage extends Component {
       accessor: 'destinationBinLocation',
       Cell: cellInfo => (<Select
         options={this.state.bins}
-        objectValue
         value={_.get(this.state.stockTransfer.stockTransferItems, `[${cellInfo.index}].${cellInfo.column.id}`) || null}
         onChange={value => this.changeStockTransfer(update(this.state.stockTransfer, {
           stockTransferItems: { [cellInfo.index]: { destinationBinLocation: { $set: value } } },
         }))}
         className="select-xs"
         disabled={cellInfo.original.status === CANCELED}
+        autoload={false}
+        loadOptions={debounceInternalLocationsFetch(
+          this.props.debounceTime,
+          this.props.minSearchLength,
+          this.props.location.id,
+          ['BIN_LOCATION'],
+          mapBins,
+          this.state.bins,
+        )}
+        filterOptions={options => options}
+        onCloseResetsInput={false}
+        async
       />),
       Filter,
     }, {
@@ -264,17 +286,7 @@ class StockTransferSecondPage extends Component {
    */
   fetchBins() {
     this.props.showSpinner();
-    const url = `/openboxes/api/internalLocations?location.id=${this.props.location.id}&locationTypeCode=BIN_LOCATION`;
-
-    const mapBins = bins => (_.chain(bins)
-      .map(bin => ({
-        value: {
-          id: bin.id, name: bin.name, zoneId: bin.zoneId, zoneName: bin.zoneName,
-        },
-        label: bin.name,
-      }))
-      .orderBy(['label'], ['asc']).value()
-    );
+    const url = `/openboxes/api/internalLocations/search?parentLocation.id=${this.props.location.id}&locationTypeCode=BIN_LOCATION&max=10`;
 
     return apiClient.get(url)
       .then((response) => {
@@ -537,6 +549,8 @@ class StockTransferSecondPage extends Component {
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   stockTransferTranslationsFetched: state.session.fetchedTranslations.stockTransfer,
+  debounceTime: state.session.searchConfig.debounceTime,
+  minSearchLength: state.session.searchConfig.minSearchLength,
 });
 
 export default connect(
@@ -569,4 +583,6 @@ StockTransferSecondPage.propTypes = {
     id: PropTypes.string,
   }).isRequired,
   stockTransferTranslationsFetched: PropTypes.bool.isRequired,
+  debounceTime: PropTypes.number.isRequired,
+  minSearchLength: PropTypes.number.isRequired,
 };
