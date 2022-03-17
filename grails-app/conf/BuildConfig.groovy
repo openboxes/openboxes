@@ -19,11 +19,12 @@ grails.plugin.location.liquibase = 'liquibase/'
 grails.project.dependency.resolution = {
     inherits("global") {
         excludes(
-                "commons-logging",  // use jcl-over-slf4j instead
-                "log4j",  // use reload4j instead
-                "slf4j-log4j12",  // use slf4j-reload4j instead
-                "xml-apis",  // looks like this conflicts with Grails's internal SAXParserImpl
-                "xmlbeans"  // conflicts with Grails: see https://stackoverflow.com/a/6410955
+            'commons-logging',  // use jcl-over-slf4j instead
+            'log4j',  // use reload4j instead
+            'logback-core',  // use slf4j instead
+            'slf4j-log4j12',  // use slf4j-reload4j instead
+            'xml-apis',  // looks like this conflicts with Grails's internal SAXParserImpl
+            'xmlbeans'  // conflicts with Grails: see https://stackoverflow.com/a/6410955
         )
     }
     log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
@@ -49,10 +50,10 @@ grails.project.dependency.resolution = {
         runtime 'org.slf4j:slf4j-reload4j:1.7.36'
 
         // Required by database connection
-        compile 'mysql:mysql-connector-java:5.1.47'
+        compile 'mysql:mysql-connector-java:5.1.49'  // last version to support Java 7
 
         // Required by database connection pool
-        compile 'com.mchange:c3p0:0.9.5.3'
+        compile 'com.mchange:c3p0:0.9.5.5'
 
         // Required by docx4j functionality
         compile 'org.docx4j:docx4j:2.8.1'
@@ -61,6 +62,7 @@ grails.project.dependency.resolution = {
 
         compile "org.apache.commons:commons-email:1.5"
         compile "org.apache.commons:commons-text:1.3"  // last Java 7-compatible release
+        compile 'commons-beanutils:commons-beanutils:1.9.4'
         compile 'commons-lang:commons-lang:2.6'
         compile 'org.jadira.usertype:usertype.jodatime:1.9'  // org.joda.time.* is redundant in Java 8
         compile "org.apache.commons:commons-csv:1.6"  // last Java 7-compatible release
@@ -117,10 +119,12 @@ grails.project.dependency.resolution = {
         }
 
         // REST client
-        compile 'org.apache.httpcomponents:httpclient:4.5.12'
+        compile 'org.apache.httpcomponents:httpclient:4.5.13'
 
-        // for com.google.common
-        compile 'com.google.guava:guava:12.0'
+        // for javax.annotation.Nullable
+        compile 'com.google.code.findbugs:jsr305:3.0.2'
+        // for com.google.common.base.Enums
+        compile 'com.google.guava:guava:20.0'  // last version to support Java 7
 
         // TODO: This is the last version for java 7. After migration to Java 8 upgrade this to 2.9+
         compile 'org.jxls:jxls:2.8.1'
@@ -131,6 +135,11 @@ grails.project.dependency.resolution = {
          * java 8, too. We exclude its jxls requirement to force the one above.
          */
         compile('org.jxls:jxls-poi:1.0.9') { exclude "jxls" }
+
+        // patch security issues in dependencies -- we don't use these directly
+        runtime 'commons-fileupload:commons-fileupload:1.3.3'
+        compile 'commons-io:commons-io:2.6'  // latest version to support Java 7
+        runtime 'xalan:xalan:2.7.2'
     }
     plugins {
 
