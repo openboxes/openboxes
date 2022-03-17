@@ -15,9 +15,19 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.product.Product
 
 class ProductNotificationController {
+
+    def userService
     def notificationService
     def productService
     def grailsApplication
+
+    def beforeInterceptor = {
+        userService.authenticateIntegrationUser()
+    }
+
+    def afterInterceptor = {
+        userService.invalidateIntegrationUserSession()
+    }
 
     def publish = {
         String message = request.JSON.toString()

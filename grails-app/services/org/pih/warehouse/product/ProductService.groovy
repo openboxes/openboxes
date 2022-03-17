@@ -1069,10 +1069,6 @@ class ProductService {
     Product addProductComponent(Product assemblyProduct, Product componentProduct, BigDecimal quantity, String unitOfMeasureId) {
         if (componentProduct) {
 
-            if (assemblyProduct.isExternalProduct || componentProduct.isExternalProduct) {
-                throw new UnsupportedOperationException("Externally managed products cannot be edited")
-            }
-
             def unitOfMeasure = UnitOfMeasure.get(unitOfMeasureId)
             log.info "Adding " + componentProduct.name + " to " + assemblyProduct.name
 
@@ -1319,8 +1315,6 @@ class ProductService {
             productInstance.save(flush: true, failOnError: true)
         }
 
-
-
         // Process documents
         if (productJson.containsKey("documents")) {
             JSONArray documentsJsonArray = productJson.getJSONArray("documents")
@@ -1343,7 +1337,6 @@ class ProductService {
         if(productJson.containsKey("components")) {
             JSONArray componentsJsonArray = productJson.getJSONArray("components")
             log.info "Components array json:${componentsJsonArray?.toString()}"
-//                    List<Document> documents = productInstance.documents?.toList()
             for (int i = 0; i < componentsJsonArray.length(); i++) {
                 JSONObject componentJson = componentsJsonArray.getJSONObject(i)
                 log.info "Component Object JSON:${componentJson?.toString()} at index:${i}"
@@ -1356,8 +1349,9 @@ class ProductService {
                 }
                 if(componentProduct) {
                     addProductComponent(productInstance, componentProduct, quantity, unitOfMeasureId)
-                }else{
-                    log.warn("Component Product not found with code:${componentProductCode}")
+                }
+                else {
+                    log.warn("Component product not found with code:${componentProductCode}")
                 }
             }
         }

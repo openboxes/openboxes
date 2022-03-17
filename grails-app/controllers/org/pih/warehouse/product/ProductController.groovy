@@ -257,11 +257,11 @@ class ProductController {
         def productInstance = Product.get(params.id)
         if (productInstance) {
 
-            if (productInstance.isExternalProduct) {
-                flash.message = "${warehouse.message(code: 'product.cannotModifyExternalProduct.message')}"
-                redirect(action: "edit", id: params.id)
-                return
-            }
+//            if (productInstance.isExternalProduct) {
+//                flash.message = "${warehouse.message(code: 'product.cannotModifyExternalProduct.message')}"
+//                redirect(action: "edit", id: params.id)
+//                return
+//            }
 
             if (params.version) {
                 def version = params.version.toLong()
@@ -998,11 +998,6 @@ class ProductController {
         def productInstance
         def productComponent = ProductComponent.get(params.id)
         if (productComponent) {
-
-            if (productComponent.isExternalProduct) {
-                throw new UnsupportedOperationException("Externally managed products cannot be edited")
-            }
-
             productInstance = productComponent.assemblyProduct
             productComponent.assemblyProduct.removeFromProductComponents(productComponent)
             productComponent.delete()
@@ -1015,7 +1010,6 @@ class ProductController {
      */
     def removeFromProductGroups = {
         println "removeFromProductGroup() " + params
-
         def product = Product.get(params.productId)
         if (product) {
             def productGroup = ProductGroup.get(params.id)

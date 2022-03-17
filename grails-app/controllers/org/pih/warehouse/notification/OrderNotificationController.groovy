@@ -24,11 +24,20 @@ import org.pih.warehouse.requisition.RequisitionType
 
 class OrderNotificationController {
 
+    def userService
     def productService
     def grailsApplication
     def identifierService
     def notificationService
     def stockMovementService
+
+    def beforeInterceptor = {
+        userService.authenticateIntegrationUser()
+    }
+
+    def afterInterceptor = {
+        userService.invalidateIntegrationUserSession()
+    }
 
     def publish = {
         String message = request.JSON.toString()

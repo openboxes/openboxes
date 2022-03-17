@@ -46,7 +46,6 @@ enum RoleType {
     ROLE_ITEM_LOW_STOCK_NOTIFICATION('Low Stock Notifications', 100),
     ROLE_ITEM_OUT_OF_STOCK_NOTIFICATION('Out of Stock Notifications', 100),
 
-
     // Employee role types
     ROLE_EMPLOYEE('Employee', 50),
 
@@ -79,7 +78,13 @@ enum RoleType {
     ROLE_PURCHASER('Purchaser', 100),
 
     // Customer role types
-    ROLE_CUSTOMER('Customer', 102)
+    ROLE_CUSTOMER('Customer', 102),
+
+    // Integration Manager
+    ROLE_INTEGRATION_USER('Integration User', 103),
+
+    // API User
+    ROLE_API_USER('API User', 104)
 
     String name
     Integer sortOrder

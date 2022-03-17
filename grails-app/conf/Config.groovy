@@ -862,7 +862,8 @@ awssdk.sns.product.arn = ""
 awssdk.sns.order.arn = ""
 awssdk.sns.productAvailability.arn = ""
 
-
+openboxes.integration.username = ""
+openboxes.integration.password = ""
 
 // Default Ajax request timeout
 openboxes.ajaxRequest.timeout = 120000
