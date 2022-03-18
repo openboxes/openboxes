@@ -34,7 +34,7 @@ class InternalLocationApiController {
     def search = {
         LocationTypeCode[] locationTypeCodes = params.locationTypeCode ? params.list("locationTypeCode") : [LocationTypeCode.INTERNAL, LocationTypeCode.BIN_LOCATION]
         List<Location> locations = locationService.searchInternalLocations(params, locationTypeCodes)
-        render([data: locations] as JSON)
+        render([data: locations, totalCount: locations?.totalCount] as JSON)
     }
 
     def listReceiving = {

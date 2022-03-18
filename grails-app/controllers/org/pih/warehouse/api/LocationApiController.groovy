@@ -110,12 +110,6 @@ class LocationApiController extends BaseDomainApiController {
             } else {
                 throw new ValidationException("Address validation failed", existingLocation.errors)
             }
-            def inventoryLevelInstance = InventoryLevel.findByInventoryAndProductIsNull(existingLocation.inventory)
-            if (!inventoryLevelInstance) {
-                inventoryLevelInstance = new InventoryLevel(inventory: existingLocation.inventory)
-            }
-            inventoryLevelInstance.properties = params
-            inventoryLevelInstance.save()
             existingLocation.save()
         } else {
             throw new ValidationException("Invalid location ${existingLocation.name}", existingLocation.errors)
