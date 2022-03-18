@@ -29,6 +29,7 @@ class StockMovementItem {
     BigDecimal quantityOnHand
     BigDecimal quantityAvailable
     BigDecimal quantityRevised
+    BigDecimal quantityApproved
     BigDecimal quantityCanceled
     BigDecimal quantityPicked
     BigDecimal quantityShipped
@@ -204,6 +205,7 @@ class StockMovementItem {
                 quantityOnHand: null,
                 quantityAvailable: null,
                 quantityCanceled: requisitionItem?.quantityCanceled,
+                quantityApproved: requisitionItem?.calculateQuantityApproved(),
                 quantityRevised: requisitionItem.calculateQuantityRevised(),
                 quantityPicked: requisitionItem?.totalQuantityPicked(),
                 substitutionItems: substitutionItems,

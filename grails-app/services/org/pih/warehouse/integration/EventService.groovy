@@ -35,7 +35,11 @@ class EventService {
         stockMovement.lineItems?.each { StockMovementItem stockMovementItem ->
             JSONObject orderItem = new JSONObject()
             orderItem.put("id", stockMovementItem.description)
-            orderItem.put("acceptedQuantity", stockMovementItem.quantityPicked)
+            orderItem.put("acceptedQuantity", stockMovementItem.quantityRequired)
+            orderItem.put("quantityRequested", stockMovementItem.quantityRequested)
+            orderItem.put("quantityRevised", stockMovementItem.quantityRevised)
+            orderItem.put("quantityPicked", stockMovementItem.quantityPicked)
+            orderItem.put("quantityShipped", stockMovementItem.quantityShipped)
             orderItems.add(orderItem)
         }
         notifyJson.put("orderItems", orderItems)

@@ -105,8 +105,27 @@ class StockMovementService {
                 jsonObject.containsKey("status") ? jsonObject.status as StockMovementStatusCode : null
 
         Boolean statusOnly =
-                jsonObject.containsKey("statusOnly") ? jsonObject.getBoolean("statusOnly") : false
+                jsonObject.containsKey("statusOnly") ? jsonObject.getBoolean("statusOnly") : Boolean.FALSE
 
+         // Determine whether we need to rollback changes
+        Boolean rollback =
+                jsonObject.containsKey("rollback") ? jsonObject.getBoolean("rollback") : Boolean.FALSE
+
+        // Clear picklist
+        Boolean shouldClearPicklist = jsonObject.containsKey("clearPicklist") ?
+                jsonObject.getBoolean("clearPicklist") : Boolean.FALSE
+
+        // Create picklist
+        Boolean shouldCreatePicklist = jsonObject.containsKey("createPicklist") ?
+                jsonObject.getBoolean("createPicklist") : Boolean.FALSE
+
+        transitionRequisitionBasedStockMovement(stockMovement, status, statusOnly, rollback, shouldClearPicklist, shouldCreatePicklist)
+
+    }
+
+    void transitionRequisitionBasedStockMovement(StockMovement stockMovement, StockMovementStatusCode status,
+                                                 Boolean statusOnly = false, Boolean rollback = false,
+                                                 Boolean shouldClearPicklist = false, Boolean shouldCreatePicklist = false) {
         // Update status only
         if (status && statusOnly) {
             RequisitionStatus requisitionStatus = RequisitionStatus.fromStockMovementStatus(stockMovementStatus)
@@ -114,11 +133,6 @@ class StockMovementService {
         }
         // Determine whether we need to rollback change,
         else {
-
-            // Determine whether we need to rollback changes
-            Boolean rollback =
-                    jsonObject.containsKey("rollback") ? jsonObject.getBoolean("rollback") : false
-
             if (rollback) {
                 rollbackStockMovement(stockMovement.id)
             }
@@ -138,17 +152,9 @@ class StockMovementService {
                     case StockMovementStatusCode.PICKING:
                         validateQuantityRequested(stockMovement)
 
-                        // Clear picklist
-                        Boolean shouldClearPicklist = jsonObject.containsKey("clearPicklist") ?
-                                jsonObject.getBoolean("clearPicklist") : Boolean.FALSE
-
                         if (shouldClearPicklist) {
                             clearPicklist(stockMovement)
                         }
-
-                        // Create picklist
-                        Boolean shouldCreatePicklist = jsonObject.containsKey("createPicklist") ?
-                                jsonObject.getBoolean("createPicklist") : Boolean.FALSE
 
                         if (shouldCreatePicklist) {
                             createPicklist(stockMovement)
@@ -181,6 +187,17 @@ class StockMovementService {
     }
 
     void validateQuantityRequested(StockMovement stockMovement) {
+
+        // Validate that all quantities have been approved
+        Boolean hasAnyUnapprovedItems = stockMovement.lineItems.any { StockMovementItem lineItem ->
+            log.info "lineItem " + lineItem.quantityRevised + " " + lineItem.quantityApproved
+            return lineItem?.quantityRevised && lineItem?.quantityRevised != lineItem.quantityApproved
+        }
+        if (hasAnyUnapprovedItems) {
+            stockMovement.errors.reject("stockMovement.notApproved.message",
+                    [stockMovement.identifier] as Object[], "Stock movement ${stockMovement.identifier} requires approval")
+        }
+
         stockMovement.lineItems?.each { StockMovementItem item ->
             if (item.substitutionItems) {
                 item.substitutionItems.each {
@@ -1869,6 +1886,7 @@ class StockMovementService {
             }
         }
 
+        grailsApplication.mainContext.publishEvent(new StockMovementStatusEvent(stockMovement, stockMovement.stockMovementStatusCode, Boolean.FALSE))
         return revisedItems
     }
 
@@ -2390,11 +2408,14 @@ class StockMovementService {
             throw new IllegalStateException("There are no shipments associated with stock movement ${requisition.requestNumber}")
         }
 
+        if (shipment?.containers?.empty) {
+            throw new IllegalStateException("Shipment must have at least one package associated with it. Click Save & Exit, go to the Packing List tab and add at least one package")
+        }
+
         shipmentService.sendShipment(shipment, null, user, requisition.origin, stockMovement.dateShipped ?: new Date())
     }
 
     void validateRequisition(Requisition requisition) {
-
         requisition.requisitionItems.each { requisitionItem ->
             if (!requisition.origin.isSupplier() && requisition.origin.supports(ActivityCode.MANAGE_INVENTORY) && requisition.status > RequisitionStatus.CREATED) {
                 validateRequisitionItem(requisitionItem)

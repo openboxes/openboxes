@@ -25,11 +25,13 @@ enum RequisitionStatus {
     CANCELED(9),
     DELETED(10),
     ERROR(11),
+    BLOCKED(12),
+    APPROVED(13),
     // Removed
     OPEN(0),
     FULFILLED(0),
     REVIEWING(0),
-    CONFIRMING(0)
+    CONFIRMING(0),
 
     int sortOrder
     RequisitionStatus displayStatusCode

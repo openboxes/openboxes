@@ -291,8 +291,10 @@ class NotificationService {
                     TOPIC_ARN = grailsApplication.config.awssdk.sns.product.arn
                 } else if (topicType == Constants.ARN_TOPIC_ORDER_CREATE_TYPE) {
                     TOPIC_ARN = grailsApplication.config.awssdk.sns.orders.arn
+                } else if (topicType == Constants.ARN_TOPIC_ORDER_STATUS_TYPE) {
+                    TOPIC_ARN = grailsApplication.config.awssdk.sns.consumer.order.status.arn
                 }
-                log.info "TOPIC_ARN::${TOPIC_ARN}, confirmation Token:${token}"
+                log.info "TOPIC_ARN::${TOPIC_ARN}, topic type = ${topicType}, confirmation Token:${token}"
                 ConfirmSubscriptionRequest request = new ConfirmSubscriptionRequest(TOPIC_ARN, token)
                 ConfirmSubscriptionResult result = amazonSnsClient.confirmSubscription(request);
                 log.info "result::${result?.toString()}"

@@ -21,6 +21,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionType
+import org.pih.warehouse.inventory.StockMovementStatusCode
 
 class OrderNotificationController {
 
@@ -124,7 +125,8 @@ class OrderNotificationController {
             stockMovement.lineItems.add(stockMovementItem)
         }
         try {
-            stockMovementService.createStockMovement(stockMovement)
+            stockMovement = stockMovementService.createStockMovement(stockMovement)
+            stockMovementService.transitionRequisitionBasedStockMovement(stockMovement, StockMovementStatusCode.REQUESTED)
         } catch (Exception e) {
             log.error "Error creating stock movement " + e.message, e
         }
