@@ -1841,6 +1841,10 @@ class StockMovementService {
                     requisitionItem.undoChanges()
                 }
 
+                if (stockMovementItem.quantityRevised > requisitionItem.quantity) {
+                    throw new IllegalArgumentException("User is not allowed to increase the quantity")
+                }
+
                 requisitionItem.changeQuantity(
                         stockMovementItem?.quantityRevised?.intValueExact(),
                         stockMovementItem.reasonCode,
