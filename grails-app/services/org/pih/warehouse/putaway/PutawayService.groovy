@@ -379,6 +379,15 @@ class PutawayService {
 
 
     void validatePutawayItem(PutawayItem putawayItem) {
+
+        Location scannedPutawayLocation =
+                Location.findByNameOrLocationNumber(putawayItem.scannedPutawayLocation, putawayItem.scannedPutawayLocation)
+
+        if (scannedPutawayLocation != putawayItem.putawayLocation) {
+            throw new IllegalArgumentException("Expected putaway location ${putawayItem.putawayLocation?.locationNumber} " +
+                    "does not match ${putawayItem?.scannedPutawayLocation}")
+        }
+
         def quantity = putawayItem.quantity
 
         if (putawayItem.splitItems) {

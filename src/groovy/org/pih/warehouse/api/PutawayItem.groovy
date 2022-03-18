@@ -31,7 +31,7 @@ class PutawayItem {
     PutawayStatus putawayStatus
     Transaction transaction
     InventoryLevel inventoryLevel
-
+    String scannedPutawayLocation
 
     Boolean delete = Boolean.FALSE
     List<PutawayItem> splitItems = []
