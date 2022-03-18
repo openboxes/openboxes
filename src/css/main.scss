@@ -302,18 +302,18 @@ body {
       box-shadow: none;
     }
 
-
-    .react-select__value-container {
-      min-height: 26px !important;
-      line-height: 26px !important;
-    }
-
-    .react-select__indicators {
-      line-height: 26px;
+    .react-select__value-container, .react-select__indicators {
+      display: flex;
+      align-items: center;
+      height: inherit;
 
       .react-select__indicator {
         padding-right: 5px !important;
         cursor: pointer;
+      }
+
+      .react-select__single-value {
+        height: fit-content;
       }
     }
 

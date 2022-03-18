@@ -143,25 +143,14 @@ class ReceivingPage extends Component {
   fetchBins() {
     const url = `/openboxes/api/internalLocations/receiving?location.id=${this.state.locationId}&shipmentNumber=${this.state.shipmentNumber}`;
     const mapBins = bins => (_.chain(bins)
-      .map(bin => ({
-        value: {
-          id: bin.id,
-          name: bin.name,
-          zoneId: bin.zoneId,
-          zoneName: bin.zoneName,
-          label: bin.name,
-          value: bin.id,
-        },
-        label: bin.name,
-      }))
-      .orderBy(['label'], ['asc']).value()
+      .orderBy(['name'], ['asc']).value()
     );
 
     return apiClient.get(url)
       .then((response) => {
         const binGroups = _.partition(response.data.data, bin => (bin.zoneName));
         const binsWithZone = _.chain(binGroups[0]).groupBy('zoneName')
-          .map((value, key) => ({ label: key, options: mapBins(value) }))
+          .map((value, key) => ({ name: key, options: mapBins(value) }))
           .orderBy(['label'], ['asc'])
           .value();
         const binsWithoutZone = mapBins(binGroups[1]);

@@ -111,7 +111,8 @@ const FIELDS = {
       disabled: !(origin && destination && origin.id && destination.id),
       options: stocklists,
       showValueTooltip: true,
-      objectValue: true,
+      valueKey: 'id',
+      labelKey: 'name',
     }),
   },
   requestedBy: {
@@ -219,7 +220,9 @@ class CreateStockMovement extends Component {
     return apiClient.get(url)
       .then((response) => {
         const stocklists = _.map(response.data.data, stocklist => (
-          { value: { id: stocklist.id, name: stocklist.name }, label: stocklist.name }
+          {
+            id: stocklist.id, name: stocklist.name, value: stocklist.id, label: stocklist.name,
+          }
         ));
 
         const stocklistChanged = !_.find(stocklists, item => item.value.id === _.get(this.state.values, 'stocklist.id'));

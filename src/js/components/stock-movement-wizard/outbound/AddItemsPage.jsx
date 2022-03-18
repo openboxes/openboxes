@@ -426,10 +426,6 @@ class AddItemsPage extends Component {
             ...val.product,
             label: `${val.productCode} ${val.product.name}`,
           },
-          recipient: val.recipient ? ({
-            ...val.recipient,
-            label: val.recipient.name,
-          }) : null,
         }),
       );
     }
@@ -738,10 +734,6 @@ class AddItemsPage extends Component {
                 ...val.product,
                 label: `${val.productCode} ${val.product.name}`,
               },
-              recipient: val.recipient ? ({
-                ...val.recipient,
-                label: val.recipient.name,
-              }) : null,
             }),
           );
 

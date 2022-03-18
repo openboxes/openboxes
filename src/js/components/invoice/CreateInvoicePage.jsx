@@ -94,14 +94,15 @@ const FIELDS = {
       autoComplete: 'off',
     },
   },
-  'currencyUom.id': {
+  currencyUom: {
     label: 'react.invoice.currency.label',
     defaultMessage: 'Currency',
     type: SelectField,
     attributes: {
       required: true,
       showValueTooltip: true,
-      objectValue: true,
+      valueKey: 'id',
+      labelKey: 'name',
     },
     getDynamicAttr: ({ currencies }) => ({
       options: currencies,

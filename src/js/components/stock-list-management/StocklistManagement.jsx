@@ -85,12 +85,7 @@ class StocklistManagement extends Component {
 
     apiClient.get(url)
       .then((response) => {
-        const users = _.map(response.data.data, user => (
-          {
-            id: user.id, value: user.id, email: user.email, label: user.name,
-          }
-        ));
-        this.setState({ users, usersFetched: true });
+        this.setState({ users: response.data.data, usersFetched: true });
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -113,14 +108,7 @@ class StocklistManagement extends Component {
     apiClient.get(url)
       .then((response) => {
         this.setState({
-          availableStocklists: _.map(parseResponse(response.data.data), val =>
-            ({
-              value: {
-                ...val,
-                label: val.name,
-              },
-              label: val.name,
-            })),
+          availableStocklists: parseResponse(response.data.data),
           stocklistsFetched: true,
         });
       })
@@ -581,7 +569,8 @@ class StocklistManagement extends Component {
               value={this.state.selectedStocklist}
               onChange={value => this.setState({ selectedStocklist: value })}
               options={this.state.availableStocklists}
-              objectValue
+              valueKey="id"
+              labelKey="name"
               className="select-xs stocklist-select"
             />
             <button

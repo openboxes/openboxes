@@ -437,7 +437,6 @@ class PutAwayPage extends Component {
                 options={[{ value: false, label: <Translate id="react.putAway.exclude.label" defaultMessage="Exclude" /> },
                   { value: true, label: <Translate id="react.putAway.include.label" defaultMessage="Include" /> }]}
                 onChange={val => this.filterPutAways(val)}
-                objectValue
                 initialValue={false}
                 clearable={false}
                 className="select-xs"

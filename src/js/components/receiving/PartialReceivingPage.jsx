@@ -188,7 +188,8 @@ const TABLE_FIELDS = {
               params.shipmentReceived || isReceived(false, params.fieldValue)}
               options={params.bins}
               onChange={value => params.setLocation(params.rowIndex, value)}
-              objectValue
+              valueKey="id"
+              labelKey="name"
               className="select-xs"
               clearable={false}
             />),
@@ -204,8 +205,9 @@ const TABLE_FIELDS = {
           hide: !hasBinLocationSupport,
         }),
         attributes: {
-          objectValue: true,
           clearable: false,
+          valueKey: 'id',
+          labelKey: 'name',
         },
       },
       recipient: {
@@ -218,6 +220,10 @@ const TABLE_FIELDS = {
           options: users,
           disabled: shipmentReceived || isReceived(true, fieldValue),
         }),
+        attributes: {
+          valueKey: 'id',
+          labelKey: 'name',
+        },
       },
       quantityShipped: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
@@ -475,30 +481,9 @@ class PartialReceivingPage extends Component {
     const url = `/openboxes/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=1`;
 
     return apiClient.get(url)
-      .then((resp) => {
-        const response = parseResponse(resp.data.data);
+      .then((response) => {
         this.setState({ values: {} }, () => {
-          this.setState({
-            values: {
-              ...response,
-              containers: _.map(response.containers, container => ({
-                ...container,
-                shipmentItems: _.map(container.shipmentItems, shipmentItem => ({
-                  ...shipmentItem,
-                  binLocation: {
-                    ...shipmentItem.binLocation,
-                    value: shipmentItem.binLocation ? shipmentItem.binLocation.id : null,
-                    label: shipmentItem.binLocation ? shipmentItem.binLocation.name : null,
-                  },
-                  recipient: {
-                    ...shipmentItem.recipient,
-                    value: shipmentItem.recipient ? shipmentItem.recipient.id : null,
-                    label: shipmentItem.recipient ? shipmentItem.recipient.name : null,
-                  },
-                })),
-              })),
-            },
-          });
+          this.setState({ values: parseResponse(response.data.data) });
         });
       })
       .catch(() => this.props.hideSpinner());

@@ -286,8 +286,8 @@ class InvoiceItemsModal extends Component {
     const url = `/openboxes/api/invoices/${invoiceId}/invoiceItemCandidates`;
 
     const payload = {
-      orderNumbers: selectedOrderNumbers,
-      shipmentNumbers: selectedShipmentNumbers,
+      orderNumbers: _.map(selectedOrderNumbers, orderNumber => orderNumber.value),
+      shipmentNumbers: _.map(selectedShipmentNumbers, shipmentNumber => shipmentNumber.value),
     };
 
     return apiClient.post(url, payload).then((resp) => {

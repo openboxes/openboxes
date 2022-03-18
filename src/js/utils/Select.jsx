@@ -32,15 +32,9 @@ class Select extends Component {
   }
 
   handleChange(value) {
-    if (this.props.multi) {
-      const values = _.map(value, val =>
-        (this.props.objectValue ? val : val));
-      this.setState({ value: values });
-      this.props.onChange(values);
-    } else if (value !== null && value !== undefined) {
-      const val = this.props.objectValue ? value.value : value;
-      this.props.onChange(val);
-      this.setState({ value: val });
+    if (value !== null && value !== undefined) {
+      this.props.onChange(value);
+      this.setState({ value });
     } else {
       this.props.onChange(null);
       this.setState({ value: null });
@@ -50,7 +44,7 @@ class Select extends Component {
   render() {
     const {
       options: selectOptions, value: selectValue = this.state.value,
-      objectValue = false, multi = false, delimiter = ';', async = false, showValueTooltip,
+      multi = false, delimiter = ';', async = false, showValueTooltip,
       arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, onTabPress, onEnterPress, ...attributes
     } = this.props;
     const { formatValue, className, showLabel = false } = attributes;
@@ -60,8 +54,14 @@ class Select extends Component {
 
       if (typeof value === 'string') {
         return { value, label: value };
-      } else if (objectValue) {
-        option = { ...value };
+      }
+
+      if (value && attributes.valueKey) {
+        option = { ...option, value: option[attributes.valueKey] };
+      }
+
+      if (value && attributes.labelKey) {
+        option = { ...option, label: option[attributes.labelKey] };
       }
 
       if (option.options) {
@@ -73,13 +73,20 @@ class Select extends Component {
 
     const options = mapOptions(selectOptions);
 
-    let value = selectValue;
+    let value = selectValue || null;
 
-    if (objectValue) {
-      value = multi ? _.map(selectValue, val => val)
-        : selectValue;
-    } else if (typeof selectValue === 'string') {
-      value = { selectValue, label: selectValue };
+    if (selectValue && typeof selectValue === 'string') {
+      value = { value: selectValue, label: selectValue };
+    }
+
+    if (!multi) {
+      if (value && attributes.valueKey) {
+        value = { ...value, value: value[attributes.valueKey] };
+      }
+
+      if (value && attributes.labelKey) {
+        value = { ...value, label: value[attributes.labelKey] };
+      }
     }
 
     const SelectType = async ? Async : ReactSelect;
@@ -240,7 +247,6 @@ Select.propTypes = {
   value: PropTypes.oneOfType([PropTypes.string,
     PropTypes.shape({}), PropTypes.any]),
   onChange: PropTypes.func,
-  objectValue: PropTypes.bool,
   multi: PropTypes.bool,
   async: PropTypes.bool,
   delimiter: PropTypes.string,
@@ -261,7 +267,6 @@ Select.propTypes = {
 Select.defaultProps = {
   value: undefined,
   onChange: null,
-  objectValue: false,
   multi: false,
   async: false,
   delimiter: ';',
