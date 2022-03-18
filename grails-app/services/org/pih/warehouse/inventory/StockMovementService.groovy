@@ -105,8 +105,27 @@ class StockMovementService {
                 jsonObject.containsKey("status") ? jsonObject.status as StockMovementStatusCode : null
 
         Boolean statusOnly =
-                jsonObject.containsKey("statusOnly") ? jsonObject.getBoolean("statusOnly") : false
+                jsonObject.containsKey("statusOnly") ? jsonObject.getBoolean("statusOnly") : Boolean.FALSE
 
+         // Determine whether we need to rollback changes
+        Boolean rollback =
+                jsonObject.containsKey("rollback") ? jsonObject.getBoolean("rollback") : Boolean.FALSE
+
+        // Clear picklist
+        Boolean shouldClearPicklist = jsonObject.containsKey("clearPicklist") ?
+                jsonObject.getBoolean("clearPicklist") : Boolean.FALSE
+
+        // Create picklist
+        Boolean shouldCreatePicklist = jsonObject.containsKey("createPicklist") ?
+                jsonObject.getBoolean("createPicklist") : Boolean.FALSE
+
+        transitionRequisitionBasedStockMovement(stockMovement, status, statusOnly, rollback, shouldClearPicklist, shouldCreatePicklist)
+
+    }
+
+    void transitionRequisitionBasedStockMovement(StockMovement stockMovement, StockMovementStatusCode status,
+                                                 Boolean statusOnly = false, Boolean rollback = false,
+                                                 Boolean shouldClearPicklist = false, Boolean shouldCreatePicklist = false) {
         // Update status only
         if (status && statusOnly) {
             RequisitionStatus requisitionStatus = RequisitionStatus.fromStockMovementStatus(stockMovementStatus)
@@ -114,11 +133,6 @@ class StockMovementService {
         }
         // Determine whether we need to rollback change,
         else {
-
-            // Determine whether we need to rollback changes
-            Boolean rollback =
-                    jsonObject.containsKey("rollback") ? jsonObject.getBoolean("rollback") : false
-
             if (rollback) {
                 rollbackStockMovement(stockMovement.id)
             }
@@ -138,17 +152,9 @@ class StockMovementService {
                     case StockMovementStatusCode.PICKING:
                         validateQuantityRequested(stockMovement)
 
-                        // Clear picklist
-                        Boolean shouldClearPicklist = jsonObject.containsKey("clearPicklist") ?
-                                jsonObject.getBoolean("clearPicklist") : Boolean.FALSE
-
                         if (shouldClearPicklist) {
                             clearPicklist(stockMovement)
                         }
-
-                        // Create picklist
-                        Boolean shouldCreatePicklist = jsonObject.containsKey("createPicklist") ?
-                                jsonObject.getBoolean("createPicklist") : Boolean.FALSE
 
                         if (shouldCreatePicklist) {
                             createPicklist(stockMovement)
@@ -2405,7 +2411,6 @@ class StockMovementService {
     }
 
     void validateRequisition(Requisition requisition) {
-
         requisition.requisitionItems.each { requisitionItem ->
             if (!requisition.origin.isSupplier() && requisition.origin.supports(ActivityCode.MANAGE_INVENTORY) && requisition.status > RequisitionStatus.CREATED) {
                 validateRequisitionItem(requisitionItem)
