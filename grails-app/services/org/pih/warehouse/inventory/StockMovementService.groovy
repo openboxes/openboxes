@@ -1886,6 +1886,7 @@ class StockMovementService {
             }
         }
 
+        grailsApplication.mainContext.publishEvent(new StockMovementStatusEvent(stockMovement, stockMovement.stockMovementStatusCode, Boolean.FALSE))
         return revisedItems
     }
 
