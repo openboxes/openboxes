@@ -100,18 +100,18 @@
                     height: 3em;
                 }
 
-                .Select {
+                .select-xs {
                     height: 3em;
 
-                    .Select-control {
+                    .react-select__control {
                         height: inherit;
 
-                        .Select-value,
-                        .Select-placeholder {
+                        .react-select__value-container,
+                        .react-select__indicators {
                             display: flex;
                             align-items: center;
 
-                            .Select-value-label {
+                            .react-select__single-value {
                                 height: fit-content;
                             }
                         }
