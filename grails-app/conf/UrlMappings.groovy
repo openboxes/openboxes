@@ -414,8 +414,13 @@ class UrlMappings {
             controller = "orderNotification"
             action = [POST: "handleMessage"]
         }
+        "/api/notifications/orderStatuses" {
+            controller = "orderStatusNotification"
+            action = [POST: "handleMessage"]
+        }
         "/notification/subscribe-product"(controller: "productNotification", action: "subscribe")
         "/notification/subscribe-order"(controller: "orderNotification", action: "subscribe")
+        "/notification/subscribe-order-status"(controller: "orderStatusNotification", action: "subscribe")
         "/notification/publish"(controller: "notification", action: "publish")
 
         // Error handling

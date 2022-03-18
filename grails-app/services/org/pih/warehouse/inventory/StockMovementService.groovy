@@ -181,6 +181,17 @@ class StockMovementService {
     }
 
     void validateQuantityRequested(StockMovement stockMovement) {
+
+        // Validate that all quantities have been approved
+        Boolean hasAnyUnapprovedItems = stockMovement.lineItems.any { StockMovementItem lineItem ->
+            log.info "lineItem " + lineItem.quantityRevised + " " + lineItem.quantityApproved
+            return lineItem?.quantityRevised && lineItem?.quantityRevised != lineItem.quantityApproved
+        }
+        if (hasAnyUnapprovedItems) {
+            stockMovement.errors.reject("stockMovement.notApproved.message",
+                    [stockMovement.identifier] as Object[], "Stock movement ${stockMovement.identifier} requires approval")
+        }
+
         stockMovement.lineItems?.each { StockMovementItem item ->
             if (item.substitutionItems) {
                 item.substitutionItems.each {

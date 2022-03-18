@@ -858,10 +858,21 @@ grails.plugin.raven.dsn = "https://{PUBLIC_KEY}:{SECRET_KEY}@app.getsentry.com/{
 awssdk.sns.accessKey = ""
 awssdk.sns.secretKey = ""
 awssdk.sns.region = Regions.US_EAST_1
+
+// Consumers
 awssdk.sns.product.arn = ""
 awssdk.sns.order.arn = ""
 awssdk.sns.productAvailability.arn = ""
+awssdk.sns.consumer.order.status.arn = ""
 
+// Producers
+awssdk.sns.order.status.arn = ""
+
+// Custom subscriber URLs
+openboxes.integration.sns.orders.subscribeUrl = null
+openboxes.integration.sns.products.subscribeUrl = null
+
+// Integration user
 openboxes.integration.username = ""
 openboxes.integration.password = ""
 

@@ -137,4 +137,5 @@ class Constants {
 
     static final String ARN_TOPIC_PRODUCT_CREATE_UPDATE_TYPE = "PRODUCT_CREATE_UPDATE"
     static final String ARN_TOPIC_ORDER_CREATE_TYPE = "ORDER_CREATE"
+    static final String ARN_TOPIC_ORDER_STATUS_TYPE = "ORDER_STATUS"
 }

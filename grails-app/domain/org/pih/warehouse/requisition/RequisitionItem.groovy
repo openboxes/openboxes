@@ -302,7 +302,8 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             modificationItem.parentRequisitionItem = this
             modificationItem.orderIndex = orderIndex
             modificationItem.quantity = newQuantity
-            modificationItem.quantityApproved = newQuantity
+            // FIXME We need to make this backwards compatible by adding a supported activity for requiring approval
+            modificationItem.quantityApproved = 0
             modificationItem.save(flush: true, failOnError: true)
         }
     }
@@ -566,6 +567,9 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return quantityPicked ?: 0
     }
 
+    def calculateQuantityApproved() {
+        return modificationItem ? modificationItem?.quantityApproved : quantityApproved
+    }
 
     def calculateQuantityRevised() {
         return modificationItem ? modificationItem?.quantity :
