@@ -1277,8 +1277,8 @@ class ProductService {
         if (!productInstance.productCode) {
             productInstance.productCode = generateProductIdentifier(productInstance.productType)
         }
-        productInstance.save(flush: true)
-
+        log.info "errors: " + productInstance?.errors
+        productInstance.save(flush: true, failOnError: true)
 
         // Process attributes
         if(productJson.containsKey("attributes")){
@@ -1303,7 +1303,8 @@ class ProductService {
                         else {
                             productAttribute.value = value
                         }
-                        productInstance.save(flush: true)
+                        log.info "errors: " + productInstance?.errors
+                        productInstance.save(flush: true, failOnError: true)
                     }
                 }
             }
@@ -1312,6 +1313,7 @@ class ProductService {
             Attribute attribute = findExternalProductIdAttribute()
             ProductAttribute productAttribute = new ProductAttribute(attribute: attribute, value: externalProductId)
             productInstance.addToAttributes(productAttribute)
+            log.info "errors: " + productInstance?.errors
             productInstance.save(flush: true, failOnError: true)
         }
 
@@ -1328,7 +1330,8 @@ class ProductService {
                     document = new Document(name: name, fileUri: fileUri, contentType: contentType)
                     document.save(flush: true)
                     productInstance.addToDocuments(document)
-                    productInstance.save(flush: true)
+                    log.info "errors: " + productInstance?.errors
+                    productInstance.save(flush: true, failOnError: true)
                 }
 
             }

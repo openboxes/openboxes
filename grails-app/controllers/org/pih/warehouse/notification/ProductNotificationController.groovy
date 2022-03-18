@@ -67,7 +67,9 @@ class ProductNotificationController {
         JSONArray products = productsJson.getJSONArray("products")
         for (int i = 0; i < products.length(); i++) {
             JSONObject productJson = products.getJSONObject(i)
-            Product productInstance = productService.createFromJson(productJson)
+            Product.withNewSession {
+                productService.createFromJson(productJson)
+            }
         }
     }
 }

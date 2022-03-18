@@ -257,12 +257,6 @@ class ProductController {
         def productInstance = Product.get(params.id)
         if (productInstance) {
 
-//            if (productInstance.isExternalProduct) {
-//                flash.message = "${warehouse.message(code: 'product.cannotModifyExternalProduct.message')}"
-//                redirect(action: "edit", id: params.id)
-//                return
-//            }
-
             if (params.version) {
                 def version = params.version.toLong()
                 if (productInstance.version > version) {
@@ -303,7 +297,12 @@ class ProductController {
                 productInstance.validateRequiredFields()
 
                 if (!productInstance.hasErrors() && productInstance.save(failOnError: true, flush: true)) {
-                    flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product: productInstance)])}"
+                    if (productInstance?.allowUpdates()) {
+                        flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product: productInstance)])}"
+                    }
+                    else {
+                        flash.message = "Updates not allowed on externally managed products"
+                    }
                     //redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
                     redirect(controller: "product", action: "edit", id: productInstance?.id)
                 } else {

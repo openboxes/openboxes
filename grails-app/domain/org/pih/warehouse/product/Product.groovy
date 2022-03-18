@@ -47,7 +47,6 @@ class Product implements Comparable, Serializable {
 
 
     def beforeInsert = {
-        checkIfExternalProduct()
         User.withNewSession {
             def currentUser = AuthService.currentUser.get()
             if (currentUser) {
@@ -57,7 +56,11 @@ class Product implements Comparable, Serializable {
         }
     }
     def beforeUpdate = {
-        checkIfExternalProduct()
+        log.info "Before update " + allowUpdates()
+        if (!allowUpdates()) {
+            log.info "External products cannot be updated"
+            return false
+        }
         User.withNewSession {
             def currentUser = AuthService.currentUser.get()
             if (currentUser) {
@@ -67,21 +70,26 @@ class Product implements Comparable, Serializable {
     }
 
     def beforeDelete = {
-        checkIfExternalProduct()
+        log.info "Before delete " + allowUpdates()
+        if (!allowUpdates()) {
+            log.info "External products cannot be deleted"
+            return false
+        }
     }
 
     /**
      * Admittedly kind of a hack, but this is the best we can do for now with permissions. We
      * should refactor this out once we migrate to spring security.
      */
-    def checkIfExternalProduct() {
+    Boolean allowUpdates() {
+        Boolean allowUpdates = true
         User.withNewSession {
-            User user = AuthService.currentUser.get()
-            Boolean isAuthorized = user?.hasRole(RoleType.ROLE_INTEGRATION_USER)
-            if (isExternalProduct && !isAuthorized) {
-                throw new UnsupportedOperationException("Externally managed products cannot be edited or deleted without authorized role")
+            if (isExternalProduct) {
+                User user = AuthService.currentUser.get()
+                allowUpdates = user?.hasRole(RoleType.ROLE_INTEGRATION_USER) ?: false
             }
         }
+        return allowUpdates
     }
 
 
