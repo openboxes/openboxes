@@ -347,21 +347,15 @@ class AddItemsPage extends Component {
     const url = `/openboxes/api/internalLocations?location.id=${this.props.locationId}&locationTypeCode=BIN_LOCATION`;
 
     const mapBins = bins => (_.chain(bins)
-      .map(bin => ({
-        value: {
-          id: bin.id, name: bin.name, zoneId: bin.zoneId, zoneName: bin.zoneName,
-        },
-        label: bin.name,
-      }))
-      .orderBy(['label'], ['asc']).value()
+      .orderBy(['name'], ['asc']).value()
     );
 
     return apiClient.get(url)
       .then((response) => {
         const binGroups = _.partition(response.data.data, bin => (bin.zoneName));
         const binsWithZone = _.chain(binGroups[0]).groupBy('zoneName')
-          .map((value, key) => ({ label: key, options: mapBins(value) }))
-          .orderBy(['label'], ['asc'])
+          .map((value, key) => ({ name: key, options: mapBins(value) }))
+          .orderBy(['name'], ['asc'])
           .value();
         const binsWithoutZone = mapBins(binGroups[1]);
         this.setState(
@@ -518,7 +512,8 @@ class AddItemsPage extends Component {
               &nbsp;
               <Select
                 options={bins}
-                objectValue
+                valueKey="id"
+                labelKey="name"
                 value={selectedBinLocation || null}
                 onChange={value => this.setSelectedBinLocation(value)}
                 placeholder={this.props.translate('react.outboundReturns.selectBinLocation.label', 'Select bin location...')}

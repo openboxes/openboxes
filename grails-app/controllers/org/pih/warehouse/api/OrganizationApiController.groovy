@@ -10,18 +10,56 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import org.hibernate.Criteria
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.User
-import org.pih.warehouse.product.ProductAvailability
+import grails.validation.ValidationException
+import org.codehaus.groovy.grails.web.json.JSONObject
+import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Organization
+import org.pih.warehouse.core.PartyType
 
 class OrganizationApiController extends BaseDomainApiController {
 
     def organizationService
+    def identifierService
 
     def list = {
         def organizations = organizationService.getOrganizations(params)
         render ([data:organizations] as JSON)
      }
 
+    def read = {
+        Organization organization = Organization.get(params.id)
+        if (!organization) {
+            throw new IllegalArgumentException("No Organization found for organization ID ${params.id}")
+        }
+
+        render([data: organization] as JSON)
+    }
+
+    def create = {
+        JSONObject jsonObject = request.JSON
+
+        Organization organization = new Organization()
+        bindOrganizationData(organization, jsonObject)
+
+        if (organization.hasErrors() || !organization.save(flush: true)) {
+            throw new ValidationException("Invalid organization", organization.errors)
+        }
+
+        render([data: [id: organization.id]] as JSON)
+    }
+
+    Organization bindOrganizationData(Organization organization, JSONObject jsonObject) {
+        bindData(organization, jsonObject)
+
+        if (!organization.code) {
+            organization.code =
+                    identifierService.generateOrganizationIdentifier(organization.name)
+        }
+
+        if (!organization.partyType) {
+            organization.partyType = PartyType.findByCode(Constants.DEFAULT_ORGANIZATION_CODE)
+        }
+
+        return organization
+    }
 }

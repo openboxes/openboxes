@@ -49,8 +49,8 @@ class CombinedShipmentItemApiController {
         List<Order> orders = orderService.getOrdersForCombinedShipment(vendor, destination)
         render([data: orders.findAll{ it.orderItems.any { item -> item.getQuantityRemainingToShip() > 0 } }.collect {
             [
-                value: it.id,
-                label: it.orderNumber
+                id: it.id,
+                orderNumber: it.orderNumber
             ]
         }] as JSON)
     }

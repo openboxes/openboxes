@@ -213,6 +213,11 @@ class UrlMappings {
             action = [GET: "listReceiving"]
         }
 
+        "/api/internalLocations/search"(parseRequest: true) {
+            controller = "internalLocationApi"
+            action = [GET: "search"]
+        }
+
         // Stocklist Item API
 
         "/api/stocklistItems/availableStocklists"(parseRequest: true) {
