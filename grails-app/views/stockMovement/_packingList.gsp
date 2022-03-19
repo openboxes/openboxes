@@ -31,7 +31,7 @@
             </th>
             <th class="left"><warehouse:message code="default.lotSerialNo.label"/></th>
             <th class="center"><warehouse:message code="default.expires.label"/></th>
-            <th class="center"><warehouse:message code="shipmentItem.quantityShipped.label"/></th>
+            <th class="center"><warehouse:message code="shipmentItem.quantity.label"/></th>
             <g:if test="${shipmentInstance?.wasReceived()||shipmentInstance?.wasPartiallyReceived()}">
                 <th class="center"><warehouse:message code="shipmentItem.quantityReceived.label" default="Received"/></th>
                 <th class="center"><warehouse:message code="shipmentItem.quantityCanceled.label" default="Canceled"/></th>
