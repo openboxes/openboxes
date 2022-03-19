@@ -59,7 +59,7 @@ class MobileController {
         def productListUrl = g.createLink(controller: "mobile", action: "productList")
 
         StockMovement inboundCriteria = new StockMovement(destination: location, stockMovementType: StockMovementType.INBOUND)
-        Map inboundParams = [max:params.max?:10, offset: params.offset?:0, sort: "requestedDeliveryDate", order: "asc"]
+        Map inboundParams = [sort: "requestedDeliveryDate", order: "asc"]
         def inboundOrders = stockMovementService.getStockMovements(inboundCriteria, inboundParams)
 
         // FIXME Hack to set line items so we can display categories for each stock movement
@@ -70,8 +70,12 @@ class MobileController {
         def inboundCount = inboundOrders.size()?:0
         def inboundPending = inboundOrders.findAll { !it.isReceived }
 
+        if (!inboundPending?.empty && inboundPending.size() > 10) {
+            inboundPending = inboundPending.subList(0, 10)
+        }
+
         StockMovement outboundCriteria = new StockMovement(origin: location, stockMovementType: StockMovementType.OUTBOUND)
-        Map outboundParams = [max:params.max?:10, offset: params.offset?:0, sort: "requestedDeliveryDate", order: "asc"]
+        Map outboundParams = [sort: "requestedDeliveryDate", order: "asc"]
         def outboundOrders = stockMovementService.getStockMovements(outboundCriteria, outboundParams)
 
         // FIXME Hack to set line items so we can display categories for each stock movement
@@ -80,17 +84,19 @@ class MobileController {
         }
 
         def outboundCount = outboundOrders.size()?:0
-
         def outboundPending = outboundOrders.findAll { it.stockMovementStatusCode < StockMovementStatusCode.DISPATCHED }
         def readyToBePicked = outboundOrders.findAll{ it.stockMovementStatusCode == StockMovementStatusCode.PICKING }
         def readyToBePacked = outboundOrders.findAll{ it.stockMovementStatusCode == StockMovementStatusCode.PICKED }
         def inTransit = outboundOrders.findAll{ it.isShipped && !it.isReceived }
 
-        def inventorySummary = ProductSummary.createCriteria().list(max: params.max ?: 10, offset: params.offset ?: 0) {
+        if (!outboundPending?.empty && outboundPending.size() > 10) {
+            outboundPending = outboundPending.subList(0, 10)
+        }
+
+        def inventorySummary = ProductSummary.createCriteria().list() {
             eq("location", location)
             order("product", "asc")
         }
-
 
         [
                 indicators: [
@@ -184,11 +190,12 @@ class MobileController {
 
         RequisitionStatus requisitionStatus = params.status ? params.status as RequisitionStatus : null
         StockMovement stockMovement = new StockMovement(
-                origin: origin,
-                stockMovementType: StockMovementType.OUTBOUND)
+                origin: origin, stockMovementType: StockMovementType.OUTBOUND)
 
         params.max = params.max?:10
         params.offset = params.offset?:0
+        params.sort = params?.sort?:"expectedDeliveryDate"
+        params.order = params?.sort?:"asc"
 
         if (params.identifier) {
            stockMovement.identifier = "%" + params.identifier + "%"

@@ -135,7 +135,7 @@
             </table>
         </g:form>
         <ul class="pagination">
-            <g:pagination total="${stockMovements.totalCount}"/>
+            <g:pagination total="${stockMovements.totalCount}" params="${pageParams}"/>
         </ul>
     </div>
 </div>

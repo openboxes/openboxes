@@ -44,7 +44,7 @@
                                 <th class="col-2">Order Number</th>
                                 <th class="col-3">Origin</th>
                                 <th class="col-3">Delivery for FA</th>
-                                <th class="col-1">Delivery Date</th>
+                                <th class="col-2">Delivery Date</th>
                                 <th class="col-1">Status</th>
                                 <th class="col-1">Details</th>
                             </tr>
@@ -55,7 +55,14 @@
                                 <td><g:link controller="mobile" action="inboundDetails" id="${inboundOrder?.id}" class="card-link">${inboundOrder.identifier}</g:link></td>
                                 <td>${inboundOrder.origin}</td>
                                 <td>${inboundOrder?.categories[0]?.name}</td>
-                                <td>${g.formatDate(date: inboundOrder.expectedDeliveryDate, format: "dd MMM yyyy")}</td>
+                                <td>
+                                    <g:if test="${inboundOrder?.expectedDeliveryDate}">
+                                        ${g.formatDate(date: inboundOrder.expectedDeliveryDate, format: "dd MMM yyyy HH:mm")}
+                                    </g:if>
+                                    <g:else>
+                                        <i>${g.formatDate(date: inboundOrder.requestedDeliveryDate, format: "dd MMM yyyy")}</i>
+                                    </g:else>
+                                </td>
                                 <td>${inboundOrder.currentStatus}</td>
                                 <td><g:link controller="mobile" action="inboundDetails" id="${inboundOrder?.id}" class="card-link">Details</g:link></td>
                             </tr>
@@ -82,7 +89,7 @@
                                 <th class="col-2">Order Number</th>
                                 <th class="col-3">Destination</th>
                                 <th class="col-3">Delivery for FA</th>
-                                <th class="col-1">Delivery Date</th>
+                                <th class="col-2">Delivery Date</th>
                                 <th class="col-1">Status</th>
                                 <th class="col-1">Details</th>
                             </tr>
@@ -93,7 +100,14 @@
                                     <td><g:link controller="mobile" action="outboundDetails" id="${outboundOrder?.id}" class="card-link">${outboundOrder.identifier}</g:link></td>
                                     <td>${outboundOrder.destination}</td>
                                     <td>${outboundOrder?.categories[0]?.name}</td>
-                                    <td>${g.formatDate(date: outboundOrder.expectedDeliveryDate, format: "dd MMM yyyy")}</td>
+                                    <td>
+                                        <g:if test="${outboundOrder?.expectedDeliveryDate}">
+                                            ${g.formatDate(date: outboundOrder.expectedDeliveryDate, format: "dd MMM yyyy HH:mm")}
+                                        </g:if>
+                                        <g:else>
+                                            <i>${g.formatDate(date: outboundOrder.requestedDeliveryDate, format: "dd MMM yyyy")}</i>
+                                        </g:else>
+                                    </td>
                                     <td>${outboundOrder.status}</td>
                                     <td><g:link controller="mobile" action="outboundDetails" id="${outboundOrder?.id}" class="card-link">Details</g:link></td>
                                 </tr>
@@ -120,7 +134,7 @@
                                 <th class="col-2">Order Number</th>
                                 <th class="col-3">Destination</th>
                                 <th class="col-3">Delivery for FA</th>
-                                <th class="col-1">Delivery Date</th>
+                                <th class="col-2">Delivery Date</th>
                                 <th class="col-1">Status</th>
                                 <th class="col-1">Details</th>
                             </tr>
@@ -131,7 +145,14 @@
                                     <td>${outboundOrder.identifier}</td>
                                     <td>${outboundOrder.origin}</td>
                                     <td>${outboundOrder?.categories[0]?.name}</td>
-                                    <td>${g.formatDate(date: outboundOrder.expectedDeliveryDate, format: "dd MMM yyyy")}</td>
+                                    <td>
+                                        <g:if test="${outboundOrder?.expectedDeliveryDate}">
+                                            ${g.formatDate(date: outboundOrder.expectedDeliveryDate, format: "dd MMM yyyy HH:mm")}
+                                        </g:if>
+                                        <g:else>
+                                            <i>${g.formatDate(date: outboundOrder.requestedDeliveryDate, format: "dd MMM yyyy")}</i>
+                                        </g:else>
+                                    </td>
                                     <td>${outboundOrder.status}</td>
                                     <td><g:link controller="mobile" action="outboundDetails" id="${outboundOrder?.id}" class="card-link">Details</g:link></td>
                                 </tr>
@@ -158,7 +179,7 @@
                                 <th class="col-2">Order Number</th>
                                 <th class="col-3">Destination</th>
                                 <th class="col-3">Delivery for FA</th>
-                                <th class="col-1">Delivery Date</th>
+                                <th class="col-2">Delivery Date</th>
                                 <th class="col-1">Status</th>
                                 <th class="col-1">Tracking</th>
                             </tr>
@@ -169,7 +190,14 @@
                                     <td><g:link controller="mobile" action="outboundDetails" id="${outboundOrder?.id}" class="card-link">${outboundOrder.identifier}</g:link></td>
                                     <td>${outboundOrder.destination}</td>
                                     <td>${outboundOrder?.categories[0]?.name}</td>
-                                    <td>${g.formatDate(date: outboundOrder.expectedDeliveryDate, format: "dd MMM yyyy")}</td>
+                                    <td>
+                                        <g:if test="${outboundOrder?.expectedDeliveryDate}">
+                                            ${g.formatDate(date: outboundOrder.expectedDeliveryDate, format: "dd MMM yyyy HH:mm")}
+                                        </g:if>
+                                        <g:else>
+                                            <i>${g.formatDate(date: outboundOrder.requestedDeliveryDate, format: "dd MMM yyyy")}</i>
+                                        </g:else>
+                                    </td>
                                     <td>${outboundOrder.currentStatus}</td>
                                     <td>
                                         <g:if test="${stockMovement?.trackingNumber}">
@@ -199,7 +227,7 @@
                     <table class="table table-borderless table-striped">
                         <thead>
                             <tr>
-                                <th class="col-2">Status</th>
+                                <th class="col-1">Status</th>
                                 <th class="col-2">SKU Code</th>
                                 <th class="col-4">Description</th>
                                 <th class="col-1">On Hand</th>

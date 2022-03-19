@@ -125,7 +125,7 @@
             </g:unless>
         </g:form>
         <div class="pagination">
-            <g:paginate total="${stockMovements.totalCount}" params="${pageParams}"/>
+            <g:pagination total="${stockMovements.totalCount}" params="${pageParams}"/>
         </div>
     </div>
 </div>
