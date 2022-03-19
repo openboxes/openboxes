@@ -416,12 +416,44 @@ class StockMovementService {
             if (criteria.updatedBy) {
                 eq("updatedBy", criteria.updatedBy)
             }
+
+            // Stock Movement List
             if(params.createdAfter) {
                 ge("dateCreated", params.createdAfter)
             }
             if(params.createdBefore) {
                 le("dateCreated", params.createdBefore)
             }
+            if(params.dateCreatedFrom) {
+                ge("dateCreated", params.dateCreatedFrom)
+            }
+            if(params.dateCreatedTo) {
+                le("dateCreated", params.dateCreatedTo)
+            }
+            if(params.requestedDeliveryDateFrom) {
+                requisition {
+                    ge("requestedDeliveryDate", params.requestedDeliveryDateFrom)
+                }
+            }
+            if(params.requestedDeliveryDateTo) {
+                requisition {
+                    le("requestedDeliveryDate", params.requestedDeliveryDateTo)
+                }
+            }
+            if(params.expectedShippingDateFrom) {
+                ge("expectedShippingDate", params.expectedShippingDateFrom)
+            }
+            if(params.expectedShippingDateTo) {
+                le("expectedShippingDate", params.expectedShippingDateTo)
+            }
+            if(params.expectedDeliveryDateFrom) {
+                ge("expectedDeliveryDate", params.expectedDeliveryDateFrom)
+            }
+            if(params.expectedDeliveryDateTo) {
+                le("expectedDeliveryDate", params.expectedDeliveryDateTo)
+            }
+
+            // Mobile Controller - Inbound List
             if (params.requestedDeliveryDates && params.list("requestedDeliveryDates").size() == 2) {
                 requisition {
                     between("requestedDeliveryDate", params.requestedDeliveryDates[0], params.requestedDeliveryDates[1])
