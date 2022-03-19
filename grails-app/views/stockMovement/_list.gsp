@@ -32,7 +32,12 @@
                               title="${warehouse.message(code: 'stockMovement.identifier.label', default: 'Stock movement number')}" />
 
             <th><g:message code="default.name.label"/></th>
-            <th><g:message code="stockMovement.destination.label"/></th>
+            <g:if test="${!params.direction || params.direction as StockMovementType == StockMovementType.OUTBOUND}">
+                <th><g:message code="stockMovement.destination.label"/></th>
+            </g:if>
+            <g:else>
+                <th><g:message code="stockMovement.origin.label"/></th>
+            </g:else>
             <g:sortableColumn property="requestedBy" params="${pageParams}"
                               title="${warehouse.message(code: 'stockMovement.requestedBy.label', default: 'Requested by')}" />
             <g:sortableColumn property="requestedDeliveryDate" params="${pageParams}"
@@ -86,7 +91,12 @@
                     </g:link>
                 </td>
                 <td>
-                    ${stockMovement?.destination?.name}
+                    <g:if test="${!params.direction || params.direction as StockMovementType == StockMovementType.OUTBOUND}">
+                        ${stockMovement?.destination?.name}
+                    </g:if>
+                    <g:else>
+                        ${stockMovement?.origin?.name}
+                    </g:else>
                 </td>
                 <td>
                     ${stockMovement.requestedBy?:warehouse.message(code:'default.noone.label')}
