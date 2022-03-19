@@ -16,6 +16,7 @@ class ShipmentStatusTransitionEventService implements ApplicationListener<Shipme
 
     boolean transactional = true
 
+    def userService
     def notificationService
 
     void onApplicationEvent(ShipmentStatusTransitionEvent event) {
@@ -24,28 +25,36 @@ class ShipmentStatusTransitionEventService implements ApplicationListener<Shipme
         log.info "Shipment ${shipment?.shipmentNumber} from ${shipment?.origin} to ${shipment.destination}"
 
         if (event.shipmentStatusCode == ShipmentStatusCode.CREATED) {
-            notificationService.sendShipmentCreatedNotification(shipment, shipment.origin,
-                    [RoleType.ROLE_SHIPMENT_NOTIFICATION, RoleType.ROLE_SHIPMENT_OUTBOUND_CREATED_NOTIFICATION])
 
-            notificationService.sendShipmentCreatedNotification(shipment, shipment.destination,
-                    [RoleType.ROLE_SHIPMENT_NOTIFICATION, RoleType.ROLE_SHIPMENT_INBOUND_CREATED_NOTIFICATION])
+            def users = []
+            users.addAll(userService.findUsersByRoleTypes(shipment.origin,
+                    [RoleType.ROLE_SHIPMENT_NOTIFICATION, RoleType.ROLE_SHIPMENT_OUTBOUND_CREATED_NOTIFICATION]))
+            users.addAll(userService.findUsersByRoleTypes(shipment.destination,
+                    [RoleType.ROLE_SHIPMENT_NOTIFICATION, RoleType.ROLE_SHIPMENT_INBOUND_CREATED_NOTIFICATION]))
+
+            notificationService.sendShipmentCreatedNotification(shipment, users)
         }
         else if(event.shipmentStatusCode == ShipmentStatusCode.SHIPPED) {
-            notificationService.sendShipmentIssuedNotification(shipment, shipment.origin,
-                    [RoleType.ROLE_SHIPMENT_NOTIFICATION, RoleType.ROLE_SHIPMENT_OUTBOUND_SHIPPED_NOTIFICATION])
 
-            notificationService.sendShipmentIssuedNotification(shipment, shipment.destination,
-                    [RoleType.ROLE_SHIPMENT_NOTIFICATION, RoleType.ROLE_SHIPMENT_INBOUND_SHIPPED_NOTIFICATION])
+            def users = []
+            users.addAll(userService.findUsersByRoleTypes(shipment.origin,
+                    [RoleType.ROLE_SHIPMENT_NOTIFICATION, RoleType.ROLE_SHIPMENT_OUTBOUND_SHIPPED_NOTIFICATION]))
+            users.addAll(userService.findUsersByRoleTypes(shipment.destination,
+                    [RoleType.ROLE_SHIPMENT_NOTIFICATION, RoleType.ROLE_SHIPMENT_INBOUND_SHIPPED_NOTIFICATION]))
+
+            notificationService.sendShipmentIssuedNotification(shipment, users)
 
             notificationService.sendShipmentItemsShippedNotification(shipment)
         }
         else if (event.shipmentStatusCode in [ShipmentStatusCode.RECEIVED]) {
 
-            notificationService.sendShipmentReceiptNotification(shipment, shipment.origin,
-                    [RoleType.ROLE_SHIPMENT_NOTIFICATION, RoleType.ROLE_SHIPMENT_OUTBOUND_RECEIVED_NOTIFICATION])
+            def users = []
+            users.addAll(userService.findUsersByRoleTypes(shipment.origin,
+                    [RoleType.ROLE_SHIPMENT_NOTIFICATION, RoleType.ROLE_SHIPMENT_OUTBOUND_RECEIVED_NOTIFICATION]))
+            users.addAll(userService.findUsersByRoleTypes(shipment.destination,
+                    [RoleType.ROLE_SHIPMENT_NOTIFICATION, RoleType.ROLE_SHIPMENT_INBOUND_RECEIVED_NOTIFICATION]))
 
-            notificationService.sendShipmentReceiptNotification(shipment, shipment.destination,
-                    [RoleType.ROLE_SHIPMENT_NOTIFICATION, RoleType.ROLE_SHIPMENT_INBOUND_RECEIVED_NOTIFICATION])
+            notificationService.sendShipmentReceiptNotification(shipment, users)
 
             // Send notification email to recipients on completed receipt
             notificationService.sendReceiptNotifications(event?.partialReceipt)

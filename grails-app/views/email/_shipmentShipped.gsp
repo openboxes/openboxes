@@ -5,10 +5,10 @@
             <h2>${warehouse.message(code:'default.summary.label', default:'Summary') }</h2>
 
             <div style="margin: 10px;">
-                ${warehouse.message(code: 'email.shipmentShipped.message', args: [format.metadata(obj:shipmentInstance.shipmentType), shipmentInstance?.name])}
+                ${warehouse.message(code: 'email.shipmentShipped.message', args: [format.metadata(obj:shipmentInstance.shipmentType), shipmentInstance?.shipmentNumber])}
                 &nbsp;
                 <g:link controller="mobile" action="showDetails" id="${shipmentInstance?.id }" absolute="true" class="button">
-                    ${warehouse.message(code: 'email.link.label', args: [shipmentInstance?.name])}
+                    ${warehouse.message(code: 'email.link.label', args: [shipmentInstance?.shipmentNumber])}
                 </g:link>
             </div>
         </div>

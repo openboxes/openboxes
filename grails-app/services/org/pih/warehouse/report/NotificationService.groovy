@@ -155,8 +155,7 @@ class NotificationService {
         sendRequisitionNotifications(requisition, users, template, subject)
     }
 
-    def sendShipmentCreatedNotification(Shipment shipmentInstance, Location location, List<RoleType> roleTypes) {
-        def users = userService.findUsersByRoleTypes(location, roleTypes)
+    def sendShipmentCreatedNotification(Shipment shipmentInstance, List<User> users) {
         String subject = "Order ${shipmentInstance?.shipmentNumber} has been created"
         String template = "/email/shipmentCreated"
         sendShipmentNotifications(shipmentInstance, users, template, subject)
@@ -169,15 +168,13 @@ class NotificationService {
         sendShipmentNotifications(shipmentInstance, users, template, subject)
     }
 
-    def sendShipmentIssuedNotification(Shipment shipmentInstance, Location location, List<RoleType> roleTypes) {
-        def users = userService.findUsersByRoleTypes(location, roleTypes)
+    def sendShipmentIssuedNotification(Shipment shipmentInstance, List<User> users) {
         String subject = "Order ${shipmentInstance?.shipmentNumber} has been shipped"
         String template = "/email/shipmentShipped"
         sendShipmentNotifications(shipmentInstance, users, template, subject)
     }
 
-    def sendShipmentReceiptNotification(Shipment shipmentInstance, Location location, List<RoleType> roleTypes) {
-        List<User> users = userService.findUsersByRoleTypes(location, roleTypes)
+    def sendShipmentReceiptNotification(Shipment shipmentInstance, List<User> users) {
         String subject = "Order ${shipmentInstance?.shipmentNumber} has been received"
         String template = "/email/shipmentReceived"
         sendShipmentNotifications(shipmentInstance, users, template, subject)
@@ -234,7 +231,7 @@ class NotificationService {
     def sendShipmentNotifications(Shipment shipmentInstance, List<User> users, String template, String subject) {
         try {
             String body = renderTemplate(template, [shipmentInstance: shipmentInstance])
-            List emails = users.collect { it.email }
+            List emails = users.collect { it.email }?.unique()
             if (!emails.empty) {
                 mailService.sendHtmlMail(subject, body, emails)
             }

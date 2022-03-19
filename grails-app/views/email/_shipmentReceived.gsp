@@ -6,10 +6,10 @@
     <h2>${warehouse.message(code:'default.summary.label', default:'Summary') }</h2>
 
     <div style="margin: 10px;">
-        ${warehouse.message(code: 'email.shipmentReceived.message', args: [format.metadata(obj:shipmentInstance.shipmentType), shipmentInstance?.name])}
+        ${warehouse.message(code: 'email.shipmentReceived.message', args: [format.metadata(obj:shipmentInstance.shipmentType), shipmentInstance?.shipmentNumber])}
         &nbsp;
         <g:link controller="mobile" action="showDetails" id="${shipmentInstance?.id }" absolute="true" class="button">
-            ${warehouse.message(code: 'email.link.label', args: [shipmentInstance?.name])}
+            ${warehouse.message(code: 'email.link.label', args: [shipmentInstance?.shipmentNumber])}
         </g:link>
     </div>
 </div>
@@ -299,8 +299,11 @@
                         </g:else>
                     </td>
                     <td class="left">
-                        <g:if test="${shipmentItem?.receiptItems}">
-                            ${shipmentItem?.receiptItems*.comment}
+                        <g:set var="comments" value="${shipmentItem?.receiptItems?.collect { it.comment }.findAll { it }}"></g:set>
+                        <g:if test="${comments}">
+                            <g:each var="comment" in="${comments}">
+                                <blockquote>${comment}</blockquote>
+                            </g:each>
                         </g:if>
                     </td>
                 </tr>
