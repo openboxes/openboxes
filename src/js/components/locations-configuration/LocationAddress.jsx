@@ -122,13 +122,6 @@ class LocationAddress extends Component {
   render() {
     return (
       <div className="d-flex flex-column">
-        <div className="submit-buttons">
-          <button type="button" onClick={() => Alert.info(this.props.supportLinks[PAGE_ID])} className="btn btn-outline-primary float-right btn-xs">
-            <i className="fa fa-question-circle-o" aria-hidden="true" />
-            &nbsp;
-            <Translate id="react.default.button.support.label" defaultMessage="Support" />
-          </button>
-        </div>
         <div className="configuration-wizard-content flex-column">
           <Form
             onSubmit={values => this.nextPage(values)}
