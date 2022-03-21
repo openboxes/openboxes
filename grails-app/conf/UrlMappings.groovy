@@ -49,6 +49,7 @@ class UrlMappings {
             controller = { "locationApi" }
         }
 
+
         // Stock Movement Item API
 
         "/api/stockMovementItems"(parseRequest: true) {
