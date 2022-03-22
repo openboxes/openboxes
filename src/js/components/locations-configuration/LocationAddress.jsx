@@ -16,8 +16,6 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'components/locations-configuration/LocationAddress.scss';
 
-const INITIAL_STATE = {};
-
 const PAGE_ID = 'locationAddress';
 
 const FIELDS = {
@@ -86,13 +84,13 @@ class LocationAddress extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      ...INITIAL_STATE,
+      values: this.props.initialValues,
       locationId: this.props.initialValues.locationId,
     };
   }
 
 
-  saveAddressOfLocation(values) {
+  saveAddressOfLocation(values, callback) {
     const valuesAsAddressObject = {
       address: {
         ...values,
@@ -104,8 +102,9 @@ class LocationAddress extends Component {
       .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.locationsConfiguration.alert.addressSaveCompleted.label', 'Address was succesfully added to the location!'), { timeout: 3000 });
-        this.props.nextPage({
-          ...values,
+        callback({
+          ...this.state.values,
+          address: values,
           locationId: this.state.locationId,
         });
       })
@@ -116,7 +115,11 @@ class LocationAddress extends Component {
   }
 
   nextPage(values) {
-    this.saveAddressOfLocation(values);
+    this.saveAddressOfLocation(values, this.props.nextPage);
+  }
+
+  previousPage(values) {
+    this.saveAddressOfLocation(values, this.props.previousPage);
   }
 
   render() {
@@ -126,8 +129,8 @@ class LocationAddress extends Component {
           <Form
             onSubmit={values => this.nextPage(values)}
             validate={validate}
-            initialValues={this.state.values}
-            render={({ form, handleSubmit }) => (
+            initialValues={_.get(this.state.values, 'address')}
+            render={({ values, handleSubmit }) => (
               <form onSubmit={handleSubmit} className="w-100">
                 <div className="classic-form with-description location-address">
                   <div className="submit-buttons">
@@ -153,7 +156,7 @@ class LocationAddress extends Component {
                   )}
                 </div>
                 <div className="submit-buttons">
-                  <button type="button" onClick={this.props.previousPage} className="btn btn-outline-primary float-left btn-xs">
+                  <button type="button" onClick={() => this.previousPage(values)} className="btn btn-outline-primary float-left btn-xs">
                     <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                   </button>
                   <button type="submit" className="btn btn-outline-primary float-right btn-xs">

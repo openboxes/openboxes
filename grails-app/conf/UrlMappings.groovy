@@ -45,6 +45,16 @@ class UrlMappings {
             controller = { "productApi" }
         }
 
+        "/api/locations/locationTypes" {
+            controller = { "locationApi" }
+            action = [GET: "locationTypes"]
+        }
+
+        "/api/locations/supportedActivities" {
+            controller = { "locationApi" }
+            action = [GET: "supportedActivities"]
+        }
+
         "/api/locations/$id/$action" {
             controller = { "locationApi" }
         }

@@ -17,8 +17,6 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'components/locations-configuration/Forecasting.scss';
 
-const INITIAL_STATE = {};
-
 const PAGE_ID = 'forecasting';
 
 const FIELDS = {
@@ -86,7 +84,7 @@ class Forecasting extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      ...INITIAL_STATE,
+      values: this.props.initialValues,
       locationId: this.props.initialValues.locationId,
       isForecastingSupported: true,
     };
@@ -107,6 +105,9 @@ class Forecasting extends Component {
       });
   }
 
+  previousPage(values) {
+    this.props.previousPage({ ...this.state.values, forecasting: values });
+  }
 
   render() {
     return (
@@ -116,8 +117,8 @@ class Forecasting extends Component {
             <Form
               onSubmit={values => this.saveForecasting(values)}
               validate={validate}
-              initialValues={this.state.values}
-              render={({ form, handleSubmit, values }) => (
+              initialValues={_.get(this.state.values, 'forecasting')}
+              render={({ handleSubmit, values }) => (
                 <form onSubmit={handleSubmit} className="w-100">
                   <div className="classic-form with-description forecasting">
                     <div className="submit-buttons">
@@ -140,16 +141,11 @@ class Forecasting extends Component {
 
                     {_.map(
                     FIELDS,
-                    (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-                      active: values.active,
-                      debouncedLocationGroupsFetch: this.debouncedLocationGroupsFetch,
-                      debouncedOrganizationsFetch: this.debouncedOrganizationsFetch,
-                      debouncedUsersFetch: this.debouncedUsersFetch,
-                    }),
+                    (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName),
                   )}
                   </div>
                   <div className="submit-buttons">
-                    <button type="button" onClick={this.props.previousPage} className="btn btn-outline-primary float-left btn-xs">
+                    <button type="button" onClick={() => this.previousPage(values)} className="btn btn-outline-primary float-left btn-xs">
                       <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                     </button>
                     <button type="submit" className="btn btn-outline-primary float-right btn-xs">

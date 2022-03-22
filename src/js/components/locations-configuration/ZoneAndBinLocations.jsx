@@ -11,21 +11,22 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'react-table/react-table.css';
 import 'components/locations-configuration/ZoneTable.scss';
 
-const INITIAL_STATE = {};
-
 const PAGE_ID = 'zoneAndBinLocations';
 
 class ZoneAndBinLocations extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      ...INITIAL_STATE,
-      locationId: this.props.initialValues.locationId,
+      values: this.props.initialValues,
     };
   }
 
   nextPage() {
-    this.props.nextPage({ locationId: this.state.locationId });
+    this.props.nextPage(this.state.values);
+  }
+
+  previousPage() {
+    this.props.previousPage(this.state.values);
   }
 
   render() {
@@ -68,7 +69,7 @@ class ZoneAndBinLocations extends Component {
             />
           </div>
           <div className="submit-buttons d-flex justify-content-between">
-            <button type="button" onClick={this.props.previousPage} className="btn btn-outline-primary float-left btn-xs">
+            <button type="button" onClick={() => this.previousPage()} className="btn btn-outline-primary float-left btn-xs">
               <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
             </button>
             <button type="button" onClick={() => this.nextPage()} className="btn btn-outline-primary float-left btn-xs">
