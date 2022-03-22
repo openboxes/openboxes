@@ -48,7 +48,7 @@
                         <g:textField name="identifier" value="${params.identifier}" class="form-control" size="3"/>
                     </th>
                     <th>
-                        <g:selectLocation id="destination" name="destination.id" value="${params?.destination?.id}"
+                        <g:selectLocation id="destination" name="destinationId" value="${params?.destinationId}"
                                           class="form-control"
                                           noSelection="['null':warehouse.message(code:'default.all.label')]"/>
                     </th>

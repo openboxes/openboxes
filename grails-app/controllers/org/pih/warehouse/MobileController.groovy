@@ -210,8 +210,8 @@ class MobileController {
             stockMovement.stockMovementStatusCode = RequisitionStatus.toStockMovementStatus(requisitionStatusCode)
         }
 
-        if (params.destination) {
-            Location destination = Location.get(params.destination.id)
+        if (params.destinationId) {
+            Location destination = Location.get(params.destinationId)
             stockMovement.destination = destination
         }
 
