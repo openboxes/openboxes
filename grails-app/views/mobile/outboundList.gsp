@@ -25,6 +25,7 @@
 
 <div class="row g-0">
     <div class="col">
+        <g:set var="pageParams" value="${pageScope.variables['params']}"/>
         <g:form controller="mobile" action="outboundList" method="GET">
             <table class="table table-borderless table-striped">
                 <thead>
