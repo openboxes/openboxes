@@ -66,7 +66,7 @@ const validate = (values) => {
           [fieldName]: 'react.default.error.requiredField.label',
         };
       }
-      if (!isNumeric(values[fieldName])) {
+      if (values[fieldName] && !isNumeric(values[fieldName])) {
         return {
           ...acc,
           [fieldName]: 'react.default.error.numericField.label',
