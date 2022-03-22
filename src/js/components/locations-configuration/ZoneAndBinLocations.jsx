@@ -4,12 +4,13 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
+import BinTable from 'components/locations-configuration/BinTable';
 import ZoneTable from 'components/locations-configuration/ZoneTable';
 import Translate from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'react-table/react-table.css';
-import 'components/locations-configuration/ZoneTable.scss';
+import 'components/locations-configuration/ZoneBinTable.scss';
 
 const INITIAL_STATE = {};
 
@@ -64,6 +65,31 @@ class ZoneAndBinLocations extends Component {
               </button>
             </div>
             <ZoneTable
+              currentLocationId={this.props.currentLocationId}
+            />
+            <div className="form-title mt-md-5">
+              <Translate id="react.locationsConfiguration.bin.label" defaultMessage="Bin Locations" />
+            </div>
+            <div className="form-subtitle">
+              <Translate
+                id="react.locationsConfiguration.bin.additionalTitle.label"
+                defaultMessage="Bin locations represent a physical storage location within a depot. Inventory within the depot is tracked and picked by bin location."
+              />
+            </div>
+            <div className="submit-buttons">
+              <button type="button" className="btn btn-outline-primary add-zonebin-btn">
+                <Translate id="react.locationsConfiguration.addBin.label" defaultMessage="+ Add Bin Location" />
+              </button>
+              <button type="button" className="btn btn-outline-primary add-zonebin-btn">
+                <i className="fa fa-download mr-1" aria-hidden="true" />
+                <Translate id="react.locationsConfiguration.importBinLocations.label" defaultMessage="Import Bin Locations" />
+              </button>
+              <button type="button" className="btn btn-outline-primary add-zonebin-btn">
+                <i className="fa fa-arrow-up mr-1" aria-hidden="true" />
+                <Translate id="react.locationsConfiguration.exportBinLocations.label" defaultMessage="Export Bin Locations" />
+              </button>
+            </div>
+            <BinTable
               currentLocationId={this.props.currentLocationId}
             />
           </div>
