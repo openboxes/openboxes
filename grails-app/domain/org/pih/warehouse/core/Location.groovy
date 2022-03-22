@@ -290,7 +290,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
         if (locationTypeCodes) {
             internalLocations?.findAll { it.locationType?.locationTypeCode in locationTypeCodes }
         }
-        internalLocations = internalLocations.sort { a, b -> a.sortOrder <=> b.sortOrder ?: a.name <=> b.name }
+        internalLocations = internalLocations?.sort { a, b -> a.sortOrder <=> b.sortOrder ?: a.name <=> b.name }
         return internalLocations
     }
 

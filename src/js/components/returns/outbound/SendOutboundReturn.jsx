@@ -56,6 +56,8 @@ const SHIPMENT_FIELDS = {
     label: 'react.stockMovement.shipmentType.label',
     defaultMessage: 'Shipment type',
     attributes: {
+      valueKey: 'id',
+      labelKey: 'name',
       required: true,
       showValueTooltip: true,
     },
@@ -216,8 +218,8 @@ class SendMovementPage extends Component {
         const shipmentTypes = _.map(response.data.data, (type) => {
           const [en, fr] = _.split(type.name, '|fr:');
           return {
-            value: type.id,
-            label: this.props.locale === 'fr' && fr ? fr : en,
+            id: type.id,
+            name: this.props.locale === 'fr' && fr ? fr : en,
           };
         });
 

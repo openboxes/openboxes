@@ -25,8 +25,9 @@ const FIELDS = {
       required: true,
       showValueTooltip: true,
       multi: true,
-      objectValue: true,
       style: { paddingBottom: 5 },
+      valueKey: 'id',
+      labelKey: 'name',
     },
     getDynamicAttr: ({ users }) => ({
       options: users,

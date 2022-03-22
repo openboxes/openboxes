@@ -188,7 +188,8 @@ const TABLE_FIELDS = {
               params.shipmentReceived || isReceived(false, params.fieldValue)}
               options={params.bins}
               onChange={value => params.setLocation(params.rowIndex, value)}
-              objectValue
+              valueKey="id"
+              labelKey="name"
               className="select-xs"
               clearable={false}
             />),
@@ -204,11 +205,12 @@ const TABLE_FIELDS = {
           hide: !hasBinLocationSupport,
         }),
         attributes: {
-          objectValue: true,
           clearable: false,
+          valueKey: 'id',
+          labelKey: 'name',
         },
       },
-      'recipient.id': {
+      recipient: {
         type: params => (params.subfield ? <SelectField {...params} /> : null),
         fieldKey: '',
         flexWidth: '1',
@@ -218,6 +220,10 @@ const TABLE_FIELDS = {
           options: users,
           disabled: shipmentReceived || isReceived(true, fieldValue),
         }),
+        attributes: {
+          valueKey: 'id',
+          labelKey: 'name',
+        },
       },
       quantityShipped: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),

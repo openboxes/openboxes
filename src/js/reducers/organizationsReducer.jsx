@@ -12,7 +12,7 @@ export default function (state = initialState, action) {
     case FETCH_ORGANIZATIONS:
       if (action.payload.data !== undefined) {
         const organizations = _.map(action.payload.data.data, organization => (
-          { value: organization.id, label: organization.name }
+          { value: organization.id, id: organization.id, label: organization.name }
         ));
         return { ...state, data: organizations, fetched: true };
       }

@@ -205,7 +205,8 @@ class SplitLineModal extends Component {
                   <td className={`py-1 ${!_.get(item, 'putawayLocation.id') ? 'has-error align-middle' : 'align-middle'}`}>
                     <Select
                       options={this.props.bins}
-                      objectValue
+                      valueKey="id"
+                      labelKey="name"
                       value={item.putawayLocation}
                       onChange={value => this.setState({
                         splitItems: update(this.state.splitItems, {

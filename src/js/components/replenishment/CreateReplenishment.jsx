@@ -167,8 +167,8 @@ class CreateReplenishment extends Component {
     this.props.showSpinner();
     const { inventoryLevelStatus } = this.state;
     let url = `/openboxes/api/requirements?location.id=${locationId}`;
-    if (inventoryLevelStatus) {
-      url += `&inventoryLevelStatus=${inventoryLevelStatus}`;
+    if (inventoryLevelStatus.id) {
+      url += `&inventoryLevelStatus=${inventoryLevelStatus.id}`;
     }
 
     return apiClient.get(url)
@@ -244,7 +244,6 @@ class CreateReplenishment extends Component {
                 options={this.state.statusOptions}
                 className="select-sm stocklist-select"
                 clearable={false}
-                objectValue
               />
               <button
                 type="submit"

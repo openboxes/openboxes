@@ -97,6 +97,7 @@ const SHIPMENT_FIELDS = {
     attributes: {
       required: true,
       showValueTooltip: true,
+      valueKey: 'id',
     },
     getDynamicAttr: ({ shipmentTypes, received, showOnly }) => ({
       options: shipmentTypes,
@@ -283,7 +284,7 @@ class SendMovementPage extends Component {
     const payload = {
       'destination.id': values.destination.id,
       dateShipped: values.dateShipped,
-      'shipmentType.id': values.shipmentType,
+      'shipmentType.id': values.shipmentType.id,
       trackingNumber: values.trackingNumber || '',
       driverName: values.driverName || '',
       comments: values.comments || '',
@@ -329,7 +330,7 @@ class SendMovementPage extends Component {
         const shipmentTypes = _.map(response.data.data, (type) => {
           const [en, fr] = _.split(type.name, '|fr:');
           return {
-            value: type.id,
+            ...type,
             label: this.props.locale === 'fr' && fr ? fr : en,
           };
         });
@@ -527,7 +528,7 @@ class SendMovementPage extends Component {
   prepareRequestAndSubmitStockMovement(values) {
     const payload = {
       dateShipped: values.dateShipped,
-      'shipmentType.id': values.shipmentType,
+      'shipmentType.id': values.shipmentType.id,
       trackingNumber: values.trackingNumber || '',
       driverName: values.driverName || '',
       comments: values.comments || '',

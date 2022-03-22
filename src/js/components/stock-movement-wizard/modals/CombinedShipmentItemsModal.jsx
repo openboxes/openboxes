@@ -232,7 +232,7 @@ class CombinedShipmentItemsModal extends Component {
     const { vendor, destination } = this.props;
     const url = '/openboxes/api/combinedShipmentItems/findOrderItems';
     const payload = {
-      orderIds: selectedOrders, productId: selectedProductId, vendor, destination,
+      orderIds: _.map(selectedOrders, o => o.id), productId: selectedProductId, vendor, destination,
     };
     return apiClient.post(url, payload).then(resp => this.setState({
       formValues: {
@@ -336,6 +336,8 @@ class CombinedShipmentItemsModal extends Component {
             options={orderNumberOptions}
             showValueTooltip
             onChange={value => this.setSelectedOrders(value)}
+            valueKey="id"
+            labelKey="orderNumber"
             classes=""
             cache={false}
           />

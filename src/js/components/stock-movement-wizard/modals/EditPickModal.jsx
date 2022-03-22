@@ -208,7 +208,7 @@ class EditPickModal extends Component {
         'binLocation.id': avItem['binLocation.id'] || '',
         quantityPicked: _.isNil(avItem.quantityPicked) ? '' : avItem.quantityPicked,
       })),
-      reasonCode: values.reasonCode || '',
+      reasonCode: values.reasonCode.value || '',
     };
 
     apiClient.post(picklistUrl, payload)
