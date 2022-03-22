@@ -815,11 +815,10 @@
     transform-origin: bottom;
     display: block;
     opacity: 0;
-    bottom: 150%;
     left: -500px;
 
     &:after {
-      top: 100%;
+      top: 0;
       left: 42%;
       border: solid transparent;
       height: 0;
@@ -829,10 +828,10 @@
       margin-left: -0.5em;
       box-sizing: border-box;
       border: 1em solid black;
-      border-color: transparent transparent #fbfbfb #fbfbfb;
+      border-color: #fbfbfb #fbfbfb transparent transparent ;
       transform-origin: 0 0;
       transform: rotate(-45deg);
-      box-shadow: -3px 3px 3px 0 rgba(0, 0, 0, 0.08);
+      box-shadow: 3px -3px 3px 0 rgba(0, 0, 0, 0.08);
       border-width: 8px;
       content: " ";
     }
@@ -897,7 +896,6 @@
 }
 
 .popover-active .unarchive-popover {
-  bottom: 150%;
   left: 12%;
   transform: scale(1);
   display: block;
