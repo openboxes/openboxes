@@ -26,7 +26,7 @@ export const renderFormField = (fieldConfig, fieldName, props = {}) => {
 export const renderFormFields = ({
   renderInput,
   attributes: {
-    required, hidden, showError, tooltip, ...otherAttributes
+    required, hidden, showError, tooltip, tooltipHtml, ...otherAttributes
   },
   label: FieldLabel,
   defaultMessage,
@@ -66,7 +66,10 @@ export const renderFormFields = ({
               {FieldLabel && <Translate id={FieldLabel} defaultMessage={defaultMessage} />}
               { attr.withTooltip ?
                 <Tooltip
-                  title={translate(tooltip, tooltip)}
+                  interactive="true"
+                  trigger="click"
+                  hideOnClick="true"
+                  html={tooltipHtml || translate(tooltip, tooltip)}
                 >
                   &nbsp;
                   <i className="fa fa-question-circle-o text-primary" aria-hidden="true" />

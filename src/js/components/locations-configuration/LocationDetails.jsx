@@ -20,7 +20,11 @@ import { debounceLocationGroupsFetch, debounceOrganizationsFetch, debounceUsersF
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
+<<<<<<< HEAD
 import 'components/locations-configuration/LocationDetails.scss';
+=======
+import {Tooltip} from "react-tippy";
+>>>>>>> OBDS-110 Tooltip improvements
 
 const PAGE_ID = 'locationDetails';
 
@@ -69,6 +73,14 @@ const FIELDS = {
     attributes: {
       withTooltip: true,
       tooltip: 'react.locationsConfiguration.locationNumber.tooltip.label',
+      tooltipHtml: () => (
+        <div>
+          {translate('react.locationsConfiguration.locationNumber.tooltip.label', 'react.locationsConfiguration.locationNumber.tooltip.label')}
+          <a target="_blank" rel="noopener noreferrer" href='https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1291452471/Configure+Organizations+and+Locations'>
+            <Translate id="react.locationsConfiguration.here.label" defaultMessage="Here" />
+          </a>
+        </div>
+      ),
     },
   },
   organization: {
