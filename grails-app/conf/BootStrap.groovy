@@ -156,7 +156,8 @@ class BootStrap {
                     organizationCode     : location?.organization?.code,
                     backgroundColor : location?.bgColor,
                     zoneName : location?.zone?.name,
-                    zoneId : location?.zone?.id
+                    zoneId : location?.zone?.id,
+                    active : location?.active
             ]
         }
 
