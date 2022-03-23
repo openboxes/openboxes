@@ -210,4 +210,10 @@ class ApiController {
         }
         render([data: requestTypes] as JSON)
     }
+
+    def getSupportLinks = {
+        def supportLinks = grailsApplication.config.openboxes.supportLinks
+        
+        render([data: supportLinks] as JSON)
+    }
 }

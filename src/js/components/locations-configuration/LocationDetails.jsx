@@ -20,11 +20,7 @@ import { debounceLocationGroupsFetch, debounceOrganizationsFetch, debounceUsersF
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-<<<<<<< HEAD
 import 'components/locations-configuration/LocationDetails.scss';
-=======
-import {Tooltip} from "react-tippy";
->>>>>>> OBDS-110 Tooltip improvements
 
 const PAGE_ID = 'locationDetails';
 
@@ -73,14 +69,6 @@ const FIELDS = {
     attributes: {
       withTooltip: true,
       tooltip: 'react.locationsConfiguration.locationNumber.tooltip.label',
-      tooltipHtml: () => (
-        <div>
-          {translate('react.locationsConfiguration.locationNumber.tooltip.label', 'react.locationsConfiguration.locationNumber.tooltip.label')}
-          <a target="_blank" rel="noopener noreferrer" href='https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1291452471/Configure+Organizations+and+Locations'>
-            <Translate id="react.locationsConfiguration.here.label" defaultMessage="Here" />
-          </a>
-        </div>
-      ),
     },
   },
   organization: {
@@ -101,9 +89,14 @@ const FIELDS = {
       options: [],
       filterOptions: options => options,
     },
-    getDynamicAttr: ({ debouncedOrganizationsFetch, openNewOrganizationModal }) => ({
+    getDynamicAttr: ({
+      debouncedOrganizationsFetch,
+      openNewOrganizationModal,
+      injectionData,
+    }) => ({
       loadOptions: debouncedOrganizationsFetch,
       newOptionModalOpen: openNewOrganizationModal,
+      injectionData,
     }),
   },
   locationGroup: {
@@ -158,6 +151,7 @@ class LocationDetails extends Component {
       useDefaultActivities: this.props.initialValues.useDefaultActivities !== false,
       locationTypes: [],
       supportedActivities: [],
+      supportLinks: {},
     };
     this.openNewOrganizationModal = this.openNewOrganizationModal.bind(this);
     this.openNewLocationGroupModal = this.openNewLocationGroupModal.bind(this);
@@ -168,12 +162,14 @@ class LocationDetails extends Component {
       debounceLocationGroupsFetch(this.props.debounceTime, this.props.minSearchLength);
 
     this.debouncedOrganizationsFetch =
-    debounceOrganizationsFetch(this.props.debounceTime, this.props.minSearchLength, []);
+      debounceOrganizationsFetch(this.props.debounceTime, this.props.minSearchLength, []);
+    this.getSupportLinks = this.getSupportLinks.bind(this);
   }
 
   componentDidMount() {
     this.setInitialValues();
     this.fetchLocationTypes();
+    this.getSupportLinks();
     if (this.props.locConfTranslationsFetched) {
       this.dataFetched = true;
       this.fetchSupportedActivities();
@@ -195,6 +191,16 @@ class LocationDetails extends Component {
         },
       });
     }
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  getSupportLinks() {
+    const url = '/openboxes/api/supportLinks';
+
+    apiClient.get(url).then((response) => {
+      const supportLinks = response.data.data;
+      this.setState({ supportLinks });
+    });
   }
 
   getSupportedActivities(locationType) {
@@ -322,11 +328,11 @@ class LocationDetails extends Component {
           render={({
             form: {
               mutators: {
-              resetSupportedActivities,
-              setLocationGroupValue,
-              setOrganizationValue,
+                resetSupportedActivities,
+                setLocationGroupValue,
+                setOrganizationValue,
+              },
             },
-          },
             handleSubmit,
             values,
           }) => (
@@ -356,13 +362,14 @@ class LocationDetails extends Component {
                   {_.map(
                     FIELDS,
                     (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-                      active: values.active,
-                      debouncedLocationGroupsFetch: this.debouncedLocationGroupsFetch,
-                      debouncedOrganizationsFetch: this.debouncedOrganizationsFetch,
-                      debouncedUsersFetch: this.debouncedUsersFetch,
-                      openNewOrganizationModal: this.openNewOrganizationModal,
-                      openNewLocationGroupModal: this.openNewLocationGroupModal,
-                    }),
+                        active: values.active,
+                        debouncedLocationGroupsFetch: this.debouncedLocationGroupsFetch,
+                        debouncedOrganizationsFetch: this.debouncedOrganizationsFetch,
+                        debouncedUsersFetch: this.debouncedUsersFetch,
+                        openNewOrganizationModal: this.openNewOrganizationModal,
+                        openNewLocationGroupModal: this.openNewLocationGroupModal,
+                        injectionData: this.state.supportLinks,
+                      }),
                   )}
 
                   <div className="form-title"><Translate id="react.locationsConfiguration.typeAndActivities.label" defaultMessage="Location Type and Supported Activities" /></div>
