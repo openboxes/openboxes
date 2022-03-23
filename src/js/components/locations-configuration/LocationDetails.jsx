@@ -343,6 +343,7 @@ class LocationDetails extends Component {
                     fieldConfig={{
                       attributes: {
                         multi: true,
+                        className: 'multi-select',
                       },
                       getDynamicAttr: ({ supportedActivities, useDefaultActivities }) => ({
                         disabled: useDefaultActivities,

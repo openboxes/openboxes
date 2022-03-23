@@ -44,7 +44,7 @@ class Select extends Component {
   render() {
     const {
       options: selectOptions, value: selectValue = this.state.value,
-      multi = false, delimiter = ';', async = false, showValueTooltip,
+      multi = false, delimiter = ';', async = false, showValueTooltip, clearable = true,
       arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, onTabPress, onEnterPress, ...attributes
     } = this.props;
     const { formatValue, className, showLabel = false } = attributes;
@@ -180,13 +180,13 @@ class Select extends Component {
             isDisabled={attributes.disabled}
             options={options}
             isMulti={multi}
+            isClearable={clearable}
             title=""
             delimiter={delimiter}
             value={value}
             onChange={this.handleChange}
             components={{ Menu, Option, SingleValue }}
             ref={fieldRef}
-            isClearable
             classNamePrefix="react-select"
             noOptionsMessage={() => (async ? 'Type to search' : 'No results found')}
             onKeyDown={(event) => {
@@ -248,6 +248,7 @@ Select.propTypes = {
     PropTypes.shape({}), PropTypes.any]),
   onChange: PropTypes.func,
   multi: PropTypes.bool,
+  clearable: PropTypes.bool,
   async: PropTypes.bool,
   delimiter: PropTypes.string,
   showValueTooltip: PropTypes.bool,
@@ -268,6 +269,7 @@ Select.defaultProps = {
   value: undefined,
   onChange: null,
   multi: false,
+  clearable: true,
   async: false,
   delimiter: ';',
   initialValue: null,

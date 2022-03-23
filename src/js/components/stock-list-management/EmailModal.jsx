@@ -25,6 +25,7 @@ const FIELDS = {
       required: true,
       showValueTooltip: true,
       multi: true,
+      className: 'multi-select',
       style: { paddingBottom: 5 },
       valueKey: 'id',
       labelKey: 'name',
