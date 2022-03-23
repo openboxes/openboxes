@@ -27,9 +27,11 @@ class LocationsConfigurationWizard extends Component {
     super(props);
 
     this.state = {
-      values: this.props.initialValues,
+      values: {},
       currentPage: 1,
     };
+
+    this.updateWizardValues = this.updateWizardValues.bind(this);
   }
 
   componentDidMount() {
@@ -70,12 +72,15 @@ class LocationsConfigurationWizard extends Component {
     ];
   }
 
+  updateWizardValues(currentPage, values) {
+    this.setState({ currentPage, values });
+  }
+
   render() {
     const { values, currentPage } = this.state;
     const pageList = [LocationDetails, LocationAddress, ZoneAndBinLocations, Forecasting];
     const stepList = this.getStepList();
-    const { location, history } = this.props;
-    const locationId = location.id;
+    const { history } = this.props;
 
     return (
       <Wizard
@@ -84,8 +89,9 @@ class LocationsConfigurationWizard extends Component {
         initialValues={values}
         currentPage={currentPage}
         prevPage={currentPage === 1 ? 1 : currentPage - 1}
+        updateWizardValues={this.updateWizardValues}
         additionalProps={{
-          locationId, location, history, supportLinks: SUPPORT_LINKS,
+          history, supportLinks: SUPPORT_LINKS,
         }}
       />
     );
@@ -107,9 +113,6 @@ LocationsConfigurationWizard.propTypes = {
   locale: PropTypes.string.isRequired,
   fetchTranslations: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
-  initialValues: PropTypes.shape({
-    shipmentStatus: PropTypes.string,
-  }),
   breadcrumbsConfig: PropTypes.shape({
     actionLabel: PropTypes.string.isRequired,
     defaultActionLabel: PropTypes.string.isRequired,
@@ -120,18 +123,9 @@ LocationsConfigurationWizard.propTypes = {
   history: PropTypes.shape({
     push: PropTypes.func,
   }).isRequired,
-  location: PropTypes.shape({
-    name: PropTypes.string,
-    id: PropTypes.string,
-    locationType: PropTypes.shape({
-      description: PropTypes.string,
-      locationTypeCode: PropTypes.string,
-    }),
-  }).isRequired,
 };
 
 LocationsConfigurationWizard.defaultProps = {
-  initialValues: {},
   breadcrumbsConfig: {
     actionLabel: '',
     defaultActionLabel: '',

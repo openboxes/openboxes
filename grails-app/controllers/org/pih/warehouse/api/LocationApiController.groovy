@@ -14,7 +14,6 @@ import grails.validation.ValidationException
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.Criteria
 import org.pih.warehouse.core.ActivityCode
-import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.RoleType
@@ -81,10 +80,37 @@ class LocationApiController extends BaseDomainApiController {
 
     }
 
+    def locationTypes = {
+        def locationTypes = LocationType.list()
+
+        def data = locationTypes.collect { locationType ->
+            [
+                    id                  : locationType.id,
+                    name                : locationType.name,
+                    description         : locationType.description,
+                    locationTypeCode    : locationType?.locationTypeCode?.name(),
+                    supportedActivities : locationType.supportedActivities
+            ]
+        }
+
+        render ([data:data] as JSON)
+    }
+
+    def supportedActivities = {
+        def data = ActivityCode.list().collect { it.name() }
+
+        render ([data:data] as JSON)
+    }
+
     def create = { Location location ->
         JSONObject jsonObject = request.JSON
 
         bindLocationData(location, jsonObject)
+
+        boolean useDefaultActivities = Boolean.valueOf(params.useDefaultActivities ?: "false")
+        if (useDefaultActivities && location?.supportedActivities) {
+            location.supportedActivities.clear()
+        }
 
         if (!location.validate() || !location.save(failOnError: true)) {
             throw new ValidationException("Invalid location ${location.name}", location.errors)
@@ -103,6 +129,11 @@ class LocationApiController extends BaseDomainApiController {
         }
 
         bindLocationData(existingLocation, jsonObject)
+
+        boolean useDefaultActivities = Boolean.valueOf(params.useDefaultActivities ?: "false")
+        if (useDefaultActivities && existingLocation?.supportedActivities) {
+            existingLocation.supportedActivities.clear()
+        }
 
         if (existingLocation.validate() && !existingLocation.hasErrors()) {
             if (existingLocation?.address?.validate() && !existingLocation?.address?.hasErrors()) {
@@ -125,15 +156,9 @@ class LocationApiController extends BaseDomainApiController {
             location.locationNumber = identifierService.generateLocationIdentifier()
         }
 
-        // TODO: should be changed in OBDS-100
-        if (!location.locationType) {
-            location.locationType = LocationType.findById('4')
-        }
-
         if (!location.inventory) {
             location.inventory = inventoryService.addInventory(location)
         }
-
 
         return location
     }
