@@ -77,7 +77,7 @@ class Select extends Component {
 
     if (selectValue && typeof selectValue === 'string') {
       const selectedOption = _.find(options, o => o.value === selectValue);
-      value = { value: selectValue, label: selectedOption ? selectedOption.label : selectValue };
+      value = { value: selectValue, label: selectedOption ? selectedOption.label : '' };
     }
 
     if (!multi) {

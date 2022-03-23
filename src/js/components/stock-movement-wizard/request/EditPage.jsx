@@ -295,12 +295,20 @@ const AD_HOCK_FIELDS = {
         fieldKey: 'quantityRevised',
         getDynamicAttr: ({
           fieldValue, subfield, reasonCodes, updateRow, values, rowIndex, showOnly,
-        }) => ({
-          disabled: !fieldValue || subfield || showOnly,
-          options: reasonCodes,
-          showValueTooltip: true,
-          onBlur: () => updateRow(values, rowIndex),
-        }),
+        }) => {
+          const isSubstituted = values.lineItems && values.lineItems[rowIndex] &&
+            values.lineItems[rowIndex].statusCode === 'SUBSTITUTED';
+          return {
+            disabled: fieldValue === null ||
+              fieldValue === undefined ||
+              subfield ||
+              isSubstituted ||
+              showOnly,
+            options: reasonCodes,
+            showValueTooltip: true,
+            onBlur: () => updateRow(values, rowIndex),
+          };
+        },
       },
       revert: {
         type: ButtonField,
@@ -586,12 +594,20 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
         fieldKey: 'quantityRevised',
         getDynamicAttr: ({
           fieldValue, subfield, reasonCodes, updateRow, values, rowIndex, showOnly,
-        }) => ({
-          disabled: !fieldValue || subfield || showOnly,
-          options: reasonCodes,
-          showValueTooltip: true,
-          onBlur: () => updateRow(values, rowIndex),
-        }),
+        }) => {
+          const isSubstituted = values.lineItems && values.lineItems[rowIndex] &&
+            values.lineItems[rowIndex].statusCode === 'SUBSTITUTED';
+          return {
+            disabled: fieldValue === null ||
+              fieldValue === undefined ||
+              subfield ||
+              isSubstituted ||
+              showOnly,
+            options: reasonCodes,
+            showValueTooltip: true,
+            onBlur: () => updateRow(values, rowIndex),
+          };
+        },
       },
       revert: {
         type: ButtonField,
@@ -877,12 +893,20 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
         fieldKey: 'quantityRevised',
         getDynamicAttr: ({
           fieldValue, subfield, reasonCodes, updateRow, values, rowIndex, showOnly,
-        }) => ({
-          disabled: !fieldValue || subfield || showOnly,
-          options: reasonCodes,
-          showValueTooltip: true,
-          onBlur: () => updateRow(values, rowIndex),
-        }),
+        }) => {
+          const isSubstituted = values.lineItems && values.lineItems[rowIndex] &&
+            values.lineItems[rowIndex].statusCode === 'SUBSTITUTED';
+          return {
+            disabled: fieldValue === null ||
+              fieldValue === undefined ||
+              subfield ||
+              isSubstituted ||
+              showOnly,
+            options: reasonCodes,
+            showValueTooltip: true,
+            onBlur: () => updateRow(values, rowIndex),
+          };
+        },
       },
       revert: {
         type: ButtonField,

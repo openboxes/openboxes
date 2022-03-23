@@ -234,12 +234,16 @@ const FIELDS = {
         fieldKey: 'quantityRevised',
         getDynamicAttr: ({
           fieldValue, subfield, reasonCodes, updateRow, values, rowIndex,
-        }) => ({
-          disabled: !fieldValue || subfield,
-          options: reasonCodes,
-          showValueTooltip: true,
-          onBlur: () => updateRow(values, rowIndex),
-        }),
+        }) => {
+          const isSubstituted = values.lineItems && values.lineItems[rowIndex] &&
+            values.lineItems[rowIndex].statusCode === 'SUBSTITUTED';
+          return {
+            disabled: fieldValue === null || fieldValue === undefined || subfield || isSubstituted,
+            options: reasonCodes,
+            showValueTooltip: true,
+            onBlur: () => updateRow(values, rowIndex),
+          };
+        },
       },
       revert: {
         type: ButtonField,
