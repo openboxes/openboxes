@@ -56,11 +56,11 @@ class Select extends Component {
         return { value, label: value };
       }
 
-      if (value && attributes.valueKey) {
+      if (value && attributes.valueKey && !option.value) {
         option = { ...option, value: option[attributes.valueKey] };
       }
 
-      if (value && attributes.labelKey) {
+      if (value && attributes.labelKey && !option.label) {
         option = { ...option, label: option[attributes.labelKey] };
       }
 
@@ -76,15 +76,16 @@ class Select extends Component {
     let value = selectValue || null;
 
     if (selectValue && typeof selectValue === 'string') {
-      value = { value: selectValue, label: selectValue };
+      const selectedOption = _.find(options, o => o.value === selectValue);
+      value = { value: selectValue, label: selectedOption ? selectedOption.label : selectValue };
     }
 
     if (!multi) {
-      if (value && attributes.valueKey) {
+      if (value && attributes.valueKey && !value.value) {
         value = { ...value, value: value[attributes.valueKey] };
       }
 
-      if (value && attributes.labelKey) {
+      if (value && attributes.labelKey && !value.label) {
         value = { ...value, label: value[attributes.labelKey] };
       }
     }

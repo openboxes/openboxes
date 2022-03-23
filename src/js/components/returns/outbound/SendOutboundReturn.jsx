@@ -346,6 +346,9 @@ class SendMovementPage extends Component {
     const url = `/openboxes/api/stockTransfers/${this.props.match.params.outboundReturnId}`;
     const payload = {
       ...values,
+      shipmentType: {
+        id: values.shipmentType.id,
+      },
       trackingNumber: values.trackingNumber || '',
       driverName: values.driverName || '',
       comments: values.comments || '',
