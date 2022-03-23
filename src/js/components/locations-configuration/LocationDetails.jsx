@@ -33,6 +33,10 @@ function validate(values) {
     errors.organization = 'react.default.error.requiredField.label';
   }
 
+  if (!values.locationType) {
+    errors.locationType = 'react.default.error.requiredField.label';
+  }
+
   return errors;
 }
 
@@ -150,6 +154,10 @@ class LocationDetails extends Component {
   componentDidMount() {
     this.setInitialValues();
     this.fetchLocationTypes();
+    if (this.props.locConfTranslationsFetched) {
+      this.dataFetched = true;
+      this.fetchSupportedActivities();
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -169,6 +177,13 @@ class LocationDetails extends Component {
     }
   }
 
+  getSupportedActivities(locationType) {
+    return _.chain(locationType)
+      .get('supportedActivities')
+      .map(value => ({ value, label: this.props.translate(`react.locationsConfiguration.ActivityCode.${value}`, value) }))
+      .value();
+  }
+
   dataFetched = false;
 
   fetchLocationTypes() {
@@ -181,7 +196,16 @@ class LocationDetails extends Component {
           const [en, fr] = _.split(locationType.name, '|fr:');
           return { ...locationType, label: this.props.locale === 'fr' && fr ? fr : en };
         });
-        this.setState({ locationTypes });
+
+        if (this.state.values.locationType) {
+          this.setState({ locationTypes });
+        } else {
+          const locationType = _.find(locationTypes, type => _.startsWith(type.name, 'Depot'));
+          const supportedActivities = this.getSupportedActivities(locationType);
+          this.setState({
+            locationTypes, values: { ...this.state.values, locationType, supportedActivities },
+          });
+        }
       });
   }
 
@@ -256,10 +280,7 @@ class LocationDetails extends Component {
           initialValues={this.state.values}
           mutators={{
             resetSupportedActivities: ([locationType], state, utils) => {
-              const supportedActivities = _.chain(locationType)
-                .get('supportedActivities')
-                .map(value => ({ value, label: this.props.translate(`react.locationsConfiguration.ActivityCode.${value}`, value) }))
-                .value();
+              const supportedActivities = this.getSupportedActivities(locationType);
               utils.changeValue(state, 'supportedActivities', () => supportedActivities);
             },
           }}
@@ -356,7 +377,15 @@ class LocationDetails extends Component {
                 </div>
               </div>
               <div className="submit-buttons">
-                <button type="submit" className="btn btn-outline-primary float-right btn-xs">
+                <button
+                  type="submit"
+                  onClick={() => {
+                    if (this.state.useDefaultActivities) {
+                      resetSupportedActivities(values.locationType);
+                    }
+                  }}
+                  className="btn btn-outline-primary float-right btn-xs"
+                >
                   <Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>

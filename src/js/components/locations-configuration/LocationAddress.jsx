@@ -101,7 +101,6 @@ class LocationAddress extends Component {
     apiClient.post(locationUrl, flattenRequest(valuesAsAddressObject))
       .then(() => {
         this.props.hideSpinner();
-        Alert.success(this.props.translate('react.locationsConfiguration.alert.addressSaveCompleted.label', 'Address was succesfully added to the location!'), { timeout: 3000 });
         callback({
           ...this.state.values,
           address: values,
@@ -115,7 +114,10 @@ class LocationAddress extends Component {
   }
 
   nextPage(values) {
-    this.saveAddressOfLocation(values, this.props.nextPage);
+    this.saveAddressOfLocation(values, (val) => {
+      Alert.success(this.props.translate('react.locationsConfiguration.alert.addressSaveCompleted.label', 'Address was succesfully added to the location!'), { timeout: 3000 });
+      this.props.nextPage(val);
+    });
   }
 
   previousPage(values) {
