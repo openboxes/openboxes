@@ -155,6 +155,24 @@ export const debounceOrganizationsFetch = (waitTime, minSearchLength) =>
     }
   }, waitTime);
 
+export const debounceAllOrganizationsFetch = (waitTime, minSearchLength) =>
+  _.debounce((searchTerm, callback) => {
+    if (searchTerm && searchTerm.length >= minSearchLength) {
+      apiClient.get(`/openboxes/api/organizations?q=${searchTerm}`)
+        .then(result => callback(_.map(result.data.data, obj => (
+          {
+            value: obj.id,
+            id: obj.id,
+            name: obj.name,
+            label: `${obj.code} ${obj.name}`,
+          }
+        ))))
+        .catch(() => callback([]));
+    } else {
+      callback([]);
+    }
+  }, waitTime);
+
 export const debounceLocationGroupsFetch = (waitTime, minSearchLength) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
