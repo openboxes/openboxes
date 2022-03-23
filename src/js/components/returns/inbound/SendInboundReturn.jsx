@@ -58,6 +58,8 @@ const SHIPMENT_FIELDS = {
     attributes: {
       required: true,
       showValueTooltip: true,
+      valueKey: 'id',
+      labelKey: 'name',
     },
     getDynamicAttr: ({ shipmentTypes, issued }) => ({
       options: shipmentTypes,
@@ -321,6 +323,9 @@ class SendMovementPage extends Component {
     const url = `/openboxes/api/stockTransfers/${this.props.match.params.inboundReturnId}`;
     const payload = {
       ...values,
+      shipmentType: {
+        id: values.shipmentType.id,
+      },
       trackingNumber: values.trackingNumber || '',
       driverName: values.driverName || '',
       comments: values.comments || '',

@@ -44,7 +44,7 @@ class Select extends Component {
   render() {
     const {
       options: selectOptions, value: selectValue = this.state.value,
-      multi = false, delimiter = ';', async = false, showValueTooltip,
+      multi = false, delimiter = ';', async = false, showValueTooltip, clearable = true,
       arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, onTabPress, onEnterPress, ...attributes
     } = this.props;
     const { formatValue, className, showLabel = false } = attributes;
@@ -56,11 +56,11 @@ class Select extends Component {
         return { value, label: value };
       }
 
-      if (value && attributes.valueKey) {
+      if (value && attributes.valueKey && !option.value) {
         option = { ...option, value: option[attributes.valueKey] };
       }
 
-      if (value && attributes.labelKey) {
+      if (value && attributes.labelKey && !option.label) {
         option = { ...option, label: option[attributes.labelKey] };
       }
 
@@ -76,15 +76,16 @@ class Select extends Component {
     let value = selectValue || null;
 
     if (selectValue && typeof selectValue === 'string') {
-      value = { value: selectValue, label: selectValue };
+      const selectedOption = _.find(options, o => o.value === selectValue);
+      value = { value: selectValue, label: selectedOption ? selectedOption.label : '' };
     }
 
     if (!multi) {
-      if (value && attributes.valueKey) {
+      if (value && attributes.valueKey && !value.value) {
         value = { ...value, value: value[attributes.valueKey] };
       }
 
-      if (value && attributes.labelKey) {
+      if (value && attributes.labelKey && !value.label) {
         value = { ...value, label: value[attributes.labelKey] };
       }
     }
@@ -180,13 +181,13 @@ class Select extends Component {
             isDisabled={attributes.disabled}
             options={options}
             isMulti={multi}
+            isClearable={clearable}
             title=""
             delimiter={delimiter}
             value={value}
             onChange={this.handleChange}
             components={{ Menu, Option, SingleValue }}
             ref={fieldRef}
-            isClearable
             classNamePrefix="react-select"
             noOptionsMessage={() => (async ? 'Type to search' : 'No results found')}
             onKeyDown={(event) => {
@@ -248,6 +249,7 @@ Select.propTypes = {
     PropTypes.shape({}), PropTypes.any]),
   onChange: PropTypes.func,
   multi: PropTypes.bool,
+  clearable: PropTypes.bool,
   async: PropTypes.bool,
   delimiter: PropTypes.string,
   showValueTooltip: PropTypes.bool,
@@ -268,6 +270,7 @@ Select.defaultProps = {
   value: undefined,
   onChange: null,
   multi: false,
+  clearable: true,
   async: false,
   delimiter: ';',
   initialValue: null,

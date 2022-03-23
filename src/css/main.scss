@@ -285,9 +285,10 @@ body {
 .select-xs {
   font-size: .875rem;
   border-radius: .2rem;
+  height: 26px;
 
   .react-select__control {
-    height: 26px;
+    height: inherit;
     min-height: 26px !important;
 
     &.react-select__control--is-focused {
@@ -306,6 +307,11 @@ body {
       display: flex;
       align-items: center;
       height: inherit;
+
+      div {
+        margin: 0;
+        padding: 0;
+      }
 
       .react-select__indicator {
         padding-right: 5px !important;
@@ -332,6 +338,19 @@ body {
   .react-select__menu {
     background-color: white;
     z-index: 9999;
+  }
+}
+
+.multi-select {
+  height: auto !important;
+
+  .react-select__control {
+    .react-select__value-container, .react-select__indicators {
+      div {
+        margin: 2px;
+        padding: 2px 0;
+      }
+    }
   }
 }
 
