@@ -1,0 +1,22 @@
+.add-zone-modal-main {
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.75);
+  .add-zone-modal-content {
+    width: 35% !important;
+    background-color: #f5f3f3 !important;
+    .add-zone-modal-form {
+      .form-group {
+        width: 100%;
+      }
+    }
+  }
+}

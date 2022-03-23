@@ -1209,7 +1209,7 @@ openboxes.typeahead.delay = 300
 openboxes.typeahead.minLength = 3
 
 // Allow system administrators to disable refresh on startup
-openboxes.refreshAnalyticsDataOnStartup.enabled = true
+openboxes.refreshAnalyticsDataOnStartup.enabled = false
 
 // Send stock alerts
 openboxes.jobs.sendStockAlertsJob.enabled = true

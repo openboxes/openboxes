@@ -9,51 +9,9 @@ import apiClient from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 const INITIAL_STATE = {
-  zoneData: [],
   zonePages: -1,
   zoneLoading: true,
 };
-
-const zoneColumns = [
-  {
-    Header: 'Status',
-    accessor: 'active',
-    minWidth: 30,
-    className: 'active-circle',
-    headerClassName: 'header',
-    Cell: (row) => {
-      if (row) {
-        return (<i className="fa fa-check-circle green-circle" aria-hidden="true" />);
-      }
-      return (<i className="fa fa-times-circle grey-circle" aria-hidden="true" />);
-    },
-  },
-  {
-    Header: 'Name',
-    accessor: 'name',
-    className: 'cell',
-    headerClassName: 'header text-align-left',
-  },
-  {
-    Header: 'Location Type',
-    accessor: 'locationType.locationTypeCode',
-    className: 'cell',
-    headerClassName: 'header text-align-left',
-  },
-  {
-    Header: 'Actions',
-    minWidth: 20,
-    accessor: 'actions',
-    className: 'cell',
-    headerClassName: 'header ',
-    Cell: () => (
-      <div className="d-flex justify-content-center align-items-center">
-        <i className="fa fa-pencil action-icons" aria-hidden="true" />
-        <i className="fa fa-trash-o action-icons" aria-hidden="true" />
-      </div>
-    ),
-  },
-];
 
 
 class ZoneTable extends Component {
@@ -65,9 +23,50 @@ class ZoneTable extends Component {
   }
 
   render() {
+    const zoneColumns = [
+      {
+        Header: 'Status',
+        accessor: 'active',
+        minWidth: 30,
+        className: 'active-circle',
+        headerClassName: 'header',
+        Cell: (row) => {
+          if (row.original.active) {
+            return (<i className="fa fa-check-circle green-circle" aria-hidden="true" />);
+          }
+          return (<i className="fa fa-times-circle grey-circle" aria-hidden="true" />);
+        },
+      },
+      {
+        Header: 'Name',
+        accessor: 'name',
+        className: 'cell',
+        headerClassName: 'header text-align-left',
+      },
+      {
+        Header: 'Location Type',
+        accessor: 'locationType.locationTypeCode',
+        className: 'cell',
+        headerClassName: 'header text-align-left',
+      },
+      {
+        Header: 'Actions',
+        minWidth: 20,
+        accessor: 'actions',
+        className: 'action-cell',
+        headerClassName: 'header ',
+        Cell: row => (
+          <div className="d-flex justify-content-center align-items-center">
+            <i className="fa fa-pencil action-icons icon-pointer" aria-hidden="true" onClick={() => this.props.handleZoneEdit(row.original)} />
+            <i className="fa fa-trash-o action-icons icon-pointer" aria-hidden="true" onClick={() => this.props.deleteLocation(row.original.id)} />
+          </div>
+        ),
+      },
+    ];
+
     return (
       <ReactTable
-        data={this.state.zoneData}
+        data={this.props.zoneData}
         columns={zoneColumns}
         loading={this.state.zoneLoading}
         pages={this.state.zonePages}
@@ -91,10 +90,10 @@ class ZoneTable extends Component {
           })
             .then((res) => {
               this.setState({
-                zoneData: res.data.data,
                 zoneLoading: false,
                 zonePages: Math.ceil(res.data.totalCount / state.pageSize),
               });
+              this.props.fetchData(res.data.data, 'ZONE');
             })
             .catch(() => Promise.reject(new Error(this.props.translate('react.locationsConfiguration.error.zoneList.label', 'Could not get list of zones'))));
         }}
@@ -110,6 +109,10 @@ const mapStateToProps = state => ({
 ZoneTable.propTypes = {
   currentLocationId: PropTypes.string.isRequired,
   translate: PropTypes.func.isRequired,
+  zoneData: PropTypes.shape([]).isRequired,
+  fetchData: PropTypes.func.isRequired,
+  handleZoneEdit: PropTypes.func.isRequired,
+  deleteLocation: PropTypes.func.isRequired,
 };
 
 export default connect(mapStateToProps)(ZoneTable);

@@ -11,6 +11,15 @@
     text-align: left;
   }
   .cell {
+    display: flex;
+    align-self: center;
+    border: none !important;
+    padding: 10px;
+  }
+  .action-cell {
+    display: flex;
+    align-self: center;
+    justify-content: center;
     border: none !important;
     padding: 10px;
     .action-icons {
@@ -56,9 +65,14 @@
   flex-direction: column;
   align-items: flex-start !important;
 }
+
 .add-zonebin-btn {
   background-color: #a2d3e8 !important;
   color: #076fce !important;
   font-weight: bold !important;
   border: none !important;
+}
+
+.icon-pointer {
+  cursor: pointer;
 }
