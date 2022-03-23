@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
+import ReactHtmlParser from 'react-html-parser';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
@@ -13,6 +14,7 @@ import apiClient from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import 'components/products-configuration/ConfigureProductCategories.scss';
 
 const INITIAL_STATE = {
   categoryOptions: {},
@@ -44,10 +46,10 @@ class ConfigureProductCategories extends Component {
 
   getCategoryTreeContent(category, categoryName) {
     return (
-      <div className="d-flex flex-column align-items-center p-5">
+      <div className="d-flex flex-column p-5">
         <h3>{category.title}</h3>
-        <div className="my-3">{category.description}</div>
-        <div>
+        <div className="my-3">{ReactHtmlParser(category.description)}</div>
+        <div className="align-self-end">
           <button
             type="button"
             className="btn btn-primary"

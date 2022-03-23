@@ -67,7 +67,7 @@ class ReviewCategories extends Component {
             {categoriesCount > 0 ? (
               <div className="d-flex flex-column justify-content-middle align-items-center col-6 offset-3">
                 <h3>
-                  <Translate id="default.success.message" defaultMessage="Success!" />
+                  <Translate id="react.productsConfiguration.importSuccess.label" defaultMessage="Import Complete!" />
                 </h3>
                 <span style={{ textAlign: 'center' }}>
                   <Translate id="react.productsConfiguration.successfulCategoriesImport.message" />

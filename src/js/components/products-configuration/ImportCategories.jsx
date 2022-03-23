@@ -63,15 +63,13 @@ class ImportCategories extends Component {
 
   render() {
     return (
-      <div className="d-flex flex-column align-items-center p-5">
+      <div className="d-flex flex-column p-5">
         <h3><Translate id="react.productsConfiguration.excelImport.label" defaultMessage="Excel Import" /></h3>
         <div>
           <Translate id="react.productsConfiguration.csvUpload.label" defaultMessage="Please upload .csv file. Download file template here:" />&nbsp;
-          <button className="btn btn-link btn-xs" style={{ color: '#44CA15' }} onClick={() => this.downloadCategoryTemplate()}>
+          <a href="#" onClick={() => this.downloadCategoryTemplate()}>
             <Translate id="react.productsConfiguration.csvTemplate.label" defaultMessage=".csv file template" />
-          </button>
-        </div>
-        <div>
+          </a>.&nbsp;
           <Translate id="react.productsConfiguration.csvReadMore.label" defaultMessage="You can read more on how to create a .csv file" />&nbsp;
           <a target="_blank" rel="noopener noreferrer" href="#">
             <Translate id="react.productsConfiguration.here.label" defaultMessage="here" />

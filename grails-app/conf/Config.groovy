@@ -1710,8 +1710,25 @@ openboxes.configurationWizard.categoryOptions = [
         rootCategoryName: "ROOT",
         categoryNameColumnIndex: 0,
         parentCategoryNameColumnIndex: 1,
-        title: "OpenBoxes default category tree",
-        description: "",
+        title: "OpenBoxes Default Category List",
+        description: "<div>A simple and flexible category tree with 25 categories organized into Equipment, Medicine, Supplies, Perishables, and Other. A good place to start for users  who aren’t sure exactly what they want. Can be edited after import. See a sample of the category tree below.</div>" +
+                "<div class='category-list'>" +
+                "  <ul>" +
+                "    <li>Supplies" +
+                "      <ul>" +
+                "        <li>Office Supplies</li>" +
+                "        <li>Medical Supplies" +
+                "          <ul>" +
+                "            <li>Dental</li>" +
+                "            <li>Lab</li>" +
+                "            <li>Surgical</li>" +
+                "          </ul>" +
+                "        </li>" +
+                "      </ul>" +
+                "    </li>" +
+                "    <li>Equipment</li>" +
+                "  </ul>" +
+                "</div>",
     ],
     unspscCategories: [
         enabled: true,
@@ -1720,8 +1737,24 @@ openboxes.configurationWizard.categoryOptions = [
         rootCategoryName: "ROOT", // needs to match the category from file
         categoryNameColumnIndex: 0,
         parentCategoryNameColumnIndex: 1,
-        title: "UNSPSC category list",
-        description: "",
+        title: "UNSPSC Category List",
+        description: "<div>A tree of 201 categories based on the <a target='_blank' rel='noopener noreferrer' href='https://www.unspsc.org'>United Nations Standard Products and Services Code</a>. This list takes some of the most commonly used sections and classes from the UNSPSC list, using the sections as parent categories for the classes. This is a good option for organizations who already use UNSPSC classifications or who want a very detailed tree. See a sample section of the tree below.</div>" +
+                "<div class='category-list'>" +
+                "  <ul>" +
+                "    <li>Paper Materials and Products" +
+                "      <ul>" +
+                "        <li>Paper materials</li>" +
+                "        <li>Paper Products</li>" +
+                "        <li>Industrial use papers</li>" +
+                "      </ul>" +
+                "    </li>" +
+                "    <li>Office Equipment and Accessories and Supplies" +
+                "      <ul>" +
+                "        <li>Office machines and their supplies and accessories</li>" +
+                "      </ul>" +
+                "    </li>" +
+                "  </ul>" +
+                "</div>",
     ],
     whoCategories: [
             enabled: true,
@@ -1730,8 +1763,21 @@ openboxes.configurationWizard.categoryOptions = [
             rootCategoryName: "ROOT", // needs to match the category from file
             categoryNameColumnIndex: 0,
             parentCategoryNameColumnIndex: 1,
-            title: "WHO category list",
-            description: "",
+            title: "WHO Category List",
+            description: "<div>A system of medical categorization used by the <a target='_blank' rel='noopener noreferrer' href='https://www.who.int/groups/expert-committee-on-selection-and-use-of-essential-medicines/essential-medicines-lists'>WHO in their Essential Medicines List</a>. This categorization system is focused entirely on medication, and is best suited to healthcare organizations. Public health facilities that use the WHO list as the basis of their product catalogue will find that this is a good starting point to which medical items and other categories can be added. Users that want to import the WHO Essential Medicines List as their product list must select this category tree. See a sample of the tree below.</div>" +
+                    "<div class='category-list'>" +
+                    "  <ul>" +
+                    "    <li>Antileprosy Medicines</li>" +
+                    "    <li>Antimalarial Medicines" +
+                    "      <ul>" +
+                    "        <li>For Chemoprevention</li>" +
+                    "        <li>For Curative Treatment</li>" +
+                    "        <li>For Treatment of Acute Attack</li>" +
+                    "      </ul>" +
+                    "    </li>" +
+                    "    <li>Antimigraine Medicines</li>" +
+                    "  </ul>" +
+                    "</div>",
     ]
 ]
 
@@ -1741,7 +1787,8 @@ openboxes.configurationWizard.productOptions = [
                 // TODO: add option to support 'classpath:'
                 fileUrl: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/WHO_products.csv",
                 title: "WHO product list",
-                description: "",
+                description: "<div>This selection will import the WHO Essential Medicines List (Sept 2021 version) into your instance as products.  Public health facilities that use the WHO list as the basis of their product catalogue will find that this is a good starting point to building out their products in OpenBoxes.</div>" +
+                        "<div class='my-3'>In order to import this product list, you must have selected the corresponding WHO category tree in the previous step. This product list will not work with any other category tree. Go to <a target='_blank' rel='noopener noreferrer' href='https://list.essentialmeds.org/'>list.essentialmeds.org</a> to view the full WHO list that will be imported.</div>",
         ]
 ]
 
