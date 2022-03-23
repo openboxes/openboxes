@@ -16,7 +16,7 @@ import AddOrganizationModal from 'components/locations-configuration/modals/AddO
 import apiClient from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
 import { renderFormField } from 'utils/form-utils';
-import { debounceAllOrganizationsFetch, debounceLocationGroupsFetch, debounceUsersFetch } from 'utils/option-utils';
+import { debounceLocationGroupsFetch, debounceOrganizationsFetch, debounceUsersFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -142,7 +142,6 @@ class LocationDetails extends Component {
     this.state = {
       showOrganizationModal: false,
       showLocationGroupModal: false,
-      setInitialValues: true,
       values: this.props.initialValues,
       useDefaultActivities: this.props.initialValues.useDefaultActivities !== false,
       locationTypes: [],
@@ -157,10 +156,7 @@ class LocationDetails extends Component {
       debounceLocationGroupsFetch(this.props.debounceTime, this.props.minSearchLength);
 
     this.debouncedOrganizationsFetch =
-      debounceAllOrganizationsFetch(this.props.debounceTime, this.props.minSearchLength);
-    this.setOrganization = this.setOrganization.bind(this);
-    this.setLocationGroup = this.setLocationGroup.bind(this);
-    this.fetchOrganization = this.fetchOrganization.bind(this);
+    debounceOrganizationsFetch(this.props.debounceTime, this.props.minSearchLength, []);
   }
 
   componentDidMount() {
@@ -232,13 +228,6 @@ class LocationDetails extends Component {
       });
   }
 
-  setOrganization({ newOrganizationId }) {
-    this.fetchOrganization(newOrganizationId);
-  }
-
-  setLocationGroup({ newLocationGroupId }) {
-    this.fetchLocationGroup(newLocationGroupId);
-  }
 
   openNewOrganizationModal() {
     this.setState({ showOrganizationModal: true });
@@ -248,23 +237,6 @@ class LocationDetails extends Component {
     this.setState({ showLocationGroupModal: true });
   }
 
-  fetchOrganization(organizationId) {
-    const url = `/openboxes/api/organizations/${organizationId}`;
-    apiClient.get(url)
-      .then((response) => {
-        const resp = response.data.data;
-        window.setFormValue('organization', resp.name);
-      });
-  }
-
-  fetchLocationGroup(locationGroupId) {
-    const url = `/openboxes/api/locationGroups/${locationGroupId}`;
-    apiClient.get(url)
-      .then((response) => {
-        const resp = response.data.data;
-        window.setFormValue('locationGroup', resp.name);
-      });
-  }
 
   saveLocationDetails(values) {
     if (values.name && values.organization) {
@@ -318,25 +290,44 @@ class LocationDetails extends Component {
           validate={validate}
           initialValues={this.state.values}
           mutators={{
-            setValue: ([field, value], state, { changeValue }) => {
-              changeValue(state, field, () => value);
+            setLocationGroupValue: ([{ id, name }], state, utils) => {
+              const data = {
+                id, label: name, name, value: id,
+              };
+              utils.changeValue(state, 'locationGroup', () => data);
+            },
+            setOrganizationValue: ([{ id, name }], state, utils) => {
+              const data = {
+                id, label: name, name, value: id,
+              };
+              utils.changeValue(state, 'organization', () => data);
             },
             resetSupportedActivities: ([locationType], state, utils) => {
               const supportedActivities = this.getSupportedActivities(locationType);
               utils.changeValue(state, 'supportedActivities', () => supportedActivities);
             },
           }}
-          render={({ form: { mutators: { resetSupportedActivities } }, handleSubmit, values }) => (
+          render={({
+            form: {
+              mutators: {
+              resetSupportedActivities,
+              setLocationGroupValue,
+              setOrganizationValue,
+            },
+          },
+            handleSubmit,
+            values,
+          }) => (
             <div>
               <AddOrganizationModal
                 isOpen={this.state.showOrganizationModal}
                 onClose={() => this.setState({ showOrganizationModal: false })}
-                onResponse={this.setOrganization}
+                onResponse={setOrganizationValue}
               />
               <AddLocationGroupModal
                 isOpen={this.state.showLocationGroupModal}
                 onClose={() => this.setState({ showLocationGroupModal: false })}
-                onResponse={this.setLocationGroup}
+                onResponse={setLocationGroupValue}
               />
               <form onSubmit={handleSubmit} className="w-100">
                 <div className="classic-form with-description">
@@ -378,7 +369,6 @@ class LocationDetails extends Component {
                       label: 'react.locationsConfiguration.locationType.label',
                       defaultMessage: 'Location Type',
                       attributes: {
-                        multi: true,
                         className: 'multi-select',
                         required: true,
                         valueKey: 'id',

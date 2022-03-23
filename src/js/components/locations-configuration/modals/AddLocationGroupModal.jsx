@@ -41,16 +41,6 @@ const FIELDS = {
 };
 
 class AddLocationGroupModal extends Component {
-  componentDidMount() {
-    this.props.fetchTranslations('', 'locationsConfiguration');
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (this.props.locale && this.props.locale !== nextProps.locale) {
-      this.props.fetchTranslations(nextProps.locale, 'locationsConfiguration');
-    }
-  }
-
   save(values) {
     if (values.name) {
       this.props.showSpinner();
@@ -66,7 +56,7 @@ class AddLocationGroupModal extends Component {
           this.props.hideSpinner();
           Alert.success(this.props.translate('react.locationsConfiguration.alert.locationGroupSaveCompleted.label', 'Location group was successfully saved!'), { timeout: 3000 });
           const resp = response.data.data;
-          this.props.onResponse({ newLocationGroupId: resp.id });
+          this.props.onResponse({ id: resp.id, name: values.name });
           this.props.onClose();
         })
         .catch(() => {
@@ -111,7 +101,7 @@ class AddLocationGroupModal extends Component {
                     )}
                   </div>
                   <div className="btn-toolbar justify-content-between pt-3">
-                    <button type="button" className="btn btn-outline-primary ml-1" onClick={() => this.closeModal()}>
+                    <button type="button" className="btn btn-outline-primary ml-1" onClick={() => this.props.onClose()}>
                       <Translate id="Cancel" defaultMessage="Cancel" />
                     </button>
                     <button type="submit" className="btn btn-primary align-self-end">
@@ -138,10 +128,8 @@ export default withRouter(connect(mapStateToProps, {
 })(AddLocationGroupModal));
 
 AddLocationGroupModal.propTypes = {
-  fetchTranslations: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
   isOpen: PropTypes.func.isRequired,
-  locale: PropTypes.string.isRequired,
   onClose: PropTypes.func.isRequired,
   onResponse: PropTypes.func.isRequired,
   showSpinner: PropTypes.func.isRequired,

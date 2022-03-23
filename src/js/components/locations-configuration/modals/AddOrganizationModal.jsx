@@ -52,16 +52,6 @@ const FIELDS = {
 };
 
 class AddOrganizationModal extends Component {
-  componentDidMount() {
-    this.props.fetchTranslations('', 'locationsConfiguration');
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (this.props.locale && this.props.locale !== nextProps.locale) {
-      this.props.fetchTranslations(nextProps.locale, 'locationsConfiguration');
-    }
-  }
-
   save(values) {
     if (values.name) {
       this.props.showSpinner();
@@ -78,7 +68,7 @@ class AddOrganizationModal extends Component {
           this.props.hideSpinner();
           Alert.success(this.props.translate('react.locationsConfiguration.alert.organizationSaveCompleted.label', 'Organization was successfully saved!'), { timeout: 3000 });
           const resp = response.data.data;
-          this.props.onResponse({ newOrganizationId: resp.id });
+          this.props.onResponse({ id: resp.id, name: values.name });
           this.props.onClose();
         })
         .catch(() => {
@@ -150,10 +140,8 @@ export default withRouter(connect(mapStateToProps, {
 })(AddOrganizationModal));
 
 AddOrganizationModal.propTypes = {
-  fetchTranslations: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
   isOpen: PropTypes.func.isRequired,
-  locale: PropTypes.string.isRequired,
   onClose: PropTypes.func.isRequired,
   onResponse: PropTypes.func.isRequired,
   showSpinner: PropTypes.func.isRequired,
