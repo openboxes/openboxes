@@ -2,12 +2,14 @@ import React, { Component } from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
+import ReactHtmlParser from 'react-html-parser';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions/index';
 import VerticalTabs from 'components/Layout/VerticalTabs';
+import ImportProducts from 'components/products-configuration/ImportProducts';
 import apiClient from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -19,20 +21,6 @@ const INITIAL_STATE = {
 };
 
 const PAGE_ID = 'configureProducts';
-
-const getImportProductFromExcel = () => (
-  <div className="d-flex flex-column align-items-center p-5">
-    <h3><Translate id="react.productsConfiguration.createProduct.label" defaultMessage="Learn how to create a product" /></h3>
-    <div className="my-3">
-      <Translate id="react.productsConfiguration.excelImportDescription.label" />
-    </div>
-    <div>
-      <a className="btn btn-primary" target="_blank" rel="noopener noreferrer" href="/openboxes/product/importAsCsv">
-        <Translate id="react.productsConfiguration.importProducts.label" defaultMessage="Import Products List" />
-      </a>
-    </div>
-  </div>
-);
 
 class ConfigureProducts extends Component {
   constructor(props) {
@@ -61,10 +49,21 @@ class ConfigureProducts extends Component {
       return (
         <div className="d-flex flex-column align-items-center p-5">
           <h3>
-            <Translate id="react.productsConfiguration.importSuccess.label" defaultMessage="Success Message!" />
+            <Translate id="react.productsConfiguration.importSuccess.label" defaultMessage="Import Complete!" />
           </h3>
           <div className="my-3">
             <Translate id="react.productsConfiguration.importSuccessDetails.label" />
+          </div>
+          <div className="my-3">
+            <Translate id="react.productsConfiguration.productListInfo1.label" />&nbsp;
+            <a className="font-weight-bold" target="_blank" rel="noopener noreferrer" href="https://openboxes.helpscoutdocs.com/article/27-product-configuration-basics">
+              <Translate id="react.productsConfiguration.basics.label" defaultMessage="Products Configuration Basics" />
+            </a>&nbsp;
+            <Translate id="react.productsConfiguration.and.label" />&nbsp;
+            <a className="font-weight-bold" target="_blank" rel="noopener noreferrer" href="https://openboxes.helpscoutdocs.com/article/37-create-a-product">
+              <Translate id="react.productsConfiguration.createProduct.label" defaultMessage="Create a Product" />
+            </a>.&nbsp;
+            <Translate id="react.productsConfiguration.productListInfo2.label" />
           </div>
           <div>
             <a className="btn btn-primary" target="_blank" rel="noopener noreferrer" href="/openboxes/product/list">
@@ -76,10 +75,10 @@ class ConfigureProducts extends Component {
     }
 
     return (
-      <div className="d-flex flex-column align-items-center p-5">
+      <div className="d-flex flex-column p-5">
         <h3>{product.title}</h3>
-        <div className="my-3">{product.description}</div>
-        <div>
+        <div className="my-3">{ReactHtmlParser(product.description)}</div>
+        <div className="align-self-center">
           <button
             type="button"
             className="btn btn-primary"
@@ -98,7 +97,7 @@ class ConfigureProducts extends Component {
       tabs[product.title] = this.getProductImportContent(product, productName);
     });
 
-    tabs[`${this.props.translate('react.productsConfiguration.importFromExcel.label', 'Import from Excel')}`] = getImportProductFromExcel();
+    tabs[`${this.props.translate('react.productsConfiguration.importFromExcel.label', 'Import from Excel')}`] = <ImportProducts />;
 
     return tabs;
   }
