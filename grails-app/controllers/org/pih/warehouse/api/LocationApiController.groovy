@@ -199,6 +199,6 @@ class LocationApiController extends BaseDomainApiController {
         }
         existingLocation.delete(flush: true)
 
-        render(status: 200)
+        render(status: 204)
     }
 }

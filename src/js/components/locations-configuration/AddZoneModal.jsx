@@ -1,56 +1,14 @@
 import React, { Component } from 'react';
 
-import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
-import CheckboxField from 'components/form-elements/CheckboxField';
-import TextField from 'components/form-elements/TextField';
+import ModalWrapper from 'components/form-elements/ModalWrapper';
 import apiClient from 'utils/apiClient';
-import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
-
-import 'components/locations-configuration/AddZoneModal.scss';
-
-const FIELDS = {
-  active: {
-    type: CheckboxField,
-    label: 'react.locationsConfiguration.addZone.status.label',
-    defaultMessage: 'Status',
-    attributes: {
-      withLabel: true,
-      label: 'Active',
-    },
-  },
-  name: {
-    type: TextField,
-    label: 'react.locationsConfiguration.name.label',
-    defaultMessage: 'Name',
-    attributes: {
-      required: true,
-      withTooltip: true,
-      tooltip: 'react.locationsConfiguration.addZone.name.tooltip.label',
-    },
-  },
-};
-
-const validate = (values) => {
-  const requiredFields = ['name'];
-  return Object.keys(FIELDS)
-    .reduce((acc, fieldName) => {
-      if (!values[fieldName] && requiredFields.includes(fieldName)) {
-        return {
-          ...acc,
-          [fieldName]: 'react.default.error.requiredField.label',
-        };
-      }
-      return acc;
-    }, {});
-};
 
 
 class AddZoneModal extends Component {
@@ -68,13 +26,12 @@ class AddZoneModal extends Component {
     apiClient.post('/openboxes/api/locations/', {
       ...values,
       'parentLocation.id': `${this.props.locationId}`,
-      'locationType.id': 'ZONE',
+      'locationType.id': values.zoneType.id,
     })
       .then((res) => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.locationsConfiguration.addZone.success.label', 'Zone location has been created successfully!'), { timeout: 3000 });
-        this.props.addLocation(res.data.data, 'ZONE');
-        this.props.setShowAddZoneModal();
+        this.props.addZoneLocation(res.data.data);
       })
       .catch(() => {
         this.props.hideSpinner();
@@ -84,38 +41,36 @@ class AddZoneModal extends Component {
 
   render() {
     return (
-      <div className="add-zone-modal-main">
-        <div className="add-zone-modal-content">
-          <Form
-            onSubmit={values => this.handleSubmit(values)}
-            initialValues={this.state.values}
-            validate={validate}
-            render={({ handleSubmit }) => (
-              <form onSubmit={handleSubmit} className="w-100">
-                <div className="classic-form with-description add-zone-modal-form">
-                  <div className="form-title">
-                    <Translate id="react.locationsConfiguration.addZone.withoutPlus.label" defaultMessage="Add Zone Location" />
-                  </div>
-                  <div className="form-subtitle mb-lg-4">
-                    <Translate
-                      id="react.locationsConfiguration.addZone.additionalTitle.label"
-                      defaultMessage="Zones are large areas within a depot encompassing multiple bin locations.
-                                    They may represent different rooms or buildings within a depot space.
-                                    To remove a zone from your depot, uncheck the box to mark it as inactive."
-                    />
-                  </div>
-                  {_.map(FIELDS, (fieldConfig, fieldName) =>
-                    renderFormField(fieldConfig, fieldName))}
-                  <div className="submit-buttons d-flex justify-content-between">
-                    <button type="button" className="btn btn-outline-primary" onClick={this.props.setShowAddZoneModal}>Cancel</button>
-                    <button type="submit" className="btn btn-primary">Save</button>
-                  </div>
-                </div>
-              </form>
-            )}
+      <ModalWrapper
+        onSave={values => this.handleSubmit(values)}
+        fields={this.props.FIELDS}
+        validate={this.props.validate}
+        initialValues={this.props.zoneTypes.length === 1 ?
+          { ...this.state.values, zoneType: this.props.zoneTypes[0] }
+          : this.state.values}
+        formProps={{
+          zoneTypes: this.props.zoneTypes,
+        }}
+        title="react.locationsConfiguration.addZone.withoutPlus.label"
+        defaultTitleMessage="Add Zone Location"
+        btnSaveDefaultText="Save"
+        btnOpenClassName="btn btn-outline-primary add-zonebin-btn"
+        btnOpenText="react.locationsConfiguration.addZone.label"
+        btnOpenDefaultText="+ Add Zone Location"
+        btnContainerClassName="d-flex justify-content-end"
+        btnContainerStyle={{ gap: '3px' }}
+        btnSaveClassName="btn btn-primary"
+        btnCancelClassName="btn btn-outline-primary"
+      >
+        <div className="form-subtitle mb-lg-4">
+          <Translate
+            id="react.locationsConfiguration.addZone.additionalTitle.label"
+            defaultMessage="Zones are large areas within a depot encompassing multiple bin locations.
+                                  They may represent different rooms or buildings within a depot space.
+                                  To remove a zone from your depot, uncheck the box to mark it as inactive."
           />
         </div>
-      </div>
+      </ModalWrapper>
     );
   }
 }
@@ -131,12 +86,14 @@ const mapDispatchToProps = {
 };
 
 AddZoneModal.propTypes = {
-  setShowAddZoneModal: PropTypes.func.isRequired,
   locationId: PropTypes.string.isRequired,
   showSpinner: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
-  addLocation: PropTypes.func.isRequired,
+  addZoneLocation: PropTypes.func.isRequired,
+  FIELDS: PropTypes.shape({}).isRequired,
+  validate: PropTypes.func.isRequired,
+  zoneTypes: PropTypes.shape([]).isRequired,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(AddZoneModal);

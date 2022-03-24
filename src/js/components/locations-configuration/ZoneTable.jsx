@@ -5,8 +5,9 @@ import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import ReactTable from 'react-table';
 
+import ModalWrapper from 'components/form-elements/ModalWrapper';
 import apiClient from 'utils/apiClient';
-import { translateWithDefaultMessage } from 'utils/Translate';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 const INITIAL_STATE = {
   zonePages: -1,
@@ -57,8 +58,40 @@ class ZoneTable extends Component {
         headerClassName: 'header ',
         Cell: row => (
           <div className="d-flex justify-content-center align-items-center">
-            <i className="fa fa-pencil action-icons icon-pointer" aria-hidden="true" onClick={() => this.props.handleZoneEdit(row.original)} />
-            <i className="fa fa-trash-o action-icons icon-pointer" aria-hidden="true" onClick={() => this.props.deleteLocation(row.original.id)} />
+            <ModalWrapper
+              onSave={values => this.props.handleZoneEdit(values)}
+              fields={this.props.FIELDS}
+              validate={this.props.validate}
+              initialValues={
+                {
+                  ...row.original,
+                  zoneType: row.original.locationType.id,
+                }
+              }
+              formProps={{
+                zoneTypes: this.props.zoneTypes,
+              }}
+              title="react.locationsConfiguration.editZone.label"
+              defaultTitleMessage="Edit Zone Location"
+              btnSaveDefaultText="Save"
+              btnOpenAsIcon
+              btnOpenIcon="fa-pencil"
+              btnOpenClassName="action-icons icon-pointer"
+              btnContainerClassName="d-flex justify-content-end"
+              btnContainerStyle={{ gap: '3px' }}
+              btnSaveClassName="btn btn-primary"
+              btnCancelClassName="btn btn-outline-primary"
+            >
+              <div className="form-subtitle mb-lg-4">
+                <Translate
+                  id="react.locationsConfiguration.addZone.additionalTitle.label"
+                  defaultMessage="Zones are large areas within a depot encompassing multiple bin locations.
+                                    They may represent different rooms or buildings within a depot space.
+                                    To remove a zone from your depot, uncheck the box to mark it as inactive."
+                />
+              </div>
+            </ModalWrapper>
+            <i className="fa fa-trash-o action-icons icon-pointer" aria-hidden="true" onClick={() => this.props.deleteZoneLocation(row.original.id)} />
           </div>
         ),
       },
@@ -93,7 +126,7 @@ class ZoneTable extends Component {
                 zoneLoading: false,
                 zonePages: Math.ceil(res.data.totalCount / state.pageSize),
               });
-              this.props.fetchData(res.data.data, 'ZONE');
+              this.props.updateZoneData(res.data.data);
             })
             .catch(() => Promise.reject(new Error(this.props.translate('react.locationsConfiguration.error.zoneList.label', 'Could not get list of zones'))));
         }}
@@ -110,9 +143,12 @@ ZoneTable.propTypes = {
   currentLocationId: PropTypes.string.isRequired,
   translate: PropTypes.func.isRequired,
   zoneData: PropTypes.shape([]).isRequired,
-  fetchData: PropTypes.func.isRequired,
+  updateZoneData: PropTypes.func.isRequired,
   handleZoneEdit: PropTypes.func.isRequired,
-  deleteLocation: PropTypes.func.isRequired,
+  deleteZoneLocation: PropTypes.func.isRequired,
+  FIELDS: PropTypes.shape({}).isRequired,
+  validate: PropTypes.func.isRequired,
+  zoneTypes: PropTypes.shape([]).isRequired,
 };
 
 export default connect(mapStateToProps)(ZoneTable);

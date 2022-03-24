@@ -1,13 +1,17 @@
 import React, { Component } from 'react';
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
+import { hideSpinner, showSpinner } from 'actions';
+import CheckboxField from 'components/form-elements/CheckboxField';
+import SelectField from 'components/form-elements/SelectField';
+import TextField from 'components/form-elements/TextField';
 import AddZoneModal from 'components/locations-configuration/AddZoneModal';
-import EditZoneModal from 'components/locations-configuration/EditZoneModal';
 import ZoneTable from 'components/locations-configuration/ZoneTable';
 import apiClient from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -17,73 +21,126 @@ import 'react-table/react-table.css';
 import 'components/locations-configuration/ZoneTable.scss';
 
 
-const INITIAL_STATE = {
-  zoneData: [],
+const FIELDS = {
+  active: {
+    type: CheckboxField,
+    label: 'react.locationsConfiguration.addZone.status.label',
+    defaultMessage: 'Status',
+    attributes: {
+      withLabel: true,
+      label: 'Active',
+    },
+  },
+  name: {
+    type: TextField,
+    label: 'react.locationsConfiguration.name.label',
+    defaultMessage: 'Name',
+    attributes: {
+      required: true,
+      withTooltip: true,
+      tooltip: 'react.locationsConfiguration.addZone.name.tooltip.label',
+    },
+  },
+  zoneType: {
+    type: SelectField,
+    label: 'react.locationsConfiguration.zoneType.label',
+    defaultMessage: 'Zone Type',
+    attributes: {
+      required: true,
+      valueKey: 'id',
+      labelKey: 'name',
+    },
+    getDynamicAttr: ({ zoneTypes }) => ({
+      options: zoneTypes,
+    }),
+  },
 };
+
+const validate = (values) => {
+  const requiredFields = ['name', 'zoneType'];
+  return Object.keys(FIELDS)
+    .reduce((acc, fieldName) => {
+      if (!values[fieldName] && requiredFields.includes(fieldName)) {
+        return {
+          ...acc,
+          [fieldName]: 'react.default.error.requiredField.label',
+        };
+      }
+      return acc;
+    }, {});
+};
+
 
 const PAGE_ID = 'zoneAndBinLocations';
 
-const ZONE = 'ZONE';
 
 class ZoneAndBinLocations extends Component {
   constructor(props) {
     super(props);
-    this.setShowAddZoneModal = this.setShowAddZoneModal.bind(this);
-    this.fetchData = this.fetchData.bind(this);
-    this.addLocation = this.addLocation.bind(this);
-    this.setShowEditZoneModal = this.setShowEditZoneModal.bind(this);
-    this.handleZoneEdit = this.handleZoneEdit.bind(this);
-    this.editLocation = this.editLocation.bind(this);
-    this.deleteLocation = this.deleteLocation.bind(this);
     this.state = {
-      ...INITIAL_STATE,
-      showAddZoneModal: false,
-      showEditZoneModal: false,
-      valuesToEdit: {},
+      zoneData: [],
       values: this.props.initialValues,
+      zoneTypes: [],
     };
+    this.updateZoneData = this.updateZoneData.bind(this);
+    this.addZoneLocation = this.addZoneLocation.bind(this);
+    this.handleZoneEdit = this.handleZoneEdit.bind(this);
+    this.deleteZoneLocation = this.deleteZoneLocation.bind(this);
   }
 
-
-  setShowAddZoneModal() {
-    this.setState({ showAddZoneModal: !this.state.showAddZoneModal });
+  componentDidMount() {
+    this.fetchZoneTypes();
   }
 
-  setShowEditZoneModal() {
-    this.setState({ showEditZoneModal: !this.state.showEditZoneModal });
+  fetchZoneTypes() {
+    const url = '/openboxes/api/locations/locationTypes';
+    apiClient.get(url)
+      .then((response) => {
+        const resp = response.data.data;
+        const locationTypes = _.map(resp, (locationType) => {
+          const [en, fr] = _.split(locationType.name, '|fr:');
+          return {
+            ...locationType,
+            label: this.props.locale === 'fr' && fr ? fr : en,
+          };
+        });
+        const zoneTypes = locationTypes.filter(location => location.locationTypeCode === 'ZONE');
+        this.setState({ zoneTypes });
+      })
+      .catch(() => Promise.reject(new Error(this.props.translate('react.locationsConfiguration.error.fetchingZoneTypes', 'Could not load zone types'))));
   }
 
   handleZoneEdit(values) {
-    this.setState({
-      showEditZoneModal: !this.state.showEditZoneModal,
-      valuesToEdit: { ...values },
-    });
+    this.props.showSpinner();
+    apiClient.post(`/openboxes/api/locations/${values.id}`, {
+      name: values.name,
+      'parentLocation.id': values.parentLocation.id,
+      active: values.active,
+      'locationType.id': values.zoneType.id,
+    })
+      .then((res) => {
+        this.props.hideSpinner();
+        Alert.success(this.props.translate('react.locationsConfiguration.editZone.success.label', 'Zone location has been edited successfully!'), { timeout: 3000 });
+        this.setState({
+          zoneData: this.state.zoneData.map((location) => {
+            if (location.id === res.data.data.id) {
+              return res.data.data;
+            }
+            return location;
+          }),
+        });
+      })
+      .catch(() => {
+        this.props.hideSpinner();
+        return Promise.reject(new Error(this.props.translate('react.locationsConfiguration.editZone.error.label', 'Could not edit zone location')));
+      });
   }
 
-  addLocation(data, entity) {
-    if (entity === ZONE) {
-      this.setState({ zoneData: [...this.state.zoneData, data] });
-      return;
-    }
-    // below is prepared for bin location. It will be needed to replace zoneData with binData.
+  addZoneLocation(data) {
     this.setState({ zoneData: [...this.state.zoneData, data] });
   }
 
-  editLocation(editedLocation, entity) {
-    if (entity === ZONE) {
-      this.setState({
-        zoneData: this.state.zoneData.map((location) => {
-          if (location.id === editedLocation.id) {
-            return editedLocation;
-          }
-          return location;
-        }),
-      });
-    }
-    // below will be added setState for bin location, that's why I used that if to check entity
-  }
-
-  deleteLocation(locationId) {
+  deleteZoneLocation(locationId) {
     confirmAlert({
       title: this.props.translate('react.locationsConfiguration.deleteZoneConfirm.title.label', 'Deleting a location'),
       message: this.props.translate(
@@ -95,12 +152,10 @@ class ZoneAndBinLocations extends Component {
           label: this.props.translate('react.default.yes.label', 'Yes'),
           onClick: () => {
             apiClient.delete(`/openboxes/api/locations/${locationId}`)
-              .then((res) => {
-                if (res.status === 200) {
-                  this.setState({
-                    zoneData: this.state.zoneData.filter(location => location.id !== locationId),
-                  });
-                }
+              .then(() => {
+                this.setState({
+                  zoneData: this.state.zoneData.filter(location => location.id !== locationId),
+                });
               })
               .catch(() => Promise.reject(new Error(this.props.translate('react.locationsConfiguration.editZone.error.label', 'Could not edit zone location'))));
           },
@@ -112,12 +167,7 @@ class ZoneAndBinLocations extends Component {
     });
   }
 
-  fetchData(data, entity) {
-    if (entity === ZONE) {
-      this.setState({ zoneData: data });
-      return;
-    }
-    // below should be bin data
+  updateZoneData(data) {
     this.setState({ zoneData: data });
   }
 
@@ -132,18 +182,6 @@ class ZoneAndBinLocations extends Component {
   render() {
     return (
       <div className="d-flex flex-column">
-        {this.state.showAddZoneModal &&
-          <AddZoneModal
-            setShowAddZoneModal={this.setShowAddZoneModal}
-            locationId={this.props.initialValues.locationId}
-            addLocation={this.addLocation}
-          />}
-        {this.state.showEditZoneModal &&
-          <EditZoneModal
-            setShowEditZoneModal={this.setShowEditZoneModal}
-            initialValues={this.state.valuesToEdit}
-            editLocation={this.editLocation}
-          />}
         <div className="configuration-wizard-content flex-column">
           <div className="classic-form with-description">
             <div className="submit-buttons">
@@ -172,17 +210,23 @@ class ZoneAndBinLocations extends Component {
               </div>
             </div>
             <div className="submit-buttons">
-              <button type="button" className="btn btn-outline-primary add-zonebin-btn" onClick={() => this.setShowAddZoneModal()}>
-                <Translate id="react.locationsConfiguration.addZone.label" defaultMessage="+ Add Zone Location" />
-              </button>
+              <AddZoneModal
+                FIELDS={FIELDS}
+                validate={validate}
+                locationId={this.props.initialValues.locationId}
+                addZoneLocation={this.addZoneLocation}
+                zoneTypes={this.state.zoneTypes}
+              />
             </div>
             <ZoneTable
               zoneData={this.state.zoneData}
-              fetchData={this.fetchData}
+              updateZoneData={this.updateZoneData}
               currentLocationId={this.props.initialValues.locationId}
-              setShowEditZoneModal={this.setShowEditZoneModal}
               handleZoneEdit={this.handleZoneEdit}
-              deleteLocation={this.deleteLocation}
+              deleteZoneLocation={this.deleteZoneLocation}
+              FIELDS={FIELDS}
+              validate={validate}
+              zoneTypes={this.state.zoneTypes}
             />
           </div>
           <div className="submit-buttons d-flex justify-content-between">
@@ -201,10 +245,15 @@ class ZoneAndBinLocations extends Component {
 
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
+  locale: state.session.activeLanguage,
 });
 
+const mapDispatchToProps = {
+  showSpinner,
+  hideSpinner,
+};
 
-export default connect(mapStateToProps)(ZoneAndBinLocations);
+export default connect(mapStateToProps, mapDispatchToProps)(ZoneAndBinLocations);
 
 
 ZoneAndBinLocations.propTypes = {
@@ -222,4 +271,7 @@ ZoneAndBinLocations.propTypes = {
     manager: PropTypes.string,
     locationId: PropTypes.string,
   }).isRequired,
+  showSpinner: PropTypes.func.isRequired,
+  hideSpinner: PropTypes.func.isRequired,
+  locale: PropTypes.string.isRequired,
 };
