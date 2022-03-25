@@ -1615,7 +1615,8 @@ openboxes {
                         [label: "shippers.label", defaultLabel: "Shippers", href: "/${appName}/shipper/list"],
                         [label: "shipmentWorkflows.label", defaultLabel: "Shipment Workflows", href: "/${appName}/shipmentWorkflow/list"],
                         [label: "productsConfiguration.label", defaultLabel: "Categories and Products Configuration", href: "/${appName}/productsConfiguration/index"],
-                        [label: "locationsConfiguration.label", defaultLabel: "Locations Configuration", href: "/${appName}/locationsConfiguration/index"]
+                        [label: "locationsConfiguration.label", defaultLabel: "Locations Configuration", href: "/${appName}/locationsConfiguration/index"],
+                        [label: "loadData.label", defaultLabel: "Load Data", href: "/${appName}/loadData/index"]
                     ]
                 ]
             ]
