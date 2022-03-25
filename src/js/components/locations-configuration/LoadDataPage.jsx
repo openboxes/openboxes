@@ -57,7 +57,7 @@ const WelcomeContent = ({
         </p>
       </div>
     </div>
-    <div className="d-flex justify-content-between align-items-center">
+    <div className="d-flex justify-content-between align-items-center m-3">
       <a href="#" onClick={skipConfiguration} className="btn btn-link">
         <Translate id="react.loadData.skipForNow.label" defaultMessage="Skip for now" />
       </a>
@@ -69,16 +69,53 @@ const WelcomeContent = ({
 );
 
 
-class LocationConfigurationModal extends Component {
+const LoadDataContent = ({
+  stepBackHandler,
+  proceedHandler,
+}) => (
+  <React.Fragment>
+    <h3 className="font-weight-bold my-3">
+      <Translate id="react.loadData.loadDataHeader.label" defaultMessage="Welcome to OpenBoxes!" />
+    </h3>
+    <p className="my-3">
+      <Translate id="react.loadData.loadDataDescription.label" />
+    </p>
+    <div>
+      <h5 className="font-weight-bold my-3">
+        <Translate id="react.loadData.summaryOfDataHeader.label" defaultMessage="Welcome to OpenBoxes!" />:
+      </h5>
+      <ul>
+        <li><Translate id="react.loadData.summaryOfItem1.label" /></li>
+        <li><Translate id="react.loadData.summaryOfItem2.label" /></li>
+        <li><Translate id="react.loadData.summaryOfItem3.label" /></li>
+        <li><Translate id="react.loadData.summaryOfItem4.label" /></li>
+        <li><Translate id="react.loadData.summaryOfItem5.label" /></li>
+      </ul>
+    </div>
+    <div className="d-flex justify-content-between m-3">
+      <button type="button" onClick={stepBackHandler} className="btn btn-outline-primary">
+        <Translate id="default.button.back.label" defaultMessage="Back" />
+      </button>
+      <button type="button" onClick={proceedHandler} className="btn btn-outline-primary">
+        <Translate id="default.button.proceed.label" defaultMessage="Proceed" />
+      </button>
+    </div>
+  </React.Fragment>
+);
+
+class LoadDataPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
       selectedLocationDataOption: null,
+      showLoadData: false,
     };
 
     this.skipConfiguration = this.skipConfiguration.bind(this);
     this.selectLocationDataHandler = this.selectLocationDataHandler.bind(this);
     this.nextStepHandler = this.nextStepHandler.bind(this);
+    this.proceedHandler = this.proceedHandler.bind(this);
+    this.stepBackHandler = this.stepBackHandler.bind(this);
   }
   componentDidMount() {
     this.props.fetchTranslations('', 'loadData');
@@ -98,13 +135,22 @@ class LocationConfigurationModal extends Component {
     this.props.history.push('/openboxes');
   }
 
+  stepBackHandler() {
+    this.setState({ showLoadData: false, selectedLocationDataOption: null });
+  }
+
+  proceedHandler() {
+    // TODO: implement proceed loading data
+    this.props.history.push('/openboxes');
+  }
+
   nextStepHandler() {
     switch (this.state.selectedLocationDataOption) {
       case LOAD_DATA_OPTIONS.createFirstLocation:
         this.props.history.push('/openboxes/locationsConfiguration/create');
         break;
       case LOAD_DATA_OPTIONS.loadDemoData:
-        this.props.history.push('/openboxes');
+        this.setState({ showLoadData: true });
         break;
       default:
         break;
@@ -122,12 +168,19 @@ class LocationConfigurationModal extends Component {
           >
             <i className="fa fa-close" />
           </button>
-          <WelcomeContent
-            selectedLocationDataOption={this.state.selectedLocationDataOption}
-            skipConfiguration={this.skipConfiguration}
-            selectOption={this.selectLocationDataHandler}
-            nextStep={this.nextStepHandler}
-          />
+          {
+            this.state.showLoadData
+              ? <LoadDataContent
+                proceedHandler={this.proceedHandler}
+                stepBackHandler={this.stepBackHandler}
+              />
+              : <WelcomeContent
+                selectedLocationDataOption={this.state.selectedLocationDataOption}
+                skipConfiguration={this.skipConfiguration}
+                selectOption={this.selectLocationDataHandler}
+                nextStep={this.nextStepHandler}
+              />
+          }
         </div>
       </div>
     );
@@ -140,7 +193,12 @@ const mapStateToProps = state => ({
 
 export default withRouter(connect(mapStateToProps, {
   fetchTranslations,
-})(LocationConfigurationModal));
+})(LoadDataPage));
+
+LoadDataContent.propTypes = {
+  proceedHandler: PropTypes.func.isRequired,
+  stepBackHandler: PropTypes.func.isRequired,
+};
 
 WelcomeContent.propTypes = {
   selectedLocationDataOption: PropTypes.string.isRequired,
@@ -149,7 +207,7 @@ WelcomeContent.propTypes = {
   selectOption: PropTypes.number.isRequired,
 };
 
-LocationConfigurationModal.propTypes = {
+LoadDataPage.propTypes = {
   locale: PropTypes.string.isRequired,
   fetchTranslations: PropTypes.func.isRequired,
   history: PropTypes.shape({ push: PropTypes.func }).isRequired,
