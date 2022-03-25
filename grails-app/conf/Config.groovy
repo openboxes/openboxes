@@ -907,12 +907,12 @@ openboxes {
                 endpoint = "/${appName}/api/dashboard/openPurchaseOrdersCount"
             }
         }
-        helpscout {
-            widget {
-                enabled = true
-                uuid = "5eafcb3f-9e7e-4943-8ebb-669f60a696cd"
-            }
-        }
+//        helpscout {
+//            widget {
+//                enabled = true
+//                uuid = "5eafcb3f-9e7e-4943-8ebb-669f60a696cd"
+//            }
+//        }
     }
 }
 
