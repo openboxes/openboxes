@@ -141,6 +141,8 @@ class ZoneAndBinLocations extends Component {
     this.addBinLocation = this.addBinLocation.bind(this);
     this.deleteLocation = this.deleteLocation.bind(this);
     this.handleLocationEdit = this.handleLocationEdit.bind(this);
+    this.refBinTable = React.createRef();
+    this.refZoneTable = React.createRef();
   }
 
   componentDidMount() {
@@ -159,7 +161,7 @@ class ZoneAndBinLocations extends Component {
             label: this.props.locale === 'fr' && fr ? fr : en,
           };
         });
-        const binTypes = locationTypes.filter(location => location.locationTypeCode === 'BIN_LOCATION');
+        const binTypes = locationTypes.filter(location => location.locationTypeCode === 'BIN_LOCATION' || location.locationTypeCode === 'INTERNAL');
         const zoneTypes = locationTypes.filter(location => location.locationTypeCode === 'ZONE');
         this.setState({ binTypes, zoneTypes });
       })
@@ -174,13 +176,13 @@ class ZoneAndBinLocations extends Component {
       active: values.active,
       'locationType.id': values.locationType.id,
     })
-      .then((res) => {
+      .then(() => {
         this.props.hideSpinner();
         if (values.locationType.locationTypeCode === 'ZONE') {
-          this.zoneEditCallback(res);
+          this.zoneEditCallback();
           return;
         }
-        this.binEditCallback(res);
+        this.binEditCallback();
       })
       .catch(() => {
         this.props.hideSpinner();
@@ -188,36 +190,22 @@ class ZoneAndBinLocations extends Component {
       });
   }
 
-  zoneEditCallback(response) {
+  zoneEditCallback() {
     Alert.success(this.props.translate('react.locationsConfiguration.editZone.success.label', 'Zone location has been edited successfully!'), { timeout: 3000 });
-    this.setState({
-      zoneData: this.state.zoneData.map((location) => {
-        if (location.id === response.data.data.id) {
-          return response.data.data;
-        }
-        return location;
-      }),
-    });
+    this.refZoneTable.current.fireFetchData();
   }
 
-  binEditCallback(response) {
+  binEditCallback() {
     Alert.success(this.props.translate('react.locationsConfiguration.editBin.success.label', 'Bin location has been edited successfully!'), { timeout: 3000 });
-    this.setState({
-      binData: this.state.binData.map((location) => {
-        if (location.id === response.data.data.id) {
-          return response.data.data;
-        }
-        return location;
-      }),
-    });
+    this.refBinTable.current.fireFetchData();
   }
 
-  addZoneLocation(data) {
-    this.setState({ zoneData: [...this.state.zoneData, data] });
+  addZoneLocation() {
+    this.refZoneTable.current.fireFetchData();
   }
 
-  addBinLocation(data) {
-    this.setState({ binData: [...this.state.binData, data] });
+  addBinLocation() {
+    this.refBinTable.current.fireFetchData();
   }
 
   deleteLocation(location) {
@@ -234,14 +222,10 @@ class ZoneAndBinLocations extends Component {
             apiClient.delete(`/openboxes/api/locations/${location.id}`)
               .then(() => {
                 if (location.locationType.locationTypeCode === 'ZONE') {
-                  this.setState({
-                    zoneData: this.state.zoneData.filter(loc => loc.id !== location.id),
-                  });
+                  this.refZoneTable.current.fireFetchData();
                   return;
                 }
-                this.setState({
-                  binData: this.state.binData.filter(loc => loc.id !== location.id),
-                });
+                this.refBinTable.current.fireFetchData();
               })
               .catch(() => {
                 if (location.locationType.locationTypeCode === 'ZONE') {
@@ -322,6 +306,7 @@ class ZoneAndBinLocations extends Component {
               FIELDS={ZONE_FIELDS}
               validate={zoneValidate}
               zoneTypes={this.state.zoneTypes}
+              refZoneTable={this.refZoneTable}
             />
           </div>
 
@@ -366,6 +351,7 @@ class ZoneAndBinLocations extends Component {
               FIELDS={BIN_FIELDS}
               validate={binValidate}
               binTypes={this.state.binTypes}
+              refBinTable={this.refBinTable}
             />
           </div>
           <div className="submit-buttons d-flex justify-content-between">

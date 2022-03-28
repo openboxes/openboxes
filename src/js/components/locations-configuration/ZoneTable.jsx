@@ -9,6 +9,8 @@ import ModalWrapper from 'components/form-elements/ModalWrapper';
 import apiClient from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
+import 'components/locations-configuration/ZoneTable.scss';
+
 const INITIAL_STATE = {
   zonePages: -1,
   zoneLoading: true,
@@ -100,6 +102,7 @@ class ZoneTable extends Component {
     return (
       <ReactTable
         data={this.props.zoneData}
+        ref={this.props.refZoneTable}
         columns={zoneColumns}
         loading={this.state.zoneLoading}
         pages={this.state.zonePages}
@@ -150,6 +153,10 @@ ZoneTable.propTypes = {
   FIELDS: PropTypes.shape({}).isRequired,
   validate: PropTypes.func.isRequired,
   zoneTypes: PropTypes.shape([]).isRequired,
+  refZoneTable: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.shape({ current: PropTypes.instanceOf(Element) }),
+  ]).isRequired,
 };
 
 export default connect(mapStateToProps)(ZoneTable);

@@ -25,10 +25,10 @@ class AddBinModal extends Component {
   handleSubmit(values) {
     this.props.showSpinner();
     apiClient.post('/openboxes/api/locations/', flattenRequest({ ...values, parentLocation: { id: this.props.locationId }, locationType: { id: values.locationType.id } }))
-      .then((res) => {
+      .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.locationsConfiguration.addBin.success.label', 'Bin location has been created successfully!'), { timeout: 3000 });
-        this.props.addBinLocation(res.data.data);
+        this.props.addBinLocation();
       })
       .catch(() => {
         this.props.hideSpinner();
