@@ -60,6 +60,11 @@ class UrlMappings {
         }
 
 
+        "/api/loadData"(parseRequest: true) {
+            controller = "loadDataApi"
+            action = [GET: "load"]
+        }
+
         // Stock Movement Item API
 
         "/api/stockMovementItems"(parseRequest: true) {

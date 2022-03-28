@@ -1804,6 +1804,15 @@ openboxes.configurationWizard.listOfDemoData = [
                  "<ul>",
 ]
 
+openboxes.configurationWizard.dataFiles = [
+        locations: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/locations.csv",
+        locationGroups: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/location_groups.csv",
+        organizations: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/organizations.csv",
+        binLocations: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/bin_locations.csv",
+        categories: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/categories.csv",
+        products: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/products.csv",
+]
+
 // Pagination
 openboxes.api.pagination.enabled = true
 openboxes.api.pagination.pageSize = 10

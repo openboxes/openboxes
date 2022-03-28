@@ -13,10 +13,41 @@ import grails.converters.JSON
 
 class LoadDataApiController extends BaseDomainApiController {
 
+    def loadDataService;
+
     def listOfDemoData = {
         def listOfDemoData = grailsApplication.config.openboxes.configurationWizard.listOfDemoData
         
         render([data: listOfDemoData] as JSON)
     }
 
+
+
+    def load = {
+        loadDataService.importOrganizations(
+                new URL(grailsApplication.config.openboxes.configurationWizard.dataFiles.organizations)
+        )
+
+        loadDataService.importLocationGroups(
+                new URL(grailsApplication.config.openboxes.configurationWizard.dataFiles.locationGroups)
+        )
+
+        loadDataService.importLocations(
+                new URL(grailsApplication.config.openboxes.configurationWizard.dataFiles.locations)
+        )
+
+        loadDataService.importLocations(
+                new URL(grailsApplication.config.openboxes.configurationWizard.dataFiles.binLocations)
+        )
+
+        loadDataService.importCategories(
+                new URL(grailsApplication.config.openboxes.configurationWizard.dataFiles.categories)
+        )
+
+        loadDataService.importProducts(
+                new URL(grailsApplication.config.openboxes.configurationWizard.dataFiles.products)
+        )
+
+        render([] as JSON)
+    }
 }
