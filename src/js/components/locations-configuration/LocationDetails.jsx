@@ -270,6 +270,7 @@ class LocationDetails extends Component {
             locationId: resp.id,
             useDefaultActivities: this.state.useDefaultActivities,
             zoneTypeId: this.state.locationTypes.find(location => location.locationTypeCode === 'ZONE').id,
+            binTypeId: this.state.locationTypes.find(location => location.locationTypeCode === 'BIN_LOCATION').id,
           });
         })
         .catch(() => {

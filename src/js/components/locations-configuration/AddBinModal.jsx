@@ -11,7 +11,7 @@ import apiClient, { flattenRequest } from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 
-class AddZoneModal extends Component {
+class AddBinModal extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -21,17 +21,18 @@ class AddZoneModal extends Component {
     };
   }
 
+
   handleSubmit(values) {
     this.props.showSpinner();
     apiClient.post('/openboxes/api/locations/', flattenRequest({ ...values, parentLocation: { id: this.props.locationId }, locationType: { id: values.locationType.id } }))
       .then((res) => {
         this.props.hideSpinner();
-        Alert.success(this.props.translate('react.locationsConfiguration.addZone.success.label', 'Zone location has been created successfully!'), { timeout: 3000 });
-        this.props.addZoneLocation(res.data.data);
+        Alert.success(this.props.translate('react.locationsConfiguration.addBin.success.label', 'Bin location has been created successfully!'), { timeout: 3000 });
+        this.props.addBinLocation(res.data.data);
       })
       .catch(() => {
         this.props.hideSpinner();
-        return Promise.reject(new Error(this.props.translate('react.locationsConfiguration.addZone.error.label', 'Could not add zone location')));
+        return Promise.reject(new Error(this.props.translate('react.locationsConfiguration.addBin.error.label', 'Could not add bin location')));
       });
   }
 
@@ -41,18 +42,18 @@ class AddZoneModal extends Component {
         onSave={values => this.handleSubmit(values)}
         fields={this.props.FIELDS}
         validate={this.props.validate}
-        initialValues={this.props.zoneTypes.length === 1 ?
-          { ...this.state.values, locationType: this.props.zoneTypes[0] }
+        initialValues={this.props.binTypes.length === 1 ?
+          { ...this.state.values, locationType: this.props.binTypes[0] }
           : this.state.values}
         formProps={{
-          zoneTypes: this.props.zoneTypes,
+          binTypes: this.props.binTypes,
         }}
-        title="react.locationsConfiguration.addZone.withoutPlus.label"
-        defaultTitleMessage="Add Zone Location"
+        title="react.locationsConfiguration.addBin.withoutPlus.label"
+        defaultTitleMessage="Add Bin Location"
         btnSaveDefaultText="Save"
         btnOpenClassName="btn btn-outline-primary add-zonebin-btn"
-        btnOpenText="react.locationsConfiguration.addZone.label"
-        btnOpenDefaultText="+ Add Zone Location"
+        btnOpenText="react.locationsConfiguration.addBin.label"
+        btnOpenDefaultText="+ Add Bin Location"
         btnContainerClassName="d-flex justify-content-end"
         btnContainerStyle={{ gap: '3px' }}
         btnSaveClassName="btn btn-primary"
@@ -60,10 +61,10 @@ class AddZoneModal extends Component {
       >
         <div className="form-subtitle mb-lg-4">
           <Translate
-            id="react.locationsConfiguration.addZone.additionalTitle.label"
-            defaultMessage="Zones are large areas within a depot encompassing multiple bin locations.
-                                  They may represent different rooms or buildings within a depot space.
-                                  To remove a zone from your depot, uncheck the box to mark it as inactive."
+            id="react.locationsConfiguration.editBin.additionalTitle.label"
+            defaultMessage="Bin locations represent a physical storage location within a depot.
+                            Bins are defined by a unique name or code that indicates the position within the depot.
+                            Common bin names might include a pallet position number, rack number, or shelf action."
           />
         </div>
       </ModalWrapper>
@@ -81,15 +82,15 @@ const mapDispatchToProps = {
   hideSpinner,
 };
 
-AddZoneModal.propTypes = {
+AddBinModal.propTypes = {
   locationId: PropTypes.string.isRequired,
   showSpinner: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
-  addZoneLocation: PropTypes.func.isRequired,
+  addBinLocation: PropTypes.func.isRequired,
   FIELDS: PropTypes.shape({}).isRequired,
   validate: PropTypes.func.isRequired,
-  zoneTypes: PropTypes.shape([]).isRequired,
+  binTypes: PropTypes.shape([]).isRequired,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(AddZoneModal);
+export default connect(mapStateToProps, mapDispatchToProps)(AddBinModal);

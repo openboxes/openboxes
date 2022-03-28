@@ -568,7 +568,9 @@ class LocationService {
 
     List<Location> searchInternalLocations(Map params, LocationTypeCode[] locationTypeCodes) {
         return Location.createCriteria().list(params) {
-            eq("active", Boolean.TRUE)
+            if (!params.includeInactive) {
+                eq("active", Boolean.TRUE)
+            }
 
             if (params.parentLocation?.id) {
                 eq("parentLocation", Location.get(params.parentLocation.id))

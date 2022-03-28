@@ -10,12 +10,12 @@ import apiClient from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 const INITIAL_STATE = {
-  zonePages: -1,
-  zoneLoading: true,
+  binPages: -1,
+  binLoading: true,
 };
 
 
-class ZoneTable extends Component {
+class BinTable extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -24,7 +24,7 @@ class ZoneTable extends Component {
   }
 
   render() {
-    const zoneColumns = [
+    const binColumns = [
       {
         Header: 'Status',
         accessor: 'active',
@@ -45,7 +45,7 @@ class ZoneTable extends Component {
         headerClassName: 'header text-align-left',
       },
       {
-        Header: 'Location Type',
+        Header: 'Bin Type',
         accessor: 'locationType.locationTypeCode',
         className: 'cell',
         headerClassName: 'header text-align-left',
@@ -69,10 +69,10 @@ class ZoneTable extends Component {
                 }
               }
               formProps={{
-                zoneTypes: this.props.zoneTypes,
+                binTypes: this.props.binTypes,
               }}
-              title="react.locationsConfiguration.editZone.label"
-              defaultTitleMessage="Edit Zone Location"
+              title="react.locationsConfiguration.editBin.label"
+              defaultTitleMessage="Edit Bin Location"
               btnSaveDefaultText="Save"
               btnOpenAsIcon
               btnOpenIcon="fa-pencil"
@@ -84,10 +84,10 @@ class ZoneTable extends Component {
             >
               <div className="form-subtitle mb-lg-4">
                 <Translate
-                  id="react.locationsConfiguration.addZone.additionalTitle.label"
-                  defaultMessage="Zones are large areas within a depot encompassing multiple bin locations.
-                                    They may represent different rooms or buildings within a depot space.
-                                    To remove a zone from your depot, uncheck the box to mark it as inactive."
+                  id="react.locationsConfiguration.editBin.additionalTitle.label"
+                  defaultMessage="Bin locations represent a physical storage location within a depot.
+                  Bins are defined by a unique name or code that indicates the position within the depot.
+                  Common bin names might include a pallet position number, rack number, or shelf action."
                 />
               </div>
             </ModalWrapper>
@@ -99,10 +99,10 @@ class ZoneTable extends Component {
 
     return (
       <ReactTable
-        data={this.props.zoneData}
-        columns={zoneColumns}
-        loading={this.state.zoneLoading}
-        pages={this.state.zonePages}
+        data={this.props.binData}
+        columns={binColumns}
+        loading={this.state.binLoading}
+        pages={this.state.binPages}
         manual
         className="-striped -highlight zoneTable"
         resizable={false}
@@ -115,7 +115,7 @@ class ZoneTable extends Component {
           const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
           apiClient.get('/openboxes/api/internalLocations/search', {
             params: {
-              locationTypeCode: 'ZONE',
+              locationTypeCode: 'BIN_LOCATION',
               offset: `${offset}`,
               max: `${state.pageSize}`,
               'parentLocation.id': `${this.props.currentLocationId}`,
@@ -124,12 +124,12 @@ class ZoneTable extends Component {
           })
             .then((res) => {
               this.setState({
-                zoneLoading: false,
-                zonePages: Math.ceil(res.data.totalCount / state.pageSize),
+                binLoading: false,
+                binPages: Math.ceil(res.data.totalCount / state.pageSize),
               });
-              this.props.updateZoneData(res.data.data);
+              this.props.updateBinData(res.data.data);
             })
-            .catch(() => Promise.reject(new Error(this.props.translate('react.locationsConfiguration.error.zoneList.label', 'Could not get list of zones'))));
+            .catch(() => Promise.reject(new Error(this.props.translate('react.locationsConfiguration.error.binList.label', 'Could not get list of bin locations'))));
         }}
       />
     );
@@ -140,16 +140,16 @@ const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
-ZoneTable.propTypes = {
+BinTable.propTypes = {
   currentLocationId: PropTypes.string.isRequired,
   translate: PropTypes.func.isRequired,
-  zoneData: PropTypes.shape([]).isRequired,
-  updateZoneData: PropTypes.func.isRequired,
+  binData: PropTypes.shape([]).isRequired,
+  updateBinData: PropTypes.func.isRequired,
   handleLocationEdit: PropTypes.func.isRequired,
   deleteLocation: PropTypes.func.isRequired,
   FIELDS: PropTypes.shape({}).isRequired,
   validate: PropTypes.func.isRequired,
-  zoneTypes: PropTypes.shape([]).isRequired,
+  binTypes: PropTypes.shape([]).isRequired,
 };
 
-export default connect(mapStateToProps)(ZoneTable);
+export default connect(mapStateToProps)(BinTable);

@@ -196,6 +196,7 @@ LocationAddress.propTypes = {
     manager: PropTypes.string,
     locationId: PropTypes.string,
     zoneTypeId: PropTypes.string,
+    binTypeId: PropTypes.string,
   }).isRequired,
   nextPage: PropTypes.func.isRequired,
   previousPage: PropTypes.func.isRequired,

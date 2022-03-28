@@ -11,7 +11,9 @@ import { hideSpinner, showSpinner } from 'actions';
 import CheckboxField from 'components/form-elements/CheckboxField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
+import AddBinModal from 'components/locations-configuration/AddBinModal';
 import AddZoneModal from 'components/locations-configuration/AddZoneModal';
+import BinTable from 'components/locations-configuration/BinTable';
 import ZoneTable from 'components/locations-configuration/ZoneTable';
 import apiClient from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -21,7 +23,7 @@ import 'react-table/react-table.css';
 import 'components/locations-configuration/ZoneTable.scss';
 
 
-const FIELDS = {
+const ZONE_FIELDS = {
   active: {
     type: CheckboxField,
     label: 'react.locationsConfiguration.addZone.status.label',
@@ -41,7 +43,7 @@ const FIELDS = {
       tooltip: 'react.locationsConfiguration.addZone.name.tooltip.label',
     },
   },
-  zoneType: {
+  locationType: {
     type: SelectField,
     label: 'react.locationsConfiguration.zoneType.label',
     defaultMessage: 'Zone Type',
@@ -56,9 +58,44 @@ const FIELDS = {
   },
 };
 
-const validate = (values) => {
-  const requiredFields = ['name', 'zoneType'];
-  return Object.keys(FIELDS)
+const BIN_FIELDS = {
+  active: {
+    type: CheckboxField,
+    label: 'react.locationsConfiguration.addZone.status.label',
+    defaultMessage: 'Status',
+    attributes: {
+      withLabel: true,
+      label: 'Active',
+    },
+  },
+  name: {
+    type: TextField,
+    label: 'react.locationsConfiguration.name.label',
+    defaultMessage: 'Name',
+    attributes: {
+      required: true,
+      withTooltip: true,
+      tooltip: 'react.locationsConfiguration.addZone.name.tooltip.label',
+    },
+  },
+  locationType: {
+    type: SelectField,
+    label: 'react.locationsConfiguration.binType.label',
+    defaultMessage: 'Bin Type',
+    attributes: {
+      required: true,
+      valueKey: 'id',
+      labelKey: 'name',
+    },
+    getDynamicAttr: ({ binTypes }) => ({
+      options: binTypes,
+    }),
+  },
+};
+
+const zoneValidate = (values) => {
+  const requiredFields = ['name', 'locationType'];
+  return Object.keys(ZONE_FIELDS)
     .reduce((acc, fieldName) => {
       if (!values[fieldName] && requiredFields.includes(fieldName)) {
         return {
@@ -71,6 +108,20 @@ const validate = (values) => {
 };
 
 
+const binValidate = (values) => {
+  const requiredFields = ['name', 'locationType'];
+  return Object.keys(BIN_FIELDS)
+    .reduce((acc, fieldName) => {
+      if (!values[fieldName] && requiredFields.includes(fieldName)) {
+        return {
+          ...acc,
+          [fieldName]: 'react.default.error.requiredField.label',
+        };
+      }
+      return acc;
+    }, {});
+};
+
 const PAGE_ID = 'zoneAndBinLocations';
 
 
@@ -79,20 +130,24 @@ class ZoneAndBinLocations extends Component {
     super(props);
     this.state = {
       zoneData: [],
+      binData: [],
       values: this.props.initialValues,
       zoneTypes: [],
+      binTypes: [],
     };
     this.updateZoneData = this.updateZoneData.bind(this);
+    this.updateBinData = this.updateBinData.bind(this);
     this.addZoneLocation = this.addZoneLocation.bind(this);
-    this.handleZoneEdit = this.handleZoneEdit.bind(this);
-    this.deleteZoneLocation = this.deleteZoneLocation.bind(this);
+    this.addBinLocation = this.addBinLocation.bind(this);
+    this.deleteLocation = this.deleteLocation.bind(this);
+    this.handleLocationEdit = this.handleLocationEdit.bind(this);
   }
 
   componentDidMount() {
-    this.fetchZoneTypes();
+    this.fetchBinAndZoneTypes();
   }
 
-  fetchZoneTypes() {
+  fetchBinAndZoneTypes() {
     const url = '/openboxes/api/locations/locationTypes';
     apiClient.get(url)
       .then((response) => {
@@ -104,31 +159,28 @@ class ZoneAndBinLocations extends Component {
             label: this.props.locale === 'fr' && fr ? fr : en,
           };
         });
+        const binTypes = locationTypes.filter(location => location.locationTypeCode === 'BIN_LOCATION');
         const zoneTypes = locationTypes.filter(location => location.locationTypeCode === 'ZONE');
-        this.setState({ zoneTypes });
+        this.setState({ binTypes, zoneTypes });
       })
-      .catch(() => Promise.reject(new Error(this.props.translate('react.locationsConfiguration.error.fetchingZoneTypes', 'Could not load zone types'))));
+      .catch(() => Promise.reject(new Error(this.props.translate('react.locationsConfiguration.error.fetchingBinAndZoneTypes', 'Could not load location types'))));
   }
 
-  handleZoneEdit(values) {
+  handleLocationEdit(values) {
     this.props.showSpinner();
     apiClient.post(`/openboxes/api/locations/${values.id}`, {
       name: values.name,
       'parentLocation.id': values.parentLocation.id,
       active: values.active,
-      'locationType.id': values.zoneType.id,
+      'locationType.id': values.locationType.id,
     })
       .then((res) => {
         this.props.hideSpinner();
-        Alert.success(this.props.translate('react.locationsConfiguration.editZone.success.label', 'Zone location has been edited successfully!'), { timeout: 3000 });
-        this.setState({
-          zoneData: this.state.zoneData.map((location) => {
-            if (location.id === res.data.data.id) {
-              return res.data.data;
-            }
-            return location;
-          }),
-        });
+        if (values.locationType.locationTypeCode === 'ZONE') {
+          this.zoneEditCallback(res);
+          return;
+        }
+        this.binEditCallback(res);
       })
       .catch(() => {
         this.props.hideSpinner();
@@ -136,11 +188,39 @@ class ZoneAndBinLocations extends Component {
       });
   }
 
+  zoneEditCallback(response) {
+    Alert.success(this.props.translate('react.locationsConfiguration.editZone.success.label', 'Zone location has been edited successfully!'), { timeout: 3000 });
+    this.setState({
+      zoneData: this.state.zoneData.map((location) => {
+        if (location.id === response.data.data.id) {
+          return response.data.data;
+        }
+        return location;
+      }),
+    });
+  }
+
+  binEditCallback(response) {
+    Alert.success(this.props.translate('react.locationsConfiguration.editBin.success.label', 'Bin location has been edited successfully!'), { timeout: 3000 });
+    this.setState({
+      binData: this.state.binData.map((location) => {
+        if (location.id === response.data.data.id) {
+          return response.data.data;
+        }
+        return location;
+      }),
+    });
+  }
+
   addZoneLocation(data) {
     this.setState({ zoneData: [...this.state.zoneData, data] });
   }
 
-  deleteZoneLocation(locationId) {
+  addBinLocation(data) {
+    this.setState({ binData: [...this.state.binData, data] });
+  }
+
+  deleteLocation(location) {
     confirmAlert({
       title: this.props.translate('react.locationsConfiguration.deleteZoneConfirm.title.label', 'Deleting a location'),
       message: this.props.translate(
@@ -151,13 +231,24 @@ class ZoneAndBinLocations extends Component {
         {
           label: this.props.translate('react.default.yes.label', 'Yes'),
           onClick: () => {
-            apiClient.delete(`/openboxes/api/locations/${locationId}`)
+            apiClient.delete(`/openboxes/api/locations/${location.id}`)
               .then(() => {
+                if (location.locationType.locationTypeCode === 'ZONE') {
+                  this.setState({
+                    zoneData: this.state.zoneData.filter(loc => loc.id !== location.id),
+                  });
+                  return;
+                }
                 this.setState({
-                  zoneData: this.state.zoneData.filter(location => location.id !== locationId),
+                  binData: this.state.binData.filter(loc => loc.id !== location.id),
                 });
               })
-              .catch(() => Promise.reject(new Error(this.props.translate('react.locationsConfiguration.editZone.error.label', 'Could not edit zone location'))));
+              .catch(() => {
+                if (location.locationType.locationTypeCode === 'ZONE') {
+                  return Promise.reject(new Error(this.props.translate('react.locationsConfiguration.deleteZone.error.label', 'Could not delete zone location')));
+                }
+                return Promise.reject(new Error(this.props.translate('react.locationsConfiguration.deleteBin.error.label', 'Could not delete bin location')));
+              });
           },
         },
         {
@@ -169,6 +260,10 @@ class ZoneAndBinLocations extends Component {
 
   updateZoneData(data) {
     this.setState({ zoneData: data });
+  }
+
+  updateBinData(data) {
+    this.setState({ binData: data });
   }
 
   nextPage() {
@@ -211,8 +306,8 @@ class ZoneAndBinLocations extends Component {
             </div>
             <div className="submit-buttons">
               <AddZoneModal
-                FIELDS={FIELDS}
-                validate={validate}
+                FIELDS={ZONE_FIELDS}
+                validate={zoneValidate}
                 locationId={this.props.initialValues.locationId}
                 addZoneLocation={this.addZoneLocation}
                 zoneTypes={this.state.zoneTypes}
@@ -222,11 +317,55 @@ class ZoneAndBinLocations extends Component {
               zoneData={this.state.zoneData}
               updateZoneData={this.updateZoneData}
               currentLocationId={this.props.initialValues.locationId}
-              handleZoneEdit={this.handleZoneEdit}
-              deleteZoneLocation={this.deleteZoneLocation}
-              FIELDS={FIELDS}
-              validate={validate}
+              handleLocationEdit={this.handleLocationEdit}
+              deleteLocation={this.deleteLocation}
+              FIELDS={ZONE_FIELDS}
+              validate={zoneValidate}
               zoneTypes={this.state.zoneTypes}
+            />
+          </div>
+
+          <div className="classic-form with-description">
+            <div className="form-title">
+              <Translate id="react.locationsConfiguration.bin.label" defaultMessage="Bin Locations" />
+            </div>
+            <div className="form-subtitle">
+              <Translate
+                id="react.locationsConfiguration.bin.additionalTitle.label"
+                defaultMessage="Bin locations represent a physical storage location within a depot.
+                                  Inventory within the depot is tracked and picked by bin location."
+              />
+            </div>
+            <div className="d-flex bin-buttons">
+              <AddBinModal
+                FIELDS={BIN_FIELDS}
+                validate={binValidate}
+                locationId={this.props.initialValues.locationId}
+                addBinLocation={this.addBinLocation}
+                binTypes={this.state.binTypes}
+              />
+              <React.Fragment>
+                <button type="button" className="btn-xs btn btn-outline-primary add-zonebin-btn">
+                  <i className="fa fa-download mr-1" aria-hidden="true" />
+                  <Translate id="react.locationsConfiguration.importBinLocations.label" defaultMessage="Import Bin Locations" />
+                </button>
+              </React.Fragment>
+              <React.Fragment>
+                <button type="button" className="btn-xs btn btn-outline-primary add-zonebin-btn">
+                  <i className="fa fa-arrow-up mr-1" aria-hidden="true" />
+                  <Translate id="react.locationsConfiguration.exportBinLocations.label" defaultMessage="Export Bin Locations" />
+                </button>
+              </React.Fragment>
+            </div>
+            <BinTable
+              binData={this.state.binData}
+              updateBinData={this.updateBinData}
+              currentLocationId={this.props.initialValues.locationId}
+              handleLocationEdit={this.handleLocationEdit}
+              deleteLocation={this.deleteLocation}
+              FIELDS={BIN_FIELDS}
+              validate={binValidate}
+              binTypes={this.state.binTypes}
             />
           </div>
           <div className="submit-buttons d-flex justify-content-between">
@@ -270,6 +409,7 @@ ZoneAndBinLocations.propTypes = {
     locationGroup: PropTypes.string,
     manager: PropTypes.string,
     locationId: PropTypes.string,
+    zoneTypeId: PropTypes.string,
   }).isRequired,
   showSpinner: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
