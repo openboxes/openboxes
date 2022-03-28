@@ -1793,6 +1793,17 @@ openboxes.configurationWizard.productOptions = [
         ]
 ]
 
+openboxes.configurationWizard.listOfDemoData = [
+    title: "Summary of data to be loaded",
+    description: "<ul>" +
+                 "  <li>57 products across 21 categories</li>" +
+                 "  <li>18 locations including 3 depots, 5 suppliers, and 10 dispensaries</li>" +
+                 "  <li>Inventory for 3 depots</li>" +
+                 "  <li>12 sample people and users</li>" +
+                 "  <li>2 sample stock lists</li>" +
+                 "<ul>",
+]
+
 // Pagination
 openboxes.api.pagination.enabled = true
 openboxes.api.pagination.pageSize = 10

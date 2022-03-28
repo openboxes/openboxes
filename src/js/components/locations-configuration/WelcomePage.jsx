@@ -34,12 +34,14 @@ class WelcomePage extends Component {
   render() {
     return (
       <div className="modal-page">
-        <div className="modal-page__content">
-          <div className="align-self-end">
-            <button className="btn btn-lg" onClick={() => this.skipConfiguration()}>
-              <i className="fa fa-close" />
-            </button>
-          </div>
+        <div className="modal-page__content position-relative">
+          <button
+            className="btn btn-lg position-absolute"
+            style={{ right: '1rem' }}
+            onClick={() => this.skipConfiguration()}
+          >
+            <i className="fa fa-close" />
+          </button>
           <h3 className="font-weight-bold text-center my-3">
             <Translate id="react.locationsConfiguration.welcomeHeader.label" defaultMessage="Welcome to OpenBoxes!" />
           </h3>

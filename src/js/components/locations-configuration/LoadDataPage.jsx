@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 
 import PropTypes from 'prop-types';
+import ReactHtmlParser from 'react-html-parser';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
 import { fetchTranslations } from 'actions';
+import apiClient from 'utils/apiClient';
 import Translate from 'utils/Translate';
+
 
 const LOAD_DATA_OPTIONS = {
   loadDemoData: 'LOAD_DEMO_DATA',
@@ -72,6 +75,8 @@ const WelcomeContent = ({
 const LoadDataContent = ({
   stepBackHandler,
   proceedHandler,
+  summaryItemsTitle,
+  summaryItemsList,
 }) => (
   <React.Fragment>
     <h3 className="font-weight-bold my-3">
@@ -81,16 +86,8 @@ const LoadDataContent = ({
       <Translate id="react.loadData.loadDataDescription.label" />
     </p>
     <div>
-      <h5 className="font-weight-bold my-3">
-        <Translate id="react.loadData.summaryOfDataHeader.label" defaultMessage="Welcome to OpenBoxes!" />:
-      </h5>
-      <ul>
-        <li><Translate id="react.loadData.summaryOfItem1.label" /></li>
-        <li><Translate id="react.loadData.summaryOfItem2.label" /></li>
-        <li><Translate id="react.loadData.summaryOfItem3.label" /></li>
-        <li><Translate id="react.loadData.summaryOfItem4.label" /></li>
-        <li><Translate id="react.loadData.summaryOfItem5.label" /></li>
-      </ul>
+      <h5 className="font-weight-bold my-3">{summaryItemsTitle}:</h5>
+      {ReactHtmlParser(summaryItemsList)}
     </div>
     <div className="d-flex justify-content-between m-3">
       <button type="button" onClick={stepBackHandler} className="btn btn-outline-primary">
@@ -109,6 +106,7 @@ class LoadDataPage extends Component {
     this.state = {
       selectedLocationDataOption: null,
       showLoadData: false,
+      summaryData: { title: '', description: '' },
     };
 
     this.skipConfiguration = this.skipConfiguration.bind(this);
@@ -119,6 +117,11 @@ class LoadDataPage extends Component {
   }
   componentDidMount() {
     this.props.fetchTranslations('', 'loadData');
+
+    apiClient.get('/openboxes/api/loadData/listOfDemoData')
+      .then((response) => {
+        this.setState({ summaryData: response.data.data });
+      });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -173,6 +176,8 @@ class LoadDataPage extends Component {
               ? <LoadDataContent
                 proceedHandler={this.proceedHandler}
                 stepBackHandler={this.stepBackHandler}
+                summaryItemsTitle={this.state.summaryData.title}
+                summaryItemsList={this.state.summaryData.description}
               />
               : <WelcomeContent
                 selectedLocationDataOption={this.state.selectedLocationDataOption}
@@ -198,6 +203,8 @@ export default withRouter(connect(mapStateToProps, {
 LoadDataContent.propTypes = {
   proceedHandler: PropTypes.func.isRequired,
   stepBackHandler: PropTypes.func.isRequired,
+  summaryItemsTitle: PropTypes.string.isRequired,
+  summaryItemsList: PropTypes.string.isRequired,
 };
 
 WelcomeContent.propTypes = {
