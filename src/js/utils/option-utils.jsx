@@ -137,10 +137,10 @@ export const debounceProductsInOrders = (waitTime, minSearchLength, vendor, dest
     }
   }, waitTime);
 
-export const debounceOrganizationsFetch = (waitTime, minSearchLength) =>
+export const debounceOrganizationsFetch = (waitTime, minSearchLength, roleTypes = ['ROLE_SUPPLIER']) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
-      apiClient.get(`/openboxes/api/organizations?q=${searchTerm}&roleType=ROLE_SUPPLIER`)
+      apiClient.get(`/openboxes/api/organizations?q=${searchTerm}${roleTypes ? roleTypes.map(roleType => `&roleType=${roleType}`).join('') : ''}`)
         .then(result => callback(_.map(result.data.data, obj => (
           {
             value: obj.id,

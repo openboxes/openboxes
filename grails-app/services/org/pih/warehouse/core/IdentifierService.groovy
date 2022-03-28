@@ -196,7 +196,7 @@ class IdentifierService {
 
     def getOrganizationIdentifierWithHighestSuffix(String identifier) {
         def organizations = Organization.executeQuery( "select o.code from Organization o where code like :identifier", [identifier: identifier + '%'] )
-        return organizations.findAll { Character.isDigit(it.charAt(it.size() - 1)) }.sort().last()
+        return organizations.findAll { Character.isDigit(it.charAt(it.size() - 1)) } ? organizations.findAll { Character.isDigit(it.charAt(it.size() - 1)) }.sort()?.last() : null
     }
 
     def extractSequenceFormat(String productIdentifierFormat, String sequentialPatternChar, Integer allowedSequences) {

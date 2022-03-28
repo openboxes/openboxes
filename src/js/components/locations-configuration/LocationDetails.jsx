@@ -11,6 +11,8 @@ import { fetchUsers, hideSpinner, showSpinner } from 'actions';
 import CheckboxField from 'components/form-elements/CheckboxField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
+import AddLocationGroupModal from 'components/locations-configuration/modals/AddLocationGroupModal';
+import AddOrganizationModal from 'components/locations-configuration/modals/AddOrganizationModal';
 import apiClient from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
 import { renderFormField } from 'utils/form-utils';
@@ -97,6 +99,8 @@ const FIELDS = {
     label: 'react.locationsConfiguration.locationGroup.label',
     defaultMessage: 'Location Group',
     attributes: {
+      createNewFromModal: true,
+      createNewFromModalLabel: 'Add new Location Group',
       async: true,
       showValueTooltip: true,
       openOnClick: false,
@@ -107,8 +111,9 @@ const FIELDS = {
       options: [],
       filterOptions: options => options,
     },
-    getDynamicAttr: ({ debouncedLocationGroupsFetch }) => ({
+    getDynamicAttr: ({ debouncedLocationGroupsFetch, openNewLocationGroupModal }) => ({
       loadOptions: debouncedLocationGroupsFetch,
+      newOptionModalOpen: openNewLocationGroupModal,
     }),
   },
   manager: {
@@ -135,12 +140,15 @@ class LocationDetails extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      showOrganizationModal: false,
+      showLocationGroupModal: false,
       values: this.props.initialValues,
       useDefaultActivities: this.props.initialValues.useDefaultActivities !== false,
       locationTypes: [],
       supportedActivities: [],
     };
-
+    this.openNewOrganizationModal = this.openNewOrganizationModal.bind(this);
+    this.openNewLocationGroupModal = this.openNewLocationGroupModal.bind(this);
     this.debouncedUsersFetch =
       debounceUsersFetch(this.props.debounceTime, this.props.minSearchLength);
 
@@ -148,7 +156,7 @@ class LocationDetails extends Component {
       debounceLocationGroupsFetch(this.props.debounceTime, this.props.minSearchLength);
 
     this.debouncedOrganizationsFetch =
-      debounceOrganizationsFetch(this.props.debounceTime, this.props.minSearchLength);
+    debounceOrganizationsFetch(this.props.debounceTime, this.props.minSearchLength, []);
   }
 
   componentDidMount() {
@@ -220,12 +228,15 @@ class LocationDetails extends Component {
       });
   }
 
-  // eslint-disable-next-line class-methods-use-this
+
   openNewOrganizationModal() {
-    // TODO: Add new organization modal opener here
-    // eslint-disable-next-line no-console
-    console.log('new organization modal open');
+    this.setState({ showOrganizationModal: true });
   }
+
+  openNewLocationGroupModal() {
+    this.setState({ showLocationGroupModal: true });
+  }
+
 
   saveLocationDetails(values) {
     if (values.name && values.organization) {
@@ -279,117 +290,152 @@ class LocationDetails extends Component {
           validate={validate}
           initialValues={this.state.values}
           mutators={{
+            setLocationGroupValue: ([{ id, name }], state, utils) => {
+              const data = {
+                id, label: name, name, value: id,
+              };
+              utils.changeValue(state, 'locationGroup', () => data);
+            },
+            setOrganizationValue: ([{ id, name }], state, utils) => {
+              const data = {
+                id, label: name, name, value: id,
+              };
+              utils.changeValue(state, 'organization', () => data);
+            },
             resetSupportedActivities: ([locationType], state, utils) => {
               const supportedActivities = this.getSupportedActivities(locationType);
               utils.changeValue(state, 'supportedActivities', () => supportedActivities);
             },
           }}
-          render={({ form: { mutators: { resetSupportedActivities } }, handleSubmit, values }) => (
-            <form onSubmit={handleSubmit} className="w-100">
-              <div className="classic-form with-description">
-                <div className="submit-buttons">
-                  <button type="button" onClick={() => Alert.info(this.props.supportLinks[PAGE_ID])} className="btn btn-outline-primary float-right btn-xs">
-                    <i className="fa fa-question-circle-o" aria-hidden="true" />
-                    &nbsp;
-                    <Translate id="react.default.button.support.label" defaultMessage="Support" />
-                  </button>
-                </div>
-                <div className="form-title"><Translate id="react.locationsConfiguration.details.label" defaultMessage="Details" /></div>
-                <div className="form-subtitle"><Translate id="react.locationsConfiguration.additionalTitle.label" defaultMessage="Fill in the details for your location. Click the question mark next to the field name to find out more." /></div>
+          render={({
+            form: {
+              mutators: {
+              resetSupportedActivities,
+              setLocationGroupValue,
+              setOrganizationValue,
+            },
+          },
+            handleSubmit,
+            values,
+          }) => (
+            <div>
+              <AddOrganizationModal
+                isOpen={this.state.showOrganizationModal}
+                onClose={() => this.setState({ showOrganizationModal: false })}
+                onResponse={setOrganizationValue}
+              />
+              <AddLocationGroupModal
+                isOpen={this.state.showLocationGroupModal}
+                onClose={() => this.setState({ showLocationGroupModal: false })}
+                onResponse={setLocationGroupValue}
+              />
+              <form onSubmit={handleSubmit} className="w-100">
+                <div className="classic-form with-description">
+                  <div className="submit-buttons">
+                    <button type="button" onClick={() => Alert.info(this.props.supportLinks[PAGE_ID])} className="btn btn-outline-primary float-right btn-xs">
+                      <i className="fa fa-question-circle-o" aria-hidden="true" />
+                      &nbsp;
+                      <Translate id="react.default.button.support.label" defaultMessage="Support" />
+                    </button>
+                  </div>
+                  <div className="form-title"><Translate id="react.locationsConfiguration.details.label" defaultMessage="Details" /></div>
+                  <div className="form-subtitle"><Translate id="react.locationsConfiguration.additionalTitle.label" defaultMessage="Fill in the details for your location. Click the question mark next to the field name to find out more." /></div>
 
-                {_.map(
-                  FIELDS,
-                  (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-                    active: values.active,
-                    debouncedLocationGroupsFetch: this.debouncedLocationGroupsFetch,
-                    debouncedOrganizationsFetch: this.debouncedOrganizationsFetch,
-                    debouncedUsersFetch: this.debouncedUsersFetch,
-                    openNewOrganizationModal: this.openNewOrganizationModal,
-                  }),
-                )}
-
-                <div className="form-title"><Translate id="react.locationsConfiguration.typeAndActivities.label" defaultMessage="Location Type and Supported Activities" /></div>
-                <div className="form-subtitle">
-                  <span>
-                    <Translate id="react.locationsConfiguration.typeAndActivitiesDescription.label" />&nbsp;
-                    <a target="_blank" rel="noopener noreferrer" href="https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1744633857/Location+Types+and+Supported+Activities">
-                      <Translate id="react.locationsConfiguration.here.label" defaultMessage="here" />
-                    </a>.
-                  </span>
-                </div>
-
-                <SelectField
-                  fieldName="locationType"
-                  fieldConfig={{
-                    label: 'react.locationsConfiguration.locationType.label',
-                    defaultMessage: 'Location Type',
-                    attributes: {
-                      required: true,
-                      valueKey: 'id',
-                      withTooltip: true,
-                      tooltip: 'react.locationsConfiguration.locationType.tooltip.label',
-                    },
-                    getDynamicAttr: ({ locationTypes }) => ({
-                      options: locationTypes,
-                      onChange: (val) => { resetSupportedActivities(val); },
+                  {_.map(
+                    FIELDS,
+                    (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
+                      active: values.active,
+                      debouncedLocationGroupsFetch: this.debouncedLocationGroupsFetch,
+                      debouncedOrganizationsFetch: this.debouncedOrganizationsFetch,
+                      debouncedUsersFetch: this.debouncedUsersFetch,
+                      openNewOrganizationModal: this.openNewOrganizationModal,
+                      openNewLocationGroupModal: this.openNewLocationGroupModal,
                     }),
-                  }}
-                  locationTypes={this.state.locationTypes}
-                />
-                <div className="d-flex w-100 ml-1 pt-2 justify-content-between align-items-center">
-                  <Checkbox
-                    id="useDefaultActivities"
-                    value={this.state.useDefaultActivities}
-                    onChange={val => this.setState({ useDefaultActivities: val })}
-                    withLabel
-                    label={this.props.translate('react.locationsConfiguration.useDefaultActivities.label', 'Use default settings for Supported Activities')}
-                  />
-                  <button
-                    type="button"
-                    className="btn btn-primary btn-xs"
-                    onClick={() => {
-                      this.setState({ useDefaultActivities: true });
-                      resetSupportedActivities(values.locationType);
-                    }}
-                  >
+                  )}
+
+                  <div className="form-title"><Translate id="react.locationsConfiguration.typeAndActivities.label" defaultMessage="Location Type and Supported Activities" /></div>
+                  <div className="form-subtitle">
                     <span>
-                      <i className="fa fa-refresh pr-2" />
-                      <Translate id="react.locationsConfiguration.resetToDefault.label" defaultMessage="Reset to default settings" />
+                      <Translate id="react.locationsConfiguration.typeAndActivitiesDescription.label" />&nbsp;
+                      <a target="_blank" rel="noopener noreferrer" href="https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1744633857/Location+Types+and+Supported+Activities">
+                        <Translate id="react.locationsConfiguration.here.label" defaultMessage="here" />
+                      </a>.
                     </span>
-                  </button>
-                </div>
-                <div className="location-supported-activities">
+                  </div>
+
                   <SelectField
-                    fieldName="supportedActivities"
+                    fieldName="locationType"
                     fieldConfig={{
+                      label: 'react.locationsConfiguration.locationType.label',
+                      defaultMessage: 'Location Type',
                       attributes: {
-                        multi: true,
                         className: 'multi-select',
+                        required: true,
+                        valueKey: 'id',
+                        withTooltip: true,
+                        tooltip: 'react.locationsConfiguration.locationType.tooltip.label',
                       },
-                      getDynamicAttr: ({ supportedActivities, useDefaultActivities }) => ({
-                        disabled: useDefaultActivities,
-                        options: supportedActivities,
+                      getDynamicAttr: ({ locationTypes }) => ({
+                        options: locationTypes,
+                        onChange: (val) => { resetSupportedActivities(val); },
                       }),
                     }}
-                    supportedActivities={this.state.supportedActivities}
-                    useDefaultActivities={this.state.useDefaultActivities}
+                    locationTypes={this.state.locationTypes}
                   />
+                  <div className="d-flex w-100 ml-1 pt-2 justify-content-between align-items-center">
+                    <Checkbox
+                      id="useDefaultActivities"
+                      value={this.state.useDefaultActivities}
+                      onChange={val => this.setState({ useDefaultActivities: val })}
+                      withLabel
+                      label={this.props.translate('react.locationsConfiguration.useDefaultActivities.label', 'Use default settings for Supported Activities')}
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-xs"
+                      onClick={() => {
+                        this.setState({ useDefaultActivities: true });
+                        resetSupportedActivities(values.locationType);
+                      }}
+                    >
+                      <span>
+                        <i className="fa fa-refresh pr-2" />
+                        <Translate id="react.locationsConfiguration.resetToDefault.label" defaultMessage="Reset to default settings" />
+                      </span>
+                    </button>
+                  </div>
+                  <div className="location-supported-activities">
+                    <SelectField
+                      fieldName="supportedActivities"
+                      fieldConfig={{
+                        attributes: {
+                          multi: true,
+                        },
+                        getDynamicAttr: ({ supportedActivities, useDefaultActivities }) => ({
+                          disabled: useDefaultActivities,
+                          options: supportedActivities,
+                        }),
+                      }}
+                      supportedActivities={this.state.supportedActivities}
+                      useDefaultActivities={this.state.useDefaultActivities}
+                    />
+                  </div>
                 </div>
-              </div>
-              <div className="submit-buttons">
-                <button
-                  type="submit"
-                  onClick={() => {
-                    if (this.state.useDefaultActivities) {
-                      resetSupportedActivities(values.locationType);
-                    }
-                  }}
-                  className="btn btn-outline-primary float-right btn-xs"
-                >
-                  <Translate id="react.default.button.next.label" defaultMessage="Next" />
-                </button>
-              </div>
-            </form>
+                <div className="submit-buttons">
+                  <button
+                    type="submit"
+                    onClick={() => {
+                      if (this.state.useDefaultActivities) {
+                        resetSupportedActivities(values.locationType);
+                      }
+                    }}
+                    className="btn btn-outline-primary float-right btn-xs"
+                  >
+                    <Translate id="react.default.button.next.label" defaultMessage="Next" />
+                  </button>
+                </div>
+              </form>
+            </div>
           )}
         />
       </div>
