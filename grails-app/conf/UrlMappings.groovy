@@ -566,6 +566,13 @@ class UrlMappings {
             action = [GET: "downloadCategories"]
         }
 
+        // Load Data
+
+        "/api/loadData/listOfDemoData"(parseRequest: true) {
+            controller = { "loadDataApi" }
+            action = [GET: "listOfDemoData"]
+        }
+
         // Standard REST APIs
 
         "/api/${resource}s"(parseRequest: true) {

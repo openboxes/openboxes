@@ -96,8 +96,13 @@ const AsyncLocationsConfiguration = Loadable({
   loading: Loading,
 });
 
-const AsyncWelcomeModal = Loadable({
-  loader: () => import('components/locations-configuration/WelcomeModal'),
+const AsyncWelcomePage = Loadable({
+  loader: () => import('components/locations-configuration/WelcomePage'),
+  loading: Loading,
+});
+
+const AsyncLoadDataPage = Loadable({
+  loader: () => import('components/locations-configuration/LoadDataPage'),
   loading: Loading,
 });
 
@@ -122,8 +127,9 @@ const Router = props => (
         <MainLayoutRoute path="/**/productsConfiguration/index" component={AsyncProductsConfiguration} />
         <MainLayoutRoute path="/**/locationsConfiguration/create" component={AsyncLocationsConfiguration} />
         <Route path="/**/locationsConfiguration/index" >
-          <AsyncWelcomeModal />
+          <AsyncWelcomePage />
         </Route>
+        <Route path="/**/loadData/index" ><AsyncLoadDataPage /></Route>
         <MainLayoutRoute path="/**/dashboard/:configId?" component={AsyncDashboard} />
         <MainLayoutRoute path="/**/" component={AsyncDashboard} />
       </Switch>

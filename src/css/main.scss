@@ -262,6 +262,14 @@ body {
   }
 }
 
+.btn-link {
+  color: #757575;
+
+  &:hover {
+    color: #007bff;
+  }
+}
+
 .btn-xs {
   padding: 0 .5rem;
   font-size: .875rem;
@@ -951,6 +959,25 @@ div.crossed-out .table-inner-row:before {
   width: 50vw;
   max-height: 60vh;
 }
+
+/* MODAL PAGE
+----------------------------*/
+.modal-page {
+  background-color: #888888;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &__content {
+    background-color: #ffffff;
+    width: clamp(500px, 60vw, 850px);
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 3rem;
+  }
+}
+
 
 /* LOGIN MODAL
 ----------------------------*/

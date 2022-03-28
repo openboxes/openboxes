@@ -1615,7 +1615,8 @@ openboxes {
                         [label: "shippers.label", defaultLabel: "Shippers", href: "/${appName}/shipper/list"],
                         [label: "shipmentWorkflows.label", defaultLabel: "Shipment Workflows", href: "/${appName}/shipmentWorkflow/list"],
                         [label: "productsConfiguration.label", defaultLabel: "Categories and Products Configuration", href: "/${appName}/productsConfiguration/index"],
-                        [label: "locationsConfiguration.label", defaultLabel: "Locations Configuration", href: "/${appName}/locationsConfiguration/index"]
+                        [label: "locationsConfiguration.label", defaultLabel: "Locations Configuration", href: "/${appName}/locationsConfiguration/index"],
+                        [label: "loadData.label", defaultLabel: "Load Data", href: "/${appName}/loadData/index"]
                     ]
                 ]
             ]
@@ -1790,6 +1791,17 @@ openboxes.configurationWizard.productOptions = [
                 description: "<div>This selection will import the WHO Essential Medicines List (Sept 2021 version) into your instance as products.  Public health facilities that use the WHO list as the basis of their product catalogue will find that this is a good starting point to building out their products in OpenBoxes.</div>" +
                         "<div class='my-3'>In order to import this product list, you must have selected the corresponding WHO category tree in the previous step. This product list will not work with any other category tree. Go to <a target='_blank' rel='noopener noreferrer' href='https://list.essentialmeds.org/'>list.essentialmeds.org</a> to view the full WHO list that will be imported.</div>",
         ]
+]
+
+openboxes.configurationWizard.listOfDemoData = [
+    title: "Summary of data to be loaded",
+    description: "<ul>" +
+                 "  <li>57 products across 21 categories</li>" +
+                 "  <li>18 locations including 3 depots, 5 suppliers, and 10 dispensaries</li>" +
+                 "  <li>Inventory for 3 depots</li>" +
+                 "  <li>12 sample people and users</li>" +
+                 "  <li>2 sample stock lists</li>" +
+                 "<ul>",
 ]
 
 // Pagination

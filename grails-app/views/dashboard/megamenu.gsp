@@ -887,6 +887,11 @@
                                     <warehouse:message code="locationsConfiguration.label" default="Locations Configuration" />
                                 </g:link>
                             </div>
+                            <div class="mm-menu-item">
+                                <g:link controller="loadData" action="index" >
+                                    <warehouse:message code="loadData.label" default="Load Data" />
+                                </g:link>
+                            </div>
                         </div>
 
                     </div>
