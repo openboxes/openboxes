@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { defaults } from 'react-chartjs-2';
+import { HelpScout, LiveChatLoaderProvider } from 'react-live-chat-loader';
 import { connect } from 'react-redux';
 import { SortableContainer } from 'react-sortable-hoc';
 
@@ -398,7 +399,11 @@ class Dashboard extends Component {
             />
           </div>
         </div>
-
+        {/* FIXME fetch providerKey from config instead of hard-coding it here */}
+        <LiveChatLoaderProvider provider="helpScout" providerKey="5eafcb3f-9e7e-4943-8ebb-669f60a696cd">
+          {/* match https://secure.helpscout.net/settings/beacons/5eafcb3f-9e7e-4943-8ebb-669f60a696cd/customize */}
+          <HelpScout color="#ff9800" horizontalPosition="right" icon="question" idlePeriod="0" zIndex="1050" />
+        </LiveChatLoaderProvider>
       </div>
     );
   }

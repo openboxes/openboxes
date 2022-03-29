@@ -42,41 +42,6 @@ module.exports = {
       templateParameters: compilation => ({
         jsSource: `\${createLinkTo(dir:'/js', file:'bundle.${compilation.hash}.js')}`,
         cssSource: `\${createLinkTo(dir:'css/', file:'bundle.${compilation.hash}.css')}`,
-        helpScoutBeacon: '<script type="text/javascript">' +
-            'window.Beacon("suggest", [' +
-              '<!-- suggest the "Logging In" help article, via its hash -->' +
-              '"6229284aab585b230a89ed8c",' +
-              '{' +
-                'text: \'Logging in\',' +
-                'url: \'https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1266516059/Log+In\',' +
-              '},' +
-              '{' +
-                'text: \'Basic navigation\',' +
-                'url: \'https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1296138352/Basic+Navigation\',' +
-              '}' +
-            '])' +
-          '</script>' +
-          '<script type="text/javascript">\n' +
-          '        !function (e, t, n) {\n' +
-          '            function a() {\n' +
-          '                var e = t.getElementsByTagName("script")[0],\n' +
-          '                    n = t.createElement("script");\n' +
-          '                n.type = "text/javascript", n.async = !0, n.src = "https://beacon-v2.helpscout.net", e.parentNode.insertBefore(n, e)\n' +
-          '            }\n' +
-          '            if (e.Beacon = n = function (t, n, a) {\n' +
-          '                e.Beacon.readyQueue.push({\n' +
-          '                    method: t,\n' +
-          '                    options: n,\n' +
-          '                    data: a\n' +
-          '                })\n' +
-          '            }, n.readyQueue = [], "complete" === t.readyState) return a();\n' +
-          '            e.attachEvent ? e.attachEvent("onload", a) : e.addEventListener("load", a, !1)\n' +
-          '        }(window, document, window.Beacon || function () {\n' +
-          '        });\n' +
-          '    </script>\n' +
-          '    <script type="text/javascript">\n' +
-          '        window.Beacon("init", "5eafcb3f-9e7e-4943-8ebb-669f60a696cd")\n' +
-          '    </script>',
         receivingIfStatement: '',
       }),
     }),
@@ -87,41 +52,6 @@ module.exports = {
       templateParameters: compilation => ({
         jsSource: `\${createLinkTo(dir:'/js', file:'bundle.${compilation.hash}.js')}`,
         cssSource: `\${createLinkTo(dir:'css/', file:'bundle.${compilation.hash}.css')}`,
-        helpScoutBeacon: '<script type="text/javascript">' +
-              'window.Beacon("suggest", [' +
-              '<!-- suggest the "Logging In" help article, via its hash -->' +
-              '"6229284aab585b230a89ed8c",' +
-              '{' +
-                'text: \'Logging in\',' +
-                'url: \'https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1266516059/Log+In\',' +
-              '},' +
-              '{' +
-                'text: \'Basic navigation\',' +
-                'url: \'https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1296138352/Basic+Navigation\',' +
-              '}' +
-            '])' +
-          '</script>' +
-          '<script type="text/javascript">\n' +
-          '        !function (e, t, n) {\n' +
-          '            function a() {\n' +
-          '                var e = t.getElementsByTagName("script")[0],\n' +
-          '                    n = t.createElement("script");\n' +
-          '                n.type = "text/javascript", n.async = !0, n.src = "https://beacon-v2.helpscout.net", e.parentNode.insertBefore(n, e)\n' +
-          '            }\n' +
-          '            if (e.Beacon = n = function (t, n, a) {\n' +
-          '                e.Beacon.readyQueue.push({\n' +
-          '                    method: t,\n' +
-          '                    options: n,\n' +
-          '                    data: a\n' +
-          '                })\n' +
-          '            }, n.readyQueue = [], "complete" === t.readyState) return a();\n' +
-          '            e.attachEvent ? e.attachEvent("onload", a) : e.addEventListener("load", a, !1)\n' +
-          '        }(window, document, window.Beacon || function () {\n' +
-          '        });\n' +
-          '    </script>\n' +
-          '    <script type="text/javascript">\n' +
-          '        window.Beacon("init", "5eafcb3f-9e7e-4943-8ebb-669f60a696cd")\n' +
-          '    </script>',
         receivingIfStatement:
           // eslint-disable-next-line no-template-curly-in-string
           '<g:if test="${!params.id}">' +
