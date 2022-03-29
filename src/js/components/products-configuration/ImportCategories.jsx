@@ -45,7 +45,7 @@ class ImportCategories extends Component {
       .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.productsConfiguration.importSuccessful.label', 'Categories imported successfully'));
-        this.props.nextPage();
+        this.props.nextPage({ categoriesImported: true });
       })
       .catch(() => {
         this.props.hideSpinner();
