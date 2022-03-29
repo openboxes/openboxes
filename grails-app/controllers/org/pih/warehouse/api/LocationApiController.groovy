@@ -136,10 +136,12 @@ class LocationApiController extends BaseDomainApiController {
         }
 
         if (existingLocation.validate() && !existingLocation.hasErrors()) {
-            if (existingLocation?.address?.validate() && !existingLocation?.address?.hasErrors()) {
-                existingLocation.address.save()
-            } else {
-                throw new ValidationException("Address validation failed", existingLocation.errors)
+            if (existingLocation.address) {
+                if (existingLocation?.address?.validate() && !existingLocation?.address?.hasErrors()) {
+                    existingLocation.address.save()
+                } else {
+                    throw new ValidationException("Address validation failed", existingLocation.errors)
+                }
             }
             existingLocation.save()
         } else {
@@ -181,5 +183,22 @@ class LocationApiController extends BaseDomainApiController {
         inventoryLevelInstance.save()
 
         render(status: 200)
+    }
+
+    def delete = {
+        def existingLocation = Location.get(params.id)
+        if (!existingLocation) {
+            throw new IllegalArgumentException("No Location found for location ID ${params.id}")
+        }
+        if (existingLocation.isZoneLocation() && Location.findAllByZone(existingLocation)) {
+            throw new IllegalArgumentException("You cannot delete zone that is assigned to a bin location ${params.id}")
+        }
+        def parentLocation = existingLocation.parentLocation
+        if (parentLocation) {
+            parentLocation.removeFromLocations(existingLocation)
+        }
+        existingLocation.delete(flush: true)
+
+        render(status: 204)
     }
 }

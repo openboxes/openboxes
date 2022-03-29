@@ -5,55 +5,14 @@ import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import ReactTable from 'react-table';
 
+import ModalWrapper from 'components/form-elements/ModalWrapper';
 import apiClient from 'utils/apiClient';
-import { translateWithDefaultMessage } from 'utils/Translate';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 const INITIAL_STATE = {
-  zoneData: [],
   zonePages: -1,
   zoneLoading: true,
 };
-
-const zoneColumns = [
-  {
-    Header: 'Status',
-    accessor: 'active',
-    minWidth: 30,
-    className: 'active-circle',
-    headerClassName: 'header',
-    Cell: (row) => {
-      if (row) {
-        return (<i className="fa fa-check-circle green-circle" aria-hidden="true" />);
-      }
-      return (<i className="fa fa-times-circle grey-circle" aria-hidden="true" />);
-    },
-  },
-  {
-    Header: 'Name',
-    accessor: 'name',
-    className: 'cell',
-    headerClassName: 'header text-align-left',
-  },
-  {
-    Header: 'Location Type',
-    accessor: 'locationType.locationTypeCode',
-    className: 'cell',
-    headerClassName: 'header text-align-left',
-  },
-  {
-    Header: 'Actions',
-    minWidth: 20,
-    accessor: 'actions',
-    className: 'cell',
-    headerClassName: 'header ',
-    Cell: () => (
-      <div className="d-flex justify-content-center align-items-center">
-        <i className="fa fa-pencil action-icons" aria-hidden="true" />
-        <i className="fa fa-trash-o action-icons" aria-hidden="true" />
-      </div>
-    ),
-  },
-];
 
 
 class ZoneTable extends Component {
@@ -65,9 +24,82 @@ class ZoneTable extends Component {
   }
 
   render() {
+    const zoneColumns = [
+      {
+        Header: 'Status',
+        accessor: 'active',
+        minWidth: 30,
+        className: 'active-circle',
+        headerClassName: 'header',
+        Cell: (row) => {
+          if (row.original.active) {
+            return (<i className="fa fa-check-circle green-circle" aria-hidden="true" />);
+          }
+          return (<i className="fa fa-times-circle grey-circle" aria-hidden="true" />);
+        },
+      },
+      {
+        Header: 'Name',
+        accessor: 'name',
+        className: 'cell',
+        headerClassName: 'header text-align-left',
+      },
+      {
+        Header: 'Location Type',
+        accessor: 'locationType.locationTypeCode',
+        className: 'cell',
+        headerClassName: 'header text-align-left',
+      },
+      {
+        Header: 'Actions',
+        minWidth: 20,
+        accessor: 'actions',
+        className: 'action-cell',
+        headerClassName: 'header ',
+        Cell: row => (
+          <div className="d-flex justify-content-center align-items-center">
+            <ModalWrapper
+              onSave={values => this.props.handleZoneEdit(values)}
+              fields={this.props.FIELDS}
+              validate={this.props.validate}
+              initialValues={
+                {
+                  ...row.original,
+                  zoneType: row.original.locationType.id,
+                }
+              }
+              formProps={{
+                zoneTypes: this.props.zoneTypes,
+              }}
+              title="react.locationsConfiguration.editZone.label"
+              defaultTitleMessage="Edit Zone Location"
+              btnSaveDefaultText="Save"
+              btnOpenAsIcon
+              btnOpenIcon="fa-pencil"
+              btnOpenClassName="action-icons icon-pointer"
+              btnContainerClassName="d-flex justify-content-end"
+              btnContainerStyle={{ gap: '3px' }}
+              btnSaveClassName="btn btn-primary"
+              btnCancelClassName="btn btn-outline-primary"
+            >
+              <div className="form-subtitle mb-lg-4">
+                <Translate
+                  id="react.locationsConfiguration.addZone.additionalTitle.label"
+                  defaultMessage="Zones are large areas within a depot encompassing multiple bin locations.
+                                    They may represent different rooms or buildings within a depot space.
+                                    To remove a zone from your depot, uncheck the box to mark it as inactive."
+                />
+              </div>
+            </ModalWrapper>
+            <i className="fa fa-trash-o action-icons icon-pointer" aria-hidden="true" onClick={() => this.props.deleteZoneLocation(row.original.id)} />
+          </div>
+        ),
+      },
+    ];
+
     return (
       <ReactTable
-        data={this.state.zoneData}
+        data={this.props.zoneData}
         columns={zoneColumns}
         loading={this.state.zoneLoading}
         pages={this.state.zonePages}
@@ -91,10 +123,10 @@ class ZoneTable extends Component {
           })
             .then((res) => {
               this.setState({
-                zoneData: res.data.data,
                 zoneLoading: false,
                 zonePages: Math.ceil(res.data.totalCount / state.pageSize),
               });
+              this.props.updateZoneData(res.data.data);
             })
             .catch(() => Promise.reject(new Error(this.props.translate('react.locationsConfiguration.error.zoneList.label', 'Could not get list of zones'))));
         }}
@@ -110,6 +142,13 @@ const mapStateToProps = state => ({
 ZoneTable.propTypes = {
   currentLocationId: PropTypes.string.isRequired,
   translate: PropTypes.func.isRequired,
+  zoneData: PropTypes.shape([]).isRequired,
+  updateZoneData: PropTypes.func.isRequired,
+  handleZoneEdit: PropTypes.func.isRequired,
+  deleteZoneLocation: PropTypes.func.isRequired,
+  FIELDS: PropTypes.shape({}).isRequired,
+  validate: PropTypes.func.isRequired,
+  zoneTypes: PropTypes.shape([]).isRequired,
 };
 
 export default connect(mapStateToProps)(ZoneTable);
