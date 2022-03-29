@@ -50,7 +50,9 @@ class ReviewCategories extends Component {
   }
 
   render() {
-    const { supportLinks, previousPage, nextPage } = this.props;
+    const {
+      initialValues, supportLinks, previousPage, nextPage,
+    } = this.props;
     const { categoriesCount } = this.state;
 
     return (
@@ -91,10 +93,10 @@ class ReviewCategories extends Component {
           </div>
         </div>
         <div className="submit-buttons">
-          <button type="button" onClick={previousPage} className="btn btn-outline-primary float-left btn-xs">
+          <button type="button" onClick={() => previousPage(initialValues)} className="btn btn-outline-primary float-left btn-xs">
             <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
           </button>
-          <button type="button" onClick={nextPage} className="btn btn-outline-primary float-right btn-xs">
+          <button type="button" onClick={() => nextPage(initialValues)} className="btn btn-outline-primary float-right btn-xs">
             <Translate id="react.default.button.next.label" defaultMessage="Next" />
           </button>
         </div>
@@ -107,6 +109,7 @@ export default connect(null, { showSpinner, hideSpinner })(ReviewCategories);
 
 ReviewCategories.propTypes = {
   hideSpinner: PropTypes.func.isRequired,
+  initialValues: PropTypes.shape({}).isRequired,
   nextPage: PropTypes.func.isRequired,
   previousPage: PropTypes.func.isRequired,
   showSpinner: PropTypes.func.isRequired,

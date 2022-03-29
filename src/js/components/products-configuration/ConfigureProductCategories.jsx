@@ -81,7 +81,7 @@ class ConfigureProductCategories extends Component {
       .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.productsConfiguration.importSuccessful.label', 'Categories imported successfully'));
-        this.props.nextPage();
+        this.props.nextPage({ categoriesImported: true });
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -102,7 +102,7 @@ class ConfigureProductCategories extends Component {
           <VerticalTabs tabs={tabs} />
         </div>
         <div className="submit-buttons">
-          <button type="button" onClick={() => this.props.goToPage(3)} className="btn btn-outline-primary float-right btn-xs">
+          <button type="button" onClick={() => this.props.goToPage(3, this.props.initialValues)} className="btn btn-outline-primary float-right btn-xs">
             <Translate id="react.default.button.skip.label" defaultMessage="Skip this step" />
           </button>
         </div>
@@ -120,6 +120,7 @@ export default connect(mapStateToProps, { showSpinner, hideSpinner })(ConfigureP
 ConfigureProductCategories.propTypes = {
   nextPage: PropTypes.func.isRequired,
   goToPage: PropTypes.func.isRequired,
+  initialValues: PropTypes.shape({}).isRequired,
   supportLinks: PropTypes.shape({}).isRequired,
   showSpinner: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
