@@ -1,0 +1,261 @@
+productCatalogCode,productCode,productName
+BOS,QX039,Morphine 10mg immediate release tablet
+BOS,TS894,"Morphine injection, 10mg/mL in 1mL ampoule"
+BOS,CR388,Lamivudine 150mg + nevirapine 200mg + zidovudine 300mg tablet
+BOS,TZ835,Lamivudine 150mg + zidovudine 300mg tablet
+BOS,CM871,Lamivudine 150mg tablet
+BOS,MC017,Lamivudine 30mg + nevirapine 50mg + zidovudine 60mg tablet
+BOS,GM080,"Bleomycin injection, 15mg"
+BOS,EK670,"Vincristine injection, 1mL"
+BOS,QX419,Isoniazid 300mg + rifapentine 300mg tablet
+BOS,XM026,Isoniazid 300mg tablet
+BOS,DA693,Isoniazid 50mg + pyrazinamide 150mg + rifampicin 75mg tablet
+BOS,RV624,Isoniazid 50mg + rifampicin 75mg tablet
+BOS,HP196,"Beaker, Graduated, Borosilicate glass, 100mL"
+BOS,MY523,"Beaker, Graduated, Borosilicate glass, 250mL"
+BOS,BX996,"Beaker, Graduated, Borosilicate glass, 400mL"
+BOS,BF640,"Coat, Laboratory, Large, Unisex"
+BOS,QS823,"Coat, Laboratory, Medium, Unisex"
+BOS,SJ489,"Coat, Laboratory, Small, Unisex"
+BOS,PK000,"Ethanol (ethyl alcohol), 95%, reagent grade, 16oz"
+BOS,HG966,"Tube, Blood collection, K2 EDTA, Lavender top, Plastic, 4mL"
+BOS,DJ064,"Tube, Blood collection, K2 EDTA, Whole blood, Lavender, 2mL (pediatric)"
+BOS,TN940,"Tube, Blood collection, Serum, Red, Plastic, 3mL (pediatric)"
+BOS,KY133,"Tube, Blood collection, Serum, Red, Plastic, 4mL"
+BOS,AX738,"Adapter, USB-C male to HDMI + VGA female"
+BOS,GK233,"Adapter, USB-C Male to HDMI Female"
+BOS,SJ730,"Case, Tablet, Samsung Galaxy, 10.5in"
+BOS,GX785,"Cellphone, Unlocked, 8GB, BLU 5.2"
+BOS,UB995,"Charger, for Lenovo Thinkpad T400 series Laptop"
+BOS,MM489,"Charger, Laptop, Lenovo, TP60/SL500"
+BOS,ET383,"Computer, Desktop, ThinkCentre M920z"
+BOS,ZC462,"Laptop, E490, ThinkPad"
+BOS,QD991,"Printer cartridge, HP 122A/Q3960A, Black"
+BOS,GH964,"Printer cartridge, HP 122A/Q3961A, Cyan"
+BOS,DP854,"Printer cartridge, HP 122A/Q3962A, Yellow"
+BOS,GA472,"Printer cartridge, HP 122A/Q3963A, Magenta"
+BOS,UM228,"Printer, Multi-function, Scanner, HP MFP 426A"
+BOS,XJ173,"Batteries, Non Rechargeable, AA"
+BOS,RU651,"Batteries, Non Rechargeable, AAA"
+BOS,XJ252,"Binder clips, 19mm"
+BOS,RS138,"Binder clips, 25mm"
+BOS,MV069,"Binder clips, 32mm"
+BOS,FF240,"Envelope, A3, Manila"
+BOS,DD108,"Envelope, A3, White"
+BOS,GT068,Staples 23/13 pack of 1000
+BOS,PH950,Staples 23/17 pack of 1000
+BOS,CG819,"File cabinet, Lateral, 5-drawer"
+BOS,MR962,"Stool, rolling"
+BOS,SZ449,"Desk, Office, Wooden or metal"
+BOS,MG983,"Chair, Office, Rolling"
+PROV,AX738,"Adapter, USB-C male to HDMI + VGA female"
+PROV,GK233,"Adapter, USB-C Male to HDMI Female"
+PROV,SJ730,"Case, Tablet, Samsung Galaxy, 10.5in"
+PROV,GX785,"Cellphone, Unlocked, 8GB, BLU 5.2"
+PROV,UB995,"Charger, for Lenovo Thinkpad T400 series Laptop"
+PROV,MM489,"Charger, Laptop, Lenovo, TP60/SL500"
+PROV,ET383,"Computer, Desktop, ThinkCentre M920z"
+PROV,ZC462,"Laptop, E490, ThinkPad"
+PROV,QD991,"Printer cartridge, HP 122A/Q3960A, Black"
+PROV,GH964,"Printer cartridge, HP 122A/Q3961A, Cyan"
+PROV,DP854,"Printer cartridge, HP 122A/Q3962A, Yellow"
+PROV,GA472,"Printer cartridge, HP 122A/Q3963A, Magenta"
+PROV,UM228,"Printer, Multi-function, Scanner, HP MFP 426A"
+PROV,XJ173,"Batteries, Non Rechargeable, AA"
+PROV,RU651,"Batteries, Non Rechargeable, AAA"
+PROV,XJ252,"Binder clips, 19mm"
+PROV,RS138,"Binder clips, 25mm"
+PROV,MV069,"Binder clips, 32mm"
+PROV,FF240,"Envelope, A3, Manila"
+PROV,DD108,"Envelope, A3, White"
+PROV,GT068,Staples 23/13 pack of 1000
+PROV,PH950,Staples 23/17 pack of 1000
+PROV,CG819,"File cabinet, Lateral, 5-drawer"
+PROV,MR962,"Stool, rolling"
+PROV,SZ449,"Desk, Office, Wooden or metal"
+PROV,MG983,"Chair, Office, Rolling"
+PORT,CR388,Lamivudine 150mg + nevirapine 200mg + zidovudine 300mg tablet
+PORT,TZ835,Lamivudine 150mg + zidovudine 300mg tablet
+PORT,CM871,Lamivudine 150mg tablet
+PORT,MC017,Lamivudine 30mg + nevirapine 50mg + zidovudine 60mg tablet
+PORT,QX419,Isoniazid 300mg + rifapentine 300mg tablet
+PORT,XM026,Isoniazid 300mg tablet
+PORT,DA693,Isoniazid 50mg + pyrazinamide 150mg + rifampicin 75mg tablet
+PORT,RV624,Isoniazid 50mg + rifampicin 75mg tablet
+PORT,AX738,"Adapter, USB-C male to HDMI + VGA female"
+PORT,GK233,"Adapter, USB-C Male to HDMI Female"
+PORT,QA069,"Battery, for canon LP-E6N"
+PORT,JG794,"Camera, 600EXII-RT, Canon"
+PORT,PU084,"Camera, Canon, EOS 80D, with 18-55mm lens, with accessories"
+PORT,SJ730,"Case, Tablet, Samsung Galaxy, 10.5in"
+PORT,GX785,"Cellphone, Unlocked, 8GB, BLU 5.2"
+PORT,PU011,"Computer, Desktop, Dell Optiplex 390 SFF"
+PORT,ZZ113,"Laptop, Dell Inspiron, T8TJG"
+PORT,QD991,"Printer cartridge, HP 122A/Q3960A, Black"
+PORT,GH964,"Printer cartridge, HP 122A/Q3961A, Cyan"
+PORT,DP854,"Printer cartridge, HP 122A/Q3962A, Yellow"
+PORT,GA472,"Printer cartridge, HP 122A/Q3963A, Magenta"
+PORT,VX576,"Printer, Multifunction, Color, HP Inkjet PageWide Pro 477dw"
+PORT,XJ173,"Batteries, Non Rechargeable, AA"
+PORT,RU651,"Batteries, Non Rechargeable, AAA"
+PORT,XJ252,"Binder clips, 19mm"
+PORT,FF240,"Envelope, A3, Manila"
+PORT,DD108,"Envelope, A3, White"
+PORT,GT068,Staples 23/13 pack of 1000
+PORT,PH950,Staples 23/17 pack of 1000
+PORT,UQ102,"File cabinet, Lateral, 6-drawer"
+PORT,SZ449,"Desk, Office, Wooden or metal"
+PORT,MG983,"Chair, Office, Rolling"
+NEW,AX738,"Adapter, USB-C male to HDMI + VGA female"
+NEW,GK233,"Adapter, USB-C Male to HDMI Female"
+NEW,QA069,"Battery, for canon LP-E6N"
+NEW,JG794,"Camera, 600EXII-RT, Canon"
+NEW,PU084,"Camera, Canon, EOS 80D, with 18-55mm lens, with accessories"
+NEW,SJ730,"Case, Tablet, Samsung Galaxy, 10.5in"
+NEW,GX785,"Cellphone, Unlocked, 8GB, BLU 5.2"
+NEW,PU011,"Computer, Desktop, Dell Optiplex 390 SFF"
+NEW,ZZ113,"Laptop, Dell Inspiron, T8TJG"
+NEW,QD991,"Printer cartridge, HP 122A/Q3960A, Black"
+NEW,GH964,"Printer cartridge, HP 122A/Q3961A, Cyan"
+NEW,DP854,"Printer cartridge, HP 122A/Q3962A, Yellow"
+NEW,GA472,"Printer cartridge, HP 122A/Q3963A, Magenta"
+NEW,VX576,"Printer, Multifunction, Color, HP Inkjet PageWide Pro 477dw"
+NEW,XJ173,"Batteries, Non Rechargeable, AA"
+NEW,RU651,"Batteries, Non Rechargeable, AAA"
+NEW,XJ252,"Binder clips, 19mm"
+NEW,FF240,"Envelope, A3, Manila"
+NEW,DD108,"Envelope, A3, White"
+NEW,GT068,Staples 23/13 pack of 1000
+NEW,PH950,Staples 23/17 pack of 1000
+NEW,UQ102,"File cabinet, Lateral, 6-drawer"
+NEW,SZ449,"Desk, Office, Wooden or metal"
+NEW,MG983,"Chair, Office, Rolling"
+CHIC,QX039,Morphine 10mg immediate release tablet
+CHIC,TS894,"Morphine injection, 10mg/mL in 1mL ampoule"
+CHIC,CR388,Lamivudine 150mg + nevirapine 200mg + zidovudine 300mg tablet
+CHIC,TZ835,Lamivudine 150mg + zidovudine 300mg tablet
+CHIC,CM871,Lamivudine 150mg tablet
+CHIC,MC017,Lamivudine 30mg + nevirapine 50mg + zidovudine 60mg tablet
+CHIC,GM080,"Bleomycin injection, 15mg"
+CHIC,EK670,"Vincristine injection, 1mL"
+CHIC,QX419,Isoniazid 300mg + rifapentine 300mg tablet
+CHIC,XM026,Isoniazid 300mg tablet
+CHIC,DA693,Isoniazid 50mg + pyrazinamide 150mg + rifampicin 75mg tablet
+CHIC,RV624,Isoniazid 50mg + rifampicin 75mg tablet
+CHIC,HP196,"Beaker, Graduated, Borosilicate glass, 100mL"
+CHIC,MY523,"Beaker, Graduated, Borosilicate glass, 250mL"
+CHIC,BX996,"Beaker, Graduated, Borosilicate glass, 400mL"
+CHIC,BF640,"Coat, Laboratory, Large, Unisex"
+CHIC,QS823,"Coat, Laboratory, Medium, Unisex"
+CHIC,SJ489,"Coat, Laboratory, Small, Unisex"
+CHIC,PK000,"Ethanol (ethyl alcohol), 95%, reagent grade, 16oz"
+CHIC,HG966,"Tube, Blood collection, K2 EDTA, Lavender top, Plastic, 4mL"
+CHIC,DJ064,"Tube, Blood collection, K2 EDTA, Whole blood, Lavender, 2mL (pediatric)"
+CHIC,TN940,"Tube, Blood collection, Serum, Red, Plastic, 3mL (pediatric)"
+CHIC,KY133,"Tube, Blood collection, Serum, Red, Plastic, 4mL"
+CHIC,AX738,"Adapter, USB-C male to HDMI + VGA female"
+CHIC,GK233,"Adapter, USB-C Male to HDMI Female"
+CHIC,SJ730,"Case, Tablet, Samsung Galaxy, 10.5in"
+CHIC,GX785,"Cellphone, Unlocked, 8GB, BLU 5.2"
+CHIC,UB995,"Charger, for Lenovo Thinkpad T400 series Laptop"
+CHIC,MM489,"Charger, Laptop, Lenovo, TP60/SL500"
+CHIC,ET383,"Computer, Desktop, ThinkCentre M920z"
+CHIC,ZC462,"Laptop, E490, ThinkPad"
+CHIC,QD991,"Printer cartridge, HP 122A/Q3960A, Black"
+CHIC,GH964,"Printer cartridge, HP 122A/Q3961A, Cyan"
+CHIC,DP854,"Printer cartridge, HP 122A/Q3962A, Yellow"
+CHIC,GA472,"Printer cartridge, HP 122A/Q3963A, Magenta"
+CHIC,UM228,"Printer, Multi-function, Scanner, HP MFP 426A"
+CHIC,XJ173,"Batteries, Non Rechargeable, AA"
+CHIC,RU651,"Batteries, Non Rechargeable, AAA"
+CHIC,XJ252,"Binder clips, 19mm"
+CHIC,RS138,"Binder clips, 25mm"
+CHIC,MV069,"Binder clips, 32mm"
+CHIC,FF240,"Envelope, A3, Manila"
+CHIC,DD108,"Envelope, A3, White"
+CHIC,GT068,Staples 23/13 pack of 1000
+CHIC,PH950,Staples 23/17 pack of 1000
+CHIC,CG819,"File cabinet, Lateral, 5-drawer"
+CHIC,MR962,"Stool, rolling"
+CHIC,SZ449,"Desk, Office, Wooden or metal"
+CHIC,MG983,"Chair, Office, Rolling"
+CED,CR388,Lamivudine 150mg + nevirapine 200mg + zidovudine 300mg tablet
+CED,TZ835,Lamivudine 150mg + zidovudine 300mg tablet
+CED,CM871,Lamivudine 150mg tablet
+CED,MC017,Lamivudine 30mg + nevirapine 50mg + zidovudine 60mg tablet
+CED,QX419,Isoniazid 300mg + rifapentine 300mg tablet
+CED,XM026,Isoniazid 300mg tablet
+CED,DA693,Isoniazid 50mg + pyrazinamide 150mg + rifampicin 75mg tablet
+CED,RV624,Isoniazid 50mg + rifampicin 75mg tablet
+CED,AX738,"Adapter, USB-C male to HDMI + VGA female"
+CED,GK233,"Adapter, USB-C Male to HDMI Female"
+CED,QA069,"Battery, for canon LP-E6N"
+CED,JG794,"Camera, 600EXII-RT, Canon"
+CED,PU084,"Camera, Canon, EOS 80D, with 18-55mm lens, with accessories"
+CED,SJ730,"Case, Tablet, Samsung Galaxy, 10.5in"
+CED,GX785,"Cellphone, Unlocked, 8GB, BLU 5.2"
+CED,PU011,"Computer, Desktop, Dell Optiplex 390 SFF"
+CED,ZZ113,"Laptop, Dell Inspiron, T8TJG"
+CED,QD991,"Printer cartridge, HP 122A/Q3960A, Black"
+CED,GH964,"Printer cartridge, HP 122A/Q3961A, Cyan"
+CED,DP854,"Printer cartridge, HP 122A/Q3962A, Yellow"
+CED,GA472,"Printer cartridge, HP 122A/Q3963A, Magenta"
+CED,VX576,"Printer, Multifunction, Color, HP Inkjet PageWide Pro 477dw"
+CED,XJ173,"Batteries, Non Rechargeable, AA"
+CED,RU651,"Batteries, Non Rechargeable, AAA"
+CED,XJ252,"Binder clips, 19mm"
+CED,FF240,"Envelope, A3, Manila"
+CED,DD108,"Envelope, A3, White"
+CED,GT068,Staples 23/13 pack of 1000
+CED,PH950,Staples 23/17 pack of 1000
+CED,UQ102,"File cabinet, Lateral, 6-drawer"
+CED,SZ449,"Desk, Office, Wooden or metal"
+CED,MG983,"Chair, Office, Rolling"
+DES,AX738,"Adapter, USB-C male to HDMI + VGA female"
+DES,GK233,"Adapter, USB-C Male to HDMI Female"
+DES,QA069,"Battery, for canon LP-E6N"
+DES,JG794,"Camera, 600EXII-RT, Canon"
+DES,PU084,"Camera, Canon, EOS 80D, with 18-55mm lens, with accessories"
+DES,SJ730,"Case, Tablet, Samsung Galaxy, 10.5in"
+DES,GX785,"Cellphone, Unlocked, 8GB, BLU 5.2"
+DES,PU011,"Computer, Desktop, Dell Optiplex 390 SFF"
+DES,ZZ113,"Laptop, Dell Inspiron, T8TJG"
+DES,QD991,"Printer cartridge, HP 122A/Q3960A, Black"
+DES,GH964,"Printer cartridge, HP 122A/Q3961A, Cyan"
+DES,DP854,"Printer cartridge, HP 122A/Q3962A, Yellow"
+DES,GA472,"Printer cartridge, HP 122A/Q3963A, Magenta"
+DES,VX576,"Printer, Multifunction, Color, HP Inkjet PageWide Pro 477dw"
+DES,XJ173,"Batteries, Non Rechargeable, AA"
+DES,RU651,"Batteries, Non Rechargeable, AAA"
+DES,XJ252,"Binder clips, 19mm"
+DES,FF240,"Envelope, A3, Manila"
+DES,DD108,"Envelope, A3, White"
+DES,GT068,Staples 23/13 pack of 1000
+DES,PH950,Staples 23/17 pack of 1000
+DES,UQ102,"File cabinet, Lateral, 6-drawer"
+DES,SZ449,"Desk, Office, Wooden or metal"
+DES,MG983,"Chair, Office, Rolling"
+ANN,AX738,"Adapter, USB-C male to HDMI + VGA female"
+ANN,GK233,"Adapter, USB-C Male to HDMI Female"
+ANN,QA069,"Battery, for canon LP-E6N"
+ANN,JG794,"Camera, 600EXII-RT, Canon"
+ANN,PU084,"Camera, Canon, EOS 80D, with 18-55mm lens, with accessories"
+ANN,SJ730,"Case, Tablet, Samsung Galaxy, 10.5in"
+ANN,GX785,"Cellphone, Unlocked, 8GB, BLU 5.2"
+ANN,PU011,"Computer, Desktop, Dell Optiplex 390 SFF"
+ANN,ZZ113,"Laptop, Dell Inspiron, T8TJG"
+ANN,QD991,"Printer cartridge, HP 122A/Q3960A, Black"
+ANN,GH964,"Printer cartridge, HP 122A/Q3961A, Cyan"
+ANN,DP854,"Printer cartridge, HP 122A/Q3962A, Yellow"
+ANN,GA472,"Printer cartridge, HP 122A/Q3963A, Magenta"
+ANN,VX576,"Printer, Multifunction, Color, HP Inkjet PageWide Pro 477dw"
+ANN,XJ173,"Batteries, Non Rechargeable, AA"
+ANN,RU651,"Batteries, Non Rechargeable, AAA"
+ANN,XJ252,"Binder clips, 19mm"
+ANN,FF240,"Envelope, A3, Manila"
+ANN,DD108,"Envelope, A3, White"
+ANN,GT068,Staples 23/13 pack of 1000
+ANN,PH950,Staples 23/17 pack of 1000
+ANN,UQ102,"File cabinet, Lateral, 6-drawer"
+ANN,SZ449,"Desk, Office, Wooden or metal"
+ANN,MG983,"Chair, Office, Rolling"

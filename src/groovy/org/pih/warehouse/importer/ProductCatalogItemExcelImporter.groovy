@@ -67,6 +67,11 @@ class ProductCatalogItemExcelImporter extends AbstractExcelImporter {
     }
 
 
+    /**
+     * @deprecated Use org.pih.warehouse.product.ProductService#createOrUpdateProductCatalogItem(java.util.Map)
+     * @param Map params
+     * @return
+     */
     ProductCatalogItem createOrUpdateProductCatalogItem(Map params) {
         Product product
         ProductCatalog productCatalog

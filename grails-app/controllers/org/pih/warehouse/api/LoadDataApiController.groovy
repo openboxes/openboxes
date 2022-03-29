@@ -17,36 +17,48 @@ class LoadDataApiController extends BaseDomainApiController {
 
     def listOfDemoData = {
         def listOfDemoData = grailsApplication.config.openboxes.configurationWizard.listOfDemoData
-        
+
         render([data: listOfDemoData] as JSON)
     }
 
-
-
     def load = {
-        loadDataService.importOrganizations(
-                new URL(grailsApplication.config.openboxes.configurationWizard.dataFiles.organizations)
-        )
+        def config = grailsApplication.config.openboxes.configurationWizard.dataInit;
 
-        loadDataService.importLocationGroups(
-                new URL(grailsApplication.config.openboxes.configurationWizard.dataFiles.locationGroups)
-        )
+        if (config.organizations.enabled) {
+            loadDataService.importOrganizations(new URL(config.organizations.url))
+        }
 
-        loadDataService.importLocations(
-                new URL(grailsApplication.config.openboxes.configurationWizard.dataFiles.locations)
-        )
+        if (config.locationGroups.enabled) {
+            loadDataService.importLocationGroups(new URL(config.locationGroups.url))
+        }
 
-        loadDataService.importLocations(
-                new URL(grailsApplication.config.openboxes.configurationWizard.dataFiles.binLocations)
-        )
+        if (config.locations.enabled) {
+            loadDataService.importLocations(new URL(config.locations.url))
+        }
 
-        loadDataService.importCategories(
-                new URL(grailsApplication.config.openboxes.configurationWizard.dataFiles.categories)
-        )
+        if (config.binLocations.enabled) {
+            loadDataService.importLocations(new URL(config.binLocations.url))
+        }
 
-        loadDataService.importProducts(
-                new URL(grailsApplication.config.openboxes.configurationWizard.dataFiles.products)
-        )
+        if (config.categories.enabled) {
+            loadDataService.importCategories(new URL(config.categories.url))
+        }
+
+        if (config.products.enabled) {
+            loadDataService.importProducts(new URL(config.products.url))
+        }
+
+        if (config.productCatalog.enabled) {
+            loadDataService.importProductCatalog(new URL(config.productCatalog.url))
+        }
+
+        if (config.productSuppliers.enabled) {
+            loadDataService.importProductCatalogItems(new URL(config.productSuppliers.url))
+        }
+
+        if(config.productSuppliers.enabled) {
+            loadDataService.importProductSuppliers(new URL(config.productSuppliers.url))
+        }
 
         render([] as JSON)
     }

@@ -1209,7 +1209,7 @@ openboxes.typeahead.delay = 300
 openboxes.typeahead.minLength = 3
 
 // Allow system administrators to disable refresh on startup
-openboxes.refreshAnalyticsDataOnStartup.enabled = true
+openboxes.refreshAnalyticsDataOnStartup.enabled = false
 
 // Send stock alerts
 openboxes.jobs.sendStockAlertsJob.enabled = true
@@ -1804,13 +1804,43 @@ openboxes.configurationWizard.listOfDemoData = [
                  "<ul>",
 ]
 
-openboxes.configurationWizard.dataFiles = [
-        locations: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/locations.csv",
-        locationGroups: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/location_groups.csv",
-        organizations: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/organizations.csv",
-        binLocations: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/bin_locations.csv",
-        categories: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/categories.csv",
-        products: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/products.csv",
+openboxes.configurationWizard.dataInit = [
+        locations: [
+                enabled: true,
+                url: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/locations.csv",
+        ],
+        locationGroups: [
+                enabled: true,
+                url: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/locationGroups.csv",
+        ],
+        organizations: [
+                enabled: true,
+                url: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/organizations.csv",
+        ],
+        binLocations: [
+                enabled: true,
+                url: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/binLocations.csv",
+        ],
+        categories: [
+                enabled: true,
+                url: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/categories.csv",
+        ],
+        products: [
+                enabled: true,
+                url: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/products.csv",
+        ],
+        productCatalog: [
+                enabled: true,
+                url: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/productCatalog.csv",
+        ],
+        productCatalogItems: [
+                enabled: true,
+                url: "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/productCatalogItems.csv",
+        ],
+        productSuppliers: [
+                enabled: false, // INFO: Disabled, not implemented
+                url: "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/productSuppliers.csv",
+        ],
 ]
 
 // Pagination

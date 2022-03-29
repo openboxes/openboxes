@@ -6,94 +6,182 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.data
 
-import au.com.bytecode.opencsv.CSVReader
-import org.grails.plugins.csv.CSVReaderUtils
-import org.pih.warehouse.core.LocationGroup
-import org.pih.warehouse.core.Organization
-import org.pih.warehouse.core.PartyRole
-import org.pih.warehouse.core.PartyType
-import org.pih.warehouse.core.RoleType
-import org.pih.warehouse.importer.LocationCsvImporter
+
+import org.grails.plugins.csv.CSVMapReader
+import org.pih.warehouse.core.*
+import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.product.ProductCatalog
 
 class LoadDataService {
 
     def locationDataService
     def productService
+    def productSupplierDataService
 
     def importLocations(URL csvURL) {
-        BufferedReader reader = csvURL.newInputStream().newReader();
+        CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
 
-        LocationCsvImporter importer = new LocationCsvImporter(
-                reader,
-                locationDataService
-        );
+        ImportDataCommand command = new ImportDataCommand();
+        command.setData(csvReader.readAll());
 
+        locationDataService.validateData(command);
+        locationDataService.importData(command);
 
-        importer.importData()
-
-        reader.close();
+        csvReader.close();
     }
 
 
     def importLocationGroups(URL csvURL) {
-        BufferedReader reader = csvURL.newInputStream().newReader();
+        CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
+        csvReader.initFieldKeys();
 
-        CSVReader csvReader = CSVReaderUtils.toCsvReader(reader, [
-                'skipLines': 1
-        ]);
+        csvReader.eachLine { Map attr ->
+            new LocationGroup(name: attr.get("Name")).save()
+        }
 
-        int nameIndex = 0;
-
-        CSVReaderUtils.eachLine(
-                csvReader,
-                { tokens -> new LocationGroup(name: tokens[nameIndex]).save() }
-        )
+        csvReader.close();
     }
 
     def importOrganizations(URL csvURL) {
-        BufferedReader reader = csvURL.newInputStream().newReader();
+        CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
+        csvReader.initFieldKeys();
 
-        CSVReader csvReader = CSVReaderUtils.toCsvReader(reader, [
-                'skipLines': 1
-        ]);
+        csvReader.eachLine({ Map attr ->
+            String organizationName = attr.get("Organization")
+            String partyRole = attr.get("Party Role")
 
-        int organizationIndex = 0;
-        int partyRoleIndex = 1;
+            Organization organization = new Organization(
+                    name: organizationName,
+                    code: partyRole.substring(0, 3), // FIXME: Should code be provided or generated?
+                    partyType: PartyType.findByCode("ORG") // FIXME: Should party type be provided?
+            )
 
-        CSVReaderUtils.eachLine(
-                csvReader,
-                { tokens ->
-                    Organization organization = new Organization(
-                            name: tokens[organizationIndex],
-                            code: tokens[organizationIndex].substring(0, 3), // FIXME: Code should be provided or generated?
-                            partyType: PartyType.findByCode("ORG") // FIXME: Party type should be provided?
-                    )
+            PartyRole role = PartyRole.findAllByRoleType(
+                    RoleType.valueOf(partyRole.toUpperCase())
+            ).first();
 
-                    PartyRole role = PartyRole.findAllByRoleType(
-                            RoleType.valueOf(tokens[partyRoleIndex].toUpperCase())
-                    ).first();
+            organization.addToRoles(role);
 
-                    organization.addToRoles(role);
+            organization.save()
+        })
 
-                    organization.save()
-                }
-        )
+        csvReader.close();
     }
 
     def importCategories(URL csvURL) {
-        String csv = new String(csvURL.newInputStream().getBytes())
+        InputStream csvStream = csvURL.newInputStream();
+        String csv = new String(csvStream.getBytes())
 
         productService.importCategoryCsv(csv)
+        csvStream.close();
     }
 
     def importProducts(URL csvURL) {
-        String csv = new String(csvURL.newInputStream().getBytes())
+        InputStream csvStream = csvURL.newInputStream()
+        String csv = new String(csvStream.getBytes())
 
         def products = productService.validateProducts(csv)
         productService.importProducts(products)
+        csvStream.close()
+    }
+
+    def importProductCatalog(URL csvURL) {
+        CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
+        csvReader.initFieldKeys();
+
+        csvReader.eachLine({ Map attr ->
+            String id = attr.id;
+            String code = attr.code;
+            String name = attr.name;
+            String description = attr.description;
+
+            ProductCatalog catalog = ProductCatalog.findById(id);
+
+            if (catalog == null) {
+                catalog = ProductCatalog.findByCode(code);
+
+                if (catalog != null) {
+                    throw new IllegalArgumentException("Duplicate code: " + code);
+                }
+
+                catalog = new ProductCatalog(
+                        code: code,
+                        name: name,
+                        description: description
+                )
+            } else {
+                catalog.code = code;
+                catalog.name = name;
+                catalog.description = description;
+            }
+
+            catalog.save()
+        })
+
+        csvReader.close();
+    }
+
+    def importProductCatalogItems(URL csvURL) {
+        CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
+        csvReader.initFieldKeys()
+
+        csvReader.eachLine { Map attr ->
+            productService.createOrUpdateProductCatalogItem(attr).save()
+        }
+
+        csvReader.close();
+    }
+
+    def importProductSuppliers(URL csvURL) {
+        CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
+        csvReader.initFieldKeys()
+
+        csvReader.initFieldKeys();
+        List<Map<String, String>> csvItems = csvReader.readAll();
+
+        for (int i = 0; i < csvItems.size(); i++) {
+            Map<String, String> currentItem = csvItems.get(i);
+            Map<String, String> newItem = new HashMap<String, String>();
+
+            newItem.put("id", currentItem.get("ID"));
+            newItem.put("code", currentItem.get("Product Source Code"));
+            newItem.put("name", currentItem.get("Product Source Name"));
+            newItem.put("productCode", currentItem.get("Product Code"));
+            newItem.put("legacyProductCode", currentItem.get("Legacy Product Code"));
+            newItem.put("supplierName", currentItem.get("Supplier Name"));
+            newItem.put("supplierCode", currentItem.get("Supplier Item No"));
+            newItem.put("manufacturerName", currentItem.get("Manufacturer Name"));
+            newItem.put("manufacturerCode", currentItem.get("Manufacturer Item No"));
+            newItem.put("minOrderQuantity", currentItem.get("Minimum Order Quantity"));
+            newItem.put("contractPricePrice", currentItem.get("Contract Price (Each)"));
+            newItem.put("contractPriceValidUntil", currentItem.get("Contract Price Valid Until"));
+            // FIXME: Rating type is not passing validation
+            String ratingType = currentItem.get("Rating Type");
+            ratingType = ratingType == "" ? null : ratingType;
+            newItem.put("ratingTypeCode", ratingType);
+
+            newItem.put("globalPreferenceTypeName", currentItem.get("Default Global Preference Type"));
+            newItem.put("globalPreferenceTypeValidityStartDate", currentItem.get("Preference Type Validity Start Date"));
+            newItem.put("globalPreferenceTypeValidityEndDate", currentItem.get("Preference Type Validity End Date"));
+            newItem.put("globalPreferenceTypeComments", currentItem.get("Preference Type Comment"));
+            newItem.put("defaultProductPackageUomCode", currentItem.get("Default Package Type"));
+            newItem.put("defaultProductPackageQuantity", currentItem.get("Quantity per package"));
+            newItem.put("defaultProductPackagePrice", currentItem.get("Package price"));
+
+            csvItems.set(i, newItem);
+        }
+
+        ImportDataCommand command = new ImportDataCommand();
+
+        command.setData(csvItems);
+
+        productSupplierDataService.validate(command)
+        productSupplierDataService.process(command)
+
+        csvReader.close();
     }
 
 }
