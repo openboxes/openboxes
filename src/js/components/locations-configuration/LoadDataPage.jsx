@@ -26,7 +26,7 @@ const WelcomeContent = ({
       <Translate id="react.loadData.welcomeHeader.label" defaultMessage="Welcome to OpenBoxes!" />
     </h3>
     <p className="my-3">
-      <Translate id="react.loadData.welcomeDescription.label" />
+      <Translate id="react.loadData.welcomeDescription.label" options={{ renderInnerHtml: true }} />
     </p>
     <div onChange={selectOption}>
       <div>
