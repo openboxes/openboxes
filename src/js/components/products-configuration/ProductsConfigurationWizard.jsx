@@ -25,9 +25,13 @@ class ProductsConfigurationWizard extends Component {
     super(props);
 
     this.state = {
-      values: this.props.initialValues,
+      values: {
+        categoriesImported: false,
+      },
       currentPage: 1,
     };
+
+    this.updateWizardValues = this.updateWizardValues.bind(this);
   }
 
   componentDidMount() {
@@ -67,6 +71,14 @@ class ProductsConfigurationWizard extends Component {
     ];
   }
 
+  updateWizardValues(currentPage, values) {
+    if (values.categoriesImported) {
+      this.setState({ currentPage, values });
+    } else {
+      this.setState({ currentPage, values: this.props.initialValues });
+    }
+  }
+
   render() {
     const { values, currentPage } = this.state;
     const pageList = [ConfigureProductCategories, ReviewCategories, ConfigureProducts];
@@ -84,6 +96,7 @@ class ProductsConfigurationWizard extends Component {
         additionalProps={{
           locationId, location, history, supportLinks: SUPPORT_LINKS,
         }}
+        updateWizardValues={this.updateWizardValues}
         showStepNumber
       />
     );
@@ -106,7 +119,7 @@ ProductsConfigurationWizard.propTypes = {
   fetchTranslations: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
   initialValues: PropTypes.shape({
-    shipmentStatus: PropTypes.string,
+    categoriesImported: PropTypes.bool,
   }),
   breadcrumbsConfig: PropTypes.shape({
     actionLabel: PropTypes.string.isRequired,
@@ -129,7 +142,7 @@ ProductsConfigurationWizard.propTypes = {
 };
 
 ProductsConfigurationWizard.defaultProps = {
-  initialValues: {},
+  initialValues: { categoriesImported: false },
   breadcrumbsConfig: {
     actionLabel: '',
     defaultActionLabel: '',

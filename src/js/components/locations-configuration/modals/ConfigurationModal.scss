@@ -1,0 +1,119 @@
+.configuration-modal-content {
+  position: absolute;
+  top: 20%;
+  left: 23%;
+  background-color: #ffffff;
+  width: 55vw;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.configuration-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+}
+
+.modal-title {
+  width: 100%;
+  font-size: 21px;
+  line-height: 24.61px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal-subtitle {
+  width: 100%;
+  font-size: 14px;
+  line-height: 21px;
+  margin-bottom: 9px;
+}
+
+// Classic form
+.classic-form {
+  background-color: #fff;
+  margin-bottom: 16px;
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 100%;
+
+  .form-title {
+    width: 100%;
+    font-size: larger;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .form-subtitle {
+    width: 100%;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 9px;
+  }
+
+  .form-group {
+    margin-top: 0px !important;
+    margin-bottom: 12px !important;
+    margin-right: 12px !important;
+    min-width: 100%;
+
+    @media (max-width: 730px) {
+      min-width: 100% !important;
+    }
+
+    .row {
+      margin-right: 0;
+      margin-left: 0;
+    }
+
+    .col-form-label {
+      text-align: unset !important;
+      max-width: unset !important;
+      min-width: 100%;
+      padding: 6px 0 !important;
+    }
+
+    .form-element-container {
+      height: 2.8em;
+      padding: 0;
+      max-width: unset !important;
+      flex-grow: 1;
+
+      input {
+        height: 3em;
+      }
+
+      .Select {
+        height: 3em;
+
+        .Select-control {
+          height: inherit;
+
+          .Select-value,
+          .Select-placeholder {
+            display: flex;
+            align-items: center;
+
+            .Select-value-label {
+              height: fit-content;
+            }
+          }
+        }
+      }
+    }
+
+    .hidden {
+      display: none;
+    }
+  }
+}

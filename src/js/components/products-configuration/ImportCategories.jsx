@@ -45,6 +45,7 @@ class ImportCategories extends Component {
       .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.productsConfiguration.importSuccessful.label', 'Categories imported successfully'));
+        this.props.nextPage({ categoriesImported: true });
       })
       .catch(() => {
         this.props.hideSpinner();
@@ -116,6 +117,7 @@ const mapStateToProps = state => ({
 export default connect(mapStateToProps, { showSpinner, hideSpinner })(ImportCategories);
 
 ImportCategories.propTypes = {
+  nextPage: PropTypes.func.isRequired,
   showSpinner: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,

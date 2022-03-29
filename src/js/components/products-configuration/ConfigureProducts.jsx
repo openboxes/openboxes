@@ -26,6 +26,8 @@ class ConfigureProducts extends Component {
   constructor(props) {
     super(props);
     this.state = INITIAL_STATE;
+
+    this.prevPage = this.prevPage.bind(this);
   }
 
   componentDidMount() {
@@ -114,6 +116,14 @@ class ConfigureProducts extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  prevPage() {
+    if (this.props.initialValues.categoriesImported) {
+      this.props.previousPage(this.props.initialValues);
+    } else {
+      this.props.goToPage(1, this.props.initialValues);
+    }
+  }
+
   render() {
     const tabs = this.getTabs();
 
@@ -130,7 +140,7 @@ class ConfigureProducts extends Component {
           <VerticalTabs tabs={tabs} />
         </div>
         <div className="submit-buttons">
-          <button type="button" onClick={this.props.previousPage} className="btn btn-outline-primary float-left btn-xs">
+          <button type="button" onClick={this.prevPage} className="btn btn-outline-primary float-left btn-xs">
             <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
           </button>
         </div>
@@ -146,8 +156,12 @@ const mapStateToProps = state => ({
 export default connect(mapStateToProps, { showSpinner, hideSpinner })(ConfigureProducts);
 
 ConfigureProducts.propTypes = {
+  goToPage: PropTypes.func.isRequired,
   previousPage: PropTypes.func.isRequired,
   supportLinks: PropTypes.shape({}).isRequired,
+  initialValues: PropTypes.shape({
+    categoriesImported: PropTypes.bool.isRequired,
+  }).isRequired,
   showSpinner: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,

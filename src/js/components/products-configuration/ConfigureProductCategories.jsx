@@ -68,7 +68,7 @@ class ConfigureProductCategories extends Component {
       tabs[category.title] = this.getCategoryTreeContent(category, categoryName);
     });
 
-    tabs[`${this.props.translate('react.productsConfiguration.importFromExcel.label', 'Import from Excel')}`] = <ImportCategories />;
+    tabs[`${this.props.translate('react.productsConfiguration.importFromExcel.label', 'Import from Excel')}`] = <ImportCategories nextPage={this.props.nextPage} />;
 
     return tabs;
   }
@@ -81,6 +81,7 @@ class ConfigureProductCategories extends Component {
       .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.productsConfiguration.importSuccessful.label', 'Categories imported successfully'));
+        this.props.nextPage({ categoriesImported: true });
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -101,8 +102,8 @@ class ConfigureProductCategories extends Component {
           <VerticalTabs tabs={tabs} />
         </div>
         <div className="submit-buttons">
-          <button type="button" onClick={this.props.nextPage} className="btn btn-outline-primary float-right btn-xs">
-            <Translate id="react.default.button.next.label" defaultMessage="Next" />
+          <button type="button" onClick={() => this.props.goToPage(3, this.props.initialValues)} className="btn btn-outline-primary float-right btn-xs">
+            <Translate id="react.default.button.skip.label" defaultMessage="Skip this step" />
           </button>
         </div>
       </div>
@@ -118,6 +119,8 @@ export default connect(mapStateToProps, { showSpinner, hideSpinner })(ConfigureP
 
 ConfigureProductCategories.propTypes = {
   nextPage: PropTypes.func.isRequired,
+  goToPage: PropTypes.func.isRequired,
+  initialValues: PropTypes.shape({}).isRequired,
   supportLinks: PropTypes.shape({}).isRequired,
   showSpinner: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
