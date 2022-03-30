@@ -10,6 +10,7 @@ import Alert from 'react-s-alert';
 import { hideSpinner, showSpinner } from 'actions';
 import TextField from 'components/form-elements/TextField';
 import ForecastingNotsupported from 'components/locations-configuration/ForecastingNotsupported';
+import SuccessMessage from 'components/locations-configuration/SuccessMessage';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -87,7 +88,13 @@ class Forecasting extends Component {
       values: this.props.initialValues,
       locationId: this.props.initialValues.locationId,
       isForecastingSupported: true,
+      showSuccessMessage: false,
     };
+    this.setShowSuccessMessage = this.setShowSuccessMessage.bind(this);
+  }
+
+  setShowSuccessMessage() {
+    this.setState({ showSuccessMessage: !this.state.showSuccessMessage });
   }
 
   saveForecasting(values) {
@@ -98,6 +105,7 @@ class Forecasting extends Component {
       .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.locationsConfiguration.alert.forecastSaveCompleted.label', 'Forecast values for the location have been set!'), { timeout: 3000 });
+        this.setState({ showSuccessMessage: true });
       })
       .catch(() => {
         this.props.hideSpinner();
@@ -109,9 +117,14 @@ class Forecasting extends Component {
     this.props.previousPage({ ...this.state.values, forecasting: values });
   }
 
+
   render() {
     return (
       <div className="d-flex flex-column">
+        <SuccessMessage
+          successMessageOpen={this.state.showSuccessMessage}
+          setShowSuccessMessage={this.setShowSuccessMessage}
+        />
         {this.state.isForecastingSupported ?
           <div className="configuration-wizard-content flex-column">
             <Form
