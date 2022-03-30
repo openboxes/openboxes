@@ -1209,7 +1209,7 @@ openboxes.typeahead.delay = 300
 openboxes.typeahead.minLength = 3
 
 // Allow system administrators to disable refresh on startup
-openboxes.refreshAnalyticsDataOnStartup.enabled = false
+openboxes.refreshAnalyticsDataOnStartup.enabled = true
 
 // Send stock alerts
 openboxes.jobs.sendStockAlertsJob.enabled = true
@@ -1805,41 +1805,41 @@ openboxes.configurationWizard.listOfDemoData = [
 ]
 
 openboxes.configurationWizard.dataInit = [
-        locations: [
-                enabled: true,
-                url: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/locations.csv",
+        locations = [
+                enabled = true,
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/locations.csv",
         ],
-        locationGroups: [
-                enabled: true,
-                url: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/locationGroups.csv",
+        locationGroups = [
+                enabled = true,
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/locationGroups.csv",
         ],
-        organizations: [
-                enabled: true,
-                url: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/organizations.csv",
+        organizations = [
+                enabled = true,
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/organizations.csv",
         ],
-        binLocations: [
-                enabled: true,
-                url: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/binLocations.csv",
+        binLocations = [
+                enabled = true,
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/binLocations.csv",
         ],
-        categories: [
-                enabled: true,
-                url: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/categories.csv",
+        categories = [
+                enabled = true,
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/categories.csv",
         ],
-        products: [
-                enabled: true,
-                url: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/products.csv",
+        products = [
+                enabled = true,
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/products.csv",
         ],
-        productCatalog: [
-                enabled: true,
-                url: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/productCatalog.csv",
+        productCatalog = [
+                enabled = true,
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/productCatalog.csv",
         ],
-        productCatalogItems: [
-                enabled: true,
-                url: "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/productCatalogItems.csv",
+        productCatalogItems = [
+                enabled = true,
+                url = "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/productCatalogItems.csv",
         ],
-        productSuppliers: [
-                enabled: false, // INFO: Disabled, not implemented
-                url: "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/productSuppliers.csv",
+        productSuppliers = [
+                enabled = true, // INFO = Disabled, not implemented
+                url = "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/productSuppliers.csv",
         ],
 ]
 

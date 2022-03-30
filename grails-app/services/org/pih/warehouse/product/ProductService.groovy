@@ -1345,25 +1345,4 @@ class ProductService {
             importProducts(products)
         }
     }
-
-    ProductCatalogItem createOrUpdateProductCatalogItem(Map params) {
-        Product product
-        ProductCatalog productCatalog
-
-        if (params.productCode) {
-            product = Product.findByProductCode(params.productCode)
-        }
-
-        if (params.productCatalogCode) {
-            productCatalog = ProductCatalog.findByCode(params.productCatalogCode)
-        }
-
-        ProductCatalogItem productCatalogItem = ProductCatalogItem.findByProductAndProductCatalog(product, productCatalog)
-        if (!productCatalogItem) {
-            productCatalogItem = new ProductCatalogItem()
-            productCatalogItem.product = product
-            productCatalogItem.productCatalog = productCatalog
-        }
-        return productCatalogItem
-    }
 }

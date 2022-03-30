@@ -59,8 +59,7 @@ class UrlMappings {
             controller = { "locationApi" }
         }
 
-
-        "/api/loadData"(parseRequest: true) {
+        "/api/config/data/demo"(parseRequest: true) {
             controller = "loadDataApi"
             action = [GET: "load"]
         }

@@ -20,6 +20,7 @@ class LoadDataService {
     def locationDataService
     def productService
     def productSupplierDataService
+    def productCatalogService
 
     def importLocations(URL csvURL) {
         CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
@@ -129,7 +130,7 @@ class LoadDataService {
         csvReader.initFieldKeys()
 
         csvReader.eachLine { Map attr ->
-            productService.createOrUpdateProductCatalogItem(attr).save()
+            productCatalogService.createOrUpdateProductCatalogItem(attr).save()
         }
 
         csvReader.close();
