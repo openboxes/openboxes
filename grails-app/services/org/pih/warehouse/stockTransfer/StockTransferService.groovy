@@ -367,7 +367,7 @@ class StockTransferService {
 
         Integer quantityAvailable
         if (originBinLocation) {
-            quantityAvailable = productAvailabilityService.getQuantityNotPickedInBinLocation(inventoryItem, originBinLocation)
+            quantityAvailable = productAvailabilityService.getQuantityNotPickedInBinLocation(inventoryItem, location, originBinLocation)
         } else {
             quantityAvailable = productAvailabilityService.getQuantityNotPickedInLocation(inventoryItem.product, location)
         }
