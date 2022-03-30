@@ -13,6 +13,8 @@ package org.pih.warehouse.data
 import org.grails.plugins.csv.CSVMapReader
 import org.pih.warehouse.core.*
 import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 
 class LoadDataService {
@@ -140,12 +142,12 @@ class LoadDataService {
         CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
         csvReader.initFieldKeys()
 
-        csvReader.initFieldKeys();
         List<Map<String, String>> csvItems = csvReader.readAll();
+        def emptyStringAsNull = { return it == "" ? null : it }
 
         for (int i = 0; i < csvItems.size(); i++) {
             Map<String, String> currentItem = csvItems.get(i);
-            Map<String, String> newItem = new HashMap<String, String>();
+            Map<String, Object> newItem = new HashMap<String, String>();
 
             newItem.put("id", currentItem.get("ID"));
             newItem.put("code", currentItem.get("Product Source Code"));
@@ -158,18 +160,14 @@ class LoadDataService {
             newItem.put("manufacturerCode", currentItem.get("Manufacturer Item No"));
             newItem.put("minOrderQuantity", currentItem.get("Minimum Order Quantity"));
             newItem.put("contractPricePrice", currentItem.get("Contract Price (Each)"));
-            newItem.put("contractPriceValidUntil", currentItem.get("Contract Price Valid Until"));
-            // FIXME: Rating type is not passing validation
-            String ratingType = currentItem.get("Rating Type");
-            ratingType = ratingType == "" ? null : ratingType;
-            newItem.put("ratingTypeCode", ratingType);
-
+            newItem.put("contractPriceValidUntil", emptyStringAsNull(currentItem.get("Contract Price Valid Until")));
+            newItem.put("ratingTypeCode", emptyStringAsNull(currentItem.get("Rating Type")));
             newItem.put("globalPreferenceTypeName", currentItem.get("Default Global Preference Type"));
             newItem.put("globalPreferenceTypeValidityStartDate", currentItem.get("Preference Type Validity Start Date"));
             newItem.put("globalPreferenceTypeValidityEndDate", currentItem.get("Preference Type Validity End Date"));
             newItem.put("globalPreferenceTypeComments", currentItem.get("Preference Type Comment"));
             newItem.put("defaultProductPackageUomCode", currentItem.get("Default Package Type"));
-            newItem.put("defaultProductPackageQuantity", currentItem.get("Quantity per package"));
+            newItem.put("defaultProductPackageQuantity", currentItem.get("Quantity per Package").toInteger());
             newItem.put("defaultProductPackagePrice", currentItem.get("Package price"));
 
             csvItems.set(i, newItem);
@@ -185,4 +183,68 @@ class LoadDataService {
         csvReader.close();
     }
 
+
+    def importInventory(URL csvURL) {
+        CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
+
+        csvReader.eachLine {Map attr ->
+            Product product = Product.findByProductCode(attr["Product code"]);
+
+            InventoryItem inventoryItem = new InventoryItem(
+                    product: product,
+                    lotNumber: attr["Lot number"],
+                    expirationDate: attr["Expiration date"],
+                    comments: attr["Comment"]
+            );
+
+            inventoryItem.save();
+        }
+
+        csvReader.close();
+    }
+
+    def importUsers(URL csvURL) {
+        CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
+
+        csvReader.eachLine {Map<String, String> attr ->
+            StringTokenizer tokenizer = new StringTokenizer(attr.roleType, ",");
+            Set<RoleType> roleTypes = new HashSet<RoleType>();
+
+            while (tokenizer.hasMoreElements()) {
+                roleTypes.add(RoleType.valueOf(tokenizer.nextElement() as String));
+            }
+
+            Set<Role> userRoles = new HashSet<Role>();
+
+            for (RoleType roleType in roleTypes) {
+                Role role = Role.findByRoleType(roleType)
+
+                if (!role) {
+                    role = new Role(
+                            roleType: roleType,
+                            name: roleType.toString(),
+                    )
+                }
+                userRoles.add(role)
+            }
+
+            if (User.findByUsername(attr.username)) {
+                throw new IllegalArgumentException('Duplicate username: ' + attr.username);
+            }
+
+            User user = new User(
+                    username: attr.username,
+                    password: attr.username, // FIXME: What is default password?
+                    passwordConfirm: attr.username,
+                    firstName: attr.firstName,
+                    lastName: attr.lastName,
+                    email: attr.email,
+                    roles: userRoles,
+            )
+
+            user.save()
+        }
+
+        csvReader.close();
+    }
 }
