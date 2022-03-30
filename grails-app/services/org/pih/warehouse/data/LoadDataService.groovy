@@ -14,6 +14,7 @@ import org.grails.plugins.csv.CSVMapReader
 import org.pih.warehouse.core.*
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 
@@ -198,6 +199,31 @@ class LoadDataService {
             );
 
             inventoryItem.save();
+        }
+
+        csvReader.close();
+    }
+
+    def importInventoryLevels(URL csvURL) {
+        CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
+
+        csvReader.eachLine { Map<String, String> attr ->
+            Product product = Product.findByProductCode(attr["Product code"]);
+
+            Location preferredBinLocation = Location.findByName(attr["Preferred bin location"])
+
+            InventoryLevel inventoryLevel = new InventoryLevel(
+                    product: product,
+                    status: attr["status"],
+                    preferredBinLocation: preferredBinLocation,
+                    minQuantity: attr["Min quantity"],
+                    maxQuantity: attr["Max quantity"],
+                    reorderQuantity: attr["Reorder quantity"],
+                    expectedLeadTimeDays: attr["Expected Lead Time Days"],
+                    replenishmentPeriodDays: attr["Replenishment Period Days"]
+            )
+
+            inventoryLevel.save(failOnError: true);
         }
 
         csvReader.close();

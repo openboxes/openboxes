@@ -72,6 +72,10 @@ class LoadDataApiController extends BaseDomainApiController {
             loadDataService.importInventory(new URL(config.chicagoWarehouseInventory.url))
         }
 
+        if(config.inventoryLevels.enabled) {
+            loadDataService.importInventoryLevels(new URL(config.inventoryLevels.url))
+        }
+
         if(config.users.enabled) {
             loadDataService.importUsers(new URL(config.users.url))
         }
