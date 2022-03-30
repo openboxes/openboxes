@@ -119,6 +119,7 @@ class ZoneTable extends Component {
               offset: `${offset}`,
               max: `${state.pageSize}`,
               'parentLocation.id': `${this.props.currentLocationId}`,
+              includeInactive: true,
             },
           })
             .then((res) => {
