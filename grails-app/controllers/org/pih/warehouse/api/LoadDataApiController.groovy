@@ -76,6 +76,10 @@ class LoadDataApiController extends BaseDomainApiController {
             loadDataService.importUsers(new URL(config.users.url))
         }
 
+        if(config.persons.enabled) {
+            loadDataService.importPersons(new URL(config.persons.url))
+        }
+
         render([] as JSON)
     }
 }

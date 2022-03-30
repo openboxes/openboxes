@@ -187,7 +187,7 @@ class LoadDataService {
     def importInventory(URL csvURL) {
         CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
 
-        csvReader.eachLine {Map attr ->
+        csvReader.eachLine { Map attr ->
             Product product = Product.findByProductCode(attr["Product code"]);
 
             InventoryItem inventoryItem = new InventoryItem(
@@ -206,7 +206,7 @@ class LoadDataService {
     def importUsers(URL csvURL) {
         CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
 
-        csvReader.eachLine {Map<String, String> attr ->
+        csvReader.eachLine { Map<String, String> attr ->
             StringTokenizer tokenizer = new StringTokenizer(attr.roleType, ",");
             Set<RoleType> roleTypes = new HashSet<RoleType>();
 
@@ -243,6 +243,21 @@ class LoadDataService {
             )
 
             user.save()
+        }
+
+        csvReader.close();
+    }
+
+    def importPersons(URL csvURL) {
+        CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
+
+        csvReader.eachLine { Map<String, String> attr ->
+            new Person(
+                    firstName: attr.firstName,
+                    lastName: attr.lastName,
+                    email: attr.email,
+                    phoneNumber: attr.phoneNumber,
+            ).save()
         }
 
         csvReader.close();

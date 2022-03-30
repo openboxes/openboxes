@@ -1854,8 +1854,12 @@ openboxes.configurationWizard.dataInit = [
                 url: "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/chicagoWarehouseInventory.csv"
         ],
         users: [
-                enabled: true,
+                enabled: false,
                 url: "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/users.csv"
+        ],
+        persons: [
+                enabled: false,
+                url: "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/persons.csv"
         ]
 ]
 
