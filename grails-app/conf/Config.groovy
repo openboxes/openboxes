@@ -1702,6 +1702,10 @@ openboxes.receiving.createReceivingLocation.enabled = true
 openboxes.receiving.receivingLocation.prefix = Constants.DEFAULT_RECEIVING_LOCATION_PREFIX
 
 
+openboxes.supportLinks = [
+    configureOrganizationsAndLocations: 'https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1291452471/Configure+Organizations+and+Locations',
+]
+
 // Product configuration wizard
 openboxes.configurationWizard.enabled = true
 openboxes.configurationWizard.categoryOptions = [

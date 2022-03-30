@@ -597,6 +597,11 @@ class UrlMappings {
             //action = [GET:"show", PUT:"update", DELETE:"delete", POST:"save"]
         }
 
+        "/api/supportLinks"(parseRequest: true) {
+            controller = { "api" }
+            action = [GET: "getSupportLinks"]
+        }
+
         // Generic API for all other resources
 
         "/api/generic/${resource}/"(parseRequest: false) {
