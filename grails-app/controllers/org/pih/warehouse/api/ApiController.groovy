@@ -142,34 +142,40 @@ class ApiController {
             [code: it, name: name]
         }
         String currencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode
+        String helpScoutColor = grailsApplication.config.openboxes.helpscout.widget.color
+        String helpScoutKey = grailsApplication.config.openboxes.helpscout.widget.key
+        boolean isHelpScoutEnabled = grailsApplication.config.openboxes.helpscout.widget.enabled
         render([
-                data: [
-                        user                 : user,
-                        location             : location,
-                        isSuperuser          : isSuperuser,
-                        isUserAdmin          : isUserAdmin,
-                        supportedActivities  : supportedActivities,
-                        isImpersonated       : isImpersonated,
-                        grailsVersion        : grailsVersion,
-                        appVersion           : appVersion,
-                        branchName           : branchName,
-                        buildNumber          : buildNumber,
-                        environment          : environment,
-                        buildDate            : buildDate,
-                        ipAddress            : ipAddress,
-                        hostname             : hostname,
-                        timezone             : timezone,
-                        minimumExpirationDate: minimumExpirationDate,
-                        activeLanguage       : locale.language,
-                        isPaginated          : isPaginated,
-                        logoLabel            : logoLabel,
-                        menuItems            : menuItems,
-                        highestRole          : highestRole,
-                        pageSize             : pageSize,
-                        logoUrl              : logoUrl,
-                        supportedLocales     : supportedLocales,
-                        currencyCode         : currencyCode,
-                ],
+            data: [
+                user                 : user,
+                location             : location,
+                isSuperuser          : isSuperuser,
+                isUserAdmin          : isUserAdmin,
+                supportedActivities  : supportedActivities,
+                isImpersonated       : isImpersonated,
+                grailsVersion        : grailsVersion,
+                appVersion           : appVersion,
+                branchName           : branchName,
+                buildNumber          : buildNumber,
+                environment          : environment,
+                buildDate            : buildDate,
+                ipAddress            : ipAddress,
+                hostname             : hostname,
+                timezone             : timezone,
+                minimumExpirationDate: minimumExpirationDate,
+                activeLanguage       : locale.language,
+                isPaginated          : isPaginated,
+                logoLabel            : logoLabel,
+                menuItems            : menuItems,
+                highestRole          : highestRole,
+                pageSize             : pageSize,
+                logoUrl              : logoUrl,
+                supportedLocales     : supportedLocales,
+                currencyCode         : currencyCode,
+                helpScoutColor       : helpScoutColor,
+                helpScoutKey         : helpScoutKey,
+                isHelpScoutEnabled   : isHelpScoutEnabled,
+            ],
         ] as JSON)
     }
 
@@ -213,7 +219,7 @@ class ApiController {
 
     def getSupportLinks = {
         def supportLinks = grailsApplication.config.openboxes.supportLinks
-        
+
         render([data: supportLinks] as JSON)
     }
 }

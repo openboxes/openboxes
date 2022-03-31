@@ -78,7 +78,11 @@
             e.attachEvent ? e.attachEvent("onload", a) : e.addEventListener("load", a, !1)
         }(window, document, window.Beacon || function () {
         });
-        window.Beacon("init", "${grailsApplication.config.openboxes.helpscout.widget.uuid}")
+        window.Beacon("init", "${grailsApplication.config.openboxes.helpscout.widget.key}")
+        window.Beacon("config", {
+            "color": "${grailsApplication.config.openboxes.helpscout.widget.color}",
+            "enableFabAnimation": false
+        })
     </script>
     <!-- end magical HelpScout incantations -->
 </g:if>

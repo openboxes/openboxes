@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import PropTypes from 'prop-types';
+import { HelpScout, LiveChatLoaderProvider } from 'react-live-chat-loader';
 import { connect } from 'react-redux';
 
 import GlobalSearch from 'components/GlobalSearch';
@@ -8,7 +9,6 @@ import LocationChooser from 'components/location/LocationChooser';
 import UserActionMenu from 'components/user/UserActionMenu';
 import apiClient from 'utils/apiClient';
 import Translate from 'utils/Translate';
-
 
 class Header extends Component {
   constructor(props) {
@@ -38,11 +38,28 @@ class Header extends Component {
   }
 
   render() {
+    let helpScoutBeacon = <div />;
+    if (this.props.isHelpScoutEnabled) {
+      helpScoutBeacon = (
+        <LiveChatLoaderProvider provider="helpScout" providerKey={this.props.helpScoutKey}>
+          <HelpScout
+            color={this.props.helpScoutColor}
+            horizontalPosition="right"
+            icon="question"
+            idlePeriod="0"
+            zIndex="1050"
+          />
+        </LiveChatLoaderProvider>
+      );
+    }
+
     return (
       <div className="w-100">
         {this.props.isImpersonated ?
           <div className="d-flex notice">
-            <div className="ml-1"><Translate id="react.default.impersonate.label" defaultMessage="You are impersonating user" /></div>
+            <div className="ml-1">
+              <Translate id="react.default.impersonate.label" defaultMessage="You are impersonating user" />
+            </div>
             <div className="ml-1"><b>{this.props.username}</b></div>
             <div className="ml-1">
               <a
@@ -71,29 +88,38 @@ class Header extends Component {
             <LocationChooser />
           </div>
         </div>
+        {helpScoutBeacon}
       </div>
     );
   }
 }
 
 const mapStateToProps = state => ({
-  username: state.session.user.username,
-  isImpersonated: state.session.isImpersonated,
+  helpScoutColor: state.session.helpScoutColor,
+  helpScoutKey: state.session.helpScoutKey,
   highestRole: state.session.highestRole,
-  logoUrl: state.session.logoUrl,
+  isHelpScoutEnabled: state.session.isHelpScoutEnabled,
+  isImpersonated: state.session.isImpersonated,
   logoLabel: state.session.logoLabel,
+  logoUrl: state.session.logoUrl,
+  username: state.session.user.username,
 });
 
 export default connect(mapStateToProps)(Header);
 
 Header.propTypes = {
-  /** Active user's username */
-  username: PropTypes.string.isRequired,
-  /** Indicator if active user is impersonated */
-  isImpersonated: PropTypes.bool.isRequired,
-  /** Id of the current location */
-  logoUrl: PropTypes.string.isRequired,
-  /** Id of the current location */
-  logoLabel: PropTypes.string.isRequired,
+  helpScoutColor: PropTypes.string,
+  helpScoutKey: PropTypes.string,
   highestRole: PropTypes.string.isRequired,
+  isHelpScoutEnabled: PropTypes.string,
+  isImpersonated: PropTypes.bool.isRequired,
+  logoLabel: PropTypes.string.isRequired,
+  logoUrl: PropTypes.string.isRequired,
+  username: PropTypes.string.isRequired,
+};
+
+Header.defaultProps = {
+  helpScoutColor: '',
+  helpScoutKey: '',
+  isHelpScoutEnabled: false,
 };
