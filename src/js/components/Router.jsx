@@ -96,6 +96,11 @@ const AsyncLocationsConfiguration = Loadable({
   loading: Loading,
 });
 
+const AsyncImportLocations = Loadable({
+  loader: () => import('components/locations-configuration/ImportLocations'),
+  loading: Loading,
+});
+
 const AsyncWelcomePage = Loadable({
   loader: () => import('components/locations-configuration/WelcomePage'),
   loading: Loading,
@@ -126,6 +131,7 @@ const Router = props => (
         <MainLayoutRoute path="/**/replenishment/create/:replenishmentId?" component={AsyncReplenishment} />
         <MainLayoutRoute path="/**/productsConfiguration/index" component={AsyncProductsConfiguration} />
         <MainLayoutRoute path="/**/locationsConfiguration/create" component={AsyncLocationsConfiguration} />
+        <MainLayoutRoute path="/**/locationsConfiguration/upload" component={AsyncImportLocations} />
         <Route path="/**/locationsConfiguration/index" >
           <AsyncWelcomePage />
         </Route>

@@ -55,6 +55,16 @@ class UrlMappings {
             action = [GET: "supportedActivities"]
         }
 
+        "/api/locations/template" {
+            controller = { "locationApi" }
+            action = [GET: "downloadTemplate"]
+        }
+
+        "/api/locations/importCsv" {
+            controller = { "locationApi" }
+            action = [POST: "importCsv"]
+        }
+
         "/api/locations/$id/$action" {
             controller = { "locationApi" }
         }
