@@ -14,6 +14,7 @@ import TextField from 'components/form-elements/TextField';
 import AddBinModal from 'components/locations-configuration/AddBinModal';
 import AddZoneModal from 'components/locations-configuration/AddZoneModal';
 import BinTable from 'components/locations-configuration/BinTable';
+import ImportBinModal from 'components/locations-configuration/ImportBinModal';
 import ZoneTable from 'components/locations-configuration/ZoneTable';
 import apiClient from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -143,6 +144,7 @@ class ZoneAndBinLocations extends Component {
     this.handleLocationEdit = this.handleLocationEdit.bind(this);
     this.refBinTable = React.createRef();
     this.refZoneTable = React.createRef();
+    this.fetchBinLocations = this.fetchBinLocations.bind(this);
   }
 
   componentDidMount() {
@@ -166,6 +168,19 @@ class ZoneAndBinLocations extends Component {
         this.setState({ binTypes, zoneTypes });
       })
       .catch(() => Promise.reject(new Error(this.props.translate('react.locationsConfiguration.error.fetchingBinAndZoneTypes', 'Could not load location types'))));
+  }
+
+  fetchBinLocations() {
+    const url = `/openboxes/api/locations/${this.props.initialValues.locationId}/binLocations`;
+    apiClient.get(url)
+      .then((res) => {
+        this.props.hideSpinner();
+        const { binLocations } = res.data;
+        this.setState({ binData: binLocations });
+      })
+      .catch(() => {
+        this.props.hideSpinner();
+      });
   }
 
   handleLocationEdit(values) {
@@ -329,18 +344,14 @@ class ZoneAndBinLocations extends Component {
                 addBinLocation={this.addBinLocation}
                 binTypes={this.state.binTypes}
               />
-              <React.Fragment>
-                <button type="button" className="btn-xs btn btn-outline-primary add-zonebin-btn">
-                  <i className="fa fa-download mr-1" aria-hidden="true" />
-                  <Translate id="react.locationsConfiguration.importBinLocations.label" defaultMessage="Import Bin Locations" />
-                </button>
-              </React.Fragment>
-              <React.Fragment>
-                <button type="button" className="btn-xs btn btn-outline-primary add-zonebin-btn">
-                  <i className="fa fa-arrow-up mr-1" aria-hidden="true" />
-                  <Translate id="react.locationsConfiguration.exportBinLocations.label" defaultMessage="Export Bin Locations" />
-                </button>
-              </React.Fragment>
+              <ImportBinModal
+                locationId={this.props.initialValues.locationId}
+                onResponse={this.fetchBinLocations}
+              />
+              <button type="button" className="btn-xs btn btn-outline-primary add-zonebin-btn">
+                <i className="fa fa-arrow-up mr-1" aria-hidden="true" />
+                <Translate id="react.locationsConfiguration.exportBinLocations.label" defaultMessage="Export Bin Locations" />
+              </button>
             </div>
             <BinTable
               binData={this.state.binData}
