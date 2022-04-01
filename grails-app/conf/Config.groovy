@@ -1854,7 +1854,7 @@ openboxes.configurationWizard.dataInit = [
                 url: "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/chicagoWarehouseInventory.csv"
         ],
         inventoryLevels: [
-                enabled: false, // INFO Disabled, not working
+                enabled: true,
                 url: "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/inventoryLevels.csv"
         ],
         users: [
@@ -1864,7 +1864,12 @@ openboxes.configurationWizard.dataInit = [
         persons: [
                 enabled: true,
                 url: "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/persons.csv"
-        ]
+        ],
+        stocklist: [
+                enabled: false, // Items not working
+                templateUrl: "file:///home/user/workspace/openboxes/grails-app/conf/templates/configuration/stocklistTemplate.csv",
+                itemsUrl: "file:///home/user/workspace/openboxes/grails-app/conf/templates/configuration/stocklistItems.csv",
+        ],
 ]
 
 // Pagination

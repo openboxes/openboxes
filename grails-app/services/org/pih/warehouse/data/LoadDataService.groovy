@@ -17,6 +17,10 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
+import org.pih.warehouse.requisition.ReplenishmentTypeCode
+import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionItemSortByCode
 
 class LoadDataService {
 
@@ -223,7 +227,7 @@ class LoadDataService {
                     replenishmentPeriodDays: attr["Replenishment Period Days"]
             )
 
-            inventoryLevel.save(failOnError: true);
+            inventoryLevel.save();
         }
 
         csvReader.close();
@@ -284,6 +288,73 @@ class LoadDataService {
                     email: attr.email,
                     phoneNumber: attr.phoneNumber,
             ).save()
+        }
+
+        csvReader.close();
+    }
+
+    Requisition importStocklist(URL csvURL) {
+        CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
+
+        List templates = csvReader.readAll();
+
+        if(templates.size() != 1) {
+            throw new IllegalArgumentException("Invalid number of templates != 1");
+        }
+
+        def attr = templates.get(0);
+
+        String originCode = attr['Origin Code'];
+        Location origin = Location.findByLocationNumber(originCode)
+
+        if(!origin) {
+            throw new IllegalArgumentException("Origin not found: " + originCode);
+        }
+
+        String destinationCode = attr["Destination Code"]
+        Location destination = Location.findByLocationNumber(destinationCode)
+
+        if(!destination) {
+            throw new IllegalArgumentException("Destination not found: " + destinationCode);
+        }
+
+        Person requestedBy = Person.createCriteria().list {
+            maxResults(1)
+            order("id", "asc")
+        }[0] // FIXME: Who is default person?
+
+        Requisition requisition = new Requisition(
+                name: attr["Name"],
+                origin: origin,
+                destination: destination,
+                dateRequested: new Date(),
+                requestedDeliveryDate: new Date(),
+                sortByCode: RequisitionItemSortByCode.valueOf(attr['Sort by']),
+                replenishmentPeriod: Integer.parseInt(attr['Replenishment Period']),
+                replenishmentTypeCode: ReplenishmentTypeCode.valueOf(attr['Replenishment Type']),
+                requestedBy: requestedBy
+        )
+
+        requisition.save()
+
+        csvReader.close();
+
+        return requisition;
+    }
+
+    def importStocklistItems(URL csvURL, Requisition requisition) {
+        CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
+
+        csvReader.eachLine { Map<String, String> attr ->
+            Product product = Product.findByCode(attr["product_code"])
+
+            RequisitionItem requisitionItem = new RequisitionItem(
+                product: product,
+                substitutable: false,
+                quantity: Integer.parseInt(attr["quantity"])
+            );
+
+            requisitionItem.save();
         }
 
         csvReader.close();
