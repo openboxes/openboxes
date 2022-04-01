@@ -17,6 +17,7 @@ import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.inventory.Inventory
 
 import javax.annotation.Nullable
 
@@ -134,7 +135,9 @@ class LocationDataService {
         location.parentLocation = params.parentLocation ? Location.findByNameOrLocationNumber(params.parentLocation, params.parentLocation) : null
         location.organization = params.organization ? Organization.findByCodeOrName(params.organization, params.organization) : null
         location.address = createOrUpdateAddress(params, location?.address?.id)
-
+        if (!location.inventory && !location.parentLocation) {
+            location.inventory = new Inventory(['warehouse': location])
+        }
         def locationType = params.locationType ? LocationType.findByNameLike(params.locationType + "%") : null
         def currentLocationType = location.locationType
 
