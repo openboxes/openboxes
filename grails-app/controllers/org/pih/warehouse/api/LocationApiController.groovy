@@ -18,6 +18,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.product.ProductAvailability
 
@@ -200,5 +201,28 @@ class LocationApiController extends BaseDomainApiController {
         existingLocation.delete(flush: true)
 
         render(status: 204)
+    }
+
+    def downloadTemplate = {
+        def csv = "id,name,active,locationNumber,locationType,locationGroup,parentLocation,organization,streetAddress,streetAddress2,city,stateOrProvince,postalCode,country,description\n"
+
+        response.setHeader("Content-disposition", "attachment; filename=\"Location_template.csv\"")
+        render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
+    }
+
+    def importCsv = { ImportDataCommand command ->
+        def importFile = command.importFile
+
+        if (importFile.isEmpty()) {
+            throw new IllegalArgumentException("File cannot be empty")
+        }
+
+        if (importFile.fileItem.contentType != "text/csv") {
+            throw new IllegalArgumentException("File must be in CSV format")
+        }
+
+        locationService.importLocationCsv(command)
+
+        render status: 200
     }
 }

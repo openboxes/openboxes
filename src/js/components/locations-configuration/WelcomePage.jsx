@@ -27,8 +27,7 @@ class WelcomePage extends Component {
   }
 
   importLocations() {
-    // TODO: Change it to import page when it's done
-    this.props.history.push('/openboxes');
+    this.props.history.push('/openboxes/locationsConfiguration/upload');
   }
 
   render() {

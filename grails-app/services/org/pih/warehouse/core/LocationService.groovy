@@ -15,12 +15,15 @@ import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
+import org.grails.plugins.csv.CSVMapReader
+import org.pih.warehouse.importer.ImportDataCommand
 import util.ConfigHelper
 
 class LocationService {
 
     def grailsApplication
     def userService
+    def locationDataService
     boolean transactional = true
 
 
@@ -592,5 +595,21 @@ class LocationService {
             order("sortOrder", "asc")
             order("name", "asc")
         }
+    }
+
+    def importLocationCsv(ImportDataCommand command) {
+        String csv = new String(command.importFile.bytes)
+        def settings = [separatorChar: ',']
+        CSVMapReader csvReader = new CSVMapReader(new StringReader(csv), settings)
+        command.data = csvReader.readAll()
+
+        command.errors = null
+        locationDataService.validateData(command)
+
+        if (command.errors.allErrors) {
+            throw new ValidationException("Failed to import template due to validation errors", command.errors)
+        }
+
+        locationDataService.importData(command)
     }
 }

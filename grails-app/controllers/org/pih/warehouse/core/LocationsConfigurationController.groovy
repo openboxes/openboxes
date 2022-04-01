@@ -18,4 +18,8 @@ class LocationsConfigurationController {
     def create = {
         render(template: "/common/react")
     }
+
+    def upload = {
+        render(template: "/common/react")
+    }
 }
