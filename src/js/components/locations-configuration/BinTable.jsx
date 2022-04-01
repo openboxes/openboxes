@@ -46,7 +46,7 @@ class BinTable extends Component {
       },
       {
         Header: 'Bin Type',
-        accessor: 'locationType.locationTypeCode',
+        accessor: 'locationType.name',
         className: 'cell',
         headerClassName: 'header text-align-left',
       },
@@ -100,6 +100,7 @@ class BinTable extends Component {
     return (
       <ReactTable
         data={this.props.binData}
+        ref={this.props.refBinTable}
         columns={binColumns}
         loading={this.state.binLoading}
         pages={this.state.binPages}
@@ -113,9 +114,8 @@ class BinTable extends Component {
         pageText=""
         onFetchData={(state) => {
           const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
-          apiClient.get('/openboxes/api/internalLocations/search', {
+          apiClient.get('/openboxes/api/internalLocations/search?locationTypeCode=BIN_LOCATION&locationTypeCode=INTERNAL', {
             params: {
-              locationTypeCode: 'BIN_LOCATION',
               offset: `${offset}`,
               max: `${state.pageSize}`,
               'parentLocation.id': `${this.props.currentLocationId}`,
@@ -150,6 +150,10 @@ BinTable.propTypes = {
   FIELDS: PropTypes.shape({}).isRequired,
   validate: PropTypes.func.isRequired,
   binTypes: PropTypes.shape([]).isRequired,
+  refBinTable: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.shape({ current: PropTypes.instanceOf(Element) }),
+  ]).isRequired,
 };
 
 export default connect(mapStateToProps)(BinTable);

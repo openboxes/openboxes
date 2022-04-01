@@ -30,6 +30,11 @@ class LocationApiController extends BaseDomainApiController {
     def inventoryService
     def grailsApplication
 
+    def read = {
+        Location location = Location.get(params.id)
+        render([data: location] as JSON)
+    }
+
     def list = {
 
         def minLength = grailsApplication.config.openboxes.typeahead.minLength

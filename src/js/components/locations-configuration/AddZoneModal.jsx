@@ -10,6 +10,7 @@ import ModalWrapper from 'components/form-elements/ModalWrapper';
 import apiClient, { flattenRequest } from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
+import 'components/locations-configuration/ZoneTable.scss';
 
 class AddZoneModal extends Component {
   constructor(props) {
@@ -24,10 +25,10 @@ class AddZoneModal extends Component {
   handleSubmit(values) {
     this.props.showSpinner();
     apiClient.post('/openboxes/api/locations/', flattenRequest({ ...values, parentLocation: { id: this.props.locationId }, locationType: { id: values.locationType.id } }))
-      .then((res) => {
+      .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.locationsConfiguration.addZone.success.label', 'Zone location has been created successfully!'), { timeout: 3000 });
-        this.props.addZoneLocation(res.data.data);
+        this.props.addZoneLocation();
       })
       .catch(() => {
         this.props.hideSpinner();

@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 import Alert from 'react-s-alert';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
@@ -18,6 +19,7 @@ import Checkbox from 'utils/Checkbox';
 import { renderFormField } from 'utils/form-utils';
 import { debounceLocationGroupsFetch, debounceOrganizationsFetch, debounceUsersFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import splitTranslation from 'utils/translation-utils';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'components/locations-configuration/LocationDetails.scss';
@@ -174,6 +176,9 @@ class LocationDetails extends Component {
       this.dataFetched = true;
       this.fetchSupportedActivities();
     }
+    if (this.props.match.params.locationId) {
+      this.fetchLocation();
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -208,6 +213,49 @@ class LocationDetails extends Component {
       .get('supportedActivities')
       .map(value => ({ value, label: this.props.translate(`react.locationsConfiguration.ActivityCode.${value}`, value) }))
       .value();
+  }
+
+  fetchLocation() {
+    const url = `/openboxes/api/locations/${this.props.match.params.locationId}`;
+    apiClient.get(url).then((response) => {
+      const location = response.data.data;
+      if (!location) {
+        this.props.history.push('/openboxes/locationsConfiguration/create');
+        return;
+      }
+      this.setState({
+        values: {
+          ...this.state.values,
+          locationId: this.props.match.params.locationId,
+          ...location,
+          locationGroup: location.locationGroup ?
+            {
+              value: location.locationGroup.id,
+              id: location.locationGroup.id,
+              name: location.locationGroup.name,
+              label: location.locationGroup.name,
+            }
+            : '',
+          manager: location.manager ? location.manager : '',
+          locationType: location.locationType ?
+            {
+              value: location.locationType.id,
+              id: location.locationType.id,
+              name: location.locationType.name,
+              label: splitTranslation(location.locationType.name, this.props.locale),
+            }
+            : '',
+          supportedActivities: _.map(location.supportedActivities, value => ({ value, label: this.props.translate(`react.locationsConfiguration.ActivityCode.${value}`, value) })),
+          organization: {
+            value: location.organization.id,
+            id: location.organization.id,
+            name: location.organization.name,
+            label: `${location.organization.code} ${location.organization.name}`,
+          },
+        },
+      });
+    })
+      .catch(() => Promise.reject(new Error(this.props.translate('react.locationsConfiguration.error.fetchingLocation', 'Could not load location data'))));
   }
 
   dataFetched = false;
@@ -259,7 +307,6 @@ class LocationDetails extends Component {
   saveLocationDetails(values) {
     if (values.name && values.organization) {
       this.props.showSpinner();
-
       let locationUrl = '';
       if (values.locationId) {
         locationUrl = `/openboxes/api/locations/${values.locationId}?useDefaultActivities=${this.state.useDefaultActivities}`;
@@ -283,12 +330,11 @@ class LocationDetails extends Component {
           this.props.hideSpinner();
           Alert.success(this.props.translate('react.locationsConfiguration.alert.locationSaveCompleted.label', 'Location was successfully saved!'), { timeout: 3000 });
           const resp = response.data.data;
+          this.props.history.push(`/openboxes/locationsConfiguration/create/${resp.id}`);
           this.props.nextPage({
             ...values,
             locationId: resp.id,
             useDefaultActivities: this.state.useDefaultActivities,
-            zoneTypeId: this.state.locationTypes.find(location => location.locationTypeCode === 'ZONE').id,
-            binTypeId: this.state.locationTypes.find(location => location.locationTypeCode === 'BIN_LOCATION').id,
           });
         })
         .catch(() => {
@@ -476,9 +522,9 @@ const mapStateToProps = state => ({
   user: state.session.user,
 });
 
-export default (connect(mapStateToProps, {
+export default withRouter((connect(mapStateToProps, {
   showSpinner, hideSpinner, fetchUsers,
-})(LocationDetails));
+})(LocationDetails)));
 
 LocationDetails.propTypes = {
   initialValues: PropTypes.shape({
@@ -500,4 +546,10 @@ LocationDetails.propTypes = {
   translate: PropTypes.func.isRequired,
   locConfTranslationsFetched: PropTypes.bool.isRequired,
   locale: PropTypes.string.isRequired,
+  match: PropTypes.shape({
+    params: PropTypes.shape({ locationId: PropTypes.string }),
+  }).isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func,
+  }).isRequired,
 };
