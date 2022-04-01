@@ -87,7 +87,7 @@ class ImportLocations extends Component {
     return apiClient.post(url, formData, config)
       .then(() => {
         this.props.hideSpinner();
-        Alert.success(this.props.translate('react.locationsConfiguration.importSuccessful.label', 'Categories imported successfully'));
+        Alert.success(this.props.translate('react.locationsConfiguration.importSuccess.label', 'Locations Created Successfully'));
         this.setState({ showSuccessMessage: true });
       })
       .catch(() => {
@@ -158,7 +158,7 @@ class ImportLocations extends Component {
                 />&nbsp;
                 <a href="#" onClick={() => this.downloadLocationsTemplate()}>
                   <Translate id="react.locationsConfiguration.here.label" defaultMessage="here" />
-                </a>.&nbsp;
+                </a>&nbsp;
                 <Translate
                   id="react.locationsConfiguration.templateInstructions.label"
                   defaultMessage="to download a template with instructions."
