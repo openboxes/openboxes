@@ -81,3 +81,7 @@
   margin-top: 18px;
   gap: 3px;
 }
+
+.ReactModal__Body--open {
+  overflow-y: hidden;
+}
