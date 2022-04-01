@@ -44,28 +44,24 @@ class ModalWrapper extends Component {
 
     return (
       <div>
-        {this.props.btnOpenAsIcon ? (
-          <div
-            role="button"
-            className={`btn-xs ${this.props.btnOpenClassName}`}
-            style={this.props.btnOpenStyle}
-            onClick={() => this.openModal()}
-            onKeyPress={() => this.openModal()}
-            tabIndex={0}
-          >
-            <i className={`fa ${this.props.btnOpenIcon ? this.props.btnOpenIcon : 'fa-search'}`} />
-          </div>
-        ) : (
-          <button
-            type="button"
-            className={`btn-xs ${this.props.btnOpenClassName}`}
-            style={this.props.btnOpenStyle}
-            disabled={this.props.btnOpenDisabled}
-            onClick={() => this.openModal()}
-          >
+        <button
+          type="button"
+          className={`btn-xs ${this.props.btnOpenClassName}`}
+          style={this.props.btnOpenStyle}
+          disabled={this.props.btnOpenDisabled}
+          onClick={() => this.openModal()}
+          onKeyPress={() => this.openModal()}
+          tabIndex={0}
+        >
+          {
+            this.props.btnOpenIcon &&
+            <i className={`fa ${this.props.btnOpenIcon} mr-1`} aria-hidden="true" />
+          }
+          {
+            this.props.btnOpenText && !this.props.btnOpenAsIcon &&
             <Translate id={this.props.btnOpenText} defaultMessage={this.props.btnOpenDefaultText} />
-          </button>
-        )}
+          }
+        </button>
         <Modal
           isOpen={this.props.showModal || this.state.showModal}
           onRequestClose={this.closeModal}
@@ -109,17 +105,6 @@ class ModalWrapper extends Component {
                       style={this.props.btnContainerStyle}
                     >
                       <button
-                        type="submit"
-                        className={this.props.btnSaveClassName}
-                        style={this.props.btnSaveStyle}
-                        disabled={this.props.btnSaveDisabled}
-                      >
-                        <Translate
-                          id={this.props.btnSaveText}
-                          defaultMessage={this.props.btnSaveDefaultText}
-                        />
-                      </button>
-                      <button
                         type="button"
                         className={this.props.btnCancelClassName}
                         style={this.props.btnCancelStyle}
@@ -128,6 +113,17 @@ class ModalWrapper extends Component {
                         <Translate
                           id={this.props.btnCancelText}
                           defaultMessage={this.props.btnCancelDefaultText}
+                        />
+                      </button>
+                      <button
+                        type="submit"
+                        className={this.props.btnSaveClassName}
+                        style={this.props.btnSaveStyle}
+                        disabled={this.props.btnSaveDisabled}
+                      >
+                        <Translate
+                          id={this.props.btnSaveText}
+                          defaultMessage={this.props.btnSaveDefaultText}
                         />
                       </button>
                     </div>
