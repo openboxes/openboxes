@@ -1868,7 +1868,7 @@ openboxes.configurationWizard.dataInit = [
         stocklist: [
                 enabled: false, // Items not working
                 templateUrl: "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/stocklistTemplate.csv",
-                itemsUrl: "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/stocklistTemplate.csv",
+                itemsUrl: "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/stocklistItems.csv",
         ],
 ]
 

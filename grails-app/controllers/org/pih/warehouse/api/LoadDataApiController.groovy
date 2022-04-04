@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import org.pih.warehouse.requisition.Requisition
 
 class LoadDataApiController extends BaseDomainApiController {
 
@@ -52,7 +53,7 @@ class LoadDataApiController extends BaseDomainApiController {
             loadDataService.importProductCatalog(new URL(config.productCatalog.url))
         }
 
-        if (config.productSuppliers.enabled) {
+        if (config.productCatalogItems.enabled) {
             loadDataService.importProductCatalogItems(new URL(config.productSuppliers.url))
         }
 
@@ -85,9 +86,14 @@ class LoadDataApiController extends BaseDomainApiController {
         }
 
         if(config.stocklist.enabled) {
-            loadDataService.importStocklist(
-                    new URL(config.stocklist.templateUrl),
-                    new URL(config.stocklist.itemsUrl)
+
+            Requisition requisition = loadDataService.importStocklistTemplate(
+                    new URL(config.stocklist.templateUrl)
+            );
+
+            loadDataService.importStocklistItems(
+                    new URL(config.stocklist.itemsUrl),
+                    requisition
             )
         }
 

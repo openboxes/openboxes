@@ -293,7 +293,7 @@ class LoadDataService {
         csvReader.close();
     }
 
-    Requisition importStocklist(URL csvURL) {
+    Requisition importStocklistTemplate(URL csvURL) {
         CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
 
         List templates = csvReader.readAll();
@@ -335,7 +335,7 @@ class LoadDataService {
                 requestedBy: requestedBy
         )
 
-        requisition.save()
+        requisition.save();
 
         csvReader.close();
 
@@ -349,9 +349,10 @@ class LoadDataService {
             Product product = Product.findByCode(attr["product_code"])
 
             RequisitionItem requisitionItem = new RequisitionItem(
-                product: product,
-                substitutable: false,
-                quantity: Integer.parseInt(attr["quantity"])
+                    requisition: requisition,
+                    product: product,
+                    substitutable: false,
+                    quantity: Integer.parseInt(attr["quantity"])
             );
 
             requisitionItem.save();
