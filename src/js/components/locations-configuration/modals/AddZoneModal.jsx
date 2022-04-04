@@ -48,12 +48,13 @@ class AddZoneModal extends Component {
         formProps={{
           zoneTypes: this.props.zoneTypes,
         }}
-        title="react.locationsConfiguration.addZone.withoutPlus.label"
+        title="react.locationsConfiguration.addZone.label"
         defaultTitleMessage="Add Zone Location"
         btnSaveDefaultText="Save"
         btnOpenClassName="btn btn-outline-primary add-zonebin-btn"
         btnOpenText="react.locationsConfiguration.addZone.label"
-        btnOpenDefaultText="+ Add Zone Location"
+        btnOpenDefaultText="Add Zone Location"
+        btnOpenIcon="fa-plus"
         btnContainerClassName="d-flex justify-content-end"
         btnContainerStyle={{ gap: '3px' }}
         btnSaveClassName="btn btn-primary"

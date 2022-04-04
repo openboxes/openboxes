@@ -78,7 +78,7 @@ class ZoneTable extends Component {
               btnSaveDefaultText="Save"
               btnOpenAsIcon
               btnOpenIcon="fa-pencil"
-              btnOpenClassName="action-icons icon-pointer"
+              btnOpenClassName="action-icons"
               btnContainerClassName="d-flex justify-content-end"
               btnContainerStyle={{ gap: '3px' }}
               btnSaveClassName="btn btn-primary"

@@ -21,6 +21,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.product.ProductAvailability
+import org.springframework.web.multipart.MultipartFile
 
 class LocationApiController extends BaseDomainApiController {
 
@@ -222,6 +223,31 @@ class LocationApiController extends BaseDomainApiController {
         }
 
         locationService.importLocationCsv(command)
+
+        render status: 200
+    }
+
+    def downloadBinLocationTemplate = {
+        def xls = "bin name, zone name\n"
+
+        response.setHeader("Content-disposition", "attachment; filename=\"Bin_Location_template.xls\"")
+        render(contentType: "text/xls", text: xls.toString(), encoding: "UTF-8")
+    }
+
+    def importBinLocations = {
+        try {
+            MultipartFile multipartFile = request.getFile('fileContents')
+            if (multipartFile.empty) {
+                throw new IllegalArgumentException("File cannot be empty")
+            }
+
+            locationService.importBinLocations(params.id, multipartFile.inputStream)
+
+        } catch (Exception e) {
+            response.status = 500
+            render([errorCode: 500, errorMessage: e?.message ?: "An unknown error occurred during import"] as JSON)
+            return
+        }
 
         render status: 200
     }

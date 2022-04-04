@@ -55,6 +55,16 @@ class UrlMappings {
             action = [GET: "supportedActivities"]
         }
 
+        "/api/locations/binLocations/template" {
+            controller = { "locationApi" }
+            action = [GET: "downloadBinLocationTemplate"]
+        }
+
+        "/api/locations/$id/binLocations/import"(parseRequest: true) {
+            controller = { "locationApi" }
+            action = [POST: "importBinLocations"]
+        }
+
         "/api/locations/template" {
             controller = { "locationApi" }
             action = [GET: "downloadTemplate"]

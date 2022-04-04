@@ -11,9 +11,10 @@ import { hideSpinner, showSpinner } from 'actions';
 import CheckboxField from 'components/form-elements/CheckboxField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
-import AddBinModal from 'components/locations-configuration/AddBinModal';
-import AddZoneModal from 'components/locations-configuration/AddZoneModal';
 import BinTable from 'components/locations-configuration/BinTable';
+import AddBinModal from 'components/locations-configuration/modals/AddBinModal';
+import AddZoneModal from 'components/locations-configuration/modals/AddZoneModal';
+import ImportBinModal from 'components/locations-configuration/modals/ImportBinModal';
 import ZoneTable from 'components/locations-configuration/ZoneTable';
 import apiClient from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -137,8 +138,8 @@ class ZoneAndBinLocations extends Component {
     };
     this.updateZoneData = this.updateZoneData.bind(this);
     this.updateBinData = this.updateBinData.bind(this);
-    this.addZoneLocation = this.addZoneLocation.bind(this);
-    this.addBinLocation = this.addBinLocation.bind(this);
+    this.refetchBinTable = this.refetchBinTable.bind(this);
+    this.refetchZoneTable = this.refetchZoneTable.bind(this);
     this.deleteLocation = this.deleteLocation.bind(this);
     this.handleLocationEdit = this.handleLocationEdit.bind(this);
     this.refBinTable = React.createRef();
@@ -200,12 +201,12 @@ class ZoneAndBinLocations extends Component {
     this.refBinTable.current.fireFetchData();
   }
 
-  addZoneLocation() {
-    this.refZoneTable.current.fireFetchData();
+  refetchBinTable() {
+    this.refBinTable.current.fireFetchData();
   }
 
-  addBinLocation() {
-    this.refBinTable.current.fireFetchData();
+  refetchZoneTable() {
+    this.refZoneTable.current.fireFetchData();
   }
 
   deleteLocation(location) {
@@ -222,10 +223,10 @@ class ZoneAndBinLocations extends Component {
             apiClient.delete(`/openboxes/api/locations/${location.id}`)
               .then(() => {
                 if (location.locationType.locationTypeCode === 'ZONE') {
-                  this.refZoneTable.current.fireFetchData();
+                  this.refetchZoneTable();
                   return;
                 }
-                this.refBinTable.current.fireFetchData();
+                this.refetchBinTable();
               })
               .catch(() => {
                 if (location.locationType.locationTypeCode === 'ZONE') {
@@ -293,7 +294,7 @@ class ZoneAndBinLocations extends Component {
                 FIELDS={ZONE_FIELDS}
                 validate={zoneValidate}
                 locationId={this.props.initialValues.locationId}
-                addZoneLocation={this.addZoneLocation}
+                addZoneLocation={this.refetchZoneTable}
                 zoneTypes={this.state.zoneTypes}
               />
             </div>
@@ -326,21 +327,17 @@ class ZoneAndBinLocations extends Component {
                 FIELDS={BIN_FIELDS}
                 validate={binValidate}
                 locationId={this.props.initialValues.locationId}
-                addBinLocation={this.addBinLocation}
+                addBinLocation={this.refetchBinTable}
                 binTypes={this.state.binTypes}
               />
-              <React.Fragment>
-                <button type="button" className="btn-xs btn btn-outline-primary add-zonebin-btn">
-                  <i className="fa fa-download mr-1" aria-hidden="true" />
-                  <Translate id="react.locationsConfiguration.importBinLocations.label" defaultMessage="Import Bin Locations" />
-                </button>
-              </React.Fragment>
-              <React.Fragment>
-                <button type="button" className="btn-xs btn btn-outline-primary add-zonebin-btn">
-                  <i className="fa fa-arrow-up mr-1" aria-hidden="true" />
-                  <Translate id="react.locationsConfiguration.exportBinLocations.label" defaultMessage="Export Bin Locations" />
-                </button>
-              </React.Fragment>
+              <ImportBinModal
+                locationId={this.props.initialValues.locationId}
+                onResponse={this.refetchBinTable}
+              />
+              <button type="button" className="btn-xs btn btn-outline-primary add-zonebin-btn">
+                <i className="fa fa-arrow-up mr-1" aria-hidden="true" />
+                <Translate id="react.locationsConfiguration.exportBinLocations.label" defaultMessage="Export Bin Locations" />
+              </button>
             </div>
             <BinTable
               binData={this.state.binData}

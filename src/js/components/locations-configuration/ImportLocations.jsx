@@ -4,17 +4,15 @@ import axios from 'axios';
 import fileDownload from 'js-file-download';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import Dropzone from 'react-dropzone';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
+import FileDrop from 'components/form-elements/FileDrop';
 import AlertMessage from 'utils/AlertMessage';
 import { handleError, handleSuccess } from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
-
-import 'components/stock-movement-wizard/StockMovement.scss';
 
 const apiClient = axios.create({});
 
@@ -41,12 +39,8 @@ class ImportLocations extends Component {
     this.getSupportLinks();
   }
 
-  onDrop(newFiles) {
-    if (newFiles && newFiles.length) {
-      this.setState({
-        file: newFiles[0],
-      });
-    }
+  onDrop(file) {
+    this.setState({ file });
   }
 
   getSupportLinks() {
@@ -172,25 +166,7 @@ class ImportLocations extends Component {
                   defaultMessage="to read more about location creation."
                 />
               </div>
-              <div className="dropzone-container align-self-stretch mt-3">
-                <Dropzone
-                  onDrop={this.onDrop}
-                  className="dropzone-content"
-                >
-                  <h4 className="mb-5">
-                    <Translate id="react.locationsConfiguration.dragAndDrop.label" defaultMessage="Drag and drop file here." />
-                  </h4>
-                  <button type="button" className="btn btn-dropzone">
-                    <Translate id="react.locationsConfiguration.openDialog.label" defaultMessage="OPEN FILE DIALOG" />
-                  </button>
-                </Dropzone>
-              </div>
-              <div className="align-self-start">
-                <span style={{ color: '#5D9531' }} className="font-weight-bold">
-                  <Translate id="react.locationsConfiguration.acceptedFile.label" defaultMessage="Accepted File" />:&nbsp;
-                </span>
-                {this.state.file ? this.state.file.name : ''}
-              </div>
+              <FileDrop className="my-3" onDrop={this.onDrop} file={this.state.file} />
               <AlertMessage className="mt-2" show={this.state.showAlert} message={this.state.alertMessage} danger />
               <div className="align-self-end mt-5">
                 <button

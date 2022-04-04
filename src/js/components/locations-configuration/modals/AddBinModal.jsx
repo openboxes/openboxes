@@ -48,12 +48,13 @@ class AddBinModal extends Component {
         formProps={{
           binTypes: this.props.binTypes,
         }}
-        title="react.locationsConfiguration.addBin.withoutPlus.label"
+        title="react.locationsConfiguration.addBin.label"
         defaultTitleMessage="Add Bin Location"
         btnSaveDefaultText="Save"
         btnOpenClassName="btn btn-outline-primary add-zonebin-btn"
         btnOpenText="react.locationsConfiguration.addBin.label"
-        btnOpenDefaultText="+ Add Bin Location"
+        btnOpenDefaultText="Add Bin Location"
+        btnOpenIcon="fa-plus"
         btnContainerClassName="d-flex justify-content-end"
         btnContainerStyle={{ gap: '3px' }}
         btnSaveClassName="btn btn-primary"
