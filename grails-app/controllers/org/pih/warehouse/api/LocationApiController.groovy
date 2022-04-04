@@ -155,6 +155,12 @@ class LocationApiController extends BaseDomainApiController {
     Location bindLocationData(Location location, JSONObject jsonObject) {
         bindData(location, jsonObject)
 
+        String logo = jsonObject.logo
+
+        if (logo) {
+            location.logo = logo.decodeBase64()
+        }
+
         if (!location.locationNumber) {
             location.locationNumber = identifierService.generateLocationIdentifier()
         }
