@@ -40,7 +40,9 @@ class ProductAssociationController {
                 'in'("code", selectedTypes)
             }
             or {
-                ilike("id", params.q + "%")
+                if (params.q) {
+                    ilike("id", params.q + "%")
+                }
                 if (products) {
                     or {
                         'in'("product", products)
