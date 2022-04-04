@@ -60,11 +60,6 @@ class UrlMappings {
             action = [GET: "downloadBinLocationTemplate"]
         }
 
-        "/api/locations/$id/binLocations"{
-            controller = { "locationApi" }
-            action = [GET: "showBinLocations"]
-        }
-
         "/api/locations/$id/binLocations/import"(parseRequest: true) {
             controller = { "locationApi" }
             action = [POST: "importBinLocations"]

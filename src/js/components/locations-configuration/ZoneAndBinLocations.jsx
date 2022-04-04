@@ -11,10 +11,10 @@ import { hideSpinner, showSpinner } from 'actions';
 import CheckboxField from 'components/form-elements/CheckboxField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
-import AddBinModal from 'components/locations-configuration/AddBinModal';
-import AddZoneModal from 'components/locations-configuration/AddZoneModal';
 import BinTable from 'components/locations-configuration/BinTable';
-import ImportBinModal from 'components/locations-configuration/ImportBinModal';
+import AddBinModal from 'components/locations-configuration/modals/AddBinModal';
+import AddZoneModal from 'components/locations-configuration/modals/AddZoneModal';
+import ImportBinModal from 'components/locations-configuration/modals/ImportBinModal';
 import ZoneTable from 'components/locations-configuration/ZoneTable';
 import apiClient from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -138,13 +138,12 @@ class ZoneAndBinLocations extends Component {
     };
     this.updateZoneData = this.updateZoneData.bind(this);
     this.updateBinData = this.updateBinData.bind(this);
-    this.addZoneLocation = this.addZoneLocation.bind(this);
-    this.addBinLocation = this.addBinLocation.bind(this);
+    this.refetchBinTable = this.refetchBinTable.bind(this);
+    this.refetchZoneTable = this.refetchZoneTable.bind(this);
     this.deleteLocation = this.deleteLocation.bind(this);
     this.handleLocationEdit = this.handleLocationEdit.bind(this);
     this.refBinTable = React.createRef();
     this.refZoneTable = React.createRef();
-    this.fetchBinLocations = this.fetchBinLocations.bind(this);
   }
 
   componentDidMount() {
@@ -168,19 +167,6 @@ class ZoneAndBinLocations extends Component {
         this.setState({ binTypes, zoneTypes });
       })
       .catch(() => Promise.reject(new Error(this.props.translate('react.locationsConfiguration.error.fetchingBinAndZoneTypes', 'Could not load location types'))));
-  }
-
-  fetchBinLocations() {
-    const url = `/openboxes/api/locations/${this.props.initialValues.locationId}/binLocations`;
-    apiClient.get(url)
-      .then((res) => {
-        this.props.hideSpinner();
-        const { binLocations } = res.data;
-        this.setState({ binData: binLocations });
-      })
-      .catch(() => {
-        this.props.hideSpinner();
-      });
   }
 
   handleLocationEdit(values) {
@@ -215,12 +201,12 @@ class ZoneAndBinLocations extends Component {
     this.refBinTable.current.fireFetchData();
   }
 
-  addZoneLocation() {
-    this.refZoneTable.current.fireFetchData();
+  refetchBinTable() {
+    this.refBinTable.current.fireFetchData();
   }
 
-  addBinLocation() {
-    this.refBinTable.current.fireFetchData();
+  refetchZoneTable() {
+    this.refZoneTable.current.fireFetchData();
   }
 
   deleteLocation(location) {
@@ -237,10 +223,10 @@ class ZoneAndBinLocations extends Component {
             apiClient.delete(`/openboxes/api/locations/${location.id}`)
               .then(() => {
                 if (location.locationType.locationTypeCode === 'ZONE') {
-                  this.refZoneTable.current.fireFetchData();
+                  this.refetchZoneTable();
                   return;
                 }
-                this.refBinTable.current.fireFetchData();
+                this.refetchBinTable();
               })
               .catch(() => {
                 if (location.locationType.locationTypeCode === 'ZONE') {
@@ -308,7 +294,7 @@ class ZoneAndBinLocations extends Component {
                 FIELDS={ZONE_FIELDS}
                 validate={zoneValidate}
                 locationId={this.props.initialValues.locationId}
-                addZoneLocation={this.addZoneLocation}
+                addZoneLocation={this.refetchZoneTable}
                 zoneTypes={this.state.zoneTypes}
               />
             </div>
@@ -341,12 +327,12 @@ class ZoneAndBinLocations extends Component {
                 FIELDS={BIN_FIELDS}
                 validate={binValidate}
                 locationId={this.props.initialValues.locationId}
-                addBinLocation={this.addBinLocation}
+                addBinLocation={this.refetchBinTable}
                 binTypes={this.state.binTypes}
               />
               <ImportBinModal
                 locationId={this.props.initialValues.locationId}
-                onResponse={this.fetchBinLocations}
+                onResponse={this.refetchBinTable}
               />
               <button type="button" className="btn-xs btn btn-outline-primary add-zonebin-btn">
                 <i className="fa fa-arrow-up mr-1" aria-hidden="true" />

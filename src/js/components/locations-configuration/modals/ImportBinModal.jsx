@@ -2,17 +2,15 @@ import React, { Component } from 'react';
 
 import fileDownload from 'js-file-download';
 import PropTypes from 'prop-types';
-import Dropzone from 'react-dropzone';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
+import FileDrop from 'components/form-elements/FileDrop';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
 import apiClient from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
-
-import 'components/stock-movement-wizard/StockMovement.scss';
 
 
 class ImportBinModal extends Component {
@@ -32,13 +30,8 @@ class ImportBinModal extends Component {
     this.getSupportLinks();
   }
 
-  onDrop(newFiles) {
-    if (newFiles && newFiles.length) {
-      this.setState({
-        file: newFiles[0],
-        supportLinks: {},
-      });
-    }
+  onDrop(file) {
+    this.setState({ file });
   }
 
   getSupportLinks() {
@@ -76,7 +69,11 @@ class ImportBinModal extends Component {
     return apiClient.post(url, formData, config)
       .then(() => {
         this.props.hideSpinner();
-        Alert.success(this.props.translate('Bin Location imported successfully', 'Bin Location imported successfully'));
+        Alert.success(this.props.translate(
+          'react.locationsConfiguration.importBinLocations.successMessage.label',
+          'Bin Location imported successfully',
+        ));
+        this.setState({ file: undefined });
         this.props.onResponse();
       })
       .catch(() => {
@@ -105,7 +102,7 @@ class ImportBinModal extends Component {
           <Translate
             id="react.locationsConfiguration.importBinLocations.importInstruction1.label"
           />
-          {' '}
+          &nbsp;
           <a href="#" onClick={this.downloadBinLocationsTemplate}>
             <Translate
               id="react.locationsConfiguration.importBinLocations.here.label"
@@ -118,25 +115,7 @@ class ImportBinModal extends Component {
             data={this.state.supportLinks}
             options={{ renderInnerHtml: true }}
           />
-          <div className="dropzone-container align-self-stretch mt-3">
-            <Dropzone
-              onDrop={this.onDrop}
-              className="dropzone-content"
-            >
-              <h4 className="mb-5">
-                <Translate id="react.productsConfiguration.dragAndDrop.label" defaultMessage="Drag and drop file here." />
-              </h4>
-              <button type="button" className="btn btn-dropzone">
-                <Translate id="react.productsConfiguration.openDialog.label" defaultMessage="OPEN FILE DIALOG" />
-              </button>
-            </Dropzone>
-          </div>
-          <div className="align-self-start">
-            <span style={{ color: '#5D9531' }} className="font-weight-bold">
-              <Translate id="react.productsConfiguration.acceptedFile.label" defaultMessage="Accepted File" />:&nbsp;
-            </span>
-            {this.state.file ? this.state.file.name : ''}
-          </div>
+          <FileDrop className="my-3" onDrop={this.onDrop} file={this.state.file} />
         </div>
       </ModalWrapper>
     );

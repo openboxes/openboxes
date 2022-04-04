@@ -50,8 +50,6 @@ class ModalWrapper extends Component {
           style={this.props.btnOpenStyle}
           disabled={this.props.btnOpenDisabled}
           onClick={() => this.openModal()}
-          onKeyPress={() => this.openModal()}
-          tabIndex={0}
         >
           {
             this.props.btnOpenIcon &&

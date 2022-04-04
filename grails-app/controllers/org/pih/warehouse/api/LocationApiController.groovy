@@ -234,22 +234,6 @@ class LocationApiController extends BaseDomainApiController {
         render(contentType: "text/xls", text: xls.toString(), encoding: "UTF-8")
     }
 
-    def showBinLocations = {
-
-        def locationInstance = Location.get(params.id)
-        if (!locationInstance) {
-            throw new IllegalArgumentException('default.not.found.message')
-        } else {
-            def binLocations
-            if (locationInstance.isZoneLocation()) {
-                binLocations = Location.findAllByZone(locationInstance)
-            } else {
-                binLocations = locationService.getBinLocations(locationInstance)
-            }
-            render([locationInstance: locationInstance, binLocations: binLocations] as JSON)
-        }
-    }
-
     def importBinLocations = {
         try {
             MultipartFile multipartFile = request.getFile('fileContents')

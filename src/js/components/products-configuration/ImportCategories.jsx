@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 
 import fileDownload from 'js-file-download';
 import PropTypes from 'prop-types';
-import Dropzone from 'react-dropzone';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
+import FileDrop from 'components/form-elements/FileDrop';
 import apiClient from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -20,12 +20,8 @@ class ImportCategories extends Component {
     this.onDrop = this.onDrop.bind(this);
   }
 
-  onDrop(newFiles) {
-    if (newFiles && newFiles.length) {
-      this.setState({
-        file: newFiles[0],
-      });
-    }
+  onDrop(file) {
+    this.setState({ file });
   }
 
   importCategory() {
@@ -76,25 +72,7 @@ class ImportCategories extends Component {
             <Translate id="react.productsConfiguration.here.label" defaultMessage="here" />
           </a>
         </div>
-        <div className="dropzone-container align-self-stretch mt-3">
-          <Dropzone
-            onDrop={this.onDrop}
-            className="dropzone-content"
-          >
-            <h4 className="mb-5">
-              <Translate id="react.productsConfiguration.dragAndDrop.label" defaultMessage="Drag and drop file here." />
-            </h4>
-            <button type="button" className="btn btn-dropzone">
-              <Translate id="react.productsConfiguration.openDialog.label" defaultMessage="OPEN FILE DIALOG" />
-            </button>
-          </Dropzone>
-        </div>
-        <div className="align-self-start">
-          <span style={{ color: '#5D9531' }} className="font-weight-bold">
-            <Translate id="react.productsConfiguration.acceptedFile.label" defaultMessage="Accepted File" />:&nbsp;
-          </span>
-          {this.state.file ? this.state.file.name : ''}
-        </div>
+        <FileDrop className="my-3" onDrop={this.onDrop} file={this.state.file} />
         <div className="align-self-end mt-5">
           <button
             type="button"
