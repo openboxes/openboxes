@@ -231,7 +231,8 @@ class Product implements Comparable, Serializable {
 
     String color
 
-    static transients = ["rootCategory",
+    static transients = ["associations",
+                         "rootCategory",
                          "categoriesList",
                          "images",
                          "genericProduct",
@@ -374,6 +375,9 @@ class Product implements Comparable, Serializable {
         return productGroups ? productGroups?.sort()?.first() : null
     }
 
+    List<ProductAssociation> getAssociations() {
+        return ProductAssociation.findAllByProduct(this)
+    }
 
     List<ProductAssociation> getSubstitutions() {
         return ProductAssociation.findAllByProductAndCode(this, ProductAssociationTypeCode.SUBSTITUTE)
@@ -393,11 +397,19 @@ class Product implements Comparable, Serializable {
     }
 
     /**
-     * Get products related to this product through all product groups.
+     * Get substitution products for this product.
      * @return
      */
     Set<Product> alternativeProducts() {
         return substitutions*.associatedProduct
+    }
+
+    /**
+     * Get all associated products for this product.
+     * @return
+     */
+    Set<Product> associatedProducts() {
+        return associations*.associatedProduct
     }
 
     /**
