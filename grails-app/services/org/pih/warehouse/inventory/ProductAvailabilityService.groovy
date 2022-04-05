@@ -477,7 +477,7 @@ class ProductAvailabilityService {
         def quantityMap = [:]
         if (location) {
             def results = ProductAvailability.executeQuery("""
-						select pa.product, sum(case when pa.quantityAvailableToPromise > 0 then pa.quantityAvailableToPromise else 0 end)
+						select pa.product.id, sum(case when pa.quantityAvailableToPromise > 0 then pa.quantityAvailableToPromise else 0 end)
 						from ProductAvailability pa
 						where pa.location = :location
 						and pa.product in (:products)
@@ -490,10 +490,10 @@ class ProductAvailabilityService {
         }
 
         if (products.size() != quantityMap.size()) {
-            def missingProducts = products - quantityMap.keySet()
-            missingProducts.each { Product product ->
-                if (!quantityMap[product]) {
-                    quantityMap[product] = 0
+            def missingProducts = products*.id - quantityMap.keySet()
+            missingProducts.each { productId ->
+                if (!quantityMap[productId]) {
+                    quantityMap[productId] = 0
                 }
             }
         }

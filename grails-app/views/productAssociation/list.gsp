@@ -124,7 +124,7 @@
                                 </tbody>
                             </table>
                             <div class="paginateButtons">
-                                <g:paginate total="${productAssociationInstanceTotal}" />
+                                <g:paginate total="${productAssociationInstanceTotal}" params="${params}" />
                             </div>
                         </div>
 

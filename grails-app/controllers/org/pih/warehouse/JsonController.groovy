@@ -1061,7 +1061,7 @@ class JsonController {
         items.addAll(products)
         items.unique { it.id }
         def json = items.collect { Product product ->
-            def quantity = quantityMap[product] ?: 0
+            def quantity = quantityMap[product.id] ?: 0
 
             if (product.productType) {
                 if (!product.productType.supportedActivities?.contains(ProductActivityCode.SEARCHABLE)) {

@@ -1,8 +1,11 @@
 <div class="box">
-    <h2><warehouse:message code="product.substitutions.label"/></h2>
+    <h2><warehouse:message code="product.associations.label"/></h2>
     <table >
         <thead>
             <tr class="odd">
+                <th class="center middle" >
+                    <warehouse:message code="default.type.label"/>
+                </th>
                 <th>
                     <warehouse:message code="product.productCode.label"/>
                 </th>
@@ -14,21 +17,25 @@
                 </th>
             </tr>
         </thead>
+
         <tbody>
-            <g:if test="${quantityAvailableMap}">
-                <g:each var="entrySet" in="${quantityAvailableMap}" status="status">
-                    <g:set var="product" value="${entrySet.key}"/>
-                    <g:set var="quantityAvailable" value="${entrySet.value}"/>
+            <g:if test="${associations}">
+                <g:each var="association" in="${associations}" status="status">
+                    <g:set var="associatedProduct" value="${association.associatedProduct}"/>
+                    <g:set var="quantityAvailable" value="${quantityAvailableMap[associatedProduct?.id] ?: 0}"/>
                     <tr class="${(status%2)?'odd':'even'}">
-                        <td>${product?.productCode}</td>
+                        <td class="center">
+                            ${association.code}
+                        </td>
+                        <td>${associatedProduct?.productCode}</td>
                         <td>
-                            <g:link controller="inventoryItem" action="showStockCard" id="${product.id}" fragment="ui-tabs-1">
-                                ${product?.name}
+                            <g:link controller="inventoryItem" action="showStockCard" id="${associatedProduct.id}" fragment="ui-tabs-1">
+                                ${associatedProduct?.name}
                             </g:link>
                         </td>
                         <td class="center">
-                            ${quantityAvailable}
-                            ${product.unitOfMeasure}
+                            ${g.formatNumber(number: quantityAvailable, format: '###,###,###') }
+                            ${associatedProduct.unitOfMeasure}
                         </td>
                     </tr>
                 </g:each>
@@ -38,7 +45,7 @@
                     <td colspan="8">
                         <div class="fade empty center">
                             <div>
-                                <g:message code="default.empty.message" default="There are no {0}" args="[g.message(code:'product.substitutions.label')]"/>
+                                <g:message code="default.empty.message" default="There are no {0}" args="[g.message(code:'product.associations.label')]"/>
                             </div>
                         </div>
                     </td>
@@ -47,7 +54,7 @@
         </tbody>
         <tfoot>
             <tr class="odd" style="border-top: 1px solid lightgrey; border-bottom: 0px solid lightgrey">
-                <td colspan="2" class="left">
+                <td colspan="3" class="left">
                 </td>
                 <td class="center">
                     <span style="font-size: 1em;">
