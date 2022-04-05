@@ -1039,3 +1039,13 @@ div.crossed-out .table-inner-row:before {
     }
   }
 }
+
+.file-field {
+  height: 3em;
+  display: flex;
+  align-items: center;
+
+  input[type=file] {
+    width: 0;
+  }
+}

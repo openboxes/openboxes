@@ -9,12 +9,15 @@ import Alert from 'react-s-alert';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
 import CheckboxField from 'components/form-elements/CheckboxField';
+import ColorPickerField from 'components/form-elements/ColorPickerField';
+import FileField from 'components/form-elements/FileField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import AddLocationGroupModal from 'components/locations-configuration/modals/AddLocationGroupModal';
 import AddOrganizationModal from 'components/locations-configuration/modals/AddOrganizationModal';
 import apiClient from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
+import { convertToBase64 } from 'utils/file-utils';
 import { renderFormField } from 'utils/form-utils';
 import { debounceLocationGroupsFetch, debounceOrganizationsFetch, debounceUsersFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -138,6 +141,36 @@ const FIELDS = {
     getDynamicAttr: ({ debouncedUsersFetch }) => ({
       loadOptions: debouncedUsersFetch,
     }),
+  },
+};
+
+const STYLE_FIELDS = {
+  logoFile: {
+    type: FileField,
+    label: 'react.locationsConfiguration.locationLogo.label',
+    defaultMessage: 'Upload Logo',
+    attributes: {
+      withTooltip: true,
+      tooltip: 'react.locationsConfiguration.locationLogo.tooltip.label',
+    },
+  },
+  bgColor: {
+    type: ColorPickerField,
+    label: 'react.locationsConfiguration.backgroundColor.label',
+    defaultMessage: 'Background color',
+    attributes: {
+      withTooltip: true,
+      tooltip: 'react.locationsConfiguration.color.tooltip.label',
+    },
+  },
+  fgColor: {
+    type: ColorPickerField,
+    label: 'react.locationsConfiguration.foregroundColor.label',
+    defaultMessage: 'Foreground color',
+    attributes: {
+      withTooltip: true,
+      tooltip: 'react.locationsConfiguration.color.tooltip.label',
+    },
   },
 };
 
@@ -276,6 +309,9 @@ class LocationDetails extends Component {
         'manager.id': _.get(values.manager, 'id') || '',
         'locationType.id': _.get(values.locationType, 'id') || '',
         supportedActivities: _.map(values.supportedActivities, val => val.value),
+        logo: values.logo,
+        bgColor: values.bgColor,
+        fgColor: values.fgColor,
       };
 
       apiClient.post(locationUrl, payload)
@@ -295,11 +331,22 @@ class LocationDetails extends Component {
           this.props.hideSpinner();
           return Promise.reject(new Error(this.props.translate('react.stockMovement.error.createStockMovement.label', 'Could not create location')));
         });
+    } else {
+      this.props.hideSpinner();
     }
   }
 
   nextPage(values) {
-    this.saveLocationDetails(values);
+    if (values.logoFile) {
+      this.props.showSpinner();
+
+      convertToBase64(values.logoFile)
+        .then((logo) => {
+          this.saveLocationDetails({ ...values, logo });
+        });
+    } else {
+      this.saveLocationDetails(values);
+    }
   }
 
   render() {
@@ -441,6 +488,15 @@ class LocationDetails extends Component {
                       useDefaultActivities={this.state.useDefaultActivities}
                     />
                   </div>
+
+                  <div className="form-title"><Translate id="react.locationsConfiguration.style.label" defaultMessage="Style" /></div>
+                  <div className="form-subtitle"><Translate id="react.locationsConfiguration.styleDescription.label" defaultMessage="Set a custom logo and color scheme. For depot locations only." /></div>
+
+                  {_.map(
+                    STYLE_FIELDS,
+                    (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName),
+                  )}
+
                 </div>
                 <div className="submit-buttons">
                   <button
