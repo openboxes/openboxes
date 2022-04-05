@@ -37,10 +37,9 @@ class Header extends Component {
       });
   }
 
-  render() {
-    let helpScoutBeacon = <div />;
+  addHelpScoutBeaconIfEnabled() {
     if (this.props.isHelpScoutEnabled) {
-      helpScoutBeacon = (
+      return (
         <LiveChatLoaderProvider provider="helpScout" providerKey={this.props.helpScoutKey}>
           <HelpScout
             color={this.props.helpScoutColor}
@@ -53,6 +52,10 @@ class Header extends Component {
       );
     }
 
+    return null;
+  }
+
+  render() {
     return (
       <div className="w-100">
         {this.props.isImpersonated ?
@@ -88,7 +91,7 @@ class Header extends Component {
             <LocationChooser />
           </div>
         </div>
-        {helpScoutBeacon}
+        {this.addHelpScoutBeaconIfEnabled()}
       </div>
     );
   }
@@ -111,7 +114,7 @@ Header.propTypes = {
   helpScoutColor: PropTypes.string,
   helpScoutKey: PropTypes.string,
   highestRole: PropTypes.string.isRequired,
-  isHelpScoutEnabled: PropTypes.string,
+  isHelpScoutEnabled: PropTypes.bool,
   isImpersonated: PropTypes.bool.isRequired,
   logoLabel: PropTypes.string.isRequired,
   logoUrl: PropTypes.string.isRequired,
