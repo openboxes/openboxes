@@ -1179,8 +1179,9 @@ openboxes.zopim.widget.enabled = false
 openboxes.zopim.widget.url = "//v2.zopim.com/?2T7RMi7ERqr3s8N20KQ3wOBRudcwosBA"
 
 // HelpScout beacon
+openboxes.helpscout.widget.color = "#ff9800"
 openboxes.helpscout.widget.enabled = true
-openboxes.helpscout.widget.uuid = "5eafcb3f-9e7e-4943-8ebb-669f60a696cd"
+openboxes.helpscout.widget.key = "5eafcb3f-9e7e-4943-8ebb-669f60a696cd"
 
 // JIRA Issue Collector
 openboxes.jira.issue.collector.enabled = false

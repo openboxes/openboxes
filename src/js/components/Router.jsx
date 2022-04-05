@@ -1,6 +1,7 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
+import { HelpScout, LiveChatLoaderProvider } from 'react-live-chat-loader';
 import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
@@ -111,6 +112,24 @@ const AsyncLoadDataPage = Loadable({
   loading: Loading,
 });
 
+function displayHelpScoutBeacon(key, color, isEnabled) {
+  if (isEnabled) {
+    return (
+      <LiveChatLoaderProvider provider="helpScout" providerKey={key}>
+        <HelpScout
+          color={color}
+          horizontalPosition="right"
+          icon="question"
+          idlePeriod="0"
+          zIndex="1050"
+        />
+      </LiveChatLoaderProvider>
+    );
+  }
+
+  return null;
+}
+
 const Router = props => (
   <div>
     <BrowserRouter>
@@ -140,6 +159,7 @@ const Router = props => (
         <MainLayoutRoute path="/**/" component={AsyncDashboard} />
       </Switch>
     </BrowserRouter>
+    {displayHelpScoutBeacon(props.helpScoutKey, props.helpScoutColor, props.isHelpScoutEnabled)}
     <div className="spinner-container">
       <ClimbingBoxLoader
         color="#0c769e"
@@ -159,11 +179,23 @@ const Router = props => (
 );
 
 const mapStateToProps = state => ({
+  helpScoutColor: state.session.helpScoutColor,
+  helpScoutKey: state.session.helpScoutKey,
+  isHelpScoutEnabled: state.session.isHelpScoutEnabled,
   spinner: state.spinner.show,
 });
 
 export default connect(mapStateToProps, {})(Router);
 
 Router.propTypes = {
+  helpScoutColor: PropTypes.string,
+  helpScoutKey: PropTypes.string,
+  isHelpScoutEnabled: PropTypes.bool,
   spinner: PropTypes.bool.isRequired,
+};
+
+Router.defaultProps = {
+  helpScoutColor: '',
+  helpScoutKey: '',
+  isHelpScoutEnabled: false,
 };
