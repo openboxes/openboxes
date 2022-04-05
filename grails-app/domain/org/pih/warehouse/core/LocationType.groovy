@@ -13,20 +13,25 @@ package org.pih.warehouse.core
 import io.swagger.v3.oas.annotations.Hidden
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(description="Identifies the type of a given Location instance (depot, supplier, etc.).")
+@Schema(description = "the type of a given Location instance (depot, supplier, etc.)")
 class LocationType implements Comparable, Serializable {
 
-    @Schema(description="database identifier, may be uuid or numeric string", format="uuid", readOnly=true, required=true)
+    @Schema(
+        accessMode = Schema.AccessMode.READ_ONLY,
+        description = "database identifier, may be uuid or numeric string",
+        format = "uuid",
+        required = true
+    )
     String id
 
-    @Schema(maxLength=255, required=true)
+    @Schema(maxLength = 255, required = true)
     String name
 
-    @Schema(maxLength=255, nullable=true)
+    @Schema(maxLength = 255, nullable = true)
     String description
 
     @Hidden
-    @Schema(nullable=true)
+    @Schema(nullable = true)
     Integer sortOrder = 0
 
     @Hidden
@@ -34,7 +39,7 @@ class LocationType implements Comparable, Serializable {
     @Hidden
     Date lastUpdated
 
-    @Schema(nullable=true)
+    @Schema(nullable = true)
     LocationTypeCode locationTypeCode
 
     static hasMany = [supportedActivities: String]

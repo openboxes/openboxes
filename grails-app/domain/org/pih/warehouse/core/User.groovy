@@ -9,66 +9,71 @@
  * */
 package org.pih.warehouse.core
 
-import grails.util.Holders
-import util.StringUtil
 import grails.converters.JSON
+import grails.util.Holders
 import io.swagger.v3.oas.annotations.Hidden
 import io.swagger.v3.oas.annotations.media.Schema
+import util.StringUtil
 
 class User extends Person {
 
-    @Schema(description="database identifier, may be uuid or numeric string", format="uuid", readOnly=true, required=true)
+    @Schema(
+        accessMode = Schema.AccessMode.READ_ONLY,
+        description = "database identifier, may be uuid or numeric string",
+        format = "uuid",
+        required = true
+    )
     String id // FIXME this field shadows User.id
 
     @Hidden
-    @Schema(nullable=true)
+    @Schema(nullable = true)
     Boolean active = false
 
-    @Schema(description="username, may be email address", format="email", maxLength=255)
+    @Schema(description = "username, may be email address", format = "email", maxLength = 255)
     String username
 
     @Hidden
-    @Schema(description="encrypted password", format="password", minLength=6, maxLength=255)
+    @Schema(description = "encrypted password", format = "password", minLength = 6, maxLength = 255)
     String password
 
     @Hidden
-    @Schema(description="password confirm used on signup and password reset", format="password")
+    @Schema(description = "password confirm used on signup and password reset", format = "password")
     String passwordConfirm
 
     @Hidden
-    @Schema(description="the user's locale", nullable=true)
+    @Schema(description = "the user's locale", nullable = true)
     Locale locale
 
     @Hidden
-    @Schema(description="the user's time zone", nullable=true)
+    @Schema(description = "the user's time zone", nullable = true)
     String timezone
 
     @Hidden
-    @Schema(description="keep track of the user's last login", nullable=true)
+    @Schema(description = "keep track of the user's last login", nullable = true)
     Date lastLoginDate
 
     @Hidden
-    @Schema(description="keep track of the user's last warehouse", nullable=true)
+    @Schema(description = "keep track of the user's last warehouse", nullable = true)
     Location warehouse
 
     //Boolean useSavedLocation		// indicates whether we should use this warehouse when user logs in
 
     @Hidden
-    @Schema(description="the user's designated manager", nullable=true)
+    @Schema(description = "the user's designated manager", nullable = true)
     User manager
 
     @Hidden
-    @Schema(description="indicates whether user would like for the system to remember from where they last logged in", nullable=true)
+    @Schema(description = "indicates whether user would like for the system to remember from where they last logged in", nullable = true)
     Boolean rememberLastLocation
 
     @Hidden
-    @Schema(description="profile photo", maxLength=10485760, nullable=true)
+    @Schema(description = "profile photo", maxLength = 10485760, nullable = true)
     byte[] photo
 
     List locationRoles
 
     @Hidden
-    @Schema(nullable=true)
+    @Schema(nullable = true)
     String dashboardConfig
 
     static hasMany = [roles: Role, locationRoles: LocationRole]

@@ -10,27 +10,42 @@
 package org.pih.warehouse.core
 
 import grails.util.Holders
-import util.StringUtil
 import io.swagger.v3.oas.annotations.Hidden
 import io.swagger.v3.oas.annotations.media.Schema
+import util.StringUtil
 
 class Person implements Comparable, Serializable {
 
-    @Schema(description="database identifier, may be uuid or numeric string", format="uuid", readOnly=true, required=true)
+    @Schema(
+        accessMode = Schema.AccessMode.READ_ONLY,
+        description = "database identifier, may be uuid or numeric string",
+        format = "uuid",
+        required = true
+    )
     String id
 
-    @Schema(description="given name or forename", maxLength=255, required=true)
+    @Schema(
+        description = "given name or forename",
+        maxLength = 255,
+        required = true
+    )
     String firstName
 
-    @Schema(description="surname or family name", maxLength=255, required=true)
+    @Schema(
+        description = "surname or family name",
+        maxLength = 255,
+        required = true
+    )
     String lastName
 
-    @Schema(description="email address", format="email", maxLength=255, nullable=true)
+    @Schema(description = "email address", format = "email", maxLength = 255, nullable = true)
     String email
 
+    // FIXME validate phone numbers properly, cf. https://www.twilio.com/docs/glossary/what-e164
     @Hidden
-    @Schema(maxLength=255, nullable=true, pattern="^[0-9()+-]+\$")  // FIXME https://www.twilio.com/docs/glossary/what-e164
+    @Schema(maxLength = 255, nullable = true, pattern = "^[0-9()+-]+\$")
     String phoneNumber
+
     @Hidden
     Date dateCreated
     @Hidden
@@ -71,7 +86,7 @@ class Person implements Comparable, Serializable {
         return "${name}"
     }
 
-    @Schema(description="full personal name", readOnly=true)
+    @Schema(description = "full personal name", readOnly = true)
     String getName() {
         Boolean anonymize = Holders.config.getProperty("openboxes.anonymize.enabled", Boolean.class, Boolean.FALSE)
         return "$firstName ${anonymize ? lastInitial : lastName}"

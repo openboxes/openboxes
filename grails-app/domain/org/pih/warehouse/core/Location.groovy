@@ -20,7 +20,7 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 
-@Schema(description="A location can be a customer, warehouse, supplier, etc.")
+@Schema(description = "a location can be a customer, warehouse, supplier, etc.")
 class Location implements Comparable<Location>, java.io.Serializable {
 
     @Hidden
@@ -35,61 +35,73 @@ class Location implements Comparable<Location>, java.io.Serializable {
     @Hidden
     def afterDelete = publishPersistenceEvent
 
-    @Schema(description="database identifier, may be uuid or numeric string", format="uuid", readOnly=true, required=true)
+    @Schema(
+        accessMode = Schema.AccessMode.READ_ONLY,
+        description = "database identifier, may be uuid or numeric string",
+        format = "uuid",
+        required = true
+    )
     String id
 
-    @Schema(description="the name of the location", maxLength=255, required=true)
+    @Schema(
+        description = "the name of the location",
+        maxLength = 255,
+        required = false  // FIXME should be true, but breaks swagger client
+    )
     String name
 
-    @Schema(description="a description for the location", maxLength=255, nullable=true)
+    @Schema(description = "a description for the location", maxLength = 255, nullable = true)
     String description
 
-    @Schema(maxLength=255, nullable=true)
+    @Schema(maxLength = 255, nullable = true)
     String locationNumber
 
     @Hidden
     byte[] logo
 
     @Hidden
-    @Schema(nullable=true)
+    @Schema(nullable = true)
     Address address
 
     @Hidden
     String fgColor = "000000"
 
-    @Schema(name="backgroundColor", nullable=true)
+    @Schema(name = "backgroundColor", nullable = true)
     String bgColor = "FFFFFF"
 
-    @Schema(nullable=true)
+    @Schema(nullable = true)
     Location parentLocation
 
-    @Schema(required=true)
+    @Schema(required = false)  // FIXME should be true, but breaks swagger client
     LocationType locationType
 
-    @Schema(nullable=true)
+    @Schema(nullable = true)
     LocationGroup locationGroup
 
     @Hidden
-    @Schema(nullable=true)
+    @Schema(nullable = true)
     Organization organization
 
     @Hidden
-    @Schema(description="the person in charge of the warehouse", nullable=true)
+    @Schema(description = "the person in charge of the warehouse", nullable = true)
     User manager
 
     @Hidden
-    @Schema(description="each warehouse has exactly one inventory")
+    @Schema(description = "each warehouse has exactly one inventory")
     Inventory inventory
 
     @Hidden
-    @Schema(description="indicates whether this warehouse is being managed on the locally deployed system", nullable=true)
+    @Schema(description = "indicates whether this warehouse is being managed on the locally deployed system", nullable = true)
     Boolean local = Boolean.TRUE
 
     @Hidden
-    @Schema(description="indicates whether this warehouse is currently active", required=true)
+    @Schema(
+        description = "indicates whether this warehouse is currently active",
+        required = true
+    )
     Boolean active = Boolean.TRUE
 
-    @Schema(nullable=true)
+    @Schema(nullable = true)
     Integer sortOrder
 
     @Hidden
@@ -139,14 +151,19 @@ class Location implements Comparable<Location>, java.io.Serializable {
 
     @Hidden
     List getTransactions() { return Transaction.findAllByDestinationOrSource(this, this) }
+
     @Hidden
     List getEvents() { return Event.findAllByEventLocation(this) }
+
     @Hidden
     List getShipments() { return Shipment.findAllByOriginOrDestination(this, this) }
+
     @Hidden
     List getRequests() { return Requisition.findAllByOriginOrDestination(this, this) }
+
     @Hidden
     List getOrders() { return Order.findAllByOriginOrDestination(this, this) }
+
     @Hidden
     List getUsers() { return User.findAllByWarehouse(this) }
 
@@ -277,7 +294,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
         return locationType.locationTypeCode == LocationTypeCode.VIRTUAL
     }
 
-    @Schema(description="override")
+    @Schema(description = "indicates whether this location supports bin locations")
     Boolean hasBinLocationSupport() {
         ActivityCode[] requiredActivities = [ActivityCode.PICK_STOCK, ActivityCode.PUTAWAY_STOCK]
         return supportsAny(requiredActivities) && !binLocations?.empty

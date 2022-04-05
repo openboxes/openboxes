@@ -31,8 +31,8 @@ import javax.ws.rs.GET
 import javax.ws.rs.Path
 import javax.ws.rs.Produces
 
-@SecurityRequirement(name="cookie")
-@Tag(name="Location", description="API for locations")
+@SecurityRequirement(name = "cookie")
+@Tag(name = "Location", description = "API for locations")
 @Transactional
 class LocationApiController extends BaseDomainApiController {
 
@@ -40,37 +40,40 @@ class LocationApiController extends BaseDomainApiController {
     def userService
     GrailsApplication grailsApplication
 
+    class ListResponse
+    {
+        List<Location> data
+    }
+
     @GET
     @Operation(
-            summary = "Get a list of locations",
-            description = """\
+        summary = "get a list of locations",
+        description = """\
 ## Warning!
 
-Do _not_ use Swagger's "Try it out" feature on this entry point without setting `locationTypeCode`!
+Do _not_ use Swagger UI's "Try it out" feature on this entry point without setting `locationTypeCode`!
 
 OpenBoxes tracks a large number of locations; the full list can
 [make this page unresponsive](https://github.com/swagger-api/swagger-ui/issues/3832).""",
-            parameters = [
-                    @Parameter(
-                            description = "optionally restrict the search to a particular type of location",
-                            in = ParameterIn.QUERY,
-                            name = "locationTypeCode",
-                            schema = @Schema(implementation=LocationTypeCode)
-                    )
-            ]
+        operationId = "list_locations",
+        parameters = [
+            @Parameter(
+                description = "optionally restrict the search to a particular type of location",
+                in = ParameterIn.QUERY,
+                name = "locationTypeCode",
+                schema = @Schema(implementation = LocationTypeCode)
+            )
+        ]
     )
     @ApiResponse(
-            content = @Content(
-                    array = @ArraySchema(
-                            schema = @Schema(implementation=Location),
-                            uniqueItems = true
-                    ),
-                    mediaType = "application/json"
-            ),
-            responseCode="200"
+        content = @Content(
+            schema = @Schema(implementation = ListResponse)
+        ),
+        description = "a list of locations",
+        responseCode = "200"
     )
     @Path("/api/locations")
-    @Produces("text/json")
+    @Produces("application/json")
     def list() {
         def minLength = grailsApplication.config.openboxes.typeahead.minLength
         if (params.name && params.name.size() < minLength) {

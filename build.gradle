@@ -11,7 +11,6 @@
 buildscript {
     repositories {
         mavenCentral()
-        maven { url "https://repo.grails.org/grails/core/" }
     }
     dependencies {
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:${assetPipelineVersion}"
@@ -28,12 +27,24 @@ plugins {
     id "com.gorylenko.gradle-git-properties" version "2.2.0"
     id "com.moowork.node" version "1.2.0"
     id "com.virgo47.ClasspathJar" version "1.0.0"
+    // versions 2.19.x seem to require Java 11 or 17
+    id "org.hidetake.swagger.generator" version "2.18.2"
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+        maven { url "https://plugins.gradle.org/m2/" }
+        maven { url "https://repo.grails.org/grails/core" }
+        // needed only for barcode4j
+        maven { url "https://repo.grails.org/grails/plugins" }
+    }
 }
 
 apply plugin: "com.bertramlabs.asset-pipeline"
 apply plugin: "io.swagger.core.v3.swagger-gradle-plugin"
-apply plugin: "org.grails.grails-web"
 apply plugin: "org.grails.grails-gsp"
+apply plugin: "org.grails.grails-web"
 
 version "0.9.0-SNAPSHOT"  // FIXME get this from git
 group "com.openboxes"
@@ -50,12 +61,6 @@ node {
     download = true
 }
 
-repositories {
-    mavenCentral()
-    maven { url "https://repo.grails.org/grails/core" }
-    maven { url "https://repo.grails.org/grails/plugins" }
-}
-
 dependencies {
     compile "org.springframework.boot:spring-boot-starter-logging"
     compile "org.springframework.boot:spring-boot-autoconfigure"
@@ -67,6 +72,7 @@ dependencies {
     implementation "io.swagger.core.v3:swagger-annotations:${swaggerCoreVersion}"
     implementation "io.swagger.core.v3:swagger-core:${swaggerCoreVersion}"
     compile "io.swagger.core.v3:swagger-models:${swaggerCoreVersion}"
+    swaggerCodegen "io.swagger.codegen.v3:swagger-codegen-cli:3.0.33"
 
     compile "org.grails:grails-web-boot"
     compile "org.grails:grails-logging"
@@ -331,12 +337,17 @@ task prepareDocker(type: Copy, dependsOn: assemble) {
     into dockerBuildDir
 }
 
-// "resolve" is swagger-gradle-plugin's funky name for "build swagger docs"
+/*
+ * First step in making swagger docs: the `swaggerDocs` target is more useful.
+ *
+ * "resolve" is swagger-gradle-plugin's unusual name for "build swagger docs",
+ * but it needs some post-processing to render cleanly in the Swagger UI.
+ */
 resolve {
     classpath = sourceSets.main.runtimeClasspath
     filterClass = "org.pih.warehouse.api.SwaggerFilter"
-    openApiFile = file("${project.projectDir}/grails-app/conf/openapi_static.yml")
-    outputDir = file("${project.projectDir}/build/openapi")
+    openApiFile = file("${project.projectDir}/swagger/docs_preamble.yml")
+    outputDir = file("${buildDir}/swagger/docs")
     outputFileName = "openboxes_api"
     outputFormat = "JSONANDYAML"
     prettyPrint = true
@@ -346,6 +357,7 @@ resolve {
      * FIXME but that option doesn't seem to find any annotations.
      */
     resourceClasses = [
+        "org.pih.warehouse.api.ApiController",
         "org.pih.warehouse.api.LocationApiController",
         "org.pih.warehouse.api.PersonApiController",
         "org.pih.warehouse.api.ProductApiController",
@@ -356,14 +368,15 @@ resolve {
 }
 
 /*
- * Post-process swagger output so it's easier to navigate via Swagger UI.
+ * Generate a complete set of API docs suitable for end-users.
  *
+ * This task tweaks `resolve` output so it's easier to view in Swagger UI.
  * When resolve.sortOutput is true, *all* keys are sorted in Swagger yaml.
  * In general, we want to expose domain fields in declaration order,
  * although alphabetizing domains and paths (API endpoints) makes sense.
  * Swagger doesn't offer fine-grained sort options, but yq certainly does.
  */
-task swaggerCleanup(dependsOn: resolve, type: Exec) {
+task swaggerDocs(dependsOn: resolve, type: Exec) {
     commandLine(
         "yq",
         "-i",
@@ -371,10 +384,13 @@ task swaggerCleanup(dependsOn: resolve, type: Exec) {
         ".components.schemas |= sort_keys(.) | .paths |= sort_keys(.)",
         "openboxes_api.yaml"
     )
-    workingDir file("${project.projectDir}/build/openapi")
+    workingDir file("${buildDir}/swagger/docs")
 }
 
-task swaggerhubUpdate(dependsOn: swaggerCleanup, type: Exec) {
+/*
+ * Upload a complete set of swagger docs to SwaggerHub, a free service.
+ */
+task uploadSwaggerDocs(dependsOn: swaggerDocs, type: Exec) {
     commandLine(
             "${project.projectDir}/node_modules/.bin/swaggerhub",
             "api:update",
@@ -384,5 +400,51 @@ task swaggerhubUpdate(dependsOn: swaggerCleanup, type: Exec) {
             "--visibility=public"
     )
     environment("SWAGGERHUB_API_KEY", secrets["swaggerhub_api_key"])
-    workingDir file("${project.projectDir}/build/openapi")
+    workingDir file("${buildDir}/swagger/docs")
 }
+
+/*
+ * Configure org.hidetake.swagger.generator to build REST clients.
+ *
+ * Run `grails gradle generateSwaggerCode${language}Help` for more details.
+ */
+swaggerSources {
+    java {
+        code {
+            configFile = file("${project.projectDir}/swagger/client_config-java.json")
+            // dependsOn validation  // this checks against v2, not the v3 we use :-(
+            language = "java"
+            outputDir = file("${buildDir}/swagger/clients/java")
+        }
+        inputFile = file("${buildDir}/swagger/docs/openboxes_api.json")
+    }
+    python {
+        code {
+            configFile = file("${project.projectDir}/swagger/client_config-python.json")
+            // dependsOn validation  // this checks against v2, not the v3 we use :-(
+            language = "python"
+            outputDir = file("${buildDir}/swagger/clients/python")
+        }
+        inputFile = file("${buildDir}/swagger/docs/openboxes_api.json")
+    }
+}
+
+// make sure swagger docs are up-to-date before building any REST client
+generateSwaggerCode.mustRunAfter swaggerDocs
+generateSwaggerCodeJava.mustRunAfter swaggerDocs
+generateSwaggerCodePython.mustRunAfter swaggerDocs
+
+/*
+ * Generate all REST clients.
+ */
+task swaggerClients(dependsOn: [
+    swaggerDocs,
+    generateSwaggerCode,
+    generateSwaggerCodeJava,
+    generateSwaggerCodePython,
+]) {}
+
+task swagger(dependsOn: [
+    swaggerClients,
+    uploadSwaggerDocs,
+]) {}

@@ -33,14 +33,14 @@ import javax.ws.rs.GET
 import javax.ws.rs.Path
 import javax.ws.rs.Produces
 
-@SecurityRequirement(name="cookie")
+@SecurityRequirement(name = "cookie")
 @Tag(
-        description="API for products",
-        externalDocs=@ExternalDocumentation(
-                description="wiki",
-                url="https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1291288624/Configure+Products"
-        ),
-        name="Product"
+    description = "API for products",
+    externalDocs = @ExternalDocumentation(
+        description = "wiki",
+        url = "https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1291288624/Configure+Products"
+    ),
+    name = "Product"
 )
 @Transactional
 class ProductApiController extends BaseDomainApiController {
@@ -59,22 +59,22 @@ class ProductApiController extends BaseDomainApiController {
 
     @GET
     @Operation(
-            summary = "Calculate demand for one product at the currently-selected warehouse",
-            description = """\
+        summary = "calculate demand for one product at the currently-selected warehouse",
+        description = """\
 This entry point reports daily, monthly, and yearly demand, as well as a
 calculation of how long current stock will last. It also provides detailed
 information on the the requested product and currently-selected warehouse.""",
-            parameters = [@Parameter(ref = "product_id_in_path")]
+        parameters = [@Parameter(ref = "product_id_in_path")]
     )
     @ApiResponse(
-            content = @Content(
-                    schema = @Schema(implementation=ProductDemand),
-                    mediaType = "application/json"
-            ),
-            responseCode="200"
+        content = @Content(
+            schema = @Schema(implementation = ProductDemand)
+        ),
+        description = "demand information for the requested product and warehouse",
+        responseCode = "200"
     )
     @Path("/api/products/{id}/demand")
-    @Produces("text/json")
+    @Produces("application/json")
     def demand() {
         def data = new ProductDemand()
         data.product = Product.get(params.id)
@@ -85,16 +85,15 @@ information on the the requested product and currently-selected warehouse.""",
 
     @GET
     @Operation(
-            summary = "Report demand history for one product at the currently-selected warehouse",
-            parameters = [ @Parameter(ref = "product_id_in_path") ]
+        summary = "report demand history for one product at the currently-selected warehouse",
+        parameters = [@Parameter(ref = "product_id_in_path")]
     )
     @ApiResponse(
-            content = @Content(mediaType="application/json"),
-            description="undocumented schema",
-            responseCode="200"
+        description = "undocumented schema",
+        responseCode = "200"
     )
     @Path("/api/products/{id}/demandSummary")
-    @Produces("text/json")
+    @Produces("application/json")
     def demandSummary() {
         def data = new ProductDemand()
         data.product = Product.get(params.id)
@@ -105,40 +104,40 @@ information on the the requested product and currently-selected warehouse.""",
 
     @GET
     @Operation(
-            summary = "Report the current quantity of one product at the currently-selected warehouse",
-            parameters = [ @Parameter(ref = "product_id_in_path") ]
+        summary = "report the current quantity of one product at the currently-selected warehouse",
+        parameters = [@Parameter(ref = "product_id_in_path")]
     )
     @ApiResponse(
-            content = @Content(mediaType="application/json"),
-            description="undocumented schema",
-            responseCode="200"
+        description = "undocumented schema",
+        responseCode = "200"
     )
     @Path("/api/products/{id}/productSummary")
-    @Produces("text/json")
+    @Produces("application/json")
     def productSummary() {
         def product = Product.load(params.id)
         def location = Location.load(session.warehouse.id)
         def quantityOnHand = ProductAvailability.findAllByProductAndLocation(product, location).sum { it.quantityOnHand }
-        render([data: [product:[id: product.id], location: [id: location.id], quantityOnHand: quantityOnHand]] as JSON)
+        render([data: [product: [id: product.id], location: [id: location.id], quantityOnHand: quantityOnHand]] as JSON)
+    }
+
+    class ProductAvailabilityResponse
+    {
+        List<ProductAvailability> data
     }
 
     @GET
     @Operation(
-            summary = "Get detailed availability for one product at the currently-selected warehouse",
-            parameters = [ @Parameter(ref = "product_id_in_path") ]
+        summary = "get detailed availability for one product at the currently-selected warehouse",
+        parameters = [@Parameter(ref = "product_id_in_path")]
     )
     @ApiResponse(
-            content = @Content(
-                    array = @ArraySchema(
-                            schema = @Schema(implementation=ProductAvailability),
-                            uniqueItems = true
-                    ),
-                    mediaType = "application/json"
-            ),
-            responseCode="200"
+        content = @Content(
+            schema = @Schema(implementation = ProductAvailabilityResponse)),
+        description = "detailed availability information for the requested product and warehouse",
+        responseCode = "200"
     )
     @Path("/api/products/{id}/productAvailability")
-    @Produces("text/json")
+    @Produces("application/json")
     def productAvailability() {
         def product = Product.load(params.id)
         def location = Location.load(session.warehouse.id)
@@ -146,29 +145,32 @@ information on the the requested product and currently-selected warehouse.""",
         render([data: data] as JSON)
     }
 
+    class ListResponse
+    {
+        List<Product> data
+    }
+
     @GET
     @Operation(
-        summary = "List all products tracked in OpenBoxes",
+        summary = "list all products tracked in OpenBoxes",
         description = """\
 ## Warning!
 
-Do _not_ use Swagger's "Try it out" feature on this entry point!
+Do _not_ use Swagger UI's "Try it out" feature on this entry point!
 
 OpenBoxes tracks a large number of products; the full list can
 [make this page unresponsive](https://github.com/swagger-api/swagger-ui/issues/3832).
-""")
+""",
+        operationId = "list_products")
     @ApiResponse(
-            content = @Content(
-                    array = @ArraySchema(
-                            schema = @Schema(implementation=Product),
-                            uniqueItems = true
-                    ),
-                    mediaType = "application/json"
-            ),
-            responseCode="200"
+        content = @Content(
+            schema = @Schema(implementation = ListResponse)
+        ),
+        description = "a (long) list of all products tracked in OpenBoxes",
+        responseCode = "200"
     )
     @Path("/api/products")
-    @Produces("text/json")
+    @Produces("application/json")
     def list() {
 
         def minLength = grailsApplication.config.openboxes.typeahead.minLength
@@ -205,36 +207,36 @@ OpenBoxes tracks a large number of products; the full list can
 
     @GET
     @Operation(
-            summary = "Retrieve bin locations and quantities for one or more products",
-            parameters = [
-                    @Parameter(ref = "product_id_in_path"),
-                    @Parameter(
-                            description = "optionally specify additional product ids. This field may be specified more than once",
-                            example = "12588",
-                            explode = Explode.TRUE,
-                            in = ParameterIn.QUERY,
-                            name = "product.id"
-                    ),
-                    @Parameter(
-                            description = "optionally specify the id of a warehouse to query",
-                            example = "8a8a9e96687c94ce0168b86793c81a68",
-                            in = ParameterIn.QUERY,
-                            name = "location.id"
-                    )
-            ]
+        summary = "retrieve bin locations and quantities for one or more products",
+        parameters = [
+            @Parameter(ref = "product_id_in_path"),
+            @Parameter(
+                description = "optionally specify additional product ids. This field may be specified more than once",
+                example = "12588",
+                explode = Explode.TRUE,
+                in = ParameterIn.QUERY,
+                name = "product.id"
+            ),
+            @Parameter(
+                description = "optionally specify the id of a warehouse to query",
+                example = "8a8a9e96687c94ce0168b86793c81a68",
+                in = ParameterIn.QUERY,
+                name = "location.id"
+            )
+        ]
     )
     @ApiResponse(
-            content = @Content(
-                    array = @ArraySchema(
-                            schema = @Schema(implementation=AvailableItem),
-                            uniqueItems = true
-                    ),
-                    mediaType = "application/json"
-            ),
-            responseCode="200"
+        content = @Content(
+            array = @ArraySchema(
+                schema = @Schema(implementation = AvailableItem),
+                uniqueItems = true
+            )
+        ),
+        description = "a list of bin locations and quantities for the requested products",
+        responseCode = "200"
     )
     @Path("/api/products/{id}/availableItems")
-    @Produces("text/json")
+    @Produces("application/json")
     def availableItems() {
         def productIds = params.list("product.id") + params.list("id")
         String locationId = params?.location?.id ?: session?.warehouse?.id
@@ -352,27 +354,27 @@ OpenBoxes tracks a large number of products; the full list can
 
     @GET
     @Operation(
-            summary = "Get the monthly demand for, and current quantity of, one product at the currently-selected warehouse",
-            parameters = [
-                    @Parameter(ref = "product_id_in_path"),
-                    @Parameter(
-                            description = "the id of a warehouse to query",
-                            example = "8a8a9e96687c94ce0168b86793c81a68",
-                            in=ParameterIn.QUERY,
-                            name="locationId",
-                            required=true
-                    )
-            ]
+        summary = "get the monthly demand for, and current quantity of, one product at the currently-selected warehouse",
+        parameters = [
+            @Parameter(ref = "product_id_in_path"),
+            @Parameter(
+                description = "the id of a warehouse to query",
+                example = "8a8a9e96687c94ce0168b86793c81a68",
+                in = ParameterIn.QUERY,
+                name = "locationId",
+                required = true
+            )
+        ]
     )
     @ApiResponse(
-            content = @Content(
-                    mediaType="application/json",
-                    schema=@Schema(implementation=ProductAvailabilityAndDemand)
-            ),
-            responseCode="200"
+        content = @Content(
+            schema = @Schema(implementation = ProductAvailabilityAndDemand)
+        ),
+        description = "the monthly demand for, and current quantity of, the specified product",
+        responseCode = "200"
     )
     @Path("/api/products/{id}/productAvailabilityAndDemand")
-    @Produces("text/json")
+    @Produces("application/json")
     def productAvailabilityAndDemand() {
         Product product = Product.get(params.id)
         Location location = Location.get(params.locationId)

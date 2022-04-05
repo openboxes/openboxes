@@ -8,15 +8,21 @@
  * You must not remove this notice, or any other, from this software.
  **/
 package org.pih.warehouse.core
+
 import io.swagger.v3.oas.annotations.Hidden
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(description="Represents a logical grouping of locations (e.g., a site that has multiple facilities like depots, pharmacies, etc.).")
+@Schema(description = "a logical grouping of locations (e.g., a site that has multiple facilities like depots, pharmacies, etc.).")
 class LocationGroup implements Serializable, Comparable<LocationGroup> {
 
-    @Schema(description="database identifier, may be uuid or numeric string", format="uuid", readOnly=true, required=true)
+    @Schema(
+        accessMode = Schema.AccessMode.READ_ONLY,
+        description = "database identifier, may be uuid or numeric string",
+        format = "uuid",
+        required = false  // FIXME should be true, but breaks python client
+    )
     String id
-    @Schema(maxLength=255, nullable=true)
+    @Schema(maxLength = 255, nullable = true)
     String name
 
     @Hidden

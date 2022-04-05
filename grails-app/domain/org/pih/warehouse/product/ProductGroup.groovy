@@ -9,6 +9,8 @@
  **/
 package org.pih.warehouse.product
 
+import io.swagger.v3.oas.annotations.Hidden
+
 /**
  *
  */
@@ -18,6 +20,8 @@ class ProductGroup implements Comparable, Serializable {
     String id
     String name
     String description
+
+    @Hidden  // FIXME swagger's having problems parsing category objects
     Category category
 
     // Auditing
@@ -62,4 +66,3 @@ class ProductGroup implements Comparable, Serializable {
         return false
     }
 }
-

@@ -32,7 +32,7 @@ import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.shipping.ShipmentItem
 
-@Schema(description='''\
+@Schema(description = '''\
 A product is an instance of a generic. For instance, the product might be
 Ibuprofen, but the product [sic.] is Advil 200mg.
 
@@ -79,53 +79,66 @@ class Product implements Comparable, Serializable {
     @Hidden
     def afterDelete = publishPersistenceEvent
 
-    @Schema(description="database identifier, may be uuid or numeric string", format="uuid", readOnly=true, required=true)
+    @Schema(
+        accessMode = Schema.AccessMode.READ_ONLY,
+        description = "database identifier, may be uuid or numeric string",
+        format = "uuid",
+        required = true
+    )
     String id
 
-    @Schema(description="name of the product", maxLength=255, required=true)
+    @Schema(
+        description = "name of the product",
+        maxLength = 255,
+        required = false  // FIXME should be true, but breaks swagger client
+    )
     String name
 
-    @Schema(description="a more detailed description of the product", maxLength=255, nullable=true)
+    @Schema(
+        description = "a more detailed description of the product",
+        maxLength = 255,
+        nullable = true
+    )
     String description
 
     @Schema(
-            description="Internal product code identifier (or SKU)",
-            externalDocs=@ExternalDocumentation(url="http://en.wikipedia.org/wiki/Stock_keeping_unit"),
-            nullable=true
+        description = "internal product code identifier (or SKU)",
+        externalDocs = @ExternalDocumentation(url = "http://en.wikipedia.org/wiki/Stock_keeping_unit"),
+        nullable = true
     )
     String productCode
 
     @Hidden
-    @Schema(description="Type of product (good, service, fixed asset)")
+    @Schema(description = "type of product (good, service, fixed asset)")
     ProductType productType
 
     @Hidden
-    @Schema(description="Price per unit (global for the entire system)", nullable=true)
+    @Schema(description = "price per unit (global for the entire system)", nullable = true)
     BigDecimal pricePerUnit
 
     // FIXME what's the difference between cost and price here?
     @Hidden
-    @Schema(description="Cost per unit", nullable=true)
+    @Schema(description = "cost per unit", nullable = true)
     BigDecimal costPerUnit
 
     @Hidden
     @Schema(
-            description="whether the product is a controlled substance",
-            externalDocs=@ExternalDocumentation(url="http://en.wikipedia.org/wiki/Controlled_Substances_Act"),
-            nullable=true
+        description = "whether the product is a controlled substance",
+        externalDocs = @ExternalDocumentation(url = "http://en.wikipedia.org/wiki/Controlled_Substances_Act"),
+        nullable = true
     )
     Boolean controlledSubstance = Boolean.FALSE
 
     @Hidden
     @Schema(
-            description="whether the product is a hazardous material",
-            externalDocs=@ExternalDocumentation(url="http://www.fmcsa.dot.gov/facts-research/research-technology/visorcards/yellowcard.pdf"),
-            nullable=true
+        description = "whether the product is a hazardous material",
+        externalDocs = @ExternalDocumentation(url = "http://www.fmcsa.dot.gov/facts-research/research-technology/visorcards/yellowcard.pdf"),
+        nullable = true
     )
     Boolean hazardousMaterial = Boolean.FALSE
 
     @Hidden
-    @Schema(description='''\
+    @Schema(description = '''\
             Indicates whether the product is active. Setting a product as
             inactive is similar to removing from the database (it cannot be
             used if it is not active). However, we may not want to delete the
@@ -135,9 +148,9 @@ class Product implements Comparable, Serializable {
 
     @Hidden
     @Schema(
-            description="whether the product requires temperature-controlled supply chain",
-            externalDocs=@ExternalDocumentation(url="http://en.wikipedia.org/wiki/Cold_chain"),
-            nullable=true
+        description = "whether the product requires temperature-controlled supply chain",
+        externalDocs = @ExternalDocumentation(url = "http://en.wikipedia.org/wiki/Cold_chain"),
+        nullable = true
     )
     Boolean coldChain = Boolean.FALSE
 
@@ -161,11 +174,11 @@ class Product implements Comparable, Serializable {
     Boolean reconditioned = Boolean.FALSE
 
     @Hidden
-    @Schema(description="primary category", required=true)
+    @Schema(description = "primary category", required = true)
     Category category
 
     @Hidden
-    @Schema(description="Default ABC Classification", nullable=true)
+    @Schema(description = "default ABC classification", nullable = true)
     String abcClass
 
     // For better or worse, unit of measure and dosage form are used somewhat interchangeably
@@ -173,12 +186,12 @@ class Product implements Comparable, Serializable {
     // http://help.sap.com/saphelp_45b/helpdata/en/c6/f83bb94afa11d182b90000e829fbfe/content.htm
     @Hidden
     @Schema(
-            description='''\
-            For better or worse, unit of measure and dosage form are used
+        description = '''\
+            for better or worse, unit of measure and dosage form are used
             somewhat interchangeably (e.g. each, tablet, pill, bottle, box)
             ''',
-            externalDocs=@ExternalDocumentation(url="http://help.sap.com/saphelp_45b/helpdata/en/c6/f83bb94afa11d182b90000e829fbfe/content.htm"),
-            nullable=true
+        externalDocs = @ExternalDocumentation(url = "http://help.sap.com/saphelp_45b/helpdata/en/c6/f83bb94afa11d182b90000e829fbfe/content.htm"),
+        nullable = true
     )
     String unitOfMeasure
 
@@ -194,49 +207,49 @@ class Product implements Comparable, Serializable {
 
     @Hidden
     @Schema(
-            description="Universal product code identifier (UPC)",
-            externalDocs=@ExternalDocumentation(url="http://en.wikipedia.org/wiki/Universal_Product_Code"),
-            nullable=true
+        description = "universal product code identifier (UPC)",
+        externalDocs = @ExternalDocumentation(url = "http://en.wikipedia.org/wiki/Universal_Product_Code"),
+        nullable = true
     )
     String upc
 
     @Hidden
     @Schema(
-            description="national drug code identifier (NDC)",
-            externalDocs=@ExternalDocumentation(url="http://en.wikipedia.org/wiki/National_Drug_Code"),
-            nullable=true
+        description = "national drug code identifier (NDC)",
+        externalDocs = @ExternalDocumentation(url = "http://en.wikipedia.org/wiki/National_Drug_Code"),
+        nullable = true
     )
     String ndc
 
     @Hidden
-    @Schema(description="manufacturer name", maxLength=255, nullable=true)
+    @Schema(description = "manufacturer name", maxLength = 255, nullable = true)
     String manufacturer
 
     @Hidden
-    @Schema(description="manufacturer's product name or catalog code", maxLength=255, nullable=true)
+    @Schema(description = "manufacturer's product name or catalog code", maxLength = 255, nullable = true)
     String manufacturerCode
 
     @Hidden
-    @Schema(description="what the manufacturer calls the product", maxLength=255, nullable=true)
+    @Schema(description = "what the manufacturer calls the product", maxLength = 255, nullable = true)
     String manufacturerName
 
     @Hidden
-    @Schema(description="manufacturer's brand name for the product", maxLength=255, nullable=true)
+    @Schema(description = "manufacturer's brand name for the product", maxLength = 255, nullable = true)
     String brandName
 
     @Hidden
-    @Schema(description="manufacturer's model number (OK to contain letters)'", maxLength=255, nullable=true)
+    @Schema(description = "manufacturer's model number (OK to contain letters)'", maxLength = 255, nullable = true)
     String modelNumber
 
     @Hidden
-    @Schema(description="vendor name", maxLength=255, nullable=true)
+    @Schema(description = "vendor name", maxLength = 255, nullable = true)
     String vendor
 
     @Hidden
-    @Schema(description="vendor's product name or catalog code", maxLength=255, nullable=true)
+    @Schema(description = "vendor's product name or catalog code", maxLength = 255, nullable = true)
     String vendorCode
     @Hidden
-    @Schema(description="what the vendor calls the product", maxLength=255, nullable=true)
+    @Schema(description = "what the vendor calls the product", maxLength = 255, nullable = true)
     String vendorName
 
     // Almost all products will have a packageSize = 1
@@ -672,7 +685,7 @@ class Product implements Comparable, Serializable {
         return false
     }
 
-    @Schema(nullable=true, readOnly=true)
+    @Schema(nullable = true, readOnly = true)
     def getColor() {
         def results = ProductCatalogItem.executeQuery("select pci.productCatalog.color " +
                 " from ProductCatalogItem pci where pci.product = :product " +
@@ -713,4 +726,3 @@ class Product implements Comparable, Serializable {
         ]
     }
 }
-

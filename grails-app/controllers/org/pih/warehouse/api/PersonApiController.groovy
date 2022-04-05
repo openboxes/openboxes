@@ -23,34 +23,34 @@ import javax.ws.rs.GET
 import javax.ws.rs.Path
 import javax.ws.rs.Produces
 
-@SecurityRequirement(name="cookie")
-@Tag(name="User", description="API for users")
+@SecurityRequirement(name = "cookie")
+@Tag(name = "User", description = "API for users")
 class PersonApiController extends BaseDomainApiController {
 
     def userService
 
     @GET
     @Operation(
-            summary = "Get a list of OpenBoxes users, as well as points of contact",
-            description = """\
+        summary = "get a list of OpenBoxes users, as well as points of contact",
+        description = """\
 ## Warning!
 
-Do _not_ use Swagger's "Try it out" feature on this entry point!
+Do _not_ use Swagger UI's "Try it out" feature on this entry point!
 
 OpenBoxes tracks a large number of users; the full list can
 [make this page unresponsive](https://github.com/swagger-api/swagger-ui/issues/3832).""")
     @ApiResponse(
-            content = @Content(
-                    array = @ArraySchema(
-                            schema = @Schema(implementation=Person),
-                            uniqueItems = true
-                    ),
-                    mediaType = "application/json"
-            ),
-            responseCode="200"
+        content = @Content(
+            array = @ArraySchema(
+                schema = @Schema(implementation = Person),
+                uniqueItems = true
+            )
+        ),
+        description = "a list of users",
+        responseCode = "200"
     )
     @Path("/api/persons")
-    @Produces("text/json")
+    @Produces("application/json")
     def list() {
         String[] terms = params?.name?.split(",| ")?.findAll { it }
         def people = userService.findPersons(terms)

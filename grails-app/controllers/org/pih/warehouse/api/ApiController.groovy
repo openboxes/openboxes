@@ -13,12 +13,25 @@ import grails.converters.JSON
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.util.Environment
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.headers.Header
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.parameters.RequestBody
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.RequisitionType
 
+import javax.ws.rs.POST
+import javax.ws.rs.PUT
+import javax.ws.rs.Path
+import javax.ws.rs.Produces
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
@@ -32,6 +45,61 @@ class ApiController {
     def megamenuService
     def messageSource
 
+    class LoginRequest {
+        @Schema(format = "email", required = true, type = "string")
+        String username
+        @Schema(format = "password", required = true, type = "string")
+        String password
+        @Schema(format = "id", type = "string")
+        String location
+    }
+
+    @POST
+    @Operation(
+        summary = "retrieve a cookie for authentication",
+        description = """\
+Supply a username and password in the usual way to authenticate
+(`application/x-www-form-urlencoded`, like `curl -d`). You may
+optionally supply the identifier of a warehouse via a `location`
+field; this is an implicit parameter to many subsequent queries.
+If no location is specified, OpenBoxes will use the last one the
+authenticating user selected via the web UI or /api/chooseLocation.
+
+---
+
+Note that SwaggerHub's UI may not report the `JSESSIONID`, depending
+on browser settings (see
+[this document](https://swagger.io/docs/specification/authentication/cookie-authentication/)
+for more details). In that event, to authenticate this page and allow
+the "Try it out" button to work elsewhere, please try the following.
+
+1. Press the "Try it out" button below and to the right of this text.
+2. Press the blue "Execute" button that appears beneath the json editor, below.
+3. Copy the `curl` code snippet, add the `-i` flag, then run it in a local terminal.
+4. Press the green "Authorize" button near the top of this page.
+5. Copy the `JSESSIONID` field from `curl` output into the field that appears.
+"""
+    )
+    @RequestBody(
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = LoginRequest)
+        ),
+        required = true
+    )
+    @ApiResponse(
+        description = "the cookie to use when authentication is required",
+        headers = [
+            @Header(
+                description = "the `JSESSIONID` cookie to use for subsequent requests",
+                name = "Set-Cookie",
+                schema = @Schema(type = "string")
+            )
+        ],
+        responseCode = "200"
+    )
+    @Path("/api/login")
+    @Tag(name = "Authentication")
     def login() {
         def username = request.JSON.username
         def password = request.JSON.password
@@ -46,6 +114,23 @@ class ApiController {
         render([status: 401, text: "Authentication failed"])
     }
 
+    @PUT
+    @Operation(
+        summary = "specify a location",
+        description = "specify a location to refer against when making requests",
+        parameters = [@Parameter(ref = "location_id_in_path")]
+    )
+    @ApiResponse(
+        content = @Content(
+            schema = @Schema(type = "string")
+        ),
+        description = "current user name and location name",
+        responseCode = "200"
+    )
+    @Path("/api/chooseLocation/{id}")
+    @Produces("text/plain")
+    @SecurityRequirement(name = "cookie")
+    @Tag(name = "Configuration")
     def chooseLocation() {
         Location location = Location.get(params.id)
         if (!location) {

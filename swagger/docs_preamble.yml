@@ -1,0 +1,81 @@
+openapi: 3.0.3
+info:
+  contact:
+    name: OpenBoxes discussion board
+    url: https://discuss.openboxes.com
+  description: |
+    [OpenBoxes](https://openboxes.org) is an open-source LMIS application
+    that increases stock visibility, reduces the risk of stock-outs and
+    stock wastage, and offers tools to improve forecasting and traceability.
+
+    **Notice**
+    The following API documentation is a work in progress.
+
+    ---
+  license:
+    name: Eclipse Public License 1.0
+    url: http://opensource.org/licenses/eclipse-1.0.php
+  termsOfService: https://www.pih.org/pages/terms
+  title: OpenBoxes API specification
+  # FIXME get this from git
+  version: "0.8.17"
+components:
+  #
+  # Providing examples in-line via ExampleObject annotations is easy,
+  # but reusing them is not: the only way I could reference one example
+  # from multiple places is to declare it as a string literal here.
+  # See also https://swagger.io/docs/specification/adding-examples/
+  # as well as https://github.com/swagger-api/swagger-core/issues/3029
+  #
+  parameters:
+    location_id_in_path:
+      description: database id of a location
+      examples:
+        Boston Purchasing:
+          summary: central purchasing department, in Boston
+          value: "cab2b48e78db19af0178dca3ab010001"
+        Cange Depot:
+          summary: supply depot in Cange, Haiti
+          value: "8a8a9e96687c94ce0168b86793c81a68"
+      in: path
+      name: id
+      required: true
+      schema:
+        format: id
+        type: string
+    product_id_in_path:
+      description: database id of a product
+      examples:
+        ibuprofen:
+          summary: Ibuprofen, 400mg tablet
+          value: "10282"
+        covid test:
+          summary: Test, COVID-19, rapid
+          value: "21103"
+        stethoscope:
+          summary: Stethoscope, dual-head
+          value: "12588"
+      in: path
+      name: id
+      required: true
+      schema:
+        format: id
+        type: string
+  securitySchemes:
+    cookie:
+      in: cookie
+      name: JSESSIONID
+      type: apiKey
+servers:
+- url: https://obdev.pih-emr.org/openboxes
+  description: Dev instance
+- url: https://obnavstage.pih-emr.org/openboxes
+  description: Staging instance
+- url: https://obnav.pih-emr.org/openboxes
+  description: Production instance
+tags:
+  - name: Authentication
+  - name: Configuration
+  - name: Product
+  - name: Location
+  - name: User
