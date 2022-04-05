@@ -47,7 +47,7 @@ class LoadDataService {
         csvReader.initFieldKeys();
 
         csvReader.eachLine { Map attr ->
-            new LocationGroup(name: attr.get("Name")).save()
+            new LocationGroup(name: attr.get("Name")).save(failOnError: true)
         }
 
         csvReader.close();
@@ -73,7 +73,7 @@ class LoadDataService {
 
             organization.addToRoles(role);
 
-            organization.save()
+            organization.save(failOnError: true)
         })
 
         csvReader.close();
@@ -126,7 +126,7 @@ class LoadDataService {
                 catalog.description = description;
             }
 
-            catalog.save()
+            catalog.save(failOnError: true)
         })
 
         csvReader.close();
@@ -137,7 +137,7 @@ class LoadDataService {
         csvReader.initFieldKeys()
 
         csvReader.eachLine { Map attr ->
-            productCatalogService.createOrUpdateProductCatalogItem(attr).save()
+            productCatalogService.createOrUpdateProductCatalogItem(attr).save(failOnError: true)
         }
 
         csvReader.close();
@@ -202,7 +202,7 @@ class LoadDataService {
                     comments: attr["Comment"]
             );
 
-            inventoryItem.save();
+            inventoryItem.save(failOnError: true);
         }
 
         csvReader.close();
@@ -227,7 +227,7 @@ class LoadDataService {
                     replenishmentPeriodDays: attr["Replenishment Period Days"]
             )
 
-            inventoryLevel.save();
+            inventoryLevel.save(failOnError: true);
         }
 
         csvReader.close();
@@ -250,16 +250,10 @@ class LoadDataService {
                 Role role = Role.findByRoleType(roleType)
 
                 if (!role) {
-                    role = new Role(
-                            roleType: roleType,
-                            name: roleType.toString(),
-                    )
+                    throw new IllegalArgumentException("Role for role type ${roleType.name()} does not exist")
                 }
-                userRoles.add(role)
-            }
 
-            if (User.findByUsername(attr.username)) {
-                throw new IllegalArgumentException('Duplicate username: ' + attr.username);
+                userRoles.add(role)
             }
 
             User user = new User(
@@ -269,10 +263,11 @@ class LoadDataService {
                     firstName: attr.firstName,
                     lastName: attr.lastName,
                     email: attr.email,
+                    active: false,
                     roles: userRoles,
             )
 
-            user.save()
+            user.save(failOnError: true)
         }
 
         csvReader.close();
@@ -287,7 +282,7 @@ class LoadDataService {
                     lastName: attr.lastName,
                     email: attr.email,
                     phoneNumber: attr.phoneNumber,
-            ).save()
+            ).save(failOnError: true)
         }
 
         csvReader.close();
@@ -335,7 +330,7 @@ class LoadDataService {
                 requestedBy: requestedBy
         )
 
-        requisition.save();
+        requisition.save(failOnError: true);
 
         csvReader.close();
 
@@ -346,7 +341,7 @@ class LoadDataService {
         CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
 
         csvReader.eachLine { Map<String, String> attr ->
-            Product product = Product.findByCode(attr["product_code"])
+            Product product = Product.findByProductCode(attr["product_code"])
 
             RequisitionItem requisitionItem = new RequisitionItem(
                     requisition: requisition,
@@ -355,7 +350,7 @@ class LoadDataService {
                     quantity: Integer.parseInt(attr["quantity"])
             );
 
-            requisitionItem.save();
+            requisitionItem.save(failOnError: true);
         }
 
         csvReader.close();

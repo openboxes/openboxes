@@ -25,68 +25,67 @@ class LoadDataApiController extends BaseDomainApiController {
     def load = {
         def config = grailsApplication.config.openboxes.configurationWizard.dataInit;
 
-        if (config.organizations.enabled) {
+        if (Boolean.valueOf(config.organizations.enabled)) {
             loadDataService.importOrganizations(new URL(config.organizations.url))
         }
 
-        if (config.locationGroups.enabled) {
+        if (Boolean.valueOf(config.locationGroups.enabled)) {
             loadDataService.importLocationGroups(new URL(config.locationGroups.url))
         }
 
-        if (config.locations.enabled) {
+        if (Boolean.valueOf(config.locations.enabled)) {
             loadDataService.importLocations(new URL(config.locations.url))
         }
 
-        if (config.binLocations.enabled) {
+        if (Boolean.valueOf(config.binLocations.enabled)) {
             loadDataService.importLocations(new URL(config.binLocations.url))
         }
 
-        if (config.categories.enabled) {
+        if (Boolean.valueOf(config.categories.enabled)) {
             loadDataService.importCategories(new URL(config.categories.url))
         }
 
-        if (config.products.enabled) {
+        if (Boolean.valueOf(config.products.enabled)) {
             loadDataService.importProducts(new URL(config.products.url))
         }
 
-        if (config.productCatalog.enabled) {
+        if (Boolean.valueOf(config.productCatalog.enabled)) {
             loadDataService.importProductCatalog(new URL(config.productCatalog.url))
         }
 
-        if (config.productCatalogItems.enabled) {
+        if (Boolean.valueOf(config.productCatalogItems.enabled)) {
             loadDataService.importProductCatalogItems(new URL(config.productSuppliers.url))
         }
 
-        if(config.productSuppliers.enabled) {
+        if (Boolean.valueOf(config.productSuppliers.enabled)) {
             loadDataService.importProductSuppliers(new URL(config.productSuppliers.url))
         }
 
-        if(config.mainWarehouseInventory.enabled) {
+        if (Boolean.valueOf(config.mainWarehouseInventory.enabled)) {
             loadDataService.importInventory(new URL(config.mainWarehouseInventory.url))
         }
 
-        if(config.bostonWarehouseInventory.enabled) {
+        if (Boolean.valueOf(config.bostonWarehouseInventory.enabled)) {
             loadDataService.importInventory(new URL(config.bostonWarehouseInventory.url))
         }
 
-        if(config.chicagoWarehouseInventory.enabled) {
+        if (Boolean.valueOf(config.chicagoWarehouseInventory.enabled)) {
             loadDataService.importInventory(new URL(config.chicagoWarehouseInventory.url))
         }
 
-        if(config.inventoryLevels.enabled) {
+        if (Boolean.valueOf(config.inventoryLevels.enabled)) {
             loadDataService.importInventoryLevels(new URL(config.inventoryLevels.url))
         }
 
-        if(config.users.enabled) {
+        if (Boolean.valueOf(config.users.enabled)) {
             loadDataService.importUsers(new URL(config.users.url))
         }
 
-        if(config.persons.enabled) {
+        if (Boolean.valueOf(config.persons.enabled)) {
             loadDataService.importPersons(new URL(config.persons.url))
         }
 
-        if(config.stocklist.enabled) {
-
+        if (Boolean.valueOf(config.stocklist.enabled)) {
             Requisition requisition = loadDataService.importStocklistTemplate(
                     new URL(config.stocklist.templateUrl)
             );

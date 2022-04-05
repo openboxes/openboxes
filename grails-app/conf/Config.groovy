@@ -1804,73 +1804,78 @@ openboxes.configurationWizard.listOfDemoData = [
                  "<ul>",
 ]
 
-openboxes.configurationWizard.dataInit = [
-        locations: [
-                enabled: true,
-                url: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/locations.csv"
-        ],
-        locationGroups: [
-                enabled: true,
-                url: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/locationGroups.csv"
-        ],
-        organizations: [
-                enabled: true,
-                url: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/organizations.csv"
-        ],
-        binLocations: [
-                enabled: true,
-                url: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/binLocations.csv"
-        ],
-        categories: [
-                enabled: true,
-                url: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/categories.csv"
-        ],
-        products: [
-                enabled: true,
-                url: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/products.csv"
-        ],
-        productCatalog: [
-                enabled: true,
-                url: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/productCatalog.csv"
-        ],
-        productCatalogItems: [
-                enabled: true,
-                url: "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/productCatalogItems.csv"
-        ],
-        productSuppliers: [
-                enabled: false, // INFO Disabled, not working
-                url: "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/productSuppliers.csv"
-        ],
-        mainWarehouseInventory: [
-                enabled: true,
-                url: "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/mainWarehouseInventory.csv"
-        ],
-        bostonWarehouseInventory: [
-                enabled: true,
-                url: "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/bostonWarehouseInventory.csv"
-        ],
-        chicagoWarehouseInventory: [
-                enabled: true,
-                url: "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/chicagoWarehouseInventory.csv"
-        ],
-        inventoryLevels: [
-                enabled: true,
-                url: "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/inventoryLevels.csv"
-        ],
-        users: [
-                enabled: true,
-                url: "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/users.csv"
-        ],
-        persons: [
-                enabled: true,
-                url: "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/persons.csv"
-        ],
-        stocklist: [
-                enabled: false, // Items not working
-                templateUrl: "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/stocklistTemplate.csv",
-                itemsUrl: "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/stocklistItems.csv",
-        ],
-]
+openboxes {
+    configurationWizard {
+        dataInit {
+            locations {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/locations.csv"
+            }
+            locationGroups {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/locationGroups.csv"
+            }
+            organizations {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/organizations.csv"
+            }
+            binLocations {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/binLocations.csv"
+            }
+            categories {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/categories.csv"
+            }
+            products {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/products.csv"
+            }
+            productCatalog {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/productCatalog.csv"
+            }
+            productCatalogItems {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/productCatalogItems.csv"
+            }
+            productSuppliers {
+                enabled = false // INFO Disabled, not working
+                url = "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/productSuppliers.csv"
+            }
+            mainWarehouseInventory {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/mainWarehouseInventory.csv"
+            }
+            bostonWarehouseInventory {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/bostonWarehouseInventory.csv"
+            }
+            chicagoWarehouseInventory {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/chicagoWarehouseInventory.csv"
+            }
+            inventoryLevels {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/inventoryLevels.csv"
+            }
+            users {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/users.csv"
+            }
+            persons {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/persons.csv"
+            }
+            stocklist {
+                enabled = true
+                templateUrl = "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/stocklistTemplate.csv"
+                itemsUrl = "https://raw.githubusercontent.com/openboxes/grails-app/conf/templates/configuration/stocklistItems.csv"
+            }
+        }
+    }
+}
+
 
 // Pagination
 openboxes.api.pagination.enabled = true
