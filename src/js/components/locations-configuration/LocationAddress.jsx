@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
@@ -89,6 +90,26 @@ class LocationAddress extends Component {
     };
   }
 
+
+  componentDidMount() {
+    if (this.props.match.params.locationId) {
+      this.fetchLocation();
+    }
+  }
+
+  fetchLocation() {
+    const url = `/openboxes/api/locations/${this.props.match.params.locationId}`;
+    apiClient.get(url).then((response) => {
+      const location = response.data.data;
+      this.setState({
+        values: {
+          ...this.state.values,
+          address: location.address,
+        },
+      });
+    })
+      .catch(() => Promise.reject(new Error(this.props.translate('react.locationsConfiguration.error.fetchingLocation', 'Could not load location data'))));
+  }
 
   saveAddressOfLocation(values, callback) {
     const valuesAsAddressObject = {
@@ -183,7 +204,7 @@ const mapDispatchToProps = {
   hideSpinner,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(LocationAddress);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(LocationAddress));
 
 LocationAddress.propTypes = {
   initialValues: PropTypes.shape({
@@ -205,4 +226,7 @@ LocationAddress.propTypes = {
   hideSpinner: PropTypes.func.isRequired,
   locationId: PropTypes.string.isRequired,
   translate: PropTypes.func.isRequired,
+  match: PropTypes.shape({
+    params: PropTypes.shape({ locationId: PropTypes.string }),
+  }).isRequired,
 };
