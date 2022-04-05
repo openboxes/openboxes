@@ -490,10 +490,10 @@ class ProductAvailabilityService {
         }
 
         if (products.size() != quantityMap.size()) {
-            def missingProducts = products - quantityMap.keySet()
-            missingProducts.each { Product product ->
-                if (!quantityMap[product.id]) {
-                    quantityMap[product.id] = 0
+            def missingProducts = products*.id - quantityMap.keySet()
+            missingProducts.each { productId ->
+                if (!quantityMap[productId]) {
+                    quantityMap[productId] = 0
                 }
             }
         }
