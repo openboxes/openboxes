@@ -204,9 +204,11 @@ class CreateStockMovement extends Component {
   }
 
   setRequestType(values, stocklist) {
+    const requestType = _.find(this.state.requestTypes, type => type.value === 'STOCK');
+
     this.setState({
       values: update(values, {
-        requestType: { $set: 'STOCK' },
+        requestType: { $set: requestType },
         stocklist: { $set: stocklist },
       }),
     });
