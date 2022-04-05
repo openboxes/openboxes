@@ -477,6 +477,7 @@ class EditItemsPage extends Component {
             editPageItems: _.map(data, item => ({
               ...item,
               quantityOnHand: item.quantityOnHand || 0,
+              reasonCode: this.props.reasonCodes.find(({ value }) => value === item.reasonCode),
               substitutionItems: _.map(item.substitutionItems, sub => ({
                 ...sub,
                 requisitionItemId: item.requisitionItemId,
