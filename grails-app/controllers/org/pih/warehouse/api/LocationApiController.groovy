@@ -30,6 +30,7 @@ class LocationApiController extends BaseDomainApiController {
     def identifierService
     def inventoryService
     def grailsApplication
+    def documentService
 
     def read = {
         Location location = Location.get(params.id)
@@ -239,10 +240,16 @@ class LocationApiController extends BaseDomainApiController {
     }
 
     def downloadBinLocationTemplate = {
-        def xls = "bin name, zone name\n"
-
-        response.setHeader("Content-disposition", "attachment; filename=\"Bin_Location_template.xls\"")
-        render(contentType: "text/xls", text: xls.toString(), encoding: "UTF-8")
+        def filename = "binLocations.xls"
+        try {
+            def file = documentService.findFile("templates/" + filename)
+            response.setHeader 'Content-disposition', "attachment; filename=\"${filename}\""
+            response.outputStream << file.bytes
+            response.outputStream.flush()
+        }
+        catch (FileNotFoundException e) {
+            render status: 404
+        }
     }
 
     def importBinLocations = {

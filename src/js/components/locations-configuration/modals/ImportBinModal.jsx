@@ -45,9 +45,9 @@ class ImportBinModal extends Component {
 
   downloadBinLocationsTemplate() {
     this.props.showSpinner();
-    apiClient.get('/openboxes/api/locations/binLocations/template')
+    apiClient.get('/openboxes/api/locations/binLocations/template', { responseType: 'blob' })
       .then((response) => {
-        fileDownload(response.data, 'BinLocations_template.xls', 'text/xls');
+        fileDownload(response.data, 'BinLocations_template.xls', 'application/vnd.ms-excel');
         this.props.hideSpinner();
       })
       .catch(() => this.props.hideSpinner());
