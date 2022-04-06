@@ -94,8 +94,8 @@ const BIN_FIELDS = {
   },
   zoneLocation: {
     type: SelectField,
-    label: 'react.locationsConfiguration.zoneType.label',
-    defaultMessage: 'Zone Type',
+    label: 'react.locationsConfiguration.zoneLocation.label',
+    defaultMessage: 'Zone Location',
     attributes: {
       valueKey: 'id',
       labelKey: 'name',
