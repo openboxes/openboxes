@@ -104,6 +104,7 @@ class BinTable extends Component {
         columns={binColumns}
         loading={this.state.binLoading}
         pages={this.state.binPages}
+        defaultPageSize={10}
         manual
         className="-striped -highlight zoneTable"
         resizable={false}

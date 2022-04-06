@@ -1,22 +1,13 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import Alert from 'react-s-alert';
 
 import Translate from 'utils/Translate';
 
-const PAGE_ID = 'forecasting';
 
-const ForecastingNotsupported = ({ previousPage, supportLinks }) => (
+const ForecastingNotsupported = ({ previousPage }) => (
   <React.Fragment>
     <div className="classic-form with-description forecasting">
-      <div className="submit-buttons">
-        <button type="button" onClick={() => Alert.info(supportLinks[PAGE_ID])} className="btn btn-outline-primary float-right btn-xs">
-          <i className="fa fa-question-circle-o" aria-hidden="true" />
-          &nbsp;
-          <Translate id="react.default.button.support.label" defaultMessage="Support" />
-        </button>
-      </div>
       <div className="form-title">
         <Translate id="react.locationsConfiguration.forecasting.label" defaultMessage="Forecasting" />
       </div>
@@ -32,7 +23,7 @@ const ForecastingNotsupported = ({ previousPage, supportLinks }) => (
         <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
       </button>
       <button type="submit" className="btn btn-outline-primary float-right btn-xs">
-        <Translate id="react.default.button.next.label" defaultMessage="Next" />
+        <Translate id="react.default.button.finish.label" defaultMessage="Finish" />
       </button>
     </div>
   </React.Fragment>
@@ -42,5 +33,4 @@ export default ForecastingNotsupported;
 
 ForecastingNotsupported.propTypes = {
   previousPage: PropTypes.func.isRequired,
-  supportLinks: PropTypes.shape({}).isRequired,
 };

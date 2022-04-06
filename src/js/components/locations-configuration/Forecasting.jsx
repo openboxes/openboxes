@@ -18,7 +18,6 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'components/locations-configuration/Forecasting.scss';
 
-const PAGE_ID = 'forecasting';
 
 const FIELDS = {
   expectedLeadTimeDays: {
@@ -134,13 +133,6 @@ class Forecasting extends Component {
               render={({ handleSubmit, values }) => (
                 <form onSubmit={handleSubmit} className="w-100">
                   <div className="classic-form with-description forecasting">
-                    <div className="submit-buttons">
-                      <button type="button" onClick={() => Alert.info(this.props.supportLinks[PAGE_ID])} className="btn btn-outline-primary float-right btn-xs">
-                        <i className="fa fa-question-circle-o" aria-hidden="true" />
-                      &nbsp;
-                        <Translate id="react.default.button.support.label" defaultMessage="Support" />
-                      </button>
-                    </div>
                     <div className="form-title">
                       <Translate id="react.locationsConfiguration.forecasting.label" defaultMessage="Forecasting" />
                     </div>
@@ -162,7 +154,7 @@ class Forecasting extends Component {
                       <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                     </button>
                     <button type="submit" className="btn btn-outline-primary float-right btn-xs">
-                      <Translate id="react.default.button.next.label" defaultMessage="Next" />
+                      <Translate id="react.default.button.finish.label" defaultMessage="Finish" />
                     </button>
                   </div>
                 </form>
@@ -171,7 +163,6 @@ class Forecasting extends Component {
           </div>
         :
           <ForecastingNotsupported
-            supportLinks={this.props.supportLinks}
             previousPage={this.props.previousPage}
           />
         }
@@ -194,7 +185,6 @@ export default connect(mapStateToProps, mapDispatchToProps)(Forecasting);
 
 Forecasting.propTypes = {
   previousPage: PropTypes.func.isRequired,
-  supportLinks: PropTypes.shape({}).isRequired,
   initialValues: PropTypes.shape({
     active: PropTypes.bool,
     name: PropTypes.string,
