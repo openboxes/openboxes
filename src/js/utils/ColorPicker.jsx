@@ -37,7 +37,7 @@ const ColorPicker = ({ value, onChange }) => {
         </div>
         <Input value={value} onChange={val => onChange(val)} />
         <div className="input-group-append">
-          <button className="input-group-text" onClick={() => onChange(null)}>
+          <button type="button" className="input-group-text" onClick={() => onChange(null)}>
             <i className="fa fa-close" />
           </button>
         </div>

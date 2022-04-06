@@ -358,8 +358,8 @@ class LocationDetails extends Component {
         'locationType.id': _.get(values.locationType, 'id') || '',
         supportedActivities: _.map(values.supportedActivities, val => val.value),
         logo: values.logo,
-        bgColor: values.bgColor,
-        fgColor: values.fgColor,
+        bgColor: values.bgColor || '',
+        fgColor: values.fgColor || '',
       };
 
       apiClient.post(locationUrl, payload)
