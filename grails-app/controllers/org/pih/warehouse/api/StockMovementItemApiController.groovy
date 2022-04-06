@@ -52,7 +52,7 @@ class StockMovementItemApiController {
     def updatePicklist = {
         JSONObject jsonObject = request.JSON
 
-        log.debug "JSON " + jsonObject.toString(4)
+        log.info "JSON " + jsonObject.toString(4)
         StockMovementItem stockMovementItem = stockMovementService.getStockMovementItem(params.id)
 
         log.debug("Updating picklist items")
@@ -61,6 +61,13 @@ class StockMovementItemApiController {
 
         if (!picklistItems) {
             throw new IllegalArgumentException("Must specifiy picklistItems")
+        }
+
+        log.info "Stock movement item " + new JSONObject(stockMovementItem.toJson()).toString(4)
+
+        Integer quantityPicked = picklistItems.sum { it.quantityPicked }?:0
+        if ( quantityPicked > stockMovementItem.quantityRequired) {
+            throw new IllegalArgumentException("User is not allowed to pick more than the required quantity ${stockMovementItem?.quantityRequired}")
         }
 
         stockMovementService.removeShipmentItemsForModifiedRequisitionItem(stockMovementItem)
