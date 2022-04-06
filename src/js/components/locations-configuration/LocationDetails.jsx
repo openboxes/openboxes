@@ -213,7 +213,6 @@ class LocationDetails extends Component {
       this.fetchLocation();
     }
   }
-
   componentWillReceiveProps(nextProps) {
     if (!this.dataFetched && nextProps.locConfTranslationsFetched) {
       this.dataFetched = true;
