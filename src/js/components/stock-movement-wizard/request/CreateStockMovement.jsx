@@ -142,7 +142,7 @@ const FIELDS = {
     label: 'react.stockMovement.requestType.label',
     defaultMessage: 'Request type',
     attributes: {
-      valueKey: 'name',
+      valueKey: 'id',
       labelKey: 'name',
       required: true,
       showValueTooltip: true,
@@ -209,9 +209,11 @@ class CreateStockMovement extends Component {
   }
 
   setRequestType(values, stocklist) {
+    const requestType = _.find(this.state.requestTypes, type => type.id === 'STOCK');
+
     this.setState({
       values: update(values, {
-        requestType: { $set: 'STOCK' },
+        requestType: { $set: requestType },
         stocklist: { $set: stocklist },
       }),
     });
@@ -323,7 +325,7 @@ class CreateStockMovement extends Component {
         'destination.id': values.destination.id,
         'requestedBy.id': values.requestedBy.id,
         'stocklist.id': _.get(values.stocklist, 'id') || '',
-        requestType: values.requestType,
+        requestType: values.requestType.id,
         sourceType: ELECTRONIC,
       };
 
