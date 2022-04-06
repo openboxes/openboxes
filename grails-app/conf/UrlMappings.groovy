@@ -79,6 +79,10 @@ class UrlMappings {
             controller = { "locationApi" }
         }
 
+        "/api/config/data/demo"(parseRequest: true) {
+            controller = "loadDataApi"
+            action = [GET: "load"]
+        }
 
         // Stock Movement Item API
 
