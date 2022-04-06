@@ -108,7 +108,7 @@ const AsyncWelcomePage = Loadable({
 });
 
 const AsyncLoadDataPage = Loadable({
-  loader: () => import('components/locations-configuration/LoadDataPage'),
+  loader: () => import('components/load-demo-data/LoadDemoDataPage'),
   loading: Loading,
 });
 

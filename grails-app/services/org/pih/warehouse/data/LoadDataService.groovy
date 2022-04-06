@@ -67,12 +67,10 @@ class LoadDataService {
                     partyType: PartyType.findByCode("ORG") // FIXME: Should party type be provided?
             )
 
-            PartyRole role = PartyRole.findAllByRoleType(
-                    RoleType.valueOf(partyRole.toUpperCase())
-            ).first();
-
-            organization.addToRoles(role);
-
+            PartyRole role = PartyRole.findByRoleType(RoleType.valueOf(partyRole.toUpperCase()))
+            if (role) {
+                organization.addToRoles(role)
+            }
             organization.save(failOnError: true)
         })
 
