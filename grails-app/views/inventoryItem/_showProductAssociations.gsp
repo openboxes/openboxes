@@ -15,6 +15,9 @@
                 <th class="center middle" >
                     <warehouse:message code="product.quantityAvailableToPromise.label"/>
                 </th>
+                <th class="center middle" >
+                    <warehouse:message code="productAssociation.comments.label"/>
+                </th>
             </tr>
         </thead>
 
@@ -36,6 +39,11 @@
                         <td class="center">
                             ${g.formatNumber(number: quantityAvailable, format: '###,###,###') }
                             ${associatedProduct.unitOfMeasure}
+                        </td>
+                        <td class="border-right middle center">
+                            <g:if test="${association.comments}">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'note.png')}" class="middle" title="${association.comments}"/>
+                            </g:if>
                         </td>
                     </tr>
                 </g:each>
@@ -71,6 +79,7 @@
                         ${warehouse.message(code:'default.each.label') }
                     </g:else>
                 </td>
+                <td></td>
             </tr>
         </tfoot>
     </table>
