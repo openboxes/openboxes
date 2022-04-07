@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 
 import { ClimbingBoxLoader } from 'react-spinners';
 
+import LoadDemoDataErrorMessage from 'components/load-demo-data/LoadDemoDataErrorMessage';
+import LoadDemoDataSuccessMessage from 'components/load-demo-data/LoadDemoDataSuccessMessage';
 import apiClient from 'utils/apiClient';
 import Translate from 'utils/Translate';
 
@@ -52,16 +54,11 @@ const LoadDemoDataProgressScreen = () => {
 
   if (error) {
     return (
-      <div className="d-flex flex-column align-items-center justify-content-center">
-        <h3>Error while loading data </h3>
-      </div>
+      <LoadDemoDataErrorMessage />
     );
   }
-  // TODO: create a success message
   return (
-    <div className="d-flex flex-column align-items-center justify-content-center">
-      <h3>Data Successfully Loaded </h3>
-    </div>
+    <LoadDemoDataSuccessMessage />
   );
 };
 
