@@ -46,8 +46,9 @@ class PutawayService {
 
     void generatePutaways(Location location, User putawayAssignee) {
         def putawayCandidates = getPutawayCandidates(location)
-        for (PutawayItem putawayCandidate in putawayCandidates) {
 
+        log.info "Found ${putawayCandidates?.size()?:0} putaway candidates"
+        for (PutawayItem putawayCandidate in putawayCandidates) {
 
             // Ignore putaway candidates that already have a putaway order associated with it
             if (!putawayCandidate.id) {
@@ -62,6 +63,7 @@ class PutawayService {
                 }
 
                 // Create a new putaway order for the putaway candidate
+                log.info "Assigning putaway location ${putawayLocation}"
                 Putaway putaway = new Putaway()
                 putaway.origin = location
                 putaway.destination = location
@@ -72,6 +74,9 @@ class PutawayService {
                 putawayCandidate.putawayLocation = putawayLocation
                 putaway.putawayItems.add(putawayCandidate)
                 savePutaway(putaway)
+            }
+            else {
+                log.info "Putaway order ${putawayCandidate.id} already exists for ${putawayCandidate?.product?.productCode}"
             }
         }
     }

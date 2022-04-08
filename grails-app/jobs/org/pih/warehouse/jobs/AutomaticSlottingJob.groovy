@@ -28,7 +28,14 @@ class AutomaticSlottingJob {
         }
 
         log.info "Running automatic slotting job ... "
-        List<Location> locations = locationService.getLocationsSupportingActivities([ActivityCode.DYNAMIC_SLOTTING, ActivityCode.STATIC_SLOTTING])
+        List<ActivityCode> activityCodes = [ActivityCode.DYNAMIC_SLOTTING, ActivityCode.STATIC_SLOTTING]
+        List<Location> locations = locationService.getLocationsSupportingActivities(activityCodes)
+
+        if (!locations) {
+            log.warn "No locations are configured with supporting activityies ${activityCodes}"
+            return
+        }
+
         locations.each { Location location ->
 
             def users = putawayService.getPutawayUsers(location)
