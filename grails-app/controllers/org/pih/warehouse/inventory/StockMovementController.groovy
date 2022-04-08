@@ -196,6 +196,7 @@ class StockMovementController {
                             offset: offset,
                             sort: params.sort,
                             order: params.order,
+                            productSearch: params.q,
                             dateCreatedFrom: dateCreatedFrom,
                             dateCreatedTo: dateCreatedTo,
                             expectedShippingDateFrom: expectedShippingDateFrom,
