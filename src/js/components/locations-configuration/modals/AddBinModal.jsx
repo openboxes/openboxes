@@ -24,7 +24,12 @@ class AddBinModal extends Component {
 
   handleSubmit(values) {
     this.props.showSpinner();
-    apiClient.post('/openboxes/api/locations/', flattenRequest({ ...values, parentLocation: { id: this.props.locationId }, locationType: { id: values.locationType.id } }))
+    apiClient.post('/openboxes/api/locations/', flattenRequest({
+      ...values,
+      parentLocation: { id: this.props.locationId },
+      locationType: { id: values.locationType.id },
+      zone: values.zoneLocation && { id: values.zoneLocation.id },
+    }))
       .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.locationsConfiguration.addBin.success.label', 'Bin location has been created successfully!'), { timeout: 3000 });
@@ -47,6 +52,7 @@ class AddBinModal extends Component {
           : this.state.values}
         formProps={{
           binTypes: this.props.binTypes,
+          zoneData: this.props.zoneData,
         }}
         title="react.locationsConfiguration.addBin.label"
         defaultTitleMessage="Add Bin Location"
@@ -92,6 +98,7 @@ AddBinModal.propTypes = {
   FIELDS: PropTypes.shape({}).isRequired,
   validate: PropTypes.func.isRequired,
   binTypes: PropTypes.shape([]).isRequired,
+  zoneData: PropTypes.shape([]).isRequired,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(AddBinModal);

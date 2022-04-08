@@ -16,7 +16,7 @@ import AddBinModal from 'components/locations-configuration/modals/AddBinModal';
 import AddZoneModal from 'components/locations-configuration/modals/AddZoneModal';
 import ImportBinModal from 'components/locations-configuration/modals/ImportBinModal';
 import ZoneTable from 'components/locations-configuration/ZoneTable';
-import apiClient from 'utils/apiClient';
+import apiClient, { flattenRequest } from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -90,6 +90,18 @@ const BIN_FIELDS = {
     },
     getDynamicAttr: ({ binTypes }) => ({
       options: binTypes,
+    }),
+  },
+  zoneLocation: {
+    type: SelectField,
+    label: 'react.locationsConfiguration.zoneType.label',
+    defaultMessage: 'Zone Type',
+    attributes: {
+      valueKey: 'id',
+      labelKey: 'name',
+    },
+    getDynamicAttr: ({ zoneData }) => ({
+      options: zoneData,
     }),
   },
 };
@@ -171,12 +183,15 @@ class ZoneAndBinLocations extends Component {
 
   handleLocationEdit(values) {
     this.props.showSpinner();
-    apiClient.post(`/openboxes/api/locations/${values.id}`, {
+    const payload = {
       name: values.name,
-      'parentLocation.id': values.parentLocation.id,
+      parentLocation: { id: values.parentLocation.id },
       active: values.active,
-      'locationType.id': values.locationType.id,
-    })
+      locationType: { id: values.locationType.id },
+      zone: values.zoneLocation && { id: values.zoneLocation.id },
+    };
+
+    apiClient.post(`/openboxes/api/locations/${values.id}`, flattenRequest(payload))
       .then(() => {
         this.props.hideSpinner();
         if (values.locationType.locationTypeCode === 'ZONE') {
@@ -329,6 +344,7 @@ class ZoneAndBinLocations extends Component {
                 locationId={this.props.initialValues.locationId}
                 addBinLocation={this.refetchBinTable}
                 binTypes={this.state.binTypes}
+                zoneData={this.state.zoneData}
               />
               <ImportBinModal
                 locationId={this.props.initialValues.locationId}
@@ -349,6 +365,7 @@ class ZoneAndBinLocations extends Component {
               validate={binValidate}
               binTypes={this.state.binTypes}
               refBinTable={this.refBinTable}
+              zoneData={this.state.zoneData}
             />
           </div>
           <div className="submit-buttons d-flex justify-content-between">
