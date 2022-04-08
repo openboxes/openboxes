@@ -135,8 +135,6 @@ const binValidate = (values) => {
     }, {});
 };
 
-const PAGE_ID = 'zoneAndBinLocations';
-
 
 class ZoneAndBinLocations extends Component {
   constructor(props) {
@@ -279,13 +277,6 @@ class ZoneAndBinLocations extends Component {
       <div className="d-flex flex-column">
         <div className="configuration-wizard-content flex-column">
           <div className="classic-form with-description">
-            <div className="submit-buttons">
-              <button type="button" onClick={() => Alert.info(this.props.supportLinks[PAGE_ID])} className="btn btn-outline-primary float-right btn-xs">
-                <i className="fa fa-question-circle-o" aria-hidden="true" />
-                &nbsp;
-                <Translate id="react.default.button.support.label" defaultMessage="Support" />
-              </button>
-            </div>
             <div className="form-title">
               <Translate id="react.locationsConfiguration.zone.label" defaultMessage="Zone Locations" />
             </div>
@@ -398,7 +389,6 @@ export default connect(mapStateToProps, mapDispatchToProps)(ZoneAndBinLocations)
 ZoneAndBinLocations.propTypes = {
   nextPage: PropTypes.func.isRequired,
   previousPage: PropTypes.func.isRequired,
-  supportLinks: PropTypes.shape({}).isRequired,
   translate: PropTypes.func.isRequired,
   initialValues: PropTypes.shape({
     active: PropTypes.bool,

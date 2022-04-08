@@ -27,7 +27,6 @@ import splitTranslation from 'utils/translation-utils';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'components/locations-configuration/LocationDetails.scss';
 
-const PAGE_ID = 'locationDetails';
 
 function validate(values) {
   const errors = {};
@@ -444,13 +443,6 @@ class LocationDetails extends Component {
               />
               <form onSubmit={handleSubmit} className="w-100">
                 <div className="classic-form with-description">
-                  <div className="submit-buttons">
-                    <button type="button" onClick={() => Alert.info(this.props.supportLinks[PAGE_ID])} className="btn btn-outline-primary float-right btn-xs">
-                      <i className="fa fa-question-circle-o" aria-hidden="true" />
-                      &nbsp;
-                      <Translate id="react.default.button.support.label" defaultMessage="Support" />
-                    </button>
-                  </div>
                   <div className="form-title"><Translate id="react.locationsConfiguration.details.label" defaultMessage="Details" /></div>
                   <div className="form-subtitle"><Translate id="react.locationsConfiguration.additionalTitle.label" defaultMessage="Fill in the details for your location. Click the question mark next to the field name to find out more." /></div>
 
@@ -594,7 +586,6 @@ LocationDetails.propTypes = {
     manager: PropTypes.string,
   }).isRequired,
   nextPage: PropTypes.func.isRequired,
-  supportLinks: PropTypes.shape({}).isRequired,
   showSpinner: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
   debounceTime: PropTypes.number.isRequired,
