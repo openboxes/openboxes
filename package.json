@@ -62,7 +62,7 @@
     "immutability-helper": "2.7.1",
     "js-file-download": "0.4.1",
     "lodash": "4.17.21",
-    "moment": "2.22.2",
+    "moment": "2.29.2",
     "popper.js": "1.14.7",
     "prop-types": "15.8.1",
     "query-string": "6.10.1",
