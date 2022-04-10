@@ -20,12 +20,16 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
+import org.pih.warehouse.product.Product
+
+import javax.xml.bind.ValidationException
 
 class ReplenishmentApiController {
 
     def identifierService
     def replenishmentService
     def picklistService
+    def inventoryService
 
     def list = {
         List<Order> replenishments = Order.findAllByOrderType(OrderType.get(OrderTypeCode.TRANSFER_ORDER.name()))
@@ -44,10 +48,15 @@ class ReplenishmentApiController {
     }
 
     def create = {
-        JSONObject jsonObject = request.JSON
-
-        User currentUser = User.get(session.user.id)
         Location currentLocation = Location.get(session.warehouse.id)
+        JSONObject jsonObject = request.JSON
+        jsonObject.replenishmentItems.each { item ->
+            Product product = Product.get(item['product.id'])
+            if (item.quantity > inventoryService.getQuantityAvailableToPromise(product, currentLocation)) {
+                throw new ValidationException("There is not available that quantity of the product with id: ${product.id}")
+            }
+        }
+        User currentUser = User.get(session.user.id)
         if (!currentLocation || !currentUser) {
             throw new IllegalArgumentException("User must be logged into a location to update replenishment")
         }

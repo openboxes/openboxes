@@ -69,10 +69,10 @@ const FIELD = {
         label: 'react.replenishment.maxQuantity.label',
         defaultMessage: 'Max Qty',
       },
-      totalQuantityOnHand: {
+      quantityAvailable: {
         type: LabelField,
-        label: 'react.replenishment.totalQuantityOnHand.label',
-        defaultMessage: 'Total QoH',
+        label: 'react.replenishment.quantityAvailable.label',
+        defaultMessage: 'Qty available',
       },
       quantity: {
         type: TextField,
@@ -97,8 +97,13 @@ function validate(values) {
   errors.requirements = [];
 
   _.forEach(values.requirements, (item, key) => {
-    if (item.quantity && item.quantity < 0) {
-      errors.requirements[key] = { quantity: 'react.replenishment.error.quantity.label' };
+    if (item.quantity) {
+      if (item.quantity < 0) {
+        errors.requirements[key] = { quantity: 'react.replenishment.error.quantity.label' };
+      }
+      if (item.quantity > item.totalQuantityAvailableToPromise) {
+        errors.requirements[key] = { quantity: 'react.replenishment.error.quantity.greaterThanQATP.label' };
+      }
     }
   });
   return errors;
@@ -182,15 +187,15 @@ class CreateReplenishment extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
-  createReplenishment() {
+  createReplenishment(values) {
     this.props.showSpinner();
     const url = '/openboxes/api/replenishments/';
     const payload = {
-      replenishmentItems: _.filter(
-        this.state.values.requirements,
-        item => _.toInteger(item.quantity) > 0,
-      ),
+      replenishmentItems: values.requirements
+        .map(item => ({ ...item, quantity: _.toInteger(item.quantity) }))
+        .filter(item => item.quantity > 0),
     };
+
 
     apiClient.post(url, flattenRequest(payload))
       .then((response) => {

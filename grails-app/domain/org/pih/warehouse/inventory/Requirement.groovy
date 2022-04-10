@@ -13,6 +13,7 @@ class Requirement implements Serializable {
     Integer maxQuantity
     Integer reorderQuantity
     Integer totalQuantityOnHand // Total QoH for this product in Depot
+    Integer totalQuantityAvailableToPromise // Total QATP for this product in Depot
     InventoryLevelStatus status
 
     static mapping = {
@@ -31,23 +32,26 @@ class Requirement implements Serializable {
         maxQuantity(nullable: true)
         reorderQuantity(nullable: true)
         totalQuantityOnHand(nullable: true)
+        totalQuantityAvailableToPromise(nullable: true)
         status(nullable: true)
     }
 
     Map toJson() {
         return [
-            id                      : id,
-            "product.id"            : product?.id,
-            "product.productCode"   : product?.productCode,
-            "product.name"          : product?.name,
-            "binLocation.id"        : binLocation?.id,
-            "binLocation.name"      : binLocation?.name,
-            "zone"                  : binLocation?.zone?.name,
-            quantityInBin           : quantityInBin,
-            minQuantity             : minQuantity,
-            maxQuantity             : maxQuantity,
-            totalQuantityOnHand     : totalQuantityOnHand,
-            quantityNeeded          : maxQuantity - quantityInBin > 0 ? maxQuantity - quantityInBin : 0,
+            id                                  : id,
+            "product.id"                        : product?.id,
+            "product.productCode"               : product?.productCode,
+            "product.name"                      : product?.name,
+            "binLocation.id"                    : binLocation?.id,
+            "binLocation.name"                  : binLocation?.name,
+            "zone"                              : binLocation?.zone?.name,
+            quantityInBin                       : quantityInBin,
+            minQuantity                         : minQuantity,
+            maxQuantity                         : maxQuantity,
+            totalQuantityOnHand                 : totalQuantityOnHand,
+            quantityNeeded                      : totalQuantityAvailableToPromise > maxQuantity - quantityInBin ? maxQuantity - quantityInBin : totalQuantityAvailableToPromise,
+            totalQuantityAvailableToPromise     : totalQuantityAvailableToPromise,
+            quantityAvailable                   : totalQuantityAvailableToPromise - quantityInBin > 0 ? totalQuantityAvailableToPromise - quantityInBin : 0,
         ]
     }
 }
