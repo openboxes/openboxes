@@ -241,7 +241,7 @@ class StockMovementController {
                 stockMovementService.rollbackStockMovement(params.id)
                 flash.message = "Successfully rolled back stock movement with ID ${params.id}"
             } catch (Exception e) {
-                log.error("Unable to rollback stock movement with ID ${params.id}: " + e.message)
+                log.error("Unable to rollback stock movement with ID ${params.id}: " + e.message, e)
                 flash.message = "Unable to rollback stock movement with ID ${params.id}: " + e.message
             }
         } else {
@@ -586,7 +586,15 @@ class StockMovementController {
 
         StockMovement stockMovement = stockMovementService.getStockMovement(params.stockMovement.id)
         Shipment shipment = stockMovement.shipment
-        Container container = new Container(params)
+        Container container
+        if (params?.container?.id) {
+            container = Container.get(params?.container?.id)
+            container.properties = params
+        }
+        else {
+            container = new Container(params)
+        }
+
         if (shipment && container.validate()) {
             shipment.addToContainers(container)
             shipment.save()
