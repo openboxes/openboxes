@@ -80,6 +80,9 @@ class OrderStatusNotificationController {
             if (status in [RequisitionStatus.CANCELED]) {
                 log.info "Canceling requisition ${identifier}"
                 requisition.status = status as RequisitionStatus
+                requisition.requisitionItems.each { RequisitionItem requisitionItem ->
+                    requisitionItem.cancelQuantity()
+                }
                 requisition.save(flush:true)
             }
             else if (status in [RequisitionStatus.APPROVED]) {
