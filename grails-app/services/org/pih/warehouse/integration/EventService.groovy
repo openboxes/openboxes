@@ -13,33 +13,41 @@ import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
+import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.Container
 
 class EventService {
 
     boolean transactional = true
 
-    def notificationService
     def grailsApplication
+    def notificationService
+    def stockMovementService
 
     void publishStockMovementStatusEvent(StockMovement stockMovement){
         log.info "Publish status change event " + stockMovement.toJson()
         String TOPIC_ARN = grailsApplication.config.awssdk.sns.order.status
         JSONObject notifyJson = new JSONObject()
-        notifyJson.put("id", stockMovement.identifier)
-        notifyJson.put("locationNumber", stockMovement?.origin?.locationNumber)
-        notifyJson.put("status", stockMovement.status)
+        notifyJson.put("id", stockMovement.identifier?:JSONObject.NULL)
+        notifyJson.put("locationNumber", stockMovement?.origin?.locationNumber?:JSONObject.NULL)
+        notifyJson.put("status", stockMovement.status?:JSONObject.NULL)
 
         // Add order items
         JSONArray orderItems = new JSONArray()
-        stockMovement.lineItems?.each { StockMovementItem stockMovementItem ->
+        stockMovement.lineItems?.each { StockMovementItem lineItem ->
+            // Need to do lookup here because the line item is what has been sent in the form submit
+            StockMovementItem stockMovementItem = stockMovementService.getStockMovementItem(lineItem.id)
+
+            // We need to get some values from the original (parent) requisition item in the case of modifications and substitutions
+            RequisitionItem originalRequisitionItem = stockMovementItem?.requisitionItem?.parentRequisitionItem ?: stockMovementItem?.requisitionItem
+
             JSONObject orderItem = new JSONObject()
-            orderItem.put("id", stockMovementItem.description)
-            orderItem.put("acceptedQuantity", stockMovementItem.quantityRequired)
-            orderItem.put("quantityRequested", stockMovementItem.quantityRequested)
-            orderItem.put("quantityRevised", stockMovementItem.quantityRevised)
-            orderItem.put("quantityPicked", stockMovementItem.quantityPicked)
-            orderItem.put("quantityShipped", stockMovementItem.quantityShipped)
+            orderItem.put("id", originalRequisitionItem?.description ?: JSONObject.NULL)
+            orderItem.put("acceptedQuantity", stockMovementItem.quantityRequired ?: 0)
+            orderItem.put("quantityRequested", originalRequisitionItem?.quantity ?: 0)
+            orderItem.put("quantityRevised", stockMovementItem.quantityRevised ?: 0)
+            orderItem.put("quantityPicked", stockMovementItem.quantityPicked ?: 0)
+            orderItem.put("quantityShipped", stockMovementItem.quantityShipped ?: 0)
             orderItems.add(orderItem)
         }
         notifyJson.put("orderItems", orderItems)
@@ -48,12 +56,14 @@ class EventService {
         JSONArray packages = new JSONArray()
         stockMovement?.shipment?.containers.each { Container container ->
             JSONObject jsonObject = new JSONObject()
-            jsonObject.put("identifier", container?.containerNumber)
-            jsonObject.put("type", container?.containerType?.name)
-            jsonObject.put("length", container?.length)
-            jsonObject.put("width", container?.width)
-            jsonObject.put("height", container?.height)
-            jsonObject.put("weight", container?.weight)
+            jsonObject.put("identifier", container?.containerNumber?:JSONObject.NULL)
+            jsonObject.put("type", container?.containerType?.name?:JSONObject.NULL)
+            jsonObject.put("length", container?.length?:JSONObject.NULL)
+            jsonObject.put("width", container?.width?:JSONObject.NULL)
+            jsonObject.put("height", container?.height?:JSONObject.NULL)
+            jsonObject.put("volumeUnits", container?.volumeUnits?:JSONObject.NULL)
+            jsonObject.put("weight", container?.weight?:JSONObject.NULL)
+            jsonObject.put("weightUnits", container?.weightUnits?:JSONObject.NULL)
             packages.add(jsonObject)
         }
         notifyJson.put("packages", packages)
