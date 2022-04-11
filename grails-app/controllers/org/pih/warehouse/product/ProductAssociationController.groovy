@@ -73,6 +73,15 @@ class ProductAssociationController {
     def save = {
         def productAssociationInstance = new ProductAssociation(params)
         if (productAssociationInstance.save(flush: true)) {
+            if (params.hasMutualAssociation) {
+                def mutualAssociationInstance = new ProductAssociation()
+                bindMutualAssociationData(mutualAssociationInstance, params)
+
+                mutualAssociationInstance.mutualAssociation = productAssociationInstance
+                productAssociationInstance.mutualAssociation = mutualAssociationInstance
+
+                mutualAssociationInstance.save(flush: true, failOnError: true)
+            }
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'productAssociation.label', default: 'ProductAssociation'), productAssociationInstance.id])}"
 
             if (params.dialog) {
@@ -118,6 +127,21 @@ class ProductAssociationController {
                     return
                 }
             }
+
+            if (params.hasMutualAssociation) {
+                def mutualAssociationInstance
+                if (productAssociationInstance.mutualAssociation) {
+                    mutualAssociationInstance = productAssociationInstance.mutualAssociation
+                } else {
+                    mutualAssociationInstance = new ProductAssociation()
+
+                    mutualAssociationInstance.mutualAssociation = productAssociationInstance
+                    productAssociationInstance.mutualAssociation = mutualAssociationInstance
+                }
+
+                bindMutualAssociationData(mutualAssociationInstance, params)
+            }
+
             productAssociationInstance.properties = params
             if (!productAssociationInstance.hasErrors() && productAssociationInstance.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'productAssociation.label', default: 'ProductAssociation'), productAssociationInstance.id])}"
@@ -173,5 +197,14 @@ class ProductAssociationController {
                 "attachment; filename=\"productAssociations.csv\"")
         response.contentType = "text/csv"
         render dataService.generateCsv(data)
+    }
+
+    void bindMutualAssociationData(ProductAssociation mutualAssociation, Map params) {
+        mutualAssociation.product = Product.get(params.associatedProduct.id)
+        mutualAssociation.associatedProduct = Product.get(params.product.id)
+        def quantity = params.quantity as Integer
+        mutualAssociation.quantity = quantity != 0 ? (1 / quantity) : 0 as BigDecimal
+        mutualAssociation.code = ProductAssociationTypeCode.valueOf(ProductAssociationTypeCode, params.code)
+        mutualAssociation.comments = params.comments
     }
 }

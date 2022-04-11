@@ -14,11 +14,22 @@ package org.pih.warehouse.product
  */
 class ProductAssociation {
 
+    def beforeDelete() {
+        if (mutualAssociation) {
+            // Set to null mutual association that references ProductAssociation which is being deleted
+            ProductAssociation mutualAssociation = ProductAssociation.get(mutualAssociation.id)
+            mutualAssociation.mutualAssociation = null
+            mutualAssociation.save()
+        }
+    }
+
     String id
     ProductAssociationTypeCode code
     Product associatedProduct
     BigDecimal quantity = 0
     String comments
+
+    ProductAssociation mutualAssociation
 
     Date dateCreated
     Date lastUpdated
@@ -34,8 +45,8 @@ class ProductAssociation {
         associatedProduct(nullable: false)
         quantity(nullable: true)
         comments(nullable: true)
+        mutualAssociation(nullable: true)
     }
-
 
     static PROPERTIES = [
             "id"                     : "id",
@@ -49,5 +60,4 @@ class ProductAssociation {
             "Date created"           : "dateCreated",
             "Last updated"           : "lastUpdated"
     ]
-
 }

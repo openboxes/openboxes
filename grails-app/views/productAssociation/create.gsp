@@ -75,6 +75,15 @@
 									<g:textArea class="text" name="comments" value="${productAssociationInstance?.comments}" />
 								</td>
 							</tr>
+
+							<tr class="prop">
+								<td class="name">
+									<label><warehouse:message code="productAssociation.mutualAssociation.label" default="Two-way Association"/></label>
+								</td>
+								<td class="value">
+									<g:checkBox name="hasMutualAssociation" value="${productAssociationInstance?.mutualAssociation}"/>
+								</td>
+							</tr>
 						
 							<tr class="prop">
 								<td valign="top" class="name">
