@@ -109,11 +109,11 @@ class StockMovementService {
 
          // Determine whether we need to rollback changes
         Boolean rollback =
-                jsonObject.containsKey("rollback") ? jsonObject.getBoolean("rollback") : Boolean.FALSE
+                    jsonObject.containsKey("rollback") ? jsonObject.getBoolean("rollback") : Boolean.FALSE
 
         // Clear picklist
         Boolean shouldClearPicklist = jsonObject.containsKey("clearPicklist") ?
-                jsonObject.getBoolean("clearPicklist") : Boolean.FALSE
+                                jsonObject.getBoolean("clearPicklist") : Boolean.FALSE
 
         // Create picklist
         Boolean shouldCreatePicklist = jsonObject.containsKey("createPicklist") ?
@@ -162,13 +162,17 @@ class StockMovementService {
 
                         break
                     case StockMovementStatusCode.PICKED:
-                    case StockMovementStatusCode.PACKED:
                     case StockMovementStatusCode.CHECKING:
                     case StockMovementStatusCode.CHECKED:
                         def shipment = createShipment(stockMovement)
                         if (stockMovement?.requisition?.picklist) {
                             shipmentService.validateShipment(shipment)
                         }
+
+                        if (stockMovement.isOutboundStockMovement() && status == StockMovementStatusCode.CHECKING && stockMovement?.shipment?.containers?.empty) {
+                            throw new IllegalStateException("Shipment must have at least one package associated with it. Click Save & Exit, go to the Packing List tab and add at least one package")
+                        }
+
                         break
                     case StockMovementStatusCode.DISPATCHED:
                         issueRequisitionBasedStockMovement(stockMovement.id)
@@ -2408,7 +2412,7 @@ class StockMovementService {
             throw new IllegalStateException("There are no shipments associated with stock movement ${requisition.requestNumber}")
         }
 
-        if (shipment?.containers?.empty) {
+        if (stockMovement.isOutboundStockMovement() && status == StockMovementStatusCode.CHECKING && shipment?.containers?.empty) {
             throw new IllegalStateException("Shipment must have at least one package associated with it. Click Save & Exit, go to the Packing List tab and add at least one package")
         }
 
