@@ -107,25 +107,24 @@ class StockMovementService {
         Boolean statusOnly =
                 jsonObject.containsKey("statusOnly") ? jsonObject.getBoolean("statusOnly") : Boolean.FALSE
 
-         // Determine whether we need to rollback changes
         Boolean rollback =
                     jsonObject.containsKey("rollback") ? jsonObject.getBoolean("rollback") : Boolean.FALSE
 
-        // Clear picklist
+        Boolean shouldCreatePicklist = jsonObject.containsKey("createPicklist") ?
+                                jsonObject.getBoolean("createPicklist") : Boolean.FALSE
+
         Boolean shouldClearPicklist = jsonObject.containsKey("clearPicklist") ?
                                 jsonObject.getBoolean("clearPicklist") : Boolean.FALSE
 
-        // Create picklist
-        Boolean shouldCreatePicklist = jsonObject.containsKey("createPicklist") ?
-                jsonObject.getBoolean("createPicklist") : Boolean.FALSE
-
-        transitionRequisitionBasedStockMovement(stockMovement, status, statusOnly, rollback, shouldClearPicklist, shouldCreatePicklist)
+        transitionRequisitionBasedStockMovement(stockMovement, status, statusOnly, rollback, shouldCreatePicklist, shouldClearPicklist)
 
     }
 
+
     void transitionRequisitionBasedStockMovement(StockMovement stockMovement, StockMovementStatusCode status,
-                                                 Boolean statusOnly = false, Boolean rollback = false,
-                                                 Boolean shouldClearPicklist = false, Boolean shouldCreatePicklist = false) {
+                                                 Boolean statusOnly = Boolean.FALSE, Boolean rollback = Boolean.FALSE,
+                                                 Boolean shouldCreatePicklist = Boolean.FALSE, Boolean shouldClearPicklist = Boolean.FALSE) {
+
         // Update status only
         if (status && statusOnly) {
             RequisitionStatus requisitionStatus = RequisitionStatus.fromStockMovementStatus(stockMovementStatus)
@@ -133,6 +132,8 @@ class StockMovementService {
         }
         // Determine whether we need to rollback change,
         else {
+
+            // Determine whether we need to rollback changes
             if (rollback) {
                 rollbackStockMovement(stockMovement.id)
             }
@@ -178,14 +179,17 @@ class StockMovementService {
                         issueRequisitionBasedStockMovement(stockMovement.id)
                         break
                     default:
-                        throw new IllegalArgumentException("Cannot update status with invalid status ${jsonObject.status}")
+                        throw new IllegalArgumentException("Cannot update status with invalid status ${status}")
                         break
 
                 }
-                // If the dependent actions were updated properly then we can update the
+                // If the dependent actions were updated properly then we can update the status
                 RequisitionStatus requisitionStatus = RequisitionStatus.fromStockMovementStatus(status)
                 updateRequisitionStatus(stockMovement.id, requisitionStatus)
+
+                // Broadcast status change to event bus in case there's more work to be done
                 grailsApplication.mainContext.publishEvent(new StockMovementStatusEvent(stockMovement, status, rollback))
+
             }
         }
     }
@@ -247,8 +251,8 @@ class StockMovementService {
 
     void updateRequisitionStatus(String id, RequisitionStatus status) {
 
-        log.info "Update status ${id} " + status
         Requisition requisition = Requisition.get(id)
+        log.info "Update status id=${id} requisition=${requisition} status=${status}"
         if (status == RequisitionStatus.CHECKING) {
             Shipment shipment = requisition.shipment
             shipment?.expectedShippingDate = new Date()
@@ -264,7 +268,6 @@ class StockMovementService {
             requisition.save(flush: true)
         }
     }
-
 
     StockMovement updateStockMovement(StockMovement stockMovement) {
         if (!stockMovement.validate()) {
@@ -361,14 +364,6 @@ class StockMovementService {
 
     void deleteStockMovement(StockMovement stockMovement) {
         if (stockMovement?.requisition) {
-            def shipments = stockMovement?.requisition?.shipments
-            shipments.toArray().each { Shipment shipment ->
-                stockMovement?.requisition.removeFromShipments(shipment)
-                if (!shipment?.events?.empty) {
-                    shipmentService.rollbackLastEvent(shipment)
-                }
-                shipmentService.deleteShipment(shipment)
-            }
             requisitionService.deleteRequisition(stockMovement?.requisition)
         }
         else {
@@ -409,6 +404,8 @@ class StockMovementService {
                     }
                 }
             }
+            if (criteria.stockMovementStatusCode) eq("currentStatus",
+                    ShipmentStatusCode.fromStockMovementStatus(criteria.stockMovementStatusCode))
             if (criteria.destination) eq("destination", criteria.destination)
             if (criteria.origin) eq("origin", criteria.origin)
             if (criteria.receiptStatusCodes) 'in'("currentStatus", criteria.receiptStatusCodes)
@@ -423,6 +420,8 @@ class StockMovementService {
             if (criteria.updatedBy) {
                 eq("updatedBy", criteria.updatedBy)
             }
+
+            // Stock Movement List
             if(params.createdAfter) {
                 ge("dateCreated", params.createdAfter)
             }
@@ -1921,6 +1920,12 @@ class StockMovementService {
         createMissingShipmentItem(requisitionItem)
     }
 
+    def revertAllItems(StockMovement stockMovement) {
+        stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
+            revertItem(stockMovementItem)
+        }
+    }
+
     def revertItem(StockMovementItem stockMovementItem) {
         removeShipmentAndPicklistItemsForModifiedRequisitionItem(stockMovementItem)
 
@@ -2447,9 +2452,35 @@ class StockMovementService {
         Requisition requisition = stockMovement?.requisition
         Shipment shipment = stockMovement?.requisition?.shipment ?: stockMovement?.shipment
         if (shipment && shipment.currentStatus > ShipmentStatusCode.PENDING) {
-            shipmentService.rollbackLastEvent(shipment)
-            if (requisition) {
+            if (shipment.hasShipped()) {
                 requisitionService.rollbackRequisition(requisition)
+            }
+            shipmentService.rollbackLastEvent(shipment)
+        } else {
+            switch (stockMovement.requisition.status) {
+                case RequisitionStatus.ISSUED:
+                    requisitionService.rollbackRequisition(stockMovement.requisition)
+                    break;
+                case RequisitionStatus.CHECKING:
+                    requisition.status = RequisitionStatus.PICKED
+                    break;
+                case RequisitionStatus.PICKED:
+                    requisition.status = RequisitionStatus.PICKING
+                    break;
+                case RequisitionStatus.PICKING:
+                    clearPicklist(stockMovement)
+                    requisition.status = RequisitionStatus.VERIFYING
+                    break;
+                case RequisitionStatus.VERIFYING:
+                    revertAllItems(stockMovement)
+                    requisition.status = RequisitionStatus.EDITING
+                    break;
+                case RequisitionStatus.EDITING:
+                    requisitionService.clearRequisition(stockMovement.requisition)
+                    requisition.status = RequisitionStatus.CREATED
+                    break;
+                default:
+                    throw new IllegalStateException("Cannot rollback to status ${stockMovement?.requisition?.status}")
             }
         }
     }

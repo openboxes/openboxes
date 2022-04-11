@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.api.StockMovementType" %>
+<%@ page import="org.pih.warehouse.api.StockMovementType; org.pih.warehouse.inventory.StockMovementStatusCode" %>
 <div class="box">
     <h2>
         ${entityName} &rsaquo;
@@ -68,7 +68,13 @@
                 </td>
                 <g:if test="${!params.direction || params.direction as StockMovementType == StockMovementType.OUTBOUND}">
                     <td>
-                        <label class="status"><format:metadata obj="${stockMovement?.status}"/></label>
+                        <label class="status"><format:metadata obj="${stockMovement?.status}"/>
+                            <g:set var="approved" value="${stockMovement.lineItems.any { it.quantityApproved > 0 } }"/>
+                            <g:if test="${stockMovement?.stockMovementStatusCode == StockMovementStatusCode.REQUESTED &&
+                                    stockMovement.isOutboundStockMovement() && !approved}">
+                                <div class="small">Awaiting Approval</div>
+                            </g:if>
+                        </label>
                     </td>
                 </g:if>
                 <g:if test="${!params.direction || params.direction as StockMovementType == StockMovementType.INBOUND}">

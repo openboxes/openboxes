@@ -7,7 +7,7 @@
             <td class="middle" width="1%">
                 <g:if test="${shipmentInstance?.shipmentType }">
                     <img src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentType' + format.metadata(obj:shipmentInstance?.shipmentType, locale:null) + '.png')}"
-                         alt="${format.metadata(obj:shipmentInstance?.shipmentType)}" style="vertical-align: middle; width: 24px; height: 24px;" />
+                         alt="${format.metadata(obj:shipmentInstance?.shipmentType)}" />
                 </g:if>
                 <g:else>
                     <img src="${createLinkTo(dir:'images/icons/shipmentType',file: 'ShipmentTypeDefault.png')}"
@@ -139,7 +139,12 @@
             </td>
             <td class="center" width="1%">
                 <div class="tag tag-alert">
-                    <format:metadata obj="${stockMovement?.shipment?.status?.code?.displayStatus?:stockMovement?.requisition?.status?.displayStatus }"/>
+                    <g:if test="${stockMovement?.requisition?.status < RequisitionStatus.ISSUED}">
+                        <format:metadata obj="${stockMovement?.requisition?.status?.displayStatus }"/>
+                    </g:if>
+                    <g:else>
+                        ${stockMovement?.shipment?.status?.code?.displayStatus}
+                    </g:else>
                 </div>
             </td>
         </tr>

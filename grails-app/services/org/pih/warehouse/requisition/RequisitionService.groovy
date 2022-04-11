@@ -23,6 +23,7 @@ import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.util.DateUtil
 
@@ -481,6 +482,18 @@ class RequisitionService {
     }
 
     void deleteRequisition(Requisition requisition) {
+
+        if (requisition?.shipments) {
+            def shipments = requisition?.shipments
+            shipments.toArray().each { Shipment shipment ->
+                requisition.removeFromShipments(shipment)
+                if (!shipment?.events?.empty) {
+                    shipmentService.rollbackLastEvent(shipment)
+                }
+                shipmentService.deleteShipment(shipment)
+            }
+        }
+
         requisition?.requisitionItems?.toArray().each { RequisitionItem requisitionItem ->
             deleteRequisitionItem(requisitionItem)
         }
@@ -488,7 +501,7 @@ class RequisitionService {
         if (requisition?.picklist) {
             requisition.picklist.delete()
         }
-        requisition.delete()
+        requisition.delete(flush:true)
     }
 
     void deleteRequisitionItem(RequisitionItem requisitionItem) {

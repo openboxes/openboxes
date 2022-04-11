@@ -674,6 +674,7 @@ class ShipmentService {
 
 
     boolean validateShipment(Shipment shipment) {
+
         if (shipment?.orders && shipment?.orders?.first()?.orderType?.isReturnOrder()) {
             shipment?.shipmentItems?.each { ShipmentItem shipmentItem ->
                 validateReturnShipmentItem(shipmentItem, shipmentItem.binLocation ? true : false)
@@ -833,6 +834,13 @@ class ShipmentService {
      * @param shipment
      */
     void deleteShipment(Shipment shipment) {
+
+        // Remove all events
+        shipment?.events?.toArray().each {
+            rollbackLastEvent(shipment)
+        }
+
+        // Remove all shipment items
         shipment.shipmentItems.toArray().each { ShipmentItem shipmentItem ->
             shipment.removeFromShipmentItems(shipmentItem)
             shipmentItem.orderItems.toArray().flatten().each { OrderItem orderItem ->
@@ -840,6 +848,8 @@ class ShipmentService {
             }
             shipmentItem.delete()
         }
+
+        // Delete shipment
         shipment.delete()
     }
 
@@ -1812,8 +1822,8 @@ class ShipmentService {
             }
 
         } catch (Exception e) {
-            log.error("Error rolling back most recent event", e)
-            throw new IllegalStateException("Error rolling back most recent event", e)
+            log.error("Error rolling back most recent event" + e.message, e)
+            throw e
         }
     }
 

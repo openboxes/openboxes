@@ -203,13 +203,18 @@
     </g:if>
     <g:if test="${requestTab}">
         <td class="middle center">
-            <g:if test="${requisitionItem?.isCanceled()}">
-                <div>
+            <g:if test="${requisitionItem?.quantityIssued}">
+                <g:if test="${requisitionItem?.isCanceled()}">
+                    <div>
+                        ${requisitionItem?.quantityAdjusted?:0}
+                    </div>
+                </g:if>
+                <g:else>
                     ${requisitionItem?.quantityAdjusted?:0}
-                </div>
+                </g:else>
             </g:if>
             <g:else>
-                ${requisitionItem?.quantityAdjusted?:0}
+                0
             </g:else>
         </td>
         <td class="middle center">
