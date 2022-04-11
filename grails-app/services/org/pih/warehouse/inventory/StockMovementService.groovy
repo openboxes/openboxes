@@ -2418,7 +2418,9 @@ class StockMovementService {
             throw new IllegalStateException("There are no shipments associated with stock movement ${requisition.requestNumber}")
         }
 
-        if (stockMovement.isOutboundStockMovement() && status == StockMovementStatusCode.CHECKING && shipment?.containers?.empty) {
+        if (stockMovement.isOutboundStockMovement()
+                && stockMovement?.stockMovementStatusCode == StockMovementStatusCode.CHECKING
+                && shipment?.containers?.empty) {
             throw new IllegalStateException("Shipment must have at least one package associated with it. Click Save & Exit, go to the Packing List tab and add at least one package")
         }
 
