@@ -270,7 +270,12 @@
                         ${container.height} ${container?.volumeUnits}
                     </td>
                     <td>
-                        <g:set var="volume" value="${(container.length/1000 * container?.height/1000 * container?.width/1000)}"/>
+                        <g:if test="${container.volumeUnits == 'mm'}">
+                            <g:set var="volume" value="${(container.length * container?.height * container?.width)/1000000000}"/>
+                        </g:if>
+                        <g:elseif test="${container.volumeUnits == 'cm'}">
+                            <g:set var="volume" value="${(container.length * container?.height * container?.width)/1000000}"/>
+                        </g:elseif>
                         <g:formatNumber number="${volume}" minFractionDigits="5"/> cbm
                     </td>
                     <td>

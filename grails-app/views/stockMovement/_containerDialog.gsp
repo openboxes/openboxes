@@ -45,8 +45,11 @@
                         <label><warehouse:message code="default.weightUnits.label" default="Weight Uom"/></label>
                     </td>
                     <td valign="top" class="value">
-                        <g:select name="weightUnits" from="${org.pih.warehouse.core.Constants.WEIGHT_UNITS}" value="${container?.weightUnits}"
-                                  class="chzn-select-deselect"/>
+                        <g:select name="weightUnits"
+                                  readonly="readonly"
+                                  from="${org.pih.warehouse.core.Constants.WEIGHT_UNITS}"
+                                  value="${container?.weightUnits}"
+                                  class="chzn-select-readonly"/>
                     </td>
                 </tr>
 
@@ -57,7 +60,8 @@
                         <label><warehouse:message code="default.length.label" default="Length"/></label>
                     </td>
                     <td class="value bottom">
-                        <g:textField id="length" name="length" size="5" value="${container?.length}" class="text large" placeholder="Length"/>
+                        <g:textField id="length" name="length" size="5" value="${container?.length}"
+                                     class="text large" placeholder="Length" readonly="readonly"/>
                     </td>
                 </tr>
                 <tr class="prop">
@@ -65,7 +69,8 @@
                         <label><warehouse:message code="default.width.label" default="Width"/></label>
                     </td>
                     <td class="value bottom">
-                        <g:textField id="width" name="width" size="5" value="${container?.width}" class="text large" placeholder="Width"/>
+                        <g:textField id="width" name="width" size="5" value="${container?.width}"
+                                     class="text large" placeholder="Width" readonly="readonly"/>
                     </td>
                 </tr>
                 <tr class="prop">
@@ -73,7 +78,8 @@
                         <label><warehouse:message code="default.height.label" default="Height"/></label>
                     </td>
                     <td class="value bottom">
-                        <g:textField id="height" name="height" size="5" value="${container?.height}" class="text large" placeholder="Height"/>
+                        <g:textField id="height" name="height" size="5" value="${container?.height}"
+                                     class="text large" placeholder="Height" readonly="readonly"/>
                     </td>
                 </tr>
                 <tr class="prop">
@@ -82,7 +88,7 @@
                     </td>
                     <td class="value bottom">
                         <g:select name="volumeUnits" from="${org.pih.warehouse.core.Constants.VOLUME_UNITS}" value="${container?.volumeUnits}"
-                            class="chzn-select-deselect"/>
+                            class="chzn-select-readonly"/>
                     </td>
                 </tr>
             </tbody>
