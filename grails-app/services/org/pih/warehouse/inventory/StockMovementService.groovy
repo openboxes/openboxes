@@ -372,11 +372,12 @@ class StockMovementService {
     }
 
     def getStockMovements(StockMovement criteria, Map params) {
-        params.includeStockMovementItems = false
         switch(criteria.stockMovementType) {
             case StockMovementType.OUTBOUND:
+                params.includeStockMovementItems = Boolean.TRUE
                 return getOutboundStockMovements(criteria, params)
             case StockMovementType.INBOUND:
+                params.includeStockMovementItems = Boolean.FALSE
                 return getInboundStockMovements(criteria, params)
             default:
                 throw new IllegalArgumentException("Origin and destination cannot be the same")
