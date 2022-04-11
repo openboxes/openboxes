@@ -404,6 +404,17 @@
         });
       });
 
+      $(".chzn-select-readonly").livequery(function() {
+        // Disable element, refresh chosen, then re-enable element
+        $(this)
+        .chosen({
+          width: '100%',
+          search_contains: true,
+          allow_single_deselect: true,
+          readonly: true,
+        }).prop('disabled',true).trigger('chosen:updated').prop('disabled',false);
+      });
+
       // Select 2 default configuration
       $(".select2")
       .select2({
