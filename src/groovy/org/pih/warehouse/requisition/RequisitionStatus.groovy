@@ -32,6 +32,7 @@ enum RequisitionStatus {
     FULFILLED(0),
     REVIEWING(0),
     CONFIRMING(0),
+    UNCHANGED(0)
 
     int sortOrder
     RequisitionStatus displayStatusCode

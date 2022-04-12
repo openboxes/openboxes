@@ -87,6 +87,10 @@ class OrderStatusNotificationController {
                 throw new IllegalStateException("Cannot update requisition in status ${requisition.status}")
             }
 
+            if (status in [RequisitionStatus.UNCHANGED]) {
+                return
+            }
+
             if (status in [RequisitionStatus.CANCELED]) {
                 log.info "Canceling requisition ${identifier}"
                 requisition.status = status as RequisitionStatus
@@ -98,14 +102,22 @@ class OrderStatusNotificationController {
             else if (status in [RequisitionStatus.APPROVED]) {
                 log.info "Approving requisition ${identifier}"
 
+                List<RequisitionItem> requisitionItemList =
+                        requisition.requisitionItems.toList()
+
+                // Process the order items from the
                 log.info "order items " + orderItems
                 orderItems.each { orderItem ->
-                    String orderItemId = orderItem.id
+                    String orderItemUuid = orderItem.id
+                    // Find by the external UUID (note: we're using description to hold UUID temporarily)
                     RequisitionItem requisitionItem =
-                            requisition.requisitionItems.find { it.description == orderItemId }
+                            requisitionItemList.find { it.description == orderItemUuid }
 
+                    // Remove requisition item from list
+                    requisitionItemList.remove(requisitionItem)
+
+                    // Process requisition item as either canceled or approved
                     log.info "Requisition item " + requisitionItem
-
                     Integer quantity = orderItem.quantity
                     if (quantity == 0) {
                         log.info "Cancel quantity " + orderItemId
@@ -127,6 +139,12 @@ class OrderStatusNotificationController {
                         }
                     }
                 }
+
+                // The remaining requisition items should all be approved
+                requisitionItemList.each { RequisitionItem requisitionItem ->
+                    requisitionItem?.modificationItem?.approveQuantity()
+                }
+
             }
         }
 
