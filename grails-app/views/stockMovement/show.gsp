@@ -148,14 +148,19 @@
                                 <g:message code="stockMovement.status.label"/>
                             </td>
                             <td class="value">
-                                <g:if test="${stockMovement?.requisition?.status < RequisitionStatus.ISSUED}">
-                                    <format:metadata obj="${stockMovement?.requisition?.status?.displayStatus }"/>
-                                </g:if>
-                                <g:else>
-                                    ${stockMovement?.shipment?.status?.code?.displayStatus}
-                                </g:else>
+                                <format:metadata obj="${stockMovement?.requisition?.status?.displayStatus }"/>
                             </td>
                         </tr>
+                        <g:if test="${stockMovement?.requisition?.status != RequisitionStatus.CANCELED && stockMovement?.shipment?.status}">
+                            <tr class="prop">
+                                <td class="name">
+                                    <g:message code="shipping.shipmentStatus.label"/>
+                                </td>
+                                <td class="value">
+                                    <format:metadata obj="${stockMovement?.shipment?.status?.code?.displayStatus}"/>
+                                </td>
+                            </tr>
+                        </g:if>
                         <tr class="prop">
                             <td class="name">
                                 <g:message code="stockMovement.origin.label"/>

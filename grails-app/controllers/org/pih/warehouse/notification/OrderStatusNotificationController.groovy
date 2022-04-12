@@ -9,11 +9,13 @@
 **/
 package org.pih.warehouse.notification
 
+import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.core.ReasonCode
 
 class OrderStatusNotificationController {
 
@@ -70,6 +72,8 @@ class OrderStatusNotificationController {
         log.info "handle order status ${jsonObject.toString(4)}"
 
         String identifier = jsonObject.id
+        JSONArray orderItems = jsonObject.orderItems
+
         RequisitionStatus status = jsonObject.status as RequisitionStatus
 
         log.info "identifier: ${identifier}, status: ${status}"
@@ -77,24 +81,50 @@ class OrderStatusNotificationController {
         if (identifier && status) {
 
             Requisition requisition = Requisition.findByRequestNumber(identifier)
+
+            // Do not allow any edits when order has been moved to Packed status
+            if (requisition.status >= RequisitionStatus.CHECKING) {
+                throw new IllegalStateException("Cannot update requisition in status ${requisition.status}")
+            }
+
             if (status in [RequisitionStatus.CANCELED]) {
                 log.info "Canceling requisition ${identifier}"
                 requisition.status = status as RequisitionStatus
                 requisition.requisitionItems.each { RequisitionItem requisitionItem ->
-                    requisitionItem.cancelQuantity()
+                    requisitionItem.cancelQuantity(ReasonCode.REJECTED, "Canceled order")
                 }
                 requisition.save(flush:true)
             }
             else if (status in [RequisitionStatus.APPROVED]) {
                 log.info "Approving requisition ${identifier}"
-                requisition.requisitionItems.each { RequisitionItem requisitionItem ->
-                    if (requisitionItem.modificationItem) {
-                        log.info "quantity " + requisitionItem.quantity
-                        log.info "quantityAdjusted " + requisitionItem.quantityAdjusted
-                        log.info "quantityApproved " + requisitionItem.quantityApproved
-                        log.info "quantityCanceled " + requisitionItem.quantityCanceled
-                        log.info "" + requisitionItem.modificationItem
-                        requisitionItem?.modificationItem?.approveQuantity()
+
+                log.info "order items " + orderItems
+                orderItems.each { orderItem ->
+                    String orderItemId = orderItem.id
+                    RequisitionItem requisitionItem =
+                            requisition.requisitionItems.find { it.description == orderItemId }
+
+                    log.info "Requisition item " + requisitionItem
+
+                    Integer quantity = orderItem.quantity
+                    if (quantity == 0) {
+                        log.info "Cancel quantity " + orderItemId
+                        if (requisitionItem?.modificationItem) {
+                            requisitionItem.undoChanges()
+                            requisitionItem?.cancelQuantity(ReasonCode.REJECTED, "Rejected quantity change")
+                        }
+                    }
+                    else {
+                        // Approve the modification
+                        if (requisitionItem?.modificationItem) {
+                            log.info "Approve quantity " + orderItemId
+                            log.info "quantity " + requisitionItem?.modificationItem?.quantity
+                            log.info "quantityAdjusted " + requisitionItem?.modificationItem?.quantityAdjusted
+                            log.info "quantityApproved " + requisitionItem?.modificationItem?.quantityApproved
+                            log.info "quantityCanceled " + requisitionItem?.modificationItem?.quantityCanceled
+                            requisitionItem?.modificationItem?.approveQuantity()
+                            requisitionItem?.save()
+                        }
                     }
                 }
             }

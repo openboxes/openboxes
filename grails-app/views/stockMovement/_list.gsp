@@ -70,8 +70,8 @@
                     <td>
                         <label class="status"><format:metadata obj="${stockMovement?.status}"/>
                             <g:set var="approved" value="${stockMovement.lineItems.any { it.quantityApproved > 0 } }"/>
-                            <g:if test="${stockMovement?.stockMovementStatusCode == StockMovementStatusCode.REQUESTED &&
-                                    stockMovement.isOutboundStockMovement() && !approved}">
+                            <g:if test="${stockMovement?.stockMovementStatusCode in [StockMovementStatusCode.REQUESTING]
+                                    && stockMovement.isOutboundStockMovement() && !approved}">
                                 <div class="small">Awaiting Approval</div>
                             </g:if>
                         </label>
