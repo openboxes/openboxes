@@ -65,7 +65,8 @@ class StockMovementItemApiController {
 
         log.info "Stock movement item " + new JSONObject(stockMovementItem.toJson()).toString(4)
 
-        Integer quantityPicked = picklistItems.sum { it.quantityPicked }?:0
+        // FIXME Should be controlled by a supported activity
+        Integer quantityPicked = picklistItems.sum { Integer.valueOf(it.quantityPicked?:0) }
         if ( quantityPicked > stockMovementItem.quantityRequired) {
             throw new IllegalArgumentException("User is not allowed to pick more than the required quantity ${stockMovementItem?.quantityRequired}")
         }
