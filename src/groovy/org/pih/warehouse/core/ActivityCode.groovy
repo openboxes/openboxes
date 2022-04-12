@@ -87,4 +87,11 @@ enum ActivityCode {
                 SUBMIT_REQUEST
         ]
     }
+
+    static binTrackingList() {
+        [
+                PICK_STOCK,
+                PUTAWAY_STOCK
+        ]
+    }
 }

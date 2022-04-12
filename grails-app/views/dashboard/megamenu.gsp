@@ -52,7 +52,7 @@
 
     <g:if test="${megamenuConfig.inventory.enabled}">
         <g:isUserInRole roles="[RoleType.ROLE_BROWSER]">
-        <g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">
+        <g:supports activityCode="${ActivityCode.MANAGE_INVENTORY}">
             <li class="mm-item">
                 <a href="javascript:void(0)" class="mm-item-link">
                     <warehouse:message code="inventory.label" />
@@ -99,7 +99,7 @@
                     </div>
                     <div class="mm-content-section">
                         <h3><warehouse:message code="inventory.manage.label"/></h3>
-                        <g:supports activityCode="${org.pih.warehouse.core.ActivityCode.ADJUST_INVENTORY}">
+                        <g:supports activityCode="${ActivityCode.ADJUST_INVENTORY}">
                             <div class="mm-menu-item">
                                 <g:link controller="inventory" action="manage">
                                     <warehouse:message code="inventory.manage.label" />
@@ -111,32 +111,34 @@
                                 <g:message code="default.import.label" args="[g.message(code:'inventory.label', default: 'Inventory')]"/>
                             </g:link>
                         </div>
-                        <div class="mm-menu-item">
-                            <g:link controller="stockTransfer" action="create" class="create">
-                                <warehouse:message code="inventory.createStockTransfer.label" />
-                            </g:link>
-                        </div>
-                        <div class="mm-menu-item">
-                            <g:link controller="stockTransfer" action="list" class="list">
-                                <warehouse:message code="inventory.listStockTransfers.label" />
-                            </g:link>
-                        </div>
+                        <g:supports activitiesAll="[ActivityCode.PICK_STOCK,ActivityCode.PUTAWAY_STOCK]">
+                            <div class="mm-menu-item">
+                                <g:link controller="stockTransfer" action="create" class="create">
+                                    <warehouse:message code="inventory.createStockTransfer.label" />
+                                </g:link>
+                            </div>
+                            <div class="mm-menu-item">
+                                <g:link controller="stockTransfer" action="list" class="list">
+                                    <warehouse:message code="inventory.listStockTransfers.label" />
+                                </g:link>
+                            </div>
 
-                        <div class="mm-menu-item">
-                            <g:link controller="replenishment" action="index" class="create">
-                                <warehouse:message code="inventory.createReplenishment.label" />
-                            </g:link>
-                        </div>
+                            <div class="mm-menu-item">
+                                <g:link controller="replenishment" action="index" class="create">
+                                    <warehouse:message code="inventory.createReplenishment.label" />
+                                </g:link>
+                            </div>
+                        </g:supports>
                     </div>
                 </div>
             </li>
-        </g:authorize>
+        </g:supports>
         </g:isUserInRole>
     </g:if>
 
     <g:if test="${megamenuConfig.requisitions.enabled}">
         <g:isUserInRole roles="[RoleType.ROLE_BROWSER]">
-        <g:authorize activity="[ActivityCode.PLACE_REQUEST,ActivityCode.FULFILL_REQUEST]">
+        <g:supports activitiesAny="[ActivityCode.PLACE_REQUEST,ActivityCode.FULFILL_REQUEST]">
             <li class="mm-item">
                 <a href="javascript:void(0)" class="mm-item-link">
                     <warehouse:message code="requests.label"/>
@@ -185,7 +187,7 @@
                     </div>
                 </div>
             </li>
-        </g:authorize>
+        </g:supports>
         </g:isUserInRole>
     </g:if>
 
@@ -276,7 +278,7 @@
 
     <g:if test="${megamenuConfig.inbound.enabled}">
         <g:hasHigherRoleThanAuthenticated>
-        <g:authorize activity="[ActivityCode.RECEIVE_STOCK]">
+        <g:supports activityCode="${ActivityCode.RECEIVE_STOCK}">
             <li class="mm-item">
                 <a href="javascript:void(0)" class="mm-item-link">
                     <warehouse:message code="default.inbound.label" />
@@ -309,21 +311,23 @@
                             </div>
                         </div>
                     </g:if>
-                    <g:if test="${megamenuConfig.putaways.enabled}">
-                        <div class="mm-content-section">
-                            <h3><warehouse:message code="putaways.label" default="Putaways" /></h3>
-                            <div class="mm-menu-item">
-                                <g:link controller="putAway" action="index">
-                                    <warehouse:message code="default.create.label" args="[g.message(code:'putAway.label')]"/>
-                                </g:link>
+                    <g:supports activitiesAll="[ActivityCode.PICK_STOCK,ActivityCode.PUTAWAY_STOCK]">
+                        <g:if test="${megamenuConfig.putaways.enabled}">
+                            <div class="mm-content-section">
+                                <h3><warehouse:message code="putaways.label" default="Putaways" /></h3>
+                                <div class="mm-menu-item">
+                                    <g:link controller="putAway" action="index">
+                                        <warehouse:message code="default.create.label" args="[g.message(code:'putAway.label')]"/>
+                                    </g:link>
+                                </div>
+                                <div class="mm-menu-item">
+                                    <g:link controller="order" action="list" params="[orderType: Constants.PUTAWAY_ORDER, status: 'PENDING']">
+                                        <warehouse:message code="default.list.label" args="[g.message(code:'putAways.label')]"/>
+                                    </g:link>
+                                </div>
                             </div>
-                            <div class="mm-menu-item">
-                                <g:link controller="order" action="list" params="[orderType: Constants.PUTAWAY_ORDER, status: 'PENDING']">
-                                    <warehouse:message code="default.list.label" args="[g.message(code:'putAways.label')]"/>
-                                </g:link>
-                            </div>
-                        </div>
-                    </g:if>
+                        </g:if>
+                    </g:supports>
                     <g:if test="${megamenuConfig.receiving.enabled}">
                         <div class="mm-content-section">
                             <h3>
@@ -358,13 +362,13 @@
             </li>
         </a>
 
-        </g:authorize>
+        </g:supports>
         </g:hasHigherRoleThanAuthenticated>
     </g:if>
 
     <g:if test="${megamenuConfig.outbound.enabled}">
         <g:isUserInRole roles="[RoleType.ROLE_BROWSER]">
-        <g:authorize activity="[ActivityCode.SEND_STOCK]">
+        <g:supports activityCode="${ActivityCode.SEND_STOCK}">
             <li class="mm-item">
                 <a href="javascript:void(0)" class="mm-item-link">
                     <warehouse:message code="default.outbound.label" />
@@ -422,7 +426,7 @@
                     </g:if>
                 </div>
             </li>
-        </g:authorize>
+        </g:supports>
         </g:isUserInRole>
     </g:if>
 
@@ -542,7 +546,7 @@
 
     <g:if test="${megamenuConfig.products.enabled}">
         <g:isUserInRole roles="[RoleType.ROLE_BROWSER]">
-        <g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">
+        <g:supports activityCode="${ActivityCode.MANAGE_INVENTORY}">
             <li class="mm-item">
                 <a href="javascript:void(0)" class="mm-item-link">
                     <warehouse:message code="products.label" />
@@ -651,7 +655,7 @@
                     </g:isUserAdmin>
                 </div>
             </li>
-        </g:authorize>
+        </g:supports>
         </g:isUserInRole>
     </g:if>
 
@@ -689,13 +693,13 @@
                     <div class="mm-content-base">
                         <div class="mm-content-section">
                             <h3><warehouse:message code="admin.label" default="Admin" /></h3>
-                            <g:authorize activity="[ActivityCode.MANAGE_INVENTORY]">
+                            <g:supports activityCode="${ActivityCode.MANAGE_INVENTORY}">
                                 <div class="mm-menu-item">
                                     <g:link controller="admin" action="showSettings" class="list">
                                         <g:message code="default.settings.label"/>
                                     </g:link>
                                 </div>
-                            </g:authorize>
+                            </g:supports>
                             <div class="mm-menu-item">
                                 <g:link controller="migration" action="index" class="list">
                                     <g:message code="default.dataMigration.label" default="Data Migration" />
