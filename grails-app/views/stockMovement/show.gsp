@@ -148,7 +148,7 @@
                                 <g:message code="stockMovement.status.label"/>
                             </td>
                             <td class="value">
-                                <format:metadata obj="${stockMovement?.requisition?.status?.displayStatus }"/>
+                                <format:metadata obj="${stockMovement?.requisition?.status }"/>
                             </td>
                         </tr>
                         <g:if test="${stockMovement?.requisition?.status != RequisitionStatus.CANCELED && stockMovement?.shipment?.status}">
