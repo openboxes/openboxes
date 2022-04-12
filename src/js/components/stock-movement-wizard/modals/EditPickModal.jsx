@@ -147,6 +147,9 @@ function validate(values) {
     errors.reasonCode = 'react.stockMovement.errors.differentTotalQty.label';
   }
 
+  if (pickedSum !== values.quantityRequired) {
+    errors.reasonCode = 'react.stockMovement.errors.cannotChangeQuantityPicked.label';
+  }
   return errors;
 }
 
