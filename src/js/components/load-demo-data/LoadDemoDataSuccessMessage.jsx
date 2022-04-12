@@ -7,7 +7,7 @@ import Translate from 'utils/Translate';
 
 import 'components/locations-configuration/SuccessMessage.scss';
 
-const LoadDemoDataSuccessMessage = ({ history }) => (
+const LoadDemoDataSuccessMessage = ({ history, supportLinks }) => (
   <div className="success-wrapper">
     <div className="success-content">
       <i className="fa fa-check-circle-o success-icon" aria-hidden="true" />
@@ -22,7 +22,7 @@ const LoadDemoDataSuccessMessage = ({ history }) => (
                                     For guidance on how to use OpenBoxes,be sure to refer to our"
         />
         {' '}
-        <a href="https://openboxes.helpscoutdocs.com/" className="knowledge-base-link">
+        <a href={supportLinks.knowledgeBase} className="knowledge-base-link">
           <Translate id="react.loadData.success.helpscout.button.label" defaultMessage="helpscout knowledge base." />
         </a>
       </p>
@@ -39,4 +39,7 @@ export default withRouter(LoadDemoDataSuccessMessage);
 
 LoadDemoDataSuccessMessage.propTypes = {
   history: PropTypes.shape({ push: PropTypes.func }).isRequired,
+  supportLinks: PropTypes.shape({
+    knowledgeBase: PropTypes.string.isRequired,
+  }).isRequired,
 };

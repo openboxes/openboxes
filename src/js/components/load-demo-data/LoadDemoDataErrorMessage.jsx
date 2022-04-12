@@ -7,7 +7,7 @@ import Translate from 'utils/Translate';
 
 import 'components/locations-configuration/SuccessMessage.scss';
 
-const LoadDemoDataErrorMessage = ({ history }) => (
+const LoadDemoDataErrorMessage = ({ history, supportLinks }) => (
   <div className="success-wrapper">
     <div className="success-content">
       <i className="fa fa-exclamation-circle error-icon" aria-hidden="true" />
@@ -24,7 +24,7 @@ const LoadDemoDataErrorMessage = ({ history }) => (
         If you aren't sure how to proceed, you can request support on the OpenBoxes"
         />
         {' '}
-        <a href="https://discuss.openboxes.com/" className="knowledge-base-link">
+        <a href={supportLinks.discussionForum} className="knowledge-base-link">
           <Translate id="react.loadData.error.discussionForum.link.label" defaultMessage="discussion forum" />
         </a>
       </p>
@@ -39,4 +39,7 @@ export default withRouter(LoadDemoDataErrorMessage);
 
 LoadDemoDataErrorMessage.propTypes = {
   history: PropTypes.shape({ push: PropTypes.func }).isRequired,
+  supportLinks: PropTypes.shape({
+    discussionForum: PropTypes.string.isRequired,
+  }).isRequired,
 };

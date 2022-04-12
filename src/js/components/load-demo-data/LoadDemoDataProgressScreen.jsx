@@ -10,6 +10,7 @@ import Translate from 'utils/Translate';
 const LoadDemoDataProgressScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [supportLinks, setSupportLinks] = useState({});
 
   useEffect(() => {
     apiClient.get('/openboxes/api/config/data/demo')
@@ -20,6 +21,11 @@ const LoadDemoDataProgressScreen = () => {
         setError(err);
         setIsLoading(false);
       });
+
+    apiClient.get('/openboxes/api/supportLinks').then((response) => {
+      const links = response.data.data;
+      setSupportLinks(links);
+    });
   }, []);
 
   if (isLoading) {
@@ -54,11 +60,11 @@ const LoadDemoDataProgressScreen = () => {
 
   if (error) {
     return (
-      <LoadDemoDataErrorMessage />
+      <LoadDemoDataErrorMessage supportLinks={supportLinks} />
     );
   }
   return (
-    <LoadDemoDataSuccessMessage />
+    <LoadDemoDataSuccessMessage supportLinks={supportLinks} />
   );
 };
 
