@@ -170,7 +170,8 @@ class StockMovementService {
                             shipmentService.validateShipment(shipment)
                         }
 
-                        if (stockMovement.isOutboundStockMovement() && status == StockMovementStatusCode.CHECKING && stockMovement?.shipment?.containers?.empty) {
+                        if (stockMovement.isOutboundStockMovement() &&
+                                status == StockMovementStatusCode.CHECKING && stockMovement?.shipment?.containers?.empty) {
                             throw new IllegalStateException("Shipment must have at least one package associated with it. Click Save & Exit, go to the Packing List tab and add at least one package")
                         }
 
@@ -201,8 +202,9 @@ class StockMovementService {
             log.info "lineItem " + lineItem.quantityRevised + " " + lineItem.quantityApproved
             return lineItem?.quantityRevised && lineItem?.quantityRevised != lineItem.quantityApproved
         }
+
         if (hasAnyUnapprovedItems) {
-            stockMovement.errors.reject("stockMovement.notApproved.message",
+            stockMovement.errors.reject("stockMovement.requiresApproval.message",
                     [stockMovement.identifier] as Object[], "Stock movement ${stockMovement.identifier} requires approval")
         }
 
@@ -1745,6 +1747,12 @@ class StockMovementService {
     StockMovement updateRequisitionBasedStockMovementItems(StockMovement stockMovement) {
         Requisition requisition = Requisition.get(stockMovement.id)
 
+        // FIXME Should be accompanied by a supported activity (cannot edit packed stock movement)
+        if (stockMovement?.isOutboundStockMovement() &&
+                stockMovement?.requisition?.status == RequisitionStatus.CHECKING) {
+            throw new IllegalStateException("Cannot update items for stock movement in state ${requisition.status}")
+        }
+
         if (stockMovement.lineItems) {
             stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
                 RequisitionItem requisitionItem
@@ -1764,13 +1772,17 @@ class StockMovementService {
 
                     removeShipmentAndPicklistItemsForModifiedRequisitionItem(requisitionItem)
 
+                    // If quantity requested is 0 we should delete the item
                     if (!stockMovementItem.quantityRequested) {
                         log.info "Item deleted " + requisitionItem.id
                         requisitionItem.undoChanges()
                         requisition.removeFromRequisitionItems(requisitionItem)
                         requisitionItem.delete(flush: true)
-                    } else {
+                    }
+                    // Otherwise validate and process the updates
+                    else {
 
+                        // FIXME Should be accompanied by a supported activity (cannot increase requested quantity)
                         if (stockMovementItem.quantityRequested > requisitionItem.quantity) {
                             throw new IllegalArgumentException("User is not allowed to increase the quantity")
                         }
@@ -1842,6 +1854,13 @@ class StockMovementService {
     List reviseItems(StockMovement stockMovement) {
         Requisition requisition = Requisition.get(stockMovement.id)
         def revisedItems = []
+
+
+        // FIXME Should be accompanied by a supported activity (cannot edit packed stock movement)
+        if (stockMovement?.isOutboundStockMovement() &&
+                stockMovement?.requisition?.status == RequisitionStatus.CHECKING) {
+            throw new IllegalStateException("Cannot update items for stock movement in state ${requisition.status}")
+        }
 
         if (stockMovement.lineItems) {
             stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
