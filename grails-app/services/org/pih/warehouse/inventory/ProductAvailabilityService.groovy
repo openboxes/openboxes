@@ -900,4 +900,22 @@ class ProductAvailabilityService {
 
         return quantityAvailableToPromise ?: 0
     }
+
+    def getQuantityAvailableToPromiseByProductNotInBin(Location location, Location binLocation, Product product) {
+        def quantityAvailableToPromiseByProductNotInBin = ProductAvailability.createCriteria().get {
+            projections {
+                sum("quantityAvailableToPromise")
+            }
+
+            eq("location", location)
+            eq("product", product)
+            if (binLocation) {
+                ne("binLocation", binLocation)
+            } else {
+                isNotNull("binLocation")
+            }
+        }
+
+        return quantityAvailableToPromiseByProductNotInBin ?: 0
+    }
 }

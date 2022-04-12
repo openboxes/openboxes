@@ -50,12 +50,6 @@ class ReplenishmentApiController {
     def create = {
         Location currentLocation = Location.get(session.warehouse.id)
         JSONObject jsonObject = request.JSON
-        jsonObject.replenishmentItems.each { item ->
-            Product product = Product.get(item['product.id'])
-            if (item.quantity > inventoryService.getQuantityAvailableToPromise(product, currentLocation)) {
-                throw new ValidationException("There is not available that quantity of the product with id: ${product.id}")
-            }
-        }
         User currentUser = User.get(session.user.id)
         if (!currentLocation || !currentUser) {
             throw new IllegalArgumentException("User must be logged into a location to update replenishment")
@@ -130,6 +124,7 @@ class ReplenishmentApiController {
             if (!replenishmentItem.location) {
                 replenishmentItem.location = replenishment.destination
             }
+            replenishmentService.validateRequirement(replenishmentItem)
 
             replenishmentItemMap.pickItems.each { pickItemMap ->
                 ReplenishmentItem pickItem = new ReplenishmentItem()

@@ -28,6 +28,7 @@ import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.picklist.PicklistItem
+import javax.xml.bind.ValidationException
 
 class ReplenishmentService {
 
@@ -155,6 +156,12 @@ class ReplenishmentService {
         return order
     }
 
+    void validateRequirement(ReplenishmentItem item) {
+        if (item.quantity > productAvailabilityService.getQuantityAvailableToPromiseByProductNotInBin(item.location, item.binLocation, item.product)) {
+            throw new ValidationException("There is not available that quantity of the product with id: ${item.product.id}")
+        }
+    }
+
     void validateReplenishment(Replenishment replenishment) {
         replenishment.replenishmentItems.toArray().each { ReplenishmentItem replenishmentItem ->
             validateReplenishmentItem(replenishmentItem)
@@ -176,7 +183,6 @@ class ReplenishmentService {
         if (!replenishmentLocation) {
             throw new IllegalArgumentException("Location is required")
         }
-
         Integer quantityAvailable = productAvailabilityService.getQuantityOnHandInBinLocation(inventoryItem, replenishmentLocation)
         log.info "Quantity: ${quantity} vs ${quantityAvailable}"
 

@@ -36,6 +36,17 @@ class Requirement implements Serializable {
         status(nullable: true)
     }
 
+    Integer getQuantityAvailable() {
+        return totalQuantityAvailableToPromise - quantityInBin > 0 ? totalQuantityAvailableToPromise - quantityInBin : 0
+    }
+
+    def getQuantityNeeded() {
+        def qtyNeeded = getQuantityAvailable() > maxQuantity - quantityInBin ? maxQuantity - quantityInBin : getQuantityAvailable()
+        return qtyNeeded > 0 ? qtyNeeded : 0
+    }
+
+    static transients = ['quantityNeeded', 'quantityAvailable']
+
     Map toJson() {
         return [
             id                                  : id,
@@ -48,10 +59,8 @@ class Requirement implements Serializable {
             quantityInBin                       : quantityInBin,
             minQuantity                         : minQuantity,
             maxQuantity                         : maxQuantity,
-            totalQuantityOnHand                 : totalQuantityOnHand,
-            quantityNeeded                      : totalQuantityAvailableToPromise > maxQuantity - quantityInBin ? maxQuantity - quantityInBin : totalQuantityAvailableToPromise,
-            totalQuantityAvailableToPromise     : totalQuantityAvailableToPromise,
-            quantityAvailable                   : totalQuantityAvailableToPromise - quantityInBin > 0 ? totalQuantityAvailableToPromise - quantityInBin : 0,
+            quantityNeeded                      : quantityNeeded,
+            quantityAvailable                   : quantityAvailable
         ]
     }
 }

@@ -101,7 +101,7 @@ function validate(values) {
       if (item.quantity < 0) {
         errors.requirements[key] = { quantity: 'react.replenishment.error.quantity.label' };
       }
-      if (item.quantity > item.totalQuantityAvailableToPromise) {
+      if (item.quantity > item.quantityAvailable) {
         errors.requirements[key] = { quantity: 'react.replenishment.error.quantity.greaterThanQATP.label' };
       }
     }
@@ -191,9 +191,7 @@ class CreateReplenishment extends Component {
     this.props.showSpinner();
     const url = '/openboxes/api/replenishments/';
     const payload = {
-      replenishmentItems: values.requirements
-        .map(item => ({ ...item, quantity: _.toInteger(item.quantity) }))
-        .filter(item => item.quantity > 0),
+      replenishmentItems: values.requirements.filter(item => item.quantity > 0),
     };
 
 
