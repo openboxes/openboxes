@@ -51,6 +51,13 @@ class BinTable extends Component {
         headerClassName: 'header text-align-left',
       },
       {
+        Header: 'Zone location',
+        accessor: 'zoneName',
+        minWidth: 50,
+        className: 'cell',
+        headerClassName: 'header text-align-left',
+      },
+      {
         Header: 'Actions',
         minWidth: 20,
         accessor: 'actions',
@@ -66,10 +73,12 @@ class BinTable extends Component {
                 {
                   ...row.original,
                   locationType: row.original.locationType,
+                  zoneLocation: { id: row.original.zoneId, name: row.original.zoneName },
                 }
               }
               formProps={{
                 binTypes: this.props.binTypes,
+                zoneData: this.props.zoneData,
               }}
               title="react.locationsConfiguration.editBin.label"
               defaultTitleMessage="Edit Bin Location"
@@ -104,6 +113,7 @@ class BinTable extends Component {
         columns={binColumns}
         loading={this.state.binLoading}
         pages={this.state.binPages}
+        defaultPageSize={10}
         manual
         className="-striped -highlight zoneTable"
         resizable={false}
@@ -154,6 +164,7 @@ BinTable.propTypes = {
     PropTypes.func,
     PropTypes.shape({ current: PropTypes.instanceOf(Element) }),
   ]).isRequired,
+  zoneData: PropTypes.shape([]).isRequired,
 };
 
 export default connect(mapStateToProps)(BinTable);
