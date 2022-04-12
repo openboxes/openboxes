@@ -28,7 +28,7 @@ const FIELDS = {
       status: {
         type: LabelField,
         fieldKey: '',
-        flexWidth: '2',
+        flexWidth: 6,
         getDynamicAttr: ({ translate }) => ({
           showValueTooltip: true,
           formatValue: (fieldValue) => {
@@ -66,7 +66,9 @@ const FIELDS = {
         label: 'react.stockMovement.quantityAvailable.label',
         defaultMessage: 'Qty Available',
         fixedWidth: '150px',
+        headerAlign: 'right',
         attributes: {
+          cellClassName: 'text-right',
           formatValue: value => (value || value === 0 ? value.toLocaleString('en-US') : null),
         },
       },
@@ -76,7 +78,9 @@ const FIELDS = {
         label: 'react.stockMovement.quantityPicked.label',
         defaultMessage: 'Qty Picked',
         fixedWidth: '120px',
+        headerAlign: 'right',
         attributes: {
+          cellClassName: 'text-right',
           type: 'number',
         },
         getDynamicAttr: ({ fieldValue }) => ({
