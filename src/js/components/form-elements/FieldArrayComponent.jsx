@@ -100,7 +100,7 @@ class FieldArrayComponent extends Component {
           <div className="d-flex flex-row border-bottom font-weight-bold">
             {_.map(fieldsConfig.fields, (config, name) => {
               const dynamicAttr = config.getDynamicAttr ? config.getDynamicAttr(properties) : {};
-              const { hide } = dynamicAttr;
+              const { hide, headerHtml } = dynamicAttr;
               if (!hide) {
                 return (
                   <div
@@ -133,8 +133,10 @@ class FieldArrayComponent extends Component {
                         style={{
                           fontSize: fieldsConfig.headerFontSize ? fieldsConfig.headerFontSize : '0.875rem',
                         }}
-                      >{config.label &&
-                      <Translate id={config.label} defaultMessage={config.defaultMessage} />}
+                      >
+                        { headerHtml && headerHtml() }
+                        { config.label && !headerHtml &&
+                          <Translate id={config.label} defaultMessage={config.defaultMessage} />}
                       </div>
                     </Tooltip>
                   </div>);

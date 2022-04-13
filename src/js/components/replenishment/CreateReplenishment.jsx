@@ -11,6 +11,7 @@ import { connect } from 'react-redux';
 
 import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
+import CheckboxField from 'components/form-elements/CheckboxField';
 import LabelField from 'components/form-elements/LabelField';
 import TextField from 'components/form-elements/TextField';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
@@ -26,6 +27,25 @@ const FIELD = {
     type: ArrayField,
     arrowsNavigation: true,
     fields: {
+      checked: {
+        type: CheckboxField,
+        label: 'react.stockMovement.selectAll.label',
+        defaultMessage: 'Select All',
+        flexWidth: 4,
+        getDynamicAttr: ({
+          rowIndex, allRowsSelected, selectAllCode, updateSelectedItems,
+        }) => ({
+          headerHtml: () => (
+            <input
+              type="checkbox"
+              className="mt-1"
+              checked={allRowsSelected}
+              onClick={selectAllCode}
+            />
+          ),
+          onChange: checkState => updateSelectedItems(checkState, rowIndex),
+        }),
+      },
       'product.productCode': {
         type: LabelField,
         label: 'react.stockMovement.productCode.label',
@@ -140,6 +160,15 @@ function validate(values) {
       }
     }
   });
+  const anyRowSelected = _.find(values.requirements, row => row.checked);
+  if (!anyRowSelected) {
+    _.forEach(values.requirements, (item, key) => {
+      errors.requirements[key] = {
+        ...errors.requirements[key],
+        checked: 'react.replenishment.error.selected.label',
+      };
+    });
+  }
   return errors;
 }
 
@@ -155,6 +184,9 @@ class CreateReplenishment extends Component {
       isDirty: false,
     };
     this.updateRow = this.updateRow.bind(this);
+    this.updateSelectedItems = this.updateSelectedItems.bind(this);
+    this.selectAllRows = this.selectAllRows.bind(this);
+    this.allRowsSelected = this.allRowsSelected.bind(this);
   }
 
   componentDidMount() {
@@ -176,6 +208,31 @@ class CreateReplenishment extends Component {
         this.fetchRequirements(nextProps.locationId);
       }
     }
+  }
+
+  allRowsSelected() {
+    return !_.find(this.state.values.requirements, row => !row.checked);
+  }
+
+  selectAllRows() {
+    const isAllSelected = this.allRowsSelected();
+    this.setState({
+      values: update(this.state.values, {
+        requirements: {
+          $apply: req => req.map(it => ({
+            ...it, checked: !isAllSelected,
+          })),
+        },
+      }),
+    });
+  }
+
+  updateSelectedItems(checkedValue, index) {
+    this.setState({
+      values: update(this.state.values, {
+        requirements: { [index]: { checked: { $set: checkedValue } } },
+      }),
+    });
   }
 
   updateRow(values, index) {
@@ -215,6 +272,7 @@ class CreateReplenishment extends Component {
         const requirements = _.map(parseResponse(resp.data.data), requirement => ({
           ...requirement,
           quantity: requirement.quantityNeeded,
+          checked: true,
         }));
         this.setState({ values: { requirements }, isDirty: false }, () => this.props.hideSpinner());
       })
@@ -225,7 +283,7 @@ class CreateReplenishment extends Component {
     this.props.showSpinner();
     const url = '/openboxes/api/replenishments/';
     const payload = {
-      replenishmentItems: values.requirements.filter(item => item.quantity > 0),
+      replenishmentItems: values.requirements.filter(item => item.checked && item.quantity > 0),
     };
 
 
@@ -307,8 +365,11 @@ class CreateReplenishment extends Component {
               <div className="table-form">
                 {_.map(FIELD, (fieldConfig, fieldName) =>
                   renderFormField(fieldConfig, fieldName, {
-                    updateRow: this.updateRow,
                     values,
+                    updateRow: this.updateRow,
+                    updateSelectedItems: this.updateSelectedItems,
+                    allRowsSelected: this.allRowsSelected(),
+                    selectAllCode: this.selectAllRows,
                   }))}
               </div>
               <div className="submit-buttons">
