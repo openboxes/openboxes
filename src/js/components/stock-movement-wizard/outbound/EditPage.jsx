@@ -356,6 +356,7 @@ class EditItemsPage extends Component {
           ...val.product,
           label: `${val.productCode} ${val.productName}`,
         },
+        reasonCode: this.props.reasonCodes.find(({ value }) => value === val.reasonCode),
         substitutionItems: _.map(val.substitutionItems, sub => ({
           ...sub,
           requisitionItemId: val.requisitionItemId,
