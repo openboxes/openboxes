@@ -106,6 +106,7 @@ class ZoneTable extends Component {
         columns={zoneColumns}
         loading={this.state.zoneLoading}
         pages={this.state.zonePages}
+        defaultPageSize={5}
         manual
         className="-striped -highlight zoneTable"
         resizable={false}

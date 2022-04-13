@@ -36,6 +36,10 @@ const FIELDS = {
         label: 'react.stockMovement.productCode.label',
         defaultMessage: 'Code',
         flexWidth: '0.5',
+        headerAlign: 'left',
+        attributes: {
+          cellClassName: 'text-left',
+        },
       },
       'product.name': {
         type: LabelField,
@@ -44,6 +48,7 @@ const FIELDS = {
         flexWidth: '2',
         headerAlign: 'left',
         attributes: {
+          cellClassName: 'text-left',
           showValueTooltip: true,
         },
       },
@@ -78,6 +83,10 @@ const FIELDS = {
         label: 'react.replenishment.quantityInBin.label',
         defaultMessage: 'Qty Needed',
         flexWidth: '1',
+        headerAlign: 'right',
+        attributes: {
+          cellClassName: 'text-right',
+        },
       },
       'zone.name': {
         type: LabelField,
@@ -114,12 +123,16 @@ const FIELDS = {
         label: 'react.stockMovement.quantityToTransfer.label',
         defaultMessage: 'Qty to Transfer',
         flexWidth: '1',
+        headerAlign: 'right',
+        attributes: {
+          cellClassName: 'text-right',
+        },
       },
       buttonEditPick: {
         label: 'react.stockMovement.editPick.label',
         defaultMessage: 'Edit pick',
-        flexWidth: '0.5',
         type: EditPickModal,
+        fixedWidth: '90px',
         fieldKey: '',
         attributes: {
           title: 'react.stockMovement.editPick.label',
@@ -138,7 +151,7 @@ const FIELDS = {
         type: ButtonField,
         label: 'react.default.button.undoEdit.label',
         defaultMessage: 'Undo edit',
-        flexWidth: '1',
+        fixedWidth: '100px',
         fieldKey: '',
         buttonLabel: 'react.default.button.undoEdit.label',
         buttonDefaultMessage: 'Undo edit',

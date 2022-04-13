@@ -17,16 +17,12 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'components/locations-configuration/LocationAddress.scss';
 
-const PAGE_ID = 'locationAddress';
 
 const FIELDS = {
   address: {
     type: TextField,
     label: 'address.address.label',
     defaultMessage: 'Street address',
-    attributes: {
-      required: true,
-    },
   },
   address2: {
     type: TextField,
@@ -61,25 +57,16 @@ const FIELDS = {
 
 };
 
-const validate = (values) => {
-  const requiredFields = ['address'];
-  return Object.keys(FIELDS)
-    .reduce((acc, fieldName) => {
-      if (!values[fieldName] && requiredFields.includes(fieldName)) {
-        return {
-          ...acc,
-          [fieldName]: 'react.default.error.requiredField.label',
-        };
-      }
-      if (values[fieldName] && values[fieldName].length > 255) {
-        return {
-          ...acc,
-          [fieldName]: 'react.default.error.tooLongInput.label',
-        };
-      }
-      return acc;
-    }, {});
-};
+const validate = values => Object.keys(FIELDS)
+  .reduce((acc, fieldName) => {
+    if (values[fieldName] && values[fieldName].length > 255) {
+      return {
+        ...acc,
+        [fieldName]: 'react.default.error.tooLongInput.label',
+      };
+    }
+    return acc;
+  }, {});
 
 class LocationAddress extends Component {
   constructor(props) {
@@ -156,13 +143,6 @@ class LocationAddress extends Component {
             render={({ values, handleSubmit }) => (
               <form onSubmit={handleSubmit} className="w-100">
                 <div className="classic-form with-description location-address">
-                  <div className="submit-buttons">
-                    <button type="button" onClick={() => Alert.info(this.props.supportLinks[PAGE_ID])} className="btn btn-outline-primary float-right btn-xs">
-                      <i className="fa fa-question-circle-o" aria-hidden="true" />
-                      &nbsp;
-                      <Translate id="react.default.button.support.label" defaultMessage="Support" />
-                    </button>
-                  </div>
                   <div className="form-title">
                     <Translate id="address.label" defaultMessage="Address" />
                   </div>
@@ -221,7 +201,6 @@ LocationAddress.propTypes = {
   }).isRequired,
   nextPage: PropTypes.func.isRequired,
   previousPage: PropTypes.func.isRequired,
-  supportLinks: PropTypes.shape({}).isRequired,
   showSpinner: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
   locationId: PropTypes.string.isRequired,

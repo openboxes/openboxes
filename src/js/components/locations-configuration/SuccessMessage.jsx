@@ -47,7 +47,7 @@ const SuccessMessage = ({ setShowSuccessMessage, history, successMessageOpen }) 
                 defaultMessage="View Location List"
               />
             </button>
-            <button type="button" className="btn btn-outline-primary no-border-btn" onClick={() => history.push('/openboxes/productsConfiguration/index')}>
+            <button type="button" className="btn btn-outline-primary" onClick={() => history.push('/openboxes/productsConfiguration/index')}>
               <Translate
                 id="react.locationsConfiguration.success.createCategoriesAndProducts="
                 defaultMessage="Create Categories and Products"

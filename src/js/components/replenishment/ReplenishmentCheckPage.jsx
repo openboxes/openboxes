@@ -34,6 +34,10 @@ const FIELDS = {
         label: 'react.stockMovement.productCode.label',
         defaultMessage: 'Code',
         flexWidth: '0.5',
+        headerAlign: 'left',
+        attributes: {
+          cellClassName: 'text-left',
+        },
       },
       'product.name': {
         type: LabelField,
@@ -43,6 +47,7 @@ const FIELDS = {
         headerAlign: 'left',
         attributes: {
           showValueTooltip: true,
+          cellClassName: 'text-left',
         },
       },
       'currentZone.name': {
@@ -76,6 +81,10 @@ const FIELDS = {
         label: 'react.replenishment.quantityInBin.label',
         defaultMessage: 'Qty Needed',
         flexWidth: '1',
+        headerAlign: 'right',
+        attributes: {
+          cellClassName: 'text-right',
+        },
       },
       'zone.name': {
         type: LabelField,
@@ -112,6 +121,10 @@ const FIELDS = {
         label: 'react.stockMovement.quantityToTransfer.label',
         defaultMessage: 'Qty to Transfer',
         flexWidth: '1',
+        headerAlign: 'right',
+        attributes: {
+          cellClassName: 'text-right',
+        },
       },
     },
   },

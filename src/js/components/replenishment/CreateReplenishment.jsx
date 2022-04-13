@@ -30,11 +30,22 @@ const FIELD = {
         type: LabelField,
         label: 'react.stockMovement.productCode.label',
         defaultMessage: 'Code',
+        flexWidth: 5,
+        headerAlign: 'left',
+        attributes: {
+          cellClassName: 'text-left',
+        },
       },
       'product.name': {
         type: LabelField,
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
+        flexWidth: 30,
+        headerAlign: 'left',
+        attributes: {
+          cellClassName: 'text-left',
+          showValueTooltip: true,
+        },
       },
       zone: {
         type: LabelField,
@@ -58,29 +69,52 @@ const FIELD = {
         type: LabelField,
         label: 'react.replenishment.quantityInBin.label',
         defaultMessage: 'Qty in Bin',
+        headerAlign: 'right',
+        flexWidth: 8,
+        attributes: {
+          cellClassName: 'text-right',
+        },
       },
       minQuantity: {
         type: LabelField,
         label: 'react.replenishment.minQuantity.label',
         defaultMessage: 'Min Qty',
+        headerAlign: 'right',
+        flexWidth: 8,
+        attributes: {
+          cellClassName: 'text-right',
+        },
       },
       maxQuantity: {
         type: LabelField,
         label: 'react.replenishment.maxQuantity.label',
         defaultMessage: 'Max Qty',
+        headerAlign: 'right',
+        flexWidth: 8,
+        attributes: {
+          cellClassName: 'text-right',
+        },
       },
       quantityAvailable: {
         type: LabelField,
         label: 'react.replenishment.quantityAvailable.label',
         defaultMessage: 'Qty available',
+        headerAlign: 'right',
+        flexWidth: 8,
+        attributes: {
+          cellClassName: 'text-right',
+        },
       },
       quantity: {
         type: TextField,
         label: 'react.stockMovement.quantityToTransfer.label',
         defaultMessage: 'Qty to Transfer',
+        headerAlign: 'right',
         attributes: {
           type: 'number',
+          cellClassName: 'text-right',
         },
+        flexWidth: 10,
         fieldKey: '',
         getDynamicAttr: ({
           updateRow, values, rowIndex,
@@ -241,13 +275,22 @@ class CreateReplenishment extends Component {
         render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
             <div className="d-flex justify-content-between submit-buttons mt-0 mb-3">
-              <Select
-                value={this.state.inventoryLevelStatus}
-                onChange={value => this.inventoryLevelStatusChange(value)}
-                options={this.state.statusOptions}
-                className="select-sm stocklist-select"
-                clearable={false}
-              />
+              <div className="d-flex flex-column">
+                <label htmlFor="stock-level-filter">
+                  <Translate
+                    id="react.replenishment.filter.label"
+                    defaultMessage="Replenish bins that have a stock level"
+                  />:
+                </label>
+                <Select
+                  name="stock-level-filter"
+                  value={this.state.inventoryLevelStatus}
+                  onChange={value => this.inventoryLevelStatusChange(value)}
+                  options={this.state.statusOptions}
+                  className="select-sm stocklist-select"
+                  clearable={false}
+                />
+              </div>
               <button
                 type="submit"
                 onClick={() => {

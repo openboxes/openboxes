@@ -54,10 +54,11 @@ const LabelField = (props) => {
         <Tooltip
           html={tooltipValue || (<div className="text-truncate">{formattedValue}</div>)}
           disabled={!showValueTooltip}
-          theme="transparent"
+          theme="dark"
           delay="150"
           duration="250"
           hideDelay="50"
+          arrow
         >
           {url ?
             <div {...otherAttr} className={`font-size-xs ${className}`}>
