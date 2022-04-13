@@ -24,9 +24,21 @@
       color: green;
       font-size: 6rem;
     }
+    .error-icon {
+      color: red;
+      font-size: 6rem;
+    }
+    .no-border-btn {
+      border: none !important;
+    }
     .success-buttons-section {
       gap: 15px;
       width: 100%;
+    }
+    .knowledge-base-link {
+      font-weight: bold;
+      text-decoration: none;
+      color: dodgerblue;
     }
   }
 }

@@ -2,12 +2,15 @@ import React, { useEffect, useState } from 'react';
 
 import { ClimbingBoxLoader } from 'react-spinners';
 
+import LoadDemoDataErrorMessage from 'components/load-demo-data/LoadDemoDataErrorMessage';
+import LoadDemoDataSuccessMessage from 'components/load-demo-data/LoadDemoDataSuccessMessage';
 import apiClient from 'utils/apiClient';
 import Translate from 'utils/Translate';
 
 const LoadDemoDataProgressScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [supportLinks, setSupportLinks] = useState({});
 
   useEffect(() => {
     apiClient.get('/openboxes/api/config/data/demo')
@@ -18,6 +21,11 @@ const LoadDemoDataProgressScreen = () => {
         setError(err);
         setIsLoading(false);
       });
+
+    apiClient.get('/openboxes/api/supportLinks').then((response) => {
+      const links = response.data.data;
+      setSupportLinks(links);
+    });
   }, []);
 
   if (isLoading) {
@@ -52,16 +60,11 @@ const LoadDemoDataProgressScreen = () => {
 
   if (error) {
     return (
-      <div className="d-flex flex-column align-items-center justify-content-center">
-        <h3>Error while loading data </h3>
-      </div>
+      <LoadDemoDataErrorMessage supportLinks={supportLinks} />
     );
   }
-  // TODO: create a success message
   return (
-    <div className="d-flex flex-column align-items-center justify-content-center">
-      <h3>Data Successfully Loaded </h3>
-    </div>
+    <LoadDemoDataSuccessMessage supportLinks={supportLinks} />
   );
 };
 
