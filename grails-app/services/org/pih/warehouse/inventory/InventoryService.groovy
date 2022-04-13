@@ -2780,7 +2780,7 @@ class InventoryService implements ApplicationContextAware {
      */
     def importInventoryData(ImportDataCommand command) {
         def dateFormatter = new SimpleDateFormat("yy-mm")
-        def importer = new InventoryExcelImporter(command.importFile.absolutePath)
+        def importer = new InventoryExcelImporter(command?.filename, command?.importFile?.inputStream)
         def data = importer.data
         assert data != null
         log.info "Data to be imported: " + data
