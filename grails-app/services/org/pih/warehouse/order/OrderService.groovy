@@ -509,8 +509,10 @@ class OrderService {
             if (method == UpdateUnitPriceMethodCode.LAST_PURCHASE_PRICE) {
                 BigDecimal pricePerPackage = orderItem.unitPrice * orderItem?.order?.lookupCurrentExchangeRate()
                 BigDecimal pricePerUnit = pricePerPackage / orderItem?.quantityPerUom
-                orderItem.product.pricePerUnit = pricePerUnit
-                orderItem.product.save()
+                if (pricePerUnit != 0) {
+                    orderItem.product.pricePerUnit = pricePerUnit
+                    orderItem.product.save()
+                }
             }
             else {
                 log.warn("Cannot update unit price because method ${method} is not currently supported")
