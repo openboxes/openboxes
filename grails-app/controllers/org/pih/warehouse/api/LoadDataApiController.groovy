@@ -54,7 +54,7 @@ class LoadDataApiController extends BaseDomainApiController {
         }
 
         if (Boolean.valueOf(config.productCatalogItems.enabled)) {
-            loadDataService.importProductCatalogItems(new URL(config.productSuppliers.url))
+            loadDataService.importProductCatalogItems(new URL(config.productCatalogItems.url))
         }
 
         if (Boolean.valueOf(config.productSuppliers.enabled)) {

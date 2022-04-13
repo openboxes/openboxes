@@ -9,6 +9,8 @@
 **/ 
 package org.pih.warehouse.product
 
+import grails.validation.ValidationException;
+
 class ProductCatalogService {
 
     ProductCatalogItem createOrUpdateProductCatalogItem(Map params) {
@@ -17,6 +19,10 @@ class ProductCatalogService {
 
         if (params.productCode) {
             product = Product.findByProductCode(params.productCode)
+
+            if (!product) {
+                throw new ValidationException("Could not locate product with code: " + params.productCode, null);
+            }
         }
 
         if (params.productCatalogCode) {

@@ -1857,15 +1857,15 @@ openboxes {
                 url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/mainWarehouseInventory.csv"
             }
             bostonWarehouseInventory {
-                enabled = true
+                enabled = false // INFO Disabled, Boston contains duplicates of main warehouse - product and lot
                 url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/bostonWarehouseInventory.csv"
             }
             chicagoWarehouseInventory {
-                enabled = true
+                enabled = false // INFO Disabled, Chicago contains duplicates of main warehouse - product and lot
                 url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/chicagoWarehouseInventory.csv"
             }
             inventoryLevels {
-                enabled = true
+                enabled = false // INFO Disabled, inventory relation is missing but not defined
                 url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/inventoryLevels.csv"
             }
             users {
