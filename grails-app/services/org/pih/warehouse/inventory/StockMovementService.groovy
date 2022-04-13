@@ -387,7 +387,6 @@ class StockMovementService {
     def getInboundStockMovements(StockMovement criteria, Map params) {
         def shipments = Shipment.createCriteria().list(max: params.max, offset: params.offset) {
 
-
             if (params.productSearch || criteria?.identifier || criteria.name || criteria?.description) {
                 or {
                     if (criteria?.identifier) {
@@ -405,6 +404,16 @@ class StockMovementService {
                                 or {
                                     ilike("name", "%" + params.productSearch + "%")
                                     ilike("productCode", "%" + params.productSearch + "%")
+                                }
+                            }
+                        }
+                        requisition {
+                            requisitionItems {
+                                product {
+                                    or {
+                                        ilike("name", "%" + params.productSearch + "%")
+                                        ilike("productCode", "%" + params.productSearch + "%")
+                                    }
                                 }
                             }
                         }
