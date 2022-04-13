@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse
 
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
@@ -18,9 +19,27 @@ class AuthTagLib {
     def userService
 
     def supports = { attrs, body ->
-        def location = Location.load(session.warehouse.id)
-        if (location && location.supports(attrs.activityCode)) {
-            out << body()
+        def warehouseInstance = Location.get(session.warehouse.id)
+        def authorized = true
+
+        // Need to handle this case better
+        if (!warehouseInstance)
+            throw new Exception("Please choose a warehouse")
+
+        // Check if activityCode attribute is supported by given warehouse
+        if (attrs?.activityCode)
+            authorized = authorized && warehouseInstance.supports(attrs.activityCode as ActivityCode)
+
+        // Check if the activitiesAny attribute has any activities supported by the given warehouse
+        if (attrs?.activitiesAny)
+            authorized = authorized && attrs.activitiesAny?.any { warehouseInstance.supports(it as ActivityCode) }
+
+        // Check if the activitiesAny attribute has all activities supported by the given warehouse
+        if (attrs?.activitiesAll)
+            authorized = authorized && attrs.activitiesAll?.every { warehouseInstance.supports(it as ActivityCode) }
+
+        if (authorized) {
+            out << body {}
         }
     }
 
@@ -85,22 +104,5 @@ class AuthTagLib {
     def hasHigherRoleThanAuthenticated = { attrs, body ->
         if (User.get(session?.user?.id)?.getHighestRole(session.warehouse).roleType != RoleType.ROLE_AUTHENTICATED)
             out << body()
-    }
-
-    def authorize = { attrs, body ->
-        def authorized = false
-
-        def warehouseInstance = Location.get(session.warehouse.id)
-
-        // Need to handle this case better
-        if (!warehouseInstance)
-            throw new Exception("Please choose a warehouse")
-
-        // Check if the activity attribute has any activities supported by the given warehouse
-        authorized = attrs?.activity?.any { warehouseInstance.supports(it) }
-
-        if (authorized) {
-            out << body {}
-        }
     }
 }

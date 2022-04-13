@@ -54,8 +54,13 @@ class MegamenuService {
             if (roles && !userService.hasAnyRoles(user, roles)) {
                 return
             }
-            ActivityCode[] activities = it.requiredActivities ?: []
-            if (activities && !location.supportsAny(activities)) {
+            ActivityCode[] activitiesAny = it.requiredActivitiesAny ?: []
+            if (activitiesAny && !location.supportsAny(activitiesAny)) {
+                return
+            }
+
+            ActivityCode[] activitiesAll = it.requiredActivitiesAll ?: []
+            if (activitiesAll && !location.supportsAll(activitiesAll)) {
                 return
             }
             def label = getMessageTagLib().message(code: it.label, default: it.defaultLabel)
@@ -74,8 +79,13 @@ class MegamenuService {
             if (roles && !userService.hasAnyRoles(user, roles)) {
                 return
             }
-            ActivityCode[] activities = it.requiredActivities ?: []
-            if (activities && !location.supportsAny(activities)) {
+            ActivityCode[] activitiesAny = it.requiredActivitiesAny ?: []
+            if (activitiesAny && !location.supportsAny(activitiesAny)) {
+                return
+            }
+
+            ActivityCode[] activitiesAll = it.requiredActivitiesAll ?: []
+            if (activitiesAll && !location.supportsAll(activitiesAll)) {
                 return
             }
             def label = getMessageTagLib().message(code: it.label, default: it.defaultLabel)
@@ -101,8 +111,13 @@ class MegamenuService {
             if (roles && !userService.hasAnyRoles(user, roles)) {
                 return
             }
-            ActivityCode[] activities = value.requiredActivities ?: []
-            if (activities && !location.supportsAny(activities)) {
+            ActivityCode[] activitiesAny = value.requiredActivitiesAny ?: []
+            if (activitiesAny && !location.supportsAny(activitiesAny)) {
+                return
+            }
+
+            ActivityCode[] activitiesAll = value.requiredActivitiesAll ?: []
+            if (activitiesAll && !location.supportsAll(activitiesAll)) {
                 return
             }
             if (value.enabled) {

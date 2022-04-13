@@ -1352,7 +1352,7 @@ openboxes {
             enabled = true
             label = "inventory.label"
             defaultLabel = "Inventory"
-            requiredActivities = [ActivityCode.MANAGE_INVENTORY]
+            requiredActivitiesAny = [ActivityCode.MANAGE_INVENTORY]
             subsections = [
                 [
                     label: "inventory.browse.label",
@@ -1368,9 +1368,9 @@ openboxes {
                     menuItems: [
                         [label: "inventory.manage.label", defaultLabel: "Manage Inventory", href: "/${appName}/inventory/manage"],
                         [label: "inventory.import.label", defaultLabel: "Import Inventory", href: "/${appName}/batch/importData?type=inventory&execution=e1s1"],
-                        [label: "inventory.createStockTransfer.label", defaultLabel: "Create Stock Transfer", href: "/${appName}/stockTransfer/create"],
-                        [label: "inventory.listStockTransfers.label", defaultLabel: "List Stock Transfers", href: "/${appName}/stockTransfer/list"],
-                        [label: "inventory.createReplenishment.label", defaultLabel: "Create Replenishment", href: "/${appName}/replenishment/index"]
+                        [label: "inventory.createStockTransfer.label", defaultLabel: "Create Stock Transfer", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/${appName}/stockTransfer/create"],
+                        [label: "inventory.listStockTransfers.label", defaultLabel: "List Stock Transfers", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/${appName}/stockTransfer/list"],
+                        [label: "inventory.createReplenishment.label", defaultLabel: "Create Replenishment", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/${appName}/replenishment/index"]
                     ]
                 ]
             ]
@@ -1384,7 +1384,7 @@ openboxes {
                     label: "",
                     defaultLabel: "Purchasing",
                     menuItems: [
-                            [label: "order.createPurchase.label", defaultLabel: "Create Purchase Order", href: "/${appName}/purchaseOrder/index", requiredActivities: [ActivityCode.PLACE_ORDER]],
+                            [label: "order.createPurchase.label", defaultLabel: "Create Purchase Order", href: "/${appName}/purchaseOrder/index", requiredActivitiesAny: [ActivityCode.PLACE_ORDER]],
                             [label: "order.listPurchase.label", defaultLabel: "List Purchase Orders", href: "/${appName}/order/list?orderType=PURCHASE_ORDER"],
                             [label: "location.listSuppliers.label", defaultLabel: "List Suppliers", href: "/${appName}/supplier/list"],
                             [label: "shipment.shipfromPO.label", defaultLabel: "Ship from Purchase Order", href: "/${appName}/stockMovement/createCombinedShipments?direction=INBOUND"],
@@ -1413,7 +1413,7 @@ openboxes {
             enabled = true
             label = "default.inbound.label"
             defaultLabel = "Inbound"
-            requiredActivities = [ActivityCode.RECEIVE_STOCK]
+            requiredActivitiesAny = [ActivityCode.RECEIVE_STOCK]
             subsections = [
                     [
                             label: "stockMovements.label",
@@ -1428,6 +1428,7 @@ openboxes {
                     [
                             label: "putAways.label",
                             defaultLabel: "Putaways",
+                            requiredActivitiesAll: ActivityCode.binTrackingList(),
                             menuItems: [
                                     [label: "react.putAway.createPutAway.label", defaultLabel: "Create Putaway", href: "/${appName}/putAway/index"],
                                     [label: "react.putAway.list.label", defaultLabel: "List Putaways", href: "/${appName}/order/list?orderType=PUTAWAY_ORDER&status=PENDING"]
@@ -1439,7 +1440,7 @@ openboxes {
             enabled = true
             label = "outbound.label"
             defaultLabel = "Outbound"
-            requiredActivities = [ActivityCode.SEND_STOCK]
+            requiredActivitiesAny = [ActivityCode.SEND_STOCK]
             subsections = [
                 [
                     label: "",
@@ -1501,7 +1502,7 @@ openboxes {
             enabled = true
             label = "products.label"
             defaultLabel = "Products"
-            requiredActivities = [ActivityCode.MANAGE_INVENTORY]
+            requiredActivitiesAny = [ActivityCode.MANAGE_INVENTORY]
             subsections = [
                 [
                     label: "", // No label

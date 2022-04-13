@@ -135,7 +135,7 @@ export function changeCurrentLocation(location) {
   return (dispatch) => {
     const url = `/openboxes/api/chooseLocation/${location.id}`;
 
-    apiClient.put(url).then(() => {
+    return apiClient.put(url).then(() => {
       dispatch({
         type: CHANGE_CURRENT_LOCATION,
         payload: location,

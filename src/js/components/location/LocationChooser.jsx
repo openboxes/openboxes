@@ -8,6 +8,7 @@ import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
 import {
   changeCurrentLocation,
+  fetchMenuConfig,
   fetchSessionInfo,
   hideLocationChooser,
   showLocationChooser,
@@ -51,7 +52,9 @@ class LocationChooser extends Component {
 
   closeModal(location) {
     if (location) {
-      this.props.changeCurrentLocation(location);
+      this.props.changeCurrentLocation(location).then(() => {
+        this.props.fetchMenuConfig();
+      });
       this.props.fetchSessionInfo();
     }
     this.props.hideLocationChooser();
@@ -167,6 +170,7 @@ export default connect(mapStateToProps, {
   showLocationChooser,
   hideLocationChooser,
   fetchSessionInfo,
+  fetchMenuConfig,
 })(LocationChooser);
 
 LocationChooser.propTypes = {
@@ -182,4 +186,5 @@ LocationChooser.propTypes = {
   currentLocationName: PropTypes.string.isRequired,
   defaultTranslationsFetched: PropTypes.bool.isRequired,
   fetchSessionInfo: PropTypes.func.isRequired,
+  fetchMenuConfig: PropTypes.func.isRequired,
 };
