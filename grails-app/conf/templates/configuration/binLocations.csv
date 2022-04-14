@@ -1,4 +1,4 @@
-id,name,active,locationType,organization,parentLocation,locationNumber,locationGroup,streetAddress,streetAddress2,city,stateProvince,postalCode,country,description
+id,name,active,locationType,organization,parentLocation,locationNumber,locationGroup,streetAddress,streetAddress2,city,stateOrProvince,postalCode,country,description
 ,COLD ROOM,TRUE,Bin_Location,,Chicago Warehouse,CHI-COLD,,,,,,,,
 ,RACK1-SHELF1,TRUE,Bin_Location,,Boston Warehouse,BOS-1-1,,,,,,,,
 ,RACK1-SHELF2,TRUE,Bin_Location,,Boston Warehouse,BOS-1-2,,,,,,,,

@@ -1,4 +1,4 @@
-id,name,active,locationType,organization,parentLocation,locationNumber,locationGroup,streetAddress,streetAddress2,city,stateProvince,postalCode,country,description
+id,name,active,locationType,organization,parentLocation,locationNumber,locationGroup,streetAddress,streetAddress2,city,stateOrProvince,postalCode,country,description
 ,Central Warehouse (NYC),TRUE,Depot,My Organization,,NYCW,NorthEast,400 Gentle Lane,Suite 6,New York,New York,30456,USA,
 ,Boston Warehouse,TRUE,Depot,My Organization,,BOSW,NorthEast,300 Apple St,,Boston,MA,54888,USA,
 ,Chicago Warehouse,TRUE,Depot,My Organization,,CHIW,MidWest,150 Hatfield ct,Doors 2-4,Chicago,IL,75898,USA,
