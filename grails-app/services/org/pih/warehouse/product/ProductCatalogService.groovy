@@ -9,24 +9,19 @@
 **/ 
 package org.pih.warehouse.product
 
-import grails.validation.ValidationException;
-
 class ProductCatalogService {
 
     ProductCatalogItem createOrUpdateProductCatalogItem(Map params) {
-        Product product
-        ProductCatalog productCatalog
+        Product product = Product.findByProductCode(params.productCode)
 
-        if (params.productCode) {
-            product = Product.findByProductCode(params.productCode)
-
-            if (!product) {
-                throw new ValidationException("Could not locate product with code: " + params.productCode, null);
-            }
+        if (!product) {
+            throw new IllegalArgumentException("Could not locate product with code: " + params.productCode);
         }
 
-        if (params.productCatalogCode) {
-            productCatalog = ProductCatalog.findByCode(params.productCatalogCode)
+        ProductCatalog productCatalog = ProductCatalog.findByCode(params.productCatalogCode);
+
+        if(!productCatalog) {
+            throw new IllegalArgumentException("Could not locate product catalog with code: " + params.productCatalogCode);
         }
 
         ProductCatalogItem productCatalogItem = ProductCatalogItem.findByProductAndProductCatalog(product, productCatalog)
