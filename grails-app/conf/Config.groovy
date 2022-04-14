@@ -1508,39 +1508,34 @@ openboxes {
                     label: "", // No label
                     defaultLabel: "", // No label
                     menuItems: [
-                        [label: "attributes.label", defaultLabel: "Attributes", href: "/${appName}/attribute/list"],
-                        [label: "product.catalogs.label", defaultLabel: "Catalogs", href: "/${appName}/productCatalog/list"],
-                        [label: "categories.label", defaultLabel: "Categories", href: "/${appName}/category/tree"],
-                        [label: "product.components.label", defaultLabel: "Components", href: "/${appName}/productComponent/list"],
-                        [label: "productGroups.label", defaultLabel: "Generic Products", href: "/${appName}/productGroup/list"],
-                        [label: "inventoryLevels.label", defaultLabel: "Inventory Levels", href: "/${appName}/inventoryLevel/list"],
-                        [label: "productType.label", defaultLabel: "Product Type", href: "/${appName}/productType/list", requiredRole: [RoleType.ROLE_SUPERUSER]]
-                    ]
-                ],
-                [
-                    label: "", // No label
-                    defaultLabel: "", // No label
-                    menuItems: [
-                        [label: "products.label", defaultLabel: "Products", href: "/${appName}/product/list"],
-                        [label: "productSuppliers.label", defaultLabel: "Products Sources", href: "/${appName}/productSupplier/list"],
-                        [label: "product.associations.label", defaultLabel: "Products Associations", href: "/${appName}/productAssociation/list"],
-                        [label: "product.tags.label", defaultLabel: "Tags", href: "/${appName}/tag/list"],
-                        [label: "unitOfMeasure.label", defaultLabel: "Unit of Measure", href: "/${appName}/unitOfMeasure/list"],
-                        [label: "unitOfMeasureClass.label", defaultLabel: "Uom Class", href: "/${appName}/unitOfMeasureClass/list"],
-                        [label: "unitOfMeasureConversion.label", defaultLabel: "Uom Conversion", href: "/${appName}/unitOfMeasureConversion/list"]
-                    ]
-                ],
-                [
-                    label: "", // No label
-                    defaultLabel: "", // No label
-                    menuItems: [
-                        [label: "product.create.label", defaultLabel: "Create new product", href: "/${appName}/product/create"],
+                        [label: "product.create.label", defaultLabel: "Create product", href: "/${appName}/product/create"],
+                        [label: "products.list.label", defaultLabel: "List Products", href: "/${appName}/product/list"],
                         [label: "product.batchEdit.label", defaultLabel: "Batch edit product", href: "/${appName}/product/batchEdit"],
                         [label: "product.importAsCsv.label", defaultLabel: "Import products", href: "/${appName}/product/importAsCsv"],
                         [label: "product.exportAsCsv.label", defaultLabel: "Export products", href: "/${appName}/product/exportAsCsv"],
-                        [label: "productSupplier.productSourcePreferencesExport.label", defaultLabel: "Export Product Source Preferences", href: "/${appName}/batch/downloadExcel?type=ProductSupplierPreference"],
-                        [label: "import.inventory.label", defaultLabel: "Import Inventory", href: "/${appName}/batch/importData?type=inventory"],
-                        [label: "import.inventoryLevel.label", defaultLabel: "Import Inventory Level", href: "/${appName}/batch/importData?type=inventoryLevel"]
+                    ]
+                ],
+                [
+                    label: "", // No label
+                    defaultLabel: "", // No label
+                    menuItems: [
+                        [label: "categories.label", defaultLabel: "Categories", href: "/${appName}/category/tree"],
+                        [label: "product.catalogs.label", defaultLabel: "Catalogs", href: "/${appName}/productCatalog/list"],
+                        [label: "product.tags.label", defaultLabel: "Tags", href: "/${appName}/tag/list"],
+                        [label: "attributes.label", defaultLabel: "Attributes", href: "/${appName}/attribute/list"],
+                        [label: "product.associations.label", defaultLabel: "Products Associations", href: "/${appName}/productAssociation/list"],
+                    ]
+                ],
+                [
+                    label: "", // No label
+                    defaultLabel: "", // No label
+                    menuItems: [
+                        [label: "productSuppliers.label", defaultLabel: "Products Sources", href: "/${appName}/productSupplier/list"],
+                        [label: "product.components.label", defaultLabel: "Components", href: "/${appName}/productComponent/list"],
+                        [label: "productGroups.label", defaultLabel: "Generic Products", href: "/${appName}/productGroup/list"],
+                        [label: "unitOfMeasure.label", defaultLabel: "Unit of Measure", href: "/${appName}/unitOfMeasure/list"],
+                        [label: "unitOfMeasureClass.label", defaultLabel: "Uom Class", href: "/${appName}/unitOfMeasureClass/list"],
+                        [label: "unitOfMeasureConversion.label", defaultLabel: "Uom Conversion", href: "/${appName}/unitOfMeasureConversion/list"]
                     ]
                 ]
             ]
