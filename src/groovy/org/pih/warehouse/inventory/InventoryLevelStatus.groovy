@@ -16,7 +16,8 @@ enum InventoryLevelStatus {
     NEVER_IN_STOCK(2),
     BELOW_MINIMUM(3),
     BELOW_REORDER(4),
-    BELOW_MAXIMUM(5)
+    BELOW_MAXIMUM(5),
+    ABOVE_MAXIMUM(6)
 
     int sortOrder
 
@@ -27,11 +28,11 @@ enum InventoryLevelStatus {
     }
 
     static list() {
-       return [IN_STOCK, OUT_OF_STOCK, NEVER_IN_STOCK, BELOW_MINIMUM, BELOW_REORDER, BELOW_MAXIMUM]
+       return [IN_STOCK, OUT_OF_STOCK, NEVER_IN_STOCK, BELOW_MINIMUM, BELOW_REORDER, BELOW_MAXIMUM, ABOVE_MAXIMUM]
     }
 
     static listReplenishmentOptions() {
-        return [BELOW_MINIMUM, BELOW_REORDER, BELOW_MAXIMUM]
+        return [BELOW_MINIMUM, BELOW_REORDER, BELOW_MAXIMUM, ABOVE_MAXIMUM]
     }
 
     String toString() { return name() }

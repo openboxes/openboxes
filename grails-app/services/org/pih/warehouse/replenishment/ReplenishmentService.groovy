@@ -42,17 +42,14 @@ class ReplenishmentService {
 
     def getRequirements(Location location, InventoryLevelStatus inventoryLevelStatus) {
         def requirements = Requirement.createCriteria().list() {
-            if (inventoryLevelStatus.toString() == 'BELOW_MAXIMUM') {
-                eq("location", location)
-                or {
-                    eq("status", inventoryLevelStatus)
-                    eq("status", InventoryLevelStatus.BELOW_MINIMUM)
-                    eq("status", InventoryLevelStatus.BELOW_REORDER)
-                }
+            if (inventoryLevelStatus == InventoryLevelStatus.BELOW_MAXIMUM) {
+                'in'("status", inventoryLevelStatus.listReplenishmentOptions())
             } else {
-                eq("location", location)
                 eq("status", inventoryLevelStatus)
             }
+            eq("location", location)
+            isNotNull("binLocation")
+            gt("quantityAvailable", 0)
         }
 
         return requirements?.unique {[it.product, it.location, it.binLocation]}?.sort { a, b ->

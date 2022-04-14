@@ -12,8 +12,8 @@ class Requirement implements Serializable {
     Integer minQuantity
     Integer maxQuantity
     Integer reorderQuantity
-    Integer totalQuantityOnHand // Total QoH for this product in Depot
     Integer totalQuantityAvailableToPromise // Total QATP for this product in Depot
+    Integer quantityAvailable // quantityAvailable = quantity available to replenish = total qatp - qatp in bin
     InventoryLevelStatus status
 
     static mapping = {
@@ -31,21 +31,18 @@ class Requirement implements Serializable {
         minQuantity(nullable: true)
         maxQuantity(nullable: true)
         reorderQuantity(nullable: true)
-        totalQuantityOnHand(nullable: true)
         totalQuantityAvailableToPromise(nullable: true)
+        quantityAvailable(nullable: true)
         status(nullable: true)
     }
 
-    Integer getQuantityAvailable() {
-        return totalQuantityAvailableToPromise - quantityInBin > 0 ? totalQuantityAvailableToPromise - quantityInBin : 0
-    }
 
     def getQuantityNeeded() {
         def qtyNeeded = getQuantityAvailable() > maxQuantity - quantityInBin ? maxQuantity - quantityInBin : getQuantityAvailable()
         return qtyNeeded > 0 ? qtyNeeded : 0
     }
 
-    static transients = ['quantityNeeded', 'quantityAvailable']
+    static transients = ['quantityNeeded']
 
     Map toJson() {
         return [
