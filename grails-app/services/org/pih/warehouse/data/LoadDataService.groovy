@@ -33,7 +33,17 @@ class LoadDataService {
         CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
 
         ImportDataCommand command = new ImportDataCommand();
-        command.setData(csvReader.readAll());
+
+        List<Map<String, String>> csvItems = csvReader.readAll()
+
+        for (i in 0..< csvItems.size()) {
+            Map<String, String> currentItem = csvItems.get(i);
+
+            currentItem.put("stateOrProvince", currentItem.get("stateProvince"));
+            currentItem.remove("stateProvince");
+        }
+
+        command.setData(csvItems);
 
         locationDataService.validateData(command);
         locationDataService.importData(command);
