@@ -9,7 +9,6 @@
 **/
 package org.pih.warehouse.data
 
-
 import org.grails.plugins.csv.CSVMapReader
 import org.pih.warehouse.core.*
 import org.pih.warehouse.importer.ImportDataCommand
@@ -28,6 +27,7 @@ class LoadDataService {
     def productService
     def productSupplierDataService
     def productCatalogService
+    def inventoryService
 
     def importLocations(URL csvURL) {
         CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
@@ -200,7 +200,7 @@ class LoadDataService {
                     comments: attr["Comment"]
             );
 
-            inventoryItem.save(failOnError: true);
+            inventoryService.findOrCreateInventoryItem(inventoryItem)
         }
 
         csvReader.close();

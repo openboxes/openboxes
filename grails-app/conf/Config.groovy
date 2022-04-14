@@ -1865,7 +1865,7 @@ openboxes {
                 url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/chicagoWarehouseInventory.csv"
             }
             inventoryLevels {
-                enabled = true
+                enabled = false // INFO Disabled, inventory relation is missing but not defined
                 url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/inventoryLevels.csv"
             }
             users {
