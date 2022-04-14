@@ -57,13 +57,28 @@
                     <g:textArea name="comments" size="80" class="text medium" value="${productAssociation?.comments}" />
                 </td>
             </tr>
+            <tr class="prop">
+                <td class="name">
+                    <label><warehouse:message code="productAssociation.mutualAssociation.label" default="Two-way Association"/></label>
+                </td>
+                <td class="value">
+                    <g:checkBox name="hasMutualAssociation" value="${productAssociation?.mutualAssociation}"/>
+                </td>
+            </tr>
         </tbody>
         <tfoot>
             <td colspan="2">
                 <div class="center">
                     <g:if test="${productAssociation.id}">
                         <g:actionSubmit action="update" class="button icon accept" value="Save" id="update">${warehouse.message(code: 'default.button.save.label', default: 'Save')}</g:actionSubmit>
-                        <g:actionSubmit action="delete" class="button icon trash" value="Delete" id="delete">${warehouse.message(code: 'default.button.save.label', default: 'Save')}</g:actionSubmit>
+                        <g:if test="${productAssociation?.mutualAssociation}">
+                            <button type="button" class="button" onclick="$('#product-association-delete-dialog').dialog('open')">
+                                ${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}
+                            </button>
+                        </g:if>
+                        <g:else>
+                            <g:actionSubmit action="delete" class="button icon trash" value="Delete" id="delete">${warehouse.message(code: 'default.button.save.label', default: 'Save')}</g:actionSubmit>
+                        </g:else>
                     </g:if>
                     <g:else>
                         <g:actionSubmit action="save" class="button icon approve" value="Save" id="save">${warehouse.message(code: 'default.button.save.label', default: 'Save')}</g:actionSubmit>
@@ -74,4 +89,5 @@
             </td>
         </tfoot>
     </table>
+    <g:productAssociationDeleteDialog productAssociationId="${productAssociation?.id}" />
 </g:form>
