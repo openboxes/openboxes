@@ -128,8 +128,8 @@ class ProductAssociationController {
                 }
             }
 
+            def mutualAssociationInstance
             if (params.hasMutualAssociation) {
-                def mutualAssociationInstance
                 if (productAssociationInstance.mutualAssociation) {
                     mutualAssociationInstance = productAssociationInstance.mutualAssociation
                 } else {
@@ -140,6 +140,10 @@ class ProductAssociationController {
                 }
 
                 bindMutualAssociationData(mutualAssociationInstance, params)
+            } else if (productAssociationInstance.mutualAssociation && !params.hasMutualAssociation) {
+                mutualAssociationInstance = productAssociationInstance.mutualAssociation
+                productAssociationInstance.mutualAssociation = null
+                mutualAssociationInstance.delete()
             }
 
             productAssociationInstance.properties = params
@@ -160,6 +164,16 @@ class ProductAssociationController {
         def productAssociationInstance = ProductAssociation.get(params.id)
         if (productAssociationInstance) {
             try {
+                if (productAssociationInstance.mutualAssociation) {
+                    ProductAssociation mutualAssociation = ProductAssociation.get(productAssociationInstance.mutualAssociation.id)
+                    mutualAssociation.mutualAssociation = null
+                    productAssociationInstance.mutualAssociation = null
+                    if (Boolean.valueOf(params.mutualDelete)) {
+                        mutualAssociation.delete()
+                    } else {
+                        mutualAssociation.save()
+                    }
+                }
                 productAssociationInstance.delete(flush: true)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'productAssociation.label', default: 'ProductAssociation'), params.id])}"
                 redirect(action: "list")

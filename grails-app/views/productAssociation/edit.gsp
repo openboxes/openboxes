@@ -24,7 +24,7 @@
 			</div>
 
 			<g:form method="post" >
-				<g:hiddenField name="id" value="${productAssociationInstance?.id}" />
+				<g:hiddenField id="productAssociationId" name="id" value="${productAssociationInstance?.id}" />
 				<g:hiddenField name="version" value="${productAssociationInstance?.version}" />
 				<div class="box">
 					<h2><warehouse:message code="default.edit.label" args="[entityName]" /></h2>
@@ -115,7 +115,14 @@
                                 <td valign="top left">
                                     <div class="buttons left">
                                         <g:actionSubmit class="button" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
-                                        <g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+										<g:if test="${productAssociationInstance?.mutualAssociation}">
+											<button type="button" class="button" onclick="$('#product-association-delete-dialog').dialog('open')">
+												${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}
+											</button>
+										</g:if>
+										<g:else>
+											<g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+										</g:else>
                                     </div>
                                 </td>
                             </tr>
@@ -123,6 +130,7 @@
 					</table>
 				</div>
             </g:form>
-        </div>
+			<g:productAssociationDeleteDialog productAssociationId="${productAssociationInstance?.id}" />
+		</div>
     </body>
 </html>
