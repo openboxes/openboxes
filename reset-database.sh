@@ -3,7 +3,7 @@
 set -e
 
 while :; do
-  echo -n "Provide openbox db name: "
+  echo -n "Provide database name: "
   read DATABASE_NAME
 
   if mysql -Nse 'SHOW DATABASES;' | grep "${DATABASE_NAME}" -q; then
@@ -14,10 +14,10 @@ while :; do
 done
 
 # User confirmation
-echo "Are you sure you want to delete data from ${DATABASE_NAME}?"
-echo -n "y/N: "
-read ANSWER
-if [[ ${ANSWER} != "y" && ${ANSWER} != "Y" ]]; then
+echo "Database ${DATABASE_NAME} is going to be deleted and recreated"
+echo "Are you sure you want proceed?"
+read -p "y/N: " CONFIRMATION
+if [[ ${CONFIRMATION} != "y" && ${CONFIRMATION} != "Y" ]]; then
   exit
 fi
 
@@ -35,16 +35,13 @@ echo "Database recreated"
 
 # Grant privileges
 echo "Do you want grant all privileges to app db user?"
-echo -n "y/N: "
-read ANSWER
+read -p "y/N: " CONFIRMATION
 
-if [[ ${ANSWER} == "y" || ${ANSWER} == "Y" ]]; then
-  echo -n "Login: "
-  read LOGIN
-  echo -n "Host: "
-  read HOST
+if [[ ${CONFIRMATION} == "y" || ${CONFIRMATION} == "Y" ]]; then
+  read -p "User: " -ei "openboxes" USER
+  read -p "Host: " -ei "localhost" HOST
 
-  APP_DATABASE_USER=${LOGIN}@${HOST}
+  APP_DATABASE_USER=${USER}@${HOST}
 
   mysql -e "GRANT ALL ON ${DATABASE_NAME}.* to ${APP_DATABASE_USER};"
   echo "All privileges granted to ${APP_DATABASE_USER}"
