@@ -68,13 +68,15 @@
                 </td>
                 <g:if test="${!params.direction || params.direction as StockMovementType == StockMovementType.OUTBOUND}">
                     <td>
-                        <label class="status"><format:metadata obj="${stockMovement?.status}"/>
-                            <g:set var="approved" value="${stockMovement.lineItems.any { it.quantityApproved > 0 } }"/>
-                            <g:if test="${stockMovement?.stockMovementStatusCode in [StockMovementStatusCode.REQUESTING]
-                                    && stockMovement.isOutboundStockMovement() && !approved}">
-                                <div class="small">Awaiting Approval</div>
-                            </g:if>
-                        </label>
+                        <div class="status">
+                            <label><format:metadata obj="${stockMovement?.status}"/></label>
+                        </div>
+                        <g:set var="quantityApproved" value="${stockMovement.lineItems.any { it.quantityApproved > 0 } }"/>
+                        <g:if test="${stockMovement?.stockMovementStatusCode in [StockMovementStatusCode.REQUESTING, StockMovementStatusCode.REQUESTED]
+                                && stockMovement.isOutboundStockMovement() && !quantityApproved}">
+                            <div class="tag tag-danger">Awaiting Approval</div>
+                        </g:if>
+
                     </td>
                 </g:if>
                 <g:if test="${!params.direction || params.direction as StockMovementType == StockMovementType.INBOUND}">

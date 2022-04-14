@@ -120,7 +120,7 @@ class OrderStatusNotificationController {
                     log.info "Requisition item " + requisitionItem
                     Integer quantity = orderItem.quantity
                     if (quantity == 0) {
-                        log.info "Cancel quantity " + orderItemId
+                        log.info "Cancel quantity " + orderItemUuid
                         if (requisitionItem?.modificationItem) {
                             requisitionItem.undoChanges()
                             requisitionItem?.cancelQuantity(ReasonCode.REJECTED, "Rejected quantity change")
@@ -129,7 +129,7 @@ class OrderStatusNotificationController {
                     else {
                         // Approve the modification
                         if (requisitionItem?.modificationItem) {
-                            log.info "Approve quantity " + orderItemId
+                            log.info "Approve quantity " + orderItemUuid
                             log.info "quantity " + requisitionItem?.modificationItem?.quantity
                             log.info "quantityAdjusted " + requisitionItem?.modificationItem?.quantityAdjusted
                             log.info "quantityApproved " + requisitionItem?.modificationItem?.quantityApproved
@@ -142,6 +142,7 @@ class OrderStatusNotificationController {
 
                 // The remaining requisition items should all be approved
                 requisitionItemList.each { RequisitionItem requisitionItem ->
+                    log.info "Approve quantity for requisition item: ${new JSONObject(requisitionItem.toJson()).toString(4)}"
                     requisitionItem?.modificationItem?.approveQuantity()
                 }
 

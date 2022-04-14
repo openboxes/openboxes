@@ -1,5 +1,7 @@
 <%@ page import="org.pih.warehouse.requisition.RequisitionStatus" %>
 <%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode" %>
+<%@ page import="org.pih.warehouse.inventory.StockMovementStatusCode" %>
+
 <div class="summary">
     <table id="stockMovement-summary">
         <tbody>
@@ -141,6 +143,11 @@
                 <div class="tag tag-alert">
                     <format:metadata obj="${stockMovement?.requisition?.status }"/>
                 </div>
+                <g:set var="quantityApproved" value="${stockMovement.lineItems.any { it.quantityApproved > 0 } }"/>
+                <g:if test="${stockMovement?.stockMovementStatusCode in [StockMovementStatusCode.REQUESTING, StockMovementStatusCode.REQUESTED]
+                        && stockMovement.isOutboundStockMovement() && !quantityApproved}">
+                    <div class="tag tag-danger">Awaiting Approval</div>
+                </g:if>
             </td>
         </tr>
         </tbody>
