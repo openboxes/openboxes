@@ -5,17 +5,18 @@ CREATE OR REPLACE VIEW requirement AS (
 		loc.id as location_id,
 		i_l.internal_location_id as bin_location_id,
 		IFNULL(pa_in_bin.quantity_on_hand, 0) as quantity_in_bin,
+        IFNULL(pa_in_bin.quantity_available_to_promise, 0) as quantity_available_to_promise,
 		IFNULL(i_l.min_quantity, 0) as min_quantity,
 		IFNULL(i_l.max_quantity, 0) as max_quantity,
 		IFNULL(i_l.reorder_quantity, 0) as reorder_quantity,
 		IFNULL(total_pa.total_quantity_on_hand, 0) as total_quantity_on_hand,
         GREATEST(IFNULL(total_pa.total_quantity_available_to_promise, 0), 0) as total_quantity_available_to_promise,
       CASE
-        WHEN IFNULL(pa_in_bin.quantity_on_hand, 0) < IFNULL(i_l.min_quantity, 0) THEN 'BELOW_MINIMUM'
-        WHEN IFNULL(pa_in_bin.quantity_on_hand, 0) < IFNULL(i_l.reorder_quantity, 0) THEN 'BELOW_REORDER'
-        WHEN IFNULL(pa_in_bin.quantity_on_hand, 0) = 0 THEN 'OUT_OF_STOCK'
-        WHEN IFNULL(pa_in_bin.quantity_on_hand, 0) > IFNULL(i_l.max_quantity, 0) THEN 'ABOVE_MAXIMUM'
-        WHEN IFNULL(pa_in_bin.quantity_on_hand, 0) >= IFNULL(i_l.min_quantity, 0) AND IFNULL(pa_in_bin.quantity_on_hand, 0) <= IFNULL(i_l.max_quantity, 0) THEN 'IN_STOCK'
+        WHEN IFNULL(pa_in_bin.quantity_available_to_promise, 0) < IFNULL(i_l.min_quantity, 0) THEN 'BELOW_MINIMUM'
+        WHEN IFNULL(pa_in_bin.quantity_available_to_promise, 0) < IFNULL(i_l.reorder_quantity, 0) THEN 'BELOW_REORDER'
+        WHEN IFNULL(pa_in_bin.quantity_available_to_promise, 0) = 0 THEN 'OUT_OF_STOCK'
+        WHEN IFNULL(pa_in_bin.quantity_available_to_promise, 0) < IFNULL(i_l.max_quantity, 0) THEN 'BELOW_MAXIMUM'
+        WHEN IFNULL(pa_in_bin.quantity_available_to_promise, 0) >= IFNULL(i_l.min_quantity, 0) AND IFNULL(pa_in_bin.quantity_available_to_promise, 0) <= IFNULL(i_l.max_quantity, 0) THEN 'IN_STOCK'
         ELSE NULL
       END AS status
 	FROM inventory_level i_l
@@ -25,6 +26,7 @@ CREATE OR REPLACE VIEW requirement AS (
         pa_in_bin.product_id,
         pa_in_bin.location_id,
         pa_in_bin.bin_location_id,
+        sum(pa_in_bin.quantity_available_to_promise) as quantity_available_to_promise,
         sum(pa_in_bin.quantity_on_hand) as quantity_on_hand
       FROM product_availability pa_in_bin
       GROUP BY pa_in_bin.product_id, pa_in_bin.location_id, pa_in_bin.bin_location_id

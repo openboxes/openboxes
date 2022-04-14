@@ -273,7 +273,10 @@ class CreateReplenishment extends Component {
           ...requirement,
           quantity: requirement.quantityNeeded,
           checked: true,
-        }));
+        }))
+          .filter(requirement => requirement.binLocation.id &&
+                                  requirement.quantityAvailable > 0 &&
+                                  requirement.quantity > 0);
         this.setState({ values: { requirements }, isDirty: false }, () => this.props.hideSpinner());
       })
       .catch(() => this.props.hideSpinner());
