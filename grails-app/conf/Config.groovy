@@ -1523,7 +1523,7 @@ openboxes {
                         [label: "product.catalogs.label", defaultLabel: "Catalogs", href: "/${appName}/productCatalog/list"],
                         [label: "product.tags.label", defaultLabel: "Tags", href: "/${appName}/tag/list"],
                         [label: "attributes.label", defaultLabel: "Attributes", href: "/${appName}/attribute/list"],
-                        [label: "product.associations.label", defaultLabel: "Products Associations", href: "/${appName}/productAssociation/list"],
+                        [label: "product.associations.label", defaultLabel: "Associations", href: "/${appName}/productAssociation/list"],
                     ]
                 ],
                 [
