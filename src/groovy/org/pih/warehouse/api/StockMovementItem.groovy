@@ -68,7 +68,7 @@ class StockMovementItem {
     BigDecimal packSize = 1
 
     BigDecimal getQuantityRequired() {
-        return quantityRevised ?: quantityRequested
+        return quantityCanceled ? quantityRevised : quantityRequested
     }
 
     BigDecimal getQuantityAllowed() {

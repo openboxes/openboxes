@@ -26,7 +26,6 @@ class EventService {
 
     void publishStockMovementStatusEvent(StockMovement stockMovement){
         log.info "Publish status change event " + stockMovement.toJson()
-        String TOPIC_ARN = grailsApplication.config.awssdk.sns.order.status
         JSONObject notifyJson = new JSONObject()
         notifyJson.put("id", stockMovement.identifier?:JSONObject.NULL)
         notifyJson.put("locationNumber", stockMovement?.origin?.locationNumber?:JSONObject.NULL)
@@ -41,11 +40,16 @@ class EventService {
             // We need to get some values from the original (parent) requisition item in the case of modifications and substitutions
             RequisitionItem originalRequisitionItem = stockMovementItem?.requisitionItem?.parentRequisitionItem ?: stockMovementItem?.requisitionItem
 
+            log.info ("json " + new JSONObject(lineItem.toJson()).toString(4))
+
             JSONObject orderItem = new JSONObject()
             orderItem.put("id", originalRequisitionItem?.description ?: JSONObject.NULL)
             orderItem.put("acceptedQuantity", stockMovementItem.quantityRequired ?: 0)
             orderItem.put("quantityRequested", originalRequisitionItem?.quantity ?: 0)
             orderItem.put("quantityRevised", stockMovementItem.quantityRevised ?: 0)
+            orderItem.put("quantityCanceled", stockMovementItem.quantityCanceled ?: 0)
+            orderItem.put("quantityApproved", stockMovementItem.quantityApproved ?: 0)
+            orderItem.put("quantityRequired", stockMovementItem.quantityRequired ?: 0)
             orderItem.put("quantityPicked", stockMovementItem.quantityPicked ?: 0)
             orderItem.put("quantityShipped", stockMovementItem.quantityShipped ?: 0)
             orderItems.add(orderItem)
@@ -68,6 +72,6 @@ class EventService {
         }
         notifyJson.put("packages", packages)
         log.info "Publishing stock movement status update ${notifyJson.toString(4)}"
-        notificationService.publish(TOPIC_ARN, notifyJson.toString(), "Order Status")
+        notificationService.publish(grailsApplication.config.awssdk.sns.order.status, notifyJson.toString(), "Order Status")
     }
 }
