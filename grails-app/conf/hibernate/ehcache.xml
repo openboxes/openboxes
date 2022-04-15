@@ -1,11 +1,43 @@
 <ehcache>
   <diskStore path="java.io.tmpdir"/>
-	<defaultCache maxElementsInMemory="10000" eternal="false" />
-  <cache eternal="false"
-    maxElementsInMemory="50" maxElementsOnDisk="0" name="org.hibernate.cache.StandardQueryCache"
-    overflowToDisk="false" timeToLiveSeconds="120"/>
+
+	<defaultCache maxElementsInMemory='10000'
+      eternal='false'
+      timeToIdleSeconds='120'
+      timeToLiveSeconds='120'
+      overflowToDisk='true'
+      maxElementsOnDisk='10000000'
+      diskPersistent='false'
+      diskExpiryThreadIntervalSeconds='120'
+      memoryStoreEvictionPolicy='LRU'
+  />
+
+  <cache name="org.pih.warehouse.inventory.OutboundStockMovementListItem"
+    maxElementsInMemory="100000"
+    eternal="true"
+    overflowToDisk="false"
+  />
+
+  <cache name="org.pih.warehouse.inventory.OutboundStockMovement"
+    maxElementsInMemory="1000"
+    eternal="true"
+    overflowToDisk="false"
+  />
+
+  <cache name="org.hibernate.cache.StandardQueryCache"
+    eternal="false"
+    maxElementsInMemory="50"
+    maxElementsOnDisk="0"
+    overflowToDisk="false"
+    timeToLiveSeconds="120"
+  />
+
   <!-- timestamps of the most recent updates to queryable tables -->
-  <cache eternal="true"
-    maxElementsInMemory="5000" maxElementsOnDisk="0" name="org.hibernate.cache.UpdateTimestampsCache"
-    overflowToDisk="false"/>
+  <cache name="org.hibernate.cache.UpdateTimestampsCache"
+    eternal="true"
+    maxElementsInMemory="5000"
+    maxElementsOnDisk="0"
+    overflowToDisk="false"
+  />
+
 </ehcache>

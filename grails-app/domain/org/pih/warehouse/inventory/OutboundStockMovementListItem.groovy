@@ -69,10 +69,10 @@ class OutboundStockMovementListItem implements Serializable {
 
     static mapping = {
         version false
-        cache usage: "read-only"
+        cache true
         table "stock_movement_list_item"
 
-        statusSortOrder formula: RequisitionStatus.getStatusSortOrderFormula()
+        //statusSortOrder formula: RequisitionStatus.getStatusSortOrderFormula()
     }
 
     static constraints = {
