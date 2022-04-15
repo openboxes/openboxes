@@ -129,10 +129,10 @@ const FIELD = {
         type: TextField,
         label: 'react.stockMovement.quantityToTransfer.label',
         defaultMessage: 'Qty to Transfer',
-        headerAlign: 'right',
+        headerAlign: 'center',
         attributes: {
           type: 'number',
-          cellClassName: 'text-right',
+          cellClassName: 'text-center',
         },
         flexWidth: 10,
         fieldKey: '',
