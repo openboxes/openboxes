@@ -14,12 +14,6 @@ import { translateWithDefaultMessage } from 'utils/Translate';
 import 'components/stock-movement-wizard/StockMovement.scss';
 
 
-const SUPPORT_LINKS = {
-  configureCategories: 'Configure Categories',
-  reviewCategories: 'Review Categories',
-  configureProducts: 'Configure Products',
-};
-
 class ProductsConfigurationWizard extends Component {
   constructor(props) {
     super(props);
@@ -94,7 +88,7 @@ class ProductsConfigurationWizard extends Component {
         currentPage={currentPage}
         prevPage={currentPage === 1 ? 1 : currentPage - 1}
         additionalProps={{
-          locationId, location, history, supportLinks: SUPPORT_LINKS,
+          locationId, location, history,
         }}
         updateWizardValues={this.updateWizardValues}
         showStepNumber

@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 import ReactHtmlParser from 'react-html-parser';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions/index';
 import VerticalTabs from 'components/Layout/VerticalTabs';
@@ -20,7 +19,6 @@ const INITIAL_STATE = {
   importSuccessful: false,
 };
 
-const PAGE_ID = 'configureProducts';
 
 class ConfigureProducts extends Component {
   constructor(props) {
@@ -129,13 +127,6 @@ class ConfigureProducts extends Component {
 
     return (
       <div className="d-flex flex-column">
-        <div className="submit-buttons">
-          <button type="button" onClick={() => Alert.info(this.props.supportLinks[PAGE_ID])} className="btn btn-outline-primary float-right btn-xs">
-            <i className="fa fa-question-circle-o" aria-hidden="true" />
-            &nbsp;
-            <Translate id="react.default.button.support.label" defaultMessage="Support" />
-          </button>
-        </div>
         <div className="configuration-wizard-content">
           <VerticalTabs tabs={tabs} />
         </div>
@@ -158,7 +149,6 @@ export default connect(mapStateToProps, { showSpinner, hideSpinner })(ConfigureP
 ConfigureProducts.propTypes = {
   goToPage: PropTypes.func.isRequired,
   previousPage: PropTypes.func.isRequired,
-  supportLinks: PropTypes.shape({}).isRequired,
   initialValues: PropTypes.shape({
     categoriesImported: PropTypes.bool.isRequired,
   }).isRequired,
