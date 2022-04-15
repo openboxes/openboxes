@@ -1618,7 +1618,8 @@ openboxes {
                         [label: "shipmentWorkflows.label", defaultLabel: "Shipment Workflows", href: "/${appName}/shipmentWorkflow/list"],
                         [label: "productsConfiguration.label", defaultLabel: "Categories and Products Configuration", href: "/${appName}/productsConfiguration/index"],
                         [label: "locationsConfiguration.label", defaultLabel: "Locations Configuration", href: "/${appName}/locationsConfiguration/index"],
-                        [label: "loadData.label", defaultLabel: "Load Data", href: "/${appName}/loadData/index"]
+                        [label: "loadData.label", defaultLabel: "Load Data", href: "/${appName}/loadData/index"],
+                        [label: "resetInstance.label", defaultLabel: "Reset your instance", href: "/${appName}/resetInstance/index"]
                     ]
                 ]
             ]
@@ -1709,6 +1710,12 @@ openboxes.supportLinks = [
     manageBinLocations: 'https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1311572061/Manage+Bin+Locations',
     discussionForum: 'https://discuss.openboxes.com/',
     knowledgeBase: 'https://openboxes.helpscoutdocs.com/',
+]
+
+// Reset an instance
+
+openboxes.resettingInstance = [
+        scriptUrl: 'https://raw.githubusercontent.com/openboxes/openboxes/develop/reset-database.sh'
 ]
 
 // Product configuration wizard

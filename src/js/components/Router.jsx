@@ -112,6 +112,11 @@ const AsyncLoadDataPage = Loadable({
   loading: Loading,
 });
 
+const AsyncResetInstancePage = Loadable({
+  loader: () => import('components/reset-instance/ResetInstancePage'),
+  loading: Loading,
+});
+
 function displayHelpScoutBeacon(key, color, isEnabled) {
   if (isEnabled) {
     return (
@@ -155,6 +160,9 @@ const Router = props => (
           <AsyncWelcomePage />
         </Route>
         <Route path="/**/loadData/index" ><AsyncLoadDataPage /></Route>
+        <Route path="/**/resetInstance/index">
+          <AsyncResetInstancePage />
+        </Route>
         <MainLayoutRoute path="/**/dashboard/:configId?" component={AsyncDashboard} />
         <MainLayoutRoute path="/**/" component={AsyncDashboard} />
       </Switch>
