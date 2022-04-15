@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.Explode
 import io.swagger.v3.oas.annotations.enums.ParameterIn
-import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -51,10 +50,14 @@ class ProductApiController extends BaseDomainApiController {
     GrailsApplication grailsApplication
     def productAvailabilityService
 
-    class ProductDemand implements Serializable {
-        Product product
-        Location location
-        Map demand
+    class ProductDemandResponse implements Serializable {
+        class ProductDemand implements Serializable {
+            Product product
+            Location location
+            Map demand
+        }
+
+        ProductDemand data
     }
 
     @GET
@@ -68,7 +71,7 @@ information on the the requested product and currently-selected warehouse.""",
     )
     @ApiResponse(
         content = @Content(
-            schema = @Schema(implementation = ProductDemand)
+            schema = @Schema(implementation = ProductDemandResponse)
         ),
         description = "demand information for the requested product and warehouse",
         responseCode = "200"
@@ -76,30 +79,56 @@ information on the the requested product and currently-selected warehouse.""",
     @Path("/api/products/{id}/demand")
     @Produces("application/json")
     def demand() {
-        def data = new ProductDemand()
-        data.product = Product.get(params.id)
-        data.location = Location.get(session.warehouse.id)
-        data.demand = forecastingService.getDemand(data.location, data.product)
-        render([data: data] as JSON)
+        def response = new ProductDemandResponse()
+        response.data.product = Product.get(params.id)
+        response.data.location = Location.get(session.warehouse.id)
+        response.data.demand = forecastingService.getDemand(response.data.location, response.data.product)
+        render(response as JSON)
+    }
+
+    class ProductDemandSummaryResponse implements Serializable {
+        class ProductDemandSummary implements Serializable {
+            Product product
+            Location location
+            List demand
+        }
+
+        ProductDemandSummary data
     }
 
     @GET
     @Operation(
-        summary = "report demand history for one product at the currently-selected warehouse",
+        summary = "summarize demand history for one product at the currently-selected warehouse",
         parameters = [@Parameter(ref = "product_id_in_path")]
     )
     @ApiResponse(
-        description = "undocumented schema",
+        content = @Content(
+            schema = @Schema(implementation = ProductDemandResponse)
+        ),
+        description = "summary information for the requested product and warehouse",
         responseCode = "200"
     )
     @Path("/api/products/{id}/demandSummary")
     @Produces("application/json")
     def demandSummary() {
-        def data = new ProductDemand()
-        data.product = Product.get(params.id)
-        data.location = Location.get(session.warehouse.id)
-        data.demand = forecastingService.getDemandSummary(data.location, data.product)
-        render([data: data] as JSON)
+        def response = new ProductDemandSummaryResponse()
+        response.data.product = Product.get(params.id)
+        response.data.location = Location.get(session.warehouse.id)
+        response.data.demand = forecastingService.getDemandSummary(response.data.location, response.data.product)
+        render(response as JSON)
+    }
+
+    class ProductSummaryResponse implements Serializable {
+        class IdContainer implements Serializable {
+            String id
+        }
+        class ProductSummary implements Serializable {
+            IdContainer product
+            IdContainer location
+            int quantityOnHand
+        }
+
+        ProductSummary data
     }
 
     @GET
@@ -108,7 +137,10 @@ information on the the requested product and currently-selected warehouse.""",
         parameters = [@Parameter(ref = "product_id_in_path")]
     )
     @ApiResponse(
-        description = "undocumented schema",
+        content = @Content(
+            schema = @Schema(implementation = ProductSummaryResponse)
+        ),
+        description = "summary information for the requested product and warehouse",
         responseCode = "200"
     )
     @Path("/api/products/{id}/productSummary")
@@ -120,7 +152,7 @@ information on the the requested product and currently-selected warehouse.""",
         render([data: [product: [id: product.id], location: [id: location.id], quantityOnHand: quantityOnHand]] as JSON)
     }
 
-    class ProductAvailabilityResponse
+    class ProductAvailabilityResponse implements Serializable
     {
         List<ProductAvailability> data
     }
@@ -145,14 +177,14 @@ information on the the requested product and currently-selected warehouse.""",
         render([data: data] as JSON)
     }
 
-    class ListResponse
+    class ProductListResponse implements Serializable
     {
         List<Product> data
     }
 
     @GET
     @Operation(
-        summary = "list all products tracked in OpenBoxes",
+        summary = "list products tracked in OpenBoxes",
         description = """\
 ## Warning!
 
@@ -161,12 +193,21 @@ Do _not_ use Swagger UI's "Try it out" feature on this entry point!
 OpenBoxes tracks a large number of products; the full list can
 [make this page unresponsive](https://github.com/swagger-api/swagger-ui/issues/3832).
 """,
-        operationId = "list_products")
+        operationId = "list_products",
+        parameters = [
+            @Parameter(
+                description = "space or comma-separated list of names to filter by (OR)",
+                example = "ibuprofen acetaminophen,paracetamol",
+                in = ParameterIn.QUERY,
+                name = "name",
+                required = false
+            )
+        ])
     @ApiResponse(
         content = @Content(
-            schema = @Schema(implementation = ListResponse)
+            schema = @Schema(implementation = ProductListResponse)
         ),
-        description = "a (long) list of all products tracked in OpenBoxes",
+        description = "a (possibly very long) list of products tracked in OpenBoxes",
         responseCode = "200"
     )
     @Path("/api/products")
@@ -205,6 +246,11 @@ OpenBoxes tracks a large number of products; the full list can
         render([data: products] as JSON)
     }
 
+    class ProductAvailableItemResponse implements Serializable
+    {
+        List<AvailableItem> data
+    }
+
     @GET
     @Operation(
         summary = "retrieve bin locations and quantities for one or more products",
@@ -227,10 +273,7 @@ OpenBoxes tracks a large number of products; the full list can
     )
     @ApiResponse(
         content = @Content(
-            array = @ArraySchema(
-                schema = @Schema(implementation = AvailableItem),
-                uniqueItems = true
-            )
+            schema = @Schema(implementation = ProductAvailableItemResponse)
         ),
         description = "a list of bin locations and quantities for the requested products",
         responseCode = "200"

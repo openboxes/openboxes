@@ -45,7 +45,7 @@ class ApiController {
     def megamenuService
     def messageSource
 
-    class LoginRequest {
+    class LoginRequest implements Serializable {
         @Schema(format = "email", required = true, type = "string")
         String username
         @Schema(format = "password", required = true, type = "string")

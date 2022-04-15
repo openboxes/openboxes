@@ -11,7 +11,8 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -29,6 +30,11 @@ class PersonApiController extends BaseDomainApiController {
 
     def userService
 
+    class PersonListResponse implements Serializable
+    {
+        List<Person> data
+    }
+
     @GET
     @Operation(
         summary = "get a list of OpenBoxes users, as well as points of contact",
@@ -38,13 +44,22 @@ class PersonApiController extends BaseDomainApiController {
 Do _not_ use Swagger UI's "Try it out" feature on this entry point!
 
 OpenBoxes tracks a large number of users; the full list can
-[make this page unresponsive](https://github.com/swagger-api/swagger-ui/issues/3832).""")
+[make this page unresponsive](https://github.com/swagger-api/swagger-ui/issues/3832).
+""",
+        operationId = "list_users",
+        parameters = [
+            @Parameter(
+                description = "comma-separated list of names to match (AND)",
+                example = "Matt,Pearson",
+                in = ParameterIn.QUERY,
+                name = "name",
+                required = false
+            )
+        ]
+    )
     @ApiResponse(
         content = @Content(
-            array = @ArraySchema(
-                schema = @Schema(implementation = Person),
-                uniqueItems = true
-            )
+            schema = @Schema(implementation = PersonListResponse)
         ),
         description = "a list of users",
         responseCode = "200"

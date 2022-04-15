@@ -40,7 +40,7 @@ class LocationApiController extends BaseDomainApiController {
     def userService
     GrailsApplication grailsApplication
 
-    class ListResponse
+    class LocationListResponse implements Serializable
     {
         List<Location> data
     }
@@ -58,6 +58,12 @@ OpenBoxes tracks a large number of locations; the full list can
         operationId = "list_locations",
         parameters = [
             @Parameter(
+                description = "filter returned locations by name",
+                example = "Lesotho",
+                in = ParameterIn.QUERY,
+                name = "name"
+            ),
+            @Parameter(
                 description = "optionally restrict the search to a particular type of location",
                 in = ParameterIn.QUERY,
                 name = "locationTypeCode",
@@ -67,7 +73,7 @@ OpenBoxes tracks a large number of locations; the full list can
     )
     @ApiResponse(
         content = @Content(
-            schema = @Schema(implementation = ListResponse)
+            schema = @Schema(implementation = LocationListResponse)
         ),
         description = "a list of locations",
         responseCode = "200"

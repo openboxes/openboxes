@@ -12,7 +12,13 @@ We manage our build using Gradle; here are two handy targets:
 
 ## API Reference
 
-We publish API documentation for the REST interface [on SwaggerHub](https://app.swaggerhub.com/apis-docs/openboxes/api/). Documentation for Java and Python clients can be found, after building them, in `build/swagger/clients/*/docs/`. Note that the client documentation is auto-generated from documentation that is itself auto-generated and may be confusing; the examples below may be a better place to start.
+We publish API documentation for the REST interface
+[on SwaggerHub](https://app.swaggerhub.com/apis-docs/openboxes/api/).
+Documentation for Java and Python clients can be found, after building
+them, in `build/swagger/clients/*/docs/`. Note that the client
+documentation is auto-generated from documentation that is itself
+auto-generated and may be confusing; the examples below may be a better
+place to start.
 
 ## Installation
 
@@ -22,7 +28,8 @@ TBD.
 
 ### Python
 
-The Python bindings should work against Python 2.7 and 3.4+ (we develop against 3.8).
+The Python bindings should work against Python 2.7 and 3.4+ (we develop
+against 3.8).
 
 ```sh
 $ pip install openboxes-client
@@ -31,7 +38,8 @@ $ python
 
 ### Building bindings locally
 
-Clone the project and check out the Swagger branch, if you haven't already.
+Clone the project and check out the Swagger branch, if you haven't
+already.
 
 ```sh
 $ git clone git@github.com:openboxes/openboxes.git
@@ -65,18 +73,18 @@ OpenBoxes uses cookie-based authentication, which is a little fiddly:
 >>> session.api_client.cookie = auth_header[-1]["Set-Cookie"]
 ```
 
-Once you have authenticated, the interface is more straightforward. Below, we find out how many doses of ibuprofen are currently stored at a particular storage depot:
+Once you have authenticated, the interface is more straightforward.
+Below, we find out how many doses of ibuprofen are currently stored at a
+particular storage depot:
 
 ```python
->>> locations = openboxes.LocationApi(session.api_client).list_locations()
->>> depot = [loc for loc in locations.data if loc.name == "Cange Depot"][0]
+>>> depot = openboxes.LocationApi(session.api_client).list_locations(name="Cange Depot").data[0]
 >>> openboxes.ConfigurationApi(session.api_client).choose_location(id=depot.id)
 "b'User ******** is now logged into Cange Depot'"
->>> products = openboxes.ProductApi(session.api_client).list_products()
->>> treatments = [p for p in products.data if "buprofen" in p.name]
+>>> products = openboxes.ProductApi(session.api_client).list_products(name="ibuprofen")
 >>> stock_records = [
-...     openboxes.ProductApi(session.api_client).product_availability(t.id)
-...     for t in treatments
+...     openboxes.ProductApi(session.api_client).product_availability(p.id)
+...     for p in products.data
 ... ]
 >>> sum([bin_loc.quantity_on_hand for record in stock_records for bin_loc in record.data])
 80580  # as of this writing -- the exact number will vary
@@ -84,7 +92,9 @@ Once you have authenticated, the interface is more straightforward. Below, we fi
 
 ## License
 
-This software, like all of OpenBoxes' source code, is made available under the [EPL-1.0](https://opensource.org/licenses/eclipse-1.0.php) license.
+This software, like all of OpenBoxes' source code, is made available
+under the [EPL-1.0](https://opensource.org/licenses/eclipse-1.0.php)
+license.
 
 Copyright (c) 2022 Partners In Health.
 
@@ -94,4 +104,7 @@ See Partners In Health's [Terms of Use](https://www.pih.org/pages/terms).
 
 ## Feedback
 
-As this is a project in the early stages of development, we are especially interested in feedback. Please reach out to us at `openboxes@pih.org` with any questions, comments or suggestions for improvement.
+As this is a project in the early stages of development, we are
+especially interested in feedback. Please reach out to us at
+`openboxes@pih.org` with any questions, comments or suggestions for
+improvement.
