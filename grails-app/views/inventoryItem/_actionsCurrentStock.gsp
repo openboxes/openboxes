@@ -44,7 +44,7 @@
         <g:if test="${isSuperuser}">
             <g:set var="templates" value="${org.pih.warehouse.core.Document.findAllByDocumentCode(org.pih.warehouse.core.DocumentCode.ZEBRA_TEMPLATE)}"/>
             <g:each in="${templates}" var="template">
-                <g:if test="${template?.documentNumber && template?.documentNumber == 'barcodeLabel:product'}">
+                <g:if test="${template?.documentNumber && template?.documentNumber in ['barcodeLabel:product', 'barcodeLabel:inventoryItem']}">
                     <hr/>
                     <div class="action-menu-item">
                         <g:link controller="document" action="buildZebraTemplate" id="${template.id}" params="['inventoryItem.id': itemInstance?.id]" target="_blank">
