@@ -46,11 +46,15 @@
                 </div>
 
                 <div class="col-sm-12 col-md-4 text-center time-info mt-3 mt-sm-0">
-                    <span class="text-muted d-block">Polling Directories</span>
+                    <span class="text-muted d-block">Message Queues</span>
                     <span class="text-5 font-weight-500 text-dark">
                         <ul class="list-group">
                             <g:each var="subdirectory" in="${grailsApplication.config.openboxes.integration.ftp.inbound.subdirectories}">
-                                <li class="list-group-item">${grailsApplication.config.openboxes.integration.ftp.inbound.directory}/${subdirectory}</li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    ${grailsApplication.config.openboxes.integration.ftp.inbound.directory}/${subdirectory}
+                                    <g:set var="messageCount" value="${messages?.findAll { it.path.contains(subdirectory) }.size()}"/>
+                                    <div class="badge bg-primary badge-pill">${messageCount}</div>
+                                </li>
                             </g:each>
                         </ul>
                     </span>
