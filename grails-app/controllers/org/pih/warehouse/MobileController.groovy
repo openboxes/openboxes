@@ -439,7 +439,7 @@ class MobileController {
             render text: content, contentType: 'text/xml', encoding: 'UTF-8'
         }
         else if (params.path.endsWith(".log")) {
-            render text: "<pre>" + content + "</pre>"
+            render text: content, contentType: 'text/plain', encoding: 'UTF-8'
         }
         else {
             render text: content
