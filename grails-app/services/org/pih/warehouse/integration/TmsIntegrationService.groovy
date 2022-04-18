@@ -147,13 +147,14 @@ class TmsIntegrationService {
     }
 
     def handleMessages() {
-        def message
-        try {
-            String directory = grailsApplication.config.openboxes.integration.ftp.inbound.directory
-            List<String> subdirectories = grailsApplication.config.openboxes.integration.ftp.inbound.subdirectories
 
-            subdirectories.each { subdirectory ->
+        String directory = grailsApplication.config.openboxes.integration.ftp.inbound.directory
+        List<String> subdirectories = grailsApplication.config.openboxes.integration.ftp.inbound.subdirectories
 
+        subdirectories.each { subdirectory ->
+
+            def message
+            try {
                 def messages = fileTransferService.listMessages(directory, [subdirectory])
                 messages.eachWithIndex { msg, index ->
                     log.info "Message ${index}: " + msg
@@ -176,17 +177,17 @@ class TmsIntegrationService {
                     }
                 }
             }
-        }
-        catch (Exception e) {
-            log.error("Message ${message?.name} not processed due to error: " + e.message, e)
-            if (message) {
-                failMessage(message?.path, e)
+            catch (Exception e) {
+                log.error("Message ${message?.name} not processed due to error: " + e.message, e)
+                if (message) {
+                    failMessage(message?.path, e)
 
-                // Archive message on failure so that other messages can be processed
-                // Not recommended as this can lead to unexpected outcomes given that this will allow other messages to be processed
-                Boolean archiveOnFailure = grailsApplication.config.openboxes.integration.ftp.inbound.archiveOnFailure.enabled
-                if (archiveOnFailure) {
-                    archiveMessage(message.path)
+                    // Archive message on failure so that other messages can be processed
+                    // Not recommended as this can lead to unexpected outcomes given that this will allow other messages to be processed
+                    Boolean archiveOnFailure = grailsApplication.config.openboxes.integration.ftp.inbound.archiveOnFailure.enabled
+                    if (archiveOnFailure) {
+                        archiveMessage(message.path)
+                    }
                 }
             }
         }
