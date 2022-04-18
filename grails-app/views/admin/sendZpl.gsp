@@ -37,6 +37,14 @@
                         </tr>
                         <tr class="prop">
                             <td class="name">
+                                <label><warehouse:message code="zpl.url.label" default="URL"/></label>
+                            </td>
+                            <td class="value">
+                                <g:textField name="url" value="${params.url?:grailsApplication.config.openboxes.barcode.labelaryApi.url}" class="text" size="60"/>
+                            </td>
+                        </tr>
+                        <tr class="prop">
+                            <td class="name">
                                 <label><warehouse:message code="mail.body.label" default="Body"/></label>
                             </td>
                             <td class="value">

@@ -152,7 +152,7 @@ class AdminController {
                         flash.message = "Successfully printed ZPL ${params.body} to ${params.ipAddress}:${params.port}"
                     }
                     else if (params.render) {
-                        def url = grailsApplication.config.openboxes.barcode.labelaryApi.url
+                        def url = params.url?:grailsApplication.config.openboxes.barcode.labelaryApi.url
                         def http = new HTTPBuilder(url.toString())
                         def html = http.post(body: params.body)
                         response.contentType = "image/png"
