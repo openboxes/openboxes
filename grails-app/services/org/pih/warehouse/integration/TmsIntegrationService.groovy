@@ -303,20 +303,20 @@ class TmsIntegrationService {
         //    throw new IllegalStateException("Unable to complete a shipment until it has been shipped")
         //}
 
-        // Create new shipment event to represent status update
         if (shipment) {
-            Event event = shipment?.events?.find { it.eventType == eventType && it.eventDate == eventDate }
-            if (!event) {
+            // Create new shipment event to represent status update if one does not already exist
+            Event existingEvent = shipment?.events?.find { it.eventType == eventType }
+            if (!existingEvent) {
                 log.info "Creating new event ${eventType} since it does not exist"
                 // OBKN-378 TransientObjectException: object references an unsaved transient instance
-                event = new Event(eventType: eventType, eventDate: eventDate, longitude: longitude, latitude: latitude)
-                event.save(flush: true, failOnError: true)
-                shipment.addToEvents(event)
+                existingEvent = new Event(eventType: eventType, eventDate: eventDate, longitude: longitude, latitude: latitude)
+                existingEvent.save(flush: true, failOnError: true)
+                shipment.addToEvents(existingEvent)
                 shipment.save(flush: true)
             }
 
             // If successful, send shipment status notification
-            notificationService.sendShipmentStatusNotification(shipment, event, shipment.origin, [RoleType.ROLE_SHIPMENT_NOTIFICATION])
+            notificationService.sendShipmentStatusNotification(shipment, existingEvent, shipment.origin, [RoleType.ROLE_SHIPMENT_NOTIFICATION])
         }
     }
 
@@ -339,7 +339,6 @@ class TmsIntegrationService {
         if (!stockMovement) {
             throw new Exception("Unable to locate stock movement by tracking number ${trackingNumber}")
         }
-
         createEvent(stockMovement, EventTypeCode.ACCEPTED, new Date())
     }
 
