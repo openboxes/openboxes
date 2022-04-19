@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.core
 
-class ResetInstanceController {
+class ResettingInstanceInfoController {
 
     def index = {
         render(template: "/common/react")

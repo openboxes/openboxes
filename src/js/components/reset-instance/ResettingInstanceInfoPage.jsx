@@ -10,16 +10,16 @@ import Translate from 'utils/Translate';
 
 
 // eslint-disable-next-line no-shadow
-const ResetInstancePage = ({ locale, history, fetchTranslations }) => {
-  const [resettingInstanceLinks, setResettingInstanceLinks] = useState({});
+const ResettingInstanceInfoPage = ({ locale, history, fetchTranslations }) => {
+  const [resettingInstanceCommand, setResettingInstanceCommand] = useState('');
 
   useEffect(() => {
     fetchTranslations(locale, 'resetInstance');
   }, [locale]);
 
   useEffect(() => {
-    apiClient.get('/openboxes/api/resettingInstanceLinks').then((response) => {
-      setResettingInstanceLinks(response.data.data);
+    apiClient.get('/openboxes/api/resettingInstance/command').then((response) => {
+      setResettingInstanceCommand(response.data.data);
     });
   }, []);
 
@@ -29,8 +29,10 @@ const ResetInstancePage = ({ locale, history, fetchTranslations }) => {
         <h3 className="font-weight-bold my-3">
           <Translate id="react.resetInstance.header.label" defaultMessage="Reset your instance" />
         </h3>
-        <p>To reset your instance request your system admin to run this script in terminal:</p>
-        <p className="font-weight-bold">wget {resettingInstanceLinks.scriptUrl} | sh</p>
+        <p>
+          <Translate id="react.resetInstance.content.label" defaultMessage="To reset your instance request your system admin to run this script in terminal:" />
+        </p>
+        <p className="font-weight-bold">{resettingInstanceCommand}</p>
         <button
           onClick={() => history.push('/openboxes')}
           type="button"
@@ -51,10 +53,10 @@ const mapDispatchToProps = {
   fetchTranslations,
 };
 
-ResetInstancePage.propTypes = {
+ResettingInstanceInfoPage.propTypes = {
   locale: PropTypes.string.isRequired,
   fetchTranslations: PropTypes.func.isRequired,
   history: PropTypes.shape({ push: PropTypes.func }).isRequired,
 };
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(ResetInstancePage));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(ResettingInstanceInfoPage));

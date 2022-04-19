@@ -223,9 +223,9 @@ class ApiController {
         render([data: supportLinks] as JSON)
     }
 
-    def getResettingInstanceLinks = {
-        def resettingInstanceLinks = grailsApplication.config.openboxes.resettingInstance
+    def getResettingInstanceCommand = {
+        def resettingInstanceCommand = grailsApplication.config.openboxes.resettingInstance.command
 
-        render([data: resettingInstanceLinks] as JSON)
+        render([data: resettingInstanceCommand] as JSON)
     }
 }

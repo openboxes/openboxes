@@ -1619,7 +1619,7 @@ openboxes {
                         [label: "productsConfiguration.label", defaultLabel: "Categories and Products Configuration", href: "/${appName}/productsConfiguration/index"],
                         [label: "locationsConfiguration.label", defaultLabel: "Locations Configuration", href: "/${appName}/locationsConfiguration/index"],
                         [label: "loadData.label", defaultLabel: "Load Data", href: "/${appName}/loadData/index"],
-                        [label: "resetInstance.label", defaultLabel: "Reset your instance", href: "/${appName}/resetInstance/index"]
+                        [label: "resetInstance.label", defaultLabel: "Reset your instance", href: "/${appName}/resettingInstanceInfo/index"]
                     ]
                 ]
             ]
@@ -1714,9 +1714,7 @@ openboxes.supportLinks = [
 
 // Reset an instance
 
-openboxes.resettingInstance = [
-        scriptUrl: 'https://raw.githubusercontent.com/openboxes/openboxes/develop/reset-database.sh'
-]
+openboxes.resettingInstance.command = "wget https://raw.githubusercontent.com/openboxes/openboxes/develop/reset-database.sh | sh"
 
 // Product configuration wizard
 openboxes.configurationWizard.enabled = true

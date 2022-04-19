@@ -113,7 +113,7 @@ const AsyncLoadDataPage = Loadable({
 });
 
 const AsyncResetInstancePage = Loadable({
-  loader: () => import('components/reset-instance/ResetInstancePage'),
+  loader: () => import('components/reset-instance/ResettingInstanceInfoPage'),
   loading: Loading,
 });
 
@@ -160,7 +160,7 @@ const Router = props => (
           <AsyncWelcomePage />
         </Route>
         <Route path="/**/loadData/index" ><AsyncLoadDataPage /></Route>
-        <Route path="/**/resetInstance/index">
+        <Route path="/**/resettingInstanceInfo/index">
           <AsyncResetInstancePage />
         </Route>
         <MainLayoutRoute path="/**/dashboard/:configId?" component={AsyncDashboard} />

@@ -897,7 +897,7 @@
                                 </g:link>
                             </div>
                             <div class="mm-menu-item">
-                                <g:link controller="resetInstance" action="index" >
+                                <g:link controller="resettingInstanceInfo" action="index" >
                                     <warehouse:message code="resetInstance.label" default="Reset your instance" />
                                 </g:link>
                             </div>
