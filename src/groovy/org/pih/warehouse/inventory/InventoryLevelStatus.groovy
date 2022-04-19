@@ -32,7 +32,7 @@ enum InventoryLevelStatus {
     }
 
     static listReplenishmentOptions() {
-        return [BELOW_MINIMUM, BELOW_REORDER, BELOW_MAXIMUM, ABOVE_MAXIMUM]
+        return [BELOW_MINIMUM, BELOW_REORDER, BELOW_MAXIMUM]
     }
 
     String toString() { return name() }
