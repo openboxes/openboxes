@@ -445,9 +445,11 @@ class TmsIntegrationService {
 
     def archiveMessage(String oldPath) {
         try {
-            def filename = FilenameUtils.getName(oldPath)
-            def destination = FilenameUtils.getFullPathNoEndSeparator(oldPath)
-            def newPath = "${destination}/archive/${filename}"
+            String timestamp = new Date().format("yyyyMMddhhmmss")
+            String baseName = FilenameUtils.getBaseName(oldPath)
+            String extension = FilenameUtils.getExtension(oldPath)
+            String destination = FilenameUtils.getFullPathNoEndSeparator(oldPath)
+            String newPath = "${destination}/archive/${timestamp}-${baseName}.${extension}"
             log.info("Archiving message ${oldPath} to ${newPath}")
             fileTransferService.moveMessage(oldPath, newPath)
         } catch (Exception e) {
