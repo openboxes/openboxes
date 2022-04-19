@@ -1618,7 +1618,8 @@ openboxes {
                         [label: "shipmentWorkflows.label", defaultLabel: "Shipment Workflows", href: "/${appName}/shipmentWorkflow/list"],
                         [label: "productsConfiguration.label", defaultLabel: "Categories and Products Configuration", href: "/${appName}/productsConfiguration/index"],
                         [label: "locationsConfiguration.label", defaultLabel: "Locations Configuration", href: "/${appName}/locationsConfiguration/index"],
-                        [label: "loadData.label", defaultLabel: "Load Data", href: "/${appName}/loadData/index"]
+                        [label: "loadData.label", defaultLabel: "Load Data", href: "/${appName}/loadData/index"],
+                        [label: "resetInstance.label", defaultLabel: "Reset your instance", href: "/${appName}/resettingInstanceInfo/index"]
                     ]
                 ]
             ]
@@ -1710,6 +1711,10 @@ openboxes.supportLinks = [
     discussionForum: 'https://discuss.openboxes.com/',
     knowledgeBase: 'https://openboxes.helpscoutdocs.com/',
 ]
+
+// Reset an instance
+
+openboxes.resettingInstance.command = "wget https://raw.githubusercontent.com/openboxes/openboxes/develop/reset-database.sh | sh"
 
 // Product configuration wizard
 openboxes.configurationWizard.enabled = true

@@ -626,6 +626,11 @@ class UrlMappings {
             action = [GET: "getSupportLinks"]
         }
 
+        "/api/resettingInstance/command"(parseRequest: true) {
+            controller = { "api" }
+            action = [GET: "getResettingInstanceCommand"]
+        }
+
         // Generic API for all other resources
 
         "/api/generic/${resource}/"(parseRequest: false) {
