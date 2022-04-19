@@ -558,7 +558,7 @@ class OrderService {
                 productPackage.save()
             }
             // Otherwise update the price
-            else {
+            else if (packagePrice > 0) {
                 if (productPackage.productPrice) {
                     productPackage.productPrice.price = packagePrice
                 } else {
@@ -575,7 +575,7 @@ class OrderService {
             }
         }
         // Otherwise we update the existing price
-        else {
+        else if (packagePrice > 0) {
             if (orderItem.productPackage.productPrice) {
                 orderItem.productPackage.productPrice.price = packagePrice
             } else {
