@@ -14,6 +14,7 @@ import { hideSpinner, showSpinner } from 'actions';
 import DateField from 'components/form-elements/DateField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
+import AddDestinationModal from 'components/stock-movement-wizard/modals/AddDestinationModal';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { debounceLocationsFetch, debounceUsersFetch } from 'utils/option-utils';
@@ -89,6 +90,8 @@ const FIELDS = {
     label: 'react.stockMovement.destination.label',
     defaultMessage: 'Destination',
     attributes: {
+      createNewFromModal: true,
+      createNewFromModalLabel: 'Add Destination',
       required: true,
       async: true,
       showValueTooltip: true,
@@ -98,11 +101,17 @@ const FIELDS = {
       options: [],
       filterOptions: options => options,
     },
-    getDynamicAttr: props => ({
-      loadOptions: props.debouncedLocationsFetch,
+    getDynamicAttr: ({
+      debouncedLocationsFetch,
+      origin,
+      fetchStockLists,
+      openNewLocationModal,
+    }) => ({
+      loadOptions: debouncedLocationsFetch,
+      newOptionModalOpen: openNewLocationModal,
       onChange: (value) => {
-        if (value && props.origin && props.origin.id) {
-          props.fetchStockLists(props.origin, value);
+        if (value && origin && origin.id) {
+          fetchStockLists(origin, value);
         }
       },
     }),
@@ -178,6 +187,7 @@ class CreateStockMovement extends Component {
       setInitialValues: true,
       values: this.props.initialValues,
       requestTypes: [],
+      showDestinationModal: false,
     };
     this.fetchStockLists = this.fetchStockLists.bind(this);
     this.setRequestType = this.setRequestType.bind(this);
@@ -187,6 +197,8 @@ class CreateStockMovement extends Component {
 
     this.debouncedLocationsFetch =
       debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength);
+
+    this.openAddDestinationModal = this.openAddDestinationModal.bind(this);
   }
 
   componentDidMount() {
@@ -226,6 +238,10 @@ class CreateStockMovement extends Component {
       },
     };
     this.setState({ values, setInitialValues: false });
+  }
+
+  openAddDestinationModal() {
+    this.setState({ showDestinationModal: true });
   }
 
   /**
@@ -396,33 +412,49 @@ class CreateStockMovement extends Component {
           clearStocklist: (args, state, utils) => {
             utils.changeValue(state, 'stocklist', () => null);
           },
+          setDestinationValues: ([{ id, name, locationType }], state, utils) => {
+            const data = {
+              id,
+              value: id,
+              label: `${name} [${locationType ? locationType.description : null}]`,
+            };
+            utils.changeValue(state, 'destination', () => data);
+          },
         }}
         render={({ form: { mutators }, handleSubmit, values }) => (
-          <form onSubmit={handleSubmit}>
-            <div className="classic-form with-description">
-              {_.map(
-                FIELDS,
-                (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-                  stocklists: this.state.stocklists,
-                  fetchStockLists: (origin, destination) =>
-                    this.fetchStockLists(origin, destination, mutators.clearStocklist),
-                  origin: values.origin,
-                  destination: values.destination,
-                  isSuperuser: this.props.isSuperuser,
-                  debouncedUsersFetch: this.debouncedUsersFetch,
-                  debouncedLocationsFetch: this.debouncedLocationsFetch,
-                  requestTypes: this.state.requestTypes,
-                  setRequestType: this.setRequestType,
-                  values,
-                }),
-              )}
-            </div>
-            <div className="submit-buttons">
-              <button type="submit" className="btn btn-outline-primary float-right btn-xs">
-                <Translate id="react.default.button.next.label" defaultMessage="Next" />
-              </button>
-            </div>
-          </form>
+          <React.Fragment>
+            <AddDestinationModal
+              isOpen={this.state.showDestinationModal}
+              onClose={() => this.setState({ showDestinationModal: false })}
+              onResponse={mutators.setDestinationValues}
+            />
+            <form onSubmit={handleSubmit}>
+              <div className="classic-form with-description">
+                {_.map(
+                  FIELDS,
+                  (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
+                    stocklists: this.state.stocklists,
+                    fetchStockLists: (origin, destination) =>
+                      this.fetchStockLists(origin, destination, mutators.clearStocklist),
+                    origin: values.origin,
+                    destination: values.destination,
+                    isSuperuser: this.props.isSuperuser,
+                    debouncedUsersFetch: this.debouncedUsersFetch,
+                    debouncedLocationsFetch: this.debouncedLocationsFetch,
+                    requestTypes: this.state.requestTypes,
+                    setRequestType: this.setRequestType,
+                    openNewLocationModal: this.openAddDestinationModal,
+                    values,
+                  }),
+                )}
+              </div>
+              <div className="submit-buttons">
+                <button type="submit" className="btn btn-outline-primary float-right btn-xs">
+                  <Translate id="react.default.button.next.label" defaultMessage="Next" />
+                </button>
+              </div>
+            </form>
+          </React.Fragment>
         )}
       />
     );
