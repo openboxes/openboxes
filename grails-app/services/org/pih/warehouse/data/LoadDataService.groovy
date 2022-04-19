@@ -14,12 +14,18 @@ import org.pih.warehouse.core.*
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
+import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.requisition.ReplenishmentTypeCode
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemSortByCode
+
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 
 class LoadDataService {
 
@@ -187,26 +193,54 @@ class LoadDataService {
     }
 
 
-    def importInventory(URL csvURL) {
+    def importInventory(URL csvURL, Location targetWarehouse) {
         CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
 
-        csvReader.eachLine { Map attr ->
+        Transaction transaction = new Transaction();
+        transaction.transactionDate = new Date();
+        transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID);
+        transaction.inventory = targetWarehouse.inventory
+        DateFormat dateFormat = new SimpleDateFormat('DD/mm/yyyy');
+
+        csvReader.eachLine { Map<String, String> attr ->
             Product product = Product.findByProductCode(attr["Product code"]);
+            if (!product) {
+                throw new IllegalArgumentException("Product not found: " + attr["Product code"])
+            }
 
-            InventoryItem inventoryItem = new InventoryItem(
-                    product: product,
-                    lotNumber: attr["Lot number"],
-                    expirationDate: attr["Expiration date"],
-                    comments: attr["Comment"]
-            );
+            Location binLocation = Location.findByName(attr["Bin location"])
 
-            inventoryService.findOrCreateInventoryItem(inventoryItem)
-        }
+            if (!binLocation) {
+                throw new IllegalArgumentException("Location not found: " + attr["Bin location"])
+            }
+
+            TransactionEntry transactionEntry = new TransactionEntry();
+            transactionEntry.quantity = attr["Physical QOH"] as Integer
+            transactionEntry.comments = attr["Comment"]
+
+            def expirationDate = attr["Expiration date"]
+
+            InventoryItem inventoryItem = inventoryService.findAndUpdateOrCreateInventoryItem(
+                    product,
+                    attr["Lot number"],
+                    expirationDate == ""
+                            ? null
+                            : dateFormat.parse(expirationDate)
+            )
+
+            transactionEntry.inventoryItem = inventoryItem
+            transactionEntry.binLocation = binLocation
+
+            transaction.addToTransactionEntries(transactionEntry)
+        };
+
+        transaction.forceRefresh = Boolean.TRUE
+        transaction.save(flush: true, failOnError: true)
 
         csvReader.close();
     }
 
-    def importInventoryLevels(URL csvURL) {
+    def importInventoryLevels(URL csvURL, Location targetWarehouse) {
         CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
 
         csvReader.eachLine { Map<String, String> attr ->
@@ -215,6 +249,7 @@ class LoadDataService {
             Location preferredBinLocation = Location.findByName(attr["Preferred bin location"])
 
             InventoryLevel inventoryLevel = new InventoryLevel(
+                    inventory: targetWarehouse.inventory,
                     product: product,
                     status: attr["status"],
                     preferredBinLocation: preferredBinLocation,
