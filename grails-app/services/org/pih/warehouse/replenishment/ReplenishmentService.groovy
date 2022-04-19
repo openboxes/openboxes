@@ -162,9 +162,15 @@ class ReplenishmentService {
         return order
     }
 
-    void validateRequirement(ReplenishmentItem item) {
-        if (item.quantity > productAvailabilityService.getQuantityAvailableToPromiseByProductNotInBin(item.location, item.binLocation, item.product)) {
-            throw new ValidationException("There is not available that quantity of the product with id: ${item.product.id}")
+    void validateRequirement(ReplenishmentItem item, Boolean updating = false) {
+        if (updating) {
+            if (item.quantity > productAvailabilityService.getQuantityAvailableToPromiseByProductNotInBin(item.location, item.binLocation, item.product) + item.quantity) {
+                throw new ValidationException("There is not available that quantity of the product with id: ${item.product.id}")
+            }
+        } else {
+            if (item.quantity > productAvailabilityService.getQuantityAvailableToPromiseByProductNotInBin(item.location, item.binLocation, item.product)) {
+                throw new ValidationException("There is not available that quantity of the product with id: ${item.product.id}")
+            }
         }
     }
 

@@ -124,7 +124,11 @@ class ReplenishmentApiController {
             if (!replenishmentItem.location) {
                 replenishmentItem.location = replenishment.destination
             }
-            replenishmentService.validateRequirement(replenishmentItem)
+            if (jsonObject.updating) {
+                replenishmentService.validateRequirement(replenishmentItem, jsonObject.updating)
+            } else {
+                replenishmentService.validateRequirement(replenishmentItem)
+            }
 
             replenishmentItemMap.pickItems.each { pickItemMap ->
                 ReplenishmentItem pickItem = new ReplenishmentItem()
