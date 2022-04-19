@@ -26,8 +26,4 @@ class ProductTagLib {
             out << iconElements
         }
     }
-
-    def productAssociationDeleteDialog = { attrs, body ->
-        out << render(template: "/taglib/productAssociationDeleteDialog", model: [productAssociationId: attrs.productAssociationId])
-    }
 }

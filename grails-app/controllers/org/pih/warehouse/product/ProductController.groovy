@@ -1108,19 +1108,6 @@ class ProductController {
         render template: "productCatalogs", model: [productInstance: product]
     }
 
-    def removeFromProductAssociations = {
-        String productId
-        def productAssociation = ProductAssociation.get(params.id)
-        if (productAssociation) {
-            productId = productAssociation.product.id
-            productAssociation.delete()
-            redirect(action: "productSubstitutions", id: productId)
-        } else {
-            response.status = 404
-        }
-    }
-
-
     def createProductSnapshot = {
 
         Product product = Product.get(params.id)

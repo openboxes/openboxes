@@ -72,7 +72,11 @@
                     <g:if test="${productAssociation.id}">
                         <g:actionSubmit action="update" class="button icon accept" value="Save" id="update">${warehouse.message(code: 'default.button.save.label', default: 'Save')}</g:actionSubmit>
                         <g:if test="${productAssociation?.mutualAssociation}">
-                            <button type="button" class="button" onclick="$('#product-association-delete-dialog').dialog('open')">
+                            <button type="button"
+                                    class="button"
+                                    onclick="$('#product-association-delete-dialog')
+                                      .data('productAssociationId', `${productAssociation?.id}`)
+                                      .dialog('open')">
                                 ${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}
                             </button>
                         </g:if>
@@ -89,5 +93,4 @@
             </td>
         </tfoot>
     </table>
-    <g:productAssociationDeleteDialog productAssociationId="${productAssociation?.id}" />
 </g:form>

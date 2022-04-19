@@ -97,7 +97,11 @@
 					                    <g:hiddenField name="id" value="${productAssociationInstance?.id}" />
 					                    <g:actionSubmit class="button" action="edit" value="${warehouse.message(code: 'default.button.edit.label', default: 'Edit')}" />
                                         <g:if test="${productAssociationInstance?.mutualAssociation}">
-                                            <button type="button" class="button" onclick="$('#product-association-delete-dialog').dialog('open')">
+                                            <button type="button"
+                                                    class="button"
+                                                    onclick="$('#product-association-delete-dialog')
+                                                      .data('productAssociationId', `${productAssociationInstance?.id}`)
+                                                      .dialog('open')">
                                                 ${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}
                                             </button>
                                         </g:if>
@@ -111,7 +115,7 @@
                     </tbody>
                 </table>
             </div>
-            <g:productAssociationDeleteDialog productAssociationId="${productAssociationInstance?.id}" />
+            <g:render template="/productAssociation/productAssociationDeleteDialog" />
         </div>
     </body>
 </html>
