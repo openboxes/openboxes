@@ -73,10 +73,10 @@ class LoadDataService {
                     partyType: PartyType.findByCode("ORG") // FIXME: Should party type be provided?
             )
 
-            PartyRole role = PartyRole.findByRoleType(RoleType.valueOf(partyRole.toUpperCase()))
-            if (role) {
-                organization.addToRoles(role)
-            }
+            PartyRole role = PartyRole.create()
+            role.roleType = RoleType.valueOf(partyRole)
+            organization.addToRoles(role)
+
             organization.save(failOnError: true)
         })
 
@@ -360,7 +360,9 @@ class LoadDataService {
                 sortByCode: RequisitionItemSortByCode.valueOf(attr['Sort by']),
                 replenishmentPeriod: Integer.parseInt(attr['Replenishment Period']),
                 replenishmentTypeCode: ReplenishmentTypeCode.valueOf(attr['Replenishment Type']),
-                requestedBy: requestedBy
+                requestedBy: requestedBy,
+                isTemplate: true,
+                isPublished: true
         )
 
         requisition.save(failOnError: true);
