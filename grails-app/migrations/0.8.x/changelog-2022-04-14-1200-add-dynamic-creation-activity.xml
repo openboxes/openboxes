@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+
+  <changeSet author="DariuszRodzewicz" id="1404202212000-0">
+    <preConditions onFail="MARK_RAN">
+      <sqlCheck expectedResult="0">
+        select count(*) from location_type_supported_activities as sa
+        JOIN location_type as lt ON sa.location_type_id = lt.id
+        WHERE lt.location_type_code = 'DISPENSARY' AND sa.supported_activities_string = 'DYNAMIC_CREATION';
+      </sqlCheck>
+    </preConditions>
+    <comment>Insert 'DYNAMIC_CREATION' supported activity where location type is 'DISPENSARY'</comment>
+    <sql>
+      INSERT INTO location_type_supported_activities (location_type_id, supported_activities_string)
+      SELECT id, 'DYNAMIC_CREATION'
+      FROM location_type
+      WHERE location_type_code = 'DISPENSARY';
+    </sql>
+  </changeSet>
+  <changeSet author="DariuszRodzewicz" id="1404202212000-1">
+    <preConditions onFail="MARK_RAN">
+      <sqlCheck expectedResult="0">
+        select count(*) from location_type_supported_activities as sa
+        JOIN location_type as lt ON sa.location_type_id = lt.id
+        WHERE lt.location_type_code = 'WARD' AND sa.supported_activities_string = 'DYNAMIC_CREATION';
+      </sqlCheck>
+    </preConditions>
+    <comment>Insert 'DYNAMIC_CREATION' supported activity where location type is 'WARD'</comment>
+    <sql>
+      INSERT INTO location_type_supported_activities (location_type_id, supported_activities_string)
+      SELECT id, 'DYNAMIC_CREATION'
+      FROM location_type
+      WHERE location_type_code = 'WARD';
+    </sql>
+  </changeSet>
+  <changeSet author="DariuszRodzewicz" id="1404202212000-2">
+    <preConditions onFail="MARK_RAN">
+      <sqlCheck expectedResult="0">
+        select count(*) from location_type_supported_activities as sa
+        JOIN location_type as lt ON sa.location_type_id = lt.id
+        WHERE lt.location_type_code = 'DISPENSARY' AND sa.supported_activities_string = 'DYNAMIC_CREATION';
+      </sqlCheck>
+    </preConditions>
+    <comment>Insert 'DYNAMIC_CREATION' supported activity where location type is 'PHARMACY'</comment>
+    <sql>
+      INSERT INTO location_type_supported_activities (location_type_id, supported_activities_string)
+      SELECT id, 'DYNAMIC_CREATION'
+      FROM location_type
+      WHERE location_type_code = 'PHARMACY';
+    </sql>
+  </changeSet>
+</databaseChangeLog>

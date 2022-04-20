@@ -89,7 +89,14 @@ class LocationApiController extends BaseDomainApiController {
     }
 
     def locationTypes = {
+        String[] activityCodes = params.list('activityCode');
         def locationTypes = LocationType.list()
+
+        if (activityCodes.length > 0) {
+            locationTypes = locationTypes.findAll { locationType ->
+                activityCodes.any { activityCode -> locationType.supports(activityCode) }
+            }
+        }
 
         def data = locationTypes.collect { locationType ->
             [
