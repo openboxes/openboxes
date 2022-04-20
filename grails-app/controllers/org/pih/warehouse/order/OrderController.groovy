@@ -571,7 +571,7 @@ class OrderController {
             csv.printRecord(
                     warehouse.message(code: 'product.productCode.label'),
                     warehouse.message(code: 'product.name.label'),
-                    warehouse.message(code: 'product.vendorCode.label'),
+                    warehouse.message(code: 'product.supplierCode.label'),
                     warehouse.message(code: 'orderItem.quantity.label'),
                     warehouse.message(code: 'product.unitOfMeasure.label'),
                     warehouse.message(code: 'orderItem.unitPrice.label'),
@@ -591,7 +591,7 @@ class OrderController {
                 csv.printRecord(
                         orderItem?.product?.productCode,
                         orderItem?.product?.name,
-                        orderItem?.product?.vendorCode,
+                        orderItem?.productSupplier?.supplierCode,
                         CSVUtils.formatInteger(number: orderItem?.quantity),
                         CSVUtils.formatUnitOfMeasure(orderItem?.quantityUom?.code, orderItem?.quantityPerUom),
                         CSVUtils.formatCurrency(number: orderItem?.unitPrice, currencyCode: orderItem?.currencyCode, isUnitPrice: true),
