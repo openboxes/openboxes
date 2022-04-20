@@ -1721,7 +1721,7 @@ openboxes.configurationWizard.enabled = true
 openboxes.configurationWizard.categoryOptions = [
     defaultCategories: [
         enabled: true,
-        fileUrl: "", // TODO: Provide file for OpenBoxes category tree
+        fileUrl: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/default_OB_categories.csv",
         rootCategoryName: "ROOT",
         categoryNameColumnIndex: 0,
         parentCategoryNameColumnIndex: 1,
@@ -1839,7 +1839,7 @@ openboxes {
             }
             categories {
                 enabled = true
-                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/categories.csv"
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/default_OB_categories.csv"
             }
             products {
                 enabled = true
