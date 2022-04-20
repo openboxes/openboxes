@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.requisition.Requisition
 
 class LoadDataApiController extends BaseDomainApiController {
@@ -62,19 +63,31 @@ class LoadDataApiController extends BaseDomainApiController {
         }
 
         if (Boolean.valueOf(config.mainWarehouseInventory.enabled)) {
-            loadDataService.importInventory(new URL(config.mainWarehouseInventory.url))
+            loadDataService.importInventory(
+                    new URL(config.mainWarehouseInventory.url),
+                    Location.findByName(config.mainWarehouseInventory.warehouseName)
+            )
         }
 
         if (Boolean.valueOf(config.bostonWarehouseInventory.enabled)) {
-            loadDataService.importInventory(new URL(config.bostonWarehouseInventory.url))
+            loadDataService.importInventory(
+                    new URL(config.bostonWarehouseInventory.url),
+                    Location.findByName(config.bostonWarehouseInventory.warehouseName)
+            )
         }
 
         if (Boolean.valueOf(config.chicagoWarehouseInventory.enabled)) {
-            loadDataService.importInventory(new URL(config.chicagoWarehouseInventory.url))
+            loadDataService.importInventory(
+                    new URL(config.chicagoWarehouseInventory.url),
+                    Location.findByName(config.chicagoWarehouseInventory.warehouseName)
+            )
         }
 
         if (Boolean.valueOf(config.inventoryLevels.enabled)) {
-            loadDataService.importInventoryLevels(new URL(config.inventoryLevels.url))
+            loadDataService.importInventoryLevels(
+                    new URL(config.inventoryLevels.url),
+                    Location.findByName(config.inventoryLevels.warehouseName)
+            )
         }
 
         if (Boolean.valueOf(config.users.enabled)) {
