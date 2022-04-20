@@ -140,6 +140,7 @@ class ProductAssociationController {
                 }
 
                 bindMutualAssociationData(mutualAssociationInstance, params)
+                mutualAssociationInstance.save(flush: true, failOnError: true)
             } else if (productAssociationInstance.mutualAssociation && !params.hasMutualAssociation) {
                 mutualAssociationInstance = productAssociationInstance.mutualAssociation
                 productAssociationInstance.mutualAssociation = null

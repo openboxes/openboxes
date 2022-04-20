@@ -1,11 +1,8 @@
 <div id="product-association-delete-dialog" title="${warehouse.message(code: 'productAssociation.delete.label')}">
-    <g:hiddenField id="productAssociationId" name="productAssociationId" value="${productAssociationId}"></g:hiddenField>
     <div style="margin:12px 20px;">${warehouse.message(code: 'productAssociation.delete.message')}</div>
 </div>
 <script type="text/javascript">
-    function deleteProductAssociation(mutualDelete) {
-        const productAssociationId = $("#productAssociationId").val();
-
+    function deleteProductAssociation(productAssociationId, mutualDelete, reload) {
         if(productAssociationId) {
             $.ajax({
                 url: "${g.createLink(controller:'productAssociation', action:'delete')}",
@@ -17,6 +14,12 @@
                 success: function () {
                     $.notify("Product association deleted successfully", "success");
                     $("#product-association-delete-dialog").dialog("close");
+
+                    if (reload) {
+                      location.reload();
+                      return;
+                    }
+
                     window.location.href = '${request.contextPath}/productAssociation/list';
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
@@ -34,6 +37,7 @@
             });
         } else {
             $.notify("Missing product association id");
+            $("#product-association-delete-dialog").dialog("close");
         }
       return false;
     }
@@ -47,10 +51,10 @@
             modal: true,
             buttons: {
                 Yes: function() {
-                    deleteProductAssociation(true);
+                    deleteProductAssociation($(this).data('productAssociationId'), true, $(this).data('reload'));
                 },
                 No: function() {
-                    deleteProductAssociation(false);
+                    deleteProductAssociation($(this).data('productAssociationId'), false, $(this).data('reload'));
                 },
                 Cancel: function() {
                     $(this).dialog("close");

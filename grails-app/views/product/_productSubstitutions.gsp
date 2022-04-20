@@ -50,11 +50,22 @@
                                     <g:message code="default.button.edit.label"/>
                                 </g:link>
 
-                                <g:remoteLink controller="product" action="removeFromProductAssociations" class="button"
-                                              id="${productSubstitution.id}" params="['product.id': productSubstitution.product.id]"
-                                            update="productSubstitutions">
-                                    <g:message code="default.button.delete.label"/>
-                                </g:remoteLink>
+                                <g:if test="${productSubstitution?.mutualAssociation}">
+                                    <button type="button"
+                                            class="button"
+                                            onclick="$('#product-association-delete-dialog')
+                                              .data('productAssociationId', `${productSubstitution?.id}`)
+                                              .data('reload', true)
+                                              .dialog('open')">
+                                        ${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}
+                                    </button>
+                                </g:if>
+                                <g:else>
+                                    <button class="button"
+                                            onclick="deleteSingleProductAssociation('${productSubstitution?.id}')">
+                                        <g:message code="default.button.delete.label"/>
+                                    </button>
+                                </g:else>
                             </td>
 
                         </tr>
@@ -87,6 +98,13 @@
             </table>
         </div>
     </div>
+    <g:render template="/productAssociation/productAssociationDeleteDialog" />
 </div>
 
-
+<script>
+    function deleteSingleProductAssociation(productAssociationId) {
+        if (confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}')) {
+            deleteProductAssociation(productAssociationId, false, true);
+        }
+    }
+</script>
