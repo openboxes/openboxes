@@ -1860,18 +1860,22 @@ openboxes {
             mainWarehouseInventory {
                 enabled = true
                 url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/mainWarehouseInventory.csv"
+                warehouseName = "Main Warehouse"
             }
             bostonWarehouseInventory {
                 enabled = true
                 url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/bostonWarehouseInventory.csv"
+                warehouseName = "Boston Warehouse"
             }
             chicagoWarehouseInventory {
                 enabled = true
                 url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/chicagoWarehouseInventory.csv"
+                warehouseName = "Chicago Warehouse"
             }
             inventoryLevels {
                 enabled = true
                 url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/inventoryLevels.csv"
+                warehouseName = "Main Warehouse"
             }
             users {
                 enabled = true

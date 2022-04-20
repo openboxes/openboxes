@@ -65,28 +65,28 @@ class LoadDataApiController extends BaseDomainApiController {
         if (Boolean.valueOf(config.mainWarehouseInventory.enabled)) {
             loadDataService.importInventory(
                     new URL(config.mainWarehouseInventory.url),
-                    Location.findByName('Main Warehouse')
+                    Location.findByName(config.mainWarehouseInventory.warehouseName)
             )
         }
 
         if (Boolean.valueOf(config.bostonWarehouseInventory.enabled)) {
             loadDataService.importInventory(
                     new URL(config.bostonWarehouseInventory.url),
-                    Location.findByName('Boston Warehouse')
+                    Location.findByName(config.bostonWarehouseInventory.warehouseName)
             )
         }
 
         if (Boolean.valueOf(config.chicagoWarehouseInventory.enabled)) {
             loadDataService.importInventory(
                     new URL(config.chicagoWarehouseInventory.url),
-                    Location.findByName('Chicago Warehouse')
+                    Location.findByName(config.chicagoWarehouseInventory.warehouseName)
             )
         }
 
         if (Boolean.valueOf(config.inventoryLevels.enabled)) {
             loadDataService.importInventoryLevels(
                     new URL(config.inventoryLevels.url),
-                    Location.findByName('Main Warehouse')
+                    Location.findByName(config.inventoryLevels.warehouseName)
             )
         }
 
