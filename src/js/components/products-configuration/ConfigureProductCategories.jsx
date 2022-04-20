@@ -20,7 +20,6 @@ const INITIAL_STATE = {
   categoryOptions: {},
 };
 
-const PAGE_ID = 'configureCategories';
 
 class ConfigureProductCategories extends Component {
   constructor(props) {
@@ -91,13 +90,6 @@ class ConfigureProductCategories extends Component {
 
     return (
       <div className="d-flex flex-column">
-        <div className="submit-buttons">
-          <button type="button" onClick={() => Alert.info(this.props.supportLinks[PAGE_ID])} className="btn btn-outline-primary float-right btn-xs">
-            <i className="fa fa-question-circle-o" aria-hidden="true" />
-            &nbsp;
-            <Translate id="react.default.button.support.label" defaultMessage="Support" />
-          </button>
-        </div>
         <div className="configuration-wizard-content">
           <VerticalTabs tabs={tabs} />
         </div>
@@ -121,7 +113,6 @@ ConfigureProductCategories.propTypes = {
   nextPage: PropTypes.func.isRequired,
   goToPage: PropTypes.func.isRequired,
   initialValues: PropTypes.shape({}).isRequired,
-  supportLinks: PropTypes.shape({}).isRequired,
   showSpinner: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,

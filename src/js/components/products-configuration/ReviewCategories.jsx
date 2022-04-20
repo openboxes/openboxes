@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import fileDownload from 'js-file-download';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
 import apiClient from 'utils/apiClient';
@@ -15,7 +14,6 @@ const INITIAL_STATE = {
   categoriesCount: 0,
 };
 
-const PAGE_ID = 'reviewCategories';
 
 class ReviewCategories extends Component {
   constructor(props) {
@@ -51,19 +49,12 @@ class ReviewCategories extends Component {
 
   render() {
     const {
-      initialValues, supportLinks, previousPage, nextPage,
+      initialValues, previousPage, nextPage,
     } = this.props;
     const { categoriesCount } = this.state;
 
     return (
       <div className="d-flex flex-column">
-        <div className="submit-buttons">
-          <button type="button" onClick={() => Alert.info(supportLinks[PAGE_ID])} className="btn btn-outline-primary float-right btn-xs">
-            <i className="fa fa-question-circle-o" aria-hidden="true" />
-            &nbsp;
-            <Translate id="react.default.button.support.label" defaultMessage="Support" />
-          </button>
-        </div>
         <div className="configuration-wizard-content">
           <div className=" configuration-wizard-card">
             {categoriesCount > 0 ? (
@@ -113,5 +104,4 @@ ReviewCategories.propTypes = {
   nextPage: PropTypes.func.isRequired,
   previousPage: PropTypes.func.isRequired,
   showSpinner: PropTypes.func.isRequired,
-  supportLinks: PropTypes.shape({}).isRequired,
 };
