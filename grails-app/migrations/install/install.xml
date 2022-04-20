@@ -6,6 +6,5 @@
 	<include file="install/baseline-tables.xml"/>
 	<include file="install/baseline-data.xml"/>
 	<include file="install/baseline-constraints.xml"/>
-	<include file="install/baseline-add-root-category.xml"/>
 
 </databaseChangeLog>
