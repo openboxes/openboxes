@@ -1849,7 +1849,7 @@ openboxes {
                 url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/productCatalogItems.csv"
             }
             productSuppliers {
-                enabled = false // INFO Disabled, not working
+                enabled = true
                 url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/productSuppliers.csv"
             }
             mainWarehouseInventory {

@@ -176,7 +176,7 @@ class LoadDataService {
             newItem.put("globalPreferenceTypeComments", currentItem.get("Preference Type Comment"));
             newItem.put("defaultProductPackageUomCode", currentItem.get("Default Package Type"));
             newItem.put("defaultProductPackageQuantity", currentItem.get("Quantity per Package").toInteger());
-            newItem.put("defaultProductPackagePrice", currentItem.get("Package price"));
+            newItem.put("defaultProductPackagePrice", currentItem.get("Package Price"));
 
             csvItems.set(i, newItem);
         }
