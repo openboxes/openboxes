@@ -8,7 +8,7 @@
 
         <div class="yui-u">
             <div id="loggedIn">
-                <ul>
+                <ul class="banner-menu">
                     <li>
                         <g:globalSearch id="globalSearch" cssClass="globalSearch" name="searchTerms" size="300"
                                         jsonUrl="${request.contextPath }/json/globalSearch"></g:globalSearch>
@@ -17,8 +17,8 @@
                         <g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
 
                         <li>
-                            <span class="action-menu" >
-                                <button class="action-hover-btn button">
+                            <span class="action-menu">
+                                <button class="action-hover-btn button top">
                                     <img src="${resource(dir: 'images/icons/silk', file: 'user.png')}"/>
                                     <span id="username">${session?.user?.name}</span>
                                     <span id="userrole">[<g:userRole user="${session.user}"/>]</span>
@@ -64,7 +64,7 @@
                         </li>
                         <g:if test="${session?.warehouse}">
                             <li>
-                                <button class="btn-show-dialog button"
+                                <button class="btn-show-dialog button top"
                                         data-title="${g.message(code:'dashboard.chooseLocation.label')}" data-height="300"
                                         data-url="${request.contextPath}/dashboard/changeLocation?targetUri=${targetUri}">
                                     <img src="${resource(dir: 'images/icons/silk', file: 'map.png')}" />
@@ -77,9 +77,9 @@
 
                     <li>
                         <span class="action-menu">
-                            <button class="action-hover-btn button">
-                                <img src="${resource(dir: 'images/icons/silk', file: 'help.png')}" />
-                                <g:message code="default.support.label" default="Support"/>
+                            <button class="action-hover-btn button helpscout top">
+                                <i class="fas fa-life-ring"></i>
+                                <g:message code="default.support.label" default="Support" />
                             </button>
                             <ul class="actions" style="text-align:left;">
                                 <li class="action-menu-item">
