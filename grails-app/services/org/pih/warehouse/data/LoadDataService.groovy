@@ -73,9 +73,8 @@ class LoadDataService {
                     partyType: PartyType.findByCode("ORG") // FIXME: Should party type be provided?
             )
 
-            PartyRole role = PartyRole.create()
-            role.roleType = RoleType.valueOf(partyRole)
-            organization.addToRoles(role)
+            RoleType roleType = RoleType.valueOf(partyRole)
+            organization.addToRoles(new PartyRole(roleType: roleType))
 
             organization.save(failOnError: true)
         })
