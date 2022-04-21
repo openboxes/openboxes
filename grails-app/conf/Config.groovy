@@ -1880,10 +1880,15 @@ openboxes {
                 enabled = true
                 url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/persons.csv"
             }
-            stocklist {
+            chicagoStocklist {
                 enabled = true
-                templateUrl = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/stocklistTemplate.csv"
-                itemsUrl = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/stocklistItems.csv"
+                templateUrl = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/chicagoStocklistTemplate.csv"
+                itemsUrl = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/chicagoStocklistItems.csv"
+            }
+            bostonStocklist {
+                enabled = true
+                templateUrl = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/bostonStocklistTemplate.csv"
+                itemsUrl = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/bostonStocklistItems.csv"
             }
         }
     }

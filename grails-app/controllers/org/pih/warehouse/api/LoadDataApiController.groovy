@@ -98,13 +98,24 @@ class LoadDataApiController extends BaseDomainApiController {
             loadDataService.importPersons(new URL(config.persons.url))
         }
 
-        if (Boolean.valueOf(config.stocklist.enabled)) {
+        if (Boolean.valueOf(config.chicagoStocklist.enabled)) {
             Requisition requisition = loadDataService.importStocklistTemplate(
-                    new URL(config.stocklist.templateUrl)
+                    new URL(config.chicagoStocklist.templateUrl)
             );
 
             loadDataService.importStocklistItems(
-                    new URL(config.stocklist.itemsUrl),
+                    new URL(config.chicagoStocklist.itemsUrl),
+                    requisition
+            )
+        }
+
+        if (Boolean.valueOf(config.bostonStocklist.enabled)) {
+            Requisition requisition = loadDataService.importStocklistTemplate(
+                    new URL(config.bostonStocklist.templateUrl)
+            )
+
+            loadDataService.importStocklistItems(
+                    new URL(config.bostonStocklist.itemsUrl),
                     requisition
             )
         }
