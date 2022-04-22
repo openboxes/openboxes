@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import arrayMutators from 'final-form-arrays';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
+import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
@@ -52,42 +53,6 @@ const FIELDS = {
           showValueTooltip: true,
         },
       },
-      'currentZone.name': {
-        type: LabelField,
-        label: 'react.replenishment.currentZone.label',
-        defaultMessage: 'Current Zone',
-        flexWidth: '0.5',
-        attributes: {
-          showValueTooltip: true,
-        },
-      },
-      'currentBinLocation.name': {
-        type: LabelField,
-        label: 'react.replenishment.currentBinLocation.label',
-        defaultMessage: 'Current Bin Location',
-        flexWidth: '1',
-        attributes: {
-          showValueTooltip: true,
-        },
-        getDynamicAttr: ({ subfield }) => ({
-          formatValue: (value) => {
-            if (subfield || value) {
-              return value;
-            }
-            return 'DEFAULT';
-          },
-        }),
-      },
-      quantityNeeded: {
-        type: LabelField,
-        label: 'react.replenishment.quantityInBin.label',
-        defaultMessage: 'Qty Needed',
-        flexWidth: '1',
-        headerAlign: 'right',
-        attributes: {
-          cellClassName: 'text-right',
-        },
-      },
       'zone.name': {
         type: LabelField,
         label: 'react.replenishment.zone.label',
@@ -127,6 +92,23 @@ const FIELDS = {
         attributes: {
           cellClassName: 'text-right',
         },
+      },
+      'currentBinLocation.name': {
+        type: LabelField,
+        label: 'react.replenishment.transferTo.label',
+        defaultMessage: 'Transfer to',
+        flexWidth: '1',
+        attributes: {
+          showValueTooltip: true,
+        },
+        getDynamicAttr: ({ subfield }) => ({
+          formatValue: (value) => {
+            if (subfield || value) {
+              return value;
+            }
+            return 'DEFAULT';
+          },
+        }),
       },
       buttonEditPick: {
         label: 'react.stockMovement.editPick.label',
@@ -175,6 +157,7 @@ class ReplenishmentSecondPage extends Component {
     super(props);
     this.state = {
       values: { replenishment: { ...this.props.initialValues } },
+      sorted: false,
     };
 
     this.revertUserPick = this.revertUserPick.bind(this);
@@ -216,6 +199,17 @@ class ReplenishmentSecondPage extends Component {
             },
           },
         }, () => this.props.hideSpinner());
+      })
+      .catch(() => this.props.hideSpinner());
+  }
+
+  recreatePickList() {
+    this.props.showSpinner();
+    const url = `/openboxes/api/replenishments/${this.props.match.params.replenishmentId}/picklists`;
+
+    apiClient.post(url)
+      .then(() => {
+        this.fetchReplenishment();
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -275,6 +269,56 @@ class ReplenishmentSecondPage extends Component {
       .catch(() => { this.props.hideSpinner(); });
   }
 
+  refresh() {
+    confirmAlert({
+      title: this.props.translate('react.replenishment.confirmRefresh.label', 'Confirm refresh'),
+      message: this.props.translate(
+        'react.replenishment.confirmRefresh.content.label',
+        'This button will redo the autopick on all items. Are you sure you want to continue?',
+      ),
+      buttons: [
+        {
+          label: this.props.translate('react.default.yes.label', 'Yes'),
+          onClick: () => {
+            this.recreatePickList();
+          },
+        },
+        {
+          label: this.props.translate('react.default.no.label', 'No'),
+        },
+      ],
+    });
+  }
+
+  saveAndExit() {
+    window.location = `/openboxes/stockTransfer/show/${this.props.match.params.replenishmentId}`;
+  }
+
+  sortByBins() {
+    if (this.state.sorted) {
+      this.setState({
+        values: {
+          replenishment: {
+            ...this.state.values.replenishment,
+            replenishmentItems: _.sortBy(this.state.values.replenishment.replenishmentItems, ['product.productCode']),
+          },
+        },
+        sorted: false,
+      });
+      return;
+    }
+
+    this.setState({
+      values: {
+        replenishment: {
+          ...this.state.values.replenishment,
+          replenishmentItems: _.sortBy(this.state.values.replenishment.replenishmentItems, ['picklistItems[0].zone', 'picklistItems[0].binLocation.name']),
+        },
+      },
+      sorted: true,
+    });
+  }
+
   render() {
     return (
       <Form
@@ -283,11 +327,43 @@ class ReplenishmentSecondPage extends Component {
         initialValues={this.state.values.replenishment}
         render={({ handleSubmit }) => (
           <div className="d-flex flex-column">
-            <div className="submit-buttons">
+            <div className="submit-buttons d-flex justify-content-end buttons-container">
               <button
-                type="submit"
-                className="btn btn-outline-primary btn-form float-right btn-xs mt-0 mb-3"
-              ><Translate id="react.replenishment.next.label" defaultMessage="Next" />
+                type="button"
+                onClick={() => this.refresh()}
+                className="mb-1 btn btn-outline-secondary btn-xs ml-1"
+              >
+                <span>
+                  <i className="fa fa-refresh pr-2" />
+                  <Translate id="react.default.button.refresh.label" defaultMessage="Reload" />
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => this.saveAndExit()}
+                className="mb-1 btn btn-outline-secondary btn-xs ml-1 bg-white border-0"
+              >
+                <span>
+                  <i className="fa fa-sign-out pr-2" />
+                  <Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" />
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => this.sortByBins()}
+                className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+              >
+                {this.state.sorted ?
+                  <span>
+                    <i className="fa fa-sort pr-2" />
+                    <Translate id="react.replenishment.originalOrder.label" defaultMessage="Original order" />
+                  </span>
+                  :
+                  <span>
+                    <i className="fa fa-sort pr-2" />
+                    <Translate id="react.replenishment.sortByBins.label" defaultMessage="Sort by bins" />
+                  </span>
+                }
               </button>
             </div>
             <form onSubmit={handleSubmit} className="print-mt">
