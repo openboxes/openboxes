@@ -5,19 +5,29 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "Acceptance_Status")
-@XmlType(propOrder = {"header", "action", "tripDetails", "tripOrderDetails"})
+@XmlType(propOrder = {"acceptanceTimestamp", "header", "action", "tripDetails", "tripOrderDetails"})
 public class AcceptanceStatus {
     public AcceptanceStatus() {}
-    public AcceptanceStatus(Header header, String action, TripDetails tripDetails, TripOrderDetails tripOrderDetails) {
+    public AcceptanceStatus(String acceptanceTimestamp, Header header, String action, TripDetails tripDetails, TripOrderDetails tripOrderDetails) {
+        this.acceptanceTimestamp = acceptanceTimestamp;
         this.header = header;
         this.action = action;
         this.tripDetails = tripDetails;
         this.tripOrderDetails = tripOrderDetails;
     }
+    private String acceptanceTimestamp;
     private Header header;
     private String action;
     private TripDetails tripDetails;
     private TripOrderDetails tripOrderDetails;
+
+    public void setAcceptanceTimestamp(String acceptanceTimestamp) {
+        this.acceptanceTimestamp = acceptanceTimestamp;
+    }
+    @XmlElement(name = "AcceptanceTimestamp")
+    public String getAcceptanceTimestamp() {
+        return acceptanceTimestamp;
+    }
     public void setHeader(Header header) {
         this.header = header;
     }

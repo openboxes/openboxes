@@ -71,6 +71,7 @@ import javax.xml.bind.JAXBContext
 import javax.xml.bind.Marshaller
 import javax.xml.bind.Unmarshaller
 import java.text.DecimalFormat
+import java.text.ParseException
 import java.text.SimpleDateFormat
 
 class TmsIntegrationService {
@@ -104,6 +105,7 @@ class TmsIntegrationService {
     }
 
     Object deserialize(String xmlContents) {
+        log.info "deserialize " + xmlContents
         // Convert XML message to message object
         JAXBContext jaxbContext = JAXBContext.newInstance("org.pih.warehouse.integration.xml.acceptancestatus:org.pih.warehouse.integration.xml.execution:org.pih.warehouse.integration.xml.pod:org.pih.warehouse.integration.xml.trip");
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
@@ -209,10 +211,18 @@ class TmsIntegrationService {
     }
 
     def handleMessage(AcceptanceStatus acceptanceStatus) {
-        log.info "Acceptance status " + acceptanceStatus.tripDetails.toString()
+        log.info "Acceptance status: trackingNumbers=" + acceptanceStatus.tripOrderDetails.orderId + ", acceptanceTimestamp=${acceptanceStatus?.acceptanceTimestamp}"
         List<String> trackingNumbers = acceptanceStatus.tripOrderDetails.orderId
+        SimpleDateFormat dateFormatter = new SimpleDateFormat(grailsApplication.config.openboxes.integration.defaultDateFormat)
+        Date acceptanceTimestamp = new Date()
+        try {
+            acceptanceTimestamp = dateFormatter.parse(acceptanceStatus.acceptanceTimestamp)
+        } catch (ParseException e) {
+            log.error("Unable to parse acceptance timestamp, using current timestamp (${acceptanceTimestamp}): ", e)
+        }
+
         trackingNumbers.each { String trackingNumber ->
-            acceptDeliveryOrder(trackingNumber)
+            acceptDeliveryOrder(trackingNumber, acceptanceTimestamp)
         }
     }
 
@@ -334,12 +344,12 @@ class TmsIntegrationService {
         }
     }
 
-    void acceptDeliveryOrder(String trackingNumber) {
+    void acceptDeliveryOrder(String trackingNumber, Date eventDate) {
         StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber, Boolean.FALSE)
         if (!stockMovement) {
             throw new Exception("Unable to locate stock movement by tracking number ${trackingNumber}")
         }
-        createEvent(stockMovement, EventTypeCode.ACCEPTED, new Date())
+        createEvent(stockMovement, EventTypeCode.ACCEPTED, eventDate)
     }
 
     void attachDocument(String trackingNumber, String documentType, String fileName, String fileContents) {
