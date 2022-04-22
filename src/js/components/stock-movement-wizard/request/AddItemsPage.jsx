@@ -26,6 +26,156 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
+function addButton({
+  // eslint-disable-next-line react/prop-types
+  addRow, getSortOrder, newItemAdded, updateTotalCount,
+}) {
+  return (
+    <button
+      type="button"
+      className="btn btn-outline-success btn-xs"
+      onClick={() => {
+        updateTotalCount(1);
+        addRow({ sortOrder: getSortOrder() });
+        newItemAdded();
+      }}
+    ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
+    </button>
+  );
+}
+
+
+const FIELDS = {
+  product: {
+    type: SelectField,
+    label: 'react.stockMovement.requestedProduct.label',
+    defaultMessage: 'Requested product',
+    headerAlign: 'left',
+    flexWidth: '9',
+    attributes: {
+      async: true,
+      openOnClick: false,
+      autoload: false,
+      filterOptions: options => options,
+      cache: false,
+      options: [],
+      showValueTooltip: true,
+      className: 'text-left',
+      optionRenderer: option => (
+        <strong style={{ color: option.color ? option.color : 'black' }} className="d-flex align-items-center">
+          {option.label}
+          &nbsp;
+          {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
+        </strong>
+      ),
+      valueRenderer: option => (
+        <span className="d-flex align-items-center">
+          <span className="text-truncate">
+            {option.label}
+          </span>
+          &nbsp;
+          {renderHandlingIcons(option ? option.handlingIcons : [])}
+        </span>
+      ),
+    },
+  },
+  quantityOnHand: {
+    type: LabelField,
+    label: 'react.stockMovement.quantityOnHand.label',
+    defaultMessage: 'QoH',
+    flexWidth: '1.7',
+    attributes: {
+      type: 'number',
+    },
+  },
+  quantityOnHandAtRequestSite: {
+    type: TextField,
+    flexWidth: '1.7',
+    label: 'react.stockMovement.quantityOnHandAtRequestSite.label',
+    defaultMessage: 'QOH at Request Site',
+    attributes: {
+      type: 'number',
+    },
+  },
+  quantityAvailable: {
+    type: LabelField,
+    label: 'react.stockMovement.available.label',
+    defaultMessage: 'Available',
+    flexWidth: '1.7',
+    attributes: {
+      type: 'number',
+    },
+  },
+  quantityAllowed: {
+    type: LabelField,
+    label: 'react.stockMovement.maxQuantity.label',
+    defaultMessage: 'Max Qty',
+    flexWidth: '1.7',
+    attributes: {
+      type: 'number',
+    },
+  },
+  monthlyDemand: {
+    type: LabelField,
+    label: 'react.stockMovement.demandPerMonth.label',
+    defaultMessage: 'Demand per Month',
+    flexWidth: '1.7',
+    attributes: {
+      type: 'number',
+    },
+  },
+  quantityRequested: {
+    type: TextField,
+    label: 'react.stockMovement.neededQuantity.label',
+    defaultMessage: 'Needed Qty',
+    flexWidth: '1.7',
+    attributes: {
+      type: 'number',
+    },
+  },
+  comments: {
+    type: TextField,
+    label: 'react.stockMovement.comments.label',
+    defaultMessage: 'Comments',
+    flexWidth: '1.7',
+    getDynamicAttr: ({
+      addRow, rowCount, rowIndex, getSortOrder,
+      updateTotalCount, updateRow, values,
+    }) => ({
+      onTabPress: rowCount === rowIndex + 1 ? () => {
+        updateTotalCount(1);
+        addRow({ sortOrder: getSortOrder() });
+      } : null,
+      arrowRight: rowCount === rowIndex + 1 ? () => {
+        updateTotalCount(1);
+        addRow({ sortOrder: getSortOrder() });
+      } : null,
+      arrowDown: rowCount === rowIndex + 1 ? () => () => {
+        updateTotalCount(1);
+        addRow({ sortOrder: getSortOrder() });
+      } : null,
+      onBlur: () => updateRow(values, rowIndex),
+    }),
+  },
+  demandPerReplenishmentPeriod: {
+    type: LabelField,
+    label: 'react.stockMovement.demandPerReplenishmentPeriod.label',
+    defaultMessage: 'Demand per Replenishment Period',
+    flexWidth: '1.7',
+    attributes: {
+      type: 'number',
+    },
+  },
+  demandPerRequestPeriod: {
+    type: LabelField,
+    label: 'react.stockMovement.demandPerRequestPeriod.label',
+    defaultMessage: 'Demand per Request Period',
+    flexWidth: '1.7',
+    attributes: {
+      type: 'number',
+    },
+  },
+};
 
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
@@ -50,65 +200,26 @@ const DELETE_BUTTON_FIELD = {
   },
 };
 
+const LINE_ITEMS_ATTR = {
+  type: ArrayField,
+  arrowsNavigation: true,
+  virtualized: true,
+  totalCount: ({ totalCount }) => totalCount,
+  isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
+  loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
+  isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
+  addButton,
+};
+
+
 const NO_STOCKLIST_FIELDS = {
   lineItems: {
-    type: ArrayField,
-    arrowsNavigation: true,
-    virtualized: true,
-    totalCount: ({ totalCount }) => totalCount,
-    isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
-    loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
-    isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
-    // eslint-disable-next-line react/prop-types
-    addButton: ({
-      // eslint-disable-next-line react/prop-types
-      addRow, getSortOrder, newItemAdded, updateTotalCount,
-    }) => (
-      <button
-        type="button"
-        className="btn btn-outline-success btn-xs"
-        onClick={() => {
-          updateTotalCount(1);
-          addRow({ sortOrder: getSortOrder() });
-          newItemAdded();
-        }}
-      ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
-      </button>
-    ),
+    ...LINE_ITEMS_ATTR,
     fields: {
       product: {
+        ...FIELDS.product,
         fieldKey: '',
-        type: SelectField,
-        label: 'react.stockMovement.requestedProduct.label',
-        defaultMessage: 'Requested product',
-        headerAlign: 'left',
         flexWidth: '9.5',
-        attributes: {
-          async: true,
-          openOnClick: false,
-          autoload: false,
-          filterOptions: options => options,
-          cache: false,
-          options: [],
-          showValueTooltip: true,
-          className: 'text-left',
-          optionRenderer: option => (
-            <strong style={{ color: option.color ? option.color : 'black' }} className="d-flex align-items-center">
-              {option.label}
-              &nbsp;
-              {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
-            </strong>
-          ),
-          valueRenderer: option => (
-            <span className="d-flex align-items-center">
-              <span className="text-truncate">
-                {option.label}
-              </span>
-              &nbsp;
-              {renderHandlingIcons(option ? option.handlingIcons : [])}
-            </span>
-          ),
-        },
         getDynamicAttr: ({
           debouncedProductsFetch, rowIndex, rowCount, updateProductData, values,
         }) => ({
@@ -117,41 +228,12 @@ const NO_STOCKLIST_FIELDS = {
           autoFocus: rowIndex === rowCount - 1,
         }),
       },
-      quantityOnHand: {
-        type: LabelField,
-        label: 'react.stockMovement.quantityOnHand.label',
-        defaultMessage: 'QoH',
-        flexWidth: '1.7',
-        attributes: {
-          type: 'number',
-        },
-      },
-      quantityAvailable: {
-        type: LabelField,
-        label: 'react.stockMovement.available.label',
-        defaultMessage: 'Available',
-        flexWidth: '1.7',
-        attributes: {
-          type: 'number',
-        },
-      },
-      monthlyDemand: {
-        type: LabelField,
-        label: 'react.stockMovement.demandPerMonth.label',
-        defaultMessage: 'Demand per Month',
-        flexWidth: '1.7',
-        attributes: {
-          type: 'number',
-        },
-      },
+      quantityOnHand: FIELDS.quantityOnHand,
+      quantityAvailable: FIELDS.quantityAvailable,
+      monthlyDemand: FIELDS.monthlyDemand,
       quantityRequested: {
-        type: TextField,
-        label: 'react.stockMovement.neededQuantity.label',
-        defaultMessage: 'Needed Qty',
+        ...FIELDS.quantityRequested,
         flexWidth: '2.5',
-        attributes: {
-          type: 'number',
-        },
         fieldKey: '',
         getDynamicAttr: ({
           updateRow, values, rowIndex,
@@ -159,30 +241,7 @@ const NO_STOCKLIST_FIELDS = {
           onBlur: () => updateRow(values, rowIndex),
         }),
       },
-      comments: {
-        type: TextField,
-        label: 'react.stockMovement.comments.label',
-        defaultMessage: 'Comments',
-        flexWidth: '1.7',
-        getDynamicAttr: ({
-          addRow, rowCount, rowIndex, getSortOrder,
-          updateTotalCount, updateRow, values,
-        }) => ({
-          onTabPress: rowCount === rowIndex + 1 ? () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-          arrowRight: rowCount === rowIndex + 1 ? () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-          arrowDown: rowCount === rowIndex + 1 ? () => () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-          onBlur: () => updateRow(values, rowIndex),
-        }),
-      },
+      comments: FIELDS.comments,
       deleteButton: DELETE_BUTTON_FIELD,
     },
   },
@@ -190,62 +249,68 @@ const NO_STOCKLIST_FIELDS = {
 
 const STOCKLIST_FIELDS_PUSH_TYPE = {
   lineItems: {
-    type: ArrayField,
-    arrowsNavigation: true,
-    virtualized: true,
-    totalCount: ({ totalCount }) => totalCount,
-    isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
-    loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
-    isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
-    addButton: ({
-      // eslint-disable-next-line react/prop-types
-      addRow, getSortOrder, newItemAdded, updateTotalCount,
-    }) => (
-      <button
-        type="button"
-        className="btn btn-outline-success btn-xs"
-        onClick={() => {
-          updateTotalCount(1);
-          addRow({ sortOrder: getSortOrder() });
-          newItemAdded();
-        }}
-      ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
-      </button>
-    ),
+    ...LINE_ITEMS_ATTR,
     fields: {
       product: {
+        ...FIELDS.product,
         fieldKey: 'disabled',
-        type: SelectField,
-        label: 'react.stockMovement.requestedProduct.label',
-        defaultMessage: 'Requested product',
-        headerAlign: 'left',
-        flexWidth: '9',
-        attributes: {
-          async: true,
-          openOnClick: false,
-          autoload: false,
-          filterOptions: options => options,
-          cache: false,
-          options: [],
-          showValueTooltip: true,
-          className: 'text-left',
-          optionRenderer: option => (
-            <strong style={{ color: option.color ? option.color : 'black' }} className="d-flex align-items-center">
-              {option.label}
-              &nbsp;
-              {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
-            </strong>
-          ),
-          valueRenderer: option => (
-            <span className="d-flex align-items-center">
-              <span className="text-truncate">
-                {option.label}
-              </span>
-              &nbsp;
-              {renderHandlingIcons(option ? option.handlingIcons : [])}
-            </span>
-          ),
-        },
+        getDynamicAttr: ({
+          fieldValue, debouncedProductsFetch, rowIndex, rowCount, newItem,
+        }) => ({
+          disabled: !!fieldValue,
+          loadOptions: debouncedProductsFetch,
+          autoFocus: newItem && rowIndex === rowCount - 1,
+        }),
+      },
+      quantityAllowed: FIELDS.quantityAllowed,
+      quantityOnHand: FIELDS.quantityOnHand,
+      quantityAvailable: FIELDS.quantityAvailable,
+      quantityRequested: {
+        ...FIELDS.quantityRequested,
+        getDynamicAttr: ({
+          rowIndex, values, updateRow,
+        }) => ({
+          onBlur: () => updateRow(values, rowIndex),
+        }),
+      },
+      comments: FIELDS.comments,
+      deleteButton: DELETE_BUTTON_FIELD,
+    },
+  },
+};
+
+const STOCKLIST_FIELDS_PULL_TYPE = {
+  lineItems: {
+    ...LINE_ITEMS_ATTR,
+    fields: {
+      product: {
+        ...FIELDS.product,
+        fieldKey: 'disabled',
+        getDynamicAttr: ({
+          fieldValue, debouncedProductsFetch, rowIndex, rowCount, newItem,
+        }) => ({
+          disabled: !!fieldValue,
+          loadOptions: debouncedProductsFetch,
+          autoFocus: newItem && rowIndex === rowCount - 1,
+        }),
+      },
+      demandPerReplenishmentPeriod: FIELDS.demandPerReplenishmentPeriod,
+      quantityOnHand: FIELDS.quantityOnHand,
+      quantityAvailable: FIELDS.quantityAvailable,
+      quantityRequested: FIELDS.quantityRequested,
+      comments: FIELDS.comments,
+      deleteButton: DELETE_BUTTON_FIELD,
+    },
+  },
+};
+
+const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PUSH_TYPE = {
+  lineItems: {
+    ...LINE_ITEMS_ATTR,
+    fields: {
+      product: {
+        ...FIELDS.product,
+        fieldKey: 'disabled',
         getDynamicAttr: ({
           fieldValue, debouncedProductsFetch, rowIndex, rowCount, newItem,
         }) => ({
@@ -255,39 +320,37 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
         }),
       },
       quantityAllowed: {
-        type: LabelField,
-        label: 'react.stockMovement.maxQuantity.label',
-        defaultMessage: 'Max Qty',
-        flexWidth: '1.7',
+        ...FIELDS.quantityAllowed,
+        headerTooltip: 'react.stockMovement.tooltip.maxQuantity.label',
+        headerAlign: 'right',
         attributes: {
-          type: 'number',
+          ...FIELDS.quantityAllowed.attributes,
+          cellClassName: 'text-right',
         },
       },
       quantityOnHand: {
-        type: LabelField,
-        label: 'react.stockMovement.quantityOnHand.label',
-        defaultMessage: 'QoH',
-        flexWidth: '1.7',
+        ...FIELDS.quantityOnHand,
+        type: TextField,
+        headerTooltip: 'react.stockMovement.tooltip.quantityOnHand.label',
+        headerAlign: 'right',
         attributes: {
-          type: 'number',
+          ...FIELDS.quantityAllowed.attributes,
+          required: true,
+          cellClassName: 'text-right',
         },
-      },
-      quantityAvailable: {
-        type: LabelField,
-        label: 'react.stockMovement.available.label',
-        defaultMessage: 'Available',
-        flexWidth: '1.7',
-        attributes: {
-          type: 'number',
-        },
+        getDynamicAttr: ({
+          rowIndex, values, updateRow,
+        }) => ({
+          onBlur: () => updateRow(values, rowIndex),
+        }),
       },
       quantityRequested: {
-        type: TextField,
-        label: 'react.stockMovement.neededQuantity.label',
-        defaultMessage: 'Needed Qty',
-        flexWidth: '1.7',
+        ...FIELDS.quantityRequested,
+        headerAlign: 'right',
+        headerTooltip: 'react.stockMovement.tooltip.quantityRequested.label',
         attributes: {
-          type: 'number',
+          ...FIELDS.quantityRequested.attributes,
+          cellClassName: 'text-right',
         },
         getDynamicAttr: ({
           rowIndex, values, updateRow,
@@ -296,228 +359,26 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
         }),
       },
       comments: {
-        type: TextField,
-        label: 'react.stockMovement.comments.label',
-        defaultMessage: 'Comments',
-        flexWidth: '1.7',
-        getDynamicAttr: ({
-          addRow, rowCount, rowIndex, getSortOrder,
-          updateTotalCount, updateRow, values,
-        }) => ({
-          onTabPress: rowCount === rowIndex + 1 ? () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-          arrowRight: rowCount === rowIndex + 1 ? () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-          arrowDown: rowCount === rowIndex + 1 ? () => () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-          onBlur: () => updateRow(values, rowIndex),
-        }),
+        ...FIELDS.comments,
+        headerTooltip: 'react.stockMovement.tooltip.comments.label',
+        headerAlign: 'left',
+        attributes: {
+          ...FIELDS.comments.attributes,
+          cellClassName: 'text-left',
+        },
       },
       deleteButton: DELETE_BUTTON_FIELD,
     },
   },
 };
 
-const STOCKLIST_FIELDS_PULL_TYPE = {
+const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PULL_TYPE = {
   lineItems: {
-    type: ArrayField,
-    arrowsNavigation: true,
-    virtualized: true,
-    totalCount: ({ totalCount }) => totalCount,
-    isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
-    loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
-    isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
-    addButton: ({
-      // eslint-disable-next-line react/prop-types
-      addRow, getSortOrder, newItemAdded, updateTotalCount,
-    }) => (
-      <button
-        type="button"
-        className="btn btn-outline-success btn-xs"
-        onClick={() => {
-          updateTotalCount(1);
-          addRow({ sortOrder: getSortOrder() });
-          newItemAdded();
-        }}
-      ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
-      </button>
-    ),
+    ...LINE_ITEMS_ATTR,
     fields: {
       product: {
+        ...FIELDS.product,
         fieldKey: 'disabled',
-        type: SelectField,
-        label: 'react.stockMovement.requestedProduct.label',
-        defaultMessage: 'Requested product',
-        headerAlign: 'left',
-        flexWidth: '9',
-        attributes: {
-          async: true,
-          openOnClick: false,
-          autoload: false,
-          filterOptions: options => options,
-          cache: false,
-          options: [],
-          showValueTooltip: true,
-          className: 'text-left',
-          optionRenderer: option => (
-            <strong style={{ color: option.color ? option.color : 'black' }} className="d-flex align-items-center">
-              {option.label}
-              &nbsp;
-              {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
-            </strong>
-          ),
-          valueRenderer: option => (
-            <span className="d-flex align-items-center">
-              <span className="text-truncate">
-                {option.label}
-              </span>
-                &nbsp;
-              {renderHandlingIcons(option ? option.handlingIcons : [])}
-            </span>
-          ),
-        },
-        getDynamicAttr: ({
-          fieldValue, debouncedProductsFetch, rowIndex, rowCount, newItem,
-        }) => ({
-          disabled: !!fieldValue,
-          loadOptions: debouncedProductsFetch,
-          autoFocus: newItem && rowIndex === rowCount - 1,
-        }),
-      },
-      demandPerReplenishmentPeriod: {
-        type: LabelField,
-        label: 'react.stockMovement.demandPerReplenishmentPeriod.label',
-        defaultMessage: 'Demand per Replenishment Period',
-        flexWidth: '1.7',
-        attributes: {
-          type: 'number',
-        },
-      },
-      quantityOnHand: {
-        type: LabelField,
-        label: 'react.stockMovement.quantityOnHand.label',
-        defaultMessage: 'QoH',
-        flexWidth: '1.7',
-        attributes: {
-          type: 'number',
-        },
-      },
-      quantityAvailable: {
-        type: LabelField,
-        label: 'react.stockMovement.available.label',
-        defaultMessage: 'Available',
-        flexWidth: '1.7',
-        attributes: {
-          type: 'number',
-        },
-      },
-      quantityRequested: {
-        type: TextField,
-        label: 'react.stockMovement.neededQuantity.label',
-        defaultMessage: 'Needed Qty',
-        flexWidth: '1.7',
-        attributes: {
-          type: 'number',
-        },
-        getDynamicAttr: ({
-          rowIndex, values, updateRow,
-        }) => ({
-          onBlur: () => updateRow(values, rowIndex),
-        }),
-      },
-      comments: {
-        type: TextField,
-        label: 'react.stockMovement.comments.label',
-        defaultMessage: 'Comments',
-        flexWidth: '1.7',
-        getDynamicAttr: ({
-          addRow, rowCount, rowIndex, getSortOrder,
-          updateTotalCount, updateRow, values,
-        }) => ({
-          onTabPress: rowCount === rowIndex + 1 ? () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-          arrowRight: rowCount === rowIndex + 1 ? () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-          arrowDown: rowCount === rowIndex + 1 ? () => () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-          onBlur: () => updateRow(values, rowIndex),
-        }),
-      },
-      deleteButton: DELETE_BUTTON_FIELD,
-    },
-  },
-};
-
-const REQUEST_FROM_WARD_STOCKLIST_FIELDS = {
-  lineItems: {
-    type: ArrayField,
-    arrowsNavigation: true,
-    virtualized: true,
-    totalCount: ({ totalCount }) => totalCount,
-    isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
-    loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
-    isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
-    addButton: ({
-      // eslint-disable-next-line react/prop-types
-      addRow, getSortOrder, newItemAdded, updateTotalCount,
-    }) => (
-      <button
-        type="button"
-        className="btn btn-outline-success btn-xs"
-        onClick={() => {
-          updateTotalCount(1);
-          addRow({ sortOrder: getSortOrder() });
-          newItemAdded();
-        }}
-      ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
-      </button>
-    ),
-    fields: {
-      product: {
-        fieldKey: 'disabled',
-        type: SelectField,
-        label: 'react.stockMovement.requestedProduct.label',
-        defaultMessage: 'Requested product',
-        headerAlign: 'left',
-        flexWidth: '9',
-        attributes: {
-          async: true,
-          openOnClick: false,
-          autoload: false,
-          filterOptions: options => options,
-          cache: false,
-          options: [],
-          showValueTooltip: true,
-          className: 'text-left',
-          optionRenderer: option => (
-            <strong style={{ color: option.color ? option.color : 'black' }} className="d-flex align-items-center">
-              {option.label}
-              &nbsp;
-              {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
-            </strong>
-          ),
-          valueRenderer: option => (
-            <span className="d-flex align-items-center">
-              <span className="text-truncate">
-                {option.label}
-              </span>
-              &nbsp;
-              {renderHandlingIcons(option ? option.handlingIcons : [])}
-            </span>
-          ),
-        },
         getDynamicAttr: ({
           fieldValue, debouncedProductsFetch, rowIndex, rowCount, newItem,
         }) => ({
@@ -527,13 +388,7 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS = {
         }),
       },
       quantityOnHand: {
-        type: TextField,
-        label: 'react.stockMovement.quantityOnHandAtRequestSite.label',
-        defaultMessage: 'QOH at Request Site',
-        flexWidth: '1.7',
-        attributes: {
-          type: 'number',
-        },
+        ...FIELDS.quantityOnHandAtRequestSite,
         getDynamicAttr: ({
           fieldValue, rowIndex, values, updateRow,
         }) => ({
@@ -546,53 +401,9 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS = {
           },
         }),
       },
-      demandPerReplenishmentPeriod: {
-        type: LabelField,
-        label: 'react.stockMovement.demandPerRequestPeriod.label',
-        defaultMessage: 'Demand per Request Period',
-        flexWidth: '1.7',
-        attributes: {
-          type: 'number',
-        },
-      },
-      quantityRequested: {
-        type: TextField,
-        label: 'react.stockMovement.neededQuantity.label',
-        defaultMessage: 'Needed Qty',
-        flexWidth: '1.7',
-        attributes: {
-          type: 'number',
-        },
-        getDynamicAttr: ({
-          rowIndex, values, updateRow,
-        }) => ({
-          onBlur: () => updateRow(values, rowIndex),
-        }),
-      },
-      comments: {
-        type: TextField,
-        label: 'react.stockMovement.comments.label',
-        defaultMessage: 'Comments',
-        flexWidth: '1.7',
-        getDynamicAttr: ({
-          addRow, rowCount, rowIndex, getSortOrder,
-          updateTotalCount, updateRow, values,
-        }) => ({
-          onTabPress: rowCount === rowIndex + 1 ? () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-          arrowRight: rowCount === rowIndex + 1 ? () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-          arrowDown: rowCount === rowIndex + 1 ? () => () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-          onBlur: () => updateRow(values, rowIndex),
-        }),
-      },
+      demandPerReplenishmentPeriod: FIELDS.demandPerRequestPeriod,
+      quantityRequested: FIELDS.quantityRequested,
+      comments: FIELDS.comments,
       deleteButton: DELETE_BUTTON_FIELD,
     },
   },
@@ -600,62 +411,11 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS = {
 
 const REQUEST_FROM_WARD_FIELDS = {
   lineItems: {
-    type: ArrayField,
-    arrowsNavigation: true,
-    virtualized: true,
-    totalCount: ({ totalCount }) => totalCount,
-    isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
-    loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
-    isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
-    addButton: ({
-      // eslint-disable-next-line react/prop-types
-      addRow, getSortOrder, newItemAdded, updateTotalCount,
-    }) => (
-      <button
-        type="button"
-        className="btn btn-outline-success btn-xs"
-        onClick={() => {
-          updateTotalCount(1);
-          addRow({ sortOrder: getSortOrder() });
-          newItemAdded();
-        }}
-      ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
-      </button>
-    ),
+    ...LINE_ITEMS_ATTR,
     fields: {
       product: {
+        ...FIELDS.product,
         fieldKey: 'disabled',
-        type: SelectField,
-        label: 'react.stockMovement.requestedProduct.label',
-        defaultMessage: 'Requested product',
-        headerAlign: 'left',
-        flexWidth: '9',
-        attributes: {
-          async: true,
-          openOnClick: false,
-          autoload: false,
-          filterOptions: options => options,
-          cache: false,
-          options: [],
-          showValueTooltip: true,
-          className: 'text-left',
-          optionRenderer: option => (
-            <strong style={{ color: option.color ? option.color : 'black' }} className="d-flex align-items-center">
-              {option.label}
-              &nbsp;
-              {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
-            </strong>
-          ),
-          valueRenderer: option => (
-            <span className="d-flex align-items-center">
-              <span className="text-truncate">
-                {option.label}
-              </span>
-              &nbsp;
-              {renderHandlingIcons(option ? option.handlingIcons : [])}
-            </span>
-          ),
-        },
         getDynamicAttr: ({
           debouncedProductsFetch, rowIndex, rowCount, updateProductData, values, newItem,
         }) => ({
@@ -665,13 +425,7 @@ const REQUEST_FROM_WARD_FIELDS = {
         }),
       },
       quantityOnHand: {
-        type: TextField,
-        label: 'react.stockMovement.quantityOnHandAtRequestSite.label',
-        defaultMessage: 'QOH at Request Site',
-        flexWidth: '1.7',
-        attributes: {
-          type: 'number',
-        },
+        ...FIELDS.quantityOnHandAtRequestSite,
         getDynamicAttr: ({
           fieldValue, rowIndex, values, updateRow,
         }) => ({
@@ -684,53 +438,9 @@ const REQUEST_FROM_WARD_FIELDS = {
           },
         }),
       },
-      monthlyDemand: {
-        type: LabelField,
-        label: 'react.stockMovement.demandPerMonth.label',
-        defaultMessage: 'Demand per Month',
-        flexWidth: '1.7',
-        attributes: {
-          type: 'number',
-        },
-      },
-      quantityRequested: {
-        type: TextField,
-        label: 'react.stockMovement.neededQuantity.label',
-        defaultMessage: 'Needed Qty',
-        flexWidth: '1.7',
-        attributes: {
-          type: 'number',
-        },
-        getDynamicAttr: ({
-          rowIndex, values, updateRow,
-        }) => ({
-          onBlur: () => updateRow(values, rowIndex),
-        }),
-      },
-      comments: {
-        type: TextField,
-        label: 'react.stockMovement.comments.label',
-        defaultMessage: 'Comments',
-        flexWidth: '1.7',
-        getDynamicAttr: ({
-          addRow, rowCount, rowIndex, getSortOrder,
-          updateTotalCount, updateRow, values,
-        }) => ({
-          onTabPress: rowCount === rowIndex + 1 ? () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-          arrowRight: rowCount === rowIndex + 1 ? () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-          arrowDown: rowCount === rowIndex + 1 ? () => () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-          onBlur: () => updateRow(values, rowIndex),
-        }),
-      },
+      monthlyDemand: FIELDS.monthlyDemand,
+      quantityRequested: FIELDS.quantityRequested,
+      comments: FIELDS.comments,
       deleteButton: DELETE_BUTTON_FIELD,
     },
   },
@@ -799,7 +509,13 @@ class AddItemsPage extends Component {
    */
   getFields() {
     if (this.state.isRequestFromWard) {
-      return _.get(this.state.values.stocklist, 'id') ? REQUEST_FROM_WARD_STOCKLIST_FIELDS : REQUEST_FROM_WARD_FIELDS;
+      if (_.get(this.state.values.stocklist, 'id')) {
+        if (_.get(this.state.values.replenishmentType, 'name') === REPLENISHMENT_TYPE_PULL) {
+          return REQUEST_FROM_WARD_STOCKLIST_FIELDS_PULL_TYPE;
+        }
+        return REQUEST_FROM_WARD_STOCKLIST_FIELDS_PUSH_TYPE;
+      }
+      return REQUEST_FROM_WARD_FIELDS;
     }
 
     if (_.get(this.state.values.stocklist, 'id')) {
@@ -879,19 +595,31 @@ class AddItemsPage extends Component {
     const { data } = response.data;
     let lineItemsData;
 
+    const isPullType = _.get(this.state.values.replenishmentType, 'name') === REPLENISHMENT_TYPE_PULL;
+
     if (this.state.values.lineItems.length === 0 && !data.length) {
       lineItemsData = new Array(1).fill({ sortOrder: 100 });
     } else if (this.state.isRequestFromWard && _.get(this.state.values.stocklist, 'id')) {
       lineItemsData = _.map(
         data,
         (val) => {
-          const { quantityRequested, demandPerReplenishmentPeriod, quantityOnHand } = val;
-          const qtyRequested =
-              quantityRequested || demandPerReplenishmentPeriod - quantityOnHand;
+          const {
+            quantityRequested,
+            demandPerReplenishmentPeriod,
+            quantityOnHand,
+            quantityAllowed,
+          } = val;
+
+          let qtyRequested = 0;
+          if (quantityRequested) qtyRequested = quantityRequested;
+          else if (isPullType) qtyRequested = demandPerReplenishmentPeriod - quantityOnHand;
+          else qtyRequested = quantityAllowed;
+
           return {
             ...val,
             disabled: true,
             quantityRequested: qtyRequested >= 0 ? qtyRequested : 0,
+            quantityOnHand: isPullType ? quantityOnHand : undefined,
             product: {
               ...val.product,
               label: `${val.productCode} ${val.product.name}`,
@@ -899,7 +627,7 @@ class AddItemsPage extends Component {
           };
         },
       );
-    } else if (_.get(this.state.values.replenishmentType, 'name') === REPLENISHMENT_TYPE_PULL) {
+    } else if (isPullType) {
       lineItemsData = _.map(
         data,
         (val) => {
@@ -973,9 +701,13 @@ class AddItemsPage extends Component {
     const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
 
     _.forEach(values.lineItems, (item, key) => {
-      if (!_.isNil(item.product) && (_.isNil(item.quantityRequested)
-        || item.quantityRequested < 0)) {
-        errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.enterQuantity.label' };
+      if (!_.isNil(item.product)) {
+        if ((_.isNil(item.quantityRequested) || item.quantityRequested < 0)) {
+          errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.enterQuantity.label' };
+        }
+        if (_.isNil(item.quantityOnHand)) {
+          errors.lineItems[key] = { quantityOnHand: 'react.stockMovement.error.enterQuantity.label' };
+        }
       }
       if (!_.isEmpty(item.boxName) && _.isEmpty(item.palletName)) {
         errors.lineItems[key] = { boxName: 'react.stockMovement.error.boxWithoutPallet.label' };
