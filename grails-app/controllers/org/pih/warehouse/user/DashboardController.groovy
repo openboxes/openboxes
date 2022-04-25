@@ -13,6 +13,7 @@ import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
 import org.apache.commons.lang.StringEscapeUtils
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
@@ -172,6 +173,9 @@ class DashboardController {
 
         // If a warehouse has been selected
         if (warehouse) {
+
+            // Save the warehouse selection to the thread
+            AuthService.currentLocation.set(warehouse)
 
             // Save the warehouse selection to the session
             session.warehouse = warehouse

@@ -10,8 +10,10 @@
 package org.pih.warehouse.user
 
 import grails.validation.ValidationException
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.auth.UserSignupEvent
 import org.pih.warehouse.core.MailService
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 
 class AuthController {
@@ -104,11 +106,17 @@ class AuthController {
 
                 // PIMS-782 Force the user to select a warehouse each time
                 if (userInstance?.warehouse && userInstance?.rememberLastLocation) {
+                    AuthService.currentLocation.set(userInstance.warehouse)
                     session.warehouse = userInstance.warehouse
                 }
 
                 if (session?.targetUri) {
                     redirect(uri: session.targetUri)
+                    return
+                }
+
+                if (userService.isUserInRole(userInstance, RoleType.ROLE_CUSTOMER)) {
+                    redirect(controller: 'mobile', action: 'index')
                     return
                 }
 
