@@ -13,6 +13,7 @@ import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.product.Attribute
+import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
@@ -78,6 +79,8 @@ class StockMovement {
 
     List<StockMovementItem> lineItems =
             LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(StockMovementItem.class))
+
+    List<Category> categories
 
     Integer lineItemCount
 
@@ -192,11 +195,6 @@ class StockMovement {
         return shipment?.status?.code ?: ShipmentStatusCode.PENDING
 
     }
-
-    List<Category> getCategories() {
-        return lineItems?.collect { it?.product?.category }?.unique()?:[]
-    }
-
 
     /**
      * Return total value of the issued shipment
@@ -406,7 +404,8 @@ class StockMovement {
             isShipped: shipment?.status?.code >= ShipmentStatusCode.SHIPPED,
             isReceived: shipment?.status?.code >= ShipmentStatusCode.RECEIVED,
             requestType: requisition?.type,
-            lineItemCount: requisition.requisitionItemCount
+            lineItemCount: requisition.requisitionItemCount,
+            categories: requisition?.categories
         )
 
         // Include all requisition items except those that are substitutions or modifications because the

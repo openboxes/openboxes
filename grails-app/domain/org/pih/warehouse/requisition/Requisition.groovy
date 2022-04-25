@@ -182,6 +182,10 @@ class Requisition implements Comparable<Requisition>, Serializable {
         return getOriginalRequisitionItems()?.size()
     }
 
+    def getCategories() {
+        return getOriginalRequisitionItems()?.collect { RequisitionItem requisitionItem -> requisitionItem?.product?.category }
+    }
+
 
     def calculatePercentageCompleted() {
         def numerator = getCompleteRequisitionItems()?.size() ?: 0

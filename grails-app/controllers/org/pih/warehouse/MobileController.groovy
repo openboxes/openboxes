@@ -59,29 +59,17 @@ class MobileController {
         def productListUrl = g.createLink(controller: "mobile", action: "productList")
 
         StockMovement inboundCriteria = new StockMovement(destination: location, stockMovementType: StockMovementType.INBOUND)
-        Map inboundParams = [sort: "requestedDeliveryDate", order: "asc"]
+        Map inboundParams = [sort: "requestedDeliveryDate", order: "asc", includeStockMovementItems: false]
         def inboundOrders = stockMovementService.getStockMovements(inboundCriteria, inboundParams)
-
-        // FIXME Hack to set line items so we can display categories for each stock movement
-        inboundOrders.each { stockMovement ->
-            stockMovement.lineItems = stockMovementService.getStockMovementItems(stockMovement.id, null, null, null)
-        }
-
         def inboundCount = inboundOrders.size()?:0
         def inboundPending = inboundOrders.findAll { !it.isReceived }
-
         if (!inboundPending?.empty && inboundPending.size() > 10) {
             inboundPending = inboundPending.subList(0, 10)
         }
 
         StockMovement outboundCriteria = new StockMovement(origin: location, stockMovementType: StockMovementType.OUTBOUND)
-        Map outboundParams = [sort: "requestedDeliveryDate", order: "asc"]
+        Map outboundParams = [sort: "requestedDeliveryDate", order: "asc", includeStockMovementItems: false]
         def outboundOrders = stockMovementService.getStockMovements(outboundCriteria, outboundParams)
-
-        // FIXME Hack to set line items so we can display categories for each stock movement
-        outboundOrders.each { stockMovement ->
-            stockMovement.lineItems = stockMovementService.getStockMovementItems(stockMovement.id, null, null, null)
-        }
 
         def outboundCount = outboundOrders.size()?:0
         def outboundPending = outboundOrders.findAll { it.stockMovementStatusCode < StockMovementStatusCode.DISPATCHED }
