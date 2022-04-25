@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 
 import PropTypes from 'prop-types';
+import { LiveChatLoaderProvider } from 'react-live-chat-loader';
 import { connect } from 'react-redux';
 
 import GlobalSearch from 'components/GlobalSearch';
 import LocationChooser from 'components/location/LocationChooser';
+import SupportButton from 'components/support-button/SupportButton';
 import UserActionMenu from 'components/user/UserActionMenu';
 import apiClient from 'utils/apiClient';
 import Translate from 'utils/Translate';
@@ -69,6 +71,15 @@ class Header extends Component {
             <GlobalSearch />
             <UserActionMenu />
             <LocationChooser />
+            {
+              this.props.isHelpScoutEnabled &&
+              <LiveChatLoaderProvider provider="helpScout" providerKey={this.props.helpScoutKey}>
+                <SupportButton
+                  buttonColor={this.props.helpScoutColor}
+                  text="react.default.button.help.label"
+                />
+              </LiveChatLoaderProvider>
+            }
           </div>
         </div>
       </div>
@@ -82,6 +93,9 @@ const mapStateToProps = state => ({
   highestRole: state.session.highestRole,
   logoUrl: state.session.logoUrl,
   logoLabel: state.session.logoLabel,
+  helpScoutColor: state.session.helpScoutColor,
+  helpScoutKey: state.session.helpScoutKey,
+  isHelpScoutEnabled: state.session.isHelpScoutEnabled,
 });
 
 export default connect(mapStateToProps)(Header);
@@ -96,4 +110,13 @@ Header.propTypes = {
   /** Id of the current location */
   logoLabel: PropTypes.string.isRequired,
   highestRole: PropTypes.string.isRequired,
+  helpScoutColor: PropTypes.string,
+  helpScoutKey: PropTypes.string,
+  isHelpScoutEnabled: PropTypes.bool,
+};
+
+Header.defaultProps = {
+  helpScoutColor: '',
+  helpScoutKey: '',
+  isHelpScoutEnabled: false,
 };
