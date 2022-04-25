@@ -33,7 +33,9 @@
                 "bSearch": true,
                 "bJQueryUI": true,
                 "bAutoWidth": true,
-                "sPaginationType": "full_numbers"
+                "sPaginationType": "full_numbers",
+                "bSort": ${params.sortable?:false},
+
     });
   });
 </g:javascript>

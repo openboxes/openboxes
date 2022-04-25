@@ -302,7 +302,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
     }
 
     Boolean isPickable() {
-        return !onHold
+        return !onHold && supports(ActivityCode.PICK_STOCK)
     }
 
     Boolean requiresMobilePicking() {

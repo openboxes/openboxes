@@ -9,7 +9,7 @@
     <g:if test="${!requestTab}">
         <td class="middle center">
             <g:if test="${requisitionItem?.isSubstituted()}">
-                <img src="${resource(dir:'images/icons/silk',file:'arrow_switch.png')}"
+                <img src="${resource(dir:'images/icons/silk',file:'arrow_switch.png')}"/>
             </g:if>
             <g:elseif test="${requisitionItem?.isSubstitution()}">
                 <img src="${resource(dir:'images/icons',file:'indent.gif')}"/>
@@ -182,6 +182,12 @@
             ${requisitionItem?.calculateQuantityToPick()?:0}
         </g:else>
 
+        <a href="javascript:void(0);" class="btn-show-dialog"
+           data-title="${g.message(code:'product.availableItems.label', default: 'Available Items')}"
+            data-width="1000"
+           data-url="${request.contextPath}/stockMovementItemApi/suggestPickableItems/${requisitionItem?.id}">
+            <img src="${resource(dir: 'images/icons/silk', file: 'page_white_magnify.png')}"/>
+        </a>
     </td>
     <g:if test="${!requestTab}">
         <td class="middle center">

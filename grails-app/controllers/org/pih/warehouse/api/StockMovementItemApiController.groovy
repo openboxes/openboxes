@@ -18,6 +18,7 @@ import org.pih.warehouse.requisition.RequisitionItem
 class StockMovementItemApiController {
 
     def stockMovementService
+    def productAvailabilityService
 
     def list = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params?.stockMovement?.id)
@@ -159,4 +160,62 @@ class StockMovementItemApiController {
 
         bindData(stockMovementItem, lineItem)
     }
+
+    def suggestPickableItems = {
+        Location location = Location.get(session.warehouse.id)
+        StockMovementItem stockMovementItem = stockMovementService.getStockMovementItem(params.id)
+
+        Integer quantityRequired = stockMovementItem?.requisitionItem?.calculateQuantityRequired()
+        List<AvailableItem> availableItems = stockMovementService.getAvailableItems(location, stockMovementItem.requisitionItem)
+        log.info "available items: "
+        availableItems.each {
+            log.info new JSONObject(getAvailableItemDetails(it, quantityRequired)).toString(4)
+        }
+        log.info "suggested items: "
+        List suggestedItems = stockMovementService.getSuggestedItems(availableItems, quantityRequired)
+        suggestedItems.each {
+            log.info new JSONObject(it.toJson()).toString(4)
+        }
+
+        def data = availableItems.collect { AvailableItem availableItem ->
+            return getSuggestedItemDetails(suggestedItems, availableItem, quantityRequired)
+        }
+        render(template: "/common/dataTable", model: [data: data])
+    }
+
+    def getAvailableItemDetails = { AvailableItem availableItem, Integer quantityRequired ->
+        return [
+                locationNumber: availableItem.binLocation?.locationNumber,
+                locationName: availableItem.binLocation?.name,
+                locationType: availableItem.binLocation?.locationType?.name,
+                lotNumber: availableItem.inventoryItem?.lotNumber,
+                expirationDate: availableItem.inventoryItem?.expirationDate,
+                quantityAvailable: availableItem.quantityAvailable,
+                quantityOnHand: availableItem.quantityOnHand,
+                isFullPallet: availableItem.quantityAvailable == quantityRequired,
+                pickClassification: availableItem?.pickClassification
+            ]
+    }
+
+    def getSuggestedItemDetails = { List suggestedItems, AvailableItem availableItem, Integer quantityRequired ->
+
+        boolean isSuggested = suggestedItems.find { it.binLocation == availableItem.binLocation &&
+                            it.inventoryItem == availableItem.inventoryItem }
+        return [
+                locationNumber: availableItem.binLocation?.locationNumber,
+                locationName: availableItem.binLocation?.name,
+                locationType: availableItem.binLocation?.locationType?.name,
+                lotNumber: availableItem.inventoryItem?.lotNumber,
+                expirationDate: availableItem.inventoryItem?.expirationDate,
+                quantityAvailable: availableItem.quantityAvailable,
+                quantityOnHand: availableItem.quantityOnHand,
+                isFullPallet: availableItem.quantityAvailable == quantityRequired,
+                pickClassification: availableItem?.pickClassification,
+                isSuggested: isSuggested
+            ]
+    }
+
+
+
+
 }

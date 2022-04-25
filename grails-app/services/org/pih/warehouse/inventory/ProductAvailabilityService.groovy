@@ -681,24 +681,53 @@ class ProductAvailabilityService {
     /**
      * Sorting used by first expiry, first out algorithm
      */
-    List<AvailableItem> sortAvailableItems(List<AvailableItem> availableItems) {
-        // Sort bins  by available quantity
-        availableItems = availableItems.sort { a, b ->
-            a?.quantityAvailable <=> b?.quantityAvailable
+    List<AvailableItem> sortAvailableItems(List<AvailableItem> availableItems, Integer quantityRequired = 0) {
+
+        // In order to sort the available items properly we need to know the quantity required
+        if (quantityRequired) {
+            availableItems.each {
+                it.quantityRequired = quantityRequired
+            }
         }
 
-        // Sort empty expiration dates last
-        availableItems = availableItems.sort { a, b ->
-            !a?.inventoryItem?.expirationDate ?
-                    !b?.inventoryItem?.expirationDate ? 0 : 1 :
-                    !b?.inventoryItem?.expirationDate ? -1 :
-                            a?.inventoryItem?.expirationDate <=> b?.inventoryItem?.expirationDate
+        log.info "Sorting available items "
+
+//        // Sort bins  by available quantity
+//        availableItems = availableItems.sort { a, b ->
+//            a?.quantityAvailable <=> b?.quantityAvailable
+//        }
+//
+//        // Sort empty expiration dates last
+//        availableItems = availableItems.sort { a, b ->
+//            !a?.inventoryItem?.expirationDate ?
+//                    !b?.inventoryItem?.expirationDate ? 0 : 1 :
+//                    !b?.inventoryItem?.expirationDate ? -1 :
+//                            a?.inventoryItem?.expirationDate <=> b?.inventoryItem?.expirationDate
+//        }
+//
+//        // Move items with zero available quantity to the end
+//        availableItems = availableItems.sort { a, b ->
+//            (a?.quantityAvailable <= 0) <=> (b?.quantityAvailable <= 0)
+//        }
+
+        // if quantity required has any exact matches then we sort by matching (floor, racking, bulk)
+        // check exact match OR quantityAvailable % quantityRequired == 0
+
+        // if quantity required is less than
+
+        availableItems = availableItems.sort {a, b ->
+            log.info "a:${a.binLocation?.name}:${a.binLocation?.locationType?.sortOrder}"
+            log.info "b:${b.binLocation?.name}:${b.binLocation?.locationType?.sortOrder}"
+            log.info "\tcompare: ${(a?.binLocation?.name <=> b?.binLocation?.name)}"
+
+            (a?.pickClassification) <=> (b?.pickClassification) ?:
+                (b?.binLocation?.locationType?.sortOrder?:0) <=> (a?.binLocation?.locationType?.sortOrder?:0) ?:
+                    (a?.binLocation?.sortOrder?:"") <=> (b?.binLocation?.sortOrder?:"") ?:
+                            (a?.quantityAvailable) <=> (b?.quantityAvailable) ?:
+                                (a?.binLocation?.name?:"") <=> (b?.binLocation?.name?:"")
         }
 
-        // Move items with zero available quantity to the end
-        availableItems = availableItems.sort { a, b ->
-            (a?.quantityAvailable <= 0) <=> (b?.quantityAvailable <= 0)
-        }
+        log.info "${availableItems*.binLocation?.name}"
 
         return availableItems
     }
