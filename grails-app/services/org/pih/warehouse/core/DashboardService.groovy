@@ -10,11 +10,7 @@
 package org.pih.warehouse.core
 
 import org.grails.plugins.csv.CSVWriter
-import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.InventoryLevel
-import org.pih.warehouse.inventory.InventoryStatus
-import org.pih.warehouse.inventory.TransactionCode
-import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.inventory.*
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.requisition.RequisitionItem
 
@@ -551,6 +547,50 @@ class DashboardService {
             inventoryLevel?.status >= InventoryStatus.SUPPORTED && reorderQuantity && quantity <= reorderQuantity
         }
         log.info "Get reorder stock: " + (System.currentTimeMillis() - startTime) + " ms"
+        return reorderStock
+    }
+
+    def getReorderReport(Location location) {
+        long startTime = System.currentTimeMillis()
+        ArrayList<Map> inventoryItems = getInventoryItems(location)
+
+        ArrayList<Map> reorderStock = inventoryItems.findAll { Map inventoryItem ->
+            def inventoryLevel = inventoryItem?.inventoryLevel as InventoryLevel
+
+            if (inventoryLevel?.binLocation != null) {
+                return false;
+            }
+
+            def quantityATP = inventoryItem.quantityAvailableToPromise as Number
+
+            def minQuantity = inventoryLevel?.minQuantity
+            if (minQuantity && quantityATP >= minQuantity) {
+                return false
+            }
+
+            def reorderQuantity = inventoryLevel?.reorderQuantity
+            if (reorderQuantity && quantityATP >= reorderQuantity) {
+                return false
+            }
+
+            def quantityToOrder = null
+            def expectedReorderCost = null
+            def unitCost =  inventoryLevel?.product?.costPerUnit
+
+            if (inventoryLevel?.maxQuantity != null) {
+                quantityToOrder = inventoryLevel.maxQuantity - quantityATP
+
+                if(unitCost != null) {
+                    expectedReorderCost = quantityToOrder * unitCost
+                }
+            }
+            inventoryItem.put("quantityToOrder", quantityToOrder);
+            inventoryItem.put("unitCost", unitCost);
+            inventoryItem.put("expectedReorderCost", expectedReorderCost);
+
+            true
+        }
+        log.info "Get simple reorder stock: " + (System.currentTimeMillis() - startTime) + " ms"
         return reorderStock
     }
 
