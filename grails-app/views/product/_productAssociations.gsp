@@ -2,7 +2,7 @@
 
     <div class="box">
         <h2>
-            <warehouse:message code="product.substitutions.label" default="Substitutions"/>
+            <warehouse:message code="productAssociations.label" default="Product Associations"/>
         </h2>
 
         <div class="dialog">
@@ -74,7 +74,7 @@
                     <tr class="prop">
                         <td colspan="11">
                             <div class="padded fade center">
-                                <!--<g:message code="default.empty.message" default="There are no {0}" args="[g.message(code:'product.substitutions.label')]"/>-->
+                                <g:message code="default.empty.message" default="There are no {0}" args="[g.message(code:'productAssociations.label')]"/>
                             </div>
                         </td>
                     </tr>
