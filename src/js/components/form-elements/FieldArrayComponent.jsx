@@ -12,7 +12,6 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-tippy/dist/tippy.css';
 
-
 class FieldArrayComponent extends Component {
   constructor(props) {
     super(props);
@@ -129,7 +128,7 @@ class FieldArrayComponent extends Component {
                       hideDelay="50"
                     >
                       <div
-                        className={`mx-2 text-truncate ${config.required ? 'required' : ''}`}
+                        className={`mx-2 text-truncate ${config.required ? 'arrayfield-header-required' : ''}`}
                         style={{
                           fontSize: fieldsConfig.headerFontSize ? fieldsConfig.headerFontSize : '0.875rem',
                         }}
