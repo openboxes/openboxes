@@ -62,8 +62,8 @@
                             </a>
                         </li>
                         <li>
-                            <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=productSubstitutions">
-                                <g:message code="product.substitutions.label" default="Substitutions"/>
+                            <a href="${request.contextPath}/product/renderTemplate/${productInstance?.id}?templateName=productAssociations">
+                                <warehouse:message code="productAssociations.label" default="Product Associations"/>
                             </a>
                         </li>
                         <li>
