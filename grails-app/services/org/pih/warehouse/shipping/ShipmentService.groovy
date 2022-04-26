@@ -1193,13 +1193,13 @@ class ShipmentService {
 
     }
 
-    void receiveShipments(List shipmentIds, String comment, String userId, String locationId, Boolean creditStockOnReceipt) {
+    void receiveShipments(List shipmentIds, String comment, String userId, String locationId, Boolean creditStockOnReceipt, Date dateDelivered = null) {
         if (!shipmentIds) {
             throw new IllegalArgumentException("Must select at least one shipment in order to use bulk receipt")
         }
         shipmentIds.each { shipmentId ->
             Shipment shipment = Shipment.get(shipmentId)
-            createReceipt(shipment, shipment.actualShippingDate + 1)
+            createReceipt(shipment, dateDelivered?:shipment.actualShippingDate)
             receiveShipment(shipmentId, comment, userId, locationId, creditStockOnReceipt)
         }
     }

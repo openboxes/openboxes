@@ -237,8 +237,8 @@ class TmsIntegrationService {
             BigDecimal longitude = executionStatus?.geoData?.longitude
             Date eventDate = dateFormatter.parse(executionStatus.dateTime)
             createEvent(trackingNumber, statusCode, eventDate, latitude, longitude)
-            triggerOutboundInventoryUpdates(trackingNumber, statusCode)
-            triggerInboundInventoryUpdates(trackingNumber, statusCode)
+            triggerOutboundInventoryUpdates(trackingNumber, statusCode, eventDate)
+            triggerInboundInventoryUpdates(trackingNumber, statusCode, eventDate)
         }
     }
 
@@ -378,7 +378,7 @@ class TmsIntegrationService {
         }
     }
 
-    def triggerOutboundInventoryUpdates(String trackingNumber, String status) {
+    def triggerOutboundInventoryUpdates(String trackingNumber, String status, Date dateShipped = null) {
         List outboundTransactionTriggerStatuses = grailsApplication.config.openboxes.integration.createOutboundTransactionOnStatusUpdate
         log.info "Triggering outbound inventory update ${trackingNumber} if ${status} in ${outboundTransactionTriggerStatuses}"
         if (status in outboundTransactionTriggerStatuses) {
@@ -393,7 +393,7 @@ class TmsIntegrationService {
         }
     }
 
-    def triggerInboundInventoryUpdates(String trackingNumber, String status) {
+    def triggerInboundInventoryUpdates(String trackingNumber, String status, Date dateDelivered = null) {
         List inboundTransactionTriggerStatuses = grailsApplication.config.openboxes.integration.createInboundTransactionOnStatusUpdate
         log.info "Triggering inbound inventory update ${trackingNumber} if ${status} in ${inboundTransactionTriggerStatuses}"
         if (status in inboundTransactionTriggerStatuses) {
@@ -404,7 +404,7 @@ class TmsIntegrationService {
                 Shipment shipment = stockMovement.shipment
                 if (shipment) {
                     String comment = "Shipment ${shipment.shipmentNumber} has been automatically received into ${shipment.destination}"
-                    shipmentService.receiveShipments([shipment.id], comment, shipment?.createdBy?.id, shipment?.destination?.id, true)
+                    shipmentService.receiveShipments([shipment.id], comment, shipment?.createdBy?.id, shipment?.destination?.id, true, dateDelivered)
                 }
             }
             else {
