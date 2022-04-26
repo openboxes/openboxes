@@ -368,7 +368,10 @@ class StockMovementService {
     }
 
     def getStockMovements(StockMovement criteria, Map params) {
-        params.includeStockMovementItems = params.includeStockMovementItems?:false
+
+        params.includeStockMovementItems = params.includeStockMovementItems ?
+                params.includeStockMovementItems as boolean : false
+
         switch(criteria.stockMovementType) {
             case StockMovementType.OUTBOUND:
                 return getOutboundStockMovements(criteria, params)
