@@ -554,73 +554,17 @@
                 <div class="mm-item-content" style="min-width: 200px;">
 
                     <div class="mm-content-section">
-                        <div class="mm-menu-item">
-                            <g:link controller="attribute" action="list" class="list">
-                                <warehouse:message code="attributes.label"/></g:link>
-                        </div>
-                        <div class="mm-menu-item">
-                            <g:link controller="productCatalog" action="list" class="list">
-                                <warehouse:message code="product.catalogs.label" default="Catalogs"/></g:link>
-                        </div>
-                        <div class="mm-menu-item">
-                            <g:link controller="category" action="tree" class="list">
-                                <warehouse:message code="categories.label"/></g:link>
-                        </div>
-                        <div class="mm-menu-item">
-                            <g:link controller="productComponent" action="list" class="list">
-                                <warehouse:message code="product.components.label" default="Components"/></g:link>
-                        </div>
-                        <div class="mm-menu-item">
-                            <g:link controller="productGroup" action="list" class="list">
-                                <warehouse:message code="productGroups.label"/></g:link>
-                        </div>
-                        <div class="mm-menu-item">
-                            <g:link controller="inventoryLevel" action="list" class="site">
-                                <warehouse:message code="inventoryLevels.label" default="Inventory Levels" /></g:link>
-                        </div>
-                        <g:isSuperuser>
-                            <div class="mm-menu-item">
-                                <g:link controller="productType" action="list" class="site">
-                                    <warehouse:message code="productType.label" default="ProductType" /></g:link>
-                            </div>
-                        </g:isSuperuser>
-                    </div>
-                    <div class="mm-content-section">
-                        <div class="mm-menu-item">
-                            <g:link controller="product" action="list" class="list">
-                                <warehouse:message code="products.label"/></g:link>
-                        </div>
-                        <div class="mm-menu-item">
-                            <g:link controller="productSupplier" action="list" class="list">
-                                <warehouse:message code="productSuppliers.label"/></g:link>
-                        </div>
-                        <div class="mm-menu-item">
-                            <g:link controller="productAssociation" action="list" class="list">
-                                <warehouse:message code="product.associations.label" default="Product Associations"/></g:link>
-                        </div>
-                        <div class="mm-menu-item">
-                            <g:link controller="tag" action="list" class="list">
-                                <warehouse:message code="product.tags.label"/></g:link>
-                        </div>
-                        <div class="mm-menu-item">
-                            <g:link controller="unitOfMeasure" action="list" class="list">
-                                <warehouse:message code="unitOfMeasure.label"/></g:link>
-                        </div>
-                        <div class="mm-menu-item">
-                            <g:link controller="unitOfMeasureClass" action="list" class="list">
-                                <warehouse:message code="unitOfMeasureClass.label"/></g:link>
-                        </div>
-                        <div class="mm-menu-item">
-                            <g:link controller="unitOfMeasureConversion" action="list" class="list">
-                                <warehouse:message code="unitOfMeasureConversion.label" default="UoM Conversion"/></g:link>
-                        </div>
-                    </div>
-                    <g:isUserAdmin>
-                        <div class="mm-content-section">
+                        <g:isUserAdmin>
                             <div class="mm-menu-item">
                                 <g:link controller="product" action="create" class="create">
                                     <warehouse:message code="product.create.label"/></g:link>
                             </div>
+                        </g:isUserAdmin>
+                        <div class="mm-menu-item">
+                            <g:link controller="product" action="list" class="list">
+                                <warehouse:message code="products.list.label"/></g:link>
+                        </div>
+                        <g:isUserAdmin>
                             <div class="mm-menu-item">
                                 <g:link controller="product" action="batchEdit" class="create">
                                     <warehouse:message code="product.batchEdit.label"/>
@@ -636,23 +580,56 @@
                                     <warehouse:message code="product.exportAsCsv.label"/>
                                 </g:link>
                             </div>
-                            <div class="mm-menu-item">
-                                <g:link controller="batch" action="downloadExcel" params="[type:'ProductSupplierPreference']">
-                                    <warehouse:message code="default.export.label" args="[g.message(code:'productSupplier.productSourcePreference.label')]"/>
-                                </g:link>
-                            </div>
-                            <div class="mm-menu-item">
-                                <g:link controller="batch" action="importData" params="[type:'inventory']" class="inventory">
-                                    <g:message code="default.import.label" args="[g.message(code:'inventory.label', default: 'Inventory')]"/>
-                                </g:link>
-                            </div>
-                            <div class="mm-menu-item">
-                                <g:link controller="batch" action="importData" params="[type:'inventoryLevel']" class="inventory">
-                                    <g:message code="default.import.label" args="[g.message(code:'inventoryLevel.label', default: 'Inventory levels')]"/>
-                                </g:link>
-                            </div>
+                        </g:isUserAdmin>
+                    </div>
+                    <div class="mm-content-section">
+                        <div class="mm-menu-item">
+                            <g:link controller="category" action="tree" class="list">
+                                <warehouse:message code="categories.label"/></g:link>
                         </div>
-                    </g:isUserAdmin>
+                        <div class="mm-menu-item">
+                            <g:link controller="productCatalog" action="list" class="list">
+                                <warehouse:message code="product.catalogs.label" default="Catalogs"/></g:link>
+                        </div>
+                        <div class="mm-menu-item">
+                            <g:link controller="tag" action="list" class="list">
+                                <warehouse:message code="product.tags.label"/></g:link>
+                        </div>
+                        <div class="mm-menu-item">
+                            <g:link controller="attribute" action="list" class="list">
+                                <warehouse:message code="attributes.label"/></g:link>
+                        </div>
+                        <div class="mm-menu-item">
+                            <g:link controller="productAssociation" action="list" class="list">
+                                <warehouse:message code="product.associations.label" default="Product Associations"/></g:link>
+                        </div>
+                    </div>
+                    <div class="mm-content-section">
+                        <div class="mm-menu-item">
+                            <g:link controller="productSupplier" action="list" class="list">
+                                <warehouse:message code="productSuppliers.label"/></g:link>
+                        </div>
+                        <div class="mm-menu-item">
+                            <g:link controller="productComponent" action="list" class="list">
+                                <warehouse:message code="product.components.label" default="Components"/></g:link>
+                        </div>
+                        <div class="mm-menu-item">
+                            <g:link controller="productGroup" action="list" class="list">
+                                <warehouse:message code="productGroups.label"/></g:link>
+                        </div>
+                        <div class="mm-menu-item">
+                            <g:link controller="unitOfMeasure" action="list" class="list">
+                                <warehouse:message code="unitOfMeasure.label"/></g:link>
+                        </div>
+                        <div class="mm-menu-item">
+                            <g:link controller="unitOfMeasureClass" action="list" class="list">
+                                <warehouse:message code="unitOfMeasureClass.label"/></g:link>
+                        </div>
+                        <div class="mm-menu-item">
+                            <g:link controller="unitOfMeasureConversion" action="list" class="list">
+                                <warehouse:message code="unitOfMeasureConversion.label" default="UoM Conversion"/></g:link>
+                        </div>
+                    </div>
                 </div>
             </li>
         </g:supports>

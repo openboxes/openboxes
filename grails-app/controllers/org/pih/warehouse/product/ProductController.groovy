@@ -674,7 +674,6 @@ class ProductController {
         }
     }
 
-
     def upnDatabase = {
 
         def file = new File("/home/jmiranda/Dropbox/OpenBoxes/Product Databases/HIBCC/UPNDownload.txt")

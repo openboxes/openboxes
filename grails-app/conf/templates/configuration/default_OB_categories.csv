@@ -1,0 +1,27 @@
+Category Name,Category Parent Name
+ROOT,
+Medicines,ROOT
+Supplies,ROOT
+Equipment,ROOT
+Perishables,ROOT
+Other,ROOT
+ARVS,Medicines
+Anesteshia,Medicines
+Cancer,Medicines
+Chronic Care,Medicines
+Pain,Medicines
+TB,Medicines
+Other,Medicines
+Medical Supplies,Supplies
+Hospital and Clinic Supplies,Supplies
+Office Supplies,Supplies
+Surgical Equipment,Equipment
+IT Equipment,Equipment
+Furniture and Equipment,Equipment
+Medical Equipment,Equipment
+Food,Perishables
+Lab,Medical Supplies
+Surgical,Medical Supplies
+X-Ray,Medical Supplies
+Dental,Medical Supplies
+Other,Medical Supplies

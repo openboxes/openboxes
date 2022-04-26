@@ -73,10 +73,9 @@ class LoadDataService {
                     partyType: PartyType.findByCode("ORG") // FIXME: Should party type be provided?
             )
 
-            PartyRole role = PartyRole.findByRoleType(RoleType.valueOf(partyRole.toUpperCase()))
-            if (role) {
-                organization.addToRoles(role)
-            }
+            RoleType roleType = RoleType.valueOf(partyRole)
+            organization.addToRoles(new PartyRole(roleType: roleType))
+
             organization.save(failOnError: true)
         })
 
@@ -177,7 +176,7 @@ class LoadDataService {
             newItem.put("globalPreferenceTypeComments", currentItem.get("Preference Type Comment"));
             newItem.put("defaultProductPackageUomCode", currentItem.get("Default Package Type"));
             newItem.put("defaultProductPackageQuantity", currentItem.get("Quantity per Package").toInteger());
-            newItem.put("defaultProductPackagePrice", currentItem.get("Package price"));
+            newItem.put("defaultProductPackagePrice", currentItem.get("Package Price"));
 
             csvItems.set(i, newItem);
         }
@@ -360,7 +359,9 @@ class LoadDataService {
                 sortByCode: RequisitionItemSortByCode.valueOf(attr['Sort by']),
                 replenishmentPeriod: Integer.parseInt(attr['Replenishment Period']),
                 replenishmentTypeCode: ReplenishmentTypeCode.valueOf(attr['Replenishment Type']),
-                requestedBy: requestedBy
+                requestedBy: requestedBy,
+                isTemplate: true,
+                isPublished: true
         )
 
         requisition.save(failOnError: true);
