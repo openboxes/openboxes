@@ -253,7 +253,6 @@ class ReplenishmentSecondPage extends Component {
       const payload = {
         status: 'PLACED',
         replenishmentItems: this.state.values.replenishment.replenishmentItems,
-        updating: true,
       };
       apiClient.post(url, flattenRequest(payload))
         .then(() => {

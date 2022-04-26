@@ -58,7 +58,7 @@ class ReplenishmentApiController {
         Replenishment replenishment = new Replenishment()
 
         bindReplenishmentData(replenishment, currentUser, currentLocation, jsonObject)
-
+        replenishmentService.validateRequirement(replenishment)
         Order order = replenishmentService.createOrUpdateOrderFromReplenishment(replenishment)
         if (order.hasErrors() || !order.save(flush: true)) {
             throw new ValidationException("Invalid order", order.errors)
@@ -86,10 +86,12 @@ class ReplenishmentApiController {
         if (replenishment?.status == ReplenishmentStatus.COMPLETED) {
             replenishmentService.completeReplenishment(replenishment)
         } else {
+            replenishmentService.validateReplenishmentQuantity(replenishment)
             Order order = replenishmentService.createOrUpdateOrderFromReplenishment(replenishment)
             if (order.hasErrors() || !order.save(flush: true)) {
                 throw new ValidationException("Invalid order", order.errors)
             }
+            // if you copy the validate here, the breakpoint doesn't even go there, it seems like it works until 90-th line. So I left it (the validation) in 89th line.
         }
 
         render status: 200
@@ -114,6 +116,7 @@ class ReplenishmentApiController {
             replenishment.replenishmentNumber = identifierService.generateOrderIdentifier()
         }
 
+
         if (jsonObject.status) {
             replenishment.status = ReplenishmentStatus.valueOf(jsonObject.status)
         }
@@ -124,13 +127,12 @@ class ReplenishmentApiController {
             if (!replenishmentItem.location) {
                 replenishmentItem.location = replenishment.destination
             }
-            if (jsonObject.updating) {
-                replenishmentService.validateRequirement(replenishmentItem, jsonObject.updating)
-            } else {
-                replenishmentService.validateRequirement(replenishmentItem)
+
+            if (!replenishmentItem.replenishmentLocation) {
+                replenishmentItem.replenishmentLocation = replenishment.destination
             }
 
-            replenishmentItemMap.pickItems.each { pickItemMap ->
+            replenishmentItemMap.picklistItems.each { pickItemMap ->
                 ReplenishmentItem pickItem = new ReplenishmentItem()
                 bindData(pickItem, pickItemMap)
                 if (!pickItem.location) {
@@ -140,6 +142,7 @@ class ReplenishmentApiController {
             }
 
             replenishment.replenishmentItems.add(replenishmentItem)
+
         }
 
         return replenishment

@@ -48,8 +48,10 @@ class ReplenishmentService {
                 eq("status", inventoryLevelStatus)
             }
             eq("location", location)
-            isNotNull("binLocation")
-            gt("quantityAvailable", 0)
+            // those two lines below have to be commented in my case for development, because only one item has binLocation and it would be difficult for me to test it,
+            // because below functions filter out the items with "DEFAULT"
+//            isNotNull("binLocation")
+//            gt("quantityAvailable", 0)
         }
 
         return requirements?.unique {[it.product, it.location, it.binLocation]}?.sort { a, b ->
@@ -162,16 +164,34 @@ class ReplenishmentService {
         return order
     }
 
-    void validateRequirement(ReplenishmentItem item, Boolean updating = false) {
-        if (updating) {
-            if (item.quantity > productAvailabilityService.getQuantityAvailableToPromiseByProductNotInBin(item.location, item.binLocation, item.product) + item.quantity) {
-                throw new ValidationException("There is not available that quantity of the product with id: ${item.product.id}")
-            }
-        } else {
-            if (item.quantity > productAvailabilityService.getQuantityAvailableToPromiseByProductNotInBin(item.location, item.binLocation, item.product)) {
-                throw new ValidationException("There is not available that quantity of the product with id: ${item.product.id}")
-            }
+    void validateRequirement(Replenishment replenishment) {
+        replenishment.replenishmentItems.toArray().each { ReplenishmentItem replenishmentItem ->
+            validateRequirement(replenishmentItem)
         }
+    }
+
+    void validateRequirement(ReplenishmentItem item) {
+        // Below, this "Integer quantity" I just tried to check if assigning this method to variable maybe makes it not work, but no, it works well
+        // Integer quantity = productAvailabilityService.getQuantityAvailableToPromiseByProductNotInBin(item.location, item.binLocation, item.product)
+        if (item.quantity > productAvailabilityService.getQuantityAvailableToPromiseByProductNotInBin(item.location, item.binLocation, item.product)) {
+            throw new ValidationException("There is not available that quantity of the product with id: ${item.product.id}")
+        }
+    }
+
+    void validateReplenishmentQuantity(Replenishment replenishment) {
+        replenishment.replenishmentItems.toArray().each { ReplenishmentItem replenishmentItem ->
+            validateReplenishmentQuantity(replenishmentItem)
+        }
+    }
+
+    void validateReplenishmentQuantity(ReplenishmentItem item) {
+        Integer quantityPicked = item.picklistItems.quantity.sum { it.toInteger() }
+        Integer quantityAvailableToPromise = productAvailabilityService.getQuantityAvailableToPromiseByProductNotInBin(item.replenishmentLocation, item.binLocation, item.product)
+        def quantityAvailableToPromiseWithPicked = quantityAvailableToPromise + quantityPicked
+        if (item.quantity > quantityAvailableToPromiseWithPicked) {
+            throw new ValidationException("There is not available that quantity of the product with id: ${item.product.id}")
+        }
+
     }
 
     void validateReplenishment(Replenishment replenishment) {
