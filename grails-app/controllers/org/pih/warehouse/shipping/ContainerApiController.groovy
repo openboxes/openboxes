@@ -67,11 +67,14 @@ class ContainerApiController extends BaseDomainApiController {
             }
 
             Shipment shipment = shipmentService.getShipment(jsonObject.getString("shipment.id"))
-            Container container = !jsonObject.isNull("containerNumber") ? Container.findByContainerNumber(jsonObject.containerNumber) : new Container()
+            Container container = !jsonObject.isNull("containerNumber") ? Container.findByShipmentAndContainerNumber(shipment, jsonObject.containerNumber) : null
+            if (!container) {
+                container = new Container()
+            }
+
             String containerNumber = shipmentService.generateContainerNumber(shipment)
             container.name = !jsonObject.isNull("name") ? jsonObject.name : containerNumber
             container.containerNumber = !jsonObject.isNull("containerNumber") ? jsonObject.containerNumber : containerNumber
-
             container.containerType = jsonObject["containerType.id"] ?
                     ContainerType.get(jsonObject["containerType.id"]) :
                     ContainerType.findById(Constants.PALLET_CONTAINER_TYPE_ID)
