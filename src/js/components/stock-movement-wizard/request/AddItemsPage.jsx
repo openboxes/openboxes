@@ -844,7 +844,7 @@ class AddItemsPage extends Component {
       }
 
       if (this.state.isRequestFromWard) {
-        if (!item.quantityOnHand || !(item.quantityOnHand >= 0)) {
+        if (!item.quantityOnHand || item.quantityOnHand < 0) {
           errors.lineItems[key] = { quantityOnHand: 'react.stockMovement.error.quantityOnHand.label' };
         }
       }
