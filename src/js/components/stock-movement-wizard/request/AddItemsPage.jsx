@@ -379,6 +379,7 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PULL_TYPE = {
       product: {
         ...FIELDS.product,
         fieldKey: 'disabled',
+        flexWidth: '2',
         getDynamicAttr: ({
           fieldValue, debouncedProductsFetch, rowIndex, rowCount, newItem,
         }) => ({
@@ -387,8 +388,28 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PULL_TYPE = {
           autoFocus: newItem && rowIndex === rowCount - 1,
         }),
       },
+      demandPerReplenishmentPeriod: {
+        type: LabelField,
+        label: 'react.stockMovement.demandPerRequestPeriod.label',
+        defaultMessage: 'Demand per Request Period',
+        flexWidth: '1.4',
+        headerAlign: 'right',
+        headerTooltip: 'react.stockMovement.demandPerRequestPeriod.headerTooltip.label',
+        headerDefaultTooltip: 'The average of your previous requests for this product for a period of [stocklist request period] days” for demand/month number is 30 days',
+        attributes: {
+          type: 'number',
+          className: 'text-right',
+        },
+      },
       quantityOnHand: {
         ...FIELDS.quantityOnHandAtRequestSite,
+        flexWidth: '1',
+        required: true,
+        headerTooltip: 'react.stockMovement.quantityOnHand.headerTooltip.label',
+        headerDefaultTooltip: 'Enter your current quantity on hand for this product',
+        attributes: {
+          type: 'number',
+        },
         getDynamicAttr: ({
           fieldValue, rowIndex, values, updateRow,
         }) => ({
@@ -401,9 +422,50 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PULL_TYPE = {
           },
         }),
       },
-      demandPerReplenishmentPeriod: FIELDS.demandPerRequestPeriod,
-      quantityRequested: FIELDS.quantityRequested,
-      comments: FIELDS.comments,
+      quantityRequested: {
+        type: TextField,
+        label: 'react.stockMovement.neededQuantity.label',
+        defaultMessage: 'Needed Qty',
+        flexWidth: '0.6',
+        headerAlign: 'right',
+        headerTooltip: 'react.stockMovement.quantityRequested.headerTooltip.label',
+        headerDefaultTooltip: 'Your demand for the request period minus your QOH. Edit as needed.',
+        attributes: {
+          type: 'number',
+        },
+        getDynamicAttr: ({
+          rowIndex, values, updateRow,
+        }) => ({
+          onBlur: () => updateRow(values, rowIndex),
+        }),
+      },
+      comments: {
+        type: TextField,
+        label: 'react.stockMovement.comments.label',
+        defaultMessage: 'Comments',
+        flexWidth: '1.8',
+        headerAlign: 'left',
+        headerTooltip: 'react.stockMovement.comments.headerTooltip.label',
+        headerDefaultTooltip: 'Leave a comment for the person who will review this request.',
+        getDynamicAttr: ({
+          addRow, rowCount, rowIndex, getSortOrder,
+          updateTotalCount, updateRow, values,
+        }) => ({
+          onTabPress: rowCount === rowIndex + 1 ? () => {
+            updateTotalCount(1);
+            addRow({ sortOrder: getSortOrder() });
+          } : null,
+          arrowRight: rowCount === rowIndex + 1 ? () => {
+            updateTotalCount(1);
+            addRow({ sortOrder: getSortOrder() });
+          } : null,
+          arrowDown: rowCount === rowIndex + 1 ? () => () => {
+            updateTotalCount(1);
+            addRow({ sortOrder: getSortOrder() });
+          } : null,
+          onBlur: () => updateRow(values, rowIndex),
+        }),
+      },
       deleteButton: DELETE_BUTTON_FIELD,
     },
   },
@@ -416,6 +478,7 @@ const REQUEST_FROM_WARD_FIELDS = {
       product: {
         ...FIELDS.product,
         fieldKey: 'disabled',
+        flexWidth: '2',
         getDynamicAttr: ({
           debouncedProductsFetch, rowIndex, rowCount, updateProductData, values, newItem,
         }) => ({
@@ -424,8 +487,30 @@ const REQUEST_FROM_WARD_FIELDS = {
           autoFocus: newItem && rowIndex === rowCount - 1,
         }),
       },
+      monthlyDemand: {
+        type: LabelField,
+        label: 'react.stockMovement.demandPerMonth.label',
+        defaultMessage: 'Demand per Month',
+        headerAlign: 'right',
+        flexWidth: '1.5',
+        headerTooltip: 'react.stockMovement.demandPerRequestPeriod.headerTooltip.label',
+        headerDefaultTooltip: 'The average of your previous requests for this product for a period of [stocklist request period] days” for demand/month number is 30 days',
+        attributes: {
+          type: 'number',
+          className: 'text-right',
+        },
+      },
       quantityOnHand: {
-        ...FIELDS.quantityOnHandAtRequestSite,
+        type: TextField,
+        label: 'react.stockMovement.quantityOnHand.label',
+        defaultMessage: 'QOH',
+        flexWidth: '1',
+        required: true,
+        headerTooltip: 'react.stockMovement.quantityOnHand.headerTooltip.label',
+        headerDefaultTooltip: 'Enter your current quantity on hand for this product',
+        attributes: {
+          type: 'number',
+        },
         getDynamicAttr: ({
           fieldValue, rowIndex, values, updateRow,
         }) => ({
@@ -438,9 +523,50 @@ const REQUEST_FROM_WARD_FIELDS = {
           },
         }),
       },
-      monthlyDemand: FIELDS.monthlyDemand,
-      quantityRequested: FIELDS.quantityRequested,
-      comments: FIELDS.comments,
+      quantityRequested: {
+        type: TextField,
+        label: 'react.stockMovement.neededQuantity.label',
+        defaultMessage: 'Needed Qty',
+        flexWidth: '1',
+        headerAlign: 'right',
+        headerTooltip: 'react.stockMovement.quantityRequested.headerTooltip.label',
+        headerDefaultTooltip: 'Your demand for the request period minus your QOH. Edit as needed.',
+        attributes: {
+          type: 'number',
+        },
+        getDynamicAttr: ({
+          rowIndex, values, updateRow,
+        }) => ({
+          onBlur: () => updateRow(values, rowIndex),
+        }),
+      },
+      comments: {
+        type: TextField,
+        label: 'react.stockMovement.comments.label',
+        defaultMessage: 'Comments',
+        flexWidth: '3',
+        headerAlign: 'left',
+        headerTooltip: 'react.stockMovement.comments.headerTooltip.label',
+        headerDefaultTooltip: 'Leave a comment for the person who will review this request.',
+        getDynamicAttr: ({
+          addRow, rowCount, rowIndex, getSortOrder,
+          updateTotalCount, updateRow, values,
+        }) => ({
+          onTabPress: rowCount === rowIndex + 1 ? () => {
+            updateTotalCount(1);
+            addRow({ sortOrder: getSortOrder() });
+          } : null,
+          arrowRight: rowCount === rowIndex + 1 ? () => {
+            updateTotalCount(1);
+            addRow({ sortOrder: getSortOrder() });
+          } : null,
+          arrowDown: rowCount === rowIndex + 1 ? () => () => {
+            updateTotalCount(1);
+            addRow({ sortOrder: getSortOrder() });
+          } : null,
+          onBlur: () => updateRow(values, rowIndex),
+        }),
+      },
       deleteButton: DELETE_BUTTON_FIELD,
     },
   },
@@ -617,9 +743,9 @@ class AddItemsPage extends Component {
 
           return {
             ...val,
+            quantityOnHand: '',
             disabled: true,
             quantityRequested: qtyRequested >= 0 ? qtyRequested : 0,
-            quantityOnHand: isPullType ? quantityOnHand : undefined,
             product: {
               ...val.product,
               label: `${val.productCode} ${val.product.name}`,
@@ -715,6 +841,12 @@ class AddItemsPage extends Component {
       const dateRequested = moment(item.expirationDate, 'MM/DD/YYYY');
       if (date.diff(dateRequested) > 0) {
         errors.lineItems[key] = { expirationDate: 'react.stockMovement.error.invalidDate.label' };
+      }
+
+      if (this.state.isRequestFromWard) {
+        if (!item.quantityOnHand || item.quantityOnHand < 0) {
+          errors.lineItems[key] = { quantityOnHand: 'react.stockMovement.error.quantityOnHand.label' };
+        }
       }
     });
     return errors;
@@ -1268,7 +1400,7 @@ class AddItemsPage extends Component {
                 lineItems: {
                   [index]: {
                     product: { $set: product },
-                    quantityOnHand: { $set: response.data.quantityOnHand || 0 },
+                    quantityOnHand: { $set: '' },
                     monthlyDemand: { $set: monthlyDemand },
                     quantityRequested: { $set: quantityRequested >= 0 ? quantityRequested : 0 },
                   },

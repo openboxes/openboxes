@@ -1049,3 +1049,9 @@ div.crossed-out .table-inner-row:before {
     width: 0;
   }
 }
+
+.arrayfield-header-required::after {
+  margin-left: .25rem;
+  content: "*";
+  color: red;
+}
