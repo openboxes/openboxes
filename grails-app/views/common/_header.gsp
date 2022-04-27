@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.core.RoleType" %>
+<%@ page import="org.pih.warehouse.api.LocalizationApiController; org.pih.warehouse.core.RoleType" %>
 <!-- Block which includes the logo and login banner -->
 <g:if test="${grailsApplication.config.openboxes.helpscout.widget.enabled}">
     <!--
@@ -28,6 +28,12 @@
         "color": "${grailsApplication.config.openboxes.helpscout.widget.color}",
         "enableFabAnimation": false
       })
+      /*
+       * Use a scriptlet block to prevent html-escaping localization labels, which are JSON.
+       * More modern grails versions have a built-in raw() method to do this, but...
+       * https://stackoverflow.com/questions/1337464/overriding-grails-views-default-codec-html-config-back-to-none
+       */
+      window.Beacon("config", <%=LocalizationApiController.localizeHelpScoutLabels(grailsApplication, session?.user?.locale)%>)
     </script>
     <!-- end magical HelpScout incantations -->
 </g:if>
