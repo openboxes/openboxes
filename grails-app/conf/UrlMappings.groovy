@@ -208,6 +208,11 @@ class UrlMappings {
             action = [GET: "getPendingRequisitionDetails"]
         }
 
+        "/api/stockMovements/list"{
+            controller = "stockMovementApi"
+            action = [GET: "list"]
+        }
+
         "/api/stockMovements/$id/updateAdjustedItems"(parseRequest: true) {
             controller = "stockMovementApi"
             action = [POST: "updateAdjustedItems"]

@@ -371,7 +371,7 @@ class StockMovementService {
 
 
     def getInboundStockMovements(Integer maxResults, Integer offset) {
-        return getInboundStockMovements(new StockMovement(), [:], maxResults, offset)
+        return getInboundStockMovements(new StockMovement(), [maxResults:maxResults, offset:offset])
     }
 
     def getInboundStockMovements(StockMovement criteria, Map params) {
