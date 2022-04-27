@@ -312,7 +312,7 @@ class ReplenishmentSecondPage extends Component {
       values: {
         replenishment: {
           ...this.state.values.replenishment,
-          replenishmentItems: _.sortBy(this.state.values.replenishment.replenishmentItems, ['picklistItems[0].zone', 'picklistItems[0].binLocation.name']),
+          replenishmentItems: _.sortBy(this.state.values.replenishment.replenishmentItems, ['picklistItems[0].zone.name', 'picklistItems[0].binLocation.name']),
         },
       },
       sorted: true,
