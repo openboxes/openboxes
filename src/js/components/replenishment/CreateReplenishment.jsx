@@ -70,12 +70,12 @@ const FIELD = {
       zone: {
         type: LabelField,
         label: 'react.replenishment.currentZone.label',
-        defaultMessage: 'Current Zone',
+        defaultMessage: 'Zone',
       },
       'binLocation.name': {
         type: LabelField,
         label: 'react.replenishment.currentBinLocation.label',
-        defaultMessage: 'Current Bin Location',
+        defaultMessage: 'Bin',
         attributes: {
           formatValue: (value) => {
             if (value) {
@@ -89,16 +89,6 @@ const FIELD = {
         type: LabelField,
         label: 'react.replenishment.quantityInBin.label',
         defaultMessage: 'Qty in Bin',
-        headerAlign: 'right',
-        flexWidth: 8,
-        attributes: {
-          cellClassName: 'text-right',
-        },
-      },
-      minQuantity: {
-        type: LabelField,
-        label: 'react.replenishment.minQuantity.label',
-        defaultMessage: 'Min Qty',
         headerAlign: 'right',
         flexWidth: 8,
         attributes: {

@@ -53,10 +53,9 @@ class ReplenishmentService {
         }
 
         return requirements?.unique {[it.product, it.location, it.binLocation]}?.sort { a, b ->
-            a.product.productCode <=> b.product.productCode ?:
-                    a.binLocation.zone.name <=> b.binLocation.zone.name ?:
-                            a.binLocation.name <=> b.binLocation.name ?:
-                                    a.quantityInBin <=> b.quantityInBin
+            a.binLocation?.zone?.name <=> b.binLocation?.zone?.name ?:
+                a.binLocation?.name <=> b.binLocation?.name ?:
+                    a.product.name <=> b.product.name
         }
     }
 
