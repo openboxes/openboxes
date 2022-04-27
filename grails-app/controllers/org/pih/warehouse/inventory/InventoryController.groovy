@@ -565,6 +565,66 @@ class InventoryController {
         render(view: "list", model: [availableItems: inventoryItems])
     }
 
+    def reorderReport = {
+        Location location = Location.get(session.warehouse.id)
+        def inventoryItems = dashboardService.getReorderReport(location)
+
+        String filename = "Reorder report - " + location.name + ".csv"
+
+        response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
+
+        def hasRoleFinance = userService.hasRoleFinance(session.user)
+
+        def csv = ""
+        csv += '"' + "${warehouse.message(code: 'inventoryLevel.status.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.productCode.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'category.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.tags.label', default: 'Tags')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.unitOfMeasure.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventoryLevel.minQuantity.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventoryLevel.reorderQuantity.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventoryLevel.maxQuantity.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventory.averageMonthlyDemand.label', default: "Average Monthly Demand")}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventory.quantityAvailable.label', default: 'Quantity Available')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'inventory.quantityToOrder.label', default: 'Quantity to Order')}" + '"' + ","
+
+        if (hasRoleFinance) {
+            csv += '"' + "${warehouse.message(code: 'product.unitCost.label', default: 'Unit Cost')}" + '"' + ","
+            csv += '"' + "${warehouse.message(code: 'inventory.expectedReorderCost.label', default: 'Expected Reorder Cost')}" + '"' + ","
+        }
+
+        csv += "\n"
+
+        inventoryItems.each { inventoryItem ->
+            def product = inventoryItem.product as Product
+            def inventoryLevel = inventoryItem.inventoryLevel as InventoryLevel
+            def status = inventoryItem.status
+            def statusMessage = "${warehouse.message(code: 'enum.InventoryLevelStatusCsv.' + status)}"
+
+            csv += '"' + (statusMessage ?: "") + '"' + ","
+            csv += '"' + (product.productCode ?: "") + '"' + ","
+            csv += StringEscapeUtils.escapeCsv(product?.name) + ","
+            csv += '"' + (product?.category?.name ?: "") + '"' + ","
+            csv += '"' + (product?.tagsToString() ?: "") + '"' + ","
+            csv += '"' + (product?.unitOfMeasure ?: "") + '"' + ","
+            csv += (inventoryLevel?.minQuantity ?: "") + ","
+            csv += (inventoryLevel?.reorderQuantity ?: "") + ","
+            csv += (inventoryLevel?.maxQuantity ?: "") + ","
+            csv += (inventoryLevel?.forecastQuantity ?: "") + ","
+            csv += (inventoryItem.quantityAvailableToPromise ?: "0") + ","
+            csv += (inventoryItem.quantityToOrder ?: "0") + ","
+
+            if(hasRoleFinance) {
+                csv += '"' + (inventoryItem.unitCost ?: "") + '"' + ","
+                csv += '"' + (inventoryItem.expectedReorderCost ?: "") + '"' + ","
+            }
+
+            csv += "\n"
+        }
+
+        render(contentType: "text/csv", text: csv)
+    }
 
     def listQuantityOnHandZero = {
         def location = Location.get(session.warehouse.id)
