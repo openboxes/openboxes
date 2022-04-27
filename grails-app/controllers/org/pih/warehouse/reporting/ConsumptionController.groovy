@@ -24,6 +24,7 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductService
@@ -46,18 +47,21 @@ class ConsumptionController {
             return
         }
 
+        String[] defaultTransactionTypeIds = [
+                Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID,
+                Constants.CONSUMPTION_TRANSACTION_TYPE_ID
+        ]
+
+        command.defaultTransactionTypes = defaultTransactionTypeIds.collect {TransactionType.get(it)}
+        command.selectedTransactionTypes = command.defaultTransactionTypes
+        command.transactionTypes = command.defaultTransactionTypes
+
         // If any parameters have changed we need to reset filters
         if (command.hasParameterChanged()) {
             command.selectedProperties = []
             command.selectedTags = []
             command.selectedLocations = []
             command.selectedCategories = []
-            //command.selectedTransactionTypes = []
-
-            String[] defaultTransactionTypeIds = [Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID, Constants.CONSUMPTION_TRANSACTION_TYPE_ID]
-            command.defaultTransactionTypes = defaultTransactionTypeIds.collect {
-                TransactionType.get(it)
-            }
 
             if (params.format == "csv") {
                 params.remove("format")
@@ -112,10 +116,10 @@ class ConsumptionController {
         command.transactionTypes = transactions*.transactionType.unique()
 
         // Iterate over all transactions
-        transactions.each { transaction ->
+        transactions.each { Transaction transaction ->
 
             // Iterate over all transaction entries
-            transaction.transactionEntries.each { transactionEntry ->
+            transaction.transactionEntries.each { TransactionEntry transactionEntry ->
                 def product = transactionEntry.inventoryItem.product
                 def currentRow = command.rows[product]
                 if (!currentRow) {
@@ -131,12 +135,15 @@ class ConsumptionController {
 
                     // Initialize transfer out by location map
                     def transferOutQuantity = command.rows[product].transferOutMap[transaction.destination]
+
                     if (!transferOutQuantity) {
                         command.rows[product].transferOutMap[transaction.destination] = 0
+                    } else if (transaction.order.orderType.code != "PUTAWAY_ORDER" && transaction.order.orderType.code != OrderTypeCode.TRANSFER_ORDER.name()) {
+                        command.rows[product].issuedQuantity += transferOutQuantity
+                    } else {
+                        command.rows[product].returnedQuantity += transferOutQuantity
                     }
 
-                    // Add to the total transfer out per location
-                    command.rows[product].transferOutMap[transaction.destination] += transactionEntry.quantity
                 } else if (transaction.transactionType.id == Constants.EXPIRATION_TRANSACTION_TYPE_ID) {
                     command.rows[product].expiredQuantity += transactionEntry.quantity
                     command.rows[product].expiredTransactions << transaction
@@ -155,11 +162,15 @@ class ConsumptionController {
 
                     // Add to the total transfer out per location
                     command.rows[product].transferInMap[transaction.source] += transactionEntry.quantity
-                } else {
-                    command.rows[product].otherQuantity += transactionEntry.quantity
-                    command.rows[product].otherTransactions << transaction
+                } else if (transaction.transactionType.id == Constants.CONSUMPTION_TRANSACTION_TYPE_ID) {
+                    command.rows[product].consumedQuantity += transactionEntry.quantity
                 }
 
+                command.rows[product].returnedQuantity *= -1
+
+                command.rows[product].totalConsumptionQuantity += command.rows[product].issuedQuantity
+                    + command.rows[product].consumedQuantity
+                    + command.rows[product].returnedQuantity
 
                 String dateKey = transaction.transactionDate.format("yyyy-MM")
                 command.selectedDates.add(dateKey)
@@ -254,21 +265,25 @@ class ConsumptionController {
         if (params.format == "csv") {
 
             def csvrows = []
-            command.rows.each { key, row ->
+            command.rows.each { key, ShowConsumptionRowCommand row ->
+                def valueConsumed = (row?.totalConsumptionQuantity ?: 0) * (row.product?.pricePerUnit ?: 0)
+
                 def csvrow = [
-                        'Product code'      : row.product.productCode ?: '',
-                        'Product'           : row.product.name,
-                        'Category'          : row.product?.category?.name,
-                        'Formulary'         : row.product?.productCatalogsToString(),
-                        'Tag'               : row.product?.tagsToString(),
-                        'UoM'               : row.product.unitOfMeasure ?: '',
-                        'Qty issued'  : g.formatNumber(number: row.transferOutQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
-                        'Qty expired': g.formatNumber(number: row.expiredQuantity, format: '###.#', maxFractionDigits: 1)?:'',
-                        'Qty damaged': g.formatNumber(number: row.damagedQuantity, format: '###.#', maxFractionDigits: 1)?:'',
-                        'Qty other': g.formatNumber(number: row.otherQuantity, format: '###.#', maxFractionDigits: 1)?:'',
-                        'Consumed monthly'  : g.formatNumber(number: row.monthlyQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
-                        'Quantity on hand'  : g.formatNumber(number: row.onHandQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
-                        'Months remaining'  : g.formatNumber(number: row.numberOfMonthsRemaining, format: '###.#', maxFractionDigits: 1) ?: '',
+                        'Product code'                                : row.product.productCode ?: '',
+                        'Product'                                     : row.product.name,
+                        'Category'                                    : row.product?.category?.name,
+                        'Formulary'                                   : row.product?.productCatalogsToString(),
+                        'Tag'                                         : row.product?.tagsToString(),
+                        'Unit Price'                                  : g.formatNumber(number: row.product.pricePerUnit, format: '###.#', maxFractionDigits: 2) ?: '',
+                        'UoM'                                         : row.product.unitOfMeasure ?: '',
+                        'Qty Issued'                                  : g.formatNumber(number: row.issuedQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
+                        'Qty Consumed'                                : g.formatNumber(number: row.consumedQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
+                        'Qty Returned'                                : g.formatNumber(number: row.returnedQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
+                        'Total Consumption (Issued+Consumed-Returned)': g.formatNumber(number: row.totalConsumptionQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
+                        'Value Consumed'                              : g.formatNumber(number: valueConsumed, format: '###.#', maxFractionDigits: 1),
+                        'Average Monthly Consumption'                 : g.formatNumber(number: row.monthlyQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
+                        'Quantity on hand'                            : g.formatNumber(number: row.onHandQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
+                        'Months remaining'                            : g.formatNumber(number: row.numberOfMonthsRemaining, format: '###.#', maxFractionDigits: 1) ?: '',
                 ]
 
                 if (command.selectedProperties) {
@@ -488,6 +503,11 @@ class ShowConsumptionRowCommand {
     Integer damagedQuantity = 0
     Integer otherQuantity = 0
     Integer debitQuantity = 0
+
+    Integer issuedQuantity = 0
+    Integer consumedQuantity = 0
+    Integer returnedQuantity = 0
+    Integer totalConsumptionQuantity = 0
 
     Set<Transaction> transferOutTransactions = []
     Set<Transaction> expiredTransactions = []

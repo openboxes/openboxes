@@ -95,14 +95,7 @@
                             </div>
                         </div>
                     </g:elseif>
-
                 </div>
-                <div class="filter-list-item">
-                        <label><warehouse:message code="consumption.transactionTypes.label" default="Transaction Types"/></label>
-                        <g:selectTransactionType name="selectedTransactionTypes" from="${command?.transactionTypes}"
-                                                 multiple="true" class="chzn-select-deselect"
-                                                 value="${command?.selectedTransactionTypes?.id?:command?.defaultTransactionTypes?.id}"/>
-                    </div>
             </div>
             <h2><warehouse:message code="consumption.renderOptions.label" default="Render Options"/></h2>
             <div class="options">
