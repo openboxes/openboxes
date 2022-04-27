@@ -844,9 +844,7 @@ class AddItemsPage extends Component {
       }
 
       if (this.state.isRequestFromWard) {
-        const isNumeric = n => !Number.isNaN(parseInt(n, 10));
-        const isPositive = n => isNumeric(n) && n >= 0;
-        if (!item.quantityOnHand || !isPositive(item.quantityOnHand)) {
+        if (!item.quantityOnHand || !(item.quantityOnHand >= 0)) {
           errors.lineItems[key] = { quantityOnHand: 'react.stockMovement.error.quantityOnHand.label' };
         }
       }
